@@ -146,6 +146,54 @@ class MakesHttpRequestsTest extends TestCase
             ->assertSee('OK');
     }
 
+    public function testTestResponseHasGetRequest()
+    {
+        $router = $this->app->make(Registrar::class);
+        $router->get('something', function () {
+            return 'OK';
+        });
+
+        $response = $this->get('something?query=value');
+        $response->assertOk();
+
+        $request = $response->request;
+        $this->assertNotNull($request);
+        $this->assertEquals('GET', $request->getRealMethod());
+        $this->assertEquals('value', $request->input('query'));
+    }
+
+    public function testTestResponseHasPostRequest()
+    {
+        $router = $this->app->make(Registrar::class);
+        $router->post('something', function () {
+            return 'OK';
+        });
+
+        $response = $this->post('something', ['post' => 'value']);
+        $response->assertOk();
+
+        $request = $response->request;
+        $this->assertNotNull($request);
+        $this->assertEquals('POST', $request->getRealMethod());
+        $this->assertEquals('value', $request->input('post'));
+    }
+
+    public function testTestResponseHasJsonRequest()
+    {
+        $router = $this->app->make(Registrar::class);
+        $router->post('something', function () {
+            return 'OK';
+        });
+
+        $response = $this->postJson('something', ['json' => 'value']);
+        $response->assertOk();
+
+        $request = $response->request;
+        $this->assertNotNull($request);
+        $this->assertTrue($request->isJson());
+        $this->assertEquals('value', $request->input('json'));
+    }
+
     public function testFollowingRedirectsTerminatesInExpectedOrder()
     {
         $router = $this->app->make(Registrar::class);

@@ -4,7 +4,9 @@ namespace Illuminate\Tests\Testing;
 
 use Exception;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Routing\ResponseFactory as ResponseFactoryContract;
 use Illuminate\Contracts\View\View;
+use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Cookie\CookieValuePrefix;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
@@ -12,7 +14,11 @@ use Illuminate\Encryption\Encrypter;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Response;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Routing\Redirector;
+use Illuminate\Routing\ResponseFactory;
 use Illuminate\Routing\RouteCollection;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Session\ArraySessionHandler;
@@ -475,7 +481,7 @@ class TestResponseTest extends TestCase
             $response->setStatusCode($statusCode);
         });
 
-        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response = TestResponse::fromBaseResponse($baseResponse, new Request());
         $response->assertOk();
     }
 
@@ -491,7 +497,7 @@ class TestResponseTest extends TestCase
             $response->setStatusCode($statusCode);
         });
 
-        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response = TestResponse::fromBaseResponse($baseResponse, new Request());
         $response->assertCreated();
     }
 
@@ -506,7 +512,7 @@ class TestResponseTest extends TestCase
             $response->setStatusCode($statusCode);
         });
 
-        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response = TestResponse::fromBaseResponse($baseResponse, new Request());
         $response->assertNotFound();
     }
 
@@ -522,7 +528,7 @@ class TestResponseTest extends TestCase
             $response->setStatusCode($statusCode);
         });
 
-        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response = TestResponse::fromBaseResponse($baseResponse, new Request());
         $response->assertForbidden();
     }
 
@@ -538,7 +544,7 @@ class TestResponseTest extends TestCase
             $response->setStatusCode($statusCode);
         });
 
-        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response = TestResponse::fromBaseResponse($baseResponse, new Request());
         $response->assertUnauthorized();
     }
 
@@ -554,7 +560,7 @@ class TestResponseTest extends TestCase
             $response->setStatusCode($statusCode);
         });
 
-        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response = TestResponse::fromBaseResponse($baseResponse, new Request());
         $response->assertUnprocessable();
     }
 
@@ -570,7 +576,7 @@ class TestResponseTest extends TestCase
             $response->setStatusCode($statusCode);
         });
 
-        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response = TestResponse::fromBaseResponse($baseResponse, new Request());
         $response->assertNoContent();
     }
 
@@ -587,7 +593,7 @@ class TestResponseTest extends TestCase
             $response->setStatusCode($statusCode);
         });
 
-        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response = TestResponse::fromBaseResponse($baseResponse, new Request());
         $response->assertNoContent($expectedStatusCode);
     }
 
@@ -602,7 +608,7 @@ class TestResponseTest extends TestCase
             $response->setContent('non-empty-response-content');
         });
 
-        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response = TestResponse::fromBaseResponse($baseResponse, new Request());
         $response->assertNoContent();
     }
 
@@ -619,7 +625,7 @@ class TestResponseTest extends TestCase
             $response->setStatusCode($statusCode);
         });
 
-        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response = TestResponse::fromBaseResponse($baseResponse, new Request());
         $response->assertStatus($expectedStatusCode);
     }
 
@@ -637,7 +643,7 @@ class TestResponseTest extends TestCase
         });
         $exceptions = collect([new Exception('Test exception message')]);
 
-        $response = TestResponse::fromBaseResponse($baseResponse)
+        $response = TestResponse::fromBaseResponse($baseResponse, new Request())
             ->withExceptions($exceptions);
         $response->assertStatus($expectedStatusCode);
     }
@@ -659,7 +665,7 @@ class TestResponseTest extends TestCase
             ]);
         });
 
-        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response = TestResponse::fromBaseResponse($baseResponse, new Request());
         $response->assertStatus($expectedStatusCode);
     }
 
@@ -683,7 +689,7 @@ class TestResponseTest extends TestCase
             $statusCode
         );
 
-        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response = TestResponse::fromBaseResponse($baseResponse, new Request());
         $response->assertStatus($expectedStatusCode);
     }
 
@@ -691,7 +697,7 @@ class TestResponseTest extends TestCase
     {
         $baseResponse = new Response('false', 200, ['Content-Type' => 'application/json']);
 
-        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response = TestResponse::fromBaseResponse($baseResponse, new Request());
         $response->assertStatus(200);
     }
 
@@ -703,7 +709,7 @@ class TestResponseTest extends TestCase
             $response->setContent('b"x£½V*.I,)-V▓R╩¤V¬\x05\x00+ü\x059"');
         });
 
-        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response = TestResponse::fromBaseResponse($baseResponse, new Request());
         $response->assertStatus(200);
     }
 
@@ -715,7 +721,7 @@ class TestResponseTest extends TestCase
             $response->header('Location', '/foo');
         });
 
-        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response = TestResponse::fromBaseResponse($baseResponse, new Request());
 
         $response->assertHeader('Location', '/bar');
     }
@@ -729,14 +735,14 @@ class TestResponseTest extends TestCase
             $response->header('Location', '/foo');
         });
 
-        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response = TestResponse::fromBaseResponse($baseResponse, new Request());
 
         $response->assertHeaderMissing('Location');
     }
 
     public function testAssertJsonWithArray()
     {
-        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub), new Request());
 
         $resource = new JsonSerializableSingleResourceStub;
 
@@ -745,7 +751,7 @@ class TestResponseTest extends TestCase
 
     public function testAssertJsonWithNull()
     {
-        $response = TestResponse::fromBaseResponse(new Response(null));
+        $response = TestResponse::fromBaseResponse(new Response(null), new Request());
 
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Invalid JSON was returned from the route.');
@@ -757,7 +763,7 @@ class TestResponseTest extends TestCase
 
     public function testAssertJsonWithFluent()
     {
-        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub), new Request());
 
         $response->assertJson(function (AssertableJson $json) {
             $json->where('0.foo', 'foo 0');
@@ -766,7 +772,7 @@ class TestResponseTest extends TestCase
 
     public function testAssertJsonWithFluentFailsWhenNotInteractingWithAllProps()
     {
-        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub), new Request());
 
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Unexpected properties were found on the root level.');
@@ -781,7 +787,7 @@ class TestResponseTest extends TestCase
         $response = TestResponse::fromBaseResponse(new Response([
             ['foo' => 'bar'],
             ['foo' => 'baz'],
-        ]));
+        ]), new Request());
 
         $response->assertJson(function (AssertableJson $json) {
             //
@@ -790,7 +796,7 @@ class TestResponseTest extends TestCase
 
     public function testAssertJsonWithFluentHasAnyThrows()
     {
-        $response = TestResponse::fromBaseResponse(new Response([]));
+        $response = TestResponse::fromBaseResponse(new Response([]), new Request());
 
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('None of properties [data, errors, meta] exist.');
@@ -804,7 +810,7 @@ class TestResponseTest extends TestCase
     {
         $response = TestResponse::fromBaseResponse(new Response([
             'data' => [],
-        ]));
+        ]), new Request());
 
         $response->assertJson(function (AssertableJson $json) {
             $json->hasAny('data', 'errors', 'meta');
@@ -813,7 +819,7 @@ class TestResponseTest extends TestCase
 
     public function testAssertSimilarJsonWithMixed()
     {
-        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub), new Request());
 
         $resource = new JsonSerializableMixedResourcesStub;
 
@@ -829,7 +835,7 @@ class TestResponseTest extends TestCase
 
     public function testAssertExactJsonWithMixedWhenDataIsExactlySame()
     {
-        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub), new Request());
 
         $resource = new JsonSerializableMixedResourcesStub;
 
@@ -843,7 +849,7 @@ class TestResponseTest extends TestCase
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that two strings are equal.');
 
-        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub), new Request());
 
         $resource = new JsonSerializableMixedResourcesStub;
 
@@ -856,7 +862,7 @@ class TestResponseTest extends TestCase
 
     public function testAssertJsonPath()
     {
-        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub), new Request());
 
         $response->assertJsonPath('0.foo', 'foo 0');
 
@@ -864,7 +870,7 @@ class TestResponseTest extends TestCase
         $response->assertJsonPath('0.bar', 'bar 0');
         $response->assertJsonPath('0.foobar', 'foobar 0');
 
-        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub), new Request());
 
         $response->assertJsonPath('foo', 'bar');
 
@@ -880,7 +886,7 @@ class TestResponseTest extends TestCase
         ]);
         $response->assertJsonPath('bars.0', ['bar' => 'foo 0', 'foo' => 'bar 0']);
 
-        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub), new Request());
 
         $response->assertJsonPath('0.id', 10);
         $response->assertJsonPath('1.id', 20);
@@ -892,7 +898,7 @@ class TestResponseTest extends TestCase
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that 10 is identical to \'10\'.');
 
-        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub), new Request());
 
         $response->assertJsonPath('0.id', '10');
     }
@@ -901,7 +907,7 @@ class TestResponseTest extends TestCase
     {
         $response = TestResponse::fromBaseResponse(new Response([
             'data' => ['foo' => 'bar'],
-        ]));
+        ]), new Request());
 
         $response->assertJsonPath('data.foo', fn ($value) => $value === 'bar');
     }
@@ -910,7 +916,7 @@ class TestResponseTest extends TestCase
     {
         $response = TestResponse::fromBaseResponse(new Response([
             'data' => ['foo' => 'bar'],
-        ]));
+        ]), new Request());
 
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that false is true.');
@@ -920,13 +926,13 @@ class TestResponseTest extends TestCase
 
     public function testAssertJsonFragment()
     {
-        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub), new Request());
 
         $response->assertJsonFragment(['foo' => 'foo 0']);
 
         $response->assertJsonFragment(['foo' => 'foo 0', 'bar' => 'bar 0', 'foobar' => 'foobar 0']);
 
-        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub), new Request());
 
         $response->assertJsonFragment(['foo' => 'bar']);
 
@@ -936,7 +942,7 @@ class TestResponseTest extends TestCase
 
         $response->assertJsonFragment(['foo' => 'bar 0', 'bar' => ['foo' => 'bar 0', 'bar' => 'foo 0']]);
 
-        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub), new Request());
 
         $response->assertJsonFragment(['id' => 10]);
     }
@@ -945,14 +951,14 @@ class TestResponseTest extends TestCase
     {
         $this->expectException(AssertionFailedError::class);
 
-        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub), new Request());
 
         $response->assertJsonFragment(['id' => 1]);
     }
 
     public function testAssertJsonStructure()
     {
-        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub), new Request());
 
         // Without structure
         $response->assertJsonStructure();
@@ -973,14 +979,14 @@ class TestResponseTest extends TestCase
         $response->assertJsonStructure(['baz' => ['*' => ['foo', 'bar' => ['foo', 'bar']]]]);
 
         // Wildcard (repeating structure) at root
-        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub), new Request());
 
         $response->assertJsonStructure(['*' => ['foo', 'bar', 'foobar']]);
     }
 
     public function testAssertJsonCount()
     {
-        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub), new Request());
 
         // With falsey key
         $response->assertJsonCount(1, '0');
@@ -993,7 +999,7 @@ class TestResponseTest extends TestCase
         $response->assertJsonCount(3, 'barfoo.2.bar');
 
         // Without structure
-        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub), new Request());
         $response->assertJsonCount(4);
     }
 
@@ -1001,14 +1007,14 @@ class TestResponseTest extends TestCase
     {
         $this->expectException(AssertionFailedError::class);
 
-        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub), new Request());
 
         $response->assertJsonMissing(['id' => 20]);
     }
 
     public function testAssertJsonMissingExact()
     {
-        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub), new Request());
 
         $response->assertJsonMissingExact(['id' => 2]);
 
@@ -1020,7 +1026,7 @@ class TestResponseTest extends TestCase
     {
         $this->expectException(AssertionFailedError::class);
 
-        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub), new Request());
 
         $response->assertJsonMissingExact(['id' => 20]);
     }
@@ -1029,14 +1035,14 @@ class TestResponseTest extends TestCase
     {
         $this->expectException(AssertionFailedError::class);
 
-        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub), new Request());
 
         $response->assertJsonMissingExact(['id' => 20, 'foo' => 'bar']);
     }
 
     public function testAssertJsonMissingPath()
     {
-        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub), new Request());
 
         // With simple key
         $response->assertJsonMissingPath('missing');
@@ -1050,7 +1056,7 @@ class TestResponseTest extends TestCase
     {
         $this->expectException(AssertionFailedError::class);
 
-        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub), new Request());
 
         $response->assertJsonMissingPath('foo');
     }
@@ -1059,7 +1065,7 @@ class TestResponseTest extends TestCase
     {
         $this->expectException(AssertionFailedError::class);
 
-        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub), new Request());
 
         $response->assertJsonMissingPath('foobar.foobar_foo');
     }
@@ -1068,7 +1074,7 @@ class TestResponseTest extends TestCase
     {
         $this->expectException(AssertionFailedError::class);
 
-        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub), new Request());
 
         $response->assertJsonMissingPath('numeric_keys.3');
     }
@@ -1081,7 +1087,8 @@ class TestResponseTest extends TestCase
         ];
 
         $testResponse = TestResponse::fromBaseResponse(
-            (new Response)->setContent(json_encode($data))
+            (new Response)->setContent(json_encode($data)),
+            new Request()
         );
 
         $testResponse->assertJsonValidationErrors('foo');
@@ -1095,7 +1102,8 @@ class TestResponseTest extends TestCase
         ];
 
         $testResponse = TestResponse::fromBaseResponse(
-            (new Response('', 200, ['Content-Type' => 'application/json']))->setContent(json_encode($data))
+            (new Response('', 200, ['Content-Type' => 'application/json']))->setContent(json_encode($data)),
+            new Request()
         );
 
         $testResponse->assertInvalid('foo');
@@ -1114,7 +1122,7 @@ class TestResponseTest extends TestCase
             ],
         ]));
 
-        $testResponse = TestResponse::fromBaseResponse(new Response);
+        $testResponse = TestResponse::fromBaseResponse(new Response, new Request);
 
         $testResponse->assertValid('last_name');
         $testResponse->assertValid(['last_name']);
@@ -1135,7 +1143,7 @@ class TestResponseTest extends TestCase
         $errorBag->put('default', new MessageBag([
         ]));
 
-        $testResponse = TestResponse::fromBaseResponse(new Response);
+        $testResponse = TestResponse::fromBaseResponse(new Response, new Request);
 
         $testResponse->assertValid();
     }
@@ -1148,7 +1156,7 @@ class TestResponseTest extends TestCase
         ];
 
         $testResponse = TestResponse::fromBaseResponse(
-            (new Response)->setContent(json_encode($data))
+            (new Response)->setContent(json_encode($data)), new Request()
         );
 
         $testResponse->assertJsonValidationErrors('foo', 'data');
@@ -1162,7 +1170,7 @@ class TestResponseTest extends TestCase
         ];
 
         $testResponse = TestResponse::fromBaseResponse(
-            (new Response)->setContent(json_encode($data))
+            (new Response)->setContent(json_encode($data)), new Request()
         );
 
         $testResponse->assertJsonValidationErrors('foo', 'data.errors');
@@ -1178,7 +1186,7 @@ class TestResponseTest extends TestCase
         ];
 
         $testResponse = TestResponse::fromBaseResponse(
-            (new Response)->setContent(json_encode($data))
+            (new Response)->setContent(json_encode($data)), new Request()
         );
 
         $testResponse->assertJsonValidationErrors('bar');
@@ -1191,7 +1199,7 @@ class TestResponseTest extends TestCase
         $data = ['status' => 'ok'];
 
         $testResponse = TestResponse::fromBaseResponse(
-            (new Response)->setContent(json_encode($data))
+            (new Response)->setContent(json_encode($data)), new Request()
         );
 
         $testResponse->assertJsonValidationErrors('bar');
@@ -1202,7 +1210,7 @@ class TestResponseTest extends TestCase
         $this->expectException(AssertionFailedError::class);
 
         $testResponse = TestResponse::fromBaseResponse(
-            (new Response)->setContent(json_encode(['errors' => ['foo' => 'oops']]))
+            (new Response)->setContent(json_encode(['errors' => ['foo' => 'oops']])), new Request()
         );
 
         $testResponse->assertJsonValidationErrors([]);
@@ -1216,7 +1224,7 @@ class TestResponseTest extends TestCase
         ];
 
         $testResponse = TestResponse::fromBaseResponse(
-            (new Response)->setContent(json_encode($data))
+            (new Response)->setContent(json_encode($data)), new Request()
         );
 
         $testResponse->assertJsonValidationErrors(['foo', 'bar']);
@@ -1230,7 +1238,7 @@ class TestResponseTest extends TestCase
         ];
 
         $testResponse = TestResponse::fromBaseResponse(
-            (new Response)->setContent(json_encode($data))
+            (new Response)->setContent(json_encode($data)), new Request()
         );
 
         $testResponse->assertJsonValidationErrors(['key' => 'foo']);
@@ -1244,7 +1252,7 @@ class TestResponseTest extends TestCase
         ];
 
         $testResponse = TestResponse::fromBaseResponse(
-            (new Response)->setContent(json_encode($data))
+            (new Response)->setContent(json_encode($data)), new Request()
         );
 
         $testResponse->assertJsonValidationErrors(['key' => 'foo']);
@@ -1260,7 +1268,7 @@ class TestResponseTest extends TestCase
         ];
 
         $testResponse = TestResponse::fromBaseResponse(
-            (new Response)->setContent(json_encode($data))
+            (new Response)->setContent(json_encode($data)), new Request()
         );
 
         $testResponse->assertJsonValidationErrors(['key' => 'bar']);
@@ -1276,7 +1284,7 @@ class TestResponseTest extends TestCase
         ];
 
         $testResponse = TestResponse::fromBaseResponse(
-            (new Response)->setContent(json_encode($data))
+            (new Response)->setContent(json_encode($data)), new Request()
         );
 
         $testResponse->assertJsonValidationErrors(['bar' => 'value']);
@@ -1290,7 +1298,7 @@ class TestResponseTest extends TestCase
         ];
 
         $testResponse = TestResponse::fromBaseResponse(
-            (new Response)->setContent(json_encode($data))
+            (new Response)->setContent(json_encode($data)), new Request()
         );
 
         $testResponse->assertJsonValidationErrors(['one' => 'foo', 'two' => 'bar']);
@@ -1306,7 +1314,7 @@ class TestResponseTest extends TestCase
         ];
 
         $testResponse = TestResponse::fromBaseResponse(
-            (new Response)->setContent(json_encode($data))
+            (new Response)->setContent(json_encode($data)), new Request()
         );
 
         $testResponse->assertJsonValidationErrors(['one' => 'foo', 'three' => 'baz']);
@@ -1320,7 +1328,7 @@ class TestResponseTest extends TestCase
         ];
 
         $testResponse = TestResponse::fromBaseResponse(
-            (new Response)->setContent(json_encode($data))
+            (new Response)->setContent(json_encode($data)), new Request()
         );
 
         $testResponse->assertJsonValidationErrors(['one' => 'foo', 'two']);
@@ -1336,7 +1344,7 @@ class TestResponseTest extends TestCase
         ];
 
         $testResponse = TestResponse::fromBaseResponse(
-            (new Response)->setContent(json_encode($data))
+            (new Response)->setContent(json_encode($data)), new Request()
         );
 
         $testResponse->assertJsonValidationErrors(['one' => 'taylor', 'otwell']);
@@ -1355,7 +1363,7 @@ class TestResponseTest extends TestCase
         ];
 
         $testResponse = TestResponse::fromBaseResponse(
-            (new Response)->setContent(json_encode($data))
+            (new Response)->setContent(json_encode($data)), new Request()
         );
 
         $testResponse->assertJsonValidationErrors(['one' => ['First error message.', 'Second error message.']]);
@@ -1375,7 +1383,7 @@ class TestResponseTest extends TestCase
         ];
 
         $testResponse = TestResponse::fromBaseResponse(
-            (new Response)->setContent(json_encode($data))
+            (new Response)->setContent(json_encode($data)), new Request()
         );
 
         $testResponse->assertJsonValidationErrors(['one' => ['First error message.', 'Second error message.']]);
@@ -1390,7 +1398,7 @@ class TestResponseTest extends TestCase
             ]]));
         });
 
-        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response = TestResponse::fromBaseResponse($baseResponse, new Request());
 
         $response->assertJsonMissingValidationErrors('baz');
 
@@ -1398,7 +1406,7 @@ class TestResponseTest extends TestCase
             $response->setContent(json_encode(['foo' => 'bar']));
         });
 
-        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response = TestResponse::fromBaseResponse($baseResponse, new Request());
         $response->assertJsonMissingValidationErrors('foo');
     }
 
@@ -1413,7 +1421,7 @@ class TestResponseTest extends TestCase
             ]]));
         });
 
-        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response = TestResponse::fromBaseResponse($baseResponse, new Request());
 
         $response->assertJsonMissingValidationErrors('foo');
     }
@@ -1429,7 +1437,7 @@ class TestResponseTest extends TestCase
             ]]));
         });
 
-        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response = TestResponse::fromBaseResponse($baseResponse, new Request());
 
         $response->assertJsonMissingValidationErrors('bar');
     }
@@ -1450,7 +1458,7 @@ class TestResponseTest extends TestCase
             );
         });
 
-        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response = TestResponse::fromBaseResponse($baseResponse, new Request());
 
         $response->assertJsonMissingValidationErrors('foo', 'data.errors');
     }
@@ -1460,7 +1468,7 @@ class TestResponseTest extends TestCase
         $data = ['status' => 'ok'];
 
         $testResponse = TestResponse::fromBaseResponse(
-            (new Response)->setContent(json_encode($data))
+            (new Response)->setContent(json_encode($data)), new Request()
         );
 
         $testResponse->assertJsonMissingValidationErrors();
@@ -1471,7 +1479,7 @@ class TestResponseTest extends TestCase
         $data = ['status' => 'ok', 'errors' => []];
 
         $testResponse = TestResponse::fromBaseResponse(
-            (new Response)->setContent(json_encode($data))
+            (new Response)->setContent(json_encode($data)), new Request()
         );
 
         $testResponse->assertJsonMissingValidationErrors();
@@ -1484,7 +1492,7 @@ class TestResponseTest extends TestCase
         $data = ['errors' => ['foo' => []]];
 
         $testResponse = TestResponse::fromBaseResponse(
-            (new Response)->setContent(json_encode($data))
+            (new Response)->setContent(json_encode($data)), new Request()
         );
 
         $testResponse->assertJsonMissingValidationErrors();
@@ -1496,7 +1504,7 @@ class TestResponseTest extends TestCase
         $this->expectExceptionMessage('Invalid JSON was returned from the route.');
 
         $invalidJsonResponse = TestResponse::fromBaseResponse(
-            (new Response)->setContent('~invalid json')
+            (new Response)->setContent('~invalid json'), new Request()
         );
 
         $invalidJsonResponse->assertJsonMissingValidationErrors();
@@ -1510,7 +1518,7 @@ class TestResponseTest extends TestCase
         ];
 
         $testResponse = TestResponse::fromBaseResponse(
-            (new Response)->setContent(json_encode($data))
+            (new Response)->setContent(json_encode($data)), new Request()
         );
 
         $testResponse->assertJsonMissingValidationErrors('bar', 'data');
@@ -1526,7 +1534,7 @@ class TestResponseTest extends TestCase
         ];
 
         $testResponse = TestResponse::fromBaseResponse(
-            (new Response)->setContent(json_encode($data))
+            (new Response)->setContent(json_encode($data)), new Request()
         );
 
         $testResponse->assertJsonMissingValidationErrors('bar', 'data.errors');
@@ -1535,7 +1543,7 @@ class TestResponseTest extends TestCase
     public function testAssertJsonMissingValidationErrorsNestedCustomErrorsName2()
     {
         $testResponse = TestResponse::fromBaseResponse(
-            (new Response)->setContent(json_encode([]))
+            (new Response)->setContent(json_encode([])), new Request()
         );
 
         $testResponse->assertJsonMissingValidationErrors('bar', 'data.errors');
@@ -1551,7 +1559,7 @@ class TestResponseTest extends TestCase
             $files->get($tempDir.'/file.txt'), 200, [
                 'Content-Disposition' => 'attachment; filename=file.txt',
             ]
-        ));
+        ), new Request());
         $testResponse->assertDownload();
         $files->deleteDirectory($tempDir);
     }
@@ -1566,7 +1574,7 @@ class TestResponseTest extends TestCase
             $files->get($tempDir.'/file.txt'), 200, [
                 'Content-Disposition' => 'attachment; filename = file.txt',
             ]
-        ));
+        ), new Request());
         $testResponse->assertDownload('file.txt');
         $files->deleteDirectory($tempDir);
     }
@@ -1579,7 +1587,7 @@ class TestResponseTest extends TestCase
         $files->put($tempDir.'/file.txt', 'Hello World');
         $testResponse = TestResponse::fromBaseResponse(new BinaryFileResponse(
             $tempDir.'/file.txt', 200, [], true, 'attachment'
-        ));
+        ), new Request());
         $testResponse->assertDownload('file.txt');
         $files->deleteDirectory($tempDir);
     }
@@ -1593,7 +1601,7 @@ class TestResponseTest extends TestCase
         $files->put($tempDir.'/file.txt', 'Hello World');
         $testResponse = TestResponse::fromBaseResponse(new BinaryFileResponse(
             $tempDir.'/file.txt', 200, [], true, 'inline'
-        ));
+        ), new Request());
         $testResponse->assertDownload();
         $files->deleteDirectory($tempDir);
     }
@@ -1608,7 +1616,7 @@ class TestResponseTest extends TestCase
             $files->get($tempDir.'/file.txt'), 200, [
                 'Content-Disposition' => 'attachment; filename = "test file.txt"',
             ]
-        ));
+        ), new Request());
         $testResponse->assertDownload('test file.txt');
         $files->deleteDirectory($tempDir);
     }
@@ -1619,7 +1627,7 @@ class TestResponseTest extends TestCase
             return 'bar';
         });
 
-        $response = TestResponse::fromBaseResponse(new Response);
+        $response = TestResponse::fromBaseResponse(new Response, new Request);
 
         $this->assertSame(
             'bar', $response->foo()
@@ -1633,7 +1641,7 @@ class TestResponseTest extends TestCase
         $files->makeDirectory($tempDir, 0755, false, true);
         $files->put($tempDir.'/file.txt', 'Hello World');
 
-        $response = TestResponse::fromBaseResponse(new BinaryFileResponse($tempDir.'/file.txt'));
+        $response = TestResponse::fromBaseResponse(new BinaryFileResponse($tempDir.'/file.txt'), new Request());
 
         $this->assertEquals($tempDir.'/file.txt', $response->getFile()->getPathname());
 
@@ -1642,7 +1650,7 @@ class TestResponseTest extends TestCase
 
     public function testJsonHelper()
     {
-        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub), new Request());
 
         $this->assertSame('foo', $response->json('foobar.foobar_foo'));
         $this->assertEquals(
@@ -1656,7 +1664,7 @@ class TestResponseTest extends TestCase
      */
     public function testResponseCanBeReturnedAsCollection()
     {
-        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub), new Request());
 
         $this->assertInstanceOf(Collection::class, $response->collect());
         $this->assertEquals(collect([
@@ -1694,7 +1702,7 @@ class TestResponseTest extends TestCase
     public function testItCanBeTapped()
     {
         $response = TestResponse::fromBaseResponse(
-            (new Response)->setContent('')->setStatusCode(418)
+            (new Response)->setContent('')->setStatusCode(418), new Request()
         );
 
         $response->tap(function ($response) {
@@ -1705,7 +1713,7 @@ class TestResponseTest extends TestCase
     public function testAssertPlainCookie()
     {
         $response = TestResponse::fromBaseResponse(
-            (new Response)->withCookie(new Cookie('cookie-name', 'cookie-value'))
+            (new Response)->withCookie(new Cookie('cookie-name', 'cookie-value')), new Request()
         );
 
         $response->assertPlainCookie('cookie-name', 'cookie-value');
@@ -1724,7 +1732,7 @@ class TestResponseTest extends TestCase
         $encryptedValue = $encrypter->encrypt(CookieValuePrefix::create($cookieName, $encrypter->getKey()).$cookieValue, false);
 
         $response = TestResponse::fromBaseResponse(
-            (new Response)->withCookie(new Cookie($cookieName, $encryptedValue))
+            (new Response)->withCookie(new Cookie($cookieName, $encryptedValue)), new Request()
         );
 
         $response->assertCookie($cookieName, $cookieValue);
@@ -1733,7 +1741,7 @@ class TestResponseTest extends TestCase
     public function testAssertCookieExpired()
     {
         $response = TestResponse::fromBaseResponse(
-            (new Response)->withCookie(new Cookie('cookie-name', 'cookie-value', time() - 5000))
+            (new Response)->withCookie(new Cookie('cookie-name', 'cookie-value', time() - 5000)), new Request()
         );
 
         $response->assertCookieExpired('cookie-name');
@@ -1742,7 +1750,7 @@ class TestResponseTest extends TestCase
     public function testAssertSessionCookieExpiredDoesNotTriggerOnSessionCookies()
     {
         $response = TestResponse::fromBaseResponse(
-            (new Response)->withCookie(new Cookie('cookie-name', 'cookie-value', 0))
+            (new Response)->withCookie(new Cookie('cookie-name', 'cookie-value', 0)), new Request()
         );
 
         $this->expectException(ExpectationFailedException::class);
@@ -1753,7 +1761,7 @@ class TestResponseTest extends TestCase
     public function testAssertCookieNotExpired()
     {
         $response = TestResponse::fromBaseResponse(
-            (new Response)->withCookie(new Cookie('cookie-name', 'cookie-value', time() + 5000))
+            (new Response)->withCookie(new Cookie('cookie-name', 'cookie-value', time() + 5000)), new Request()
         );
 
         $response->assertCookieNotExpired('cookie-name');
@@ -1762,7 +1770,7 @@ class TestResponseTest extends TestCase
     public function testAssertSessionCookieNotExpired()
     {
         $response = TestResponse::fromBaseResponse(
-            (new Response)->withCookie(new Cookie('cookie-name', 'cookie-value', 0))
+            (new Response)->withCookie(new Cookie('cookie-name', 'cookie-value', 0)), new Request()
         );
 
         $response->assertCookieNotExpired('cookie-name');
@@ -1770,7 +1778,7 @@ class TestResponseTest extends TestCase
 
     public function testAssertCookieMissing()
     {
-        $response = TestResponse::fromBaseResponse(new Response);
+        $response = TestResponse::fromBaseResponse(new Response, new Request);
 
         $response->assertCookieMissing('cookie-name');
     }
@@ -1780,7 +1788,7 @@ class TestResponseTest extends TestCase
         app()->instance('url', $url = new UrlGenerator(new RouteCollection, new Request));
 
         $response = TestResponse::fromBaseResponse(
-            (new RedirectResponse($url->to('https://foo.com')))
+            (new RedirectResponse($url->to('https://foo.com'))), new Request()
         );
 
         $response->assertLocation('https://foo.com');
@@ -1792,7 +1800,7 @@ class TestResponseTest extends TestCase
     public function testAssertRedirectContains()
     {
         $response = TestResponse::fromBaseResponse(
-            (new Response('', 302))->withHeaders(['Location' => 'https://url.com'])
+            (new Response('', 302))->withHeaders(['Location' => 'https://url.com']), new Request()
         );
 
         $response->assertRedirectContains('url.com');
@@ -1805,7 +1813,7 @@ class TestResponseTest extends TestCase
     public function testAssertRedirect()
     {
         $response = TestResponse::fromBaseResponse(
-            (new Response('', 302))->withHeaders(['Location' => 'https://url.com'])
+            (new Response('', 302))->withHeaders(['Location' => 'https://url.com']), new Request()
         );
 
         $response->assertRedirect();
@@ -1814,7 +1822,7 @@ class TestResponseTest extends TestCase
     public function testGetDecryptedCookie()
     {
         $response = TestResponse::fromBaseResponse(
-            (new Response())->withCookie(new Cookie('cookie-name', 'cookie-value'))
+            (new Response())->withCookie(new Cookie('cookie-name', 'cookie-value')), new Request()
         );
 
         $cookie = $response->getCookie('cookie-name', false);
@@ -1836,7 +1844,7 @@ class TestResponseTest extends TestCase
             ],
         ]));
 
-        $response = TestResponse::fromBaseResponse(new Response());
+        $response = TestResponse::fromBaseResponse(new Response(), new Request());
 
         $response->assertSessionHasErrors(['foo']);
     }
@@ -1855,7 +1863,7 @@ class TestResponseTest extends TestCase
 
         $store->save(); // Required to serialize error bag to JSON
 
-        $response = TestResponse::fromBaseResponse(new Response());
+        $response = TestResponse::fromBaseResponse(new Response(), new Request());
 
         $response->assertSessionHasErrors(['foo']);
     }
@@ -1874,7 +1882,7 @@ class TestResponseTest extends TestCase
             ],
         ]));
 
-        $response = TestResponse::fromBaseResponse(new Response());
+        $response = TestResponse::fromBaseResponse(new Response(), new Request());
 
         $response->assertSessionDoesntHaveErrors(['foo']);
     }
@@ -1893,7 +1901,7 @@ class TestResponseTest extends TestCase
             ],
         ]));
 
-        $response = TestResponse::fromBaseResponse(new Response());
+        $response = TestResponse::fromBaseResponse(new Response(), new Request());
 
         $response->assertSessionHasNoErrors();
     }
@@ -1905,7 +1913,7 @@ class TestResponseTest extends TestCase
         $store->put('foo', 'value');
         $store->put('bar', 'value');
 
-        $response = TestResponse::fromBaseResponse(new Response());
+        $response = TestResponse::fromBaseResponse(new Response(), new Request());
 
         $response->assertSessionHas('foo');
         $response->assertSessionHas('bar');
@@ -1920,7 +1928,7 @@ class TestResponseTest extends TestCase
 
         $store->put('foo', 'value');
 
-        $response = TestResponse::fromBaseResponse(new Response());
+        $response = TestResponse::fromBaseResponse(new Response(), new Request());
         $response->assertSessionMissing('foo');
     }
 
@@ -1933,7 +1941,7 @@ class TestResponseTest extends TestCase
             'bar' => 'value',
         ]);
 
-        $response = TestResponse::fromBaseResponse(new Response());
+        $response = TestResponse::fromBaseResponse(new Response(), new Request());
 
         $response->assertSessionHasInput('foo');
         $response->assertSessionHasInput('foo', 'value');
@@ -1943,6 +1951,95 @@ class TestResponseTest extends TestCase
         $response->assertSessionHasInput('foo', function ($value) {
             return $value === 'value';
         });
+    }
+
+    public function testAssertJsonResourceSingle()
+    {
+        app()->instance(ResponseFactoryContract::class, new ResponseFactory(
+            m::mock(ViewFactory::class),
+            m::mock(Redirector::class)
+        ));
+
+        $data = [
+            'id' => 1,
+            'hello' => 'world',
+            'foo' => 'bar',
+        ];
+
+        $response = TestResponse::fromBaseResponse(
+            new Response(json_encode(['data' => $data]), 200, ['Content-Type' => 'application/json']),
+            new Request()
+        );
+
+        $model = new TestModel($data);
+        $resource = new TestModelJsonResource($model);
+
+        $response->assertJsonResource($resource);
+    }
+
+    public function testAssertJsonResourcePaginated()
+    {
+        app()->instance('translator', new class {
+            function get($key) { return $key; }
+        });
+        app()->instance(ResponseFactoryContract::class, new ResponseFactory(
+            m::mock(ViewFactory::class),
+            m::mock(Redirector::class)
+        ));
+
+        $args = [
+            'data' => [
+                ['id' => 1, 'hello' => 'world', 'foo' => 'bar'],
+                ['id' => 2, 'hello' => 'planet', 'foo' => 'beyond all repair'],
+            ],
+            'links' => [
+                'first' => '/?page=1',
+                'last' => '/?page=1',
+                'prev' => null,
+                'next' => null,
+            ],
+            'meta' => [
+                'current_page' => 1,
+                'from' => 1,
+                'last_page' => 1,
+                'links' => [
+                    [
+                        'url' => null,
+                        'label' => 'pagination.previous',
+                        'active' => false,
+                    ],
+                    [
+                        'url' => '/?page=1',
+                        'label' => '1',
+                        'active' => true,
+                    ],
+                    [
+                        'url' => null,
+                        'label' => 'pagination.next',
+                        'active' => false,
+                    ],
+                ],
+                'path' => '/',
+                'per_page' => 15,
+                'to' => 2,
+                'total' => 2,
+            ],
+        ];
+
+        $response = TestResponse::fromBaseResponse(
+            /** @see PaginatedResourceResponse::toResponse() */
+            new Response(json_encode($args), 200, ['Content-Type' => 'application/json']),
+            new Request()
+        );
+
+        $models = new EloquentCollection([
+            new TestModel($args['data'][0]),
+            new TestModel($args['data'][1]),
+        ]);
+        $paginator = new LengthAwarePaginator($models, 2, 15, 1);
+        $resource = TestModelJsonResource::collection($paginator);
+
+        $response->assertJsonResource($resource);
     }
 
     public function testGetEncryptedCookie()
@@ -1960,7 +2057,8 @@ class TestResponseTest extends TestCase
         );
 
         $response = TestResponse::fromBaseResponse(
-            (new Response())->withCookie(new Cookie($cookieName, $encryptedValue))
+            (new Response())->withCookie(new Cookie($cookieName, $encryptedValue)),
+            new Request()
         );
 
         $cookie = $response->getCookie($cookieName);
@@ -1970,13 +2068,17 @@ class TestResponseTest extends TestCase
         $this->assertEquals($cookieValue, $cookie->getValue());
     }
 
-    private function makeMockResponse($content)
+    private function makeMockResponse($content, $requestData = [])
     {
         $baseResponse = tap(new Response, function ($response) use ($content) {
             $response->setContent(m::mock(View::class, $content));
         });
 
-        return TestResponse::fromBaseResponse($baseResponse);
+        $request = tap(new Request, function (Request $request) use ($requestData) {
+            $request->replace($requestData);
+        });
+
+        return TestResponse::fromBaseResponse($baseResponse, $request);
     }
 }
 
@@ -2047,4 +2149,16 @@ class TestModel extends Model
 class AnotherTestModel extends Model
 {
     protected $guarded = [];
+}
+
+class TestModelJsonResource extends JsonResource
+{
+    public function toArray($request)
+    {
+        return [
+            'id' => $this->id,
+            'hello' => $this->hello,
+            'foo' => $this->foo,
+        ];
+    }
 }
