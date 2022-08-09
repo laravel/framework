@@ -490,7 +490,7 @@ class Arr
      */
     public static function only($array, $keys)
     {
-        if (!is_array($keys)) {
+        if (! is_array($keys)) {
             $keys = [$keys];
         }
 
