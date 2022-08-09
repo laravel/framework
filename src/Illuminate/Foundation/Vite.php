@@ -3,11 +3,12 @@
 namespace Illuminate\Foundation;
 
 use Exception;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 
-class Vite
+class Vite implements Htmlable
 {
     /**
      * The Content Security Policy nonce to apply to all generated tags.
@@ -43,6 +44,27 @@ class Vite
      * @var array
      */
     protected static $manifests = [];
+
+    /**
+     * The registered entry points.
+     *
+     * @var array
+     */
+    protected $entryPoints = [];
+
+    /**
+     * The path to the hot file.
+     *
+     * @var string
+     */
+    protected $hotFilePath = '/hot';
+
+    /**
+     * The path to the build directory.
+     *
+     * @var string
+     */
+    protected $buildDirectory = '/build';
 
     /**
      * Get the Content Security Policy nonce applied to all generated tags.
@@ -466,5 +488,54 @@ class Vite
     protected function isRunningHot()
     {
         return is_file(public_path('/hot'));
+    }
+
+    /**
+     * Merge the given entry points.
+     *
+     * @param  array  $entryPoints
+     * @return $this
+     */
+    public function withEntryPoints(array $entryPoints)
+    {
+        $this->entryPoints = array_merge($this->entryPoints, $entryPoints);
+
+        return $this;
+    }
+
+    /**
+     * Set the hot file path attribute.
+     *
+     * @param  string
+     * @return $this
+     */
+    public function useHotFile(string $path)
+    {
+        $this->hotFilePath = Str::start($path, '/');
+
+        return $this;
+    }
+
+    /**
+     * Set the build directory attribute.
+     *
+     * @param  string
+     * @return $this
+     */
+    public function useBuildDirectory(string $path)
+    {
+        $this->buildDirectory = Str::start($path, '/');
+
+        return $this;
+    }
+
+    /**
+     * Get content as a string of HTML.
+     *
+     * @return string
+     */
+    public function toHtml()
+    {
+        return $this->__invoke($this->entryPoints, $this->buildDirectory);
     }
 }
