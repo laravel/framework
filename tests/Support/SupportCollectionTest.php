@@ -1102,6 +1102,36 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testWhereLike($collection)
+    {
+        $data = [
+            ['v' => 'taylor'],
+            ['v' => 'otwell'],
+            ['v' => 'laravel'],
+            ['v' => '*la.r*a*vel'],
+        ];
+        $this->assertEquals([], (new $collection($data))->where('v', 'like', '%tay')->all());
+        $this->assertEquals([], (new $collection($data))->where('v', 'like', 'well%')->values()->all());
+        $this->assertEquals([], (new $collection($data))->where('v', 'like', '%wel')->values()->all());
+        // % represents multiple characters
+        $this->assertEquals([['v' => 'taylor']], (new $collection($data))->where('v', 'like', '%aylo%')->all());
+        // % ends with
+        $this->assertEquals([['v' => 'otwell']], (new $collection($data))->where('v', 'like', '%well')->values()->all());
+        // begin with:
+        $this->assertEquals([['v' => 'laravel']], (new $collection($data))->where('v', 'like', 'l%')->values()->all());
+        // % represents zero characters
+        $this->assertEquals([['v' => 'otwell']], (new $collection($data))->where('v', 'like', '%otwell%')->values()->all());
+        // It is case-insensitive:
+        $this->assertEquals([['v' => 'otwell']], (new $collection($data))->where('v', 'like', '%OTWELL%')->values()->all());
+        // it can find multiple items.
+        $this->assertEquals($data, (new $collection($data))->where('v', 'like', '%l%')->values()->all());
+        // It treats special chars of regex as normal characters.
+        $this->assertEquals([['v' => '*la.r*a*vel']], (new $collection($data))->where('v', 'like', '%.r*a*v%')->values()->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testWhereStrict($collection)
     {
         $c = new $collection([['v' => 3], ['v' => '3']]);

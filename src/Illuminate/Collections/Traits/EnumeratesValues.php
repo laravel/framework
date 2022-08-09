@@ -1062,8 +1062,23 @@ trait EnumeratesValues
                 case '>=':  return $retrieved >= $value;
                 case '===': return $retrieved === $value;
                 case '!==': return $retrieved !== $value;
+                case 'like': return $this->like_match($retrieved, $value);
             }
         };
+    }
+
+    /**
+     * SQL Like operator in PHP.
+     *
+     * @param  string  $subject
+     * @param  string  $pattern
+     * @return bool
+     */
+    protected function like_match($subject, $pattern)
+    {
+        $pattern = str_replace('%', '.*', preg_quote($pattern, '/'));
+
+        return (bool) preg_match("/^{$pattern}$/i", $subject);
     }
 
     /**
