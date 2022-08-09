@@ -184,7 +184,7 @@ if (! function_exists('value')) {
      */
     function value($value, ...$args)
     {
-        if ($value instanceof \BackedEnum) {
+        if (function_exists('enum_exists') && $value instanceof \BackedEnum) {
             return $value->value;
         }
 
