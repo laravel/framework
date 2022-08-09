@@ -388,11 +388,20 @@ class DocsCommand extends Command
      */
     protected function openViaBuiltInStrategy($url)
     {
-        $binary = (new ExecutableFinder())->find(match ($this->systemOsFamily) {
-            'Darwin' => 'open',
-            'Windows' => 'start',
-            'Linux' => 'xdg-open',
-        });
+        if ($this->systemOsFamily === 'Windows') {
+            $process = tap(Process::fromShellCommandline(escapeshellcmd("start {$url}")))->run();
+
+            if (! $process->isSuccessful()) {
+                throw new ProcessFailedException($process);
+            }
+
+            return;
+        }
+
+        $binary = Collection::make(match ($this->systemOsFamily) {
+            'Darwin' => ['open'],
+            'Linux' => ['xdg-open', 'wslview'],
+        })->first(fn ($binary) => (new ExecutableFinder)->find($binary) !== null);
 
         if ($binary === null) {
             $this->components->warn('Unable to open the URL on your system. You will need to open it yourself or create a custom opener for your system.');
@@ -400,13 +409,7 @@ class DocsCommand extends Command
             return;
         }
 
-        $binaryExecutable = [
-            'Darwin' => 'open',
-            'Windows' => 'start',
-            'Linux' => 'xdg-open',
-        ][$this->systemOsFamily];
-
-        $process = tap(Process::fromShellCommandline($binaryExecutable.' '.escapeshellcmd($url)))->run();
+        $process = tap(Process::fromShellCommandline(escapeshellcmd("{$binary} {$url}")))->run();
 
         if (! $process->isSuccessful()) {
             throw new ProcessFailedException($process);

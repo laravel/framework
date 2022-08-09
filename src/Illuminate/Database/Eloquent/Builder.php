@@ -102,6 +102,7 @@ class Builder implements BuilderContract
         'getBindings',
         'getConnection',
         'getGrammar',
+        'implode',
         'insert',
         'insertGetId',
         'insertOrIgnore',
