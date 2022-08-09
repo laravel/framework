@@ -80,9 +80,6 @@ class ContainerTest extends TestCase
     public function testSingletonIfDoesRegisterIfBindingNotRegisteredYet()
     {
         $container = new Container;
-        $container->singleton('class', function () {
-            return new stdClass;
-        });
         $container->singletonIf('otherClass', function () {
             return new ContainerConcreteStub;
         });
