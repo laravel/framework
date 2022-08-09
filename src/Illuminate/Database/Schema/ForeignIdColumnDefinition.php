@@ -14,7 +14,7 @@ class ForeignIdColumnDefinition extends ColumnDefinition
     protected $blueprint;
 
     /**
-     * The table used for constrained() if not directly specified
+     * The table used for constrained() if not directly specified.
      */
     protected ?string $table = null;
 
