@@ -37,7 +37,9 @@ class TableCommand extends DatabaseInspectionCommand
      */
     public function handle(ConnectionResolverInterface $connections)
     {
-        $this->ensureDependenciesExist();
+        if (! $this->ensureDependenciesExist()) {
+            return 1;
+        }
 
         $connection = $connections->connection($this->input->getOption('database'));
 

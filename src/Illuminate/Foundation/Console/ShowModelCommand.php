@@ -81,7 +81,9 @@ class ShowModelCommand extends DatabaseInspectionCommand
      */
     public function handle()
     {
-        $this->ensureDependenciesExist();
+        if (! $this->ensureDependenciesExist()) {
+            return 1;
+        }
 
         $class = $this->qualifyModel($this->argument('model'));
 
