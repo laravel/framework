@@ -268,7 +268,7 @@ class ContainerTest extends TestCase
     {
         $container = new Container;
         $container->bind(ContainerConcreteStub::class, function () {
-           //
+            //
         });
         $this->assertTrue($container->bound(ContainerConcreteStub::class));
         $this->assertFalse($container->bound(IContainerContractStub::class));
