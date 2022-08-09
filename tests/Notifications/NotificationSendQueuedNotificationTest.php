@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Notifications\ChannelManager;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\SendQueuedNotifications;
 use Illuminate\Support\Collection;
 use Mockery as m;
@@ -52,6 +53,24 @@ class NotificationSendQueuedNotificationTest extends TestCase
 
         $this->assertStringContainsString($serializedNotifiable, $serialized);
     }
+
+    public function testDefaultDisplayName()
+    {
+        $notifiable = new AnonymousNotifiable;
+
+        $job = new SendQueuedNotifications($notifiable, new NotificationWithDefaultName);
+
+        $this->assertSame(NotificationWithDefaultName::class, $job->displayName());
+    }
+
+    public function testOverriddenDisplayName()
+    {
+        $notifiable = new AnonymousNotifiable;
+
+        $job = new SendQueuedNotifications($notifiable, new NotificationWithOverriddenName('overridden-name'));
+
+        $this->assertSame('overridden-name', $job->displayName());
+    }
 }
 
 class NotifiableUser extends Model
@@ -60,4 +79,26 @@ class NotifiableUser extends Model
 
     public $table = 'users';
     public $timestamps = false;
+}
+
+class NotificationWithDefaultName extends Notification
+{
+
+}
+
+class NotificationWithOverriddenName extends Notification
+{
+    /** @var string */
+    private $displayName;
+
+    public function __construct(string $displayName)
+    {
+        $this->displayName = $displayName;
+    }
+
+    /** @return string */
+    public function displayName()
+    {
+        return $this->displayName;
+    }
 }
