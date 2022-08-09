@@ -275,6 +275,21 @@ class ContainerTest extends TestCase
         $this->assertSame('taylor', $instance->default);
     }
 
+    public function testBound()
+    {
+        $container = new Container;
+        $container->bind(ContainerConcreteStub::class, function () {
+            //
+        });
+        $this->assertTrue($container->bound(ContainerConcreteStub::class));
+        $this->assertFalse($container->bound(IContainerContractStub::class));
+
+        $container = new Container;
+        $container->bind(IContainerContractStub::class, ContainerConcreteStub::class);
+        $this->assertTrue($container->bound(IContainerContractStub::class));
+        $this->assertFalse($container->bound(ContainerConcreteStub::class));
+    }
+
     public function testUnsetRemoveBoundInstances()
     {
         $container = new Container;
