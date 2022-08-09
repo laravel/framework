@@ -116,6 +116,20 @@ class ContainerTest extends TestCase
         $this->assertSame($firstInstantiation, $secondInstantiation);
     }
 
+    public function testScopedIf()
+    {
+        $container = new Container;
+        $container->scopedIf('class', function () {
+            return 'foo';
+        });
+        $this->assertSame('foo', $container->make('class'));
+        $container->scopedIf('class', function () {
+            return 'bar';
+        });
+        $this->assertSame('foo', $container->make('class'));
+        $this->assertNotSame('bar', $container->make('class'));
+    }
+
     public function testScopedClosureResets()
     {
         $container = new Container;
