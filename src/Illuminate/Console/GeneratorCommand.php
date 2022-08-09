@@ -183,6 +183,8 @@ abstract class GeneratorCommand extends Command
         }
 
         $this->components->info($info.' created successfully.');
+
+        $this->components->warn(sprintf('Path: [%s]', $path));
     }
 
     /**

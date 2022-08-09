@@ -111,10 +111,11 @@ class MigrateMakeCommand extends BaseCommand
         );
 
         if (! $this->option('fullpath')) {
-            $file = pathinfo($file, PATHINFO_FILENAME);
+            $file = pathinfo($file, PATHINFO_BASENAME);
         }
 
-        $this->components->info(sprintf('Created migration [%s].', $file));
+        $this->components->info('Created migration.');
+        $this->components->warn(sprintf('Path: [%s]', $file));
     }
 
     /**
