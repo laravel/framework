@@ -24,6 +24,7 @@ use Illuminate\Routing\Router;
 use Illuminate\Session\TokenMismatchException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\ItemNotFoundException;
 use Illuminate\Support\Reflector;
 use Illuminate\Support\Traits\ReflectsClosures;
 use Illuminate\Support\ViewErrorBag;
@@ -378,6 +379,7 @@ class Handler implements ExceptionHandlerContract
         return match (true) {
             $e instanceof BackedEnumCaseNotFoundException => new NotFoundHttpException($e->getMessage(), $e),
             $e instanceof ModelNotFoundException => new NotFoundHttpException($e->getMessage(), $e),
+            $e instanceof ItemNotFoundException => new NotFoundHttpException($e->getMessage(), $e),
             $e instanceof AuthorizationException && $e->hasStatus() => new HttpException($e->status(), $e->getMessage(), $e),
             $e instanceof AuthorizationException && ! $e->hasStatus() => new AccessDeniedHttpException($e->getMessage(), $e),
             $e instanceof TokenMismatchException => new HttpException(419, $e->getMessage(), $e),
