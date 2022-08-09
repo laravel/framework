@@ -89,9 +89,9 @@ class ViewComponentAttributeBagTest extends TestCase
                 'test-discard-2' => 'discarded-2',
             ]);
 
-        $this->assertSame('test-extract-1="extracted-1" test-extract-2="extracted-2"', (string) $bag->onlyProps([
+        $this->assertEquals(['test-extract-1="extracted-1"', 'test-extract-2="extracted-2"'], explode(' ', (string) $bag->onlyProps([
             'test-extract-1',
             'test-extract-2' => 'defaultValue',
-        ]));
+        ])));
     }
 }

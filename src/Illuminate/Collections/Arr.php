@@ -490,7 +490,18 @@ class Arr
      */
     public static function only($array, $keys)
     {
-        return array_intersect_key($array, array_flip((array) $keys));
+        if (!is_array($keys)) {
+            $keys = [$keys];
+        }
+
+        $newArray = [];
+        foreach ($keys as $key) {
+            if (static::has($array, $key)) {
+                static::set($newArray, $key, static::get($array, $key));
+            }
+        }
+
+        return $newArray;
     }
 
     /**

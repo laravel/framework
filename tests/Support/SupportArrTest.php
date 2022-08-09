@@ -495,6 +495,10 @@ class SupportArrTest extends TestCase
         $array = Arr::only($array, ['name', 'price']);
         $this->assertEquals(['name' => 'Desk', 'price' => 100], $array);
         $this->assertEmpty(Arr::only($array, ['nonExistingKey']));
+        $array = ['taxonomies' => ['colors' => ['red', 'blue'], 'positions' => ['top', 'bottom']]];
+        $this->assertEquals(['taxonomies' => ['colors' => ['red', 'blue']]], Arr::only($array, 'taxonomies.colors'));
+        $this->assertEquals(['taxonomies' => ['positions' => ['top', 'bottom']]], Arr::only($array, 'taxonomies.positions'));
+        $this->assertEquals($array, Arr::only($array, ['taxonomies.colors', 'taxonomies.positions']));
     }
 
     public function testPluck()

@@ -341,7 +341,7 @@ class DatabaseConnectorTest extends TestCase
             $appname = isset($config['appname']) ? ';appname='.$config['appname'] : '';
             $charset = isset($config['charset']) ? ';charset='.$config['charset'] : '';
 
-            return "dblib:host={$host}{$port};dbname={$database}{$charset}{$appname}";
+            return "dblib:host={$host}{$port};dbname={$database}{$appname}{$charset}";
         }
     }
 }
