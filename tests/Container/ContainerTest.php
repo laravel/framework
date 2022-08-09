@@ -56,9 +56,6 @@ class ContainerTest extends TestCase
     public function testBindIfDoesRegisterIfServiceNotRegisteredYet()
     {
         $container = new Container;
-        $container->bind('surname', function () {
-            return 'Taylor';
-        });
         $container->bindIf('name', function () {
             return 'Dayle';
         });
