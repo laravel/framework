@@ -308,6 +308,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $blueprint->foreignId('laravel_idea_id')->constrained();
         $blueprint->foreignId('team_id')->references('id')->on('teams');
         $blueprint->foreignId('team_column_id')->constrained('teams');
+        $blueprint->foreignIdFor('Illuminate\Foundation\Auth\User', 'my_user_id')->constrained();
 
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
@@ -318,6 +319,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
             'alter table "users" add column "laravel_idea_id" integer not null',
             'alter table "users" add column "team_id" integer not null',
             'alter table "users" add column "team_column_id" integer not null',
+            'alter table "users" add column "my_user_id" integer not null',
         ], $statements);
     }
 

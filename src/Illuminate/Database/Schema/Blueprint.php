@@ -931,9 +931,11 @@ class Blueprint
             $model = new $model;
         }
 
-        return $model->getKeyType() === 'int' && $model->getIncrementing()
+        $foreignIdDefinition = $model->getKeyType() === 'int' && $model->getIncrementing()
                     ? $this->foreignId($column ?: $model->getForeignKey())
                     : $this->foreignUuid($column ?: $model->getForeignKey());
+        
+        return $foreignIdDefinition->withTable($model->getTable());
     }
 
     /**

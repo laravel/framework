@@ -14,6 +14,11 @@ class ForeignIdColumnDefinition extends ColumnDefinition
     protected $blueprint;
 
     /**
+     * The table used for constrained() if not directly specified
+     */
+    protected ?string $table = null;
+
+    /**
      * Create a new foreign ID column definition.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
@@ -27,6 +32,12 @@ class ForeignIdColumnDefinition extends ColumnDefinition
         $this->blueprint = $blueprint;
     }
 
+    public function withTable(string $table): static
+    {
+        $this->table = $table;
+        return $this;
+    }
+
     /**
      * Create a foreign key constraint on this column referencing the "id" column of the conventionally related table.
      *
@@ -36,7 +47,7 @@ class ForeignIdColumnDefinition extends ColumnDefinition
      */
     public function constrained($table = null, $column = 'id')
     {
-        return $this->references($column)->on($table ?? Str::plural(Str::beforeLast($this->name, '_'.$column)));
+        return $this->references($column)->on($table ?? $this->table ?? Str::plural(Str::beforeLast($this->name, '_'.$column)));
     }
 
     /**
