@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -40,6 +41,13 @@ class TestResponse implements ArrayAccess
     public $baseResponse;
 
     /**
+     * The request that was used to make the application return our response.
+     *
+     * @var \Illuminate\Http\Request
+     */
+    public $request;
+
+    /**
      * The collection of logged exceptions for the request.
      *
      * @var \Illuminate\Support\Collection
@@ -57,11 +65,13 @@ class TestResponse implements ArrayAccess
      * Create a new test response instance.
      *
      * @param  \Illuminate\Http\Response  $response
+     * @param  \Illuminate\Http\Request  $request
      * @return void
      */
-    public function __construct($response)
+    public function __construct($response, $request)
     {
         $this->baseResponse = $response;
+        $this->request = $request;
         $this->exceptions = new Collection;
     }
 
@@ -69,11 +79,12 @@ class TestResponse implements ArrayAccess
      * Create a new TestResponse from another response.
      *
      * @param  \Illuminate\Http\Response  $response
+     * @param  \Illuminate\Http\Request  $request
      * @return static
      */
-    public static function fromBaseResponse($response)
+    public static function fromBaseResponse($response, $request)
     {
-        return new static($response);
+        return new static($response, $request);
     }
 
     /**
@@ -834,6 +845,21 @@ EOF;
     public function assertJsonStructure(array $structure = null, $responseData = null)
     {
         $this->decodeResponseJson()->assertStructure($structure, $responseData);
+
+        return $this;
+    }
+
+    /**
+     * Assert that the response is formed by a JsonResource
+     *
+     * @param JsonResource $resource
+     * @return $this
+     */
+    public function assertJsonResource(JsonResource $resource)
+    {
+        $this->assertExactJson(
+            $resource->response($this->request)->getData(true),
+        );
 
         return $this;
     }
