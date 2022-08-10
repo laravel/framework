@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Console;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Schema\Schema;
 use Illuminate\Console\Command;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\MySqlConnection;
@@ -10,6 +11,7 @@ use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\SQLiteConnection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Composer;
+use Illuminate\Support\Str;
 use Symfony\Component\Process\Exception\ProcessSignaledException;
 use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\Process;
@@ -143,7 +145,7 @@ abstract class DatabaseInspectionCommand extends Command
     {
         $database ??= config('database.default');
 
-        return Arr::except(config('database.connections.'.$database), ['password']);
+        return Arr::except(config('database.connections.' . $database), ['password']);
     }
 
     /**
@@ -153,8 +155,8 @@ abstract class DatabaseInspectionCommand extends Command
      */
     protected function ensureDependenciesExist()
     {
-        if (! interface_exists('Doctrine\DBAL\Driver')) {
-            if (! $this->components->confirm('Displaying model information requires the Doctrine DBAL (doctrine/dbal) package. Would you like to install it?')) {
+        if (!interface_exists('Doctrine\DBAL\Driver')) {
+            if (!$this->components->confirm('Displaying model information requires the Doctrine DBAL (doctrine/dbal) package. Would you like to install it?')) {
                 return 1;
             }
 
@@ -192,5 +194,18 @@ abstract class DatabaseInspectionCommand extends Command
                 throw $e;
             }
         }
+    }
+
+    /**
+     * Register custom Doctrine type mappings.
+     *
+     * @param  \Doctrine\DBAL\Platforms\AbstractPlatform  $platform
+     * @param  string  $database
+     * @return void
+     */
+    protected function regsisterTypeMapping(AbstractPlatform $platform)
+    {
+        $platform->registerDoctrineTypeMapping('enum', 'string');
+        $platform->registerDoctrineTypeMapping('sysname', 'string');
     }
 }

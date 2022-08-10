@@ -98,7 +98,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
         $this->display(
             $class,
             $model->getConnection()->getName(),
-            $model->getConnection()->getTablePrefix().$model->getTable(),
+            $model->getConnection()->getTablePrefix() . $model->getTable(),
             $this->getAttributes($model),
             $this->getRelations($model),
         );
@@ -113,7 +113,8 @@ class ShowModelCommand extends DatabaseInspectionCommand
     protected function getAttributes($model)
     {
         $schema = $model->getConnection()->getDoctrineSchemaManager();
-        $table = $model->getConnection()->getTablePrefix().$model->getTable();
+        $this->regsisterTypeMapping($schema->getDatabasePlatform());
+        $table = $model->getConnection()->getTablePrefix() . $model->getTable();
         $columns = $schema->listTableColumns($table);
         $indexes = $schema->listTableIndexes($table);
 
@@ -123,7 +124,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
                 'name' => $column->getName(),
                 'type' => $this->getColumnType($column),
                 'increments' => $column->getAutoincrement(),
-                'nullable' => ! $column->getNotnull(),
+                'nullable' => !$column->getNotnull(),
                 'default' => $this->getColumnDefault($column, $model),
                 'unique' => $this->columnIsUnique($column->getName(), $indexes),
                 'fillable' => $model->isFillable($column->getName()),
@@ -201,12 +202,12 @@ class ShowModelCommand extends DatabaseInspectionCommand
                 }
 
                 return collect($this->relationMethods)
-                    ->contains(fn ($relationMethod) => str_contains($code, '$this->'.$relationMethod.'('));
+                    ->contains(fn ($relationMethod) => str_contains($code, '$this->' . $relationMethod . '('));
             })
             ->map(function (ReflectionMethod $method) use ($model) {
                 $relation = $method->invoke($model);
 
-                if (! $relation instanceof Relation) {
+                if (!$relation instanceof Relation) {
                     return null;
                 }
 
@@ -274,7 +275,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
     {
         $this->newLine();
 
-        $this->components->twoColumnDetail('<fg=green;options=bold>'.$class.'</>');
+        $this->components->twoColumnDetail('<fg=green;options=bold>' . $class . '</>');
         $this->components->twoColumnDetail('Database', $database);
         $this->components->twoColumnDetail('Table', $table);
 
@@ -297,7 +298,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
 
             $second = collect([
                 $attribute['type'],
-                $attribute['cast'] ? '<fg=yellow;options=bold>'.$attribute['cast'].'</>' : null,
+                $attribute['cast'] ? '<fg=yellow;options=bold>' . $attribute['cast'] . '</>' : null,
             ])->filter()->implode(' <fg=gray>/</> ');
 
             $this->components->twoColumnDetail($first, $second);
@@ -371,7 +372,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
         $unsigned = $column->getUnsigned() ? ' unsigned' : '';
 
         $details = match (get_class($column->getType())) {
-            DecimalType::class => $column->getPrecision().','.$column->getScale(),
+            DecimalType::class => $column->getPrecision() . ',' . $column->getScale(),
             default => $column->getLength(),
         };
 
@@ -414,7 +415,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
         }
 
         if (count($model->getVisible()) > 0) {
-            return ! in_array($attribute, $model->getVisible());
+            return !in_array($attribute, $model->getVisible());
         }
 
         return false;
@@ -459,7 +460,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
         }
 
         return is_dir(app_path('Models'))
-            ? $rootNamespace.'Models\\'.$model
-            : $rootNamespace.$model;
+            ? $rootNamespace . 'Models\\' . $model
+            : $rootNamespace . $model;
     }
 }

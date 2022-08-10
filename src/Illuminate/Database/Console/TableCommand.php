@@ -42,6 +42,7 @@ class TableCommand extends DatabaseInspectionCommand
         $connection = $connections->connection($this->input->getOption('database'));
 
         $schema = $connection->getDoctrineSchemaManager();
+        $this->regsisterTypeMapping($schema->getDatabasePlatform());
 
         $table = $this->argument('table') ?: $this->components->choice(
             'Which table would you like to inspect?',
@@ -98,7 +99,7 @@ class TableCommand extends DatabaseInspectionCommand
             $column->getAutoincrement() ? 'autoincrement' : null,
             'type' => $column->getType()->getName(),
             $column->getUnsigned() ? 'unsigned' : null,
-            ! $column->getNotNull() ? 'nullable' : null,
+            !$column->getNotNull() ? 'nullable' : null,
         ])->filter();
     }
 
@@ -187,11 +188,11 @@ class TableCommand extends DatabaseInspectionCommand
 
         $this->newLine();
 
-        $this->components->twoColumnDetail('<fg=green;options=bold>'.$table['name'].'</>');
+        $this->components->twoColumnDetail('<fg=green;options=bold>' . $table['name'] . '</>');
         $this->components->twoColumnDetail('Columns', $table['columns']);
 
         if ($size = $table['size']) {
-            $this->components->twoColumnDetail('Size', number_format($size / 1024 / 1024, 2).'Mb');
+            $this->components->twoColumnDetail('Size', number_format($size / 1024 / 1024, 2) . 'Mb');
         }
 
         $this->newLine();
@@ -201,8 +202,8 @@ class TableCommand extends DatabaseInspectionCommand
 
             $columns->each(function ($column) {
                 $this->components->twoColumnDetail(
-                    $column['column'].' <fg=gray>'.$column['attributes']->implode(', ').'</>',
-                    ($column['default'] ? '<fg=gray>'.$column['default'].'</> ' : '').''.$column['type'].''
+                    $column['column'] . ' <fg=gray>' . $column['attributes']->implode(', ') . '</>',
+                    ($column['default'] ? '<fg=gray>' . $column['default'] . '</> ' : '') . '' . $column['type'] . ''
                 );
             });
 
@@ -214,7 +215,7 @@ class TableCommand extends DatabaseInspectionCommand
 
             $indexes->each(function ($index) {
                 $this->components->twoColumnDetail(
-                    $index['name'].' <fg=gray>'.$index['columns']->implode(', ').'</>',
+                    $index['name'] . ' <fg=gray>' . $index['columns']->implode(', ') . '</>',
                     $index['attributes']->implode(', ')
                 );
             });
@@ -227,8 +228,8 @@ class TableCommand extends DatabaseInspectionCommand
 
             $foreignKeys->each(function ($foreignKey) {
                 $this->components->twoColumnDetail(
-                    $foreignKey['name'].' <fg=gray;options=bold>'.$foreignKey['local_columns']->implode(', ').' references '.$foreignKey['foreign_columns']->implode(', ').' on '.$foreignKey['foreign_table'].'</>',
-                    $foreignKey['on_update'].' / '.$foreignKey['on_delete'],
+                    $foreignKey['name'] . ' <fg=gray;options=bold>' . $foreignKey['local_columns']->implode(', ') . ' references ' . $foreignKey['foreign_columns']->implode(', ') . ' on ' . $foreignKey['foreign_table'] . '</>',
+                    $foreignKey['on_update'] . ' / ' . $foreignKey['on_delete'],
                 );
             });
 
