@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent\Relations;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Query\JoinClause;
 
 abstract class MorphOneOrMany extends HasOneOrMany
 {
@@ -65,6 +66,27 @@ abstract class MorphOneOrMany extends HasOneOrMany
         parent::addEagerConstraints($models);
 
         $this->getRelationQuery()->where($this->morphType, $this->morphClass);
+    }
+
+    /**
+     * Add a join clause to the query based on the relationship constraints.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder|null  $query
+     * @param  string  $type
+     * @param  bool  $where
+     * @return  \Illuminate\Database\Eloquent\Builder
+     */
+    public function addJoinClause($query = null, $type = 'inner', $where = false)
+    {
+        $query = $query ?: $this->query;
+
+        return $query->join($this->getModel()->getTable(), function(JoinClause $join) {
+            $join->on(
+                $this->getQualifiedParentKeyName(),
+                '=',
+                $this->getQualifiedForeignKeyName()
+            )->where($this->getQualifiedMorphType(), '=', $this->getMorphClass());
+        }, null, null, $type, $where);
     }
 
     /**

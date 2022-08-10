@@ -307,6 +307,11 @@ class EloquentRelationStub extends Relation
         //
     }
 
+    public function addJoinClause($query = null, $type = 'inner', $where = false)
+    {
+        //
+    }
+
     public function match(array $models, Collection $results, $relation)
     {
         //

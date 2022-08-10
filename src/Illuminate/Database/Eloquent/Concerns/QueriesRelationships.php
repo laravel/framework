@@ -574,7 +574,7 @@ trait QueriesRelationships
     }
 
     /**
-     * Add an "BelongsTo" relationship with an "or where" clause to the query.
+     * Add a "BelongsTo" relationship with an "or where" clause to the query.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $related
      * @param  string|null  $relationshipName
@@ -585,6 +585,34 @@ trait QueriesRelationships
     public function orWhereBelongsTo($related, $relationshipName = null)
     {
         return $this->whereBelongsTo($related, $relationshipName, 'or');
+    }
+
+    /**
+     * Add a join clause to the query based on the relationship constraints.
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation|string  $relation
+     * @param  string  $type
+     * @param  bool  $where
+     *
+     * @return $this
+     *
+     * @throws \Illuminate\Database\Eloquent\RelationNotFoundException
+     */
+    public function joinRelation($relation, $type = 'inner', $where = false)
+    {
+        if (is_string($relation)) {
+            try {
+                $relation = $this->model->{$relation}();
+            } catch (BadMethodCallException) {
+                throw RelationNotFoundException::make($this->model, $relation);
+            }
+
+            if (! $relation instanceof Relation) {
+                throw RelationNotFoundException::make($this->model, $relation);
+            }
+        }
+
+        return $relation->addJoinClause($this, $type, $where);
     }
 
     /**

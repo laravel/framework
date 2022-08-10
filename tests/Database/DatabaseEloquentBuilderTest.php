@@ -1439,6 +1439,81 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(['baz', 'quuuuuux', 'qux', 'quuux'], $builder->getBindings());
     }
 
+    public function testJoinBelongsToRelation()
+    {
+        $expected = 'select * from "eloquent_builder_test_model_parent_stubs" inner join "eloquent_builder_test_model_close_related_stubs" on "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id"';
+
+        $model = new EloquentBuilderTestModelParentStub;
+        $builder = $model->joinRelation('foo');
+
+        $this->assertSame($expected, $builder->toSql(), 'using name');
+
+        $model = new EloquentBuilderTestModelParentStub;
+        $builder = $model->joinRelation($model->foo());
+
+        $this->assertSame($expected, $builder->toSql(), 'using relation');
+    }
+
+    public function testJoinHasOneOrManyRelation()
+    {
+        $expected = 'select * from "eloquent_builder_test_model_close_related_stubs" inner join "eloquent_builder_test_model_far_related_stubs" on "eloquent_builder_test_model_close_related_stubs"."id" = "eloquent_builder_test_model_far_related_stubs"."eloquent_builder_test_model_close_related_stub_id"';
+
+        $model = new EloquentBuilderTestModelCloseRelatedStub;
+        $builder = $model->joinRelation('bar');
+
+        $this->assertSame($expected, $builder->toSql(), 'using name');
+
+        $model = new EloquentBuilderTestModelCloseRelatedStub;
+        $builder = $model->joinRelation($model->bar());
+
+        $this->assertSame($expected, $builder->toSql(), 'using relation');
+    }
+
+    public function testJoinMorphOneOrManyRelation()
+    {
+        $expected = 'select * from "eloquent_builder_test_model_parent_stubs" inner join "eloquent_builder_test_model_close_related_stubs" on "eloquent_builder_test_model_parent_stubs"."id" = "eloquent_builder_test_model_close_related_stubs"."bazzable_id" and "eloquent_builder_test_model_close_related_stubs"."bazzable_type" = ?';
+
+        $model = new EloquentBuilderTestModelParentStub;
+        $builder = $model->joinRelation('baz');
+
+        $this->assertSame($expected, $builder->toSql(), 'using name');
+
+        $model = new EloquentBuilderTestModelParentStub;
+        $builder = $model->joinRelation($model->baz());
+
+        $this->assertSame($expected, $builder->toSql(), 'using relation');
+    }
+
+    public function testJoinBelongsToManyRelation()
+    {
+        $expected = 'select * from "eloquent_builder_test_model_parent_stubs" inner join "user_role" on "eloquent_builder_test_model_parent_stubs"."id" = "user_role"."self_id" inner join "eloquent_builder_test_model_far_related_stubs" on "user_role"."related_id" = "eloquent_builder_test_model_far_related_stubs"."id"';
+
+        $model = new EloquentBuilderTestModelParentStub;
+        $builder = $model->joinRelation('roles');
+
+        $this->assertSame($expected, $builder->toSql(), 'using name');
+
+        $model = new EloquentBuilderTestModelParentStub;
+        $builder = $model->joinRelation($model->roles());
+
+        $this->assertSame($expected, $builder->toSql(), 'using relation');
+    }
+
+    public function testJoinHasToManyThroughRelation()
+    {
+        $expected = 'select * from "eloquent_builder_test_model_parent_stubs" inner join "eloquent_builder_test_model_close_related_stubs" on "eloquent_builder_test_model_parent_stubs"."id" = "eloquent_builder_test_model_close_related_stubs"."parent_id" inner join "eloquent_builder_test_model_far_related_stubs" on "eloquent_builder_test_model_close_related_stubs"."id" = "eloquent_builder_test_model_far_related_stubs"."through_id"';
+
+        $model = new EloquentBuilderTestModelParentStub;
+        $builder = $model->joinRelation('bazes');
+
+        $this->assertSame($expected, $builder->toSql(), 'using name');
+
+        $model = new EloquentBuilderTestModelParentStub;
+        $builder = $model->joinRelation($model->bazes());
+
+        $this->assertSame($expected, $builder->toSql(), 'using relation');
+    }
+
     public function testHasWithConstraintsAndHavingInSubqueryWithCount()
     {
         $model = new EloquentBuilderTestModelParentStub;
@@ -2253,6 +2328,21 @@ class EloquentBuilderTestModelParentStub extends Model
     public function morph()
     {
         return $this->morphTo();
+    }
+
+    public function baz()
+    {
+        return $this->morphOne(EloquentBuilderTestModelCloseRelatedStub::class, 'bazzable');
+    }
+
+    public function bazes()
+    {
+        return $this->hasManyThrough(
+            EloquentBuilderTestModelFarRelatedStub::class,
+            EloquentBuilderTestModelCloseRelatedStub::class,
+            'parent_id',
+            'through_id',
+        );
     }
 }
 

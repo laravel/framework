@@ -132,6 +132,16 @@ abstract class Relation implements BuilderContract
     abstract public function initRelation(array $models, $relation);
 
     /**
+     * Add a join clause to the query based on the relationship constraints.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder|null  $query
+     * @param  string  $type
+     * @param  bool  $where
+     * @return  $this
+     */
+    abstract public function addJoinClause($query, $type = 'inner', $where = false);
+
+    /**
      * Match the eagerly loaded results to their parents.
      *
      * @param  array  $models

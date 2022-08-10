@@ -182,6 +182,33 @@ class HasManyThrough extends Relation
     }
 
     /**
+     * Add a join clause to the query based on the relationship constraints.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder|null  $query
+     * @param  string  $type
+     * @param  bool  $where
+     * @return  \Illuminate\Database\Eloquent\Builder
+     */
+    public function addJoinClause($query = null, $type = 'inner', $where = false)
+    {
+        $query = $query ?: $this->query;
+
+        return $query->join(
+            $this->throughParent->getTable(),
+            $this->getQualifiedLocalKeyName(),
+            '=',
+            $this->getQualifiedFirstKeyName()
+        )->join(
+            $this->getModel()->getTable(),
+            $this->throughParent->qualifyColumn($this->getSecondLocalKeyName()),
+            '=',
+            $this->getQualifiedFarKeyName(),
+            $type,
+            $where
+        );
+    }
+
+    /**
      * Match the eagerly loaded results to their parents.
      *
      * @param  array  $models

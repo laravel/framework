@@ -43,6 +43,28 @@ abstract class HasOneOrMany extends Relation
     }
 
     /**
+     * Add a join clause to the query based on the relationship constraints.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder|null  $query
+     * @param  string  $type
+     * @param  bool  $where
+     * @return  \Illuminate\Database\Eloquent\Builder
+     */
+    public function addJoinClause($query = null, $type = 'inner', $where = false)
+    {
+        $query = $query ?: $this->query;
+
+        return $query->join(
+            $this->getRelated()->getTable(),
+            $this->getQualifiedParentKeyName(),
+            '=',
+            $this->getQualifiedForeignKeyName(),
+            $type,
+            $where
+        );
+    }
+
+    /**
      * Create and return an un-saved instance of the related model.
      *
      * @param  array  $attributes

@@ -265,6 +265,35 @@ class BelongsToMany extends Relation
     }
 
     /**
+     * Add a join clause to the query based on the relationship constraints.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder|null  $query
+     * @param  string  $type
+     * @param  bool  $where
+     * @return  \Illuminate\Database\Eloquent\Builder
+     */
+    public function addJoinClause($query = null, $type = 'inner', $where = false)
+    {
+        $query = $query ?: $this->query;
+
+        return $query->join(
+            $this->table,
+            $this->getQualifiedParentKeyName(),
+            '=',
+            $this->getQualifiedForeignPivotKeyName(),
+            $type,
+            $where
+        )->join(
+            $this->getModel()->getTable(),
+            $this->getQualifiedRelatedPivotKeyName(),
+            '=',
+            $this->getQualifiedRelatedKeyName(),
+            $type,
+            $where
+        );
+    }
+
+    /**
      * Match the eagerly loaded results to their parents.
      *
      * @param  array  $models
