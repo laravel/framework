@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -971,6 +972,56 @@ EOF;
     }
 
     /**
+     * Assert that the response contains the structure of the JsonResponse
+     *
+     * @param  JsonResource $resource
+     * @return $this
+     */
+    public function assertJsonResourceExist(JsonResource $resource)
+    {
+        $this->assertJson(
+            [
+                'data' => [
+                    $this->resourceToArray($resource)
+                ]
+            ]
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert that the json response doesn't contain the json response structure
+     *
+     * @param  JsonResource $resource
+     * @return $this
+     */
+    public function assertJsonResourceMissing(JsonResource $resource)
+    {
+        $this->assertJsonMissingExact(
+            $this->jsonResourceToArray($resource)
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert that the response contains the exact structure of the json response
+     *
+     * @param  JsonResource $resource
+     * @return $this
+     */
+    public function assertJsonResource(JsonResource $resource)
+    {
+        PHPUnit::assertSame(
+            $this->jsonResourceToArray($resource),
+            $this->json('data')
+        );
+
+        return $this;
+    }
+
+    /**
      * Validate and return the decoded response JSON.
      *
      * @return \Illuminate\Testing\AssertableJsonString
@@ -1446,6 +1497,11 @@ EOF;
         }
 
         return $session;
+    }
+
+    protected function jsonResourceToArray(JsonResource $resource)
+    {
+        return json_decode($resource->toJson(), true);
     }
 
     /**
