@@ -198,10 +198,9 @@ abstract class DatabaseInspectionCommand extends Command
      * Register custom Doctrine type mappings.
      *
      * @param  \Doctrine\DBAL\Platforms\AbstractPlatform  $platform
-     * @param  string  $database
      * @return void
      */
-    protected function regsisterTypeMapping(AbstractPlatform $platform)
+    protected function registerTypeMapping(AbstractPlatform $platform)
     {
         $platform->registerDoctrineTypeMapping('enum', 'string');
         $platform->registerDoctrineTypeMapping('sysname', 'string');

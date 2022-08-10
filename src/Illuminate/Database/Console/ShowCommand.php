@@ -43,7 +43,7 @@ class ShowCommand extends DatabaseInspectionCommand
         $connection = $connections->connection($database = $this->input->getOption('database'));
 
         $schema = $connection->getDoctrineSchemaManager();
-        $this->regsisterTypeMapping($schema->getDatabasePlatform());
+        $this->registerTypeMapping($schema->getDatabasePlatform());
 
         $data = [
             'platform' => [
