@@ -539,6 +539,56 @@ class FoundationViteTest extends TestCase
         ViteFacade::asset('resources/js/missing.js');
     }
 
+    public function testViteCanMergeEntryPoints()
+    {
+        $this->makeViteManifest();
+
+        $vite = app(Vite::class);
+
+        $this->assertSame('', $vite->toHtml());
+
+        $vite->withEntryPoints(['resources/js/app.js']);
+
+        $this->assertSame(
+            '<script type="module" src="https://example.com/build/assets/app.versioned.js"></script>',
+            $vite->toHtml()
+        );
+    }
+
+    public function testViteCanOverrideBuildDirectory()
+    {
+        $this->makeViteManifest(null, 'custom-build');
+
+        $vite = app(Vite::class);
+
+        $vite->withEntryPoints(['resources/js/app.js'])->useBuildDirectory('custom-build');
+
+        $this->assertSame(
+            '<script type="module" src="https://example.com/custom-build/assets/app.versioned.js"></script>',
+            $vite->toHtml()
+        );
+
+        $this->cleanViteManifest('custom-build');
+    }
+
+    public function testViteCanOverrideHotFilePath()
+    {
+        $this->makeViteManifest();
+        $this->makeViteHotFile('build/hot');
+
+        $vite = app(Vite::class);
+
+        $vite->withEntryPoints(['resources/js/app.js'])->useHotFile('build/hot');
+
+        $this->assertSame(
+            '<script type="module" src="http://localhost:3000/@vite/client"></script>'
+            .'<script type="module" src="http://localhost:3000/resources/js/app.js"></script>',
+            $vite->toHtml()
+        );
+
+        $this->cleanViteHotFile('build/hot');
+    }
+
     protected function makeViteManifest($contents = null, $path = 'build')
     {
         app()->singleton('path.public', fn () => __DIR__);
@@ -582,28 +632,28 @@ class FoundationViteTest extends TestCase
         file_put_contents(public_path("{$path}/manifest.json"), $manifest);
     }
 
-    protected function cleanViteManifest()
+    protected function cleanViteManifest($path = 'build')
     {
-        if (file_exists(public_path('build/manifest.json'))) {
-            unlink(public_path('build/manifest.json'));
+        if (file_exists(public_path("{$path}/manifest.json"))) {
+            unlink(public_path("{$path}/manifest.json"));
         }
 
-        if (file_exists(public_path('build'))) {
-            rmdir(public_path('build'));
+        if (file_exists(public_path($path))) {
+            rmdir(public_path($path));
         }
     }
 
-    protected function makeViteHotFile()
+    protected function makeViteHotFile($path = 'hot')
     {
         app()->singleton('path.public', fn () => __DIR__);
 
-        file_put_contents(public_path('hot'), 'http://localhost:3000');
+        file_put_contents(public_path($path), 'http://localhost:3000');
     }
 
-    protected function cleanViteHotFile()
+    protected function cleanViteHotFile($path = 'hot')
     {
-        if (file_exists(public_path('hot'))) {
-            unlink(public_path('hot'));
+        if (file_exists(public_path($path))) {
+            unlink(public_path($path));
         }
     }
 }

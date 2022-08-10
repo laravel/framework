@@ -536,6 +536,6 @@ class Vite implements Htmlable
      */
     public function toHtml()
     {
-        return $this->__invoke($this->entryPoints, $this->buildDirectory);
+        return $this->__invoke($this->entryPoints, $this->buildDirectory)->toHtml();
     }
 }
