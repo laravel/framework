@@ -438,7 +438,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             if ($this->isFillable($key)) {
                 if ($value instanceof AtomicExpression) {
                     $this->setAttribute($key, $outcome = $value->getExpectedOutcome());
-                    $this->dirtyAttributesAtomic[$key] = $outcome;
+                    $this->dirtyAttributesAtomic[$key] = $value;
                 } else {
                     $this->setAttribute($key, $value);
                 }
