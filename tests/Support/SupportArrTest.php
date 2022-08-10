@@ -496,9 +496,9 @@ class SupportArrTest extends TestCase
         $this->assertEmpty(Arr::only($array, ['nonExistingKey']));
 
         $array = ['taxonomies' => ['colors' => ['red', 'blue'], 'sizes' => ['small', 'medium', 'large']]];
-        $this->assertEquals(['taxonomies' => ['colors' => ['red', 'blue']]], Arr::only($array, 'taxonomies.colors', true));
-        $this->assertEquals(['taxonomies' => ['sizes' => ['small', 'medium', 'large']]], Arr::only($array, 'taxonomies.sizes', true));
-        $this->assertEquals($array, Arr::only($array, ['taxonomies.sizes', 'taxonomies.colors'], true));
+        $this->assertEquals(['taxonomies' => ['colors' => ['red', 'blue']]], Arr::only($array, 'taxonomies.colors'));
+        $this->assertEquals(['taxonomies' => ['sizes' => ['small', 'medium', 'large']]], Arr::only($array, 'taxonomies.sizes'));
+        $this->assertEquals($array, Arr::only($array, ['taxonomies.sizes', 'taxonomies.colors']));
 
         $array = ['2.name' => 'Laravel', '3.name' => 'Framework'];
         $this->assertEquals(['2.name' => 'Laravel'], Arr::only($array, '2.name'));
