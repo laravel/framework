@@ -8,6 +8,7 @@ use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\SQLiteConnection;
+use Illuminate\Database\SqlServerConnection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Composer;
 use Symfony\Component\Process\Exception\ProcessSignaledException;
@@ -121,14 +122,14 @@ abstract class DatabaseInspectionCommand extends Command
      * Get the number of open connections for a database.
      *
      * @param  \Illuminate\Database\ConnectionInterface  $connection
-     * @return null
+     * @return int|null
      */
     protected function getConnectionCount(ConnectionInterface $connection)
     {
-        return match (class_basename($connection)) {
-            'MySqlConnection' => (int) $connection->selectOne($connection->raw('show status where variable_name = "threads_connected"'))->Value,
-            'PostgresConnection' => (int) $connection->selectOne('select count(*) as connections from pg_stat_activity')->connections,
-            'SqlServerConnection' => (int) $connection->selectOne('SELECT COUNT(*) connections FROM sys.dm_exec_sessions WHERE status = ?', ['running'])->connections,
+        return match (true) {
+            $connection instanceof MySqlConnection => (int) $connection->selectOne($connection->raw('show status where variable_name = "threads_connected"'))->Value,
+            $connection instanceof PostgresConnection => (int) $connection->selectOne('select count(*) as connections from pg_stat_activity')->connections,
+            $connection instanceof SqlServerConnection => (int) $connection->selectOne('SELECT COUNT(*) connections FROM sys.dm_exec_sessions WHERE status = ?', ['running'])->connections,
             default => null,
         };
     }
