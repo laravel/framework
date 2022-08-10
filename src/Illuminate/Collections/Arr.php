@@ -490,11 +490,11 @@ class Arr
      */
     public static function only($array, $keys)
     {
-    	$keys = static::wrap($keys);
+        $keys = static::wrap($keys);
     	
-    	$newArray = array_intersect_key($array, array_flip($keys));
+        $newArray = array_intersect_key($array, array_flip($keys));
         foreach ($keys as $key) {
-            if (!static::exists($newArray, $key) && static::has($array, $key)) {
+            if (! static::exists($newArray, $key) && static::has($array, $key)) {
                 static::set($newArray, $key, static::get($array, $key));
             }
         }
