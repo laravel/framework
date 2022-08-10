@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Console;
 
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Schema\View;
@@ -43,6 +44,8 @@ class ShowCommand extends DatabaseInspectionCommand
         $connection = $connections->connection($database = $this->input->getOption('database'));
 
         $schema = $connection->getDoctrineSchemaManager();
+
+        $this->registerTypeMapping($connection);
 
         $data = [
             'platform' => [
@@ -180,6 +183,22 @@ class ShowCommand extends DatabaseInspectionCommand
             $views->each(fn ($view) => $this->components->twoColumnDetail($view['view'], number_format($view['rows'])));
 
             $this->newLine();
+        }
+    }
+
+    /**
+     * Register Doctrine type mappings where needed for unsupported database types.
+     *
+     * @param  ConnectionInterface  $connection
+     * @return void
+     */
+    protected function registerTypeMapping(ConnectionInterface $connection)
+    {
+        $doctrineConnection = $connection->getDoctrineConnection();
+        $platform = $doctrineConnection->getDatabasePlatform();
+
+        if (is_subclass_of($platform, MySQLPlatform::class)) {
+            $platform->registerDoctrineTypeMapping('enum', 'string');
         }
     }
 }
