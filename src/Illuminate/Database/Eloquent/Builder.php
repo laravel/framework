@@ -389,11 +389,12 @@ class Builder implements BuilderContract
     public function hydrate(array $items)
     {
         $instance = $this->newModelInstance();
+        $hasMultipleItems = count($items) > 1;
 
-        return $instance->newCollection(array_map(function ($item) use ($items, $instance) {
+        return $instance->newCollection(array_map(function ($item) use ($hasMultipleItems, $instance) {
             $model = $instance->newFromBuilder($item);
 
-            if (count($items) > 1) {
+            if ($hasMultipleItems) {
                 $model->preventsLazyLoading = Model::preventsLazyLoading();
             }
 
