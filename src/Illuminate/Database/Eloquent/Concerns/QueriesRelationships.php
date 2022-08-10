@@ -593,7 +593,6 @@ trait QueriesRelationships
      * @param  \Illuminate\Database\Eloquent\Relations\Relation|string  $relation
      * @param  string  $type
      * @param  bool  $where
-     *
      * @return $this
      *
      * @throws \Illuminate\Database\Eloquent\RelationNotFoundException

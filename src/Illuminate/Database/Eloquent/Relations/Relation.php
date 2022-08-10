@@ -137,7 +137,7 @@ abstract class Relation implements BuilderContract
      * @param  \Illuminate\Database\Eloquent\Builder|null  $query
      * @param  string  $type
      * @param  bool  $where
-     * @return  $this
+     * @return $this
      */
     abstract public function addJoinClause($query, $type = 'inner', $where = false);
 

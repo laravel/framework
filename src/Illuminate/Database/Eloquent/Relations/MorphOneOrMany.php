@@ -74,13 +74,13 @@ abstract class MorphOneOrMany extends HasOneOrMany
      * @param  \Illuminate\Database\Eloquent\Builder|null  $query
      * @param  string  $type
      * @param  bool  $where
-     * @return  \Illuminate\Database\Eloquent\Builder
+     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function addJoinClause($query = null, $type = 'inner', $where = false)
     {
         $query = $query ?: $this->query;
 
-        return $query->join($this->getModel()->getTable(), function(JoinClause $join) {
+        return $query->join($this->getModel()->getTable(), function (JoinClause $join) {
             $join->on(
                 $this->getQualifiedParentKeyName(),
                 '=',

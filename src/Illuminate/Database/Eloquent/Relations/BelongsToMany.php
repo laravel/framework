@@ -270,7 +270,7 @@ class BelongsToMany extends Relation
      * @param  \Illuminate\Database\Eloquent\Builder|null  $query
      * @param  string  $type
      * @param  bool  $where
-     * @return  \Illuminate\Database\Eloquent\Builder
+     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function addJoinClause($query = null, $type = 'inner', $where = false)
     {
