@@ -2,8 +2,6 @@
 
 namespace Illuminate\Support\Facades;
 
-use Illuminate\Foundation\Vite as Factory;
-
 /**
  * @method static string useCspNonce(?string $nonce = null)
  * @method static string|null cspNonce()
@@ -27,6 +25,6 @@ class Vite extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return Factory::class;
+        return \Illuminate\Foundation\Vite::class;
     }
 }
