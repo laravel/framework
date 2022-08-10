@@ -490,7 +490,24 @@ class Arr
      */
     public static function only($array, $keys)
     {
-        return array_intersect_key($array, array_flip((array) $keys));
+        if (! is_array($keys)) {
+            $keys = [$keys];
+        }
+    
+        $newArray = [];
+        foreach ($keys as $key) {
+            if (Arr::exists($array, $key)) {
+              $newArray[$key] = Arr::get($array, $key);
+            } else if (Arr::has($array, $key)) {
+                Arr::set($newArray, $key, Arr::get($array, $key));
+            }
+        }
+    
+        $oldKeys = array_fill_keys(array_keys($array), null);
+        $orderedNewArray = array_replace($oldKeys, $newArray);
+        $filteredOrderedNewArray = array_intersect_key($orderedNewArray, $newArray);
+    
+        return $filteredOrderedNewArray;
     }
 
     /**
