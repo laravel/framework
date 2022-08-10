@@ -498,6 +498,7 @@ class Arr
                 static::set($newArray, $key, static::get($array, $key));
             }
         }
+
         return $newArray;
     }
 
