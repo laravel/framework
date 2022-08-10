@@ -871,8 +871,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
         $fillMethod = $method === 'increment' ? 'createIncrementStatement' : 'createDecrementStatement';
 
-        dump($fillMethod);
-        dd($this->setKeysForSaveQuery($query)->{$fillMethod}($column, $amount, $expectedOutcome, $extra));
         $this->fill($this->setKeysForSaveQuery($query)->{$fillMethod}($column, $amount, $expectedOutcome, $extra));
 
         return $this->save();
