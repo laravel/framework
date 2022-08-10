@@ -511,7 +511,7 @@ class Vite implements Htmlable
      */
     public function useHotFile(string $path)
     {
-        $this->hotFilePath = Str::start($path, '/');
+        $this->hotFilePath = $path;
 
         return $this;
     }
@@ -524,7 +524,7 @@ class Vite implements Htmlable
      */
     public function useBuildDirectory(string $path)
     {
-        $this->buildDirectory = Str::start($path, '/');
+        $this->buildDirectory = $path;
 
         return $this;
     }
