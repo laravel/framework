@@ -135,7 +135,7 @@ class ShowCommand extends DatabaseInspectionCommand
 
         $this->newLine();
 
-        $this->components->twoColumnDetail('<fg=green;options=bold>' . $platform['name'] . '</>');
+        $this->components->twoColumnDetail('<fg=green;options=bold>'.$platform['name'].'</>');
         $this->components->twoColumnDetail('Database', Arr::get($platform['config'], 'database'));
         $this->components->twoColumnDetail('Host', Arr::get($platform['config'], 'host'));
         $this->components->twoColumnDetail('Port', Arr::get($platform['config'], 'port'));
@@ -145,13 +145,13 @@ class ShowCommand extends DatabaseInspectionCommand
         $this->components->twoColumnDetail('Tables', $tables->count());
 
         if ($tableSizeSum = $tables->sum('size')) {
-            $this->components->twoColumnDetail('Total Size', number_format($tableSizeSum / 1024 / 1024, 2) . 'Mb');
+            $this->components->twoColumnDetail('Total Size', number_format($tableSizeSum / 1024 / 1024, 2).'Mb');
         }
 
         $this->newLine();
 
         if ($tables->isNotEmpty()) {
-            $this->components->twoColumnDetail('<fg=green;options=bold>Table</>', 'Size (Mb)' . ($this->option('counts') ? ' <fg=gray;options=bold>/</> <fg=yellow;options=bold>Rows</>' : ''));
+            $this->components->twoColumnDetail('<fg=green;options=bold>Table</>', 'Size (Mb)'.($this->option('counts') ? ' <fg=gray;options=bold>/</> <fg=yellow;options=bold>Rows</>' : ''));
 
             $tables->each(function ($table) {
                 if ($tableSize = $table['size']) {
@@ -159,8 +159,8 @@ class ShowCommand extends DatabaseInspectionCommand
                 }
 
                 $this->components->twoColumnDetail(
-                    $table['table'] . ($this->output->isVerbose() ? ' <fg=gray>' . $table['engine'] . '</>' : null),
-                    ($tableSize ? $tableSize : '—') . ($this->option('counts') ? ' <fg=gray;options=bold>/</> <fg=yellow;options=bold>' . number_format($table['rows']) . '</>' : '')
+                    $table['table'].($this->output->isVerbose() ? ' <fg=gray>'.$table['engine'].'</>' : null),
+                    ($tableSize ? $tableSize : '—').($this->option('counts') ? ' <fg=gray;options=bold>/</> <fg=yellow;options=bold>'.number_format($table['rows']).'</>' : '')
                 );
 
                 if ($this->output->isVerbose()) {
