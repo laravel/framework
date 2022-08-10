@@ -1038,8 +1038,10 @@ class Builder implements BuilderContract
      */
     public function increment($column, $amount = 1, array $extra = [])
     {
-        return $this->toBase()->increment(
-            $column, $amount, $this->addUpdatedAtColumn($extra)
+        return $this->update(
+            $this->toBase()->createIncrementStatement(
+                $column, $amount, $this->model->$column + $amount, $extra
+            )
         );
     }
 
@@ -1053,9 +1055,21 @@ class Builder implements BuilderContract
      */
     public function decrement($column, $amount = 1, array $extra = [])
     {
-        return $this->toBase()->decrement(
-            $column, $amount, $this->addUpdatedAtColumn($extra)
+        return $this->update(
+            $this->toBase()->createDecrementStatement(
+                $column, $amount, $this->model->$column - $amount, $extra
+            )
         );
+    }
+
+    public function createIncrementStatement($column, $amount, $expectedOutcome, array $extra = [])
+    {
+        return $this->toBase()->createIncrementStatement($column, $amount, $expectedOutcome, $extra);
+    }
+
+    public function createDecrementStatement($column, $amount, $expectedOutcome, array $extra = [])
+    {
+        return $this->toBase()->createDecrementStatement($column, $amount, $expectedOutcome, $extra);
     }
 
     /**

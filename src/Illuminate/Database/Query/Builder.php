@@ -3388,9 +3388,7 @@ class Builder implements BuilderContract
             throw new InvalidArgumentException('Non-numeric value passed to increment method.');
         }
 
-        $wrapped = $this->grammar->wrap($column);
-
-        $columns = array_merge([$column => $this->raw("$wrapped + $amount")], $extra);
+        $columns = $this->createIncrementStatement($column, $amount, null, $extra);
 
         return $this->update($columns);
     }
@@ -3411,11 +3409,28 @@ class Builder implements BuilderContract
             throw new InvalidArgumentException('Non-numeric value passed to decrement method.');
         }
 
-        $wrapped = $this->grammar->wrap($column);
-
-        $columns = array_merge([$column => $this->raw("$wrapped - $amount")], $extra);
+        $columns = $this->createDecrementStatement($column, $amount, null, $extra);
 
         return $this->update($columns);
+    }
+
+    public function createAtomicExpressionStatement(
+        $column, $operator, $amount, $expectedOutcome, array $extra = []
+    )
+    {
+        $wrapped = $this->grammar->wrap($column);
+
+        return array_merge([$column => $this->atomicExpression("$wrapped $operator $amount", $expectedOutcome)], $extra);
+    }
+
+    public function createIncrementStatement($column, $amount, $expectedOutcome, array $extra = [])
+    {
+        return $this->createAtomicExpressionStatement($column, '+', $amount, $expectedOutcome,  $extra);
+    }
+
+    public function createDecrementStatement($column, $amount, $expectedOutcome, array $extra = [])
+    {
+        return $this->createAtomicExpressionStatement($column, '-', $amount, $expectedOutcome, $extra);
     }
 
     /**
@@ -3485,6 +3500,18 @@ class Builder implements BuilderContract
     public function raw($value)
     {
         return $this->connection->raw($value);
+    }
+
+    /**
+     * Get a new atomic query expression.
+     *
+     * @param  mixed  $value
+     * @param  scalar  $expectedOutcome
+     * @return \Illuminate\Database\Query\AtomicExpression
+     */
+    public function atomicExpression($value, $expectedOutcome)
+    {
+        return $this->connection->atomicExpression($value, $expectedOutcome);
     }
 
     /**

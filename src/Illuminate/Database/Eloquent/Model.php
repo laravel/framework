@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\Query\AtomicExpression;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Str;
@@ -117,6 +118,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * @var bool
      */
     protected $escapeWhenCastingToString = false;
+
+    /**
+     * Indicates attributes that should be updated that consist of an atomic query operation like "`points` + 10".
+     *
+     * @var array
+     */
+    protected $dirtyAttributesAtomic = [];
 
     /**
      * The connection resolver instance.
@@ -428,7 +436,12 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             // which means only those attributes may be set through mass assignment to
             // the model, and all others will just get ignored for security reasons.
             if ($this->isFillable($key)) {
-                $this->setAttribute($key, $value);
+                if ($value instanceof AtomicExpression) {
+                    $this->setAttribute($key, $outcome = $value->getExpectedOutcome());
+                    $this->dirtyAttributesAtomic[$key] = $outcome;
+                } else {
+                    $this->setAttribute($key, $value);
+                }
             } elseif ($totallyGuarded) {
                 throw new MassAssignmentException(sprintf(
                     'Add [%s] to fillable property to allow mass assignment on [%s].',
@@ -852,23 +865,17 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             return $query->{$method}($column, $amount, $extra);
         }
 
-        $this->{$column} = $this->isClassDeviable($column)
+        $expectedOutcome = $this->isClassDeviable($column)
             ? $this->deviateClassCastableAttribute($method, $column, $amount)
             : $this->{$column} + ($method === 'increment' ? $amount : $amount * -1);
 
-        $this->forceFill($extra);
+        $fillMethod = $method === 'increment' ? 'createIncrementStatement' : 'createDecrementStatement';
 
-        if ($this->fireModelEvent('updating') === false) {
-            return false;
-        }
+        dump($fillMethod);
+        dd($this->setKeysForSaveQuery($query)->{$fillMethod}($column, $amount, $expectedOutcome, $extra));
+        $this->fill($this->setKeysForSaveQuery($query)->{$fillMethod}($column, $amount, $expectedOutcome, $extra));
 
-        return tap($this->setKeysForSaveQuery($query)->{$method}($column, $amount, $extra), function () use ($column) {
-            $this->syncChanges();
-
-            $this->fireModelEvent('updated', false);
-
-            $this->syncOriginalAttribute($column);
-        });
+        return $this->save();
     }
 
     /**
@@ -1002,7 +1009,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     {
         $this->mergeAttributesFromCachedCasts();
 
-        $query = $this->newModelQuery();
+        $query = ($options['restoring'] ?? false) ? $this->newModelQuery() : $this->newQueryWithoutRelationships();
 
         // If the "saving" event returns false we'll bail out of the save and return
         // false, indicating that the save failed. This provides a chance for any
@@ -1098,7 +1105,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         // Once we have run the update operation, we will fire the "updated" event for
         // this model instance. This will allow developers to hook into these after
         // models are updated, giving them a chance to do any special processing.
-        $dirty = $this->getDirty();
+        $dirty = array_merge($this->getDirty(), $this->dirtyAttributesAtomic);
 
         if (count($dirty) > 0) {
             $this->setKeysForSaveQuery($query)->update($dirty);
@@ -1107,6 +1114,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
             $this->fireModelEvent('updated', false);
         }
+
+        $this->dirtyAttributesAtomic = [];
 
         return true;
     }

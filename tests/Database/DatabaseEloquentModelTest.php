@@ -1852,6 +1852,43 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertNull($replicated->updated_at);
     }
 
+
+    public function testIncrementChangesUpdatedAt()
+    {
+        $model = m::mock(EloquentModelStub::class.'[newQueryWithoutRelationships]');
+        $model->exists = true;
+        $model->id = 1;
+        $model->internet_points = 10;
+        $model->syncOriginalAttributes(['id', 'internet_points']);
+
+        [$connection, $grammar, $processor] = $this->addMockConnection($model);
+        $grammar->makePartial();
+        $connection->makePartial();
+        $connection->expects('update');
+
+        $baseBuilder = m::mock(
+            new BaseBuilder(
+                $connection,
+                $grammar,
+                $processor
+            )
+        );
+
+        $builder = m::mock(new Builder($baseBuilder));
+        $builder->setModel($model);
+
+        $model->shouldReceive('newQueryWithoutRelationships')->andReturn($builder);
+
+        $this->assertNull($model->updated_at);
+
+        $model->increment('internet_points', 5, [
+            'foo' => true
+        ]);
+        $this->assertNotNull($model->updated_at);
+        $this->assertTrue($model->foo);
+        $this->assertEquals(15, $model->internet_points);
+    }
+
     public function testIncrementOnExistingModelCallsQueryAndSetsAttribute()
     {
         $model = m::mock(EloquentModelStub::class.'[newQueryWithoutRelationships]');
@@ -2311,6 +2348,8 @@ class DatabaseEloquentModelTest extends TestCase
         $connection->shouldReceive('query')->andReturnUsing(function () use ($connection, $grammar, $processor) {
             return new BaseBuilder($connection, $grammar, $processor);
         });
+
+        return [$connection, $grammar, $processor];
     }
 
     public function testTouchingModelWithTimestamps()

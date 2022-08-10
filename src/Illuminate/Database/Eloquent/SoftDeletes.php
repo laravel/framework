@@ -121,7 +121,7 @@ trait SoftDeletes
         // totally finished. Then we will return the result of the save call.
         $this->exists = true;
 
-        $result = $this->save();
+        $result = $this->save(['restoring' => true]);
 
         $this->fireModelEvent('restored', false);
 

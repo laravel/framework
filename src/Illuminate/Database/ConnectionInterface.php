@@ -24,6 +24,15 @@ interface ConnectionInterface
     public function raw($value);
 
     /**
+     * Get a new atomic query expression.
+     *
+     * @param  mixed  $value
+     * @param  scalar  $expectedOutcome
+     * @return \Illuminate\Database\Query\AtomicExpression
+     */
+    public function atomicExpression($value, $expectedOutcome);
+
+    /**
      * Run a select statement and return a single result.
      *
      * @param  string  $query
