@@ -578,7 +578,7 @@ class FoundationViteTest extends TestCase
 
         $vite = app(Vite::class);
 
-        $vite->withEntryPoints(['resources/js/app.js'])->useHotFile('build/hot');
+        $vite->withEntryPoints(['resources/js/app.js'])->useHotFile(public_path('build/hot'));
 
         $this->assertSame(
             '<script type="module" src="http://localhost:3000/@vite/client"></script>'

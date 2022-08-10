@@ -57,7 +57,7 @@ class Vite implements Htmlable
      *
      * @var string
      */
-    protected $hotFilePath = '/hot';
+    protected $hotFilePath = null;
 
     /**
      * The path to the build directory.
@@ -514,6 +514,16 @@ class Vite implements Htmlable
         $this->hotFilePath = $path;
 
         return $this;
+    }
+
+    /**
+     * Get the hot file path.
+     *
+     * @return string
+     */
+    protected function hotFilePath()
+    {
+        return $this->hotFilePath ?? public_path('/hot');
     }
 
     /**
