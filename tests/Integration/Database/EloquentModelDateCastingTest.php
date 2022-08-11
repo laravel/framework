@@ -53,6 +53,34 @@ class EloquentModelDateCastingTest extends DatabaseTestCase
         $this->assertSame(['2019-10-01', '2019-10-01 10:15:20', '2019-10-01', '2019-10-01 10:15'], $bindings);
     }
 
+    public function testDatesArePreservedInSetter()
+    {
+        $date = Carbon::make('2022-08-28T12:52:02+09:00');
+
+        $model = new TestModel1();
+
+        $model->setAttribute('basic_datetime', $date);
+        $model->setAttribute('format_datetime', $date);
+
+        $this->assertEquals((new Carbon($model->getAttributes()['format_datetime']))->timestamp, $date->timestamp);
+        $this->assertEquals((new Carbon($model->getAttributes()['basic_datetime']))->timestamp, $date->timestamp);
+    }
+
+    public function testDatesArePreservedInGetter()
+    {
+        $date = Carbon::make('2022-08-28T12:52:02+09:00');
+
+        $model = new TestModel1();
+
+        $model->setRawAttributes([
+            'basic_datetime' => $date,
+            'format_datetime' => $date,
+        ]);
+
+        $this->assertEquals((new Carbon($model->getAttribute('format_datetime')))->timestamp, $date->timestamp);
+        $this->assertEquals((new Carbon($model->getAttribute('basic_datetime')))->timestamp, $date->timestamp);
+    }
+
     public function testDatesFormattedArrayAndJson()
     {
         $user = TestModel1::create([
@@ -126,5 +154,8 @@ class TestModel1 extends Model
         'datetime_field' => 'datetime:Y-m H:i',
         'immutable_date_field' => 'date:Y-m',
         'immutable_datetime_field' => 'datetime:Y-m H:i',
+        'basic_datetime' => 'datetime',
+        // Even though they should be the same, there is a functional difference
+        'format_datetime' => 'datetime:Y-m-d H:i:s',
     ];
 }
