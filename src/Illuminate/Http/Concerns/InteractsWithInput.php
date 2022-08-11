@@ -134,6 +134,28 @@ trait InteractsWithInput
     }
 
     /**
+     * Apply the callback if the request contains the given input with the given value.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @param  callable  $callback
+     * @param  callable|null  $default
+     * @return $this|mixed
+     */
+    public function whenHasValue($key, $value, callable $callback, callable $default = null)
+    {
+        if ($this->input($key) == $value) {
+            return $callback(data_get($this->all(), $key)) ?: $this;
+        }
+
+        if ($default) {
+            return $default();
+        }
+
+        return $this;
+    }
+
+    /**
      * Determine if the request contains a non-empty value for an input item.
      *
      * @param  string|array  $key

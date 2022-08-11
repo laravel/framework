@@ -384,6 +384,26 @@ class HttpRequestTest extends TestCase
         $this->assertTrue($bar);
     }
 
+    public function testWhenHasValueMethod()
+    {
+        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'framework' => 'Laravel']);
+
+        $name = $framework = 'Test';
+
+        $request->whenHasValue('name', 'Taylor' , function ($value) use (&$name) {
+            $name = $value;
+        });
+
+        $request->whenHasValue('framework', 'Django', function () use (&$framework) {
+            $framework = true;
+        }, function () use (&$framework) {
+            $framework = false;
+        });
+
+        $this->assertSame('Taylor', $name);
+        $this->assertFalse($framework);
+    }
+
     public function testWhenFilledMethod()
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => '', 'city' => null]);
