@@ -54,6 +54,7 @@ class TableCommand extends DatabaseInspectionCommand
 
         if (! $schema->tablesExist([$table])) {
             $this->warn("Table [{$table}] doesn't exist.");
+
             return 0;
         }
 
