@@ -243,20 +243,20 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      *
      * @return bool
      */
-     public function isAttemptingPrecognitiveGlance()
-     {
-         return $this->header('Precognition') === '1';
-     }
+    public function isAttemptingPrecognitiveGlance()
+    {
+        return $this->header('Precognition') === '1';
+    }
 
     /**
      * Check if the request is not attempting to be a precognitive glance at the response.
      *
      * @return bool
      */
-     public function isNotAttemptingPrecognitiveGlance()
-     {
-         return ! $this->isAttemptingPrecognitiveGlance();
-     }
+    public function isNotAttemptingPrecognitiveGlance()
+    {
+        return ! $this->isAttemptingPrecognitiveGlance();
+    }
 
     /**
      * Get the host name.
