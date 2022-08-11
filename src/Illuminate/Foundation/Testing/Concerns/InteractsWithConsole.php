@@ -16,49 +16,49 @@ trait InteractsWithConsole
     public $mockConsoleOutput = true;
 
     /**
-     * All of the expected output lines.
+     * All the expected output lines.
      *
      * @var array
      */
     public $expectedOutput = [];
 
     /**
-     * All of the expected text to be present in the output.
+     * All the expected text to be present in the output.
      *
      * @var array
      */
     public $expectedOutputSubstrings = [];
 
     /**
-     * All of the output lines that aren't expected to be displayed.
+     * All the output lines that aren't expected to be displayed.
      *
      * @var array
      */
     public $unexpectedOutput = [];
 
     /**
-     * All of the text that is not expected to be present in the output.
+     * All the text that is not expected to be present in the output.
      *
      * @var array
      */
     public $unexpectedOutputSubstrings = [];
 
     /**
-     * All of the expected output tables.
+     * All the expected output tables.
      *
      * @var array
      */
     public $expectedTables = [];
 
     /**
-     * All of the expected questions.
+     * All the expected questions.
      *
      * @var array
      */
     public $expectedQuestions = [];
 
     /**
-     * All of the expected choice questions.
+     * All the expected choice questions.
      *
      * @var array
      */

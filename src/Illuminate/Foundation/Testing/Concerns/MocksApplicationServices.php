@@ -14,28 +14,28 @@ use Mockery;
 trait MocksApplicationServices
 {
     /**
-     * All of the fired events.
+     * All the fired events.
      *
      * @var array
      */
     protected $firedEvents = [];
 
     /**
-     * All of the fired model events.
+     * All the fired model events.
      *
      * @var array
      */
     protected $firedModelEvents = [];
 
     /**
-     * All of the dispatched jobs.
+     * All the dispatched jobs.
      *
      * @var array
      */
     protected $dispatchedJobs = [];
 
     /**
-     * All of the dispatched notifications.
+     * All the dispatched notifications.
      *
      * @var array
      */

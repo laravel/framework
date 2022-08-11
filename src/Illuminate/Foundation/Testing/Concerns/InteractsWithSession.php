@@ -49,7 +49,7 @@ trait InteractsWithSession
     }
 
     /**
-     * Flush all of the current session data.
+     * Flush all the current session data.
      *
      * @return $this
      */
