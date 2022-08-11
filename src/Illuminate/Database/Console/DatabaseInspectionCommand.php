@@ -17,7 +17,7 @@ use Symfony\Component\Process\Process;
 abstract class DatabaseInspectionCommand extends Command
 {
     /**
-     * Database column type map.
+     * A map of database column types.
      *
      * @var array
      */
