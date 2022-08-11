@@ -44,6 +44,8 @@ class ShowCommand extends DatabaseInspectionCommand
 
         $schema = $connection->getDoctrineSchemaManager();
 
+        $this->registerTypeMapping($schema->getDatabasePlatform());
+
         $data = [
             'platform' => [
                 'config' => $this->getConfigFromDatabase($database),
@@ -75,7 +77,7 @@ class ShowCommand extends DatabaseInspectionCommand
             'table' => $table->getName(),
             'size' => $this->getTableSize($connection, $table->getName()),
             'rows' => $this->option('counts') ? $connection->table($table->getName())->count() : null,
-            'engine' => rescue(fn () => $table->getOption('engine')),
+            'engine' => rescue(fn () => $table->getOption('engine'), null, false),
             'comment' => $table->getComment(),
         ]);
     }
