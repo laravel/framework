@@ -2,10 +2,6 @@
 
 namespace Illuminate\Routing;
 
-use Illuminate\Container\Container;
-use Illuminate\Routing\Contracts\CallableDispatcher as CallableDispatcherContract;
-use ReflectionFunction;
-
 class PrecognitiveCallableDispatcher extends CallableDispatcher
 {
     /**
