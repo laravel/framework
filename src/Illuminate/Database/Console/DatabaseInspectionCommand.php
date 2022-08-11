@@ -57,6 +57,19 @@ abstract class DatabaseInspectionCommand extends Command
     }
 
     /**
+     * Register the custom Doctrine type mappings for inspection commands.
+     *
+     * @param  \Doctrine\DBAL\Platforms\AbstractPlatform  $platform
+     * @return void
+     */
+    protected function registerTypeMappings(AbstractPlatform $platform)
+    {
+        foreach ($this->typeMappings as $type => $value) {
+            $platform->registerDoctrineTypeMapping($type, $value);
+        }
+    }
+
+    /**
      * Get a human-readable platform name for the given platform.
      *
      * @param  \Doctrine\DBAL\Platforms\AbstractPlatform  $platform
@@ -223,19 +236,6 @@ abstract class DatabaseInspectionCommand extends Command
             if (extension_loaded('pcntl') && $e->getSignal() !== SIGINT) {
                 throw $e;
             }
-        }
-    }
-
-    /**
-     * Register custom Doctrine type mappings.
-     *
-     * @param  \Doctrine\DBAL\Platforms\AbstractPlatform  $platform
-     * @return void
-     */
-    protected function registerTypeMapping(AbstractPlatform $platform)
-    {
-        foreach ($this->typeMappings as $type => $value) {
-            $platform->registerDoctrineTypeMapping($type, $value);
         }
     }
 }

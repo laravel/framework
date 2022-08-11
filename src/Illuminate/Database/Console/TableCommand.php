@@ -42,7 +42,8 @@ class TableCommand extends DatabaseInspectionCommand
         $connection = $connections->connection($this->input->getOption('database'));
 
         $schema = $connection->getDoctrineSchemaManager();
-        $this->registerTypeMapping($schema->getDatabasePlatform());
+
+        $this->registerTypeMappings($schema->getDatabasePlatform());
 
         $table = $this->argument('table') ?: $this->components->choice(
             'Which table would you like to inspect?',
