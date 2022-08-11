@@ -466,29 +466,30 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function addRoute($methods, $uri, $action)
     {
-        $this->validateDuplicatesIfNeeded($methods, $uri);
+        $route = tap($this->createRoute($methods, $uri, $action), fn (Route $route) => $this->validateDuplicatesIfNeeded($route));
 
-        return $this->routes->add($this->createRoute($methods, $uri, $action));
+        return $this->routes->add($route);
     }
 
     /**
      * Throw an exception if a route with the same path already exists.
      *
-     * @param  array|string  $methods
-     * @param  string  $uri
+     * @param  \Illuminate\Routing\Route $newRoute
      * @return void
      * @throws \Illuminate\Routing\Exceptions\RouteAlreadyRegisteredException
      */
-    protected function validateDuplicatesIfNeeded($methods, $uri)
+    protected function validateDuplicatesIfNeeded(Route $newRoute)
     {
         if (! static::$enforceUniqueRoutes) {
             return;
         }
 
         $cleanUriParameters = fn (string $uri) => preg_replace('/{(.*?)\}/s', '', $uri);
-        $route = collect($this->routes->getRoutes())->first(fn (Route $route) =>
-            $route->methods() === $methods && $cleanUriParameters($route->uri) === $cleanUriParameters($uri)
-        );
+        $route = collect($this->routes->getRoutes())->first(function (Route $existingRoute) use ($cleanUriParameters, $newRoute) {
+            return $existingRoute->methods() === $newRoute->methods()
+                && $existingRoute->domain() === $newRoute->domain()
+                && $cleanUriParameters($existingRoute->uri()) === $cleanUriParameters($newRoute->uri());
+        });
 
         if ($route) {
             throw RouteAlreadyRegisteredException::forRoute($route);
