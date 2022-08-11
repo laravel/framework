@@ -789,6 +789,19 @@ class Str
     }
 
     /**
+     * Replace the given case-insensitive value in the given string.
+     *
+     * @param  string|string[]  $search
+     * @param  string|string[]  $replace
+     * @param  string|string[]  $subject
+     * @return string
+     */
+    public function replaceInsensitive($search, $replace, $subject)
+    {
+        return str_ireplace($search, $replace, $subject);
+    }
+
+    /**
      * Replace the given value in the given string.
      *
      * @param  string|string[]  $search

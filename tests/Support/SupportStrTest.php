@@ -518,6 +518,14 @@ class SupportStrTest extends TestCase
         }
     }
 
+    public function testReplaceInsensitive()
+    {
+        $this->assertSame('foo bar laravel', Str::replaceInsensitive('Baz', 'laravel', 'foo bar baz'));
+        $this->assertSame('foo bar baz 8.x', Str::replaceInsensitive('?', '8.x', 'foo bar baz ?'));
+        $this->assertSame('foo/bar/baz', Str::replaceInsensitive(' ', '/', 'foo bar baz'));
+        $this->assertSame('foo bar baz', Str::replaceInsensitive(['?1', '?2', '?3'], ['foo', 'bar', 'baz'], '?1 ?2 ?3'));
+    }
+
     public function testReplace()
     {
         $this->assertSame('foo bar laravel', Str::replace('baz', 'laravel', 'foo bar baz'));
