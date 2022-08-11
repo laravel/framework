@@ -485,10 +485,8 @@ class Router implements BindingRegistrar, RegistrarContract
             return;
         }
 
-        $routes = collect($this->routes->getRoutes());
         $cleanUriParameters = fn (string $uri) => preg_replace('/{(.*?)\}/s', '', $uri);
-
-        $route = $routes->first(fn (Route $route) =>
+        $route = collect($this->routes->getRoutes())->first(fn (Route $route) =>
             $route->methods() === $methods && $cleanUriParameters($route->uri) === $cleanUriParameters($uri)
         );
 
@@ -1390,6 +1388,7 @@ class Router implements BindingRegistrar, RegistrarContract
     /**
      * Instruct the application to throw an exception if a duplicate route is registered.
      *
+     * @param bool $value
      * @return void
      */
     public static function enforceUniqueRoutes($value = true)
