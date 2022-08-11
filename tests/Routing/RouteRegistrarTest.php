@@ -897,6 +897,16 @@ class RouteRegistrarTest extends TestCase
         $this->router->get('foo', fn () => false);
     }
 
+    public function testDifferentRoutesWithParametersDoNotThrowARouteAlreadyRegisteredException()
+    {
+        $this->router::enforceUniqueRoutes();
+
+        $this->router->get('foo/{foo}/baz/{baz}', fn () => true);
+        $this->router->get('foo/{bar}/bar/{baz}', fn () => false);
+
+        $this->assertCount(2, $this->router->getRoutes());
+    }
+
     public function testDuplicateRoutesWithTheSameDomainThrowAnException()
     {
         $this->router::enforceUniqueRoutes();
