@@ -10,6 +10,7 @@ use Illuminate\Contracts\Validation\ValidatesWhenResolved;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
+use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidatesWhenResolvedTrait;
 use Illuminate\Validation\ValidationException;
 
@@ -109,8 +110,14 @@ class FormRequest extends Request implements ValidatesWhenResolved
      */
     protected function createDefaultValidator(ValidationFactory $factory)
     {
+        $rules = $this->container->call([$this, 'rules']);
+
+        if ($this->isPrecognitive()) {
+            $rules = $this->filterPrecognitiveRules($rules);
+        }
+
         return $factory->make(
-            $this->validationData(), $this->container->call([$this, 'rules']),
+            $this->validationData(), $rules,
             $this->messages(), $this->attributes()
         )->stopOnFirstFailure($this->stopOnFirstFailure);
     }
