@@ -17,6 +17,25 @@ use Symfony\Component\Process\Process;
 abstract class DatabaseInspectionCommand extends Command
 {
     /**
+     * Database column type map.
+     *
+     * @var array
+     */
+    protected $typeMappings = [
+        'bit' => 'string',
+        'enum' => 'string',
+        'geometry' => 'string',
+        'geomcollection' => 'string',
+        'linestring' => 'string',
+        'multilinestring' => 'string',
+        'multipoint' => 'string',
+        'multipolygon' => 'string',
+        'point' => 'string',
+        'polygon' => 'string',
+        'sysname' => 'string',
+    ];
+
+    /**
      * The Composer instance.
      *
      * @var \Illuminate\Support\Composer
@@ -202,7 +221,8 @@ abstract class DatabaseInspectionCommand extends Command
      */
     protected function registerTypeMapping(AbstractPlatform $platform)
     {
-        $platform->registerDoctrineTypeMapping('enum', 'string');
-        $platform->registerDoctrineTypeMapping('sysname', 'string');
+        foreach ($this->typeMappings as $type => $value) {
+            $platform->registerDoctrineTypeMapping($type, $value);
+        }
     }
 }
