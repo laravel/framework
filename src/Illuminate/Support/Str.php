@@ -796,7 +796,7 @@ class Str
      * @param  string|string[]  $subject
      * @return string
      */
-    public function replaceInsensitive($search, $replace, $subject)
+    public static function replaceInsensitive($search, $replace, $subject)
     {
         return str_ireplace($search, $replace, $subject);
     }
