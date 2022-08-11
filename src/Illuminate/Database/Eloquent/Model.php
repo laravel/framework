@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\Pivot;
-use Illuminate\Database\Query\AtomicExpression;
+use Illuminate\Database\Query\ExpectableExpression;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Str;
@@ -436,7 +436,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             // which means only those attributes may be set through mass assignment to
             // the model, and all others will just get ignored for security reasons.
             if ($this->isFillable($key)) {
-                if ($value instanceof AtomicExpression) {
+                if ($value instanceof ExpectableExpression) {
                     $this->setAttribute($key, $outcome = $value->getExpectedOutcome());
                     $this->dirtyAttributesAtomic[$key] = $value;
                 } else {

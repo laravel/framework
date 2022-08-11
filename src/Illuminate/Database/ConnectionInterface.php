@@ -28,9 +28,9 @@ interface ConnectionInterface
      *
      * @param  mixed  $value
      * @param  scalar  $expectedOutcome
-     * @return \Illuminate\Database\Query\AtomicExpression
+     * @return \Illuminate\Database\Query\ExpectableExpression
      */
-    public function atomicExpression($value, $expectedOutcome);
+    public function expectableExpression($value, $expectedOutcome);
 
     /**
      * Run a select statement and return a single result.

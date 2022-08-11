@@ -14,7 +14,7 @@ use Illuminate\Database\Events\StatementPrepared;
 use Illuminate\Database\Events\TransactionBeginning;
 use Illuminate\Database\Events\TransactionCommitted;
 use Illuminate\Database\Events\TransactionRolledBack;
-use Illuminate\Database\Query\AtomicExpression;
+use Illuminate\Database\Query\ExpectableExpression;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\Grammars\Grammar as QueryGrammar;
@@ -1011,11 +1011,11 @@ class Connection implements ConnectionInterface
      *
      * @param  mixed  $value
      * @param  scalar  $expectedOutcome
-     * @return \Illuminate\Database\Query\AtomicExpression
+     * @return \Illuminate\Database\Query\ExpectableExpression
      */
-    public function atomicExpression($value, $expectedOutcome)
+    public function expectableExpression($value, $expectedOutcome)
     {
-        return new AtomicExpression($value, $expectedOutcome);
+        return new ExpectableExpression($value, $expectedOutcome);
     }
 
     /**

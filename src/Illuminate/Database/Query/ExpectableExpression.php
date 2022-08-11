@@ -2,7 +2,7 @@
 
 namespace Illuminate\Database\Query;
 
-class AtomicExpression extends Expression
+class ExpectableExpression extends Expression
 {
     /**
      * The expected outcome of the expression.

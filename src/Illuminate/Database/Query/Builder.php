@@ -3414,23 +3414,26 @@ class Builder implements BuilderContract
         return $this->update($columns);
     }
 
-    public function createAtomicExpressionStatement(
+    public function createExpectableExpressionStatement(
         $column, $operator, $amount, $expectedOutcome, array $extra = []
     )
     {
         $wrapped = $this->grammar->wrap($column);
 
-        return array_merge([$column => $this->atomicExpression("$wrapped $operator $amount", $expectedOutcome)], $extra);
+        return array_merge([
+            $column => $this->expectableExpression("$wrapped $operator $amount", $expectedOutcome)],
+            $extra
+        );
     }
 
     public function createIncrementStatement($column, $amount, $expectedOutcome, array $extra = [])
     {
-        return $this->createAtomicExpressionStatement($column, '+', $amount, $expectedOutcome,  $extra);
+        return $this->createExpectableExpressionStatement($column, '+', $amount, $expectedOutcome,  $extra);
     }
 
     public function createDecrementStatement($column, $amount, $expectedOutcome, array $extra = [])
     {
-        return $this->createAtomicExpressionStatement($column, '-', $amount, $expectedOutcome, $extra);
+        return $this->createExpectableExpressionStatement($column, '-', $amount, $expectedOutcome, $extra);
     }
 
     /**
@@ -3507,11 +3510,11 @@ class Builder implements BuilderContract
      *
      * @param  mixed  $value
      * @param  scalar  $expectedOutcome
-     * @return \Illuminate\Database\Query\AtomicExpression
+     * @return \Illuminate\Database\Query\ExpectableExpression
      */
-    public function atomicExpression($value, $expectedOutcome)
+    public function expectableExpression($value, $expectedOutcome)
     {
-        return $this->connection->atomicExpression($value, $expectedOutcome);
+        return $this->connection->expectableExpression($value, $expectedOutcome);
     }
 
     /**
