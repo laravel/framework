@@ -1701,7 +1701,7 @@ EOF;
     {
         throw new LogicException('Response data may not be mutated using array access.');
     }
-ƒ
+
     /**
      * Unset the value at the given offset.
      *
