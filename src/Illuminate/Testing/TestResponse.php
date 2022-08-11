@@ -977,11 +977,11 @@ EOF;
      * @param  JsonResource $resource
      * @return $this
      */
-    public function assertJsonResourceExist(JsonResource $resource)
+    public function assertJsonResourceExist(JsonResource $resource, $dataKey = 'data')
     {
         $this->assertJson(
             [
-                'data' => [
+                $dataKey => [
                     $this->resourceToArray($resource)
                 ]
             ]
@@ -999,7 +999,7 @@ EOF;
     public function assertJsonResourceMissing(JsonResource $resource)
     {
         $this->assertJsonMissingExact(
-            $this->jsonResourceToArray($resource)
+            $this->jsonResourceToArray($resource),
         );
 
         return $this;
@@ -1011,11 +1011,11 @@ EOF;
      * @param  JsonResource $resource
      * @return $this
      */
-    public function assertJsonResource(JsonResource $resource)
+    public function assertJsonResource(JsonResource $resource, $dataKey = 'data')
     {
         PHPUnit::assertSame(
             $this->jsonResourceToArray($resource),
-            $this->json('data')
+            $this->json($dataKey)
         );
 
         return $this;
