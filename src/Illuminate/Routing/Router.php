@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Events\RouteMatched;
 use Illuminate\Routing\Events\Routing;
+use Illuminate\Routing\Exceptions\RouteAlreadyRegisteredException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -123,6 +124,13 @@ class Router implements BindingRegistrar, RegistrarContract
      * @var string[]
      */
     public static $verbs = ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'];
+
+    /**
+     * Whether duplicate routes should be disallowed.
+     *
+     * @var bool
+     */
+    protected static $protectRoutes = false;
 
     /**
      * Create a new Router instance.
@@ -454,10 +462,39 @@ class Router implements BindingRegistrar, RegistrarContract
      * @param  string  $uri
      * @param  array|string|callable|null  $action
      * @return \Illuminate\Routing\Route
+     * @throws \Illuminate\Routing\Exceptions\RouteAlreadyRegisteredException
      */
     public function addRoute($methods, $uri, $action)
     {
+        $this->validateDuplicatesIfNeeded($methods, $uri);
+
         return $this->routes->add($this->createRoute($methods, $uri, $action));
+    }
+
+    /**
+     * Throw an exception if a route with the same path already exists.
+     *
+     * @param  array|string  $methods
+     * @param  string  $uri
+     * @return void
+     * @throws \Illuminate\Routing\Exceptions\RouteAlreadyRegisteredException
+     */
+    protected function validateDuplicatesIfNeeded($methods, $uri)
+    {
+        if (! static::$protectRoutes) {
+            return;
+        }
+
+        $routes = collect($this->routes->getRoutes());
+        $cleanUriParameters = fn (string $uri) => preg_replace('/{(.*?)\}/s', '', $uri);
+
+        $route = $routes->first(fn (Route $route) =>
+            $route->methods() === $methods && $cleanUriParameters($route->uri) === $cleanUriParameters($uri)
+        );
+
+        if ($route) {
+            throw RouteAlreadyRegisteredException::forRoute($route);
+        }
     }
 
     /**
@@ -1348,6 +1385,16 @@ class Router implements BindingRegistrar, RegistrarContract
         $this->container = $container;
 
         return $this;
+    }
+
+    /**
+     * Instruct the application to throw an exception if a duplicate route is registered.
+     *
+     * @return void
+     */
+    public static function blockDuplicateRoutes()
+    {
+        static::$protectRoutes = true;
     }
 
     /**

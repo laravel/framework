@@ -7,6 +7,7 @@ use FooController;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Exceptions\RouteAlreadyRegisteredException;
 use Illuminate\Routing\Router;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -882,6 +883,52 @@ class RouteRegistrarTest extends TestCase
 
         $this->seeResponse('all-users', Request::create('users', 'GET'));
         $this->assertSame('users.index', $this->getRoute()->getName());
+    }
+
+    public function testDuplicateRoutesThrowAnException()
+    {
+        $this->router::blockDuplicateRoutes();
+        $this->expectException(RouteAlreadyRegisteredException::class);
+        $this->expectExceptionMessage('Route [foo] has already been registered.');
+
+        $this->router->get('foo', fn () => true);
+        $this->router->get('foo', fn () => false);
+    }
+
+    public function testDuplicateRoutesWithTheSameDomainThrowAnException()
+    {
+        $this->router::blockDuplicateRoutes();
+        $this->expectException(RouteAlreadyRegisteredException::class);
+        $this->expectExceptionMessage('Route [laravel.com/foo] has already been registered.');
+
+        $this->router->domain('laravel.com')->group(function () {
+            $this->router->get('foo', fn () => true);
+            $this->router->get('foo', fn () => false);
+        });
+    }
+
+    public function testDuplicateRoutesWithDifferentDomainsDoNotThrowAnException()
+    {
+        $this->router::blockDuplicateRoutes();
+        $this->router->domain('laravel.com')->group(function () {
+            $this->router->get('foo', fn () => true);
+        });
+
+        $this->router->domain('google.com')->group(function () {
+            $this->router->get('foo', fn () => true);
+        });
+
+        $this->assertCount(2, $this->router->getRoutes());
+    }
+
+    public function testDuplicateRoutesWithParametersThrowAnException()
+    {
+        $this->router::blockDuplicateRoutes();
+        $this->expectException(RouteAlreadyRegisteredException::class);
+        $this->expectExceptionMessage('Route [foo/{foo}/baz] has already been registered.');
+
+        $this->router->get('foo/{foo}/baz', fn () => true);
+        $this->router->get('foo/{bar}/baz', fn () => false);
     }
 
     /**
