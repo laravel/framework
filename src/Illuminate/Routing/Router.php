@@ -1393,7 +1393,7 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public static function enforceUniqueRoutes($value = true)
     {
-        static::$enforceUniqueRoutes = true;
+        static::$enforceUniqueRoutes = $value;
     }
 
     /**
