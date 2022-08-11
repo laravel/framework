@@ -96,7 +96,7 @@ class DatabaseServiceProvider extends ServiceProvider
             $extraFakerProviders = $app['config']->get('app.extra_faker_providers', []);
 
             foreach ($extraFakerProviders as $fakerProvider) {
-                static::$fakers[$locale]->addProvider(new $extraProvider(static::$fakers[$locale]));
+                static::$fakers[$locale]->addProvider(new $fakerProvider(static::$fakers[$locale]));
             }
 
             static::$fakers[$locale]->unique(true);
