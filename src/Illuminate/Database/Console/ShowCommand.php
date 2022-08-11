@@ -38,7 +38,9 @@ class ShowCommand extends DatabaseInspectionCommand
      */
     public function handle(ConnectionResolverInterface $connections)
     {
-        $this->ensureDependenciesExist();
+        if (! $this->ensureDependenciesExist()) {
+            return 1;
+        }
 
         $connection = $connections->connection($database = $this->input->getOption('database'));
 

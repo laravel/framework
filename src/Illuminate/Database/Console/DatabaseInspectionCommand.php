@@ -194,17 +194,15 @@ abstract class DatabaseInspectionCommand extends Command
     /**
      * Ensure the dependencies for the database commands are available.
      *
-     * @return int|null
+     * @return bool
      */
     protected function ensureDependenciesExist()
     {
-        if (! interface_exists('Doctrine\DBAL\Driver')) {
-            if (! $this->components->confirm('Displaying model information requires the Doctrine DBAL (doctrine/dbal) package. Would you like to install it?')) {
-                return 1;
+        return tap(interface_exists('Doctrine\DBAL\Driver'), function ($dependenciesExist) {
+            if (! $dependenciesExist && $this->components->confirm('Inspecting database information requires the Doctrine DBAL (doctrine/dbal) package. Would you like to install it?')) {
+                $this->installDependencies();
             }
-
-            return $this->installDependencies();
-        }
+        });
     }
 
     /**
