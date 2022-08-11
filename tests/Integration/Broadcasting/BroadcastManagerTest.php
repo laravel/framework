@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Integration\Broadcasting;
 
 use Illuminate\Broadcasting\BroadcastEvent;
-use Illuminate\Broadcasting\UniqueBroadcastEvent;
 use Illuminate\Contracts\Broadcasting\ShouldBeUnique;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
@@ -44,11 +43,11 @@ class BroadcastManagerTest extends TestCase
 
         Broadcast::queue(new TestEventUnique);
 
-        Bus::assertNotDispatched(UniqueBroadcastEvent::class);
-        Queue::assertPushed(UniqueBroadcastEvent::class);
+        Bus::assertNotDispatched(BroadcastEvent::class);
+        Queue::assertPushed(BroadcastEvent::class);
 
-        $lockKey = 'laravel_unique_job:'.UniqueBroadcastEvent::class.TestEventUnique::class;
-        $this->assertTrue($this->app->get(Cache::class)->lock($lockKey, 10)->get());
+        $lockKey = 'laravel_unique_job:'.TestEventUnique::class;
+        $this->assertFalse($this->app->get(Cache::class)->lock($lockKey, 10)->get());
     }
 }
 

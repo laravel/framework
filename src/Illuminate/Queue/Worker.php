@@ -680,6 +680,10 @@ class Worker
     {
         pcntl_async_signals(true);
 
+        pcntl_signal(SIGQUIT, function () {
+            $this->shouldQuit = true;
+        });
+
         pcntl_signal(SIGTERM, function () {
             $this->shouldQuit = true;
         });

@@ -180,6 +180,10 @@ class Migrator
         }
 
         $this->fireMigrationEvent(new MigrationsEnded('up'));
+
+        if ($this->output) {
+            $this->output->writeln('');
+        }
     }
 
     /**
@@ -233,7 +237,11 @@ class Migrator
             return [];
         }
 
-        return $this->rollbackMigrations($migrations, $paths, $options);
+        return tap($this->rollbackMigrations($migrations, $paths, $options), function () {
+            if ($this->output) {
+                $this->output->writeln('');
+            }
+        });
     }
 
     /**

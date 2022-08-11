@@ -217,4 +217,13 @@ class RepositoryTest extends TestCase
         $this->assertArrayHasKey('associate', $this->repository->all());
         $this->assertNull($this->repository->get('associate'));
     }
+
+    public function testsItIsMacroable()
+    {
+        $this->repository->macro('foo', function () {
+            return 'macroable';
+        });
+
+        $this->assertSame('macroable', $this->repository->foo());
+    }
 }

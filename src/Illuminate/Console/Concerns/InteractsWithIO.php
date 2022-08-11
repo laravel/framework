@@ -207,7 +207,7 @@ trait InteractsWithIO
      *
      * @param  string  $question
      * @param  array  $choices
-     * @param  string|null  $default
+     * @param  string|int|null  $default
      * @param  mixed|null  $attempts
      * @param  bool  $multiple
      * @return string|array
