@@ -37,15 +37,28 @@ class ControllerDispatcher implements ControllerDispatcherContract
      */
     public function dispatch(Route $route, $controller, $method)
     {
-        $parameters = $this->resolveClassMethodDependencies(
-            $route->parametersWithoutNulls(), $controller, $method
-        );
+        $arguments = $this->resolveArguments($route, $controller, $method);
 
         if (method_exists($controller, 'callAction')) {
-            return $controller->callAction($method, $parameters);
+            return $controller->callAction($method, $arguments);
         }
 
-        return $controller->{$method}(...array_values($parameters));
+        return $controller->{$method}(...array_values($arguments));
+    }
+
+    /**
+     * Resolve arguments for the controller.
+     *
+     * @param  \Illuminate\Routing\Route  $route
+     * @param  mixed  $controller
+     * @param  string  $method
+     * @return array
+     */
+    protected function resolveArguments(Route $route, $controller, $method)
+    {
+        return $this->resolveClassMethodDependencies(
+            $route->parametersWithoutNulls(), $controller, $method
+        );
     }
 
     /**
