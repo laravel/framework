@@ -462,6 +462,7 @@ class Router implements BindingRegistrar, RegistrarContract
      * @param  string  $uri
      * @param  array|string|callable|null  $action
      * @return \Illuminate\Routing\Route
+     *
      * @throws \Illuminate\Routing\Exceptions\RouteAlreadyRegisteredException
      */
     public function addRoute($methods, $uri, $action)
@@ -474,8 +475,9 @@ class Router implements BindingRegistrar, RegistrarContract
     /**
      * Throw an exception if a route with the same path already exists.
      *
-     * @param  \Illuminate\Routing\Route $newRoute
+     * @param  \Illuminate\Routing\Route  $newRoute
      * @return void
+     *
      * @throws \Illuminate\Routing\Exceptions\RouteAlreadyRegisteredException
      */
     protected function validateDuplicatesIfNeeded(Route $newRoute)
@@ -1389,7 +1391,7 @@ class Router implements BindingRegistrar, RegistrarContract
     /**
      * Instruct the application to throw an exception if a duplicate route is registered.
      *
-     * @param bool $value
+     * @param  bool  $value
      * @return void
      */
     public function enforceUniqueRoutes($value = true)
