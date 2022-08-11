@@ -55,16 +55,16 @@ class Vite implements Htmlable
     /**
      * The path to the hot file.
      *
-     * @var string
+     * @var string|null
      */
-    protected $hotFilePath = null;
+    protected $hotFilePath;
 
     /**
      * The path to the build directory.
      *
      * @var string
      */
-    protected $buildDirectory = '/build';
+    protected $buildDirectory = 'build';
 
     /**
      * Get the Content Security Policy nonce applied to all generated tags.
@@ -146,7 +146,6 @@ class Vite implements Htmlable
     public function __invoke($entrypoints, $buildDirectory = 'build')
     {
         $entrypoints = collect($entrypoints);
-        $buildDirectory = Str::start($buildDirectory, '/');
 
         if ($this->isRunningHot()) {
             return new HtmlString(
@@ -506,10 +505,10 @@ class Vite implements Htmlable
     /**
      * Set the hot file path attribute.
      *
-     * @param  string
+     * @param  string  $path
      * @return $this
      */
-    public function useHotFile(string $path)
+    public function useHotFile($path)
     {
         $this->hotFilePath = $path;
 
@@ -529,10 +528,10 @@ class Vite implements Htmlable
     /**
      * Set the build directory attribute.
      *
-     * @param  string
+     * @param  string  $path
      * @return $this
      */
-    public function useBuildDirectory(string $path)
+    public function useBuildDirectory($path)
     {
         $this->buildDirectory = $path;
 
