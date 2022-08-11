@@ -972,9 +972,9 @@ EOF;
     }
 
     /**
-     * Assert that the response contains the structure of the JsonResponse
+     * Assert that the response contains the structure of the JsonResponse.
      *
-     * @param  JsonResource $resource
+     * @param JsonResource $resource
      * @return $this
      */
     public function assertJsonResourceExist(JsonResource $resource, $dataKey = 'data')
@@ -983,7 +983,7 @@ EOF;
             [
                 $dataKey => [
                     $this->resourceToArray($resource)
-                ]
+                ],
             ]
         );
 
@@ -991,9 +991,9 @@ EOF;
     }
 
     /**
-     * Assert that the json response doesn't contain the json response structure
+     * Assert that the json response doesn't contain the json response structure.
      *
-     * @param  JsonResource $resource
+     * @param JsonResource $resource
      * @return $this
      */
     public function assertJsonResourceMissing(JsonResource $resource)
@@ -1006,9 +1006,9 @@ EOF;
     }
 
     /**
-     * Assert that the response contains the exact structure of the json response
+     * Assert that the response contains the exact structure of the json response.
      *
-     * @param  JsonResource $resource
+     * @param JsonResource $resource
      * @return $this
      */
     public function assertJsonResource(JsonResource $resource, $dataKey = 'data')
