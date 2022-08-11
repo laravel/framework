@@ -974,7 +974,7 @@ EOF;
     /**
      * Assert that the response contains the structure of the JsonResponse.
      *
-     * @param  JsonResource  $resource
+     * @param  \Illuminate\Http\Resources\Json\JsonResource  $resource
      * @param  string  $wrapKey
      * @return $this
      */
@@ -994,7 +994,7 @@ EOF;
     /**
      * Assert that the json response doesn't contain the json response structure.
      *
-     * @param  JsonResource  $resource
+     * @param  \Illuminate\Http\Resources\Json\JsonResource  $resource
      * @return $this
      */
     public function assertJsonResourceMissing(JsonResource $resource)
@@ -1009,7 +1009,7 @@ EOF;
     /**
      * Assert that the response contains the exact structure of the json response.
      *
-     * @param  JsonResource  $resource
+     * @param  \Illuminate\Http\Resources\Json\JsonResource  $resource
      * @param  string  $wrapKey
      * @return $this
      */
@@ -1701,7 +1701,7 @@ EOF;
     {
         throw new LogicException('Response data may not be mutated using array access.');
     }
-
+ƒ
     /**
      * Unset the value at the given offset.
      *
@@ -1712,7 +1712,7 @@ EOF;
      */
     public function offsetUnset($offset): void
     {
-        throw new LogicException('Response data may not be mutated using array access.');
+        throw new LogicException(ƒa'Response data may not be mutated using array access.');
     }
 
     /**
