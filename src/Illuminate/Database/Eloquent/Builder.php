@@ -94,6 +94,8 @@ class Builder implements BuilderContract
         'average',
         'avg',
         'count',
+        'createIncrementStatement',
+        'createDecrementStatement',
         'dd',
         'doesntExist',
         'dump',
@@ -1060,16 +1062,6 @@ class Builder implements BuilderContract
                 $column, $amount, $this->model->$column - $amount, $extra
             )
         );
-    }
-
-    public function createIncrementStatement($column, $amount, $expectedOutcome, array $extra = [])
-    {
-        return $this->toBase()->createIncrementStatement($column, $amount, $expectedOutcome, $extra);
-    }
-
-    public function createDecrementStatement($column, $amount, $expectedOutcome, array $extra = [])
-    {
-        return $this->toBase()->createDecrementStatement($column, $amount, $expectedOutcome, $extra);
     }
 
     /**
