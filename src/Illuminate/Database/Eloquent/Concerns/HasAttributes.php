@@ -1827,7 +1827,8 @@ trait HasAttributes
     public function isDirty($attributes = null)
     {
         return $this->hasChanges(
-            $this->getDirty(), is_array($attributes) ? $attributes : func_get_args()
+            array_merge($this->getDirty(), $this->getDirtyExpectables()),
+            is_array($attributes) ? $attributes : func_get_args()
         );
     }
 
@@ -1899,6 +1900,16 @@ trait HasAttributes
         }
 
         return $dirty;
+    }
+
+    /**
+     * Get the attributes that have been changed since the last sync and contain ExpectableExpressions.
+     *
+     * @return array
+     */
+    public function getDirtyExpectables()
+    {
+        return $this->dirtyAttributesExpectable;
     }
 
     /**

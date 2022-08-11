@@ -124,7 +124,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      *
      * @var array
      */
-    protected $dirtyAttributesAtomic = [];
+    protected $dirtyAttributesExpectable = [];
 
     /**
      * The connection resolver instance.
@@ -438,7 +438,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             if ($this->isFillable($key)) {
                 if ($value instanceof ExpectableExpression) {
                     $this->setAttribute($key, $value->getExpectedOutcome());
-                    $this->dirtyAttributesAtomic[$key] = $value;
+                    $this->dirtyAttributesExpectable[$key] = $value;
                 } else {
                     $this->setAttribute($key, $value);
                 }
@@ -1103,7 +1103,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         // Once we have run the update operation, we will fire the "updated" event for
         // this model instance. This will allow developers to hook into these after
         // models are updated, giving them a chance to do any special processing.
-        $dirty = array_merge($this->getDirty(), $this->dirtyAttributesAtomic);
+        $dirty = array_merge($this->getDirty(), $this->getDirtyExpectables());
 
         if (count($dirty) > 0) {
             $this->setKeysForSaveQuery($query)->update($dirty);
@@ -1113,7 +1113,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             $this->fireModelEvent('updated', false);
         }
 
-        $this->dirtyAttributesAtomic = [];
+        $this->dirtyAttributesExpectable = [];
 
         return true;
     }
