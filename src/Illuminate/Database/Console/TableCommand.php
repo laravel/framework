@@ -52,6 +52,11 @@ class TableCommand extends DatabaseInspectionCommand
             collect($schema->listTables())->flatMap(fn (Table $table) => [$table->getName()])->toArray()
         );
 
+        if (! $schema->tablesExist([$table])) {
+            $this->warn("Table [{$table}] doesn't exist.");
+            return 0;
+        }
+
         $table = $schema->listTableDetails($table);
 
         $columns = $this->columns($table);
