@@ -887,7 +887,7 @@ class RouteRegistrarTest extends TestCase
 
     public function testDuplicateRoutesThrowAnException()
     {
-        $this->router::blockDuplicateRoutes();
+        $this->router::enforceUniqueRoutes();
         $this->expectException(RouteAlreadyRegisteredException::class);
         $this->expectExceptionMessage('Route [foo] has already been registered.');
 
@@ -897,7 +897,7 @@ class RouteRegistrarTest extends TestCase
 
     public function testDuplicateRoutesWithTheSameDomainThrowAnException()
     {
-        $this->router::blockDuplicateRoutes();
+        $this->router::enforceUniqueRoutes();
         $this->expectException(RouteAlreadyRegisteredException::class);
         $this->expectExceptionMessage('Route [laravel.com/foo] has already been registered.');
 
@@ -909,7 +909,7 @@ class RouteRegistrarTest extends TestCase
 
     public function testDuplicateRoutesWithDifferentDomainsDoNotThrowAnException()
     {
-        $this->router::blockDuplicateRoutes();
+        $this->router::enforceUniqueRoutes();
         $this->router->domain('laravel.com')->group(function () {
             $this->router->get('foo', fn () => true);
         });
@@ -923,7 +923,7 @@ class RouteRegistrarTest extends TestCase
 
     public function testDuplicateRoutesWithParametersThrowAnException()
     {
-        $this->router::blockDuplicateRoutes();
+        $this->router::enforceUniqueRoutes();
         $this->expectException(RouteAlreadyRegisteredException::class);
         $this->expectExceptionMessage('Route [foo/{foo}/baz] has already been registered.');
 

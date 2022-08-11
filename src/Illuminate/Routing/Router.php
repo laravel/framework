@@ -130,7 +130,7 @@ class Router implements BindingRegistrar, RegistrarContract
      *
      * @var bool
      */
-    protected static $protectRoutes = false;
+    protected static $enforceUniqueRoutes = false;
 
     /**
      * Create a new Router instance.
@@ -481,7 +481,7 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     protected function validateDuplicatesIfNeeded($methods, $uri)
     {
-        if (! static::$protectRoutes) {
+        if (! static::$enforceUniqueRoutes) {
             return;
         }
 
@@ -1392,9 +1392,9 @@ class Router implements BindingRegistrar, RegistrarContract
      *
      * @return void
      */
-    public static function blockDuplicateRoutes()
+    public static function enforceUniqueRoutes($value = true)
     {
-        static::$protectRoutes = true;
+        static::$enforceUniqueRoutes = true;
     }
 
     /**
