@@ -974,15 +974,15 @@ EOF;
     /**
      * Assert that the response contains the structure of the JsonResponse.
      *
-     * @param JsonResource $resource
-     * @param string $dataKey
+     * @param  JsonResource  $resource
+     * @param  string  $wrapKey
      * @return $this
      */
-    public function assertJsonResourceExist(JsonResource $resource, string $dataKey = 'data')
+    public function assertJsonResourceExist(JsonResource $resource, string $wrapKey = 'data')
     {
         $this->assertJson(
             [
-                $dataKey => [
+                $wrapKey => [
                     $this->jsonResourceToArray($resource),
                 ],
             ]
@@ -1009,15 +1009,15 @@ EOF;
     /**
      * Assert that the response contains the exact structure of the json response.
      *
-     * @param JsonResource $resource
-     * @param string $dataKey
+     * @param  JsonResource  $resource
+     * @param  string  $wrapKey
      * @return $this
      */
-    public function assertJsonResource(JsonResource $resource, string $dataKey = 'data')
+    public function assertJsonResource(JsonResource $resource, string $wrapKey = 'data')
     {
         PHPUnit::assertSame(
             $this->jsonResourceToArray($resource),
-            $this->json($dataKey)
+            $this->json($wrapKey)
         );
 
         return $this;
