@@ -893,6 +893,7 @@ class RouteRegistrarTest extends TestCase
 
         $this->router->get('foo', fn () => true);
         $this->router->get('foo', fn () => false);
+        $this->router::enforceUniqueRoutes(false);
     }
 
     public function testDuplicateRoutesWithTheSameDomainThrowAnException()
@@ -905,6 +906,8 @@ class RouteRegistrarTest extends TestCase
             $this->router->get('foo', fn () => true);
             $this->router->get('foo', fn () => false);
         });
+
+        $this->router::enforceUniqueRoutes(false);
     }
 
     public function testDuplicateRoutesWithDifferentDomainsDoNotThrowAnException()
@@ -919,6 +922,7 @@ class RouteRegistrarTest extends TestCase
         });
 
         $this->assertCount(2, $this->router->getRoutes());
+        $this->router::enforceUniqueRoutes(false);
     }
 
     public function testDuplicateRoutesWithParametersThrowAnException()
@@ -929,6 +933,8 @@ class RouteRegistrarTest extends TestCase
 
         $this->router->get('foo/{foo}/baz', fn () => true);
         $this->router->get('foo/{bar}/baz', fn () => false);
+
+        $this->router::enforceUniqueRoutes(false);
     }
 
     /**
