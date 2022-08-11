@@ -1712,7 +1712,7 @@ EOF;
      */
     public function offsetUnset($offset): void
     {
-        throw new LogicException(ƒa'Response data may not be mutated using array access.');
+        throw new LogicException('Response data may not be mutated using array access.');
     }
 
     /**
