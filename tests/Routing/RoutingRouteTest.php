@@ -18,6 +18,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Routing\CallableDispatcher;
+use Illuminate\Routing\Contracts\CallableDispatcher as CallableDispatcherContract;
 use Illuminate\Routing\Controller;
 use Illuminate\Routing\Events\Routing;
 use Illuminate\Routing\Exceptions\UrlGenerationException;
@@ -474,6 +476,7 @@ class RoutingRouteTest extends TestCase
         $container->singleton(Registrar::class, function () use ($router) {
             return $router;
         });
+        $container->singleton(CallableDispatcherContract::class, fn ($app) => new CallableDispatcher($app));
 
         $container->bind(RoutingTestUserModel::class, function () {
         });
@@ -1012,6 +1015,7 @@ class RoutingRouteTest extends TestCase
         $container->singleton(Registrar::class, function () use ($router) {
             return $router;
         });
+        $container->singleton(CallableDispatcherContract::class, fn ($app) => new CallableDispatcher($app));
         $container->bind(RouteModelInterface::class, RouteModelBindingStub::class);
         $router->get('foo/{bar}', ['middleware' => SubstituteBindings::class, 'uses' => function ($name) {
             return $name;
@@ -1510,6 +1514,7 @@ class RoutingRouteTest extends TestCase
         $container->singleton(Registrar::class, function () use ($router) {
             return $router;
         });
+        $container->singleton(CallableDispatcherContract::class, fn ($app) => new CallableDispatcher($app));
         $router->get('foo/bar', function () {
             return '';
         });
@@ -1545,6 +1550,7 @@ class RoutingRouteTest extends TestCase
         $container->singleton(Registrar::class, function () use ($router) {
             return $router;
         });
+        $container->singleton(CallableDispatcherContract::class, fn ($app) => new CallableDispatcher($app));
         $router->get('foo/bar', function () {
             return '';
         });
@@ -1808,6 +1814,7 @@ class RoutingRouteTest extends TestCase
         $container->singleton(Registrar::class, function () use ($router) {
             return $router;
         });
+        $container->singleton(CallableDispatcherContract::class, fn ($app) => new CallableDispatcher($app));
 
         $container->bind(RoutingTestUserModel::class, RoutingTestExtendedUserModel::class);
         $router->get('foo/{bar}', [
@@ -2035,6 +2042,8 @@ class RoutingRouteTest extends TestCase
         $container->singleton(Registrar::class, function () use ($router) {
             return $router;
         });
+
+        $container->singleton(CallableDispatcherContract::class, fn ($app) => new CallableDispatcher($app));
 
         return $router;
     }
