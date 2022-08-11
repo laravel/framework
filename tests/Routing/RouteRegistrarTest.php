@@ -29,7 +29,7 @@ class RouteRegistrarTest extends TestCase
 
     protected function tearDown(): void
     {
-        $this->router::enforceUniqueRoutes(false);
+        $this->router->enforceUniqueRoutes(false);
 
         m::close();
     }
@@ -889,7 +889,7 @@ class RouteRegistrarTest extends TestCase
 
     public function testDuplicateRoutesThrowAnException()
     {
-        $this->router::enforceUniqueRoutes();
+        $this->router->enforceUniqueRoutes();
         $this->expectException(RouteAlreadyRegisteredException::class);
         $this->expectExceptionMessage('Route [foo] has already been registered.');
 
@@ -899,7 +899,7 @@ class RouteRegistrarTest extends TestCase
 
     public function testDifferentRoutesWithParametersDoNotThrowARouteAlreadyRegisteredException()
     {
-        $this->router::enforceUniqueRoutes();
+        $this->router->enforceUniqueRoutes();
 
         $this->router->get('foo/{foo}/baz/{baz}', fn () => true);
         $this->router->get('foo/{bar}/bar/{baz}', fn () => false);
@@ -909,7 +909,7 @@ class RouteRegistrarTest extends TestCase
 
     public function testDuplicateRoutesWithTheSameDomainThrowAnException()
     {
-        $this->router::enforceUniqueRoutes();
+        $this->router->enforceUniqueRoutes();
         $this->expectException(RouteAlreadyRegisteredException::class);
         $this->expectExceptionMessage('Route [laravel.com/foo] has already been registered.');
 
@@ -921,7 +921,7 @@ class RouteRegistrarTest extends TestCase
 
     public function testDuplicateRoutesWithDifferentDomainsDoNotThrowAnException()
     {
-        $this->router::enforceUniqueRoutes();
+        $this->router->enforceUniqueRoutes();
         $this->router->domain('laravel.com')->group(function () {
             $this->router->get('foo', fn () => true);
         });
@@ -935,7 +935,7 @@ class RouteRegistrarTest extends TestCase
 
     public function testDuplicateRoutesWithParametersThrowAnException()
     {
-        $this->router::enforceUniqueRoutes();
+        $this->router->enforceUniqueRoutes();
         $this->expectException(RouteAlreadyRegisteredException::class);
         $this->expectExceptionMessage('Route [foo/{foo}/baz] has already been registered.');
 
