@@ -437,7 +437,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             // the model, and all others will just get ignored for security reasons.
             if ($this->isFillable($key)) {
                 if ($value instanceof ExpectableExpression) {
-                    $this->setAttribute($key, $outcome = $value->getExpectedOutcome());
+                    $this->setAttribute($key, $value->getExpectedOutcome());
                     $this->dirtyAttributesAtomic[$key] = $value;
                 } else {
                     $this->setAttribute($key, $value);
