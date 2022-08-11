@@ -148,13 +148,13 @@ class ShowCommand extends DatabaseInspectionCommand
         $this->components->twoColumnDetail('Tables', $tables->count());
 
         if ($tableSizeSum = $tables->sum('size')) {
-            $this->components->twoColumnDetail('Total Size', number_format($tableSizeSum / 1024 / 1024, 2).'Mb');
+            $this->components->twoColumnDetail('Total Size', number_format($tableSizeSum / 1024 / 1024, 2).'MiB');
         }
 
         $this->newLine();
 
         if ($tables->isNotEmpty()) {
-            $this->components->twoColumnDetail('<fg=green;options=bold>Table</>', 'Size (Mb)'.($this->option('counts') ? ' <fg=gray;options=bold>/</> <fg=yellow;options=bold>Rows</>' : ''));
+            $this->components->twoColumnDetail('<fg=green;options=bold>Table</>', 'Size (MiB)'.($this->option('counts') ? ' <fg=gray;options=bold>/</> <fg=yellow;options=bold>Rows</>' : ''));
 
             $tables->each(function ($table) {
                 if ($tableSize = $table['size']) {
