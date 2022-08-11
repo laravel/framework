@@ -34,19 +34,12 @@ class CacheLock extends Lock
      */
     public function acquire()
     {
-        if (method_exists($this->store, 'add') && $this->seconds > 0) {
-            return $this->store->add(
-                $this->name, $this->owner, $this->seconds
-            );
-        }
-
-        if (! is_null($this->store->get($this->name))) {
-            return false;
-        }
-
-        return ($this->seconds > 0)
-                ? $this->store->put($this->name, $this->owner, $this->seconds)
-                : $this->store->forever($this->name, $this->owner);
+        // Cache stores that return this lock type must ensure that they
+        // contain a compatible add method that atomically stores an item
+        // in the cache if does not already exist.
+        return $this->store->add(
+            $this->name, $this->owner, $this->seconds
+        );
     }
 
     /**
