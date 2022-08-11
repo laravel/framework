@@ -64,6 +64,9 @@ class EloquentModelDateCastingTest extends DatabaseTestCase
 
         $this->assertEquals((new Carbon($model->getAttributes()['format_datetime']))->timestamp, $date->timestamp);
         $this->assertEquals((new Carbon($model->getAttributes()['basic_datetime']))->timestamp, $date->timestamp);
+
+        // Make sure the date was not mutated
+        $this->assertEquals('+09:00', $date->getOffsetString());
     }
 
     public function testDatesArePreservedInGetter()
