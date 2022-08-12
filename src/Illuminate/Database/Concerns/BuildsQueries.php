@@ -142,7 +142,7 @@ trait BuildsQueries
                 return false;
             }
 
-            $lastId = $results->last()->{$alias};
+            $lastId = data_get($results->last(), $alias);
 
             if ($lastId === null) {
                 throw new RuntimeException("The chunkById operation was aborted because the [{$alias}] column is not present in the query result.");
