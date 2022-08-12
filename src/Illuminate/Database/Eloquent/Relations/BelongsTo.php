@@ -114,7 +114,7 @@ class BelongsTo extends Relation
 
         $whereIn = $this->whereInMethod($this->related, $this->ownerKey);
 
-        $this->query->{$whereIn}($key, $this->getEagerModelKeys($models));
+        $this->whereInEager($whereIn, $key, $this->getEagerModelKeys($models));
     }
 
     /**
