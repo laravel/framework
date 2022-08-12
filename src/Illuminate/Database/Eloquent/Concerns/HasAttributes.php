@@ -1291,7 +1291,7 @@ trait HasAttributes
         // Carbon instances from that format. Again, this provides for simple date
         // fields on the database, while still supporting Carbonized conversion.
         if ($this->isStandardDateFormat($value)) {
-            return Date::instance(Carbon::createFromFormat('Y-m-d', $value)->startOfDay());
+            return Date::instance(Carbon::createFromFormat('Y-m-d', $value, 'UTC')->startOfDay());
         }
 
         $format = $this->getDateFormat();
@@ -1300,12 +1300,12 @@ trait HasAttributes
         // the database connection and use that format to create the Carbon object
         // that is returned back out to the developers after we convert it here.
         try {
-            $date = Date::createFromFormat($format, $value);
-        } catch (InvalidArgumentException $e) {
+            $date = Date::createFromFormat($format, $value, 'UTC')->setTimezone(date_default_timezone_get());
+        } catch (InvalidArgumentException) {
             $date = false;
         }
 
-        return $date ?: Date::parse($value);
+        return $date ?: Date::parse($value, 'UTC')->setTimezone(date_default_timezone_get());
     }
 
     /**
@@ -1327,7 +1327,7 @@ trait HasAttributes
      */
     public function fromDateTime($value)
     {
-        return empty($value) ? $value : $this->asDateTime($value)->setTimezone(date_default_timezone_get())->format(
+        return empty($value) ? $value : $this->asDateTime($value)->setTimezone('UTC')->format(
             $this->getDateFormat()
         );
     }
