@@ -1861,28 +1861,12 @@ class DatabaseEloquentModelTest extends TestCase
         $model->internet_points = 10;
         $model->syncOriginalAttributes(['id', 'internet_points']);
 
-        [$connection, $grammar, $processor] = $this->addMockConnection($model);
-        $grammar->makePartial();
-        $connection->makePartial();
-        $connection->expects('update');
-
-        $baseBuilder = m::mock(
-            new BaseBuilder(
-                $connection,
-                $grammar,
-                $processor
-            )
-        );
-
-        $builder = m::mock(new Builder($baseBuilder));
-        $builder->setModel($model);
-
-        $model->shouldReceive('newQueryWithoutRelationships')->andReturn($builder);
+        $model->shouldReceive('newQueryWithoutRelationships')->andReturn($this->mockBuilderForModel($model));
 
         $this->assertNull($model->updated_at);
 
         $model->increment('internet_points', 5, [
-            'foo' => true
+            'foo' => true,
         ]);
         $this->assertNotNull($model->updated_at);
         $this->assertTrue($model->foo);
@@ -1897,9 +1881,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->syncOriginalAttribute('id');
         $model->foo = 2;
 
-        $model->shouldReceive('newQueryWithoutRelationships')->andReturn($query = m::mock(stdClass::class));
-        $query->shouldReceive('where')->andReturn($query);
-        $query->shouldReceive('increment');
+        $model->shouldReceive('newQueryWithoutRelationships')->andReturn($this->mockBuilderForModel($model));
 
         $model->publicIncrement('foo', 1);
         $this->assertFalse($model->isDirty());
@@ -1907,7 +1889,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->publicIncrement('foo', 1, ['category' => 1]);
         $this->assertEquals(4, $model->foo);
         $this->assertEquals(1, $model->category);
-        $this->assertTrue($model->isDirty('category'));
+        $this->assertFalse($model->isDirty('category'));
     }
 
     public function testIncrementQuietlyOnExistingModelCallsQueryAndSetsAttributeAndIsQuiet()
@@ -1918,7 +1900,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->syncOriginalAttribute('id');
         $model->foo = 2;
 
-        $model->shouldReceive('newQueryWithoutRelationships')->andReturn($query = m::mock(stdClass::class));
+        $model->shouldReceive('newQueryWithoutRelationships')->andReturn($query = $this->mockBuilderForModel($model));
         $query->shouldReceive('where')->andReturn($query);
         $query->shouldReceive('increment');
 
@@ -1934,7 +1916,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->publicIncrementQuietly('foo', 1, ['category' => 1]);
         $this->assertEquals(4, $model->foo);
         $this->assertEquals(1, $model->category);
-        $this->assertTrue($model->isDirty('category'));
+        $this->assertFalse($model->isDirty('category'));
     }
 
     public function testDecrementQuietlyOnExistingModelCallsQueryAndSetsAttributeAndIsQuiet()
@@ -1945,7 +1927,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->syncOriginalAttribute('id');
         $model->foo = 4;
 
-        $model->shouldReceive('newQueryWithoutRelationships')->andReturn($query = m::mock(stdClass::class));
+        $model->shouldReceive('newQueryWithoutRelationships')->andReturn($query =$this->mockBuilderForModel($model));
         $query->shouldReceive('where')->andReturn($query);
         $query->shouldReceive('decrement');
 
@@ -1961,7 +1943,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->publicDecrementQuietly('foo', 1, ['category' => 1]);
         $this->assertEquals(2, $model->foo);
         $this->assertEquals(1, $model->category);
-        $this->assertTrue($model->isDirty('category'));
+        $this->assertFalse($model->isDirty('category'));
     }
 
     public function testRelationshipTouchOwnersIsPropagated()
@@ -2452,6 +2434,27 @@ class DatabaseEloquentModelTest extends TestCase
         $user->name = null;
 
         $this->assertNull($user->name);
+    }
+
+    protected function mockBuilderForModel($model)
+    {
+        [$connection, $grammar, $processor] = $this->addMockConnection($model);
+        $grammar->makePartial();
+        $connection->makePartial();
+        $connection->shouldReceive('update');
+
+        $baseBuilder = m::mock(
+            new BaseBuilder(
+                $connection,
+                $grammar,
+                $processor
+            )
+        );
+
+        $builder = m::mock(new Builder($baseBuilder));
+        $builder->setModel($model);
+
+        return $builder;
     }
 }
 

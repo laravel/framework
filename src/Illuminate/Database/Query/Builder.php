@@ -3414,6 +3414,16 @@ class Builder implements BuilderContract
         return $this->update($columns);
     }
 
+    /**
+     * Create an expectable expression statement.
+     *
+     * @param  string  $column
+     * @param  string  $operator
+     * @param  mixed  $amount
+     * @param  mixed  $expectedOutcome
+     * @param  array  $extra
+     * @return array|ExpectableExpression[]
+     */
     public function createExpectableExpressionStatement(
         $column, $operator, $amount, $expectedOutcome, array $extra = []
     )
@@ -3421,16 +3431,34 @@ class Builder implements BuilderContract
         $wrapped = $this->grammar->wrap($column);
 
         return array_merge([
-            $column => $this->expectableExpression("$wrapped $operator $amount", $expectedOutcome)],
+            $column => $this->expectableExpression("$wrapped $operator $amount", $expectedOutcome), ],
             $extra
         );
     }
 
+    /**
+     * Create an increment statement.
+     *
+     * @param  string  $column
+     * @param  mixed  $amount
+     * @param  mixed  $expectedOutcome
+     * @param  array  $extra
+     * @return array|ExpectableExpression[]
+     */
     public function createIncrementStatement($column, $amount, $expectedOutcome, array $extra = [])
     {
-        return $this->createExpectableExpressionStatement($column, '+', $amount, $expectedOutcome,  $extra);
+        return $this->createExpectableExpressionStatement($column, '+', $amount, $expectedOutcome, $extra);
     }
 
+    /**
+     * Create a decrement statement.
+     *
+     * @param  string  $column
+     * @param  mixed  $amount
+     * @param  mixed  $expectedOutcome
+     * @param  array  $extra
+     * @return array|ExpectableExpression[]
+     */
     public function createDecrementStatement($column, $amount, $expectedOutcome, array $extra = [])
     {
         return $this->createExpectableExpressionStatement($column, '-', $amount, $expectedOutcome, $extra);
