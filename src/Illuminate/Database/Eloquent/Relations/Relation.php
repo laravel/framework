@@ -414,6 +414,7 @@ abstract class Relation implements BuilderContract
         }
     }
 
+    /*
      * Prevent polymorphic relationships from being used without model mappings.
      *
      * @param  bool  $requireMorphMap
