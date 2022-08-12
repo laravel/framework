@@ -30,7 +30,7 @@ class AblyBroadcasterTest extends TestCase
 
         $this->ably->options = (object) ['key' => 'abcd:efgh'];
 
-        $this->broadcaster = m::mock(AblyBroadcaster::class, [$this->ably])->makePartial();
+        $this->broadcaster = m::mock(AblyBroadcaster::class, [$this->ably, array()])->makePartial();
     }
 
     protected function tearDown(): void
