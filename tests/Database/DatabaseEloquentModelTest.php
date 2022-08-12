@@ -1852,7 +1852,6 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertNull($replicated->updated_at);
     }
 
-
     public function testIncrementChangesUpdatedAt()
     {
         $model = m::mock(EloquentModelStub::class.'[newQueryWithoutRelationships]');
