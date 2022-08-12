@@ -1927,7 +1927,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->syncOriginalAttribute('id');
         $model->foo = 4;
 
-        $model->shouldReceive('newQueryWithoutRelationships')->andReturn($query =$this->mockBuilderForModel($model));
+        $model->shouldReceive('newQueryWithoutRelationships')->andReturn($query = $this->mockBuilderForModel($model));
         $query->shouldReceive('where')->andReturn($query);
         $query->shouldReceive('decrement');
 

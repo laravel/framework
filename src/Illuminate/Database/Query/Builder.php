@@ -3426,8 +3426,7 @@ class Builder implements BuilderContract
      */
     public function createExpectableExpressionStatement(
         $column, $operator, $amount, $expectedOutcome, array $extra = []
-    )
-    {
+    ) {
         $wrapped = $this->grammar->wrap($column);
 
         return array_merge([
