@@ -195,7 +195,7 @@ class TableCommand extends DatabaseInspectionCommand
         $this->components->twoColumnDetail('Columns', $table['columns']);
 
         if ($size = $table['size']) {
-            $this->components->twoColumnDetail('Size', number_format($size / 1024 / 1024, 2).'Mb');
+            $this->components->twoColumnDetail('Size', number_format($size / 1024 / 1024, 2).'MiB');
         }
 
         $this->newLine();
