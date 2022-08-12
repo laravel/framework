@@ -11,6 +11,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
  * @deprecated Needs pusher-adapter support to be enabled in ably, use @AblyBroadcaster instead
+ *
  * @author Matthew Hall (matthall28@gmail.com)
  * @author Taylor Otwell (taylor@laravel.com)
  */
