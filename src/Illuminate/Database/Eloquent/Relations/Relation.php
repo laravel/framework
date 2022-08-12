@@ -401,8 +401,8 @@ abstract class Relation implements BuilderContract
      *
      * @param  string  $whereIn
      * @param  string  $key
-     * @param  array   $modelKeys
-     * @param  Builder $query
+     * @param  array  $modelKeys
+     * @param  Builder  $query
      * @return void
      */
     protected function whereInEager(string $whereIn, $key, array $modelKeys, $query = null)
