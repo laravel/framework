@@ -314,7 +314,7 @@ trait ValidatesAttributes
      */
     public function validateAlpha($attribute, $value)
     {
-        return is_string($value) && preg_match('/^[\pL\pM]+$/u', $value);
+        return is_string($value) && preg_match('/^[\pL]+$/u', $value);
     }
 
     /**
