@@ -2443,15 +2443,9 @@ class DatabaseEloquentModelTest extends TestCase
         $connection->makePartial();
         $connection->shouldReceive('update');
 
-        $baseBuilder = m::mock(
-            new BaseBuilder(
-                $connection,
-                $grammar,
-                $processor
-            )
-        );
+        $baseBuilder = m::mock(BaseBuilder::class, [$connection, $grammar, $processor])->makePartial();
 
-        $builder = m::mock(new Builder($baseBuilder));
+        $builder = m::mock(Builder::class, [$baseBuilder])->makePartial();
         $builder->setModel($model);
 
         return $builder;
