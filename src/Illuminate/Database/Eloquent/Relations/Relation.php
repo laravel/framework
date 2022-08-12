@@ -154,6 +154,10 @@ abstract class Relation implements BuilderContract
      */
     public function getEager()
     {
+        if ($this->eagerImplicitlyEmpty ?? false) {
+            return $this->query->getModel()->newCollection();
+        }
+
         return $this->get();
     }
 
@@ -390,6 +394,24 @@ abstract class Relation implements BuilderContract
                     && in_array($model->getKeyType(), ['int', 'integer'])
                         ? 'whereIntegerInRaw'
                         : 'whereIn';
+    }
+
+    /**
+     * Add a whereIn eager constraint for the given set of model keys to be loaded.
+     *
+     * @param  string  $whereIn
+     * @param  string  $key
+     * @param  array  $modelKeys
+     * @param  Builder  $query
+     * @return void
+     */
+    protected function whereInEager(string $whereIn, $key, array $modelKeys, $query = null)
+    {
+        ($query ?? $this->query)->{$whereIn}($key, $modelKeys);
+
+        if ($modelKeys === []) {
+            $this->eagerImplicitlyEmpty = true;
+        }
     }
 
     /**

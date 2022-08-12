@@ -767,6 +767,29 @@ class DatabaseEloquentBuilderTest extends TestCase
         unset($_SERVER['__eloquent.constrain']);
     }
 
+    public function testRelationshipEagerLoadProcessForImplicitlyEmpty()
+    {
+        $queryBuilder = $this->getMockQueryBuilder();
+        $builder = m::mock(Builder::class.'[getRelation]', [$queryBuilder]);
+        $builder->setEagerLoads(['parentFoo' => function ($query) {
+            $_SERVER['__eloquent.constrain'] = $query;
+        }]);
+        $model = new EloquentBuilderTestModelSelfRelatedStub;
+        $this->mockConnectionForModel($model, 'SQLite');
+
+        $models = [
+            new EloquentBuilderTestModelSelfRelatedStub,
+            new EloquentBuilderTestModelSelfRelatedStub,
+        ];
+        $relation = m::mock($model->parentFoo());
+
+        $builder->shouldReceive('getRelation')->once()->with('parentFoo')->andReturn($relation);
+
+        $results = $builder->eagerLoadRelations($models);
+
+        unset($_SERVER['__eloquent.constrain']);
+    }
+
     public function testGetRelationProperlySetsNestedRelationships()
     {
         $builder = $this->getBuilder();
