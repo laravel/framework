@@ -10,6 +10,7 @@ use Illuminate\Database\DetectsLostConnections;
 use Illuminate\Queue\Events\JobExceptionOccurred;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
+use Illuminate\Queue\Events\JobReleasedAfterException;
 use Illuminate\Queue\Events\Looping;
 use Illuminate\Queue\Events\WorkerStopping;
 use Illuminate\Support\Carbon;
@@ -126,7 +127,7 @@ class Worker
      */
     public function daemon($connectionName, $queue, WorkerOptions $options)
     {
-        if ($this->supportsAsyncSignals()) {
+        if ($supportsAsyncSignals = $this->supportsAsyncSignals()) {
             $this->listenForSignals();
         }
 
@@ -159,7 +160,7 @@ class Worker
                 $this->manager->connection($connectionName), $queue
             );
 
-            if ($this->supportsAsyncSignals()) {
+            if ($supportsAsyncSignals) {
                 $this->registerTimeoutHandler($job, $options);
             }
 
@@ -178,7 +179,7 @@ class Worker
                 $this->sleep($options->sleep);
             }
 
-            if ($this->supportsAsyncSignals()) {
+            if ($supportsAsyncSignals) {
                 $this->resetTimeoutHandler();
             }
 
@@ -409,7 +410,7 @@ class Worker
     public function process($connectionName, $job, WorkerOptions $options)
     {
         try {
-            // First we will raise the before job event and determine if the job has already ran
+            // First we will raise the before job event and determine if the job has already run
             // over its maximum attempt limits, which could primarily happen when this job is
             // continually timing out and not actually throwing any exceptions from itself.
             $this->raiseBeforeJobEvent($connectionName, $job);
@@ -422,9 +423,9 @@ class Worker
                 return $this->raiseAfterJobEvent($connectionName, $job);
             }
 
-            // Here we will fire off the job and let it process. We will catch any exceptions so
-            // they can be reported to the developers logs, etc. Once the job is finished the
-            // proper events will be fired to let any listeners know this job has finished.
+            // Here we will fire off the job and let it process. We will catch any exceptions, so
+            // they can be reported to the developer's logs, etc. Once the job is finished the
+            // proper events will be fired to let any listeners know this job has completed.
             $job->fire();
 
             $this->raiseAfterJobEvent($connectionName, $job);
@@ -469,6 +470,10 @@ class Worker
             // another listener (or this same one). We will re-throw this exception after.
             if (! $job->isDeleted() && ! $job->isReleased() && ! $job->hasFailed()) {
                 $job->release($this->calculateBackoff($job, $options));
+
+                $this->events->dispatch(new JobReleasedAfterException(
+                    $connectionName, $job
+                ));
             }
         }
 
@@ -726,7 +731,7 @@ class Worker
      * Kill the process.
      *
      * @param  int  $status
-     * @return void
+     * @return never
      */
     public function kill($status = 0)
     {

@@ -32,7 +32,7 @@ class NotPwnedVerifier implements UncompromisedVerifier
     public function __construct($factory, $timeout = null)
     {
         $this->factory = $factory;
-        $this->timeout = $timeout ?? 10;
+        $this->timeout = $timeout ?? 30;
     }
 
     /**
@@ -98,7 +98,7 @@ class NotPwnedVerifier implements UncompromisedVerifier
             : '';
 
         return Str::of($body)->trim()->explode("\n")->filter(function ($line) {
-            return Str::contains($line, ':');
+            return str_contains($line, ':');
         });
     }
 }

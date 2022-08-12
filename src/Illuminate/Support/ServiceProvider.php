@@ -7,7 +7,6 @@ use Illuminate\Console\Application as Artisan;
 use Illuminate\Contracts\Foundation\CachesConfiguration;
 use Illuminate\Contracts\Foundation\CachesRoutes;
 use Illuminate\Contracts\Support\DeferrableProvider;
-use Illuminate\Database\Eloquent\Factory as ModelFactory;
 use Illuminate\View\Compilers\BladeCompiler;
 
 abstract class ServiceProvider
@@ -97,8 +96,12 @@ abstract class ServiceProvider
      */
     public function callBootingCallbacks()
     {
-        foreach ($this->bootingCallbacks as $callback) {
-            $this->app->call($callback);
+        $index = 0;
+
+        while ($index < count($this->bootingCallbacks)) {
+            $this->app->call($this->bootingCallbacks[$index]);
+
+            $index++;
         }
     }
 
@@ -109,8 +112,12 @@ abstract class ServiceProvider
      */
     public function callBootedCallbacks()
     {
-        foreach ($this->bootedCallbacks as $callback) {
-            $this->app->call($callback);
+        $index = 0;
+
+        while ($index < count($this->bootedCallbacks)) {
+            $this->app->call($this->bootedCallbacks[$index]);
+
+            $index++;
         }
     }
 
@@ -222,23 +229,6 @@ abstract class ServiceProvider
         $this->callAfterResolving('migrator', function ($migrator) use ($paths) {
             foreach ((array) $paths as $path) {
                 $migrator->path($path);
-            }
-        });
-    }
-
-    /**
-     * Register Eloquent model factory paths.
-     *
-     * @deprecated Will be removed in a future Laravel version.
-     *
-     * @param  array|string  $paths
-     * @return void
-     */
-    protected function loadFactoriesFrom($paths)
-    {
-        $this->callAfterResolving(ModelFactory::class, function ($factory) use ($paths) {
-            foreach ((array) $paths as $path) {
-                $factory->load($path);
             }
         });
     }

@@ -2,7 +2,9 @@
 
 namespace Illuminate\Tests\View\Blade;
 
+use Illuminate\View\Component;
 use Illuminate\View\ComponentAttributeBag;
+use Illuminate\View\Factory;
 use Mockery as m;
 
 class BladeComponentsTest extends AbstractBladeTestCase
@@ -26,22 +28,18 @@ class BladeComponentsTest extends AbstractBladeTestCase
     {
         $this->compiler->newComponentHash('foo');
 
-        $this->assertSame('<?php if (isset($__componentOriginal0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33)): ?>
-<?php $component = $__componentOriginal0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33; ?>
-<?php unset($__componentOriginal0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33); ?>
-<?php endif; ?>
-<?php echo $__env->renderComponent(); ?>', $this->compiler->compileString('@endcomponent'));
+        $this->assertSame('<?php echo $__env->renderComponent(); ?>', $this->compiler->compileString('@endcomponent'));
     }
 
     public function testEndComponentClassesAreCompiled()
     {
         $this->compiler->newComponentHash('foo');
 
-        $this->assertSame('<?php if (isset($__componentOriginal0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33)): ?>
+        $this->assertSame('<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33)): ?>
 <?php $component = $__componentOriginal0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33; ?>
 <?php unset($__componentOriginal0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33); ?>
-<?php endif; ?>
-<?php echo $__env->renderComponent(); ?>
 <?php endif; ?>', $this->compiler->compileString('@endcomponentClass'));
     }
 
@@ -60,11 +58,11 @@ class BladeComponentsTest extends AbstractBladeTestCase
     {
         $attributes = new ComponentAttributeBag(['foo' => 'baz', 'other' => 'ok']);
 
-        $component = m::mock(\Illuminate\View\Component::class);
+        $component = m::mock(Component::class);
         $component->shouldReceive('withName', 'test');
         $component->shouldReceive('shouldRender')->andReturn(false);
 
-        $__env = m::mock(\Illuminate\View\Factory::class);
+        $__env = m::mock(Factory::class);
         $__env->shouldReceive('getContainer->make')->with('Test', ['foo' => 'bar', 'other' => 'ok'])->andReturn($component);
 
         $template = $this->compiler->compileString('@component(\'Test::class\', \'test\', ["foo" => "bar"])');

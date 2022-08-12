@@ -3,21 +3,19 @@
 namespace Illuminate\Database\Eloquent\Relations;
 
 use Closure;
-use Illuminate\Contracts\Database\Query\Builder as BuilderContract;
+use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Concerns\DecoratesQueryBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\MultipleRecordsFoundException;
 use Illuminate\Database\Query\Expression;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
 
 abstract class Relation implements BuilderContract
 {
-    use DecoratesQueryBuilder, ForwardsCalls, Macroable {
+    use ForwardsCalls, Macroable {
         Macroable::__call as macroCall;
     }
 
@@ -55,6 +53,13 @@ abstract class Relation implements BuilderContract
      * @var array
      */
     public static $morphMap = [];
+
+    /**
+     * Prevents morph relationships without a morph map.
+     *
+     * @var bool
+     */
+    protected static $requireMorphMap = false;
 
     /**
      * The count of self joins.
@@ -162,19 +167,21 @@ abstract class Relation implements BuilderContract
      * @param  array|string  $columns
      * @return \Illuminate\Database\Eloquent\Model
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<\Illuminate\Database\Eloquent\Model>
      * @throws \Illuminate\Database\MultipleRecordsFoundException
      */
     public function sole($columns = ['*'])
     {
         $result = $this->take(2)->get($columns);
 
-        if ($result->isEmpty()) {
+        $count = $result->count();
+
+        if ($count === 0) {
             throw (new ModelNotFoundException)->setModel(get_class($this->related));
         }
 
-        if ($result->count() > 1) {
-            throw new MultipleRecordsFoundException;
+        if ($count > 1) {
+            throw new MultipleRecordsFoundException($count);
         }
 
         return $result->first();
@@ -297,13 +304,11 @@ abstract class Relation implements BuilderContract
     /**
      * Get the base query builder driving the Eloquent builder.
      *
-     * @deprecated Use toBase() instead
-     *
      * @return \Illuminate\Database\Query\Builder
      */
     public function getBaseQuery()
     {
-        return $this->toBase();
+        return $this->query->getQuery();
     }
 
     /**
@@ -313,7 +318,7 @@ abstract class Relation implements BuilderContract
      */
     public function toBase()
     {
-        return $this->query->getQuery();
+        return $this->query->toBase();
     }
 
     /**
@@ -409,6 +414,40 @@ abstract class Relation implements BuilderContract
         }
     }
 
+     * Prevent polymorphic relationships from being used without model mappings.
+     *
+     * @param  bool  $requireMorphMap
+     * @return void
+     */
+    public static function requireMorphMap($requireMorphMap = true)
+    {
+        static::$requireMorphMap = $requireMorphMap;
+    }
+
+    /**
+     * Determine if polymorphic relationships require explicit model mapping.
+     *
+     * @return bool
+     */
+    public static function requiresMorphMap()
+    {
+        return static::$requireMorphMap;
+    }
+
+    /**
+     * Define the morph map for polymorphic relations and require all morphed models to be explicitly mapped.
+     *
+     * @param  array  $map
+     * @param  bool  $merge
+     * @return array
+     */
+    public static function enforceMorphMap(array $map, $merge = true)
+    {
+        static::requireMorphMap();
+
+        return static::morphMap($map, $merge);
+    }
+
     /**
      * Set or get the morph map for polymorphic relations.
      *
@@ -436,7 +475,7 @@ abstract class Relation implements BuilderContract
      */
     protected static function buildMorphMapFromModels(array $models = null)
     {
-        if (is_null($models) || Arr::isAssoc($models)) {
+        if (is_null($models) || ! array_is_list($models)) {
             return $models;
         }
 
@@ -469,13 +508,7 @@ abstract class Relation implements BuilderContract
             return $this->macroCall($method, $parameters);
         }
 
-        $result = $this->forwardCallTo($this->query, $method, $parameters);
-
-        if ($result === $this->query) {
-            return $this;
-        }
-
-        return $result;
+        return $this->forwardDecoratedCallTo($this->query, $method, $parameters);
     }
 
     /**

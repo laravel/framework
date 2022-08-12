@@ -1,10 +1,10 @@
 <?php
 
-namespace DummyNamespace;
+namespace {{ namespace }};
 
 use Illuminate\Support\ServiceProvider;
 
-class DummyClass extends ServiceProvider
+class {{ class }} extends ServiceProvider
 {
     /**
      * Register services.

@@ -193,7 +193,7 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
             );
         }
 
-        if (Str::contains($key, '*')) {
+        if (str_contains($key, '*')) {
             return $this->getMessagesForWildcardKey($key, $format);
         }
 
@@ -260,6 +260,10 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
      */
     protected function transform($messages, $format, $messageKey)
     {
+        if ($format == ':message') {
+            return (array) $messages;
+        }
+
         return collect((array) $messages)
             ->map(function ($message) use ($format, $messageKey) {
                 // We will simply spin through the given messages and transform each one
@@ -368,8 +372,7 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
      *
      * @return int
      */
-    #[\ReturnTypeWillChange]
-    public function count()
+    public function count(): int
     {
         return count($this->messages, COUNT_RECURSIVE) - count($this->messages);
     }
@@ -389,8 +392,7 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
      *
      * @return array
      */
-    #[\ReturnTypeWillChange]
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return $this->toArray();
     }

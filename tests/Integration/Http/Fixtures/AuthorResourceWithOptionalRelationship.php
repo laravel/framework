@@ -14,7 +14,7 @@ class AuthorResourceWithOptionalRelationship extends PostResource
                 return 'not loaded';
             }),
             'latest_post_title' => $this->whenLoaded('posts', function () {
-                return optional($this->posts->first())->title ?: 'no posts yet';
+                return $this->posts->first()?->title ?: 'no posts yet';
             }, 'not loaded'),
         ];
     }

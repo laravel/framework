@@ -7,30 +7,67 @@ use PHPUnit\Framework\TestCase;
 
 class RouteUriTest extends TestCase
 {
-    public function testRouteUrisAreProperlyParsed()
+    /**
+     * @dataProvider uriProvider
+     */
+    public function testRouteUrisAreProperlyParsed($uri, $expectedParsedUri, $expectedBindingFields)
     {
-        $parsed = RouteUri::parse('/foo');
-        $this->assertSame('/foo', $parsed->uri);
-        $this->assertEquals([], $parsed->bindingFields);
+        $parsed = RouteUri::parse($uri);
+        $this->assertSame($expectedParsedUri, $parsed->uri);
+        $this->assertEquals($expectedBindingFields, $parsed->bindingFields);
+    }
 
-        $parsed = RouteUri::parse('/foo/{bar}');
-        $this->assertSame('/foo/{bar}', $parsed->uri);
-        $this->assertEquals([], $parsed->bindingFields);
-
-        $parsed = RouteUri::parse('/foo/{bar:slug}');
-        $this->assertSame('/foo/{bar}', $parsed->uri);
-        $this->assertEquals(['bar' => 'slug'], $parsed->bindingFields);
-
-        $parsed = RouteUri::parse('/foo/{bar}/baz/{qux:slug}');
-        $this->assertSame('/foo/{bar}/baz/{qux}', $parsed->uri);
-        $this->assertEquals(['qux' => 'slug'], $parsed->bindingFields);
-
-        $parsed = RouteUri::parse('/foo/{bar}/baz/{qux:slug?}');
-        $this->assertSame('/foo/{bar}/baz/{qux?}', $parsed->uri);
-        $this->assertEquals(['qux' => 'slug'], $parsed->bindingFields);
-
-        $parsed = RouteUri::parse('/foo/{bar}/baz/{qux:slug?}/{test:id?}');
-        $this->assertSame('/foo/{bar}/baz/{qux?}/{test?}', $parsed->uri);
-        $this->assertEquals(['qux' => 'slug', 'test' => 'id'], $parsed->bindingFields);
+    /**
+     * @return array
+     */
+    public function uriProvider()
+    {
+        return [
+            [
+                '/foo',
+                '/foo',
+                [],
+            ],
+            [
+                '/foo/{bar}',
+                '/foo/{bar}',
+                [],
+            ],
+            [
+                '/foo/{bar}/baz/{qux}',
+                '/foo/{bar}/baz/{qux}',
+                [],
+            ],
+            [
+                '/foo/{bar}/baz/{qux?}',
+                '/foo/{bar}/baz/{qux?}',
+                [],
+            ],
+            [
+                '/foo/{bar:slug}',
+                '/foo/{bar}',
+                ['bar' => 'slug'],
+            ],
+            [
+                '/foo/{bar}/baz/{qux:slug}',
+                '/foo/{bar}/baz/{qux}',
+                ['qux' => 'slug'],
+            ],
+            [
+                '/foo/{bar}/baz/{qux:slug}',
+                '/foo/{bar}/baz/{qux}',
+                ['qux' => 'slug'],
+            ],
+            [
+                '/foo/{bar}/baz/{qux:slug?}',
+                '/foo/{bar}/baz/{qux?}',
+                ['qux' => 'slug'],
+            ],
+            [
+                '/foo/{bar}/baz/{qux:slug?}/{test:id?}',
+                '/foo/{bar}/baz/{qux?}/{test?}',
+                ['qux' => 'slug', 'test' => 'id'],
+            ],
+        ];
     }
 }

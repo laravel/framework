@@ -5,18 +5,11 @@ namespace Illuminate\Tests\Integration\Cache;
 use Memcached;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 abstract class MemcachedIntegrationTestCase extends TestCase
 {
     protected function setUp(): void
     {
         parent::setUp();
-
-        if (! extension_loaded('memcached')) {
-            $this->markTestSkipped('Memcached module not installed');
-        }
 
         // Determine whether there is a running Memcached instance
         $testConnection = new Memcached;
@@ -29,7 +22,7 @@ abstract class MemcachedIntegrationTestCase extends TestCase
         $testConnection->getVersion();
 
         if ($testConnection->getResultCode() > Memcached::RES_SUCCESS) {
-            $this->markTestSkipped('Memcached could not establish a connection');
+            $this->markTestSkipped('Memcached could not establish a connection.');
         }
 
         $testConnection->quit();

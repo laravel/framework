@@ -70,7 +70,7 @@ class AliasLoader
      */
     public function load($alias)
     {
-        if (static::$facadeNamespace && strpos($alias, static::$facadeNamespace) === 0) {
+        if (static::$facadeNamespace && str_starts_with($alias, static::$facadeNamespace)) {
             $this->loadFacade($alias);
 
             return true;

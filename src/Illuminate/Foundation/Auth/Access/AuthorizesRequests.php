@@ -49,7 +49,7 @@ trait AuthorizesRequests
      */
     protected function parseAbilityAndArguments($ability, $arguments)
     {
-        if (is_string($ability) && strpos($ability, '\\') === false) {
+        if (is_string($ability) && ! str_contains($ability, '\\')) {
             return [$ability, $arguments];
         }
 
@@ -74,14 +74,18 @@ trait AuthorizesRequests
     /**
      * Authorize a resource action based on the incoming request.
      *
-     * @param  string  $model
-     * @param  string|null  $parameter
+     * @param  string|array  $model
+     * @param  string|array|null  $parameter
      * @param  array  $options
      * @param  \Illuminate\Http\Request|null  $request
      * @return void
      */
     public function authorizeResource($model, $parameter = null, array $options = [], $request = null)
     {
+        $model = is_array($model) ? implode(',', $model) : $model;
+
+        $parameter = is_array($parameter) ? implode(',', $parameter) : $parameter;
+
         $parameter = $parameter ?: Str::snake(class_basename($model));
 
         $middleware = [];

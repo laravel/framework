@@ -8,9 +8,6 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class FoundationHelpersTest extends TestCase
 {
     public function testRescue()
@@ -71,6 +68,7 @@ class FoundationHelpersTest extends TestCase
     public function testMixSilentlyFailsWhenAssetIsMissingFromManifestWhenNotInDebugMode()
     {
         $this->app['config']->set('app.debug', false);
+
         $manifest = $this->makeManifest();
 
         $path = mix('missing.js');
@@ -86,6 +84,7 @@ class FoundationHelpersTest extends TestCase
         $this->expectExceptionMessage('Unable to locate Mix file: /missing.js.');
 
         $this->app['config']->set('app.debug', true);
+
         $manifest = $this->makeManifest();
 
         try {
@@ -102,7 +101,9 @@ class FoundationHelpersTest extends TestCase
         $handler = new FakeHandler;
         $this->app->instance(ExceptionHandler::class, $handler);
         $this->app['config']->set('app.debug', true);
+
         $manifest = $this->makeManifest();
+
         Route::get('test-route', function () {
             mix('missing.js');
         });

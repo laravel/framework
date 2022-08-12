@@ -71,7 +71,7 @@ class Response implements ArrayAccess
     /**
      * Get the JSON decoded body of the response as an object.
      *
-     * @return object
+     * @return object|array
      */
     public function object()
     {
@@ -107,9 +107,7 @@ class Response implements ArrayAccess
      */
     public function headers()
     {
-        return collect($this->response->getHeaders())->mapWithKeys(function ($v, $k) {
-            return [$k => $v];
-        })->all();
+        return $this->response->getHeaders();
     }
 
     /**
@@ -123,13 +121,23 @@ class Response implements ArrayAccess
     }
 
     /**
+     * Get the reason phrase of the response.
+     *
+     * @return string
+     */
+    public function reason()
+    {
+        return $this->response->getReasonPhrase();
+    }
+
+    /**
      * Get the effective URI of the response.
      *
      * @return \Psr\Http\Message\UriInterface|null
      */
     public function effectiveUri()
     {
-        return optional($this->transferStats)->getEffectiveUri();
+        return $this->transferStats?->getEffectiveUri();
     }
 
     /**
@@ -160,6 +168,26 @@ class Response implements ArrayAccess
     public function redirect()
     {
         return $this->status() >= 300 && $this->status() < 400;
+    }
+
+    /**
+     * Determine if the response was a 401 "Unauthorized" response.
+     *
+     * @return bool
+     */
+    public function unauthorized()
+    {
+        return $this->status() === 401;
+    }
+
+    /**
+     * Determine if the response was a 403 "Forbidden" response.
+     *
+     * @return bool
+     */
+    public function forbidden()
+    {
+        return $this->status() === 403;
     }
 
     /**
@@ -195,7 +223,7 @@ class Response implements ArrayAccess
     /**
      * Execute the given callback if there was a server or client error.
      *
-     * @param  \Closure|callable $callback
+     * @param  callable  $callback
      * @return $this
      */
     public function onError(callable $callback)
@@ -224,7 +252,7 @@ class Response implements ArrayAccess
      */
     public function handlerStats()
     {
-        return optional($this->transferStats)->getHandlerStats() ?? [];
+        return $this->transferStats?->getHandlerStats() ?? [];
     }
 
     /**
@@ -285,13 +313,25 @@ class Response implements ArrayAccess
     }
 
     /**
+     * Throw an exception if a server or client error occurred and the given condition evaluates to true.
+     *
+     * @param  bool  $condition
+     * @return $this
+     *
+     * @throws \Illuminate\Http\Client\RequestException
+     */
+    public function throwIf($condition)
+    {
+        return $condition ? $this->throw() : $this;
+    }
+
+    /**
      * Determine if the given offset exists.
      *
      * @param  string  $offset
      * @return bool
      */
-    #[\ReturnTypeWillChange]
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return isset($this->json()[$offset]);
     }
@@ -302,8 +342,7 @@ class Response implements ArrayAccess
      * @param  string  $offset
      * @return mixed
      */
-    #[\ReturnTypeWillChange]
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         return $this->json()[$offset];
     }
@@ -317,8 +356,7 @@ class Response implements ArrayAccess
      *
      * @throws \LogicException
      */
-    #[\ReturnTypeWillChange]
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         throw new LogicException('Response data may not be mutated using array access.');
     }
@@ -331,8 +369,7 @@ class Response implements ArrayAccess
      *
      * @throws \LogicException
      */
-    #[\ReturnTypeWillChange]
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         throw new LogicException('Response data may not be mutated using array access.');
     }

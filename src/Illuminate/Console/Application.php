@@ -84,6 +84,8 @@ class Application extends SymfonyApplication implements ApplicationContract
 
     /**
      * {@inheritdoc}
+     *
+     * @return int
      */
     public function run(InputInterface $input = null, OutputInterface $output = null): int
     {
@@ -123,7 +125,7 @@ class Application extends SymfonyApplication implements ApplicationContract
      */
     public static function artisanBinary()
     {
-        return defined('ARTISAN_BINARY') ? ProcessUtils::escapeArgument(ARTISAN_BINARY) : 'artisan';
+        return ProcessUtils::escapeArgument(defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan');
     }
 
     /**
@@ -216,7 +218,7 @@ class Application extends SymfonyApplication implements ApplicationContract
             $input = new ArrayInput($parameters);
         }
 
-        return [$command, $input ?? null];
+        return [$command, $input];
     }
 
     /**
@@ -265,7 +267,7 @@ class Application extends SymfonyApplication implements ApplicationContract
      */
     public function resolve($command)
     {
-        if (class_exists($command) && ($commandName = $command::getDefaultName())) {
+        if (is_subclass_of($command, SymfonyCommand::class) && ($commandName = $command::getDefaultName())) {
             $this->commandMap[$commandName] = $command;
 
             return null;

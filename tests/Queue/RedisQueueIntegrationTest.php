@@ -30,15 +30,16 @@ class RedisQueueIntegrationTest extends TestCase
 
     protected function setUp(): void
     {
-        Carbon::setTestNow(Carbon::now());
         parent::setUp();
+
         $this->setUpRedis();
     }
 
     protected function tearDown(): void
     {
-        Carbon::setTestNow(null);
         parent::tearDown();
+
+        Carbon::setTestNow(null);
         $this->tearDownRedis();
         m::close();
     }
@@ -85,10 +86,6 @@ class RedisQueueIntegrationTest extends TestCase
      */
     public function testBlockingPop($driver)
     {
-        if (! function_exists('pcntl_fork')) {
-            $this->markTestSkipped('Skipping since the pcntl extension is not available');
-        }
-
         $this->tearDownRedis();
 
         if ($pid = pcntl_fork() > 0) {
@@ -106,22 +103,22 @@ class RedisQueueIntegrationTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider redisDriverProvider
-     *
-     * @param  string  $driver
-     */
-    public function testMigrateMoreThan100Jobs($driver)
-    {
-        $this->setQueue($driver);
-        for ($i = -1; $i >= -201; $i--) {
-            $this->queue->later($i, new RedisQueueIntegrationTestJob($i));
-        }
-        for ($i = -201; $i <= -1; $i++) {
-            $this->assertEquals($i, unserialize(json_decode($this->queue->pop()->getRawBody())->data->command)->i);
-            $this->assertEquals(-$i - 1, $this->redis[$driver]->llen('queues:default:notify'));
-        }
-    }
+    // /**
+    //  * @dataProvider redisDriverProvider
+    //  *
+    //  * @param  string  $driver
+    //  */
+    // public function testMigrateMoreThan100Jobs($driver)
+    // {
+    //     $this->setQueue($driver);
+    //     for ($i = -1; $i >= -201; $i--) {
+    //         $this->queue->later($i, new RedisQueueIntegrationTestJob($i));
+    //     }
+    //     for ($i = -201; $i <= -1; $i++) {
+    //         $this->assertEquals($i, unserialize(json_decode($this->queue->pop()->getRawBody())->data->command)->i);
+    //         $this->assertEquals(-$i - 1, $this->redis[$driver]->llen('queues:default:notify'));
+    //     }
+    // }
 
     /**
      * @dataProvider redisDriverProvider

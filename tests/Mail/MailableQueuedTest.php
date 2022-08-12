@@ -15,7 +15,7 @@ use Illuminate\Mail\SendQueuedMailable;
 use Illuminate\Support\Testing\Fakes\QueueFake;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Swift_Mailer;
+use Symfony\Component\Mailer\Transport\TransportInterface;
 
 class MailableQueuedTest extends TestCase
 {
@@ -91,7 +91,7 @@ class MailableQueuedTest extends TestCase
 
     protected function getMocks()
     {
-        return ['smtp', m::mock(Factory::class), m::mock(Swift_Mailer::class)];
+        return ['smtp', m::mock(Factory::class), m::mock(TransportInterface::class)];
     }
 }
 

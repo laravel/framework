@@ -5,7 +5,9 @@ namespace Illuminate\Queue\Console;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Support\InteractsWithTime;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'queue:restart')]
 class RestartCommand extends Command
 {
     use InteractsWithTime;
@@ -16,15 +18,6 @@ class RestartCommand extends Command
      * @var string
      */
     protected $name = 'queue:restart';
-
-    /**
-     * The name of the console command.
-     *
-     * This name is used to identify the command during lazy loading.
-     *
-     * @var string|null
-     */
-    protected static $defaultName = 'queue:restart';
 
     /**
      * The console command description.
@@ -62,6 +55,6 @@ class RestartCommand extends Command
     {
         $this->cache->forever('illuminate:queue:restart', $this->currentTime());
 
-        $this->info('Broadcasting queue restart signal.');
+        $this->components->info('Broadcasting queue restart signal.');
     }
 }

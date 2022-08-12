@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Testing\Concerns;
 
+use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Testing\Concerns\TestDatabases;
@@ -96,7 +97,7 @@ class TestDatabasesTest extends TestCase
         ];
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 

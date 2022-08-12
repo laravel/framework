@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Schema\Builder;
 use Illuminate\Database\Schema\ForeignIdColumnDefinition;
 use Illuminate\Database\Schema\Grammars\PostgresGrammar;
 use Mockery as m;
@@ -262,6 +263,46 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertSame('create index "baz" on "users" using hash ("foo", "bar")', $statements[0]);
     }
 
+    public function testAddingFulltextIndex()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->fulltext('body');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create index "users_body_fulltext" on "users" using gin ((to_tsvector(\'english\', "body")))', $statements[0]);
+    }
+
+    public function testAddingFulltextIndexMultipleColumns()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->fulltext(['body', 'title']);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create index "users_body_title_fulltext" on "users" using gin ((to_tsvector(\'english\', "body") || to_tsvector(\'english\', "title")))', $statements[0]);
+    }
+
+    public function testAddingFulltextIndexWithLanguage()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->fulltext('body')->language('spanish');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create index "users_body_fulltext" on "users" using gin ((to_tsvector(\'spanish\', "body")))', $statements[0]);
+    }
+
+    public function testAddingFulltextIndexWithFluency()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->string('body')->fulltext();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(2, $statements);
+        $this->assertSame('create index "users_body_fulltext" on "users" using gin ((to_tsvector(\'english\', "body")))', $statements[1]);
+    }
+
     public function testAddingSpatialIndex()
     {
         $blueprint = new Blueprint('geo');
@@ -392,6 +433,52 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('alter table "users" add column "foo" varchar(100) null default \'bar\'', $statements[0]);
+    }
+
+    public function testAddingStringWithoutLengthLimit()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->string('foo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "users" add column "foo" varchar(255) not null', $statements[0]);
+
+        Builder::$defaultStringLength = null;
+
+        $blueprint = new Blueprint('users');
+        $blueprint->string('foo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        try {
+            $this->assertCount(1, $statements);
+            $this->assertSame('alter table "users" add column "foo" varchar not null', $statements[0]);
+        } finally {
+            Builder::$defaultStringLength = 255;
+        }
+    }
+
+    public function testAddingCharWithoutLengthLimit()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->char('foo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "users" add column "foo" char(255) not null', $statements[0]);
+
+        Builder::$defaultStringLength = null;
+
+        $blueprint = new Blueprint('users');
+        $blueprint->char('foo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        try {
+            $this->assertCount(1, $statements);
+            $this->assertSame('alter table "users" add column "foo" char not null', $statements[0]);
+        } finally {
+            Builder::$defaultStringLength = 255;
+        }
     }
 
     public function testAddingText()

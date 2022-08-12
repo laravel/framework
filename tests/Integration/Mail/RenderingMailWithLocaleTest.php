@@ -6,9 +6,6 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Support\Facades\View;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class RenderingMailWithLocaleTest extends TestCase
 {
     protected function getEnvironmentSetUp($app)

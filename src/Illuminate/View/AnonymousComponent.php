@@ -51,7 +51,7 @@ class AnonymousComponent extends Component
         $this->attributes = $this->attributes ?: $this->newAttributeBag();
 
         return array_merge(
-            optional($this->data['attributes'] ?? null)->getAttributes() ?: [],
+            ($this->data['attributes'] ?? null)?->getAttributes() ?: [],
             $this->attributes->getAttributes(),
             $this->data,
             ['attributes' => $this->attributes]

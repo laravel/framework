@@ -51,6 +51,18 @@ trait CreatesRegularExpressionRouteConstraints
     }
 
     /**
+     * Specify that the given route parameters must be one of the given values.
+     *
+     * @param  array|string  $parameters
+     * @param  array  $values
+     * @return $this
+     */
+    public function whereIn($parameters, array $values)
+    {
+        return $this->assignExpressionToParameters($parameters, implode('|', $values));
+    }
+
+    /**
      * Apply the given regular expression to the given parameters.
      *
      * @param  array|string  $parameters
@@ -60,8 +72,7 @@ trait CreatesRegularExpressionRouteConstraints
     protected function assignExpressionToParameters($parameters, $expression)
     {
         return $this->where(collect(Arr::wrap($parameters))
-                    ->mapWithKeys(function ($parameter) use ($expression) {
-                        return [$parameter => $expression];
-                    })->all());
+                    ->mapWithKeys(fn ($parameter) => [$parameter => $expression])
+                    ->all());
     }
 }

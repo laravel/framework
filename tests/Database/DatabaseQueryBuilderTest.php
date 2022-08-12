@@ -15,6 +15,7 @@ use Illuminate\Database\Query\Grammars\PostgresGrammar;
 use Illuminate\Database\Query\Grammars\SQLiteGrammar;
 use Illuminate\Database\Query\Grammars\SqlServerGrammar;
 use Illuminate\Database\Query\Processors\MySqlProcessor;
+use Illuminate\Database\Query\Processors\PostgresProcessor;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Pagination\AbstractPaginator as Paginator;
 use Illuminate\Pagination\Cursor;
@@ -299,6 +300,14 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->where('id', '=', 1);
         $this->assertSame('select * from "users" where "id" = ?', $builder->toSql());
         $this->assertEquals([0 => 1], $builder->getBindings());
+    }
+
+    public function testBasicWhereNot()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereNot('name', 'foo')->whereNot('name', '<>', 'bar');
+        $this->assertSame('select * from "users" where not "name" = ? and not "name" <> ?', $builder->toSql());
+        $this->assertEquals(['foo', 'bar'], $builder->getBindings());
     }
 
     public function testWheresWithArrayValue()
@@ -715,6 +724,14 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 1, 1 => 'foo'], $builder->getBindings());
     }
 
+    public function testBasicOrWhereNot()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->orWhereNot('name', 'foo')->orWhereNot('name', '<>', 'bar');
+        $this->assertSame('select * from "users" where not "name" = ? or not "name" <> ?', $builder->toSql());
+        $this->assertEquals(['foo', 'bar'], $builder->getBindings());
+    }
+
     public function testRawWheres()
     {
         $builder = $this->getBuilder();
@@ -867,6 +884,72 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->whereColumn($conditions);
         $this->assertSame('select * from "users" where ("first_name" = "last_name" and "updated_at" > "created_at")', $builder->toSql());
         $this->assertEquals([], $builder->getBindings());
+    }
+
+    public function testWhereFulltextMySql()
+    {
+        $builder = $this->getMySqlBuilderWithProcessor();
+        $builder->select('*')->from('users')->whereFulltext('body', 'Hello World');
+        $this->assertSame('select * from `users` where match (`body`) against (? in natural language mode)', $builder->toSql());
+        $this->assertEquals(['Hello World'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilderWithProcessor();
+        $builder->select('*')->from('users')->whereFulltext('body', 'Hello World', ['expanded' => true]);
+        $this->assertSame('select * from `users` where match (`body`) against (? in natural language mode with query expansion)', $builder->toSql());
+        $this->assertEquals(['Hello World'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilderWithProcessor();
+        $builder->select('*')->from('users')->whereFulltext('body', '+Hello -World', ['mode' => 'boolean']);
+        $this->assertSame('select * from `users` where match (`body`) against (? in boolean mode)', $builder->toSql());
+        $this->assertEquals(['+Hello -World'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilderWithProcessor();
+        $builder->select('*')->from('users')->whereFulltext('body', '+Hello -World', ['mode' => 'boolean', 'expanded' => true]);
+        $this->assertSame('select * from `users` where match (`body`) against (? in boolean mode)', $builder->toSql());
+        $this->assertEquals(['+Hello -World'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilderWithProcessor();
+        $builder->select('*')->from('users')->whereFulltext(['body', 'title'], 'Car,Plane');
+        $this->assertSame('select * from `users` where match (`body`, `title`) against (? in natural language mode)', $builder->toSql());
+        $this->assertEquals(['Car,Plane'], $builder->getBindings());
+    }
+
+    public function testWhereFulltextPostgres()
+    {
+        $builder = $this->getPostgresBuilderWithProcessor();
+        $builder->select('*')->from('users')->whereFulltext('body', 'Hello World');
+        $this->assertSame('select * from "users" where (to_tsvector(\'english\', "body")) @@ plainto_tsquery(\'english\', ?)', $builder->toSql());
+        $this->assertEquals(['Hello World'], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilderWithProcessor();
+        $builder->select('*')->from('users')->whereFulltext('body', 'Hello World', ['language' => 'simple']);
+        $this->assertSame('select * from "users" where (to_tsvector(\'simple\', "body")) @@ plainto_tsquery(\'simple\', ?)', $builder->toSql());
+        $this->assertEquals(['Hello World'], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilderWithProcessor();
+        $builder->select('*')->from('users')->whereFulltext('body', 'Hello World', ['mode' => 'plain']);
+        $this->assertSame('select * from "users" where (to_tsvector(\'english\', "body")) @@ plainto_tsquery(\'english\', ?)', $builder->toSql());
+        $this->assertEquals(['Hello World'], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilderWithProcessor();
+        $builder->select('*')->from('users')->whereFulltext('body', 'Hello World', ['mode' => 'phrase']);
+        $this->assertSame('select * from "users" where (to_tsvector(\'english\', "body")) @@ phraseto_tsquery(\'english\', ?)', $builder->toSql());
+        $this->assertEquals(['Hello World'], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilderWithProcessor();
+        $builder->select('*')->from('users')->whereFulltext('body', '+Hello -World', ['mode' => 'websearch']);
+        $this->assertSame('select * from "users" where (to_tsvector(\'english\', "body")) @@ websearch_to_tsquery(\'english\', ?)', $builder->toSql());
+        $this->assertEquals(['+Hello -World'], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilderWithProcessor();
+        $builder->select('*')->from('users')->whereFulltext('body', 'Hello World', ['language' => 'simple', 'mode' => 'plain']);
+        $this->assertSame('select * from "users" where (to_tsvector(\'simple\', "body")) @@ plainto_tsquery(\'simple\', ?)', $builder->toSql());
+        $this->assertEquals(['Hello World'], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilderWithProcessor();
+        $builder->select('*')->from('users')->whereFulltext(['body', 'title'], 'Car Plane');
+        $this->assertSame('select * from "users" where (to_tsvector(\'english\', "body") || to_tsvector(\'english\', "title")) @@ plainto_tsquery(\'english\', ?)', $builder->toSql());
+        $this->assertEquals(['Car Plane'], $builder->getBindings());
     }
 
     public function testUnions()
@@ -1232,7 +1315,7 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder = $this->getSqlServerBuilder();
         $builder->select('*')->from('users')->skip(25)->take(10)->orderByRaw('[email] desc');
-        $this->assertSame('select * from (select *, row_number() over (order by [email] desc) as row_num from [users]) as temp_table where row_num between 26 and 35 order by row_num', $builder->toSql());
+        $this->assertSame('select * from [users] order by [email] desc offset 25 rows fetch next 10 rows only', $builder->toSql());
     }
 
     public function testReorder()
@@ -1323,6 +1406,25 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->select(['category', new Raw('count(*) as "total"')])->from('item')->where('department', '=', 'popular')->groupBy('category')->having('total', '>', 3);
         $this->assertSame('select "category", count(*) as "total" from "item" where "department" = ? group by "category" having "total" > ?', $builder->toSql());
+    }
+
+    public function testNestedHavings()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->having('email', '=', 'foo')->orHaving(function ($q) {
+            $q->having('name', '=', 'bar')->having('age', '=', 25);
+        });
+        $this->assertSame('select * from "users" having "email" = ? or ("name" = ? and "age" = ?)', $builder->toSql());
+        $this->assertEquals([0 => 'foo', 1 => 'bar', 2 => 25], $builder->getBindings());
+    }
+
+    public function testNestedHavingBindings()
+    {
+        $builder = $this->getBuilder();
+        $builder->having('email', '=', 'foo')->having(function ($q) {
+            $q->selectRaw('?', ['ignore'])->having('name', '=', 'bar');
+        });
+        $this->assertEquals([0 => 'foo', 1 => 'bar'], $builder->getBindings());
     }
 
     public function testHavingBetweens()
@@ -1461,6 +1563,14 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select * from "users" limit 10 offset 5', $builder->toSql());
 
         $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->limit(null);
+        $this->assertSame('select * from "users"', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->limit(0);
+        $this->assertSame('select * from "users" limit 0', $builder->toSql());
+
+        $builder = $this->getBuilder();
         $builder->select('*')->from('users')->skip(5)->take(10);
         $this->assertSame('select * from "users" limit 10 offset 5', $builder->toSql());
 
@@ -1471,6 +1581,14 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->skip(-5)->take(-10);
         $this->assertSame('select * from "users" offset 0', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->skip(null)->take(null);
+        $this->assertSame('select * from "users" offset 0', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->skip(5)->take(null);
+        $this->assertSame('select * from "users" offset 5', $builder->toSql());
     }
 
     public function testForPage()
@@ -1589,6 +1707,30 @@ class DatabaseQueryBuilderTest extends TestCase
             $q->selectRaw('?', ['ignore'])->where('name', '=', 'bar');
         });
         $this->assertEquals([0 => 'foo', 1 => 'bar'], $builder->getBindings());
+    }
+
+    public function testWhereNot()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereNot(function ($q) {
+            $q->where('email', '=', 'foo');
+        });
+        $this->assertSame('select * from "users" where not ("email" = ?)', $builder->toSql());
+        $this->assertEquals([0 => 'foo'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('name', '=', 'bar')->whereNot(function ($q) {
+            $q->where('email', '=', 'foo');
+        });
+        $this->assertSame('select * from "users" where "name" = ? and not ("email" = ?)', $builder->toSql());
+        $this->assertEquals([0 => 'bar', 1 => 'foo'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('name', '=', 'bar')->orWhereNot(function ($q) {
+            $q->where('email', '=', 'foo');
+        });
+        $this->assertSame('select * from "users" where "name" = ? or not ("email" = ?)', $builder->toSql());
+        $this->assertEquals([0 => 'bar', 1 => 'foo'], $builder->getBindings());
     }
 
     public function testFullSubSelects()
@@ -1986,6 +2128,19 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $results);
     }
 
+    public function testFindOrReturnsFirstResultByID()
+    {
+        $builder = $this->getMockQueryBuilder();
+        $data = m::mock(stdClass::class);
+        $builder->shouldReceive('first')->andReturn($data)->once();
+        $builder->shouldReceive('first')->with(['column'])->andReturn($data)->once();
+        $builder->shouldReceive('first')->andReturn(null)->once();
+
+        $this->assertSame($data, $builder->findOr(1, fn () => 'callback result'));
+        $this->assertSame($data, $builder->findOr(1, ['column'], fn () => 'callback result'));
+        $this->assertSame('callback result', $builder->findOr(1, fn () => 'callback result'));
+    }
+
     public function testFirstMethodReturnsFirstResult()
     {
         $builder = $this->getBuilder();
@@ -2349,7 +2504,16 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testUpsertMethod()
     {
         $builder = $this->getMySqlBuilder();
-        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert into `users` (`email`, `name`) values (?, ?), (?, ?) on duplicate key update `email` = values(`email`), `name` = values(`name`)', ['foo', 'bar', 'foo2', 'bar2'])->andReturn(2);
+        $builder->getConnection()
+            ->shouldReceive('getConfig')->with('use_upsert_alias')->andReturn(false)
+            ->shouldReceive('affectingStatement')->once()->with('insert into `users` (`email`, `name`) values (?, ?), (?, ?) on duplicate key update `email` = values(`email`), `name` = values(`name`)', ['foo', 'bar', 'foo2', 'bar2'])->andReturn(2);
+        $result = $builder->from('users')->upsert([['email' => 'foo', 'name' => 'bar'], ['name' => 'bar2', 'email' => 'foo2']], 'email');
+        $this->assertEquals(2, $result);
+
+        $builder = $this->getMySqlBuilder();
+        $builder->getConnection()
+            ->shouldReceive('getConfig')->with('use_upsert_alias')->andReturn(true)
+            ->shouldReceive('affectingStatement')->once()->with('insert into `users` (`email`, `name`) values (?, ?), (?, ?) as laravel_upsert_alias on duplicate key update `email` = `laravel_upsert_alias`.`email`, `name` = `laravel_upsert_alias`.`name`', ['foo', 'bar', 'foo2', 'bar2'])->andReturn(2);
         $result = $builder->from('users')->upsert([['email' => 'foo', 'name' => 'bar'], ['name' => 'bar2', 'email' => 'foo2']], 'email');
         $this->assertEquals(2, $result);
 
@@ -2372,7 +2536,16 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testUpsertMethodWithUpdateColumns()
     {
         $builder = $this->getMySqlBuilder();
-        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert into `users` (`email`, `name`) values (?, ?), (?, ?) on duplicate key update `name` = values(`name`)', ['foo', 'bar', 'foo2', 'bar2'])->andReturn(2);
+        $builder->getConnection()
+            ->shouldReceive('getConfig')->with('use_upsert_alias')->andReturn(false)
+            ->shouldReceive('affectingStatement')->once()->with('insert into `users` (`email`, `name`) values (?, ?), (?, ?) on duplicate key update `name` = values(`name`)', ['foo', 'bar', 'foo2', 'bar2'])->andReturn(2);
+        $result = $builder->from('users')->upsert([['email' => 'foo', 'name' => 'bar'], ['name' => 'bar2', 'email' => 'foo2']], 'email', ['name']);
+        $this->assertEquals(2, $result);
+
+        $builder = $this->getMySqlBuilder();
+        $builder->getConnection()
+            ->shouldReceive('getConfig')->with('use_upsert_alias')->andReturn(true)
+            ->shouldReceive('affectingStatement')->once()->with('insert into `users` (`email`, `name`) values (?, ?), (?, ?) as laravel_upsert_alias on duplicate key update `name` = `laravel_upsert_alias`.`name`', ['foo', 'bar', 'foo2', 'bar2'])->andReturn(2);
         $result = $builder->from('users')->upsert([['email' => 'foo', 'name' => 'bar'], ['name' => 'bar2', 'email' => 'foo2']], 'email', ['name']);
         $this->assertEquals(2, $result);
 
@@ -2515,6 +2688,32 @@ class DatabaseQueryBuilderTest extends TestCase
                     ->where('users.id', '=', 1);
             })->where('name', 'baz')
             ->update(['email' => 'foo', 'name' => 'bar']);
+        $this->assertEquals(1, $result);
+    }
+
+    public function testUpdateFromMethodWithJoinsOnPostgres()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ? from "orders" where "users"."id" = ? and "users"."id" = "orders"."user_id"', ['foo', 'bar', 1])->andReturn(1);
+        $result = $builder->from('users')->join('orders', 'users.id', '=', 'orders.user_id')->where('users.id', '=', 1)->updateFrom(['email' => 'foo', 'name' => 'bar']);
+        $this->assertEquals(1, $result);
+
+        $builder = $this->getPostgresBuilder();
+        $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ? from "orders" where "users"."id" = "orders"."user_id" and "users"."id" = ?', ['foo', 'bar', 1])->andReturn(1);
+        $result = $builder->from('users')->join('orders', function ($join) {
+            $join->on('users.id', '=', 'orders.user_id')
+                ->where('users.id', '=', 1);
+        })->updateFrom(['email' => 'foo', 'name' => 'bar']);
+        $this->assertEquals(1, $result);
+
+        $builder = $this->getPostgresBuilder();
+        $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ? from "orders" where "name" = ? and "users"."id" = "orders"."user_id" and "users"."id" = ?', ['foo', 'bar', 'baz', 1])->andReturn(1);
+        $result = $builder->from('users')
+            ->join('orders', function ($join) {
+                $join->on('users.id', '=', 'orders.user_id')
+                   ->where('users.id', '=', 1);
+            })->where('name', 'baz')
+           ->updateFrom(['email' => 'foo', 'name' => 'bar']);
         $this->assertEquals(1, $result);
     }
 
@@ -2758,7 +2957,18 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testPreservedAreAppliedByUpsert()
     {
         $builder = $this->getMySqlBuilder();
-        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert into `users` (`email`) values (?) on duplicate key update `email` = values(`email`)', ['foo']);
+        $builder->getConnection()
+            ->shouldReceive('getConfig')->with('use_upsert_alias')->andReturn(false)
+            ->shouldReceive('affectingStatement')->once()->with('insert into `users` (`email`) values (?) on duplicate key update `email` = values(`email`)', ['foo']);
+        $builder->beforeQuery(function ($builder) {
+            $builder->from('users');
+        });
+        $builder->upsert(['email' => 'foo'], 'id');
+
+        $builder = $this->getMySqlBuilder();
+        $builder->getConnection()
+            ->shouldReceive('getConfig')->with('use_upsert_alias')->andReturn(true)
+            ->shouldReceive('affectingStatement')->once()->with('insert into `users` (`email`) values (?) as laravel_upsert_alias on duplicate key update `email` = `laravel_upsert_alias`.`email`', ['foo']);
         $builder->beforeQuery(function ($builder) {
             $builder->from('users');
         });
@@ -2970,6 +3180,21 @@ class DatabaseQueryBuilderTest extends TestCase
         ]);
     }
 
+    public function testPostgresUpdateWrappingJsonPathArrayIndex()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->getConnection()->shouldReceive('update')
+            ->with('update "users" set "options" = jsonb_set("options"::jsonb, \'{1,"2fa"}\', ?), "meta" = jsonb_set("meta"::jsonb, \'{"tags",0,2}\', ?) where ("options"->1->\'2fa\')::jsonb = \'true\'::jsonb', [
+                'false',
+                '"large"',
+            ]);
+
+        $builder->from('users')->where('options->[1]->2fa', true)->update([
+            'options->[1]->2fa' => false,
+            'meta->tags[0][2]' => 'large',
+        ]);
+    }
+
     public function testSQLiteUpdateWrappingJsonArray()
     {
         $builder = $this->getSQLiteBuilder();
@@ -3002,6 +3227,21 @@ class DatabaseQueryBuilderTest extends TestCase
             'options->security' => ['2fa' => false, 'presets' => ['laravel', 'vue']],
             'options->sharing->twitter' => 'username',
             'created_at' => new DateTime('2019-08-06'),
+        ]);
+    }
+
+    public function testSQLiteUpdateWrappingJsonPathArrayIndex()
+    {
+        $builder = $this->getSQLiteBuilder();
+        $builder->getConnection()->shouldReceive('update')
+            ->with('update "users" set "options" = json_patch(ifnull("options", json(\'{}\')), json(?)), "meta" = json_patch(ifnull("meta", json(\'{}\')), json(?)) where json_extract("options", \'$[1]."2fa"\') = true', [
+                '{"[1]":{"2fa":false}}',
+                '{"tags[0][2]":"large"}',
+            ]);
+
+        $builder->from('users')->where('options->[1]->2fa', true)->update([
+            'options->[1]->2fa' => false,
+            'meta->tags[0][2]' => 'large',
         ]);
     }
 
@@ -3171,8 +3411,8 @@ SQL;
         $this->assertSame('select * from (select *, row_number() over (order by (select 0)) as row_num from [users]) as temp_table where row_num between 11 and 20 order by row_num', $builder->toSql());
 
         $builder = $this->getSqlServerBuilder();
-        $builder->select('*')->from('users')->skip(10)->take(10)->orderBy('email', 'desc');
-        $this->assertSame('select * from (select *, row_number() over (order by [email] desc) as row_num from [users]) as temp_table where row_num between 11 and 20 order by row_num', $builder->toSql());
+        $builder->select('*')->from('users')->skip(11)->take(10)->orderBy('email', 'desc');
+        $this->assertSame('select * from [users] order by [email] desc offset 11 rows fetch next 10 rows only', $builder->toSql());
 
         $builder = $this->getSqlServerBuilder();
         $subQueryBuilder = $this->getSqlServerBuilder();
@@ -3180,8 +3420,8 @@ SQL;
             return $query->select('created_at')->from('logins')->where('users.name', 'nameBinding')->whereColumn('user_id', 'users.id')->limit(1);
         };
         $builder->select('*')->from('users')->where('email', 'emailBinding')->orderBy($subQuery)->skip(10)->take(10);
-        $this->assertSame('select * from (select *, row_number() over (order by (select top 1 [created_at] from [logins] where [users].[name] = ? and [user_id] = [users].[id]) asc) as row_num from [users] where [email] = ?) as temp_table where row_num between 11 and 20 order by row_num', $builder->toSql());
-        $this->assertEquals(['nameBinding', 'emailBinding'], $builder->getBindings());
+        $this->assertSame('select * from [users] where [email] = ? order by (select top 1 [created_at] from [logins] where [users].[name] = ? and [user_id] = [users].[id]) asc offset 10 rows fetch next 10 rows only', $builder->toSql());
+        $this->assertEquals(['emailBinding', 'nameBinding'], $builder->getBindings());
 
         $builder = $this->getSqlServerBuilder();
         $builder->select('*')->from('users')->take('foo');
@@ -3202,6 +3442,41 @@ SQL;
         $builder->select('*')->from('users')->where('name', 'sounds like', 'John Doe');
         $this->assertSame('select * from `users` where `name` sounds like ?', $builder->toSql());
         $this->assertEquals(['John Doe'], $builder->getBindings());
+    }
+
+    public function testBitwiseOperators()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('bar', '&', 1);
+        $this->assertSame('select * from "users" where "bar" & ?', $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->where('bar', '#', 1);
+        $this->assertSame('select * from "users" where ("bar" # ?)::bool', $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->where('range', '>>', '[2022-01-08 00:00:00,2022-01-09 00:00:00)');
+        $this->assertSame('select * from "users" where ("range" >> ?)::bool', $builder->toSql());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->where('bar', '&', 1);
+        $this->assertSame('select * from [users] where ([bar] & ?) != 0', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->having('bar', '&', 1);
+        $this->assertSame('select * from "users" having "bar" & ?', $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->having('bar', '#', 1);
+        $this->assertSame('select * from "users" having ("bar" # ?)::bool', $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->having('range', '>>', '[2022-01-08 00:00:00,2022-01-09 00:00:00)');
+        $this->assertSame('select * from "users" having ("range" >> ?)::bool', $builder->toSql());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->having('bar', '&', 1);
+        $this->assertSame('select * from [users] having ([bar] & ?) != 0', $builder->toSql());
     }
 
     public function testMergeWheresCanMergeWheresAndBindings()
@@ -3983,6 +4258,276 @@ SQL;
         ]), $result);
     }
 
+    public function testCursorPaginateWithDynamicColumnInSelectRaw()
+    {
+        $perPage = 15;
+        $cursorName = 'cursor';
+        $cursor = new Cursor(['test' => 'bar']);
+        $builder = $this->getMockQueryBuilder();
+        $builder->from('foobar')->select('*')->selectRaw('(CONCAT(firstname, \' \', lastname)) as test')->orderBy('test');
+        $builder->shouldReceive('newQuery')->andReturnUsing(function () use ($builder) {
+            return new Builder($builder->connection, $builder->grammar, $builder->processor);
+        });
+
+        $path = 'http://foo.bar?cursor='.$cursor->encode();
+
+        $results = collect([['test' => 'foo'], ['test' => 'bar']]);
+
+        $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results) {
+            $this->assertEquals(
+                'select *, (CONCAT(firstname, \' \', lastname)) as test from "foobar" where ((CONCAT(firstname, \' \', lastname)) > ?) order by "test" asc limit 16',
+                $builder->toSql());
+            $this->assertEquals(['bar'], $builder->bindings['where']);
+
+            return $results;
+        });
+
+        CursorPaginator::currentCursorResolver(function () use ($cursor) {
+            return $cursor;
+        });
+
+        Paginator::currentPathResolver(function () use ($path) {
+            return $path;
+        });
+
+        $result = $builder->cursorPaginate();
+
+        $this->assertEquals(new CursorPaginator($results, $perPage, $cursor, [
+            'path' => $path,
+            'cursorName' => $cursorName,
+            'parameters' => ['test'],
+        ]), $result);
+    }
+
+    public function testCursorPaginateWithDynamicColumnInSelectSub()
+    {
+        $perPage = 15;
+        $cursorName = 'cursor';
+        $cursor = new Cursor(['test' => 'bar']);
+        $builder = $this->getMockQueryBuilder();
+        $builder->from('foobar')->select('*')->selectSub('CONCAT(firstname, \' \', lastname)', 'test')->orderBy('test');
+        $builder->shouldReceive('newQuery')->andReturnUsing(function () use ($builder) {
+            return new Builder($builder->connection, $builder->grammar, $builder->processor);
+        });
+
+        $path = 'http://foo.bar?cursor='.$cursor->encode();
+
+        $results = collect([['test' => 'foo'], ['test' => 'bar']]);
+
+        $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results) {
+            $this->assertEquals(
+                'select *, (CONCAT(firstname, \' \', lastname)) as "test" from "foobar" where ((CONCAT(firstname, \' \', lastname)) > ?) order by "test" asc limit 16',
+                $builder->toSql());
+            $this->assertEquals(['bar'], $builder->bindings['where']);
+
+            return $results;
+        });
+
+        CursorPaginator::currentCursorResolver(function () use ($cursor) {
+            return $cursor;
+        });
+
+        Paginator::currentPathResolver(function () use ($path) {
+            return $path;
+        });
+
+        $result = $builder->cursorPaginate();
+
+        $this->assertEquals(new CursorPaginator($results, $perPage, $cursor, [
+            'path' => $path,
+            'cursorName' => $cursorName,
+            'parameters' => ['test'],
+        ]), $result);
+    }
+
+    public function testCursorPaginateWithUnionWheres()
+    {
+        $ts = now()->toDateTimeString();
+
+        $perPage = 16;
+        $columns = ['test'];
+        $cursorName = 'cursor-name';
+        $cursor = new Cursor(['created_at' => $ts]);
+        $builder = $this->getMockQueryBuilder();
+        $builder->select('id', 'start_time as created_at')->selectRaw("'video' as type")->from('videos');
+        $builder->union($this->getBuilder()->select('id', 'created_at')->selectRaw("'news' as type")->from('news'));
+        $builder->orderBy('created_at');
+
+        $builder->shouldReceive('newQuery')->andReturnUsing(function () use ($builder) {
+            return new Builder($builder->connection, $builder->grammar, $builder->processor);
+        });
+
+        $path = 'http://foo.bar?cursor='.$cursor->encode();
+
+        $results = collect([
+            ['id' => 1, 'created_at' => now(), 'type' => 'video'],
+            ['id' => 2, 'created_at' => now(), 'type' => 'news'],
+        ]);
+
+        $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results, $ts) {
+            $this->assertEquals(
+                '(select "id", "start_time" as "created_at", \'video\' as type from "videos" where ("start_time" > ?)) union (select "id", "created_at", \'news\' as type from "news" where ("start_time" > ?)) order by "created_at" asc limit 17',
+                $builder->toSql());
+            $this->assertEquals([$ts], $builder->bindings['where']);
+            $this->assertEquals([$ts], $builder->bindings['union']);
+
+            return $results;
+        });
+
+        Paginator::currentPathResolver(function () use ($path) {
+            return $path;
+        });
+
+        $result = $builder->cursorPaginate($perPage, $columns, $cursorName, $cursor);
+
+        $this->assertEquals(new CursorPaginator($results, $perPage, $cursor, [
+            'path' => $path,
+            'cursorName' => $cursorName,
+            'parameters' => ['created_at'],
+        ]), $result);
+    }
+
+    public function testCursorPaginateWithUnionWheresWithRawOrderExpression()
+    {
+        $ts = now()->toDateTimeString();
+
+        $perPage = 16;
+        $columns = ['test'];
+        $cursorName = 'cursor-name';
+        $cursor = new Cursor(['created_at' => $ts]);
+        $builder = $this->getMockQueryBuilder();
+        $builder->select('id', 'is_published', 'start_time as created_at')->selectRaw("'video' as type")->where('is_published', true)->from('videos');
+        $builder->union($this->getBuilder()->select('id', 'is_published', 'created_at')->selectRaw("'news' as type")->where('is_published', true)->from('news'));
+        $builder->orderByRaw('case when (id = 3 and type="news" then 0 else 1 end)')->orderBy('created_at');
+
+        $builder->shouldReceive('newQuery')->andReturnUsing(function () use ($builder) {
+            return new Builder($builder->connection, $builder->grammar, $builder->processor);
+        });
+
+        $path = 'http://foo.bar?cursor='.$cursor->encode();
+
+        $results = collect([
+            ['id' => 1, 'created_at' => now(), 'type' => 'video', 'is_published' => true],
+            ['id' => 2, 'created_at' => now(), 'type' => 'news', 'is_published' => true],
+        ]);
+
+        $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results, $ts) {
+            $this->assertEquals(
+                '(select "id", "is_published", "start_time" as "created_at", \'video\' as type from "videos" where "is_published" = ? and ("start_time" > ?)) union (select "id", "is_published", "created_at", \'news\' as type from "news" where "is_published" = ? and ("start_time" > ?)) order by case when (id = 3 and type="news" then 0 else 1 end), "created_at" asc limit 17',
+                $builder->toSql());
+            $this->assertEquals([true, $ts], $builder->bindings['where']);
+            $this->assertEquals([true, $ts], $builder->bindings['union']);
+
+            return $results;
+        });
+
+        Paginator::currentPathResolver(function () use ($path) {
+            return $path;
+        });
+
+        $result = $builder->cursorPaginate($perPage, $columns, $cursorName, $cursor);
+
+        $this->assertEquals(new CursorPaginator($results, $perPage, $cursor, [
+            'path' => $path,
+            'cursorName' => $cursorName,
+            'parameters' => ['created_at'],
+        ]), $result);
+    }
+
+    public function testCursorPaginateWithUnionWheresReverseOrder()
+    {
+        $ts = now()->toDateTimeString();
+
+        $perPage = 16;
+        $columns = ['test'];
+        $cursorName = 'cursor-name';
+        $cursor = new Cursor(['created_at' => $ts], false);
+        $builder = $this->getMockQueryBuilder();
+        $builder->select('id', 'start_time as created_at')->selectRaw("'video' as type")->from('videos');
+        $builder->union($this->getBuilder()->select('id', 'created_at')->selectRaw("'news' as type")->from('news'));
+        $builder->orderBy('created_at');
+
+        $builder->shouldReceive('newQuery')->andReturnUsing(function () use ($builder) {
+            return new Builder($builder->connection, $builder->grammar, $builder->processor);
+        });
+
+        $path = 'http://foo.bar?cursor='.$cursor->encode();
+
+        $results = collect([
+            ['id' => 1, 'created_at' => now(), 'type' => 'video'],
+            ['id' => 2, 'created_at' => now(), 'type' => 'news'],
+        ]);
+
+        $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results, $ts) {
+            $this->assertEquals(
+                '(select "id", "start_time" as "created_at", \'video\' as type from "videos" where ("start_time" < ?)) union (select "id", "created_at", \'news\' as type from "news" where ("start_time" < ?)) order by "created_at" asc limit 17',
+                $builder->toSql());
+            $this->assertEquals([$ts], $builder->bindings['where']);
+            $this->assertEquals([$ts], $builder->bindings['union']);
+
+            return $results;
+        });
+
+        Paginator::currentPathResolver(function () use ($path) {
+            return $path;
+        });
+
+        $result = $builder->cursorPaginate($perPage, $columns, $cursorName, $cursor);
+
+        $this->assertEquals(new CursorPaginator($results, $perPage, $cursor, [
+            'path' => $path,
+            'cursorName' => $cursorName,
+            'parameters' => ['created_at'],
+        ]), $result);
+    }
+
+    public function testCursorPaginateWithUnionWheresMultipleOrders()
+    {
+        $ts = now()->toDateTimeString();
+
+        $perPage = 16;
+        $columns = ['test'];
+        $cursorName = 'cursor-name';
+        $cursor = new Cursor(['created_at' => $ts, 'id' => 1]);
+        $builder = $this->getMockQueryBuilder();
+        $builder->select('id', 'start_time as created_at')->selectRaw("'video' as type")->from('videos');
+        $builder->union($this->getBuilder()->select('id', 'created_at')->selectRaw("'news' as type")->from('news'));
+        $builder->orderByDesc('created_at')->orderBy('id');
+
+        $builder->shouldReceive('newQuery')->andReturnUsing(function () use ($builder) {
+            return new Builder($builder->connection, $builder->grammar, $builder->processor);
+        });
+
+        $path = 'http://foo.bar?cursor='.$cursor->encode();
+
+        $results = collect([
+            ['id' => 1, 'created_at' => now(), 'type' => 'video'],
+            ['id' => 2, 'created_at' => now(), 'type' => 'news'],
+        ]);
+
+        $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results, $ts) {
+            $this->assertEquals(
+                '(select "id", "start_time" as "created_at", \'video\' as type from "videos" where ("start_time" < ? or ("start_time" = ? and ("id" > ?)))) union (select "id", "created_at", \'news\' as type from "news" where ("start_time" < ? or ("start_time" = ? and ("id" > ?)))) order by "created_at" desc, "id" asc limit 17',
+                $builder->toSql());
+            $this->assertEquals([$ts, $ts, 1], $builder->bindings['where']);
+            $this->assertEquals([$ts, $ts, 1], $builder->bindings['union']);
+
+            return $results;
+        });
+
+        Paginator::currentPathResolver(function () use ($path) {
+            return $path;
+        });
+
+        $result = $builder->cursorPaginate($perPage, $columns, $cursorName, $cursor);
+
+        $this->assertEquals(new CursorPaginator($results, $perPage, $cursor, [
+            'path' => $path,
+            'cursorName' => $cursorName,
+            'parameters' => ['created_at', 'id'],
+        ]), $result);
+    }
+
     public function testWhereRowValues()
     {
         $builder = $this->getBuilder();
@@ -4117,6 +4662,150 @@ SQL;
         $this->assertEquals([1], $builder->getBindings());
     }
 
+    public function testWhereJsonContainsKeyMySql()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereJsonContainsKey('users.options->languages');
+        $this->assertSame('select * from `users` where ifnull(json_contains_path(`users`.`options`, \'one\', \'$."languages"\'), 0)', $builder->toSql());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereJsonContainsKey('options->language->primary');
+        $this->assertSame('select * from `users` where ifnull(json_contains_path(`options`, \'one\', \'$."language"."primary"\'), 0)', $builder->toSql());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonContainsKey('options->languages');
+        $this->assertSame('select * from `users` where `id` = ? or ifnull(json_contains_path(`options`, \'one\', \'$."languages"\'), 0)', $builder->toSql());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereJsonContainsKey('options->languages[0][1]');
+        $this->assertSame('select * from `users` where ifnull(json_contains_path(`options`, \'one\', \'$."languages"[0][1]\'), 0)', $builder->toSql());
+    }
+
+    public function testWhereJsonContainsKeyPostgres()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereJsonContainsKey('users.options->languages');
+        $this->assertSame('select * from "users" where coalesce(("users"."options")::jsonb ?? \'languages\', false)', $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereJsonContainsKey('options->language->primary');
+        $this->assertSame('select * from "users" where coalesce(("options"->\'language\')::jsonb ?? \'primary\', false)', $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonContainsKey('options->languages');
+        $this->assertSame('select * from "users" where "id" = ? or coalesce(("options")::jsonb ?? \'languages\', false)', $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereJsonContainsKey('options->languages[0][1]');
+        $this->assertSame('select * from "users" where case when jsonb_typeof(("options"->\'languages\'->0)::jsonb) = \'array\' then jsonb_array_length(("options"->\'languages\'->0)::jsonb) >= 2 else false end', $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereJsonContainsKey('options->languages[-1]');
+        $this->assertSame('select * from "users" where case when jsonb_typeof(("options"->\'languages\')::jsonb) = \'array\' then jsonb_array_length(("options"->\'languages\')::jsonb) >= 1 else false end', $builder->toSql());
+    }
+
+    public function testWhereJsonContainsKeySqlite()
+    {
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('*')->from('users')->whereJsonContainsKey('users.options->languages');
+        $this->assertSame('select * from "users" where json_type("users"."options", \'$."languages"\') is not null', $builder->toSql());
+
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('*')->from('users')->whereJsonContainsKey('options->language->primary');
+        $this->assertSame('select * from "users" where json_type("options", \'$."language"."primary"\') is not null', $builder->toSql());
+
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonContainsKey('options->languages');
+        $this->assertSame('select * from "users" where "id" = ? or json_type("options", \'$."languages"\') is not null', $builder->toSql());
+
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('*')->from('users')->whereJsonContainsKey('options->languages[0][1]');
+        $this->assertSame('select * from "users" where json_type("options", \'$."languages"[0][1]\') is not null', $builder->toSql());
+    }
+
+    public function testWhereJsonContainsKeySqlServer()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereJsonContainsKey('users.options->languages');
+        $this->assertSame('select * from [users] where \'languages\' in (select [key] from openjson([users].[options]))', $builder->toSql());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereJsonContainsKey('options->language->primary');
+        $this->assertSame('select * from [users] where \'primary\' in (select [key] from openjson([options], \'$."language"\'))', $builder->toSql());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonContainsKey('options->languages');
+        $this->assertSame('select * from [users] where [id] = ? or \'languages\' in (select [key] from openjson([options]))', $builder->toSql());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereJsonContainsKey('options->languages[0][1]');
+        $this->assertSame('select * from [users] where 1 in (select [key] from openjson([options], \'$."languages"[0]\'))', $builder->toSql());
+    }
+
+    public function testWhereJsonDoesntContainKeyMySql()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereJsonDoesntContainKey('options->languages');
+        $this->assertSame('select * from `users` where not ifnull(json_contains_path(`options`, \'one\', \'$."languages"\'), 0)', $builder->toSql());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonDoesntContainKey('options->languages');
+        $this->assertSame('select * from `users` where `id` = ? or not ifnull(json_contains_path(`options`, \'one\', \'$."languages"\'), 0)', $builder->toSql());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereJsonDoesntContainKey('options->languages[0][1]');
+        $this->assertSame('select * from `users` where not ifnull(json_contains_path(`options`, \'one\', \'$."languages"[0][1]\'), 0)', $builder->toSql());
+    }
+
+    public function testWhereJsonDoesntContainKeyPostgres()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereJsonDoesntContainKey('options->languages');
+        $this->assertSame('select * from "users" where not coalesce(("options")::jsonb ?? \'languages\', false)', $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonDoesntContainKey('options->languages');
+        $this->assertSame('select * from "users" where "id" = ? or not coalesce(("options")::jsonb ?? \'languages\', false)', $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereJsonDoesntContainKey('options->languages[0][1]');
+        $this->assertSame('select * from "users" where not case when jsonb_typeof(("options"->\'languages\'->0)::jsonb) = \'array\' then jsonb_array_length(("options"->\'languages\'->0)::jsonb) >= 2 else false end', $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereJsonDoesntContainKey('options->languages[-1]');
+        $this->assertSame('select * from "users" where not case when jsonb_typeof(("options"->\'languages\')::jsonb) = \'array\' then jsonb_array_length(("options"->\'languages\')::jsonb) >= 1 else false end', $builder->toSql());
+    }
+
+    public function testWhereJsonDoesntContainKeySqlite()
+    {
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('*')->from('users')->whereJsonDoesntContainKey('options->languages');
+        $this->assertSame('select * from "users" where not json_type("options", \'$."languages"\') is not null', $builder->toSql());
+
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonDoesntContainKey('options->languages');
+        $this->assertSame('select * from "users" where "id" = ? or not json_type("options", \'$."languages"\') is not null', $builder->toSql());
+
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonDoesntContainKey('options->languages[0][1]');
+        $this->assertSame('select * from "users" where "id" = ? or not json_type("options", \'$."languages"[0][1]\') is not null', $builder->toSql());
+    }
+
+    public function testWhereJsonDoesntContainKeySqlServer()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereJsonDoesntContainKey('options->languages');
+        $this->assertSame('select * from [users] where not \'languages\' in (select [key] from openjson([options]))', $builder->toSql());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonDoesntContainKey('options->languages');
+        $this->assertSame('select * from [users] where [id] = ? or not \'languages\' in (select [key] from openjson([options]))', $builder->toSql());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonDoesntContainKey('options->languages[0][1]');
+        $this->assertSame('select * from [users] where [id] = ? or not 1 in (select [key] from openjson([options], \'$."languages"[0]\'))', $builder->toSql());
+    }
+
     public function testWhereJsonLengthMySql()
     {
         $builder = $this->getMySqlBuilder();
@@ -4144,22 +4833,22 @@ SQL;
     {
         $builder = $this->getPostgresBuilder();
         $builder->select('*')->from('users')->whereJsonLength('options', 0);
-        $this->assertSame('select * from "users" where json_array_length(("options")::json) = ?', $builder->toSql());
+        $this->assertSame('select * from "users" where jsonb_array_length(("options")::jsonb) = ?', $builder->toSql());
         $this->assertEquals([0], $builder->getBindings());
 
         $builder = $this->getPostgresBuilder();
         $builder->select('*')->from('users')->whereJsonLength('users.options->languages', '>', 0);
-        $this->assertSame('select * from "users" where json_array_length(("users"."options"->\'languages\')::json) > ?', $builder->toSql());
+        $this->assertSame('select * from "users" where jsonb_array_length(("users"."options"->\'languages\')::jsonb) > ?', $builder->toSql());
         $this->assertEquals([0], $builder->getBindings());
 
         $builder = $this->getPostgresBuilder();
         $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonLength('options->languages', new Raw('0'));
-        $this->assertSame('select * from "users" where "id" = ? or json_array_length(("options"->\'languages\')::json) = 0', $builder->toSql());
+        $this->assertSame('select * from "users" where "id" = ? or jsonb_array_length(("options"->\'languages\')::jsonb) = 0', $builder->toSql());
         $this->assertEquals([1], $builder->getBindings());
 
         $builder = $this->getPostgresBuilder();
         $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonLength('options->languages', '>', new Raw('0'));
-        $this->assertSame('select * from "users" where "id" = ? or json_array_length(("options"->\'languages\')::json) > 0', $builder->toSql());
+        $this->assertSame('select * from "users" where "id" = ? or jsonb_array_length(("options"->\'languages\')::jsonb) > 0', $builder->toSql());
         $this->assertEquals([1], $builder->getBindings());
     }
 
@@ -4370,6 +5059,14 @@ SQL;
     {
         $grammar = new MySqlGrammar;
         $processor = new MySqlProcessor;
+
+        return new Builder(m::mock(ConnectionInterface::class), $grammar, $processor);
+    }
+
+    protected function getPostgresBuilderWithProcessor()
+    {
+        $grammar = new PostgresGrammar;
+        $processor = new PostgresProcessor;
 
         return new Builder(m::mock(ConnectionInterface::class), $grammar, $processor);
     }

@@ -12,9 +12,6 @@ use Illuminate\Queue\Middleware\ThrottlesExceptions;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class ThrottlesExceptionsTest extends TestCase
 {
     protected function tearDown(): void

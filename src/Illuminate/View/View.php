@@ -81,7 +81,7 @@ class View implements ArrayAccess, Htmlable, ViewContract
      * Get the string contents of the view.
      *
      * @param  callable|null  $callback
-     * @return array|string
+     * @return string
      *
      * @throws \Throwable
      */
@@ -112,7 +112,7 @@ class View implements ArrayAccess, Htmlable, ViewContract
      */
     protected function renderContents()
     {
-        // We will keep track of the amount of views being rendered so we can flush
+        // We will keep track of the number of views being rendered so we can flush
         // the section after the complete rendering operation is done. This will
         // clear out the sections for any separate views that may be rendered.
         $this->factory->incrementRender();
@@ -122,7 +122,7 @@ class View implements ArrayAccess, Htmlable, ViewContract
         $contents = $this->getContents();
 
         // Once we've finished rendering the view, we'll decrement the render count
-        // so that each sections get flushed out next time a view is created and
+        // so that each section gets flushed out next time a view is created and
         // no old sections are staying around in the memory of an environment.
         $this->factory->decrementRender();
 
@@ -306,8 +306,7 @@ class View implements ArrayAccess, Htmlable, ViewContract
      * @param  string  $key
      * @return bool
      */
-    #[\ReturnTypeWillChange]
-    public function offsetExists($key)
+    public function offsetExists($key): bool
     {
         return array_key_exists($key, $this->data);
     }
@@ -318,8 +317,7 @@ class View implements ArrayAccess, Htmlable, ViewContract
      * @param  string  $key
      * @return mixed
      */
-    #[\ReturnTypeWillChange]
-    public function offsetGet($key)
+    public function offsetGet($key): mixed
     {
         return $this->data[$key];
     }
@@ -331,8 +329,7 @@ class View implements ArrayAccess, Htmlable, ViewContract
      * @param  mixed  $value
      * @return void
      */
-    #[\ReturnTypeWillChange]
-    public function offsetSet($key, $value)
+    public function offsetSet($key, $value): void
     {
         $this->with($key, $value);
     }
@@ -343,8 +340,7 @@ class View implements ArrayAccess, Htmlable, ViewContract
      * @param  string  $key
      * @return void
      */
-    #[\ReturnTypeWillChange]
-    public function offsetUnset($key)
+    public function offsetUnset($key): void
     {
         unset($this->data[$key]);
     }
@@ -409,7 +405,7 @@ class View implements ArrayAccess, Htmlable, ViewContract
             return $this->macroCall($method, $parameters);
         }
 
-        if (! Str::startsWith($method, 'with')) {
+        if (! str_starts_with($method, 'with')) {
             throw new BadMethodCallException(sprintf(
                 'Method %s::%s does not exist.', static::class, $method
             ));

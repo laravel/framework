@@ -3,7 +3,7 @@
 namespace Illuminate\Events;
 
 use Closure;
-use Illuminate\Queue\SerializableClosure;
+use Laravel\SerializableClosure\SerializableClosure;
 
 class QueuedClosure
 {
@@ -80,7 +80,7 @@ class QueuedClosure
     }
 
     /**
-     * Set the desired delay for the job.
+     * Set the desired delay in seconds for the job.
      *
      * @param  \DateTimeInterface|\DateInterval|int|null  $delay
      * @return $this

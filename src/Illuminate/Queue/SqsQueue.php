@@ -116,7 +116,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     }
 
     /**
-     * Push a new job onto the queue after a delay.
+     * Push a new job onto the queue after (n) seconds.
      *
      * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  string  $job
@@ -139,6 +139,25 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
                 ])->get('MessageId');
             }
         );
+    }
+
+    /**
+     * Push an array of jobs onto the queue.
+     *
+     * @param  array  $jobs
+     * @param  mixed  $data
+     * @param  string|null  $queue
+     * @return void
+     */
+    public function bulk($jobs, $data = '', $queue = null)
+    {
+        foreach ((array) $jobs as $job) {
+            if (isset($job->delay)) {
+                $this->later($job->delay, $job, $data, $queue);
+            } else {
+                $this->push($job, $data, $queue);
+            }
+        }
     }
 
     /**
@@ -188,8 +207,26 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
         $queue = $queue ?: $this->default;
 
         return filter_var($queue, FILTER_VALIDATE_URL) === false
-            ? rtrim($this->prefix, '/').'/'.Str::finish($queue, $this->suffix)
+            ? $this->suffixQueue($queue, $this->suffix)
             : $queue;
+    }
+
+    /**
+     * Add the given suffix to the given queue name.
+     *
+     * @param  string  $queue
+     * @param  string  $suffix
+     * @return string
+     */
+    protected function suffixQueue($queue, $suffix = '')
+    {
+        if (str_ends_with($queue, '.fifo')) {
+            $queue = Str::beforeLast($queue, '.fifo');
+
+            return rtrim($this->prefix, '/').'/'.Str::finish($queue, $suffix).'.fifo';
+        }
+
+        return rtrim($this->prefix, '/').'/'.Str::finish($queue, $this->suffix);
     }
 
     /**

@@ -21,7 +21,7 @@ trait ForwardsCalls
     {
         try {
             return $object->{$method}(...$parameters);
-        } catch (Error | BadMethodCallException $e) {
+        } catch (Error|BadMethodCallException $e) {
             $pattern = '~^Call to undefined method (?P<class>[^:]+)::(?P<method>[^\(]+)\(\)$~';
 
             if (! preg_match($pattern, $e->getMessage(), $matches)) {
@@ -35,6 +35,27 @@ trait ForwardsCalls
 
             static::throwBadMethodCallException($method);
         }
+    }
+
+    /**
+     * Forward a method call to the given object, returning $this if the forwarded call returned itself.
+     *
+     * @param  mixed  $object
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return mixed
+     *
+     * @throws \BadMethodCallException
+     */
+    protected function forwardDecoratedCallTo($object, $method, $parameters)
+    {
+        $result = $this->forwardCallTo($object, $method, $parameters);
+
+        if ($result === $object) {
+            return $this;
+        }
+
+        return $result;
     }
 
     /**

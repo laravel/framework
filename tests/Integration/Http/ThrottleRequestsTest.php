@@ -12,9 +12,6 @@ use Illuminate\Support\Facades\Route;
 use Orchestra\Testbench\TestCase;
 use Throwable;
 
-/**
- * @group integration
- */
 class ThrottleRequestsTest extends TestCase
 {
     protected function tearDown(): void

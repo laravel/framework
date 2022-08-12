@@ -8,6 +8,7 @@ use Illuminate\Database\Connection;
 use Illuminate\Queue\Jobs\DatabaseJob;
 use Illuminate\Queue\Jobs\DatabaseJobRecord;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 use PDO;
 
 class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
@@ -111,7 +112,7 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
     }
 
     /**
-     * Push a new job onto the queue after a delay.
+     * Push a new job onto the queue after (n) seconds.
      *
      * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  string  $job
@@ -144,17 +145,21 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
     {
         $queue = $this->getQueue($queue);
 
-        $availableAt = $this->availableAt();
+        $now = $this->availableAt();
 
         return $this->database->table($this->table)->insert(collect((array) $jobs)->map(
-            function ($job) use ($queue, $data, $availableAt) {
-                return $this->buildDatabaseRecord($queue, $this->createPayload($job, $this->getQueue($queue), $data), $availableAt);
+            function ($job) use ($queue, $data, $now) {
+                return $this->buildDatabaseRecord(
+                    $queue,
+                    $this->createPayload($job, $this->getQueue($queue), $data),
+                    isset($job->delay) ? $this->availableAt($job->delay) : $now,
+                );
             }
         )->all());
     }
 
     /**
-     * Release a reserved job back onto the queue.
+     * Release a reserved job back onto the queue after (n) seconds.
      *
      * @param  string  $queue
      * @param  \Illuminate\Queue\Jobs\DatabaseJobRecord  $job
@@ -167,7 +172,7 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
     }
 
     /**
-     * Push a raw payload to the database with a given delay.
+     * Push a raw payload to the database with a given delay of (n) seconds.
      *
      * @param  string|null  $queue
      * @param  string  $payload
@@ -253,9 +258,19 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
         $databaseEngine = $this->database->getPdo()->getAttribute(PDO::ATTR_DRIVER_NAME);
         $databaseVersion = $this->database->getConfig('version') ?? $this->database->getPdo()->getAttribute(PDO::ATTR_SERVER_VERSION);
 
-        if ($databaseEngine === 'mysql' && ! strpos($databaseVersion, 'MariaDB') && version_compare($databaseVersion, '8.0.1', '>=') ||
-            $databaseEngine === 'pgsql' && version_compare($databaseVersion, '9.5', '>=')) {
+        if (Str::of($databaseVersion)->contains('MariaDB')) {
+            $databaseEngine = 'mariadb';
+            $databaseVersion = Str::before(Str::after($databaseVersion, '5.5.5-'), '-');
+        }
+
+        if (($databaseEngine === 'mysql' && version_compare($databaseVersion, '8.0.1', '>=')) ||
+            ($databaseEngine === 'mariadb' && version_compare($databaseVersion, '10.6.0', '>=')) ||
+            ($databaseEngine === 'pgsql' && version_compare($databaseVersion, '9.5', '>='))) {
             return 'FOR UPDATE SKIP LOCKED';
+        }
+
+        if ($databaseEngine === 'sqlsrv') {
+            return 'with(rowlock,updlock,readpast)';
         }
 
         return true;

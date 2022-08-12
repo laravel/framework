@@ -40,7 +40,7 @@ class {{ class }} extends Notification
      */
     public function toMail($notifiable)
     {
-        return (new MailMessage)->markdown('DummyView');
+        return (new MailMessage)->markdown('{{ view }}');
     }
 
     /**

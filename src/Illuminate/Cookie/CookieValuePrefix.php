@@ -37,7 +37,7 @@ class CookieValuePrefix
      */
     public static function validate($cookieName, $cookieValue, $key)
     {
-        $hasValidPrefix = strpos($cookieValue, static::create($cookieName, $key)) === 0;
+        $hasValidPrefix = str_starts_with($cookieValue, static::create($cookieName, $key));
 
         return $hasValidPrefix ? static::remove($cookieValue) : null;
     }

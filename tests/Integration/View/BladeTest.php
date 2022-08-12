@@ -2,14 +2,34 @@
 
 namespace Illuminate\Tests\Integration\View;
 
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\View;
+use Illuminate\View\Component;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class BladeTest extends TestCase
 {
+    public function test_rendering_blade_string()
+    {
+        $this->assertSame('Hello Taylor', Blade::render('Hello {{ $name }}', ['name' => 'Taylor']));
+    }
+
+    public function test_rendering_blade_long_maxpathlen_string()
+    {
+        $longString = str_repeat('a', PHP_MAXPATHLEN);
+
+        $result = Blade::render($longString.'{{ $name }}', ['name' => 'a']);
+
+        $this->assertSame($longString.'a', $result);
+    }
+
+    public function test_rendering_blade_component_instance()
+    {
+        $component = new HelloComponent('Taylor');
+
+        $this->assertSame('Hello Taylor', Blade::renderComponent($component));
+    }
+
     public function test_basic_blade_rendering()
     {
         $view = View::make('hello', ['name' => 'Taylor'])->render();
@@ -76,8 +96,49 @@ class BladeTest extends TestCase
         $this->assertSame('<input class="disabled-class" foo="bar" type="text" disabled />', trim($view));
     }
 
+    public function test_consume_defaults()
+    {
+        $view = View::make('consume')->render();
+
+        $this->assertSame('<h1>Menu</h1>
+<div>Slot: A, Color: orange, Default: foo</div>
+<div>Slot: B, Color: red, Default: foo</div>
+<div>Slot: C, Color: blue, Default: foo</div>
+<div>Slot: D, Color: red, Default: foo</div>
+<div>Slot: E, Color: red, Default: foo</div>
+<div>Slot: F, Color: yellow, Default: foo</div>', trim($view));
+    }
+
+    public function test_consume_with_props()
+    {
+        $view = View::make('consume', ['color' => 'rebeccapurple'])->render();
+
+        $this->assertSame('<h1>Menu</h1>
+<div>Slot: A, Color: orange, Default: foo</div>
+<div>Slot: B, Color: rebeccapurple, Default: foo</div>
+<div>Slot: C, Color: blue, Default: foo</div>
+<div>Slot: D, Color: rebeccapurple, Default: foo</div>
+<div>Slot: E, Color: rebeccapurple, Default: foo</div>
+<div>Slot: F, Color: yellow, Default: foo</div>', trim($view));
+    }
+
     protected function getEnvironmentSetUp($app)
     {
         $app['config']->set('view.paths', [__DIR__.'/templates']);
+    }
+}
+
+class HelloComponent extends Component
+{
+    public $name;
+
+    public function __construct(string $name)
+    {
+        $this->name = $name;
+    }
+
+    public function render()
+    {
+        return 'Hello {{ $name }}';
     }
 }

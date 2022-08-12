@@ -9,9 +9,6 @@ use Illuminate\Redis\Limiters\ConcurrencyLimiter;
 use PHPUnit\Framework\TestCase;
 use Throwable;
 
-/**
- * @group redislimiters
- */
 class ConcurrentLimiterTest extends TestCase
 {
     use InteractsWithRedis;

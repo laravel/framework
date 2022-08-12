@@ -3,6 +3,7 @@
 namespace Illuminate\Testing;
 
 use ArrayAccess;
+use Closure;
 use Countable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Arr;
@@ -15,7 +16,7 @@ class AssertableJsonString implements ArrayAccess, Countable
     /**
      * The original encoded json.
      *
-     * @var \Illuminate\Contracts\Support\Jsonable|\JsonSerializable|array
+     * @var \Illuminate\Contracts\Support\Jsonable|\JsonSerializable|array|string
      */
     public $json;
 
@@ -96,7 +97,10 @@ class AssertableJsonString implements ArrayAccess, Countable
 
         $expected = $this->reorderAssocKeys($data);
 
-        PHPUnit::assertEquals(json_encode($expected), json_encode($actual));
+        PHPUnit::assertEquals(
+            json_encode($expected, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES),
+            json_encode($actual, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+        );
 
         return $this;
     }
@@ -208,6 +212,19 @@ class AssertableJsonString implements ArrayAccess, Countable
     }
 
     /**
+     * Assert that the response does not contain the given path.
+     *
+     * @param  string  $path
+     * @return $this
+     */
+    public function assertMissingPath($path)
+    {
+        PHPUnit::assertFalse(Arr::has($this->json(), $path));
+
+        return $this;
+    }
+
+    /**
      * Assert that the expected value and type exists at the given path in the response.
      *
      * @param  string  $path
@@ -216,7 +233,11 @@ class AssertableJsonString implements ArrayAccess, Countable
      */
     public function assertPath($path, $expect)
     {
-        PHPUnit::assertSame($expect, $this->json($path));
+        if ($expect instanceof Closure) {
+            PHPUnit::assertTrue($expect($this->json($path)));
+        } else {
+            PHPUnit::assertSame($expect, $this->json($path));
+        }
 
         return $this;
     }
@@ -334,8 +355,7 @@ class AssertableJsonString implements ArrayAccess, Countable
      *
      * @return int
      */
-    #[\ReturnTypeWillChange]
-    public function count()
+    public function count(): int
     {
         return count($this->decoded);
     }
@@ -346,8 +366,7 @@ class AssertableJsonString implements ArrayAccess, Countable
      * @param  mixed  $offset
      * @return bool
      */
-    #[\ReturnTypeWillChange]
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return isset($this->decoded[$offset]);
     }
@@ -358,8 +377,7 @@ class AssertableJsonString implements ArrayAccess, Countable
      * @param  string  $offset
      * @return mixed
      */
-    #[\ReturnTypeWillChange]
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         return $this->decoded[$offset];
     }
@@ -371,8 +389,7 @@ class AssertableJsonString implements ArrayAccess, Countable
      * @param  mixed  $value
      * @return void
      */
-    #[\ReturnTypeWillChange]
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         $this->decoded[$offset] = $value;
     }
@@ -383,8 +400,7 @@ class AssertableJsonString implements ArrayAccess, Countable
      * @param  string  $offset
      * @return void
      */
-    #[\ReturnTypeWillChange]
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         unset($this->decoded[$offset]);
     }

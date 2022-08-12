@@ -14,9 +14,6 @@ use Illuminate\Contracts\Debug\ExceptionHandler;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class EventPingTest extends TestCase
 {
     protected function tearDown(): void

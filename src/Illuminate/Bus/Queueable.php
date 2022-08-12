@@ -4,7 +4,6 @@ namespace Illuminate\Bus;
 
 use Closure;
 use Illuminate\Queue\CallQueuedClosure;
-use Illuminate\Queue\SerializableClosure;
 use Illuminate\Support\Arr;
 use RuntimeException;
 
@@ -48,7 +47,7 @@ trait Queueable
     /**
      * The number of seconds before the job should be made available.
      *
-     * @var \DateTimeInterface|\DateInterval|int|null
+     * @var \DateTimeInterface|\DateInterval|array|int|null
      */
     public $delay;
 
@@ -128,9 +127,9 @@ trait Queueable
     }
 
     /**
-     * Set the desired delay for the job.
+     * Set the desired delay in seconds for the job.
      *
-     * @param  \DateTimeInterface|\DateInterval|int|null  $delay
+     * @param  \DateTimeInterface|\DateInterval|array|int|null  $delay
      * @return $this
      */
     public function delay($delay)
@@ -193,6 +192,32 @@ trait Queueable
     }
 
     /**
+     * Prepend a job to the current chain so that it is run after the currently running job.
+     *
+     * @param  mixed  $job
+     * @return $this
+     */
+    public function prependToChain($job)
+    {
+        $this->chained = Arr::prepend($this->chained, $this->serializeJob($job));
+
+        return $this;
+    }
+
+    /**
+     * Append a job to the end of the current chain.
+     *
+     * @param  mixed  $job
+     * @return $this
+     */
+    public function appendToChain($job)
+    {
+        $this->chained = array_merge($this->chained, [$this->serializeJob($job)]);
+
+        return $this;
+    }
+
+    /**
      * Serialize a job for queuing.
      *
      * @param  mixed  $job
@@ -245,7 +270,7 @@ trait Queueable
     public function invokeChainCatchCallbacks($e)
     {
         collect($this->chainCatchCallbacks)->each(function ($callback) use ($e) {
-            $callback instanceof SerializableClosure ? $callback->__invoke($e) : call_user_func($callback, $e);
+            $callback($e);
         });
     }
 }

@@ -160,6 +160,29 @@ class ContainerCallTest extends TestCase
         $this->assertSame('taylor', $result[1]);
     }
 
+    public function testCallWithVariadicDependency()
+    {
+        $stub1 = new ContainerCallConcreteStub;
+        $stub2 = new ContainerCallConcreteStub;
+
+        $container = new Container;
+        $container->bind(ContainerCallConcreteStub::class, function () use ($stub1, $stub2) {
+            return [
+                $stub1,
+                $stub2,
+            ];
+        });
+
+        $result = $container->call(function (stdClass $foo, ContainerCallConcreteStub ...$bar) {
+            return func_get_args();
+        });
+
+        $this->assertInstanceOf(stdClass::class, $result[0]);
+        $this->assertInstanceOf(ContainerCallConcreteStub::class, $result[1]);
+        $this->assertSame($stub1, $result[1]);
+        $this->assertSame($stub2, $result[2]);
+    }
+
     public function testCallWithCallableObject()
     {
         $container = new Container;

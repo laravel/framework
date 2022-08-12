@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console;
 
+use Illuminate\Console\View\Components\Factory;
 use Illuminate\Support\Traits\Macroable;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -117,6 +118,8 @@ class Command extends SymfonyCommand
             OutputStyle::class, ['input' => $input, 'output' => $output]
         );
 
+        $this->components = new Factory($this->output);
+
         return parent::run(
             $this->input = $input, $this->output
         );
@@ -163,10 +166,22 @@ class Command extends SymfonyCommand
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function isHidden(): bool
     {
         return $this->hidden;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setHidden(bool $hidden = true): static
+    {
+        parent::setHidden($this->hidden = $hidden);
+
+        return $this;
     }
 
     /**

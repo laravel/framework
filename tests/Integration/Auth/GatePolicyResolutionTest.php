@@ -9,9 +9,6 @@ use Illuminate\Tests\Integration\Auth\Fixtures\AuthenticationTestUser;
 use Illuminate\Tests\Integration\Auth\Fixtures\Policies\AuthenticationTestUserPolicy;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class GatePolicyResolutionTest extends TestCase
 {
     public function testGateEvaluationEventIsFired()

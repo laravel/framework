@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
+use Exception;
 use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
@@ -13,15 +14,10 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
 
-/**
- * @group integration
- */
 class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
 {
-    protected function setUp(): void
+    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
-        parent::setUp();
-
         Schema::create('test_eloquent_model_with_custom_casts', function (Blueprint $table) {
             $table->increments('id');
             $table->timestamps();
@@ -221,6 +217,18 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
         $this->assertSame('117 Spencer St.', $model->address->lineOne);
     }
 
+    public function testSettingAttributesUsingArrowClearsTheCastCache()
+    {
+        $model = new TestEloquentModelWithCustomCast;
+        $model->typed_settings = ['foo' => true];
+
+        $this->assertTrue($model->typed_settings->foo);
+
+        $model->setAttribute('typed_settings->foo', false);
+
+        $this->assertFalse($model->typed_settings->foo);
+    }
+
     public function testWithCastableInterface()
     {
         $model = new TestEloquentModelWithCustomCast;
@@ -230,6 +238,7 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
         ]);
 
         $this->assertInstanceOf(ValueObject::class, $model->value_object_with_caster);
+        $this->assertSame(serialize(new ValueObject('hello')), $model->toArray()['value_object_with_caster']);
 
         $model->setRawAttributes([
             'value_object_caster_with_argument' => null,
@@ -284,6 +293,7 @@ class TestEloquentModelWithCustomCast extends Model
         'other_password' => HashCaster::class.':md5',
         'uppercase' => UppercaseCaster::class,
         'options' => JsonCaster::class,
+        'typed_settings' => JsonSettingsCaster::class,
         'value_object_with_caster' => ValueObject::class,
         'value_object_caster_with_argument' => ValueObject::class.':argument',
         'value_object_caster_with_caster_instance' => ValueObjectWithCasterInstance::class,
@@ -355,6 +365,41 @@ class JsonCaster implements CastsAttributes
     }
 }
 
+class JsonSettingsCaster implements CastsAttributes
+{
+    public function get($model, string $key, $value, array $attributes): ?Settings
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        if ($value instanceof Settings) {
+            return $value;
+        }
+
+        $payload = json_decode($value, true, JSON_THROW_ON_ERROR);
+
+        return Settings::from($payload);
+    }
+
+    public function set($model, string $key, $value, array $attributes): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        if (is_array($value)) {
+            $value = Settings::from($value);
+        }
+
+        if (! $value instanceof Settings) {
+            throw new Exception("Attribute `{$key}` with JsonSettingsCaster should be a Settings object");
+        }
+
+        return $value->toJson();
+    }
+}
+
 class DecimalCaster implements CastsAttributes, DeviatesCastableAttributes, SerializesCastableAttributes
 {
     public function get($model, $key, $value, $attributes)
@@ -418,7 +463,7 @@ class ValueObject implements Castable
 
     public static function castUsing(array $arguments)
     {
-        return new class(...$arguments) implements CastsAttributes
+        return new class(...$arguments) implements CastsAttributes, SerializesCastableAttributes
         {
             private $argument;
 
@@ -437,6 +482,11 @@ class ValueObject implements Castable
             }
 
             public function set($model, $key, $value, $attributes)
+            {
+                return serialize($value);
+            }
+
+            public function serialize($model, $key, $value, $attributes)
             {
                 return serialize($value);
             }
@@ -461,6 +511,31 @@ class Address
     {
         $this->lineOne = $lineOne;
         $this->lineTwo = $lineTwo;
+    }
+}
+
+class Settings
+{
+    public ?bool $foo;
+    public ?bool $bar;
+
+    public function __construct(?bool $foo, ?bool $bar)
+    {
+        $this->foo = $foo;
+        $this->bar = $bar;
+    }
+
+    public static function from(array $data): Settings
+    {
+        return new self(
+            $data['foo'] ?? null,
+            $data['bar'] ?? null,
+        );
+    }
+
+    public function toJson($options = 0): string
+    {
+        return json_encode(['foo' => $this->foo, 'bar' => $this->bar], $options);
     }
 }
 

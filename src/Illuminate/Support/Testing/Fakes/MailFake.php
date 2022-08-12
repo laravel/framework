@@ -128,9 +128,9 @@ class MailFake implements Factory, Mailer, MailQueue
      */
     public function assertNothingSent()
     {
-        $mailableNames = collect($this->mailables)->map(function ($mailable) {
-            return get_class($mailable);
-        })->join(', ');
+        $mailableNames = collect($this->mailables)->map(
+            fn ($mailable) => get_class($mailable)
+        )->join(', ');
 
         PHPUnit::assertEmpty($this->mailables, 'The following mailables were sent unexpectedly: '.$mailableNames);
     }
@@ -197,9 +197,9 @@ class MailFake implements Factory, Mailer, MailQueue
      */
     public function assertNothingQueued()
     {
-        $mailableNames = collect($this->queuedMailables)->map(function ($mailable) {
-            return get_class($mailable);
-        })->join(', ');
+        $mailableNames = collect($this->queuedMailables)->map(
+            fn ($mailable) => get_class($mailable)
+        )->join(', ');
 
         PHPUnit::assertEmpty($this->queuedMailables, 'The following mailables were queued unexpectedly: '.$mailableNames);
     }
@@ -219,13 +219,9 @@ class MailFake implements Factory, Mailer, MailQueue
             return collect();
         }
 
-        $callback = $callback ?: function () {
-            return true;
-        };
+        $callback = $callback ?: fn () => true;
 
-        return $this->mailablesOf($mailable)->filter(function ($mailable) use ($callback) {
-            return $callback($mailable);
-        });
+        return $this->mailablesOf($mailable)->filter(fn ($mailable) => $callback($mailable));
     }
 
     /**
@@ -254,13 +250,9 @@ class MailFake implements Factory, Mailer, MailQueue
             return collect();
         }
 
-        $callback = $callback ?: function () {
-            return true;
-        };
+        $callback = $callback ?: fn () => true;
 
-        return $this->queuedMailablesOf($mailable)->filter(function ($mailable) use ($callback) {
-            return $callback($mailable);
-        });
+        return $this->queuedMailablesOf($mailable)->filter(fn ($mailable) => $callback($mailable));
     }
 
     /**
@@ -282,9 +274,7 @@ class MailFake implements Factory, Mailer, MailQueue
      */
     protected function mailablesOf($type)
     {
-        return collect($this->mailables)->filter(function ($mailable) use ($type) {
-            return $mailable instanceof $type;
-        });
+        return collect($this->mailables)->filter(fn ($mailable) => $mailable instanceof $type);
     }
 
     /**
@@ -295,9 +285,7 @@ class MailFake implements Factory, Mailer, MailQueue
      */
     protected function queuedMailablesOf($type)
     {
-        return collect($this->queuedMailables)->filter(function ($mailable) use ($type) {
-            return $mailable instanceof $type;
-        });
+        return collect($this->queuedMailables)->filter(fn ($mailable) => $mailable instanceof $type);
     }
 
     /**
@@ -363,11 +351,11 @@ class MailFake implements Factory, Mailer, MailQueue
 
         $view->mailer($this->currentMailer);
 
-        $this->currentMailer = null;
-
         if ($view instanceof ShouldQueue) {
             return $this->queue($view, $data);
         }
+
+        $this->currentMailer = null;
 
         $this->mailables[] = $view;
     }
@@ -419,7 +407,7 @@ class MailFake implements Factory, Mailer, MailQueue
      * Infer mailable class using reflection if a typehinted closure is passed to assertion.
      *
      * @param  string|\Closure  $mailable
-     * @param  callable|null $callback
+     * @param  callable|null  $callback
      * @return array
      */
     protected function prepareMailableAndCallback($mailable, $callback)
@@ -429,5 +417,17 @@ class MailFake implements Factory, Mailer, MailQueue
         }
 
         return [$mailable, $callback];
+    }
+
+    /**
+     * Forget all of the resolved mailer instances.
+     *
+     * @return $this
+     */
+    public function forgetMailers()
+    {
+        $this->currentMailer = null;
+
+        return $this;
     }
 }

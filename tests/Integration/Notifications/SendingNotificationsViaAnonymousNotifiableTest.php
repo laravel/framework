@@ -8,17 +8,9 @@ use Illuminate\Support\Facades\Notification as NotificationFacade;
 use Illuminate\Support\Testing\Fakes\NotificationFake;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class SendingNotificationsViaAnonymousNotifiableTest extends TestCase
 {
     public $mailer;
-
-    protected function getEnvironmentSetUp($app)
-    {
-        $app['config']->set('app.debug', 'true');
-    }
 
     public function testMailIsSent()
     {

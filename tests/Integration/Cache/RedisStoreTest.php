@@ -6,9 +6,6 @@ use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Support\Facades\Cache;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class RedisStoreTest extends TestCase
 {
     use InteractsWithRedis;

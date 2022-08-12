@@ -2,18 +2,25 @@
 
 namespace Illuminate\Database;
 
+use Doctrine\DBAL\Types\Type;
 use Illuminate\Database\Connectors\ConnectionFactory;
 use Illuminate\Support\Arr;
 use Illuminate\Support\ConfigurationUrlParser;
 use Illuminate\Support\Str;
+use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use PDO;
+use RuntimeException;
 
 /**
  * @mixin \Illuminate\Database\Connection
  */
 class DatabaseManager implements ConnectionResolverInterface
 {
+    use Macroable {
+        __call as macroCall;
+    }
+
     /**
      * The application instance.
      *
@@ -31,14 +38,14 @@ class DatabaseManager implements ConnectionResolverInterface
     /**
      * The active connection instances.
      *
-     * @var array
+     * @var array<string, \Illuminate\Database\Connection>
      */
     protected $connections = [];
 
     /**
      * The custom connection resolvers.
      *
-     * @var array
+     * @var array<string, callable>
      */
     protected $extensions = [];
 
@@ -48,6 +55,13 @@ class DatabaseManager implements ConnectionResolverInterface
      * @var callable
      */
     protected $reconnector;
+
+    /**
+     * The custom Doctrine column types.
+     *
+     * @var array<string, array>
+     */
+    protected $doctrineTypes = [];
 
     /**
      * Create a new database manager instance.
@@ -183,6 +197,8 @@ class DatabaseManager implements ConnectionResolverInterface
         // the connection, which will allow us to reconnect from the connections.
         $connection->setReconnector($this->reconnector);
 
+        $this->registerConfiguredDoctrineTypes($connection);
+
         return $connection;
     }
 
@@ -202,6 +218,49 @@ class DatabaseManager implements ConnectionResolverInterface
         }
 
         return $connection;
+    }
+
+    /**
+     * Register custom Doctrine types with the connection.
+     *
+     * @param  \Illuminate\Database\Connection  $connection
+     * @return void
+     */
+    protected function registerConfiguredDoctrineTypes(Connection $connection): void
+    {
+        foreach ($this->app['config']->get('database.dbal.types', []) as $name => $class) {
+            $this->registerDoctrineType($class, $name, $name);
+        }
+
+        foreach ($this->doctrineTypes as $name => [$type, $class]) {
+            $connection->registerDoctrineType($class, $name, $type);
+        }
+    }
+
+    /**
+     * Register a custom Doctrine type.
+     *
+     * @param  string  $class
+     * @param  string  $name
+     * @param  string  $type
+     * @return void
+     *
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \RuntimeException
+     */
+    public function registerDoctrineType(string $class, string $name, string $type): void
+    {
+        if (! class_exists('Doctrine\DBAL\Connection')) {
+            throw new RuntimeException(
+                'Registering a custom Doctrine type requires Doctrine DBAL (doctrine/dbal).'
+            );
+        }
+
+        if (! Type::hasType($name)) {
+            Type::addType($name, $class);
+        }
+
+        $this->doctrineTypes[$name] = [$type, $class];
     }
 
     /**
@@ -310,7 +369,7 @@ class DatabaseManager implements ConnectionResolverInterface
     /**
      * Get all of the support drivers.
      *
-     * @return array
+     * @return string[]
      */
     public function supportedDrivers()
     {
@@ -320,7 +379,7 @@ class DatabaseManager implements ConnectionResolverInterface
     /**
      * Get all of the drivers that are actually available.
      *
-     * @return array
+     * @return string[]
      */
     public function availableDrivers()
     {
@@ -343,9 +402,20 @@ class DatabaseManager implements ConnectionResolverInterface
     }
 
     /**
+     * Remove an extension connection resolver.
+     *
+     * @param  string  $name
+     * @return void
+     */
+    public function forgetExtension($name)
+    {
+        unset($this->extensions[$name]);
+    }
+
+    /**
      * Return all of the created connections.
      *
-     * @return array
+     * @return array<string, \Illuminate\Database\Connection>
      */
     public function getConnections()
     {
@@ -385,6 +455,10 @@ class DatabaseManager implements ConnectionResolverInterface
      */
     public function __call($method, $parameters)
     {
+        if (static::hasMacro($method)) {
+            return $this->macroCall($method, $parameters);
+        }
+
         return $this->connection()->$method(...$parameters);
     }
 }

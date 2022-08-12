@@ -69,24 +69,30 @@ class DatabaseSessionHandler implements ExistenceAwareInterface, SessionHandlerI
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
-    public function open($savePath, $sessionName)
+    public function open($savePath, $sessionName): bool
     {
         return true;
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
-    public function close()
+    public function close(): bool
     {
         return true;
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @return string|false
      */
-    public function read($sessionId)
+    public function read($sessionId): string|false
     {
         $session = (object) $this->getQuery()->find($sessionId);
 
@@ -119,8 +125,10 @@ class DatabaseSessionHandler implements ExistenceAwareInterface, SessionHandlerI
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
-    public function write($sessionId, $data)
+    public function write($sessionId, $data): bool
     {
         $payload = $this->getDefaultPayload($data);
 
@@ -141,7 +149,7 @@ class DatabaseSessionHandler implements ExistenceAwareInterface, SessionHandlerI
      * Perform an insert operation on the session ID.
      *
      * @param  string  $sessionId
-     * @param  string  $payload
+     * @param  array<string, mixed>  $payload
      * @return bool|null
      */
     protected function performInsert($sessionId, $payload)
@@ -157,7 +165,7 @@ class DatabaseSessionHandler implements ExistenceAwareInterface, SessionHandlerI
      * Perform an update operation on the session ID.
      *
      * @param  string  $sessionId
-     * @param  string  $payload
+     * @param  array<string, mixed>  $payload
      * @return int
      */
     protected function performUpdate($sessionId, $payload)
@@ -253,8 +261,10 @@ class DatabaseSessionHandler implements ExistenceAwareInterface, SessionHandlerI
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
-    public function destroy($sessionId)
+    public function destroy($sessionId): bool
     {
         $this->getQuery()->where('id', $sessionId)->delete();
 
@@ -263,10 +273,12 @@ class DatabaseSessionHandler implements ExistenceAwareInterface, SessionHandlerI
 
     /**
      * {@inheritdoc}
+     *
+     * @return int
      */
-    public function gc($lifetime)
+    public function gc($lifetime): int
     {
-        $this->getQuery()->where('last_activity', '<=', $this->currentTime() - $lifetime)->delete();
+        return $this->getQuery()->where('last_activity', '<=', $this->currentTime() - $lifetime)->delete();
     }
 
     /**

@@ -14,7 +14,7 @@ class InteractsWithViewsTest extends TestCase
     {
         $string = (string) $this->blade('@if(true)test @endif');
 
-        $this->assertEquals('test ', $string);
+        $this->assertSame('test ', $string);
     }
 
     public function testComponentCanAccessPublicProperties()
@@ -36,8 +36,8 @@ class InteractsWithViewsTest extends TestCase
 
         $component = $this->component(get_class($exampleComponent));
 
-        $this->assertEquals('bar', $component->foo);
-        $this->assertEquals('hello', $component->speak());
+        $this->assertSame('bar', $component->foo);
+        $this->assertSame('hello', $component->speak());
         $component->assertSee('content');
     }
 }

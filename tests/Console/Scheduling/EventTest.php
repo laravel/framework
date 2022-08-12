@@ -12,50 +12,48 @@ class EventTest extends TestCase
     protected function tearDown(): void
     {
         m::close();
+
+        parent::tearDown();
     }
 
+    /**
+     * @requires OS Linux|Darwin
+     */
     public function testBuildCommandUsingUnix()
     {
-        if (windows_os()) {
-            $this->markTestSkipped('Skipping since operating system is Windows');
-        }
-
         $event = new Event(m::mock(EventMutex::class), 'php -i');
 
         $this->assertSame("php -i > '/dev/null' 2>&1", $event->buildCommand());
     }
 
+    /**
+     * @requires OS Windows
+     */
     public function testBuildCommandUsingWindows()
     {
-        if (! windows_os()) {
-            $this->markTestSkipped('Skipping since operating system is not Windows');
-        }
-
         $event = new Event(m::mock(EventMutex::class), 'php -i');
 
         $this->assertSame('php -i > "NUL" 2>&1', $event->buildCommand());
     }
 
+    /**
+     * @requires OS Linux|Darwin
+     */
     public function testBuildCommandInBackgroundUsingUnix()
     {
-        if (windows_os()) {
-            $this->markTestSkipped('Skipping since operating system is Windows');
-        }
-
         $event = new Event(m::mock(EventMutex::class), 'php -i');
         $event->runInBackground();
 
         $scheduleId = '"framework'.DIRECTORY_SEPARATOR.'schedule-eeb46c93d45e928d62aaf684d727e213b7094822"';
 
-        $this->assertSame("(php -i > '/dev/null' 2>&1 ; '".PHP_BINARY."' artisan schedule:finish {$scheduleId} \"$?\") > '/dev/null' 2>&1 &", $event->buildCommand());
+        $this->assertSame("(php -i > '/dev/null' 2>&1 ; '".PHP_BINARY."' 'artisan' schedule:finish {$scheduleId} \"$?\") > '/dev/null' 2>&1 &", $event->buildCommand());
     }
 
+    /**
+     * @requires OS Windows
+     */
     public function testBuildCommandInBackgroundUsingWindows()
     {
-        if (! windows_os()) {
-            $this->markTestSkipped('Skipping since operating system is not Windows');
-        }
-
         $event = new Event(m::mock(EventMutex::class), 'php -i');
         $event->runInBackground();
 

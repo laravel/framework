@@ -2,7 +2,9 @@
 
 namespace Illuminate\Auth\Access;
 
+use Closure;
 use Exception;
+use Illuminate\Auth\Access\Events\GateEvaluated;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -118,10 +120,68 @@ class Gate implements GateContract
     }
 
     /**
+     * Perform an on-demand authorization check. Throw an authorization exception if the condition or callback is false.
+     *
+     * @param  \Illuminate\Auth\Access\Response|\Closure|bool  $condition
+     * @param  string|null  $message
+     * @param  string|null  $code
+     * @return \Illuminate\Auth\Access\Response
+     *
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    public function allowIf($condition, $message = null, $code = null)
+    {
+        return $this->authorizeOnDemand($condition, $message, $code, true);
+    }
+
+    /**
+     * Perform an on-demand authorization check. Throw an authorization exception if the condition or callback is true.
+     *
+     * @param  \Illuminate\Auth\Access\Response|\Closure|bool  $condition
+     * @param  string|null  $message
+     * @param  string|null  $code
+     * @return \Illuminate\Auth\Access\Response
+     *
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    public function denyIf($condition, $message = null, $code = null)
+    {
+        return $this->authorizeOnDemand($condition, $message, $code, false);
+    }
+
+    /**
+     * Authorize a given condition or callback.
+     *
+     * @param  \Illuminate\Auth\Access\Response|\Closure|bool  $condition
+     * @param  string|null  $message
+     * @param  string|null  $code
+     * @param  bool  $allowWhenResponseIs
+     * @return \Illuminate\Auth\Access\Response
+     *
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    protected function authorizeOnDemand($condition, $message, $code, $allowWhenResponseIs)
+    {
+        $user = $this->resolveUser();
+
+        if ($condition instanceof Closure) {
+            $response = $this->canBeCalledWithUser($user, $condition)
+                            ? $condition($user)
+                            : new Response(false, $message, $code);
+        } else {
+            $response = $condition;
+        }
+
+        return with($response instanceof Response ? $response : new Response(
+            (bool) $response === $allowWhenResponseIs, $message, $code
+        ))->authorize();
+    }
+
+    /**
      * Define a new ability.
      *
      * @param  string  $ability
-     * @param  callable|string  $callback
+     * @param  callable|array|string  $callback
      * @return $this
      *
      * @throws \InvalidArgumentException
@@ -139,7 +199,7 @@ class Gate implements GateContract
 
             $this->abilities[$ability] = $this->buildAbilityCallback($ability, $callback);
         } else {
-            throw new InvalidArgumentException("Callback must be a callable or a 'Class@method' string.");
+            throw new InvalidArgumentException("Callback must be a callable, callback array, or a 'Class@method' string.");
         }
 
         return $this;
@@ -180,7 +240,7 @@ class Gate implements GateContract
     protected function buildAbilityCallback($ability, $callback)
     {
         return function () use ($ability, $callback) {
-            if (Str::contains($callback, '@')) {
+            if (str_contains($callback, '@')) {
                 [$class, $method] = Str::parseCallback($callback);
             } else {
                 $class = $callback;
@@ -279,9 +339,9 @@ class Gate implements GateContract
      */
     public function check($abilities, $arguments = [])
     {
-        return collect($abilities)->every(function ($ability) use ($arguments) {
-            return $this->inspect($ability, $arguments)->allowed();
-        });
+        return collect($abilities)->every(
+            fn ($ability) => $this->inspect($ability, $arguments)->allowed()
+        );
     }
 
     /**
@@ -293,9 +353,7 @@ class Gate implements GateContract
      */
     public function any($abilities, $arguments = [])
     {
-        return collect($abilities)->contains(function ($ability) use ($arguments) {
-            return $this->check($ability, $arguments);
-        });
+        return collect($abilities)->contains(fn ($ability) => $this->check($ability, $arguments));
     }
 
     /**
@@ -516,7 +574,7 @@ class Gate implements GateContract
 
             $afterResult = $after($user, $ability, $result, $arguments);
 
-            $result = $result ?? $afterResult;
+            $result ??= $afterResult;
         }
 
         return $result;
@@ -535,7 +593,7 @@ class Gate implements GateContract
     {
         if ($this->container->bound(Dispatcher::class)) {
             $this->container->make(Dispatcher::class)->dispatch(
-                new Events\GateEvaluated($user, $ability, $result, $arguments)
+                new GateEvaluated($user, $ability, $result, $arguments)
             );
         }
     }
@@ -749,7 +807,7 @@ class Gate implements GateContract
      */
     protected function formatAbilityToMethod($ability)
     {
-        return strpos($ability, '-') !== false ? Str::camel($ability) : $ability;
+        return str_contains($ability, '-') ? Str::camel($ability) : $ability;
     }
 
     /**
@@ -760,9 +818,7 @@ class Gate implements GateContract
      */
     public function forUser($user)
     {
-        $callback = function () use ($user) {
-            return $user;
-        };
+        $callback = fn () => $user;
 
         return new static(
             $this->container, $callback, $this->abilities,

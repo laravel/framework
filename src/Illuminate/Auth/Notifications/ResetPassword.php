@@ -18,14 +18,14 @@ class ResetPassword extends Notification
     /**
      * The callback that should be used to create the reset password URL.
      *
-     * @var \Closure|null
+     * @var (\Closure(mixed, string): string)|null
      */
     public static $createUrlCallback;
 
     /**
      * The callback that should be used to build the mail message.
      *
-     * @var \Closure|null
+     * @var (\Closure(mixed, string): \Illuminate\Notifications\Messages\MailMessage)|null
      */
     public static $toMailCallback;
 
@@ -63,16 +63,7 @@ class ResetPassword extends Notification
             return call_user_func(static::$toMailCallback, $notifiable, $this->token);
         }
 
-        if (static::$createUrlCallback) {
-            $url = call_user_func(static::$createUrlCallback, $notifiable, $this->token);
-        } else {
-            $url = url(route('password.reset', [
-                'token' => $this->token,
-                'email' => $notifiable->getEmailForPasswordReset(),
-            ], false));
-        }
-
-        return $this->buildMailMessage($url);
+        return $this->buildMailMessage($this->resetUrl($notifiable));
     }
 
     /**
@@ -92,9 +83,27 @@ class ResetPassword extends Notification
     }
 
     /**
+     * Get the reset URL for the given notifiable.
+     *
+     * @param  mixed  $notifiable
+     * @return string
+     */
+    protected function resetUrl($notifiable)
+    {
+        if (static::$createUrlCallback) {
+            return call_user_func(static::$createUrlCallback, $notifiable, $this->token);
+        }
+
+        return url(route('password.reset', [
+            'token' => $this->token,
+            'email' => $notifiable->getEmailForPasswordReset(),
+        ], false));
+    }
+
+    /**
      * Set a callback that should be used when creating the reset password button URL.
      *
-     * @param  \Closure  $callback
+     * @param  \Closure(mixed, string): string  $callback
      * @return void
      */
     public static function createUrlUsing($callback)
@@ -105,7 +114,7 @@ class ResetPassword extends Notification
     /**
      * Set a callback that should be used when building the notification mail message.
      *
-     * @param  \Closure  $callback
+     * @param  \Closure(mixed, string): \Illuminate\Notifications\Messages\MailMessage  $callback
      * @return void
      */
     public static function toMailUsing($callback)

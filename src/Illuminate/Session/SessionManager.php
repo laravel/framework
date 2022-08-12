@@ -47,7 +47,9 @@ class SessionManager extends Manager
     protected function createCookieDriver()
     {
         return $this->buildSession(new CookieSessionHandler(
-            $this->container->make('cookie'), $this->config->get('session.lifetime')
+            $this->container->make('cookie'),
+            $this->config->get('session.lifetime'),
+            $this->config->get('session.expire_on_close')
         ));
     }
 
@@ -186,7 +188,12 @@ class SessionManager extends Manager
     {
         return $this->config->get('session.encrypt')
                 ? $this->buildEncryptedSession($handler)
-                : new Store($this->config->get('session.cookie'), $handler);
+                : new Store(
+                    $this->config->get('session.cookie'),
+                    $handler,
+                    $id = null,
+                    $this->config->get('session.serialization', 'php')
+                );
     }
 
     /**
@@ -198,7 +205,11 @@ class SessionManager extends Manager
     protected function buildEncryptedSession($handler)
     {
         return new EncryptedStore(
-            $this->config->get('session.cookie'), $handler, $this->container['encrypter']
+            $this->config->get('session.cookie'),
+            $handler,
+            $this->container['encrypter'],
+            $id = null,
+            $this->config->get('session.serialization', 'php'),
         );
     }
 

@@ -125,6 +125,10 @@ class ChangeColumn
             $options['length'] = static::calculateDoctrineTextLength($fluent['type']);
         }
 
+        if ($fluent['type'] === 'char') {
+            $options['fixed'] = true;
+        }
+
         if (static::doesntNeedCharacterOptions($fluent['type'])) {
             $options['customSchemaOptions'] = [
                 'collation' => '',
@@ -145,26 +149,15 @@ class ChangeColumn
     {
         $type = strtolower($type);
 
-        switch ($type) {
-            case 'biginteger':
-                $type = 'bigint';
-                break;
-            case 'smallinteger':
-                $type = 'smallint';
-                break;
-            case 'mediumtext':
-            case 'longtext':
-                $type = 'text';
-                break;
-            case 'binary':
-                $type = 'blob';
-                break;
-            case 'uuid':
-                $type = 'guid';
-                break;
-        }
-
-        return Type::getType($type);
+        return Type::getType(match ($type) {
+            'biginteger' => 'bigint',
+            'smallinteger' => 'smallint',
+            'mediumtext', 'longtext' => 'text',
+            'binary' => 'blob',
+            'uuid' => 'guid',
+            'char' => 'string',
+            default => $type,
+        });
     }
 
     /**
@@ -175,14 +168,11 @@ class ChangeColumn
      */
     protected static function calculateDoctrineTextLength($type)
     {
-        switch ($type) {
-            case 'mediumText':
-                return 65535 + 1;
-            case 'longText':
-                return 16777215 + 1;
-            default:
-                return 255 + 1;
-        }
+        return match ($type) {
+            'mediumText' => 65535 + 1,
+            'longText' => 16777215 + 1,
+            default => 255 + 1,
+        };
     }
 
     /**
@@ -198,6 +188,7 @@ class ChangeColumn
             'binary',
             'boolean',
             'date',
+            'dateTime',
             'decimal',
             'double',
             'float',
@@ -218,19 +209,13 @@ class ChangeColumn
      */
     protected static function mapFluentOptionToDoctrine($attribute)
     {
-        switch ($attribute) {
-            case 'type':
-            case 'name':
-                return;
-            case 'nullable':
-                return 'notnull';
-            case 'total':
-                return 'precision';
-            case 'places':
-                return 'scale';
-            default:
-                return $attribute;
-        }
+        return match ($attribute) {
+            'type', 'name' => null,
+            'nullable' => 'notnull',
+            'total' => 'precision',
+            'places' => 'scale',
+            default => $attribute,
+        };
     }
 
     /**

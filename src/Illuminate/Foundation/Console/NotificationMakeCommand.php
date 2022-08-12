@@ -2,26 +2,22 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
 
+#[AsCommand(name: 'make:notification')]
 class NotificationMakeCommand extends GeneratorCommand
 {
+    use CreatesMatchingTest;
+
     /**
      * The console command name.
      *
      * @var string
      */
     protected $name = 'make:notification';
-
-    /**
-     * The name of the console command.
-     *
-     * This name is used to identify the command during lazy loading.
-     *
-     * @var string|null
-     */
-    protected static $defaultName = 'make:notification';
 
     /**
      * The console command description.
@@ -82,7 +78,7 @@ class NotificationMakeCommand extends GeneratorCommand
         $class = parent::buildClass($name);
 
         if ($this->option('markdown')) {
-            $class = str_replace('DummyView', $this->option('markdown'), $class);
+            $class = str_replace(['DummyView', '{{ view }}'], $this->option('markdown'), $class);
         }
 
         return $class;

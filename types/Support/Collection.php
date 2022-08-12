@@ -1,13 +1,8 @@
 <?php
 
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Collection;
 use function PHPStan\Testing\assertType;
-
-class User extends Authenticatable
-{
-}
 
 $collection = collect([new User]);
 /** @var Arrayable<int, User> $arrayable */
@@ -16,6 +11,15 @@ $arrayable = [];
 $iterable = [];
 /** @var Traversable<int, string> $traversable */
 $traversable = [];
+
+class Invokable
+{
+    public function __invoke(): string
+    {
+        return 'Taylor';
+    }
+}
+$invokable = new Invokable();
 
 assertType('Illuminate\Support\Collection<int, User>', $collection);
 
@@ -97,6 +101,9 @@ assertType('bool', $collection->containsStrict(function ($user) {
     return true;
 }));
 assertType('bool', $collection::make(['string'])->containsStrict('string', 'string'));
+assertType('bool', $collection::make([[1]])->containsStrict(0));
+
+assertType('Illuminate\Support\LazyCollection<int, User>', $collection->lazy());
 
 assertType('float|int|null', $collection->avg());
 assertType('float|int|null', $collection->avg('string'));
@@ -116,6 +123,12 @@ assertType('bool', $collection->contains(function ($user) {
 
     return true;
 }));
+assertType('bool', $collection->contains(function ($user, $int) {
+    assertType('int', $int);
+    assertType('User', $user);
+
+    return true;
+}));
 assertType('bool', $collection::make(['string'])->contains('string', '=', 'string'));
 
 assertType('Illuminate\Support\Collection<int, array<int, string|User>>', $collection->crossJoin($collection::make(['string'])));
@@ -124,13 +137,15 @@ assertType('Illuminate\Support\Collection<int, array<int, int|User>>', $collecti
 assertType('Illuminate\Support\Collection<int, int>', $collection::make([3, 4])->diff([1, 2]));
 assertType('Illuminate\Support\Collection<int, string>', $collection::make(['string-1'])->diff(['string-2']));
 
-assertType('Illuminate\Support\Collection<int, int>', $collection::make([3, 4])->diffUsing([1, 2], function ($int) {
-    assertType('int', $int);
+assertType('Illuminate\Support\Collection<int, int>', $collection::make([3, 4])->diffUsing([1, 2], function ($intA, $intB) {
+    assertType('int', $intA);
+    assertType('int', $intB);
 
     return -1;
 }));
-assertType('Illuminate\Support\Collection<int, string>', $collection::make(['string-1'])->diffUsing(['string-2'], function ($string) {
-    assertType('string', $string);
+assertType('Illuminate\Support\Collection<int, string>', $collection::make(['string-1'])->diffUsing(['string-2'], function ($stringA, $stringB) {
+    assertType('string', $stringA);
+    assertType('string', $stringB);
 
     return -1;
 }));
@@ -138,13 +153,15 @@ assertType('Illuminate\Support\Collection<int, string>', $collection::make(['str
 assertType('Illuminate\Support\Collection<int, int>', $collection::make([3, 4])->diffAssoc([1, 2]));
 assertType('Illuminate\Support\Collection<string, string>', $collection::make(['string' => 'string'])->diffAssoc(['string' => 'string']));
 
-assertType('Illuminate\Support\Collection<int, int>', $collection::make([3, 4])->diffAssocUsing([1, 2], function ($int) {
-    assertType('int', $int);
+assertType('Illuminate\Support\Collection<int, int>', $collection::make([3, 4])->diffAssocUsing([1, 2], function ($intA, $intB) {
+    assertType('int', $intA);
+    assertType('int', $intB);
 
     return -1;
 }));
-assertType('Illuminate\Support\Collection<int, string>', $collection::make(['string-1'])->diffAssocUsing(['string-2'], function ($int) {
-    assertType('int', $int);
+assertType('Illuminate\Support\Collection<int, string>', $collection::make(['string-1'])->diffAssocUsing(['string-2'], function ($intA, $intB) {
+    assertType('int', $intA);
+    assertType('int', $intB);
 
     return -1;
 }));
@@ -152,13 +169,15 @@ assertType('Illuminate\Support\Collection<int, string>', $collection::make(['str
 assertType('Illuminate\Support\Collection<int, int>', $collection::make([3, 4])->diffKeys([1, 2]));
 assertType('Illuminate\Support\Collection<string, string>', $collection::make(['string' => 'string'])->diffKeys(['string' => 'string']));
 
-assertType('Illuminate\Support\Collection<int, int>', $collection::make([3, 4])->diffKeysUsing([1, 2], function ($int) {
-    assertType('int', $int);
+assertType('Illuminate\Support\Collection<int, int>', $collection::make([3, 4])->diffKeysUsing([1, 2], function ($intA, $intB) {
+    assertType('int', $intA);
+    assertType('int', $intB);
 
     return -1;
 }));
-assertType('Illuminate\Support\Collection<int, string>', $collection::make(['string-1'])->diffKeysUsing(['string-2'], function ($int) {
-    assertType('int', $int);
+assertType('Illuminate\Support\Collection<int, string>', $collection::make(['string-1'])->diffKeysUsing(['string-2'], function ($intA, $intB) {
+    assertType('int', $intA);
+    assertType('int', $intB);
 
     return -1;
 }));
@@ -191,15 +210,19 @@ assertType('Illuminate\Support\Collection<int, User>', $collection->each(functio
 assertType('Illuminate\Support\Collection<int, User>', $collection->each(function ($user) {
     assertType('User', $user);
 }));
+assertType('Illuminate\Support\Collection<int, User>', $collection->each(function ($user, $int) {
+    assertType('int', $int);
+    assertType('User', $user);
+}));
 
-assertType('Illuminate\Support\Collection<int, array(string)>', $collection::make([['string']])
+assertType('Illuminate\Support\Collection<int, array{string}>', $collection::make([['string']])
     ->eachSpread(function ($int, $string) {
         // assertType('int', $int);
         // assertType('int', $string);
 
         return null;
     }));
-assertType('Illuminate\Support\Collection<int, array(int, string)>', $collection::make([[1, 'string']])
+assertType('Illuminate\Support\Collection<int, array{int, string}>', $collection::make([[1, 'string']])
     ->eachSpread(function ($int, $string) {
         // assertType('int', $int);
         // assertType('int', $string);
@@ -216,7 +239,7 @@ assertType('bool', $collection::make(['string'])->every('string', '=', 'string')
 assertType('Illuminate\Support\Collection<string, string>', $collection::make(['string' => 'string'])->except(['string']));
 assertType('Illuminate\Support\Collection<int, User>', $collection->except([1]));
 assertType('Illuminate\Support\Collection<int, string>', $collection::make(['string'])
-    ->except($collection->keys()->toArray()));
+    ->except([1]));
 
 assertType('Illuminate\Support\Collection<int, User>', $collection->filter());
 assertType('Illuminate\Support\Collection<int, User>', $collection->filter(function ($user) {
@@ -244,6 +267,51 @@ assertType('Illuminate\Support\Collection<int, User>|string', $collection->when(
     assertType('Illuminate\Support\Collection<int, User>', $collection);
 
     return 'string';
+}));
+assertType('Illuminate\Support\Collection<int, User>|void', $collection->when('Taylor', function ($collection, $name) {
+    assertType('Illuminate\Support\Collection<int, User>', $collection);
+    assertType('string', $name);
+}));
+assertType(
+    'Illuminate\Support\Collection<int, User>|void',
+    $collection->when(
+        'Taylor',
+        function ($collection, $name) {
+            assertType('Illuminate\Support\Collection<int, User>', $collection);
+            assertType('string', $name);
+        },
+        function ($collection, $name) {
+            assertType('Illuminate\Support\Collection<int, User>', $collection);
+            assertType('string', $name);
+        }
+    )
+);
+assertType('Illuminate\Support\Collection<int, User>|void', $collection->when(fn () =>'Taylor', function ($collection, $name) {
+    assertType('Illuminate\Support\Collection<int, User>', $collection);
+    assertType('string', $name);
+}));
+assertType(
+    'Illuminate\Support\Collection<int, User>|void',
+    $collection->when(
+        function ($collection) {
+            assertType('Illuminate\Support\Collection<int, User>', $collection);
+
+            return 14;
+        },
+        function ($collection, $count) {
+            assertType('Illuminate\Support\Collection<int, User>', $collection);
+            assertType('int', $count);
+        },
+        function ($collection, $count) {
+            assertType('Illuminate\Support\Collection<int, User>', $collection);
+            assertType('int', $count);
+        }
+    )
+);
+
+assertType('Illuminate\Support\Collection<int, User>|void', $collection->when($invokable, function ($collection, $param) {
+    assertType('Illuminate\Support\Collection<int, User>', $collection);
+    assertType('Invokable', $param);
 }));
 
 assertType('bool|Illuminate\Support\Collection<int, User>', $collection->whenEmpty(function ($collection) {
@@ -287,6 +355,51 @@ assertType('Illuminate\Support\Collection<int, User>|string', $collection->unles
 
     return 'string';
 }));
+assertType('Illuminate\Support\Collection<int, User>|void', $collection->unless('Taylor', function ($collection, $name) {
+    assertType('Illuminate\Support\Collection<int, User>', $collection);
+    assertType('string', $name);
+}));
+assertType(
+    'Illuminate\Support\Collection<int, User>|void',
+    $collection->unless(
+        'Taylor',
+        function ($collection, $name) {
+            assertType('Illuminate\Support\Collection<int, User>', $collection);
+            assertType('string', $name);
+        },
+        function ($collection, $name) {
+            assertType('Illuminate\Support\Collection<int, User>', $collection);
+            assertType('string', $name);
+        }
+    )
+);
+assertType('Illuminate\Support\Collection<int, User>|void', $collection->unless(fn () => 'Taylor', function ($collection, $name) {
+    assertType('Illuminate\Support\Collection<int, User>', $collection);
+    assertType('string', $name);
+}));
+assertType(
+    'Illuminate\Support\Collection<int, User>|void',
+    $collection->unless(
+        function ($collection) {
+            assertType('Illuminate\Support\Collection<int, User>', $collection);
+
+            return 14;
+        },
+        function ($collection, $count) {
+            assertType('Illuminate\Support\Collection<int, User>', $collection);
+            assertType('int', $count);
+        },
+        function ($collection, $count) {
+            assertType('Illuminate\Support\Collection<int, User>', $collection);
+            assertType('int', $count);
+        }
+    )
+);
+
+assertType('Illuminate\Support\Collection<int, User>|void', $collection->unless($invokable, function ($collection, $param) {
+    assertType('Illuminate\Support\Collection<int, User>', $collection);
+    assertType('Invokable', $param);
+}));
 
 assertType('bool|Illuminate\Support\Collection<int, User>', $collection->unlessEmpty(function ($collection) {
     assertType('Illuminate\Support\Collection<int, User>', $collection);
@@ -316,11 +429,11 @@ assertType('Illuminate\Support\Collection<int, User>|string', $collection->unles
     return 'string';
 }));
 
-assertType("Illuminate\Support\Collection<int, array('string' => string)>", $collection::make([['string' => 'string']])
+assertType("Illuminate\Support\Collection<int, array{string: string}>", $collection::make([['string' => 'string']])
     ->where('string'));
-assertType("Illuminate\Support\Collection<int, array('string' => string)>", $collection::make([['string' => 'string']])
+assertType("Illuminate\Support\Collection<int, array{string: string}>", $collection::make([['string' => 'string']])
     ->where('string', '=', 'string'));
-assertType("Illuminate\Support\Collection<int, array('string' => string)>", $collection::make([['string' => 'string']])
+assertType("Illuminate\Support\Collection<int, array{string: string}>", $collection::make([['string' => 'string']])
     ->where('string', 'string'));
 
 assertType('Illuminate\Support\Collection<int, User>', $collection->whereNull());
@@ -329,32 +442,32 @@ assertType('Illuminate\Support\Collection<int, User>', $collection->whereNull('f
 assertType('Illuminate\Support\Collection<int, User>', $collection->whereNotNull());
 assertType('Illuminate\Support\Collection<int, User>', $collection->whereNotNull('foo'));
 
-assertType("Illuminate\Support\Collection<int, array('string' => int)>", $collection::make([['string' => 2]])
+assertType("Illuminate\Support\Collection<int, array{string: int}>", $collection::make([['string' => 2]])
     ->whereStrict('string', 2));
 
-assertType("Illuminate\Support\Collection<int, array('string' => int)>", $collection::make([['string' => 2]])
+assertType("Illuminate\Support\Collection<int, array{string: int}>", $collection::make([['string' => 2]])
     ->whereIn('string', [2]));
 
-assertType("Illuminate\Support\Collection<int, array('string' => int)>", $collection::make([['string' => 2]])
+assertType("Illuminate\Support\Collection<int, array{string: int}>", $collection::make([['string' => 2]])
     ->whereInStrict('string', [2]));
 
-assertType("Illuminate\Support\Collection<int, array('string' => int)>", $collection::make([['string' => 2]])
+assertType("Illuminate\Support\Collection<int, array{string: int}>", $collection::make([['string' => 2]])
     ->whereBetween('string', [1, 3]));
 
-assertType("Illuminate\Support\Collection<int, array('string' => int)>", $collection::make([['string' => 2]])
+assertType("Illuminate\Support\Collection<int, array{string: int}>", $collection::make([['string' => 2]])
     ->whereNotBetween('string', [1, 3]));
 
-assertType("Illuminate\Support\Collection<int, array('string' => int)>", $collection::make([['string' => 2]])
+assertType("Illuminate\Support\Collection<int, array{string: int}>", $collection::make([['string' => 2]])
     ->whereNotIn('string', [2]));
 
-assertType("Illuminate\Support\Collection<int, array('string' => int)>", $collection::make([['string' => 2]])
+assertType("Illuminate\Support\Collection<int, array{string: int}>", $collection::make([['string' => 2]])
     ->whereNotInStrict('string', [2]));
 
-assertType('Illuminate\Support\Collection<int, int|User>', $collection::make([new User, 1])
+assertType('Illuminate\Support\Collection<int, User>', $collection::make([new User, 1])
     ->whereInstanceOf(User::class));
 
-assertType('Illuminate\Support\Collection<int, int|User>', $collection::make([new User, 1])
-    ->whereInstanceOf([User::class, User::class]));
+assertType('Illuminate\Support\Collection<int, Exception|User>', $collection::make([new User, 1])
+    ->whereInstanceOf([User::class, Exception::class]));
 
 assertType('User|null', $collection->first());
 assertType('User|null', $collection->first(function ($user) {
@@ -367,6 +480,9 @@ assertType('string|User', $collection->first(function ($user) {
 
     return false;
 }, 'string'));
+assertType('string|User', $collection->first(null, function () {
+    return 'string';
+}));
 
 assertType('Illuminate\Support\Collection<int, mixed>', $collection->flatten());
 assertType('Illuminate\Support\Collection<int, mixed>', $collection::make(['string' => 'string'])->flatten(4));
@@ -376,20 +492,20 @@ assertType('User|null', $collection->firstWhere('string', 'string', 'string'));
 
 assertType('Illuminate\Support\Collection<string, int>', $collection::make(['string'])->flip());
 
-assertType('Illuminate\Support\Collection<(int|string), array<User>>', $collection->groupBy('name'));
-assertType('Illuminate\Support\Collection<(int|string), array<User>>', $collection->groupBy('name', true));
-assertType('Illuminate\Support\Collection<(int|string), array<User>>', $collection->groupBy(function ($user, $int) {
+assertType('Illuminate\Support\Collection<(int|string), Illuminate\Support\Collection<(int|string), User>>', $collection->groupBy('name'));
+assertType('Illuminate\Support\Collection<(int|string), Illuminate\Support\Collection<(int|string), User>>', $collection->groupBy('name', true));
+assertType('Illuminate\Support\Collection<(int|string), Illuminate\Support\Collection<(int|string), User>>', $collection->groupBy(function ($user, $int) {
     // assertType('User', $user);
     // assertType('int', $int);
 
     return 'foo';
 }));
-assertType('Illuminate\Support\Collection<(int|string), array<User>>', $collection->groupBy(function ($user) {
+assertType('Illuminate\Support\Collection<(int|string), Illuminate\Support\Collection<(int|string), User>>', $collection->groupBy(function ($user) {
     return 'foo';
 }));
 
-assertType('Illuminate\Support\Collection<(int|string), array<User>>', $collection->keyBy('name'));
-assertType('Illuminate\Support\Collection<(int|string), array<User>>', $collection->keyBy(function ($user, $int) {
+assertType('Illuminate\Support\Collection<(int|string), User>', $collection->keyBy('name'));
+assertType('Illuminate\Support\Collection<(int|string), User>', $collection->keyBy(function ($user, $int) {
     // assertType('User', $user);
     // assertType('int', $int);
 
@@ -415,6 +531,9 @@ assertType('User|null', $collection->last(function ($user, $int) {
 assertType('string|User', $collection->last(function () {
     return true;
 }, 'string'));
+assertType('string|User', $collection->last(null, function () {
+    return 'string';
+}));
 
 assertType('Illuminate\Support\Collection<int, int>', $collection->map(function () {
     return 1;
@@ -473,13 +592,13 @@ assertType('Illuminate\Support\Collection<int, mixed>', $collection::make(['stri
         return 1;
     }));
 
-assertType('Illuminate\Support\Collection<int, mixed>', $collection->mapInto(User::class));
+assertType('Illuminate\Support\Collection<int, User>', $collection->mapInto(User::class));
 
 assertType('Illuminate\Support\Collection<int, int>', $collection->make([1])->merge([2]));
 assertType('Illuminate\Support\Collection<int, string>', $collection->make(['string'])->merge(['string']));
 
-assertType('Illuminate\Support\Collection<int, array<int, int>>', $collection->make([1])->mergeRecursive([2]));
-assertType('Illuminate\Support\Collection<int, array<int, string>>', $collection->make(['string'])->mergeRecursive(['string']));
+assertType('Illuminate\Support\Collection<int, int|string>', $collection->make([1])->mergeRecursive([2 => 'string']));
+assertType('Illuminate\Support\Collection<int, string>', $collection->make(['string'])->mergeRecursive(['string']));
 
 assertType('Illuminate\Support\Collection<string, int>', $collection->make(['string' => 'string'])->combine([2]));
 assertType('Illuminate\Support\Collection<int, int>', $collection->make([1])->combine([1]));
@@ -508,19 +627,19 @@ assertType('Illuminate\Support\Collection<int, User>', $collection->nth(1, 2));
 assertType('Illuminate\Support\Collection<string, string>', $collection::make(['string' => 'string'])->only(['string']));
 assertType('Illuminate\Support\Collection<int, User>', $collection->only([1]));
 assertType('Illuminate\Support\Collection<int, string>', $collection::make(['string'])
-    ->only($collection->keys()->toArray()));
+    ->only([1]));
 
 assertType('Illuminate\Support\Collection<int, User>', $collection->forPage(1, 2));
 
-assertType('array<int, Illuminate\Support\Collection<int, User>>', $collection->partition(function ($user, $int) {
+assertType('Illuminate\Support\Collection<int<0, 1>, Illuminate\Support\Collection<int, User>>', $collection->partition(function ($user, $int) {
     assertType('User', $user);
     assertType('int', $int);
 
     return true;
 }));
-assertType('array<int, Illuminate\Support\Collection<int, string>>', $collection::make(['string'])->partition('string', '=', 'string'));
-assertType('array<int, Illuminate\Support\Collection<int, string>>', $collection::make(['string'])->partition('string', 'string'));
-assertType('array<int, Illuminate\Support\Collection<int, string>>', $collection::make(['string'])->partition('string', ));
+assertType('Illuminate\Support\Collection<int<0, 1>, Illuminate\Support\Collection<int, string>>', $collection::make(['string'])->partition('string', '=', 'string'));
+assertType('Illuminate\Support\Collection<int<0, 1>, Illuminate\Support\Collection<int, string>>', $collection::make(['string'])->partition('string', 'string'));
+assertType('Illuminate\Support\Collection<int<0, 1>, Illuminate\Support\Collection<int, string>>', $collection::make(['string'])->partition('string'));
 
 assertType('Illuminate\Support\Collection<int, int>', $collection->make([1])->concat([2]));
 assertType('Illuminate\Support\Collection<int, string>', $collection->make(['string'])->concat(['string']));
@@ -542,6 +661,14 @@ assertType('int', $collection
 
         return 1;
     }, 0));
+assertType('int', $collection
+    ->reduce(function ($int, $user, $key) {
+        assertType('User', $user);
+        assertType('int', $int);
+        assertType('int', $key);
+
+        return 1;
+    }, 0));
 
 assertType('int', $collection
     ->reduceWithKeys(function ($null, $user) {
@@ -554,6 +681,14 @@ assertType('int', $collection
     ->reduceWithKeys(function ($int, $user) {
         assertType('User', $user);
         assertType('int', $int);
+
+        return 1;
+    }, 0));
+assertType('int', $collection
+    ->reduceWithKeys(function ($int, $user, $key) {
+        assertType('User', $user);
+        assertType('int', $int);
+        assertType('int', $key);
 
         return 1;
     }, 0));
@@ -614,6 +749,16 @@ assertType('User', $collection->sole(function ($user, $int) {
     return true;
 }));
 
+assertType('User', $collection->firstOrFail());
+assertType('User', $collection->firstOrFail('string', 'string'));
+assertType('User', $collection->firstOrFail('string', '=', 'string'));
+assertType('User', $collection->firstOrFail(function ($user, $int) {
+    assertType('User', $user);
+    assertType('int', $int);
+
+    return true;
+}));
+
 assertType('Illuminate\Support\Collection<int, Illuminate\Support\Collection<int, string>>', $collection::make(['string'])->chunk(1));
 assertType('Illuminate\Support\Collection<int, Illuminate\Support\Collection<int, User>>', $collection->chunk(2));
 
@@ -629,7 +774,7 @@ assertType('Illuminate\Support\Collection<int, User>', $collection->sort(functio
     assertType('User', $userA);
     assertType('User', $userB);
 
-    return true;
+    return 1;
 }));
 assertType('Illuminate\Support\Collection<int, User>', $collection->sort());
 
@@ -637,20 +782,40 @@ assertType('Illuminate\Support\Collection<int, User>', $collection->sortDesc());
 assertType('Illuminate\Support\Collection<int, User>', $collection->sortDesc(2));
 
 assertType('Illuminate\Support\Collection<int, User>', $collection->sortBy(function ($user, $int) {
-    assertType('User', $user);
-    assertType('int', $int);
+    // assertType('User', $user);
+    // assertType('int', $int);
 
     return 1;
 }));
 assertType('Illuminate\Support\Collection<int, User>', $collection->sortBy('string'));
 assertType('Illuminate\Support\Collection<int, User>', $collection->sortBy('string', 1, false));
+assertType('Illuminate\Support\Collection<int, User>', $collection->sortBy([
+    ['string', 'string'],
+]));
+assertType('Illuminate\Support\Collection<int, User>', $collection->sortBy([function ($user, $int) {
+    // assertType('User', $user);
+    // assertType('int', $int);
+
+    return 1;
+}]));
 
 assertType('Illuminate\Support\Collection<int, User>', $collection->sortByDesc(function ($user, $int) {
-    assertType('User', $user);
-    assertType('int', $int);
+    // assertType('User', $user);
+    // assertType('int', $int);
 
     return 1;
 }));
+assertType('Illuminate\Support\Collection<int, User>', $collection->sortByDesc('string'));
+assertType('Illuminate\Support\Collection<int, User>', $collection->sortByDesc('string', 1));
+assertType('Illuminate\Support\Collection<int, User>', $collection->sortByDesc([
+    ['string', 'string'],
+]));
+assertType('Illuminate\Support\Collection<int, User>', $collection->sortByDesc([function ($user, $int) {
+    // assertType('User', $user);
+    // assertType('int', $int);
+
+    return 1;
+}]));
 
 assertType('Illuminate\Support\Collection<int, int>', $collection->make([1])->sortKeys());
 assertType('Illuminate\Support\Collection<string, string>', $collection->make(['string' => 'string'])->sortKeys(1, true));
@@ -686,8 +851,8 @@ assertType('Illuminate\Support\Collection<int, User>', $collection->takeWhile(fu
     return true;
 }));
 
-assertType('Illuminate\Support\Collection<int, User>', $collection->tap(function ($user) {
-    assertType('User', $user);
+assertType('Illuminate\Support\Collection<int, User>', $collection->tap(function ($collection) {
+    assertType('Illuminate\Support\Collection<int, User>', $collection);
 }));
 
 assertType('Illuminate\Support\Collection<int, int>', $collection->pipe(function ($collection) {
@@ -712,19 +877,25 @@ assertType('Illuminate\Support\Collection<int, User>', $collection->reject(funct
 
     return true;
 }));
+assertType('Illuminate\Support\Collection<int, User>', $collection->reject(function ($user, $int) {
+    assertType('User', $user);
+    assertType('int', $int);
+
+    return true;
+}));
 
 assertType('Illuminate\Support\Collection<int, User>', $collection->unique());
 assertType('Illuminate\Support\Collection<int, User>', $collection->unique(function ($user, $int) {
     assertType('User', $user);
     assertType('int', $int);
 
-    return true;
+    return $user->getTable();
 }));
 assertType('Illuminate\Support\Collection<string, string>', $collection->make(['string' => 'string'])->unique(function ($stringA, $stringB) {
     assertType('string', $stringA);
-    assertType('string', $stringA);
+    assertType('string', $stringB);
 
-    return false;
+    return $stringA;
 }, true));
 
 assertType('Illuminate\Support\Collection<int, User>', $collection->uniqueStrict());
@@ -732,7 +903,7 @@ assertType('Illuminate\Support\Collection<int, User>', $collection->uniqueStrict
     assertType('User', $user);
     assertType('int', $int);
 
-    return true;
+    return $user->getTable();
 }));
 
 assertType('Illuminate\Support\Collection<int, User>', $collection->values());
@@ -743,9 +914,10 @@ assertType('Illuminate\Support\Collection<int, int>', $collection->make([1])->pa
 assertType('Illuminate\Support\Collection<int, int|string>', $collection->make([1])->pad(2, 'string'));
 assertType('Illuminate\Support\Collection<int, int|User>', $collection->pad(2, 0));
 
-assertType('Illuminate\Support\Collection<int, int>', $collection->make([1])->countBy());
-assertType('Illuminate\Support\Collection<string, int>', $collection->make(['string' => 'string'])->countBy('string'));
-assertType('Illuminate\Support\Collection<string, int>', $collection->make(['string'])->countBy(function ($string, $int) {
+assertType('Illuminate\Support\Collection<(int|string), int>', $collection->make([1])->countBy());
+assertType('Illuminate\Support\Collection<(int|string), int>', $collection->make(['string' => 'string'])->countBy('string'));
+assertType('Illuminate\Support\Collection<(int|string), int>', $collection->make([new User])->countBy('email'));
+assertType('Illuminate\Support\Collection<(int|string), int>', $collection->make(['string'])->countBy(function ($string, $int) {
     assertType('string', $string);
     assertType('int', $int);
 
@@ -765,6 +937,9 @@ assertType('array<int, User>', $collection->all());
 
 assertType('User|null', $collection->get(0));
 assertType('string|User', $collection->get(0, 'string'));
+assertType('string|User', $collection->get(0, function () {
+    return 'string';
+}));
 
 assertType('Illuminate\Support\Collection<int, User>', $collection->forget(1));
 assertType('Illuminate\Support\Collection<int, User>', $collection->forget([1, 2]));
@@ -783,6 +958,9 @@ assertType('Illuminate\Support\Collection<int, User>', $collection->push(new Use
 
 assertType('User|null', $collection->pull(1));
 assertType('string|User', $collection->pull(1, 'string'));
+assertType('string|User', $collection->pull(1, function () {
+    return 'string';
+}));
 
 assertType('Illuminate\Support\Collection<int, User>', $collection->put(1, new User));
 assertType('Illuminate\Support\Collection<string, string>', $collection::make([

@@ -25,7 +25,7 @@ class SupportCarbonTest extends TestCase
 
     protected function tearDown(): void
     {
-        Carbon::setTestNow();
+        Carbon::setTestNow(null);
         Carbon::serializeUsing(null);
 
         parent::tearDown();
@@ -116,5 +116,11 @@ class SupportCarbonTest extends TestCase
         $this->assertSame('2017-06-27 13:14:15', Carbon::now()->toDateTimeString());
         $this->assertSame('2017-06-27 13:14:15', BaseCarbon::now()->toDateTimeString());
         $this->assertSame('2017-06-27 13:14:15', BaseCarbonImmutable::now()->toDateTimeString());
+    }
+
+    public function testCarbonIsConditionable()
+    {
+        $this->assertTrue(Carbon::now()->when(null, fn (Carbon $carbon) => $carbon->addDays(1))->isToday());
+        $this->assertTrue(Carbon::now()->when(true, fn (Carbon $carbon) => $carbon->addDays(1))->isTomorrow());
     }
 }

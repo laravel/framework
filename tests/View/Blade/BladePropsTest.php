@@ -36,11 +36,11 @@ class BladePropsTest extends AbstractBladeTestCase
 
         $this->assertSame($test1, 'value1');
         $this->assertSame($test2, 'value2');
-        $this->assertSame(isset($test3), false);
+        $this->assertFalse(isset($test3));
         $this->assertSame($test4, 'default');
 
-        $this->assertSame($attributes->get('test1'), null);
-        $this->assertSame($attributes->get('test2'), null);
+        $this->assertNull($attributes->get('test1'));
+        $this->assertNull($attributes->get('test2'));
         $this->assertSame($attributes->get('test3'), 'value3');
     }
 }

@@ -9,12 +9,9 @@ use Illuminate\Session\TokenMismatchException;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
-use Mockery;
+use Mockery as m;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class SessionPersistenceTest extends TestCase
 {
     public function testSessionIsPersistedEvenIfExceptionIsThrownFromRoute()
@@ -38,7 +35,7 @@ class SessionPersistenceTest extends TestCase
     {
         $app->instance(
             ExceptionHandler::class,
-            $handler = Mockery::mock(ExceptionHandler::class)->shouldIgnoreMissing()
+            $handler = m::mock(ExceptionHandler::class)->shouldIgnoreMissing()
         );
 
         $handler->shouldReceive('render')->andReturn(new Response);
@@ -53,7 +50,7 @@ class FakeNullSessionHandler extends NullSessionHandler
 {
     public $written = false;
 
-    public function write($sessionId, $data)
+    public function write($sessionId, $data): bool
     {
         $this->written = true;
 

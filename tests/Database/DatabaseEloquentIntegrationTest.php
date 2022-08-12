@@ -155,6 +155,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
      */
     protected function tearDown(): void
     {
+        parent::tearDown();
+
         foreach (['default', 'second_connection'] as $connection) {
             $this->schema($connection)->drop('users');
             $this->schema($connection)->drop('friends');
@@ -165,6 +167,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         Relation::morphMap([], false);
         Eloquent::unsetConnectionResolver();
+
+        Carbon::setTestNow(null);
     }
 
     /**
@@ -263,6 +267,69 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertInstanceOf(LengthAwarePaginator::class, $models);
         $this->assertInstanceOf(EloquentTestUser::class, $models[0]);
         $this->assertSame('foo@gmail.com', $models[0]->email);
+    }
+
+    public function testPaginatedModelCollectionRetrievalUsingCallablePerPage()
+    {
+        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 3, 'email' => 'foo@gmail.com']);
+
+        Paginator::currentPageResolver(function () {
+            return 1;
+        });
+        $models = EloquentTestUser::oldest('id')->paginate(function ($total) {
+            return $total <= 3 ? 3 : 2;
+        });
+
+        $this->assertCount(3, $models);
+        $this->assertInstanceOf(LengthAwarePaginator::class, $models);
+        $this->assertInstanceOf(EloquentTestUser::class, $models[0]);
+        $this->assertInstanceOf(EloquentTestUser::class, $models[1]);
+        $this->assertInstanceOf(EloquentTestUser::class, $models[2]);
+        $this->assertSame('taylorotwell@gmail.com', $models[0]->email);
+        $this->assertSame('abigailotwell@gmail.com', $models[1]->email);
+        $this->assertSame('foo@gmail.com', $models[2]->email);
+
+        Paginator::currentPageResolver(function () {
+            return 2;
+        });
+        $models = EloquentTestUser::oldest('id')->paginate(function ($total) {
+            return $total <= 3 ? 3 : 2;
+        });
+
+        $this->assertCount(0, $models);
+        $this->assertInstanceOf(LengthAwarePaginator::class, $models);
+
+        EloquentTestUser::create(['id' => 4, 'email' => 'bar@gmail.com']);
+
+        Paginator::currentPageResolver(function () {
+            return 1;
+        });
+        $models = EloquentTestUser::oldest('id')->paginate(function ($total) {
+            return $total <= 3 ? 3 : 2;
+        });
+
+        $this->assertCount(2, $models);
+        $this->assertInstanceOf(LengthAwarePaginator::class, $models);
+        $this->assertInstanceOf(EloquentTestUser::class, $models[0]);
+        $this->assertInstanceOf(EloquentTestUser::class, $models[1]);
+        $this->assertSame('taylorotwell@gmail.com', $models[0]->email);
+        $this->assertSame('abigailotwell@gmail.com', $models[1]->email);
+
+        Paginator::currentPageResolver(function () {
+            return 2;
+        });
+        $models = EloquentTestUser::oldest('id')->paginate(function ($total) {
+            return $total <= 3 ? 3 : 2;
+        });
+
+        $this->assertCount(2, $models);
+        $this->assertInstanceOf(LengthAwarePaginator::class, $models);
+        $this->assertInstanceOf(EloquentTestUser::class, $models[0]);
+        $this->assertInstanceOf(EloquentTestUser::class, $models[1]);
+        $this->assertSame('foo@gmail.com', $models[0]->email);
+        $this->assertSame('bar@gmail.com', $models[1]->email);
     }
 
     public function testPaginatedModelCollectionRetrievalWhenNoElements()
@@ -612,6 +679,9 @@ class DatabaseEloquentIntegrationTest extends TestCase
     {
         $this->expectException(ModelNotFoundException::class);
         $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Database\EloquentTestUser] 1');
+        $this->expectExceptionObject(
+            (new ModelNotFoundException())->setModel(EloquentTestUser::class, [1]),
+        );
 
         EloquentTestUser::findOrFail(1);
     }
@@ -619,19 +689,25 @@ class DatabaseEloquentIntegrationTest extends TestCase
     public function testFindOrFailWithMultipleIdsThrowsModelNotFoundException()
     {
         $this->expectException(ModelNotFoundException::class);
-        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Database\EloquentTestUser] 1, 2');
+        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Database\EloquentTestUser] 2, 3');
+        $this->expectExceptionObject(
+            (new ModelNotFoundException())->setModel(EloquentTestUser::class, [2, 3]),
+        );
 
         EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
-        EloquentTestUser::findOrFail([1, 2]);
+        EloquentTestUser::findOrFail([1, 2, 3]);
     }
 
     public function testFindOrFailWithMultipleIdsUsingCollectionThrowsModelNotFoundException()
     {
         $this->expectException(ModelNotFoundException::class);
-        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Database\EloquentTestUser] 1, 2');
+        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Database\EloquentTestUser] 2, 3');
+        $this->expectExceptionObject(
+            (new ModelNotFoundException())->setModel(EloquentTestUser::class, [2, 3]),
+        );
 
         EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
-        EloquentTestUser::findOrFail(new Collection([1, 2]));
+        EloquentTestUser::findOrFail(new Collection([1, 1, 2, 3]));
     }
 
     public function testOneToOneRelationship()
@@ -751,6 +827,21 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('taylorotwell@gmail.com', $results->first()->email);
     }
 
+    public function testWithWhereHasOnSelfReferencingBelongsToManyRelationship()
+    {
+        $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
+        $user->friends()->create(['email' => 'abigailotwell@gmail.com']);
+
+        $results = EloquentTestUser::withWhereHas('friends', function ($query) {
+            $query->where('email', 'abigailotwell@gmail.com');
+        })->get();
+
+        $this->assertCount(1, $results);
+        $this->assertSame('taylorotwell@gmail.com', $results->first()->email);
+        $this->assertTrue($results->first()->relationLoaded('friends'));
+        $this->assertSame($results->first()->friends->pluck('email')->unique()->toArray(), ['abigailotwell@gmail.com']);
+    }
+
     public function testHasOnNestedSelfReferencingBelongsToManyRelationship()
     {
         $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
@@ -775,6 +866,23 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $this->assertCount(1, $results);
         $this->assertSame('taylorotwell@gmail.com', $results->first()->email);
+    }
+
+    public function testWithWhereHasOnNestedSelfReferencingBelongsToManyRelationship()
+    {
+        $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
+        $friend = $user->friends()->create(['email' => 'abigailotwell@gmail.com']);
+        $friend->friends()->create(['email' => 'foo@gmail.com']);
+
+        $results = EloquentTestUser::withWhereHas('friends.friends', function ($query) {
+            $query->where('email', 'foo@gmail.com');
+        })->get();
+
+        $this->assertCount(1, $results);
+        $this->assertSame('taylorotwell@gmail.com', $results->first()->email);
+        $this->assertTrue($results->first()->relationLoaded('friends'));
+        $this->assertSame($results->first()->friends->pluck('email')->unique()->toArray(), ['abigailotwell@gmail.com']);
+        $this->assertSame($results->first()->friends->pluck('friends')->flatten()->pluck('email')->unique()->toArray(), ['foo@gmail.com']);
     }
 
     public function testHasOnSelfReferencingBelongsToManyRelationshipWithWherePivot()
@@ -833,6 +941,21 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('Child Post', $results->first()->name);
     }
 
+    public function testWithWhereHasOnSelfReferencingBelongsToRelationship()
+    {
+        $parentPost = EloquentTestPost::create(['name' => 'Parent Post', 'user_id' => 1]);
+        EloquentTestPost::create(['name' => 'Child Post', 'parent_id' => $parentPost->id, 'user_id' => 2]);
+
+        $results = EloquentTestPost::withWhereHas('parentPost', function ($query) {
+            $query->where('name', 'Parent Post');
+        })->get();
+
+        $this->assertCount(1, $results);
+        $this->assertSame('Child Post', $results->first()->name);
+        $this->assertTrue($results->first()->relationLoaded('parentPost'));
+        $this->assertSame($results->first()->parentPost->name, 'Parent Post');
+    }
+
     public function testHasOnNestedSelfReferencingBelongsToRelationship()
     {
         $grandParentPost = EloquentTestPost::create(['name' => 'Grandparent Post', 'user_id' => 1]);
@@ -859,6 +982,24 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('Child Post', $results->first()->name);
     }
 
+    public function testWithWhereHasOnNestedSelfReferencingBelongsToRelationship()
+    {
+        $grandParentPost = EloquentTestPost::create(['name' => 'Grandparent Post', 'user_id' => 1]);
+        $parentPost = EloquentTestPost::create(['name' => 'Parent Post', 'parent_id' => $grandParentPost->id, 'user_id' => 2]);
+        EloquentTestPost::create(['name' => 'Child Post', 'parent_id' => $parentPost->id, 'user_id' => 3]);
+
+        $results = EloquentTestPost::withWhereHas('parentPost.parentPost', function ($query) {
+            $query->where('name', 'Grandparent Post');
+        })->get();
+
+        $this->assertCount(1, $results);
+        $this->assertSame('Child Post', $results->first()->name);
+        $this->assertTrue($results->first()->relationLoaded('parentPost'));
+        $this->assertSame($results->first()->parentPost->name, 'Parent Post');
+        $this->assertTrue($results->first()->parentPost->relationLoaded('parentPost'));
+        $this->assertSame($results->first()->parentPost->parentPost->name, 'Grandparent Post');
+    }
+
     public function testHasOnSelfReferencingHasManyRelationship()
     {
         $parentPost = EloquentTestPost::create(['name' => 'Parent Post', 'user_id' => 1]);
@@ -881,6 +1022,21 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $this->assertCount(1, $results);
         $this->assertSame('Parent Post', $results->first()->name);
+    }
+
+    public function testWithWhereHasOnSelfReferencingHasManyRelationship()
+    {
+        $parentPost = EloquentTestPost::create(['name' => 'Parent Post', 'user_id' => 1]);
+        EloquentTestPost::create(['name' => 'Child Post', 'parent_id' => $parentPost->id, 'user_id' => 2]);
+
+        $results = EloquentTestPost::withWhereHas('childPosts', function ($query) {
+            $query->where('name', 'Child Post');
+        })->get();
+
+        $this->assertCount(1, $results);
+        $this->assertSame('Parent Post', $results->first()->name);
+        $this->assertTrue($results->first()->relationLoaded('childPosts'));
+        $this->assertSame($results->first()->childPosts->pluck('name')->unique()->toArray(), ['Child Post']);
     }
 
     public function testHasOnNestedSelfReferencingHasManyRelationship()
@@ -907,6 +1063,23 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $this->assertCount(1, $results);
         $this->assertSame('Grandparent Post', $results->first()->name);
+    }
+
+    public function testWithWhereHasOnNestedSelfReferencingHasManyRelationship()
+    {
+        $grandParentPost = EloquentTestPost::create(['name' => 'Grandparent Post', 'user_id' => 1]);
+        $parentPost = EloquentTestPost::create(['name' => 'Parent Post', 'parent_id' => $grandParentPost->id, 'user_id' => 2]);
+        EloquentTestPost::create(['name' => 'Child Post', 'parent_id' => $parentPost->id, 'user_id' => 3]);
+
+        $results = EloquentTestPost::withWhereHas('childPosts.childPosts', function ($query) {
+            $query->where('name', 'Child Post');
+        })->get();
+
+        $this->assertCount(1, $results);
+        $this->assertSame('Grandparent Post', $results->first()->name);
+        $this->assertTrue($results->first()->relationLoaded('childPosts'));
+        $this->assertSame($results->first()->childPosts->pluck('name')->unique()->toArray(), ['Parent Post']);
+        $this->assertSame($results->first()->childPosts->pluck('childPosts')->flatten()->pluck('name')->unique()->toArray(), ['Child Post']);
     }
 
     public function testHasWithNonWhereBindings()
@@ -1627,8 +1800,6 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $this->assertTrue($future->isSameDay($post->fresh()->updated_at), 'It is not touching model own timestamps.');
         $this->assertTrue($future->isSameDay($user->fresh()->updated_at), 'It is not touching models related timestamps.');
-
-        Carbon::setTestNow($before);
     }
 
     public function testMultiLevelTouchingWorks()
@@ -1647,8 +1818,6 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $this->assertTrue($future->isSameDay($post->fresh()->updated_at), 'It is not touching models related timestamps.');
         $this->assertTrue($future->isSameDay($user->fresh()->updated_at), 'It is not touching models related timestamps.');
-
-        Carbon::setTestNow($before);
     }
 
     public function testDeletingChildModelTouchesParentTimestamps()
@@ -1666,8 +1835,6 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $post->delete();
 
         $this->assertTrue($future->isSameDay($user->fresh()->updated_at), 'It is not touching models related timestamps.');
-
-        Carbon::setTestNow($before);
     }
 
     public function testTouchingChildModelUpdatesParentsTimestamps()
@@ -1686,8 +1853,6 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $this->assertTrue($future->isSameDay($post->fresh()->updated_at), 'It is not touching model own timestamps.');
         $this->assertTrue($future->isSameDay($user->fresh()->updated_at), 'It is not touching models related timestamps.');
-
-        Carbon::setTestNow($before);
     }
 
     public function testTouchingChildModelRespectsParentNoTouching()
@@ -1715,8 +1880,6 @@ class DatabaseEloquentIntegrationTest extends TestCase
             $before->isSameDay($user->fresh()->updated_at),
             'It is touching model own timestamps in withoutTouching scope, when it should not.'
         );
-
-        Carbon::setTestNow($before);
     }
 
     public function testUpdatingChildPostRespectsNoTouchingDefinition()
@@ -1737,8 +1900,6 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $this->assertTrue($future->isSameDay($post->fresh()->updated_at), 'It is not touching model own timestamps when it should.');
         $this->assertTrue($before->isSameDay($user->fresh()->updated_at), 'It is touching models relationships when it should be disabled.');
-
-        Carbon::setTestNow($before);
     }
 
     public function testUpdatingModelInTheDisabledScopeTouchesItsOwnTimestamps()
@@ -1759,8 +1920,6 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $this->assertTrue($future->isSameDay($post->fresh()->updated_at), 'It is touching models when it should be disabled.');
         $this->assertTrue($before->isSameDay($user->fresh()->updated_at), 'It is touching models when it should be disabled.');
-
-        Carbon::setTestNow($before);
     }
 
     public function testDeletingChildModelRespectsTheNoTouchingRule()
@@ -1780,8 +1939,6 @@ class DatabaseEloquentIntegrationTest extends TestCase
         });
 
         $this->assertTrue($before->isSameDay($user->fresh()->updated_at), 'It is touching models when it should be disabled.');
-
-        Carbon::setTestNow($before);
     }
 
     public function testRespectedMultiLevelTouchingChain()
@@ -1802,8 +1959,6 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $this->assertTrue($future->isSameDay($post->fresh()->updated_at), 'It is touching models when it should be disabled.');
         $this->assertTrue($before->isSameDay($user->fresh()->updated_at), 'It is touching models when it should be disabled.');
-
-        Carbon::setTestNow($before);
     }
 
     public function testTouchesGreatParentEvenWhenParentIsInNoTouchScope()
@@ -1824,8 +1979,6 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $this->assertTrue($before->isSameDay($post->fresh()->updated_at), 'It is touching models when it should be disabled.');
         $this->assertTrue($future->isSameDay($user->fresh()->updated_at), 'It is touching models when it should be disabled.');
-
-        Carbon::setTestNow($before);
     }
 
     public function testCanNestCallsOfNoTouching()
@@ -1848,8 +2001,6 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $this->assertTrue($before->isSameDay($post->fresh()->updated_at), 'It is touching models when it should be disabled.');
         $this->assertTrue($before->isSameDay($user->fresh()->updated_at), 'It is touching models when it should be disabled.');
-
-        Carbon::setTestNow($before);
     }
 
     public function testCanPassArrayOfModelsToIgnore()
@@ -1870,8 +2021,6 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $this->assertTrue($before->isSameDay($post->fresh()->updated_at), 'It is touching models when it should be disabled.');
         $this->assertTrue($before->isSameDay($user->fresh()->updated_at), 'It is touching models when it should be disabled.');
-
-        Carbon::setTestNow($before);
     }
 
     public function testWhenBaseModelIsIgnoredAllChildModelsAreIgnored()

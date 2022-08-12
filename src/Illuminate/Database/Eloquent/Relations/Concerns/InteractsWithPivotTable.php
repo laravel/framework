@@ -207,7 +207,7 @@ trait InteractsWithPivotTable
             return $this->updateExistingPivotUsingCustomClass($id, $attributes, $touch);
         }
 
-        if (in_array($this->updatedAt(), $this->pivotColumns)) {
+        if ($this->hasPivotColumn($this->updatedAt())) {
             $attributes = $this->addTimestampsToAttachment($attributes, true);
         }
 
@@ -669,18 +669,11 @@ trait InteractsWithPivotTable
      */
     protected function getTypeSwapValue($type, $value)
     {
-        switch (strtolower($type)) {
-            case 'int':
-            case 'integer':
-                return (int) $value;
-            case 'real':
-            case 'float':
-            case 'double':
-                return (float) $value;
-            case 'string':
-                return (string) $value;
-            default:
-                return $value;
-        }
+        return match (strtolower($type)) {
+            'int', 'integer' => (int) $value,
+            'real', 'float', 'double' => (float) $value,
+            'string' => (string) $value,
+            default => $value,
+        };
     }
 }

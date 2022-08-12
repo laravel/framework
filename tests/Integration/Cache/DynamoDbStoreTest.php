@@ -9,9 +9,6 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class DynamoDbStoreTest extends TestCase
 {
     protected function setUp(): void

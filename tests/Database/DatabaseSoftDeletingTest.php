@@ -19,7 +19,6 @@ class DatabaseSoftDeletingTest extends TestCase
 
     public function testDeletedAtIsCastToCarbonInstance()
     {
-        Carbon::setTestNow(Carbon::now());
         $expected = Carbon::createFromFormat('Y-m-d H:i:s', '2018-12-29 13:59:39');
         $model = new SoftDeletingModel(['deleted_at' => $expected->format('Y-m-d H:i:s')]);
 

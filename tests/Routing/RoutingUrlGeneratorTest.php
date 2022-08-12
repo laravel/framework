@@ -14,6 +14,10 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
+if (PHP_VERSION_ID >= 80100) {
+    include_once 'Enums.php';
+}
+
 class RoutingUrlGeneratorTest extends TestCase
 {
     public function testBasicGeneration()
@@ -373,6 +377,51 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertSame('/foo/test-slug', $url->route('routable', [$model], false));
     }
 
+    public function testRoutableInterfaceRoutingAsQueryString()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+
+        $route = new Route(['GET'], 'foo', ['as' => 'query-string']);
+        $routes->add($route);
+
+        $model = new RoutableInterfaceStub;
+        $model->key = 'routable';
+
+        $this->assertSame('/foo?routable', $url->route('query-string', $model, false));
+        $this->assertSame('/foo?routable', $url->route('query-string', [$model], false));
+        $this->assertSame('/foo?foo=routable', $url->route('query-string', ['foo' => $model], false));
+    }
+
+    /**
+     * @todo Fix bug related to route keys
+     *
+     * @link https://github.com/laravel/framework/pull/42425
+     */
+    public function testRoutableInterfaceRoutingWithSeparateBindingFieldOnlyForSecondParameter()
+    {
+        $this->markTestSkipped('See https://github.com/laravel/framework/pull/43255');
+
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+
+        $route = new Route(['GET'], 'foo/{bar}/{baz:slug}', ['as' => 'routable']);
+        $routes->add($route);
+
+        $model1 = new RoutableInterfaceStub;
+        $model1->key = 'routable-1';
+
+        $model2 = new RoutableInterfaceStub;
+        $model2->key = 'routable-2';
+
+        $this->assertSame('/foo/routable-1/test-slug', $url->route('routable', ['bar' => $model1, 'baz' => $model2], false));
+        $this->assertSame('/foo/routable-1/test-slug', $url->route('routable', [$model1, $model2], false));
+    }
+
     public function testRoutableInterfaceRoutingWithSingleParameter()
     {
         $url = new UrlGenerator(
@@ -654,6 +703,28 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertEquals($url->to('/foo'), $url->previous('/foo'));
     }
 
+    public function testPreviousPath()
+    {
+        $url = new UrlGenerator(
+            new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+
+        $url->getRequest()->headers->set('referer', 'http://www.foo.com?baz=bah');
+        $this->assertSame('/', $url->previousPath());
+
+        $url->getRequest()->headers->set('referer', 'http://www.foo.com/?baz=bah');
+        $this->assertSame('/', $url->previousPath());
+
+        $url->getRequest()->headers->set('referer', 'http://www.foo.com/bar?baz=bah');
+        $this->assertSame('/bar', $url->previousPath());
+
+        $url->getRequest()->headers->remove('referer');
+        $this->assertSame('/', $url->previousPath());
+
+        $this->assertSame('/bar', $url->previousPath('/bar'));
+    }
+
     public function testRouteNotDefinedException()
     {
         $this->expectException(RouteNotFoundException::class);
@@ -779,6 +850,22 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->expectExceptionMessage('reserved');
 
         Request::create($url->signedRoute('foo', ['expires' => 253402300799]));
+    }
+
+    /**
+     * @requires PHP >= 8.1
+     */
+    public function testRouteGenerationWithBackedEnums()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+
+        $namedRoute = new Route(['GET'], '/foo/{bar}', ['as' => 'foo.bar']);
+        $routes->add($namedRoute);
+
+        $this->assertSame('http://www.foo.com/foo/fruits', $url->route('foo.bar', CategoryBackedEnum::Fruits));
     }
 }
 

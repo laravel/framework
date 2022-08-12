@@ -269,6 +269,19 @@ abstract class HasOneOrMany extends Relation
     }
 
     /**
+     * Attach a model instance without raising any events to the parent model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return \Illuminate\Database\Eloquent\Model|false
+     */
+    public function saveQuietly(Model $model)
+    {
+        return Model::withoutEvents(function () use ($model) {
+            return $this->save($model);
+        });
+    }
+
+    /**
      * Attach a collection of models to the parent instance.
      *
      * @param  iterable  $models
@@ -296,6 +309,19 @@ abstract class HasOneOrMany extends Relation
 
             $instance->save();
         });
+    }
+
+    /**
+     * Create a new instance of the related model. Allow mass-assignment.
+     *
+     * @param  array  $attributes
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function forceCreate(array $attributes = [])
+    {
+        $attributes[$this->getForeignKeyName()] = $this->getParentKey();
+
+        return $this->related->forceCreate($attributes);
     }
 
     /**

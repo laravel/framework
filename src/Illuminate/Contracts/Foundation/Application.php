@@ -24,7 +24,7 @@ interface Application extends Container
     /**
      * Get the path to the bootstrap directory.
      *
-     * @param  string  $path Optionally, a path to append to the bootstrap path
+     * @param  string  $path
      * @return string
      */
     public function bootstrapPath($path = '');
@@ -32,7 +32,7 @@ interface Application extends Container
     /**
      * Get the path to the application configuration files.
      *
-     * @param  string  $path Optionally, a path to append to the config path
+     * @param  string  $path
      * @return string
      */
     public function configPath($path = '');
@@ -40,10 +40,18 @@ interface Application extends Container
     /**
      * Get the path to the database directory.
      *
-     * @param  string  $path Optionally, a path to append to the database path
+     * @param  string  $path
      * @return string
      */
     public function databasePath($path = '');
+
+    /**
+     * Get the path to the language files.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    public function langPath($path = '');
 
     /**
      * Get the path to the resources directory.
@@ -56,9 +64,10 @@ interface Application extends Container
     /**
      * Get the path to the storage directory.
      *
+     * @param  string  $path
      * @return string
      */
-    public function storagePath();
+    public function storagePath($path = '');
 
     /**
      * Get or check the current application environment.
@@ -81,6 +90,13 @@ interface Application extends Container
      * @return bool
      */
     public function runningUnitTests();
+
+    /**
+     * Get an instance of the maintenance mode manager implementation.
+     *
+     * @return \Illuminate\Contracts\Foundation\MaintenanceMode
+     */
+    public function maintenanceMode();
 
     /**
      * Determine if the application is currently down for maintenance.
@@ -205,6 +221,14 @@ interface Application extends Container
      * @return bool
      */
     public function shouldSkipMiddleware();
+
+    /**
+     * Register a terminating callback with the application.
+     *
+     * @param  callable|string  $callback
+     * @return \Illuminate\Contracts\Foundation\Application
+     */
+    public function terminating($callback);
 
     /**
      * Terminate the application.

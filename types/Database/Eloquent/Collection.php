@@ -1,11 +1,6 @@
 <?php
 
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use function PHPStan\Testing\assertType;
-
-class User extends Authenticatable
-{
-}
 
 $collection = User::all();
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection);
@@ -85,7 +80,7 @@ assertType('bool', $collection->contains(function ($user) {
 }));
 assertType('bool', $collection->contains('string', '=', 'string'));
 
-assertType('array<int, mixed>', $collection->modelKeys());
+assertType('array<int, (int|string)>', $collection->modelKeys());
 
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->merge($collection));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->merge([new User]));
@@ -140,7 +135,7 @@ assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->un
     assertType('User', $user);
     assertType('int', $int);
 
-    return true;
+    return $user->getTable();
 }));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->unique('string'));
 

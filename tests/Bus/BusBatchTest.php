@@ -20,6 +20,7 @@ use Illuminate\Queue\CallQueuedClosure;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
+use stdClass;
 
 class BusBatchTest extends TestCase
 {
@@ -100,7 +101,7 @@ class BusBatchTest extends TestCase
                         ->with('test-connection')
                         ->andReturn($connection = m::mock(stdClass::class));
 
-        $connection->shouldReceive('bulk')->once()->with(\Mockery::on(function ($args) use ($job, $secondJob) {
+        $connection->shouldReceive('bulk')->once()->with(m::on(function ($args) use ($job, $secondJob) {
             return
                 $args[0] == $job &&
                 $args[1] == $secondJob &&
@@ -114,6 +115,47 @@ class BusBatchTest extends TestCase
         $this->assertEquals(3, $batch->pendingJobs);
         $this->assertIsString($job->batchId);
         $this->assertInstanceOf(CarbonImmutable::class, $batch->createdAt);
+    }
+
+    public function test_jobs_can_be_added_to_pending_batch()
+    {
+        $batch = new PendingBatch(new Container, collect());
+        $this->assertCount(0, $batch->jobs);
+
+        $job = new class
+        {
+            use Batchable;
+        };
+        $batch->add([$job]);
+        $this->assertCount(1, $batch->jobs);
+
+        $secondJob = new class
+        {
+            use Batchable;
+
+            public $anotherProperty;
+        };
+        $batch->add($secondJob);
+        $this->assertCount(2, $batch->jobs);
+    }
+
+    public function test_jobs_can_be_added_to_the_pending_batch_from_iterable()
+    {
+        $batch = new PendingBatch(new Container, collect());
+        $this->assertCount(0, $batch->jobs);
+
+        $count = 3;
+        $generator = function (int $jobsCount) {
+            for ($i = 0; $i < $jobsCount; $i++) {
+                yield new class
+                {
+                    use Batchable;
+                };
+            }
+        };
+
+        $batch->add($generator($count));
+        $this->assertCount($count, $batch->jobs);
     }
 
     public function test_processed_jobs_can_be_calculated()
@@ -325,7 +367,7 @@ class BusBatchTest extends TestCase
             ->with('test-connection')
             ->andReturn($connection = m::mock(stdClass::class));
 
-        $connection->shouldReceive('bulk')->once()->with(\Mockery::on(function ($args) use ($chainHeadJob, $secondJob, $thirdJob) {
+        $connection->shouldReceive('bulk')->once()->with(m::on(function ($args) use ($chainHeadJob, $secondJob, $thirdJob) {
             return
                 $args[0] == $chainHeadJob
                 && serialize($secondJob) == $args[0]->chained[0]

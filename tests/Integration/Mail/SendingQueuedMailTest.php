@@ -10,9 +10,6 @@ use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\View;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class SendingQueuedMailTest extends TestCase
 {
     protected function getEnvironmentSetUp($app)

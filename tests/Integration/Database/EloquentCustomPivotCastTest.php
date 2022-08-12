@@ -7,15 +7,10 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-/**
- * @group integration
- */
 class EloquentCustomPivotCastTest extends DatabaseTestCase
 {
-    protected function setUp(): void
+    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
-        parent::setUp();
-
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('email');
@@ -142,6 +137,17 @@ class EloquentCustomPivotCastTest extends DatabaseTestCase
         $this->assertEquals(['foo1' => 'bar1'], $project->collaborators[0]->pivot->permissions);
         $this->assertEquals(['baz2' => 'bar2'], $project->collaborators[1]->pivot->permissions);
     }
+
+    public function testDefaultAttributesAreRespectedAndCastsAreRespected()
+    {
+        $project = CustomPivotCastTestProject::forceCreate([
+            'name' => 'Test Project',
+        ]);
+
+        $pivot = $project->collaborators()->newPivot();
+
+        $this->assertEquals(['permissions' => ['create', 'update']], $pivot->toArray());
+    }
 }
 
 class CustomPivotCastTestUser extends Model
@@ -165,6 +171,10 @@ class CustomPivotCastTestProject extends Model
 
 class CustomPivotCastTestCollaborator extends Pivot
 {
+    protected $attributes = [
+        'permissions' => '["create", "update"]',
+    ];
+
     protected $casts = [
         'permissions' => 'json',
     ];

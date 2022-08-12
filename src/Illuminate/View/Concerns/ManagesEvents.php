@@ -55,7 +55,7 @@ trait ManagesEvents
         $composers = [];
 
         foreach ((array) $views as $view) {
-            $composers[] = $this->addViewEvent($view, $callback, 'composing: ');
+            $composers[] = $this->addViewEvent($view, $callback);
         }
 
         return $composers;
@@ -145,7 +145,7 @@ trait ManagesEvents
      */
     protected function classEventMethodForPrefix($prefix)
     {
-        return Str::contains($prefix, 'composing') ? 'compose' : 'create';
+        return str_contains($prefix, 'composing') ? 'compose' : 'create';
     }
 
     /**
@@ -157,7 +157,7 @@ trait ManagesEvents
      */
     protected function addEventListener($name, $callback)
     {
-        if (Str::contains($name, '*')) {
+        if (str_contains($name, '*')) {
             $callback = function ($name, array $data) use ($callback) {
                 return $callback($data[0]);
             };

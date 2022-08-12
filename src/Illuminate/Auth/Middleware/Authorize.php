@@ -75,7 +75,7 @@ class Authorize
         if ($this->isClassName($model)) {
             return trim($model);
         } else {
-            return $request->route($model, null) ?:
+            return $request->route($model, null) ??
                 ((preg_match("/^['\"](.*)['\"]$/", trim($model), $matches)) ? $matches[1] : null);
         }
     }
@@ -88,6 +88,6 @@ class Authorize
      */
     protected function isClassName($value)
     {
-        return strpos($value, '\\') !== false;
+        return str_contains($value, '\\');
     }
 }

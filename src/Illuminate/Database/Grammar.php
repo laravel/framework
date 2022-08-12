@@ -3,7 +3,6 @@
 namespace Illuminate\Database;
 
 use Illuminate\Database\Query\Expression;
-use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
 
@@ -146,7 +145,7 @@ abstract class Grammar
      */
     protected function isJsonSelector($value)
     {
-        return Str::contains($value, '->');
+        return str_contains($value, '->');
     }
 
     /**
@@ -212,7 +211,7 @@ abstract class Grammar
      * Get the value of a raw expression.
      *
      * @param  \Illuminate\Database\Query\Expression  $expression
-     * @return string
+     * @return mixed
      */
     public function getValue($expression)
     {

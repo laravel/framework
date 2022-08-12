@@ -8,11 +8,18 @@ use DateTimeInterface;
 use Exception;
 use Foo\Bar\EloquentModelNamespacedStub;
 use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
+use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\ArrayObject;
+use Illuminate\Database\Eloquent\Casts\AsArrayObject;
+use Illuminate\Database\Eloquent\Casts\AsCollection;
+use Illuminate\Database\Eloquent\Casts\AsEncryptedArrayObject;
+use Illuminate\Database\Eloquent\Casts\AsEncryptedCollection;
+use Illuminate\Database\Eloquent\Casts\AsStringable;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Database\Eloquent\MassAssignmentException;
@@ -24,7 +31,10 @@ use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection as BaseCollection;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\InteractsWithTime;
+use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 use InvalidArgumentException;
 use LogicException;
 use Mockery as m;
@@ -35,13 +45,6 @@ use stdClass;
 class DatabaseEloquentModelTest extends TestCase
 {
     use InteractsWithTime;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        Carbon::setTestNow(Carbon::now());
-    }
 
     protected function tearDown(): void
     {
@@ -153,6 +156,146 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($model->isDirty());
         $this->assertFalse($model->isDirty('objectAttribute'));
         $this->assertFalse($model->isDirty('collectionAttribute'));
+    }
+
+    public function testDirtyOnCastedArrayObject()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->setRawAttributes([
+            'asarrayobjectAttribute' => '{"foo": "bar"}',
+        ]);
+        $model->syncOriginal();
+
+        $this->assertInstanceOf(ArrayObject::class, $model->asarrayobjectAttribute);
+        $this->assertFalse($model->isDirty('asarrayobjectAttribute'));
+
+        $model->asarrayobjectAttribute = ['foo' => 'bar'];
+        $this->assertFalse($model->isDirty('asarrayobjectAttribute'));
+
+        $model->asarrayobjectAttribute = ['foo' => 'baz'];
+        $this->assertTrue($model->isDirty('asarrayobjectAttribute'));
+    }
+
+    public function testDirtyOnCastedCollection()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->setRawAttributes([
+            'ascollectionAttribute' => '{"foo": "bar"}',
+        ]);
+        $model->syncOriginal();
+
+        $this->assertInstanceOf(BaseCollection::class, $model->ascollectionAttribute);
+        $this->assertFalse($model->isDirty('ascollectionAttribute'));
+
+        $model->ascollectionAttribute = ['foo' => 'bar'];
+        $this->assertFalse($model->isDirty('ascollectionAttribute'));
+
+        $model->ascollectionAttribute = ['foo' => 'baz'];
+        $this->assertTrue($model->isDirty('ascollectionAttribute'));
+    }
+
+    public function testDirtyOnCastedStringable()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->setRawAttributes([
+            'asStringableAttribute' => 'foo bar',
+        ]);
+        $model->syncOriginal();
+
+        $this->assertInstanceOf(Stringable::class, $model->asStringableAttribute);
+        $this->assertFalse($model->isDirty('asStringableAttribute'));
+
+        $model->asStringableAttribute = Str::of('foo bar');
+        $this->assertFalse($model->isDirty('asStringableAttribute'));
+
+        $model->asStringableAttribute = Str::of('foo baz');
+        $this->assertTrue($model->isDirty('asStringableAttribute'));
+    }
+
+    public function testDirtyOnCastedEncryptedCollection()
+    {
+        $this->encrypter = m::mock(Encrypter::class);
+        Crypt::swap($this->encrypter);
+        Model::$encrypter = null;
+
+        $this->encrypter->expects('encryptString')
+            ->twice()
+            ->with('{"foo":"bar"}')
+            ->andReturn('encrypted-value');
+
+        $this->encrypter->expects('decryptString')
+            ->with('encrypted-value')
+            ->andReturn('{"foo": "bar"}');
+
+        $this->encrypter->expects('encryptString')
+            ->with('{"foo":"baz"}')
+            ->andReturn('new-encrypted-value');
+
+        $this->encrypter->expects('decrypt')
+            ->with('encrypted-value', false)
+            ->andReturn('{"foo": "bar"}');
+
+        $this->encrypter->expects('decrypt')
+            ->with('new-encrypted-value', false)
+            ->andReturn('{"foo":"baz"}');
+
+        $model = new EloquentModelCastingStub;
+        $model->setRawAttributes([
+            'asEncryptedCollectionAttribute' => 'encrypted-value',
+        ]);
+        $model->syncOriginal();
+
+        $this->assertInstanceOf(BaseCollection::class, $model->asEncryptedCollectionAttribute);
+        $this->assertFalse($model->isDirty('asEncryptedCollectionAttribute'));
+
+        $model->asEncryptedCollectionAttribute = ['foo' => 'bar'];
+        $this->assertFalse($model->isDirty('asEncryptedCollectionAttribute'));
+
+        $model->asEncryptedCollectionAttribute = ['foo' => 'baz'];
+        $this->assertTrue($model->isDirty('asEncryptedCollectionAttribute'));
+    }
+
+    public function testDirtyOnCastedEncryptedArrayObject()
+    {
+        $this->encrypter = m::mock(Encrypter::class);
+        Crypt::swap($this->encrypter);
+        Model::$encrypter = null;
+
+        $this->encrypter->expects('encryptString')
+            ->twice()
+            ->with('{"foo":"bar"}')
+            ->andReturn('encrypted-value');
+
+        $this->encrypter->expects('decryptString')
+            ->with('encrypted-value')
+            ->andReturn('{"foo": "bar"}');
+
+        $this->encrypter->expects('encryptString')
+            ->with('{"foo":"baz"}')
+            ->andReturn('new-encrypted-value');
+
+        $this->encrypter->expects('decrypt')
+            ->with('encrypted-value', false)
+            ->andReturn('{"foo": "bar"}');
+
+        $this->encrypter->expects('decrypt')
+            ->with('new-encrypted-value', false)
+            ->andReturn('{"foo":"baz"}');
+
+        $model = new EloquentModelCastingStub;
+        $model->setRawAttributes([
+            'asEncryptedArrayObjectAttribute' => 'encrypted-value',
+        ]);
+        $model->syncOriginal();
+
+        $this->assertInstanceOf(ArrayObject::class, $model->asEncryptedArrayObjectAttribute);
+        $this->assertFalse($model->isDirty('asEncryptedArrayObjectAttribute'));
+
+        $model->asEncryptedArrayObjectAttribute = ['foo' => 'bar'];
+        $this->assertFalse($model->isDirty('asEncryptedArrayObjectAttribute'));
+
+        $model->asEncryptedArrayObjectAttribute = ['foo' => 'baz'];
+        $this->assertTrue($model->isDirty('asEncryptedArrayObjectAttribute'));
     }
 
     public function testCleanAttributes()
@@ -1691,6 +1834,24 @@ class DatabaseEloquentModelTest extends TestCase
         $model->replicate();
     }
 
+    public function testReplicateQuietlyCreatesANewModelInstanceWithSameAttributeValuesAndIsQuiet()
+    {
+        $model = new EloquentModelStub;
+        $model->id = 'id';
+        $model->foo = 'bar';
+        $model->created_at = new DateTime;
+        $model->updated_at = new DateTime;
+        $replicated = $model->replicateQuietly();
+
+        $model->setEventDispatcher($events = m::mock(Dispatcher::class));
+        $events->shouldReceive('dispatch')->never()->with('eloquent.replicating: '.get_class($model), $model)->andReturn(true);
+
+        $this->assertNull($replicated->id);
+        $this->assertSame('bar', $replicated->foo);
+        $this->assertNull($replicated->created_at);
+        $this->assertNull($replicated->updated_at);
+    }
+
     public function testIncrementOnExistingModelCallsQueryAndSetsAttribute()
     {
         $model = m::mock(EloquentModelStub::class.'[newQueryWithoutRelationships]');
@@ -1708,6 +1869,60 @@ class DatabaseEloquentModelTest extends TestCase
 
         $model->publicIncrement('foo', 1, ['category' => 1]);
         $this->assertEquals(4, $model->foo);
+        $this->assertEquals(1, $model->category);
+        $this->assertTrue($model->isDirty('category'));
+    }
+
+    public function testIncrementQuietlyOnExistingModelCallsQueryAndSetsAttributeAndIsQuiet()
+    {
+        $model = m::mock(EloquentModelStub::class.'[newQueryWithoutRelationships]');
+        $model->exists = true;
+        $model->id = 1;
+        $model->syncOriginalAttribute('id');
+        $model->foo = 2;
+
+        $model->shouldReceive('newQueryWithoutRelationships')->andReturn($query = m::mock(stdClass::class));
+        $query->shouldReceive('where')->andReturn($query);
+        $query->shouldReceive('increment');
+
+        $model->setEventDispatcher($events = m::mock(Dispatcher::class));
+        $events->shouldReceive('until')->never()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
+        $events->shouldReceive('until')->never()->with('eloquent.updating: '.get_class($model), $model)->andReturn(true);
+        $events->shouldReceive('dispatch')->never()->with('eloquent.updated: '.get_class($model), $model)->andReturn(true);
+        $events->shouldReceive('dispatch')->never()->with('eloquent.saved: '.get_class($model), $model)->andReturn(true);
+
+        $model->publicIncrementQuietly('foo', 1);
+        $this->assertFalse($model->isDirty());
+
+        $model->publicIncrementQuietly('foo', 1, ['category' => 1]);
+        $this->assertEquals(4, $model->foo);
+        $this->assertEquals(1, $model->category);
+        $this->assertTrue($model->isDirty('category'));
+    }
+
+    public function testDecrementQuietlyOnExistingModelCallsQueryAndSetsAttributeAndIsQuiet()
+    {
+        $model = m::mock(EloquentModelStub::class.'[newQueryWithoutRelationships]');
+        $model->exists = true;
+        $model->id = 1;
+        $model->syncOriginalAttribute('id');
+        $model->foo = 4;
+
+        $model->shouldReceive('newQueryWithoutRelationships')->andReturn($query = m::mock(stdClass::class));
+        $query->shouldReceive('where')->andReturn($query);
+        $query->shouldReceive('decrement');
+
+        $model->setEventDispatcher($events = m::mock(Dispatcher::class));
+        $events->shouldReceive('until')->never()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
+        $events->shouldReceive('until')->never()->with('eloquent.updating: '.get_class($model), $model)->andReturn(true);
+        $events->shouldReceive('dispatch')->never()->with('eloquent.updated: '.get_class($model), $model)->andReturn(true);
+        $events->shouldReceive('dispatch')->never()->with('eloquent.saved: '.get_class($model), $model)->andReturn(true);
+
+        $model->publicDecrementQuietly('foo', 1);
+        $this->assertFalse($model->isDirty());
+
+        $model->publicDecrementQuietly('foo', 1, ['category' => 1]);
+        $this->assertEquals(2, $model->foo);
         $this->assertEquals(1, $model->category);
         $this->assertTrue($model->isDirty('category'));
     }
@@ -1998,8 +2213,6 @@ class DatabaseEloquentModelTest extends TestCase
         $model = new EloquentModelStub;
         $this->addMockConnection($model);
 
-        Carbon::setTestNow();
-
         $scopes = [
             'published',
             'category' => 'Laravel',
@@ -2093,6 +2306,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->setConnectionResolver($resolver = m::mock(ConnectionResolverInterface::class));
         $resolver->shouldReceive('connection')->andReturn($connection = m::mock(Connection::class));
         $connection->shouldReceive('getQueryGrammar')->andReturn($grammar = m::mock(Grammar::class));
+        $grammar->shouldReceive('getBitwiseOperators')->andReturn([]);
         $connection->shouldReceive('getPostProcessor')->andReturn($processor = m::mock(Processor::class));
         $connection->shouldReceive('query')->andReturnUsing(function () use ($connection, $grammar, $processor) {
             return new BaseBuilder($connection, $grammar, $processor);
@@ -2261,6 +2475,16 @@ class EloquentModelStub extends Model
         return $this->increment($column, $amount, $extra);
     }
 
+    public function publicIncrementQuietly($column, $amount = 1, $extra = [])
+    {
+        return $this->incrementQuietly($column, $amount, $extra);
+    }
+
+    public function publicDecrementQuietly($column, $amount = 1, $extra = [])
+    {
+        return $this->decrementQuietly($column, $amount, $extra);
+    }
+
     public function belongsToStub()
     {
         return $this->belongsTo(EloquentModelSaveStub::class);
@@ -2380,6 +2604,7 @@ class EloquentModelSaveStub extends Model
     {
         $mock = m::mock(Connection::class);
         $mock->shouldReceive('getQueryGrammar')->andReturn($grammar = m::mock(Grammar::class));
+        $grammar->shouldReceive('getBitwiseOperators')->andReturn([]);
         $mock->shouldReceive('getPostProcessor')->andReturn($processor = m::mock(Processor::class));
         $mock->shouldReceive('getName')->andReturn('name');
         $mock->shouldReceive('query')->andReturnUsing(function () use ($mock, $grammar, $processor) {
@@ -2570,6 +2795,11 @@ class EloquentModelCastingStub extends Model
         'dateAttribute' => 'date',
         'datetimeAttribute' => 'datetime',
         'timestampAttribute' => 'timestamp',
+        'asarrayobjectAttribute' => AsArrayObject::class,
+        'ascollectionAttribute' => AsCollection::class,
+        'asStringableAttribute' => AsStringable::class,
+        'asEncryptedCollectionAttribute' => AsEncryptedCollection::class,
+        'asEncryptedArrayObjectAttribute' => AsEncryptedArrayObject::class,
     ];
 
     public function jsonAttributeValue()

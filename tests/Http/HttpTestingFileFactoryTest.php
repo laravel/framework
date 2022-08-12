@@ -5,12 +5,17 @@ namespace Illuminate\Tests\Http;
 use Illuminate\Http\Testing\FileFactory;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @requires extension gd
+ *
+ * @link https://www.php.net/manual/en/function.gd-info.php
+ */
 class HttpTestingFileFactoryTest extends TestCase
 {
     public function testImagePng()
     {
-        if (! function_exists('imagepng')) {
-            $this->markTestSkipped('The extension gd is missing from your system or was compiled without PNG support.');
+        if (! $this->isGDSupported('PNG Support')) {
+            $this->markTestSkipped('Requires PNG support.');
         }
 
         $image = (new FileFactory)->image('test.png', 15, 20);
@@ -24,8 +29,8 @@ class HttpTestingFileFactoryTest extends TestCase
 
     public function testImageJpeg()
     {
-        if (! function_exists('imagejpeg')) {
-            $this->markTestSkipped('The extension gd is missing from your system or was compiled without JPEG support.');
+        if (! $this->isGDSupported('JPEG Support')) {
+            $this->markTestSkipped('Requires JPEG support.');
         }
 
         $jpeg = (new FileFactory)->image('test.jpeg', 15, 20);
@@ -44,8 +49,8 @@ class HttpTestingFileFactoryTest extends TestCase
 
     public function testImageGif()
     {
-        if (! function_exists('imagegif')) {
-            $this->markTestSkipped('The extension gd is missing from your system or was compiled without GIF support.');
+        if (! $this->isGDSupported('GIF Create Support')) {
+            $this->markTestSkipped('Requires GIF Create support.');
         }
 
         $image = (new FileFactory)->image('test.gif');
@@ -58,8 +63,8 @@ class HttpTestingFileFactoryTest extends TestCase
 
     public function testImageWebp()
     {
-        if (! function_exists('imagewebp')) {
-            $this->markTestSkipped('The extension gd is missing from your system or was compiled without WEBP support.');
+        if (! $this->isGDSupported('WebP Support')) {
+            $this->markTestSkipped('Requires Webp support.');
         }
 
         $image = (new FileFactory)->image('test.webp');
@@ -72,8 +77,8 @@ class HttpTestingFileFactoryTest extends TestCase
 
     public function testImageWbmp()
     {
-        if (! function_exists('imagewbmp')) {
-            $this->markTestSkipped('The extension gd is missing from your system or was compiled without WBMP support.');
+        if (! $this->isGDSupported('WBMP Support')) {
+            $this->markTestSkipped('Requires WBMP support.');
         }
 
         $image = (new FileFactory)->image('test.wbmp');
@@ -86,10 +91,6 @@ class HttpTestingFileFactoryTest extends TestCase
 
     public function testImageBmp()
     {
-        if (! function_exists('imagebmp')) {
-            $this->markTestSkipped('The extension gd is missing from your system or was compiled without BMP support.');
-        }
-
         $image = (new FileFactory)->image('test.bmp');
 
         $imagePath = $image->getRealPath();
@@ -113,5 +114,20 @@ class HttpTestingFileFactoryTest extends TestCase
             'video/webm',
             (new FileFactory)->create('someaudio.webm')->getMimeType()
         );
+    }
+
+    /**
+     * @param  string  $driver
+     * @return bool
+     */
+    private function isGDSupported(string $driver = 'GD Version'): bool
+    {
+        $gdInfo = gd_info();
+
+        if (isset($gdInfo[$driver])) {
+            return $gdInfo[$driver];
+        }
+
+        return false;
     }
 }

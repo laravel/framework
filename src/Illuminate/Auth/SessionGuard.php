@@ -37,7 +37,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      *
      * @var string
      */
-    protected $name;
+    public readonly string $name;
 
     /**
      * The user we last attempted to retrieve.
@@ -52,6 +52,13 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * @var bool
      */
     protected $viaRemember = false;
+
+    /**
+     * The number of minutes that the "remember me" cookie should be valid for.
+     *
+     * @var int
+     */
+    protected $rememberDuration = 2628000;
 
     /**
      * The session used by the guard.
@@ -269,6 +276,8 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * @param  string  $field
      * @param  array  $extraConditions
      * @return \Symfony\Component\HttpFoundation\Response|null
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException
      */
     public function basic($field = 'email', $extraConditions = [])
     {
@@ -292,6 +301,8 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * @param  string  $field
      * @param  array  $extraConditions
      * @return \Symfony\Component\HttpFoundation\Response|null
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException
      */
     public function onceBasic($field = 'email', $extraConditions = [])
     {
@@ -380,7 +391,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      *
      * @param  array  $credentials
      * @param  array|callable  $callbacks
-     * @param  false  $remember
+     * @param  bool  $remember
      * @return bool
      */
     public function attemptWhen(array $credentials = [], $callbacks = null, $remember = false)
@@ -532,7 +543,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      */
     protected function createRecaller($value)
     {
-        return $this->getCookieJar()->forever($this->getRecallerName(), $value);
+        return $this->getCookieJar()->make($this->getRecallerName(), $value, $this->getRememberDuration());
     }
 
     /**
@@ -678,9 +689,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      */
     public function attempting($callback)
     {
-        if (isset($this->events)) {
-            $this->events->listen(Events\Attempting::class, $callback);
-        }
+        $this->events?->listen(Events\Attempting::class, $callback);
     }
 
     /**
@@ -692,11 +701,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      */
     protected function fireAttemptEvent(array $credentials, $remember = false)
     {
-        if (isset($this->events)) {
-            $this->events->dispatch(new Attempting(
-                $this->name, $credentials, $remember
-            ));
-        }
+        $this->events?->dispatch(new Attempting($this->name, $credentials, $remember));
     }
 
     /**
@@ -707,11 +712,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      */
     protected function fireValidatedEvent($user)
     {
-        if (isset($this->events)) {
-            $this->events->dispatch(new Validated(
-                $this->name, $user
-            ));
-        }
+        $this->events?->dispatch(new Validated($this->name, $user));
     }
 
     /**
@@ -723,11 +724,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      */
     protected function fireLoginEvent($user, $remember = false)
     {
-        if (isset($this->events)) {
-            $this->events->dispatch(new Login(
-                $this->name, $user, $remember
-            ));
-        }
+        $this->events?->dispatch(new Login($this->name, $user, $remember));
     }
 
     /**
@@ -738,11 +735,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      */
     protected function fireAuthenticatedEvent($user)
     {
-        if (isset($this->events)) {
-            $this->events->dispatch(new Authenticated(
-                $this->name, $user
-            ));
-        }
+        $this->events?->dispatch(new Authenticated($this->name, $user));
     }
 
     /**
@@ -753,11 +746,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      */
     protected function fireOtherDeviceLogoutEvent($user)
     {
-        if (isset($this->events)) {
-            $this->events->dispatch(new OtherDeviceLogout(
-                $this->name, $user
-            ));
-        }
+        $this->events?->dispatch(new OtherDeviceLogout($this->name, $user));
     }
 
     /**
@@ -769,11 +758,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      */
     protected function fireFailedEvent($user, array $credentials)
     {
-        if (isset($this->events)) {
-            $this->events->dispatch(new Failed(
-                $this->name, $user, $credentials
-            ));
-        }
+        $this->events?->dispatch(new Failed($this->name, $user, $credentials));
     }
 
     /**
@@ -814,6 +799,29 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     public function viaRemember()
     {
         return $this->viaRemember;
+    }
+
+    /**
+     * Get the number of minutes the remember me cookie should be valid for.
+     *
+     * @return int
+     */
+    protected function getRememberDuration()
+    {
+        return $this->rememberDuration;
+    }
+
+    /**
+     * Set the number of minutes the remember me cookie should be valid for.
+     *
+     * @param  int  $minutes
+     * @return $this
+     */
+    public function setRememberDuration($minutes)
+    {
+        $this->rememberDuration = $minutes;
+
+        return $this;
     }
 
     /**
@@ -888,7 +896,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * Set the current user.
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @return $this
+     * @return void
      */
     public function setUser(AuthenticatableContract $user)
     {
@@ -897,8 +905,6 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         $this->loggedOut = false;
 
         $this->fireAuthenticatedEvent($user);
-
-        return $this;
     }
 
     /**

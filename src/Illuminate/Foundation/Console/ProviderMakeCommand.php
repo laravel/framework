@@ -3,7 +3,9 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'make:provider')]
 class ProviderMakeCommand extends GeneratorCommand
 {
     /**
@@ -12,15 +14,6 @@ class ProviderMakeCommand extends GeneratorCommand
      * @var string
      */
     protected $name = 'make:provider';
-
-    /**
-     * The name of the console command.
-     *
-     * This name is used to identify the command during lazy loading.
-     *
-     * @var string|null
-     */
-    protected static $defaultName = 'make:provider';
 
     /**
      * The console command description.
@@ -43,7 +36,20 @@ class ProviderMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return __DIR__.'/stubs/provider.stub';
+        return $this->resolveStubPath('/stubs/provider.stub');
+    }
+
+    /**
+     * Resolve the fully-qualified path to the stub.
+     *
+     * @param  string  $stub
+     * @return string
+     */
+    protected function resolveStubPath($stub)
+    {
+        return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
+            ? $customPath
+            : __DIR__.$stub;
     }
 
     /**

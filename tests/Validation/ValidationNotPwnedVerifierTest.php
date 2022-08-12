@@ -49,7 +49,7 @@ class ValidationNotPwnedVerifierTest extends TestCase
         $httpFactory
             ->shouldReceive('timeout')
             ->once()
-            ->with(10)
+            ->with(30)
             ->andReturn($httpFactory);
 
         $httpFactory->shouldReceive('get')
@@ -86,7 +86,7 @@ class ValidationNotPwnedVerifierTest extends TestCase
         $httpFactory
             ->shouldReceive('timeout')
             ->once()
-            ->with(10)
+            ->with(30)
             ->andReturn($httpFactory);
 
         $httpFactory->shouldReceive('get')
@@ -127,7 +127,7 @@ class ValidationNotPwnedVerifierTest extends TestCase
         $httpFactory
             ->shouldReceive('timeout')
             ->once()
-            ->with(10)
+            ->with(30)
             ->andReturn($httpFactory);
 
         $httpFactory
@@ -140,5 +140,7 @@ class ValidationNotPwnedVerifierTest extends TestCase
             'value' => 123123123,
             'threshold' => 0,
         ]));
+
+        unset($container[ExceptionHandler::class]);
     }
 }

@@ -3,8 +3,10 @@
 namespace Illuminate\Notifications\Messages;
 
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Mail\Attachable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Mail\Attachment;
 use Illuminate\Mail\Markdown;
 use Illuminate\Support\Traits\Conditionable;
 
@@ -81,6 +83,20 @@ class MailMessage extends SimpleMessage implements Renderable
      * @var array
      */
     public $rawAttachments = [];
+
+    /**
+     * The tags for the message.
+     *
+     * @var array
+     */
+    public $tags = [];
+
+    /**
+     * The metadata for the message.
+     *
+     * @var array
+     */
+    public $metadata = [];
 
     /**
      * Priority level of the message.
@@ -227,12 +243,20 @@ class MailMessage extends SimpleMessage implements Renderable
     /**
      * Attach a file to the message.
      *
-     * @param  string  $file
+     * @param  string|\Illuminate\Contracts\Mail\Attachable  $file
      * @param  array  $options
      * @return $this
      */
     public function attach($file, array $options = [])
     {
+        if ($file instanceof Attachable) {
+            $file = $file->toMailAttachment();
+        }
+
+        if ($file instanceof Attachment) {
+            return $file->attachTo($this);
+        }
+
         $this->attachments[] = compact('file', 'options');
 
         return $this;
@@ -249,6 +273,33 @@ class MailMessage extends SimpleMessage implements Renderable
     public function attachData($data, $name, array $options = [])
     {
         $this->rawAttachments[] = compact('data', 'name', 'options');
+
+        return $this;
+    }
+
+    /**
+     * Add a tag header to the message when supported by the underlying transport.
+     *
+     * @param  string  $value
+     * @return $this
+     */
+    public function tag($value)
+    {
+        array_push($this->tags, $value);
+
+        return $this;
+    }
+
+    /**
+     * Add a metadata header to the message when supported by the underlying transport.
+     *
+     * @param  string  $key
+     * @param  string  $value
+     * @return $this
+     */
+    public function metadata($key, $value)
+    {
+        $this->metadata[$key] = $value;
 
         return $this;
     }
@@ -322,12 +373,12 @@ class MailMessage extends SimpleMessage implements Renderable
     }
 
     /**
-     * Register a callback to be called with the Swift message instance.
+     * Register a callback to be called with the Symfony message instance.
      *
      * @param  callable  $callback
      * @return $this
      */
-    public function withSwiftMessage($callback)
+    public function withSymfonyMessage($callback)
     {
         $this->callbacks[] = $callback;
 

@@ -118,6 +118,32 @@ class AssertableJson implements Arrayable
     }
 
     /**
+     * Instantiate a new "scope" on each child element.
+     *
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function each(Closure $callback): self
+    {
+        $props = $this->prop();
+
+        $path = $this->dotPath();
+
+        PHPUnit::assertNotEmpty($props, $path === ''
+            ? 'Cannot scope directly onto each element of the root level because it is empty.'
+            : sprintf('Cannot scope directly onto each element of property [%s] because it is empty.', $path)
+        );
+
+        foreach (array_keys($props) as $key) {
+            $this->interactsWith($key);
+
+            $this->scope($key, $callback);
+        }
+
+        return $this;
+    }
+
+    /**
      * Create a new instance from an array.
      *
      * @param  array  $data
@@ -129,7 +155,7 @@ class AssertableJson implements Arrayable
     }
 
     /**
-     * Create a new instance from a AssertableJsonString.
+     * Create a new instance from an AssertableJsonString.
      *
      * @param  \Illuminate\Testing\AssertableJsonString  $json
      * @return static

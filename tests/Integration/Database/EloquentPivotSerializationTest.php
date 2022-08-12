@@ -10,15 +10,10 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Schema;
 
-/**
- * @group integration
- */
 class EloquentPivotSerializationTest extends DatabaseTestCase
 {
-    protected function setUp(): void
+    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
-        parent::setUp();
-
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('email');

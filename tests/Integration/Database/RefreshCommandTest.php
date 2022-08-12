@@ -3,8 +3,9 @@
 namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Support\Facades\DB;
+use Orchestra\Testbench\TestCase;
 
-class RefreshCommandTest extends DatabaseTestCase
+class RefreshCommandTest extends TestCase
 {
     public function testRefreshWithoutRealpath()
     {
@@ -14,7 +15,7 @@ class RefreshCommandTest extends DatabaseTestCase
             '--path' => 'stubs/',
         ];
 
-        $this->migrate_refresh_with($options);
+        $this->migrateRefreshWith($options);
     }
 
     public function testRefreshWithRealpath()
@@ -24,11 +25,15 @@ class RefreshCommandTest extends DatabaseTestCase
             '--realpath' => true,
         ];
 
-        $this->migrate_refresh_with($options);
+        $this->migrateRefreshWith($options);
     }
 
-    private function migrate_refresh_with(array $options)
+    private function migrateRefreshWith(array $options)
     {
+        if ($this->app['config']->get('database.default') !== 'testing') {
+            $this->artisan('db:wipe', ['--drop-views' => true]);
+        }
+
         $this->beforeApplicationDestroyed(function () use ($options) {
             $this->artisan('migrate:rollback', $options);
         });

@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Mail;
 
-use Illuminate\Mail\Transport\ArrayTransport;
 use Orchestra\Testbench\TestCase;
+use Symfony\Component\Mailer\Transport\FailoverTransport;
 
 class MailFailoverTransportTest extends TestCase
 {
@@ -30,14 +30,8 @@ class MailFailoverTransportTest extends TestCase
             ],
         ]);
 
-        $transport = app('mailer')->getSwiftMailer()->getTransport();
-        $this->assertInstanceOf(\Swift_FailoverTransport::class, $transport);
-
-        $transports = $transport->getTransports();
-        $this->assertCount(2, $transports);
-        $this->assertInstanceOf(\Swift_SendmailTransport::class, $transports[0]);
-        $this->assertEquals('/usr/sbin/sendmail -bs', $transports[0]->getCommand());
-        $this->assertInstanceOf(ArrayTransport::class, $transports[1]);
+        $transport = app('mailer')->getSymfonyTransport();
+        $this->assertInstanceOf(FailoverTransport::class, $transport);
     }
 
     public function testGetFailoverTransportWithLaravel6StyleMailConfiguration()
@@ -51,13 +45,7 @@ class MailFailoverTransportTest extends TestCase
 
         $this->app['config']->set('mail.sendmail', '/usr/sbin/sendmail -bs');
 
-        $transport = app('mailer')->getSwiftMailer()->getTransport();
-        $this->assertInstanceOf(\Swift_FailoverTransport::class, $transport);
-
-        $transports = $transport->getTransports();
-        $this->assertCount(2, $transports);
-        $this->assertInstanceOf(\Swift_SendmailTransport::class, $transports[0]);
-        $this->assertEquals('/usr/sbin/sendmail -bs', $transports[0]->getCommand());
-        $this->assertInstanceOf(ArrayTransport::class, $transports[1]);
+        $transport = app('mailer')->getSymfonyTransport();
+        $this->assertInstanceOf(FailoverTransport::class, $transport);
     }
 }

@@ -5,7 +5,9 @@ namespace Illuminate\Queue\Console;
 use Illuminate\Console\Command;
 use Illuminate\Queue\Listener;
 use Illuminate\Queue\ListenerOptions;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'queue:listen')]
 class ListenCommand extends Command
 {
     /**
@@ -24,15 +26,6 @@ class ListenCommand extends Command
                             {--sleep=3 : Number of seconds to sleep when no job is available}
                             {--timeout=60 : The number of seconds a child process can run}
                             {--tries=1 : Number of times to attempt a job before logging it failed}';
-
-    /**
-     * The name of the console command.
-     *
-     * This name is used to identify the command during lazy loading.
-     *
-     * @var string|null
-     */
-    protected static $defaultName = 'queue:listen';
 
     /**
      * The console command description.
@@ -74,6 +67,8 @@ class ListenCommand extends Command
         $queue = $this->getQueue(
             $connection = $this->input->getArgument('connection')
         );
+
+        $this->components->info(sprintf('Processing jobs from the [%s] %s.', $queue, str('queue')->plural(explode(',', $queue))));
 
         $this->listener->listen(
             $connection, $queue, $this->gatherOptions()

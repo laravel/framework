@@ -2,16 +2,20 @@
 
 namespace Illuminate\Mail\Events;
 
-use Swift_Attachment;
+use Exception;
+use Illuminate\Mail\SentMessage;
 
+/**
+ * @property \Symfony\Component\Mime\Email $message
+ */
 class MessageSent
 {
     /**
-     * The Swift message instance.
+     * The message that was sent.
      *
-     * @var \Swift_Message
+     * @var \Illuminate\Mail\SentMessage
      */
-    public $message;
+    public $sent;
 
     /**
      * The message data.
@@ -23,14 +27,14 @@ class MessageSent
     /**
      * Create a new event instance.
      *
-     * @param  \Swift_Message  $message
+     * @param  \Illuminate\Mail\SentMessage  $message
      * @param  array  $data
      * @return void
      */
-    public function __construct($message, $data = [])
+    public function __construct(SentMessage $message, array $data = [])
     {
+        $this->sent = $message;
         $this->data = $data;
-        $this->message = $message;
     }
 
     /**
@@ -40,16 +44,14 @@ class MessageSent
      */
     public function __serialize()
     {
-        $hasAttachments = collect($this->message->getChildren())
-                                ->whereInstanceOf(Swift_Attachment::class)
-                                ->isNotEmpty();
+        $hasAttachments = collect($this->message->getAttachments())->isNotEmpty();
 
         return $hasAttachments ? [
-            'message' => base64_encode(serialize($this->message)),
+            'sent' => base64_encode(serialize($this->sent)),
             'data' => base64_encode(serialize($this->data)),
             'hasAttachments' => true,
         ] : [
-            'message' => $this->message,
+            'sent' => $this->sent,
             'data' => $this->data,
             'hasAttachments' => false,
         ];
@@ -64,11 +66,28 @@ class MessageSent
     public function __unserialize(array $data)
     {
         if (isset($data['hasAttachments']) && $data['hasAttachments'] === true) {
-            $this->message = unserialize(base64_decode($data['message']));
+            $this->sent = unserialize(base64_decode($data['sent']));
             $this->data = unserialize(base64_decode($data['data']));
         } else {
-            $this->message = $data['message'];
+            $this->sent = $data['sent'];
             $this->data = $data['data'];
         }
+    }
+
+    /**
+     * Dynamically get the original message.
+     *
+     * @param  string  $key
+     * @return mixed
+     *
+     * @throws \Exception
+     */
+    public function __get($key)
+    {
+        if ($key === 'message') {
+            return $this->sent->getOriginalMessage();
+        }
+
+        throw new Exception('Unable to access undefined property on '.__CLASS__.': '.$key);
     }
 }

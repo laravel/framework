@@ -36,6 +36,17 @@ class LogLoggerTest extends TestCase
         $writer->error('foo');
     }
 
+    public function testContextIsFlushed()
+    {
+        $writer = new Logger($monolog = m::mock(Monolog::class));
+        $writer->withContext(['bar' => 'baz']);
+        $writer->withoutContext();
+
+        $monolog->expects('error')->with('foo', []);
+
+        $writer->error('foo');
+    }
+
     public function testLoggerFiresEventsDispatcher()
     {
         $writer = new Logger($monolog = m::mock(Monolog::class), $events = new Dispatcher);

@@ -3,7 +3,7 @@
 namespace Illuminate\Log;
 
 use InvalidArgumentException;
-use Monolog\Logger as Monolog;
+use Monolog\Level;
 
 trait ParsesLogConfiguration
 {
@@ -13,14 +13,14 @@ trait ParsesLogConfiguration
      * @var array
      */
     protected $levels = [
-        'debug' => Monolog::DEBUG,
-        'info' => Monolog::INFO,
-        'notice' => Monolog::NOTICE,
-        'warning' => Monolog::WARNING,
-        'error' => Monolog::ERROR,
-        'critical' => Monolog::CRITICAL,
-        'alert' => Monolog::ALERT,
-        'emergency' => Monolog::EMERGENCY,
+        'debug' => Level::Debug,
+        'info' => Level::Info,
+        'notice' => Level::Notice,
+        'warning' => Level::Warning,
+        'error' => Level::Error,
+        'critical' => Level::Critical,
+        'alert' => Level::Alert,
+        'emergency' => Level::Emergency,
     ];
 
     /**
@@ -47,6 +47,23 @@ trait ParsesLogConfiguration
         }
 
         throw new InvalidArgumentException('Invalid log level.');
+    }
+
+    /**
+     * Parse the action level from the given configuration.
+     *
+     * @param  array  $config
+     * @return int
+     */
+    protected function actionLevel(array $config)
+    {
+        $level = $config['action_level'] ?? 'debug';
+
+        if (isset($this->levels[$level])) {
+            return $this->levels[$level];
+        }
+
+        throw new InvalidArgumentException('Invalid log action level.');
     }
 
     /**

@@ -16,9 +16,6 @@ use Illuminate\Support\Str;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class RateLimitedWithRedisTest extends TestCase
 {
     use InteractsWithRedis;

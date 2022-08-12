@@ -34,7 +34,8 @@ class KernelTest extends TestCase
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests::class,
             \Illuminate\Routing\Middleware\ThrottleRequests::class,
-            \Illuminate\Session\Middleware\AuthenticateSession::class,
+            \Illuminate\Routing\Middleware\ThrottleRequestsWithRedis::class,
+            \Illuminate\Contracts\Session\Middleware\AuthenticatesSessions::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \Illuminate\Auth\Middleware\Authorize::class,
         ], $kernel->getMiddlewarePriority());

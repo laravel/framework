@@ -13,6 +13,8 @@ class CacheMemcachedConnectorTest extends TestCase
     protected function tearDown(): void
     {
         m::close();
+
+        parent::tearDown();
     }
 
     public function testServersAreAddedCorrectly()
@@ -46,12 +48,11 @@ class CacheMemcachedConnectorTest extends TestCase
         $this->assertSame($result, $memcached);
     }
 
+    /**
+     * @requires extension memcached
+     */
     public function testServersAreAddedCorrectlyWithValidOptions()
     {
-        if (! class_exists('Memcached')) {
-            $this->markTestSkipped('Memcached module not installed');
-        }
-
         $validOptions = [
             Memcached::OPT_NO_BLOCK => true,
             Memcached::OPT_CONNECT_TIMEOUT => 2000,
@@ -70,12 +71,11 @@ class CacheMemcachedConnectorTest extends TestCase
         $this->assertSame($result, $memcached);
     }
 
+    /**
+     * @requires extension memcached
+     */
     public function testServersAreAddedCorrectlyWithSaslCredentials()
     {
-        if (! class_exists('Memcached')) {
-            $this->markTestSkipped('Memcached module not installed');
-        }
-
         $saslCredentials = ['foo', 'bar'];
 
         $memcached = $this->memcachedMockWithAddServer();

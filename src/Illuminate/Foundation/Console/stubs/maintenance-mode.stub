@@ -48,7 +48,7 @@ if (isset($_COOKIE['laravel_maintenance']) && isset($data['secret'])) {
     if (is_array($payload) &&
         is_numeric($payload['expires_at'] ?? null) &&
         isset($payload['mac']) &&
-        hash_equals(hash_hmac('SHA256', $payload['expires_at'], $data['secret']), $payload['mac']) &&
+        hash_equals(hash_hmac('sha256', $payload['expires_at'], $data['secret']), $payload['mac']) &&
         (int) $payload['expires_at'] >= time()) {
         return;
     }
@@ -67,6 +67,10 @@ http_response_code($data['status'] ?? 503);
 
 if (isset($data['retry'])) {
     header('Retry-After: '.$data['retry']);
+}
+
+if (isset($data['refresh'])) {
+    header('Refresh: '.$data['refresh']);
 }
 
 echo $data['template'];

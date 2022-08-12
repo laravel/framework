@@ -282,7 +282,9 @@ class Filesystem
 
         foreach ($paths as $path) {
             try {
-                if (! @unlink($path)) {
+                if (@unlink($path)) {
+                    clearstatcache(false, $path);
+                } else {
                     $success = false;
                 }
             } catch (ErrorException $e) {
@@ -476,6 +478,18 @@ class Filesystem
     }
 
     /**
+     * Determine if the given path is a directory that does not contain any other files or directories.
+     *
+     * @param  string  $directory
+     * @param  bool  $ignoreDotFiles
+     * @return bool
+     */
+    public function isEmptyDirectory($directory, $ignoreDotFiles = false)
+    {
+        return ! Finder::create()->ignoreDotFiles($ignoreDotFiles)->in($directory)->depth(0)->hasResults();
+    }
+
+    /**
      * Determine if the given path is readable.
      *
      * @param  string  $path
@@ -495,6 +509,20 @@ class Filesystem
     public function isWritable($path)
     {
         return is_writable($path);
+    }
+
+    /**
+     * Determine if two files are the same by comparing their hashes.
+     *
+     * @param  string  $firstFile
+     * @param  string  $secondFile
+     * @return bool
+     */
+    public function hasSameHash($firstFile, $secondFile)
+    {
+        $hash = @md5_file($firstFile);
+
+        return $hash && $hash === @md5_file($secondFile);
     }
 
     /**
@@ -657,10 +685,8 @@ class Filesystem
             // If the current items is just a regular file, we will just copy this to the new
             // location and keep looping. If for some reason the copy fails we'll bail out
             // and return false, so the developer is aware that the copy process failed.
-            else {
-                if (! $this->copy($item->getPathname(), $target)) {
-                    return false;
-                }
+            elseif (! $this->copy($item->getPathname(), $target)) {
+                return false;
             }
         }
 

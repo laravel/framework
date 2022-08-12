@@ -5,7 +5,7 @@ namespace Illuminate\Foundation\Bus;
 use Closure;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Queue\CallQueuedClosure;
-use Illuminate\Queue\SerializableClosure;
+use Laravel\SerializableClosure\SerializableClosure;
 
 class PendingChain
 {
@@ -91,7 +91,7 @@ class PendingChain
     }
 
     /**
-     * Set the desired delay for the chain.
+     * Set the desired delay in seconds for the chain.
      *
      * @param  \DateTimeInterface|\DateInterval|int|null  $delay
      * @return $this

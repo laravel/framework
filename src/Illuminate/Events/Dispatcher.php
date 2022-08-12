@@ -91,7 +91,7 @@ class Dispatcher implements DispatcherContract
         }
 
         foreach ((array) $events as $event) {
-            if (Str::contains($event, '*')) {
+            if (str_contains($event, '*')) {
                 $this->setupWildcardListen($event, $listener);
             } else {
                 $this->listeners[$event][] = $listener;
@@ -147,7 +147,7 @@ class Dispatcher implements DispatcherContract
      * Register an event and payload to be fired later.
      *
      * @param  string  $event
-     * @param  array  $payload
+     * @param  object|array  $payload
      * @return void
      */
     public function push($event, $payload = [])
@@ -612,22 +612,24 @@ class Dispatcher implements DispatcherContract
      * Propagate listener options to the job.
      *
      * @param  mixed  $listener
-     * @param  mixed  $job
+     * @param  \Illuminate\Events\CallQueuedListener  $job
      * @return mixed
      */
     protected function propagateListenerOptions($listener, $job)
     {
         return tap($job, function ($job) use ($listener) {
+            $data = array_values($job->data);
+
             $job->afterCommit = property_exists($listener, 'afterCommit') ? $listener->afterCommit : null;
-            $job->backoff = method_exists($listener, 'backoff') ? $listener->backoff() : ($listener->backoff ?? null);
+            $job->backoff = method_exists($listener, 'backoff') ? $listener->backoff(...$data) : ($listener->backoff ?? null);
             $job->maxExceptions = $listener->maxExceptions ?? null;
-            $job->retryUntil = method_exists($listener, 'retryUntil') ? $listener->retryUntil() : null;
+            $job->retryUntil = method_exists($listener, 'retryUntil') ? $listener->retryUntil(...$data) : null;
             $job->shouldBeEncrypted = $listener instanceof ShouldBeEncrypted;
             $job->timeout = $listener->timeout ?? null;
             $job->tries = $listener->tries ?? null;
 
             $job->through(array_merge(
-                method_exists($listener, 'middleware') ? $listener->middleware() : [],
+                method_exists($listener, 'middleware') ? $listener->middleware(...$data) : [],
                 $listener->middleware ?? []
             ));
         });
@@ -641,7 +643,7 @@ class Dispatcher implements DispatcherContract
      */
     public function forget($event)
     {
-        if (Str::contains($event, '*')) {
+        if (str_contains($event, '*')) {
             unset($this->wildcards[$event]);
         } else {
             unset($this->listeners[$event]);
@@ -662,7 +664,7 @@ class Dispatcher implements DispatcherContract
     public function forgetPushed()
     {
         foreach ($this->listeners as $key => $value) {
-            if (Str::endsWith($key, '_pushed')) {
+            if (str_ends_with($key, '_pushed')) {
                 $this->forget($key);
             }
         }

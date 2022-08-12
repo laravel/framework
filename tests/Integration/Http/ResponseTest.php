@@ -4,11 +4,9 @@ namespace Illuminate\Tests\Integration\Http;
 
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Route;
+use JsonSerializable;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class ResponseTest extends TestCase
 {
     public function testResponseWithInvalidJsonThrowsException()
@@ -17,7 +15,7 @@ class ResponseTest extends TestCase
         $this->expectExceptionMessage('Malformed UTF-8 characters, possibly incorrectly encoded');
 
         Route::get('/response', function () {
-            return (new Response())->setContent(new class implements \JsonSerializable
+            return (new Response())->setContent(new class implements JsonSerializable
             {
                 public function jsonSerialize(): string
                 {

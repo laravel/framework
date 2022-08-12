@@ -8,9 +8,6 @@ use Illuminate\Console\Scheduling\EventMutex;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class CallbackEventTest extends TestCase
 {
     protected function tearDown(): void
@@ -58,7 +55,7 @@ class CallbackEventTest extends TestCase
         $success = null;
 
         $event = (new CallbackEvent(m::mock(EventMutex::class), function () {
-            throw new \Exception;
+            throw new Exception;
         }))->onSuccess(function () use (&$success) {
             $success = true;
         })->onFailure(function () use (&$success) {

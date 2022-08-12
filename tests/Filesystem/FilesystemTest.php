@@ -19,7 +19,7 @@ class FilesystemTest extends TestCase
      */
     public static function setUpTempDir()
     {
-        self::$tempDir = __DIR__.'/tmp';
+        self::$tempDir = sys_get_temp_dir().'/tmp';
         mkdir(self::$tempDir);
     }
 
@@ -97,12 +97,11 @@ class FilesystemTest extends TestCase
         $this->assertStringEqualsFile($tempFile, 'Hello Taylor');
     }
 
+    /**
+     * @requires OS Linux|Darwin
+     */
     public function testReplaceWhenUnixSymlinkExists()
     {
-        if (windows_os()) {
-            $this->markTestSkipped('The operating system is Windows');
-        }
-
         $tempFile = self::$tempDir.'/file.txt';
         $symlinkDir = self::$tempDir.'/symlink_dir';
         $symlink = "{$symlinkDir}/symlink.txt";
@@ -451,6 +450,29 @@ class FilesystemTest extends TestCase
         $this->assertFalse($files->isReadable(self::$tempDir.'/doesnotexist.txt'));
     }
 
+    public function testIsDirEmpty()
+    {
+        mkdir(self::$tempDir.'/foo-dir');
+        file_put_contents(self::$tempDir.'/foo-dir/.hidden', 'foo');
+        mkdir(self::$tempDir.'/bar-dir');
+        file_put_contents(self::$tempDir.'/bar-dir/foo.txt', 'foo');
+        mkdir(self::$tempDir.'/baz-dir');
+        mkdir(self::$tempDir.'/baz-dir/.hidden');
+        mkdir(self::$tempDir.'/quz-dir');
+        mkdir(self::$tempDir.'/quz-dir/not-hidden');
+
+        $files = new Filesystem;
+
+        $this->assertTrue($files->isEmptyDirectory(self::$tempDir.'/foo-dir', true));
+        $this->assertFalse($files->isEmptyDirectory(self::$tempDir.'/foo-dir'));
+        $this->assertFalse($files->isEmptyDirectory(self::$tempDir.'/bar-dir', true));
+        $this->assertFalse($files->isEmptyDirectory(self::$tempDir.'/bar-dir'));
+        $this->assertTrue($files->isEmptyDirectory(self::$tempDir.'/baz-dir', true));
+        $this->assertFalse($files->isEmptyDirectory(self::$tempDir.'/baz-dir'));
+        $this->assertFalse($files->isEmptyDirectory(self::$tempDir.'/quz-dir', true));
+        $this->assertFalse($files->isEmptyDirectory(self::$tempDir.'/quz-dir'));
+    }
+
     public function testGlobFindsFiles()
     {
         file_put_contents(self::$tempDir.'/foo.txt', 'foo');
@@ -493,14 +515,10 @@ class FilesystemTest extends TestCase
 
     /**
      * @requires extension pcntl
-     * @requires function pcntl_fork
+     * @requires OS Linux|Darwin
      */
     public function testSharedGet()
     {
-        if (PHP_OS === 'Darwin') {
-            $this->markTestSkipped('The operating system is MacOS.');
-        }
-
         $content = str_repeat('123456', 1000000);
         $result = 1;
 
@@ -547,6 +565,21 @@ class FilesystemTest extends TestCase
         $filesystem->copy(self::$tempDir.'/text/foo.txt', self::$tempDir.'/text/foo2.txt');
         $this->assertFileExists(self::$tempDir.'/text/foo2.txt');
         $this->assertEquals($data, file_get_contents(self::$tempDir.'/text/foo2.txt'));
+    }
+
+    public function testHasSameHashChecksFileHashes()
+    {
+        $filesystem = new Filesystem;
+
+        mkdir(self::$tempDir.'/text');
+        file_put_contents(self::$tempDir.'/text/foo.txt', 'contents');
+        file_put_contents(self::$tempDir.'/text/foo2.txt', 'contents');
+        file_put_contents(self::$tempDir.'/text/foo3.txt', 'invalid');
+
+        $this->assertTrue($filesystem->hasSameHash(self::$tempDir.'/text/foo.txt', self::$tempDir.'/text/foo2.txt'));
+        $this->assertFalse($filesystem->hasSameHash(self::$tempDir.'/text/foo.txt', self::$tempDir.'/text/foo3.txt'));
+        $this->assertFalse($filesystem->hasSameHash(self::$tempDir.'/text/foo4.txt', self::$tempDir.'/text/foo.txt'));
+        $this->assertFalse($filesystem->hasSameHash(self::$tempDir.'/text/foo.txt', self::$tempDir.'/text/foo4.txt'));
     }
 
     public function testIsFileChecksFilesProperly()

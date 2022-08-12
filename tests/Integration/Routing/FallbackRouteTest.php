@@ -5,9 +5,6 @@ namespace Illuminate\Tests\Integration\Routing;
 use Illuminate\Support\Facades\Route;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class FallbackRouteTest extends TestCase
 {
     public function testBasicFallback()

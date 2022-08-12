@@ -9,9 +9,6 @@ use Illuminate\Support\Facades\Route;
 use Orchestra\Testbench\TestCase;
 use Throwable;
 
-/**
- * @group integration
- */
 class ThrottleRequestsWithRedisTest extends TestCase
 {
     use InteractsWithRedis;

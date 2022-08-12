@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Validation;
 
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Validation\Rule as RuleContract;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
@@ -104,35 +105,34 @@ class ValidationPasswordRuleTest extends TestCase
         $this->passes(Password::min(2)->symbols(), ['n^d', 'd^!', 'âè$', '金廿土弓竹中；']);
     }
 
-    public function testUncompromised()
-    {
-        $this->fails(Password::min(2)->uncompromised(), [
-            '123456',
-            'password',
-            'welcome',
-            'ninja',
-            'abc123',
-            '123456789',
-            '12345678',
-            'nuno',
-        ], [
-            'The given my password has appeared in a data leak. Please choose a different my password.',
-        ]);
+    // public function testUncompromised()
+    // {
+    //     $this->fails(Password::min(2)->uncompromised(), [
+    //         '123456',
+    //         'password',
+    //         'welcome',
+    //         'abc123',
+    //         '123456789',
+    //         '12345678',
+    //         'nuno',
+    //     ], [
+    //         'The given my password has appeared in a data leak. Please choose a different my password.',
+    //     ]);
 
-        $this->passes(Password::min(2)->uncompromised(9999999), [
-            'nuno',
-        ]);
+    //     $this->passes(Password::min(2)->uncompromised(9999999), [
+    //         'nuno',
+    //     ]);
 
-        $this->passes(Password::min(2)->uncompromised(), [
-            '手田日尸Ｚ難金木水口火女月土廿卜竹弓一十山',
-            '!p8VrB',
-            '&xe6VeKWF#n4',
-            '%HurHUnw7zM!',
-            'rundeliekend',
-            '7Z^k5EvqQ9g%c!Jt9$ufnNpQy#Kf',
-            'NRs*Gz2@hSmB$vVBSPDfqbRtEzk4nF7ZAbM29VMW$BPD%b2U%3VmJAcrY5eZGVxP%z%apnwSX',
-        ]);
-    }
+    //     $this->passes(Password::min(2)->uncompromised(), [
+    //         '手田日尸Ｚ難金木水口火女月土廿卜竹弓一十山',
+    //         '!p8VrB',
+    //         '&xe6VeKWF#n4',
+    //         '%HurHUnw7zM!',
+    //         'rundeliekend',
+    //         '7Z^k5EvqQ9g%c!Jt9$ufnNpQy#Kf',
+    //         'NRs*Gz2@hSmB$vVBSPDfqbRtEzk4nF7ZAbM29VMW$BPD%b2U%3VmJAcrY5eZGVxP%z%apnwSX',
+    //     ]);
+    // }
 
     public function testMessagesOrder()
     {
@@ -144,8 +144,15 @@ class ValidationPasswordRuleTest extends TestCase
             'validation.required',
         ]);
 
-        $this->fails($makeRules(), ['foo', 'azdazd', '1231231'], [
+        $this->fails($makeRules(), ['foo', 'azdazd'], [
             'validation.min.string',
+            'The my password must contain at least one uppercase and one lowercase letter.',
+            'The my password must contain at least one number.',
+        ]);
+
+        $this->fails($makeRules(), ['1231231'], [
+            'validation.min.string',
+            'The my password must contain at least one uppercase and one lowercase letter.',
         ]);
 
         $this->fails($makeRules(), ['4564654564564'], [
@@ -165,8 +172,15 @@ class ValidationPasswordRuleTest extends TestCase
 
         $this->passes($makeRules(), [null]);
 
-        $this->fails($makeRules(), ['foo', 'azdazd', '1231231'], [
+        $this->fails($makeRules(), ['foo', 'azdazd'], [
             'validation.min.string',
+            'The my password must contain at least one symbol.',
+        ]);
+
+        $this->fails($makeRules(), ['1231231'], [
+            'validation.min.string',
+            'The my password must contain at least one letter.',
+            'The my password must contain at least one symbol.',
         ]);
 
         $this->fails($makeRules(), ['aaaaaaaaa', 'TJQSJQSIUQHS'], [
@@ -230,6 +244,64 @@ class ValidationPasswordRuleTest extends TestCase
         $this->expectExceptionMessage('given callback should be callable');
 
         Password::defaults('required|password');
+    }
+
+    public function testItPassesWithValidDataIfTheSameValidationRulesAreReused()
+    {
+        $rules = [
+            'password' => Password::default(),
+        ];
+
+        $v = new Validator(
+            resolve('translator'),
+            ['password' => '1234'],
+            $rules
+        );
+
+        $this->assertFalse($v->passes());
+
+        $v1 = new Validator(
+            resolve('translator'),
+            ['password' => '12341234'],
+            $rules
+        );
+
+        $this->assertTrue($v1->passes());
+    }
+
+    public function testPassesWithCustomRules()
+    {
+        $closureRule = function ($attribute, $value, $fail) {
+            if ($value !== 'aa') {
+                $fail('Custom rule closure failed');
+            }
+        };
+
+        $ruleObject = new class implements RuleContract
+        {
+            public function passes($attribute, $value)
+            {
+                return $value === 'aa';
+            }
+
+            public function message()
+            {
+                return 'Custom rule object failed';
+            }
+        };
+
+        $this->passes(Password::min(2)->rules($closureRule), ['aa']);
+        $this->passes(Password::min(2)->rules([$closureRule]), ['aa']);
+        $this->passes(Password::min(2)->rules($ruleObject), ['aa']);
+        $this->passes(Password::min(2)->rules([$closureRule, $ruleObject]), ['aa']);
+
+        $this->fails(Password::min(2)->rules($closureRule), ['ab'], [
+            'Custom rule closure failed',
+        ]);
+
+        $this->fails(Password::min(2)->rules($ruleObject), ['ab'], [
+            'Custom rule object failed',
+        ]);
     }
 
     protected function passes($rule, $values)

@@ -55,6 +55,16 @@ class TranslationTranslatorTest extends TestCase
         $this->assertSame('foo', $t->get('foo::bar.foo'));
     }
 
+    public function testGetMethodProperlyLoadsAndRetrievesArrayItem()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'bar', 'foo')->andReturn(['foo' => 'foo', 'baz' => 'breeze :foo', 'qux' => ['tree :foo', 'breeze :foo', 'beep' => ['rock' => 'tree :foo']]]);
+        $this->assertEquals(['foo' => 'foo', 'baz' => 'breeze bar', 'qux' => ['tree bar', 'breeze bar', 'beep' => ['rock' => 'tree bar']]], $t->get('foo::bar', ['foo' => 'bar'], 'en'));
+        $this->assertSame('breeze bar', $t->get('foo::bar.baz', ['foo' => 'bar'], 'en'));
+        $this->assertSame('foo', $t->get('foo::bar.foo'));
+    }
+
     public function testGetMethodForNonExistingReturnsSameKey()
     {
         $t = new Translator($this->getLoader(), 'en');
@@ -78,8 +88,8 @@ class TranslationTranslatorTest extends TestCase
     {
         $t = $this->getMockBuilder(Translator::class)->onlyMethods([])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
         $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
-        $t->getLoader()->shouldReceive('load')->once()->with('en', 'bar', 'foo')->andReturn(['foo' => 'foo', 'baz' => 'breeze :Foo :BAR']);
-        $this->assertSame('breeze Bar FOO', $t->get('foo::bar.baz', ['foo' => 'bar', 'bar' => 'foo'], 'en'));
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'bar', 'foo')->andReturn(['foo' => 'foo', 'baz' => 'breeze :0 :Foo :BAR']);
+        $this->assertSame('breeze john Bar FOO', $t->get('foo::bar.baz', ['john', 'foo' => 'bar', 'bar' => 'foo'], 'en'));
         $this->assertSame('foo', $t->get('foo::bar.foo'));
     }
 
@@ -150,6 +160,13 @@ class TranslationTranslatorTest extends TestCase
         $this->assertSame('bar onetwo three', $t->get('foo :i:c :u', ['i' => 'one', 'c' => 'two', 'u' => 'three']));
     }
 
+    public function testGetJsonHasAtomicReplacements()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn(['Hello :foo!' => 'Hello :foo!']);
+        $this->assertSame('Hello baz:bar!', $t->get('Hello :foo!', ['foo' => 'baz:bar', 'bar' => 'abcdef']));
+    }
+
     public function testGetJsonReplacesForAssociativeInput()
     {
         $t = new Translator($this->getLoader(), 'en');
@@ -194,6 +211,28 @@ class TranslationTranslatorTest extends TestCase
         $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
         $t->getLoader()->shouldReceive('load')->once()->with('en', 'foo :message', '*')->andReturn([]);
         $this->assertSame('foo baz', $t->get('foo :message', ['message' => 'baz']));
+    }
+
+    public function testEmptyFallbacks()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'foo :message', '*')->andReturn([]);
+        $this->assertSame('foo ', $t->get('foo :message', ['message' => null]));
+    }
+
+    public function testDetermineLocalesUsingMethod()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+        $t->determineLocalesUsing(function ($locales) {
+            $this->assertSame(['en'], $locales);
+
+            return ['en', 'lz'];
+        });
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'foo', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('lz', 'foo', '*')->andReturn([]);
+        $this->assertSame('foo', $t->get('foo'));
     }
 
     protected function getLoader()

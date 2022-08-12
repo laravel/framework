@@ -5,11 +5,9 @@ namespace Illuminate\Database\Eloquent;
 use BadMethodCallException;
 use Closure;
 use Exception;
-use Illuminate\Contracts\Database\Query\Builder as BuilderContract;
+use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Concerns\BuildsQueries;
-use Illuminate\Database\Concerns\ExplainsQueries;
-use Illuminate\Database\Eloquent\Concerns\DecoratesQueryBuilder;
 use Illuminate\Database\Eloquent\Concerns\QueriesRelationships;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -24,10 +22,14 @@ use ReflectionMethod;
 
 /**
  * @property-read HigherOrderBuilderProxy $orWhere
+ * @property-read HigherOrderBuilderProxy $whereNot
+ * @property-read HigherOrderBuilderProxy $orWhereNot
+ *
+ * @mixin \Illuminate\Database\Query\Builder
  */
 class Builder implements BuilderContract
 {
-    use BuildsQueries, DecoratesQueryBuilder, ExplainsQueries, ForwardsCalls, QueriesRelationships {
+    use BuildsQueries, ForwardsCalls, QueriesRelationships {
         BuildsQueries::sole as baseSole;
     }
 
@@ -72,6 +74,44 @@ class Builder implements BuilderContract
      * @var \Closure
      */
     protected $onDelete;
+
+    /**
+     * The properties that should be returned from query builder.
+     *
+     * @var string[]
+     */
+    protected $propertyPassthru = [
+        'from',
+    ];
+
+    /**
+     * The methods that should be returned from query builder.
+     *
+     * @var string[]
+     */
+    protected $passthru = [
+        'aggregate',
+        'average',
+        'avg',
+        'count',
+        'dd',
+        'doesntExist',
+        'dump',
+        'exists',
+        'explain',
+        'getBindings',
+        'getConnection',
+        'getGrammar',
+        'insert',
+        'insertGetId',
+        'insertOrIgnore',
+        'insertUsing',
+        'max',
+        'min',
+        'raw',
+        'sum',
+        'toSql',
+    ];
 
     /**
      * Applied global scopes.
@@ -258,7 +298,7 @@ class Builder implements BuilderContract
      */
     public function firstWhere($column, $operator = null, $value = null, $boolean = 'and')
     {
-        return $this->where($column, $operator, $value, $boolean)->first();
+        return $this->where(...func_get_args())->first();
     }
 
     /**
@@ -276,6 +316,33 @@ class Builder implements BuilderContract
         );
 
         return $this->where($column, $operator, $value, 'or');
+    }
+
+    /**
+     * Add a basic "where not" clause to the query.
+     *
+     * @param  \Closure|string|array|\Illuminate\Database\Query\Expression  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereNot($column, $operator = null, $value = null, $boolean = 'and')
+    {
+        return $this->where($column, $operator, $value, $boolean.' not');
+    }
+
+    /**
+     * Add an "or where not" clause to the query.
+     *
+     * @param  \Closure|array|string|\Illuminate\Database\Query\Expression  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function orWhereNot($column, $operator = null, $value = null)
+    {
+        return $this->whereNot($column, $operator, $value, 'or');
     }
 
     /**
@@ -351,7 +418,7 @@ class Builder implements BuilderContract
      * Find a model by its primary key.
      *
      * @param  mixed  $id
-     * @param  array  $columns
+     * @param  array|string  $columns
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static[]|static|null
      */
     public function find($id, $columns = ['*'])
@@ -367,7 +434,7 @@ class Builder implements BuilderContract
      * Find multiple models by their primary keys.
      *
      * @param  \Illuminate\Contracts\Support\Arrayable|array  $ids
-     * @param  array  $columns
+     * @param  array|string  $columns
      * @return \Illuminate\Database\Eloquent\Collection
      */
     public function findMany($ids, $columns = ['*'])
@@ -385,10 +452,10 @@ class Builder implements BuilderContract
      * Find a model by its primary key or throw an exception.
      *
      * @param  mixed  $id
-     * @param  array  $columns
+     * @param  array|string  $columns
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static|static[]
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<\Illuminate\Database\Eloquent\Model>
      */
     public function findOrFail($id, $columns = ['*'])
     {
@@ -397,23 +464,29 @@ class Builder implements BuilderContract
         $id = $id instanceof Arrayable ? $id->toArray() : $id;
 
         if (is_array($id)) {
-            if (count($result) === count(array_unique($id))) {
-                return $result;
+            if (count($result) !== count(array_unique($id))) {
+                throw (new ModelNotFoundException)->setModel(
+                    get_class($this->model), array_diff($id, $result->modelKeys())
+                );
             }
-        } elseif (! is_null($result)) {
+
             return $result;
         }
 
-        throw (new ModelNotFoundException)->setModel(
-            get_class($this->model), $id
-        );
+        if (is_null($result)) {
+            throw (new ModelNotFoundException)->setModel(
+                get_class($this->model), $id
+            );
+        }
+
+        return $result;
     }
 
     /**
      * Find a model by its primary key or return fresh model instance.
      *
      * @param  mixed  $id
-     * @param  array  $columns
+     * @param  array|string  $columns
      * @return \Illuminate\Database\Eloquent\Model|static
      */
     public function findOrNew($id, $columns = ['*'])
@@ -423,6 +496,29 @@ class Builder implements BuilderContract
         }
 
         return $this->newModelInstance();
+    }
+
+    /**
+     * Find a model by its primary key or call a callback.
+     *
+     * @param  mixed  $id
+     * @param  \Closure|array|string  $columns
+     * @param  \Closure|null  $callback
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static[]|static|mixed
+     */
+    public function findOr($id, $columns = ['*'], Closure $callback = null)
+    {
+        if ($columns instanceof Closure) {
+            $callback = $columns;
+
+            $columns = ['*'];
+        }
+
+        if (! is_null($model = $this->find($id, $columns))) {
+            return $model;
+        }
+
+        return $callback();
     }
 
     /**
@@ -476,10 +572,10 @@ class Builder implements BuilderContract
     /**
      * Execute the query and get the first result or throw an exception.
      *
-     * @param  array  $columns
+     * @param  array|string  $columns
      * @return \Illuminate\Database\Eloquent\Model|static
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<\Illuminate\Database\Eloquent\Model>
      */
     public function firstOrFail($columns = ['*'])
     {
@@ -493,7 +589,7 @@ class Builder implements BuilderContract
     /**
      * Execute the query and get the first result or call a callback.
      *
-     * @param  \Closure|array  $columns
+     * @param  \Closure|array|string  $columns
      * @param  \Closure|null  $callback
      * @return \Illuminate\Database\Eloquent\Model|static|mixed
      */
@@ -518,7 +614,7 @@ class Builder implements BuilderContract
      * @param  array|string  $columns
      * @return \Illuminate\Database\Eloquent\Model
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<\Illuminate\Database\Eloquent\Model>
      * @throws \Illuminate\Database\MultipleRecordsFoundException
      */
     public function sole($columns = ['*'])
@@ -541,6 +637,33 @@ class Builder implements BuilderContract
         if ($result = $this->first([$column])) {
             return $result->{Str::afterLast($column, '.')};
         }
+    }
+
+    /**
+     * Get a single column's value from the first result of a query if it's the sole matching record.
+     *
+     * @param  string|\Illuminate\Database\Query\Expression  $column
+     * @return mixed
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<\Illuminate\Database\Eloquent\Model>
+     * @throws \Illuminate\Database\MultipleRecordsFoundException
+     */
+    public function soleValue($column)
+    {
+        return $this->sole([$column])->{Str::afterLast($column, '.')};
+    }
+
+    /**
+     * Get a single column's value from the first result of the query or throw an exception.
+     *
+     * @param  string|\Illuminate\Database\Query\Expression  $column
+     * @return mixed
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<\Illuminate\Database\Eloquent\Model>
+     */
+    public function valueOrFail($column)
+    {
+        return $this->firstOrFail([$column])->{Str::afterLast($column, '.')};
     }
 
     /**
@@ -588,7 +711,7 @@ class Builder implements BuilderContract
             // For nested eager loads we'll skip loading them here and they will be set as an
             // eager load on the query to retrieve the relation so that they will be eager
             // loaded on that query, because that is where they get hydrated as models.
-            if (strpos($name, '.') === false) {
+            if (! str_contains($name, '.')) {
                 $models = $this->eagerLoadRelation($models, $name, $constraints);
             }
         }
@@ -686,7 +809,7 @@ class Builder implements BuilderContract
      */
     protected function isNestedUnder($relation, $name)
     {
-        return Str::contains($name, '.') && Str::startsWith($name, $relation.'.');
+        return str_contains($name, '.') && str_starts_with($name, $relation.'.');
     }
 
     /**
@@ -741,8 +864,8 @@ class Builder implements BuilderContract
     /**
      * Paginate the given query.
      *
-     * @param  int|null  $perPage
-     * @param  array  $columns
+     * @param  int|null|\Closure  $perPage
+     * @param  array|string  $columns
      * @param  string  $pageName
      * @param  int|null  $page
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
@@ -753,11 +876,16 @@ class Builder implements BuilderContract
     {
         $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
-        $perPage = $perPage ?: $this->model->getPerPage();
+        $total = $this->toBase()->getCountForPagination();
 
-        $results = ($total = $this->toBase()->getCountForPagination())
-                                    ? $this->forPage($page, $perPage)->get($columns)
-                                    : $this->model->newCollection();
+        $perPage = ($perPage instanceof Closure
+            ? $perPage($total)
+            : $perPage
+        ) ?: $this->model->getPerPage();
+
+        $results = $total
+            ? $this->forPage($page, $perPage)->get($columns)
+            : $this->model->newCollection();
 
         return $this->paginator($results, $total, $perPage, $page, [
             'path' => Paginator::resolveCurrentPath(),
@@ -769,7 +897,7 @@ class Builder implements BuilderContract
      * Paginate the given query into a simple paginator.
      *
      * @param  int|null  $perPage
-     * @param  array  $columns
+     * @param  array|string  $columns
      * @param  string  $pageName
      * @param  int|null  $page
      * @return \Illuminate\Contracts\Pagination\Paginator
@@ -795,7 +923,7 @@ class Builder implements BuilderContract
      * Paginate the given query into a cursor paginator.
      *
      * @param  int|null  $perPage
-     * @param  array  $columns
+     * @param  array|string  $columns
      * @param  string  $cursorName
      * @param  \Illuminate\Pagination\Cursor|string|null  $cursor
      * @return \Illuminate\Contracts\Pagination\CursorPaginator
@@ -815,9 +943,7 @@ class Builder implements BuilderContract
      */
     protected function ensureOrderForCursorPagination($shouldReverse = false)
     {
-        $orders = collect($this->query->orders);
-
-        if ($orders->count() === 0) {
+        if (empty($this->query->orders) && empty($this->query->unionOrders)) {
             $this->enforceOrderBy();
         }
 
@@ -827,6 +953,10 @@ class Builder implements BuilderContract
 
                 return $order;
             })->toArray();
+        }
+
+        if ($this->query->unionOrders) {
+            return collect($this->query->unionOrders);
         }
 
         return collect($this->query->orders);
@@ -952,7 +1082,7 @@ class Builder implements BuilderContract
 
         $qualifiedColumn = end($segments).'.'.$column;
 
-        $values[$qualifiedColumn] = $values[$column];
+        $values[$qualifiedColumn] = Arr::get($values, $qualifiedColumn, $values[$column]);
 
         unset($values[$column]);
 
@@ -1144,7 +1274,7 @@ class Builder implements BuilderContract
         $originalWhereCount = is_null($query->wheres)
                     ? 0 : count($query->wheres);
 
-        $result = $scope(...array_values($parameters)) ?? $this;
+        $result = $scope(...$parameters) ?? $this;
 
         if (count((array) $query->wheres) > $originalWhereCount) {
             $this->addNewWheresWithinGroup($query, $originalWhereCount);
@@ -1300,22 +1430,13 @@ class Builder implements BuilderContract
      */
     protected function parseWithRelations(array $relations)
     {
+        if ($relations === []) {
+            return [];
+        }
+
         $results = [];
 
-        foreach ($relations as $name => $constraints) {
-            // If the "name" value is a numeric key, we can assume that no constraints
-            // have been specified. We will just put an empty Closure there so that
-            // we can treat these all the same while we are looping through them.
-            if (is_numeric($name)) {
-                $name = $constraints;
-
-                [$name, $constraints] = Str::contains($name, ':')
-                            ? $this->createSelectWithConstraint($name)
-                            : [$name, static function () {
-                                //
-                            }];
-            }
-
+        foreach ($this->prepareNestedWithRelationships($relations) as $name => $constraints) {
             // We need to separate out any nested includes, which allows the developers
             // to load deep relationships using "dots" without stating each level of
             // the relationship with its own key in the array of eager-load names.
@@ -1328,6 +1449,91 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Prepare nested with relationships.
+     *
+     * @param  array  $relations
+     * @param  string  $prefix
+     * @return array
+     */
+    protected function prepareNestedWithRelationships($relations, $prefix = '')
+    {
+        $preparedRelationships = [];
+
+        if ($prefix !== '') {
+            $prefix .= '.';
+        }
+
+        // If any of the relationships are formatted with the [$attribute => array()]
+        // syntax, we shall loop over the nested relations and prepend each key of
+        // this array while flattening into the traditional dot notation format.
+        foreach ($relations as $key => $value) {
+            if (! is_string($key) || ! is_array($value)) {
+                continue;
+            }
+
+            [$attribute, $attributeSelectConstraint] = $this->parseNameAndAttributeSelectionConstraint($key);
+
+            $preparedRelationships = array_merge(
+                $preparedRelationships,
+                ["{$prefix}{$attribute}" => $attributeSelectConstraint],
+                $this->prepareNestedWithRelationships($value, "{$prefix}{$attribute}"),
+            );
+
+            unset($relations[$key]);
+        }
+
+        // We now know that the remaining relationships are in a dot notation format
+        // and may be a string or Closure. We'll loop over them and ensure all of
+        // the present Closures are merged + strings are made into constraints.
+        foreach ($relations as $key => $value) {
+            if (is_numeric($key) && is_string($value)) {
+                [$key, $value] = $this->parseNameAndAttributeSelectionConstraint($value);
+            }
+
+            $preparedRelationships[$prefix.$key] = $this->combineConstraints([
+                $value,
+                $preparedRelationships[$prefix.$key] ?? static function () {
+                    //
+                },
+            ]);
+        }
+
+        return $preparedRelationships;
+    }
+
+    /**
+     * Combine an array of constraints into a single constraint.
+     *
+     * @param  array  $constraints
+     * @return \Closure
+     */
+    protected function combineConstraints(array $constraints)
+    {
+        return function ($builder) use ($constraints) {
+            foreach ($constraints as $constraint) {
+                $builder = $constraint($builder) ?? $builder;
+            }
+
+            return $builder;
+        };
+    }
+
+    /**
+     * Parse the attribute select constraints from the name.
+     *
+     * @param  string  $name
+     * @return array
+     */
+    protected function parseNameAndAttributeSelectionConstraint($name)
+    {
+        return str_contains($name, ':')
+            ? $this->createSelectWithConstraint($name)
+            : [$name, static function () {
+                //
+            }];
+    }
+
+    /**
      * Create a constraint to select the given columns for the relation.
      *
      * @param  string  $name
@@ -1337,7 +1543,7 @@ class Builder implements BuilderContract
     {
         return [explode(':', $name)[0], static function ($query) use ($name) {
             $query->select(array_map(static function ($column) use ($query) {
-                if (Str::contains($column, '.')) {
+                if (str_contains($column, '.')) {
                     return $column;
                 }
 
@@ -1442,6 +1648,29 @@ class Builder implements BuilderContract
         $this->eagerLoad = $eagerLoad;
 
         return $this;
+    }
+
+    /**
+     * Indicate that the given relationships should not be eagerly loaded.
+     *
+     * @param  array  $relations
+     * @return $this
+     */
+    public function withoutEagerLoad(array $relations)
+    {
+        $relations = array_diff(array_keys($this->model->getRelations()), $relations);
+
+        return $this->with($relations);
+    }
+
+    /**
+     * Flush the relationships being eagerly loaded.
+     *
+     * @return $this
+     */
+    public function withoutEagerLoads()
+    {
+        return $this->setEagerLoads([]);
     }
 
     /**
@@ -1555,8 +1784,12 @@ class Builder implements BuilderContract
      */
     public function __get($key)
     {
-        if ($key === 'orWhere') {
+        if (in_array($key, ['orWhere', 'whereNot', 'orWhereNot'])) {
             return new HigherOrderBuilderProxy($this, $key);
+        }
+
+        if (in_array($key, $this->propertyPassthru)) {
+            return $this->toBase()->{$key};
         }
 
         throw new Exception("Property [{$key}] does not exist on the Eloquent builder instance.");
@@ -1595,6 +1828,10 @@ class Builder implements BuilderContract
 
         if ($this->hasNamedScope($method)) {
             return $this->callNamedScope($method, $parameters);
+        }
+
+        if (in_array($method, $this->passthru)) {
+            return $this->toBase()->{$method}(...$parameters);
         }
 
         $this->forwardCallTo($this->query, $method, $parameters);

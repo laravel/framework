@@ -58,7 +58,7 @@ abstract class Queue
     }
 
     /**
-     * Push a new job onto the queue after a delay.
+     * Push a new job onto a specific queue after (n) seconds.
      *
      * @param  string  $queue
      * @param  \DateTimeInterface|\DateInterval|int  $delay
@@ -102,9 +102,9 @@ abstract class Queue
             $job = CallQueuedClosure::create($job);
         }
 
-        $payload = json_encode($this->createPayloadArray($job, $queue, $data));
+        $payload = json_encode($this->createPayloadArray($job, $queue, $data), \JSON_UNESCAPED_UNICODE);
 
-        if (JSON_ERROR_NONE !== json_last_error()) {
+        if (json_last_error() !== JSON_ERROR_NONE) {
             throw new InvalidPayloadException(
                 'Unable to JSON encode payload. Error code: '.json_last_error()
             );
@@ -189,7 +189,11 @@ abstract class Queue
             return;
         }
 
-        return collect(Arr::wrap($job->backoff ?? $job->backoff()))
+        if (is_null($backoff = $job->backoff ?? $job->backoff())) {
+            return;
+        }
+
+        return collect(Arr::wrap($backoff))
             ->map(function ($backoff) {
                 return $backoff instanceof DateTimeInterface
                                 ? $this->secondsUntil($backoff) : $backoff;
@@ -278,9 +282,7 @@ abstract class Queue
     {
         if (! empty(static::$createPayloadCallbacks)) {
             foreach (static::$createPayloadCallbacks as $callback) {
-                $payload = array_merge($payload, call_user_func(
-                    $callback, $this->getConnectionName(), $queue, $payload
-                ));
+                $payload = array_merge($payload, $callback($this->getConnectionName(), $queue, $payload));
             }
         }
 

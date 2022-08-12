@@ -20,7 +20,7 @@ class MySqlConnection extends Connection
      */
     public function isMaria()
     {
-        return strpos($this->getPdo()->getAttribute(PDO::ATTR_SERVER_VERSION), 'MariaDB') !== false;
+        return str_contains($this->getPdo()->getAttribute(PDO::ATTR_SERVER_VERSION), 'MariaDB');
     }
 
     /**

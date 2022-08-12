@@ -49,6 +49,24 @@ class NotificationDatabaseChannelTest extends TestCase
         $channel = new ExtendedDatabaseChannel;
         $channel->send($notifiable, $notification);
     }
+
+    public function testCustomizeTypeIsSentToDatabase()
+    {
+        $notification = new NotificationDatabaseChannelCustomizeTypeTestNotification;
+        $notification->id = 1;
+        $notifiable = m::mock();
+
+        $notifiable->shouldReceive('routeNotificationFor->create')->with([
+            'id'        => 1,
+            'type'      => 'MONTHLY',
+            'data'      => ['invoice_id' => 1],
+            'read_at'   => null,
+            'something' => 'else',
+        ]);
+
+        $channel = new ExtendedDatabaseChannel;
+        $channel->send($notifiable, $notification);
+    }
 }
 
 class NotificationDatabaseChannelTestNotification extends Notification
@@ -56,6 +74,19 @@ class NotificationDatabaseChannelTestNotification extends Notification
     public function toDatabase($notifiable)
     {
         return new DatabaseMessage(['invoice_id' => 1]);
+    }
+}
+
+class NotificationDatabaseChannelCustomizeTypeTestNotification extends Notification
+{
+    public function toDatabase($notifiable)
+    {
+        return new DatabaseMessage(['invoice_id' => 1]);
+    }
+
+    public function databaseType()
+    {
+        return 'MONTHLY';
     }
 }
 

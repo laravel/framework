@@ -36,7 +36,7 @@ class ParallelTestingTest extends TestCase
                 $this->assertNull($testCase);
             }
 
-            $this->assertEquals(1, $token);
+            $this->assertSame('1', (string) $token);
             $state = true;
         });
 
@@ -44,7 +44,7 @@ class ParallelTestingTest extends TestCase
         $this->assertFalse($state);
 
         $parallelTesting->resolveTokenUsing(function () {
-            return 1;
+            return '1';
         });
 
         $parallelTesting->{$caller}($this);
@@ -80,10 +80,10 @@ class ParallelTestingTest extends TestCase
         $this->assertFalse($parallelTesting->token());
 
         $parallelTesting->resolveTokenUsing(function () {
-            return 1;
+            return '1';
         });
 
-        $this->assertSame(1, $parallelTesting->token());
+        $this->assertSame('1', (string) $parallelTesting->token());
     }
 
     public function callbacks()
@@ -97,7 +97,7 @@ class ParallelTestingTest extends TestCase
         ];
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 

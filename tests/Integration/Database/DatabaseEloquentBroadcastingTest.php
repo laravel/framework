@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
+use Closure;
 use Illuminate\Broadcasting\BroadcastEvent;
 use Illuminate\Contracts\Broadcasting\Broadcaster;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastingFactory;
@@ -15,15 +16,10 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
 use Mockery as m;
 
-/**
- * @group integration
- */
 class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
 {
-    protected function setUp(): void
+    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
-        parent::setUp();
-
         Schema::create('test_eloquent_broadcasting_users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
@@ -52,7 +48,7 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
     {
         $model = new TestEloquentBroadcastUser;
 
-        $this->assertEquals('Illuminate.Tests.Integration.Database.TestEloquentBroadcastUser.{testEloquentBroadcastUser}', $model->broadcastChannelRoute());
+        $this->assertSame('Illuminate.Tests.Integration.Database.TestEloquentBroadcastUser.{testEloquentBroadcastUser}', $model->broadcastChannelRoute());
     }
 
     public function testBroadcastingOnModelTrashing()
@@ -196,7 +192,7 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
         });
     }
 
-    private function assertHandldedBroadcastableEvent(BroadcastableModelEventOccurred $event, \Closure $closure)
+    private function assertHandldedBroadcastableEvent(BroadcastableModelEventOccurred $event, Closure $closure)
     {
         $broadcaster = m::mock(Broadcaster::class);
         $broadcaster->shouldReceive('broadcast')->once()
