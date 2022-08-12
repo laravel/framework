@@ -3892,6 +3892,9 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['x' => 'abc123'], ['x' => 'Alpha']);
         $this->assertFalse($v->passes());
+        
+        $v = new Validator($trans, ['x' => "҈"], ['x' => 'Alpha']); // U+0488 unicode pointer "\u{0488}"
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateAlphaNum()
