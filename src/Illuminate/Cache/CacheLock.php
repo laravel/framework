@@ -14,7 +14,7 @@ class CacheLock extends Lock
     /**
      * Create a new lock instance.
      *
-     * @param  \Illuminate\Contracts\Cache\Store  $store
+     * @param  \Illuminate\Contracts\Cache\Store  $store  The store must contain an add method that atomically stores an item in the cache if it does not already exist. See CacheLock's acquire method for details.
      * @param  string  $name
      * @param  int  $seconds
      * @param  string|null  $owner
@@ -34,19 +34,9 @@ class CacheLock extends Lock
      */
     public function acquire()
     {
-        if (method_exists($this->store, 'add') && $this->seconds > 0) {
-            return $this->store->add(
-                $this->name, $this->owner, $this->seconds
-            );
-        }
-
-        if (! is_null($this->store->get($this->name))) {
-            return false;
-        }
-
-        return ($this->seconds > 0)
-                ? $this->store->put($this->name, $this->owner, $this->seconds)
-                : $this->store->forever($this->name, $this->owner);
+        return $this->store->add(
+            $this->name, $this->owner, $this->seconds
+        );
     }
 
     /**
