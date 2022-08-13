@@ -148,17 +148,6 @@ class MigrationCreator
     }
 
     /**
-     * Get the class name of a migration name.
-     *
-     * @param  string  $name
-     * @return string
-     */
-    protected function getClassName($name)
-    {
-        return Str::studly($name);
-    }
-
-    /**
      * Get the full path to the migration.
      *
      * @param  string  $name
