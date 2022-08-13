@@ -84,6 +84,6 @@ trait CompilesHelpers
      */
     protected function compilePrice($arguments)
     {
-        return "<?php echo number_format{$arguments} ?>";
+        return "<?php echo number_format{$arguments}; ?>";
     }
 }
