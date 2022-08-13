@@ -236,7 +236,7 @@ class ServeCommand extends Command
                 $requestPort = $this->getRequestPortFromLine($line);
                 $requestDate = $this->getDateFromLine($line);
                 
-                if( null !== $requestPort && null !== $requestDate){
+                if( null !== $requestPort && null !== $requestDate) {
                     $this->requestsPool[$requestPort] = [
                         $requestDate,
                         false,
@@ -245,12 +245,12 @@ class ServeCommand extends Command
                 
             } elseif (str($line)->contains([' [200]: GET '])) {
                 $requestPort = $this->getRequestPortFromLine($line);
-                if( null !== $requestPort){
+                if( null !== $requestPort) {
                     $this->requestsPool[$requestPort][1] = trim(explode('[200]: GET', $line)[1]);
                 }
             } elseif (str($line)->contains(' Closing')) {
                 $requestPort = $this->getRequestPortFromLine($line);
-                if( null !== $requestPort ){
+                if( null !== $requestPort ) {
                     $request = $this->requestsPool[$requestPort];
 
                     [$startDate, $file] = $request;
@@ -264,7 +264,7 @@ class ServeCommand extends Command
                     $this->output->write("  <fg=gray>$date</> $time");
 
                     $requestDate = $this->getDateFromLine($line);
-                    if(null !== $requestDate){
+                    if(null !== $requestDate) {
                         $runTime = $requestDate->diffInSeconds($startDate);
                     }else{
                         $runTime = 'unknown ';
@@ -298,7 +298,7 @@ class ServeCommand extends Command
     {
         preg_match('/^\[([^\]]+)\]/', $line, $matches);
 
-        if(isset($matches[1])){
+        if(isset($matches[1])) {
             return Carbon::createFromFormat('D M d H:i:s Y', $matches[1]);
         }
         return null;
@@ -314,7 +314,7 @@ class ServeCommand extends Command
     {
         preg_match('/:(\d+)\s(?:(?:\w+$)|(?:\[.*))/', $line, $matches);
 
-        if(isset($matches[1])){
+        if(isset($matches[1])) {
             return (int) $matches[1];
         }
         return null;
