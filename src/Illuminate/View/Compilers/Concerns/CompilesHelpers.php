@@ -82,7 +82,7 @@ trait CompilesHelpers
      * @param  string  $arguments
      * @return string
      */
-    protected function compilePrice($arguments)
+    protected function compileNumberFormat($arguments)
     {
         return "<?php echo number_format{$arguments}; ?>";
     }
