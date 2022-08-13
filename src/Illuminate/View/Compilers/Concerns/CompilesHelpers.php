@@ -75,4 +75,15 @@ trait CompilesHelpers
 
         return "<?php echo app('$class')->reactRefresh(); ?>";
     }
+
+    /**
+     * Compile the "number_format" statements into valid PHP.
+     *
+     * @param  string $arguments
+     * @return string
+     */
+    protected function compilePrice($arguments)
+    {
+        return "<?php echo number_format{$arguments} ?>";
+    }
 }
