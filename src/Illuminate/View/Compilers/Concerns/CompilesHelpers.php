@@ -79,7 +79,7 @@ trait CompilesHelpers
     /**
      * Compile the "number_format" statements into valid PHP.
      *
-     * @param  string $arguments
+     * @param  string  $arguments
      * @return string
      */
     protected function compilePrice($arguments)
