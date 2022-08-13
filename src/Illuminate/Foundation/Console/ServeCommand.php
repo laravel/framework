@@ -242,7 +242,6 @@ class ServeCommand extends Command
                         false,
                     ];
                 }
-                
             } elseif (str($line)->contains([' [200]: GET '])) {
                 $requestPort = $this->getRequestPortFromLine($line);
                 if (null !== $requestPort) {
