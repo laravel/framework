@@ -236,7 +236,7 @@ class ServeCommand extends Command
                 $requestPort = $this->getRequestPortFromLine($line);
                 $requestDate = $this->getDateFromLine($line);
 
-                if ( null !== $requestPort && null !== $requestDate) {
+                if (null !== $requestPort && null !== $requestDate) {
                     $this->requestsPool[$requestPort] = [
                         $requestDate,
                         false,
@@ -245,12 +245,12 @@ class ServeCommand extends Command
                 
             } elseif (str($line)->contains([' [200]: GET '])) {
                 $requestPort = $this->getRequestPortFromLine($line);
-                if ( null !== $requestPort) {
+                if (null !== $requestPort) {
                     $this->requestsPool[$requestPort][1] = trim(explode('[200]: GET', $line)[1]);
                 }
             } elseif (str($line)->contains(' Closing')) {
                 $requestPort = $this->getRequestPortFromLine($line);
-                if ( null !== $requestPort ) {
+                if (null !== $requestPort) {
                     $request = $this->requestsPool[$requestPort];
 
                     [$startDate, $file] = $request;
