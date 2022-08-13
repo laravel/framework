@@ -234,39 +234,51 @@ class ServeCommand extends Command
                 $this->newLine();
             } elseif (str($line)->contains(' Accepted')) {
                 $requestPort = $this->getRequestPortFromLine($line);
-
-                $this->requestsPool[$requestPort] = [
-                    $this->getDateFromLine($line),
-                    false,
-                ];
+                $requestDate = $this->getDateFromLine($line);
+                
+                if( null !== $requestPort && null !== $requestDate){
+                    $this->requestsPool[$requestPort] = [
+                        $requestDate,
+                        false,
+                    ];
+                }
+                
             } elseif (str($line)->contains([' [200]: GET '])) {
                 $requestPort = $this->getRequestPortFromLine($line);
-
-                $this->requestsPool[$requestPort][1] = trim(explode('[200]: GET', $line)[1]);
+                if( null !== $requestPort){
+                    $this->requestsPool[$requestPort][1] = trim(explode('[200]: GET', $line)[1]);
+                }
             } elseif (str($line)->contains(' Closing')) {
                 $requestPort = $this->getRequestPortFromLine($line);
-                $request = $this->requestsPool[$requestPort];
+                if( null !== $requestPort ){
+                    $request = $this->requestsPool[$requestPort];
 
-                [$startDate, $file] = $request;
+                    [$startDate, $file] = $request;
 
-                $formattedStartedAt = $startDate->format('Y-m-d H:i:s');
+                    $formattedStartedAt = $startDate->format('Y-m-d H:i:s');
 
-                unset($this->requestsPool[$requestPort]);
+                    unset($this->requestsPool[$requestPort]);
 
-                [$date, $time] = explode(' ', $formattedStartedAt);
+                    [$date, $time] = explode(' ', $formattedStartedAt);
 
-                $this->output->write("  <fg=gray>$date</> $time");
+                    $this->output->write("  <fg=gray>$date</> $time");
 
-                $runTime = $this->getDateFromLine($line)->diffInSeconds($startDate);
+                    $requestDate = $this->getDateFromLine($line);
+                    if(null !== $requestDate){
+                        $runTime = $requestDate->diffInSeconds($startDate);
+                    }else{
+                        $runTime = 'unknown ';
+                    }
 
-                if ($file) {
-                    $this->output->write($file = " $file");
+                    if ($file) {
+                        $this->output->write($file = " $file");
+                    }
+
+                    $dots = max(terminal()->width() - mb_strlen($formattedStartedAt) - mb_strlen($file) - mb_strlen($runTime) - 9, 0);
+
+                    $this->output->write(' '.str_repeat('<fg=gray>.</>', $dots));
+                    $this->output->writeln(" <fg=gray>~ {$runTime}s</>");
                 }
-
-                $dots = max(terminal()->width() - mb_strlen($formattedStartedAt) - mb_strlen($file) - mb_strlen($runTime) - 9, 0);
-
-                $this->output->write(' '.str_repeat('<fg=gray>.</>', $dots));
-                $this->output->writeln(" <fg=gray>~ {$runTime}s</>");
             } elseif (str($line)->contains(['Closed without sending a request'])) {
                 // ...
             } elseif (! empty($line)) {
@@ -286,7 +298,10 @@ class ServeCommand extends Command
     {
         preg_match('/^\[([^\]]+)\]/', $line, $matches);
 
-        return Carbon::createFromFormat('D M d H:i:s Y', $matches[1]);
+        if(isset($matches[1])){
+            return Carbon::createFromFormat('D M d H:i:s Y', $matches[1]);
+        }
+        return null;
     }
 
     /**
@@ -299,7 +314,10 @@ class ServeCommand extends Command
     {
         preg_match('/:(\d+)\s(?:(?:\w+$)|(?:\[.*))/', $line, $matches);
 
-        return (int) $matches[1];
+        if(isset($matches[1])){
+            return (int) $matches[1];
+        }
+        return null;
     }
 
     /**
