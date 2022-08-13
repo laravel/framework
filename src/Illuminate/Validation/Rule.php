@@ -4,6 +4,8 @@ namespace Illuminate\Validation;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Validation\Rules\AcceptedIf;
+use Illuminate\Validation\Rules\DeclinedIf;
 use Illuminate\Validation\Rules\Dimensions;
 use Illuminate\Validation\Rules\ExcludeIf;
 use Illuminate\Validation\Rules\Exists;
@@ -114,6 +116,28 @@ class Rule
     public static function excludeIf($callback)
     {
         return new ExcludeIf($callback);
+    }
+
+    /**
+     * Get a accepted_if constraint builder instance.
+     *
+     * @param  callable|bool  $callback
+     * @return \Illuminate\Validation\Rules\AcceptedIf
+     */
+    public static function acceptedIf($callback)
+    {
+        return new AcceptedIf($callback);
+    }
+
+    /**
+     * Get a declined_if constraint builder instance.
+     *
+     * @param  callable|bool  $callback
+     * @return \Illuminate\Validation\Rules\DeclinedIf
+     */
+    public static function declinedIf($callback)
+    {
+        return new DeclinedIf($callback);
     }
 
     /**
