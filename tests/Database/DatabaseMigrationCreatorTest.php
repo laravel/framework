@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Migrations\MigrationCreator;
 use Illuminate\Filesystem\Filesystem;
-use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
