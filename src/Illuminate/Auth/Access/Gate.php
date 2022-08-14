@@ -392,13 +392,20 @@ class Gate implements GateContract
     public function inspect($ability, $arguments = [])
     {
         try {
-            $result = $this->raw($ability, $arguments);
+            $abilities = explode("|", $ability);
+            foreach($abilities as $ability) {
+                $result = $this->raw($ability, $arguments);
 
-            if ($result instanceof Response) {
-                return $result;
+                if ($result instanceof Response) {
+                    return $result;
+                }
+
+                if($result) {
+                    return Response::allow();
+                }
             }
 
-            return $result ? Response::allow() : Response::deny();
+            return Response::deny();
         } catch (AuthorizationException $e) {
             return $e->toResponse();
         }
