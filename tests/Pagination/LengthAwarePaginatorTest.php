@@ -120,6 +120,24 @@ class LengthAwarePaginatorTest extends TestCase
                             $this->p->url($this->p->currentPage()));
     }
 
+    public function testLengthAwarePaginatorFirstPageUrlLastPageUrl()
+    {
+        $paginator = new LengthAwarePaginator($array = ['item1', 'item2', 'item3', 'item4', 'item5'], 5, 2, 2,
+                                                       ['path' => 'http://website.com/test']);
+
+        $this->assertSame('http://website.com/test?page=1', $paginator->firstPageUrl());
+        $this->assertSame('http://website.com/test?page=3', $paginator->lastPageUrl());
+        $this->assertSame($paginator->url(1), $paginator->firstPageUrl());
+        $this->assertSame($paginator->url($paginator->lastPage()), $paginator->lastPageUrl());
+
+        $paginator = new LengthAwarePaginator($array = ['item1', 'item2', 'item3', 'item4', 'item5'], 5, 5, 1,
+                                                       ['path' => 'http://website.com/test']);
+
+        $this->assertSame('http://website.com/test?page=1', $paginator->firstPageUrl());
+        $this->assertSame('http://website.com/test?page=1', $paginator->lastPageUrl());
+        $this->assertSame($paginator->url($paginator->lastPage()), $paginator->lastPageUrl());
+    }
+
     public function testItRetrievesThePaginatorOptions()
     {
         $this->assertSame($this->options, $this->p->getOptions());

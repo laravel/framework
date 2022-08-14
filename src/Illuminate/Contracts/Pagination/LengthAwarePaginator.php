@@ -26,4 +26,13 @@ interface LengthAwarePaginator extends Paginator
      * @return int
      */
     public function lastPage();
+
+    /**
+     * Get the URL for the last page.
+     *
+     * @author Stephen Damian <contact@devandweb.fr>
+     *
+     * @return string
+     */
+    public function lastPageUrl();
 }

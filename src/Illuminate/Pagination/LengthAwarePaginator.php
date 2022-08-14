@@ -175,6 +175,18 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
     }
 
     /**
+     * Get the URL for the last page.
+     *
+     * @author Stephen Damian <contact@devandweb.fr>
+     *
+     * @return string
+     */
+    public function lastPageUrl()
+    {
+        return $this->url($this->lastPage());
+    }
+
+    /**
      * Get the last page.
      *
      * @return int

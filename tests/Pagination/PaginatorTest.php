@@ -47,6 +47,20 @@ class PaginatorTest extends TestCase
         $this->assertSame('http://website.com/test?page=1', $p->previousPageUrl());
     }
 
+    public function testPaginatorFirstPageUrlLastPageUrl()
+    {
+        $p = new Paginator($array = ['item1', 'item2', 'item3', 'item4', 'item5'], 2, 2,
+                                    ['path' => 'http://website.com/test']);
+
+        $this->assertSame('http://website.com/test?page=1', $p->firstPageUrl());
+        $this->assertSame($p->url(1), $p->firstPageUrl());
+
+        $p = new Paginator($array = ['item1', 'item2', 'item3', 'item4', 'item5'], 5, 1,
+                                    ['path' => 'http://website.com/test']);
+
+        $this->assertSame('http://website.com/test?page=1', $p->firstPageUrl());
+    }
+
     public function testItRetrievesThePaginatorOptions()
     {
         $p = new Paginator($array = ['item1', 'item2', 'item3'], 2, 2,

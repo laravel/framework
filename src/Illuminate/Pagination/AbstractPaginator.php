@@ -146,6 +146,18 @@ abstract class AbstractPaginator implements Htmlable
     }
 
     /**
+     * Get the URL for the first page.
+     *
+     * @author Stephen Damian <contact@devandweb.fr>
+     *
+     * @return string
+     */
+    public function firstPageUrl()
+    {
+        return $this->url(1);
+    }
+
+    /**
      * Create a range of pagination URLs.
      *
      * @param  int  $start
