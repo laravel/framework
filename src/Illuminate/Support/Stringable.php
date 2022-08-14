@@ -963,7 +963,7 @@ class Stringable implements JsonSerializable
      */
     public function whenNotExactly($value, $callback, $default = null)
     {
-        return $this->when(!$this->exactly($value), $callback, $default);
+        return $this->when(! $this->exactly($value), $callback, $default);
     }
 
     /**
