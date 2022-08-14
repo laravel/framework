@@ -34,7 +34,7 @@ class PaginatorTest extends TestCase
     /**
      * @author Stephen Damian <contact@devandweb.fr>
      */
-    public function testPaginatorisOnFirstAndLastPage()
+    public function testPaginatorIsOnFirstAndLastPage()
     {
         $p = new Paginator($array = ['1', '2', '3', '4', '5'], 2, 1);
 
