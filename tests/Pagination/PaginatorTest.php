@@ -47,7 +47,7 @@ class PaginatorTest extends TestCase
         $this->assertTrue($p->onLastPage());
 
         // if current page is a page after the last page: the boolean onLastPage() is true.
-        $p = new Paginator($array = ['1', '2', '3', '4', '5'], 2, 4); 
+        $p = new Paginator($array = ['1', '2', '3', '4', '5'], 2, 4);
 
         $this->assertFalse($p->onFirstPage());
         $this->assertTrue($p->onLastPage());
