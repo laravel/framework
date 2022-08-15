@@ -8,29 +8,21 @@ use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\Vite as ViteFacade;
 use Illuminate\Support\Str;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Orchestra\Testbench\TestCase;
 
 class FoundationViteTest extends TestCase
 {
     protected function setUp(): void
     {
-        app()->instance('url', tap(
-            m::mock(UrlGenerator::class),
-            fn ($url) => $url
-                ->shouldReceive('asset')
-                ->andReturnUsing(fn ($value) => "https://example.com{$value}")
-        ));
+        parent::setUp();
 
-        app()->singleton(Vite::class);
-        Facade::setFacadeApplication(app());
+        app('config')->set('app.asset_url', 'https://example.com');
     }
 
     protected function tearDown(): void
     {
         $this->cleanViteManifest();
         $this->cleanViteHotFile();
-        Facade::clearResolvedInstances();
-        m::close();
     }
 
     public function testViteWithJsOnly()

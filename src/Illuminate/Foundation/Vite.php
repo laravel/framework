@@ -124,7 +124,6 @@ class Vite
     public function __invoke($entrypoints, $buildDirectory = 'build')
     {
         $entrypoints = collect($entrypoints);
-        $buildDirectory = Str::start($buildDirectory, '/');
 
         if (is_file(public_path('/hot'))) {
             $url = rtrim(file_get_contents(public_path('/hot')));
