@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Foundation;
 
+use Exception;
 use Illuminate\Foundation\Vite;
 use Illuminate\Support\Facades\Vite as ViteFacade;
 use Illuminate\Support\Str;
@@ -518,6 +519,24 @@ class FoundationViteTest extends TestCase
         $url = ViteFacade::asset('resources/js/app.js');
 
         $this->assertSame('http://localhost:3000/resources/js/app.js', $url);
+    }
+
+    public function testItThrowsWhenUnableToFindAssetManifestInBuildMode()
+    {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Vite manifest not found at: '.public_path('build/manifest.json'));
+
+        ViteFacade::asset('resources/js/app.js');
+    }
+
+    public function testItThrowsWhenUnableToFindAssetChunkInBuildMode()
+    {
+        $this->makeViteManifest();
+
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Unable to locate file in Vite manifest: resources/js/missing.js');
+
+        ViteFacade::asset('resources/js/missing.js');
     }
 
     protected function makeViteManifest($contents = null, $path = 'build')
