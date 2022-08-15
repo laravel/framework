@@ -129,7 +129,7 @@ class Vite
             return new HtmlString(
                 $entrypoints
                     ->prepend('@vite/client')
-                    ->map(fn ($entrypoint) => $this->makeTagForChunk($entrypoint, "{$this->hotAssetUrl()}/{$entrypoint}", null, null))
+                    ->map(fn ($entrypoint) => $this->makeTagForChunk($entrypoint, $this->hotAsset($entrypoint), null, null))
                     ->join('')
             );
         }
@@ -376,14 +376,14 @@ class Vite
             sprintf(
                 <<<'HTML'
                 <script type="module">
-                    import RefreshRuntime from '%s/@react-refresh'
+                    import RefreshRuntime from '%s'
                     RefreshRuntime.injectIntoGlobalHook(window)
                     window.$RefreshReg$ = () => {}
                     window.$RefreshSig$ = () => (type) => type
                     window.__vite_plugin_react_preamble_installed__ = true
                 </script>
                 HTML,
-                $this->hotAssetUrl()
+                $this->hotAsset('@react-refresh')
             )
         );
     }
@@ -462,8 +462,8 @@ class Vite
      *
      * @return string
      */
-    protected function hotAssetUrl()
+    protected function hotAsset($asset)
     {
-        return rtrim(file_get_contents(public_path('/hot')));
+        return rtrim(file_get_contents(public_path('/hot'))).'/'.$asset;
     }
 }
