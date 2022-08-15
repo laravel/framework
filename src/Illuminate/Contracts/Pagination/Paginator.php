@@ -44,15 +44,6 @@ interface Paginator
     public function previousPageUrl();
 
     /**
-     * Get the URL for the first page.
-     *
-     * @author Stephen Damian <contact@devandweb.fr>
-     *
-     * @return string
-     */
-    public function firstPageUrl();
-
-    /**
      * Get all of the items being paginated.
      *
      * @return array
