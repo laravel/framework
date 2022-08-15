@@ -442,7 +442,7 @@ class Vite
      *
      * @throws \Exception
      */
-    public function findChunk($manifest, $file)
+    protected function findChunk($manifest, $file)
     {
         if (! isset($manifest[$file])) {
             throw new Exception("Unable to locate file in Vite manifest: {$file}.");
