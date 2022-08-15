@@ -3,11 +3,8 @@
 namespace Illuminate\Tests\Foundation;
 
 use Illuminate\Foundation\Vite;
-use Illuminate\Routing\UrlGenerator;
-use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\Vite as ViteFacade;
 use Illuminate\Support\Str;
-use Mockery as m;
 use Orchestra\Testbench\TestCase;
 
 class FoundationViteTest extends TestCase
