@@ -397,6 +397,10 @@ class Vite
      */
     public function asset($asset, $buildDirectory = null)
     {
+        if ($this->isRunningHot()) {
+            return $this->hotAsset($asset);
+        }
+
         $buildDirectory = func_get_args()[1] ?? $this->buildDirectory ?? 'build';
 
         $manifest = $this->manifest($buildDirectory);
