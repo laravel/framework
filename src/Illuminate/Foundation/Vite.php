@@ -415,6 +415,8 @@ class Vite
      *
      * @param  string  $buildDirectory
      * @return array
+     *
+     * @throws \Exception
      */
     protected function manifest($buildDirectory)
     {
