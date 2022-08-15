@@ -138,14 +138,15 @@ class Vite implements Htmlable
      * Generate Vite tags for an entrypoint.
      *
      * @param  string|string[]  $entrypoints
-     * @param  string  $buildDirectory
+     * @param  string|null  $buildDirectory
      * @return \Illuminate\Support\HtmlString
      *
      * @throws \Exception
      */
-    public function __invoke($entrypoints, $buildDirectory = 'build')
+    public function __invoke($entrypoints, $buildDirectory = null)
     {
         $entrypoints = collect($entrypoints);
+        $buildDirectory ??= $this->buildDirectory ?? 'build';
 
         if ($this->isRunningHot()) {
             return new HtmlString(
@@ -545,6 +546,6 @@ class Vite implements Htmlable
      */
     public function toHtml()
     {
-        return $this->__invoke($this->entryPoints, $this->buildDirectory)->toHtml();
+        return $this->__invoke($this->entryPoints)->toHtml();
     }
 }
