@@ -11,8 +11,7 @@ use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
- * @author Matthew Hall (matthall28@gmail.com)
- * @author Taylor Otwell (taylor@laravel.com)
+ * @author Sachin Shinde (sachinshinde7676@gmail.com)
  */
 class AblyBroadcaster extends Broadcaster
 {
@@ -35,7 +34,7 @@ class AblyBroadcaster extends Broadcaster
      * Default channel capabilities, all public channels are by default given subscribe, history and channel-metadata access
      * Set as per https://ably.com/docs/core-features/authentication#capability-operations.
      *
-     * @var array|\string[][]
+     * @var array
      */
     private $defaultChannelClaims = [
         'public:*' => ['subscribe', 'history', 'channel-metadata'],
@@ -44,7 +43,8 @@ class AblyBroadcaster extends Broadcaster
     /**
      * Create a new broadcaster instance.
      *
-     * @param $ably \Ably\AblyRest
+     * @param  \Ably\AblyRest  $ably
+     * @param  array  $config
      * @return void
      */
     public function __construct(AblyRest $ably, $config)
@@ -64,7 +64,7 @@ class AblyBroadcaster extends Broadcaster
     private static $serverTimeDiff = null;
 
     /**
-     * @param $time int
+     * @param  int  $time
      * @return void
      */
     private static function setServerTime($time)
@@ -107,7 +107,7 @@ class AblyBroadcaster extends Broadcaster
     /**
      * Authenticate the incoming request for a given channel.
      *
-     * @param $request \Illuminate\Http\Request
+     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      *
      * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
@@ -158,8 +158,8 @@ class AblyBroadcaster extends Broadcaster
     /**
      * Return the valid authentication response.
      *
-     * @param $request \Illuminate\Http\Request
-     * @param $result mixed
+     * @param  \Illuminate\Http\Request  $request
+     * @param  mixed  $result
      * @return mixed
      */
     public function validAuthenticationResponse($request, $result)
@@ -170,9 +170,9 @@ class AblyBroadcaster extends Broadcaster
     /**
      * Broadcast the given event.
      *
-     * @param $channels array
-     * @param $event string
-     * @param $payload array
+     * @param  array  $channels
+     * @param  string  $event
+     * @param  array  $payload
      * @return void
      *
      * @throws \Illuminate\Broadcasting\BroadcastException
@@ -193,10 +193,10 @@ class AblyBroadcaster extends Broadcaster
     }
 
     /**
-     * @param $channelName string
-     * @param $token string
-     * @param $clientId string
-     * @param $channelCapability string[]
+     * @param  string  $channelName
+     * @param  string  $token
+     * @param  string  $clientId
+     * @param  string[]  $channelCapability
      * @return string
      */
     public function getSignedToken($channelName, $token, $clientId, $channelCapability = ['*'])
@@ -236,7 +236,7 @@ class AblyBroadcaster extends Broadcaster
     /**
      * Remove prefix from channel name.
      *
-     * @param $channel string
+     * @param  string  $channel
      * @return string
      */
     public function normalizeChannelName($channel)
@@ -258,7 +258,7 @@ class AblyBroadcaster extends Broadcaster
     /**
      * Checks if channel is a private channel.
      *
-     * @param $channel string
+     * @param  string  $channel
      * @return bool
      */
     public function isPrivateChannel($channel)
@@ -269,7 +269,7 @@ class AblyBroadcaster extends Broadcaster
     /**
      * Checks if channel is a presence channel.
      *
-     * @param $channel string
+     * @param  string  $channel
      * @return bool
      */
     public function isPresenceChannel($channel)
@@ -280,7 +280,7 @@ class AblyBroadcaster extends Broadcaster
     /**
      * Checks if channel needs authentication.
      *
-     * @param $channel string
+     * @param  string  $channel
      * @return bool
      */
     public function isGuardedChannel($channel)
@@ -291,7 +291,7 @@ class AblyBroadcaster extends Broadcaster
     /**
      * Format the channel array into an array of strings.
      *
-     * @param $channels array
+     * @param  array  $channels
      * @return array
      */
     protected function formatChannels($channels)
@@ -312,8 +312,8 @@ class AblyBroadcaster extends Broadcaster
     /**
      * Build an Ably message object for broadcasting.
      *
-     * @param $event string
-     * @param $payload array
+     * @param  string  $event
+     * @param  array  $payload
      * @return \Ably\Models\Message
      */
     protected function buildAblyMessage($event, $payload = [])
@@ -326,9 +326,9 @@ class AblyBroadcaster extends Broadcaster
     }
 
     /**
-     * @param $channelName string
-     * @param $connectionId string
-     * @param $userId string
+     * @param  string  $channelName
+     * @param  string  $connectionId
+     * @param  string|null  $userId
      * @return string
      */
     protected function stringify($channelName, $connectionId, $userId = null)

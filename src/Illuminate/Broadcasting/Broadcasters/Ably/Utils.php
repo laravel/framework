@@ -2,11 +2,14 @@
 
 namespace Illuminate\Broadcasting\Broadcasters\Ably;
 
+/**
+ * @author Sachin Shinde (sachinshinde7676@gmail.com)
+ */
 class Utils
 {
     // JWT related PHP utility functions
     /**
-     * @param $jwt string
+     * @param  string  $jwt
      * @return array
      */
     public static function parseJwt($jwt)
@@ -19,8 +22,8 @@ class Utils
     }
 
     /**
-     * @param $headers array
-     * @param $payload array
+     * @param  array  $headers
+     * @param  array  $payload
      * @return string
      */
     public static function generateJwt($headers, $payload, $key)
@@ -35,8 +38,8 @@ class Utils
     }
 
     /**
-     * @param $jwt string
-     * @param $timeFn
+     * @param  string  $jwt
+     * @param  mixed  $timeFn
      * @return bool
      */
     public static function isJwtValid($jwt, $timeFn, $key)
