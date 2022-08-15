@@ -125,13 +125,11 @@ class Vite
     {
         $entrypoints = collect($entrypoints);
 
-        if ($this->isRunningHMR()) {
-            $url = rtrim(file_get_contents(public_path('/hot')));
-
+        if ($this->isRunningHot()) {
             return new HtmlString(
                 $entrypoints
                     ->prepend('@vite/client')
-                    ->map(fn ($entrypoint) => $this->makeTagForChunk($entrypoint, "{$url}/{$entrypoint}", null, null))
+                    ->map(fn ($entrypoint) => $this->makeTagForChunk($entrypoint, "{$this->hotAssetUrl()}/{$entrypoint}", null, null))
                     ->join('')
             );
         }
@@ -370,11 +368,9 @@ class Vite
      */
     public function reactRefresh()
     {
-        if (! $this->isRunningHMR()) {
+        if (! $this->isRunningHot()) {
             return;
         }
-
-        $url = rtrim(file_get_contents(public_path('/hot')));
 
         return new HtmlString(
             sprintf(
@@ -387,7 +383,7 @@ class Vite
                     window.__vite_plugin_react_preamble_installed__ = true
                 </script>
                 HTML,
-                $url
+                $this->hotAssetUrl()
             )
         );
     }
@@ -456,8 +452,18 @@ class Vite
      *
      * @return bool
      */
-    protected function isRunningHMR()
+    protected function isRunningHot()
     {
         return is_file(public_path('/hot'));
+    }
+
+    /**
+     * The path for assets during HMR mode.
+     *
+     * @return string
+     */
+    protected function hotAssetUrl()
+    {
+        return rtrim(file_get_contents(public_path('/hot')));
     }
 }
