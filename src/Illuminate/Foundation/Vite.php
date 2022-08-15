@@ -125,7 +125,7 @@ class Vite
     {
         $entrypoints = collect($entrypoints);
 
-        if (is_file(public_path('/hot'))) {
+        if ($this->isRunningHMR()) {
             $url = rtrim(file_get_contents(public_path('/hot')));
 
             return new HtmlString(
@@ -370,7 +370,7 @@ class Vite
      */
     public function reactRefresh()
     {
-        if (! is_file(public_path('/hot'))) {
+        if (! $this->isRunningHMR()) {
             return;
         }
 
@@ -449,5 +449,15 @@ class Vite
         }
 
         return $manifest[$file];
+    }
+
+    /**
+     * Determine if the HMR server is running.
+     *
+     * @return bool
+     */
+    protected function isRunningHMR()
+    {
+        return is_file(public_path('/hot'));
     }
 }
