@@ -124,6 +124,7 @@ class Vite
     public function __invoke($entrypoints, $buildDirectory = 'build')
     {
         $entrypoints = collect($entrypoints);
+        $buildDirectory = Str::start($buildDirectory, '/');
 
         if ($this->isRunningHot()) {
             return new HtmlString(
