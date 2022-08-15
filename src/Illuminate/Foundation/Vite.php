@@ -401,7 +401,7 @@ class Vite
             return $this->hotAsset($asset);
         }
 
-        $buildDirectory = func_get_args()[1] ?? $this->buildDirectory ?? 'build';
+        $buildDirectory = $buildDirectory ?? $this->buildDirectory ?? 'build';
 
         $manifest = $this->manifest($buildDirectory);
 
