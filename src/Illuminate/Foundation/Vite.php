@@ -405,9 +405,9 @@ class Vite
 
         $manifest = $this->manifest($buildDirectory);
 
-        $this->findChunk($manifest, $asset);
+        $chunk = $this->findChunk($manifest, $asset);
 
-        return asset($buildDirectory.'/'.$manifest[$asset]['file']);
+        return asset($buildDirectory.'/'$chunk['file']);
     }
 
     /**
