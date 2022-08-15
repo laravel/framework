@@ -10,6 +10,13 @@ use Illuminate\Support\Str;
 class Vite
 {
     /**
+     * The cached manifest files.
+     *
+     * @var array
+     */
+    protected static $manifests = [];
+
+    /**
      * The Content Security Policy nonce to apply to all generated tags.
      *
      * @var string|null
@@ -116,8 +123,6 @@ class Vite
      */
     public function __invoke($entrypoints, $buildDirectory = 'build')
     {
-        static $manifests = [];
-
         $entrypoints = collect($entrypoints);
         $buildDirectory = Str::start($buildDirectory, '/');
 
@@ -132,17 +137,7 @@ class Vite
             );
         }
 
-        $manifestPath = public_path($buildDirectory.'/manifest.json');
-
-        if (! isset($manifests[$manifestPath])) {
-            if (! is_file($manifestPath)) {
-                throw new Exception("Vite manifest not found at: {$manifestPath}");
-            }
-
-            $manifests[$manifestPath] = json_decode(file_get_contents($manifestPath), true);
-        }
-
-        $manifest = $manifests[$manifestPath];
+        $manifest = $this->manifest($buildDirectory);
 
         $tags = collect();
 
@@ -398,5 +393,26 @@ class Vite
                 $url
             )
         );
+    }
+
+    /**
+     * Get the the manifest file in the build directory.
+     *
+     * @param  string  $buildDirectory
+     * @return array
+     */
+    protected function manifest($buildDirectory)
+    {
+        $path = public_path($buildDirectory.'/manifest.json');
+
+        if (! isset(static::$manifests[$path])) {
+            if (! is_file($path)) {
+                throw new Exception("Vite manifest not found at: {$path}");
+            }
+
+            static::$manifests[$path] = json_decode(file_get_contents($path), true);
+        }
+
+        return static::$manifests[$path];
     }
 }
