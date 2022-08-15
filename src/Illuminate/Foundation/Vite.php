@@ -395,13 +395,11 @@ class Vite
      * @param  string|null  $buildDirectory
      * @return string
      */
-    public function asset($asset, $buildDirectory = null)
+    public function asset($asset, $buildDirectory = 'build')
     {
         if ($this->isRunningHot()) {
             return $this->hotAsset($asset);
         }
-
-        $buildDirectory = $buildDirectory ?? $this->buildDirectory ?? 'build';
 
         $chunk = $this->findChunk($this->manifest($buildDirectory), $asset);
 
