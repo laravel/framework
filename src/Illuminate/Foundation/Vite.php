@@ -139,7 +139,7 @@ class Vite
         $tags = collect();
 
         foreach ($entrypoints as $entrypoint) {
-            $chunk = $this->findChunk($manifest, $entrypoint);
+            $chunk = $this->chunk($manifest, $entrypoint);
 
             $tags->push($this->makeTagForChunk(
                 $entrypoint,
@@ -401,7 +401,7 @@ class Vite
             return $this->hotAsset($asset);
         }
 
-        $chunk = $this->findChunk($this->manifest($buildDirectory), $asset);
+        $chunk = $this->chunk($this->manifest($buildDirectory), $asset);
 
         return asset($buildDirectory.'/'.$chunk['file']);
     }
@@ -430,7 +430,7 @@ class Vite
     }
 
     /**
-     * Find the chunk for the given entry point / asset.
+     * Get the chunk for the given entry point / asset.
      *
      * @param  array  $manifest
      * @param  string  $file
@@ -438,7 +438,7 @@ class Vite
      *
      * @throws \Exception
      */
-    protected function findChunk($manifest, $file)
+    protected function chunk($manifest, $file)
     {
         if (! isset($manifest[$file])) {
             throw new Exception("Unable to locate file in Vite manifest: {$file}.");
