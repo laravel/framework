@@ -394,6 +394,24 @@ class Vite
     }
 
     /**
+     * Get the URL for an asset.
+     *
+     * @param  string  $asset
+     * @param  string|null  $buildDirectory
+     * @return string
+     */
+    public function asset($asset, $buildDirectory = null)
+    {
+        $buildDirectory = func_get_args()[1] ?? $this->buildDirectory ?? 'build';
+
+        $manifest = $this->manifest($buildDirectory);
+
+        $this->findChunk($manifest, $asset);
+
+        return asset($buildDirectory.'/'.$manifest[$asset]['file']);
+    }
+
+    /**
      * Get the the manifest file in the build directory.
      *
      * @param  string  $buildDirectory

@@ -513,6 +513,15 @@ class FoundationViteTest extends TestCase
         );
     }
 
+    public function testItCanGenerateIndividualAssetUrlInBuildMode()
+    {
+        $this->makeViteManifest();
+
+        $url = ViteFacade::asset('resources/js/app.js');
+
+        $this->assertSame('https://example.com/build/assets/app.versioned.js', $url);
+    }
+
     protected function makeViteManifest($contents = null, $path = 'build')
     {
         app()->singleton('path.public', fn () => __DIR__);
