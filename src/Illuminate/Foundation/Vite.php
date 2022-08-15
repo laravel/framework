@@ -142,18 +142,16 @@ class Vite
         $tags = collect();
 
         foreach ($entrypoints as $entrypoint) {
-            if (! isset($manifest[$entrypoint])) {
-                throw new Exception("Unable to locate file in Vite manifest: {$entrypoint}.");
-            }
+            $chunk = $this->findChunk($manifest, $entrypoint);
 
             $tags->push($this->makeTagForChunk(
                 $entrypoint,
-                asset("{$buildDirectory}/{$manifest[$entrypoint]['file']}"),
-                $manifest[$entrypoint],
+                asset("{$buildDirectory}/{$chunk['file']}"),
+                $chunk,
                 $manifest
             ));
 
-            foreach ($manifest[$entrypoint]['css'] ?? [] as $css) {
+            foreach ($chunk['css'] ?? [] as $css) {
                 $partialManifest = Collection::make($manifest)->where('file', $css);
 
                 $tags->push($this->makeTagForChunk(
@@ -164,7 +162,7 @@ class Vite
                 ));
             }
 
-            foreach ($manifest[$entrypoint]['imports'] ?? [] as $import) {
+            foreach ($chunk['imports'] ?? [] as $import) {
                 foreach ($manifest[$import]['css'] ?? [] as $css) {
                     $partialManifest = Collection::make($manifest)->where('file', $css);
 
@@ -414,5 +412,23 @@ class Vite
         }
 
         return static::$manifests[$path];
+    }
+
+    /**
+     * Find the chunk for the given entry point / asset.
+     *
+     * @param  array  $manifest
+     * @param  string  $file
+     * @return array
+     *
+     * @throws \Exception
+     */
+    public function findChunk($manifest, $file)
+    {
+        if (! isset($manifest[$file])) {
+            throw new Exception("Unable to locate file in Vite manifest: {$file}.");
+        }
+
+        return $manifest[$file];
     }
 }
