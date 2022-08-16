@@ -818,7 +818,7 @@ trait HasAttributes
             return $castType::from($value);
         }
 
-        return constant($castType . '::' . $value);
+        return constant($castType.'::'.$value);
     }
 
     /**
@@ -1123,7 +1123,7 @@ trait HasAttributes
 
         if (! isset($value)) {
             $this->attributes[$key] = null;
-        } else if (is_subclass_of($enumClass, \BackedEnum::class)) {
+        } elseif (is_subclass_of($enumClass, \BackedEnum::class)) {
             if ($value instanceof $enumClass) {
                 $this->attributes[$key] = $value->value;
             } else {
@@ -1133,7 +1133,7 @@ trait HasAttributes
             if ($value instanceof $enumClass) {
                 $this->attributes[$key] = $value->name;
             } else {
-                $this->attributes[$key] = constant($enumClass .'::' . $value)->name;
+                $this->attributes[$key] = constant($enumClass.'::'.$value)->name;
             }
         }
     }
