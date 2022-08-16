@@ -1114,7 +1114,7 @@ trait HasAttributes
      * Set the value of an enum castable attribute.
      *
      * @param  string  $key
-     * @param  \UnitEnum  $value
+     * @param  \UnitEnum|string|int  $value
      * @return void
      */
     protected function setEnumCastableAttribute($key, $value)
