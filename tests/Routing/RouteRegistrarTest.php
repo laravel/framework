@@ -868,11 +868,11 @@ class RouteRegistrarTest extends TestCase
     {
         $wheres = ['foo' => '[0-9]+', 'bar' => '[0-9]+'];
 
-        $this->router->prefix('/{foo}/{bar}')->whereNumber(['foo', 'bar'])->group(function($router) {
+        $this->router->prefix('/{foo}/{bar}')->whereNumber(['foo', 'bar'])->group(function ($router) {
             $router->get('/');
         });
 
-        $this->router->prefix('/api/{bar}/{foo}')->whereNumber(['bar', 'foo'])->group(function($router) {
+        $this->router->prefix('/api/{bar}/{foo}')->whereNumber(['bar', 'foo'])->group(function ($router) {
             $router->get('/');
         });
 
@@ -886,11 +886,11 @@ class RouteRegistrarTest extends TestCase
     {
         $wheres = ['foo' => '[a-zA-Z]+', 'bar' => '[a-zA-Z]+'];
 
-        $this->router->prefix('/{foo}/{bar}')->whereAlpha(['foo', 'bar'])->group(function($router) {
+        $this->router->prefix('/{foo}/{bar}')->whereAlpha(['foo', 'bar'])->group(function ($router) {
             $router->get('/');
         });
 
-        $this->router->prefix('/api/{bar}/{foo}')->whereAlpha(['bar', 'foo'])->group(function($router) {
+        $this->router->prefix('/api/{bar}/{foo}')->whereAlpha(['bar', 'foo'])->group(function ($router) {
             $router->get('/');
         });
 
@@ -904,7 +904,7 @@ class RouteRegistrarTest extends TestCase
     {
         $wheres = ['1a2b3c' => '[a-zA-Z0-9]+'];
 
-        $this->router->prefix('/{foo}')->whereAlphaNumeric(['1a2b3c'])->group(function($router) {
+        $this->router->prefix('/{foo}')->whereAlphaNumeric(['1a2b3c'])->group(function ($router) {
             $router->get('/');
         });
 
@@ -918,11 +918,11 @@ class RouteRegistrarTest extends TestCase
     {
         $wheres = ['foo' => 'one|two', 'bar' => 'one|two'];
 
-        $this->router->prefix('/{foo}/{bar}')->whereIn(['foo', 'bar'], ['one', 'two'])->group(function($router) {
+        $this->router->prefix('/{foo}/{bar}')->whereIn(['foo', 'bar'], ['one', 'two'])->group(function ($router) {
             $router->get('/');
         });
 
-        $this->router->prefix('/api/{bar}/{foo}')->whereIn(['bar', 'foo'], ['one', 'two'])->group(function($router) {
+        $this->router->prefix('/api/{bar}/{foo}')->whereIn(['bar', 'foo'], ['one', 'two'])->group(function ($router) {
             $router->get('/');
         });
 
@@ -936,11 +936,11 @@ class RouteRegistrarTest extends TestCase
     {
         $wheres = ['foo' => '[0-9]+', 'bar' => '[0-9]+'];
 
-        $this->router->whereNumber(['foo', 'bar'])->prefix('/{foo}/{bar}')->group(function($router) {
+        $this->router->whereNumber(['foo', 'bar'])->prefix('/{foo}/{bar}')->group(function ($router) {
             $router->get('/');
         });
 
-        $this->router->whereNumber(['bar', 'foo'])->prefix('/api/{bar}/{foo}')->group(function($router) {
+        $this->router->whereNumber(['bar', 'foo'])->prefix('/api/{bar}/{foo}')->group(function ($router) {
             $router->get('/');
         });
 
@@ -954,11 +954,11 @@ class RouteRegistrarTest extends TestCase
     {
         $wheres = ['foo' => '[a-zA-Z]+', 'bar' => '[a-zA-Z]+'];
 
-        $this->router->whereAlpha(['foo', 'bar'])->prefix('/{foo}/{bar}')->group(function($router) {
+        $this->router->whereAlpha(['foo', 'bar'])->prefix('/{foo}/{bar}')->group(function ($router) {
             $router->get('/');
         });
 
-        $this->router->whereAlpha(['bar', 'foo'])->prefix('/api/{bar}/{foo}')->group(function($router) {
+        $this->router->whereAlpha(['bar', 'foo'])->prefix('/api/{bar}/{foo}')->group(function ($router) {
             $router->get('/');
         });
 
@@ -972,7 +972,7 @@ class RouteRegistrarTest extends TestCase
     {
         $wheres = ['1a2b3c' => '[a-zA-Z0-9]+'];
 
-        $this->router->whereAlphaNumeric(['1a2b3c'])->prefix('/{foo}')->group(function($router) {
+        $this->router->whereAlphaNumeric(['1a2b3c'])->prefix('/{foo}')->group(function ($router) {
             $router->get('/');
         });
 
@@ -986,11 +986,11 @@ class RouteRegistrarTest extends TestCase
     {
         $wheres = ['foo' => 'one|two', 'bar' => 'one|two'];
 
-        $this->router->whereIn(['foo', 'bar'], ['one', 'two'])->prefix('/{foo}/{bar}')->group(function($router) {
+        $this->router->whereIn(['foo', 'bar'], ['one', 'two'])->prefix('/{foo}/{bar}')->group(function ($router) {
             $router->get('/');
         });
 
-        $this->router->whereIn(['bar', 'foo'], ['one', 'two'])->prefix('/api/{bar}/{foo}')->group(function($router) {
+        $this->router->whereIn(['bar', 'foo'], ['one', 'two'])->prefix('/api/{bar}/{foo}')->group(function ($router) {
             $router->get('/');
         });
 
