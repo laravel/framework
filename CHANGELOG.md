@@ -1,6 +1,12 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.25.0...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.25.1...9.x)
+
+
+## [v9.25.1](https://github.com/laravel/framework/compare/v9.25.0...v9.25.1) - 2022-08-16
+
+### Fixes
+- [Fixed typos](https://github.com/laravel/framework/compare/v9.25.0...v9.25.1) 
 
 
 ## [v9.25.0](https://github.com/laravel/framework/compare/v9.24.0...v9.25.0) - 2022-08-16
