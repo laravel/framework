@@ -814,7 +814,11 @@ trait HasAttributes
             return $value;
         }
 
-        return $castType::from($value);
+        if (is_subclass_of($castType, \BackedEnum::class)) {
+            return $castType::from($value);
+        }
+
+        return constant($castType.'::'.$value);
     }
 
     /**
@@ -1110,7 +1114,7 @@ trait HasAttributes
      * Set the value of an enum castable attribute.
      *
      * @param  string  $key
-     * @param  \BackedEnum  $value
+     * @param  \UnitEnum|string|int  $value
      * @return void
      */
     protected function setEnumCastableAttribute($key, $value)
@@ -1119,10 +1123,18 @@ trait HasAttributes
 
         if (! isset($value)) {
             $this->attributes[$key] = null;
-        } elseif ($value instanceof $enumClass) {
-            $this->attributes[$key] = $value->value;
+        } elseif (is_subclass_of($enumClass, \BackedEnum::class)) {
+            if ($value instanceof $enumClass) {
+                $this->attributes[$key] = $value->value;
+            } else {
+                $this->attributes[$key] = $enumClass::from($value)->value;
+            }
         } else {
-            $this->attributes[$key] = $enumClass::from($value)->value;
+            if ($value instanceof $enumClass) {
+                $this->attributes[$key] = $value->name;
+            } else {
+                $this->attributes[$key] = constant($enumClass.'::'.$value)->name;
+            }
         }
     }
 
