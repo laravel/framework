@@ -227,57 +227,49 @@ class ServeCommand extends Command
     protected function handleProcessOutput()
     {
         return fn ($type, $buffer) => str($buffer)->explode("\n")->each(function ($line) {
+            $requestPort = $this->getRequestPortFromLine($line);
+            $requestDate = $this->getDateFromLine($line);
+
             if (str($line)->contains('Development Server (http')) {
                 $this->components->info("Server running on [http://{$this->host()}:{$this->port()}].");
                 $this->comment('  <fg=yellow;options=bold>Press Ctrl+C to stop the server</>');
 
                 $this->newLine();
-            } elseif (str($line)->contains(' Accepted')) {
-                $requestPort = $this->getRequestPortFromLine($line);
+            } elseif (str($line)->contains(' Accepted') && null !== $requestPort && null !== $requestDate) {
+                $this->requestsPool[$requestPort] = [
+                    $requestDate,
+                    false,
+                ];
+            } elseif (str($line)->contains([' [200]: GET ']) && null !== $requestPort) {
+                $this->requestsPool[$requestPort][1] = trim(explode('[200]: GET', $line)[1]);
+            } elseif (str($line)->contains(' Closing') && null !== $requestPort && isset($this->requestsPool[$requestPort]) && count($this->requestsPool[$requestPort]) == 2) {
+                $request = $this->requestsPool[$requestPort];
+                
+                [$startDate, $file] = $request;
+
+                $formattedStartedAt = $startDate->format('Y-m-d H:i:s');
+
+                unset($this->requestsPool[$requestPort]);
+
+                [$date, $time] = explode(' ', $formattedStartedAt);
+
+                $this->output->write("  <fg=gray>$date</> $time");
+
                 $requestDate = $this->getDateFromLine($line);
-
-                if (null !== $requestPort && null !== $requestDate) {
-                    $this->requestsPool[$requestPort] = [
-                        $requestDate,
-                        false,
-                    ];
+                if (null !== $requestDate) {
+                    $runTime = $requestDate->diffInSeconds($startDate);
+                } else {
+                    $runTime = 'unknown ';
                 }
-            } elseif (str($line)->contains([' [200]: GET '])) {
-                $requestPort = $this->getRequestPortFromLine($line);
-                if (null !== $requestPort) {
-                    $this->requestsPool[$requestPort][1] = trim(explode('[200]: GET', $line)[1]);
+
+                if ($file) {
+                    $this->output->write($file = " $file");
                 }
-            } elseif (str($line)->contains(' Closing')) {
-                $requestPort = $this->getRequestPortFromLine($line);
-                if (null !== $requestPort) {
-                    $request = $this->requestsPool[$requestPort];
 
-                    [$startDate, $file] = $request;
+                $dots = max(terminal()->width() - mb_strlen($formattedStartedAt) - mb_strlen($file) - mb_strlen($runTime) - 9, 0);
 
-                    $formattedStartedAt = $startDate->format('Y-m-d H:i:s');
-
-                    unset($this->requestsPool[$requestPort]);
-
-                    [$date, $time] = explode(' ', $formattedStartedAt);
-
-                    $this->output->write("  <fg=gray>$date</> $time");
-
-                    $requestDate = $this->getDateFromLine($line);
-                    if (null !== $requestDate) {
-                        $runTime = $requestDate->diffInSeconds($startDate);
-                    } else {
-                        $runTime = 'unknown ';
-                    }
-
-                    if ($file) {
-                        $this->output->write($file = " $file");
-                    }
-
-                    $dots = max(terminal()->width() - mb_strlen($formattedStartedAt) - mb_strlen($file) - mb_strlen($runTime) - 9, 0);
-
-                    $this->output->write(' '.str_repeat('<fg=gray>.</>', $dots));
-                    $this->output->writeln(" <fg=gray>~ {$runTime}s</>");
-                }
+                $this->output->write(' '.str_repeat('<fg=gray>.</>', $dots));
+                $this->output->writeln(" <fg=gray>~ {$runTime}s</>");
             } elseif (str($line)->contains(['Closed without sending a request'])) {
                 // ...
             } elseif (! empty($line)) {
