@@ -2,6 +2,7 @@
 
 namespace Illuminate\Http\Concerns;
 
+use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Date;
@@ -360,6 +361,24 @@ trait InteractsWithInput
         }
 
         return $enumClass::tryFrom($this->input($key));
+    }
+
+    /**
+     * Retrieve input from the request as a model.
+     *
+     * @param  string  $key
+     * @param  string  $modelClass
+     * @return Eloquent|null
+     */
+    public function model($key, $modelClass)
+    {
+        if ($this->isNotFilled($key) ||
+            ! class_exists($modelClass) ||
+            ! new $modelClass instanceof Eloquent) {
+            return null;
+        }
+
+        return $modelClass::find($this->input($key));
     }
 
     /**
