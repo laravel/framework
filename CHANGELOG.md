@@ -1,6 +1,26 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.24.0...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.25.0...9.x)
+
+
+## [v9.25.0](https://github.com/laravel/framework/compare/v9.24.0...v9.25.0) - 2022-08-16
+
+### Added
+- Added whenNotExactly to Stringable ([#43700](https://github.com/laravel/framework/pull/43700))
+- Added ability to Model::query()->touch() to mass update timestamps ([#43665](https://github.com/laravel/framework/pull/43665))
+
+### Fixed
+- Prevent error in db/model commands when using unsupported columns ([#43635](https://github.com/laravel/framework/pull/43635))
+- Fixes ensureDependenciesExist runtime error ([#43626](https://github.com/laravel/framework/pull/43626))
+- Null value for auto-cast field caused deprication warning in php 8.1 ([#43706](https://github.com/laravel/framework/pull/43706))
+- db:table command properly handle table who doesn't exist ([#43669](https://github.com/laravel/framework/pull/43669))
+
+### Changed
+- Handle assoc mode within db commands ([#43636](https://github.com/laravel/framework/pull/43636))
+- Allow chunkById on Arrays, as well as Models ([#43666](https://github.com/laravel/framework/pull/43666))
+- Allow for int value parameters to whereMonth() and whereDay() ([#43668](https://github.com/laravel/framework/pull/43668))
+- Cleaning up old if-else statement ([#43712](https://github.com/laravel/framework/pull/43712))
+- Ensure correct 'integrity' value is used for css assets ([#43714](https://github.com/laravel/framework/pull/43714))
 
 
 ## [v9.24.0](https://github.com/laravel/framework/compare/v9.23.0...v9.24.0) - 2022-08-09
