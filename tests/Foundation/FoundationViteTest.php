@@ -206,6 +206,42 @@ class FoundationViteTest extends TestCase
         rmdir(public_path($buildDir));
     }
 
+    public function testItCanInjectIntegrityWhenPresentInManifestForCss()
+    {
+        $buildDir = Str::random();
+        $this->makeViteManifest([
+            'resources/js/app.js' => [
+                'file' => 'assets/app.versioned.js',
+                'css' => [
+                    'assets/direct-css-dependency.aabbcc.css',
+                ],
+                'integrity' => 'expected-app.js-integrity',
+            ],
+            '_import.versioned.js' => [
+                'file' => 'assets/import.versioned.js',
+                'css' => [
+                    'assets/imported-css.versioned.css',
+                ],
+                'integrity' => 'expected-import.js-integrity',
+            ],
+            'imported-css.css' => [
+                'file' => 'assets/direct-css-dependency.aabbcc.css',
+                'integrity' => 'expected-imported-css.css-integrity',
+            ],
+        ], $buildDir);
+
+        $result = app(Vite::class)('resources/js/app.js', $buildDir);
+
+        $this->assertSame(
+            '<link rel="stylesheet" href="https://example.com/'.$buildDir.'/assets/direct-css-dependency.aabbcc.css" integrity="expected-imported-css.css-integrity" />'
+            .'<script type="module" src="https://example.com/'.$buildDir.'/assets/app.versioned.js" integrity="expected-app.js-integrity"></script>',
+            $result->toHtml()
+        );
+
+        unlink(public_path("{$buildDir}/manifest.json"));
+        rmdir(public_path($buildDir));
+    }
+
     public function testItCanInjectIntegrityWhenPresentInManifestForImportedCss()
     {
         $buildDir = Str::random();
