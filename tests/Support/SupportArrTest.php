@@ -497,6 +497,13 @@ class SupportArrTest extends TestCase
         $this->assertEmpty(Arr::only($array, ['nonExistingKey']));
     }
 
+    public function testMatch()
+    {
+        $array = ['name' => 'Desk', 'price' => 100, 'orders' => 10];
+        $array = Arr::match($array, ['name', 'price', 'color']);
+        $this->assertEquals(['name' => 'Desk', 'price' => 100, 'color' => null], $array);
+    }
+
     public function testPluck()
     {
         $data = [

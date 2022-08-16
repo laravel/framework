@@ -494,6 +494,21 @@ class Arr
     }
 
     /**
+     * Match array keys with given keys set
+     *
+     * @param  array  $array
+     * @param  array|string  $keys
+     * @return array
+     */
+    public static function match($array, $keys)
+    {
+        foreach ((array) $keys as $key) {
+            $array[$key] = $array[$key] ?? null;
+        }
+        return static::only($array, $keys);
+    }
+
+    /**
      * Pluck an array of values from an array.
      *
      * @param  iterable  $array
