@@ -32,6 +32,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         Concerns\HasTimestamps,
         Concerns\HidesAttributes,
         Concerns\GuardsAttributes,
+        Concerns\HandlesModelIdentities,
         ForwardsCalls;
 
     /**
@@ -522,6 +523,19 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         $model->setRawAttributes((array) $attributes, true);
 
         $model->setConnection($connection ?: $this->getConnectionName());
+
+        if ($this->getIdentityManager()->hasModel($model)) {
+            $model = $this->getIdentityManager()->getModel($model);
+
+            if ($this->areAttributesMoreRecent($model, $attributes)) {
+                $dirtyAttributes = $model->getDirty();
+
+                $model->setRawAttributes((array) $attributes, true);
+                $model->setRawAttributes(array_merge($model->getAttributes(), $dirtyAttributes));
+            }
+
+            return $model;
+        }
 
         $model->fireModelEvent('retrieved', false);
 

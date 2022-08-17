@@ -9,6 +9,7 @@ use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Eloquent\Concerns\QueriesRelationships;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
@@ -39,6 +40,13 @@ class Builder implements BuilderContract
      * @var \Illuminate\Database\Query\Builder
      */
     protected $query;
+
+    /**
+     * The identity manager.
+     *
+     * @var \Illuminate\Database\Eloquent\IdentityManager
+     */
+    protected $identityManager;
 
     /**
      * The model being queried.
@@ -127,6 +135,25 @@ class Builder implements BuilderContract
      * @var array
      */
     protected $removedScopes = [];
+
+    /**
+     * Whether the model is mapped by its identity.
+     *
+     * @var bool
+     */
+    protected bool $identityIsMapped = false;
+
+    /**
+     * Whether the identity map needs refreshing.
+     *
+     * @var bool
+     */
+    protected bool $refreshIdentityMap = false;
+
+    /**
+     * @var array
+     */
+    protected array $noConstraintEagerLoads = [];
 
     /**
      * Create a new Eloquent query builder instance.
@@ -424,6 +451,10 @@ class Builder implements BuilderContract
      */
     public function find($id, $columns = ['*'])
     {
+        if ($this->shouldUseIdentityMap()) {
+            return $this->findOrIdentify($id, $columns);
+        }
+
         if (is_array($id) || $id instanceof Arrayable) {
             return $this->findMany($id, $columns);
         }
@@ -444,6 +475,26 @@ class Builder implements BuilderContract
 
         if (empty($ids)) {
             return $this->model->newCollection();
+        }
+
+        if ($this->shouldUseIdentityMap()) {
+            $models = [];
+            $newIds = [];
+
+            foreach ($ids as $id) {
+                $models[$id] = $this->identityModel($id);
+
+                if ($models[$id] === null) {
+                    $newIds[] = $id;
+                }
+            }
+
+            $newModels = $this->whereKey($newIds)->get($columns);
+            $newModels->each(function (Model $model) use(&$models) {
+                $models[$model->getKey()] = $model;
+            });
+
+            return $this->model->newCollection(array_values($models));
         }
 
         return $this->whereKey($ids)->get($columns);
@@ -520,6 +571,99 @@ class Builder implements BuilderContract
         }
 
         return $callback();
+    }
+
+    /**
+     * Find a model by its primary key or load by its identity.
+     *
+     * @param  mixed  $id
+     * @param  array|string  $columns
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static[]|static|null
+     */
+    public function findOrIdentify($id, $columns = ['*'])
+    {
+        if (is_array($id) || $id instanceof Arrayable) {
+            return $this->findMany($id, $columns);
+        }
+
+        $model = $this->identifyModel($id);
+
+        return $this->identifyModel($id) ?? $this->whereKey($id)->first($columns);
+    }
+
+    /**
+     * Get the identity manager.
+     *
+     * @return \Illuminate\Database\Eloquent\IdentityManager
+     */
+    public function getIdentityManager()
+    {
+        if (! isset($this->identityManager)) {
+            $this->identityManager = app(IdentityManager::class);
+        }
+
+        return $this->identityManager;
+    }
+
+    /**
+     * Get a model by its identity, if it is mapped.
+     *
+     * @param $id
+     *
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
+    protected function identityModel($id)
+    {
+        if (! $this->identityIsMapped || ! $this->shouldUseIdentityMap()) {
+            return null;
+        }
+
+        $identifier = $this->newModelInstance([
+            $this->getModel()->getKeyName() => $id
+        ])->getModelIdentifier();
+
+        if ($this->getIdentityManager()->hasModel($identifier)) {
+            return $this->getIdentityManager()->getModel($identifier);
+        }
+
+        return null;
+    }
+
+    /**
+     * Determine whether the identity map should be used.
+     *
+     * @return bool
+     */
+    protected function shouldUseIdentityMap()
+    {
+        return ! $this->refreshIdentityMap
+            && empty($this->query->bindings['where'] ?? [])
+            && empty($this->query->bindings['join'] ?? [])
+            && empty($this->query->bindings['having'] ?? []);
+    }
+
+    /**
+     * Tell the query to use the identity map.
+     *
+     * @return static
+     */
+    public function useIdentityMap(): self
+    {
+        $this->refreshIdentityMap = false;
+
+        return $this;
+    }
+
+    /**
+     * Tell the query to not use the identity map, and refresh it.
+     *
+     * @return static
+     */
+    public function refreshIdentityMap(): self
+    {
+        $this->refreshIdentityMap = true;
+
+        return $this;
     }
 
     /**
@@ -734,6 +878,27 @@ class Builder implements BuilderContract
         // add our eager constraints. Then we will merge the wheres that were on the
         // query back to it in order that any where conditions might be specified.
         $relation = $this->getRelation($name);
+        $loadedModels = [];
+        $newModels = $models;
+
+        if ($this->eagerLoadHasNoConstraints($name) && $this->shouldUseIdentityMap()) {
+            if ($relation instanceof BelongsToMany) {
+                // This is intentionally empty so that the relation doesn't get
+                // caught in the belongs to block below it.
+            } else if ($relation instanceof BelongsTo) {
+                $loadedModels = $this->eagerLoadBelongsToIdentities($relation, $newModels);
+            }
+        }
+
+        if (empty($newModels)) {
+            $eagerModels = $relation->getRelated()->newCollection($loadedModels);
+        } else {
+            $relation->addEagerConstraints($newModels);
+
+            $constraints($relation);
+
+            $eagerModels = $relation->getEager()->merge($loadedModels);
+        }
 
         $relation->addEagerConstraints($models);
 
@@ -744,8 +909,55 @@ class Builder implements BuilderContract
         // of models which have been eagerly hydrated and are readied for return.
         return $relation->match(
             $relation->initRelation($models, $name),
-            $relation->getEager(), $name
+            $eagerModels, $name
         );
+    }
+
+    /**
+     * Determine if the eager loadaed relationship has no constraints.
+     *
+     * @param string $name
+     *
+     * @return bool
+     */
+    protected function eagerLoadHasNoConstraints(string $name): bool
+    {
+        return in_array($name, $this->noConstraintEagerLoads, true);
+    }
+
+    /**
+     * Find identity stored models for an eager loaded belongs to relationship.
+     *
+     * @param \Illuminate\Database\Eloquent\Relations\BelongsTo $relation
+     * @param array                                             $models
+     *
+     * @return array
+     */
+    protected function eagerLoadBelongsToIdentities(BelongsTo $relation, array &$models): array
+    {
+        $newModels    = [];
+        $loadedModels = [];
+
+        foreach ($models as $i => $model) {
+            $key = $model->getAttribute($relation->getForeignKeyName());
+
+            if ($key !== null) {
+                if ($relation->getRelated()->isIdentifiableModel()) {
+                    $loadedModel = $this->identityModel($key);
+
+                    if ($loadedModel !== null) {
+                        $loadedModels[] = $loadedModel;
+                        continue;
+                    }
+                }
+
+                $newModels[] = $key;
+            }
+        }
+
+        $models = $newModels;
+
+        return array_unique($loadedModels);
     }
 
     /**
@@ -1461,6 +1673,22 @@ class Builder implements BuilderContract
         $results = [];
 
         foreach ($this->prepareNestedWithRelationships($relations) as $name => $constraints) {
+            // If the "name" value is a numeric key, we can assume that no constraints
+            // have been specified. We will just put an empty Closure there so that
+            // we can treat these all the same while we are looping through them.
+            if (is_numeric($name)) {
+                $name = $constraints;
+
+                if (Str::contains($name, ':')) {
+                    [$name, $constraints] = $this->createSelectWithConstraint($name);
+                } else {
+                    $this->noConstraintEagerLoads[] = $name;
+                    $constraints = function () {
+                        //
+                    };
+                }
+            }
+
             // We need to separate out any nested includes, which allows the developers
             // to load deep relationships using "dots" without stating each level of
             // the relationship with its own key in the array of eager-load names.
@@ -1728,6 +1956,8 @@ class Builder implements BuilderContract
         $this->model = $model;
 
         $this->query->from($model->getTable());
+
+        $this->identityIsMapped = $this->model->isIdentifiableModel();
 
         return $this;
     }

@@ -6,6 +6,7 @@ use Faker\Factory as FakerFactory;
 use Faker\Generator as FakerGenerator;
 use Illuminate\Contracts\Queue\EntityResolver;
 use Illuminate\Database\Connectors\ConnectionFactory;
+use Illuminate\Database\Eloquent\IdentityManager;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\QueueEntityResolver;
 use Illuminate\Support\ServiceProvider;
@@ -43,6 +44,7 @@ class DatabaseServiceProvider extends ServiceProvider
         $this->registerConnectionServices();
         $this->registerEloquentFactory();
         $this->registerQueueableEntityResolver();
+        $this->registerEloquentIdentityManager();
     }
 
     /**
@@ -96,6 +98,18 @@ class DatabaseServiceProvider extends ServiceProvider
             static::$fakers[$locale]->unique(true);
 
             return static::$fakers[$locale];
+        });
+    }
+
+    /**
+     * Register the Eloquent identity map instance in the container.
+     *
+     * @return void
+     */
+    private function registerEloquentIdentityManager()
+    {
+        $this->app->singleton(IdentityManager::class, function ($app) {
+            return new IdentityManager();
         });
     }
 
