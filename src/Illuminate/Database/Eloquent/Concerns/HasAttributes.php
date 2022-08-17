@@ -2077,7 +2077,7 @@ trait HasAttributes
     {
         return array_merge($this->getAppendMutatedAttributes(), $this->appends);
     }
-    
+
     /**
      * Append attributes to query when building a query.
      *
