@@ -468,6 +468,7 @@ class DatabaseEloquentCollectionTest extends TestCase
         $c = $c->makeVisible('test');
         $c = $c->append('test');
 
+        // dd($c[0]->toArray());
         $this->assertEquals(['test' => 'test'], $c[0]->toArray());
     }
 
