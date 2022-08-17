@@ -10,13 +10,6 @@ use Illuminate\Support\Str;
 class Vite
 {
     /**
-     * The cached manifest files.
-     *
-     * @var array
-     */
-    protected static $manifests = [];
-
-    /**
      * The Content Security Policy nonce to apply to all generated tags.
      *
      * @var string|null
@@ -43,6 +36,13 @@ class Vite
      * @var array
      */
     protected $styleTagAttributesResolvers = [];
+
+    /**
+     * The cached manifest files.
+     *
+     * @var array
+     */
+    protected static $manifests = [];
 
     /**
      * Get the Content Security Policy nonce applied to all generated tags.
@@ -390,6 +390,16 @@ class Vite
     }
 
     /**
+     * Get the path to a given asset when running in HMR mode.
+     *
+     * @return string
+     */
+    protected function hotAsset($asset)
+    {
+        return rtrim(file_get_contents(public_path('/hot'))).'/'.$asset;
+    }
+
+    /**
      * Get the URL for an asset.
      *
      * @param  string  $asset
@@ -408,7 +418,7 @@ class Vite
     }
 
     /**
-     * Get the the manifest file in the build directory.
+     * Get the the manifest file for the given build directory.
      *
      * @param  string  $buildDirectory
      * @return array
@@ -456,15 +466,5 @@ class Vite
     protected function isRunningHot()
     {
         return is_file(public_path('/hot'));
-    }
-
-    /**
-     * The path for assets during HMR mode.
-     *
-     * @return string
-     */
-    protected function hotAsset($asset)
-    {
-        return rtrim(file_get_contents(public_path('/hot'))).'/'.$asset;
     }
 }
