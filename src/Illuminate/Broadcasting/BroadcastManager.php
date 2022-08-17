@@ -169,7 +169,7 @@ class BroadcastManager implements FactoryContract
         }
 
         $broadcastEvent = new BroadcastEvent(clone $event);
-        if($event instanceof ShouldBeUnique) {
+        if ($event instanceof ShouldBeUnique) {
             $broadcastEvent = new UniqueBroadcastEvent(clone $event);
             if ($this->mustBeUniqueAndCannotAcquireLock($broadcastEvent)) {
                 return;
