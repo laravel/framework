@@ -81,14 +81,14 @@ class HasInDatabase extends Constraint
         $similarResults = $query->where(
             array_key_first($this->data),
             $this->data[array_key_first($this->data)]
-        )->limit($this->show)->get();
+        )->select(array_keys($this->data))->limit($this->show)->get();
 
         if ($similarResults->isNotEmpty()) {
             $description = 'Found similar results: '.json_encode($similarResults, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         } else {
             $query = $this->database->table($table);
 
-            $results = $query->limit($this->show)->get();
+            $results = $query->select(array_keys($this->data))->limit($this->show)->get();
 
             if ($results->isEmpty()) {
                 return 'The table is empty';
