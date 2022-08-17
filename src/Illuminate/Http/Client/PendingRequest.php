@@ -1089,9 +1089,12 @@ class PendingRequest
      */
     protected function dispatchConnectionFailedEvent()
     {
-        if ($dispatcher = optional($this->factory)->getDispatcher()) {
-            $dispatcher->dispatch(new ConnectionFailed($this->request));
+        if (! ($dispatcher = optional($this->factory)->getDispatcher()) ||
+            ! $this->request) {
+                return;
         }
+
+        $dispatcher->dispatch(new ConnectionFailed($this->request));
     }
 
     /**
