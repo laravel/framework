@@ -186,6 +186,8 @@ trait HasAttributes
      */
     public function attributesToArray()
     {
+        $this->sutAppendMutatedAttributes();
+
         // If an attribute is a date, we will cast it to a string after converting it
         // to a DateTime / Carbon instance. This is so we will get some consistent
         // formatting while accessing attributes vs. arraying / JSONing a model.
@@ -212,6 +214,39 @@ trait HasAttributes
         }
 
         return $attributes;
+    }
+
+    /**
+     * Set attributes has append to the appends array.
+     *
+     * @return void
+     */
+    public function sutAppendMutatedAttributes()
+    {
+        $attributes = $this->getAppendMutatedAttributes();
+        $this->setAppends($attributes);
+    }
+
+    /**
+     * Get attributes has append to the appends array.
+     *
+     * @return array
+     */
+    protected function getAppendMutatedAttributes()
+    {
+        $class = static::class;
+
+        return collect(static::getAttributeMarkedMutatorMethods($class))
+            ->filter(function ($methodName) {
+                $attribute = $this->{Str::camel($methodName)}();
+
+                return $attribute->withAppend;
+            })
+            ->map(function ($match) {
+                return lcfirst(static::$snakeAttributes ? Str::snake($match) : $match);
+            })
+            ->values()
+            ->all();
     }
 
     /**
@@ -2034,6 +2069,16 @@ trait HasAttributes
     }
 
     /**
+     * Get all appends with allow append in attributes.
+     *
+     * @return array
+     */
+    public function appends()
+    {
+        return array_merge($this->getAppendMutatedAttributes(), $this->appends);
+    }
+    
+    /**
      * Append attributes to query when building a query.
      *
      * @param  array|string  $attributes
@@ -2069,7 +2114,7 @@ trait HasAttributes
      */
     public function hasAppended($attribute)
     {
-        return in_array($attribute, $this->appends);
+        return in_array($attribute, $this->appends());
     }
 
     /**

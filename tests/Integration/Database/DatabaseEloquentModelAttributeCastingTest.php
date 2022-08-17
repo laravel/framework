@@ -18,6 +18,11 @@ class DatabaseEloquentModelAttributeCastingTest extends DatabaseTestCase
             $table->increments('id');
             $table->timestamps();
         });
+
+        Schema::create('test_eloquent_model_with_appends', function (Blueprint $table) {
+            $table->increments('id');
+            $table->timestamps();
+        });
     }
 
     public function testBasicCustomCasting()
@@ -331,6 +336,15 @@ class DatabaseEloquentModelAttributeCastingTest extends DatabaseTestCase
             $this->assertNotSame($previous, $previous = $model->virtualDateTimeWithoutCachingFluent);
         }
     }
+
+    public function testAppendingOfAttributes()
+    {
+        $model = new TestEloquentModelWithAppend;
+
+        $this->assertTrue(isset($model->studly_cased));
+        $this->assertSame('StudlyCased', $model->studly_cased);
+        $this->assertTrue($model->hasAppended('studly_cased'));
+    }
 }
 
 class TestEloquentModelWithAttributeCast extends Model
@@ -518,5 +532,15 @@ class AttributeCastAddress
     {
         $this->lineOne = $lineOne;
         $this->lineTwo = $lineTwo;
+    }
+}
+
+class TestEloquentModelWithAppend extends Model
+{
+    protected function studlyCased(): Attribute
+    {
+        return Attribute::get(function () {
+            return 'StudlyCased';
+        })->withAppend();
     }
 }

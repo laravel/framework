@@ -1774,7 +1774,7 @@ class DatabaseEloquentModelTest extends TestCase
     public function testAppendingOfAttributes()
     {
         $model = new EloquentModelAppendsStub;
-
+        
         $this->assertTrue(isset($model->is_admin));
         $this->assertTrue(isset($model->camelCased));
         $this->assertTrue(isset($model->StudlyCased));

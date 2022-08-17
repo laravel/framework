@@ -33,6 +33,13 @@ class Attribute
     public $withObjectCaching = true;
 
     /**
+     * Indicates if need to add this attribute in append.
+     *
+     * @var bool
+     */
+    public $withAppend = false;
+
+    /**
      * Create a new attribute accessor / mutator.
      *
      * @param  callable|null  $get
@@ -99,6 +106,18 @@ class Attribute
     public function shouldCache()
     {
         $this->withCaching = true;
+
+        return $this;
+    }
+
+    /**
+     * Enable append for the attribute.
+     *
+     * @return static
+     */
+    public function withAppend()
+    {
+        $this->withAppend = true;
 
         return $this;
     }
