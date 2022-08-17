@@ -397,9 +397,8 @@ class BusBatchTest extends TestCase
         $builder = m::spy(Builder::class);
 
         $connection->shouldReceive('table')->andReturn($builder);
-        $builder->shouldReceive('where')->andReturnSelf()
-            ->shouldReceive('when')->passthru()
-            ->shouldReceive('useWritePdo')->andReturnSelf();
+        $builder->shouldReceive('useWritePdo')->andReturnSelf();
+        $builder->shouldReceive('where')->andReturnSelf();
 
         $repository = new DatabaseBatchRepository(
             new BatchFactory(m::mock(Factory::class)), $connection, 'job_batches'
@@ -424,7 +423,7 @@ class BusBatchTest extends TestCase
 
         $connection = m::spy(PostgresConnection::class);
 
-        $connection->shouldReceive('table->where->when->first')
+        $connection->shouldReceive('table->useWritePdo->where->first')
             ->andReturn($m = (object) [
                 'id' => '',
                 'name' => '',
