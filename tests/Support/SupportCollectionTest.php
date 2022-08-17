@@ -1207,7 +1207,7 @@ class SupportCollectionTest extends TestCase
      */
     public function testFlatGet($collection)
     {
-        $c = new $collection([['data' => [1, 2, 3]]]);
+        $c = new $collection(['data' => [1, 2, 3]]);
 
         $this->assertEquals([1, 2, 3], $c->flatGet('data')->all());
     }
