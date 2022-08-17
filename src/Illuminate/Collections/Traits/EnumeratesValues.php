@@ -397,10 +397,10 @@ trait EnumeratesValues
     /**
      * flatten the collection by the given key.
      *
-     * @param  string  $key
+     * @param  \Illuminate\Support\Enumerable<array-key, TKey>|array<array-key, TKey>|string  $key
      * @return static
      */
-    public function flatGet(string $key)
+    public function flatGet($key)
     {
         return $this->only($key)->collapse();
     }
