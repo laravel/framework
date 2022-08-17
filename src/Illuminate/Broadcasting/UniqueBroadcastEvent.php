@@ -2,6 +2,7 @@
 
 namespace Illuminate\Broadcasting;
 
+use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 
 class UniqueBroadcastEvent extends BroadcastEvent implements ShouldBeUnique
@@ -19,13 +20,6 @@ class UniqueBroadcastEvent extends BroadcastEvent implements ShouldBeUnique
      * @var int
      */
     public $uniqueFor;
-
-    /**
-     * The cache repository implementation that should be used to obtain unique locks.
-     *
-     * @var \Illuminate\Contracts\Cache\Repository
-     */
-    public $uniqueVia;
 
     /**
      * Create a new job handler instance.
@@ -49,12 +43,15 @@ class UniqueBroadcastEvent extends BroadcastEvent implements ShouldBeUnique
             $this->uniqueFor = $event->uniqueFor;
         }
 
-        if (method_exists($event, 'uniqueVia')) {
-            $this->uniqueVia = $event->uniqueVia();
-        } elseif (property_exists($event, 'uniqueVia')) {
-            $this->uniqueVia = $event->uniqueVia;
+        parent::__construct($event);
+    }
+
+    public function uniqueVia()
+    {
+        if (method_exists($this->event, 'uniqueVia')) {
+            return $this->event->uniqueVia();
         }
 
-        parent::__construct($event);
+        return app(Repository::class);
     }
 }
