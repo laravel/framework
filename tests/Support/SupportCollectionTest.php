@@ -1201,7 +1201,7 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals('foo', $c->value('pivot.value'));
         $this->assertEquals('bar', $c->where('id', 2)->value('pivot.value'));
     }
-    
+
     /**
      * @dataProvider collectionClassProvider
      */
@@ -1211,7 +1211,7 @@ class SupportCollectionTest extends TestCase
 
         $this->assertEquals([1, 2, 3], $c->flatGet('data')->all());
     }
-    
+
     /**
      * @dataProvider collectionClassProvider
      */
