@@ -337,13 +337,17 @@ class DatabaseEloquentModelAttributeCastingTest extends DatabaseTestCase
         }
     }
 
-    public function testAppendingOfAttributes()
+    public function testEloquentModelWithAppend()
     {
         $model = new TestEloquentModelWithAppend;
 
-        $this->assertTrue(isset($model->studly_cased));
-        $this->assertSame('StudlyCased', $model->studly_cased);
-        $this->assertTrue($model->hasAppended('studly_cased'));
+        $this->assertTrue(isset($model->name));
+        $this->assertSame('Michael', $model->name);
+        $this->assertTrue($model->hasAppended('name'));
+
+        $this->assertTrue(isset($model->firstName));
+        $this->assertSame('Nabil', $model->firstName);
+        $this->assertFalse($model->hasAppended('firstName'));
     }
 }
 
@@ -537,10 +541,17 @@ class AttributeCastAddress
 
 class TestEloquentModelWithAppend extends Model
 {
-    protected function studlyCased(): Attribute
+    protected function name(): Attribute
     {
         return Attribute::get(function () {
-            return 'StudlyCased';
+            return 'Michael';
         })->withAppend();
+    }
+
+    protected function firstName(): Attribute
+    {
+        return Attribute::get(function () {
+            return 'Nabil';
+        });
     }
 }

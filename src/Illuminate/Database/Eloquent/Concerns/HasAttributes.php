@@ -224,7 +224,7 @@ trait HasAttributes
     public function sutAppendMutatedAttributes()
     {
         $attributes = $this->getAppendMutatedAttributes();
-        $this->setAppends($attributes);
+        $this->append($attributes);
     }
 
     /**
