@@ -1386,7 +1386,7 @@ class Builder implements BuilderContract
      *
      * @param  string  $column
      * @param  string  $operator
-     * @param  \DateTimeInterface|string|null  $value
+     * @param  \DateTimeInterface|string|int|null  $value
      * @param  string  $boolean
      * @return $this
      */
@@ -1403,7 +1403,7 @@ class Builder implements BuilderContract
         }
 
         if (! $value instanceof Expression) {
-            $value = str_pad($value, 2, '0', STR_PAD_LEFT);
+            $value = sprintf('%02d', $value);
         }
 
         return $this->addDateBasedWhere('Day', $column, $operator, $value, $boolean);
@@ -1414,7 +1414,7 @@ class Builder implements BuilderContract
      *
      * @param  string  $column
      * @param  string  $operator
-     * @param  \DateTimeInterface|string|null  $value
+     * @param  \DateTimeInterface|string|int|null  $value
      * @return $this
      */
     public function orWhereDay($column, $operator, $value = null)
@@ -1431,7 +1431,7 @@ class Builder implements BuilderContract
      *
      * @param  string  $column
      * @param  string  $operator
-     * @param  \DateTimeInterface|string|null  $value
+     * @param  \DateTimeInterface|string|int|null  $value
      * @param  string  $boolean
      * @return $this
      */
@@ -1448,7 +1448,7 @@ class Builder implements BuilderContract
         }
 
         if (! $value instanceof Expression) {
-            $value = str_pad($value, 2, '0', STR_PAD_LEFT);
+            $value = sprintf('%02d', $value);
         }
 
         return $this->addDateBasedWhere('Month', $column, $operator, $value, $boolean);
@@ -1459,7 +1459,7 @@ class Builder implements BuilderContract
      *
      * @param  string  $column
      * @param  string  $operator
-     * @param  \DateTimeInterface|string|null  $value
+     * @param  \DateTimeInterface|string|int|null  $value
      * @return $this
      */
     public function orWhereMonth($column, $operator, $value = null)
