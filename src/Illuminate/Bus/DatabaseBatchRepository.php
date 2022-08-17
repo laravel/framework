@@ -71,12 +71,14 @@ class DatabaseBatchRepository implements PrunableBatchRepository
      * Retrieve information about an existing batch.
      *
      * @param  string  $batchId
+     * @param  bool  $useWritePdo
      * @return \Illuminate\Bus\Batch|null
      */
-    public function find(string $batchId)
+    public function find(string $batchId, bool $useWritePdo = false)
     {
         $batch = $this->connection->table($this->table)
                             ->where('id', $batchId)
+                            ->when($useWritePdo, fn($query) => $query->useWritePdo())
                             ->first();
 
         if ($batch) {
@@ -107,7 +109,8 @@ class DatabaseBatchRepository implements PrunableBatchRepository
             'finished_at' => null,
         ]);
 
-        return $this->find($id);
+        // Use write PDO to prevent reading from a replicated DB immediately after writing
+        return $this->find($id, useWritePdo: true);
     }
 
     /**

@@ -395,7 +395,8 @@ class BusBatchTest extends TestCase
         $connection = m::spy(PostgresConnection::class);
 
         $connection->shouldReceive('table')->andReturnSelf()
-            ->shouldReceive('where')->andReturnSelf();
+            ->shouldReceive('where')->andReturnSelf()
+            ->shouldReceive('useWritePdo')->andReturnSelf();
 
         $repository = new DatabaseBatchRepository(
             new BatchFactory(m::mock(Factory::class)), $connection, 'job_batches'
@@ -407,6 +408,8 @@ class BusBatchTest extends TestCase
             ->withArgs(function ($argument) use ($pendingBatch) {
                 return unserialize(base64_decode($argument['options'])) === $pendingBatch->options;
             });
+
+        $connection->shouldHaveReceived('first');
     }
 
     /**
