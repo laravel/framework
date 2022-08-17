@@ -4,6 +4,7 @@ namespace Illuminate\Queue;
 
 use Exception;
 use Illuminate\Bus\Batchable;
+use Illuminate\Bus\UniqueLock;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Container\Container;
@@ -204,17 +205,7 @@ class CallQueuedHandler
             return;
         }
 
-        $uniqueId = method_exists($command, 'uniqueId')
-                    ? $command->uniqueId()
-                    : ($command->uniqueId ?? '');
-
-        $cache = method_exists($command, 'uniqueVia')
-                    ? $command->uniqueVia()
-                    : $this->container->make(Cache::class);
-
-        $cache->lock(
-            'laravel_unique_job:'.get_class($command).$uniqueId
-        )->forceRelease();
+        (new UniqueLock($this->container->make(Cache::class)))->release($command);
     }
 
     /**
