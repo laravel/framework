@@ -201,11 +201,9 @@ class CallQueuedHandler
      */
     protected function ensureUniqueJobLockIsReleased($command)
     {
-        if (! $command instanceof ShouldBeUnique) {
-            return;
+        if ($command instanceof ShouldBeUnique) {
+            (new UniqueLock($this->container->make(Cache::class)))->release($command);
         }
-
-        (new UniqueLock($this->container->make(Cache::class)))->release($command);
     }
 
     /**
