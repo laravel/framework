@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Console;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\File;
 use LogicException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Throwable;
@@ -12,6 +13,7 @@ use Throwable;
 #[AsCommand(name: 'config:cache')]
 class ConfigCacheCommand extends Command
 {
+
     /**
      * The console command name.
      *
@@ -66,7 +68,9 @@ class ConfigCacheCommand extends Command
      */
     public function handle()
     {
-        $this->callSilent('config:clear');
+        $this->hasEnv();
+
+        $this->call('config:clear');
 
         $config = $this->getFreshConfiguration();
 
@@ -101,5 +105,59 @@ class ConfigCacheCommand extends Command
         $app->make(ConsoleKernelContract::class)->bootstrap();
 
         return $app['config']->all();
+    }
+
+    /**
+     * Checks if env() is being used under /app directory recursively.
+     * A Laravel app will ignore env() if php artisan config:cache has been run
+     * resulting in empty values.
+     *
+     * @return bool
+     */
+    private function hasEnv(): bool
+    {
+        $root = $this->laravel->basePath();
+
+        $dir = $root.'/app/';
+        $re = '/env\(.*\)/m';
+        $results = [];
+        $files = File::allFiles($dir);
+
+        foreach ($files as $file)
+        {
+            $content = file_get_contents($dir.$file->getRelativePathname());
+
+            if (!$content)
+            {
+                continue;
+            }
+
+            $found = count(preg_grep($re, [$content]));
+            if ($found == 0) {
+                continue;
+            }
+
+
+            $results[] = [
+                'file' => $file,
+            ];
+        }
+
+        if (count($results) == 0)
+        {
+            return false;
+        }
+
+        $this->warn('env() exists in:');
+        $this->newLine();
+        foreach ($results as $result)
+        {
+            $this->warn($result['file']);
+        }
+
+        $this->newLine();
+        $this->warn('Please remove your env() outside of config directory if you want to use config:cache');
+
+        return true;
     }
 }
