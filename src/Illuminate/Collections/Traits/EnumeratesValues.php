@@ -395,6 +395,17 @@ trait EnumeratesValues
     }
 
     /**
+     * flatten the collection by the given key.
+     *
+     * @param  string  $key
+     * @return static
+     */
+    public function flatGet(string $key)
+    {
+        return $this->only($key)->collapse();
+    }
+
+    /**
      * Map the values into a new class.
      *
      * @template TMapIntoValue
