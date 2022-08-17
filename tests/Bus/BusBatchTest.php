@@ -396,6 +396,7 @@ class BusBatchTest extends TestCase
 
         $connection->shouldReceive('table')->andReturnSelf()
             ->shouldReceive('where')->andReturnSelf()
+            ->shouldReceive('when')->passthru()
             ->shouldReceive('useWritePdo')->andReturnSelf();
 
         $repository = new DatabaseBatchRepository(

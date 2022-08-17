@@ -78,7 +78,7 @@ class DatabaseBatchRepository implements PrunableBatchRepository
     {
         $batch = $this->connection->table($this->table)
                             ->where('id', $batchId)
-                            ->when($useWritePdo, fn($query) => $query->useWritePdo())
+                            ->when($useWritePdo, fn ($query) => $query->useWritePdo())
                             ->first();
 
         if ($batch) {
