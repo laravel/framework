@@ -2262,7 +2262,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         $this->classCastCache = [];
         $this->attributeCastCache = [];
 
-        return array_keys(get_object_vars($this));
+        return array_keys(Arr::except(get_object_vars($this), 'identityManager'));
     }
 
     /**
