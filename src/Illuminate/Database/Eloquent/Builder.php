@@ -586,8 +586,6 @@ class Builder implements BuilderContract
             return $this->findMany($id, $columns);
         }
 
-        $model = $this->identifyModel($id);
-
         return $this->identifyModel($id) ?? $this->whereKey($id)->first($columns);
     }
 
@@ -614,7 +612,7 @@ class Builder implements BuilderContract
      */
     protected function identityModel($id)
     {
-        if (! $this->identityIsMapped || ! $this->shouldUseIdentityMap()) {
+        if (! $this->shouldUseIdentityMap()) {
             return null;
         }
 
@@ -636,7 +634,8 @@ class Builder implements BuilderContract
      */
     protected function shouldUseIdentityMap()
     {
-        return ! $this->refreshIdentityMap
+        return $this->identityIsMapped
+            && ! $this->refreshIdentityMap
             && empty($this->query->bindings['where'] ?? [])
             && empty($this->query->bindings['join'] ?? [])
             && empty($this->query->bindings['having'] ?? []);

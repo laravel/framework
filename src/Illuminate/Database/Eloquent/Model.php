@@ -1213,6 +1213,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
         $this->wasRecentlyCreated = true;
 
+        if ($this->isIdentifiableModel()) {
+            $this->storeModelIdentity();
+        }
+
         $this->fireModelEvent('created', false);
 
         return true;
@@ -1302,6 +1306,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         $this->touchOwners();
 
         $this->performDeleteOnModel();
+
+        if ($this->isIdentifiableModel()) {
+            $this->forgetModelIdentity();
+        }
 
         // Once the model has been deleted, we will fire off the deleted event so that
         // the developers may hook into post-delete operations. We will then return

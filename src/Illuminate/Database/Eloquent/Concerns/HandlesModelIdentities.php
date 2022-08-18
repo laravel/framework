@@ -24,26 +24,6 @@ trait HandlesModelIdentities
     private $identityManager;
 
     /**
-     * Boot the trait.
-     *
-     * @return void
-     */
-    public static function bootHandlesModelIdentities()
-    {
-        static::deleted(function (Model $model) {
-            if ($model->isIdentifiableModel()) {
-                $model->forgetModelIdentity();
-            }
-        });
-
-        static::created(function (Model $model) {
-            if ($model->isIdentifiableModel()) {
-                $model->storeModelIdentity();
-            }
-        });
-    }
-
-    /**
      * Get the identifier for the model.
      *
      * @throws \Illuminate\Database\Eloquent\ModelIdentityException
