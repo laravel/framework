@@ -892,19 +892,19 @@ class Builder implements BuilderContract
 
         if (empty($newModels)) {
             $eagerModels = $relation->getRelated()->newCollection($loadedModels);
+
+            $newModels = $relation->initRelation($newModels, $name);
         } else {
             $relation->addEagerConstraints($newModels);
 
             $constraints($relation);
 
+            $newModels = $relation->initRelation($newModels, $name);
+
             $eagerModels = $relation->getEager();
 
             if (! empty($loadedModels)) {
-                if ($eagerModels instanceof \Illuminate\Support\Collection) {
-                    $eagerModels = $eagerModels->merge($loadedModels);
-                } else {
-                    $eagerModels = array_merge($eagerModels, $loadedModels);
-                }
+                $eagerModels = $eagerModels->merge($loadedModels);
             }
         }
 
@@ -912,8 +912,7 @@ class Builder implements BuilderContract
         // using the relationship instance. Then we just return the finished arrays
         // of models which have been eagerly hydrated and are readied for return.
         return $relation->match(
-            $relation->initRelation($models, $name),
-            $eagerModels, $name
+            $newModels, $eagerModels, $name
         );
     }
 
