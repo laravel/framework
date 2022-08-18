@@ -2,35 +2,25 @@
 
 namespace Illuminate\Tests\Foundation;
 
+use Exception;
 use Illuminate\Foundation\Vite;
-use Illuminate\Routing\UrlGenerator;
-use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\Vite as ViteFacade;
 use Illuminate\Support\Str;
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Orchestra\Testbench\TestCase;
 
 class FoundationViteTest extends TestCase
 {
     protected function setUp(): void
     {
-        app()->instance('url', tap(
-            m::mock(UrlGenerator::class),
-            fn ($url) => $url
-                ->shouldReceive('asset')
-                ->andReturnUsing(fn ($value) => "https://example.com{$value}")
-        ));
+        parent::setUp();
 
-        app()->singleton(Vite::class);
-        Facade::setFacadeApplication(app());
+        app('config')->set('app.asset_url', 'https://example.com');
     }
 
     protected function tearDown(): void
     {
         $this->cleanViteManifest();
         $this->cleanViteHotFile();
-        Facade::clearResolvedInstances();
-        m::close();
     }
 
     public function testViteWithJsOnly()
@@ -511,6 +501,42 @@ class FoundationViteTest extends TestCase
             .'<script type="expected-type" src="expected-src"></script>',
             $result->toHtml()
         );
+    }
+
+    public function testItCanGenerateIndividualAssetUrlInBuildMode()
+    {
+        $this->makeViteManifest();
+
+        $url = ViteFacade::asset('resources/js/app.js');
+
+        $this->assertSame('https://example.com/build/assets/app.versioned.js', $url);
+    }
+
+    public function testItCanGenerateIndividualAssetUrlInHotMode()
+    {
+        $this->makeViteHotFile();
+
+        $url = ViteFacade::asset('resources/js/app.js');
+
+        $this->assertSame('http://localhost:3000/resources/js/app.js', $url);
+    }
+
+    public function testItThrowsWhenUnableToFindAssetManifestInBuildMode()
+    {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Vite manifest not found at: '.public_path('build/manifest.json'));
+
+        ViteFacade::asset('resources/js/app.js');
+    }
+
+    public function testItThrowsWhenUnableToFindAssetChunkInBuildMode()
+    {
+        $this->makeViteManifest();
+
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Unable to locate file in Vite manifest: resources/js/missing.js');
+
+        ViteFacade::asset('resources/js/missing.js');
     }
 
     protected function makeViteManifest($contents = null, $path = 'build')
