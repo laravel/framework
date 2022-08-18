@@ -82,9 +82,7 @@ class IdentityManager
      */
     public function forgetModel(Model|string $identifier)
     {
-        if ($this->hasModel($identifier)) {
-            $this->models->forget($this->getIdentifier($identifier));
-        }
+        $this->models->forget($this->getIdentifier($identifier));
 
         return $this;
     }

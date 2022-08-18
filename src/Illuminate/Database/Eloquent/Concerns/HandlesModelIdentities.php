@@ -31,11 +31,15 @@ trait HandlesModelIdentities
     public static function bootHandlesModelIdentities()
     {
         static::deleted(function (Model $model) {
-            $model->forgetModelIdentity();
+            if ($model->isIdentifiableModel()) {
+                $model->forgetModelIdentity();
+            }
         });
 
         static::created(function (Model $model) {
-            $model->storeModelIdentity();
+            if ($model->isIdentifiableModel()) {
+                $model->storeModelIdentity();
+            }
         });
     }
 

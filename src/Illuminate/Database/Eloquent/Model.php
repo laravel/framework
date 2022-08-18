@@ -524,7 +524,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
         $model->setConnection($connection ?: $this->getConnectionName());
 
-        if ($this->getIdentityManager()->hasModel($model)) {
+        if ($this->isIdentifiableModel() && $this->getIdentityManager()->hasModel($model)) {
             $model = $this->getIdentityManager()->getModel($model);
 
             if ($this->areAttributesMoreRecent($model, $attributes)) {
