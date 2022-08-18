@@ -24,7 +24,8 @@ trait SerializesAndRestoresModelIdentifiers
                 $value->getQueueableClass(),
                 $value->getQueueableIds(),
                 $value->getQueueableRelations(),
-                $value->getQueueableConnection()
+                $value->getQueueableConnection(),
+                get_class($value)
             );
         }
 
@@ -66,7 +67,9 @@ trait SerializesAndRestoresModelIdentifiers
     protected function restoreCollection($value)
     {
         if (! $value->class || count($value->id) === 0) {
-            return new EloquentCollection;
+            return ! is_null($value->collectionClass ?? null)
+                ? new $value->collectionClass
+                : new EloquentCollection;
         }
 
         $collection = $this->getQueryForModelRestoration(

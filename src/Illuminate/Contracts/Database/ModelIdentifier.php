@@ -35,19 +35,28 @@ class ModelIdentifier
     public $connection;
 
     /**
+     * The class name of the model collection.
+     *
+     * @var string|null
+     */
+    public $collectionClass;
+
+    /**
      * Create a new model identifier.
      *
      * @param  string  $class
      * @param  mixed  $id
      * @param  array  $relations
      * @param  mixed  $connection
+     * @param  string  $collectionClass
      * @return void
      */
-    public function __construct($class, $id, array $relations, $connection)
+    public function __construct($class, $id, array $relations, $connection, $collectionClass = null)
     {
         $this->id = $id;
         $this->class = $class;
         $this->relations = $relations;
         $this->connection = $connection;
+        $this->collectionClass = $collectionClass;
     }
 }
