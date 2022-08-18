@@ -314,8 +314,20 @@ class ModelSerializationTest extends TestCase
         $serialized = serialize(new ModelSerializationParentAccessibleTestClass($user, $user, $user));
 
         $this->assertSame(
-            'O:78:"Illuminate\\Tests\\Integration\\Queue\\ModelSerializationParentAccessibleTestClass":2:{s:4:"user";O:45:"Illuminate\\Contracts\\Database\\ModelIdentifier":4:{s:5:"class";s:61:"Illuminate\\Tests\\Integration\\Queue\\ModelSerializationTestUser";s:2:"id";i:1;s:9:"relations";a:0:{}s:10:"connection";s:7:"testing";}s:8:"'."\0".'*'."\0".'user2";O:45:"Illuminate\\Contracts\\Database\\ModelIdentifier":4:{s:5:"class";s:61:"Illuminate\\Tests\\Integration\\Queue\\ModelSerializationTestUser";s:2:"id";i:1;s:9:"relations";a:0:{}s:10:"connection";s:7:"testing";}}', $serialized
+            'O:78:"Illuminate\\Tests\\Integration\\Queue\\ModelSerializationParentAccessibleTestClass":2:{s:4:"user";O:45:"Illuminate\\Contracts\\Database\\ModelIdentifier":5:{s:5:"class";s:61:"Illuminate\\Tests\\Integration\\Queue\\ModelSerializationTestUser";s:2:"id";i:1;s:9:"relations";a:0:{}s:10:"connection";s:7:"testing";s:15:"collectionClass";N;}s:8:"'."\0".'*'."\0".'user2";O:45:"Illuminate\\Contracts\\Database\\ModelIdentifier":5:{s:5:"class";s:61:"Illuminate\\Tests\\Integration\\Queue\\ModelSerializationTestUser";s:2:"id";i:1;s:9:"relations";a:0:{}s:10:"connection";s:7:"testing";s:15:"collectionClass";N;}}', $serialized
         );
+    }
+
+    public function test_serialization_types_empty_custom_eloquent_collection()
+    {
+        $class = new ModelSerializationTypedCustomCollectionTestClass(
+            new ModelSerializationTestCustomUserCollection());
+
+        $serialized = serialize($class);
+
+        unserialize($serialized);
+
+        $this->assertTrue(true);
     }
 }
 
@@ -350,6 +362,18 @@ class ModelSerializationTestUser extends Model
 class ModelSerializationTestCustomUserCollection extends Collection
 {
     //
+}
+
+class ModelSerializationTypedCustomCollectionTestClass
+{
+    use SerializesModels;
+
+    public ModelSerializationTestCustomUserCollection $collection;
+
+    public function __construct(ModelSerializationTestCustomUserCollection $collection)
+    {
+        $this->collection = $collection;
+    }
 }
 
 class ModelSerializationTestCustomUser extends Model
