@@ -376,7 +376,6 @@ class ModelSerializationTypedCustomCollectionTestClass
     }
 }
 
-
 class ModelSerializationTestCustomUser extends Model
 {
     public $table = 'users';
