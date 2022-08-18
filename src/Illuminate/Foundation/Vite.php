@@ -46,7 +46,7 @@ class Vite implements Htmlable
     protected static $manifests = [];
 
     /**
-     * The registered entry points.
+     * The entry points.
      *
      * @var array
      */
@@ -57,7 +57,7 @@ class Vite implements Htmlable
      *
      * @var string|null
      */
-    protected $hotFilePath;
+    protected $hotFile;
 
     /**
      * The path to the build directory.
@@ -146,7 +146,7 @@ class Vite implements Htmlable
     public function __invoke($entrypoints, $buildDirectory = null)
     {
         $entrypoints = collect($entrypoints);
-        $buildDirectory ??= $this->buildDirectory ?? 'build';
+        $buildDirectory ??= $this->buildDirectory;
 
         if ($this->isRunningHot()) {
             return new HtmlString(
@@ -418,7 +418,66 @@ class Vite implements Htmlable
      */
     protected function hotAsset($asset)
     {
-        return rtrim(file_get_contents(public_path('/hot'))).'/'.$asset;
+        return rtrim(file_get_contents($this->hotFile())).'/'.$asset;
+    }
+
+    /**
+     * Set the entry points.
+     *
+     * @param  array  $entryPoints
+     * @return $this
+     */
+    public function withEntryPoints($entryPoints)
+    {
+        $this->entryPoints = $entryPoints;
+
+        return $this;
+    }
+
+    /**
+     * Set the hot file path.
+     *
+     * @param  string  $path
+     * @return $this
+     */
+    public function useHotFile($path)
+    {
+        $this->hotFile = $path;
+
+        return $this;
+    }
+
+    /**
+     * Get the hot file path.
+     *
+     * @return string
+     */
+    protected function hotFile()
+    {
+        return $this->hotFile ?? public_path('/hot');
+    }
+
+    /**
+     * Set the build directory.
+     *
+     * @param  string  $path
+     * @return $this
+     */
+    public function useBuildDirectory($path)
+    {
+        $this->buildDirectory = $path;
+
+        return $this;
+    }
+
+    /**
+     * Get content as a string of HTML.
+     *
+     * @return string
+     */
+    public function toHtml()
+    {
+        return $this->__invoke($this->entryPoints)->toHtml();
     }
 
     /**
@@ -428,8 +487,10 @@ class Vite implements Htmlable
      * @param  string|null  $buildDirectory
      * @return string
      */
-    public function asset($asset, $buildDirectory = 'build')
+    public function asset($asset, $buildDirectory = null)
     {
+        $buildDirectory ??= $this->buildDirectory;
+
         if ($this->isRunningHot()) {
             return $this->hotAsset($asset);
         }
@@ -449,7 +510,7 @@ class Vite implements Htmlable
      */
     protected function manifest($buildDirectory)
     {
-        $path = public_path($buildDirectory.'/manifest.json');
+        $path = $this->manifestPath($buildDirectory);
 
         if (! isset(static::$manifests[$path])) {
             if (! is_file($path)) {
@@ -460,6 +521,17 @@ class Vite implements Htmlable
         }
 
         return static::$manifests[$path];
+    }
+
+    /**
+     * The path to the manifest file for the given build directory.
+     *
+     * @param  string  $buildDirectory
+     * @return string
+     */
+    protected function manifestPath($buildDirectory)
+    {
+        return public_path($buildDirectory.'/manifest.json');
     }
 
     /**
@@ -487,65 +559,6 @@ class Vite implements Htmlable
      */
     protected function isRunningHot()
     {
-        return is_file(public_path('/hot'));
-    }
-
-    /**
-     * Merge the given entry points.
-     *
-     * @param  array  $entryPoints
-     * @return $this
-     */
-    public function withEntryPoints(array $entryPoints)
-    {
-        $this->entryPoints = array_merge($this->entryPoints, $entryPoints);
-
-        return $this;
-    }
-
-    /**
-     * Set the hot file path attribute.
-     *
-     * @param  string  $path
-     * @return $this
-     */
-    public function useHotFile($path)
-    {
-        $this->hotFilePath = $path;
-
-        return $this;
-    }
-
-    /**
-     * Get the hot file path.
-     *
-     * @return string
-     */
-    protected function hotFilePath()
-    {
-        return $this->hotFilePath ?? public_path('/hot');
-    }
-
-    /**
-     * Set the build directory attribute.
-     *
-     * @param  string  $path
-     * @return $this
-     */
-    public function useBuildDirectory($path)
-    {
-        $this->buildDirectory = $path;
-
-        return $this;
-    }
-
-    /**
-     * Get content as a string of HTML.
-     *
-     * @return string
-     */
-    public function toHtml()
-    {
-        return $this->__invoke($this->entryPoints)->toHtml();
+        return is_file($this->hotFile());
     }
 }
