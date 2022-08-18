@@ -413,7 +413,7 @@ trait EnumeratesValues
      * Get the min value of a given key.
      *
      * @param  (callable(TValue):mixed)|string|null  $callback
-     * @return TValue
+     * @return mixed
      */
     public function min($callback = null)
     {
@@ -432,7 +432,7 @@ trait EnumeratesValues
      * Get the max value of a given key.
      *
      * @param  (callable(TValue):mixed)|string|null  $callback
-     * @return TValue
+     * @return mixed
      */
     public function max($callback = null)
     {
