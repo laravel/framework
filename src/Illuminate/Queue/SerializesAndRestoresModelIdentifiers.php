@@ -25,7 +25,9 @@ trait SerializesAndRestoresModelIdentifiers
                 $value->getQueueableIds(),
                 $value->getQueueableRelations(),
                 $value->getQueueableConnection(),
-                get_class($value)
+                ($collectionClass = get_class($value)) !== EloquentCollection::class
+                    ? $collectionClass
+                    : null
             );
         }
 
