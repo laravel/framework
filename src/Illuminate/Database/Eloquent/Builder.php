@@ -11,6 +11,7 @@ use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Eloquent\Concerns\QueriesRelationships;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\RecordsNotFoundException;
@@ -881,7 +882,7 @@ class Builder implements BuilderContract
         $newModels = $models;
 
         if ($this->eagerLoadHasNoConstraints($name) && $this->shouldUseIdentityMap()) {
-            if ($relation instanceof BelongsToMany) {
+            if ($relation instanceof MorphTo) {
                 // This is intentionally empty so that the relation doesn't get
                 // caught in the belongs to block below it.
             } else if ($relation instanceof BelongsTo) {
@@ -896,7 +897,15 @@ class Builder implements BuilderContract
 
             $constraints($relation);
 
-            $eagerModels = $relation->getEager()->merge($loadedModels);
+            $eagerModels = $relation->getEager();
+
+            if (! empty($loadedModels)) {
+                if ($eagerModels instanceof \Illuminate\Support\Collection) {
+                    $eagerModels = $eagerModels->merge($loadedModels);
+                } else {
+                    $eagerModels = array_merge($eagerModels, $loadedModels);
+                }
+            }
         }
 
         // Once we have the results, we just match those back up to their parent models
