@@ -48,15 +48,26 @@ class ModelIdentifier
      * @param  mixed  $id
      * @param  array  $relations
      * @param  mixed  $connection
-     * @param  string  $collectionClass
      * @return void
      */
-    public function __construct($class, $id, array $relations, $connection, $collectionClass = null)
+    public function __construct($class, $id, array $relations, $connection)
     {
         $this->id = $id;
         $this->class = $class;
         $this->relations = $relations;
         $this->connection = $connection;
+    }
+
+    /**
+     * Specify the collection class that should be used when serializing / restoring collections.
+     *
+     * @param  string|null  $collectionClass
+     * @return $this
+     */
+    public function useCollectionClass(?string $collectionClass)
+    {
         $this->collectionClass = $collectionClass;
+
+        return $this;
     }
 }

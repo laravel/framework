@@ -20,11 +20,12 @@ trait SerializesAndRestoresModelIdentifiers
     protected function getSerializedPropertyValue($value)
     {
         if ($value instanceof QueueableCollection) {
-            return new ModelIdentifier(
+            return (new ModelIdentifier(
                 $value->getQueueableClass(),
                 $value->getQueueableIds(),
                 $value->getQueueableRelations(),
-                $value->getQueueableConnection(),
+                $value->getQueueableConnection()
+            ))->useCollectionClass(
                 ($collectionClass = get_class($value)) !== EloquentCollection::class
                     ? $collectionClass
                     : null
