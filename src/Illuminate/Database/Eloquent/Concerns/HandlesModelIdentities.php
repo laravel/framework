@@ -21,7 +21,7 @@ trait HandlesModelIdentities
     /**
      * @var IdentityManager|null
      */
-    private $identityManager;
+    protected $identityManager;
 
     /**
      * Get the identifier for the model.
