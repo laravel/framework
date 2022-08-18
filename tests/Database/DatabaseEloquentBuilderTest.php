@@ -2183,6 +2183,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model->shouldReceive('getKeyName')->andReturn('foo');
         $model->shouldReceive('getTable')->andReturn('foo_table');
         $model->shouldReceive('getQualifiedKeyName')->andReturn('foo_table.foo');
+        $model->shouldReceive('isIdentifiableModel')->andReturn(false);
 
         return $model;
     }
