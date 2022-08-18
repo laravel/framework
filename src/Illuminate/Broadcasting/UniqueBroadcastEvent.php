@@ -2,6 +2,7 @@
 
 namespace Illuminate\Broadcasting;
 
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 
@@ -22,7 +23,7 @@ class UniqueBroadcastEvent extends BroadcastEvent implements ShouldBeUnique
     public $uniqueFor;
 
     /**
-     * Create a new job handler instance.
+     * Create a new event instance.
      *
      * @param  mixed  $event
      * @return void
@@ -46,12 +47,15 @@ class UniqueBroadcastEvent extends BroadcastEvent implements ShouldBeUnique
         parent::__construct($event);
     }
 
+    /**
+     * Resolve the cache implementation that should manage the event's uniqueness.
+     *
+     * @return \Illuminate\Contracts\Cache\Repository
+     */
     public function uniqueVia()
     {
-        if (method_exists($this->event, 'uniqueVia')) {
-            return $this->event->uniqueVia();
-        }
-
-        return app(Repository::class);
+        return method_exists($this->event, 'uniqueVia')
+                ? $this->event->uniqueVia()
+                : Container::getInstance()->make(Repository::class);
     }
 }
