@@ -6,9 +6,9 @@ namespace Illuminate\Support\Facades;
  * @method static string useCspNonce(?string $nonce = null)
  * @method static string|null cspNonce()
  * @method static string asset(string $asset, string|null $buildDirectory)
- * @method static \Illuminte\Foundation\Vite useIntegrityKey(string|false $key)
- * @method static \Illuminte\Foundation\Vite useScriptTagAttributes(callable|array $callback)
- * @method static \Illuminte\Foundation\Vite useStyleTagAttributes(callable|array $callback)
+ * @method static \Illuminate\Foundation\Vite useIntegrityKey(string|false $key)
+ * @method static \Illuminate\Foundation\Vite useScriptTagAttributes(callable|array $callback)
+ * @method static \Illuminate\Foundation\Vite useStyleTagAttributes(callable|array $callback)
  *
  * @see \Illuminate\Foundation\Vite
  */
