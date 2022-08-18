@@ -26,9 +26,9 @@ trait HandlesModelIdentities
     /**
      * Get the identifier for the model.
      *
-     * @throws \Illuminate\Database\Eloquent\ModelIdentityException
-     *
      * @return string
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelIdentityException
      */
     public function getModelIdentifier()
     {
@@ -90,9 +90,8 @@ trait HandlesModelIdentities
     /**
      * Determine whether the provided attributes are newer than the provided models attributes.
      *
-     * @param \Illuminate\Database\Eloquent\Model $model
-     * @param array                               $attributes
-     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  array  $attributes
      * @return bool
      */
     protected function areAttributesMoreRecent(Model $model, array $attributes)
@@ -108,7 +107,7 @@ trait HandlesModelIdentities
 
             if (is_numeric($updatedAt)) {
                 $updatedAt = Date::createFromTimestamp($updatedAt);
-            } else if (Date::hasFormat($updatedAt, $format)) {
+            } elseif (Date::hasFormat($updatedAt, $format)) {
                 $updatedAt = Date::createFromFormat($format, $updatedAt);
             }
         }

@@ -491,7 +491,7 @@ class Builder implements BuilderContract
             }
 
             $newModels = $this->whereKey($newIds)->get($columns);
-            $newModels->each(function (Model $model) use(&$models) {
+            $newModels->each(function (Model $model) use (&$models) {
                 $models[$model->getKey()] = $model;
             });
 
@@ -885,7 +885,7 @@ class Builder implements BuilderContract
             if ($relation instanceof MorphTo) {
                 // This is intentionally empty so that the relation doesn't get
                 // caught in the belongs to block below it.
-            } else if ($relation instanceof BelongsTo) {
+            } elseif ($relation instanceof BelongsTo) {
                 $loadedModels = $this->eagerLoadBelongsToIdentities($relation, $newModels);
             }
         }
@@ -917,10 +917,9 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Determine if the eager loadaed relationship has no constraints.
+     * Determine if the eager loaded relationship has no constraints.
      *
-     * @param string $name
-     *
+     * @param  string  $name
      * @return bool
      */
     protected function eagerLoadHasNoConstraints(string $name): bool
@@ -931,14 +930,13 @@ class Builder implements BuilderContract
     /**
      * Find identity stored models for an eager loaded belongs to relationship.
      *
-     * @param \Illuminate\Database\Eloquent\Relations\BelongsTo $relation
-     * @param array                                             $models
-     *
+     * @param  \Illuminate\Database\Eloquent\Relations\BelongsTo  $relation
+     * @param  array  $models
      * @return array
      */
     protected function eagerLoadBelongsToIdentities(BelongsTo $relation, array &$models): array
     {
-        $newModels    = [];
+        $newModels = [];
         $loadedModels = [];
 
         foreach ($models as $i => $model) {

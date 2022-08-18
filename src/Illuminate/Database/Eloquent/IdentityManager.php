@@ -14,7 +14,7 @@ class IdentityManager
     /**
      * Create a new identity map instance.
      *
-     * @param \Illuminate\Database\Eloquent\Collection|null $collection
+     * @param  \Illuminate\Database\Eloquent\Collection|null  $collection
      */
     public function __construct(\Illuminate\Support\Collection $collection = null)
     {
@@ -24,11 +24,10 @@ class IdentityManager
     /**
      * Get the model identifier from a model or return the provided string.
      *
-     * @param \Illuminate\Database\Eloquent\Model|string $identifier
+     * @param  \Illuminate\Database\Eloquent\Model|string  $identifier
+     * @return string
      *
      * @throws \Illuminate\Database\Eloquent\ModelIdentityException
-     *
-     * @return string
      */
     private function getIdentifier(Model|string $identifier)
     {
@@ -38,8 +37,7 @@ class IdentityManager
     /**
      * Determine whether a model is stored for an identifier.
      *
-     * @param \Illuminate\Database\Eloquent\Model|string $identifier
-     *
+     * @param  \Illuminate\Database\Eloquent\Model|string  $identifier
      * @return bool
      */
     public function hasModel(Model|string $identifier)
@@ -50,8 +48,7 @@ class IdentityManager
     /**
      * Get a model for the given identifier.
      *
-     * @param \Illuminate\Database\Eloquent\Model|string $identifier
-     *
+     * @param  \Illuminate\Database\Eloquent\Model|string  $identifier
      * @return \Illuminate\Database\Eloquent\Model|null
      */
     public function getModel(Model|string $identifier)
@@ -62,8 +59,7 @@ class IdentityManager
     /**
      * Store the provided model.
      *
-     * @param \Illuminate\Database\Eloquent\Model $model
-     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return static
      */
     public function storeModel(Model $model)
@@ -76,8 +72,7 @@ class IdentityManager
     /**
      * Forget the provided model.
      *
-     * @param \Illuminate\Database\Eloquent\Model|string $identifier
-     *
+     * @param  \Illuminate\Database\Eloquent\Model|string  $identifier
      * @return static
      */
     public function forgetModel(Model|string $identifier)
