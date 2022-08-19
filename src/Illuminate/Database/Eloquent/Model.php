@@ -1605,6 +1605,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
         $this->setRawAttributes(
             $this->setKeysForSelectQuery($this->newQueryWithoutScopes())
+                ->refreshIdentityMap()
                 ->useWritePdo()
                 ->firstOrFail()
                 ->attributes
