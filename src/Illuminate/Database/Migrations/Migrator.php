@@ -275,7 +275,7 @@ class Migrator
 
         $this->fireMigrationEvent(new MigrationsStarted('down'));
 
-        $this->write(Info::class, 'Rollbacking migrations.');
+        $this->write(Info::class, 'Rolling back migrations.');
 
         // Next we will run through all of the migrations and call the "down" method
         // which will reverse each migration in order. This getLast method on the
