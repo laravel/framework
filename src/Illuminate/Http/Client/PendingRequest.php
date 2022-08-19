@@ -41,6 +41,13 @@ class PendingRequest
      * @var \GuzzleHttp\Client
      */
     protected $client;
+    
+     /**
+     * The HTTP handler.
+     *
+     * @var callable|null
+     */
+    protected $handler = null;
 
     /**
      * The base URL for the request.
@@ -978,7 +985,7 @@ class PendingRequest
      */
     protected function requestsReusableClient()
     {
-        return ! is_null($this->client) || $this->async;
+        return ! is_null($this->client);
     }
 
     /**
@@ -1012,7 +1019,7 @@ class PendingRequest
      */
     public function buildHandlerStack()
     {
-        return $this->pushHandlers(HandlerStack::create());
+        return $this->pushHandlers(HandlerStack::create($this->handler));
     }
 
     /**
@@ -1278,9 +1285,7 @@ class PendingRequest
      */
     public function setHandler($handler)
     {
-        $this->client = $this->createClient(
-            $this->pushHandlers(HandlerStack::create($handler))
-        );
+        $this->handler = $handler;
 
         return $this;
     }
