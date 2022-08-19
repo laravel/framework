@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Testing;
 
 use Exception;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Contracts\View\View;
 use Illuminate\Cookie\CookieValuePrefix;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
@@ -1981,8 +1980,7 @@ class TestResponseTest extends TestCase
 
         app()->instance('router', $router);
 
-        $route = new Route('get', '/', function(){
-
+        $route = new Route('get', '/', function() {
         });
         $route->middleware('MiddlewareGroup');
         $route->middleware('MiddlewareClass');

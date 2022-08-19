@@ -64,7 +64,7 @@ trait MakesHttpRequests
     protected $withCredentials = false;
 
     /**
-     * Automatically apply assertMiddleware to TestResponse
+     * Automatically apply assertMiddleware to TestResponse.
      *
      * @var array
      */
@@ -555,7 +555,7 @@ trait MakesHttpRequests
 
         $testResponse = $this->createTestResponse($response);
         $testResponse->setRequestRoute($request->route());
-        if(count($this->assertMiddleware) > 0) {
+        if (count($this->assertMiddleware) > 0) {
             $testResponse->assertMiddleware($this->assertMiddleware);
         }
 
