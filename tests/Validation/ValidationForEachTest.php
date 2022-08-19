@@ -214,8 +214,8 @@ class ValidationForEachTest extends TestCase
         $rules = [
             'items.*.sku' => Rule::forEach(function () {
                 return [
-                    Rule::make('in', ['|foo', '|bar', '|baz']),
-                    Rule::make('ends_with', 'invalid'),
+                    Rule::raw('in', ['|foo', '|bar', '|baz']),
+                    Rule::raw('ends_with', 'invalid'),
                 ];
             }),
         ];

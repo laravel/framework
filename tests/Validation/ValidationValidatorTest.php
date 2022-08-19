@@ -21,6 +21,7 @@ use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
 use Illuminate\Validation\DatabasePresenceVerifierInterface;
 use Illuminate\Validation\Rules\Exists;
+use Illuminate\Validation\Rules\RawRule;
 use Illuminate\Validation\Rules\Unique;
 use Illuminate\Validation\ValidationData;
 use Illuminate\Validation\ValidationException;
@@ -3040,6 +3041,14 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
 
         $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['email' => 'foo'], ['email' => new RawRule('Exists', ['users', 'email', 'account_id', 1, 'name', 'taylor'])]);
+        $mock = m::mock(DatabasePresenceVerifierInterface::class);
+        $mock->shouldReceive('setConnection')->once()->with(null);
+        $mock->shouldReceive('getCount')->once()->with('users', 'email', 'foo', null, null, ['account_id' => 1, 'name' => 'taylor'])->andReturn(1);
+        $v->setPresenceVerifier($mock);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['email' => 'foo'], ['email' => 'Exists:users,email,account_id,1,name,taylor']);
         $mock = m::mock(DatabasePresenceVerifierInterface::class);
         $mock->shouldReceive('setConnection')->once()->with(null);
@@ -3636,7 +3645,7 @@ class ValidationValidatorTest extends TestCase
         // Knowing that demo image.png has width = 3 and height = 2
         $uploadedFile = new UploadedFile(__DIR__.'/fixtures/image.png', '', null, null, true);
         $trans = $this->getIlluminateArrayTranslator();
-
+        
         $v = new Validator($trans, ['x' => 'file'], ['x' => 'dimensions']);
         $this->assertTrue($v->fails());
 
@@ -3671,6 +3680,12 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['x' => $uploadedFile], ['x' => 'dimensions:min_height=2,ratio=3/2']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => $uploadedFile], ['x' => new RawRule('dimensions', ['min_height' => 2, 'ratio' => '3/2'])]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => $uploadedFile], ['x' => new RawRule('dimensions', ['min_height=2', 'ratio=3/2'])]);
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['x' => $uploadedFile], ['x' => 'dimensions:ratio=1.5']);
