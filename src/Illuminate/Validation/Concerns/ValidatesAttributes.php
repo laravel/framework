@@ -2136,12 +2136,19 @@ trait ValidatesAttributes
     public function parseNamedParameters($parameters)
     {
         return array_reduce($parameters, function ($result, $item) {
-            [$key, $value] = array_pad(explode('=', $item, 2), 2, null);
+            // If the item is a an array, we will assume the parameters have been
+            // passed in as groups of key value pairs. Otherwise, we can assume
+            // they are string based, separating them by their equals sign.
+            if (is_array($item)) {
+                array_push($result, $item);
+            } else {
+                [$key, $value] = array_pad(explode('=', $item, 2), 2, null);
 
-            $result[$key] = $value;
+                $result[$key] = $value;
+            }
 
             return $result;
-        });
+        }, []);
     }
 
     /**

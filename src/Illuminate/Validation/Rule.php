@@ -12,7 +12,7 @@ use Illuminate\Validation\Rules\In;
 use Illuminate\Validation\Rules\NotIn;
 use Illuminate\Validation\Rules\ProhibitedIf;
 use Illuminate\Validation\Rules\RequiredIf;
-use Illuminate\Validation\Rules\StringRule;
+use Illuminate\Validation\Rules\RawRule;
 use Illuminate\Validation\Rules\Unique;
 
 class Rule
@@ -20,15 +20,19 @@ class Rule
     use Macroable;
 
     /**
-     * Make a new validation rule.
+     * Make a new raw validation rule.
      *
      * @param  string  $rule
-     * @param  string|array  $args
-     * @return \Illuminate\Validation\Rules\StringRule
+     * @param  \Illuminate\Contracts\Support\Arrayable|string|array  $args
+     * @return \Illuminate\Validation\Rules\RawRule
      */
-    public static function make($rule, $args)
+    public static function raw($rule, $args = [])
     {
-        return new StringRule($rule, Arr::wrap($args));
+        if ($args instanceof Arrayable) {
+            $args = $args->toArray();
+        }
+        
+        return new RawRule($rule, Arr::wrap($args));
     }
 
     /**

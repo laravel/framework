@@ -2,7 +2,7 @@
 
 namespace Illuminate\Validation\Rules;
 
-class StringRule
+class RawRule
 {
     /**
      * The validation rule.
@@ -23,7 +23,6 @@ class StringRule
      *
      * @param  string  $rule
      * @param  array  $args
-     * 
      * @return void
      */
     public function __construct($rule, array $args)
