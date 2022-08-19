@@ -118,6 +118,7 @@ trait ValidatesAttributes
         if ($url = parse_url($value, PHP_URL_HOST)) {
             try {
                 $records = $this->getDnsRecords($url.'.', DNS_A | DNS_AAAA);
+
                 if (is_array($records) && count($records) > 0) {
                     return true;
                 }
@@ -130,7 +131,7 @@ trait ValidatesAttributes
     }
 
     /**
-     * Overwritable dns check method. Can be mocked in tests to avoid actual calls.
+     * Get the DNS records for the given hostname.
      *
      * @param  string  $hostname
      * @param  int  $type
