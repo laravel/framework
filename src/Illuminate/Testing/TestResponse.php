@@ -212,7 +212,9 @@ class TestResponse implements ArrayAccess
             }
         }
 
-        return "Expected response status code [{$expected}] but received {$actual}.";
+        $statusText = $this->statusText();
+
+        return "Expected response status code [{$expected}] but received {$actual} ({$statusText}).";
     }
 
     /**
