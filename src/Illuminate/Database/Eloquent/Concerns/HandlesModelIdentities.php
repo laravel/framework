@@ -39,7 +39,7 @@ trait HandlesModelIdentities
         return implode(':', [
             $this->getConnection()->getName(),
             static::class,
-            $this->getKey()
+            $this->getKey(),
         ]);
     }
 

@@ -12,7 +12,6 @@ class ModelIdentityException extends RuntimeException
      * Create a new model identity exception for the model.
      *
      * @param  mixed  $model
-     *
      * @return static
      */
     public static function forModel($model)

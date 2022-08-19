@@ -617,7 +617,7 @@ class Builder implements BuilderContract
         }
 
         $identifier = $this->newModelInstance([
-            $this->getModel()->getKeyName() => $id
+            $this->getModel()->getKeyName() => $id,
         ])->getModelIdentifier();
 
         if ($this->getIdentityManager()->hasModel($identifier)) {
