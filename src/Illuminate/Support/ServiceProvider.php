@@ -4,6 +4,7 @@ namespace Illuminate\Support;
 
 use Closure;
 use Illuminate\Console\Application as Artisan;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Foundation\CachesConfiguration;
 use Illuminate\Contracts\Foundation\CachesRoutes;
 use Illuminate\Contracts\Support\DeferrableProvider;
@@ -402,6 +403,21 @@ abstract class ServiceProvider
 
         Artisan::starting(function ($artisan) use ($commands) {
             $artisan->resolveCommands($commands);
+        });
+    }
+
+    /**
+     * Register the package's custom schedules.
+     *
+     * @param  array|mixed  $commands
+     * @return void
+     */
+    public function schedules($callback)
+    {
+        $this->app->booted(function () use ($callback) {
+            $schedule = $this->app->make(Schedule::class);
+
+            $callback($schedule);
         });
     }
 
