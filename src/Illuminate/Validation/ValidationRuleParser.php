@@ -8,6 +8,7 @@ use Illuminate\Contracts\Validation\Rule as RuleContract;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Exists;
+use Illuminate\Validation\Rules\StringRule;
 use Illuminate\Validation\Rules\Unique;
 
 class ValidationRuleParser
@@ -120,6 +121,7 @@ class ValidationRuleParser
         }
 
         if (! is_object($rule) ||
+            $rule instanceof StringRule ||
             $rule instanceof RuleContract ||
             ($rule instanceof Exists && $rule->queryCallbacks()) ||
             ($rule instanceof Unique && $rule->queryCallbacks())) {
@@ -226,6 +228,10 @@ class ValidationRuleParser
     {
         if ($rule instanceof RuleContract || $rule instanceof NestedRules) {
             return [$rule, []];
+        }
+
+        if ($rule instanceof StringRule) {
+            $rule = [$rule->rule, ...$rule->args];
         }
 
         if (is_array($rule)) {

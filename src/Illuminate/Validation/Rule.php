@@ -3,6 +3,7 @@
 namespace Illuminate\Validation;
 
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Validation\Rules\Dimensions;
 use Illuminate\Validation\Rules\ExcludeIf;
@@ -11,11 +12,24 @@ use Illuminate\Validation\Rules\In;
 use Illuminate\Validation\Rules\NotIn;
 use Illuminate\Validation\Rules\ProhibitedIf;
 use Illuminate\Validation\Rules\RequiredIf;
+use Illuminate\Validation\Rules\StringRule;
 use Illuminate\Validation\Rules\Unique;
 
 class Rule
 {
     use Macroable;
+
+    /**
+     * Make a new validation rule.
+     *
+     * @param  string  $rule
+     * @param  string|array  $args
+     * @return \Illuminate\Validation\Rules\StringRule
+     */
+    public static function make($rule, $args)
+    {
+        return new StringRule($rule, Arr::wrap($args));
+    }
 
     /**
      * Create a new conditional rule set.
