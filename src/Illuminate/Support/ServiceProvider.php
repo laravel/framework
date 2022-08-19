@@ -409,16 +409,12 @@ abstract class ServiceProvider
     /**
      * Register the package's custom schedules.
      *
-     * @param  array|mixed  $commands
+     * @param  mixed  $callback
      * @return void
      */
     public function schedules($callback)
     {
-        $this->app->booted(function () use ($callback) {
-            $schedule = $this->app->make(Schedule::class);
-
-            $callback($schedule);
-        });
+        $this->callAfterResolving(Schedule::class, $callback);
     }
 
     /**
