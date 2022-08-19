@@ -20,13 +20,13 @@ trait Dispatchable
     /**
      * Dispatch the job with the given arguments if the given truth test passes.
      *
-     * @param  bool  $boolean
+     * @param  bool|\Closure  $boolean
      * @param  mixed  ...$arguments
      * @return \Illuminate\Foundation\Bus\PendingDispatch|\Illuminate\Support\Fluent
      */
     public static function dispatchIf($boolean, ...$arguments)
     {
-        return $boolean
+        return value($boolean, ...$arguments)
             ? new PendingDispatch(new static(...$arguments))
             : new Fluent;
     }
@@ -34,13 +34,13 @@ trait Dispatchable
     /**
      * Dispatch the job with the given arguments unless the given truth test passes.
      *
-     * @param  bool  $boolean
+     * @param  bool|\Closure  $boolean
      * @param  mixed  ...$arguments
      * @return \Illuminate\Foundation\Bus\PendingDispatch|\Illuminate\Support\Fluent
      */
     public static function dispatchUnless($boolean, ...$arguments)
     {
-        return ! $boolean
+        return ! value($boolean, ...$arguments)
             ? new PendingDispatch(new static(...$arguments))
             : new Fluent;
     }

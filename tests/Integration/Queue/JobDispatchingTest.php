@@ -12,11 +12,64 @@ class JobDispatchingTest extends TestCase
     protected function tearDown(): void
     {
         Job::$ran = false;
+        Job::$value = null;
     }
 
     public function testJobCanUseCustomMethodsAfterDispatch()
     {
         Job::dispatch('test')->replaceValue('new-test');
+
+        $this->assertTrue(Job::$ran);
+        $this->assertSame('new-test', Job::$value);
+    }
+
+    public function testDispatchesConditionallyWithBoolean()
+    {
+        Job::dispatchIf(false, 'test')->replaceValue('new-test');
+
+        $this->assertFalse(Job::$ran);
+        $this->assertNull(Job::$value);
+
+        Job::dispatchIf(true, 'test')->replaceValue('new-test');
+
+        $this->assertTrue(Job::$ran);
+        $this->assertSame('new-test', Job::$value);
+    }
+
+    public function testDispatchesConditionallyWithClosure()
+    {
+        Job::dispatchIf(fn($string) => $string === 'test' ? 0 : 1, 'test')->replaceValue('new-test');
+
+        $this->assertFalse(Job::$ran);
+        $this->assertNull(Job::$value);
+
+        Job::dispatchIf(fn($string) => $string === 'test' ? 1 : 0, 'test')->replaceValue('new-test');
+
+        $this->assertTrue(Job::$ran);
+        $this->assertSame('new-test', Job::$value);
+    }
+
+    public function testDoesNotDispatchesConditionallyWithBoolean()
+    {
+        Job::dispatchUnless(true, 'test')->replaceValue('new-test');
+
+        $this->assertFalse(Job::$ran);
+        $this->assertNull(Job::$value);
+
+        Job::dispatchUnless(false, 'test')->replaceValue('new-test');
+
+        $this->assertTrue(Job::$ran);
+        $this->assertSame('new-test', Job::$value);
+    }
+
+    public function testDoesNotDispatchesConditionallyWithClosure()
+    {
+        Job::dispatchUnless(fn($string) => $string === 'test' ? 1 : 0, 'test')->replaceValue('new-test');
+
+        $this->assertFalse(Job::$ran);
+        $this->assertNull(Job::$value);
+
+        Job::dispatchUnless(fn($string) => $string === 'test' ? 0 : 1, 'test')->replaceValue('new-test');
 
         $this->assertTrue(Job::$ran);
         $this->assertSame('new-test', Job::$value);
