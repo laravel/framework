@@ -483,7 +483,7 @@ class Builder implements BuilderContract
             $newIds = [];
 
             foreach ($ids as $id) {
-                $models[$id] = $this->identityModel($id);
+                $models[$id] = $this->identifyModel($id);
 
                 if ($models[$id] === null) {
                     $newIds[] = $id;
@@ -608,10 +608,9 @@ class Builder implements BuilderContract
      * Get a model by its identity, if it is mapped.
      *
      * @param $id
-     *
      * @return \Illuminate\Database\Eloquent\Model|null
      */
-    protected function identityModel($id)
+    protected function identifyModel($id)
     {
         if (! $this->shouldUseIdentityMap()) {
             return null;
@@ -944,7 +943,7 @@ class Builder implements BuilderContract
 
             if ($key !== null) {
                 if ($relation->getRelated()->isIdentifiableModel()) {
-                    $loadedModel = $this->identityModel($key);
+                    $loadedModel = $this->identifyModel($key);
 
                     if ($loadedModel !== null) {
                         $loadedModels[] = $loadedModel;
