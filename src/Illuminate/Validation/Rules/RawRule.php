@@ -17,7 +17,7 @@ class RawRule
      * @var array
      */
     public $parameters = [];
-    
+
     /**
      * Constructor.
      *

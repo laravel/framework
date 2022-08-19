@@ -14,7 +14,7 @@ class ValidationRawRuleTest extends TestCase
     public function testRawRule()
     {
         $data = ['foo' => 'bar'];
-        
+
         $rules = [
             'foo' => [
                 Rule::raw('required'),
@@ -37,7 +37,7 @@ class ValidationRawRuleTest extends TestCase
             'bar' => ';',
             'baz' => ',',
         ];
-        
+
         $rules = [
             'foo' => Rule::raw('in', '|'),
             'bar' => Rule::raw('in', ';'),
@@ -59,15 +59,15 @@ class ValidationRawRuleTest extends TestCase
                 ['|foo' => '...', ';bar' => '...', '.baz' => '...'],
                 ['|foo' => '...', ';bar' => '...', '.baz' => '...'],
                 ['|foo' => '...', ';bar' => '...', '.baz' => '...'],
-            ]
+            ],
         ];
-        
+
         $rules = [
             'items' => ['array'],
             'items.*.name' => [
                 'array',
                 Rule::raw('required_array_keys', ['|foo', ';bar', '.baz']),
-            ]
+            ],
         ];
 
         $trans = $this->getIlluminateArrayTranslator();
@@ -85,7 +85,7 @@ class ValidationRawRuleTest extends TestCase
             ';baz' => 'zal',
             ',zee' => 'fur',
         ];
-        
+
         $rules = [
             '|foo' => Rule::raw('required_if', [';baz', 'zal']),
             ',zee' => Rule::raw('prohibited_if', [';baz', 'zal']),
@@ -105,9 +105,9 @@ class ValidationRawRuleTest extends TestCase
     public function testRawRegexRule()
     {
         $data = ['x' => 'asdasdf'];
-        
+
         $rules = ['x' => Rule::raw('regex', '/^[a-z]+$/i')];
-    
+
         $trans = $this->getIlluminateArrayTranslator();
 
         $v = new Validator($trans, $data, $rules);
@@ -126,5 +126,4 @@ class ValidationRawRuleTest extends TestCase
             new ArrayLoader, 'en'
         );
     }
-
 }

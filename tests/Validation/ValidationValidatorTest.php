@@ -3645,7 +3645,7 @@ class ValidationValidatorTest extends TestCase
         // Knowing that demo image.png has width = 3 and height = 2
         $uploadedFile = new UploadedFile(__DIR__.'/fixtures/image.png', '', null, null, true);
         $trans = $this->getIlluminateArrayTranslator();
-        
+
         $v = new Validator($trans, ['x' => 'file'], ['x' => 'dimensions']);
         $this->assertTrue($v->fails());
 

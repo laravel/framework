@@ -9,7 +9,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\RawRule;
-use Illuminate\Validation\Rules\Rulable;
 use Illuminate\Validation\Rules\Unique;
 
 class ValidationRuleParser
@@ -119,7 +118,7 @@ class ValidationRuleParser
 
         if ($rule instanceof InvokableRule) {
             $rule = InvokableValidationRule::make($rule);
-        }        
+        }
 
         if (! is_object($rule) ||
             $rule instanceof RawRule ||

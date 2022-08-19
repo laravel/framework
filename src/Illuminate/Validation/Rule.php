@@ -11,8 +11,8 @@ use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\In;
 use Illuminate\Validation\Rules\NotIn;
 use Illuminate\Validation\Rules\ProhibitedIf;
-use Illuminate\Validation\Rules\RequiredIf;
 use Illuminate\Validation\Rules\RawRule;
+use Illuminate\Validation\Rules\RequiredIf;
 use Illuminate\Validation\Rules\Unique;
 
 class Rule
@@ -31,7 +31,7 @@ class Rule
         if ($parameters instanceof Arrayable) {
             $parameters = $parameters->toArray();
         }
-        
+
         return new RawRule($rule, Arr::wrap($parameters));
     }
 
