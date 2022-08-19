@@ -8,6 +8,7 @@ use DateTimeInterface;
 use Doctrine\DBAL\Connection as DoctrineConnection;
 use Doctrine\DBAL\Types\Type;
 use Exception;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\Events\StatementPrepared;
@@ -332,9 +333,11 @@ class Connection implements ConnectionInterface
      */
     public function query()
     {
-        return new QueryBuilder(
-            $this, $this->getQueryGrammar(), $this->getPostProcessor()
-        );
+        return Container::getInstance()->make(QueryBuilder::class, [
+            'connection' => $this,
+            'grammar' => $this->getQueryGrammar(),
+            'processor' => $this->getPostProcessor(),
+        ]);
     }
 
     /**
