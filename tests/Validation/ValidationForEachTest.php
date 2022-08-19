@@ -201,7 +201,7 @@ class ValidationForEachTest extends TestCase
         ], $v->getMessageBag()->toArray());
     }
 
-    public function testForEachCallbacksCanReturnStringRules()
+    public function testForEachCallbacksCanReturnRawRules()
     {
         $data = [
             'items' => [
