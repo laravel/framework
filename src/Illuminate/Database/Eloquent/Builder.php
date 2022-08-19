@@ -160,11 +160,13 @@ class Builder implements BuilderContract
      * Create a new Eloquent query builder instance.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  \Illuminate\Database\Eloquent\IdentityManager|null $identityManager
      * @return void
      */
-    public function __construct(QueryBuilder $query)
+    public function __construct(QueryBuilder $query, IdentityManager $identityManager = null)
     {
         $this->query = $query;
+        $this->identityManager = $identityManager;
     }
 
     /**
@@ -597,11 +599,20 @@ class Builder implements BuilderContract
      */
     public function getIdentityManager()
     {
-        if (! isset($this->identityManager)) {
-            $this->identityManager = app(IdentityManager::class);
-        }
-
         return $this->identityManager;
+    }
+
+    /**
+     * Set the underlying query builder instance.
+     *
+     * @param  \Illuminate\Database\Eloquent\IdentityManager  $identityManager
+     * @return $this
+     */
+    public function setIdentityManager($identityManager)
+    {
+        $this->identityManager = $identityManager;
+
+        return $this;
     }
 
     /**
@@ -635,6 +646,7 @@ class Builder implements BuilderContract
     protected function shouldUseIdentityMap()
     {
         return $this->identityIsMapped
+            && isset($this->identityManager)
             && ! $this->refreshIdentityMap
             && empty($this->query->bindings['where'] ?? [])
             && empty($this->query->bindings['join'] ?? [])

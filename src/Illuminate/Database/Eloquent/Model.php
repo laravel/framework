@@ -524,8 +524,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
         $model->setConnection($connection ?: $this->getConnectionName());
 
-        if ($this->isIdentifiableModel() && $this->getIdentityManager()->hasModel($model)) {
-            $model = $this->getIdentityManager()->getModel($model);
+        if ($this->isIdentifiableModel() && static::$identityManager->hasModel($model)) {
+            $model = static::$identityManager->getModel($model);
 
             if ($this->areAttributesMoreRecent($model, $attributes)) {
                 $dirtyAttributes = $model->getDirty();
@@ -1472,7 +1472,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function newEloquentBuilder($query)
     {
-        return new Builder($query);
+        return new Builder($query, static::$identityManager);
     }
 
     /**

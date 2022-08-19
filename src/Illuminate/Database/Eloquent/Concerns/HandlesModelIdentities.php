@@ -21,7 +21,19 @@ trait HandlesModelIdentities
     /**
      * @var IdentityManager|null
      */
-    protected $identityManager;
+    protected static $identityManager;
+
+    /**
+     * Set the identity manager instance.
+     *
+     * @param \Illuminate\Database\Eloquent\IdentityManager $identityManager
+     *
+     * @return static
+     */
+    public static function setIdentityManager(IdentityManager $identityManager)
+    {
+        static::$identityManager = $identityManager;
+    }
 
     /**
      * Get the identifier for the model.
@@ -50,7 +62,7 @@ trait HandlesModelIdentities
      */
     public function isIdentifiableModel()
     {
-        return $this->identifiable;
+        return static::$identityManager !== null && $this->identifiable;
     }
 
     /**
@@ -60,7 +72,11 @@ trait HandlesModelIdentities
      */
     public function storeModelIdentity()
     {
-        $this->getIdentityManager()->storeModel($this);
+        if (! isset(static::$identityManager)) {
+            return;
+        }
+
+        static::$identityManager->storeModel($this);
     }
 
     /**
@@ -70,21 +86,11 @@ trait HandlesModelIdentities
      */
     public function forgetModelIdentity()
     {
-        $this->getIdentityManager()->forgetModel($this);
-    }
-
-    /**
-     * Get the identity manager.
-     *
-     * @return \Illuminate\Database\Eloquent\IdentityManager
-     */
-    private function getIdentityManager()
-    {
-        if (! isset($this->identityManager)) {
-            $this->identityManager = app(IdentityManager::class);
+        if (! isset(static::$identityManager)) {
+            return;
         }
 
-        return $this->identityManager;
+        static::$identityManager->forgetModel($this);
     }
 
     /**
