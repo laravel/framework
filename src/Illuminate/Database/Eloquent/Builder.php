@@ -160,7 +160,7 @@ class Builder implements BuilderContract
      * Create a new Eloquent query builder instance.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  \Illuminate\Database\Eloquent\IdentityManager|null $identityManager
+     * @param  \Illuminate\Database\Eloquent\IdentityManager|null  $identityManager
      * @return void
      */
     public function __construct(QueryBuilder $query, IdentityManager $identityManager = null)
