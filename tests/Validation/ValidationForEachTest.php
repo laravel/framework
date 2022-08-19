@@ -201,6 +201,38 @@ class ValidationForEachTest extends TestCase
         ], $v->getMessageBag()->toArray());
     }
 
+    public function testForEachCallbacksCanReturnStringRules()
+    {
+        $data = [
+            'items' => [
+                ['sku' => '|foo'],
+                ['sku' => '|bar'],
+                ['sku' => '|baz'],
+            ],
+        ];
+
+        $rules = [
+            'items.*.sku' => Rule::forEach(function () {
+                return [
+                    Rule::make('in', ['|foo', '|bar', '|baz']),
+                    Rule::make('ends_with', 'invalid'),
+                ];
+            }),
+        ];
+
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, $data, $rules);
+
+        $this->assertFalse($v->passes());
+
+        $this->assertEquals([
+            'items.0.sku' => ['validation.ends_with'],
+            'items.1.sku' => ['validation.ends_with'],
+            'items.2.sku' => ['validation.ends_with'],
+        ], $v->getMessageBag()->toArray());
+    }
+
     public function testForEachCallbacksDoNotBreakRegexRules()
     {
         $data = [
