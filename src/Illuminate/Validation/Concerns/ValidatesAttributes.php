@@ -117,13 +117,29 @@ trait ValidatesAttributes
 
         if ($url = parse_url($value, PHP_URL_HOST)) {
             try {
-                return count(dns_get_record($url.'.', DNS_A | DNS_AAAA)) > 0;
+                $records = $this->getDnsRecords($url.'.', DNS_A | DNS_AAAA);
+
+                if (is_array($records) && count($records) > 0) {
+                    return true;
+                }
             } catch (Exception $e) {
                 return false;
             }
         }
 
         return false;
+    }
+
+    /**
+     * Get the DNS records for the given hostname.
+     *
+     * @param  string  $hostname
+     * @param  int  $type
+     * @return array|false
+     */
+    protected function getDnsRecords($hostname, $type)
+    {
+        return dns_get_record($hostname, $type);
     }
 
     /**
