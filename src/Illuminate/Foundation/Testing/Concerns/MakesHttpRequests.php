@@ -64,6 +64,13 @@ trait MakesHttpRequests
     protected $withCredentials = false;
 
     /**
+     * Automatically apply assertMiddleware to TestResponse
+     *
+     * @var array
+     */
+    protected $assertMiddleware = [];
+
+    /**
      * Define additional headers to be sent with the request.
      *
      * @param  array  $headers
@@ -161,6 +168,8 @@ trait MakesHttpRequests
                     return $next($request);
                 }
             });
+
+            $this->assertMiddleware[] = $abstract;
         }
 
         return $this;
@@ -544,7 +553,13 @@ trait MakesHttpRequests
             $response = $this->followRedirects($response);
         }
 
-        return $this->createTestResponse($response);
+        $testResponse = $this->createTestResponse($response);
+        $testResponse->setRequestRoute($request->route());
+        if(count($this->assertMiddleware) > 0) {
+            $testResponse->assertMiddleware($this->assertMiddleware);
+        }
+
+        return $testResponse;
     }
 
     /**

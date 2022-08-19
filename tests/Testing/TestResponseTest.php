@@ -4,16 +4,20 @@ namespace Illuminate\Tests\Testing;
 
 use Exception;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Contracts\View\View;
 use Illuminate\Cookie\CookieValuePrefix;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Encryption\Encrypter;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Routing\Route;
 use Illuminate\Routing\RouteCollection;
+use Illuminate\Routing\Router;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Session\ArraySessionHandler;
 use Illuminate\Session\Store;
@@ -1965,6 +1969,34 @@ class TestResponseTest extends TestCase
         $this->assertInstanceOf(Cookie::class, $cookie);
         $this->assertEquals($cookieName, $cookie->getName());
         $this->assertEquals($cookieValue, $cookie->getValue());
+    }
+
+    public function testAssertMiddleware()
+    {
+        $container = new Container();
+        $router = new Router(new Dispatcher(), $container);
+        $router->middlewareGroup('MiddlewareGroup', [
+            'GroupedMiddlewareClass',
+        ]);
+
+        app()->instance('router', $router);
+
+        $route = new Route('get', '/', function(){
+
+        });
+        $route->middleware('MiddlewareGroup');
+        $route->middleware('MiddlewareClass');
+        $route->setContainer($container);
+
+        $response = TestResponse::fromBaseResponse(new Response());
+        $response->setRequestRoute($route);
+
+        $response->assertMiddleware('MiddlewareClass');
+        $response->assertMiddleware('MiddlewareGroup');
+        $response->assertMiddleware('GroupedMiddlewareClass');
+
+        $this->expectException(AssertionFailedError::class);
+        $response->assertMiddleware('foo');
     }
 
     private function makeMockResponse($content)
