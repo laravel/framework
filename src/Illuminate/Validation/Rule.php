@@ -23,16 +23,16 @@ class Rule
      * Make a new raw validation rule.
      *
      * @param  string  $rule
-     * @param  \Illuminate\Contracts\Support\Arrayable|string|array  $args
+     * @param  \Illuminate\Contracts\Support\Arrayable|string|array  $parameters
      * @return \Illuminate\Validation\Rules\RawRule
      */
-    public static function raw($rule, $args = [])
+    public static function raw($rule, $parameters = [])
     {
-        if ($args instanceof Arrayable) {
-            $args = $args->toArray();
+        if ($parameters instanceof Arrayable) {
+            $parameters = $parameters->toArray();
         }
         
-        return new RawRule($rule, Arr::wrap($args));
+        return new RawRule($rule, Arr::wrap($parameters));
     }
 
     /**

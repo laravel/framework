@@ -232,9 +232,9 @@ class ValidationRuleParser
         }
 
         if ($rule instanceof RawRule) {
-            $rule = Arr::isAssoc($rule->args)
-                ? [$rule->rule, $rule->args]
-                : [$rule->rule, ...$rule->args];
+            $rule = Arr::isAssoc($rule->parameters)
+                ? [$rule->rule, $rule->parameters]
+                : [$rule->rule, ...$rule->parameters];
         }
 
         if (is_array($rule)) {

@@ -12,22 +12,22 @@ class RawRule
     public $rule;
 
     /**
-     * The validation rule arguments.
+     * The validation rule parameters.
      *
      * @var array
      */
-    public $args = [];
+    public $parameters = [];
     
     /**
      * Constructor.
      *
      * @param  string  $rule
-     * @param  array  $args
+     * @param  array  $parameters
      * @return void
      */
-    public function __construct($rule, array $args)
+    public function __construct($rule, array $parameters)
     {
         $this->rule = $rule;
-        $this->args = $args;
+        $this->parameters = $parameters;
     }
 }
