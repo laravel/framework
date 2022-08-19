@@ -38,12 +38,12 @@ class JobDispatchingTest extends TestCase
 
     public function testDispatchesConditionallyWithClosure()
     {
-        Job::dispatchIf(fn($string) => $string === 'test' ? 0 : 1, 'test')->replaceValue('new-test');
+        Job::dispatchIf(fn ($string) => $string === 'test' ? 0 : 1, 'test')->replaceValue('new-test');
 
         $this->assertFalse(Job::$ran);
         $this->assertNull(Job::$value);
 
-        Job::dispatchIf(fn($string) => $string === 'test' ? 1 : 0, 'test')->replaceValue('new-test');
+        Job::dispatchIf(fn ($string) => $string === 'test' ? 1 : 0, 'test')->replaceValue('new-test');
 
         $this->assertTrue(Job::$ran);
         $this->assertSame('new-test', Job::$value);
@@ -64,12 +64,12 @@ class JobDispatchingTest extends TestCase
 
     public function testDoesNotDispatchesConditionallyWithClosure()
     {
-        Job::dispatchUnless(fn($string) => $string === 'test' ? 1 : 0, 'test')->replaceValue('new-test');
+        Job::dispatchUnless(fn ($string) => $string === 'test' ? 1 : 0, 'test')->replaceValue('new-test');
 
         $this->assertFalse(Job::$ran);
         $this->assertNull(Job::$value);
 
-        Job::dispatchUnless(fn($string) => $string === 'test' ? 0 : 1, 'test')->replaceValue('new-test');
+        Job::dispatchUnless(fn ($string) => $string === 'test' ? 0 : 1, 'test')->replaceValue('new-test');
 
         $this->assertTrue(Job::$ran);
         $this->assertSame('new-test', Job::$value);
