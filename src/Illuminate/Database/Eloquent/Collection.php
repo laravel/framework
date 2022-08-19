@@ -763,4 +763,21 @@ class Collection extends BaseCollection implements QueueableCollection
 
         return $model->newModelQuery()->whereKey($this->modelKeys());
     }
+
+    /**
+     * Hidden columns onto the collection.
+     *
+     * @param  array  $columns
+     * @return Collection
+     */
+    public function hidden($columns)
+    {
+        $this->collect()->each(function ($item, $key) use ($columns) {
+            foreach ($columns as $column) {
+                unset($item->$column);
+            }
+        });
+
+        return $this;
+    }
 }
