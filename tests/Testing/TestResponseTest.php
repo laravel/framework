@@ -1980,7 +1980,7 @@ class TestResponseTest extends TestCase
 
         app()->instance('router', $router);
 
-        $route = new Route('get', '/', function() {
+        $route = new Route('get', '/', function () {
         });
         $route->middleware('MiddlewareGroup');
         $route->middleware('MiddlewareClass');
