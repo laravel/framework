@@ -13,9 +13,7 @@ class ValidationRawRuleTest extends TestCase
 {
     public function testRawRule()
     {
-        $data = [
-            'foo' => 'bar',
-        ];
+        $data = ['foo' => 'bar'];
         
         $rules = [
             'foo' => [
