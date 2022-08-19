@@ -772,7 +772,7 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function hidden($columns)
     {
-        $this->collect()->each(function ($item, $key) use ($columns) {
+        $this->each(function ($item, $key) use ($columns) {
             foreach ($columns as $column) {
                 unset($item->$column);
             }
