@@ -43,13 +43,6 @@ class Builder implements BuilderContract
     protected $query;
 
     /**
-     * The identity manager.
-     *
-     * @var \Illuminate\Database\Eloquent\IdentityManager
-     */
-    protected $identityManager;
-
-    /**
      * The model being queried.
      *
      * @var \Illuminate\Database\Eloquent\Model
@@ -160,13 +153,11 @@ class Builder implements BuilderContract
      * Create a new Eloquent query builder instance.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  \Illuminate\Database\Eloquent\IdentityManager|null  $identityManager
      * @return void
      */
-    public function __construct(QueryBuilder $query, IdentityManager $identityManager = null)
+    public function __construct(QueryBuilder $query)
     {
         $this->query = $query;
-        $this->identityManager = $identityManager;
     }
 
     /**
@@ -599,20 +590,7 @@ class Builder implements BuilderContract
      */
     public function getIdentityManager()
     {
-        return $this->identityManager;
-    }
-
-    /**
-     * Set the underlying query builder instance.
-     *
-     * @param  \Illuminate\Database\Eloquent\IdentityManager  $identityManager
-     * @return $this
-     */
-    public function setIdentityManager($identityManager)
-    {
-        $this->identityManager = $identityManager;
-
-        return $this;
+        return $this->getModel()::getIdentityManager();
     }
 
     /**

@@ -34,6 +34,16 @@ trait HandlesModelIdentities
     }
 
     /**
+     * Get the identity manager instance.
+     *
+     * @return \Illuminate\Database\Eloquent\IdentityManager|null
+     */
+    public static function getIdentityManager()
+    {
+        return self::$identityManager;
+    }
+
+    /**
      * Get the identifier for the model.
      *
      * @return string
