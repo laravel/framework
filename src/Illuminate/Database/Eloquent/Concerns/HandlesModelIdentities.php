@@ -27,7 +27,6 @@ trait HandlesModelIdentities
      * Set the identity manager instance.
      *
      * @param  \Illuminate\Database\Eloquent\IdentityManager  $identityManager
-     * @return static
      */
     public static function setIdentityManager(IdentityManager $identityManager)
     {
