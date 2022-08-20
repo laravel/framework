@@ -1164,6 +1164,48 @@ class HttpClientTest extends TestCase
         $this->assertSame(['hyped-for' => 'laravel-movie'], json_decode(tap($history[0]['request']->getBody())->rewind()->getContents(), true));
     }
 
+    public function testPoolKeepsInitialSetup()
+    {
+        $this->factory->fake([
+            'https://example.com/endpoint' => $this->factory->response('Fake'),
+        ]);
+
+        $history = [];
+
+        $responses = $this->factory
+            ->withMiddleware(Middleware::history($history))
+            ->withToken('super-secret')
+            ->baseUrl('https://example.com')
+            ->withHeaders([
+                'x-header' => 'value'
+            ])
+            ->pool(fn (Pool $pool) => [
+                $pool->withHeaders(['x-custom' => 0])->post('/endpoint', ['hyped-for' => 'laravel-movie-0']),
+                $pool->withHeaders(['x-custom' => 1])->post('/endpoint', ['hyped-for' => 'laravel-movie-1']),
+            ]);
+
+        foreach ($responses as $key => $response) {
+            /** @var Response $response */
+            $this->assertSame('Fake', $response->body());
+
+            $this->assertArrayHasKey($key, $history);
+
+            $historyItem = $history[$key];
+
+            $this->assertSame('Fake', tap($historyItem['response']->getBody())->rewind()->getContents());
+
+            $request = $historyItem['request'];
+
+            $this->assertSame(['hyped-for' => 'laravel-movie-' . $key], json_decode(tap($request->getBody())->rewind()->getContents(), true));
+
+            $headers = $request->getHeaders();
+
+            $this->assertSame('Bearer super-secret', $headers['Authorization'][0]);
+            $this->assertSame('value', $headers['x-header'][0]);
+            $this->assertSame((string) $key, $headers['x-custom'][0]);
+        }
+    }
+
     public function testTheRequestSendingAndResponseReceivedEventsAreFiredWhenARequestIsSent()
     {
         $events = m::mock(Dispatcher::class);

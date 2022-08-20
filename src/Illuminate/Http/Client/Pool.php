@@ -5,14 +5,14 @@ namespace Illuminate\Http\Client;
 use GuzzleHttp\Utils;
 
 /**
- * @mixin \Illuminate\Http\Client\Factory
+ * @mixin \Illuminate\Http\Client\PendingRequest
  */
 class Pool
 {
     /**
      * The factory instance.
      *
-     * @var \Illuminate\Http\Client\Factory
+     * @var \Illuminate\Http\Client\PendingRequest
      */
     protected $factory;
 
@@ -33,18 +33,18 @@ class Pool
     /**
      * Create a new requests pool.
      *
-     * @param  \Illuminate\Http\Client\Factory|null  $factory
+     * @param  \Illuminate\Http\Client\PendingRequest|null  $factory
      * @return void
      */
-    public function __construct(Factory $factory = null)
+    public function __construct(PendingRequest $factory = null)
     {
-        $this->factory = $factory ?: new Factory();
-
         if (method_exists(Utils::class, 'chooseHandler')) {
-            $this->handler = Utils::chooseHandler();
+            $handler = Utils::chooseHandler();
         } else {
-            $this->handler = \GuzzleHttp\choose_handler();
+            $handler = \GuzzleHttp\choose_handler();
         }
+
+        $this->factory = ($factory ?? new Factory())->async()->setHandler($handler);
     }
 
     /**
@@ -55,7 +55,7 @@ class Pool
      */
     public function as(string $key)
     {
-        return $this->pool[$key] = $this->asyncRequest();
+        return $this->pool[$key] = $this->newPendingAsyncRequest();
     }
 
     /**
@@ -63,9 +63,9 @@ class Pool
      *
      * @return \Illuminate\Http\Client\PendingRequest
      */
-    protected function asyncRequest()
+    protected function newPendingAsyncRequest()
     {
-        return $this->factory->setHandler($this->handler)->async();
+        return clone $this->factory;
     }
 
     /**
@@ -87,6 +87,6 @@ class Pool
      */
     public function __call($method, $parameters)
     {
-        return $this->pool[] = $this->asyncRequest()->$method(...$parameters);
+        return $this->pool[] = $this->newPendingAsyncRequest()->$method(...$parameters);
     }
 }
