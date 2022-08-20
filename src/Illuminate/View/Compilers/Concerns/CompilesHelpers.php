@@ -39,6 +39,17 @@ trait CompilesHelpers
     }
 
     /**
+     * Compile the "die" statements into valid PHP.
+     *
+     * @param  string  $argument
+     * @return string
+     */
+    protected function compileDie($argument)
+    {
+        return "<?php die{$argument}; ?>";
+    }
+
+    /**
      * Compile the method statements into valid PHP.
      *
      * @param  string  $method
