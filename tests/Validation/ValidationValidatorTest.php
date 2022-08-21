@@ -2381,7 +2381,7 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => 'bar'], ['foo' => 'max_digits:10']);
         $this->assertFalse($v->passes());
 
-        $v = new Validator($trans, ['foo' => '123'], ['foo' => 'max_digits:5']);
+        $v = new Validator($trans, ['foo' => '123'], ['foo' => 'max_digits:3']);
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['foo' => '+12.3'], ['foo' => 'max_digits:6']);
