@@ -100,17 +100,17 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     /**
      * Get the URL (no query string) for the request.
      *
-     * @return string
+     * @return \Illuminate\Support\Stringable
      */
     public function url()
     {
-        return rtrim(preg_replace('/\?.*/', '', $this->getUri()), '/');
+        return str(rtrim(preg_replace('/\?.*/', '', $this->getUri()), '/'));
     }
 
     /**
      * Get the full URL for the request.
      *
-     * @return string
+     * @return \Illuminate\Support\Stringable
      */
     public function fullUrl()
     {
@@ -118,29 +118,29 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
 
         $question = $this->getBaseUrl().$this->getPathInfo() === '/' ? '/?' : '?';
 
-        return $query ? $this->url().$question.$query : $this->url();
+        return $query ? str($this->url().$question.$query) : $this->url();
     }
 
     /**
      * Get the full URL for the request with the added query string parameters.
      *
      * @param  array  $query
-     * @return string
+     * @return \Illuminate\Support\Stringable
      */
     public function fullUrlWithQuery(array $query)
     {
         $question = $this->getBaseUrl().$this->getPathInfo() === '/' ? '/?' : '?';
 
         return count($this->query()) > 0
-            ? $this->url().$question.Arr::query(array_merge($this->query(), $query))
-            : $this->fullUrl().$question.Arr::query($query);
+            ? str($this->url().$question.Arr::query(array_merge($this->query(), $query)))
+            : str($this->fullUrl().$question.Arr::query($query));
     }
 
     /**
      * Get the full URL for the request without the given query string parameters.
      *
      * @param  array|string  $keys
-     * @return string
+     * @return \Illuminate\Support\Stringable
      */
     public function fullUrlWithoutQuery($keys)
     {
@@ -149,30 +149,30 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
         $question = $this->getBaseUrl().$this->getPathInfo() === '/' ? '/?' : '?';
 
         return count($query) > 0
-            ? $this->url().$question.Arr::query($query)
-            : $this->url();
+            ? str($this->url().$question.Arr::query($query))
+            : str($this->url());
     }
 
     /**
      * Get the current path info for the request.
      *
-     * @return string
+     * @return \Illuminate\Support\Stringable
      */
     public function path()
     {
         $pattern = trim($this->getPathInfo(), '/');
 
-        return $pattern === '' ? '/' : $pattern;
+        return $pattern === '' ? str('/') : str($pattern);
     }
 
     /**
      * Get the current decoded path info for the request.
      *
-     * @return string
+     * @return \Illuminate\Support\Stringable
      */
     public function decodedPath()
     {
-        return rawurldecode($this->path());
+        return str(rawurldecode($this->path()));
     }
 
     /**
@@ -180,11 +180,11 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      *
      * @param  int  $index
      * @param  string|null  $default
-     * @return string|null
+     * @return \Illuminate\Support\Stringable|null
      */
     public function segment($index, $default = null)
     {
-        return Arr::get($this->segments(), $index - 1, $default);
+        return str(Arr::get($this->segments(), $index - 1, $default));
     }
 
     /**
@@ -241,31 +241,31 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     /**
      * Get the host name.
      *
-     * @return string
+     * @return \Illuminate\Support\Stringable
      */
     public function host()
     {
-        return $this->getHost();
+        return str($this->getHost());
     }
 
     /**
      * Get the HTTP host being requested.
      *
-     * @return string
+     * @return \Illuminate\Support\Stringable
      */
     public function httpHost()
     {
-        return $this->getHttpHost();
+        return str($this->getHttpHost());
     }
 
     /**
      * Get the scheme and HTTP host.
      *
-     * @return string
+     * @return \Illuminate\Support\Stringable
      */
     public function schemeAndHttpHost()
     {
-        return $this->getSchemeAndHttpHost();
+        return ($this->getSchemeAndHttpHost());
     }
 
     /**
@@ -312,11 +312,11 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     /**
      * Get the client IP address.
      *
-     * @return string|null
+     * @return \Illuminate\Support\Stringable|null
      */
     public function ip()
     {
-        return $this->getClientIp();
+        return str($this->getClientIp());
     }
 
     /**
@@ -332,11 +332,11 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     /**
      * Get the client user agent.
      *
-     * @return string|null
+     * @return \Illuminate\Support\Stringable|null
      */
     public function userAgent()
     {
-        return $this->headers->get('User-Agent');
+        return str($this->headers->get('User-Agent'));
     }
 
     /**
