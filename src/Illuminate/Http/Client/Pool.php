@@ -17,13 +17,6 @@ class Pool
     protected $factory;
 
     /**
-     * The handler function for the Guzzle client.
-     *
-     * @var callable
-     */
-    protected $handler;
-
-    /**
      * The pool of requests.
      *
      * @var array

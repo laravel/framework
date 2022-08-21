@@ -43,7 +43,7 @@ class PendingRequest
     protected $client;
 
     /**
-     * The HTTP handler.
+     * The handler function for the Guzzle client.
      *
      * @var callable|null
      */
