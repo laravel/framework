@@ -13,6 +13,17 @@ use Symfony\Component\VarDumper\VarDumper;
 trait InteractsWithInput
 {
     /**
+     * Determine if a server is set on the request.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function hasServer($key)
+    {
+        return ! is_null($this->server($key));
+    }
+
+    /**
      * Retrieve a server variable from the request.
      *
      * @param  string|null  $key
@@ -222,6 +233,27 @@ trait InteractsWithInput
         $keys = is_array($key) ? $key : func_get_args();
 
         return ! $this->has($keys);
+    }
+
+    /**
+     * Apply the callback if the request contains an empty value for the given input item key.
+     *
+     * @param  string  $key
+     * @param  callable  $callback
+     * @param  callable|null  $default
+     * @return $this|mixed
+     */
+    public function whenMissing($key, callable $callback, callable $default = null)
+    {
+        if ($this->missing($key)) {
+            return $callback(data_get($this->all(), $key)) ?: $this;
+        }
+
+        if ($default) {
+            return $default();
+        }
+
+        return $this;
     }
 
     /**
