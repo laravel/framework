@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Bus;
 
+use Closure;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Support\Fluent;
 
@@ -26,7 +27,15 @@ trait Dispatchable
      */
     public static function dispatchIf($boolean, ...$arguments)
     {
-        return value($boolean, ...$arguments)
+        if ($boolean instanceof Closure) {
+            $dispatchable = new static(...$arguments);
+
+            return value($boolean, $dispatchable)
+                ? new PendingDispatch($dispatchable)
+                : new Fluent;
+        }
+
+        return value($boolean)
             ? new PendingDispatch(new static(...$arguments))
             : new Fluent;
     }
@@ -40,7 +49,15 @@ trait Dispatchable
      */
     public static function dispatchUnless($boolean, ...$arguments)
     {
-        return ! value($boolean, ...$arguments)
+        if ($boolean instanceof Closure) {
+            $dispatchable = new static(...$arguments);
+
+            return ! value($boolean, $dispatchable)
+                ? new PendingDispatch($dispatchable)
+                : new Fluent;
+        }
+
+        return ! value($boolean)
             ? new PendingDispatch(new static(...$arguments))
             : new Fluent;
     }
