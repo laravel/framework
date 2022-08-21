@@ -6,7 +6,7 @@ use Ably\AblyRest;
 use Closure;
 use GuzzleHttp\Client as GuzzleClient;
 use Illuminate\Broadcasting\Broadcasters\AblyBroadcaster;
-use Illuminate\Broadcasting\Broadcasters\AblyBroadcasterDeprecated;
+use Illuminate\Broadcasting\Broadcasters\AblyNativeBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\LogBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\NullBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\PusherBroadcaster;
@@ -313,10 +313,10 @@ class BroadcastManager implements FactoryContract
     protected function createAblyDriver(array $config)
     {
         if (array_key_exists('ably_client', $config) && $config['ably_client']) {
-            return new AblyBroadcaster($this->ably($config), $config);
+            return new AblyNativeBroadcaster($this->ably($config), $config);
         }
 
-        return new AblyBroadcasterDeprecated($this->ably($config));
+        return new AblyBroadcaster($this->ably($config));
     }
 
     /**
