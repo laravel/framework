@@ -802,6 +802,36 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Merge the collection with the given items when existing collection is empty.
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>  $items
+     * @return static
+     */
+    public function mergeWhenEmpty($items)
+    {
+        if ($this->isEmpty()) {
+            return $this->merge($items);
+        }
+
+        return new static($this->items);
+    }
+
+    /**
+     * Merge the collection with the given items when existing collection is not empty.
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>  $items
+     * @return static
+     */
+    public function mergeWhenNotEmpty($items)
+    {
+        if ($this->isNotEmpty()) {
+            return $this->merge($items);
+        }
+
+        return new static($this->items);
+    }
+
+    /**
      * Create a collection by using this collection for keys and another for its values.
      *
      * @template TCombineValue

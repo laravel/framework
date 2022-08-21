@@ -704,6 +704,22 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function merge($items);
 
     /**
+     * Merge the collection with the given items when existing collection is empty.
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>  $items
+     * @return static
+     */
+    public function mergeWhenEmpty($items);
+
+    /**
+     * Merge the collection with the given items when existing collection is not empty.
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>  $items
+     * @return static
+     */
+    public function mergeWhenNotEmpty($items);
+
+    /**
      * Recursively merge the collection with the given items.
      *
      * @template TMergeRecursiveValue

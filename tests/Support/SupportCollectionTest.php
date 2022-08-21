@@ -1317,6 +1317,30 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testMergeWhenEmpty($collection)
+    {
+        $c = new $collection([]);
+        $new = new $collection(['name' => 'Hello']);
+
+        $this->assertNotEquals(['name' => 'Hello', 'id' => 1], $new->mergeWhenEmpty(['id' => 1])->all());
+        $this->assertEquals(['name' => 'Hello', 'id' => 1], $c->mergeWhenEmpty(['name' => 'Hello', 'id' => 1])->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testMergeWhenNotEmpty($collection)
+    {
+        $c = new $collection([]);
+        $new = new $collection(['name' => 'Hello']);
+
+        $this->assertEquals(['name' => 'Hello', 'id' => 1], $new->mergeWhenNotEmpty(['id' => 1])->all());
+        $this->assertNotEquals(['name' => 'Hello', 'id' => 1], $c->mergeWhenNotEmpty(['name' => 'Hello', 'id' => 1])->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testMergeCollection($collection)
     {
         $c = new $collection(['name' => 'Hello']);

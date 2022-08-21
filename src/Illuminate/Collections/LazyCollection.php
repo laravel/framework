@@ -780,6 +780,28 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
+     * Merge the collection with the given items when existing collection is empty.
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>  $items
+     * @return static
+     */
+    public function mergeWhenEmpty($items)
+    {
+        return $this->passthru('mergeWhenEmpty', func_get_args());
+    }
+
+    /**
+     * Merge the collection with the given items when existing collection is not empty.
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>  $items
+     * @return static
+     */
+    public function mergeWhenNotEmpty($items)
+    {
+        return $this->passthru('mergeWhenNotEmpty', func_get_args());
+    }
+
+    /**
      * Recursively merge the collection with the given items.
      *
      * @template TMergeRecursiveValue
