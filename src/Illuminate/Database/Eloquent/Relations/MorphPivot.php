@@ -2,6 +2,10 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
+use Illuminate\Support\Str;
+use function class_basename;
+use function str_replace;
+
 class MorphPivot extends Pivot
 {
     /**
@@ -106,6 +110,16 @@ class MorphPivot extends Pivot
         $this->morphClass = $morphClass;
 
         return $this;
+    }
+
+    /**
+     * Get the table associated with the model.
+     *
+     * @return string
+     */
+    public function getTable()
+    {
+        return $this->table ?? Str::snake(Str::pluralStudly(class_basename($this)));
     }
 
     /**
