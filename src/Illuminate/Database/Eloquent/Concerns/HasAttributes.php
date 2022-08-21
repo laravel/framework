@@ -157,6 +157,13 @@ trait HasAttributes
     protected static $setAttributeMutatorCache = [];
 
     /**
+     * The cache of the converted cast types.
+     *
+     * @var array
+     */
+    protected static $castTypeCache = [];
+
+    /**
      * The encrypter instance that is used to encrypt attributes.
      *
      * @var \Illuminate\Contracts\Encryption\Encrypter
@@ -798,7 +805,11 @@ trait HasAttributes
             return $value;
         }
 
-        return $castType::from($value);
+        if (is_subclass_of($castType, \BackedEnum::class)) {
+            return $castType::from($value);
+        }
+
+        return constant($castType.'::'.$value);
     }
 
     /**
@@ -809,19 +820,23 @@ trait HasAttributes
      */
     protected function getCastType($key)
     {
-        if ($this->isCustomDateTimeCast($this->getCasts()[$key])) {
-            return 'custom_datetime';
+        $castType = $this->getCasts()[$key];
+
+        if (isset(static::$castTypeCache[$castType])) {
+            return static::$castTypeCache[$castType];
         }
 
-        if ($this->isImmutableCustomDateTimeCast($this->getCasts()[$key])) {
-            return 'immutable_custom_datetime';
+        if ($this->isCustomDateTimeCast($castType)) {
+            $convertedCastType = 'custom_datetime';
+        } elseif ($this->isImmutableCustomDateTimeCast($castType)) {
+            $convertedCastType = 'immutable_custom_datetime';
+        } elseif ($this->isDecimalCast($castType)) {
+            $convertedCastType = 'decimal';
+        } else {
+            $convertedCastType = trim(strtolower($castType));
         }
 
-        if ($this->isDecimalCast($this->getCasts()[$key])) {
-            return 'decimal';
-        }
-
-        return trim(strtolower($this->getCasts()[$key]));
+        return static::$castTypeCache[$castType] = $convertedCastType;
     }
 
     /**
@@ -873,8 +888,8 @@ trait HasAttributes
      */
     protected function isImmutableCustomDateTimeCast($cast)
     {
-        return strncmp($cast, 'immutable_date:', 15) === 0 ||
-               strncmp($cast, 'immutable_datetime:', 19) === 0;
+        return str_starts_with($cast, 'immutable_date:') ||
+                str_starts_with($cast, 'immutable_datetime:');
     }
 
     /**
@@ -1090,7 +1105,7 @@ trait HasAttributes
      * Set the value of an enum castable attribute.
      *
      * @param  string  $key
-     * @param  \BackedEnum  $value
+     * @param  \UnitEnum|string|int  $value
      * @return void
      */
     protected function setEnumCastableAttribute($key, $value)
@@ -1099,10 +1114,18 @@ trait HasAttributes
 
         if (! isset($value)) {
             $this->attributes[$key] = null;
-        } elseif ($value instanceof $enumClass) {
-            $this->attributes[$key] = $value->value;
+        } elseif (is_subclass_of($enumClass, \BackedEnum::class)) {
+            if ($value instanceof $enumClass) {
+                $this->attributes[$key] = $value->value;
+            } else {
+                $this->attributes[$key] = $enumClass::from($value)->value;
+            }
         } else {
-            $this->attributes[$key] = $enumClass::from($value)->value;
+            if ($value instanceof $enumClass) {
+                $this->attributes[$key] = $value->name;
+            } else {
+                $this->attributes[$key] = constant($enumClass.'::'.$value)->name;
+            }
         }
     }
 
@@ -1180,7 +1203,7 @@ trait HasAttributes
      */
     public function fromJson($value, $asObject = false)
     {
-        return json_decode($value, ! $asObject);
+        return json_decode($value ?? '', ! $asObject);
     }
 
     /**
@@ -1476,11 +1499,13 @@ trait HasAttributes
      */
     protected function isClassCastable($key)
     {
-        if (! array_key_exists($key, $this->getCasts())) {
+        $casts = $this->getCasts();
+
+        if (! array_key_exists($key, $casts)) {
             return false;
         }
 
-        $castType = $this->parseCasterClass($this->getCasts()[$key]);
+        $castType = $this->parseCasterClass($casts[$key]);
 
         if (in_array($castType, static::$primitiveCastTypes)) {
             return false;
@@ -1501,11 +1526,13 @@ trait HasAttributes
      */
     protected function isEnumCastable($key)
     {
-        if (! array_key_exists($key, $this->getCasts())) {
+        $casts = $this->getCasts();
+
+        if (! array_key_exists($key, $casts)) {
             return false;
         }
 
-        $castType = $this->getCasts()[$key];
+        $castType = $casts[$key];
 
         if (in_array($castType, static::$primitiveCastTypes)) {
             return false;

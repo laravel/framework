@@ -143,6 +143,13 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
     }
 
+    public function testDoesntContainIsLazy()
+    {
+        $this->assertEnumerates(5, function ($collection) {
+            $collection->doesntContain(5);
+        });
+    }
+
     public function testContainsStrictIsLazy()
     {
         $this->assertEnumerates(5, function ($collection) {
@@ -679,6 +686,13 @@ class SupportLazyCollectionIsLazyTest extends TestCase
     {
         $this->assertEnumeratesOnce(function ($collection) {
             $collection->median();
+        });
+    }
+
+    public function testAvgEnumeratesOnce()
+    {
+        $this->assertEnumeratesOnce(function ($collection) {
+            $collection->avg();
         });
     }
 

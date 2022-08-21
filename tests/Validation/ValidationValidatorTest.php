@@ -27,6 +27,7 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 use InvalidArgumentException;
 use Mockery as m;
+use Mockery\MockInterface;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use stdClass;
@@ -2131,6 +2132,17 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame('The url must end with one of the following values http, https', $v->messages()->first('url'));
     }
 
+    public function testValidateDoesntEndWith()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => 'hello world'], ['x' => 'doesnt_end_with:hello']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => 'hello world'], ['x' => 'doesnt_end_with:world']);
+        $this->assertFalse($v->passes());
+    }
+
     public function testValidateStartsWith()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -3522,23 +3534,50 @@ class ValidationValidatorTest extends TestCase
         ];
     }
 
-    public function testValidateActiveUrl()
+    /**
+     * @dataProvider activeUrlDataProvider
+     */
+    public function testValidateActiveUrl($data, $outcome)
     {
         $trans = $this->getIlluminateArrayTranslator();
-        $v = new Validator($trans, ['x' => 'aslsdlks'], ['x' => 'active_url']);
-        $this->assertFalse($v->passes());
+        $v = m::mock(
+            new Validator($trans, $data, ['x' => 'active_url']),
+            function (MockInterface $mock) {
+                $mock
+                    ->shouldAllowMockingProtectedMethods()
+                    ->shouldReceive('getDnsRecords')
+                    ->withAnyArgs()
+                    ->zeroOrMoreTimes()
+                    ->andReturn(['hit']);
+            }
+        );
+        $this->assertEquals($outcome, $v->passes());
+    }
 
-        $v = new Validator($trans, ['x' => ['fdsfs', 'fdsfds']], ['x' => 'active_url']);
-        $this->assertFalse($v->passes());
-
-        $v = new Validator($trans, ['x' => 'http://google.com'], ['x' => 'active_url']);
-        $this->assertTrue($v->passes());
-
-        $v = new Validator($trans, ['x' => 'http://www.google.com'], ['x' => 'active_url']);
-        $this->assertTrue($v->passes());
-
-        $v = new Validator($trans, ['x' => 'http://www.google.com/about'], ['x' => 'active_url']);
-        $this->assertTrue($v->passes());
+    public function activeUrlDataProvider()
+    {
+        return [
+            'Invalid Url' => [
+                ['x' => 'aslsdlks'],
+                false,
+            ],
+            'Invalid Urls' => [
+                ['x' => 'fdsfs', 'fdsfds'],
+                false,
+            ],
+            'Google Without Subdomain' => [
+                ['x' => 'http://google.com'],
+                true,
+            ],
+            'Google With Subdomain' => [
+                ['x' => 'http://www.google.com'],
+                true,
+            ],
+            'Google With Subdomain About Page' => [
+                ['x' => 'http://www.google.com/about'],
+                true,
+            ],
+        ];
     }
 
     public function testValidateImage()

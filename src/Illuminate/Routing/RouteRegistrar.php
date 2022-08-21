@@ -29,6 +29,8 @@ use InvalidArgumentException;
  */
 class RouteRegistrar
 {
+    use CreatesRegularExpressionRouteConstraints;
+
     /**
      * The router instance.
      *

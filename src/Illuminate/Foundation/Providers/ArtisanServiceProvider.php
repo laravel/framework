@@ -16,9 +16,12 @@ use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Database\Console\DbCommand;
 use Illuminate\Database\Console\DumpCommand;
 use Illuminate\Database\Console\Factories\FactoryMakeCommand;
+use Illuminate\Database\Console\MonitorCommand as DatabaseMonitorCommand;
 use Illuminate\Database\Console\PruneCommand;
 use Illuminate\Database\Console\Seeds\SeedCommand;
 use Illuminate\Database\Console\Seeds\SeederMakeCommand;
+use Illuminate\Database\Console\ShowCommand;
+use Illuminate\Database\Console\TableCommand as DatabaseTableCommand;
 use Illuminate\Database\Console\WipeCommand;
 use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Foundation\Console\CastMakeCommand;
@@ -28,6 +31,7 @@ use Illuminate\Foundation\Console\ComponentMakeCommand;
 use Illuminate\Foundation\Console\ConfigCacheCommand;
 use Illuminate\Foundation\Console\ConfigClearCommand;
 use Illuminate\Foundation\Console\ConsoleMakeCommand;
+use Illuminate\Foundation\Console\DocsCommand;
 use Illuminate\Foundation\Console\DownCommand;
 use Illuminate\Foundation\Console\EnvironmentCommand;
 use Illuminate\Foundation\Console\EventCacheCommand;
@@ -101,7 +105,10 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'ConfigCache' => ConfigCacheCommand::class,
         'ConfigClear' => ConfigClearCommand::class,
         'Db' => DbCommand::class,
+        'DbMonitor' => DatabaseMonitorCommand::class,
         'DbPrune' => PruneCommand::class,
+        'DbShow' => ShowCommand::class,
+        'DbTable' => DatabaseTableCommand::class,
         'DbWipe' => WipeCommand::class,
         'Down' => DownCommand::class,
         'Environment' => EnvironmentCommand::class,
@@ -154,6 +161,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'ComponentMake' => ComponentMakeCommand::class,
         'ConsoleMake' => ConsoleMakeCommand::class,
         'ControllerMake' => ControllerMakeCommand::class,
+        'Docs' => DocsCommand::class,
         'EventGenerate' => EventGenerateCommand::class,
         'EventMake' => EventMakeCommand::class,
         'ExceptionMake' => ExceptionMakeCommand::class,
@@ -191,7 +199,8 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     public function register()
     {
         $this->registerCommands(array_merge(
-            $this->commands, $this->devCommands
+            $this->commands,
+            $this->devCommands
         ));
     }
 
@@ -377,6 +386,16 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      *
      * @return void
      */
+    protected function registerDbMonitorCommand()
+    {
+        $this->app->singleton(DatabaseMonitorCommand::class);
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
     protected function registerDbPruneCommand()
     {
         $this->app->singleton(PruneCommand::class);
@@ -387,9 +406,39 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      *
      * @return void
      */
+    protected function registerDbShowCommand()
+    {
+        $this->app->singleton(ShowCommand::class);
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerDbTableCommand()
+    {
+        $this->app->singleton(DatabaseTableCommand::class);
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
     protected function registerDbWipeCommand()
     {
         $this->app->singleton(WipeCommand::class);
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerDocsCommand()
+    {
+        $this->app->singleton(DocsCommand::class);
     }
 
     /**

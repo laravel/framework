@@ -348,4 +348,14 @@ class NotificationFake implements NotificationDispatcher, NotificationFactory
 
         return $this;
     }
+
+    /**
+     * Get the notifications that have been sent.
+     *
+     * @return array
+     */
+    public function sentNotifications()
+    {
+        return $this->notifications;
+    }
 }

@@ -956,6 +956,19 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Execute the given callback if the string is not an exact match with the given value.
+     *
+     * @param  string  $value
+     * @param  callable  $callback
+     * @param  callable|null  $default
+     * @return static
+     */
+    public function whenNotExactly($value, $callback, $default = null)
+    {
+        return $this->when(! $this->exactly($value), $callback, $default);
+    }
+
+    /**
      * Execute the given callback if the string matches a given pattern.
      *
      * @param  string|array  $pattern

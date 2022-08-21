@@ -244,7 +244,7 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
     }
 
     /**
-     * Separate given mimetypes from extensions and return an array of correct rules to validate against.
+     * Separate the given mimetypes from extensions and return an array of correct rules to validate against.
      *
      * @return array
      */
@@ -275,7 +275,7 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
     }
 
     /**
-     * Adds the given failures and return false.
+     * Add the given failures and return false.
      *
      * @param  array|string  $messages
      * @return bool
@@ -302,7 +302,7 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
     }
 
     /**
-     * Set the performing validator.
+     * Set the current validator.
      *
      * @param  \Illuminate\Contracts\Validation\Validator  $validator
      * @return $this
@@ -315,7 +315,7 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
     }
 
     /**
-     * Set the data under validation.
+     * Set the current data under validation.
      *
      * @param  array  $data
      * @return $this

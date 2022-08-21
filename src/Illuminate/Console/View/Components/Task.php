@@ -38,7 +38,7 @@ class Task extends Component
             throw $e;
         } finally {
             $runTime = $task
-                ? (' '.number_format((microtime(true) - $startTime) * 1000, 2).'ms')
+                ? (' '.number_format((microtime(true) - $startTime) * 1000).'ms')
                 : '';
 
             $runTimeWidth = mb_strlen($runTime);

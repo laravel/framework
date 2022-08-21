@@ -864,6 +864,142 @@ class RouteRegistrarTest extends TestCase
         }
     }
 
+    public function testGroupWhereNumberRegistrationOnRouteRegistrar()
+    {
+        $wheres = ['foo' => '[0-9]+', 'bar' => '[0-9]+'];
+
+        $this->router->prefix('/{foo}/{bar}')->whereNumber(['foo', 'bar'])->group(function ($router) {
+            $router->get('/');
+        });
+
+        $this->router->prefix('/api/{bar}/{foo}')->whereNumber(['bar', 'foo'])->group(function ($router) {
+            $router->get('/');
+        });
+
+        /** @var \Illuminate\Routing\Route $route */
+        foreach ($this->router->getRoutes() as $route) {
+            $this->assertEquals($wheres, $route->wheres);
+        }
+    }
+
+    public function testGroupWhereAlphaRegistrationOnRouteRegistrar()
+    {
+        $wheres = ['foo' => '[a-zA-Z]+', 'bar' => '[a-zA-Z]+'];
+
+        $this->router->prefix('/{foo}/{bar}')->whereAlpha(['foo', 'bar'])->group(function ($router) {
+            $router->get('/');
+        });
+
+        $this->router->prefix('/api/{bar}/{foo}')->whereAlpha(['bar', 'foo'])->group(function ($router) {
+            $router->get('/');
+        });
+
+        /** @var \Illuminate\Routing\Route $route */
+        foreach ($this->router->getRoutes() as $route) {
+            $this->assertEquals($wheres, $route->wheres);
+        }
+    }
+
+    public function testGroupWhereAlphaNumericRegistrationOnRouteRegistrar()
+    {
+        $wheres = ['1a2b3c' => '[a-zA-Z0-9]+'];
+
+        $this->router->prefix('/{foo}')->whereAlphaNumeric(['1a2b3c'])->group(function ($router) {
+            $router->get('/');
+        });
+
+        /** @var \Illuminate\Routing\Route $route */
+        foreach ($this->router->getRoutes() as $route) {
+            $this->assertEquals($wheres, $route->wheres);
+        }
+    }
+
+    public function testGroupWhereInRegistrationOnRouteRegistrar()
+    {
+        $wheres = ['foo' => 'one|two', 'bar' => 'one|two'];
+
+        $this->router->prefix('/{foo}/{bar}')->whereIn(['foo', 'bar'], ['one', 'two'])->group(function ($router) {
+            $router->get('/');
+        });
+
+        $this->router->prefix('/api/{bar}/{foo}')->whereIn(['bar', 'foo'], ['one', 'two'])->group(function ($router) {
+            $router->get('/');
+        });
+
+        /** @var \Illuminate\Routing\Route $route */
+        foreach ($this->router->getRoutes() as $route) {
+            $this->assertEquals($wheres, $route->wheres);
+        }
+    }
+
+    public function testGroupWhereNumberRegistrationOnRouter()
+    {
+        $wheres = ['foo' => '[0-9]+', 'bar' => '[0-9]+'];
+
+        $this->router->whereNumber(['foo', 'bar'])->prefix('/{foo}/{bar}')->group(function ($router) {
+            $router->get('/');
+        });
+
+        $this->router->whereNumber(['bar', 'foo'])->prefix('/api/{bar}/{foo}')->group(function ($router) {
+            $router->get('/');
+        });
+
+        /** @var \Illuminate\Routing\Route $route */
+        foreach ($this->router->getRoutes() as $route) {
+            $this->assertEquals($wheres, $route->wheres);
+        }
+    }
+
+    public function testGroupWhereAlphaRegistrationOnRouter()
+    {
+        $wheres = ['foo' => '[a-zA-Z]+', 'bar' => '[a-zA-Z]+'];
+
+        $this->router->whereAlpha(['foo', 'bar'])->prefix('/{foo}/{bar}')->group(function ($router) {
+            $router->get('/');
+        });
+
+        $this->router->whereAlpha(['bar', 'foo'])->prefix('/api/{bar}/{foo}')->group(function ($router) {
+            $router->get('/');
+        });
+
+        /** @var \Illuminate\Routing\Route $route */
+        foreach ($this->router->getRoutes() as $route) {
+            $this->assertEquals($wheres, $route->wheres);
+        }
+    }
+
+    public function testGroupWhereAlphaNumericRegistrationOnRouter()
+    {
+        $wheres = ['1a2b3c' => '[a-zA-Z0-9]+'];
+
+        $this->router->whereAlphaNumeric(['1a2b3c'])->prefix('/{foo}')->group(function ($router) {
+            $router->get('/');
+        });
+
+        /** @var \Illuminate\Routing\Route $route */
+        foreach ($this->router->getRoutes() as $route) {
+            $this->assertEquals($wheres, $route->wheres);
+        }
+    }
+
+    public function testGroupWhereInRegistrationOnRouter()
+    {
+        $wheres = ['foo' => 'one|two', 'bar' => 'one|two'];
+
+        $this->router->whereIn(['foo', 'bar'], ['one', 'two'])->prefix('/{foo}/{bar}')->group(function ($router) {
+            $router->get('/');
+        });
+
+        $this->router->whereIn(['bar', 'foo'], ['one', 'two'])->prefix('/api/{bar}/{foo}')->group(function ($router) {
+            $router->get('/');
+        });
+
+        /** @var \Illuminate\Routing\Route $route */
+        foreach ($this->router->getRoutes() as $route) {
+            $this->assertEquals($wheres, $route->wheres);
+        }
+    }
+
     public function testCanSetRouteName()
     {
         $this->router->as('users.index')->get('users', function () {

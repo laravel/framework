@@ -696,6 +696,8 @@ class Application extends Container implements ApplicationContract, CachesConfig
 
         if (property_exists($provider, 'singletons')) {
             foreach ($provider->singletons as $key => $value) {
+                $key = is_int($key) ? $value : $key;
+
                 $this->singleton($key, $value);
             }
         }
