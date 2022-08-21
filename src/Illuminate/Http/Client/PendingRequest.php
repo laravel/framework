@@ -1277,4 +1277,11 @@ class PendingRequest
     {
         return $this->options;
     }
+
+    public function __clone() : void
+    {
+        $this->beforeSendingCallbacks = new Collection($this->beforeSendingCallbacks->all());
+        $this->stubCallbacks = new Collection($this->stubCallbacks->all());
+        $this->middleware = new Collection($this->middleware->all());
+    }
 }

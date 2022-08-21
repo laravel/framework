@@ -1172,6 +1172,8 @@ class HttpClientTest extends TestCase
 
         $history = [];
 
+        $middlewareCallCount = 0;
+
         $responses = $this->factory
             ->withMiddleware(Middleware::history($history))
             ->withToken('super-secret')
@@ -1179,10 +1181,18 @@ class HttpClientTest extends TestCase
             ->withHeaders([
                 'x-header' => 'value'
             ])
-            ->pool(fn (Pool $pool) => [
-                $pool->withHeaders(['x-custom' => 0])->post('/endpoint', ['hyped-for' => 'laravel-movie-0']),
-                $pool->withHeaders(['x-custom' => 1])->post('/endpoint', ['hyped-for' => 'laravel-movie-1']),
-            ]);
+            ->pool(function (Pool $pool) use (&$middlewareCallCount) {
+                return [
+                    $pool->withMiddleware(Middleware::mapRequest(function ($r) use (&$middlewareCallCount) {
+                        $middlewareCallCount++;
+
+                        return $r;
+                    }))->withHeaders(['x-custom' => 0])->post('/endpoint', ['hyped-for' => 'laravel-movie-0']),
+                    $pool->withHeaders(['x-custom' => 1])->post('/endpoint', ['hyped-for' => 'laravel-movie-1']),
+                ];
+            });
+
+        $this->assertSame(1, $middlewareCallCount);
 
         foreach ($responses as $key => $response) {
             /** @var Response $response */
