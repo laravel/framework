@@ -2,9 +2,8 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
-use Illuminate\Support\Str;
 use function class_basename;
-use function str_replace;
+use Illuminate\Support\Str;
 
 class MorphPivot extends Pivot
 {
