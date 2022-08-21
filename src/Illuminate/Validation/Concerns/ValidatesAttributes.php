@@ -1326,6 +1326,23 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute has a maximum number of digits.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateMaxDigits($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'max');
+
+        $length = strlen((string) $value);
+
+        return ! preg_match('/[^0-9]/', $value) && $length <= $parameters[0];
+    }
+
+    /**
      * Validate the guessed extension of a file upload is in a set of file extensions.
      *
      * @param  string  $attribute
@@ -1408,6 +1425,23 @@ trait ValidatesAttributes
         $this->requireParameterCount(1, $parameters, 'min');
 
         return $this->getSize($attribute, $value) >= $parameters[0];
+    }
+
+    /**
+     * Validate that an attribute has a minimum number of digits.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateMinDigits($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'min');
+
+        $length = strlen((string) $value);
+
+        return ! preg_match('/[^0-9]/', $value) && $length >= $parameters[0];
     }
 
     /**

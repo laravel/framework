@@ -2360,6 +2360,32 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['foo' => '+12.3'], ['foo' => 'digits_between:1,6']);
         $this->assertFalse($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => '12345'], ['foo' => 'min_digits:1']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'bar'], ['foo' => 'min_digits:1']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '123'], ['foo' => 'min_digits:4']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '+12.3'], ['foo' => 'min_digits:1']);
+        $this->assertFalse($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => '12345'], ['foo' => 'max_digits:6']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'bar'], ['foo' => 'max_digits:10']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '123'], ['foo' => 'max_digits:2']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '+12.3'], ['foo' => 'max_digits:6']);
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateSize()
