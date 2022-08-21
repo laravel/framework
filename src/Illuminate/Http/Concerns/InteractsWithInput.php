@@ -236,7 +236,7 @@ trait InteractsWithInput
     }
 
     /**
-     * Apply the callback if the request contains an empty value for the given input item key.
+     * Apply the callback if the request contains a missing key for the given input item key.
      *
      * @param  string  $key
      * @param  callable  $callback
