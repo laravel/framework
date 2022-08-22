@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
+use Illuminate\Support\LazyCollection;
 
 abstract class HasOneOrMany extends Relation
 {
@@ -124,7 +125,7 @@ abstract class HasOneOrMany extends Relation
      * @param  string  $relation
      * @return array
      */
-    public function matchMany(array $models, Collection $results, $relation)
+    public function matchMany(array $models, Collection | LazyCollection $results, $relation)
     {
         return $this->matchOneOrMany($models, $results, $relation, 'many');
     }
@@ -138,7 +139,7 @@ abstract class HasOneOrMany extends Relation
      * @param  string  $type
      * @return array
      */
-    protected function matchOneOrMany(array $models, Collection $results, $relation, $type)
+    protected function matchOneOrMany(array $models, Collection | LazyCollection $results, $relation, $type)
     {
         $dictionary = $this->buildDictionary($results);
 

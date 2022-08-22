@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\Concerns\CanBeOneOfMany;
 use Illuminate\Database\Eloquent\Relations\Concerns\ComparesRelatedModels;
 use Illuminate\Database\Eloquent\Relations\Concerns\SupportsDefaultModels;
 use Illuminate\Database\Query\JoinClause;
+use Illuminate\Support\LazyCollection;
 
 class MorphOne extends MorphOneOrMany implements SupportsPartialRelations
 {
@@ -49,11 +50,11 @@ class MorphOne extends MorphOneOrMany implements SupportsPartialRelations
      * Match the eagerly loaded results to their parents.
      *
      * @param  array  $models
-     * @param  \Illuminate\Database\Eloquent\Collection  $results
+     * @param  \Illuminate\Database\Eloquent\Collection | \Illuminate\Support\LazyCollection  $results
      * @param  string  $relation
      * @return array
      */
-    public function match(array $models, Collection $results, $relation)
+    public function match(array $models, Collection | LazyCollection $results, $relation)
     {
         return $this->matchOne($models, $results, $relation);
     }
