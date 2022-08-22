@@ -3,11 +3,12 @@
 namespace Illuminate\Foundation;
 
 use Exception;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 
-class Vite
+class Vite implements Htmlable
 {
     /**
      * The Content Security Policy nonce to apply to all generated tags.
@@ -22,6 +23,27 @@ class Vite
      * @var string|false
      */
     protected $integrityKey = 'integrity';
+
+    /**
+     * The configured entry points.
+     *
+     * @var array
+     */
+    protected $entryPoints = [];
+
+    /**
+     * The path to the "hot" file.
+     *
+     * @var string|null
+     */
+    protected $hotFile;
+
+    /**
+     * The path to the build directory.
+     *
+     * @var string
+     */
+    protected $buildDirectory = 'build';
 
     /**
      * The script tag attributes resolvers.
@@ -79,6 +101,55 @@ class Vite
     }
 
     /**
+     * Set the Vite entry points.
+     *
+     * @param  array  $entryPoints
+     * @return $this
+     */
+    public function withEntryPoints($entryPoints)
+    {
+        $this->entryPoints = $entryPoints;
+
+        return $this;
+    }
+
+    /**
+     * Get the Vite "hot" file path.
+     *
+     * @return string
+     */
+    protected function hotFile()
+    {
+        return $this->hotFile ?? public_path('/hot');
+    }
+
+    /**
+     * Set the Vite "hot" file path.
+     *
+     * @param  string  $path
+     * @return $this
+     */
+    public function useHotFile($path)
+    {
+        $this->hotFile = $path;
+
+        return $this;
+    }
+
+    /**
+     * Set the Vite build directory.
+     *
+     * @param  string  $path
+     * @return $this
+     */
+    public function useBuildDirectory($path)
+    {
+        $this->buildDirectory = $path;
+
+        return $this;
+    }
+
+    /**
      * Use the given callback to resolve attributes for script tags.
      *
      * @param  (callable(string, string, ?array, ?array): array)|array  $attributes
@@ -116,15 +187,15 @@ class Vite
      * Generate Vite tags for an entrypoint.
      *
      * @param  string|string[]  $entrypoints
-     * @param  string  $buildDirectory
+     * @param  string|null  $buildDirectory
      * @return \Illuminate\Support\HtmlString
      *
      * @throws \Exception
      */
-    public function __invoke($entrypoints, $buildDirectory = 'build')
+    public function __invoke($entrypoints, $buildDirectory = null)
     {
         $entrypoints = collect($entrypoints);
-        $buildDirectory = Str::start($buildDirectory, '/');
+        $buildDirectory ??= $this->buildDirectory;
 
         if ($this->isRunningHot()) {
             return new HtmlString(
@@ -396,7 +467,7 @@ class Vite
      */
     protected function hotAsset($asset)
     {
-        return rtrim(file_get_contents(public_path('/hot'))).'/'.$asset;
+        return rtrim(file_get_contents($this->hotFile())).'/'.$asset;
     }
 
     /**
@@ -406,8 +477,10 @@ class Vite
      * @param  string|null  $buildDirectory
      * @return string
      */
-    public function asset($asset, $buildDirectory = 'build')
+    public function asset($asset, $buildDirectory = null)
     {
+        $buildDirectory ??= $this->buildDirectory;
+
         if ($this->isRunningHot()) {
             return $this->hotAsset($asset);
         }
@@ -427,7 +500,7 @@ class Vite
      */
     protected function manifest($buildDirectory)
     {
-        $path = public_path($buildDirectory.'/manifest.json');
+        $path = $this->manifestPath($buildDirectory);
 
         if (! isset(static::$manifests[$path])) {
             if (! is_file($path)) {
@@ -438,6 +511,17 @@ class Vite
         }
 
         return static::$manifests[$path];
+    }
+
+    /**
+     * Get the path to the manifest file for the given build directory.
+     *
+     * @param  string  $buildDirectory
+     * @return string
+     */
+    protected function manifestPath($buildDirectory)
+    {
+        return public_path($buildDirectory.'/manifest.json');
     }
 
     /**
@@ -465,6 +549,16 @@ class Vite
      */
     protected function isRunningHot()
     {
-        return is_file(public_path('/hot'));
+        return is_file($this->hotFile());
+    }
+
+    /**
+     * Get the Vite tag content as a string of HTML.
+     *
+     * @return string
+     */
+    public function toHtml()
+    {
+        return $this->__invoke($this->entryPoints)->toHtml();
     }
 }
