@@ -71,7 +71,7 @@ class CookieJar implements JarContract
     }
 
     /**
-     * Create a cookie that lasts "forever" (five years).
+     * Create a cookie that lasts "forever" (400 days).
      *
      * @param  string  $name
      * @param  string  $value
