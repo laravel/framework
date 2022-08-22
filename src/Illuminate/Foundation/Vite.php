@@ -114,6 +114,16 @@ class Vite implements Htmlable
     }
 
     /**
+     * Get the Vite "hot" file path.
+     *
+     * @return string
+     */
+    protected function hotFile()
+    {
+        return $this->hotFile ?? public_path('/hot');
+    }
+
+    /**
      * Set the Vite "hot" file path.
      *
      * @param  string  $path
@@ -124,16 +134,6 @@ class Vite implements Htmlable
         $this->hotFile = $path;
 
         return $this;
-    }
-
-    /**
-     * Get the Vite "hot" file path.
-     *
-     * @return string
-     */
-    protected function hotFile()
-    {
-        return $this->hotFile ?? public_path('/hot');
     }
 
     /**
