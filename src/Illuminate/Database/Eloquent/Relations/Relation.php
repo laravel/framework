@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\MultipleRecordsFoundException;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Arr;
+use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
 
@@ -68,6 +69,13 @@ abstract class Relation implements BuilderContract
      * @var int
      */
     protected static $selfJoinCount = 0;
+
+    /**
+     * Flag to enable loading this relation as a LazyCollection
+     *
+     * @var false | int Chunk size for the lazy collection, false to load relation as normal collection
+     */
+    private false | int $lazy_chunkSize = false;
 
     /**
      * Create a new relation instance.
@@ -135,11 +143,11 @@ abstract class Relation implements BuilderContract
      * Match the eagerly loaded results to their parents.
      *
      * @param  array  $models
-     * @param  \Illuminate\Database\Eloquent\Collection  $results
+     * @param  \Illuminate\Database\Eloquent\Collection | \Illuminate\Support\LazyCollection  $results
      * @param  string  $relation
      * @return array
      */
-    abstract public function match(array $models, Collection $results, $relation);
+    abstract public function match(array $models, Collection | LazyCollection $results, $relation);
 
     /**
      * Get the results of the relationship.
@@ -151,11 +159,30 @@ abstract class Relation implements BuilderContract
     /**
      * Get the relationship for eager loading.
      *
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Database\Eloquent\Collection | \Illuminate\Support\LazyCollection
      */
     public function getEager()
     {
-        return $this->get();
+        // check if lazy loading is enabled
+        return $this->lazy_chunkSize
+            // load relation as lazy collection
+            ? $this->lazy( $this->lazy_chunkSize )
+            // load relation as normal collection
+            : $this->get();
+    }
+
+    /**
+     * Enable lazy loading for this relation
+     *
+     * @param false | int $chunkSize
+     *
+     * @return $this
+     */
+    public function asLazy(false | int $chunkSize = 1000): self {
+        // store the chunk size for lazy collection
+        $this->lazy_chunkSize = $chunkSize;
+
+        return $this;
     }
 
     /**
