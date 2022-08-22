@@ -6,6 +6,7 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\Eloquent\Relations\MorphPivot;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Mockery as m;
@@ -139,6 +140,18 @@ class DatabaseEloquentPivotTest extends TestCase
         $this->assertSame('pivot', $pivot->getTable());
     }
 
+    public function testPivotModelTableNameIsSingularSnake()
+    {
+        $pivot = new DummyPivotModelPluralDummies;
+        $this->assertSame('dummy_pivot_model_plural_dummy', $pivot->getTable());
+    }
+
+    public function testMorphPivotModelTableNameIsPlural()
+    {
+        $pivot = new DummyMorphPivot;
+        $this->assertSame('dummy_morph_pivots', $pivot->getTable());
+    }
+
     public function testPivotModelWithParentReturnsParentsTimestampColumns()
     {
         $parent = m::mock(Model::class);
@@ -223,4 +236,14 @@ class DatabaseEloquentPivotTestJsonCastStub extends Pivot
 class DummyModel extends Model
 {
     //
+}
+
+class DummyPivotModelPluralDummies extends Pivot
+{
+
+}
+
+class DummyMorphPivot extends MorphPivot
+{
+
 }
