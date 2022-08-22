@@ -29,6 +29,16 @@ class SupportMacroableTest extends TestCase
         $this->assertSame('Taylor', $macroable::{__CLASS__}());
     }
 
+    public function testHasMacro()
+    {
+        $macroable = $this->macroable;
+        $macroable::macro('foo', function () {
+            return 'Taylor';
+        });
+        $this->assertTrue($macroable::hasMacro('foo'));
+        $this->assertFalse($macroable::hasMacro('bar'));
+    }
+
     public function testRegisterMacroAndCallWithoutStatic()
     {
         $macroable = $this->macroable;
