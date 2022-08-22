@@ -25,6 +25,27 @@ class Vite implements Htmlable
     protected $integrityKey = 'integrity';
 
     /**
+     * The configured entry points.
+     *
+     * @var array
+     */
+    protected $entryPoints = [];
+
+    /**
+     * The path to the "hot" file.
+     *
+     * @var string|null
+     */
+    protected $hotFile;
+
+    /**
+     * The path to the build directory.
+     *
+     * @var string
+     */
+    protected $buildDirectory = 'build';
+
+    /**
      * The script tag attributes resolvers.
      *
      * @var array
@@ -44,27 +65,6 @@ class Vite implements Htmlable
      * @var array
      */
     protected static $manifests = [];
-
-    /**
-     * The entry points.
-     *
-     * @var array
-     */
-    protected $entryPoints = [];
-
-    /**
-     * The path to the hot file.
-     *
-     * @var string|null
-     */
-    protected $hotFile;
-
-    /**
-     * The path to the build directory.
-     *
-     * @var string
-     */
-    protected $buildDirectory = 'build';
 
     /**
      * Get the Content Security Policy nonce applied to all generated tags.
@@ -96,6 +96,55 @@ class Vite implements Htmlable
     public function useIntegrityKey($key)
     {
         $this->integrityKey = $key;
+
+        return $this;
+    }
+
+    /**
+     * Set the Vite entry points.
+     *
+     * @param  array  $entryPoints
+     * @return $this
+     */
+    public function withEntryPoints($entryPoints)
+    {
+        $this->entryPoints = $entryPoints;
+
+        return $this;
+    }
+
+    /**
+     * Set the Vite "hot" file path.
+     *
+     * @param  string  $path
+     * @return $this
+     */
+    public function useHotFile($path)
+    {
+        $this->hotFile = $path;
+
+        return $this;
+    }
+
+    /**
+     * Get the Vite "hot" file path.
+     *
+     * @return string
+     */
+    protected function hotFile()
+    {
+        return $this->hotFile ?? public_path('/hot');
+    }
+
+    /**
+     * Set the Vite build directory.
+     *
+     * @param  string  $path
+     * @return $this
+     */
+    public function useBuildDirectory($path)
+    {
+        $this->buildDirectory = $path;
 
         return $this;
     }
@@ -422,65 +471,6 @@ class Vite implements Htmlable
     }
 
     /**
-     * Set the entry points.
-     *
-     * @param  array  $entryPoints
-     * @return $this
-     */
-    public function withEntryPoints($entryPoints)
-    {
-        $this->entryPoints = $entryPoints;
-
-        return $this;
-    }
-
-    /**
-     * Set the hot file path.
-     *
-     * @param  string  $path
-     * @return $this
-     */
-    public function useHotFile($path)
-    {
-        $this->hotFile = $path;
-
-        return $this;
-    }
-
-    /**
-     * Get the hot file path.
-     *
-     * @return string
-     */
-    protected function hotFile()
-    {
-        return $this->hotFile ?? public_path('/hot');
-    }
-
-    /**
-     * Set the build directory.
-     *
-     * @param  string  $path
-     * @return $this
-     */
-    public function useBuildDirectory($path)
-    {
-        $this->buildDirectory = $path;
-
-        return $this;
-    }
-
-    /**
-     * Get content as a string of HTML.
-     *
-     * @return string
-     */
-    public function toHtml()
-    {
-        return $this->__invoke($this->entryPoints)->toHtml();
-    }
-
-    /**
      * Get the URL for an asset.
      *
      * @param  string  $asset
@@ -524,7 +514,7 @@ class Vite implements Htmlable
     }
 
     /**
-     * The path to the manifest file for the given build directory.
+     * Get the path to the manifest file for the given build directory.
      *
      * @param  string  $buildDirectory
      * @return string
@@ -560,5 +550,15 @@ class Vite implements Htmlable
     protected function isRunningHot()
     {
         return is_file($this->hotFile());
+    }
+
+    /**
+     * Get the Vite tag content as a string of HTML.
+     *
+     * @return string
+     */
+    public function toHtml()
+    {
+        return $this->__invoke($this->entryPoints)->toHtml();
     }
 }
