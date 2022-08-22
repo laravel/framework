@@ -382,4 +382,36 @@ trait CompilesConditionals
     {
         return '<?php $__env->stopPush(); endif; ?>';
     }
+
+    /**
+     * Compile the if-locale statements into valid PHP.
+     *
+     * @param  string  $locale
+     * @return string
+     */
+    protected function compileLocale($locale)
+    {
+        return "<?php if(app()->getLocale() === $locale): ?>";
+    }
+
+    /**
+     * Compile the else-locale statements into valid PHP.
+     *
+     * @param  string  $locale
+     * @return string
+     */
+    protected function compileElseLocale($locale)
+    {
+        return "<?php elseif(app()->getLocale() === $locale): ?>";
+    }
+
+    /**
+     * Compile the end-locale statements into valid PHP.
+     *
+     * @return string
+     */
+    protected function compileEndLocale()
+    {
+        return '<?php endif; ?>';
+    }
 }
