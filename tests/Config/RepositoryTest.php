@@ -62,6 +62,13 @@ class RepositoryTest extends TestCase
         );
     }
 
+    public function testGetNullValue()
+    {
+        $this->assertNull(
+            $this->repository->get('null')
+        );
+    }
+
     public function testConstruct()
     {
         $this->assertInstanceOf(Repository::class, $this->repository);
