@@ -13,14 +13,15 @@ class PaginatorTest extends TestCase
 
         $this->assertEquals(2, $p->currentPage());
         $this->assertTrue($p->hasPages());
-        $this->assertTrue($p->hasMorePages());
+        $this->assertFalse($p->hasMorePages()); // Because: there are 3 items, 2 items per page = there are 2 pages. And we are on page 2 = we are on the last page.
         $this->assertEquals(['item3', 'item4'], $p->items());
 
         $pageInfo = [
             'per_page' => 2,
             'current_page' => 2,
             'first_page_url' => '/?page=1',
-            'next_page_url' => '/?page=3',
+            //'next_page_url' => '/?page=3',
+            'next_page_url' => '', // Because: hasMorePages() is false.
             'prev_page_url' => '/?page=1',
             'from' => 3,
             'to' => 4,
@@ -29,6 +30,24 @@ class PaginatorTest extends TestCase
         ];
 
         $this->assertEquals($pageInfo, $p->toArray());
+    }
+
+    /**
+     * @author Stephen Damian
+     */
+    public function testPaginatorisOnFirstAndLastPage()
+    {
+        $p = new Paginator($array = ['1', '2', '3', '4', '5'], 2, 1);
+
+        $this->assertTrue($p->onFirstPage());
+        $this->assertFalse($p->onLastPage());
+        $this->assertTrue($p->hasMorePages());
+
+        $p = new Paginator($array = ['1', '2', '3', '4', '5'], 2, 3);
+
+        $this->assertFalse($p->onFirstPage());
+        $this->assertTrue($p->onLastPage());
+        $this->assertFalse($p->hasMorePages());
     }
 
     public function testPaginatorRemovesTrailingSlashes()
