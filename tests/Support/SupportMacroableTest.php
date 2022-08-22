@@ -39,6 +39,24 @@ class SupportMacroableTest extends TestCase
         $this->assertFalse($macroable::hasMacro('bar'));
     }
 
+    public function testAccessNotRegisterMethod()
+    {
+        $macroable = $this->macroable;
+
+        $this->expectException(BadMethodCallException::class);
+
+        $macroable->foo();
+    }
+
+    public function testAccessNotRegisterStaticMethod()
+    {
+        $macroable = $this->macroable;
+
+        $this->expectException(BadMethodCallException::class);
+
+        $macroable::foo();
+    }
+
     public function testRegisterMacroAndCallWithoutStatic()
     {
         $macroable = $this->macroable;
