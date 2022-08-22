@@ -101,6 +101,23 @@ class SupportMacroableTest extends TestCase
 
         $instance->flushMethod();
     }
+
+    public function testFlushMacrosStatic()
+    {
+        TestMacroable::macro('flushMethod', function () {
+            return 'flushMethod';
+        });
+
+        $instance = new TestMacroable;
+
+        $this->assertSame('flushMethod', $instance::flushMethod());
+
+        TestMacroable::flushMacros();
+
+        $this->expectException(BadMethodCallException::class);
+
+        $instance::flushMethod();
+    }
 }
 
 class EmptyMacroable
