@@ -20,7 +20,6 @@ class PaginatorTest extends TestCase
             'per_page' => 2,
             'current_page' => 2,
             'first_page_url' => '/?page=1',
-            //'next_page_url' => '/?page=3',
             'next_page_url' => '', // Because: hasMorePages() is false.
             'prev_page_url' => '/?page=1',
             'from' => 3,
