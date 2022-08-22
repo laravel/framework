@@ -186,11 +186,11 @@ class HasManyThrough extends Relation
      * Match the eagerly loaded results to their parents.
      *
      * @param  array  $models
-     * @param  \Illuminate\Database\Eloquent\Collection | \Illuminate\Support\LazyCollection  $results
+     * @param  \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\LazyCollection  $results
      * @param  string  $relation
      * @return array
      */
-    public function match(array $models, Collection | LazyCollection $results, $relation)
+    public function match(array $models, Collection|LazyCollection $results, $relation)
     {
         $dictionary = $this->buildDictionary($results);
 
@@ -211,10 +211,10 @@ class HasManyThrough extends Relation
     /**
      * Build model dictionary keyed by the relation's foreign key.
      *
-     * @param  \Illuminate\Database\Eloquent\Collection  $results
+     * @param  \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\LazyCollection  $results
      * @return array
      */
-    protected function buildDictionary(Collection $results)
+    protected function buildDictionary(Collection|LazyCollection $results)
     {
         $dictionary = [];
 

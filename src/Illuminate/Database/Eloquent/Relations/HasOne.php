@@ -50,11 +50,11 @@ class HasOne extends HasOneOrMany implements SupportsPartialRelations
      * Match the eagerly loaded results to their parents.
      *
      * @param  array  $models
-     * @param  \Illuminate\Database\Eloquent\Collection | \Illuminate\Support\LazyCollection  $results
+     * @param  \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\LazyCollection  $results
      * @param  string  $relation
      * @return array
      */
-    public function match(array $models, Collection | LazyCollection $results, $relation)
+    public function match(array $models, Collection|LazyCollection $results, $relation)
     {
         return $this->matchOne($models, $results, $relation);
     }

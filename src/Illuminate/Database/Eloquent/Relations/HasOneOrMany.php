@@ -108,11 +108,11 @@ abstract class HasOneOrMany extends Relation
      * Match the eagerly loaded results to their single parents.
      *
      * @param  array  $models
-     * @param  \Illuminate\Database\Eloquent\Collection  $results
+     * @param  \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\LazyCollection  $results
      * @param  string  $relation
      * @return array
      */
-    public function matchOne(array $models, Collection $results, $relation)
+    public function matchOne(array $models, Collection|LazyCollection $results, $relation)
     {
         return $this->matchOneOrMany($models, $results, $relation, 'one');
     }
@@ -121,11 +121,11 @@ abstract class HasOneOrMany extends Relation
      * Match the eagerly loaded results to their many parents.
      *
      * @param  array  $models
-     * @param  \Illuminate\Database\Eloquent\Collection  $results
+     * @param  \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\LazyCollection  $results
      * @param  string  $relation
      * @return array
      */
-    public function matchMany(array $models, Collection | LazyCollection $results, $relation)
+    public function matchMany(array $models, Collection|LazyCollection $results, $relation)
     {
         return $this->matchOneOrMany($models, $results, $relation, 'many');
     }
@@ -134,12 +134,12 @@ abstract class HasOneOrMany extends Relation
      * Match the eagerly loaded results to their many parents.
      *
      * @param  array  $models
-     * @param  \Illuminate\Database\Eloquent\Collection  $results
+     * @param  \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\LazyCollection  $results
      * @param  string  $relation
      * @param  string  $type
      * @return array
      */
-    protected function matchOneOrMany(array $models, Collection | LazyCollection $results, $relation, $type)
+    protected function matchOneOrMany(array $models, Collection|LazyCollection $results, $relation, $type)
     {
         $dictionary = $this->buildDictionary($results);
 
@@ -175,10 +175,10 @@ abstract class HasOneOrMany extends Relation
     /**
      * Build model dictionary keyed by the relation's foreign key.
      *
-     * @param  \Illuminate\Database\Eloquent\Collection  $results
+     * @param  \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\LazyCollection  $results
      * @return array
      */
-    protected function buildDictionary(Collection $results)
+    protected function buildDictionary(Collection|LazyCollection $results)
     {
         $foreign = $this->getForeignKeyName();
 

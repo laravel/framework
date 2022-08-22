@@ -71,11 +71,11 @@ abstract class Relation implements BuilderContract
     protected static $selfJoinCount = 0;
 
     /**
-     * Flag to enable loading this relation as a LazyCollection
+     * Flag to enable loading this relation as a LazyCollection.
      *
-     * @var false | int Chunk size for the lazy collection, false to load relation as normal collection
+     * @var false|int Chunk size for the lazy collection, false to load relation as normal collection
      */
-    private false | int $lazy_chunkSize = false;
+    private false|int $lazy_chunkSize = false;
 
     /**
      * Create a new relation instance.
@@ -143,11 +143,11 @@ abstract class Relation implements BuilderContract
      * Match the eagerly loaded results to their parents.
      *
      * @param  array  $models
-     * @param  \Illuminate\Database\Eloquent\Collection | \Illuminate\Support\LazyCollection  $results
+     * @param  \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\LazyCollection  $results
      * @param  string  $relation
      * @return array
      */
-    abstract public function match(array $models, Collection | LazyCollection $results, $relation);
+    abstract public function match(array $models, Collection|LazyCollection $results, $relation);
 
     /**
      * Get the results of the relationship.
@@ -159,26 +159,26 @@ abstract class Relation implements BuilderContract
     /**
      * Get the relationship for eager loading.
      *
-     * @return \Illuminate\Database\Eloquent\Collection | \Illuminate\Support\LazyCollection
+     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\LazyCollection
      */
     public function getEager()
     {
         // check if lazy loading is enabled
         return $this->lazy_chunkSize
             // load relation as lazy collection
-            ? $this->lazy( $this->lazy_chunkSize )
+            ? $this->lazy($this->lazy_chunkSize)
             // load relation as normal collection
             : $this->get();
     }
 
     /**
-     * Enable lazy loading for this relation
+     * Enable lazy loading for this relation.
      *
-     * @param false | int $chunkSize
-     *
+     * @param  false|int  $chunkSize
      * @return $this
      */
-    public function asLazy(false | int $chunkSize = 1000): self {
+    public function asLazy(false|int $chunkSize = 1000): self
+    {
         // store the chunk size for lazy collection
         $this->lazy_chunkSize = $chunkSize;
 

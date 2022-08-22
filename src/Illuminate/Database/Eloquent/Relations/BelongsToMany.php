@@ -269,11 +269,11 @@ class BelongsToMany extends Relation
      * Match the eagerly loaded results to their parents.
      *
      * @param  array  $models
-     * @param  \Illuminate\Database\Eloquent\Collection | \Illuminate\Support\LazyCollection  $results
+     * @param  \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\LazyCollection  $results
      * @param  string  $relation
      * @return array
      */
-    public function match(array $models, Collection | LazyCollection $results, $relation)
+    public function match(array $models, Collection|LazyCollection $results, $relation)
     {
         $dictionary = $this->buildDictionary($results);
 
@@ -296,10 +296,10 @@ class BelongsToMany extends Relation
     /**
      * Build model dictionary keyed by the relation's foreign key.
      *
-     * @param  \Illuminate\Database\Eloquent\Collection  $results
+     * @param  \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\LazyCollection  $results
      * @return array
      */
-    protected function buildDictionary(Collection $results)
+    protected function buildDictionary(Collection|LazyCollection $results)
     {
         // First we'll build a dictionary of child models keyed by the foreign key
         // of the relation so that we will easily and quickly match them to the
