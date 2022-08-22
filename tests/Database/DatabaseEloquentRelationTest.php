@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\LazyCollection;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -307,7 +308,7 @@ class EloquentRelationStub extends Relation
         //
     }
 
-    public function match(array $models, Collection $results, $relation)
+    public function match(array $models, Collection|LazyCollection $results, $relation)
     {
         //
     }
