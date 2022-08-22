@@ -19,4 +19,20 @@ baz
 <?php endif; ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
+
+    public function testIfLocaleStatementsWithArrayPassedAreCompiled()
+    {
+        $string = '@locale ([foo, bar])
+foo or bar
+@elselocale ([baz,qux])
+baz or qux
+@endlocale';
+
+        $expected = '<?php if(in_array(app()->getLocale(), ([foo, bar]))): ?>
+foo or bar
+<?php elseif(in_array(app()->getLocale(), ([baz,qux]))): ?>
+baz or qux
+<?php endif; ?>';
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
 }

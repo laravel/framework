@@ -391,7 +391,11 @@ trait CompilesConditionals
      */
     protected function compileLocale($locale)
     {
-        return "<?php if(app()->getLocale() === $locale): ?>";
+        $condition = str_contains($locale, ',')
+                    ? "in_array(app()->getLocale(), $locale)"
+                    : "app()->getLocale() === $locale";
+
+        return "<?php if(${condition}): ?>";
     }
 
     /**
@@ -402,7 +406,11 @@ trait CompilesConditionals
      */
     protected function compileElseLocale($locale)
     {
-        return "<?php elseif(app()->getLocale() === $locale): ?>";
+        $condition = str_contains($locale, ',')
+            ? "in_array(app()->getLocale(), $locale)"
+            : "app()->getLocale() === $locale";
+
+        return "<?php elseif(${condition}): ?>";
     }
 
     /**
