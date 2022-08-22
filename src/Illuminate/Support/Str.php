@@ -609,12 +609,12 @@ class Str
     public static function padBoth($value, $length, $pad = ' ')
     {
         $short = max(0, $length - mb_strlen($value));
-        $short_left = floor($short / 2);
-        $short_right = ceil($short / 2);
-        return
-            mb_substr(str_repeat($pad, $short_left), 0, $short_left).
-            $value.
-            mb_substr(str_repeat($pad, $short_right), 0, $short_right);
+        $shortLeft = floor($short / 2);
+        $shortRight = ceil($short / 2);
+
+        return mb_substr(str_repeat($pad, $shortLeft), 0, $shortLeft).
+               $value.
+               mb_substr(str_repeat($pad, $shortRight), 0, $shortRight);
     }
 
     /**
@@ -628,6 +628,7 @@ class Str
     public static function padLeft($value, $length, $pad = ' ')
     {
         $short = max(0, $length - mb_strlen($value));
+
         return mb_substr(str_repeat($pad, $short), 0, $short).$value;
     }
 
@@ -642,6 +643,7 @@ class Str
     public static function padRight($value, $length, $pad = ' ')
     {
         $short = max(0, $length - mb_strlen($value));
+
         return $value.mb_substr(str_repeat($pad, $short), 0, $short);
     }
 
