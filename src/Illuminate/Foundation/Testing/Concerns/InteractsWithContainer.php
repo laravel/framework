@@ -121,6 +121,11 @@ trait InteractsWithContainer
                 return '';
             }
 
+            public function __toString()
+            {
+                return '';
+            }
+
             public function useIntegrityKey()
             {
                 return $this;
@@ -132,6 +137,21 @@ trait InteractsWithContainer
             }
 
             public function useStyleTagAttributes()
+            {
+                return $this;
+            }
+
+            public function useBuildDirectory($path)
+            {
+                return $this;
+            }
+
+            public function useHotFile($path)
+            {
+                return $this;
+            }
+
+            public function withEntryPoints($entryPoints)
             {
                 return $this;
             }
