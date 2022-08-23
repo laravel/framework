@@ -159,7 +159,7 @@ class RepositoryTest extends TestCase
             'key4' => [
                 'foo' => 'bar',
                 'bar' => [
-                    'foo' => 'bar'
+                    'foo' => 'bar',
                 ]
             ],
         ]);
