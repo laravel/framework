@@ -164,9 +164,9 @@ abstract class Relation implements BuilderContract
     public function getEager()
     {
         // check if lazy loading is enabled
-        return $this->lazy_chunkSize
+        return $this->lazyChunkSize
             // load relation as lazy collection
-            ? $this->lazy($this->lazy_chunkSize)
+            ? $this->lazy($this->lazyChunkSize)
             // load relation as normal collection
             : $this->get();
     }
@@ -180,7 +180,7 @@ abstract class Relation implements BuilderContract
     public function asLazy(false|int $chunkSize = 1000): self
     {
         // store the chunk size for lazy collection
-        $this->lazy_chunkSize = $chunkSize;
+        $this->lazyChunkSize = $chunkSize;
 
         return $this;
     }
