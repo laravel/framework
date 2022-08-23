@@ -141,17 +141,17 @@ trait InteractsWithContainer
                 return $this;
             }
 
-            public function useBuildDirectory($path)
+            public function useBuildDirectory()
             {
                 return $this;
             }
 
-            public function useHotFile($path)
+            public function useHotFile()
             {
                 return $this;
             }
 
-            public function withEntryPoints($entryPoints)
+            public function withEntryPoints()
             {
                 return $this;
             }
