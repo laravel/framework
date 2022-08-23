@@ -43,7 +43,7 @@ class FoundationEnvironmentDetectorTest extends TestCase
 
         $result = $env->detect(function () {
             return 'foobar';
-        }, ['--enviroment=local']);
+        }, ['--environment=local']);
         $this->assertSame('local', $result);
     }
 
@@ -73,7 +73,7 @@ class FoundationEnvironmentDetectorTest extends TestCase
 
         $result = $env->detect(function () {
             return 'foobar';
-        }, ['--enviroment']);
+        }, ['--environment']);
         $this->assertFalse($result);
     }
 
@@ -103,12 +103,12 @@ class FoundationEnvironmentDetectorTest extends TestCase
 
         $result = $env->detect(function () {
             return 'foobar';
-        }, ['--env=local', '--enviroment=production']);
+        }, ['--env=local', '--environment=production']);
         $this->assertSame('local', $result);
 
         $result = $env->detect(function () {
             return 'foobar';
-        }, ['--enviroment=production', '--env=local']);
+        }, ['--environment=production', '--env=local']);
         $this->assertSame('production', $result);
     }
 }
