@@ -75,7 +75,7 @@ abstract class Relation implements BuilderContract
      *
      * @var false|int Chunk size for the lazy collection, false to load relation as normal collection
      */
-    private false|int $lazy_chunkSize = false;
+    private false|int $lazyChunkSize = false;
 
     /**
      * Create a new relation instance.
