@@ -155,9 +155,20 @@ class RepositoryTest extends TestCase
         $this->repository->set([
             'key1' => 'value1',
             'key2' => 'value2',
+            'key3',
+            'key4' => [
+                'foo' => 'bar',
+                'bar' => [
+                    'foo' => 'bar',
+                ],
+            ],
         ]);
         $this->assertSame('value1', $this->repository->get('key1'));
         $this->assertSame('value2', $this->repository->get('key2'));
+        $this->assertNull($this->repository->get('key3'));
+        $this->assertSame('bar', $this->repository->get('key4.foo'));
+        $this->assertSame('bar', $this->repository->get('key4.bar.foo'));
+        $this->assertNull($this->repository->get('key5'));
     }
 
     public function testPrepend()
