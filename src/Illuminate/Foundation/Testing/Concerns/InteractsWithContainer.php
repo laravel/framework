@@ -131,16 +131,6 @@ trait InteractsWithContainer
                 return $this;
             }
 
-            public function useScriptTagAttributes()
-            {
-                return $this;
-            }
-
-            public function useStyleTagAttributes()
-            {
-                return $this;
-            }
-
             public function useBuildDirectory()
             {
                 return $this;
@@ -152,6 +142,16 @@ trait InteractsWithContainer
             }
 
             public function withEntryPoints()
+            {
+                return $this;
+            }
+
+            public function useScriptTagAttributes()
+            {
+                return $this;
+            }
+
+            public function useStyleTagAttributes()
             {
                 return $this;
             }
