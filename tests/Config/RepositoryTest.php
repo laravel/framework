@@ -160,7 +160,7 @@ class RepositoryTest extends TestCase
                 'foo' => 'bar',
                 'bar' => [
                     'foo' => 'bar',
-                ]
+                ],
             ],
         ]);
         $this->assertSame('value1', $this->repository->get('key1'));
