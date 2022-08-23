@@ -99,6 +99,7 @@ trait InteractsWithPivotTable
         // array of the new IDs given to the method which will complete the sync.
         if ($detaching) {
             $detach = array_diff($current, array_keys($records));
+
             if (count($detach) > 0) {
                 $this->detach($detach);
 
