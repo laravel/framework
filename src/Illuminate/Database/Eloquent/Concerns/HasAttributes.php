@@ -307,7 +307,7 @@ trait HasAttributes
             }
 
             if ($this->isEnumCastable($key) && (! ($attributes[$key] ?? null) instanceof Arrayable)) {
-                $attributes[$key] = isset($attributes[$key]) ? $attributes[$key]->value : null;
+                $attributes[$key] = isset($attributes[$key]) ? $this->getCastableAttributeFromEnum($attributes[$key]) : null;
             }
 
             if ($attributes[$key] instanceof Arrayable) {
@@ -814,11 +814,7 @@ trait HasAttributes
             return $value;
         }
 
-        if (is_subclass_of($castType, \BackedEnum::class)) {
-            return $castType::from($value);
-        }
-
-        return constant($castType.'::'.$value);
+        return $this->getEnumCaseFromValue($castType, $value);
     }
 
     /**
@@ -1123,19 +1119,41 @@ trait HasAttributes
 
         if (! isset($value)) {
             $this->attributes[$key] = null;
-        } elseif (is_subclass_of($enumClass, \BackedEnum::class)) {
-            if ($value instanceof $enumClass) {
-                $this->attributes[$key] = $value->value;
-            } else {
-                $this->attributes[$key] = $enumClass::from($value)->value;
-            }
+        } else if (is_object($value)) {
+            $this->attributes[$key] = $this->getCastableAttributeFromEnum($value);
         } else {
-            if ($value instanceof $enumClass) {
-                $this->attributes[$key] = $value->name;
-            } else {
-                $this->attributes[$key] = constant($enumClass.'::'.$value)->name;
-            }
+            $this->attributes[$key] = $this->getCastableAttributeFromEnum($this->getEnumCaseFromValue($enumClass, $value));
         }
+    }
+
+    /**
+     * @param  string  $enumClass
+     * @param  string|int  $value
+     *
+     * @return \UnitEnum|\BackedEnum
+     */
+    protected function getEnumCaseFromValue($enumClass, $value)
+    {
+        if (is_subclass_of($enumClass, \BackedEnum::class)) {
+            return $enumClass::from($value);
+        }
+
+        return constant($enumClass.'::'.$value);
+    }
+
+    /**
+     * Get the castable value from an enum.
+     *
+     * @param  \UnitEnum|\BackedEnum  $value
+     * @return int|string
+     */
+    protected function getCastableAttributeFromEnum($value)
+    {
+        if ($value instanceof \BackedEnum::class) {
+            return $value->value;
+        }
+
+        return $value->name;
     }
 
     /**
