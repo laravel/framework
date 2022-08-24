@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
+use BackedEnum;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use DateTimeImmutable;
@@ -307,7 +308,7 @@ trait HasAttributes
             }
 
             if ($this->isEnumCastable($key) && (! ($attributes[$key] ?? null) instanceof Arrayable)) {
-                $attributes[$key] = isset($attributes[$key]) ? $this->getCastableAttributeFromEnum($attributes[$key]) : null;
+                $attributes[$key] = isset($attributes[$key]) ? $this->getStorableEnumValue($attributes[$key]) : null;
             }
 
             if ($attributes[$key] instanceof Arrayable) {
@@ -1120,39 +1121,39 @@ trait HasAttributes
         if (! isset($value)) {
             $this->attributes[$key] = null;
         } elseif (is_object($value)) {
-            $this->attributes[$key] = $this->getCastableAttributeFromEnum($value);
+            $this->attributes[$key] = $this->getStorableEnumValue($value);
         } else {
-            $this->attributes[$key] = $this->getCastableAttributeFromEnum($this->getEnumCaseFromValue($enumClass, $value));
+            $this->attributes[$key] = $this->getStorableEnumValue(
+                $this->getEnumCaseFromValue($enumClass, $value)
+            );
         }
     }
 
     /**
+     * Get an enum case instance from a given class and value.
+     *
      * @param  string  $enumClass
      * @param  string|int  $value
      * @return \UnitEnum|\BackedEnum
      */
     protected function getEnumCaseFromValue($enumClass, $value)
     {
-        if (is_subclass_of($enumClass, \BackedEnum::class)) {
-            return $enumClass::from($value);
-        }
-
-        return constant($enumClass.'::'.$value);
+        return is_subclass_of($enumClass, BackedEnum::class)
+                ? $enumClass::from($value)
+                : constant($enumClass.'::'.$value);
     }
 
     /**
-     * Get the castable value from an enum.
+     * Get the storable value from the given enum.
      *
      * @param  \UnitEnum|\BackedEnum  $value
-     * @return int|string
+     * @return string|int
      */
-    protected function getCastableAttributeFromEnum($value)
+    protected function getStorableEnumValue($value)
     {
-        if ($value instanceof \BackedEnum) {
-            return $value->value;
-        }
-
-        return $value->name;
+        return $value instanceof BackedEnum
+                ? $value->value
+                : $value->name;
     }
 
     /**
