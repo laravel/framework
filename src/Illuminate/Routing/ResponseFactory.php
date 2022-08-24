@@ -167,7 +167,6 @@ class ResponseFactory implements FactoryContract
      *
      * @param  StreamInterface $stream
      * @param  string $name
-     *
      * @return  StreamedResponse
      */
     public function directStreamDownload(StreamInterface $stream, string $name)
