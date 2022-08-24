@@ -149,7 +149,7 @@ abstract class DatabaseInspectionCommand extends Command
      */
     protected function getSqliteTableSize(ConnectionInterface $connection, string $table)
     {
-        $result = $connection->selectOne('SELECT SUM(pgsize) FROM dbstat WHERE name=?', [
+        $result = $connection->selectOne('SELECT SUM(pgsize) AS size FROM dbstat WHERE name=?', [
             $table,
         ]);
 
