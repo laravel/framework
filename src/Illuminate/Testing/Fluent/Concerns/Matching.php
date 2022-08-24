@@ -5,6 +5,7 @@ namespace Illuminate\Testing\Fluent\Concerns;
 use Closure;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use PHPUnit\Framework\Assert as PHPUnit;
 
 trait Matching
@@ -42,6 +43,28 @@ trait Matching
             $expected,
             $actual,
             sprintf('Property [%s] does not match the expected value.', $this->dotPath($key))
+        );
+
+        return $this;
+    }
+
+
+    /**
+     * Asserts that the property matches the expected pattern.
+     *
+     * @param  string  $key
+     * @param  string  $expected
+     * @return $this
+     */
+    public function whereLike(string $key, $expected): self
+    {
+        $this->has($key);
+
+        $actual = $this->prop($key);
+
+        PHPUnit::assertTrue(
+            Str::is($expected, $actual),
+            sprintf('Property [%s] does not match the expected pattern.', $this->dotPath($key))
         );
 
         return $this;

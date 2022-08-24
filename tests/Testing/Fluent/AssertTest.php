@@ -496,6 +496,39 @@ class AssertTest extends TestCase
             ]);
     }
 
+    public function testAssertWhereLikeMatchesValue()
+    {
+        $assert = AssertableJson::fromArray([
+            'bar' => 'value is here',
+        ]);
+
+        $assert->whereLike('bar', 'value * here');
+    }
+
+    public function testAssertWhereLikeFailsWhenDoesNotMatchValue()
+    {
+        $assert = AssertableJson::fromArray([
+            'bar' => 'value is somewhere else...',
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Property [bar] does not match the expected pattern.');
+
+        $assert->whereLike('bar', 'value * here');
+    }
+
+    public function testAssertWhereLikeFailsWhenMissing()
+    {
+        $assert = AssertableJson::fromArray([
+            'bar' => 'value',
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Property [baz] does not exist.');
+
+        $assert->whereLike('baz', 'invalid');
+    }
+    
     public function testAssertWhereContainsFailsWithEmptyValue()
     {
         $assert = AssertableJson::fromArray([]);
