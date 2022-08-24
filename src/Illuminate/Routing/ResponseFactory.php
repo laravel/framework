@@ -91,9 +91,9 @@ class ResponseFactory implements FactoryContract
     /**
      * Create a new compressed JSON response instance. Requires php-zip extension.
      *
-     * @param  array|string $data
-     * @param  $status
-     * @param  array $headers
+     * @param  array|string  $data
+     * @param  int  $status
+     * @param  array  $headers
      * @return Response
      */
     public function compressedJson(array|string $data = [], $status = 200, array $headers = [])
