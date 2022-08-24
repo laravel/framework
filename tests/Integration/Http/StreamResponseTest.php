@@ -10,6 +10,10 @@ class StreamResponseTest extends TestCase
 {
     public function testDirectStreamResponse()
     {
+        if (! class_exists(HttpFactory::class)) {
+            $this->markTestSkipped('GuzzleHttp is not installed.');
+        }
+
         Route::get('/stream-response', function () {
             $factory = new HttpFactory;
 
