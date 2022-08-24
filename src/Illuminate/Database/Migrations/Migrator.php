@@ -180,6 +180,10 @@ class Migrator
         }
 
         $this->fireMigrationEvent(new MigrationsEnded('up'));
+
+        if ($this->output) {
+            $this->output->writeln('');
+        }
     }
 
     /**
@@ -233,7 +237,11 @@ class Migrator
             return [];
         }
 
-        return $this->rollbackMigrations($migrations, $paths, $options);
+        return tap($this->rollbackMigrations($migrations, $paths, $options), function () {
+            if ($this->output) {
+                $this->output->writeln('');
+            }
+        });
     }
 
     /**
@@ -267,7 +275,7 @@ class Migrator
 
         $this->fireMigrationEvent(new MigrationsStarted('down'));
 
-        $this->write(Info::class, 'Rollbacking migrations.');
+        $this->write(Info::class, 'Rolling back migrations.');
 
         // Next we will run through all of the migrations and call the "down" method
         // which will reverse each migration in order. This getLast method on the

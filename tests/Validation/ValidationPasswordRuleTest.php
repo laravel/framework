@@ -105,34 +105,34 @@ class ValidationPasswordRuleTest extends TestCase
         $this->passes(Password::min(2)->symbols(), ['n^d', 'd^!', 'âè$', '金廿土弓竹中；']);
     }
 
-    // public function testUncompromised()
-    // {
-    //     $this->fails(Password::min(2)->uncompromised(), [
-    //         '123456',
-    //         'password',
-    //         'welcome',
-    //         'abc123',
-    //         '123456789',
-    //         '12345678',
-    //         'nuno',
-    //     ], [
-    //         'The given my password has appeared in a data leak. Please choose a different my password.',
-    //     ]);
+    public function testUncompromised()
+    {
+        $this->fails(Password::min(2)->uncompromised(), [
+            '123456',
+            'password',
+            'welcome',
+            'abc123',
+            '123456789',
+            '12345678',
+            'nuno',
+        ], [
+            'The given my password has appeared in a data leak. Please choose a different my password.',
+        ]);
 
-    //     $this->passes(Password::min(2)->uncompromised(9999999), [
-    //         'nuno',
-    //     ]);
+        $this->passes(Password::min(2)->uncompromised(9999999), [
+            'nuno',
+        ]);
 
-    //     $this->passes(Password::min(2)->uncompromised(), [
-    //         '手田日尸Ｚ難金木水口火女月土廿卜竹弓一十山',
-    //         '!p8VrB',
-    //         '&xe6VeKWF#n4',
-    //         '%HurHUnw7zM!',
-    //         'rundeliekend',
-    //         '7Z^k5EvqQ9g%c!Jt9$ufnNpQy#Kf',
-    //         'NRs*Gz2@hSmB$vVBSPDfqbRtEzk4nF7ZAbM29VMW$BPD%b2U%3VmJAcrY5eZGVxP%z%apnwSX',
-    //     ]);
-    // }
+        $this->passes(Password::min(2)->uncompromised(), [
+            '手田日尸Ｚ難金木水口火女月土廿卜竹弓一十山',
+            '!p8VrB',
+            '&xe6VeKWF#n4',
+            '%HurHUnw7zM!',
+            'rundeliekend',
+            '7Z^k5EvqQ9g%c!Jt9$ufnNpQy#Kf',
+            'NRs*Gz2@hSmB$vVBSPDfqbRtEzk4nF7ZAbM29VMW$BPD%b2U%3VmJAcrY5eZGVxP%z%apnwSX',
+        ]);
+    }
 
     public function testMessagesOrder()
     {

@@ -62,6 +62,12 @@ class SupportStringableTest extends TestCase
         $this->assertFalse($this->stringable('0')->isEmpty());
     }
 
+    public function testIsNotEmpty()
+    {
+        $this->assertFalse($this->stringable('')->isNotEmpty());
+        $this->assertTrue($this->stringable('A')->isNotEmpty());
+    }
+
     public function testPluralStudly()
     {
         $this->assertSame('LaraCon', (string) $this->stringable('LaraCon')->pluralStudly(1));
@@ -216,6 +222,23 @@ class SupportStringableTest extends TestCase
         $this->assertSame('Tony Stark', (string) $this->stringable('Tony Stark')->whenExactly('Iron Man', function ($stringable) {
             return 'Nailed it...!';
         }));
+    }
+
+    public function testWhenNotExactly()
+    {
+        $this->assertSame(
+            'Iron Man',
+            (string) $this->stringable('Tony')->whenNotExactly('Tony Stark', function ($stringable) {
+                return 'Iron Man';
+            }));
+
+        $this->assertSame(
+            'Swing and a miss...!',
+            (string) $this->stringable('Tony Stark')->whenNotExactly('Tony Stark', function ($stringable) {
+                return 'Iron Man';
+            }, function ($stringable) {
+                return 'Swing and a miss...!';
+            }));
     }
 
     public function testWhenIs()

@@ -27,6 +27,7 @@ class ConditionableTest extends TestCase
     {
         $this->assertInstanceOf(HigherOrderWhenProxy::class, TestConditionableModel::query()->when(true));
         $this->assertInstanceOf(HigherOrderWhenProxy::class, TestConditionableModel::query()->when(false));
+        $this->assertInstanceOf(HigherOrderWhenProxy::class, TestConditionableModel::query()->when());
         $this->assertInstanceOf(Builder::class, TestConditionableModel::query()->when(false, null));
         $this->assertInstanceOf(Builder::class, TestConditionableModel::query()->when(true, function () {
         }));
@@ -36,6 +37,7 @@ class ConditionableTest extends TestCase
     {
         $this->assertInstanceOf(HigherOrderWhenProxy::class, TestConditionableModel::query()->unless(true));
         $this->assertInstanceOf(HigherOrderWhenProxy::class, TestConditionableModel::query()->unless(false));
+        $this->assertInstanceOf(HigherOrderWhenProxy::class, TestConditionableModel::query()->unless());
         $this->assertInstanceOf(Builder::class, TestConditionableModel::query()->unless(true, null));
         $this->assertInstanceOf(Builder::class, TestConditionableModel::query()->unless(false, function () {
         }));

@@ -29,6 +29,16 @@ class SupportMacroableTest extends TestCase
         $this->assertSame('Taylor', $macroable::{__CLASS__}());
     }
 
+    public function testHasMacro()
+    {
+        $macroable = $this->macroable;
+        $macroable::macro('foo', function () {
+            return 'Taylor';
+        });
+        $this->assertTrue($macroable::hasMacro('foo'));
+        $this->assertFalse($macroable::hasMacro('bar'));
+    }
+
     public function testRegisterMacroAndCallWithoutStatic()
     {
         $macroable = $this->macroable;
@@ -90,6 +100,23 @@ class SupportMacroableTest extends TestCase
         $this->expectException(BadMethodCallException::class);
 
         $instance->flushMethod();
+    }
+
+    public function testFlushMacrosStatic()
+    {
+        TestMacroable::macro('flushMethod', function () {
+            return 'flushMethod';
+        });
+
+        $instance = new TestMacroable;
+
+        $this->assertSame('flushMethod', $instance::flushMethod());
+
+        TestMacroable::flushMacros();
+
+        $this->expectException(BadMethodCallException::class);
+
+        $instance::flushMethod();
     }
 }
 

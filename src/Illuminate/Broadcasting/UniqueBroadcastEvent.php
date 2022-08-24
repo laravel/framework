@@ -2,6 +2,8 @@
 
 namespace Illuminate\Broadcasting;
 
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 
 class UniqueBroadcastEvent extends BroadcastEvent implements ShouldBeUnique
@@ -21,14 +23,7 @@ class UniqueBroadcastEvent extends BroadcastEvent implements ShouldBeUnique
     public $uniqueFor;
 
     /**
-     * The cache repository implementation that should be used to obtain unique locks.
-     *
-     * @var \Illuminate\Contracts\Cache\Repository
-     */
-    public $uniqueVia;
-
-    /**
-     * Create a new job handler instance.
+     * Create a new event instance.
      *
      * @param  mixed  $event
      * @return void
@@ -38,9 +33,9 @@ class UniqueBroadcastEvent extends BroadcastEvent implements ShouldBeUnique
         $this->uniqueId = get_class($event);
 
         if (method_exists($event, 'uniqueId')) {
-            $this->uniqueId = $event->uniqueId();
+            $this->uniqueId .= $event->uniqueId();
         } elseif (property_exists($event, 'uniqueId')) {
-            $this->uniqueId = $event->uniqueId;
+            $this->uniqueId .= $event->uniqueId;
         }
 
         if (method_exists($event, 'uniqueFor')) {
@@ -49,12 +44,18 @@ class UniqueBroadcastEvent extends BroadcastEvent implements ShouldBeUnique
             $this->uniqueFor = $event->uniqueFor;
         }
 
-        if (method_exists($event, 'uniqueVia')) {
-            $this->uniqueVia = $event->uniqueVia();
-        } elseif (property_exists($event, 'uniqueVia')) {
-            $this->uniqueVia = $event->uniqueVia;
-        }
-
         parent::__construct($event);
+    }
+
+    /**
+     * Resolve the cache implementation that should manage the event's uniqueness.
+     *
+     * @return \Illuminate\Contracts\Cache\Repository
+     */
+    public function uniqueVia()
+    {
+        return method_exists($this->event, 'uniqueVia')
+                ? $this->event->uniqueVia()
+                : Container::getInstance()->make(Repository::class);
     }
 }

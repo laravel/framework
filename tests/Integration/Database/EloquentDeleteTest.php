@@ -65,6 +65,30 @@ class EloquentDeleteTest extends DatabaseTestCase
 
         $this->assertEquals($role->id, RoleObserver::$model->id);
     }
+
+    public function testDeleteQuietly()
+    {
+        $_SERVER['(-_-)'] = '\(^_^)/';
+        Post::deleting(fn () => $_SERVER['(-_-)'] = null);
+        Post::deleted(fn () => $_SERVER['(-_-)'] = null);
+        $post = Post::query()->create([]);
+        $result = $post->deleteQuietly();
+
+        $this->assertEquals('\(^_^)/', $_SERVER['(-_-)']);
+        $this->assertTrue($result);
+        $this->assertFalse($post->exists);
+
+        // For a soft-deleted model:
+        Role::deleting(fn () => $_SERVER['(-_-)'] = null);
+        Role::deleted(fn () => $_SERVER['(-_-)'] = null);
+        Role::softDeleted(fn () => $_SERVER['(-_-)'] = null);
+        $role = Role::create([]);
+        $result = $role->deleteQuietly();
+        $this->assertTrue($result);
+        $this->assertEquals('\(^_^)/', $_SERVER['(-_-)']);
+
+        unset($_SERVER['(-_-)']);
+    }
 }
 
 class Comment extends Model
