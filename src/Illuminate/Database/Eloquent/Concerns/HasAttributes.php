@@ -1119,7 +1119,7 @@ trait HasAttributes
 
         if (! isset($value)) {
             $this->attributes[$key] = null;
-        } else if (is_object($value)) {
+        } elseif (is_object($value)) {
             $this->attributes[$key] = $this->getCastableAttributeFromEnum($value);
         } else {
             $this->attributes[$key] = $this->getCastableAttributeFromEnum($this->getEnumCaseFromValue($enumClass, $value));
