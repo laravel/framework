@@ -1149,7 +1149,7 @@ trait HasAttributes
      */
     protected function getCastableAttributeFromEnum($value)
     {
-        if ($value instanceof \BackedEnum::class) {
+        if ($value instanceof \BackedEnum) {
             return $value->value;
         }
 
