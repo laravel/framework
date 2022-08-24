@@ -37,7 +37,7 @@ class ResponseTest extends TestCase
 
         $response = ['foo' => 'bar'];
 
-        $handler = fn() => response()->compressedJson($response);
+        $handler = fn () => response()->compressedJson($response);
 
         Route::get('/compressed-json', $handler);
 

@@ -91,13 +91,12 @@ class ResponseFactory implements FactoryContract
     /**
      * Create a new compressed JSON response instance. Requires php-zip extension.
      *
-     * @param array|string $data
-     * @param $status
-     * @param array $headers
-     * @param $options
+     * @param  array|string $data
+     * @param  $status
+     * @param  array $headers
      * @return Response
      */
-    public function compressedJson(array|string $data = [], $status = 200, array $headers = [], $options = 0)
+    public function compressedJson(array|string $data = [], $status = 200, array $headers = [])
     {
         if (! extension_loaded('zip')) {
             throw new RuntimeException('Gzip extension is not available.');
