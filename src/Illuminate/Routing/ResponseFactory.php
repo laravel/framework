@@ -165,8 +165,8 @@ class ResponseFactory implements FactoryContract
     /**
      * Directly output stream as an HTTP Response.
      *
-     * @param  StreamInterface $stream
-     * @param  string $name
+     * @param   StreamInterface $stream
+     * @param   string $name
      * @return  StreamedResponse
      */
     public function directStreamDownload(StreamInterface $stream, string $name)
