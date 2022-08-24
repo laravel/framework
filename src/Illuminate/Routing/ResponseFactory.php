@@ -9,6 +9,7 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Exceptions\StreamedResponseException;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
+use Psr\Http\Message\StreamInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Throwable;
@@ -159,6 +160,21 @@ class ResponseFactory implements FactoryContract
         }
 
         return $response;
+    }
+
+    /**
+     * Directly output stream as an HTTP Response.
+     *
+     * @param  StreamInterface $stream
+     * @param  string $name
+     *
+     * @return  StreamedResponse
+     */
+    public function directStreamDownload(StreamInterface $stream, string $name)
+    {
+        return $this->streamDownload(function () use ($stream) {
+            echo $stream;
+        }, $name);
     }
 
     /**
