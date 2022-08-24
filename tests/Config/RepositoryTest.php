@@ -173,13 +173,21 @@ class RepositoryTest extends TestCase
 
     public function testPrepend()
     {
+        $this->assertSame('aaa', $this->repository->get('array.0'));
+        $this->assertSame('zzz', $this->repository->get('array.1'));
         $this->repository->prepend('array', 'xxx');
         $this->assertSame('xxx', $this->repository->get('array.0'));
+        $this->assertSame('aaa', $this->repository->get('array.1'));
+        $this->assertSame('zzz', $this->repository->get('array.2'));
     }
 
     public function testPush()
     {
+        $this->assertSame('aaa', $this->repository->get('array.0'));
+        $this->assertSame('zzz', $this->repository->get('array.1'));
         $this->repository->push('array', 'xxx');
+        $this->assertSame('aaa', $this->repository->get('array.0'));
+        $this->assertSame('zzz', $this->repository->get('array.1'));
         $this->assertSame('xxx', $this->repository->get('array.2'));
     }
 
