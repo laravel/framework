@@ -995,6 +995,18 @@ EOF;
     }
 
     /**
+     * Decode compressed response content.
+     *
+     * @return $this
+     */
+    public function decodeGzip(): self
+    {
+        $this->setContent(gzdecode($this->getContent()));
+
+        return $this;
+    }
+
+    /**
      * Validate and return the decoded response JSON.
      *
      * @param  string|null  $key

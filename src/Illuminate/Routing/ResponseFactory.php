@@ -9,6 +9,7 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Exceptions\StreamedResponseException;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
+use RuntimeException;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Throwable;
@@ -85,6 +86,34 @@ class ResponseFactory implements FactoryContract
         }
 
         return $this->make($this->view->make($view, $data), $status, $headers);
+    }
+
+    /**
+     * Create a new compressed JSON response instance. Requires php-zip extension.
+     *
+     * @param array|string $data
+     * @param $status
+     * @param array $headers
+     * @param $options
+     * @return Response
+     */
+    public function compressedJson(array|string $data = [], $status = 200, array $headers = [], $options = 0)
+    {
+        if (! extension_loaded('zip')) {
+            throw new RuntimeException('Gzip extension is not available.');
+        }
+
+        if (is_array($data)) {
+            $data = json_encode($data);
+        }
+
+        $data = gzencode($data, 9);
+
+        return $this->make($data, $status, $headers)->withHeaders([
+            'Content-type' => 'application/json; charset=utf-8',
+            'Content-Length' => strlen($data),
+            'Content-Encoding' => 'gzip',
+        ]);
     }
 
     /**

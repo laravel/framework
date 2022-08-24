@@ -28,4 +28,22 @@ class ResponseTest extends TestCase
 
         $this->get('/response');
     }
+
+    public function testCompressedJsonResponse()
+    {
+        if (! extension_loaded('zip')) {
+            $this->markTestSkipped('Zip extension is not loaded');
+        }
+
+        $response = ['foo' => 'bar'];
+
+        $handler = fn() => response()->compressedJson($response);
+
+        Route::get('/compressed-json', $handler);
+
+        $this->getJson('/compressed-json')->assertSuccessful()
+            ->assertSee(gzencode(json_encode($response), 9))
+            ->decodeGzip()
+            ->assertJson(['foo' => 'bar']);
+    }
 }
