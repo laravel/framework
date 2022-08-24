@@ -2610,7 +2610,7 @@ class Builder implements BuilderContract
      * Execute the query as a "select" statement.
      *
      * @param  array|string  $columns
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Collection
      */
     public function get($columns = ['*'])
     {
