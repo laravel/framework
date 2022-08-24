@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Concerns\QueriesRelationships;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Database\QueryException;
 use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Arr;
@@ -554,6 +555,22 @@ class Builder implements BuilderContract
         return tap($this->newModelInstance(array_merge($attributes, $values)), function ($instance) {
             $instance->save();
         });
+    }
+
+    /**
+     * Concurrent-safe load first record matching the attributes or create it.
+     *
+     * @param  array  $attributes
+     * @param  array  $values
+     * @return \Illuminate\Database\Eloquent\Model|static
+     */
+    public function concurrentlyFirstOrCreate(array $attributes = [], array $values = [])
+    {
+        try {
+            return $this->firstOrCreate($attributes, $values);
+        } catch (QueryException $e) {
+            return $this->where($attributes)->firstOrFail();
+        }
     }
 
     /**
