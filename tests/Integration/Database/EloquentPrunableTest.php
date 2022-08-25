@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
 use LogicException;
 
-/** @group SkipMSSQL */
 class EloquentPrunableTest extends DatabaseTestCase
 {
     protected function defineDatabaseMigrationsAfterDatabaseRefreshed()

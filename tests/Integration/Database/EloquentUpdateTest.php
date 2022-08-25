@@ -46,7 +46,6 @@ class EloquentUpdateTest extends DatabaseTestCase
         $this->assertCount(0, TestUpdateModel1::all());
     }
 
-    /** @group SkipMSSQL */
     public function testUpdateWithLimitsAndOrders()
     {
         for ($i = 1; $i <= 10; $i++) {

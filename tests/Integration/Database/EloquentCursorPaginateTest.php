@@ -81,7 +81,6 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
         $this->assertCount(3, $query->cursorPaginate()->items());
     }
 
-    /** @group SkipMSSQL */
     public function testPaginationWithHasClause()
     {
         for ($i = 1; $i <= 3; $i++) {
@@ -98,7 +97,6 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
         $this->assertCount(2, $query->cursorPaginate()->items());
     }
 
-    /** @group SkipMSSQL */
     public function testPaginationWithWhereHasClause()
     {
         for ($i = 1; $i <= 3; $i++) {
@@ -117,7 +115,6 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
         $this->assertCount(1, $query->cursorPaginate()->items());
     }
 
-    /** @group SkipMSSQL */
     public function testPaginationWithWhereExistsClause()
     {
         for ($i = 1; $i <= 3; $i++) {
@@ -138,7 +135,6 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
         $this->assertCount(2, $query->cursorPaginate()->items());
     }
 
-    /** @group SkipMSSQL */
     public function testPaginationWithMultipleWhereClauses()
     {
         for ($i = 1; $i <= 4; $i++) {
@@ -171,7 +167,6 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
         );
     }
 
-    /** @group SkipMSSQL */
     public function testPaginationWithAliasedOrderBy()
     {
         for ($i = 1; $i <= 6; $i++) {
