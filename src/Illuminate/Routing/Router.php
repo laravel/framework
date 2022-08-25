@@ -19,9 +19,11 @@ use Illuminate\Routing\Events\RouteMatched;
 use Illuminate\Routing\Events\Routing;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\View\Component;
 use JsonSerializable;
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 use ReflectionClass;
@@ -813,6 +815,10 @@ class Router implements BindingRegistrar, RegistrarContract
     {
         if ($response instanceof Responsable) {
             $response = $response->toResponse($request);
+        }
+
+        if ($response instanceof Component) {
+            $response = Blade::renderComponent($response);
         }
 
         if ($response instanceof PsrResponseInterface) {
