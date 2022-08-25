@@ -295,7 +295,7 @@ class DatabaseEloquentMorphTest extends TestCase
 
     public function testIsModelWithZeroRelatedKey()
     {
-        $relation = $this->getOneRelation();
+        $relation = $this->getOneRelationZero();
 
         $relation->getRelated()->shouldReceive('getTable')->once()->andReturn('table');
         $relation->getRelated()->shouldReceive('getConnectionName')->once()->andReturn('connection');
@@ -310,7 +310,7 @@ class DatabaseEloquentMorphTest extends TestCase
 
     public function testIsModelWithZeroStringRelatedKey()
     {
-        $relation = $this->getOneRelation();
+        $relation = $this->getOneRelationZero();
 
         $relation->getRelated()->shouldReceive('getTable')->once()->andReturn('table');
         $relation->getRelated()->shouldReceive('getConnectionName')->once()->andReturn('connection');
@@ -392,6 +392,21 @@ class DatabaseEloquentMorphTest extends TestCase
         $builder->shouldReceive('getModel')->andReturn($related);
         $parent = m::mock(Model::class);
         $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
+        $parent->shouldReceive('getMorphClass')->andReturn(get_class($parent));
+        $builder->shouldReceive('where')->once()->with('table.morph_type', get_class($parent));
+
+        return new MorphOne($builder, $parent, 'table.morph_type', 'table.morph_id', 'id');
+    }
+
+    protected function getOneRelationZero()
+    {
+        $builder = m::mock(Builder::class);
+        $builder->shouldReceive('whereNotNull')->once()->with('table.morph_id');
+        $builder->shouldReceive('where')->once()->with('table.morph_id', '=', 0);
+        $related = m::mock(Model::class);
+        $builder->shouldReceive('getModel')->andReturn($related);
+        $parent = m::mock(Model::class);
+        $parent->shouldReceive('getAttribute')->with('id')->andReturn(0);
         $parent->shouldReceive('getMorphClass')->andReturn(get_class($parent));
         $builder->shouldReceive('where')->once()->with('table.morph_type', get_class($parent));
 

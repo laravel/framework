@@ -248,7 +248,7 @@ class DatabaseEloquentHasOneTest extends TestCase
 
     public function testIsModelZeroRelatedKey()
     {
-        $relation = $this->getRelation();
+        $relation = $this->getRelationZero();
 
         $this->related->shouldReceive('getTable')->once()->andReturn('table');
         $this->related->shouldReceive('getConnectionName')->once()->andReturn('connection');
@@ -345,6 +345,23 @@ class DatabaseEloquentHasOneTest extends TestCase
         $this->builder->shouldReceive('getModel')->andReturn($this->related);
         $this->parent = m::mock(Model::class);
         $this->parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
+        $this->parent->shouldReceive('getAttribute')->with('username')->andReturn('taylor');
+        $this->parent->shouldReceive('getCreatedAtColumn')->andReturn('created_at');
+        $this->parent->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
+        $this->parent->shouldReceive('newQueryWithoutScopes')->andReturn($this->builder);
+
+        return new HasOne($this->builder, $this->parent, 'table.foreign_key', 'id');
+    }
+
+    protected function getRelationZero()
+    {
+        $this->builder = m::mock(Builder::class);
+        $this->builder->shouldReceive('whereNotNull')->with('table.foreign_key');
+        $this->builder->shouldReceive('where')->with('table.foreign_key', '=', 0);
+        $this->related = m::mock(Model::class);
+        $this->builder->shouldReceive('getModel')->andReturn($this->related);
+        $this->parent = m::mock(Model::class);
+        $this->parent->shouldReceive('getAttribute')->with('id')->andReturn(0);
         $this->parent->shouldReceive('getAttribute')->with('username')->andReturn('taylor');
         $this->parent->shouldReceive('getCreatedAtColumn')->andReturn('created_at');
         $this->parent->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
