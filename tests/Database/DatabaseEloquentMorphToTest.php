@@ -286,6 +286,67 @@ class DatabaseEloquentMorphToTest extends TestCase
         $this->assertTrue($relation->is($model));
     }
 
+    public function testIsModelWithZeroParentKey()
+    {
+        $parent = m::mock(Model::class);
+        // when addConstraints is called we need to return the foreign value
+        $parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('foreign.value');
+        // when getParentKey is called we want to return an integer
+        $parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn(0);
+
+        $relation = $this->getRelation($parent);
+
+        $this->related->shouldReceive('getConnectionName')->once()->andReturn('relation');
+
+        $model = m::mock(Model::class);
+        $model->shouldReceive('getAttribute')->once()->with('id')->andReturn('0');
+        $model->shouldReceive('getTable')->once()->andReturn('relation');
+        $model->shouldReceive('getConnectionName')->once()->andReturn('relation');
+
+        $this->assertTrue($relation->is($model));
+    }
+
+    public function testIsModelWithZeroRelatedKey()
+    {
+        $parent = m::mock(Model::class);
+        // when addConstraints is called we need to return the foreign value
+        $parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('foreign.value');
+        // when getParentKey is called we want to return a string
+        $parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('0');
+
+        $relation = $this->getRelation($parent);
+
+        $this->related->shouldReceive('getConnectionName')->once()->andReturn('relation');
+
+        $model = m::mock(Model::class);
+        $model->shouldReceive('getAttribute')->once()->with('id')->andReturn(0);
+        $model->shouldReceive('getTable')->once()->andReturn('relation');
+        $model->shouldReceive('getConnectionName')->once()->andReturn('relation');
+
+        $this->assertTrue($relation->is($model));
+    }
+
+    public function testIsModelWithZeroKeys()
+    {
+        $parent = m::mock(Model::class);
+
+        // when addConstraints is called we need to return the foreign value
+        $parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('foreign.value');
+        // when getParentKey is called we want to return an integer
+        $parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn(0);
+
+        $relation = $this->getRelation($parent);
+
+        $this->related->shouldReceive('getConnectionName')->once()->andReturn('relation');
+
+        $model = m::mock(Model::class);
+        $model->shouldReceive('getAttribute')->once()->with('id')->andReturn(0);
+        $model->shouldReceive('getTable')->once()->andReturn('relation');
+        $model->shouldReceive('getConnectionName')->once()->andReturn('relation');
+
+        $this->assertTrue($relation->is($model));
+    }
+
     public function testIsNotModelWithNullParentKey()
     {
         $parent = m::mock(Model::class);

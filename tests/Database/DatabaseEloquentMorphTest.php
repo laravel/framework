@@ -293,6 +293,36 @@ class DatabaseEloquentMorphTest extends TestCase
         $this->assertTrue($relation->is($model));
     }
 
+    public function testIsModelWithZeroRelatedKey()
+    {
+        $relation = $this->getOneRelation();
+
+        $relation->getRelated()->shouldReceive('getTable')->once()->andReturn('table');
+        $relation->getRelated()->shouldReceive('getConnectionName')->once()->andReturn('connection');
+
+        $model = m::mock(Model::class);
+        $model->shouldReceive('getAttribute')->once()->with('morph_id')->andReturn(0);
+        $model->shouldReceive('getTable')->once()->andReturn('table');
+        $model->shouldReceive('getConnectionName')->once()->andReturn('connection');
+
+        $this->assertTrue($relation->is($model));
+    }
+
+    public function testIsModelWithZeroStringRelatedKey()
+    {
+        $relation = $this->getOneRelation();
+
+        $relation->getRelated()->shouldReceive('getTable')->once()->andReturn('table');
+        $relation->getRelated()->shouldReceive('getConnectionName')->once()->andReturn('connection');
+
+        $model = m::mock(Model::class);
+        $model->shouldReceive('getAttribute')->once()->with('morph_id')->andReturn('0');
+        $model->shouldReceive('getTable')->once()->andReturn('table');
+        $model->shouldReceive('getConnectionName')->once()->andReturn('connection');
+
+        $this->assertTrue($relation->is($model));
+    }
+
     public function testIsNotModelWithNullRelatedKey()
     {
         $relation = $this->getOneRelation();

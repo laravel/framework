@@ -246,6 +246,21 @@ class DatabaseEloquentHasOneTest extends TestCase
         $this->assertTrue($relation->is($model));
     }
 
+    public function testIsModelZeroRelatedKey()
+    {
+        $relation = $this->getRelation();
+
+        $this->related->shouldReceive('getTable')->once()->andReturn('table');
+        $this->related->shouldReceive('getConnectionName')->once()->andReturn('connection');
+
+        $model = m::mock(Model::class);
+        $model->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn(0);
+        $model->shouldReceive('getTable')->once()->andReturn('table');
+        $model->shouldReceive('getConnectionName')->once()->andReturn('connection');
+
+        $this->assertTrue($relation->is($model));
+    }
+
     public function testIsModelWithStringRelatedKey()
     {
         $relation = $this->getRelation();
