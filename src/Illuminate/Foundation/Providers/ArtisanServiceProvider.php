@@ -42,6 +42,7 @@ use Illuminate\Foundation\Console\EventMakeCommand;
 use Illuminate\Foundation\Console\ExceptionMakeCommand;
 use Illuminate\Foundation\Console\JobMakeCommand;
 use Illuminate\Foundation\Console\KeyGenerateCommand;
+use Illuminate\Foundation\Console\ListCommand;
 use Illuminate\Foundation\Console\ListenerMakeCommand;
 use Illuminate\Foundation\Console\MailMakeCommand;
 use Illuminate\Foundation\Console\ModelMakeCommand;
@@ -116,6 +117,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'EventClear' => EventClearCommand::class,
         'EventList' => EventListCommand::class,
         'KeyGenerate' => KeyGenerateCommand::class,
+        'List' => ListCommand::class,
         'Optimize' => OptimizeCommand::class,
         'OptimizeClear' => OptimizeClearCommand::class,
         'PackageDiscover' => PackageDiscoverCommand::class,
@@ -559,6 +561,16 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     protected function registerKeyGenerateCommand()
     {
         $this->app->singleton(KeyGenerateCommand::class);
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerListCommand()
+    {
+        $this->app->singleton(ListCommand::class);
     }
 
     /**

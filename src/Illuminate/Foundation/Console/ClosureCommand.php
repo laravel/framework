@@ -79,4 +79,14 @@ class ClosureCommand extends Command
 
         return $this;
     }
+
+    /**
+     * Get the command callback.
+     *
+     * @return Closure
+     */
+    public function getCallback()
+    {
+        return $this->callback;
+    }
 }
