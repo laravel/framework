@@ -15,11 +15,20 @@ use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentBelongsToManyTest extends DatabaseTestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        DB::unprepared('SET IDENTITY_INSERT tags ON');
+    }
+
     protected function tearDown(): void
     {
         parent::tearDown();
 
         Carbon::setTestNow(null);
+
+        DB::unprepared('SET IDENTITY_INSERT tags OFF');
     }
 
     protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
