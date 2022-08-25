@@ -15,20 +15,11 @@ use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentBelongsToManyTest extends DatabaseTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        DB::unprepared('SET IDENTITY_INSERT tags ON');
-    }
-
     protected function tearDown(): void
     {
         parent::tearDown();
 
         Carbon::setTestNow(null);
-
-        DB::unprepared('SET IDENTITY_INSERT tags OFF');
     }
 
     protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
@@ -241,8 +232,14 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         );
         foreach ($post->tagsWithCustomExtraPivot as $tag) {
             $this->assertSame('exclude', $tag->pivot->flag);
-            $this->assertSame('2017-10-10 10:10:10', $tag->pivot->getAttributes()['created_at']);
-            $this->assertSame('2017-10-10 10:10:20', $tag->pivot->getAttributes()['updated_at']); // +10 seconds
+
+            if ($this->driver === 'mssql') {
+                $this->assertSame('2017-10-10 10:10:10.000', $tag->pivot->getAttributes()['created_at']);
+                $this->assertSame('2017-10-10 10:10:20.000', $tag->pivot->getAttributes()['updated_at']); // +10 seconds
+            } else {
+                $this->assertSame('2017-10-10 10:10:10', $tag->pivot->getAttributes()['created_at']);
+                $this->assertSame('2017-10-10 10:10:20', $tag->pivot->getAttributes()['updated_at']); // +10 seconds
+            }
         }
     }
 
@@ -804,17 +801,17 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $post = Post::create(['title' => Str::random()]);
 
         DB::table('tags')->insert([
-            ['id' => 200, 'name' => 'excluded'],
-            ['id' => 300, 'name' => Str::random()],
+            ['name' => 'excluded'],
+            ['name' => Str::random()],
         ]);
 
         DB::table('posts_tags')->insert([
-            ['post_id' => $post->id, 'tag_id' => 200, 'flag' => ''],
-            ['post_id' => $post->id, 'tag_id' => 300, 'flag' => 'exclude'],
-            ['post_id' => $post->id, 'tag_id' => 400, 'flag' => ''],
+            ['post_id' => $post->id, 'tag_id' => 1, 'flag' => ''],
+            ['post_id' => $post->id, 'tag_id' => 2, 'flag' => 'exclude'],
+            ['post_id' => $post->id, 'tag_id' => 3, 'flag' => ''],
         ]);
 
-        $this->assertEquals([200, 400], $post->tags()->allRelatedIds()->toArray());
+        $this->assertEquals([1, 3], $post->tags()->allRelatedIds()->toArray());
     }
 
     public function testCanTouchRelatedModels()
@@ -822,14 +819,14 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $post = Post::create(['title' => Str::random()]);
 
         DB::table('tags')->insert([
-            ['id' => 200, 'name' => Str::random()],
-            ['id' => 300, 'name' => Str::random()],
+            ['name' => Str::random()],
+            ['name' => Str::random()],
         ]);
 
         DB::table('posts_tags')->insert([
-            ['post_id' => $post->id, 'tag_id' => 200, 'flag' => ''],
-            ['post_id' => $post->id, 'tag_id' => 300, 'flag' => 'exclude'],
-            ['post_id' => $post->id, 'tag_id' => 400, 'flag' => ''],
+            ['post_id' => $post->id, 'tag_id' => 1, 'flag' => ''],
+            ['post_id' => $post->id, 'tag_id' => 2, 'flag' => 'exclude'],
+            ['post_id' => $post->id, 'tag_id' => 3, 'flag' => ''],
         ]);
 
         Carbon::setTestNow('2017-10-10 10:10:10');
@@ -840,7 +837,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
             $this->assertSame('2017-10-10 10:10:10', $date);
         }
 
-        $this->assertNotSame('2017-10-10 10:10:10', Tag::find(300)->updated_at);
+        $this->assertNotSame('2017-10-10 10:10:10', Tag::find(2)->updated_at);
     }
 
     public function testWherePivotOnString()

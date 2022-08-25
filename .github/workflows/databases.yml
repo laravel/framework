@@ -213,7 +213,7 @@ jobs:
           command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
 
       - name: Execute tests
-        run: vendor/bin/phpunit tests/Integration/Database --verbose --exclude-group SkipMSSQL
+        run: vendor/bin/phpunit tests/Integration/Database --verbose
         env:
           DB_CONNECTION: sqlsrv
           DB_DATABASE: master

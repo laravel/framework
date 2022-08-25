@@ -23,6 +23,7 @@ class EloquentPrunableTest extends DatabaseTestCase
         ])->each(function ($table) {
             Schema::create($table, function (Blueprint $table) {
                 $table->increments('id');
+                $table->string('name')->nullable();
                 $table->softDeletes();
                 $table->boolean('pruned')->default(false);
                 $table->timestamps();
@@ -45,7 +46,7 @@ class EloquentPrunableTest extends DatabaseTestCase
         Event::fake();
 
         collect(range(1, 5000))->map(function ($id) {
-            return ['id' => $id];
+            return ['name' => 'foo'];
         })->chunk(200)->each(function ($chunk) {
             PrunableTestModel::insert($chunk->all());
         });
@@ -63,7 +64,7 @@ class EloquentPrunableTest extends DatabaseTestCase
         Event::fake();
 
         collect(range(1, 5000))->map(function ($id) {
-            return ['id' => $id, 'deleted_at' => now()];
+            return ['deleted_at' => now()];
         })->chunk(200)->each(function ($chunk) {
             PrunableSoftDeleteTestModel::insert($chunk->all());
         });
@@ -82,7 +83,7 @@ class EloquentPrunableTest extends DatabaseTestCase
         Event::fake();
 
         collect(range(1, 5000))->map(function ($id) {
-            return ['id' => $id];
+            return ['name' => 'foo'];
         })->chunk(200)->each(function ($chunk) {
             PrunableWithCustomPruneMethodTestModel::insert($chunk->all());
         });

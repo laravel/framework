@@ -34,6 +34,10 @@ class EloquentDeleteTest extends DatabaseTestCase
 
     public function testDeleteWithLimit()
     {
+        if ($this->driver === 'mssql') {
+            $this->markTestSkipped('The limit keyword is not supported on MSSQL.');
+        }
+
         for ($i = 1; $i <= 10; $i++) {
             Comment::create([
                 'post_id' => Post::create()->id,

@@ -84,7 +84,7 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
     public function testPaginationWithHasClause()
     {
         for ($i = 1; $i <= 3; $i++) {
-            TestUser::create(['id' => $i]);
+            TestUser::create();
             TestPost::create(['title' => 'Hello world', 'user_id' => null]);
             TestPost::create(['title' => 'Goodbye world', 'user_id' => 2]);
             TestPost::create(['title' => 'Howdy', 'user_id' => 3]);
@@ -100,7 +100,7 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
     public function testPaginationWithWhereHasClause()
     {
         for ($i = 1; $i <= 3; $i++) {
-            TestUser::create(['id' => $i]);
+            TestUser::create();
             TestPost::create(['title' => 'Hello world', 'user_id' => null]);
             TestPost::create(['title' => 'Goodbye world', 'user_id' => 2]);
             TestPost::create(['title' => 'Howdy', 'user_id' => 3]);
@@ -118,7 +118,7 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
     public function testPaginationWithWhereExistsClause()
     {
         for ($i = 1; $i <= 3; $i++) {
-            TestUser::create(['id' => $i]);
+            TestUser::create();
             TestPost::create(['title' => 'Hello world', 'user_id' => null]);
             TestPost::create(['title' => 'Goodbye world', 'user_id' => 2]);
             TestPost::create(['title' => 'Howdy', 'user_id' => 3]);
@@ -138,7 +138,7 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
     public function testPaginationWithMultipleWhereClauses()
     {
         for ($i = 1; $i <= 4; $i++) {
-            TestUser::create(['id' => $i]);
+            TestUser::create();
             TestPost::create(['title' => 'Hello world', 'user_id' => null]);
             TestPost::create(['title' => 'Goodbye world', 'user_id' => 2]);
             TestPost::create(['title' => 'Howdy', 'user_id' => 3]);
@@ -170,7 +170,7 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
     public function testPaginationWithAliasedOrderBy()
     {
         for ($i = 1; $i <= 6; $i++) {
-            TestUser::create(['id' => $i]);
+            TestUser::create();
         }
 
         $query = TestUser::query()->select('id as user_id')->orderBy('user_id');
@@ -206,6 +206,7 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
     {
         for ($i = 1; $i <= 5; $i++) {
             $user = TestUser::create();
+
             for ($j = 1; $j <= 10; $j++) {
                 TestPost::create([
                     'title' => 'Title '.$i,
