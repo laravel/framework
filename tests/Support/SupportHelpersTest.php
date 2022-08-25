@@ -57,6 +57,27 @@ class SupportHelpersTest extends TestCase
         $class->name->first = 'Taylor';
 
         $this->assertSame('Taylor', object_get($class, 'name.first'));
+        $this->assertSame('Taylor', object_get($class, 'name.first', 'default'));
+    }
+
+    public function testObjectGetDefaultValue()
+    {
+        $class = new stdClass;
+        $class->name = new stdClass;
+        $class->name->first = 'Taylor';
+
+        $this->assertSame('default', object_get($class, 'name.family', 'default'));
+        $this->assertNull(object_get($class, 'name.family'));
+    }
+
+    public function testObjectGetWhenKeyIsNullOrEmpty()
+    {
+        $object = new stdClass;
+
+        $this->assertEquals($object, object_get($object, null));
+        $this->assertEquals($object, object_get($object, false));
+        $this->assertEquals($object, object_get($object, ''));
+        $this->assertEquals($object, object_get($object, '  '));
     }
 
     public function testDataGet()
