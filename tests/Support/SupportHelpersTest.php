@@ -57,7 +57,7 @@ class SupportHelpersTest extends TestCase
         $class->name->first = 'Taylor';
 
         $this->assertSame('Taylor', object_get($class, 'name.first'));
-        $this->assertSame('Taylor', object_get($class, 'name.first','default'));
+        $this->assertSame('Taylor', object_get($class, 'name.first', 'default'));
     }
 
     public function testObjectGetDefaultValue()
