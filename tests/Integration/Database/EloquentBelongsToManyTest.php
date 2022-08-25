@@ -233,7 +233,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         foreach ($post->tagsWithCustomExtraPivot as $tag) {
             $this->assertSame('exclude', $tag->pivot->flag);
 
-            if ($this->driver === 'mssql') {
+            if ($this->driver === 'sqlsrv') {
                 $this->assertSame('2017-10-10 10:10:10.000', $tag->pivot->getAttributes()['created_at']);
                 $this->assertSame('2017-10-10 10:10:20.000', $tag->pivot->getAttributes()['updated_at']); // +10 seconds
             } else {
@@ -533,7 +533,6 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testFirstOrCreateUnrelatedExisting()
     {
-        /** @var Post $post */
         $post = Post::create(['title' => Str::random()]);
 
         $name = Str::random();
@@ -834,7 +833,11 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $post->tags()->touch();
 
         foreach ($post->tags()->pluck('tags.updated_at') as $date) {
-            $this->assertSame('2017-10-10 10:10:10', $date);
+            if ($this->driver === 'sqlsrv') {
+                $this->assertSame('2017-10-10 10:10:10.000', $date);
+            } else {
+                $this->assertSame('2017-10-10 10:10:10', $date);
+            }
         }
 
         $this->assertNotSame('2017-10-10 10:10:10', Tag::find(2)->updated_at);

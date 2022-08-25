@@ -34,7 +34,7 @@ class EloquentDeleteTest extends DatabaseTestCase
 
     public function testDeleteWithLimit()
     {
-        if ($this->driver === 'mssql') {
+        if ($this->driver === 'sqlsrv') {
             $this->markTestSkipped('The limit keyword is not supported on MSSQL.');
         }
 
