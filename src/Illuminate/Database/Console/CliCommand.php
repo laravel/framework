@@ -7,14 +7,14 @@ use Illuminate\Support\ConfigurationUrlParser;
 use Symfony\Component\Process\Process;
 use UnexpectedValueException;
 
-class DbCommand extends Command
+class CliCommand extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'db {connection? : The database connection that should be used}
+    protected $signature = 'db:cli {connection? : The database connection that should be used}
                {--read : Connect to the read connection}
                {--write : Connect to the write connection}';
 

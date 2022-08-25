@@ -13,7 +13,7 @@ use Illuminate\Console\Scheduling\ScheduleRunCommand;
 use Illuminate\Console\Scheduling\ScheduleTestCommand;
 use Illuminate\Console\Scheduling\ScheduleWorkCommand;
 use Illuminate\Contracts\Support\DeferrableProvider;
-use Illuminate\Database\Console\DbCommand;
+use Illuminate\Database\Console\CliCommand as DatabaseCliCommand;
 use Illuminate\Database\Console\DumpCommand;
 use Illuminate\Database\Console\Factories\FactoryMakeCommand;
 use Illuminate\Database\Console\MonitorCommand as DatabaseMonitorCommand;
@@ -104,7 +104,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'ClearResets' => ClearResetsCommand::class,
         'ConfigCache' => ConfigCacheCommand::class,
         'ConfigClear' => ConfigClearCommand::class,
-        'Db' => DbCommand::class,
+        'DbCli' => DatabaseCliCommand::class,
         'DbMonitor' => DatabaseMonitorCommand::class,
         'DbPrune' => PruneCommand::class,
         'DbShow' => ShowCommand::class,
@@ -376,9 +376,9 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      *
      * @return void
      */
-    protected function registerDbCommand()
+    protected function registerDbCliCommand()
     {
-        $this->app->singleton(DbCommand::class);
+        $this->app->singleton(DatabaseCliCommand::class);
     }
 
     /**
