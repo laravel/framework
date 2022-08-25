@@ -6,6 +6,7 @@ use Illuminate\Auth\Console\ClearResetsCommand;
 use Illuminate\Cache\Console\CacheTableCommand;
 use Illuminate\Cache\Console\ClearCommand as CacheClearCommand;
 use Illuminate\Cache\Console\ForgetCommand as CacheForgetCommand;
+use Illuminate\Cache\Console\FlushStaleCommand as CacheFlushStaleCommand;
 use Illuminate\Console\Scheduling\ScheduleClearCacheCommand;
 use Illuminate\Console\Scheduling\ScheduleFinishCommand;
 use Illuminate\Console\Scheduling\ScheduleListCommand;
@@ -100,6 +101,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'About' => AboutCommand::class,
         'CacheClear' => CacheClearCommand::class,
         'CacheForget' => CacheForgetCommand::class,
+        'CacheFlushStale' => CacheFlushStaleCommand::class,
         'ClearCompiled' => ClearCompiledCommand::class,
         'ClearResets' => ClearResetsCommand::class,
         'ConfigCache' => ConfigCacheCommand::class,
@@ -252,6 +254,18 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     {
         $this->app->singleton(CacheForgetCommand::class, function ($app) {
             return new CacheForgetCommand($app['cache']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerCacheFlushStaleCommand()
+    {
+        $this->app->singleton(CacheFlushStaleCommand::class, function ($app) {
+            return new CacheFlushStaleCommand($app['cache']);
         });
     }
 

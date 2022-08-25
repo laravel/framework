@@ -236,6 +236,23 @@ class RedisStore extends TaggableStore implements LockProvider
     }
 
     /**
+     * Clean up any tag members that don't refer to an existing key anymore and empty tags themselves.
+     *
+     * @return void
+     */
+    public function flushStale(): void
+    {
+        $this->connection()->eval(
+            LuaScripts::flushStaleTags(),
+            1,
+            '',
+            $this->prefix,
+            RedisTaggedCache::REFERENCE_KEY_STANDARD,
+            RedisTaggedCache::REFERENCE_KEY_FOREVER,
+        );
+    }
+
+    /**
      * Begin executing a new tags operation.
      *
      * @param  array|mixed  $names

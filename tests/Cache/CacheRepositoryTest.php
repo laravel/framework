@@ -428,6 +428,22 @@ class CacheRepositoryTest extends TestCase
         $this->assertFalse($nonTaggableRepo->supportsTags());
     }
 
+    public function testStaleFlushableRepositoriesSupportFlushingStale()
+    {
+        $taggable = m::mock(RedisStore::class);
+        $taggableRepo = new Repository($taggable);
+
+        $this->assertTrue($taggableRepo->supportsFlushingStale());
+    }
+
+    public function testNonStaleFlushableRepositoriesDoNotSupportFlushingStale()
+    {
+        $nonTaggable = m::mock(FileStore::class);
+        $nonTaggableRepo = new Repository($nonTaggable);
+
+        $this->assertFalse($nonTaggableRepo->supportsFlushingStale());
+    }
+
     protected function getRepository()
     {
         $dispatcher = new Dispatcher(m::mock(Container::class));

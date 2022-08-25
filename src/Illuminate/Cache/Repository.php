@@ -543,6 +543,16 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
+     * Determine if the current store flushing stale data.
+     *
+     * @return bool
+     */
+    public function supportsFlushingStale()
+    {
+        return method_exists($this->store, 'flushStale');
+    }
+
+    /**
      * Get the default cache time.
      *
      * @return int|null
