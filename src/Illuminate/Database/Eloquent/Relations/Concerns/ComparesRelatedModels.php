@@ -64,7 +64,10 @@ trait ComparesRelatedModels
      */
     protected function compareKeys($parentKey, $relatedKey)
     {
-        if (empty($parentKey) || empty($relatedKey)) {
+        if ($parentKey === null
+            || $parentKey === ''
+            || $relatedKey === null
+            || $relatedKey === '') {
             return false;
         }
 
