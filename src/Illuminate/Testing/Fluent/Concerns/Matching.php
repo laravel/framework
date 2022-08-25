@@ -48,7 +48,6 @@ trait Matching
         return $this;
     }
 
-
     /**
      * Asserts that the property matches the expected pattern.
      *

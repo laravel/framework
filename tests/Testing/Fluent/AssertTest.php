@@ -528,7 +528,7 @@ class AssertTest extends TestCase
 
         $assert->whereLike('baz', 'invalid');
     }
-    
+
     public function testAssertWhereContainsFailsWithEmptyValue()
     {
         $assert = AssertableJson::fromArray([]);
