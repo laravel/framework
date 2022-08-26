@@ -765,7 +765,7 @@ class Router implements BindingRegistrar, RegistrarContract
                 return true;
             }
 
-            if (! class_exists($name)) {
+            if (!class_exists($name)) {
                 return false;
             }
 
