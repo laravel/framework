@@ -39,6 +39,21 @@ class SupportHelpersTest extends TestCase
         $this->assertSame('Baz', class_basename('Baz'));
     }
 
+    public function testFilled()
+    {
+        $this->assertFalse(filled(null));
+        $this->assertFalse(filled(''));
+        $this->assertFalse(filled('  '));
+        $this->assertTrue(filled(10));
+        $this->assertTrue(filled(true));
+        $this->assertTrue(filled(false));
+        $this->assertTrue(filled(0));
+        $this->assertTrue(filled(0.0));
+
+        $object = new SupportTestCountable();
+        $this->assertFalse(blank($object));
+    }
+
     public function testValue()
     {
         $this->assertSame('foo', value('foo'));
