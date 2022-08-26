@@ -544,7 +544,10 @@ trait MakesHttpRequests
             $response = $this->followRedirects($response);
         }
 
-        return $this->createTestResponse($response);
+        $testResponse = $this->createTestResponse($response);
+        $testResponse->setRequestRoute($request->route());
+
+        return $testResponse;
     }
 
     /**

@@ -54,6 +54,13 @@ class TestResponse implements ArrayAccess
     protected $streamedContent;
 
     /**
+     * The route from where the response originated.
+     *
+     * @var \Illuminate\Routing\Route
+     */
+    public $requestRoute;
+
+    /**
      * Create a new test response instance.
      *
      * @param  \Illuminate\Http\Response  $response
@@ -74,6 +81,17 @@ class TestResponse implements ArrayAccess
     public static function fromBaseResponse($response)
     {
         return new static($response);
+    }
+
+    /**
+     * Set request route.
+     *
+     * @param  \Illuminate\Routing\Route  $requestRoute
+     * @return static
+     */
+    public function setRequestRoute($requestRoute)
+    {
+        $this->requestRoute = $requestRoute;
     }
 
     /**
@@ -1428,6 +1446,30 @@ EOF;
                 "Session has unexpected key [{$key}]."
             );
         }
+
+        return $this;
+    }
+
+    /**
+     * Assert that middleware is applied to requested route.
+     *
+     * @param  string|array|null  $middleware
+     * @return $this
+     */
+    public function assertMiddleware($middleware)
+    {
+        if($this->requestRoute === null) {
+            PHPUnit::fail('Can not assert middleware because route does not exists (http error 404)');
+
+            return $this;
+        }
+
+        $router = app('router');
+        $requestRouteMiddleware = array_merge($this->requestRoute->gatherMiddleware(), $router->resolveMiddleware($this->requestRoute->gatherMiddleware()));
+
+        $notFoundMiddleware = array_diff((array) $middleware, $requestRouteMiddleware);
+
+        PHPUnit::assertTrue(count($notFoundMiddleware) == 0, 'Middleware '. Arr::join($notFoundMiddleware, ', ', 'and') .' not found');
 
         return $this;
     }
