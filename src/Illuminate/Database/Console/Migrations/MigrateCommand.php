@@ -127,7 +127,7 @@ class MigrateCommand extends BaseCommand
     }
 
     /**
-     * Check if the migrator repository exists.
+     * Determine if the migrator repository exists.
      *
      * @return bool
      */
@@ -146,9 +146,9 @@ class MigrateCommand extends BaseCommand
                 return false;
             }
 
-            $this->components->warn('The SQLite database does yet exist: '.$e->getPrevious()->path);
+            $this->components->warn('The SQLite database does not exist: '.$e->getPrevious()->path);
 
-            if (! $this->components->confirm('Would you like to attempt to create it?')) {
+            if (! $this->components->confirm('Would you like to create it?')) {
                 return false;
             }
 
