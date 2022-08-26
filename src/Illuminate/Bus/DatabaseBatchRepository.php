@@ -343,17 +343,6 @@ class DatabaseBatchRepository implements PrunableBatchRepository
     }
 
     /**
-     * Set the desired connection for the batch.
-     *
-     * @param  \Illuminate\Database\Connection  $connection
-     * @return void
-     */
-    public function setConnection(Connection $connection)
-    {
-        $this->connection = $connection;
-    }
-
-    /**
      * Get the underlying database connection.
      *
      * @return \Illuminate\Database\Connection
@@ -361,5 +350,16 @@ class DatabaseBatchRepository implements PrunableBatchRepository
     public function getConnection()
     {
         return $this->connection;
+    }
+
+    /**
+     * Set the underlying database connection.
+     *
+     * @param  \Illuminate\Database\Connection  $connection
+     * @return void
+     */
+    public function setConnection(Connection $connection)
+    {
+        $this->connection = $connection;
     }
 }
