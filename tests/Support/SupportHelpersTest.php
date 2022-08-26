@@ -33,6 +33,18 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals($str, e($html));
     }
 
+    public function testBlank()
+    {
+        $this->assertTrue(blank(null));
+        $this->assertTrue(blank(''));
+        $this->assertTrue(blank('  '));
+        $this->assertFalse(blank(10));
+        $this->assertFalse(blank(true));
+        $this->assertFalse(blank(false));
+        $this->assertFalse(blank(0));
+        $this->assertFalse(blank(0.0));
+    }
+
     public function testClassBasename()
     {
         $this->assertSame('Baz', class_basename('Foo\Bar\Baz'));
