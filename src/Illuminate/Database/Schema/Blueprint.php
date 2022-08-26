@@ -10,6 +10,9 @@ use Illuminate\Database\Schema\Grammars\Grammar;
 use Illuminate\Database\SQLiteConnection;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Traits\Macroable;
+use ReflectionEnum;
+use ReflectionException;
+use UnitEnum;
 
 class Blueprint
 {
@@ -1034,9 +1037,14 @@ class Blueprint
      * @param  string  $column
      * @param  array  $allowed
      * @return \Illuminate\Database\Schema\ColumnDefinition
+     * @throws ReflectionException
      */
     public function enum($column, array $allowed)
     {
+        if ($allowed[0] instanceof UnitEnum) {
+            $allowed = array_map(fn ($enum) => ((new ReflectionEnum($enum))->isBacked()) ? $enum->value : $enum->name, $allowed);
+        }
+
         return $this->addColumn('enum', $column, compact('allowed'));
     }
 
