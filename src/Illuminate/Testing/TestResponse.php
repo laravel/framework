@@ -20,6 +20,7 @@ use Illuminate\Testing\Assert as PHPUnit;
 use Illuminate\Testing\Constraints\SeeInOrder;
 use Illuminate\Testing\Fluent\AssertableJson;
 use LogicException;
+use PHPUnit\Framework\AssertionFailedError;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -1469,7 +1470,9 @@ EOF;
 
         $notFoundMiddleware = array_diff((array) $middleware, $requestRouteMiddleware);
 
-        PHPUnit::assertTrue(count($notFoundMiddleware) == 0, 'Middleware '. Arr::join($notFoundMiddleware, ', ', 'and') .' not found');
+        if(count($notFoundMiddleware) != 0){
+            throw new AssertionFailedError('Middleware '. Arr::join($notFoundMiddleware, ', ', 'and') .' not found');
+        }
 
         return $this;
     }

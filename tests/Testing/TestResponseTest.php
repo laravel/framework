@@ -1995,6 +1995,17 @@ class TestResponseTest extends TestCase
 
         $this->expectException(AssertionFailedError::class);
         $response->assertMiddleware('foo');
+
+        $response->setRequestRoute(null);
+        $response->assertMiddleware('MiddlewareClass');
+    }
+
+    public function testAssertMiddlewareThrowsErrorIfRouteNotFound()
+    {
+        $response = TestResponse::fromBaseResponse(new Response());
+        
+        $this->expectException(AssertionFailedError::class);
+        $response->assertMiddleware('foo');
     }
 
     private function makeMockResponse($content)
