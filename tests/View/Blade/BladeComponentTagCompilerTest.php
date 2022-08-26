@@ -84,6 +84,44 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $this->assertSame("@slot('foo', null, ['class' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\Illuminate\Support\Arr::toCssClasses(\$classes))]) \n".' @endslot', trim($result));
     }
 
+    public function testSelfClosingSlotsCanBeCompiled()
+    {
+        $result = $this->compiler()->compileSlots('<x-slot name="foo"/>');
+
+        $this->assertSame("@slot('foo', null, []) @endslot", trim($result));
+
+        $result = $this->compiler()->compileSlots('<x-slot name="foo" />');
+
+        $this->assertSame("@slot('foo', null, []) @endslot", trim($result));
+
+        $result = $this->compiler()->compileSlots('<x-slot name="foo"/ >');
+
+        $this->assertSame("@slot('foo', null, []) @endslot", trim($result));
+
+        $result = $this->compiler()->compileSlots('<x-slot name="foo" / >');
+
+        $this->assertSame("@slot('foo', null, []) @endslot", trim($result));
+    }
+
+    public function testSlefClosingInlineSlotsCanBeCompiled()
+    {
+        $result = $this->compiler()->compileSlots('<x-slot:foo/>');
+
+        $this->assertSame("@slot('foo', null, []) @endslot", trim($result));
+
+        $result = $this->compiler()->compileSlots('<x-slot:foo />');
+
+        $this->assertSame("@slot('foo', null, []) @endslot", trim($result));
+
+        $result = $this->compiler()->compileSlots('<x-slot:foo/ >');
+
+        $this->assertSame("@slot('foo', null, []) @endslot", trim($result));
+
+        $result = $this->compiler()->compileSlots('<x-slot:foo / >');
+
+        $this->assertSame("@slot('foo', null, []) @endslot", trim($result));
+    }
+
     public function testBasicComponentParsing()
     {
         $this->mockViewFactory();

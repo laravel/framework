@@ -466,6 +466,7 @@ class ComponentTagCompiler
                     \s*
                 )
                 (?<![\/=\-])
+                (?<selfClosing>\s*\/\s*)?
             >
         /x";
 
@@ -484,7 +485,9 @@ class ComponentTagCompiler
 
             $attributes = $this->getAttributesFromAttributeString($matches['attributes']);
 
-            return " @slot({$name}, null, [".$this->attributesToString($attributes).']) ';
+            $maybeClose = isset($matches['selfClosing']) ? '@endslot' : '';
+
+            return " @slot({$name}, null, [".$this->attributesToString($attributes).']) '.$maybeClose;
         }, $value);
 
         return preg_replace('/<\/\s*x[\-\:]slot[^>]*>/', ' @endslot', $value);
