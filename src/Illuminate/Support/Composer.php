@@ -68,7 +68,7 @@ class Composer
     public function findComposer()
     {
         if ($this->files->exists($this->workingPath.'/composer.phar')) {
-            return [$this->phpBinary(), 'composer.phar'];
+            return [$this->phpBinary(false), 'composer.phar'];
         }
 
         return ['composer'];
@@ -77,11 +77,18 @@ class Composer
     /**
      * Get the PHP binary.
      *
+     * @param  bool  $escape
      * @return string
      */
-    protected function phpBinary()
+    protected function phpBinary($escape = true)
     {
-        return ProcessUtils::escapeArgument((new PhpExecutableFinder)->find(false));
+        $binary = (new PhpExecutableFinder)->find(false);
+
+        if (! $escape) {
+            return $binary;
+        }
+
+        return ProcessUtils::escapeArgument($binary);
     }
 
     /**
