@@ -118,7 +118,7 @@ class Vite implements Htmlable
      *
      * @return string
      */
-    protected function hotFile()
+    public function hotFile()
     {
         return $this->hotFile ?? public_path('/hot');
     }
