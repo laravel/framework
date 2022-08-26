@@ -2003,7 +2003,7 @@ class TestResponseTest extends TestCase
     public function testAssertMiddlewareThrowsErrorIfRouteNotFound()
     {
         $response = TestResponse::fromBaseResponse(new Response());
-        
+
         $this->expectException(AssertionFailedError::class);
         $response->assertMiddleware('foo');
     }

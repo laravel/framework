@@ -1459,7 +1459,7 @@ EOF;
      */
     public function assertMiddleware($middleware)
     {
-        if($this->requestRoute === null) {
+        if ($this->requestRoute === null) {
             PHPUnit::fail('Can not assert middleware because route does not exists (http error 404)');
 
             return $this;
@@ -1470,8 +1470,8 @@ EOF;
 
         $notFoundMiddleware = array_diff((array) $middleware, $requestRouteMiddleware);
 
-        if(count($notFoundMiddleware) != 0){
-            throw new AssertionFailedError('Middleware '. Arr::join($notFoundMiddleware, ', ', 'and') .' not found');
+        if (count($notFoundMiddleware) != 0) {
+            throw new AssertionFailedError('Middleware '.Arr::join($notFoundMiddleware, ', ', 'and').' not found');
         }
 
         return $this;
