@@ -753,6 +753,7 @@ class Router implements BindingRegistrar, RegistrarContract
         $middleware = collect($middleware)->map(function ($name) {
             return (array) MiddlewareNameResolver::resolve($name, $this->middleware, $this->middlewareGroups);
         })->flatten()->reject(function ($name) use ($excluded) {
+
             if (empty($excluded)) {
                 return false;
             }
@@ -765,7 +766,7 @@ class Router implements BindingRegistrar, RegistrarContract
                 return true;
             }
 
-            if (! class_exists($name)) {
+            if (!class_exists($name)) {
                 return false;
             }
 
