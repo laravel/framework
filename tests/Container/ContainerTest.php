@@ -192,11 +192,11 @@ class ContainerTest extends TestCase
         $this->assertSame('laravel', $var2->something);
     }
 
-    public function testMakeOrNullable()
+    public function testMakeOrThrowsExceptionIfNoCallbackPassed()
     {
+        $this->expectException(BindingResolutionException::class);
         $container = new Container;
-        $var = $container->makeOr(ContainerInjectVariableStub::class);
-        $this->assertNull($var);
+        $container->makeOr(ContainerInjectVariableStub::class, ['something' => 'laravel']);
     }
 
     public function testScopedConcreteResolutionResets()

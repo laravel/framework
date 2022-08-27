@@ -698,6 +698,8 @@ class Container implements ArrayAccess, ContainerContract
      * @param  string  $abstract
      * @param  Closure|array  $callback
      * @return mixed
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function makeOr($abstract, $callback = null)
     {
@@ -711,8 +713,8 @@ class Container implements ArrayAccess, ContainerContract
             }
 
             return $this->make($abstract);
-        } catch (BindingResolutionException) {
-            return $callback instanceof Closure ? $callback($this) : null;
+        } catch (BindingResolutionException $e) {
+            return $callback instanceof Closure ? $callback($this) : throw $e;
         }
     }
 
