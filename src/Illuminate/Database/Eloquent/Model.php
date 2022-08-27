@@ -429,7 +429,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             // the model, and all others will just get ignored for security reasons.
             if ($this->isFillable($key)) {
                 $this->setAttribute($key, $value);
-            } elseif ($totallyGuarded) {
+            } elseif ($totallyGuarded || app()->environment('local')) {
                 throw new MassAssignmentException(sprintf(
                     'Add [%s] to fillable property to allow mass assignment on [%s].',
                     $key, get_class($this)
