@@ -693,6 +693,26 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
+     * Resolve the given type from the container or execute the callback.
+     *
+     * @param  string|array  $abstract
+     * @param  Closure|null  $callback
+     * @return mixed
+     */
+    public function makeOr($abstract, Closure $callback = null)
+    {
+        try {
+            if (! is_array($abstract)) {
+                return $this->make($abstract);
+            }
+
+            return $this->make($abstract[0], $abstract[1]);
+        } catch (BindingResolutionException) {
+            return $callback();
+        }
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @return mixed
