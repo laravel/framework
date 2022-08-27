@@ -176,7 +176,7 @@ class ContainerTest extends TestCase
         $this->assertTrue($var2);
     }
 
-    public function testParametrizedMakeOr()
+    public function testMakeOrParametrized()
     {
         $container = new Container;
         $callback = function ($app) {
