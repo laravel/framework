@@ -160,6 +160,41 @@ class ContainerTest extends TestCase
         $this->assertSame($var1, $var2);
     }
 
+    public function testMakeOr()
+    {
+        $container = new Container;
+        $callback = function () use ($container) {
+            $container->bind('test', fn () => true);
+
+            return false;
+        };
+
+        $var1 = $container->makeOr('test', $callback);
+        $this->assertFalse($var1);
+
+        $var2 = $container->makeOr('test', $callback);
+        $this->assertTrue($var2);
+    }
+
+    public function testParametrizedMakeOr()
+    {
+        $container = new Container;
+        $callback = function () use ($container) {
+            $container->bind('test', fn () => true);
+
+            return false;
+        };
+
+        $var1 = $container->makeOr(ContainerInjectVariableStub::class, $callback);
+        $this->assertFalse($var1);
+
+        $var2 = $container->makeOr([
+            ContainerInjectVariableStub::class,
+            ['something' => 'laravel'],
+        ], $callback);
+        $this->assertSame('laravel', $var2->something);
+    }
+
     public function testScopedConcreteResolutionResets()
     {
         $container = new Container;
