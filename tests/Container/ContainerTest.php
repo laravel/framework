@@ -192,6 +192,13 @@ class ContainerTest extends TestCase
         $this->assertSame('laravel', $var2->something);
     }
 
+    public function testMakeOrNullable()
+    {
+        $container = new Container;
+        $var = $container->makeOr(ContainerInjectVariableStub::class);
+        $this->assertNull($var);
+    }
+
     public function testScopedConcreteResolutionResets()
     {
         $container = new Container;
