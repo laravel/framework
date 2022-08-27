@@ -188,10 +188,7 @@ class ContainerTest extends TestCase
         $var1 = $container->makeOr(ContainerInjectVariableStub::class, $callback);
         $this->assertFalse($var1);
 
-        $var2 = $container->makeOr([
-            ContainerInjectVariableStub::class,
-            ['something' => 'laravel'],
-        ], $callback);
+        $var2 = $container->makeOr(ContainerInjectVariableStub::class, ['something' => 'laravel'], $callback);
         $this->assertSame('laravel', $var2->something);
     }
 
