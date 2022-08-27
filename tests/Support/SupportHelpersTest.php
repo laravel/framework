@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Support;
 
 use ArrayAccess;
 use ArrayIterator;
+use Countable;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Env;
 use Illuminate\Support\Optional;
@@ -51,7 +52,7 @@ class SupportHelpersTest extends TestCase
         $this->assertTrue(filled(0.0));
 
         $object = new SupportTestCountable();
-        $this->assertFalse(blank($object));
+        $this->assertFalse(filled($object));
     }
 
     public function testValue()
@@ -916,5 +917,13 @@ class SupportTestArrayIterable implements IteratorAggregate
     public function getIterator(): Traversable
     {
         return new ArrayIterator($this->items);
+    }
+}
+
+class SupportTestCountable implements Countable
+{
+    public function count(): int
+    {
+        return 0;
     }
 }
