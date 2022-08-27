@@ -697,7 +697,7 @@ class Container implements ArrayAccess, ContainerContract
      *
      * @param  string  $abstract
      * @param  mixed|array  $parameters
-     * @param  Closure|array  $callback
+     * @param  \Closure|null  $callback
      * @return mixed
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
