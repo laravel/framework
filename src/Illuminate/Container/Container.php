@@ -712,7 +712,7 @@ class Container implements ArrayAccess, ContainerContract
 
             return $this->make(...$args);
         } catch (BindingResolutionException) {
-            return $callback instanceof Closure ? $callback() : null;
+            return $callback instanceof Closure ? $callback($this) : null;
         }
     }
 

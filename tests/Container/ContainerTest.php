@@ -163,8 +163,8 @@ class ContainerTest extends TestCase
     public function testMakeOr()
     {
         $container = new Container;
-        $callback = function () use ($container) {
-            $container->bind('test', fn () => true);
+        $callback = function ($app) {
+            $app->bind('test', fn () => true);
 
             return false;
         };
@@ -179,8 +179,8 @@ class ContainerTest extends TestCase
     public function testParametrizedMakeOr()
     {
         $container = new Container;
-        $callback = function () use ($container) {
-            $container->bind('test', fn () => true);
+        $callback = function ($app) {
+            $app->bind('test', fn () => true);
 
             return false;
         };
