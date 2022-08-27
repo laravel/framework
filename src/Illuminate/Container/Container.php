@@ -679,20 +679,6 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
-     * Resolve the given type from the container.
-     *
-     * @param  string|callable  $abstract
-     * @param  array  $parameters
-     * @return mixed
-     *
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
-     */
-    public function make($abstract, array $parameters = [])
-    {
-        return $this->resolve($abstract, $parameters);
-    }
-
-    /**
      * Resolve the given type from the container or execute the callback.
      *
      * @param  string  $abstract
@@ -715,6 +701,20 @@ class Container implements ArrayAccess, ContainerContract
         } catch (BindingResolutionException $e) {
             return $callback instanceof Closure ? $callback($this) : throw $e;
         }
+    }
+
+    /**
+     * Resolve the given type from the container.
+     *
+     * @param  string|callable  $abstract
+     * @param  array  $parameters
+     * @return mixed
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     */
+    public function make($abstract, array $parameters = [])
+    {
+        return $this->resolve($abstract, $parameters);
     }
 
     /**
