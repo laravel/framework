@@ -28,13 +28,6 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
-     * The cache store implementation.
-     *
-     * @var \Illuminate\Contracts\Cache\Store
-     */
-    protected $store;
-
-    /**
      * The event dispatcher implementation.
      *
      * @var \Illuminate\Contracts\Events\Dispatcher
@@ -54,9 +47,10 @@ class Repository implements ArrayAccess, CacheContract
      * @param  \Illuminate\Contracts\Cache\Store  $store
      * @return void
      */
-    public function __construct(Store $store)
+    public function __construct(
+        private Store $store
+        )
     {
-        $this->store = $store;
     }
 
     /**
