@@ -702,7 +702,7 @@ class Container implements ArrayAccess, ContainerContract
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
-    public function makeOr($abstract, $parameters = [], $callback = null)
+    public function makeOr($abstract, $parameters = [], Closure $callback = null)
     {
         try {
             if ($parameters instanceof Closure) {
