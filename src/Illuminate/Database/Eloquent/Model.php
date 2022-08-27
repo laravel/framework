@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use JsonSerializable;
@@ -173,6 +174,20 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * @var callable|null
      */
     protected static $lazyLoadingViolationCallback;
+
+    /**
+     * Indicates whether discarding attribute fills is allowed.
+     *
+     * @var bool
+     */
+    protected static $modelsShouldPreventDiscardingGuardedAttributeFills = false;
+
+    /**
+     * The callback that is responsible for handling mass assignment violations.
+     *
+     * @var callable|null
+     */
+    protected static $massAssignmentViolationCallback;
 
     /**
      * Indicates if broadcasting is currently enabled.
@@ -393,6 +408,28 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Prevent fills to guarded attributes from being discarded.
+     *
+     * @param  bool  $value
+     * @return void
+     */
+    public static function preventDiscardingGuardedAttributeFills($value = true)
+    {
+        static::$modelsShouldPreventDiscardingGuardedAttributeFills = $value;
+    }
+
+    /**
+     * Register a callback that is responsible for handling lazy loading violations.
+     *
+     * @param  callable|null  $callback
+     * @return void
+     */
+    public static function handleMassAssignmentViolationUsing(?callable $callback)
+    {
+        static::$massAssignmentViolationCallback = $callback;
+    }
+
+    /**
      * Execute a callback without broadcasting any model events for all model types.
      *
      * @param  callable  $callback
@@ -429,7 +466,11 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             // the model, and all others will just get ignored for security reasons.
             if ($this->isFillable($key)) {
                 $this->setAttribute($key, $value);
-            } elseif ($totallyGuarded || app()->environment('local')) {
+            } elseif($totallyGuarded || static::preventsGuardedAttributeFills()) {
+                if (isset(static::$massAssignmentViolationCallback)) {
+                    return call_user_func(static::$massAssignmentViolationCallback, $this, $key, $value);
+                }
+
                 throw new MassAssignmentException(sprintf(
                     'Add [%s] to fillable property to allow mass assignment on [%s].',
                     $key, get_class($this)
@@ -2059,6 +2100,16 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public static function preventsLazyLoading()
     {
         return static::$modelsShouldPreventLazyLoading;
+    }
+
+    /**
+     * Determine if discarding guarded attribute fills is disabled.
+     *
+     * @return bool
+     */
+    public static function preventsGuardedAttributeFills()
+    {
+        return static::$modelsShouldPreventDiscardingGuardedAttributeFills;
     }
 
     /**

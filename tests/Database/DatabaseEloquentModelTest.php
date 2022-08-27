@@ -1280,6 +1280,31 @@ class DatabaseEloquentModelTest extends TestCase
         $model->guard(['name', 'age']);
         $model->fill(['Foo' => 'bar']);
         $this->assertFalse(isset($model->Foo));
+
+
+        $handledMassAssignmentExceptions = 0;
+
+        Model::preventDiscardingGuardedAttributeFills();
+
+        Model::handleMassAssignmentViolationUsing(function(Model $model, string $key, mixed $value) use (&$handledMassAssignmentExceptions) {
+            $handledMassAssignmentExceptions++;
+        });
+
+        $model = new EloquentModelStub;
+        $model->guard(['name', 'age']);
+        $model->fill(['Foo' => 'bar']);
+        $model->fill(['name' => 'Taylor']);
+        $model->mergeFillable(['name']);
+        $model->fill(['name' => 'Taylor']);
+
+        $this->assertSame(2, $handledMassAssignmentExceptions);
+
+        Model::handleMassAssignmentViolationUsing(null);
+
+        $this->expectException(MassAssignmentException::class);
+        $model = new EloquentModelStub;
+        $model->guard(['name', 'age']);
+        $model->fill(['Foo' => 'bar']);
     }
 
     public function testFillableOverridesGuarded()
