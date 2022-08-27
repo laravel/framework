@@ -1281,12 +1281,11 @@ class DatabaseEloquentModelTest extends TestCase
         $model->fill(['Foo' => 'bar']);
         $this->assertFalse(isset($model->Foo));
 
-
         $handledMassAssignmentExceptions = 0;
 
         Model::preventDiscardingGuardedAttributeFills();
 
-        Model::handleMassAssignmentViolationUsing(function(Model $model, string $key, mixed $value) use (&$handledMassAssignmentExceptions) {
+        Model::handleMassAssignmentViolationUsing(function (Model $model, string $key, mixed $value) use (&$handledMassAssignmentExceptions) {
             $handledMassAssignmentExceptions++;
         });
 

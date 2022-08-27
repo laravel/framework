@@ -18,7 +18,6 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use JsonSerializable;
@@ -466,7 +465,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             // the model, and all others will just get ignored for security reasons.
             if ($this->isFillable($key)) {
                 $this->setAttribute($key, $value);
-            } elseif($totallyGuarded || static::preventsGuardedAttributeFills()) {
+            } elseif ($totallyGuarded || static::preventsGuardedAttributeFills()) {
                 if (isset(static::$massAssignmentViolationCallback)) {
                     return call_user_func(static::$massAssignmentViolationCallback, $this, $key, $value);
                 }
