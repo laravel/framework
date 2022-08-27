@@ -704,15 +704,15 @@ class Container implements ArrayAccess, ContainerContract
     public function makeOr($abstract, $callback = null)
     {
         try {
-            if (func_num_args() > 2) {
-                $args = func_get_args();
-
-                $callback = $args[2];
-
-                return $this->make(...$args);
+            if (func_num_args() <= 2) {
+                return $this->make($abstract);
             }
 
-            return $this->make($abstract);
+            $args = func_get_args();
+
+            $callback = $args[2];
+
+            return $this->make(...$args);
         } catch (BindingResolutionException $e) {
             return $callback instanceof Closure ? $callback($this) : throw $e;
         }
