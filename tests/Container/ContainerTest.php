@@ -195,7 +195,8 @@ class ContainerTest extends TestCase
     public function testMakeOrResolutionWithoutCallback()
     {
         $container = new Container;
-        $container->makeOr(ContainerInjectVariableStub::class, ['something' => 'laravel']);
+        $var = $container->makeOr(ContainerInjectVariableStub::class, ['something' => 'laravel']);
+        $this->assertSame('laravel', $var->something);
     }
 
     public function testMakeOrThrowsExceptionWhenCannotResolveAbstractOrExecuteCallback()
