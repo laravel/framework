@@ -180,8 +180,30 @@ class Grammar extends BaseGrammar
 
             $tableAndNestedJoins = is_null($join->joins) ? $table : '('.$table.$nestedJoins.')';
 
-            return trim("{$join->type} join {$tableAndNestedJoins} {$this->compileWheres($join)}");
+            // Determine if the join condition should be expressed
+            // with an ON subclause or a USING subclause, and compile
+            // the corresponding join condition
+            $joinCondition = $join instanceof JoinClause && ! is_null($join->using)
+                ? $this->compileJoinUsingClause($join)
+                : $this->compileWheres($join);
+
+            return trim("{$join->type} join {$tableAndNestedJoins} {$joinCondition}");
         })->implode(' ');
+    }
+
+    /**
+     * Compile a join clause's USING (...) subclause.
+     *
+     * @param  \Illuminate\Database\Query\JoinClause $query
+     * @return string
+     */
+    protected function compileJoinUsingClause(JoinClause $query)
+    {
+        $columns = collect($query->using)
+            ->map(fn ($column) => $this->wrap($column))
+            ->implode(',');
+
+        return "using ($columns)";
     }
 
     /**

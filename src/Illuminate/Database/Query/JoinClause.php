@@ -21,6 +21,13 @@ class JoinClause extends Builder
     public $table;
 
     /**
+     * The columns to use in the "USING" subclause.
+     *
+     * @var string[]|null
+     */
+    public ?array $using = null;
+
+    /**
      * The connection of the parent query builder.
      *
      * @var \Illuminate\Database\ConnectionInterface
@@ -120,6 +127,19 @@ class JoinClause extends Builder
     public function newQuery()
     {
         return new static($this->newParentQuery(), $this->type, $this->table);
+    }
+
+    /**
+     * Set the columns for the "USING" subclause
+     *
+     * @param  string|string[] $columns
+     * @return $this
+     */
+    public function using($columns)
+    {
+        $this->using = is_array($columns) ? $columns : func_get_args();
+
+        return $this;
     }
 
     /**
