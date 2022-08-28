@@ -194,7 +194,7 @@ class Grammar extends BaseGrammar
     /**
      * Compile a join clause's USING (...) subclause.
      *
-     * @param  \Illuminate\Database\Query\JoinClause $query
+     * @param  \Illuminate\Database\Query\JoinClause  $query
      * @return string
      */
     protected function compileJoinUsingClause(JoinClause $query)

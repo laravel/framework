@@ -130,9 +130,9 @@ class JoinClause extends Builder
     }
 
     /**
-     * Set the columns for the "USING" subclause
+     * Set the columns for the "USING" subclause.
      *
-     * @param  string|string[] $columns
+     * @param  string|string[]  $columns
      * @return $this
      */
     public function using($columns)
