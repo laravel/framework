@@ -386,7 +386,7 @@ class PendingCommand
             }
 
             foreach ($this->test->unexpectedAllOutputSubstrings as $text) {
-                if (!str_contains($allOutputStr, $text)) {
+                if (str_contains($allOutputStr, $text)) {
                     $this->test->fail('Output "'.$text.'" was printed.');
                 }
             }
