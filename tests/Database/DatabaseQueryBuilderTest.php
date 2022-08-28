@@ -2110,6 +2110,21 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->from('users')->rightJoinSub(['foo'], 'sub', 'users.id', '=', 'sub.id');
     }
 
+    public function testJoinWithUsing()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->join('contacts', function ($join) {
+            $join->using('name');
+        });
+        $this->assertSame('select * from "users" inner join "contacts" using ("name")', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->join('contacts', function ($join) {
+            $join->using('name', 'email');
+        });
+        $this->assertSame('select * from "users" inner join "contacts" using ("name","email")', $builder->toSql());
+    }
+
     public function testRawExpressionsInSelect()
     {
         $builder = $this->getBuilder();
