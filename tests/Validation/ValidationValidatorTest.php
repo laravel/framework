@@ -176,17 +176,17 @@ class ValidationValidatorTest extends TestCase
     public function testValidateUsingNestedValidationRulesPasses()
     {
         $rules = [
-            'items' => ['array'], 
+            'items' => ['array'],
             'items.*' => ['array', ['required_array_keys', '|name']],
             'items.*.|name' => [['in', '|ABC123']],
         ];
-        
+
         $data = [
             'items' => [
                 ['|name' => '|ABC123'],
-            ]
+            ],
         ];
-    
+
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, $data, $rules);
 
@@ -195,12 +195,12 @@ class ValidationValidatorTest extends TestCase
         $data = [
             'items' => [
                 ['|name' => '|1234'],
-            ]
+            ],
         ];
 
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, $data, $rules);
-        
+
         $this->assertSame('validation.in', $v->messages()->get('items.0.|name')[0]);
     }
 

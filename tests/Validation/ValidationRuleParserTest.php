@@ -143,7 +143,7 @@ class ValidationRuleParserTest extends TestCase
         $this->assertSame('regex:/^(foo', $exploded->rules['items.0.type'][1]);
         $this->assertSame('bar)$/i', $exploded->rules['items.0.type'][2]);
     }
-    
+
     public function testExplodeGeneratesNestedRules()
     {
         $parser = (new ValidationRuleParser([
@@ -196,8 +196,7 @@ class ValidationRuleParserTest extends TestCase
         ]));
 
         $results = $parser->explode([
-            'users.*.name' => 
-                Rule::forEach(function ($value, $attribute, $data) {
+            'users.*.name' => Rule::forEach(function ($value, $attribute, $data) {
                     $this->assertEquals([
                         'users.0.name' => 'Taylor Otwell',
                         'users.1.name' => 'Abigail Otwell',
