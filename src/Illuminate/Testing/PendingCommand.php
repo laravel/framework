@@ -168,6 +168,33 @@ class PendingCommand
     }
 
     /**
+     * Specify that the given string should be contained in the command's all output.
+     *
+     * @param  string  $string
+     * @return $this
+     */
+    public function expectsAllOutputToContain($string)
+    {
+        $this->test->expectedAllOutputSubstrings[] = $string;
+
+        return $this;
+    }
+
+    /**
+     * Specify that the given string shouldn't be contained in the command's all output.
+     *
+     * @param  string  $string
+     * @return $this
+     */
+    public function doesntExpectAllOutputToContain($string)
+    {
+        $this->test->unexpectedOutputSubstrings[$string] = false;
+
+        return $this;
+    }
+
+
+    /**
      * Specify that the given string shouldn't be contained in the command output.
      *
      * @param  string  $string
@@ -348,6 +375,22 @@ class PendingCommand
         if ($output = array_search(true, $this->test->unexpectedOutputSubstrings)) {
             $this->test->fail('Output "'.$output.'" was printed.');
         }
+
+        if ($this->test->allOutputs) {
+            $allOutputStr = implode("\n", $this->test->allOutputs);
+
+            foreach ($this->test->expectedAllOutputSubstrings as $text) {
+                if (!str_contains($allOutputStr, $text)) {
+                    $this->test->fail('Output does not contain "'.$text.'".');
+                }
+            }
+
+            foreach ($this->test->unexpectedAllOutputSubstrings as $text) {
+                if (!str_contains($allOutputStr, $text)) {
+                    $this->test->fail('Output "'.$text.'" was printed.');
+                }
+            }
+        }
     }
 
     /**
@@ -432,6 +475,15 @@ class PendingCommand
                  });
         }
 
+        if ($this->test->expectedAllOutputSubstrings || $this->test->unexpectedAllOutputSubstrings) {
+            $mock->shouldReceive('doWrite')
+                ->withArgs(function ($output) {
+                    $this->test->allOutputs[] = $output;
+
+                    return true;
+                });
+        }
+
         return $mock;
     }
 
@@ -449,6 +501,9 @@ class PendingCommand
         $this->test->expectedTables = [];
         $this->test->expectedQuestions = [];
         $this->test->expectedChoices = [];
+        $this->test->allOutputs = [];
+        $this->test->expectedAllOutputSubstrings = [];
+        $this->test->unexpectedAllOutputSubstrings = [];
     }
 
     /**

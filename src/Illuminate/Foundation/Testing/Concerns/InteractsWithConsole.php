@@ -16,6 +16,13 @@ trait InteractsWithConsole
     public $mockConsoleOutput = true;
 
     /**
+     * All of the output that printed out by the command
+     *
+     * @var array
+     */
+    public $allOutputs = [];
+
+    /**
      * All of the expected output lines.
      *
      * @var array
@@ -30,6 +37,13 @@ trait InteractsWithConsole
     public $expectedOutputSubstrings = [];
 
     /**
+     * All of the expected text to be present in the all the outputs.
+     *
+     * @var array
+     */
+    public $expectedAllOutputSubstrings = [];
+
+    /**
      * All of the output lines that aren't expected to be displayed.
      *
      * @var array
@@ -42,6 +56,13 @@ trait InteractsWithConsole
      * @var array
      */
     public $unexpectedOutputSubstrings = [];
+
+    /**
+     * All of the text that is not expected to be present in all the output.
+     *
+     * @var array
+     */
+    public $unexpectedAllOutputSubstrings = [];
 
     /**
      * All of the expected output tables.
