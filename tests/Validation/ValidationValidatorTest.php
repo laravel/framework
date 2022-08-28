@@ -113,26 +113,6 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
-    public function testValidateUsingNestedValidationRules()
-    {
-        $data = [
-            'items' => [
-                ['|name' => '|ABC123'],
-            ]
-        ];
-        
-        $rules = [
-            'items' => ['array'], 
-            'items.*' => ['array', ['required_array_keys', '|name']],
-            'items.*.|name' => [['in', '|ABC123']],
-        ];
-
-        $trans = $this->getIlluminateArrayTranslator();
-        $v = new Validator($trans, $data, $rules);
-
-        $this->assertTrue($v->passes());
-    }
-
     public function testValidateThrowsOnFail()
     {
         $this->expectException(ValidationException::class);
@@ -190,6 +170,26 @@ class ValidationValidatorTest extends TestCase
         $trans = $this->getTranslator();
         $trans->shouldReceive('get')->never();
         $v = new Validator($trans, ['foo' => 'taylor'], ['name' => 'Confirmed']);
+        $this->assertTrue($v->passes());
+    }
+
+    public function testValidateUsingNestedValidationRulesPasses()
+    {
+        $data = [
+            'items' => [
+                ['|name' => '|ABC123'],
+            ]
+        ];
+        
+        $rules = [
+            'items' => ['array'], 
+            'items.*' => ['array', ['required_array_keys', '|name']],
+            'items.*.|name' => [['in', '|ABC123']],
+        ];
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, $data, $rules);
+
         $this->assertTrue($v->passes());
     }
 
