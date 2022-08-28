@@ -203,7 +203,7 @@ class Grammar extends BaseGrammar
             ->map(fn ($column) => $this->wrap($column))
             ->implode(',');
 
-        return "using ($columns)";
+        return 'using ('.$columns.')';
     }
 
     /**
