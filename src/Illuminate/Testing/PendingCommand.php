@@ -380,7 +380,7 @@ class PendingCommand
             $allOutputStr = implode("\n", $this->test->allOutputs);
 
             foreach ($this->test->expectedAllOutputSubstrings as $text) {
-                if (!str_contains($allOutputStr, $text)) {
+                if (! str_contains($allOutputStr, $text)) {
                     $this->test->fail('Output does not contain "'.$text.'".');
                 }
             }

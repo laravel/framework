@@ -16,7 +16,7 @@ trait InteractsWithConsole
     public $mockConsoleOutput = true;
 
     /**
-     * All of the output that printed out by the command
+     * All of the output that printed out by the command.
      *
      * @var array
      */
