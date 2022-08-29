@@ -12,6 +12,7 @@ use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Reflector;
+use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\ReflectsClosures;
@@ -43,6 +44,13 @@ class Event
      * @var \DateTimeZone|string
      */
     public $timezone;
+
+    /**
+     * The UUID to track the event.
+     *
+     * @var string
+     */
+    public $uuid;
 
     /**
      * The user the command should run as.
@@ -169,6 +177,7 @@ class Event
         $this->mutex = $mutex;
         $this->command = $command;
         $this->timezone = $timezone;
+        $this->uuid = (string) Str::uuid();
 
         $this->output = $this->getDefaultOutput();
     }
