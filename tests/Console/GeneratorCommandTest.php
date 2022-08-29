@@ -2,7 +2,12 @@
 
 namespace Illuminate\Tests\Console;
 
+use Illuminate\Config\Repository;
 use Illuminate\Console\GeneratorCommand;
+use Illuminate\Console\OutputStyle;
+use Illuminate\Console\View\Components\Factory;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Filesystem\Filesystem;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
@@ -22,7 +27,7 @@ class GeneratorCommandTest extends TestCase
 
         $sut = $this->getMockForAbstractClass(
             GeneratorCommand::class,
-            [new Filesystem()],
+            [$this->createStub(Filesystem::class)],
             'FooMakeCommand'
         );
         $sut->setLaravel(app());
@@ -40,7 +45,7 @@ class GeneratorCommandTest extends TestCase
     {
         $sut = $this->getMockForAbstractClass(
             GeneratorCommand::class,
-            [new Filesystem()],
+            [$this->createStub(Filesystem::class)],
             'FooMakeCommand'
         );
         $sut->setLaravel(app());
@@ -49,5 +54,59 @@ class GeneratorCommandTest extends TestCase
         $output = new NullOutput();
 
         $this->assertSame(Command::FAILURE, $sut->run($input, $output));
+    }
+
+    /**
+     * @test
+     * @throws FileNotFoundException
+     */
+    public function itShouldGenerateTheRequestedClass(): void
+    {
+        $appPath = '/path/to/App';
+        $nameArgument = 'MyFoo';
+
+        $fileSystem = $this->createStub(Filesystem::class);
+        $stub = '<?php namespace DummyNamespace; class DummyClass {}';
+        $fileSystem->method('get')->willReturn($stub);
+
+        // @phpstan-ignore-next-line
+        $fileSystem->expects($this->once())->method('put')->with(
+            sprintf("%s//%s.php", $appPath, $nameArgument),
+            '<?php namespace App; class MyFoo {}'
+        )->willReturn(0);
+
+        $sut = $this->getMockForAbstractClass(
+            GeneratorCommand::class,
+            [$fileSystem],
+            'FooMakeCommand'
+        );
+
+        $laravel = $this->createStub(Application::class);
+        $config = new Repository();
+        $config->set('auth', [
+            'defaults'=> ['guard' => 'web'],
+            'guards' => ['web' => ['provider' => 'users']],
+            'providers' => ['users' => ['model' => 'App\User']],
+        ]);
+
+        $laravel->method('make')->willReturnOnConsecutiveCalls(
+            $this->createStub(OutputStyle::class),
+            $this->createStub(Factory::class),
+            $appPath,
+            null,
+            $config,
+            $config,
+            $config,
+        );
+        $laravel->method('getNamespace')->willReturn('App');
+
+        $sut->setLaravel($laravel);
+
+        $input = new ArrayInput(['name' => 'MyFoo']);
+        $output = new NullOutput();
+
+        $sut->run($input, $output);
+
+        $this->assertSame(Command::SUCCESS, $sut->handle());
     }
 }
