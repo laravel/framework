@@ -3,6 +3,7 @@
 namespace Illuminate\Console;
 
 use Illuminate\Console\Concerns\CreatesMatchingTest;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputArgument;
@@ -137,7 +138,7 @@ abstract class GeneratorCommand extends Command
     /**
      * Execute the console command.
      *
-     * @return bool|null
+     * @return int|void
      *
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
@@ -149,7 +150,7 @@ abstract class GeneratorCommand extends Command
         if ($this->isReservedName($this->getNameInput())) {
             $this->components->error('The name "'.$this->getNameInput().'" is reserved by PHP.');
 
-            return false;
+            return self::FAILURE;
         }
 
         $name = $this->qualifyClass($this->getNameInput());
@@ -164,7 +165,7 @@ abstract class GeneratorCommand extends Command
              $this->alreadyExists($this->getNameInput())) {
             $this->components->error($this->type.' already exists.');
 
-            return false;
+            return self::FAILURE;
         }
 
         // Next, we will generate the path to the location where this class' file should get
@@ -183,6 +184,8 @@ abstract class GeneratorCommand extends Command
         }
 
         $this->components->info($info.' created successfully.');
+
+        return self::SUCCESS;
     }
 
     /**
@@ -258,12 +261,14 @@ abstract class GeneratorCommand extends Command
      *
      * @param  string  $name
      * @return string
+     *
+     * @throws BindingResolutionException
      */
     protected function getPath($name)
     {
         $name = Str::replaceFirst($this->rootNamespace(), '', $name);
 
-        return $this->laravel['path'].'/'.str_replace('\\', '/', $name).'.php';
+        return $this->laravel->make('path').'/'.str_replace('\\', '/', $name).'.php';
     }
 
     /**
@@ -390,10 +395,12 @@ abstract class GeneratorCommand extends Command
      * Get the model for the default guard's user provider.
      *
      * @return string|null
+     *
+     * @throws BindingResolutionException
      */
     protected function userProviderModel()
     {
-        $config = $this->laravel['config'];
+        $config = $this->laravel->make('config');
 
         $provider = $config->get('auth.guards.'.$config->get('auth.defaults.guard').'.provider');
 
