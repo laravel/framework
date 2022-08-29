@@ -173,6 +173,37 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testValidateUsingNestedValidationRulesPasses()
+    {
+        $rules = [
+            'items' => ['array'],
+            'items.*' => ['array', ['required_array_keys', '|name']],
+            'items.*.|name' => [['in', '|ABC123']],
+        ];
+
+        $data = [
+            'items' => [
+                ['|name' => '|ABC123'],
+            ],
+        ];
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, $data, $rules);
+
+        $this->assertTrue($v->passes());
+
+        $data = [
+            'items' => [
+                ['|name' => '|1234'],
+            ],
+        ];
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, $data, $rules);
+
+        $this->assertSame('validation.in', $v->messages()->get('items.0.|name')[0]);
+    }
+
     public function testValidateEmptyStringsAlwaysPasses()
     {
         $trans = $this->getIlluminateArrayTranslator();
