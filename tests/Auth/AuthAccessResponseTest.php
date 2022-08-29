@@ -96,7 +96,7 @@ class AuthAccessResponseTest extends TestCase
         } catch (AuthorizationException $e) {
             $this->assertSame(404, $e->status());
             $this->assertTrue($e->hasStatus());
-            $this->assertSame('This action is unauthorized.', $e->getMessage());
+            $this->assertSame('Not Found', $e->getMessage());
             $this->assertSame(0, $e->getCode());
         }
 
