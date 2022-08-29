@@ -39,7 +39,8 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: ['8.0', 8.1, 8.2]
+        # php: ['8.0', 8.1, 8.2]
+        php: [8.2]
         stability: [prefer-lowest, prefer-stable]
 
     name: PHP ${{ matrix.php }} - ${{ matrix.stability }}
@@ -107,7 +108,8 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: ['8.0', 8.1, 8.2]
+        # php: ['8.0', 8.1, 8.2]
+        php: [8.2]
         stability: [prefer-lowest, prefer-stable]
 
     name: PHP ${{ matrix.php }} - ${{ matrix.stability }} - Windows
