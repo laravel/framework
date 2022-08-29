@@ -3,6 +3,7 @@
 namespace Illuminate\Console;
 
 use Illuminate\Console\Concerns\CreatesMatchingTest;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputArgument;
@@ -258,14 +259,16 @@ abstract class GeneratorCommand extends Command
     /**
      * Get the destination class path.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return string
+     * @throws BindingResolutionException
      */
     protected function getPath($name)
     {
         $name = Str::replaceFirst($this->rootNamespace(), '', $name);
 
-        return $this->laravel['path'].'/'.str_replace('\\', '/', $name).'.php';
+        return $this->laravel->make('path').'/'.str_replace('\\', '/', $name).'.php';
     }
 
     /**
@@ -392,10 +395,11 @@ abstract class GeneratorCommand extends Command
      * Get the model for the default guard's user provider.
      *
      * @return string|null
+     * @throws BindingResolutionException
      */
     protected function userProviderModel()
     {
-        $config = $this->laravel['config'];
+        $config = $this->laravel->make('config');
 
         $provider = $config->get('auth.guards.'.$config->get('auth.defaults.guard').'.provider');
 
