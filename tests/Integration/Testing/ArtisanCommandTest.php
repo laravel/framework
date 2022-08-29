@@ -34,7 +34,9 @@ class ArtisanCommandTest extends TestCase
         });
 
         Artisan::command('contains', function () {
+            $this->line('Hello everyone!');
             $this->line('My name is Taylor Otwell');
+            $this->line('I bet you can assert this line');
         });
     }
 
@@ -128,6 +130,8 @@ class ArtisanCommandTest extends TestCase
     {
         $this->artisan('contains')
              ->expectsOutputToContain('Taylor Otwell')
+             ->expectsOutputToContain('I bet you can assert this line')
+             ->expectsOutputToContain('I bet you can assert this line')
              ->assertExitCode(0);
     }
 

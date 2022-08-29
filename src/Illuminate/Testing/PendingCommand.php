@@ -182,7 +182,7 @@ class PendingCommand
      */
     public function doesntExpectOutputToContain($string)
     {
-        $this->test->unexpectedOutputSubstrings[$string] = false;
+        $this->test->unexpectedOutputSubstrings[] = $string;
 
         return $this;
     }
@@ -356,7 +356,7 @@ class PendingCommand
             }
         }
 
-        foreach ($this->test->unexpectedOutput as $text) {
+        foreach ($this->test->unexpectedOutputSubstrings as $text) {
             if (str_contains($allOutputStr, $text)) {
                 $this->test->fail('Output "'.$text.'" was printed.');
             }
