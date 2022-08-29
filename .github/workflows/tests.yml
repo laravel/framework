@@ -40,10 +40,12 @@ jobs:
       fail-fast: true
       matrix:
         # php: ['8.0', 8.1]
-        stability: [prefer-lowest, prefer-stable]
-        include:
-          - php: 8.2
-            stability: prefer-stable
+        # stability: [prefer-lowest, prefer-stable]
+        php: [8.2]
+        stability: [prefer-stable]
+        # include:
+        #   - php: 8.2
+        #     stability: prefer-stable
 
     name: PHP ${{ matrix.php }} - ${{ matrix.stability }}
 
