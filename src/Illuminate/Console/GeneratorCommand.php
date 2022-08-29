@@ -259,9 +259,9 @@ abstract class GeneratorCommand extends Command
     /**
      * Get the destination class path.
      *
-     * @param string $name
-     *
+     * @param  string  $name
      * @return string
+     *
      * @throws BindingResolutionException
      */
     protected function getPath($name)
@@ -395,6 +395,7 @@ abstract class GeneratorCommand extends Command
      * Get the model for the default guard's user provider.
      *
      * @return string|null
+     *
      * @throws BindingResolutionException
      */
     protected function userProviderModel()
