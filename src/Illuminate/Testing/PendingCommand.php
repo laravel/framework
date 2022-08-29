@@ -67,6 +67,13 @@ class PendingCommand
     protected $hasExecuted = false;
 
     /**
+     * All outputs that printed out by the command.
+     *
+     * @var array
+     */
+    protected $allOutputs = [];
+
+    /**
      * Create a new pending console command run.
      *
      * @param  \PHPUnit\Framework\TestCase  $test
@@ -337,16 +344,22 @@ class PendingCommand
             $this->test->fail('Output "'.Arr::first($this->test->expectedOutput).'" was not printed.');
         }
 
-        if (count($this->test->expectedOutputSubstrings)) {
-            $this->test->fail('Output does not contain "'.Arr::first($this->test->expectedOutputSubstrings).'".');
-        }
-
         if ($output = array_search(true, $this->test->unexpectedOutput)) {
             $this->test->fail('Output "'.$output.'" was printed.');
         }
 
-        if ($output = array_search(true, $this->test->unexpectedOutputSubstrings)) {
-            $this->test->fail('Output "'.$output.'" was printed.');
+        $allOutputStr = implode("\n", $this->allOutputs);
+
+        foreach ($this->test->expectedOutputSubstrings as $text) {
+            if (! str_contains($allOutputStr, $text)) {
+                $this->test->fail('Output does not contain "'.$text.'".');
+            }
+        }
+
+        foreach ($this->test->unexpectedOutput as $text) {
+            if (str_contains($allOutputStr, $text)) {
+                $this->test->fail('Output "'.$text.'" was printed.');
+            }
         }
     }
 
@@ -407,14 +420,6 @@ class PendingCommand
                 });
         }
 
-        foreach ($this->test->expectedOutputSubstrings as $i => $text) {
-            $mock->shouldReceive('doWrite')
-                ->withArgs(fn ($output) => str_contains($output, $text))
-                ->andReturnUsing(function () use ($i) {
-                    unset($this->test->expectedOutputSubstrings[$i]);
-                });
-        }
-
         foreach ($this->test->unexpectedOutput as $output => $displayed) {
             $mock->shouldReceive('doWrite')
                 ->ordered()
@@ -424,13 +429,10 @@ class PendingCommand
                 });
         }
 
-        foreach ($this->test->unexpectedOutputSubstrings as $text => $displayed) {
-            $mock->shouldReceive('doWrite')
-                 ->withArgs(fn ($output) => str_contains($output, $text))
-                 ->andReturnUsing(function () use ($text) {
-                     $this->test->unexpectedOutputSubstrings[$text] = true;
-                 });
-        }
+        $this->allOutputs = [];
+
+        $mock->shouldReceive('doWrite')
+            ->withArgs(fn ($output) => $this->allOutputs[] = $output);
 
         return $mock;
     }
