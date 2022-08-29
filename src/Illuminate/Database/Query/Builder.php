@@ -3146,10 +3146,7 @@ class Builder implements BuilderContract
     protected function onceWithColumns($columns, $callback)
     {
         $original = $this->columns;
-
-        if (is_null($original)) {
-            $this->columns = $columns;
-        }
+        $this->columns = $columns;
 
         $result = $callback();
 
