@@ -137,7 +137,7 @@ abstract class GeneratorCommand extends Command
     /**
      * Execute the console command.
      *
-     * @return bool|null
+     * @return int|void
      *
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
@@ -149,7 +149,7 @@ abstract class GeneratorCommand extends Command
         if ($this->isReservedName($this->getNameInput())) {
             $this->components->error('The name "'.$this->getNameInput().'" is reserved by PHP.');
 
-            return false;
+            return self::FAILURE;
         }
 
         $name = $this->qualifyClass($this->getNameInput());
@@ -164,7 +164,7 @@ abstract class GeneratorCommand extends Command
              $this->alreadyExists($this->getNameInput())) {
             $this->components->error($this->type.' already exists.');
 
-            return false;
+            return self::FAILURE;
         }
 
         // Next, we will generate the path to the location where this class' file should get
@@ -183,6 +183,8 @@ abstract class GeneratorCommand extends Command
         }
 
         $this->components->info($info.' created successfully.');
+
+        return self::SUCCESS;
     }
 
     /**
