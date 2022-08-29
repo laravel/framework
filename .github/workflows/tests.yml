@@ -42,10 +42,10 @@ jobs:
         # php: ['8.0', 8.1]
         # stability: [prefer-lowest, prefer-stable]
         php: [8.2]
-        stability: [prefer-stable]
+        stability: ["prefer-stable --ignore-platform-reqs"]
         # include:
         #   - php: 8.2
-        #     stability: prefer-stable
+        #     stability: prefer-stable --ignore-platform-reqs
 
     name: PHP ${{ matrix.php }} - ${{ matrix.stability }}
 
