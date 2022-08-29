@@ -197,18 +197,18 @@ class ValidationRuleParserTest extends TestCase
 
         $results = $parser->explode([
             'users.*.name' => Rule::forEach(function ($value, $attribute, $data) {
-                    $this->assertEquals([
-                        'users.0.name' => 'Taylor Otwell',
-                        'users.1.name' => 'Abigail Otwell',
-                    ], $data);
+                $this->assertEquals([
+                    'users.0.name' => 'Taylor Otwell',
+                    'users.1.name' => 'Abigail Otwell',
+                ], $data);
 
-                    return [
-                        Rule::requiredIf(true),
-                        $value === 'Taylor Otwell'
-                            ? Rule::in('taylor')
-                            : Rule::in('abigail'),
-                    ];
-                }),
+                return [
+                    Rule::requiredIf(true),
+                    $value === 'Taylor Otwell'
+                        ? Rule::in('taylor')
+                        : Rule::in('abigail'),
+                ];
+            }),
         ]);
 
         $this->assertEquals([
