@@ -76,6 +76,13 @@ class Gate implements GateContract
     protected $guessPolicyNamesUsingCallback;
 
     /**
+     * The default deny status for authorization exceptions.
+     *
+     * @var int|null
+     */
+    protected $defaultDenyStatus;
+
+    /**
      * Create a new gate instance.
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
@@ -98,6 +105,19 @@ class Gate implements GateContract
         $this->afterCallbacks = $afterCallbacks;
         $this->beforeCallbacks = $beforeCallbacks;
         $this->guessPolicyNamesUsingCallback = $guessPolicyNamesUsingCallback;
+    }
+
+    /**
+     * Set the default deny status.
+     *
+     * @param  int  $status
+     * @return $this
+     */
+    public function useDefaultDenyStatus($status)
+    {
+        $this->defaultDenyStatus = $status;
+
+        return $this;
     }
 
     /**
@@ -172,9 +192,11 @@ class Gate implements GateContract
             $response = $condition;
         }
 
-        return with($response instanceof Response ? $response : new Response(
-            (bool) $response === $allowWhenResponseIs, $message, $code
-        ))->authorize();
+        return with($response instanceof Response
+            ? $response
+            : new Response((bool) $response === $allowWhenResponseIs, $message, $code), function ($response) {
+                return $response->withStatus($response->status ?? $this->defaultDenyStatus)->authorize();
+            });
     }
 
     /**
@@ -379,7 +401,9 @@ class Gate implements GateContract
      */
     public function authorize($ability, $arguments = [])
     {
-        return $this->inspect($ability, $arguments)->authorize();
+        return with($this->inspect($ability, $arguments), fn ($response) => $response
+            ->withStatus($response->status() ?? $this->defaultDenyStatus)
+            ->authorize());
     }
 
     /**

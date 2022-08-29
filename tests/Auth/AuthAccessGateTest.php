@@ -1109,6 +1109,212 @@ class AuthAccessGateTest extends TestCase
 
         $this->assertFalse($gate->check('absent_invokable'));
     }
+
+    public function testItCanSetGlobalHttpStatus()
+    {
+        $gate = new Gate(new Container, function () {
+            //
+        });
+        $gate->useDefaultDenyStatus(404);
+        $gate->define('bool-test', fn () => false);
+        $gate->define('null-test', fn () => null);
+        $gate->define('response-test', fn ($user = null) => Response::deny());
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithDeniedResponseObject::class);
+        $exceptions = [];
+
+        try {
+            $gate->authorize('bool-test');
+            $this->fail();
+        } catch (AuthorizationException $e) {
+            $exceptions[] = $e;
+        }
+
+        try {
+            $gate->authorize('null-test');
+            $this->fail();
+        } catch (AuthorizationException $e) {
+            $exceptions[] = $e;
+        }
+
+        try {
+            $gate->authorize('response-test');
+            $this->fail();
+        } catch (AuthorizationException $e) {
+            $exceptions[] = $e;
+        }
+
+        try {
+            $gate->allowIf(fn () => false);
+            $this->fail();
+        } catch (AuthorizationException $e) {
+            $exceptions[] = $e;
+        }
+
+        try {
+            $gate->authorize('create', new AccessGateTestDummy);
+            $this->fail();
+        } catch (AuthorizationException $e) {
+            $exceptions[] = $e;
+        }
+
+        $this->assertCount(5, $exceptions);
+        $this->assertSame(404, $exceptions[0]->status());
+        $this->assertSame(404, $exceptions[1]->status());
+        $this->assertSame(404, $exceptions[2]->status());
+        $this->assertSame(404, $exceptions[3]->status());
+        $this->assertSame(404, $exceptions[4]->status());
+    }
+
+    public function testItDoesNotSetStatusWithoutSettingGlobally()
+    {
+        $gate = new Gate(new Container, function () {
+            //
+        });
+        $gate->define('bool-test', fn () => false);
+        $gate->define('null-test', fn () => null);
+        $gate->define('response-test', fn ($user = null) => Response::deny());
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithDeniedResponseObject::class);
+        $exceptions = [];
+
+        try {
+            $gate->authorize('bool-test');
+            $this->fail();
+        } catch (AuthorizationException $e) {
+            $exceptions[] = $e;
+        }
+
+        try {
+            $gate->authorize('null-test');
+            $this->fail();
+        } catch (AuthorizationException $e) {
+            $exceptions[] = $e;
+        }
+
+        try {
+            $gate->authorize('response-test');
+            $this->fail();
+        } catch (AuthorizationException $e) {
+            $exceptions[] = $e;
+        }
+
+        try {
+            $gate->allowIf(fn () => false);
+            $this->fail();
+        } catch (AuthorizationException $e) {
+            $exceptions[] = $e;
+        }
+
+        try {
+            $gate->authorize('create', new AccessGateTestDummy);
+            $this->fail();
+        } catch (AuthorizationException $e) {
+            $exceptions[] = $e;
+        }
+
+        $this->assertCount(5, $exceptions);
+        $this->assertNull($exceptions[0]->status());
+        $this->assertNull($exceptions[1]->status());
+        $this->assertNull($exceptions[2]->status());
+        $this->assertNull($exceptions[3]->status());
+        $this->assertNull($exceptions[4]->status());
+    }
+
+    public function testItCanOverrideGlobalStatus()
+    {
+        $gate = new Gate(new Container, function () {
+            //
+        });
+        $gate->useDefaultDenyStatus(404);
+        $gate->define('response-test', fn ($user = null) => Response::denyWithStatus(123));
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithDeniedResponseObject::class);
+        $exceptions = [];
+
+        try {
+            $gate->authorize('response-test');
+            $this->fail();
+        } catch (AuthorizationException $e) {
+            $exceptions[] = $e;
+        }
+
+        try {
+            $gate->authorize('view', new AccessGateTestDummy);
+            $this->fail();
+        } catch (AuthorizationException $e) {
+            $exceptions[] = $e;
+        }
+
+        $this->assertCount(2, $exceptions);
+        $this->assertSame(123, $exceptions[0]->status());
+        $this->assertSame(123, $exceptions[1]->status());
+    }
+
+    public function testGateBeforeRespectsDefaultStatus()
+    {
+        $gate = new Gate(new Container, function () {
+            //
+        });
+        $gate->useDefaultDenyStatus(404);
+        $gate->define('alwaysAllow', fn ($user = null) => true);
+        $gate->before(fn ($user = null, $ability = []) => false);
+
+        try {
+            $gate->authorize('alwaysAllow');
+            $this->fail();
+        } catch (AuthorizationException $e) {
+            $this->assertSame(404, $e->status());
+        }
+    }
+
+    public function testGateBeforeCanOverrideDefaultStatus()
+    {
+        $gate = new Gate(new Container, function () {
+            //
+        });
+        $gate->useDefaultDenyStatus(404);
+        $gate->define('alwaysAllow', fn ($user = null) => true);
+        $gate->before(fn ($user = null, $ability = []) => Response::denyWithStatus(123));
+
+        try {
+            $gate->authorize('alwaysAllow');
+            $this->fail();
+        } catch (AuthorizationException $e) {
+            $this->assertSame(123, $e->status());
+        }
+    }
+
+    public function testGateAfterRespectsDefaultStatus()
+    {
+        $gate = new Gate(new Container, function () {
+            //
+        });
+        $gate->useDefaultDenyStatus(404);
+        $gate->define('noResponse', fn ($user = null) => null);
+        $gate->after(fn ($user = null, $ability = '', $result = null, $arguments = []) => false);
+
+        try {
+            $gate->authorize('noResponse');
+            $this->fail();
+        } catch (AuthorizationException $e) {
+            $this->assertSame(404, $e->status());
+        }
+    }
+
+    public function testGateAfterCanOverrideDefaultStatus()
+    {
+        $gate = new Gate(new Container, function () {
+            //
+        });
+        $gate->useDefaultDenyStatus(404);
+        $gate->define('noResponse', fn ($user = null) => null);
+        $gate->after(fn ($user = null, $ability = '', $result = null, $arguments = []) => Response::denyWithStatus(123));
+
+        try {
+            $gate->authorize('noResponse');
+            $this->fail();
+        } catch (AuthorizationException $e) {
+            $this->assertSame(123, $e->status());
+        }
+    }
 }
 
 class AccessGateTestClassForGuest
@@ -1386,6 +1592,11 @@ class AccessGateTestPolicyWithDeniedResponseObject
     public function create()
     {
         return Response::deny('Not allowed.', 'some_code');
+    }
+
+    public function view($user = null)
+    {
+        return Response::deny('Not allowed.', 'some_code')->withStatus(123);
     }
 }
 

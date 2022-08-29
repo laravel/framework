@@ -23,6 +23,7 @@ use Illuminate\Contracts\Auth\Access\Gate as GateContract;
  * @method static bool has(string $ability)
  * @method static mixed getPolicyFor(object|string $class)
  * @method static mixed raw(string $ability, array|mixed $arguments = [])
+ * @method static \Illuminate\Auth\Access\Gate useDefaultDenyStatus(int $status)
  *
  * @see \Illuminate\Contracts\Auth\Access\Gate
  */
