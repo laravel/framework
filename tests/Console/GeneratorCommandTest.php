@@ -58,6 +58,7 @@ class GeneratorCommandTest extends TestCase
 
     /**
      * @test
+     *
      * @throws FileNotFoundException
      */
     public function itShouldGenerateTheRequestedClass(): void
@@ -71,7 +72,7 @@ class GeneratorCommandTest extends TestCase
 
         // @phpstan-ignore-next-line
         $fileSystem->expects($this->once())->method('put')->with(
-            sprintf("%s//%s.php", $appPath, $nameArgument),
+            sprintf('%s//%s.php', $appPath, $nameArgument),
             '<?php namespace App; class MyFoo {}'
         )->willReturn(0);
 
