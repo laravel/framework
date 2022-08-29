@@ -112,7 +112,7 @@ class AuthHandlesAuthorizationTest extends TestCase
         } catch (AuthorizationException $e) {
             $this->assertTrue($e->hasStatus());
             $this->assertSame(404, $e->status());
-            $this->assertSame('Not found.', $e->getMessage());
+            $this->assertSame('Not found', $e->getMessage());
             $this->assertSame(0, $e->getCode());
         }
 

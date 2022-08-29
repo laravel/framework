@@ -50,8 +50,6 @@ trait HandlesAuthorization
      */
     public function denyAsNotFound($message = null, $code = null)
     {
-        $message = $message ?? 'Not found.';
-
         return Response::denyWithStatus(404, $message, $code);
     }
 }
