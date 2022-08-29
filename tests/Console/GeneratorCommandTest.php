@@ -63,7 +63,7 @@ class GeneratorCommandTest extends TestCase
      */
     public function itShouldGenerateTheRequestedClass(): void
     {
-        $appPath = '/path/to/App';
+        $appPath = '/path/to/app';
         $nameArgument = 'MyFoo';
 
         $fileSystem = $this->createStub(Filesystem::class);
