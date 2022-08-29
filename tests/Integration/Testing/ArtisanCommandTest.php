@@ -36,6 +36,11 @@ class ArtisanCommandTest extends TestCase
         Artisan::command('contains', function () {
             $this->line('My name is Taylor Otwell');
         });
+
+        Artisan::command('containsMultipleLines', function () {
+            $this->line('First line
+Second line');
+        });
     }
 
     public function test_console_command_that_passes()
@@ -141,6 +146,16 @@ class ArtisanCommandTest extends TestCase
                  ->expectsOutputToContain('Otwell Taylor')
                  ->assertExitCode(0);
         });
+    }
+
+    public function test_console_command_can_assert_multiple_lines_contain()
+    {
+        $this->artisan('containsMultipleLines')
+            ->expectsOutputToContain('First line')
+            ->expectsOutputToContain('Second line')
+            ->expectsOutputToContain('First line
+Second line')
+            ->assertExitCode(0);
     }
 
     /**
