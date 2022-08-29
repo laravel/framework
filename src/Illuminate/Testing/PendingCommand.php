@@ -193,7 +193,6 @@ class PendingCommand
         return $this;
     }
 
-
     /**
      * Specify that the given string shouldn't be contained in the command output.
      *
