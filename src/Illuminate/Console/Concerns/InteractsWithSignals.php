@@ -36,4 +36,3 @@ trait InteractsWithSignals
             && SignalRegistry::isSupported();
     }
 }
-
