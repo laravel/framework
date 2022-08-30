@@ -127,6 +127,16 @@ class Redirector
     }
 
     /**
+     * Get the intended url.
+     *
+     * @return string|null
+     */
+    public function getIntendedUrl()
+    {
+        return $this->session->get('url.intended');
+    }
+
+    /**
      * Create a new redirect response to the given path.
      *
      * @param  string  $path
