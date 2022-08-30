@@ -3,7 +3,6 @@
 namespace Illuminate\Auth\Access;
 
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Http\Response as HttpResponse;
 
 class Response implements Arrayable
 {
@@ -148,10 +147,8 @@ class Response implements Arrayable
      */
     public function authorize()
     {
-        $message = $this->message() ?? HttpResponse::$statusTexts[$this->status] ?? null;
-
         if ($this->denied()) {
-            throw (new AuthorizationException($message, $this->code()))
+            throw (new AuthorizationException($this->message(), $this->code()))
                 ->setResponse($this)
                 ->withStatus($this->status);
         }
