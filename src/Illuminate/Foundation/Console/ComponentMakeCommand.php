@@ -3,7 +3,6 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
-use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -37,8 +36,6 @@ class ComponentMakeCommand extends GeneratorCommand
      * Execute the console command.
      *
      * @return void
-     *
-     * @throws FileNotFoundException
      */
     public function handle()
     {
