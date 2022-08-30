@@ -2,11 +2,18 @@
 
 namespace Illuminate\Console\Concerns;
 
+use Illuminate\Console\Signals;
 use Illuminate\Support\Arr;
-use Symfony\Component\Console\SignalRegistry\SignalRegistry;
 
 trait InteractsWithSignals
 {
+    /**
+     * The signals instance, if any.
+     *
+     * @var \Illuminate\Console\Signals|null
+     */
+    protected $signals;
+
     /**
      * Sets a trap to be run when the given signal(s) occurs.
      *
@@ -16,23 +23,27 @@ trait InteractsWithSignals
      */
     public function trap($signals, $callback)
     {
-        if ($this->areSignalsSupported()) {
-            collect(Arr::wrap($signals))->each(
-                fn ($signal) => $this->getApplication()
-                    ->getSignalRegistry()
-                    ->register($signal, $callback),
+        Signals::ifSupported(function () use ($signals, $callback) {
+            $this->signals ??= new Signals(
+                $this->getApplication()->getSignalRegistry(),
             );
-        }
+
+            collect(Arr::wrap($signals))
+                ->each(fn ($signal) => $this->signals->register($signal, $callback));
+        });
     }
 
     /**
-     * Checks if signals are supported.
+     * Untraps traps set by the command class.
      *
-     * @return bool
+     * @return void
      */
-    protected function areSignalsSupported()
+    public function untrap()
     {
-        return defined('SIGINT')
-            && SignalRegistry::isSupported();
+        if (! is_null($this->signals)) {
+            $this->signals->unregister();
+
+            $this->signals = null;
+        }
     }
 }

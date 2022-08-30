@@ -121,9 +121,13 @@ class Command extends SymfonyCommand
 
         $this->components = $this->laravel->make(Factory::class, ['output' => $this->output]);
 
-        return parent::run(
-            $this->input = $input, $this->output
-        );
+        try {
+            return parent::run(
+                $this->input = $input, $this->output
+            );
+        } finally {
+            $this->untrap();
+        }
     }
 
     /**
