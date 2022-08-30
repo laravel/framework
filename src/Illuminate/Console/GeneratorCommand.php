@@ -3,7 +3,6 @@
 namespace Illuminate\Console;
 
 use Illuminate\Console\Concerns\CreatesMatchingTest;
-use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputArgument;
@@ -261,8 +260,6 @@ abstract class GeneratorCommand extends Command
      *
      * @param  string  $name
      * @return string
-     *
-     * @throws BindingResolutionException
      */
     protected function getPath($name)
     {
@@ -395,8 +392,6 @@ abstract class GeneratorCommand extends Command
      * Get the model for the default guard's user provider.
      *
      * @return string|null
-     *
-     * @throws BindingResolutionException
      */
     protected function userProviderModel()
     {
