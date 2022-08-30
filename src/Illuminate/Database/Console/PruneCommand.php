@@ -80,7 +80,7 @@ class PruneCommand extends Command
     /**
      * Prune the given model.
      *
-     * @param string $model
+     * @param  string  $model
      * @return void
      */
     protected function pruneModel(string $model)
