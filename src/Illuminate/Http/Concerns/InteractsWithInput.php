@@ -359,7 +359,7 @@ trait InteractsWithInput
             return $default;
         }
 
-        return $enumClass::tryFrom($this->input($key)) ?: $default;
+        return $enumClass::tryFrom($this->input($key));
     }
 
     /**
