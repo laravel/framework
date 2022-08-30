@@ -347,7 +347,7 @@ class ValidationInvokableRuleTest extends TestCase
             }
         };
 
-        $validator = new Validator($trans, ['foo' => 'bar'], ['foo' => $rule], [$rule::class => ':attribute custom.',]);
+        $validator = new Validator($trans, ['foo' => 'bar'], ['foo' => $rule], [$rule::class => ':attribute custom.']);
 
         $this->assertFalse($validator->passes());
         $this->assertSame([
@@ -356,7 +356,7 @@ class ValidationInvokableRuleTest extends TestCase
             ],
         ], $validator->messages()->messages());
 
-        $validator = new Validator($trans, ['foo' => 'bar'], ['foo' => $rule], ['foo.'.$rule::class => ':attribute custom with key.',]);
+        $validator = new Validator($trans, ['foo' => 'bar'], ['foo' => $rule], ['foo.'.$rule::class => ':attribute custom with key.']);
 
         $this->assertFalse($validator->passes());
         $this->assertSame([

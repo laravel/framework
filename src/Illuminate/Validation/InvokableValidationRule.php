@@ -114,7 +114,7 @@ class InvokableValidationRule implements Rule, ValidatorAwareRule
     }
 
     /**
-     * Get the invokable
+     * Get the invokable.
      *
      * @return \Illuminate\Contracts\Validation\InvokableRule
      */
