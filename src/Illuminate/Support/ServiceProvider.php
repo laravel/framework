@@ -391,6 +391,23 @@ abstract class ServiceProvider
     }
 
     /**
+     * Register an application warmer.
+     *
+     * @param  string  $key
+     * @param  callable  $callable
+     * @return $this
+     */
+    protected function registerWarmer($key, $callable)
+    {
+        $this->app->instance(
+            WarmerCollection::class,
+            $this->app[WarmerCollection::class]->put($key, $callable)
+        );
+
+        return $this;
+    }
+
+    /**
      * Register the package's custom Artisan commands.
      *
      * @param  array|mixed  $commands

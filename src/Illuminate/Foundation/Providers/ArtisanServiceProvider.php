@@ -68,6 +68,7 @@ use Illuminate\Foundation\Console\UpCommand;
 use Illuminate\Foundation\Console\VendorPublishCommand;
 use Illuminate\Foundation\Console\ViewCacheCommand;
 use Illuminate\Foundation\Console\ViewClearCommand;
+use Illuminate\Foundation\Console\WarmCommand;
 use Illuminate\Notifications\Console\NotificationTableCommand;
 use Illuminate\Queue\Console\BatchesTableCommand;
 use Illuminate\Queue\Console\ClearCommand as QueueClearCommand;
@@ -147,6 +148,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'Up' => UpCommand::class,
         'ViewCache' => ViewCacheCommand::class,
         'ViewClear' => ViewClearCommand::class,
+        'Warm' => WarmCommand::class,
     ];
 
     /**
@@ -1151,6 +1153,16 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         $this->app->singleton(ViewClearCommand::class, function ($app) {
             return new ViewClearCommand($app['files']);
         });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerWarmCommand()
+    {
+        $this->app->singleton(WarmCommand::class);
     }
 
     /**

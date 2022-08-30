@@ -320,6 +320,18 @@ class Kernel implements KernelContract
     }
 
     /**
+     * Return a resolver for the application warmer.
+     *
+     * @return \Closure
+     */
+    public function warmResolver()
+    {
+        return method_exists($this, 'warm')
+            ? Closure::fromCallable([$this, 'warm'])
+            : fn () => null;
+    }
+
+    /**
      * Get the Artisan application instance.
      *
      * @return \Illuminate\Console\Application
