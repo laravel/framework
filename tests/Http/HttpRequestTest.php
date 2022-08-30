@@ -643,6 +643,8 @@ class HttpRequestTest extends TestCase
 
         $this->assertEquals(TestEnum::test, $request->enum('valid_enum_value', TestEnum::class));
 
+        $this->assertEquals(TestEnum::test, $request->enum('invalid_enum_value', TestEnum::class, TestEnum::test));
+
         $this->assertNull($request->enum('invalid_enum_value', TestEnum::class));
     }
 

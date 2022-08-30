@@ -350,16 +350,16 @@ trait InteractsWithInput
      * @param  string  $enumClass
      * @return mixed|null
      */
-    public function enum($key, $enumClass)
+    public function enum($key, $enumClass, $default = null)
     {
         if ($this->isNotFilled($key) ||
             ! function_exists('enum_exists') ||
             ! enum_exists($enumClass) ||
             ! method_exists($enumClass, 'tryFrom')) {
-            return null;
+            return $default;
         }
 
-        return $enumClass::tryFrom($this->input($key));
+        return $enumClass::tryFrom($this->input($key)) ?: $default;
     }
 
     /**
