@@ -803,7 +803,7 @@ class Route
      */
     protected function updatePrefixOnAction($prefix)
     {
-        if (! empty($newPrefix = trim(rtrim($prefix, '/').'/'.ltrim($this->action['prefix'] ?? '', '/'), '/'))) {
+        if (! empty($newPrefix = rtrim(rtrim($prefix, '/').'/'.ltrim($this->action['prefix'] ?? '', '/'), '/'))) {
             $this->action['prefix'] = $newPrefix;
         }
     }
