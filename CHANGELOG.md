@@ -1,6 +1,25 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.26.1...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.27.0...9.x)
+
+
+## [v9.27.0](https://github.com/laravel/framework/compare/v9.26.1...v9.27.0) - 2022-08-30
+
+### Added
+- Add getter and setter for connection in the DatabaseBatchRepository class ([#43869](https://github.com/laravel/framework/pull/43869))
+
+### Fixed
+- Fix for potential bug with non-backed enums ([#43842](https://github.com/laravel/framework/pull/43842))
+- Patch nested array validation rule regression bug ([#43897](https://github.com/laravel/framework/pull/43897))
+- Fix registering event listeners with array callback ([#43890](https://github.com/laravel/framework/pull/43890))
+
+### Changed
+- Explicitly add column name to SQLite query in `Illuminate/Database/Console/DatabaseInspectionCommand::getSqliteTableSize()` ([#43832](https://github.com/laravel/framework/pull/43832))
+- Allow broadcast on demand notifications ([d2b1446](https://github.com/laravel/framework/commit/d2b14466c27a3d62219256cea27088e6ecd9d32f))
+- Make Vite::hotFile() public ([#43875](https://github.com/laravel/framework/pull/43875))
+- Prompt to create sqlite db when migrating ([#43867](https://github.com/laravel/framework/pull/43867))
+- Call prepare() on HttpException responses ([#43895](https://github.com/laravel/framework/pull/43895))
+- Make the model:prune command easier to extend ([#43919](https://github.com/laravel/framework/pull/43919))
 
 
 ## [v9.26.1](https://github.com/laravel/framework/compare/v9.26.0...v9.26.1) - 2022-08-23
