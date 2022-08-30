@@ -39,6 +39,7 @@ class MailMakeCommand extends GeneratorCommand
      * Execute the console command.
      *
      * @return void
+     *
      * @throws FileNotFoundException
      */
     public function handle()
