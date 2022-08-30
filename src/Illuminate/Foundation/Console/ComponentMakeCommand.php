@@ -49,7 +49,7 @@ class ComponentMakeCommand extends GeneratorCommand
             return;
         }
 
-        if (parent::handle() !== self::SUCCESS) {
+        if ((parent::handle() !== self::SUCCESS) && ! $this->option('force')) {
             return;
         }
 

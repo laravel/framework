@@ -43,7 +43,7 @@ class MailMakeCommand extends GeneratorCommand
      */
     public function handle()
     {
-        if (parent::handle() !== self::SUCCESS) {
+        if ((parent::handle() !== self::SUCCESS) && ! $this->option('force')) {
             return;
         }
 
