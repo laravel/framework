@@ -6,7 +6,6 @@ use Illuminate\Config\Repository;
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Console\View\Components\Factory;
-use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Filesystem\Filesystem;
 use PHPUnit\Framework\TestCase;
@@ -17,10 +16,7 @@ use Symfony\Component\Console\Output\NullOutput;
 
 class GeneratorCommandTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function itShouldThrowIfNameIsNotPassedAsArgument(): void
+    public function testItShouldThrowIfNameIsNotPassedAsArgument(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Not enough arguments (missing: "name").');
@@ -38,10 +34,7 @@ class GeneratorCommandTest extends TestCase
         $sut->run($input, $output);
     }
 
-    /**
-     * @test
-     */
-    public function itShouldFailIfNameArgumentIsReservedName(): void
+    public function testItShouldFailIfNameArgumentIsReservedName(): void
     {
         $sut = $this->getMockForAbstractClass(
             GeneratorCommand::class,
@@ -56,12 +49,7 @@ class GeneratorCommandTest extends TestCase
         $this->assertSame(Command::FAILURE, $sut->run($input, $output));
     }
 
-    /**
-     * @test
-     *
-     * @throws FileNotFoundException
-     */
-    public function itShouldGenerateTheRequestedClass(): void
+    public function testItShouldGenerateTheRequestedClass(): void
     {
         $appPath = '/path/to/app';
         $nameArgument = 'MyFoo';
@@ -103,7 +91,7 @@ class GeneratorCommandTest extends TestCase
 
         $sut->setLaravel($laravel);
 
-        $input = new ArrayInput(['name' => 'MyFoo']);
+        $input = new ArrayInput(['name' => $nameArgument]);
         $output = new NullOutput();
 
         $sut->run($input, $output);
