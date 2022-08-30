@@ -114,6 +114,16 @@ class InvokableValidationRule implements Rule, ValidatorAwareRule
     }
 
     /**
+     * Get the invokable
+     *
+     * @return \Illuminate\Contracts\Validation\InvokableRule
+     */
+    public function invokable()
+    {
+        return $this->invokable;
+    }
+
+    /**
      * Set the data under validation.
      *
      * @param  array  $data
