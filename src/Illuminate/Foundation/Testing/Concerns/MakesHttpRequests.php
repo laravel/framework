@@ -68,7 +68,7 @@ trait MakesHttpRequests
      *
      * @var TestResponse
      */
-    protected $latestResponse;
+    public $latestResponse;
 
     /**
      * Define additional headers to be sent with the request.
