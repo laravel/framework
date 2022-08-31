@@ -86,8 +86,6 @@ class Signals
      *
      * @param  callable(): bool
      * @return void
-     *
-     * @internal
      */
     public static function resolveAvailabilityUsing($resolver)
     {
