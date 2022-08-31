@@ -136,7 +136,7 @@ class Signals
     }
 
     /**
-     * Gets the signal's default callback on the array format.
+     * Gets the signal's existing handler, and returns it on the array format.
      *
      * @return array<int, callable(int $signal): mixed>
      */
