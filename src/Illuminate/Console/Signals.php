@@ -72,7 +72,7 @@ class Signals
     }
 
     /**
-     * Executes the given callback if "signals" are supported.
+     * Executes the given callback if "signals" should be used and are available.
      *
      * @param  callable  $callback
      * @return void
