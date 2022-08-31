@@ -79,7 +79,9 @@ class Signals
      */
     public static function ifSupported($callback)
     {
-        if (defined('SIGINT') && SignalRegistry::isSupported()) {
+        if (extension_loaded('pcntl')
+            && defined('SIGINT')
+            && SignalRegistry::isSupported()) {
             $callback();
         }
     }
@@ -108,9 +110,9 @@ class Signals
     }
 
     /**
-     * Sets the signal's default callback.
+     * Gets the signal's default callback on the array format.
      *
-     * @return void
+     * @return [callable]
      */
     protected function initializeSignal($signal)
     {
