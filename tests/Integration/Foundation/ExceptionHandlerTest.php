@@ -98,13 +98,13 @@ class ExceptionHandlerTest extends TestCase
         // HTTP request...
         $this->get('test-route')
             ->assertStatus(399)
-            ->assertSeeText("Whoops, looks like something went wrong.");
+            ->assertSeeText('Whoops, looks like something went wrong.');
 
         // JSON request...
         $this->getJson('test-route')
             ->assertStatus(399)
             ->assertExactJson([
-                'message' => "Whoops, looks like something went wrong.",
+                'message' => 'Whoops, looks like something went wrong.',
             ]);
     }
 }
