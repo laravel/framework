@@ -138,18 +138,21 @@ class Signals
     /**
      * Gets the signal's default callback on the array format.
      *
-     * @return [callable]
+     * @return array<int, callable(int $signal): mixed>
      */
     protected function initializeSignal($signal)
     {
-        $existingHandler = pcntl_signal_get_handler($signal);
+        return is_callable($existingHandler = pcntl_signal_get_handler($signal))
+            ? [$existingHandler]
+            : [function () use ($signal) {
+                if (function_exists('posix_kill') && function_exists('posix_getpid')) {
+                    pcntl_signal($signal, SIG_DFL);
+                    posix_kill(posix_getpid(), $signal);
 
-        return [is_callable($existingHandler)
-            ? $existingHandler
-            : function ($signal) {
-                if (! in_array($signal, [SIGUSR1, SIGUSR2])) {
-                    exit(0);
+                    return;
                 }
-            }, ];
+
+                exit(128 + $signal);
+            }];
     }
 }
