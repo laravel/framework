@@ -76,7 +76,15 @@ class Signals
      */
     public function unregister()
     {
-        $this->setHandlers($this->previousHandlers);
+        $previousHandlers = $this->previousHandlers;
+
+        foreach ($previousHandlers as $signal => $handler) {
+            if (is_null($handler)) {
+                pcntl_signal($signal, SIG_DFL);
+            }
+        }
+
+        $this->setHandlers($previousHandlers);
     }
 
     /**
@@ -101,8 +109,7 @@ class Signals
         $resolver = static::$availabilityResolver
             ?? fn () => (app()->runningInConsole()
                 && ! app()->runningUnitTests()
-                && extension_loaded('pcntl')
-                && extension_loaded('posix'));
+                && extension_loaded('pcntl'));
 
         if ($resolver()) {
             $callback();
@@ -141,9 +148,6 @@ class Signals
     {
         return is_callable($existingHandler = pcntl_signal_get_handler($signal))
             ? [$existingHandler]
-            : [function () use ($signal) {
-                pcntl_signal($signal, SIG_DFL);
-                posix_kill(posix_getpid(), $signal);
-            }];
+            : null;
     }
 }
