@@ -271,7 +271,8 @@ abstract class TestCase extends BaseTestCase
     /**
      * This method is called when a test method did not execute successfully.
      *
-     * @throws Throwable
+     * @param  Throwable  $exception
+     * @return void
      */
     protected function onNotSuccessfulTest(Throwable $exception): void
     {
