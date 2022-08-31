@@ -49,7 +49,13 @@ class TestMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        $suffix = $this->option('unit') ? '.unit.stub' : '.stub';
+        $suffix = '.stub';
+        if ($this->option('unit')) {
+            $suffix = '.unit.stub';
+        }
+        if ($this->option('model') && !$this->option('pest')) {
+            $suffix = '.model.stub';
+        }
 
         return $this->option('pest')
             ? $this->resolveStubPath('/stubs/pest'.$suffix)
@@ -108,6 +114,61 @@ class TestMakeCommand extends GeneratorCommand
     }
 
     /**
+     * Get the fully-qualified model class name.
+     *
+     * @param  string  $model
+     * @return string
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function parseModel($model)
+    {
+        if (preg_match('([^A-Za-z0-9_/\\\\])', $model)) {
+            throw new InvalidArgumentException('Model name contains invalid characters.');
+        }
+
+        return str_replace($this->rootNamespace(), 'App\\', $this->qualifyModel($model));
+    }
+
+    /**
+     * Build the class with the given name.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    protected function buildClass($name)
+    {
+        $replace = [];
+
+        if ($this->option('model')) {
+            $replace = $this->buildModelReplacements($replace);
+        }
+
+        return str_replace(
+            array_keys($replace), array_values($replace), parent::buildClass($name)
+        );
+    }
+
+    /**
+     * Build the model replacement values.
+     *
+     * @return array
+     */
+    protected function buildModelReplacements()
+    {
+        $modelClass = $this->parseModel($this->option('model'));
+
+        return [
+            '{{ namespacedModel }}' => $modelClass,
+            '{{namespacedModel}}' => $modelClass,
+            '{{ model }}' => class_basename($modelClass),
+            '{{model}}' => class_basename($modelClass),
+            '{{ route }}' => Str::snake(Str::pluralStudly(class_basename($modelClass))),
+            '{{route}}' => Str::snake(Str::pluralStudly(class_basename($modelClass))),
+        ];
+    }
+
+    /**
      * Get the console command options.
      *
      * @return array
@@ -117,6 +178,7 @@ class TestMakeCommand extends GeneratorCommand
         return [
             ['unit', 'u', InputOption::VALUE_NONE, 'Create a unit test.'],
             ['pest', 'p', InputOption::VALUE_NONE, 'Create a Pest test.'],
+            ['model', 'm', InputOption::VALUE_OPTIONAL, 'Generate a feature test for the given model.'],
         ];
     }
 }

@@ -1,0 +1,80 @@
+<?php
+
+namespace {{ namespace }};
+
+use {{ namespacedModel }};
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Tests\TestCase;
+
+class {{ class }} extends TestCase
+{
+    // use RefreshDatabase;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->followingRedirects();
+    }
+
+    public function test_{{ route }}_index()
+    {
+        $response = $this->get('{{ route }}');
+
+        $response->assertStatus(200);
+    }
+
+    public function test_{{ route }}_create()
+    {
+        $response = $this->get('{{ route }}/create');
+
+        $response->assertStatus(200);
+    }
+
+    public function test_{{ route }}_store()
+    {
+        $new{{ model }} = {{ model }}::factory()->make();
+
+        $response = $this->post('{{ route }}', $new{{ model }}->toArray());
+
+        $response->assertStatus(200);
+    }
+
+    public function test_{{ route }}_show()
+    {
+        $new{{ model }} = {{ model }}::factory()->create();
+
+        $response = $this->get('{{ route }}/' . $new{{ model }}->getKey());
+
+        $response->assertStatus(200);
+    }
+
+    public function test_{{ route }}_edit()
+    {
+        $new{{ model }} = {{ model }}::factory()->create();
+
+        $response = $this->get('{{ route }}/' . $new{{ model }}->getKey() . '/edit');
+
+        $response->assertStatus(200);
+    }
+
+    public function test_{{ route }}_update()
+    {
+        $new{{ model }} = {{ model }}::factory()->create();
+        $updated{{ model }} = {{ model }}::factory()->make();
+
+        $response = $this->put('{{ route }}/' . $new{{ model }}->getKey(), $updated{{ model }}->toArray());
+
+        $response->assertStatus(200);
+    }
+
+    public function test_{{ route }}_destroy()
+    {
+        $new{{ model }} = {{ model }}::factory()->create();
+
+        $response = $this->delete('{{ route }}/' . $new{{ model }}->getKey());
+
+        $response->assertStatus(200);
+    }
+}
