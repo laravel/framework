@@ -2,8 +2,6 @@
 
 namespace Illuminate\Console;
 
-use Symfony\Component\Console\SignalRegistry\SignalRegistry;
-
 /**
  * @internal
  */
