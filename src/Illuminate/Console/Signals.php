@@ -101,11 +101,10 @@ class Signals
     public static function whenAvailable($callback)
     {
         $resolver = static::$availabilityResolver
-            ?? fn () => app()->runningInConsole()
+            ?? fn () => (app()->runningInConsole()
                 && ! app()->runningUnitTests()
                 && extension_loaded('pcntl')
-                && defined('SIGINT')
-                && SignalRegistry::isSupported();
+                && extension_loaded('posix');
 
         if ($resolver()) {
             $callback();
@@ -145,14 +144,8 @@ class Signals
         return is_callable($existingHandler = pcntl_signal_get_handler($signal))
             ? [$existingHandler]
             : [function () use ($signal) {
-                if (function_exists('posix_kill') && function_exists('posix_getpid')) {
-                    pcntl_signal($signal, SIG_DFL);
-                    posix_kill(posix_getpid(), $signal);
-
-                    return;
-                }
-
-                exit(128 + $signal);
+                pcntl_signal($signal, SIG_DFL);
+                posix_kill(posix_getpid(), $signal);
             }];
     }
 }
