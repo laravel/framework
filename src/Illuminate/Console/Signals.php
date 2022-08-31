@@ -77,9 +77,12 @@ class Signals
      * @param  callable  $callback
      * @return void
      */
-    public static function ifSupported($callback)
+    public static function whenAvailable($callback)
     {
-        if (extension_loaded('pcntl')
+        if (
+            app()->runningInConsole()
+            && ! app()->runningUnitTests()
+            && extension_loaded('pcntl')
             && defined('SIGINT')
             && SignalRegistry::isSupported()) {
             $callback();

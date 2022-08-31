@@ -23,7 +23,7 @@ trait InteractsWithSignals
      */
     public function trap($signals, $callback)
     {
-        Signals::ifSupported(function () use ($signals, $callback) {
+        Signals::whenAvailable(function () use ($signals, $callback) {
             $this->signals ??= new Signals(
                 $this->getApplication()->getSignalRegistry(),
             );
