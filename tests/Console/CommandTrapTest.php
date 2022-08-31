@@ -1,0 +1,115 @@
+<?php
+
+namespace Illuminate\Tests\Console;
+
+use Illuminate\Console\Command;
+use Illuminate\Console\Signals;
+use Illuminate\Tests\Console\Fixtures\FakeSignalsRegistry;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+
+class CommandTrapTest extends TestCase
+{
+    protected $registry;
+
+    protected $signals;
+
+    protected $state;
+
+    protected function setUp(): void
+    {
+        Signals::resolveAvailabilityUsing(fn () => true);
+
+        $this->registry = new FakeSignalsRegistry();
+        $this->state = null;
+    }
+
+    protected function tearDown(): void
+    {
+        m::close();
+    }
+
+    public function testTrapWhenAvailable()
+    {
+        $command = $this->createCommand();
+
+        $command->trap(SIGINT, function () {
+            $this->state = 'taylorotwell';
+        });
+
+        $this->registry->handle(SIGINT);
+
+        $this->assertSame('taylorotwell', $this->state);
+    }
+
+    public function testTrapWhenNotAvailable()
+    {
+        Signals::resolveAvailabilityUsing(fn () => false);
+
+        $command = $this->createCommand();
+
+        $command->trap(SIGINT, function () {
+            $this->state = 'taylorotwell';
+        });
+
+        $this->registry->handle(SIGINT);
+
+        $this->assertNull($this->state);
+    }
+
+    public function testUntrap()
+    {
+        $command = $this->createCommand();
+
+        $command->trap(SIGINT, function () {
+            $this->state = 'taylorotwell';
+        });
+
+        $command->untrap();
+
+        $this->registry->handle(SIGINT);
+
+        $this->assertNull($this->state);
+    }
+
+    public function testNestedTraps()
+    {
+        $a = $this->createCommand();
+        $a->trap(SIGINT, fn () => $this->state .= '1');
+
+        $b = $this->createCommand();
+        $b->trap(SIGINT, fn () => $this->state .= '2');
+
+        $c = $this->createCommand();
+        $c->trap(SIGINT, fn () => $this->state .= '3');
+
+        $this->state = '';
+        $this->registry->handle(SIGINT);
+        $this->assertSame('321', $this->state);
+
+        $c->untrap();
+        $this->state = '';
+        $this->registry->handle(SIGINT);
+        $this->assertSame('21', $this->state);
+
+        $b->untrap();
+        $this->state = '';
+        $this->registry->handle(SIGINT);
+        $this->assertSame('1', $this->state);
+
+        $a->untrap();
+        $this->state = '';
+        $this->registry->handle(SIGINT);
+        $this->assertSame('', $this->state);
+    }
+
+    protected function createCommand()
+    {
+        $command = new Command;
+        $registry = $this->registry;
+
+        (fn () => $this->signals = new Signals($registry))->call($command);
+
+        return $command;
+    }
+}

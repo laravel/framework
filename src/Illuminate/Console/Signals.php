@@ -4,6 +4,9 @@ namespace Illuminate\Console;
 
 use Symfony\Component\Console\SignalRegistry\SignalRegistry;
 
+/**
+ * @internal
+ */
 class Signals
 {
     /**
@@ -19,6 +22,13 @@ class Signals
      * @param array<int, array<int, callable>>|null
      */
     protected $previousHandlers;
+
+    /**
+     * The current availability resolver, if any.
+     *
+     * @param (callable(): bool)|null
+     */
+    protected static $availabilityResolver;
 
     /**
      * Create a new Signals instance.
@@ -72,6 +82,19 @@ class Signals
     }
 
     /**
+     * Sets the availability resolver.
+     *
+     * @param  callable(): bool
+     * @return void
+     *
+     * @internal
+     */
+    public static function resolveAvailabilityUsing($resolver)
+    {
+        static::$availabilityResolver = $resolver;
+    }
+
+    /**
      * Executes the given callback if "signals" should be used and are available.
      *
      * @param  callable  $callback
@@ -79,12 +102,14 @@ class Signals
      */
     public static function whenAvailable($callback)
     {
-        if (
-            app()->runningInConsole()
-            && ! app()->runningUnitTests()
-            && extension_loaded('pcntl')
-            && defined('SIGINT')
-            && SignalRegistry::isSupported()) {
+        $resolver = static::$availabilityResolver
+            ?? fn () => app()->runningInConsole()
+                && ! app()->runningUnitTests()
+                && extension_loaded('pcntl')
+                && defined('SIGINT')
+                && SignalRegistry::isSupported();
+
+        if ($resolver()) {
             $callback();
         }
     }

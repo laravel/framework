@@ -37,6 +37,8 @@ trait InteractsWithSignals
      * Untraps traps set by the command class.
      *
      * @return void
+     *
+     * @internal
      */
     public function untrap()
     {
