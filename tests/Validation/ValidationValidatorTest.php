@@ -2221,10 +2221,10 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['foo' => 'false'], ['foo' => 'Boolean']);
-        $this->assertFalse($v->passes());
+        $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['foo' => 'true'], ['foo' => 'Boolean']);
-        $this->assertFalse($v->passes());
+        $this->assertTrue($v->passes());
 
         $v = new Validator($trans, [], ['foo' => 'Boolean']);
         $this->assertTrue($v->passes());
@@ -2246,6 +2246,15 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['foo' => 0], ['foo' => 'Boolean']);
         $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'bar'], ['foo' => 'Boolean']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => []], ['foo' => 'Boolean']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => new NonEloquentModel()], ['foo' => 'Boolean']);
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateBool()
@@ -2258,10 +2267,10 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['foo' => 'false'], ['foo' => 'Bool']);
-        $this->assertFalse($v->passes());
+        $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['foo' => 'true'], ['foo' => 'Bool']);
-        $this->assertFalse($v->passes());
+        $this->assertTrue($v->passes());
 
         $v = new Validator($trans, [], ['foo' => 'Bool']);
         $this->assertTrue($v->passes());
@@ -2283,6 +2292,15 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['foo' => 0], ['foo' => 'Bool']);
         $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'bar'], ['foo' => 'Bool']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => []], ['foo' => 'Bool']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => new NonEloquentModel()], ['foo' => 'Bool']);
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateNumeric()
