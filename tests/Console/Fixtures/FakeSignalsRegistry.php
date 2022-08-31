@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Console\Fixtures;
 class FakeSignalsRegistry
 {
     protected $signalHandlers = [
-        SIGINT => [],
+        'my-signal' => [],
     ];
 
     public function register($signal, $signalHandler)

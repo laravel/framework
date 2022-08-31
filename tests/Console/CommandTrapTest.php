@@ -33,11 +33,11 @@ class CommandTrapTest extends TestCase
     {
         $command = $this->createCommand();
 
-        $command->trap(SIGINT, function () {
+        $command->trap('my-signal', function () {
             $this->state = 'taylorotwell';
         });
 
-        $this->registry->handle(SIGINT);
+        $this->registry->handle('my-signal');
 
         $this->assertSame('taylorotwell', $this->state);
     }
@@ -48,11 +48,11 @@ class CommandTrapTest extends TestCase
 
         $command = $this->createCommand();
 
-        $command->trap(SIGINT, function () {
+        $command->trap('my-signal', function () {
             $this->state = 'taylorotwell';
         });
 
-        $this->registry->handle(SIGINT);
+        $this->registry->handle('my-signal');
 
         $this->assertNull($this->state);
     }
@@ -61,13 +61,13 @@ class CommandTrapTest extends TestCase
     {
         $command = $this->createCommand();
 
-        $command->trap(SIGINT, function () {
+        $command->trap('my-signal', function () {
             $this->state = 'taylorotwell';
         });
 
         $command->untrap();
 
-        $this->registry->handle(SIGINT);
+        $this->registry->handle('my-signal');
 
         $this->assertNull($this->state);
     }
@@ -75,43 +75,43 @@ class CommandTrapTest extends TestCase
     public function testNestedTraps()
     {
         $a = $this->createCommand();
-        $a->trap(SIGINT, fn () => $this->state .= '1');
+        $a->trap('my-signal', fn () => $this->state .= '1');
 
         $b = $this->createCommand();
-        $b->trap(SIGINT, fn () => $this->state .= '2');
+        $b->trap('my-signal', fn () => $this->state .= '2');
 
         $c = $this->createCommand();
-        $c->trap(SIGINT, fn () => $this->state .= '3');
+        $c->trap('my-signal', fn () => $this->state .= '3');
 
         $this->state = '';
-        $this->registry->handle(SIGINT);
+        $this->registry->handle('my-signal');
         $this->assertSame('321', $this->state);
 
         $c->untrap();
         $this->state = '';
-        $this->registry->handle(SIGINT);
+        $this->registry->handle('my-signal');
         $this->assertSame('21', $this->state);
 
         $d = $this->createCommand();
-        $d->trap(SIGINT, fn () => $this->state .= '3');
+        $d->trap('my-signal', fn () => $this->state .= '3');
 
         $this->state = '';
-        $this->registry->handle(SIGINT);
+        $this->registry->handle('my-signal');
         $this->assertSame('321', $this->state);
 
         $d->untrap();
         $this->state = '';
-        $this->registry->handle(SIGINT);
+        $this->registry->handle('my-signal');
         $this->assertSame('21', $this->state);
 
         $b->untrap();
         $this->state = '';
-        $this->registry->handle(SIGINT);
+        $this->registry->handle('my-signal');
         $this->assertSame('1', $this->state);
 
         $a->untrap();
         $this->state = '';
-        $this->registry->handle(SIGINT);
+        $this->registry->handle('my-signal');
         $this->assertSame('', $this->state);
     }
 
