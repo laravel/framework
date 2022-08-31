@@ -92,6 +92,18 @@ class CommandTrapTest extends TestCase
         $this->registry->handle(SIGINT);
         $this->assertSame('21', $this->state);
 
+        $d = $this->createCommand();
+        $d->trap(SIGINT, fn () => $this->state .= '3');
+
+        $this->state = '';
+        $this->registry->handle(SIGINT);
+        $this->assertSame('321', $this->state);
+
+        $d->untrap();
+        $this->state = '';
+        $this->registry->handle(SIGINT);
+        $this->assertSame('21', $this->state);
+
         $b->untrap();
         $this->state = '';
         $this->registry->handle(SIGINT);
