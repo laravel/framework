@@ -104,7 +104,7 @@ class Signals
             ?? fn () => (app()->runningInConsole()
                 && ! app()->runningUnitTests()
                 && extension_loaded('pcntl')
-                && extension_loaded('posix');
+                && extension_loaded('posix'));
 
         if ($resolver()) {
             $callback();
