@@ -147,6 +147,36 @@ class ValidationEnumRuleTest extends TestCase
         $this->assertEquals(['The selected status is invalid.'], $v->messages()->get('status'));
     }
 
+    public function testValidationPassesWhenUsingOnArray()
+    {
+        $v = new Validator(
+            resolve('translator'),
+            [
+                'status_array' => ['pending', 'done']
+            ],
+            [
+                'status_array' => new Enum(StringStatus::class),
+            ]
+        );
+
+        $this->assertFalse($v->fails());
+    }
+
+    public function testValidationPassesWhenProvidingArrayThatContainsNonExistingCases()
+    {
+        $v = new Validator(
+            resolve('translator'),
+            [
+                'status_array' => ['pending', 'foo']
+            ],
+            [
+                'status_array' => new Enum(StringStatus::class),
+            ]
+        );
+
+        $this->assertTrue($v->fails());
+    }
+
     protected function setUp(): void
     {
         $container = Container::getInstance();

@@ -3,6 +3,7 @@
 namespace Illuminate\Validation\Rules;
 
 use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Support\Arr;
 use TypeError;
 
 class Enum implements Rule
@@ -39,7 +40,13 @@ class Enum implements Rule
         }
 
         try {
-            return ! is_null($this->type::tryFrom($value));
+            foreach (Arr::wrap($value) as $item) {
+                if (is_null($this->type::tryFrom($item))) {
+                    return false;
+                };
+            }
+
+            return true;
         } catch (TypeError $e) {
             return false;
         }
