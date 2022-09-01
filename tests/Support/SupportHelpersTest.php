@@ -41,6 +41,7 @@ class SupportHelpersTest extends TestCase
 
     public function testValue()
     {
+        $this->assertSame(10, value(BackedEnumValeTest::English));
         $this->assertSame('foo', value('foo'));
         $this->assertSame('foo', value(function () {
             return 'foo';
@@ -881,4 +882,9 @@ class SupportTestArrayIterable implements IteratorAggregate
     {
         return new ArrayIterator($this->items);
     }
+}
+
+enum BackedEnumValeTest: int
+{
+    case English = 10;
 }
