@@ -2,7 +2,6 @@
 
 namespace Illuminate\Foundation\Providers;
 
-use Illuminate\Console\Signals;
 use Illuminate\Contracts\Foundation\MaintenanceMode as MaintenanceModeContract;
 use Illuminate\Foundation\MaintenanceModeManager;
 use Illuminate\Foundation\Vite;
@@ -62,7 +61,6 @@ class FoundationServiceProvider extends AggregateServiceProvider
         $this->registerRequestSignatureValidation();
         $this->registerExceptionTracking();
         $this->registerMaintenanceModeManager();
-        $this->registerSignalAvailabilityResolver();
     }
 
     /**
@@ -146,19 +144,5 @@ class FoundationServiceProvider extends AggregateServiceProvider
             MaintenanceModeContract::class,
             fn () => $this->app->make(MaintenanceModeManager::class)->driver()
         );
-    }
-
-    /**
-     * Register the signal availability resolver.
-     *
-     * @return void
-     */
-    protected function registerSignalAvailabilityResolver()
-    {
-        Signals::resolveAvailabilityUsing(function () {
-            return $this->app->runningInConsole()
-                && ! $this->app->runningUnitTests()
-                && extension_loaded('pcntl');
-        });
     }
 }
