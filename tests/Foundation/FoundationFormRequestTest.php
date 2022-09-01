@@ -29,6 +29,18 @@ class FoundationFormRequestTest extends TestCase
         $this->mocks = [];
     }
 
+    public function testValidatedExceptMethodReturnsTheValidatedDataExceptForASpecifiedArrayOfItems()
+    {
+        $payload = ['name' => 'Taylor', 'age' => 25, 'with' => 'extras'];
+
+        $request = $this->createRequest($payload, FoundationTestFormRequestExceptStub::class);
+
+        $request->validateResolved();
+
+        $this->assertEquals(['name' => 'Taylor'], $request->validatedExcept('age'));
+        $this->assertEquals([], $request->validatedExcept('age', 'name'));
+    }
+
     public function testValidatedMethodReturnsTheValidatedData()
     {
         $request = $this->createRequest(['name' => 'specified', 'with' => 'extras']);
@@ -257,6 +269,19 @@ class FoundationTestFormRequestStub extends FormRequest
     public function rules()
     {
         return ['name' => 'required'];
+    }
+
+    public function authorize()
+    {
+        return true;
+    }
+}
+
+class FoundationTestFormRequestExceptStub extends FormRequest
+{
+    public function rules()
+    {
+        return ['name' => 'required', 'age' => 'required'];
     }
 
     public function authorize()

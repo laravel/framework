@@ -10,6 +10,7 @@ use Illuminate\Contracts\Validation\ValidatesWhenResolved;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
+use Illuminate\Support\Arr;
 use Illuminate\Validation\ValidatesWhenResolvedTrait;
 use Illuminate\Validation\ValidationException;
 
@@ -213,6 +214,23 @@ class FormRequest extends Request implements ValidatesWhenResolved
     public function validated($key = null, $default = null)
     {
         return data_get($this->validator->validated(), $key, $default);
+    }
+
+    /**
+     * Get the validated data from the request except for a specified array of items.
+     *
+     * @param  array|mixed  $keys
+     * @return array
+     */
+    public function validatedExcept($keys)
+    {
+        $keys = is_array($keys) ? $keys : func_get_args();
+
+        $results = $this->validator->validated();
+
+        Arr::forget($results, $keys);
+
+        return $results;
     }
 
     /**
