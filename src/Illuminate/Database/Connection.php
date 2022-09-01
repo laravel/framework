@@ -1258,7 +1258,7 @@ class Connection implements ConnectionInterface
     /**
      * Get the database connection name.
      *
-     * @return string|null
+     * @return string
      */
     public function getName()
     {
@@ -1268,7 +1268,7 @@ class Connection implements ConnectionInterface
     /**
      * Get the database connection full name.
      *
-     * @return string|null
+     * @return string
      */
     public function getNameWithReadWriteType()
     {
