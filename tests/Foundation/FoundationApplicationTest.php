@@ -515,7 +515,7 @@ class FoundationApplicationTest extends TestCase
 
           $app['env'] = 'bar';
 
-        $this->assertFalse($app->foo());
+          $this->assertFalse($app->foo());
       }
 }
 
