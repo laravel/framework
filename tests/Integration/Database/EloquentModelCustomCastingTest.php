@@ -2,11 +2,15 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
+use GMP;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
+use Illuminate\Contracts\Database\Eloquent\SerializesCastableAttributes;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Schema\Blueprint;
 use InvalidArgumentException;
+use JsonSerializable;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -40,6 +44,7 @@ class EloquentModelCustomCastingTest extends TestCase
             $table->increments('id');
             $table->string('address_line_one');
             $table->string('address_line_two');
+            $table->integer('amount');
             $table->string('string_field');
             $table->timestamps();
         });
@@ -63,6 +68,7 @@ class EloquentModelCustomCastingTest extends TestCase
         /** @var \Illuminate\Tests\Integration\Database\CustomCasts $model */
         $model = CustomCasts::create([
             'address' => new AddressModel('address_line_one_value', 'address_line_two_value'),
+            'amount' => gmp_init('1000', 10),
             'string_field' => null,
         ]);
 
@@ -72,6 +78,8 @@ class EloquentModelCustomCastingTest extends TestCase
         $this->assertSame('address_line_two_value', $model->getOriginal('address_line_two'));
         $this->assertSame('address_line_two_value', $model->getAttribute('address_line_two'));
 
+        $this->assertSame('1000', $model->getRawOriginal('amount'));
+
         $this->assertNull($model->getOriginal('string_field'));
         $this->assertNull($model->getAttribute('string_field'));
         $this->assertSame('', $model->getRawOriginal('string_field'));
@@ -80,6 +88,7 @@ class EloquentModelCustomCastingTest extends TestCase
         $another_model = CustomCasts::create([
             'address_line_one' => 'address_line_one_value',
             'address_line_two' => 'address_line_two_value',
+            'amount' => gmp_init('500', 10),
             'string_field' => 'string_value',
         ]);
 
@@ -87,6 +96,7 @@ class EloquentModelCustomCastingTest extends TestCase
 
         $this->assertSame('address_line_one_value', $model->address->lineOne);
         $this->assertSame('address_line_two_value', $model->address->lineTwo);
+        $this->assertInstanceOf(GMP::class, $model->amount);
     }
 
     public function testInvalidArgumentExceptionOnInvalidValue()
@@ -94,6 +104,7 @@ class EloquentModelCustomCastingTest extends TestCase
         /** @var \Illuminate\Tests\Integration\Database\CustomCasts $model */
         $model = CustomCasts::create([
             'address' => new AddressModel('address_line_one_value', 'address_line_two_value'),
+            'amount' => gmp_init('1000', 10),
             'string_field' => 'string_value',
         ]);
 
@@ -111,6 +122,7 @@ class EloquentModelCustomCastingTest extends TestCase
         /** @var \Illuminate\Tests\Integration\Database\CustomCasts $model */
         $model = CustomCasts::create([
             'address' => new AddressModel('address_line_one_value', 'address_line_two_value'),
+            'amount' => gmp_init('1000', 10),
             'string_field' => 'string_value',
         ]);
 
@@ -121,6 +133,27 @@ class EloquentModelCustomCastingTest extends TestCase
         // Ensure model values remain unchanged
         $this->assertSame('address_line_one_value', $model->address->lineOne);
         $this->assertSame('address_line_two_value', $model->address->lineTwo);
+    }
+
+    public function testModelsWithCustomCastsCanBeConvertedToArrays()
+    {
+        /** @var \Illuminate\Tests\Integration\Database\CustomCasts $model */
+        $model = CustomCasts::create([
+            'address' => new AddressModel('address_line_one_value', 'address_line_two_value'),
+            'amount' => gmp_init('1000', 10),
+            'string_field' => 'string_value',
+        ]);
+
+        // Ensure model values remain unchanged
+        $this->assertSame([
+            'address_line_one' => 'address_line_one_value',
+            'address_line_two' => 'address_line_two_value',
+            'amount' => '1000',
+            'string_field' => 'string_value',
+            'updated_at' => $model->updated_at->toJSON(),
+            'created_at' => $model->created_at->toJSON(),
+            'id' => 1,
+        ], $model->toArray());
     }
 
     /**
@@ -188,6 +221,42 @@ class AddressCast implements CastsAttributes
     }
 }
 
+class GMPCast implements CastsAttributes, SerializesCastableAttributes
+{
+    /**
+     * Cast the given value.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  string  $key
+     * @param  string  $value
+     * @param  array  $attributes
+     * @return string|null
+     */
+    public function get($model, $key, $value, $attributes)
+    {
+        return gmp_init($value, 10);
+    }
+
+    /**
+     * Prepare the given value for storage.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  string  $key
+     * @param  string|null  $value
+     * @param  array  $attributes
+     * @return string
+     */
+    public function set($model, $key, $value, $attributes)
+    {
+        return gmp_strval($value, 10);
+    }
+
+    public function serialize($model, string $key, $value, array $attributes)
+    {
+        return gmp_strval($value, 10);
+    }
+}
+
 class NonNullableString implements CastsAttributes
 {
     /**
@@ -239,6 +308,7 @@ class CustomCasts extends Eloquent
      */
     protected $casts = [
         'address' => AddressCast::class,
+        'amount' => GMPCast::class,
         'string_field' => NonNullableString::class,
     ];
 }
