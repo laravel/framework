@@ -45,7 +45,7 @@ class Signals
      * Registers a new signal handler.
      *
      * @param  int  $signal
-     * @param  callable  $callback
+     * @param  callable(int $signal): void  $callback
      * @return void
      */
     public function register($signal, $callback)
@@ -72,7 +72,7 @@ class Signals
      * Unregister the current signals instance, and reverts
      * the signal's registry handlers state.
      *
-     * @return array<int, array<int, callable>>
+     * @return array<int, array<int, callable(int $signal): void>>
      */
     public function unregister()
     {
@@ -120,7 +120,7 @@ class Signals
     /**
      * Set the registry's handlers.
      *
-     * @param  array<int, array<int, callable>>  $handlers
+     * @param  array<int, array<int, callable(int $signal):void>>  $handlers
      * @return void
      */
     protected function setHandlers($handlers)
@@ -143,7 +143,7 @@ class Signals
     /**
      * Gets the signal's existing handler, and returns it on the array format.
      *
-     * @return array<int, callable(int $signal): mixed>
+     * @return array<int, callable(int $signal): void>
      */
     protected function initializeSignal($signal)
     {
