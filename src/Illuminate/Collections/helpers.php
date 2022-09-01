@@ -187,7 +187,7 @@ if (! function_exists('value')) {
         if ($value instanceof \BackedEnum) {
             return $value->value;
         }
-        
+
         return $value instanceof Closure ? $value(...$args) : $value;
     }
 }
