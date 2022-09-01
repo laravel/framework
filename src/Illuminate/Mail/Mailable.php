@@ -910,6 +910,27 @@ class Mailable implements MailableContract, Renderable
     }
 
     /**
+     * Determine if the mailable has the given attachment.
+     *
+     * @param  string|\Illuminate\Contracts\Mail\Attachable|\Illuminate\Mail\Attachment  $file
+     * @param  array $options
+     * @return bool
+     */
+    public function hasAttachment($file, ?array $options = null)
+    {
+        return collect($this->attachments)->filter(function ($attachment) use ($file, $options) {
+            if (is_null($options)) {
+                $optionsMatch = true;
+            } else {
+                $optionsMatch = $attachment['options'] === $options;
+            }
+
+            return $attachment['file'] === $file
+                && $optionsMatch;
+        })->isNotEmpty();
+    }
+
+    /**
      * Attach a file to the message from storage.
      *
      * @param  string  $path
@@ -946,6 +967,37 @@ class Mailable implements MailableContract, Renderable
     }
 
     /**
+     * Determine if the mailable has the given attachment from storage.
+     *
+     * @param  string  $disk
+     * @param  string  $path
+     * @param  string|null  $name
+     * @param  array $options
+     * @return bool
+     */
+    public function hasAttachmentFromStorageDisk($disk, $path, $name = null, ?array $options = null)
+    {
+        return collect($this->diskAttachments)->filter(function ($diskAttachment) use ($disk, $path, $name, $options) {
+            if (is_null($name)) {
+                $nameMatches = true;
+            } else {
+                $nameMatches = $diskAttachment['name'] === $name;
+            }
+
+            if (is_null($options)) {
+                $optionsMatch = true;
+            } else {
+                $optionsMatch = $diskAttachment['options'] === $options;
+            }
+
+            return $diskAttachment['disk'] === $disk
+                && $diskAttachment['path'] === $path
+                && $nameMatches
+                && $optionsMatch;
+        })->isNotEmpty();
+    }
+
+    /**
      * Attach in-memory data as an attachment.
      *
      * @param  string  $data
@@ -962,6 +1014,35 @@ class Mailable implements MailableContract, Renderable
                 })->all();
 
         return $this;
+    }
+
+    /**
+     * Determine if the mailable has the given data as an attachment.
+     *
+     * @param  string  $data
+     * @param  string  $name
+     * @param  array  $options
+     * @return bool
+     */
+    public function hasAttachedData($data, $name = null, ?array $options = null)
+    {
+        return collect($this->rawAttachments)->filter(function ($attachment) use ($data, $name, $options) {
+            if (is_null($name)) {
+                $nameMatches = true;
+            } else {
+                $nameMatches = $attachment['name'] === $name;
+            }
+
+            if (is_null($options)) {
+                $optionsMatch = true;
+            } else {
+                $optionsMatch = $attachment['options'] === $options;
+            }
+
+            return $attachment['data'] === $data
+                && $nameMatches
+                && $optionsMatch;
+        })->isNotEmpty();
     }
 
     /**
