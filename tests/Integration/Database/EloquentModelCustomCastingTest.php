@@ -249,6 +249,15 @@ class GMPCast implements CastsAttributes, SerializesCastableAttributes
         return gmp_strval($value, 10);
     }
 
+    /**
+     * Serialize the attribute when converting the model to an array.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  string  $key
+     * @param  mixed  $value
+     * @param  array  $attributes
+     * @return mixed
+     */
     public function serialize($model, string $key, $value, array $attributes)
     {
         return gmp_strval($value, 10);
