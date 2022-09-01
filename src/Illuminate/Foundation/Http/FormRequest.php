@@ -219,7 +219,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
     /**
      * Get the validated data from the request except for a specified array of items.
      *
-     * @param  array|mixed  $keys
+     * @param  mixed  $keys
      * @return array
      */
     public function validatedExcept($keys)
