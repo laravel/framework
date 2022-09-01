@@ -29,7 +29,7 @@ class Signals
     protected static $availabilityResolver;
 
     /**
-     * Create a new Signals instance.
+     * Create a new signal registrar instance.
      *
      * @param  \Symfony\Component\Console\SignalRegistry\SignalRegistry  $registry
      * @return void
@@ -62,6 +62,7 @@ class Signals
 
         with($this->getHandlers(), function ($handlers) use ($signal) {
             $lastHandlerInserted = array_pop($handlers[$signal]);
+
             array_unshift($handlers[$signal], $lastHandlerInserted);
 
             $this->setHandlers($handlers);
@@ -69,8 +70,19 @@ class Signals
     }
 
     /**
-     * Unregister the current signals instance, and reverts
-     * the signal's registry handlers state.
+     * Gets the signal's existing handler in array format.
+     *
+     * @return array<int, callable(int $signal): void>
+     */
+    protected function initializeSignal($signal)
+    {
+        return is_callable($existingHandler = pcntl_signal_get_handler($signal))
+            ? [$existingHandler]
+            : null;
+    }
+
+    /**
+     * Unregister the current signal handlers.
      *
      * @return array<int, array<int, callable(int $signal): void>>
      */
@@ -89,17 +101,6 @@ class Signals
     }
 
     /**
-     * Sets the availability resolver.
-     *
-     * @param  callable(): bool
-     * @return void
-     */
-    public static function resolveAvailabilityUsing($resolver)
-    {
-        static::$availabilityResolver = $resolver;
-    }
-
-    /**
      * Executes the given callback if "signals" should be used and are available.
      *
      * @param  callable  $callback
@@ -107,14 +108,22 @@ class Signals
      */
     public static function whenAvailable($callback)
     {
-        $resolver = static::$availabilityResolver
-            ?? fn () => (app()->runningInConsole()
-                && ! app()->runningUnitTests()
-                && extension_loaded('pcntl'));
+        $resolver = static::$availabilityResolver;
 
         if ($resolver()) {
             $callback();
         }
+    }
+
+    /**
+     * Get the registry's handlers.
+     *
+     * @return array<int, array<int, callable>>
+     */
+    protected function getHandlers()
+    {
+        return (fn () => $this->signalHandlers)
+            ->call($this->registry);
     }
 
     /**
@@ -130,25 +139,13 @@ class Signals
     }
 
     /**
-     * Get the registry's handlers.
+     * Set the availability resolver.
      *
-     * @return array<int, array<int, callable>>
+     * @param  callable(): bool
+     * @return void
      */
-    protected function getHandlers()
+    public static function resolveAvailabilityUsing($resolver)
     {
-        return (fn () => $this->signalHandlers)
-            ->call($this->registry);
-    }
-
-    /**
-     * Gets the signal's existing handler, and returns it on the array format.
-     *
-     * @return array<int, callable(int $signal): void>
-     */
-    protected function initializeSignal($signal)
-    {
-        return is_callable($existingHandler = pcntl_signal_get_handler($signal))
-            ? [$existingHandler]
-            : null;
+        static::$availabilityResolver = $resolver;
     }
 }

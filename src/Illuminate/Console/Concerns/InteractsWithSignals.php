@@ -15,7 +15,7 @@ trait InteractsWithSignals
     protected $signals;
 
     /**
-     * Sets a trap to be run when the given signal(s) occurs.
+     * Define a callback to be run when the given signal(s) occurs.
      *
      * @param  iterable<array-key, int>|int  $signals
      * @param  callable(int $signal): void  $callback
@@ -34,7 +34,7 @@ trait InteractsWithSignals
     }
 
     /**
-     * Untraps traps set within the command's handler.
+     * Untraps signal handlers set within the command's handler.
      *
      * @return void
      *
