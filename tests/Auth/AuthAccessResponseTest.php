@@ -43,6 +43,7 @@ class AuthAccessResponseTest extends TestCase
         } catch (AuthorizationException $e) {
             $this->assertNull($e->status());
             $this->assertFalse($e->hasStatus());
+            $this->assertSame('foo', $e->response()->message());
             $this->assertSame('foo', $e->getMessage());
             $this->assertSame(3, $e->getCode());
         }
@@ -56,6 +57,7 @@ class AuthAccessResponseTest extends TestCase
         } catch (AuthorizationException $e) {
             $this->assertSame(418, $e->status());
             $this->assertTrue($e->hasStatus());
+            $this->assertSame('foo', $e->response()->message());
             $this->assertSame('foo', $e->getMessage());
             $this->assertSame(3, $e->getCode());
         }
@@ -66,6 +68,7 @@ class AuthAccessResponseTest extends TestCase
         } catch (AuthorizationException $e) {
             $this->assertSame(404, $e->status());
             $this->assertTrue($e->hasStatus());
+            $this->assertSame('foo', $e->response()->message());
             $this->assertSame('foo', $e->getMessage());
             $this->assertSame(3, $e->getCode());
         }
@@ -76,6 +79,7 @@ class AuthAccessResponseTest extends TestCase
         } catch (AuthorizationException $e) {
             $this->assertSame(444, $e->status());
             $this->assertTrue($e->hasStatus());
+            $this->assertNull($e->response()->message());
             $this->assertSame('This action is unauthorized.', $e->getMessage());
             $this->assertSame(0, $e->getCode());
         }
@@ -86,6 +90,7 @@ class AuthAccessResponseTest extends TestCase
         } catch (AuthorizationException $e) {
             $this->assertSame(444, $e->status());
             $this->assertTrue($e->hasStatus());
+            $this->assertSame('foo', $e->response()->message());
             $this->assertSame('foo', $e->getMessage());
             $this->assertSame(3, $e->getCode());
         }
@@ -96,6 +101,7 @@ class AuthAccessResponseTest extends TestCase
         } catch (AuthorizationException $e) {
             $this->assertSame(404, $e->status());
             $this->assertTrue($e->hasStatus());
+            $this->assertNull($e->response()->message());
             $this->assertSame('This action is unauthorized.', $e->getMessage());
             $this->assertSame(0, $e->getCode());
         }
@@ -106,6 +112,7 @@ class AuthAccessResponseTest extends TestCase
         } catch (AuthorizationException $e) {
             $this->assertSame(404, $e->status());
             $this->assertTrue($e->hasStatus());
+            $this->assertSame('foo', $e->response()->message());
             $this->assertSame('foo', $e->getMessage());
             $this->assertSame(3, $e->getCode());
         }
