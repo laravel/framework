@@ -17,7 +17,7 @@ class DatabaseMigrationsTest extends TestCase
     {
         RefreshDatabaseState::$migrated = false;
 
-        $this->traitObject = $this->getMockForAbstractClass(TestMockClass::class, [], '', true, true, true, [
+        $this->traitObject = $this->getMockForAbstractClass(DatabaseMigrationsTestMockClass::class, [], '', true, true, true, [
             'artisan',
             'beforeApplicationDestroyed',
         ]);
@@ -96,7 +96,7 @@ class DatabaseMigrationsTest extends TestCase
     }
 }
 
-class TestMockClass
+class DatabaseMigrationsTestMockClass
 {
     use DatabaseMigrations;
 
