@@ -152,7 +152,7 @@ class ValidationEnumRuleTest extends TestCase
         $v = new Validator(
             resolve('translator'),
             [
-                'status_array' => ['pending', 'done']
+                'status_array' => ['pending', 'done'],
             ],
             [
                 'status_array' => new Enum(StringStatus::class),
@@ -167,7 +167,7 @@ class ValidationEnumRuleTest extends TestCase
         $v = new Validator(
             resolve('translator'),
             [
-                'status_array' => ['pending', 'foo']
+                'status_array' => ['pending', 'foo'],
             ],
             [
                 'status_array' => new Enum(StringStatus::class),

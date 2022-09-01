@@ -43,7 +43,7 @@ class Enum implements Rule
             foreach (Arr::wrap($value) as $item) {
                 if (is_null($this->type::tryFrom($item))) {
                     return false;
-                };
+                }
             }
 
             return true;
