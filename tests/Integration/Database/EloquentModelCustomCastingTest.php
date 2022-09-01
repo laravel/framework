@@ -5,12 +5,10 @@ namespace Illuminate\Tests\Integration\Database;
 use GMP;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Contracts\Database\Eloquent\SerializesCastableAttributes;
-use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Schema\Blueprint;
 use InvalidArgumentException;
-use JsonSerializable;
 use PHPUnit\Framework\TestCase;
 
 /**
