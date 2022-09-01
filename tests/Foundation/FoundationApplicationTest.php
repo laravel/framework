@@ -7,6 +7,7 @@ use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Bootstrap\RegisterFacades;
 use Illuminate\Foundation\Events\LocaleUpdated;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\ServiceProvider;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -499,6 +500,23 @@ class FoundationApplicationTest extends TestCase
             $_SERVER['APP_EVENTS_CACHE']
         );
     }
+
+     /** @test */
+      public function testMacroable(): void
+      {
+          $app = new Application;
+          $app['env'] = 'foo';
+
+          $app->macro('foo', function() {
+              return $this->environment('foo');
+          });
+
+          $this->assertTrue($app->foo());
+
+          $app['env'] = 'bar';
+
+          $this->assertFalse($app->foo());
+      }
 }
 
 class ApplicationBasicServiceProviderStub extends ServiceProvider
