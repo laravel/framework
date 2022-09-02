@@ -171,6 +171,10 @@ class NotificationSender
             return false;
         }
 
+        if (method_exists($notification, 'onSending')) {
+            $notification->onSending($channel);
+        }
+
         return $this->events->until(
             new NotificationSending($notifiable, $notification, $channel)
         ) !== false;
