@@ -7,6 +7,7 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Translation\Translator;
+use Illuminate\Contracts\Validation\DeferrableValidation;
 use Illuminate\Contracts\Validation\Factory as ValidationFactoryContract;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
@@ -127,6 +128,26 @@ class FoundationFormRequestTest extends TestCase
         $request->validateResolved();
 
         $this->assertEquals(['name' => 'Adam'], $request->all());
+    }
+
+    public function testDeferrableValidationNotThrowingExceptionOnFailedValidation()
+    {
+        $request = $this->createRequest([], FoundationTestFormRequestDeferrableValidation::class);
+
+        $request->validateResolved();
+
+        $this->assertFalse($request->isValid());
+        $this->assertEquals([], $request->validated());
+    }
+
+    public function testDeferrableValidationCanDetermineIsValidValidation()
+    {
+        $request = $this->createRequest(['name' => 'Anton'], FoundationTestFormRequestDeferrableValidation::class);
+
+        $request->validateResolved();
+
+        $this->assertTrue($request->isValid());
+        $this->assertEquals('Anton', $request->validated('name'));
     }
 
     public function testValidatedMethodReturnsOnlyRequestedValidatedData()
@@ -253,6 +274,19 @@ class FoundationFormRequestTest extends TestCase
 }
 
 class FoundationTestFormRequestStub extends FormRequest
+{
+    public function rules()
+    {
+        return ['name' => 'required'];
+    }
+
+    public function authorize()
+    {
+        return true;
+    }
+}
+
+class FoundationTestFormRequestDeferrableValidation extends FormRequest implements DeferrableValidation
 {
     public function rules()
     {
