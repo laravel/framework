@@ -13,6 +13,22 @@ use PHPUnit\Framework\TestCase;
 
 class QueueSqsQueueTest extends TestCase
 {
+    protected $sqs;
+    protected $account;
+    protected $queueName;
+    protected $baseUrl;
+    protected $prefix;
+    protected $queueUrl;
+    protected $mockedJob;
+    protected $mockedData;
+    protected $mockedPayload;
+    protected $mockedMessageId;
+    protected $mockedReceiptHandle;
+    protected $mockedSendMessageResponseModel;
+    protected $mockedReceiveMessageResponseModel;
+    protected $mockedReceiveEmptyMessageResponseModel;
+    protected $mockedQueueAttributesResponseModel;
+
     protected function tearDown(): void
     {
         m::close();
