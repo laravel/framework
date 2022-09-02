@@ -312,7 +312,7 @@ class BroadcastManager implements FactoryContract
      */
     protected function createAblyDriver(array $config)
     {
-        if (array_key_exists('ably_client', $config) && $config['ably_client']) {
+        if (array_key_exists('native_client', $config) && $config['native_client']) {
             return new AblyNativeBroadcaster($this->ably($config), $config);
         }
 
