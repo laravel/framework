@@ -289,11 +289,11 @@ trait HasAttributes
             // If the attribute cast was a date or a datetime, we will serialize the date as
             // a string. This allows the developers to customize how dates are serialized
             // into an array without affecting how they are persisted into the storage.
-            if ($attributes[$key] && in_array($value, ['date', 'datetime', 'immutable_date', 'immutable_datetime'])) {
+            if (isset($attributes[$key]) && in_array($value, ['date', 'datetime', 'immutable_date', 'immutable_datetime'])) {
                 $attributes[$key] = $this->serializeDate($attributes[$key]);
             }
 
-            if ($attributes[$key] && ($this->isCustomDateTimeCast($value) ||
+            if (isset($attributes[$key]) && ($this->isCustomDateTimeCast($value) ||
                 $this->isImmutableCustomDateTimeCast($value))) {
                 $attributes[$key] = $attributes[$key]->format(explode(':', $value, 2)[1]);
             }
@@ -303,7 +303,7 @@ trait HasAttributes
                 $attributes[$key] = $this->serializeDate($attributes[$key]);
             }
 
-            if ($attributes[$key] && $this->isClassSerializable($key)) {
+            if (isset($attributes[$key]) && $this->isClassSerializable($key)) {
                 $attributes[$key] = $this->serializeClassCastableAttribute($key, $attributes[$key]);
             }
 
@@ -930,7 +930,7 @@ trait HasAttributes
         // If an attribute is listed as a "date", we'll convert it from a DateTime
         // instance into a form proper for storage on the database tables using
         // the connection grammar's date format. We will auto set the values.
-        elseif ($value && $this->isDateAttribute($key)) {
+        elseif (! is_null($value) && $this->isDateAttribute($key)) {
             $value = $this->fromDateTime($value);
         }
 

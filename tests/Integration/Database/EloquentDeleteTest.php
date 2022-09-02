@@ -32,9 +32,12 @@ class EloquentDeleteTest extends DatabaseTestCase
         });
     }
 
-    /** @group SkipMSSQL */
     public function testDeleteWithLimit()
     {
+        if ($this->driver === 'sqlsrv') {
+            $this->markTestSkipped('The limit keyword is not supported on MSSQL.');
+        }
+
         for ($i = 1; $i <= 10; $i++) {
             Comment::create([
                 'post_id' => Post::create()->id,
