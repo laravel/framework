@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Http;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Contracts\Validation\DeferrableValidation;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Contracts\Validation\ValidatesWhenResolved;
 use Illuminate\Contracts\Validation\Validator;
@@ -74,6 +75,13 @@ class FormRequest extends Request implements ValidatesWhenResolved
     protected $validator;
 
     /**
+     * The validation exception.
+     *
+     * @var \Illuminate\Validation\ValidationException
+     */
+    protected ?ValidationException $validationException;
+
+    /**
      * Get the validator instance for the request.
      *
      * @return \Illuminate\Contracts\Validation\Validator
@@ -135,9 +143,15 @@ class FormRequest extends Request implements ValidatesWhenResolved
      */
     protected function failedValidation(Validator $validator)
     {
-        throw (new ValidationException($validator))
-                    ->errorBag($this->errorBag)
-                    ->redirectTo($this->getRedirectUrl());
+        $exception = (new ValidationException($validator))
+            ->errorBag($this->errorBag)
+            ->redirectTo($this->getRedirectUrl());
+
+        if ($this instanceof DeferrableValidation) {
+            $this->validationException = $exception;
+        } else {
+            throw $exception;
+        }
     }
 
     /**
@@ -233,6 +247,16 @@ class FormRequest extends Request implements ValidatesWhenResolved
     public function attributes()
     {
         return [];
+    }
+
+    /**
+     * Determine if validated data is valid.
+     *
+     * @return bool
+     */
+    public function isValid(): bool
+    {
+        return $this->validationException === null;
     }
 
     /**
