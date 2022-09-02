@@ -27,6 +27,7 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use LogicException;
+use Ramsey\Uuid\Uuid;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionNamedType;
@@ -755,6 +756,8 @@ trait HasAttributes
                 return $this->asDateTime($value)->toImmutable();
             case 'timestamp':
                 return $this->asTimestamp($value);
+            case 'uuid':
+                return $this->asUuid($value);
         }
 
         if ($this->isEnumCastable($key)) {
@@ -1446,6 +1449,17 @@ trait HasAttributes
         $this->dateFormat = $format;
 
         return $this;
+    }
+
+    /**
+     * Return a UUID.
+     *
+     * @param  mixed  $value
+     * @return \Ramsey\Uuid\UuidInterface
+     */
+    protected function asUuid($value)
+    {
+        return Uuid::fromString($value);
     }
 
     /**
