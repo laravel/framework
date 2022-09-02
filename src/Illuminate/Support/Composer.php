@@ -85,6 +85,10 @@ class Composer
         $binary = (new PhpExecutableFinder)->find(false);
 
         if (! $escape) {
+            if (! windows_os()) {
+                return preg_replace('/\s/', '\\ ', $binary);
+            }
+
             return $binary;
         }
 
