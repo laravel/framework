@@ -93,6 +93,7 @@ class Signals
         foreach ($previousHandlers as $signal => $handler) {
             if (is_null($handler)) {
                 pcntl_signal($signal, SIG_DFL);
+
                 unset($previousHandlers[$signal]);
             }
         }
