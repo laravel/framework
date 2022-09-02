@@ -77,9 +77,9 @@ class FormRequest extends Request implements ValidatesWhenResolved
     /**
      * The validation exception.
      *
-     * @var \Illuminate\Validation\ValidationException
+     * @var \Illuminate\Validation\ValidationException|null
      */
-    protected ?ValidationException $validationException;
+    protected $validationException;
 
     /**
      * Get the validator instance for the request.
