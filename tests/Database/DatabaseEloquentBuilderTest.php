@@ -2118,7 +2118,6 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(2, $result);
     }
 
-
     public function upsertWithJsonCastsModelProvider()
     {
         return [
