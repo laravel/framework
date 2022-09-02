@@ -2079,6 +2079,56 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(2, $result);
     }
 
+    /**
+     * @dataProvider upsertWithJsonCastsModelProvider
+     *
+     * @return void
+     */
+    public function testUpsertWithJsonCasts($model)
+    {
+        Carbon::setTestNow($now = '2017-10-10 10:10:10');
+
+        $query = m::mock(BaseBuilder::class);
+        $query->shouldReceive('from')->with('foo_table')->andReturn('foo_table');
+        $query->from = 'foo_table';
+
+        $builder = new Builder($query);
+        $model = new $model;
+        $builder->setModel($model);
+
+        $array_bars = [
+            [
+                'foo' => 'foo',
+                'bar' => 'bar',
+            ],
+            [
+                'foo' => 'foo',
+                'bar' => 'bar',
+            ],
+        ];
+
+        $query->shouldReceive('upsert')->once()
+            ->with([
+                ['email' => 'foo', 'name' => 'bar', 'array_bars' => json_encode($array_bars), 'updated_at' => $now, 'created_at' => $now],
+                ['name' => 'bar2', 'email' => 'foo2', 'array_bars' => json_encode($array_bars), 'updated_at' => $now, 'created_at' => $now],
+            ], ['email'], ['email', 'name', 'array_bars', 'updated_at'])->andReturn(2);
+
+        $result = $builder->upsert([['email' => 'foo', 'name' => 'bar', 'array_bars' => $array_bars], ['name' => 'bar2', 'email' => 'foo2', 'array_bars' => $array_bars]], ['email']);
+
+        $this->assertEquals(2, $result);
+    }
+
+
+    public function upsertWithJsonCastsModelProvider()
+    {
+        return [
+            [EloquentBuilderTestStubFieldCastAsArray::class],
+            [EloquentBuilderTestStubFieldCastAsObject::class],
+            [EloquentBuilderTestStubFieldCastAsCollection::class],
+            [EloquentBuilderTestStubFieldCastAsArrayObject::class]
+        ];
+    }
+
     public function testTouch()
     {
         Carbon::setTestNow($now = '2017-10-10 10:10:10');
@@ -2396,4 +2446,47 @@ class EloquentBuilderTestWhereBelongsToStub extends Model
     {
         return $this->belongsTo(self::class, 'parent_id', 'id', 'parent');
     }
+}
+
+class EloquentBuilderTestStubFieldCastAsArray extends Model
+{
+    public $incrementing = false;
+
+    protected $table = 'foo_table';
+
+    protected $casts = [
+        'array_bars' => 'array'
+    ];
+}
+
+class EloquentBuilderTestStubFieldCastAsObject extends Model
+{
+    public $incrementing = false;
+
+    protected $table = 'foo_table';
+
+    protected $casts = [
+        'array_bars' => 'object'
+    ];
+}
+
+class EloquentBuilderTestStubFieldCastAsCollection extends Model
+{
+    public $incrementing = false;
+
+    protected $table = 'foo_table';
+
+    protected $casts = [
+        'array_bars' => \Illuminate\Database\Eloquent\Casts\AsCollection::class
+    ];
+}
+class EloquentBuilderTestStubFieldCastAsArrayObject extends Model
+{
+    public $incrementing = false;
+
+    protected $table = 'foo_table';
+
+    protected $casts = [
+        'array_bars' => \Illuminate\Database\Eloquent\Casts\AsArrayObject::class
+    ];
 }

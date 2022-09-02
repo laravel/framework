@@ -1022,8 +1022,12 @@ class Builder implements BuilderContract
             $update = array_keys(reset($values));
         }
 
+
+        $modifiedUpdateValues = $this->addTimestampsToUpsertValues($values);
+        $modifiedUpdateValues = $this->convertArrayObjectToJsonString($modifiedUpdateValues, $update);
+
         return $this->toBase()->upsert(
-            $this->addTimestampsToUpsertValues($values),
+            $modifiedUpdateValues,
             $uniqueBy,
             $this->addUpdatedAtToUpsertColumns($update)
         );
@@ -1162,6 +1166,41 @@ class Builder implements BuilderContract
         }
 
         return $update;
+    }
+
+
+    /**
+     * Convert array or object field to json string if the field is defined in model's casts
+     *
+     * @param array $values
+     * @param array $update
+     * @return array
+     */
+    protected function convertArrayObjectToJsonString(array $values, array $update)
+    {
+        $casts = $this->model->getCasts();
+        $jsonFields = collect($casts)->filter(function ($type, $field) use ($update) {
+            return in_array($field, $update) && in_array($type, [
+                'object',
+                'array',
+                \Illuminate\Database\Eloquent\Casts\AsArrayObject::class,
+                \Illuminate\Database\Eloquent\Casts\AsCollection::class
+            ]);
+        })->keys();
+
+        if ($jsonFields->count() <= 0) {
+            return $values;
+        }
+
+        foreach ($values as &$value) {
+            foreach ($jsonFields as $jsonField) {
+                if (isset($value[$jsonField])) {
+                    $value[$jsonField] = is_string($value[$jsonField]) ? $value[$jsonField] : json_encode($value[$jsonField]);
+                }
+            }
+        }
+
+        return $values;
     }
 
     /**
