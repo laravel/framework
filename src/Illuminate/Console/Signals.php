@@ -17,14 +17,14 @@ class Signals
     /**
      * The signal registry's previous list of handlers.
      *
-     * @param array<int, array<int, callable>>|null
+     * @var array<int, array<int, callable>>|null
      */
     protected $previousHandlers;
 
     /**
      * The current availability resolver, if any.
      *
-     * @param (callable(): bool)|null
+     * @var (callable(): bool)|null
      */
     protected static $availabilityResolver;
 
