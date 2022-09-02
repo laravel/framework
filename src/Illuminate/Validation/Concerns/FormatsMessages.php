@@ -99,7 +99,7 @@ trait FormatsMessages
     {
         $source = $source ?: $this->customMessages;
 
-        $keys = ["{$attribute}.{$lowerRule}", $lowerRule];
+        $keys = ["{$attribute}.{$lowerRule}", $lowerRule, $attribute];
 
         // First we will check for a custom message for an attribute specific rule
         // message for the fields, then we will check for a general custom line
@@ -117,7 +117,13 @@ trait FormatsMessages
                 }
 
                 if (Str::is($sourceKey, $key)) {
-                    return $source[$sourceKey];
+                    $message = $source[$sourceKey];
+
+                    if ($sourceKey === $attribute && is_array($message) && isset($message[$lowerRule])) {
+                        return $message[$lowerRule];
+                    }
+
+                    return $message;
                 }
             }
         }
