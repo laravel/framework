@@ -8,7 +8,7 @@ use Illuminate\Support\Arr;
 trait InteractsWithSignals
 {
     /**
-     * The signals instance, if any.
+     * The signal registrar instance.
      *
      * @var \Illuminate\Console\Signals|null
      */
@@ -34,7 +34,7 @@ trait InteractsWithSignals
     }
 
     /**
-     * Untraps signal handlers set within the command's handler.
+     * Untrap signal handlers set within the command's handler.
      *
      * @return void
      *
