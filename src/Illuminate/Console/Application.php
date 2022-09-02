@@ -273,6 +273,10 @@ class Application extends SymfonyApplication implements ApplicationContract
             return null;
         }
 
+        if ($command instanceof Command) {
+            return $this->add($command);
+        }
+
         return $this->add($this->laravel->make($command));
     }
 
