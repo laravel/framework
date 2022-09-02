@@ -1018,12 +1018,9 @@ class Validator implements ValidatorContract
      */
     protected function getRule($attribute, $rules)
     {
-        if (! array_key_exists($attribute, $this->rules)) {
-            return;
-        }
+        if (! array_key_exists($attribute, $this->rules)) return;
 
         $rules = (array) $rules;
-
         foreach ($this->rules[$attribute] as $rule) {
             [$rule, $parameters] = ValidationRuleParser::parse($rule);
 
