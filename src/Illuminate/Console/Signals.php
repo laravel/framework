@@ -42,7 +42,7 @@ class Signals
     }
 
     /**
-     * Registers a new signal handler.
+     * Register a new signal handler.
      *
      * @param  int  $signal
      * @param  callable(int $signal): void  $callback
@@ -101,7 +101,7 @@ class Signals
     }
 
     /**
-     * Executes the given callback if "signals" should be used and are available.
+     * Execute the given callback if "signals" should be used and are available.
      *
      * @param  callable  $callback
      * @return void
