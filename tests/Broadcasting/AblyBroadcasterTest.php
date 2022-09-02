@@ -22,7 +22,7 @@ class AblyBroadcasterTest extends TestCase
     {
         parent::setUp();
 
-        $this->ably = new AblyRest('abcd:efgh');
+        $this->ably = m::mock(AblyRest::class, ['abcd:efgh']);
 
         $this->broadcaster = m::mock(AblyBroadcaster::class, [$this->ably])->makePartial();
     }
