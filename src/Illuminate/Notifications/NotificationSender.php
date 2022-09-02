@@ -147,6 +147,10 @@ class NotificationSender
 
         $response = $this->manager->driver($channel)->send($notifiable, $notification);
 
+        if (method_exists($notification, 'onSent')) {
+            $notification->onSent($channel);
+        }
+
         $this->events->dispatch(
             new NotificationSent($notifiable, $notification, $channel, $response)
         );
