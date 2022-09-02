@@ -28,7 +28,6 @@ use Illuminate\Support\Str;
 use InvalidArgumentException;
 use LogicException;
 use Ramsey\Uuid\Uuid;
-use Ramsey\Uuid\UuidInterface;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionNamedType;

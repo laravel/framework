@@ -2,8 +2,6 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentModelUuidCastingTest;
 
-use Carbon\Carbon;
-use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
