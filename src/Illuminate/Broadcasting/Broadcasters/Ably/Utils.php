@@ -2,10 +2,14 @@
 
 namespace Illuminate\Broadcasting\Broadcasters\Ably;
 
-class Utils {
+/**
+ * @author Sachin Shinde (sachinshinde7676@gmail.com)
+ */
+class Utils
+{
     // JWT related PHP utility functions
     /**
-     * @param $jwt string
+     * @param  string  $jwt
      * @return array
      */
     public static function parseJwt($jwt)
@@ -13,12 +17,13 @@ class Utils {
         $tokenParts = explode('.', $jwt);
         $header = json_decode(base64_decode($tokenParts[0]), true);
         $payload = json_decode(base64_decode($tokenParts[1]), true);
-        return array('header' => $header, 'payload' => $payload);
+
+        return ['header' => $header, 'payload' => $payload];
     }
 
     /**
-     * @param $headers array
-     * @param $payload array
+     * @param  array  $headers
+     * @param  array  $payload
      * @return string
      */
     public static function generateJwt($headers, $payload, $key)
@@ -33,8 +38,8 @@ class Utils {
     }
 
     /**
-     * @param $jwt string
-     * @param $timeFn
+     * @param  string  $jwt
+     * @param  mixed  $timeFn
      * @return bool
      */
     public static function isJwtValid($jwt, $timeFn, $key)
@@ -50,10 +55,10 @@ class Utils {
         $isTokenExpired = $expiration <= $timeFn();
 
         // build a signature based on the header and payload using the secret
-        $signature = hash_hmac('SHA256', $header . "." . $payload, $key, true);
+        $signature = hash_hmac('SHA256', $header.'.'.$payload, $key, true);
         $isSignatureValid = self::base64urlEncode($signature) === $tokenSignature;
 
-        return $isSignatureValid && !$isTokenExpired;
+        return $isSignatureValid && ! $isTokenExpired;
     }
 
     public static function base64urlEncode($str)
