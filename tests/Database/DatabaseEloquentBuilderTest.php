@@ -2125,7 +2125,7 @@ class DatabaseEloquentBuilderTest extends TestCase
             [EloquentBuilderTestStubFieldCastAsArray::class],
             [EloquentBuilderTestStubFieldCastAsObject::class],
             [EloquentBuilderTestStubFieldCastAsCollection::class],
-            [EloquentBuilderTestStubFieldCastAsArrayObject::class]
+            [EloquentBuilderTestStubFieldCastAsArrayObject::class],
         ];
     }
 
@@ -2455,7 +2455,7 @@ class EloquentBuilderTestStubFieldCastAsArray extends Model
     protected $table = 'foo_table';
 
     protected $casts = [
-        'array_bars' => 'array'
+        'array_bars' => 'array',
     ];
 }
 
@@ -2466,7 +2466,7 @@ class EloquentBuilderTestStubFieldCastAsObject extends Model
     protected $table = 'foo_table';
 
     protected $casts = [
-        'array_bars' => 'object'
+        'array_bars' => 'object',
     ];
 }
 
@@ -2477,7 +2477,7 @@ class EloquentBuilderTestStubFieldCastAsCollection extends Model
     protected $table = 'foo_table';
 
     protected $casts = [
-        'array_bars' => \Illuminate\Database\Eloquent\Casts\AsCollection::class
+        'array_bars' => \Illuminate\Database\Eloquent\Casts\AsCollection::class,
     ];
 }
 class EloquentBuilderTestStubFieldCastAsArrayObject extends Model
@@ -2487,6 +2487,6 @@ class EloquentBuilderTestStubFieldCastAsArrayObject extends Model
     protected $table = 'foo_table';
 
     protected $casts = [
-        'array_bars' => \Illuminate\Database\Eloquent\Casts\AsArrayObject::class
+        'array_bars' => \Illuminate\Database\Eloquent\Casts\AsArrayObject::class,
     ];
 }
