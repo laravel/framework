@@ -115,6 +115,8 @@ trait FormatsMessages
                         if (is_array($message) && isset($message[$lowerRule])) {
                             return $message[$lowerRule];
                         }
+
+                        return $message;
                     }
 
                     continue;
