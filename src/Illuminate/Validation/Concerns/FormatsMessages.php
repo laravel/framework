@@ -110,7 +110,11 @@ trait FormatsMessages
                     $pattern = str_replace('\*', '([^.]*)', preg_quote($sourceKey, '#'));
 
                     if (preg_match('#^'.$pattern.'\z#u', $key) === 1) {
-                        return $source[$sourceKey];
+                        $message = $source[$sourceKey];
+
+                        if (is_array($message) && isset($message[$lowerRule])) {
+                            return $message[$lowerRule];
+                        }
                     }
 
                     continue;
