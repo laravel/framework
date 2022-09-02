@@ -260,6 +260,16 @@ class FormRequest extends Request implements ValidatesWhenResolved
     }
 
     /**
+     * Get deferred validation exception.
+     *
+     * @return \Illuminate\Validation\ValidationException
+     */
+    public function getValidationException(): ?ValidationException
+    {
+        return $this->validationException;
+    }
+
+    /**
      * Set the Validator instance.
      *
      * @param  \Illuminate\Contracts\Validation\Validator  $validator

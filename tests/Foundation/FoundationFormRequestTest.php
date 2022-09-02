@@ -137,7 +137,7 @@ class FoundationFormRequestTest extends TestCase
         $request->validateResolved();
 
         $this->assertFalse($request->isValid());
-        $this->assertInstanceOf(ValidationException::class, $request->validationException);
+        $this->assertInstanceOf(ValidationException::class, $request->getValidationException());
         $this->assertEquals([], $request->validated());
     }
 
@@ -148,7 +148,7 @@ class FoundationFormRequestTest extends TestCase
         $request->validateResolved();
 
         $this->assertTrue($request->isValid());
-        $this->assertNull($request->validationException);
+        $this->assertNull($request->getValidationException());
         $this->assertEquals('Anton', $request->validated('name'));
     }
 
