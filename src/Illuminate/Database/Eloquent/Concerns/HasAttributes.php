@@ -28,6 +28,7 @@ use Illuminate\Support\Str;
 use InvalidArgumentException;
 use LogicException;
 use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionNamedType;
@@ -107,6 +108,7 @@ trait HasAttributes
         'real',
         'string',
         'timestamp',
+        'uuid',
     ];
 
     /**
@@ -302,6 +304,10 @@ trait HasAttributes
             if ($attributes[$key] instanceof DateTimeInterface &&
                 $this->isClassCastable($key)) {
                 $attributes[$key] = $this->serializeDate($attributes[$key]);
+            }
+
+            if ($this->isUuidAttribute($key)) {
+                $attributes[$key] = $attributes[$key]->toString();
             }
 
             if (isset($attributes[$key]) && $this->isClassSerializable($key)) {
@@ -935,6 +941,8 @@ trait HasAttributes
         // the connection grammar's date format. We will auto set the values.
         elseif (! is_null($value) && $this->isDateAttribute($key)) {
             $value = $this->fromDateTime($value);
+        } elseif (! is_null($value) && $this->isUuidAttribute($key)) {
+            $value = $this->fromUuid($value);
         }
 
         if ($this->isEnumCastable($key)) {
@@ -1460,6 +1468,28 @@ trait HasAttributes
     protected function asUuid($value)
     {
         return Uuid::fromString($value);
+    }
+
+    /**
+     * Converts a UUID into a string.
+     *
+     * @param  mixed  $value
+     * @return mixed
+     */
+    public function fromUuid($value)
+    {
+        return empty($value) ? $value : $this->asUuid($value)->toString();
+    }
+
+    /**
+     * Determine if the given attribute is a UUID.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    protected function isUuidAttribute($key)
+    {
+        return $this->hasCast($key, 'uuid');
     }
 
     /**
@@ -2016,6 +2046,8 @@ trait HasAttributes
             }
 
             return abs($this->castAttribute($key, $attribute) - $this->castAttribute($key, $original)) < PHP_FLOAT_EPSILON * 4;
+        } elseif ($this->hasCast($key, 'uuid')) {
+            return $this->fromUuid($attribute) === $this->fromUuid($original);
         } elseif ($this->hasCast($key, static::$primitiveCastTypes)) {
             return $this->castAttribute($key, $attribute) ===
                 $this->castAttribute($key, $original);
