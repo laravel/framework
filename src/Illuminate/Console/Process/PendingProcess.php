@@ -27,7 +27,7 @@ class PendingProcess
     /**
      * Create a new Pending Process instance.
      *
-
+     *
      * @return void
      */
     public function __construct()
