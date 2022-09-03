@@ -328,12 +328,20 @@ class PostgresGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $values
-     * @param  string  $sequence
+     * @param  string|array|null  $sequence
      * @return string
      */
     public function compileInsertGetId(Builder $query, $values, $sequence)
     {
-        return $this->compileInsert($query, $values).' returning '.$this->wrap($sequence ?: 'id');
+        if ($sequence === null) {
+            $fields = $this->wrap('id');
+        } elseif (is_array($sequence)) {
+            $fields = Arr::join(Arr::map($sequence, fn ($e) => $this->wrap($e)), ',');
+        } else {
+            $fields = $this->wrap($sequence);
+        }
+
+        return $this->compileInsert($query, $values).' returning '.$fields;
     }
 
     /**
