@@ -585,4 +585,40 @@ class LogManagerTest extends TestCase
 
         $this->assertEmpty($manager->sharedContext());
     }
+
+    public function testLogManagerCreateCustomFormatterWithTap()
+    {
+        $config = $this->app['config'];
+        $config->set('logging.channels.custom', [
+            'driver' => 'single',
+            'tap' => [CustomizeFormatter::class],
+        ]);
+
+        $manager = new LogManager($this->app);
+
+        $logger = $manager->channel('custom');
+        $handler = $logger->getLogger()->getHandlers()[0];
+        $formatter = $handler->getFormatter();
+
+        $this->assertInstanceOf(LineFormatter::class, $formatter);
+
+        $format = new ReflectionProperty(get_class($formatter), 'format');
+        $format->setAccessible(true);
+
+        $this->assertEquals(
+            '[%datetime%] %channel%.%level_name%: %message% %context% %extra%',
+            rtrim($format->getValue($formatter)));
+    }
+}
+
+class CustomizeFormatter
+{
+    public function __invoke($logger)
+    {
+        foreach ($logger->getHandlers() as $handler) {
+            $handler->setFormatter(new LineFormatter(
+                '[%datetime%] %channel%.%level_name%: %message% %context% %extra%'
+            ));
+        }
+    }
 }
