@@ -4,6 +4,7 @@ namespace Illuminate\Validation;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Validation\Rules\Boolean;
 use Illuminate\Validation\Rules\Dimensions;
 use Illuminate\Validation\Rules\ExcludeIf;
 use Illuminate\Validation\Rules\Exists;
@@ -137,5 +138,15 @@ class Rule
     public static function unique($table, $column = 'NULL')
     {
         return new Unique($table, $column);
+    }
+
+    /**
+     * Get a boolean constraint builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\Boolean
+     */
+    public static function boolean()
+    {
+        return new Boolean();
     }
 }
