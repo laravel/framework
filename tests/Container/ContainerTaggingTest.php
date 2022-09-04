@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Container;
 
 use Illuminate\Container\Container;
+use Illuminate\Container\Tagged;
 use PHPUnit\Framework\TestCase;
 
 class ContainerTaggingTest extends TestCase
@@ -87,6 +88,33 @@ class ContainerTaggingTest extends TestCase
         $this->assertInstanceOf(ContainerImplementationTaggedStub::class, $fooResults[0]);
         $this->assertInstanceOf(ContainerImplementationTaggedStubTwo::class, $fooResults[1]);
     }
+
+    public function testTaggedInstancesCanBeInjectedViaTheAttribute()
+    {
+        $container = new Container;
+        $container->tag(ContainerImplementationTaggedStub::class, ['foo']);
+        $container->tag(ContainerImplementationTaggedStubTwo::class, ['foo']);
+
+        $instance = $container->build(ContainerTaggedInjection::class);
+
+        $this->assertInstanceOf(ContainerTaggedInjection::class, $instance);
+        $this->assertCount(2, $instance->tagged);
+        $this->assertContainsOnlyInstancesOf(IContainerTaggedContractStub::class, $instance->tagged);
+    }
+
+    public function testTaggedAttributeCanBeUsedTogetherWithOtherParameters()
+    {
+        $container = new Container;
+        $container->tag(ContainerImplementationTaggedStub::class, ['foo']);
+        $container->tag(ContainerImplementationTaggedStubTwo::class, ['foo']);
+
+        $instance = $container->build(ContainerTaggedInjectionTwo::class);
+
+        $this->assertInstanceOf(ContainerTaggedInjectionTwo::class, $instance);
+        $this->assertCount(2, $instance->tagged);
+        $this->assertContainsOnlyInstancesOf(IContainerTaggedContractStub::class, $instance->tagged);
+        $this->assertInstanceOf(ContainerImplementationTaggedStub::class, $instance->stub);
+    }
 }
 
 interface IContainerTaggedContractStub
@@ -103,3 +131,18 @@ class ContainerImplementationTaggedStubTwo implements IContainerTaggedContractSt
 {
     //
 }
+
+class ContainerTaggedInjection {
+    public function __construct(
+        #[Tagged('foo')] public iterable $tagged,
+    ) {}
+}
+
+class ContainerTaggedInjectionTwo {
+    public function __construct(
+        #[Tagged('foo')] public iterable $tagged,
+        public ContainerImplementationTaggedStub $stub,
+    ) {}
+}
+
+

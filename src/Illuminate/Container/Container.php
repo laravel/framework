@@ -1006,6 +1006,19 @@ class Container implements ArrayAccess, ContainerContract
             return $parameter->getDefaultValue();
         }
 
+        $type = $parameter->getType();
+
+        if ($type instanceof \ReflectionNamedType && $type->getName() === 'iterable') {
+            $attribute = $parameter->getAttributes(Tagged::class)[0] ?? null;
+
+            if (null !== $attribute) {
+                /** @var Tagged|null $tagged */
+                $tagged = $attribute?->newInstance();
+
+                return $this->tagged($tagged->tag);
+            }
+        }
+
         $this->unresolvablePrimitive($parameter);
     }
 
