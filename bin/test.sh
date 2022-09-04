@@ -1,22 +1,14 @@
 #!/usr/bin/env bash
 
-down=false
 php="8.0"
 
 while true; do
   case "$1" in
-    --down ) down=true; shift ;;
     --php ) php=$2; shift 2;;
     -- ) shift; break ;;
     * ) break ;;
   esac
 done
-
-if $down; then
-    docker-compose down -t 0
-
-    exit 0
-fi
 
 echo "Checking whether docker is running"
 
@@ -27,17 +19,19 @@ fi
 
 echo "Ensuring services required by the tests are running"
 
-docker-compose up -d
+docker-compose up -d --force-recreate --remove-orphans
 
 echo "Waiting until database is available"
 
 docker run -it \
     --add-host=host.docker.internal:host-gateway \
     --rm "registry.gitlab.com/grahamcampbell/php:$php-base" \
-    -r "\$tries = 0; while (true) { \$tries++; try { new PDO('mysql:host=host.docker.internal;dbname=forge', 'root', '', [PDO::ATTR_TIMEOUT => 3]); break; } catch (PDOException \$e) {} if (\$tries > 30) { throw new Exception(); } sleep(1); }"  > /dev/null 2>&1
+    -r "ini_set(\"default_socket_timeout\", 1); \$tries = 0; while (true) { \$tries++; try { new PDO('mysql:host=host.docker.internal;dbname=forge', 'root', '', [PDO::ATTR_TIMEOUT => 1]); echo \"Connected on {\$tries}. attempt\\r\\n\"; break; } catch (PDOException \$e) { echo \"Failed to connect on {\$tries}. attempt. {\$e->getMessage()}\\r\\n\"; } if (\$tries > 60) { throw new Exception(); } sleep(1); }"
 
 if [ "$?" -ne 0 ]; then
     echo "MySQL never became available"
+    echo "Shutting down services"
+    docker-compose down -t 0
     exit 1
 fi
 
@@ -51,6 +45,8 @@ docker run -it -w /data -v ${PWD}:/data:delegated -u $(id -u ${USER}):$(id -g ${
 
 if [ "$?" -ne 0 ]; then
     echo "Failed to install packages"
+    echo "Shutting down services"
+    docker-compose down -t 0
     exit 1
 fi
 
@@ -72,3 +68,7 @@ docker run -it -w /data -v ${PWD}:/data:delegated -u $(id -u ${USER}):$(id -g ${
     --env MEMCACHED_HOST=host.docker.internal \
     --env MEMCACHED_PORT=11211 \
     --rm "registry.gitlab.com/grahamcampbell/php:$php-base" "$@"
+
+echo "Shutting down services"
+
+docker-compose down -t 0
