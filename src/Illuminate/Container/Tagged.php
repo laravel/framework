@@ -7,5 +7,6 @@ class Tagged
 {
     public function __construct(
         public string $tag
-    ) {}
+    ) {
+    }
 }

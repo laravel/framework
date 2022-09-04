@@ -132,17 +132,21 @@ class ContainerImplementationTaggedStubTwo implements IContainerTaggedContractSt
     //
 }
 
-class ContainerTaggedInjection {
+class ContainerTaggedInjection
+{
     public function __construct(
         #[Tagged('foo')] public iterable $tagged,
-    ) {}
+    ) {
+    }
 }
 
-class ContainerTaggedInjectionTwo {
+class ContainerTaggedInjectionTwo
+{
     public function __construct(
         #[Tagged('foo')] public iterable $tagged,
         public ContainerImplementationTaggedStub $stub,
-    ) {}
+    ) {
+    }
 }
 
 
