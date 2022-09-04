@@ -115,6 +115,18 @@ class ContainerTaggingTest extends TestCase
         $this->assertContainsOnlyInstancesOf(IContainerTaggedContractStub::class, $instance->tagged);
         $this->assertInstanceOf(ContainerImplementationTaggedStub::class, $instance->stub);
     }
+
+    public function testAnEmptyArrayIsInjectedWhenProvidingAnInvalidTagToTheAttribute()
+    {
+        $container = new Container;
+        $container->tag(ContainerImplementationTaggedStub::class, ['bar']);
+        $container->tag(ContainerImplementationTaggedStubTwo::class, ['bar']);
+
+        $instance = $container->build(ContainerTaggedInjection::class);
+
+        $this->assertInstanceOf(ContainerTaggedInjection::class, $instance);
+        $this->assertEmpty($instance->tagged);
+    }
 }
 
 interface IContainerTaggedContractStub
