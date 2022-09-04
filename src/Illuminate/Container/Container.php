@@ -1012,8 +1012,7 @@ class Container implements ArrayAccess, ContainerContract
             $attribute = $parameter->getAttributes(Tagged::class)[0] ?? null;
 
             if (null !== $attribute) {
-                /** @var Tagged|null $tagged */
-                $tagged = $attribute?->newInstance();
+                $tagged = $attribute->newInstance();
 
                 return $this->tagged($tagged->tag);
             }
