@@ -2,7 +2,6 @@
 
 namespace Illuminate\Console\Process;
 
-use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\Macroable;
 use Symfony\Component\Process\Process;
 
@@ -25,6 +24,13 @@ class PendingProcess
     protected $path;
 
     /**
+     * The stub callables that will handle processes.
+     *
+     * @var \Illuminate\Support\Collection|null
+     */
+    protected $stubCallbacks;
+
+    /**
      * Create a new Pending Process instance.
      *
      *
@@ -36,6 +42,19 @@ class PendingProcess
     }
 
     /**
+     * Register a stub callable that will intercept processes and be able to return stub process result.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function stub($callback)
+    {
+        $this->stubCallbacks = collect($callback);
+
+        return $this;
+    }
+
+    /**
      * Sets the process's arguments.
      *
      * @param  iterable<array-key, string>  $arguments
@@ -43,7 +62,7 @@ class PendingProcess
      */
     public function withArguments($arguments)
     {
-        return tap($this, fn () => $this->arguments = array_merge($this->arguments ?? [], array_values($arguments)));
+        return tap($this, fn () => $this->arguments = array_merge($this->arguments ?? [], collect($arguments)->values()->toArray()));
     }
 
     /**
@@ -58,17 +77,32 @@ class PendingProcess
     }
 
     /**
+     * Starts a new process with the given arguments.
+     *
      * @param  iterable<array-key, string>|string  $arguments
-     * @return
+     * @return \Illuminate\Console\Contracts\ProcessResult
      */
     public function run($arguments)
     {
-        $this->withArguments(Arr::wrap($arguments));
+        $arguments = collect(is_string($arguments) ? str($arguments)->explode(' ') : $arguments)->map(function ($argument) {
+            return trim($argument);
+        });
 
-        return new Response(tap(new Process($this->arguments), function ($process) {
+        $this->withArguments($arguments);
+
+        $process = tap(new Process($this->arguments), function ($process) {
             $process->setWorkingDirectory($this->path ?? getcwd());
 
-            $process->run();
-        }));
+            // ..
+        });
+
+        foreach ($this->stubCallbacks ?? [] as $callback) {
+            if ($result = $callback($process)) {
+                /** @var \Illuminate\Console\Process\FakeProcessResult $result */
+                return $result->setProcess($process);
+            }
+        }
+
+        return new SymfonyProcessResult(tap($process)->start());
     }
 }
