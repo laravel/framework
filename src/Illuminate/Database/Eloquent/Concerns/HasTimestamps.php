@@ -155,4 +155,21 @@ trait HasTimestamps
     {
         return $this->qualifyColumn($this->getUpdatedAtColumn());
     }
+
+    /**
+     * Run the given callable without timestamping the model.
+     *
+     * @param  callable  $callback
+     * @return mixed
+     */
+    public function withoutTimestamps(callable $callback)
+    {
+        if (! $this->usesTimestamps()) {
+            return $callback();
+        }
+
+        $this->timestamps = false;
+
+        return tap($callback(), fn () => $this->timestamps = true);
+    }
 }
