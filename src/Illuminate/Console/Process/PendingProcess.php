@@ -31,14 +31,34 @@ class PendingProcess
     protected $stubCallbacks;
 
     /**
-     * Create a new Pending Process instance.
+     * The callbacks that should execute before the process starts.
      *
-     *
-     * @return void
+     * @var \Illuminate\Support\Collection|null
      */
-    public function __construct()
+    protected $beforeStartCallbacks;
+
+    /**
+     * Dump the process before start the process.
+     *
+     * @return $this
+     */
+    public function dump()
     {
-        // ..
+        return $this->beforeStart(function ($process) {
+            dump($process);
+        });
+    }
+
+    /**
+     * Dump the process and end the script before start the process.
+     *
+     * @return $this
+     */
+    public function dd()
+    {
+        return $this->beforeStart(function ($process) {
+            dd($process);
+        });
     }
 
     /**
@@ -96,6 +116,9 @@ class PendingProcess
             // ..
         });
 
+        ($this->beforeStartCallbacks ?? collect())
+            ->each(fn ($callback) => $callback($process));
+
         foreach ($this->stubCallbacks ?? [] as $callback) {
             if ($result = $callback($process)) {
                 /** @var \Illuminate\Console\Process\FakeProcessResult $result */
@@ -104,5 +127,18 @@ class PendingProcess
         }
 
         return new SymfonyProcessResult(tap($process)->start());
+    }
+
+    /**
+     * Add a new "before start" callback to the process.
+     *
+     * @param  callable(\Symfony\Component\Process\Process): mixed  $callback
+     * @return $this
+     */
+    protected function beforeStart($callback)
+    {
+        $this->beforeStartCallbacks ??= collect();
+
+        return tap($this, fn () => $this->beforeStartCallbacks->push($callback));
     }
 }

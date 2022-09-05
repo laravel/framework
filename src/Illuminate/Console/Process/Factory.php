@@ -6,6 +6,8 @@ use Illuminate\Support\Traits\Macroable;
 use Symfony\Component\Process\Process;
 
 /**
+ * @method \Illuminate\Console\Process\PendingProcess dd()
+ * @method \Illuminate\Console\Process\PendingProcess dump()
  * @method \Illuminate\Console\Process\PendingProcess path(string $path)
  * @method \Illuminate\Console\Contracts\ProcessResult run(iterable|string $arguments)
  */
