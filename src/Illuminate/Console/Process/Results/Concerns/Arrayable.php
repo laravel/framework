@@ -8,7 +8,7 @@ namespace Illuminate\Console\Process\Results\Concerns;
 trait Arrayable
 {
     /**
-     * {@see \Illuminate\Console\Contracts\ProcessResult::toArray()}
+     * {@see \Illuminate\Console\Contracts\ProcessResult::toArray()}.
      */
     public function toArray()
     {
