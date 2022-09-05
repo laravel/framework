@@ -2246,13 +2246,13 @@ class Builder implements BuilderContract
      * Add an ascending "order by" clause to the query with the option to move the null values at the end.
      *
      * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Query\Expression|string  $column
-     * @param  Boolean  $nullsLast
+     * @param  bool  $nullsLast
      * @return $this
      */
     public function orderByAsc($column, $nullsLast = false)
     {
-        return $this->when($nullsLast, fn($query) => $query->orderByRaw($column . ' is null'))
-            ->orderBy($column, 'asc');
+        return $this->when($nullsLast, fn ($query) => $query->orderByRaw('ISNULL('.$column.')'))
+            ->orderBy($column);
     }
 
     /**
