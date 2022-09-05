@@ -31,6 +31,20 @@ class LogManagerTest extends TestCase
         $this->assertSame($logger1, $logger2);
     }
 
+    public function testLogManagerGetDefaultDriver()
+    {
+        $config = $this->app['config'];
+        $config->set('logging.default', 'single');
+
+        $manager = new LogManager($this->app);
+        $this->assertEmpty($manager->getChannels());
+
+        //we don't specify any channel name
+        $manager->channel();
+        $this->assertCount(1, $manager->getChannels());
+        $this->assertEquals('single', $manager->getDefaultDriver());
+    }
+
     public function testStackChannel()
     {
         $config = $this->app['config'];
