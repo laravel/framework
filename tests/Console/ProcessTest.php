@@ -4,9 +4,10 @@ namespace Illuminate\Tests;
 
 use Illuminate\Console\Exceptions\ProcessFailedException;
 use Illuminate\Console\Exceptions\ProcessNotStartedException;
+use Illuminate\Console\Exceptions\ProcessTimedOutException;
 use Illuminate\Console\Process\Factory;
 use Illuminate\Console\Process\FakeProcessResult;
-use Illuminate\Console\Process\SymfonyProcessResult;
+use Illuminate\Console\Process\ProcessResult;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
@@ -116,17 +117,17 @@ class ProcessTest extends TestCase
 
         $this->assertInstanceOf(ProcessFailedException::class, $exception);
 
-        $this->assertSame($result, $exception->getResult());
-        $this->assertStringContainsString('ls', $exception->getProcess()->getCommandLine());
+        $this->assertSame($result, $exception->result());
+        $this->assertStringContainsString('ls', $exception->process()->getCommandLine());
         $this->assertNull($exception->getPrevious());
     }
 
-    public function testSymfonyResultEnsuresTheProcessStarts()
+    public function testResultEnsuresTheProcessStarts()
     {
         $this->expectException(ProcessNotStartedException::class);
-        $this->expectExceptionMessage("The process ['ls'] failed to start.");
+        $this->expectExceptionMessage("The process \"'ls'\" failed to start.");
 
-        new SymfonyProcessResult(new Process(['ls']));
+        new ProcessResult(new Process(['ls']));
     }
 
     public function testFakeResultEnsuresTheProcessStarts()
@@ -161,5 +162,55 @@ class ProcessTest extends TestCase
         $result = $this->factory->path(__DIR__)->run('ls')->throw();
         $this->assertStringContainsString('', $result->wait()->output());
         $this->assertTrue($result->ok());
+    }
+
+    public function testTimeout()
+    {
+        $exception = null;
+
+        $result = $this->factory->path(__DIR__)->timeout(0.1)->run('sleep 1');
+
+        $this->assertSame(0.1, $result->process()->getTimeout());
+
+        try {
+            $result->wait();
+        } catch (ProcessTimedOutException $exception) {
+            // ..
+        }
+
+        $this->assertInstanceOf(ProcessTimedOutException::class, $exception);
+        $this->assertTrue($exception->result()->failed());
+        $this->assertSame(143, $exception->result()->exitCode());
+    }
+
+    public function testSignals()
+    {
+        if (! extension_loaded('pcntl')) {
+            $this->markTestSkipped('Test requires pcntl extension.');
+        }
+
+        $result = $this->factory->path(__DIR__)->run('sleep 5');
+        $result->process()->signal(SIGKILL);
+
+        $this->assertTrue($result->failed());
+        $this->assertSame(128 + SIGKILL, $result->exitCode());
+    }
+
+    public function testPath()
+    {
+        $this->factory->fake();
+
+        $result = $this->factory->path(__DIR__)->run('ls');
+
+        $this->assertSame(__DIR__, $result->process()->getWorkingDirectory());
+    }
+
+    public function testForever()
+    {
+        $this->factory->fake();
+
+        $result = $this->factory->forever()->run('ls');
+
+        $this->assertNull($result->process()->getTimeout());
     }
 }

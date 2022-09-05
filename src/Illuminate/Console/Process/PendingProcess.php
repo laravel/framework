@@ -24,6 +24,13 @@ class PendingProcess
     protected $path;
 
     /**
+     * The process's timeout.
+     *
+     * @var int|null
+     */
+    protected $timeout = 60;
+
+    /**
      * The stub callables that will handle processes.
      *
      * @var \Illuminate\Support\Collection|null
@@ -38,18 +45,6 @@ class PendingProcess
     protected $beforeStartCallbacks;
 
     /**
-     * Dump the process before start the process.
-     *
-     * @return $this
-     */
-    public function dump()
-    {
-        return $this->beforeStart(function ($process) {
-            dump($process);
-        });
-    }
-
-    /**
      * Dump the process and end the script before start the process.
      *
      * @return $this
@@ -58,6 +53,18 @@ class PendingProcess
     {
         return $this->beforeStart(function ($process) {
             dd($process);
+        });
+    }
+
+    /**
+     * Dump the process before start the process.
+     *
+     * @return $this
+     */
+    public function dump()
+    {
+        return $this->beforeStart(function ($process) {
+            dump($process);
         });
     }
 
@@ -97,6 +104,27 @@ class PendingProcess
     }
 
     /**
+     * Sets the process's timeout.
+     *
+     * @param  int  $timeout
+     * @return $this
+     */
+    public function timeout($timeout)
+    {
+        return tap($this, fn () => $this->timeout = $timeout);
+    }
+
+    /**
+     * Disables process's timeout.
+     *
+     * @return $this
+     */
+    public function forever()
+    {
+        return tap($this, fn () => $this->timeout = null);
+    }
+
+    /**
      * Starts a new process with the given arguments.
      *
      * @param  iterable<array-key, string>|string  $arguments
@@ -110,10 +138,9 @@ class PendingProcess
 
         $this->withArguments($arguments);
 
-        $process = tap(new Process($this->arguments), function ($process) {
+        $process = tap(new Process($this->arguments), function (Process $process) {
             $process->setWorkingDirectory($this->path ?? getcwd());
-
-            // ..
+            $process->setTimeout($this->timeout);
         });
 
         ($this->beforeStartCallbacks ?? collect())
@@ -126,7 +153,7 @@ class PendingProcess
             }
         }
 
-        return new SymfonyProcessResult(tap($process)->start());
+        return new ProcessResult(tap($process)->start());
     }
 
     /**

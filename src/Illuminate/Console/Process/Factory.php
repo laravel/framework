@@ -6,10 +6,14 @@ use Illuminate\Support\Traits\Macroable;
 use Symfony\Component\Process\Process;
 
 /**
+ * @method \Illuminate\Console\Contracts\ProcessResult run(iterable|string $arguments)
  * @method \Illuminate\Console\Process\PendingProcess dd()
  * @method \Illuminate\Console\Process\PendingProcess dump()
+ * @method \Illuminate\Console\Process\PendingProcess forever()
  * @method \Illuminate\Console\Process\PendingProcess path(string $path)
- * @method \Illuminate\Console\Contracts\ProcessResult run(iterable|string $arguments)
+ * @method \Illuminate\Console\Process\PendingProcess timeout(int $seconds)
+ * @method \Illuminate\Console\Process\PendingProcess stub(callable $callback)
+ * @method \Illuminate\Console\Process\PendingProcess withArguments(iterable $arguments)
  */
 class Factory
 {
