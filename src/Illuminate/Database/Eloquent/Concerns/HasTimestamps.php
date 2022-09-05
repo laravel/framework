@@ -165,11 +165,11 @@ trait HasTimestamps
     public function withoutTimestamps(callable $callback)
     {
         if (! $this->usesTimestamps()) {
-            return $callback();
+            return $callback($this);
         }
 
         $this->timestamps = false;
 
-        return tap($callback(), fn () => $this->timestamps = true);
+        return tap($callback($this), fn () => $this->timestamps = true);
     }
 }
