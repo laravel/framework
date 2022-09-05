@@ -213,6 +213,19 @@ class Vite implements Htmlable
         foreach ($entrypoints as $entrypoint) {
             $chunk = $this->chunk($manifest, $entrypoint);
 
+            foreach ($chunk['imports'] ?? [] as $import) {
+                foreach ($manifest[$import]['css'] ?? [] as $css) {
+                    $partialManifest = Collection::make($manifest)->where('file', $css);
+
+                    $tags->push($this->makeTagForChunk(
+                        $partialManifest->keys()->first(),
+                        asset("{$buildDirectory}/{$css}"),
+                        $partialManifest->first(),
+                        $manifest
+                    ));
+                }
+            }
+
             $tags->push($this->makeTagForChunk(
                 $entrypoint,
                 asset("{$buildDirectory}/{$chunk['file']}"),
@@ -229,19 +242,6 @@ class Vite implements Htmlable
                     $partialManifest->first(),
                     $manifest
                 ));
-            }
-
-            foreach ($chunk['imports'] ?? [] as $import) {
-                foreach ($manifest[$import]['css'] ?? [] as $css) {
-                    $partialManifest = Collection::make($manifest)->where('file', $css);
-
-                    $tags->push($this->makeTagForChunk(
-                        $partialManifest->keys()->first(),
-                        asset("{$buildDirectory}/{$css}"),
-                        $partialManifest->first(),
-                        $manifest
-                    ));
-                }
             }
         }
 
