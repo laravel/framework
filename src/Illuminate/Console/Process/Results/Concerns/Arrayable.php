@@ -20,7 +20,7 @@ trait Arrayable
     }
 
     /**
-     * {@see \Illuminate\Console\Contracts\ProcessResult::offsetExists()}
+     * {@see \Illuminate\Console\Contracts\ProcessResult::offsetExists()}.
      */
     public function offsetExists($offset): bool
     {
@@ -28,7 +28,7 @@ trait Arrayable
     }
 
     /**
-     * {@see \Illuminate\Console\Contracts\ProcessResult::offsetGet()}
+     * {@see \Illuminate\Console\Contracts\ProcessResult::offsetGet()}.
      */
     public function offsetGet($offset): mixed
     {
@@ -36,7 +36,7 @@ trait Arrayable
     }
 
     /**
-     * {@see \Illuminate\Console\Contracts\ProcessResult::offsetSet()}
+     * {@see \Illuminate\Console\Contracts\ProcessResult::offsetSet()}.
      */
     public function offsetSet($offset, $value): void
     {
@@ -44,7 +44,7 @@ trait Arrayable
     }
 
     /**
-     * {@see \Illuminate\Console\Contracts\ProcessResult::offsetUnset()}
+     * {@see \Illuminate\Console\Contracts\ProcessResult::offsetUnset()}.
      */
     public function offsetUnset($offset): void
     {
@@ -52,7 +52,7 @@ trait Arrayable
     }
 
     /**
-     * {@see \Illuminate\Console\Contracts\ProcessResult::getIterator()}
+     * {@see \Illuminate\Console\Contracts\ProcessResult::getIterator()}.
      */
     public function getIterator(): Traversable
     {
