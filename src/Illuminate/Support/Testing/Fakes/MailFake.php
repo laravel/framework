@@ -394,16 +394,6 @@ class MailFake implements Factory, Mailer, MailQueue
     }
 
     /**
-     * Get the array of failed recipients.
-     *
-     * @return array
-     */
-    public function failures()
-    {
-        return [];
-    }
-
-    /**
      * Infer mailable class using reflection if a typehinted closure is passed to assertion.
      *
      * @param  string|\Closure  $mailable
