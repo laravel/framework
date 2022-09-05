@@ -55,7 +55,7 @@ class AwsS3V3Adapter extends FilesystemAdapter
             $this->config['bucket'], $this->prefixer->prefixPath($path)
         );
     }
-    
+
     /**
      * Determine if temporary URLs can be generated.
      *
