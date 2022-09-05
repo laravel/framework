@@ -263,4 +263,17 @@ class ProcessTest extends TestCase
         $this->assertSame('My line 1', $result[0]);
         $this->assertSame('My line 2', $result[1]);
     }
+
+    public function testResultAsIterator()
+    {
+        $this->factory->fake(fn () => $this->factory::result(['My line 1', 'My line 2']));
+
+        $result = $this->factory->run('two');
+
+        $output = iterator_to_array($result);
+
+        $this->assertCount(2, $output);
+        $this->assertSame('My line 1', $output[0]);
+        $this->assertSame('My line 2', $output[1]);
+    }
 }

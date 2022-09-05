@@ -4,6 +4,7 @@ namespace Illuminate\Console\Contracts;
 
 use ArrayAccess;
 use Illuminate\Contracts\Support\Arrayable;
+use IteratorAggregate;
 use Stringable;
 
 /**
@@ -11,7 +12,7 @@ use Stringable;
  *
  * @extends Arrayable<int, string>
  */
-interface ProcessResult extends Arrayable, Stringable, ArrayAccess
+interface ProcessResult extends Arrayable, Stringable, ArrayAccess, IteratorAggregate
 {
     /**
      * Get the process's output.

@@ -2,7 +2,9 @@
 
 namespace Illuminate\Console\Process\Results\Concerns;
 
+use ArrayIterator;
 use LogicException;
+use Traversable;
 
 /**
  * @mixin \Illuminate\Console\Contracts\ProcessResult
@@ -47,5 +49,13 @@ trait Arrayable
     public function offsetUnset($offset): void
     {
         throw new LogicException('Process output may not be mutated using array access.');
+    }
+
+    /**
+     * {@see \Illuminate\Console\Contracts\ProcessResult::getIterator()}
+     */
+    public function getIterator(): Traversable
+    {
+        return new ArrayIterator($this->toArray());
     }
 }
