@@ -36,6 +36,20 @@ interface ProcessResult
     public function wait();
 
     /**
+     * Get the process's exit code.
+     *
+     * @return int
+     */
+    public function exitCode();
+
+    /**
+     * Get the underlying process.
+     *
+     * @return \Symfony\Component\Process\Process
+     */
+    public function process();
+
+    /**
      * Throw an exception if the process fails.
      *
      * @param  (callable(\Illuminate\Console\Exceptions\ProcessFailedException): mixed)|null  $callback

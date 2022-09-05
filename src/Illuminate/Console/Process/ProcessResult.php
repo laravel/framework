@@ -2,12 +2,16 @@
 
 namespace Illuminate\Console\Process;
 
-use Illuminate\Console\Contracts\ProcessResult;
+use Illuminate\Console\Contracts\ProcessResult as ProcessResultContract;
 use Illuminate\Console\Exceptions\ProcessFailedException;
 use Illuminate\Console\Exceptions\ProcessNotStartedException;
+use Illuminate\Console\Exceptions\ProcessSignaledException;
+use Illuminate\Console\Exceptions\ProcessTimedOutException;
+use Symfony\Component\Process\Exception\ProcessSignaledException as SymfonyProcessSignaledException;
+use Symfony\Component\Process\Exception\ProcessTimedOutException as SymfonyProcessTimedOutException;
 use Symfony\Component\Process\Process;
 
-class SymfonyProcessResult implements ProcessResult
+class ProcessResult implements ProcessResultContract
 {
     /**
      * The underlying process instance.
@@ -32,9 +36,7 @@ class SymfonyProcessResult implements ProcessResult
      */
     public function output()
     {
-        if ($this->process->isRunning()) {
-            $this->process->wait();
-        }
+        $this->wait();
 
         return $this->process->getOutput();
     }
@@ -44,9 +46,7 @@ class SymfonyProcessResult implements ProcessResult
      */
     public function ok()
     {
-        if ($this->process->isRunning()) {
-            $this->process->wait();
-        }
+        $this->wait();
 
         return $this->process->getExitCode() == 0;
     }
@@ -65,10 +65,34 @@ class SymfonyProcessResult implements ProcessResult
     public function wait()
     {
         if ($this->process->isRunning()) {
-            $this->process->wait();
+            try {
+                $this->process->wait();
+            } catch (SymfonyProcessTimedOutException $e) {
+                throw new ProcessTimedOutException($this->process, $this, $e);
+            } catch (SymfonyProcessSignaledException $e) {
+                throw new ProcessSignaledException($this->process, $this, $e);
+            }
         }
 
         return $this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function exitCode()
+    {
+        $this->wait();
+
+        return $this->process->getExitCode();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function process()
+    {
+        return $this->process;
     }
 
     /**

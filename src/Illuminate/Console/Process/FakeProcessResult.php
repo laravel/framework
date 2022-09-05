@@ -91,6 +91,22 @@ class FakeProcessResult implements ProcessResult
     /**
      * {@inheritDoc}
      */
+    public function exitCode()
+    {
+        return $this->exitCode();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function process()
+    {
+        return $this->process;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function throw($callback = null)
     {
         if ($this->failed()) {
