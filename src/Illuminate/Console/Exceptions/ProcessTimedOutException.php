@@ -4,7 +4,7 @@ namespace Illuminate\Console\Exceptions;
 
 use Symfony\Component\Process\Exception\RuntimeException;
 
-class ProcessFailedException extends RuntimeException
+class ProcessTimedOutException extends RuntimeException
 {
     /**
      * The underlying process instance.
@@ -25,19 +25,15 @@ class ProcessFailedException extends RuntimeException
      *
      * @param  \Symfony\Component\Process\Process  $process
      * @param  \Illuminate\Console\Contracts\ProcessResult  $result
-     * @param  \Symfony\Component\Process\Exception\RuntimeException  $original
+     * @param  \Symfony\Component\Process\Exception\ProcessTimedOutException  $original
      * @return void
      */
-    public function __construct($process, $result, $original = null)
+    public function __construct($process, $result, $original)
     {
         $this->process = $process;
         $this->result = $result;
 
-        parent::__construct(
-            sprintf('The process "%s" failed.', $process->getCommandLine()),
-            $process->getExitCode() ?? 1,
-            $original
-        );
+        parent::__construct($original->getMessage(), $original->getCode(), $original);
     }
 
     /**
