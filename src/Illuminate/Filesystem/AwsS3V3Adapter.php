@@ -63,8 +63,6 @@ class AwsS3V3Adapter extends FilesystemAdapter
      */
     public function providesTemporaryUrls()
     {
-        // S3Adapter doesn't provide a getTemporaryUrl method, but this AwsS3V3Adapter provides temporary urls.
-
         return true;
     }
 
