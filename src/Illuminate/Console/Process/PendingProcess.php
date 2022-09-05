@@ -131,7 +131,7 @@ class PendingProcess
      * @param  iterable<array-key, string>|string  $arguments
      * @return \Illuminate\Console\Contracts\ProcessResult
      */
-    public function run($arguments)
+    public function run($arguments = [])
     {
         $arguments = collect(is_string($arguments) ? str($arguments)->explode(' ') : $arguments)->map(function ($argument) {
             return trim($argument);

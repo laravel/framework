@@ -7,7 +7,7 @@ use Illuminate\Support\Traits\Macroable;
 use Symfony\Component\Process\Process;
 
 /**
- * @method \Illuminate\Console\Contracts\ProcessResult run(iterable|string $arguments)
+ * @method \Illuminate\Console\Contracts\ProcessResult run(iterable|string $arguments = [])
  * @method \Illuminate\Console\Process\PendingProcess dd()
  * @method \Illuminate\Console\Process\PendingProcess dump()
  * @method \Illuminate\Console\Process\PendingProcess forever()

@@ -276,4 +276,19 @@ class ProcessTest extends TestCase
         $this->assertSame('My line 1', $output[0]);
         $this->assertSame('My line 2', $output[1]);
     }
+
+    public function testWithArguments()
+    {
+        $result = $this->factory->path(__DIR__)->withArguments(['ls'])->run();
+        $this->assertStringContainsString('ProcessTest', (string) $result);
+        $this->assertStringContainsString('ProcessTest', $result->toString());
+        $this->assertTrue($result->ok());
+
+        $this->factory->fake(fn () => $this->factory::result('ProcessOutput'));
+
+        $result = $this->factory->path(__DIR__)->withArguments(['ls'])->run();
+        $this->assertStringContainsString('ProcessOutput', (string) $result);
+        $this->assertStringContainsString('ProcessOutput', $result->toString());
+        $this->assertTrue($result->ok());
+    }
 }
