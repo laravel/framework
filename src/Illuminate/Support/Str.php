@@ -1294,6 +1294,21 @@ class Str
     }
 
     /**
+     * Always return the same UUID when generating new UUIDs during the given callback's execution.
+     *
+     * @param  \Closure  $callback
+     * @return \Ramsey\Uuid\UuidInterface
+     */
+    public static function freezeUuidsFor(Closure $callback)
+    {
+        try {
+            return static::freezeUuids($callback);
+        } finally {
+            Str::createUuidsNormally();
+        }
+    }
+
+    /**
      * Indicate that UUIDs should be created normally and not using a custom factory.
      *
      * @return void
