@@ -1418,7 +1418,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function sortByAsc($callback)
     {
-        return $this->sortBy(fn($items) => $items->{$callback} ?: PHP_INT_MAX);
+        return $this->sortBy(fn ($items) => $items->{$callback} ?: PHP_INT_MAX);
     }
 
     /**
