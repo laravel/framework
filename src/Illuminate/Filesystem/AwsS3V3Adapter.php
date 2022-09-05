@@ -55,6 +55,18 @@ class AwsS3V3Adapter extends FilesystemAdapter
             $this->config['bucket'], $this->prefixer->prefixPath($path)
         );
     }
+    
+    /**
+     * Determine if temporary URLs can be generated.
+     *
+     * @return bool
+     */
+    public function providesTemporaryUrls()
+    {
+        // S3Adapter doesn't provide a getTemporaryUrl method, but this AwsS3V3Adapter provides temporary urls.
+
+        return true;
+    }
 
     /**
      * Get a temporary URL for the file at the given path.
