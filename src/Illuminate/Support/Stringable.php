@@ -576,12 +576,20 @@ class Stringable implements JsonSerializable
     /**
      * Replace the given value in the given string.
      *
-     * @param  string|string[]  $search
-     * @param  string|string[]  $replace
+     * @param  string|string[]|Enumerable<array-key, string>  $search
+     * @param  string|string[]|Enumerable<array-key, string>  $replace
      * @return static
      */
     public function replace($search, $replace)
     {
+        if ($search instanceof Enumerable) {
+            $search = $search->toArray();
+        }
+
+        if ($replace instanceof Enumerable) {
+            $replace = $replace->toArray();
+        }
+
         return new static(str_replace($search, $replace, $this->value));
     }
 
