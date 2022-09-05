@@ -2251,8 +2251,8 @@ class Builder implements BuilderContract
      */
     public function orderByAsc($column, $nullsLast = false)
     {
-        return $this->when($nullsLast, fn($query) => $query->orderByRaw($column . ' is null'))
-            ->orderBy($column, 'asc');
+        return $this->when($nullsLast, fn($query) => $query->orderByRaw('ISNULL('.$column.')'))
+            ->orderBy($column);
     }
 
     /**
