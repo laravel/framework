@@ -5,7 +5,7 @@ namespace Illuminate\Console\Process\Results\Concerns;
 trait Stringable
 {
     /**
-     * {@see \Illuminate\Console\Contracts\ProcessResult::toString()}
+     * {@see \Illuminate\Console\Contracts\ProcessResult::toString()}.
      */
     public function toString()
     {
@@ -13,7 +13,7 @@ trait Stringable
     }
 
     /**
-     * {@see \Illuminate\Console\Contracts\ProcessResult::__toString()}
+     * {@see \Illuminate\Console\Contracts\ProcessResult::__toString()}.
      */
     public function __toString()
     {

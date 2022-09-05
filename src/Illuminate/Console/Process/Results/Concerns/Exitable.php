@@ -8,7 +8,7 @@ namespace Illuminate\Console\Process\Results\Concerns;
 trait Exitable
 {
     /**
-     * {@see \Illuminate\Console\Contracts\ProcessResult::ok()}
+     * {@see \Illuminate\Console\Contracts\ProcessResult::ok()}.
      */
     public function ok()
     {
@@ -18,7 +18,7 @@ trait Exitable
     }
 
     /**
-     * {@see \Illuminate\Console\Contracts\ProcessResult::failed()}
+     * {@see \Illuminate\Console\Contracts\ProcessResult::failed()}.
      */
     public function failed()
     {

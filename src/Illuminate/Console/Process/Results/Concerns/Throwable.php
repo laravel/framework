@@ -7,7 +7,7 @@ use Illuminate\Console\Exceptions\ProcessFailedException;
 trait Throwable
 {
     /**
-     * {@see \Illuminate\Console\Contracts\ProcessResult::throw}
+     * {@see \Illuminate\Console\Contracts\ProcessResult::throw}.
      */
     public function throw($callback = null)
     {
@@ -21,7 +21,7 @@ trait Throwable
     }
 
     /**
-     * {@see \Illuminate\Console\Contracts\ProcessResult::throwIf}
+     * {@see \Illuminate\Console\Contracts\ProcessResult::throwIf}.
      */
     public function throwIf($condition)
     {
@@ -29,7 +29,7 @@ trait Throwable
     }
 
     /**
-     * {@see \Illuminate\Console\Contracts\ProcessResult::throwUnless}
+     * {@see \Illuminate\Console\Contracts\ProcessResult::throwUnless}.
      */
     public function throwUnless($condition)
     {
