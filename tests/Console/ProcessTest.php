@@ -252,4 +252,15 @@ class ProcessTest extends TestCase
         $this->assertSame('My line 2', $result->toArray()[1]);
         $this->assertSame('My line 3', $result->toArray()[2]);
     }
+
+    public function testResultArrayAccess()
+    {
+        $this->factory->fake(fn () => $this->factory::result(['My line 1', 'My line 2']));
+
+        $result = $this->factory->run('two');
+
+        $this->assertCount(2, $result->toArray());
+        $this->assertSame('My line 1', $result[0]);
+        $this->assertSame('My line 2', $result[1]);
+    }
 }

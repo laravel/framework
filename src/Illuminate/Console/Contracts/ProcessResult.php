@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console\Contracts;
 
+use ArrayAccess;
 use Illuminate\Contracts\Support\Arrayable;
 use Stringable;
 
@@ -10,7 +11,7 @@ use Stringable;
  *
  * @extends Arrayable<int, string>
  */
-interface ProcessResult extends Arrayable, Stringable
+interface ProcessResult extends Arrayable, Stringable, ArrayAccess
 {
     /**
      * Get the process's output.
