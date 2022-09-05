@@ -993,6 +993,12 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->union($this->getSqlServerBuilder()->select('name')->from('users')->where('id', '=', 2));
         $this->assertEquals($expectedSql, $builder->toSql());
         $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $eloquentBuilder = new EloquentBuilder($this->getBuilder());
+        $builder->select('*')->from('users')->where('id', '=', 1)->union($eloquentBuilder->select('*')->from('users')->where('id', '=', 2));
+        $this->assertSame('(select * from "users" where "id" = ?) union (select * from "users" where "id" = ?)', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
     }
 
     public function testUnionAlls()
@@ -1008,6 +1014,13 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->where('id', '=', 1);
         $builder->unionAll($this->getBuilder()->select('*')->from('users')->where('id', '=', 2));
         $this->assertEquals($expectedSql, $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $eloquentBuilder = new EloquentBuilder($this->getBuilder());
+        $builder->select('*')->from('users')->where('id', '=', 1);
+        $builder->unionAll($eloquentBuilder->select('*')->from('users')->where('id', '=', 2));
+        $this->assertSame('(select * from "users" where "id" = ?) union all (select * from "users" where "id" = ?)', $builder->toSql());
         $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
     }
 

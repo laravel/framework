@@ -175,11 +175,14 @@ class RoutingRedirectorTest extends TestCase
         $this->assertSame('http://foo.com/bar?signature=secret', $response->getTargetUrl());
     }
 
-    public function testItSetsValidIntendedUrl()
+    public function testItSetsAndGetsValidIntendedUrl()
     {
         $this->session->shouldReceive('put')->once()->with('url.intended', 'http://foo.com/bar');
+        $this->session->shouldReceive('get')->andReturn('http://foo.com/bar');
 
         $result = $this->redirect->setIntendedUrl('http://foo.com/bar');
         $this->assertInstanceOf(Redirector::class, $result);
+
+        $this->assertSame('http://foo.com/bar', $this->redirect->getIntendedUrl());
     }
 }

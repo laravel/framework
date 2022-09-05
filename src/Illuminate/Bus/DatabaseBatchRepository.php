@@ -341,4 +341,25 @@ class DatabaseBatchRepository implements PrunableBatchRepository
             $batch->finished_at ? CarbonImmutable::createFromTimestamp($batch->finished_at) : $batch->finished_at
         );
     }
+
+    /**
+     * Get the underlying database connection.
+     *
+     * @return \Illuminate\Database\Connection
+     */
+    public function getConnection()
+    {
+        return $this->connection;
+    }
+
+    /**
+     * Set the underlying database connection.
+     *
+     * @param  \Illuminate\Database\Connection  $connection
+     * @return void
+     */
+    public function setConnection(Connection $connection)
+    {
+        $this->connection = $connection;
+    }
 }

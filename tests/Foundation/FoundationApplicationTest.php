@@ -499,6 +499,23 @@ class FoundationApplicationTest extends TestCase
             $_SERVER['APP_EVENTS_CACHE']
         );
     }
+
+    /** @test */
+    public function testMacroable(): void
+    {
+        $app = new Application;
+        $app['env'] = 'foo';
+
+        $app->macro('foo', function () {
+            return $this->environment('foo');
+        });
+
+        $this->assertTrue($app->foo());
+
+        $app['env'] = 'bar';
+
+        $this->assertFalse($app->foo());
+    }
 }
 
 class ApplicationBasicServiceProviderStub extends ServiceProvider

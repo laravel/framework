@@ -1280,6 +1280,15 @@ class DatabaseEloquentModelTest extends TestCase
         $model->guard(['name', 'age']);
         $model->fill(['Foo' => 'bar']);
         $this->assertFalse(isset($model->Foo));
+
+        $handledMassAssignmentExceptions = 0;
+
+        Model::preventSilentlyDiscardingAttributes();
+
+        $this->expectException(MassAssignmentException::class);
+        $model = new EloquentModelStub;
+        $model->guard(['name', 'age']);
+        $model->fill(['Foo' => 'bar']);
     }
 
     public function testFillableOverridesGuarded()
