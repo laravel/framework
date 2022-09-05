@@ -4,6 +4,9 @@ namespace Illuminate\Console\Process\Results\Concerns;
 
 use Illuminate\Console\Exceptions\ProcessFailedException;
 
+/**
+ * @mixin \Illuminate\Console\Contracts\ProcessResult
+ */
 trait Throwable
 {
     /**

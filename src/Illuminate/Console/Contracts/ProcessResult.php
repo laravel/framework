@@ -2,12 +2,15 @@
 
 namespace Illuminate\Console\Contracts;
 
+use Illuminate\Contracts\Support\Arrayable;
 use Stringable;
 
 /**
  * @internal
+ *
+ * @extends Arrayable<int, string>
  */
-interface ProcessResult extends Stringable
+interface ProcessResult extends Arrayable, Stringable
 {
     /**
      * Get the process's output.
@@ -87,11 +90,4 @@ interface ProcessResult extends Stringable
      * @return string
      */
     public function toString();
-
-    /**
-     * Get the process's output.
-     *
-     * @return string
-     */
-    public function __toString();
 }

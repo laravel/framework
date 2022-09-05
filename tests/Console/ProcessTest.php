@@ -228,4 +228,28 @@ class ProcessTest extends TestCase
         $this->assertStringContainsString('ProcessOutput', $result->toString());
         $this->assertTrue($result->ok());
     }
+
+    public function testResultToArray()
+    {
+        $this->factory->fake([
+            'one' => $this->factory::result(['My line 1']),
+            'two' => $this->factory::result(['My line 1', 'My line 2']),
+            'three' => $this->factory::result("My line 1\nMy line 2\nMy line 3"),
+        ]);
+
+        $result = $this->factory->run('one');
+        $this->assertCount(1, $result->toArray());
+        $this->assertSame('My line 1', $result->toArray()[0]);
+
+        $result = $this->factory->run('two');
+        $this->assertCount(2, $result->toArray());
+        $this->assertSame('My line 1', $result->toArray()[0]);
+        $this->assertSame('My line 2', $result->toArray()[1]);
+
+        $result = $this->factory->run('three');
+        $this->assertCount(3, $result->toArray());
+        $this->assertSame('My line 1', $result->toArray()[0]);
+        $this->assertSame('My line 2', $result->toArray()[1]);
+        $this->assertSame('My line 3', $result->toArray()[2]);
+    }
 }

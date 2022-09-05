@@ -7,7 +7,7 @@ use Illuminate\Console\Exceptions\ProcessNotStartedException;
 
 class FakeResult implements ProcessResult
 {
-    use Concerns\Throwable, Concerns\Stringable, Concerns\Exitable;
+    use Concerns\Arrayable, Concerns\Exitable, Concerns\Stringable, Concerns\Throwable;
 
     /**
      * The underlying process instance.

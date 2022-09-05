@@ -9,7 +9,7 @@ use Symfony\Component\Process\Exception\ProcessTimedOutException as SymfonyProce
 
 class Result implements ProcessResult
 {
-    use Concerns\Throwable, Concerns\Stringable, Concerns\Exitable;
+    use Concerns\Arrayable, Concerns\Exitable, Concerns\Stringable, Concerns\Throwable;
 
     /**
      * The underlying process instance.

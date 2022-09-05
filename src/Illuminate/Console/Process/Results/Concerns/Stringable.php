@@ -2,6 +2,9 @@
 
 namespace Illuminate\Console\Process\Results\Concerns;
 
+/**
+ * @mixin \Illuminate\Console\Contracts\ProcessResult
+ */
 trait Stringable
 {
     /**

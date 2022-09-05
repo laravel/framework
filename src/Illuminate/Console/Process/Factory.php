@@ -81,12 +81,14 @@ class Factory
     /**
      * Create a new result instance for use during stubbing.
      *
-     * @param  string  $output
+     * @param  array<array-key, string>|string  $output
      * @param  int  $exitCode
      * @return \Illuminate\Console\Contracts\ProcessResult
      */
     public static function result($output = '', $exitCode = 0)
     {
+        $output = is_array($output) ? implode("\n", $output) : $output;
+
         return new FakeResult($output, $exitCode);
     }
 
