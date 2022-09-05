@@ -1,14 +1,14 @@
 <?php
 
-namespace Illuminate\Console\Process;
+namespace Illuminate\Console\Process\Results;
 
 use Illuminate\Console\Contracts\ProcessResult;
-use Illuminate\Console\Exceptions\ProcessFailedException;
 use Illuminate\Console\Exceptions\ProcessNotStartedException;
-use Symfony\Component\Process\Process;
 
-class FakeProcessResult implements ProcessResult
+class FakeResult implements ProcessResult
 {
+    use Concerns\Throwable, Concerns\Stringable, Concerns\Exitable;
+
     /**
      * The underlying process instance.
      *
@@ -48,6 +48,8 @@ class FakeProcessResult implements ProcessResult
      *
      * @param  \Symfony\Component\Process\Process  $process
      * @return $this
+     *
+     * @internal
      */
     public function setProcess($process)
     {
@@ -65,22 +67,6 @@ class FakeProcessResult implements ProcessResult
     /**
      * {@inheritDoc}
      */
-    public function ok()
-    {
-        return $this->exitCode == 0;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function failed()
-    {
-        return ! $this->ok();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function wait()
     {
         $this->ensureProcessIsRunning();
@@ -93,7 +79,7 @@ class FakeProcessResult implements ProcessResult
      */
     public function exitCode()
     {
-        return $this->exitCode();
+        return $this->exitCode;
     }
 
     /**
@@ -102,34 +88,6 @@ class FakeProcessResult implements ProcessResult
     public function process()
     {
         return $this->process;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function throw($callback = null)
-    {
-        if ($this->failed()) {
-            throw new ProcessFailedException($this->process, $this);
-        }
-
-        return $this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function throwIf($condition)
-    {
-        return $condition ? $this->throw() : $this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function throwUnless($condition)
-    {
-        return $condition ? $this : $this->throw();
     }
 
     /**

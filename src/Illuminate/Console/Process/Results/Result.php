@@ -1,18 +1,16 @@
 <?php
 
-namespace Illuminate\Console\Process;
+namespace Illuminate\Console\Process\Results;
 
-use Illuminate\Console\Contracts\ProcessResult as ProcessResultContract;
-use Illuminate\Console\Exceptions\ProcessFailedException;
+use Illuminate\Console\Contracts\ProcessResult;
 use Illuminate\Console\Exceptions\ProcessNotStartedException;
-use Illuminate\Console\Exceptions\ProcessSignaledException;
 use Illuminate\Console\Exceptions\ProcessTimedOutException;
-use Symfony\Component\Process\Exception\ProcessSignaledException as SymfonyProcessSignaledException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException as SymfonyProcessTimedOutException;
-use Symfony\Component\Process\Process;
 
-class ProcessResult implements ProcessResultContract
+class Result implements ProcessResult
 {
+    use Concerns\Throwable, Concerns\Stringable, Concerns\Exitable;
+
     /**
      * The underlying process instance.
      *
@@ -44,24 +42,6 @@ class ProcessResult implements ProcessResultContract
     /**
      * {@inheritDoc}
      */
-    public function ok()
-    {
-        $this->wait();
-
-        return $this->process->getExitCode() == 0;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function failed()
-    {
-        return ! $this->ok();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function wait()
     {
         if ($this->process->isRunning()) {
@@ -69,8 +49,6 @@ class ProcessResult implements ProcessResultContract
                 $this->process->wait();
             } catch (SymfonyProcessTimedOutException $e) {
                 throw new ProcessTimedOutException($this->process, $this, $e);
-            } catch (SymfonyProcessSignaledException $e) {
-                throw new ProcessSignaledException($this->process, $this, $e);
             }
         }
 
@@ -93,36 +71,6 @@ class ProcessResult implements ProcessResultContract
     public function process()
     {
         return $this->process;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function throw($callback = null)
-    {
-        $this->wait();
-
-        if ($this->failed()) {
-            throw new ProcessFailedException($this->process, $this);
-        }
-
-        return $this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function throwIf($condition)
-    {
-        return $condition ? $this->throw() : $this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function throwUnless($condition)
-    {
-        return $condition ? $this : $this->throw();
     }
 
     /**

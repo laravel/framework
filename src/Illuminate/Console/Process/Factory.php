@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console\Process;
 
+use Illuminate\Console\Process\Results\FakeResult;
 use Illuminate\Support\Traits\Macroable;
 use Symfony\Component\Process\Process;
 
@@ -31,7 +32,7 @@ class Factory
     /**
      * Register a stub callable that will intercept requests and be able to return stub results.
      *
-     * @param  iterable<string, callable>|callable|null  $callback
+     * @param  iterable<string, callable(\Symfony\Component\Process\Process): \Illuminate\Console\Contracts\ProcessResult>|callable(\Symfony\Component\Process\Process): \Illuminate\Console\Contracts\ProcessResult|string|null  $callback
      * @return $this
      */
     public function fake($callback = null)
@@ -43,8 +44,8 @@ class Factory
         }
 
         if (is_iterable($callback)) {
-            foreach ($callback as $url => $output) {
-                $this->stubCallbacks->push(function ($process) use ($url, $output) {
+            foreach ($callback as $url => $result) {
+                $this->stubCallbacks->push(function ($process) use ($url, $result) {
                     $url = str($url)->explode(' ')
                         ->map(fn ($part) => trim($part))
                         ->filter(fn ($part) => ! empty($part))
@@ -52,7 +53,7 @@ class Factory
                         ->implode(' ');
 
                     if ($url === '*' || $process->getCommandline() === (new Process(explode(' ', $url)))->getCommandLine()) {
-                        return static::result($output);
+                        return $result;
                     }
                 });
             }
@@ -84,9 +85,9 @@ class Factory
      * @param  int  $exitCode
      * @return \Illuminate\Console\Contracts\ProcessResult
      */
-    public static function result($content = '', $exitCode = 0)
+    public static function result($output = '', $exitCode = 0)
     {
-        return new FakeProcessResult($content, $exitCode);
+        return new FakeResult($output, $exitCode);
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console\Process;
 
+use Illuminate\Console\Process\Results\Result;
 use Illuminate\Support\Traits\Macroable;
 use Symfony\Component\Process\Process;
 
@@ -148,12 +149,12 @@ class PendingProcess
 
         foreach ($this->stubCallbacks ?? [] as $callback) {
             if ($result = $callback($process)) {
-                /** @var \Illuminate\Console\Process\FakeProcessResult $result */
+                /** @var \Illuminate\Console\Process\Results\FakeResult $result */
                 return $result->setProcess($process);
             }
         }
 
-        return new ProcessResult(tap($process)->start());
+        return new Result(tap($process)->start());
     }
 
     /**

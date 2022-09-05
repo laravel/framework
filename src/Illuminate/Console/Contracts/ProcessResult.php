@@ -2,10 +2,12 @@
 
 namespace Illuminate\Console\Contracts;
 
+use Stringable;
+
 /**
  * @internal
  */
-interface ProcessResult
+interface ProcessResult extends Stringable
 {
     /**
      * Get the process's output.
@@ -78,4 +80,18 @@ interface ProcessResult
      * @throws \Illuminate\Console\Exceptions\ProcessFailedException
      */
     public function throwUnless($condition);
+
+    /**
+     * Get the process's output.
+     *
+     * @return string
+     */
+    public function toString();
+
+    /**
+     * Get the process's output.
+     *
+     * @return string
+     */
+    public function __toString();
 }

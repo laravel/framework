@@ -6,8 +6,8 @@ use Illuminate\Console\Exceptions\ProcessFailedException;
 use Illuminate\Console\Exceptions\ProcessNotStartedException;
 use Illuminate\Console\Exceptions\ProcessTimedOutException;
 use Illuminate\Console\Process\Factory;
-use Illuminate\Console\Process\FakeProcessResult;
-use Illuminate\Console\Process\ProcessResult;
+use Illuminate\Console\Process\Results\FakeResult;
+use Illuminate\Console\Process\Results\Result;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
@@ -60,9 +60,9 @@ class ProcessTest extends TestCase
         });
 
         $this->factory->fake([
-            'ls -la' => 'drwxr-xr-x   25 nunomaduro',
-            'ls -laaaaa' => 'drwxr-xr-x   25 taylorotwell',
-            '*' => 'drwxr-xr-x   25 root',
+            'ls -la' => $this->factory::result('drwxr-xr-x   25 nunomaduro'),
+            'ls -laaaaa' => $this->factory::result('drwxr-xr-x   25 taylorotwell'),
+            '*' => $this->factory::result('drwxr-xr-x   25 root'),
         ]);
 
         $result = $this->factory->run('fooo');
@@ -82,7 +82,7 @@ class ProcessTest extends TestCase
     public function testResultOutputWhenFakeDoesNotExist()
     {
         $this->factory->fake([
-            'ls -la ' => 'drwxr-xr-x   25 nunomaduro',
+            'ls -la ' => $this->factory::result('drwxr-xr-x   25 nunomaduro'),
         ]);
 
         $result = $this->factory->run(['ls', '-la']);
@@ -127,7 +127,7 @@ class ProcessTest extends TestCase
         $this->expectException(ProcessNotStartedException::class);
         $this->expectExceptionMessage("The process \"'ls'\" failed to start.");
 
-        new ProcessResult(new Process(['ls']));
+        new Result(new Process(['ls']));
     }
 
     public function testFakeResultEnsuresTheProcessStarts()
@@ -135,7 +135,7 @@ class ProcessTest extends TestCase
         $this->expectException(ProcessNotStartedException::class);
         $this->expectExceptionMessage('The process failed to start.');
 
-        tap(new FakeProcessResult('foo', 0))->wait();
+        tap(new FakeResult('foo', 0))->wait();
     }
 
     public function testWait()
@@ -212,5 +212,20 @@ class ProcessTest extends TestCase
         $result = $this->factory->forever()->run('ls');
 
         $this->assertNull($result->process()->getTimeout());
+    }
+
+    public function testResultToString()
+    {
+        $result = $this->factory->path(__DIR__)->run('ls');
+        $this->assertStringContainsString('ProcessTest', (string) $result);
+        $this->assertStringContainsString('ProcessTest', $result->toString());
+        $this->assertTrue($result->ok());
+
+        $this->factory->fake(fn () => $this->factory::result('ProcessOutput'));
+
+        $result = $this->factory->path(__DIR__)->run('ls');
+        $this->assertStringContainsString('ProcessOutput', (string) $result);
+        $this->assertStringContainsString('ProcessOutput', $result->toString());
+        $this->assertTrue($result->ok());
     }
 }
