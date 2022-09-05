@@ -1190,7 +1190,7 @@ class RoutingRouteTest extends TestCase
          */
         $router = $this->getRouter();
         $router->group(['as' => 'Foo::'], function () use ($router) {
-            $router->group(['prefix' => 'bar'], function () use($router) {
+            $router->group(['prefix' => 'bar'], function () use ($router) {
                 $router->get('baz', ['as' => 'baz', function () {
                     return 'hello';
                 }]);
