@@ -1411,6 +1411,23 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Sort the collection in ascending order using the given callback with the option to move null values at the end.
+     *
+     * @param array<array-key, (callable(TValue, TKey): mixed)|array<array-key, string>|(callable(TValue, TKey): mixed)|string  $callback
+     * @param int $options
+     * @return static
+     */
+    public function sortByAsc($callback, $options = SORT_REGULAR)
+    {
+        define("SORT_ASC_NULLS_LAST", 6);
+
+        return $this->sortBy($options == SORT_ASC_NULLS_LAST
+            ? fn($items) => $items->{$callback} ?: PHP_INT_MAX
+            : $callback,
+            $options);
+    }
+
+    /**
      * Sort the collection keys.
      *
      * @param  int  $options
