@@ -80,8 +80,28 @@ class Factory
 
             PHPUnit::assertTrue($callback(
                 $this->recorded[$index],
-            ), 'An expected request (#'.($index + 1).') was not recorded.');
+            ), 'An expected process (#'.($index + 1).') was not recorded.');
         }
+
+        return $this;
+    }
+
+    /**
+     * Assert that a process was not recorded matching a given truth test.
+     *
+     * @param  (callable(\Illuminate\Console\Process): bool)|string  $command
+     * @return $this
+     */
+    public function assertNotRan($command)
+    {
+        $callback = is_string($command) ? fn ($process) => $process->command() === $command : $command;
+
+        PHPUnit::assertFalse(
+            $this->recorded($callback)->count() > 0,
+            'Unexpected process was recorded.'
+        );
+
+        return $this;
     }
 
     /**

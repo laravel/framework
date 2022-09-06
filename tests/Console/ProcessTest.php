@@ -386,7 +386,20 @@ class ProcessTest extends TestCase
             return $process->command() === 'ls';
         });
 
-        $this->factory->assertRan('ls');
+        $factory = $this->factory->assertRan('ls');
+
+        $this->assertSame($this->factory, $factory);
+    }
+
+    public function testAssertRanMayFail()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $this->factory->fake();
+
+        $this->factory->run('ls');
+
+        $this->factory->assertRan('nop');
     }
 
     public function testAssertRanInOrder()
@@ -403,10 +416,40 @@ class ProcessTest extends TestCase
             fn ($process) => $process->command() === 'ls -l2',
         ]);
 
-        $this->factory->assertRanInOrder(['ls -l0', 'ls -l1', 'ls -l2']);
+        $factory = $this->factory->assertRanInOrder(['ls -l0', 'ls -l1', 'ls -l2']);
+
+        $this->assertSame($this->factory, $factory);
     }
 
-    public function testAssertRanMayFail()
+    public function testAssertRanInOrderMayFail()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $this->factory->fake();
+
+        $this->factory->run('ls -l0');
+        $this->factory->run('ls -l1');
+        $this->factory->run('ls -l2');
+
+        $this->factory->assertRanInOrder(['ls -l0', 'ls -l2', 'ls -l1']);
+    }
+
+    public function testAssertNotRan()
+    {
+        $this->factory->fake();
+
+        $this->factory->run('ls');
+
+        $this->factory->assertNotRan(function ($process) {
+            return $process->command() === 'sleep';
+        });
+
+        $factory = $this->factory->assertNotRan('sleep');
+
+        $this->assertSame($this->factory, $factory);
+    }
+
+    public function testAssertNotRanMayFail()
     {
         $this->expectException(AssertionFailedError::class);
 
@@ -414,9 +457,7 @@ class ProcessTest extends TestCase
 
         $this->factory->run('ls');
 
-        $this->factory->assertRan(function ($process) {
-            return $process->command() === 'nop';
-        });
+        $this->factory->assertNotRan('ls');
     }
 
     protected function ls()

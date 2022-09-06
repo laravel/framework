@@ -16,7 +16,8 @@ use Illuminate\Console\Process\Factory;
  * @method static \Illuminate\Support\Collection pool(callable $callback)
  * @method static \Illuminate\Console\Process\Factory assertRan(callable|string $command)
  * @method static \Illuminate\Console\Process\Factory assertRanInOrder(array $commands)
- *
+ * @method static \Illuminate\Console\Process\Factory assertNotRan(callable|string $command)
+
  * @see \Illuminate\Console\Process\Factory
  */
 class Process extends Facade
