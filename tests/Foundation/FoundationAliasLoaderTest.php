@@ -37,6 +37,36 @@ class FoundationAliasLoaderTest extends TestCase
         $this->assertEquals(['foo2' => 'bar2', 'foo' => 'baz'], $loader->getAliases());
     }
 
+    public function testSetAliases()
+    {
+        $loader = AliasLoader::getInstance();
+        $aliases = $loader->getAliases();
+        $this->assertEmpty($aliases);
+
+        $loader->setAliases(['foo' => 'bar']);
+        $aliases = $loader->getAliases();
+        $this->assertEquals(['foo' => 'bar'], $aliases);
+        $this->assertCount(1, $aliases);
+
+        //test set more than one alias
+        $loader->setAliases(['foo' => 'bar', 'bar' => 'baz']);
+        $aliases = $loader->getAliases();
+        $this->assertEquals(['foo' => 'bar', 'bar' => 'baz'], $aliases);
+        $this->assertCount(2, $aliases);
+
+        //test override last alias
+        $loader->setAliases(['bar' => 'baz']);
+        $loader->setAliases(['foo' => 'bar']);
+        $aliases = $loader->getAliases();
+        $this->assertEquals(['foo' => 'bar'], $aliases);
+        $this->assertCount(1, $aliases);
+
+        //get instance merge aliases
+        $loader::getInstance(['foo2', 'bar2']);
+        $aliases = $loader->getAliases();
+        $this->assertEquals(['foo' => 'bar', 'foo2', 'bar2'], $aliases);
+    }
+
     public function testLoaderCanAliasAndLoadClasses()
     {
         $loader = AliasLoader::getInstance(['some_alias_foo_bar' => FoundationAliasLoaderStub::class]);
