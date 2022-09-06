@@ -170,6 +170,10 @@ trait HasTimestamps
 
         $this->timestamps = false;
 
-        return tap($callback($this), fn () => $this->timestamps = true);
+        try {
+            return $callback($this);
+        } finally {
+            $this->timestamps = true;
+        }
     }
 }

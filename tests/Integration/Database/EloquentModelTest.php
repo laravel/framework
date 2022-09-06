@@ -7,6 +7,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use RuntimeException;
 
 class EloquentModelTest extends DatabaseTestCase
 {
@@ -101,6 +102,21 @@ class EloquentModelTest extends DatabaseTestCase
 
         $this->assertFalse($user->timestamps);
         $this->assertTrue($now->equalTo($user->updated_at));
+    }
+
+    public function testWithoutTimestampRestoresWhenClosureThrowsException()
+    {
+        $user = TestModel3::create(['name' => 'foo']);
+        $user->timestamps = true;
+
+        try {
+            $user->withoutTimestamps(fn () => throw new RuntimeException());
+            $this->fail();
+        } catch (RuntimeException) {
+            //
+        }
+
+        $this->assertTrue($user->timestamps);
     }
 }
 
