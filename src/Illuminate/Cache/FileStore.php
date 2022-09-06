@@ -238,6 +238,20 @@ class FileStore implements Store, LockProvider
     }
 
     /**
+     * Begin executing a new dependency operation.
+     *
+     * @param  array|mixed  $dependencies
+     * @return \Illuminate\Cache\DependencyCache
+     */
+    public function dependencies($dependencies)
+    {
+        return new DependencyCache(
+            $this,
+            is_array($dependencies) ? $dependencies : func_get_args(),
+        );
+    }
+
+    /**
      * Retrieve an item and expiry time from the cache by key.
      *
      * @param  string  $key

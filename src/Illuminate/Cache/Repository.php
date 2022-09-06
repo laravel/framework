@@ -505,6 +505,21 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
+     * Begin executing a new dependency operation.
+     *
+     * @param  array|mixed  $dependencies
+     * @return \Illuminate\Cache\DependencyCache
+     */
+    public function dependencies($dependencies)
+    {
+        return new DependencyCache(
+            $this->store,
+            is_array($dependencies) ? $dependencies : func_get_args(),
+            $this->supportsTags() ? ($this->tags ?? NULL) : NULL
+        );
+    }
+
+    /**
      * Format the key for a cache item.
      *
      * @param  string  $key

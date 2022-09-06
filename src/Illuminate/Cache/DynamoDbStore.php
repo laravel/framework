@@ -452,6 +452,20 @@ class DynamoDbStore implements LockProvider, Store
     }
 
     /**
+     * Begin executing a new dependency operation.
+     *
+     * @param  array|mixed  $dependencies
+     * @return \Illuminate\Cache\DependencyCache
+     */
+    public function dependencies($dependencies)
+    {
+        return new DependencyCache(
+            $this,
+            is_array($dependencies) ? $dependencies : func_get_args(),
+        );
+    }
+
+    /**
      * Get the UNIX timestamp for the given number of seconds.
      *
      * @param  int  $seconds

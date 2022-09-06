@@ -236,6 +236,20 @@ class RedisStore extends TaggableStore implements LockProvider
     }
 
     /**
+     * Begin executing a new dependency operation.
+     *
+     * @param  array|mixed  $dependencies
+     * @return \Illuminate\Cache\DependencyCache
+     */
+    public function dependencies($dependencies)
+    {
+        return new DependencyCache(
+            $this,
+            is_array($dependencies) ? $dependencies : func_get_args(),
+        );
+    }
+
+    /**
      * Begin executing a new tags operation.
      *
      * @param  array|mixed  $names
