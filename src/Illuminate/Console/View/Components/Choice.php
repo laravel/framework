@@ -12,7 +12,7 @@ class Choice extends Component
      * @param  string  $question
      * @param  array<array-key, string>  $choices
      * @param  mixed  $default
-     * @param bool  $multiple
+     * @param  bool  $multiple
      * @return mixed
      */
     public function render($question, $choices, $default = null, $multiple = false)
