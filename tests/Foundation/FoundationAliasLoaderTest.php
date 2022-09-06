@@ -72,7 +72,7 @@ class FoundationAliasLoaderTest extends TestCase
         $loader = AliasLoader::getInstance();
 
         //add alias with alias method
-        $loader->alias('foo' , 'bar');
+        $loader->alias('foo', 'bar');
         $aliases = $loader->getAliases();
         $this->assertEquals(['foo' => 'bar'], $aliases);
         $this->assertCount(1, $aliases);
