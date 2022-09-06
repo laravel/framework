@@ -61,7 +61,9 @@ class ProcessTest extends TestCase
 
         $result = $this->factory->run(['ls', '-la']);
 
-        $this->factory->assertRan("'ls' '-la'");
+        $this->factory->assertRan(function ($process) {
+            dd($process->command());
+        });
     }
 
     public function testResultOutput()
@@ -369,7 +371,7 @@ class ProcessTest extends TestCase
 
         $process = $result->process();
 
-        $this->assertSame('ls', $process->command());
+        $this->assertSame($this->ls(), $process->command());
         $this->assertSame(45.0, $process->timeout());
         $this->assertSame(__DIR__, $process->path());
     }
