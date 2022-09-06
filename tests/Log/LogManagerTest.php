@@ -32,6 +32,20 @@ class LogManagerTest extends TestCase
         $this->assertSame($logger1, $logger2);
     }
 
+    public function testLogManagerGetDefaultDriver()
+    {
+        $config = $this->app['config'];
+        $config->set('logging.default', 'single');
+
+        $manager = new LogManager($this->app);
+        $this->assertEmpty($manager->getChannels());
+
+        //we don't specify any channel name
+        $manager->channel();
+        $this->assertCount(1, $manager->getChannels());
+        $this->assertEquals('single', $manager->getDefaultDriver());
+    }
+
     public function testStackChannel()
     {
         $config = $this->app['config'];
@@ -575,5 +589,41 @@ class LogManagerTest extends TestCase
         $manager->flushSharedContext();
 
         $this->assertEmpty($manager->sharedContext());
+    }
+
+    public function testLogManagerCreateCustomFormatterWithTap()
+    {
+        $config = $this->app['config'];
+        $config->set('logging.channels.custom', [
+            'driver' => 'single',
+            'tap' => [CustomizeFormatter::class],
+        ]);
+
+        $manager = new LogManager($this->app);
+
+        $logger = $manager->channel('custom');
+        $handler = $logger->getLogger()->getHandlers()[0];
+        $formatter = $handler->getFormatter();
+
+        $this->assertInstanceOf(LineFormatter::class, $formatter);
+
+        $format = new ReflectionProperty(get_class($formatter), 'format');
+        $format->setAccessible(true);
+
+        $this->assertEquals(
+            '[%datetime%] %channel%.%level_name%: %message% %context% %extra%',
+            rtrim($format->getValue($formatter)));
+    }
+}
+
+class CustomizeFormatter
+{
+    public function __invoke($logger)
+    {
+        foreach ($logger->getHandlers() as $handler) {
+            $handler->setFormatter(new LineFormatter(
+                '[%datetime%] %channel%.%level_name%: %message% %context% %extra%'
+            ));
+        }
     }
 }
