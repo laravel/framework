@@ -1285,27 +1285,14 @@ class Str
         Str::createUuidsUsing(fn () => $uuid);
 
         if ($callback !== null) {
-            $callback($uuid);
-
-            Str::createUuidsNormally();
+            try {
+                $callback($uuid);
+            } finally {
+                Str::createUuidsNormally();
+            }
         }
 
         return $uuid;
-    }
-
-    /**
-     * Always return the same UUID when generating new UUIDs during the given callback's execution.
-     *
-     * @param  \Closure  $callback
-     * @return \Ramsey\Uuid\UuidInterface
-     */
-    public static function freezeUuidsFor(Closure $callback)
-    {
-        try {
-            return static::freezeUuids($callback);
-        } finally {
-            Str::createUuidsNormally();
-        }
     }
 
     /**

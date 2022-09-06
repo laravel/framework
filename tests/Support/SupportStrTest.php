@@ -991,10 +991,10 @@ class SupportStrTest extends TestCase
         Str::createUuidsNormally();
     }
 
-    public function testItCreatesUuidsNormallyAfterFailureWithinFreezeFor()
+    public function testItCreatesUuidsNormallyAfterFailureWithinFreezeMethod()
     {
         try {
-            Str::freezeUuidsFor(function () {
+            Str::freezeUuids(function () {
                 Str::createUuidsUsing(fn () => Str::of('1234'));
                 $this->assertSame('1234', Str::uuid()->toString());
                 throw new \Exception('Something failed.');
