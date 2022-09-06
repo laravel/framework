@@ -22,6 +22,10 @@ class QueueSqsQueueTest extends TestCase
     protected $mockedJob;
     protected $mockedData;
     protected $mockedPayload;
+<<<<<<< Updated upstream
+=======
+    protected $mockedDelay;
+>>>>>>> Stashed changes
     protected $mockedMessageId;
     protected $mockedReceiptHandle;
     protected $mockedSendMessageResponseModel;
