@@ -62,7 +62,7 @@ class ProcessTest extends TestCase
         $result = $this->factory->run(['ls', '-la']);
 
         $this->factory->assertRan(function ($process) {
-            dd($process->command());
+            return windows_os() ? $process->command() === 'ls -la' : $process->command() === "'ls' '-la'";
         });
     }
 
