@@ -135,7 +135,7 @@ class PendingProcess
     {
         $arguments = collect(is_string($arguments) ? str($arguments)->explode(' ') : $arguments)->map(function ($argument) {
             return trim($argument);
-        });
+        })->toArray();
 
         $this->withArguments($arguments);
 
