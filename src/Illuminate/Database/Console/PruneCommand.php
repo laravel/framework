@@ -3,6 +3,8 @@
 namespace Illuminate\Database\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Eloquent\MassPrunable as MassPrunableContract;
+use Illuminate\Contracts\Eloquent\Prunable as PrunableContract;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Eloquent\MassPrunable;
 use Illuminate\Database\Eloquent\Prunable;
@@ -157,6 +159,10 @@ class PruneCommand extends Command
      */
     protected function isPrunable($model)
     {
+        if ($model instanceof PrunableContract || $model instanceof MassPrunableContract) {
+            return true;
+        }
+
         $uses = class_uses_recursive($model);
 
         return in_array(Prunable::class, $uses) || in_array(MassPrunable::class, $uses);
