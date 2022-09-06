@@ -61,6 +61,15 @@ class ComponentsTest extends TestCase
         $this->assertStringContainsString('INFO  The application is in the [production] environment.', $output->fetch());
     }
 
+    public function testSuccess()
+    {
+        $output = new BufferedOutput();
+
+        with(new Components\Success($output))->render('The application is in the [production] environment');
+
+        $this->assertStringContainsString('SUCCESS  The application is in the [production] environment.', $output->fetch());
+    }
+
     public function testConfirm()
     {
         $output = m::mock(OutputStyle::class);
