@@ -125,7 +125,12 @@ class ProcessTest extends TestCase
     public function testResultEnsuresTheProcessStarts()
     {
         $this->expectException(ProcessNotStartedException::class);
-        $this->expectExceptionMessage("The process \"'{$this->ls()}'\" failed to start.");
+
+        if (windows_os()) {
+            $this->expectExceptionMessage("The process \"{$this->ls()}\" failed to start.");
+        } else {
+            $this->expectExceptionMessage("The process \"'{$this->ls()}'\" failed to start.");
+        }
 
         new Result(new Process([$this->ls()]));
     }
