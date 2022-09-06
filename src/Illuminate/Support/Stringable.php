@@ -180,7 +180,7 @@ class Stringable implements JsonSerializable
      * @param  iterable<string>  $needles
      * @return bool
      */
-    public function containsAll(array $needles)
+    public function containsAll($needles)
     {
         return Str::containsAll($this->value, $needles);
     }
