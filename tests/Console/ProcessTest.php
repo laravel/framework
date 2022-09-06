@@ -173,7 +173,7 @@ class ProcessTest extends TestCase
     {
         $exception = null;
 
-        $result = $this->factory->path(__DIR__)->timeout(0.1)->run($this->sleep(1));
+        $result = $this->factory->path(__DIR__)->timeout(1)->run($this->sleep(3));
 
         $this->assertSame(0.1, $result->process()->getTimeout());
 
