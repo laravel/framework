@@ -67,6 +67,23 @@ class FoundationAliasLoaderTest extends TestCase
         $this->assertEquals(['foo' => 'bar', 'foo2', 'bar2'], $aliases);
     }
 
+    public function testAddAliasToLoader()
+    {
+        $loader = AliasLoader::getInstance();
+
+        //add alias with alias method
+        $loader->alias('foo' , 'bar');
+        $aliases = $loader->getAliases();
+        $this->assertEquals(['foo' => 'bar'], $aliases);
+        $this->assertCount(1, $aliases);
+
+        // test add alias again and it merges
+        $loader->alias('bar' , 'baz');
+        $aliases = $loader->getAliases();
+        $this->assertEquals(['foo' => 'bar', 'bar' => 'baz'], $aliases);
+        $this->assertCount(2, $aliases);
+    }
+
     public function testLoaderCanAliasAndLoadClasses()
     {
         $loader = AliasLoader::getInstance(['some_alias_foo_bar' => FoundationAliasLoaderStub::class]);
