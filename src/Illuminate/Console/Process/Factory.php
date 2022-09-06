@@ -32,7 +32,7 @@ class Factory
     /**
      * Register a stub callable that will intercept requests and be able to return stub results.
      *
-     * @param  iterable<string, callable(\Symfony\Component\Process\Process): \Illuminate\Console\Contracts\ProcessResult>|callable(\Symfony\Component\Process\Process): \Illuminate\Console\Contracts\ProcessResult|string|null  $callback
+     * @param  (iterable<string, callable(\Symfony\Component\Process\Process): \Illuminate\Console\Contracts\ProcessResult>)|(callable(\Symfony\Component\Process\Process): \Illuminate\Console\Contracts\ProcessResult)|null  $callback
      * @return $this
      */
     public function fake($callback = null)
