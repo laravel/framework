@@ -175,7 +175,7 @@ class ProcessTest extends TestCase
 
         $result = $this->factory->path(__DIR__)->timeout(1)->run($this->sleep(3));
 
-        $this->assertSame(0.1, $result->process()->getTimeout());
+        $this->assertSame(1, $result->process()->getTimeout());
 
         try {
             $result->wait();
