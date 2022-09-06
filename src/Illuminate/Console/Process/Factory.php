@@ -51,7 +51,7 @@ class Factory
      * Assert that a process was recorded matching a given truth test.
      *
      * @param  (callable(\Illuminate\Console\Process): bool)|string  $callback
-     * @return void
+     * @return $this
      */
     public function assertRan($command)
     {
@@ -63,6 +63,25 @@ class Factory
         );
 
         return $this;
+    }
+
+    /**
+     * Assert that the given process was ram in the given order.
+     *
+     * @param  iterable<int, (callable(\Illuminate\Console\Process): bool)|string>  $commands
+     * @return $this
+     */
+    public function assertRanInOrder($commands)
+    {
+        // $this->assertSentCount(count($callbacks));
+
+        foreach ($commands as $index => $command) {
+            $callback = is_string($command) ? fn ($process) => $process->command() === $command : $command;
+
+            PHPUnit::assertTrue($callback(
+                $this->recorded[$index],
+            ), 'An expected request (#'.($index + 1).') was not recorded.');
+        }
     }
 
     /**

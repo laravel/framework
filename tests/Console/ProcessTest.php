@@ -389,6 +389,23 @@ class ProcessTest extends TestCase
         $this->factory->assertRan('ls');
     }
 
+    public function testAssertRanInOrder()
+    {
+        $this->factory->fake();
+
+        $this->factory->run('ls -l0');
+        $this->factory->run('ls -l1');
+        $this->factory->run('ls -l2');
+
+        $this->factory->assertRanInOrder([
+            fn ($process) => $process->command() === 'ls -l0',
+            fn ($process) => $process->command() === 'ls -l1',
+            fn ($process) => $process->command() === 'ls -l2',
+        ]);
+
+        $this->factory->assertRanInOrder(['ls -l0', 'ls -l1', 'ls -l2']);
+    }
+
     public function testAssertRanMayFail()
     {
         $this->expectException(AssertionFailedError::class);
