@@ -3,6 +3,8 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Eloquent\MassPrunable as MassPrunableContract;
+use Illuminate\Contracts\Eloquent\Prunable as PrunableContract;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Console\PruneCommand;
@@ -212,14 +214,14 @@ class PruneCommandTest extends TestCase
     }
 }
 
-class PrunableTestModelWithPrunableRecords extends Model
+class PrunableTestModelWithPrunableRecords extends Model implements MassPrunableContract
 {
     use MassPrunable;
 
     protected $table = 'prunables';
     protected $connection = 'default';
 
-    public function pruneAll()
+    public function pruneAll(int $chunkSize = 1000)
     {
         event(new ModelsPruned(static::class, 10));
         event(new ModelsPruned(static::class, 20));
@@ -233,7 +235,7 @@ class PrunableTestModelWithPrunableRecords extends Model
     }
 }
 
-class PrunableTestSoftDeletedModelWithPrunableRecords extends Model
+class PrunableTestSoftDeletedModelWithPrunableRecords extends Model implements MassPrunableContract
 {
     use MassPrunable, SoftDeletes;
 
@@ -246,11 +248,11 @@ class PrunableTestSoftDeletedModelWithPrunableRecords extends Model
     }
 }
 
-class PrunableTestModelWithoutPrunableRecords extends Model
+class PrunableTestModelWithoutPrunableRecords extends Model implements PrunableContract
 {
     use Prunable;
 
-    public function pruneAll()
+    public function pruneAll(int $chunkSize = 1000)
     {
         return 0;
     }
