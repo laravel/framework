@@ -67,7 +67,7 @@ class ComponentsTest extends TestCase
 
         with(new Components\Success($output))->render('The application is in the [production] environment');
 
-        $this->assertStringContainsString('SUCCESS  The application is in the [production] environment.', $output->fetch());
+        $this->assertStringContainsString('INFO  The application is in the [production] environment.', $output->fetch());
     }
 
     public function testConfirm()
@@ -102,6 +102,14 @@ class ComponentsTest extends TestCase
 
         $result = with(new Components\Choice($output))->render('Question?', ['a', 'b']);
         $this->assertSame('a', $result);
+
+        $output->shouldReceive('askQuestion')
+               ->with(m::type(ChoiceQuestion::class))
+               ->once()
+               ->andReturn(['a', 'b']);
+
+        $result = with(new Components\Choice($output))->render('Question?', ['a', 'b'], 'a', true);
+        $this->assertSame(['a', 'b'], $result);
     }
 
     public function testTask()
