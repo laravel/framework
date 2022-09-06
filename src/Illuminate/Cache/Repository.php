@@ -515,7 +515,7 @@ class Repository implements ArrayAccess, CacheContract
         return new DependencyCache(
             $this->store,
             is_array($dependencies) ? $dependencies : func_get_args(),
-            $this->supportsTags() ? ($this->tags ?? NULL) : NULL
+            $this->supportsTags() ? ($this->tags ?? null) : null
         );
     }
 

@@ -9,7 +9,8 @@ use Illuminate\Filesystem\Filesystem;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
-class CacheDependencyCacheTest extends TestCase {
+class CacheDependencyCacheTest extends TestCase
+{
     protected function tearDown(): void
     {
         m::close();

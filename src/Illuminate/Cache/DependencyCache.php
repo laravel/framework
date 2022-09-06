@@ -3,25 +3,26 @@
 namespace Illuminate\Cache;
 
 use Illuminate\Contracts\Cache\Store;
-use Psr\SimpleCache\InvalidArgumentException;
 
-class DependencyCache extends Repository {
+class DependencyCache extends Repository
+{
     private const DEPENDENCY_CACHE_KEY_PREFIX = 'cache_dependency';
 
     /**
-     * Built dependencies names
+     * Built dependencies names.
+     *
      * @var array
      */
     private array $dependenciesNames;
 
     /**
-     * Create a new DependencyCache instance
+     * Create a new DependencyCache instance.
      *
-     * @param Store $store
-     * @param array $dependenciesList
-     * @param TagSet|null $tags
+     * @param  Store  $store
+     * @param  array  $dependenciesList
+     * @param  TagSet|null  $tags
      */
-    public function __construct(Store $store, array $dependenciesList, protected ?TagSet $tags = NULL)
+    public function __construct(Store $store, array $dependenciesList, protected ?TagSet $tags = null)
     {
         parent::__construct($store);
 
@@ -31,12 +32,12 @@ class DependencyCache extends Repository {
     /**
      * Store an item in the cache and create its dependencies.
      *
-     * @param array|string $key
-     * @param mixed $value
-     * @param \DateTimeInterface|\DateInterval|int|null $ttl
+     * @param  array|string  $key
+     * @param  mixed  $value
+     * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
      * @return bool
      */
-    public function set($key, $value, $ttl = NULL): bool
+    public function set($key, $value, $ttl = null): bool
     {
         $result = parent::set($key, $value, $ttl);
 
@@ -50,12 +51,12 @@ class DependencyCache extends Repository {
     /**
      * Store an item in the cache and create its dependencies.
      *
-     * @param array|string $key
-     * @param mixed $value
-     * @param \DateTimeInterface|\DateInterval|int|null $ttl
+     * @param  array|string  $key
+     * @param  mixed  $value
+     * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
      * @return bool
      */
-    public function put($key, $value, $ttl = NULL): bool
+    public function put($key, $value, $ttl = null): bool
     {
         $result = parent::put($key, $value, $ttl);
 
@@ -69,11 +70,11 @@ class DependencyCache extends Repository {
     /**
      * Store multiple items in the cache for a given number of seconds and create its dependencies.
      *
-     * @param array $values
-     * @param \DateTimeInterface|\DateInterval|int|null $ttl
+     * @param  array  $values
+     * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
      * @return bool
      */
-    public function putMany(array $values, $ttl = NULL): bool
+    public function putMany(array $values, $ttl = null): bool
     {
         $result = parent::putMany($values, $ttl);
 
@@ -87,7 +88,7 @@ class DependencyCache extends Repository {
     /**
      * Store multiple items in the cache indefinitely and create its dependencies.
      *
-     * @param array $values
+     * @param  array  $values
      * @return bool
      */
     public function putManyForever(array $values): bool
@@ -104,12 +105,12 @@ class DependencyCache extends Repository {
     /**
      * Store an item in the cache if the key does not exist and create its dependencies.
      *
-     * @param string $key
-     * @param mixed $value
-     * @param \DateTimeInterface|\DateInterval|int|null $ttl
+     * @param  string  $key
+     * @param  mixed  $value
+     * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
      * @return bool
      */
-    public function add($key, $value, $ttl = NULL): bool
+    public function add($key, $value, $ttl = null): bool
     {
         $result = parent::add($key, $value, $ttl);
 
@@ -123,8 +124,8 @@ class DependencyCache extends Repository {
     /**
      * Store an item in the cache indefinitely and create its dependencies.
      *
-     * @param string $key
-     * @param mixed $value
+     * @param  string  $key
+     * @param  mixed  $value
      * @return bool
      */
     public function forever($key, $value): bool
@@ -139,10 +140,9 @@ class DependencyCache extends Repository {
     }
 
     /**
-     * Removes all items stored in cache assigned to dependencies
+     * Removes all items stored in cache assigned to dependencies.
      *
      * @return void
-     * @throws InvalidArgumentException
      */
     public function invalidate(): void
     {
@@ -178,16 +178,16 @@ class DependencyCache extends Repository {
     public function exists(): bool
     {
         foreach ($this->dependenciesNames as $dependencyName) {
-            if (!$this->has(self::getCacheKeyForDependencyName($dependencyName))) {
-                return FALSE;
+            if (! $this->has(self::getCacheKeyForDependencyName($dependencyName))) {
+                return false;
             }
         }
 
-        return TRUE;
+        return true;
     }
 
     /**
-     * Store a dependency item in the cache with related cache item data
+     * Store a dependency item in the cache with related cache item data.
      *
      * @param $key
      * @return void
@@ -204,14 +204,14 @@ class DependencyCache extends Repository {
             // rnt - shortcut for "remove non tagged" item. It means, if we want to remove cached item which is not assigned to any tag
             // tags - include existing tag groups assigned to cached item
             $dependencies[$key] = [
-                'rnt' => empty($this->tags) ? TRUE : ($dependencies[$key]['rnt'] ?? FALSE),
+                'rnt' => empty($this->tags) ? true : ($dependencies[$key]['rnt'] ?? false),
                 'tags' => $dependencies[$key]['tags'] ?? [],
             ];
 
             // Save cache tags if provided
             if ($this->tags?->getNames()) {
                 $tags = implode('|', $this->tags->getNames());
-                if (!empty($tags) && !in_array($tags, $dependencies[$key]['tags'])) {
+                if (! empty($tags) && ! in_array($tags, $dependencies[$key]['tags'])) {
                     $dependencies[$key]['tags'][] = $tags;
                 }
             }
@@ -221,7 +221,7 @@ class DependencyCache extends Repository {
     }
 
     /**
-     * Dependencies names builder
+     * Dependencies names builder.
      *
      * @param $dependencies
      * @return array
@@ -231,7 +231,7 @@ class DependencyCache extends Repository {
         $builtDependenciesNames = [];
 
         foreach ($dependencies as $dependencyKey => $dependencyValues) {
-            if (!is_array($dependencyValues)) {
+            if (! is_array($dependencyValues)) {
                 $builtDependenciesNames[] = $dependencyValues;
 
                 continue;
@@ -246,13 +246,13 @@ class DependencyCache extends Repository {
     }
 
     /**
-     * Generate cache key for dependency name
+     * Generate cache key for dependency name.
      *
      * @param $dependencyName
      * @return string
      */
     private static function getCacheKeyForDependencyName($dependencyName): string
     {
-        return sha1(self::DEPENDENCY_CACHE_KEY_PREFIX) . ':' . $dependencyName;
+        return sha1(self::DEPENDENCY_CACHE_KEY_PREFIX).':'.$dependencyName;
     }
 }
