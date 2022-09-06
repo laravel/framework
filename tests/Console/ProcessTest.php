@@ -173,7 +173,7 @@ class ProcessTest extends TestCase
     {
         $exception = null;
 
-        $result = $this->factory->path(__DIR__)->timeout(0.1)->run('sleep 1');
+        $result = $this->factory->path(__DIR__)->timeout(0.1)->run($this->sleep(1));
 
         $this->assertSame(0.1, $result->process()->getTimeout());
 
@@ -194,7 +194,7 @@ class ProcessTest extends TestCase
             $this->markTestSkipped('Test requires pcntl extension.');
         }
 
-        $result = $this->factory->path(__DIR__)->run('sleep 5');
+        $result = $this->factory->path(__DIR__)->run($this->sleep(5));
         $result->process()->signal(SIGKILL);
 
         $this->assertTrue($result->failed());
@@ -297,13 +297,13 @@ class ProcessTest extends TestCase
         $this->assertTrue($result->ok());
     }
 
-    /**
-     * Gets the "ls" command for the current operating system.
-     *
-     * @return string
-     */
     protected function ls()
     {
         return windows_os() ? 'dir' : 'ls';
+    }
+
+    protected function sleep($seconds)
+    {
+        return windows_os() ? sprintf('timeout /t %s', $seconds) : sprintf('sleep %s', $seconds);
     }
 }
