@@ -58,7 +58,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      *
      * @var int
      */
-    protected $rememberDuration = 2628000;
+    protected $rememberDuration = 576000;
 
     /**
      * The session used by the guard.
