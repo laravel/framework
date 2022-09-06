@@ -1285,9 +1285,11 @@ class Str
         Str::createUuidsUsing(fn () => $uuid);
 
         if ($callback !== null) {
-            $callback($uuid);
-
-            Str::createUuidsNormally();
+            try {
+                $callback($uuid);
+            } finally {
+                Str::createUuidsNormally();
+            }
         }
 
         return $uuid;
