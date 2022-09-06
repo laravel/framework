@@ -14,6 +14,7 @@ use Illuminate\Console\Process\Factory;
  * @method static \Illuminate\Console\Process\PendingProcess stub(callable $callback)
  * @method static \Illuminate\Console\Process\PendingProcess withArguments(iterable $arguments)
  * @method static \Illuminate\Support\Collection pool(callable $callback)
+ * @method static \Illuminate\Console\Process\Factory assertRan(callable|string $command)
  *
  * @see \Illuminate\Console\Process\Factory
  */

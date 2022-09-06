@@ -53,14 +53,16 @@ class Factory
      * @param  (callable(\Illuminate\Console\Process): bool)|string  $callback
      * @return void
      */
-    public function assertRan($callback)
+    public function assertRan($command)
     {
-        $callback = is_string($callback) ? fn ($process) => $process->command() === $callback : $callback;
+        $callback = is_string($command) ? fn ($process) => $process->command() === $command : $command;
 
         PHPUnit::assertTrue(
             $this->recorded($callback)->count() > 0,
             'An expected process was not recorded.'
         );
+
+        return $this;
     }
 
     /**
