@@ -120,6 +120,19 @@ class Factory
     }
 
     /**
+     * Assert how many processes have been recorded.
+     *
+     * @param  int  $count
+     * @return $this
+     */
+    public function assertRanCount($count)
+    {
+        PHPUnit::assertCount($count, $this->recorded);
+
+        return $this;
+    }
+
+    /**
      * Register a stub callable that will intercept requests and be able to return stub results.
      *
      * @param  (iterable<string, callable(\Illuminate\Console\Process): \Illuminate\Console\Contracts\ProcessResult>)|(callable(\Illuminate\Console\Process): \Illuminate\Console\Contracts\ProcessResult)|null  $callback
