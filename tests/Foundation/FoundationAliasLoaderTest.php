@@ -61,7 +61,7 @@ class FoundationAliasLoaderTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $aliases);
         $this->assertCount(1, $aliases);
 
-        //get instance merge aliases
+        //get instance merges aliases
         $loader::getInstance(['foo2', 'bar2']);
         $aliases = $loader->getAliases();
         $this->assertEquals(['foo' => 'bar', 'foo2', 'bar2'], $aliases);
