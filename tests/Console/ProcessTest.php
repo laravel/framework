@@ -12,6 +12,7 @@ use Illuminate\Console\Process\Pool;
 use Illuminate\Console\Process\Results\FakeResult;
 use Illuminate\Console\Process\Results\Result;
 use Mockery as m;
+use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
@@ -54,6 +55,15 @@ class ProcessTest extends TestCase
         $this->assertTrue($result->failed());
     }
 
+    public function testCommandGetsEscaped()
+    {
+        $this->factory->fake();
+
+        $result = $this->factory->run(['ls', '-la']);
+
+        $this->factory->assertRan("'ls' '-la'");
+    }
+
     public function testResultOutput()
     {
         $this->factory->fake(function ($process) {
@@ -72,7 +82,7 @@ class ProcessTest extends TestCase
         $this->assertSame('some failure', $result->output());
         $this->assertTrue($result->failed());
 
-        $result = $this->factory->run(['nuno']);
+        $result = $this->factory->run('nuno');
         $this->assertSame('drwxr-xr-x   25 nunomaduro', $result->output());
 
         $result = $this->factory->run('taylor');
@@ -88,7 +98,7 @@ class ProcessTest extends TestCase
             'nuno' => $this->factory::result('drwxr-xr-x   25 nunomaduro'),
         ]);
 
-        $result = $this->factory->run(['nuno']);
+        $result = $this->factory->run('nuno');
         $this->assertSame('drwxr-xr-x   25 nunomaduro', $result->output());
 
         $result = $this->factory->path(__DIR__)->run($this->ls());
@@ -97,7 +107,7 @@ class ProcessTest extends TestCase
 
         $this->factory->fake();
 
-        $result = $this->factory->run(['nuno']);
+        $result = $this->factory->run('nuno');
         $this->assertSame('drwxr-xr-x   25 nunomaduro', $result->output());
 
         $result = $this->factory->path(__DIR__)->run($this->ls());
@@ -285,16 +295,16 @@ class ProcessTest extends TestCase
         $this->assertSame('My line 2', $output[1]);
     }
 
-    public function testWithArguments()
+    public function testCommand()
     {
-        $result = $this->factory->path(__DIR__)->withArguments([$this->ls()])->run();
+        $result = $this->factory->path(__DIR__)->command($this->ls())->run();
         $this->assertStringContainsString('ProcessTest', (string) $result);
         $this->assertStringContainsString('ProcessTest', $result->toString());
         $this->assertTrue($result->ok());
 
         $this->factory->fake(fn () => $this->factory::result('ProcessOutput'));
 
-        $result = $this->factory->path(__DIR__)->withArguments([$this->ls()])->run();
+        $result = $this->factory->path(__DIR__)->command($this->ls())->run();
         $this->assertStringContainsString('ProcessOutput', (string) $result);
         $this->assertStringContainsString('ProcessOutput', $result->toString());
         $this->assertTrue($result->ok());
@@ -347,6 +357,47 @@ class ProcessTest extends TestCase
         $this->assertTrue($results[2]->failed());
         $this->assertSame(143, $results[2]->exitCode());
         $this->assertSame(['My line 1', 'My line 2', 'My line 3'], $results[2]->toArray());
+    }
+
+    public function testProcessGetters()
+    {
+        $this->factory->fake();
+
+        $result = $this->factory->path(__DIR__)
+            ->timeout(45.0)
+            ->run($this->ls());
+
+        $process = $result->process();
+
+        $this->assertSame('ls', $process->command());
+        $this->assertSame(45.0, $process->timeout());
+        $this->assertSame(__DIR__, $process->path());
+    }
+
+    public function testAssertRan()
+    {
+        $this->factory->fake();
+
+        $this->factory->run('ls');
+
+        $this->factory->assertRan(function ($process) {
+            return $process->command() === 'ls';
+        });
+
+        $this->factory->assertRan('ls');
+    }
+
+    public function testAssertRanMayFail()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $this->factory->fake();
+
+        $this->factory->run('ls');
+
+        $this->factory->assertRan(function ($process) {
+            return $process->command() === 'nop';
+        });
     }
 
     protected function ls()

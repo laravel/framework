@@ -9,7 +9,7 @@ class ProcessNotStartedException extends LogicException
     /**
      * Creates a new Process Not Started Exception instance.
      *
-     * @param  \Symfony\Component\Process\Process|null  $process
+     * @param  \Illuminate\Console\Process|null  $process
      * @return void
      */
     public function __construct($process = null)

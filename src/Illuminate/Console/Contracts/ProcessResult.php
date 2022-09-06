@@ -52,7 +52,7 @@ interface ProcessResult extends Arrayable, Stringable, ArrayAccess, IteratorAggr
     /**
      * Get the underlying process.
      *
-     * @return \Symfony\Component\Process\Process
+     * @return \Illuminate\Console\Process
      */
     public function process();
 

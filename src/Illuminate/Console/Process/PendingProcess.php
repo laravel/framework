@@ -2,20 +2,20 @@
 
 namespace Illuminate\Console\Process;
 
+use Illuminate\Console\Process;
 use Illuminate\Console\Process\Results\Result;
 use Illuminate\Support\Traits\Macroable;
-use Symfony\Component\Process\Process;
 
 class PendingProcess
 {
     use Macroable;
 
     /**
-     * The process's arguments.
+     * The process's command.
      *
-     * @var iterable<array-key, string>
+     * @var iterable<array-key, string>|string
      */
-    protected $arguments;
+    protected $command = [];
 
     /**
      * Whether the process should be have a delayed run.
@@ -23,6 +23,13 @@ class PendingProcess
      * @var bool
      */
     protected $delayStart = false;
+
+    /**
+     * The factory instance.
+     *
+     * @var \Illuminate\Console\Process\Factory
+     */
+    protected $factory;
 
     /**
      * The process's path.
@@ -34,23 +41,34 @@ class PendingProcess
     /**
      * The process's timeout.
      *
-     * @var int|null
+     * @var float|null
      */
-    protected $timeout = 60;
+    protected $timeout = 60.0;
 
     /**
      * The stub callables that will handle processes.
      *
-     * @var \Illuminate\Support\Collection|null
+     * @var array<int, callable(\Illuminate\Console\Process): \Illuminate\Console\Contracts\ProcessResult>
      */
-    protected $stubCallbacks;
+    protected $stubs = [];
 
     /**
      * The callbacks that should execute before the process starts.
      *
-     * @var \Illuminate\Support\Collection|null
+     * @var iterable<int, callable(\Illuminate\Console\Process): mixed>
      */
-    protected $beforeStartCallbacks;
+    protected $beforeStartCallbacks = [];
+
+    /**
+     * Creates a new Pending Process instance.
+     *
+     * @param  \Illuminate\Console\Process\Factory  $factory
+     * @return void
+     */
+    public function __construct($factory)
+    {
+        $this->factory = $factory;
+    }
 
     /**
      * Ensures the process's run is delayed.
@@ -91,12 +109,12 @@ class PendingProcess
     /**
      * Register a stub callable that will intercept processes and be able to return stub process result.
      *
-     * @param  callable  $callback
+     * @param  array<int, callable(\Illuminate\Console\Process): \Illuminate\Console\Contracts\ProcessResult>  $callbacks
      * @return $this
      */
-    public function stub($callback)
+    public function stubs($callbacks)
     {
-        $this->stubCallbacks = collect($callback);
+        $this->stubs = $callbacks;
 
         return $this;
     }
@@ -104,12 +122,12 @@ class PendingProcess
     /**
      * Sets the process's arguments.
      *
-     * @param  iterable<array-key, string>  $arguments
+     * @param  iterable<array-key, string>|string  $command
      * @return $this
      */
-    public function withArguments($arguments)
+    public function command($command)
     {
-        return tap($this, fn () => $this->arguments = array_merge($this->arguments ?? [], collect($arguments)->values()->toArray()));
+        return tap($this, fn () => $this->command = $command);
     }
 
     /**
@@ -126,7 +144,7 @@ class PendingProcess
     /**
      * Sets the process's timeout.
      *
-     * @param  int  $timeout
+     * @param  float|null  $timeout
      * @return $this
      */
     public function timeout($timeout)
@@ -147,21 +165,21 @@ class PendingProcess
     /**
      * Starts a new process with the given arguments.
      *
-     * @param  iterable<array-key, string>|string  $arguments
+     * @param  iterable<array-key, string>|string|null  $command
      * @return \Illuminate\Console\Contracts\ProcessResult
      */
-    public function run($arguments = [])
+    public function run($command = '')
     {
-        $arguments = collect(is_string($arguments) ? str($arguments)->explode(' ') : $arguments)->map(function ($argument) {
-            return trim($argument);
-        })->toArray();
+        if (func_num_args() > 0) {
+            $this->command($command);
+        }
 
-        $this->withArguments($arguments);
+        $process = is_array($this->command)
+            ? new Process($this->command)
+            : Process::fromShellCommandline((string) $this->command);
 
-        $process = tap(new Process($this->arguments), function (Process $process) {
-            $process->setWorkingDirectory($this->path ?? getcwd());
-            $process->setTimeout($this->timeout);
-        });
+        $process->setWorkingDirectory($this->path ?? getcwd());
+        $process->setTimeout($this->timeout);
 
         return $this->delayStart ? new DelayedStart(fn () => $this->start($process)) : $this->start($process);
     }
@@ -169,15 +187,14 @@ class PendingProcess
     /**
      * Starts the given process.
      *
-     * @param  \Symfony\Component\Process\Process  $process
+     * @param  \Illuminate\Console\Process  $process
      * @return \Illuminate\Console\Contracts\ProcessResult
      */
     protected function start($process)
     {
-        ($this->beforeStartCallbacks ?? collect())
-            ->each(fn ($callback) => $callback($process));
+        collect($this->beforeStartCallbacks)->each(fn ($callback) => $callback($process));
 
-        foreach ($this->stubCallbacks ?? [] as $callback) {
+        foreach ($this->stubs as $callback) {
             if ($result = $callback($process)) {
                 /** @var \Illuminate\Console\Process\Results\FakeResult $result */
                 return $result->setProcess($process);
@@ -190,13 +207,11 @@ class PendingProcess
     /**
      * Add a new "before start" callback to the process.
      *
-     * @param  callable(\Symfony\Component\Process\Process): mixed  $callback
+     * @param  callable(\Illuminate\Console\Process): mixed  $callback
      * @return $this
      */
-    protected function beforeStart($callback)
+    public function beforeStart($callback)
     {
-        $this->beforeStartCallbacks ??= collect();
-
-        return tap($this, fn () => $this->beforeStartCallbacks->push($callback));
+        return tap($this, fn () => $this->beforeStartCallbacks[] = $callback);
     }
 }

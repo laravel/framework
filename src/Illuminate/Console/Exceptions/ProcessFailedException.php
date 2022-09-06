@@ -9,7 +9,7 @@ class ProcessFailedException extends RuntimeException
     /**
      * The underlying process instance.
      *
-     * @var \Symfony\Component\Process\Process
+     * @var \Illuminate\Console\Process
      */
     protected $process;
 
@@ -23,7 +23,7 @@ class ProcessFailedException extends RuntimeException
     /**
      * Creates a new Process Exception instance.
      *
-     * @param  \Symfony\Component\Process\Process  $process
+     * @param  \Illuminate\Console\Process  $process
      * @param  \Illuminate\Console\Contracts\ProcessResult  $result
      * @param  \Symfony\Component\Process\Exception\RuntimeException  $original
      * @return void
@@ -43,7 +43,7 @@ class ProcessFailedException extends RuntimeException
     /**
      * Get the underlying process instance.
      *
-     * @return \Symfony\Component\Process\Process
+     * @return \Illuminate\Console\Process
      */
     public function process()
     {

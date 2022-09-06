@@ -12,7 +12,7 @@ class FakeResult implements ProcessResult
     /**
      * The underlying process instance.
      *
-     * @var \Symfony\Component\Process\Process
+     * @var \Illuminate\Console\Process
      */
     protected $process;
 
@@ -46,7 +46,7 @@ class FakeResult implements ProcessResult
     /**
      * Sets the process for the fake result.
      *
-     * @param  \Symfony\Component\Process\Process  $process
+     * @param  \Illuminate\Console\Process  $process
      * @return $this
      *
      * @internal

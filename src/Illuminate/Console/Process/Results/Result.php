@@ -14,14 +14,14 @@ class Result implements ProcessResult
     /**
      * The underlying process instance.
      *
-     * @var \Symfony\Component\Process\Process
+     * @var \Illuminate\Console\Process
      */
     protected $process;
 
     /**
      * Creates a new Process Result instance.
      *
-     * @param  \Symfony\Component\Process\Process
+     * @param  \Illuminate\Console\Process
      * @return void
      */
     public function __construct($process)

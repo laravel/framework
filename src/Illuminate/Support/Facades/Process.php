@@ -5,7 +5,7 @@ namespace Illuminate\Support\Facades;
 use Illuminate\Console\Process\Factory;
 
 /**
- * @method static \Illuminate\Console\Contracts\ProcessResult run(iterable|string $arguments = [])
+ * @method static \Illuminate\Console\Contracts\ProcessResult run(iterable|string $command = [])
  * @method static \Illuminate\Console\Process\PendingProcess dd()
  * @method static \Illuminate\Console\Process\PendingProcess dump()
  * @method static \Illuminate\Console\Process\PendingProcess forever()
@@ -22,7 +22,7 @@ class Process extends Facade
     /**
      * Register a stub callable that will intercept processes and be able to return stub processes results.
      *
-     * @param  (iterable<string, callable(\Symfony\Component\Process\Process): \Illuminate\Console\Contracts\ProcessResult>)|(callable(\Symfony\Component\Process\Process): \Illuminate\Console\Contracts\ProcessResult)|null  $callback
+     * @param  (iterable<string, callable(\Illuminate\Console\Process): \Illuminate\Console\Contracts\ProcessResult>)|(callable(\Illuminate\Console\Process): \Illuminate\Console\Contracts\ProcessResult)|null  $callback
      * @return \Illuminate\Console\Process\Factory
      */
     public static function fake($callback = null)
