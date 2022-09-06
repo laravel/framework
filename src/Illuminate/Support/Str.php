@@ -14,6 +14,7 @@ use Ramsey\Uuid\Codec\TimestampFirstCombCodec;
 use Ramsey\Uuid\Generator\CombGenerator;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidFactory;
+use Traversable;
 use voku\helper\ASCII;
 
 class Str
@@ -228,7 +229,11 @@ class Str
             $haystack = mb_strtolower($haystack);
         }
 
-        foreach ((array) $needles as $needle) {
+        if (! is_iterable($needles)) {
+            $needles = (array) $needles;
+        }
+
+        foreach ($needles as $needle) {
             if ($ignoreCase) {
                 $needle = mb_strtolower($needle);
             }
@@ -269,7 +274,11 @@ class Str
      */
     public static function endsWith($haystack, $needles)
     {
-        foreach ((array) $needles as $needle) {
+        if (! is_iterable($needles)) {
+            $needles = (array) $needles;
+        }
+
+        foreach ($needles as $needle) {
             if ((string) $needle !== '' && str_ends_with($haystack, $needle)) {
                 return true;
             }
@@ -339,7 +348,11 @@ class Str
     {
         $value = (string) $value;
 
-        foreach ((array) $pattern as $pattern) {
+        if (! is_iterable($pattern)) {
+            $pattern = [$pattern];
+        }
+
+        foreach ($pattern as $pattern) {
             $pattern = (string) $pattern;
 
             // If the given value is an exact match we can of course return true right
@@ -773,14 +786,14 @@ class Str
      * Replace a given value in the string sequentially with an array.
      *
      * @param  string  $search
-     * @param  array<string>|Enumerable<array-key, string>  $replace
+     * @param  iterable<string>  $replace
      * @param  string  $subject
      * @return string
      */
     public static function replaceArray($search, $replace, $subject)
     {
-        if ($replace instanceof Enumerable) {
-            $replace = $replace->toArray();
+        if ($replace instanceof Traversable) {
+            $replace = collect($replace)->all();
         }
 
         $segments = explode($search, $subject);
@@ -797,23 +810,23 @@ class Str
     /**
      * Replace the given value in the given string.
      *
-     * @param  string|array<string>|Enumerable<array-key, string>  $search
-     * @param  string|array<string>|Enumerable<array-key, string>  $replace
-     * @param  string|array<string>|Enumerable<array-key, string>  $subject
+     * @param  string|iterable<string>  $search
+     * @param  string|iterable<string>  $replace
+     * @param  string|iterable<string>  $subject
      * @return string
      */
     public static function replace($search, $replace, $subject)
     {
-        if ($search instanceof Enumerable) {
-            $search = $search->toArray();
+        if ($search instanceof Traversable) {
+            $search = collect($search)->all();
         }
 
-        if ($replace instanceof Enumerable) {
-            $replace = $replace->toArray();
+        if ($replace instanceof Traversable) {
+            $replace = collect($replace)->all();
         }
 
-        if ($subject instanceof Enumerable) {
-            $subject = $subject->toArray();
+        if ($subject instanceof Traversable) {
+            $subject = collect($subject)->all();
         }
 
         return str_replace($search, $replace, $subject);
@@ -870,15 +883,15 @@ class Str
     /**
      * Remove any occurrence of the given string in the subject.
      *
-     * @param  string|array<string>|Enumerable<array-key, string>  $search
+     * @param  string|iterable<string>  $search
      * @param  string  $subject
      * @param  bool  $caseSensitive
      * @return string
      */
     public static function remove($search, $subject, $caseSensitive = true)
     {
-        if ($search instanceof Enumerable) {
-            $search = $search->toArray();
+        if ($search instanceof Traversable) {
+            $search = collect($search)->all();
         }
 
         $subject = $caseSensitive
@@ -1038,7 +1051,11 @@ class Str
      */
     public static function startsWith($haystack, $needles)
     {
-        foreach ((array) $needles as $needle) {
+        if (! is_iterable($needles)) {
+            $needles = [$needles];
+        }
+
+        foreach ($needles as $needle) {
             if ((string) $needle !== '' && str_starts_with($haystack, $needle)) {
                 return true;
             }
