@@ -35,7 +35,7 @@ class ProcessTest extends TestCase
     {
         $this->factory->fake();
 
-        $result = $this->factory->run('ls');
+        $result = $this->factory->run($this->ls());
 
         $this->assertTrue($result->ok());
     }
@@ -46,7 +46,7 @@ class ProcessTest extends TestCase
             return $this->factory::result('my-process-output', 1);
         });
 
-        $result = $this->factory->run('ls');
+        $result = $this->factory->run($this->ls());
 
         $this->assertTrue($result->failed());
     }
@@ -60,8 +60,8 @@ class ProcessTest extends TestCase
         });
 
         $this->factory->fake([
-            'ls -la' => $this->factory::result('drwxr-xr-x   25 nunomaduro'),
-            'ls -laaaaa' => $this->factory::result('drwxr-xr-x   25 taylorotwell'),
+            'nuno' => $this->factory::result('drwxr-xr-x   25 nunomaduro'),
+            'taylor' => $this->factory::result('drwxr-xr-x   25 taylorotwell'),
             '*' => $this->factory::result('drwxr-xr-x   25 root'),
         ]);
 
@@ -69,35 +69,35 @@ class ProcessTest extends TestCase
         $this->assertSame('some failure', $result->output());
         $this->assertTrue($result->failed());
 
-        $result = $this->factory->run(['ls', '-la']);
+        $result = $this->factory->run(['nuno']);
         $this->assertSame('drwxr-xr-x   25 nunomaduro', $result->output());
 
-        $result = $this->factory->run('ls -laaaaa');
+        $result = $this->factory->run('taylor');
         $this->assertSame('drwxr-xr-x   25 taylorotwell', $result->output());
 
-        $result = $this->factory->run('ls');
+        $result = $this->factory->run($this->ls());
         $this->assertSame('drwxr-xr-x   25 root', $result->output());
     }
 
     public function testResultOutputWhenFakeDoesNotExist()
     {
         $this->factory->fake([
-            'ls -la ' => $this->factory::result('drwxr-xr-x   25 nunomaduro'),
+            'nuno' => $this->factory::result('drwxr-xr-x   25 nunomaduro'),
         ]);
 
-        $result = $this->factory->run(['ls', '-la']);
+        $result = $this->factory->run(['nuno']);
         $this->assertSame('drwxr-xr-x   25 nunomaduro', $result->output());
 
-        $result = $this->factory->path(__DIR__)->run('ls');
+        $result = $this->factory->path(__DIR__)->run($this->ls());
         $this->assertStringContainsString('ProcessTest', $result->output());
         $this->assertTrue($result->ok());
 
         $this->factory->fake();
 
-        $result = $this->factory->run(['ls', '-la']);
+        $result = $this->factory->run(['nuno']);
         $this->assertSame('drwxr-xr-x   25 nunomaduro', $result->output());
 
-        $result = $this->factory->path(__DIR__)->run('ls';
+        $result = $this->factory->path(__DIR__)->run($this->ls());
         $this->assertStringContainsString('', $result->output());
         $this->assertTrue($result->ok());
     }
@@ -110,7 +110,7 @@ class ProcessTest extends TestCase
         $this->factory->fake(fn () => $result);
 
         try {
-            $this->factory->run('ls')->throw();
+            $this->factory->run($this->ls())->throw();
         } catch (ProcessFailedException $exception) {
             // ..
         }
@@ -125,7 +125,7 @@ class ProcessTest extends TestCase
     public function testResultEnsuresTheProcessStarts()
     {
         $this->expectException(ProcessNotStartedException::class);
-        $this->expectExceptionMessage("The process \"$this->>ls()\" failed to start.");
+        $this->expectExceptionMessage("The process \"'{$this->ls()}'\" failed to start.");
 
         new Result(new Process([$this->ls()]));
     }
@@ -200,7 +200,7 @@ class ProcessTest extends TestCase
     {
         $this->factory->fake();
 
-        $result = $this->factory->path(__DIR__)->run('ls');
+        $result = $this->factory->path(__DIR__)->run($this->ls());
 
         $this->assertSame(__DIR__, $result->process()->getWorkingDirectory());
     }
@@ -209,7 +209,7 @@ class ProcessTest extends TestCase
     {
         $this->factory->fake();
 
-        $result = $this->factory->forever()->run('ls');
+        $result = $this->factory->forever()->run($this->ls());
 
         $this->assertNull($result->process()->getTimeout());
     }

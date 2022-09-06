@@ -52,7 +52,7 @@ class Factory
                         ->values()
                         ->implode(' ');
 
-                    if ($url === '*' || $process->getCommandline() === (new Process(explode(' ', $url)))->getCommandLine()) {
+                    if ($url === '*' || $process->getCommandline() == (new Process(explode(' ', $url)))->getCommandLine()) {
                         return $result;
                     }
                 });
