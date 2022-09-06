@@ -67,7 +67,7 @@ class ComponentsTest extends TestCase
 
         with(new Components\Success($output))->render('The application is in the [production] environment');
 
-        $this->assertStringContainsString('INFO  The application is in the [production] environment.', $output->fetch());
+        $this->assertStringContainsString('SUCCESS  The application is in the [production] environment.', $output->fetch());
     }
 
     public function testConfirm()
