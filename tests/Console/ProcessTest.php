@@ -97,7 +97,7 @@ class ProcessTest extends TestCase
         $result = $this->factory->run(['ls', '-la']);
         $this->assertSame('drwxr-xr-x   25 nunomaduro', $result->output());
 
-        $result = $this->factory->path(__DIR__)->run('ls');
+        $result = $this->factory->path(__DIR__)->run('ls';
         $this->assertStringContainsString('', $result->output());
         $this->assertTrue($result->ok());
     }
@@ -118,16 +118,16 @@ class ProcessTest extends TestCase
         $this->assertInstanceOf(ProcessFailedException::class, $exception);
 
         $this->assertSame($result, $exception->result());
-        $this->assertStringContainsString('ls', $exception->process()->getCommandLine());
+        $this->assertStringContainsString($this->ls(), $exception->process()->getCommandLine());
         $this->assertNull($exception->getPrevious());
     }
 
     public function testResultEnsuresTheProcessStarts()
     {
         $this->expectException(ProcessNotStartedException::class);
-        $this->expectExceptionMessage("The process \"'ls'\" failed to start.");
+        $this->expectExceptionMessage("The process \"$this->>ls()\" failed to start.");
 
-        new Result(new Process(['ls']));
+        new Result(new Process([$this->ls()]));
     }
 
     public function testFakeResultEnsuresTheProcessStarts()
@@ -140,26 +140,26 @@ class ProcessTest extends TestCase
 
     public function testWait()
     {
-        $result = $this->factory->path(__DIR__)->run('ls');
+        $result = $this->factory->path(__DIR__)->run($this->ls());
         $this->assertStringContainsString('ProcessTest', $result->wait()->output());
         $this->assertTrue($result->ok());
 
         $this->factory->fake();
 
-        $result = $this->factory->path(__DIR__)->run('ls');
+        $result = $this->factory->path(__DIR__)->run($this->ls());
         $this->assertStringContainsString('', $result->wait()->output());
         $this->assertTrue($result->ok());
     }
 
     public function testDoesNotThrow()
     {
-        $result = $this->factory->path(__DIR__)->run('ls')->throw();
+        $result = $this->factory->path(__DIR__)->run($this->ls())->throw();
         $this->assertStringContainsString('ProcessTest', $result->wait()->output());
         $this->assertTrue($result->ok());
 
         $this->factory->fake();
 
-        $result = $this->factory->path(__DIR__)->run('ls')->throw();
+        $result = $this->factory->path(__DIR__)->run($this->ls())->throw();
         $this->assertStringContainsString('', $result->wait()->output());
         $this->assertTrue($result->ok());
     }
@@ -216,14 +216,14 @@ class ProcessTest extends TestCase
 
     public function testResultToString()
     {
-        $result = $this->factory->path(__DIR__)->run('ls');
+        $result = $this->factory->path(__DIR__)->run($this->ls());
         $this->assertStringContainsString('ProcessTest', (string) $result);
         $this->assertStringContainsString('ProcessTest', $result->toString());
         $this->assertTrue($result->ok());
 
         $this->factory->fake(fn () => $this->factory::result('ProcessOutput'));
 
-        $result = $this->factory->path(__DIR__)->run('ls');
+        $result = $this->factory->path(__DIR__)->run($this->ls());
         $this->assertStringContainsString('ProcessOutput', (string) $result);
         $this->assertStringContainsString('ProcessOutput', $result->toString());
         $this->assertTrue($result->ok());
@@ -279,16 +279,26 @@ class ProcessTest extends TestCase
 
     public function testWithArguments()
     {
-        $result = $this->factory->path(__DIR__)->withArguments(['ls'])->run();
+        $result = $this->factory->path(__DIR__)->withArguments([$this->ls()])->run();
         $this->assertStringContainsString('ProcessTest', (string) $result);
         $this->assertStringContainsString('ProcessTest', $result->toString());
         $this->assertTrue($result->ok());
 
         $this->factory->fake(fn () => $this->factory::result('ProcessOutput'));
 
-        $result = $this->factory->path(__DIR__)->withArguments(['ls'])->run();
+        $result = $this->factory->path(__DIR__)->withArguments([$this->ls()])->run();
         $this->assertStringContainsString('ProcessOutput', (string) $result);
         $this->assertStringContainsString('ProcessOutput', $result->toString());
         $this->assertTrue($result->ok());
+    }
+
+    /**
+     * Gets the "ls" command for the current operating system.
+     *
+     * @return string
+     */
+    protected function ls()
+    {
+        return windows_os() ? 'dir' : 'ls';
     }
 }
