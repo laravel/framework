@@ -105,6 +105,21 @@ class Factory
     }
 
     /**
+     * Assert that no process was recorded.
+     *
+     * @return $this
+     */
+    public function assertNothingRan()
+    {
+        PHPUnit::assertEmpty(
+            $this->recorded,
+            'Processes were recorded.'
+        );
+
+        return $this;
+    }
+
+    /**
      * Register a stub callable that will intercept requests and be able to return stub results.
      *
      * @param  (iterable<string, callable(\Illuminate\Console\Process): \Illuminate\Console\Contracts\ProcessResult>)|(callable(\Illuminate\Console\Process): \Illuminate\Console\Contracts\ProcessResult)|null  $callback

@@ -460,6 +460,26 @@ class ProcessTest extends TestCase
         $this->factory->assertNotRan('ls');
     }
 
+    public function testAssertNothingRan()
+    {
+        $this->factory->fake();
+
+        $factory = $this->factory->assertNothingRan();
+
+        $this->assertSame($this->factory, $factory);
+    }
+
+    public function testAssertNothingRanMayFail()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $this->factory->fake();
+
+        $this->factory->run('ls');
+
+        $this->factory->assertNothingRan();
+    }
+
     protected function ls()
     {
         return windows_os() ? 'dir' : 'ls';
