@@ -3,9 +3,12 @@
 namespace Illuminate\Tests;
 
 use Illuminate\Console\Exceptions\ProcessFailedException;
+use Illuminate\Console\Exceptions\ProcessNotRunningException;
 use Illuminate\Console\Exceptions\ProcessNotStartedException;
 use Illuminate\Console\Exceptions\ProcessTimedOutException;
+use Illuminate\Console\Process\DelayedStart;
 use Illuminate\Console\Process\Factory;
+use Illuminate\Console\Process\Pool;
 use Illuminate\Console\Process\Results\FakeResult;
 use Illuminate\Console\Process\Results\Result;
 use Mockery as m;
@@ -295,6 +298,55 @@ class ProcessTest extends TestCase
         $this->assertStringContainsString('ProcessOutput', (string) $result);
         $this->assertStringContainsString('ProcessOutput', $result->toString());
         $this->assertTrue($result->ok());
+    }
+
+    public function testDelayedRun()
+    {
+        $this->factory->fake();
+
+        $result = $this->factory->delayStart()->run($this->ls());
+        $this->assertInstanceOf(DelayedStart::class, $result);
+        $this->assertFalse($result->process()->isRunning()); // because of fake...
+        $this->assertTrue($result->ok());
+    }
+
+    public function testProcessesOnPoolMustCallRun()
+    {
+        $this->factory->fake();
+
+        $this->expectException(ProcessNotRunningException::class);
+
+        $this->factory->pool(function (Pool $pool) {
+            return [$pool->path(__DIR__)];
+        });
+    }
+
+    public function testPoolResults()
+    {
+        $this->factory->fake([
+            'one' => $this->factory::result(['My line 1']),
+            'two' => $this->factory::result(['My line 1', 'My line 2'], 1),
+            'three' => $this->factory::result(['My line 1', 'My line 2', 'My line 3'], 143),
+        ]);
+
+        $results = $this->factory->pool(fn (Pool $pool) => [
+            $pool->run('one'),
+            $pool->run('two'),
+            $pool->run('three'),
+        ]);
+
+        $this->assertCount(3, $results);
+
+        $this->assertTrue($results[0]->ok());
+        $this->assertSame(['My line 1'], $results[0]->toArray());
+
+        $this->assertTrue($results[1]->failed());
+        $this->assertSame(1, $results[1]->exitCode());
+        $this->assertSame(['My line 1', 'My line 2'], $results[1]->toArray());
+
+        $this->assertTrue($results[2]->failed());
+        $this->assertSame(143, $results[2]->exitCode());
+        $this->assertSame(['My line 1', 'My line 2', 'My line 3'], $results[2]->toArray());
     }
 
     protected function ls()

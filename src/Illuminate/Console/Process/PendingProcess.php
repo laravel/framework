@@ -18,6 +18,13 @@ class PendingProcess
     protected $arguments;
 
     /**
+     * Whether the process should be have a delayed run.
+     *
+     * @var bool
+     */
+    protected $delayStart = false;
+
+    /**
      * The process's path.
      *
      * @var string|null
@@ -44,6 +51,18 @@ class PendingProcess
      * @var \Illuminate\Support\Collection|null
      */
     protected $beforeStartCallbacks;
+
+    /**
+     * Ensures the process's run is delayed.
+     *
+     * @return $this
+     */
+    public function delayStart()
+    {
+        $this->delayStart = true;
+
+        return $this;
+    }
 
     /**
      * Dump the process and end the script before start the process.
@@ -144,6 +163,17 @@ class PendingProcess
             $process->setTimeout($this->timeout);
         });
 
+        return $this->delayStart ? new DelayedStart(fn () => $this->start($process)) : $this->start($process);
+    }
+
+    /**
+     * Starts the given process.
+     *
+     * @param  \Symfony\Component\Process\Process  $process
+     * @return \Illuminate\Console\Contracts\ProcessResult
+     */
+    protected function start($process)
+    {
         ($this->beforeStartCallbacks ?? collect())
             ->each(fn ($callback) => $callback($process));
 

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console\Process;
 
+use Illuminate\Console\Exceptions\ProcessNotRunningException;
 use Illuminate\Console\Process\Results\FakeResult;
 use Illuminate\Support\Traits\Macroable;
 use Symfony\Component\Process\Process;
@@ -15,6 +16,8 @@ use Symfony\Component\Process\Process;
  * @method \Illuminate\Console\Process\PendingProcess timeout(int $seconds)
  * @method \Illuminate\Console\Process\PendingProcess stub(callable $callback)
  * @method \Illuminate\Console\Process\PendingProcess withArguments(iterable $arguments)
+ *
+ * @see \Illuminate\Console\Process\PendingProcess
  */
 class Factory
 {
@@ -69,9 +72,26 @@ class Factory
     }
 
     /**
+     * Send a pool of processes concurrently.
+     *
+     * @param  callable(\Illuminate\Console\Process\Pool): iterable<array-key, \Illuminate\Console\Contracts\ProcessResult>  $callback
+     * @return array<array-key, \Illuminate\Console\Contracts\ProcessResult>
+     */
+    public function pool($callback)
+    {
+        $results = $callback(new Pool($this));
+
+        return collect($results)->each(function ($result) {
+            if (! $result instanceof DelayedStart) {
+                throw new ProcessNotRunningException('Process has not been started. Did you forget to call "run"?');
+            }
+        })->map->start()->values();
+    }
+
+    /**
      * Create a new pending process instance for this factory.
      *
-     * @return \Illuminate\Console\Process\PenfdingProcess
+     * @return \Illuminate\Console\Process\PendingProcess
      */
     protected function newPendingProcess()
     {

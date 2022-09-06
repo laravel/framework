@@ -13,6 +13,7 @@ use Illuminate\Console\Process\Factory;
  * @method static \Illuminate\Console\Process\PendingProcess timeout(int $seconds)
  * @method static \Illuminate\Console\Process\PendingProcess stub(callable $callback)
  * @method static \Illuminate\Console\Process\PendingProcess withArguments(iterable $arguments)
+ * @method static \Illuminate\Support\Collection pool(callable $callback)
  *
  * @see \Illuminate\Console\Process\Factory
  */
