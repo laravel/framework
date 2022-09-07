@@ -202,6 +202,10 @@ class ProcessTest extends TestCase
 
     public function testSignals()
     {
+        if (! extension_loaded('pcntl')) {
+            $this->markTestSkipped('Test requires pcntl extension.');
+        }
+
         $result = $this->factory->path(__DIR__)->run($this->ls());
         $result->process()->signal(SIGKILL);
 
