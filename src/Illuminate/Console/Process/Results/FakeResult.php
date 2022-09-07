@@ -38,16 +38,25 @@ class FakeResult implements ProcessResult
     protected $exitCode;
 
     /**
+     * The process's error output.
+     *
+     * @var string
+     */
+    protected $errorOutput;
+
+    /**
      * Creates a new Process Result instance.
      *
      * @param  string  $output
      * @param  int  $exitCode
+     * @param  string  $errorOutput
      * @return void
      */
-    public function __construct($output, $exitCode)
+    public function __construct($output, $exitCode, $errorOutput)
     {
         $this->output = $output;
         $this->exitCode = $exitCode;
+        $this->errorOutput = $errorOutput;
     }
 
     /**
@@ -89,6 +98,14 @@ class FakeResult implements ProcessResult
     public function exitCode()
     {
         return $this->exitCode;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function errorOutput()
+    {
+        return $this->errorOutput;
     }
 
     /**

@@ -208,13 +208,15 @@ class Factory
      *
      * @param  array<array-key, string>|string  $output
      * @param  int  $exitCode
+     * @param  array<array-key, string>|string  $output
      * @return \Illuminate\Console\Contracts\ProcessResult
      */
-    public static function result($output = '', $exitCode = 0)
+    public static function result($output = '', $exitCode = 0, $errorOutput = '')
     {
         $output = is_array($output) ? implode("\n", $output) : $output;
+        $errorOutput = is_array($errorOutput) ? implode("\n", $errorOutput) : $errorOutput;
 
-        return new FakeResult($output, $exitCode);
+        return new FakeResult($output, $exitCode, $errorOutput);
     }
 
     /**

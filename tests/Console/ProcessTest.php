@@ -93,6 +93,18 @@ class ProcessTest extends TestCase
         $this->assertSame('drwxr-xr-x   25 root', $result->output());
     }
 
+    public function testResultErrorOutput()
+    {
+        $this->factory->fake(function () {
+            return $this->factory::result('my stdout output', 1, 'my stderr output');
+        });
+
+        $result = $this->factory->run('');
+        $this->assertSame('my stdout output', $result->output());
+        $this->assertTrue($result->failed());
+        $this->assertSame('my stderr output', $result->errorOutput());
+    }
+
     public function testResultOutputWhenFakeDoesNotExist()
     {
         $this->factory->fake([
@@ -154,7 +166,7 @@ class ProcessTest extends TestCase
         $this->expectException(ProcessNotStartedException::class);
         $this->expectExceptionMessage('The process failed to start.');
 
-        tap(new FakeResult('foo', 0))->wait();
+        tap(new FakeResult('foo', 0, ''))->wait();
     }
 
     public function testWait()

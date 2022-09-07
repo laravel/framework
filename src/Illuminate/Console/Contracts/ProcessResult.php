@@ -24,6 +24,13 @@ interface ProcessResult extends Arrayable, Stringable, ArrayAccess, IteratorAggr
     public function output();
 
     /**
+     * Get the process's error output.
+     *
+     * @return string
+     */
+    public function errorOutput();
+
+    /**
      * Determine if the process has run successfully.
      *
      * @return bool

@@ -76,6 +76,16 @@ class Result implements ProcessResult
     /**
      * {@inheritDoc}
      */
+    public function errorOutput()
+    {
+        $this->wait();
+
+        return $this->process->getErrorOutput();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function process()
     {
         return $this->process;
