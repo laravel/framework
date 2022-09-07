@@ -744,14 +744,16 @@ class MailMailableTest extends TestCase
 
     public function testAssertHasAttachment()
     {
-        Container::getInstance()->instance('mailer', new class {
+        Container::getInstance()->instance('mailer', new class
+        {
             public function render()
             {
                 //
             }
         });
 
-        $mailable = new class () extends Mailable {
+        $mailable = new class() extends Mailable
+        {
             public function build()
             {
                 //
@@ -765,7 +767,8 @@ class MailMailableTest extends TestCase
             $this->assertSame("Did not find the expected attachment.\nFailed asserting that false is true.", $e->getMessage());
         }
 
-        $mailable = new class () extends Mailable {
+        $mailable = new class() extends Mailable
+        {
             public function build()
             {
                 $this->attach('/path/to/foo.jpg');
@@ -777,14 +780,16 @@ class MailMailableTest extends TestCase
 
     public function testAssertHasAttachedData()
     {
-        Container::getInstance()->instance('mailer', new class {
+        Container::getInstance()->instance('mailer', new class
+        {
             public function render()
             {
                 //
             }
         });
 
-        $mailable = new class () extends Mailable {
+        $mailable = new class() extends Mailable
+        {
             public function build()
             {
                 //
@@ -798,7 +803,8 @@ class MailMailableTest extends TestCase
             $this->assertSame("Did not find the expected attachment.\nFailed asserting that false is true.", $e->getMessage());
         }
 
-        $mailable = new class () extends Mailable {
+        $mailable = new class() extends Mailable
+        {
             public function build()
             {
                 $this->attachData('data', 'foo.jpg');
@@ -810,7 +816,8 @@ class MailMailableTest extends TestCase
 
     public function testAssertHasAttachmentFromStorage()
     {
-        $mailable = new class () extends Mailable {
+        $mailable = new class() extends Mailable
+        {
             public function build()
             {
                 //
@@ -824,7 +831,8 @@ class MailMailableTest extends TestCase
             $this->assertSame("Did not find the expected attachment.\nFailed asserting that false is true.", $e->getMessage());
         }
 
-        $mailable = new class () extends Mailable {
+        $mailable = new class() extends Mailable
+        {
             public function build()
             {
                 $this->attachFromStorage('/path/to/foo.jpg');
