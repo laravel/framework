@@ -202,4 +202,27 @@ class EnvironmentDecryptCommandTest extends TestCase
         $this->filesystem->shouldHaveReceived('put')
             ->with(base_path('.env'), $contents);
     }
+
+    public function testItWritesTheEnvironmentFileCustomFilename()
+    {
+        $this->filesystem->shouldReceive('exists')
+            ->once()
+            ->andReturn(true)
+            ->shouldReceive('exists')
+            ->once()
+            ->andReturn(false)
+            ->shouldReceive('get')
+            ->once()
+            ->andReturn(
+                (new Encrypter('abcdefghijklmnop'))
+                    ->encrypt('APP_NAME="Laravel Two"')
+            );
+
+        $this->artisan('env:decrypt', ['--env' => 'production', '--key' => 'abcdefghijklmnop', '--filename' => '.env'])
+            ->expectsOutputToContain('Environment successfully decrypted.')
+            ->assertExitCode(0);
+
+        $this->filesystem->shouldHaveReceived('put')
+            ->with(base_path('.env'), 'APP_NAME="Laravel Two"');
+    }
 }

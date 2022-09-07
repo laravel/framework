@@ -22,7 +22,8 @@ class EnvironmentDecryptCommand extends Command
                     {--key= : The encryption key}
                     {--cipher= : The encryption cipher}
                     {--env= : The environment to be decrypted}
-                    {--force : Overwrite existing environment file}';
+                    {--force : Overwrite existing environment file}
+                    {--filename : Filename to which to write the decrypted contents}';
 
     /**
      * The name of the console command.
@@ -77,6 +78,7 @@ class EnvironmentDecryptCommand extends Command
                             ? base_path('.env').'.'.$this->option('env')
                             : $this->laravel->environmentFilePath();
         $encryptedFile = $environmentFile.'.encrypted';
+        $filename = $this->option('filename') ? base_path($this->option('filename')) : $environmentFile;
 
         if (! $this->files->exists($encryptedFile)) {
             $this->components->error('Encrypted environment file not found.');
@@ -94,7 +96,7 @@ class EnvironmentDecryptCommand extends Command
             $encrypter = new Encrypter($key, $cipher);
 
             $this->files->put(
-                $environmentFile,
+                $filename,
                 $encrypter->decrypt($this->files->get($encryptedFile))
             );
         } catch (Exception $e) {
