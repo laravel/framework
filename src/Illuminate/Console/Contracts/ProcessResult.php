@@ -8,8 +8,6 @@ use IteratorAggregate;
 use Stringable;
 
 /**
- * @internal
- *
  * @extends Arrayable<int, string>
  * @extends IteratorAggregate<int, string>
  * @extends ArrayAccess<int, string>
