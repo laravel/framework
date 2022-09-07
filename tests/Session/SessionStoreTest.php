@@ -499,9 +499,9 @@ class SessionStoreTest extends TestCase
         $session->put('baz', null);
         $session->put('hulk', ['one' => true]);
         $this->assertFalse($session->has('baz'));
-        $this->assertFalse($session->missing('baz'));
+        $this->assertTrue($session->missing('baz'));
         $this->assertTrue($session->missing('bogus'));
-        $this->assertFalse($session->missing(['foo', 'baz']));
+        $this->assertTrue($session->missing(['foo', 'baz']));
         $this->assertTrue($session->missing(['foo', 'baz', 'bogus']));
         $this->assertFalse($session->missing(['hulk.one']));
         $this->assertTrue($session->missing(['hulk.two']));

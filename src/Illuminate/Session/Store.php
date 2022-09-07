@@ -265,7 +265,7 @@ class Store implements Session
      */
     public function missing($key)
     {
-        return ! $this->exists($key);
+        return ! $this->has($key);
     }
 
     /**
