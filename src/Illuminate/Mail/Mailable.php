@@ -923,11 +923,18 @@ class Mailable implements MailableContract, Renderable
         }
 
         if ($file instanceof Attachment) {
-            [$file, $options] = $file->attachWith(
+            $parts = $file->attachWith(
                 fn ($path) => [$path, ['as' => $file->as, 'mime' => $file->mime]],
-                // TODO: pass through to hasAttachedData.
-                fn () => [null, []]
+                fn ($data) => $this->hasAttachedData($data(), $file->as, ['mime' => $file->mime])
             );
+
+            if ($parts === true) {
+                return true;
+            }
+
+            [$file, $options] = $parts === false
+                ? [null, []]
+                : $parts;
         }
 
         return collect($this->attachments)->contains(
