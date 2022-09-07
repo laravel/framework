@@ -30,7 +30,7 @@ class Pool
      *
      * @param  string  $method
      * @param  iterable<int, mixed>  $parameters
-     * @return \Illuminate\Console\Process\PendingProcess
+     * @return \Illuminate\Console\Process\PendingProcess|\Illuminate\Console\Contracts\ProcessResult
      */
     public function __call($method, $parameters)
     {

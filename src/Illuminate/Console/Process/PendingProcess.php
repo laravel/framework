@@ -89,9 +89,7 @@ class PendingProcess
      */
     public function dd()
     {
-        return $this->beforeStart(function ($process) {
-            dd($process);
-        });
+        return $this->beforeStart(fn ($process) => dd($process));
     }
 
     /**
@@ -101,9 +99,7 @@ class PendingProcess
      */
     public function dump()
     {
-        return $this->beforeStart(function ($process) {
-            dump($process);
-        });
+        return $this->beforeStart(fn ($process) => dump($process));
     }
 
     /**
@@ -120,7 +116,7 @@ class PendingProcess
     }
 
     /**
-     * Sets the process's arguments.
+     * Sets the process's command.
      *
      * @param  array<array-key, string>|string  $command
      * @return $this

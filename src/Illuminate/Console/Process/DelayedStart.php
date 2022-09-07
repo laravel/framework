@@ -26,7 +26,7 @@ class DelayedStart
     }
 
     /**
-     * Starts the pending process, and returns the result.
+     * Starts the process, and returns the result.
      *
      * @return \Illuminate\Console\Contracts\ProcessResult
      */
@@ -36,7 +36,7 @@ class DelayedStart
     }
 
     /**
-     * Execute a method against the result of "run".
+     * Execute a method against the process's result instance.
      *
      * @param  string  $method
      * @param  iterable<array-key, string>  $parameters
