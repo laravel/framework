@@ -34,6 +34,7 @@ use Illuminate\Foundation\Console\ConsoleMakeCommand;
 use Illuminate\Foundation\Console\DocsCommand;
 use Illuminate\Foundation\Console\DownCommand;
 use Illuminate\Foundation\Console\EnvironmentCommand;
+use Illuminate\Foundation\Console\EnvironmentDecryptCommand;
 use Illuminate\Foundation\Console\EnvironmentEncryptCommand;
 use Illuminate\Foundation\Console\EventCacheCommand;
 use Illuminate\Foundation\Console\EventClearCommand;
@@ -113,6 +114,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'DbWipe' => WipeCommand::class,
         'Down' => DownCommand::class,
         'Environment' => EnvironmentCommand::class,
+        'EnvironmentDecrypt' => EnvironmentDecryptCommand::class,
         'EnvironmentEncrypt' => EnvironmentEncryptCommand::class,
         'EventCache' => EventCacheCommand::class,
         'EventClear' => EventClearCommand::class,
@@ -507,6 +509,16 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     protected function registerEnvironmentCommand()
     {
         $this->app->singleton(EnvironmentCommand::class);
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerEnvironmentDecryptCommand()
+    {
+        $this->app->singleton(EnvironmentDecryptCommand::class);
     }
 
     /**

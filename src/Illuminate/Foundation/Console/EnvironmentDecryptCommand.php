@@ -7,21 +7,22 @@ use Illuminate\Console\Command;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Env;
+use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
 
-#[AsCommand(name: 'env:encrypt')]
-class EnvironmentEncryptCommand extends Command
+#[AsCommand(name: 'env:decrypt')]
+class EnvironmentDecryptCommand extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'env:encrypt
+    protected $signature = 'env:decrypt
                     {--key= : The encryption key}
                     {--cipher= : The encryption cipher}
-                    {--env= : The environment to be encrypted}
-                    {--force : Overwrite existing encrypted environment file}';
+                    {--env= : The environment to be decrypted}
+                    {--force : Overwrite existing environment file}';
 
     /**
      * The name of the console command.
@@ -32,14 +33,14 @@ class EnvironmentEncryptCommand extends Command
      *
      * @deprecated
      */
-    protected static $defaultName = 'env:encrypt';
+    protected static $defaultName = 'env:decrypt';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Encrypt the given environment file';
+    protected $description = 'Decrypt the given environment file';
 
     /**
      * The filesystem instance.
@@ -62,25 +63,29 @@ class EnvironmentEncryptCommand extends Command
      */
     public function handle()
     {
+        $key = $this->option('key') ?: Env::get('LARAVEL_ENV_ENCRYPTION_KEY');
+
+        if (! $key) {
+            $this->components->error('A decryption key is required.');
+
+            return Command::FAILURE;
+        }
+
         $cipher = $this->option('cipher') ?: 'aes-128-cbc';
-        $key = $keyPassed = $this->option('key') ?: Env::get('ENVIRONMENT_ENCRYPTION_KEY');
+        $key = $this->parseKey($key);
         $environmentFile = $this->option('env')
                             ? base_path('.env').'.'.$this->option('env')
                             : $this->laravel->environmentFilePath();
         $encryptedFile = $environmentFile.'.encrypted';
 
-        if (! $keyPassed) {
-            $key = Encrypter::generateKey($cipher);
-        }
-
-        if (! $this->files->exists($environmentFile)) {
-            $this->components->error('Environment file not found.');
+        if (! $this->files->exists($encryptedFile)) {
+            $this->components->error('Encrypted environment file not found.');
 
             return Command::FAILURE;
         }
 
-        if ($this->files->exists($encryptedFile) && ! $this->option('force')) {
-            $this->components->error('Encrypted environment file already exists.');
+        if ($this->files->exists($environmentFile) && ! $this->option('force')) {
+            $this->components->error('Environment file already exists.');
 
             return Command::FAILURE;
         }
@@ -89,8 +94,8 @@ class EnvironmentEncryptCommand extends Command
             $encrypter = new Encrypter($key, $cipher);
 
             $this->files->put(
-                $encryptedFile,
-                $encrypter->encrypt($this->files->get($environmentFile))
+                $environmentFile,
+                $encrypter->decrypt($this->files->get($encryptedFile))
             );
         } catch (Exception $e) {
             $this->components->error($e->getMessage());
@@ -98,12 +103,21 @@ class EnvironmentEncryptCommand extends Command
             return Command::FAILURE;
         }
 
-        $this->components->info('Environment successfully encrypted.');
-        $this->components->bulletList([
-            'Key: '.($keyPassed ? $key : 'base64:'.base64_encode($key)),
-            "Cipher: {$cipher}",
-            "File: {$encryptedFile}",
-        ]);
-        $this->newLine();
+        $this->components->info('Environment successfully decrypted.');
+    }
+
+    /**
+     * Parse the encryption key.
+     *
+     * @param  string  $key
+     * @return string
+     */
+    protected function parseKey(string $key)
+    {
+        if (Str::startsWith($key, $prefix = 'base64:')) {
+            $key = base64_decode(Str::after($key, $prefix));
+        }
+
+        return $key;
     }
 }
