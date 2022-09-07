@@ -186,30 +186,24 @@ class ProcessTest extends TestCase
 
     public function testTimeout()
     {
-        $exception = null;
+        $this->factory->fake();
 
-        $result = $this->factory->path(__DIR__)->timeout(1)->run($this->sleep(3));
+        $result = $this->factory->run('sleep 2');
+        $this->assertSame(60.0, $result->process()->getTimeout());
 
+        $result = $this->factory->forever()->run('sleep 2');
+        $this->assertSame(null, $result->process()->getTimeout());
+
+        $result = $this->factory->timeout(1)->run('sleep 2');
         $this->assertSame(1.0, $result->process()->getTimeout());
 
-        try {
-            $result->wait();
-        } catch (ProcessTimedOutException $exception) {
-            // ..
-        }
-
-        $this->assertInstanceOf(ProcessTimedOutException::class, $exception);
-        $this->assertTrue($exception->result()->failed());
-        $this->assertSame(143, $exception->result()->exitCode());
+        $result = $this->factory->timeout(500)->run('sleep 2');
+        $this->assertSame(500.0, $result->process()->getTimeout());
     }
 
     public function testSignals()
     {
-        if (! extension_loaded('pcntl')) {
-            $this->markTestSkipped('Test requires pcntl extension.');
-        }
-
-        $result = $this->factory->path(__DIR__)->run($this->sleep(5));
+        $result = $this->factory->path(__DIR__)->run($this->ls());
         $result->process()->signal(SIGKILL);
 
         $this->assertTrue($result->failed());
@@ -507,10 +501,5 @@ class ProcessTest extends TestCase
     protected function ls()
     {
         return windows_os() ? 'dir' : 'ls';
-    }
-
-    protected function sleep($seconds)
-    {
-        return windows_os() ? sprintf('timeout /t %s', $seconds) : sprintf('sleep %s', $seconds);
     }
 }
