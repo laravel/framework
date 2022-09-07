@@ -5,20 +5,20 @@ namespace Illuminate\Support\Facades;
 use Illuminate\Console\Process\Factory;
 
 /**
- * @method static \Illuminate\Console\Contracts\ProcessResult run(array|string $command = [])
- * @method static \Illuminate\Console\Process\PendingProcess command(array|string|null $command)
+ * @method static \Illuminate\Console\Contracts\ProcessResult result(string $output = '', int $exitCode = 0, string $errorOutput = '')
+ * @method static \Illuminate\Console\Contracts\ProcessResult run(array|string|null $command = null)
+ * @method static \Illuminate\Console\Process\PendingProcess command(array|string $command)
  * @method static \Illuminate\Console\Process\PendingProcess dd()
  * @method static \Illuminate\Console\Process\PendingProcess dump()
  * @method static \Illuminate\Console\Process\PendingProcess forever()
  * @method static \Illuminate\Console\Process\PendingProcess path(string $path)
- * @method static \Illuminate\Console\Process\PendingProcess timeout(int $seconds)
- * @method static \Illuminate\Console\Process\PendingProcess stub(callable $callback)
- * @method static \Illuminate\Support\Collection pool(callable $callback)
+ * @method static \Illuminate\Console\Process\PendingProcess timeout(float|null $seconds)
  * @method static \Illuminate\Console\Process\Factory assertRan(callable|string $command)
  * @method static \Illuminate\Console\Process\Factory assertRanInOrder(array $commands)
  * @method static \Illuminate\Console\Process\Factory assertNotRan(callable|string $command)
  * @method static \Illuminate\Console\Process\Factory assertNothingSent()
  * @method static \Illuminate\Console\Process\Factory assertRanCount(int $count)
+ * @method static \Illuminate\Support\Collection pool(callable $callback)
  *
  * @see \Illuminate\Console\Process\Factory
  */

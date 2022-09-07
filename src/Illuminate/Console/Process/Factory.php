@@ -9,14 +9,13 @@ use Illuminate\Support\Traits\Macroable;
 use PHPUnit\Framework\Assert as PHPUnit;
 
 /**
- * @method \Illuminate\Console\Contracts\ProcessResult run(array|string $command = [])
+ * @method \Illuminate\Console\Contracts\ProcessResult run(array|string|null $command = null)
  * @method \Illuminate\Console\Process\PendingProcess command(array|string $command)
  * @method \Illuminate\Console\Process\PendingProcess dd()
  * @method \Illuminate\Console\Process\PendingProcess dump()
  * @method \Illuminate\Console\Process\PendingProcess forever()
  * @method \Illuminate\Console\Process\PendingProcess path(string $path)
- * @method \Illuminate\Console\Process\PendingProcess timeout(int $seconds)
- * @method \Illuminate\Console\Process\PendingProcess stub(callable $callback)
+ * @method \Illuminate\Console\Process\PendingProcess timeout(float|null $seconds)
  *
  * @see \Illuminate\Console\Process\PendingProcess
  */
@@ -208,7 +207,7 @@ class Factory
      *
      * @param  array<array-key, string>|string  $output
      * @param  int  $exitCode
-     * @param  array<array-key, string>|string  $output
+     * @param  array<array-key, string>|string  $errorOutput
      * @return \Illuminate\Console\Contracts\ProcessResult
      */
     public static function result($output = '', $exitCode = 0, $errorOutput = '')
