@@ -23,7 +23,7 @@ class EnvironmentDecryptCommand extends Command
                     {--cipher= : The encryption cipher}
                     {--env= : The environment to be decrypted}
                     {--force : Overwrite existing environment file}
-                    {--filename : Filename to which to write the decrypted contents}';
+                    {--filename= : Filename to which to write the decrypted contents}';
 
     /**
      * The name of the console command.
