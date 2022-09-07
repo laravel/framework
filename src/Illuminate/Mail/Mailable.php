@@ -981,6 +981,19 @@ class Mailable implements MailableContract, Renderable
     /**
      * Determine if the mailable has the given attachment from storage.
      *
+     * @param  string  $path
+     * @param  string|null  $name
+     * @param  array  $options
+     * @return bool
+     */
+    public function hasAttachmentFromStorage($path, $name = null, array $options = [])
+    {
+        return $this->hasAttachmentFromStorageDisk(null, $path, $name, $options);
+    }
+
+    /**
+     * Determine if the mailable has the given attachment from storage disk.
+     *
      * @param  string  $disk
      * @param  string  $path
      * @param  string|null  $name
@@ -1056,6 +1069,78 @@ class Mailable implements MailableContract, Renderable
     public function metadata($key, $value)
     {
         $this->metadata[$key] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Assert the mailable has the given attachment.
+     *
+     * @param  string|\Illuminate\Contracts\Mail\Attachable|\Illuminate\Mail\Attachment  $file
+     * @param  array  $options
+     * @return $this
+     */
+    public function assertHasAttachment($file, array $options = [])
+    {
+        PHPUnit::assertTrue(
+            $this->hasAttachment($file, $options),
+            'Did not find the expected attachment.'
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert the mailable has the given data as an attachment.
+     *
+     * @param  string  $data
+     * @param  string  $name
+     * @param  array  $options
+     * @return $this
+     */
+    public function assertHasAttachedData($data, $name, array $options = [])
+    {
+        PHPUnit::assertTrue(
+            $this->hasAttachedData($data, $name, $options),
+            'Did not find the expected attachment.'
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert the mailable has the given attachment from storage.
+     *
+     * @param  string  $path
+     * @param  string|null  $name
+     * @param  array  $options
+     * @return $this
+     */
+    public function assertHasAttachmentFromStorage($path, $name = null, array $options = [])
+    {
+        PHPUnit::assertTrue(
+            $this->hasAttachmentFromStorage($path, $name, $options),
+            'Did not find the expected attachment.'
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert the mailable has the given attachment from storage disk.
+     *
+     * @param  string  $disk
+     * @param  string  $path
+     * @param  string|null  $name
+     * @param  array  $options
+     * @return $this
+     */
+    public function assertHasAttachmentFromStorageDisk($disk, $path, $name = null, array $options = [])
+    {
+        PHPUnit::assertTrue(
+            $this->hasAttachmentFromStorageDisk($disk, $path, $name, $options),
+            'Did not find the expected attachment.'
+        );
 
         return $this;
     }
