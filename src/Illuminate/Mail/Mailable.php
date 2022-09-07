@@ -913,7 +913,7 @@ class Mailable implements MailableContract, Renderable
      * Determine if the mailable has the given attachment.
      *
      * @param  string|\Illuminate\Contracts\Mail\Attachable|\Illuminate\Mail\Attachment  $file
-     * @param  array $options
+     * @param  array  $options
      * @return bool
      */
     public function hasAttachment($file, array $options = [])
@@ -984,7 +984,7 @@ class Mailable implements MailableContract, Renderable
      * @param  string  $disk
      * @param  string  $path
      * @param  string|null  $name
-     * @param  array $options
+     * @param  array  $options
      * @return bool
      */
     public function hasAttachmentFromStorageDisk($disk, $path, $name = null, array $options = [])
