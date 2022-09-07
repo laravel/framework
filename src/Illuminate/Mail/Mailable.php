@@ -1029,25 +1029,13 @@ class Mailable implements MailableContract, Renderable
      * @param  array  $options
      * @return bool
      */
-    public function hasAttachedData($data, $name = null, ?array $options = null)
+    public function hasAttachedData($data, $name, array $options = [])
     {
-        return collect($this->rawAttachments)->filter(function ($attachment) use ($data, $name, $options) {
-            if (is_null($name)) {
-                $nameMatches = true;
-            } else {
-                $nameMatches = $attachment['name'] === $name;
-            }
-
-            if (is_null($options)) {
-                $optionsMatch = true;
-            } else {
-                $optionsMatch = $attachment['options'] === $options;
-            }
-
-            return $attachment['data'] === $data
-                && $nameMatches
-                && $optionsMatch;
-        })->isNotEmpty();
+        return collect($this->rawAttachments)->contains(
+            fn ($attachment) => $attachment['data'] === $data
+                && $attachment['name'] === $name
+                && array_filter($attachment['options']) === array_filter($options)
+        );
     }
 
     /**
