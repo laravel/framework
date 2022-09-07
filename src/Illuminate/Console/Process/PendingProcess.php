@@ -13,7 +13,7 @@ class PendingProcess
     /**
      * The process's command.
      *
-     * @var iterable<array-key, string>|string
+     * @var array<array-key, string>|string
      */
     protected $command = [];
 
@@ -48,14 +48,14 @@ class PendingProcess
     /**
      * The stub callables that will handle processes.
      *
-     * @var array<int, callable(\Illuminate\Console\Process): \Illuminate\Console\Contracts\ProcessResult>
+     * @var array<int, callable(\Illuminate\Console\Process): (\Illuminate\Console\Contracts\ProcessResult|null)>
      */
     protected $stubs = [];
 
     /**
      * The callbacks that should execute before the process starts.
      *
-     * @var iterable<int, callable(\Illuminate\Console\Process): mixed>
+     * @var array<int, callable(\Illuminate\Console\Process): mixed>
      */
     protected $beforeStartCallbacks = [];
 
@@ -122,7 +122,7 @@ class PendingProcess
     /**
      * Sets the process's arguments.
      *
-     * @param  iterable<array-key, string>|string  $command
+     * @param  array<array-key, string>|string  $command
      * @return $this
      */
     public function command($command)
@@ -165,20 +165,20 @@ class PendingProcess
     /**
      * Starts a new process with the given arguments.
      *
-     * @param  iterable<array-key, string>|string|null  $command
+     * @param  array<array-key, string>|string|null  $command
      * @return \Illuminate\Console\Contracts\ProcessResult
      */
-    public function run($command = '')
+    public function run($command = null)
     {
-        if (func_num_args() > 0) {
+        if (! is_null($command)) {
             $this->command($command);
         }
 
-        $process = is_array($this->command)
+        $process = is_iterable($this->command)
             ? new Process($this->command)
             : Process::fromShellCommandline((string) $this->command);
 
-        $process->setWorkingDirectory($this->path ?? getcwd());
+        $process->setWorkingDirectory((string) ($this->path ?? getcwd()));
         $process->setTimeout($this->timeout);
 
         return $this->delayStart ? new DelayedStart(fn () => $this->start($process)) : $this->start($process);

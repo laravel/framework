@@ -9,7 +9,7 @@ class Process extends BaseProcess
     /**
      * Get the process's command.
      *
-     * @var string
+     * @return string
      */
     public function command()
     {
@@ -19,7 +19,7 @@ class Process extends BaseProcess
     /**
      * Get the process's path.
      *
-     * @var string
+     * @return string|null
      */
     public function path()
     {
@@ -29,7 +29,7 @@ class Process extends BaseProcess
     /**
      * Get the process's timeout.
      *
-     * @var float|null
+     * @return float|null
      */
     public function timeout()
     {

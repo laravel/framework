@@ -11,6 +11,8 @@ use Stringable;
  * @internal
  *
  * @extends Arrayable<int, string>
+ * @extends IteratorAggregate<int, string>
+ * @extends ArrayAccess<int, string>
  */
 interface ProcessResult extends Arrayable, Stringable, ArrayAccess, IteratorAggregate
 {

@@ -12,7 +12,7 @@ class FakeResult implements ProcessResult
     /**
      * The underlying process instance.
      *
-     * @var \Illuminate\Console\Process
+     * @var \Illuminate\Console\Process|null
      */
     protected $process;
 
@@ -95,10 +95,12 @@ class FakeResult implements ProcessResult
      *
      * @return void
      *
-     * @throws \Illuminate\Console\Process\Exceptions\ProcessNotStartedException
+     * @throws \Illuminate\Console\Exceptions\ProcessNotStartedException
      */
     protected function ensureProcessIsRunning()
     {
-        throw_unless($this->process, new ProcessNotStartedException());
+        if (! $this->process) {
+            throw new ProcessNotStartedException;
+        }
     }
 }

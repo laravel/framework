@@ -29,7 +29,7 @@ class Pool
      * Add a process to the pool with a numeric index.
      *
      * @param  string  $method
-     * @param  array  $parameters
+     * @param  iterable<int, mixed>  $parameters
      * @return \Illuminate\Console\Process\PendingProcess
      */
     public function __call($method, $parameters)

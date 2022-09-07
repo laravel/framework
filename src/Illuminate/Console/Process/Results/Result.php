@@ -21,7 +21,7 @@ class Result implements ProcessResult
     /**
      * Creates a new Process Result instance.
      *
-     * @param  \Illuminate\Console\Process
+     * @param  \Illuminate\Console\Process  $process
      * @return void
      */
     public function __construct($process)
@@ -62,7 +62,7 @@ class Result implements ProcessResult
     {
         $this->wait();
 
-        return $this->process->getExitCode();
+        return (int) $this->process->getExitCode();
     }
 
     /**
@@ -76,12 +76,15 @@ class Result implements ProcessResult
     /**
      * Ensures the existing process has started.
      *
+     * @param  \Illuminate\Console\Process  $process
      * @return void
      *
-     * @throws \Illuminate\Console\Process\Exceptions\ProcessNotStartedException
+     * @throws \Illuminate\Console\Exceptions\ProcessNotStartedException
      */
     protected function ensureProcessIsRunning($process)
     {
-        throw_unless($process->isStarted(), new ProcessNotStartedException($process));
+        if (! $process->isStarted()) {
+            throw new ProcessNotStartedException($process);
+        }
     }
 }

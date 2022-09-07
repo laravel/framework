@@ -17,7 +17,7 @@ class DelayedStart
     /**
      * Creates a new Process Result instance.
      *
-     * @param  callable(): \Illuminate\Console\Contracts\ProcessResult
+     * @param  callable(): \Illuminate\Console\Contracts\ProcessResult  $callback
      * @return void
      */
     public function __construct($callback)

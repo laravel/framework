@@ -43,14 +43,14 @@ class Factory
     /**
      * The recorded request array.
      *
-     * @var iterable<int, \Illuminate\Console\Process>
+     * @var array<int, \Illuminate\Console\Process>
      */
     protected $recorded = [];
 
     /**
      * Assert that a process was recorded matching a given truth test.
      *
-     * @param  (callable(\Illuminate\Console\Process): bool)|string  $callback
+     * @param  (callable(\Illuminate\Console\Process): bool)|string  $command
      * @return $this
      */
     public function assertRan($command)
@@ -158,7 +158,7 @@ class Factory
             return $this;
         }
 
-        $this->stubs[] = fn ($process) => is_callable($callback) ? $callback($process) : $callback;
+        $this->stubs[] = $callback;
 
         return $this;
     }
