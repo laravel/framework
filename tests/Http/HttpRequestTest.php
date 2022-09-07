@@ -758,7 +758,7 @@ class HttpRequestTest extends TestCase
         $request = Request::create('/', 'GET', ['name' => 'Taylor']);
         $this->assertSame(['name' => 'Taylor'], $request->query());
         $this->assertSame('Taylor', $request->query('name'));
-        $this->assertSame('Taylor', $request->query('name','Amir'));
+        $this->assertSame('Taylor', $request->query('name', 'Amir'));
         $this->assertSame('Bob', $request->query('foo', 'Bob'));
         $all = $request->query(null);
         $this->assertSame('Taylor', $all['name']);
@@ -914,8 +914,8 @@ class HttpRequestTest extends TestCase
         $payload = ['name' => 'taylor'];
         $request = Request::create('/', 'GET', [], [], [], ['CONTENT_TYPE' => 'application/json'], json_encode($payload));
         $this->assertSame('taylor', $request->json('name'));
-        $this->assertSame('taylor', $request->json('name','Otwell'));
-        $this->assertSame('Moharami', $request->json('family','Moharami'));
+        $this->assertSame('taylor', $request->json('name', 'Otwell'));
+        $this->assertSame('Moharami', $request->json('family', 'Moharami'));
         $this->assertSame('taylor', $request->input('name'));
         $data = $request->json()->all();
         $this->assertEquals($payload, $data);
