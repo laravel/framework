@@ -39,7 +39,7 @@ class EnvironmentEncryptCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Encrypt the given environment file';
+    protected $description = 'Encrypt an environment file';
 
     /**
      * The filesystem instance.
