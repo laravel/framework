@@ -6,7 +6,6 @@ use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Env;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'env:encrypt')]
@@ -63,7 +62,8 @@ class EnvironmentEncryptCommand extends Command
     public function handle()
     {
         $cipher = $this->option('cipher') ?: 'aes-128-cbc';
-        $key = $keyPassed = $this->option('key') ?: Env::get('ENVIRONMENT_ENCRYPTION_KEY');
+        $key = $this->option('key');
+        $keyPassed = $key !== null;
         $environmentFile = $this->option('env')
                             ? base_path('.env').'.'.$this->option('env')
                             : $this->laravel->environmentFilePath();
