@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Mail;
 
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Mail\Attachable;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Mail\Attachment;
@@ -9,6 +10,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailer;
 use Illuminate\Mail\Transport\ArrayTransport;
 use Mockery as m;
+use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
 
 class MailMailableTest extends TestCase
@@ -738,6 +740,98 @@ class MailMailableTest extends TestCase
         $this->assertFalse($mailable->hasAttachmentFromStorageDisk('disk', 'bar.jpg', 'bar.jpg', ['mime' => 'text/css']));
         $this->assertFalse($mailable->hasAttachmentFromStorageDisk('disk', '/path/to/foo.jpg', 'foo.jpg', ['mime' => 'text/css']));
         $this->assertFalse($mailable->hasAttachmentFromStorageDisk('disk', '/path/to/foo.jpg', 'bar.jpg', ['mime' => 'text/html']));
+    }
+
+    public function testAssertHasAttachment()
+    {
+        Container::getInstance()->instance('mailer', new class {
+            public function render()
+            {
+                //
+            }
+        });
+
+        $mailable = new class () extends Mailable {
+            public function build()
+            {
+                //
+            }
+        };
+
+        try {
+            $mailable->assertHasAttachment('/path/to/foo.jpg');
+            $this->fail();
+        } catch (AssertionFailedError $e) {
+            $this->assertSame("Did not find the expected attachment.\nFailed asserting that false is true.", $e->getMessage());
+        }
+
+        $mailable = new class () extends Mailable {
+            public function build()
+            {
+                $this->attach('/path/to/foo.jpg');
+            }
+        };
+
+        $mailable->assertHasAttachment('/path/to/foo.jpg');
+    }
+
+    public function testAssertHasAttachedData()
+    {
+        Container::getInstance()->instance('mailer', new class {
+            public function render()
+            {
+                //
+            }
+        });
+
+        $mailable = new class () extends Mailable {
+            public function build()
+            {
+                //
+            }
+        };
+
+        try {
+            $mailable->assertHasAttachedData('data', 'foo.jpg');
+            $this->fail();
+        } catch (AssertionFailedError $e) {
+            $this->assertSame("Did not find the expected attachment.\nFailed asserting that false is true.", $e->getMessage());
+        }
+
+        $mailable = new class () extends Mailable {
+            public function build()
+            {
+                $this->attachData('data', 'foo.jpg');
+            }
+        };
+
+        $mailable->assertHasAttachedData('data', 'foo.jpg');
+    }
+
+    public function testAssertHasAttachmentFromStorage()
+    {
+        $mailable = new class () extends Mailable {
+            public function build()
+            {
+                //
+            }
+        };
+
+        try {
+            $mailable->assertHasAttachmentFromStorage('/path/to/foo.jpg');
+            $this->fail();
+        } catch (AssertionFailedError $e) {
+            $this->assertSame("Did not find the expected attachment.\nFailed asserting that false is true.", $e->getMessage());
+        }
+
+        $mailable = new class () extends Mailable {
+            public function build()
+            {
+                $this->attachFromStorage('/path/to/foo.jpg');
+            }
+        };
+
+        $mailable->assertHasAttachmentFromStorage('/path/to/foo.jpg');
     }
 }
 

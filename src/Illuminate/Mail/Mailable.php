@@ -1082,6 +1082,8 @@ class Mailable implements MailableContract, Renderable
      */
     public function assertHasAttachment($file, array $options = [])
     {
+        $this->renderForAssertions();
+
         PHPUnit::assertTrue(
             $this->hasAttachment($file, $options),
             'Did not find the expected attachment.'
@@ -1100,6 +1102,8 @@ class Mailable implements MailableContract, Renderable
      */
     public function assertHasAttachedData($data, $name, array $options = [])
     {
+        $this->renderForAssertions();
+
         PHPUnit::assertTrue(
             $this->hasAttachedData($data, $name, $options),
             'Did not find the expected attachment.'
@@ -1118,6 +1122,8 @@ class Mailable implements MailableContract, Renderable
      */
     public function assertHasAttachmentFromStorage($path, $name = null, array $options = [])
     {
+        $this->renderForAssertions();
+
         PHPUnit::assertTrue(
             $this->hasAttachmentFromStorage($path, $name, $options),
             'Did not find the expected attachment.'
@@ -1137,6 +1143,8 @@ class Mailable implements MailableContract, Renderable
      */
     public function assertHasAttachmentFromStorageDisk($disk, $path, $name = null, array $options = [])
     {
+        $this->renderForAssertions();
+
         PHPUnit::assertTrue(
             $this->hasAttachmentFromStorageDisk($disk, $path, $name, $options),
             'Did not find the expected attachment.'
