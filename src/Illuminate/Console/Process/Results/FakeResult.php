@@ -4,6 +4,7 @@ namespace Illuminate\Console\Process\Results;
 
 use Illuminate\Console\Contracts\ProcessResult;
 use Illuminate\Console\Exceptions\ProcessNotStartedException;
+use Illuminate\Console\Process;
 
 class FakeResult implements ProcessResult
 {
@@ -60,15 +61,24 @@ class FakeResult implements ProcessResult
     }
 
     /**
-     * Sets the process for the fake result.
+     * Simulates a start of the fake result underlying process.
      *
      * @param  \Illuminate\Console\Process  $process
+     * @param  (callable(string, int): mixed)|null  $onOutput
      * @return $this
      *
      * @internal
      */
-    public function setProcess($process)
+    public function start($process, $onOutput)
     {
+        if ($onOutput && $this->output !== '') {
+            $onOutput(Process::STDOUT, $this->output);
+        }
+
+        if ($onOutput && $this->errorOutput !== '') {
+            $onOutput(Process::STDERR, $this->errorOutput);
+        }
+
         return tap($this, fn () => $this->process = $process);
     }
 

@@ -5,6 +5,7 @@ namespace Illuminate\Tests;
 use Illuminate\Console\Exceptions\ProcessFailedException;
 use Illuminate\Console\Exceptions\ProcessNotRunningException;
 use Illuminate\Console\Exceptions\ProcessNotStartedException;
+use Illuminate\Console\Process;
 use Illuminate\Console\Process\DelayedStart;
 use Illuminate\Console\Process\Factory;
 use Illuminate\Console\Process\Pool;
@@ -13,7 +14,6 @@ use Illuminate\Console\Process\Results\Result;
 use Mockery as m;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Process\Process;
 
 class ProcessTest extends TestCase
 {
@@ -97,6 +97,63 @@ class ProcessTest extends TestCase
         $this->assertSame('drwxr-xr-x   25 root', $result->output());
     }
 
+    public function testOutputAsCallback()
+    {
+        $this->factory->fake(function ($process) {
+            return $this->factory::result('my stdout output');
+        });
+
+        $outputViaCallback = '';
+        $typeViaCallback = null;
+
+        $output = $this->factory->run('ls', function ($output, $type) use (&$outputViaCallback, &$typeViaCallback) {
+            $typeViaCallback = $type;
+            $outputViaCallback = $output;
+        })->output();
+
+        $this->assertSame($outputViaCallback, $output);
+        $this->assertSame('my stdout output', $output);
+        $this->assertSame(Process::STDOUT, $typeViaCallback);
+    }
+
+    public function testOutput()
+    {
+        $this->factory->fake(function ($process) {
+            return $this->factory::result(['my stdout line 1', 'my stdout line 2']);
+        });
+
+        $outputViaCallback = '';
+        $typeViaCallback = null;
+
+        $output = $this->factory->output(function ($output, $type) use (&$outputViaCallback, &$typeViaCallback) {
+            $typeViaCallback = $type;
+            $outputViaCallback = $output;
+        })->run('ls')->output();
+
+        $this->assertSame($outputViaCallback, $output);
+        $this->assertSame("my stdout line 1\nmy stdout line 2", $outputViaCallback);
+        $this->assertSame(Process::STDOUT, $typeViaCallback);
+    }
+
+    public function testErrorOutput()
+    {
+        $this->factory->fake(function ($process) {
+            return $this->factory::result('', 1, ['my stderr line 1', 'my stderr line 2']);
+        });
+
+        $outputViaCallback = '';
+        $typeViaCallback = null;
+
+        $output = $this->factory->output(function ($output, $type) use (&$outputViaCallback, &$typeViaCallback) {
+            $typeViaCallback = $type;
+            $outputViaCallback = $output;
+        })->run('ls')->errorOutput();
+
+        $this->assertSame($outputViaCallback, $output);
+        $this->assertSame("my stderr line 1\nmy stderr line 2", $outputViaCallback);
+        $this->assertSame(Process::STDERR, $typeViaCallback);
+    }
+
     public function testResultErrorOutput()
     {
         $this->factory->fake(function () {
@@ -107,6 +164,25 @@ class ProcessTest extends TestCase
         $this->assertSame('my stdout output', $result->output());
         $this->assertTrue($result->failed());
         $this->assertSame('my stderr output', $result->errorOutput());
+    }
+
+    public function testErrorOutputAsCallback()
+    {
+        $this->factory->fake(function ($process) {
+            return $this->factory::result('', 1, 'my stderr output');
+        });
+
+        $outputViaCallback = '';
+        $typeViaCallback = null;
+
+        $output = $this->factory->run('ls', function ($output, $type) use (&$outputViaCallback, &$typeViaCallback) {
+            $typeViaCallback = $type;
+            $outputViaCallback = $output;
+        })->errorOutput();
+
+        $this->assertSame($outputViaCallback, $output);
+        $this->assertSame('my stderr output', $output);
+        $this->assertSame(Process::STDERR, $typeViaCallback);
     }
 
     public function testResultOutputWhenFakeDoesNotExist()

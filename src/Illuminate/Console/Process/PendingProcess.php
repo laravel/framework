@@ -32,6 +32,13 @@ class PendingProcess
     protected $factory;
 
     /**
+     * The process's output callback.
+     *
+     * @var (callable(string, int): mixed)|null
+     */
+    protected $output;
+
+    /**
      * The process's path.
      *
      * @var string|null
@@ -159,15 +166,31 @@ class PendingProcess
     }
 
     /**
+     * Sets the process's output callback.
+     *
+     * @param  callable(string, int): mixed  $callback
+     * @return $this
+     */
+    public function output($callback)
+    {
+        return tap($this, fn () => $this->output = fn ($type, $output) => $callback($output, $type));
+    }
+
+    /**
      * Starts a new process with the given arguments.
      *
      * @param  array<array-key, string>|string|null  $command
+     * @param  (callable(string, int): mixed)|null  $output
      * @return \Illuminate\Console\Contracts\ProcessResult
      */
-    public function run($command = null)
+    public function run($command = null, $output = null)
     {
         if (! is_null($command)) {
             $this->command($command);
+        }
+
+        if (! is_null($output)) {
+            $this->output($output);
         }
 
         $process = is_iterable($this->command)
@@ -177,29 +200,30 @@ class PendingProcess
         $process->setWorkingDirectory((string) ($this->path ?? getcwd()));
         $process->setTimeout($this->timeout);
 
-        return $this->delayStart
-            ? new DelayedStart(fn () => $this->start($process))
-            : $this->start($process);
+        $start = fn () => $this->start($process, $this->output);
+
+        return $this->delayStart ? new DelayedStart($start) : value($start);
     }
 
     /**
      * Starts the given process.
      *
      * @param  \Illuminate\Console\Process  $process
+     * @param  (callable(string, int): mixed)|null  $output
      * @return \Illuminate\Console\Contracts\ProcessResult
      */
-    protected function start($process)
+    protected function start($process, $output)
     {
         collect($this->beforeStartCallbacks)->each(fn ($callback) => $callback($process));
 
         foreach ($this->stubs as $callback) {
             if ($result = $callback($process)) {
                 /** @var \Illuminate\Console\Process\Results\FakeResult $result */
-                return $result->setProcess($process);
+                return $result->start($process, $output);
             }
         }
 
-        return new Result(tap($process)->start());
+        return new Result(tap($process)->start($output));
     }
 
     /**

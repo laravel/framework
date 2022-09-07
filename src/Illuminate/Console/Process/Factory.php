@@ -10,10 +10,11 @@ use Illuminate\Support\Traits\Macroable;
 use PHPUnit\Framework\Assert as PHPUnit;
 
 /**
- * @method \Illuminate\Console\Contracts\ProcessResult run(array|string|null $command = null)
+ * @method \Illuminate\Console\Contracts\ProcessResult run(array|string|null $command = null, callable|null $output = null)
  * @method \Illuminate\Console\Process\PendingProcess command(array|string $command)
  * @method \Illuminate\Console\Process\PendingProcess dd()
  * @method \Illuminate\Console\Process\PendingProcess dump()
+ * @method \Illuminate\Console\Process\PendingProcess output(callable $output)
  * @method \Illuminate\Console\Process\PendingProcess forever()
  * @method \Illuminate\Console\Process\PendingProcess path(string $path)
  * @method \Illuminate\Console\Process\PendingProcess timeout(float|null $seconds)
