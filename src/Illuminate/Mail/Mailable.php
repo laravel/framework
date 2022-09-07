@@ -916,18 +916,23 @@ class Mailable implements MailableContract, Renderable
      * @param  array $options
      * @return bool
      */
-    public function hasAttachment($file, ?array $options = null)
+    public function hasAttachment($file, array $options = [])
     {
-        return collect($this->attachments)->filter(function ($attachment) use ($file, $options) {
-            if (is_null($options)) {
-                $optionsMatch = true;
-            } else {
-                $optionsMatch = $attachment['options'] === $options;
-            }
+        if ($file instanceof Attachable) {
+            $file = $file->toMailAttachment();
+        }
 
-            return $attachment['file'] === $file
-                && $optionsMatch;
-        })->isNotEmpty();
+        if ($file instanceof Attachment) {
+            [$file, $options] = $file->attachWith(
+                fn ($path) => [$path, ['as' => $file->as, 'mime' => $file->mime]],
+                // TODO: pass through to hasAttachedData.
+                fn () => [null, []]
+            );
+        }
+
+        return collect($this->attachments)->contains(
+            fn ($attachment) => $attachment['file'] === $file && array_filter($attachment['options']) === array_filter($options)
+        );
     }
 
     /**
