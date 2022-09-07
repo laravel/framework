@@ -231,6 +231,22 @@ class ProcessTest extends TestCase
         $this->assertNull($result->process()->getTimeout());
     }
 
+    public function testResultRunning()
+    {
+        $result = $this->factory->run($this->ls());
+        $this->assertTrue($result->running());
+        $this->assertTrue($result->ok());
+        $this->assertFalse($result->running());
+
+        $this->factory->fake();
+
+        $result = $this->factory->run($this->ls());
+
+        $this->assertTrue($result->running());
+        $this->assertTrue($result->ok());
+        $this->assertFalse($result->running());
+    }
+
     public function testResultToString()
     {
         $result = $this->factory->path(__DIR__)->run($this->ls());

@@ -17,6 +17,13 @@ class FakeResult implements ProcessResult
     protected $process;
 
     /**
+     * If the process is running.
+     *
+     * @var bool
+     */
+    protected $running = true;
+
+    /**
      * The process's output.
      *
      * @var string
@@ -69,7 +76,9 @@ class FakeResult implements ProcessResult
      */
     public function wait()
     {
-        $this->ensureProcessIsRunning();
+        $this->ensureProcessExists();
+
+        $this->running = false;
 
         return $this;
     }
@@ -97,10 +106,15 @@ class FakeResult implements ProcessResult
      *
      * @throws \Illuminate\Console\Exceptions\ProcessNotStartedException
      */
-    protected function ensureProcessIsRunning()
+    protected function ensureProcessExists()
     {
         if (! $this->process) {
             throw new ProcessNotStartedException;
         }
+    }
+
+    public function running()
+    {
+        return $this->running;
     }
 }

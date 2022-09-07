@@ -42,6 +42,14 @@ class Result implements ProcessResult
     /**
      * {@inheritDoc}
      */
+    public function running()
+    {
+        return $this->process->isRunning();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function wait()
     {
         if ($this->process->isRunning()) {

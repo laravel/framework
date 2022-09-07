@@ -38,6 +38,13 @@ interface ProcessResult extends Arrayable, Stringable, ArrayAccess, IteratorAggr
     public function failed();
 
     /**
+     * Checks if the process is running.
+     *
+     * @return bool
+     */
+    public function running();
+
+    /**
      * Waits for the process to finish.
      *
      * @return $this
