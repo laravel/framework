@@ -427,7 +427,12 @@ class ProcessTest extends TestCase
         $this->factory->run(['curl', 'https://google.com']);
 
         $this->factory->assertRan(['curl', 'https://google.com']);
-        $this->factory->assertRan("'curl' 'https://google.com'");
+
+        if (windows_os()) {
+            $this->factory->assertRan('curl https://google.com');
+        } else {
+            $this->factory->assertRan("'curl' 'https://google.com'");
+        }
     }
 
     public function testAssertRanMayFail()
