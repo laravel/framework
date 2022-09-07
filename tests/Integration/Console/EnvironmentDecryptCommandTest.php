@@ -225,4 +225,15 @@ class EnvironmentDecryptCommandTest extends TestCase
         $this->filesystem->shouldHaveReceived('put')
             ->with(base_path('.env'), 'APP_NAME="Laravel Two"');
     }
+
+    public function testItCannotOverwriteEncryptedFiles()
+    {
+        $this->artisan('env:decrypt', ['--env' => 'production', '--key' => 'abcdefghijklmnop', '--filename' => '.env.production.encrypted'])
+            ->expectsOutputToContain('Invalid filename.')
+            ->assertExitCode(1);
+
+        $this->artisan('env:decrypt', ['--env' => 'production', '--key' => 'abcdefghijklmnop', '--filename' => '.env.staging.encrypted'])
+            ->expectsOutputToContain('Invalid filename.')
+            ->assertExitCode(1);
+    }
 }

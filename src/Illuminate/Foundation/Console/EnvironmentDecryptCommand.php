@@ -80,6 +80,12 @@ class EnvironmentDecryptCommand extends Command
         $encryptedFile = $environmentFile.'.encrypted';
         $filename = $this->option('filename') ? base_path($this->option('filename')) : $environmentFile;
 
+        if (Str::endsWith($filename, '.encrypted')) {
+            $this->components->error('Invalid filename.');
+
+            return Command::FAILURE;
+        }
+
         if (! $this->files->exists($encryptedFile)) {
             $this->components->error('Encrypted environment file not found.');
 
