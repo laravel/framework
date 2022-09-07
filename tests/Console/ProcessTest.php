@@ -416,6 +416,16 @@ class ProcessTest extends TestCase
         $this->assertSame($this->factory, $factory);
     }
 
+    public function testAssertRanWithArray()
+    {
+        $this->factory->fake();
+
+        $this->factory->run(['curl', 'https://google.com']);
+
+        $this->factory->assertRan(['curl', 'https://google.com']);
+        $this->factory->assertRan("'curl' 'https://google.com'");
+    }
+
     public function testAssertRanMayFail()
     {
         $this->expectException(AssertionFailedError::class);
@@ -444,6 +454,21 @@ class ProcessTest extends TestCase
         $factory = $this->factory->assertRanInOrder(['ls -l0', 'ls -l1', 'ls -l2']);
 
         $this->assertSame($this->factory, $factory);
+    }
+
+    public function testAssertRanInOrderWithArray()
+    {
+        $this->factory->fake();
+
+        $this->factory->run(['ls', '-l0']);
+        $this->factory->run(['ls', '-l1']);
+        $this->factory->run(['ls', '-l2']);
+
+        $this->factory->assertRanInOrder([
+            ['ls', '-l0'],
+            ['ls', '-l1'],
+            ['ls', '-l2'],
+        ]);
     }
 
     public function testAssertRanInOrderMayFail()

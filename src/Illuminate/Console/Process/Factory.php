@@ -54,7 +54,7 @@ class Factory
      */
     public function assertRan($command)
     {
-        $callback = is_string($command) ? fn ($process) => $process->command() === $command : $command;
+        $callback = $this->makeAssertCallback($command);
 
         PHPUnit::assertTrue(
             $this->recorded($callback)->count() > 0,
@@ -72,10 +72,10 @@ class Factory
      */
     public function assertRanInOrder($commands)
     {
-        // $this->assertSentCount(count($callbacks));
+        $this->assertRanCount(count($commands));
 
         foreach ($commands as $index => $command) {
-            $callback = is_string($command) ? fn ($process) => $process->command() === $command : $command;
+            $callback = $this->makeAssertCallback($command);
 
             PHPUnit::assertTrue($callback(
                 $this->recorded[$index],
@@ -93,7 +93,7 @@ class Factory
      */
     public function assertNotRan($command)
     {
-        $callback = is_string($command) ? fn ($process) => $process->command() === $command : $command;
+        $callback = $this->makeAssertCallback($command);
 
         PHPUnit::assertFalse(
             $this->recorded($callback)->count() > 0,
@@ -101,6 +101,25 @@ class Factory
         );
 
         return $this;
+    }
+
+    /**
+     * Makes an assert callback for the given command "expectation".
+     *
+     * @param  array<array-key, string>|(callable(\Illuminate\Console\Process): bool)|string $command
+     * @return callable(\Illuminate\Console\Process): bool
+     */
+    protected function makeAssertCallback($command)
+    {
+        if (is_string($command)) {
+            return fn ($process) => $process->command() === $command;
+        }
+
+        if (is_callable($command)) {
+            return $command;
+        }
+
+        return fn ($process) => $process->command() === with(new Process($command))->command();
     }
 
     /**
