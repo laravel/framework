@@ -5,7 +5,6 @@ namespace Illuminate\Tests;
 use Illuminate\Console\Exceptions\ProcessFailedException;
 use Illuminate\Console\Exceptions\ProcessNotRunningException;
 use Illuminate\Console\Exceptions\ProcessNotStartedException;
-use Illuminate\Console\Exceptions\ProcessTimedOutException;
 use Illuminate\Console\Process\DelayedStart;
 use Illuminate\Console\Process\Factory;
 use Illuminate\Console\Process\Pool;
