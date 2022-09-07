@@ -980,26 +980,14 @@ class Mailable implements MailableContract, Renderable
      * @param  array $options
      * @return bool
      */
-    public function hasAttachmentFromStorageDisk($disk, $path, $name = null, ?array $options = null)
+    public function hasAttachmentFromStorageDisk($disk, $path, $name = null, array $options = [])
     {
-        return collect($this->diskAttachments)->filter(function ($diskAttachment) use ($disk, $path, $name, $options) {
-            if (is_null($name)) {
-                $nameMatches = true;
-            } else {
-                $nameMatches = $diskAttachment['name'] === $name;
-            }
-
-            if (is_null($options)) {
-                $optionsMatch = true;
-            } else {
-                $optionsMatch = $diskAttachment['options'] === $options;
-            }
-
-            return $diskAttachment['disk'] === $disk
-                && $diskAttachment['path'] === $path
-                && $nameMatches
-                && $optionsMatch;
-        })->isNotEmpty();
+        return collect($this->diskAttachments)->contains(
+            fn ($attachment) => $attachment['disk'] === $disk
+                && $attachment['path'] === $path
+                && $attachment['name'] === ($name ?? basename($path))
+                && $attachment['options'] === $options
+        );
     }
 
     /**
