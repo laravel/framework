@@ -106,6 +106,10 @@ class EnvironmentDecryptCommand extends Command
         }
 
         $this->components->info('Environment successfully decrypted.');
+        $this->components->bulletList([
+            "File: {$filename}",
+        ]);
+        $this->newLine();
     }
 
     /**
