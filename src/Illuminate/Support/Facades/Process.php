@@ -16,7 +16,7 @@ use Illuminate\Console\Process\Factory;
  * @method static \Illuminate\Console\Process\Factory assertRan(callable|string $command)
  * @method static \Illuminate\Console\Process\Factory assertRanInOrder(array $commands)
  * @method static \Illuminate\Console\Process\Factory assertNotRan(callable|string $command)
- * @method static \Illuminate\Console\Process\Factory assertNothingSent()
+ * @method static \Illuminate\Console\Process\Factory assertNothingRan()
  * @method static \Illuminate\Console\Process\Factory assertRanCount(int $count)
  * @method static \Illuminate\Support\Collection pool(callable $callback)
  *
