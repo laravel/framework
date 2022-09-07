@@ -838,7 +838,6 @@ class HttpRequestTest extends TestCase
     public function testServerMethod()
     {
         $request = Request::create('/', 'GET', [], [], [], ['foo' => 'bar']);
-        $this->assertSame(['foo' => 'bar'], $request->server());
         $this->assertSame('bar', $request->server('foo'));
         $this->assertSame('bar', $request->server('foo.doesnt.exist', 'bar'));
         $all = $request->server(null);
