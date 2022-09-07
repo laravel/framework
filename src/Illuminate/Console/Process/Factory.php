@@ -5,6 +5,7 @@ namespace Illuminate\Console\Process;
 use Illuminate\Console\Exceptions\ProcessNotRunningException;
 use Illuminate\Console\Process;
 use Illuminate\Console\Process\Results\FakeResult;
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use PHPUnit\Framework\Assert as PHPUnit;
 
@@ -167,7 +168,7 @@ class Factory
         if (is_iterable($callback)) {
             foreach ($callback as $command => $result) {
                 $this->stubs[] = (function ($process) use ($command, $result) {
-                    if ($command === '*' || $process->command() == $command) {
+                    if (Str::is($command, $process->command())) {
                         return $result;
                     }
                 });

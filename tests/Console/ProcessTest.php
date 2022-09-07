@@ -75,7 +75,8 @@ class ProcessTest extends TestCase
 
         $this->factory->fake([
             'nuno' => $this->factory::result('drwxr-xr-x   25 nunomaduro'),
-            'taylor' => $this->factory::result('drwxr-xr-x   25 taylorotwell'),
+            'taylor*' => $this->factory::result('drwxr-xr-x   25 taylorotwell'),
+            '*joe*' => $this->factory::result('drwxr-xr-x   25 joe'),
             '*' => $this->factory::result('drwxr-xr-x   25 root'),
         ]);
 
@@ -86,7 +87,10 @@ class ProcessTest extends TestCase
         $result = $this->factory->run('nuno');
         $this->assertSame('drwxr-xr-x   25 nunomaduro', $result->output());
 
-        $result = $this->factory->run('taylor');
+        $result = $this->factory->run('wwwjoewww');
+        $this->assertSame('drwxr-xr-x   25 joe', $result->output());
+
+        $result = $this->factory->run('taylor otwell');
         $this->assertSame('drwxr-xr-x   25 taylorotwell', $result->output());
 
         $result = $this->factory->run($this->ls());
