@@ -1613,7 +1613,7 @@ trait ValidatesAttributes
     {
         $this->requireParameterCount(1, $parameters, 'required_if_accepted');
 
-        if ( $this->validateAccepted($parameters[0], $this->getValue($parameters[0]))) {
+        if ($this->validateAccepted($parameters[0], $this->getValue($parameters[0]))) {
             return $this->validateRequired($attribute, $value);            
         }
 
