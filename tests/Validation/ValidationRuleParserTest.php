@@ -143,6 +143,7 @@ class ValidationRuleParserTest extends TestCase
         $this->assertSame('regex:/^(foo', $exploded->rules['items.0.type'][1]);
         $this->assertSame('bar)$/i', $exploded->rules['items.0.type'][2]);
     }
+
     public function testExplodeAssociativeArraysOfRules()
     {
         $rules = [
