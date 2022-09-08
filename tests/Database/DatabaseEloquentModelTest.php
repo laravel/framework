@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use DateInterval;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
@@ -30,6 +31,7 @@ use Illuminate\Database\Query\Builder as BaseBuilder;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\CarbonInterval;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\InteractsWithTime;
@@ -139,6 +141,19 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($model->isDirty('boolAttribute'));
         $this->assertFalse($model->isDirty('dateAttribute'));
         $this->assertTrue($model->isDirty('datetimeAttribute'));
+    }
+
+    public function testDirtyOnIntervalAttributes()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->intervalAttribute = 'P1YT1H';
+
+        $model->syncOriginal();
+
+        $model->intervalAttribute = 'P2YT2H';
+
+        $this->assertTrue($model->isDirty());
+        $this->assertTrue($model->isDirty('intervalAttribute'));
     }
 
     public function testDirtyOnCastedObjects()
@@ -738,6 +753,25 @@ class DatabaseEloquentModelTest extends TestCase
 
         $this->assertInstanceOf(Carbon::class, $model->created_at);
         $this->assertSame('22:30:59.321000', $model->created_at->format('H:i:s.u'));
+    }
+
+    public function testFromDateInterval()
+    {
+        $model = new EloquentModelStub;
+
+        $value = CarbonInterval::create(0, 1, 0, 0, 1);
+        $this->assertSame('P1MT1H', $model->fromDateInterval($value));
+
+        $value = new DateInterval('P1MT1H');
+        $this->assertSame('P1MT1H', $model->fromDateInterval($value));
+
+        $value = 'P1MT1H';
+        $this->assertSame('P1MT1H', $model->fromDateInterval($value));
+
+        $value = '1 month 1 hour';
+        $this->assertSame('P1MT1H', $model->fromDateInterval($value));
+
+        $this->assertNull($model->fromDateInterval(null));
     }
 
     public function testInsertProcess()
@@ -1984,6 +2018,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->jsonAttribute = ['foo' => 'bar'];
         $model->dateAttribute = '1969-07-20';
         $model->datetimeAttribute = '1969-07-20 22:56:00';
+        $model->intervalAttribute = 'P1DT1H';
         $model->timestampAttribute = '1969-07-20 22:56:00';
         $model->collectionAttribute = new BaseCollection;
 
@@ -2003,6 +2038,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame('{"foo":"bar"}', $model->jsonAttributeValue());
         $this->assertInstanceOf(Carbon::class, $model->dateAttribute);
         $this->assertInstanceOf(Carbon::class, $model->datetimeAttribute);
+        $this->assertInstanceOf(CarbonInterval::class, $model->intervalAttribute);
         $this->assertInstanceOf(BaseCollection::class, $model->collectionAttribute);
         $this->assertSame('1969-07-20', $model->dateAttribute->toDateString());
         $this->assertSame('1969-07-20 22:56:00', $model->datetimeAttribute->toDateTimeString());
@@ -2026,6 +2062,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $arr['jsonAttribute']);
         $this->assertSame('1969-07-20 00:00:00', $arr['dateAttribute']);
         $this->assertSame('1969-07-20 22:56:00', $arr['datetimeAttribute']);
+        $this->assertSame('P1DT1H', $arr['intervalAttribute']);
         $this->assertEquals(-14173440, $arr['timestampAttribute']);
     }
 
@@ -2054,6 +2091,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->jsonAttribute = null;
         $model->dateAttribute = null;
         $model->datetimeAttribute = null;
+        $model->intervalAttribute = null;
         $model->timestampAttribute = null;
         $model->collectionAttribute = null;
 
@@ -2069,6 +2107,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertNull($attributes['jsonAttribute']);
         $this->assertNull($attributes['dateAttribute']);
         $this->assertNull($attributes['datetimeAttribute']);
+        $this->assertNull($attributes['intervalAttribute']);
         $this->assertNull($attributes['timestampAttribute']);
         $this->assertNull($attributes['collectionAttribute']);
 
@@ -2082,6 +2121,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertNull($model->jsonAttribute);
         $this->assertNull($model->dateAttribute);
         $this->assertNull($model->datetimeAttribute);
+        $this->assertNull($model->intervalAttribute);
         $this->assertNull($model->timestampAttribute);
         $this->assertNull($model->collectionAttribute);
 
@@ -2097,6 +2137,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertNull($array['jsonAttribute']);
         $this->assertNull($array['dateAttribute']);
         $this->assertNull($array['datetimeAttribute']);
+        $this->assertNull($array['intervalAttribute']);
         $this->assertNull($array['timestampAttribute']);
         $this->assertNull($attributes['collectionAttribute']);
     }
@@ -2114,6 +2155,15 @@ class DatabaseEloquentModelTest extends TestCase
         $model->jsonAttribute = ['foo' => "b\xF8r"];
 
         $model->getAttributes();
+    }
+
+    public function testModelAttributeIntervalFailsOnUnencodableData()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The value bar is not a valid interval.');
+
+        $model = new EloquentModelCastingStub;
+        $model->intervalAttribute = 'bar';
     }
 
     public function testModelAttributeCastingWithSpecialFloatValues()
@@ -2803,6 +2853,7 @@ class EloquentModelCastingStub extends Model
         'collectionAttribute' => 'collection',
         'dateAttribute' => 'date',
         'datetimeAttribute' => 'datetime',
+        'intervalAttribute' => 'interval',
         'timestampAttribute' => 'timestamp',
         'asarrayobjectAttribute' => AsArrayObject::class,
         'ascollectionAttribute' => AsCollection::class,

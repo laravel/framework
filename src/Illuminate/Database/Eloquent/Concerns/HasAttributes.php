@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\LazyLoadingViolationException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\CarbonInterval;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Date;
@@ -101,6 +102,7 @@ trait HasAttributes
         'immutable_custom_datetime',
         'int',
         'integer',
+        'interval',
         'json',
         'object',
         'real',
@@ -753,6 +755,8 @@ trait HasAttributes
             case 'immutable_custom_datetime':
             case 'immutable_datetime':
                 return $this->asDateTime($value)->toImmutable();
+            case 'interval':
+                return $this->asInterval($value);
             case 'timestamp':
                 return $this->asTimestamp($value);
         }
@@ -932,6 +936,13 @@ trait HasAttributes
         // the connection grammar's date format. We will auto set the values.
         elseif (! is_null($value) && $this->isDateAttribute($key)) {
             $value = $this->fromDateTime($value);
+        }
+
+        // If the attribute is listed as an "interval", we will convert the instance
+        // into a storable ISO 8601 specification string, which most software can
+        // understand, regardless of how the interval instance format was set.
+        elseif (! is_null($value) && $this->isIntervalCastable($key)) {
+            $value = $this->fromDateInterval($value);
         }
 
         if ($this->isEnumCastable($key)) {
@@ -1383,6 +1394,30 @@ trait HasAttributes
     }
 
     /**
+     * Convert an interval to a storable string.
+     *
+     * @param  mixed  $value
+     * @return string|null
+     */
+    public function fromDateInterval($value)
+    {
+        return empty($value) ? $value : $this->asInterval($value)->spec();
+    }
+
+    /**
+     * Return an interval as a Carbon Interval object.
+     *
+     * @param  mixed  $value
+     * @return \Illuminate\Support\CarbonInterval
+     */
+    protected function asInterval($value)
+    {
+        return CarbonInterval::make($value)?->settings([
+            'toStringFormat' => fn ($interval) => CarbonInterval::getDateIntervalSpec($interval),
+        ]) ?? throw new InvalidArgumentException("The value $value is not a valid interval.");
+    }
+
+    /**
      * Return a timestamp as unix timestamp.
      *
      * @param  mixed  $value
@@ -1498,6 +1533,17 @@ trait HasAttributes
     protected function isDateCastableWithCustomFormat($key)
     {
         return $this->hasCast($key, ['custom_datetime', 'immutable_custom_datetime']);
+    }
+
+    /**
+     * Determine whether a value is an interval for inbound manipulation.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    protected function isIntervalCastable($key)
+    {
+        return $this->hasCast($key, ['interval']);
     }
 
     /**
@@ -1993,6 +2039,9 @@ trait HasAttributes
         } elseif ($this->isDateAttribute($key) || $this->isDateCastableWithCustomFormat($key)) {
             return $this->fromDateTime($attribute) ===
                 $this->fromDateTime($original);
+        } elseif ($this->isIntervalCastable($key)) {
+            return $this->fromDateInterval($attribute) ===
+                $this->fromDateInterval($original);
         } elseif ($this->hasCast($key, ['object', 'collection'])) {
             return $this->fromJson($attribute) ===
                 $this->fromJson($original);
