@@ -1885,14 +1885,13 @@ trait HasAttributes
     }
 
     /**
-     * Discard attribute(s) changes.
+     * Discard attribute changes and reset the attributes to their original state.
      *
      * @return $this
      */
     public function discardChanges()
     {
-        $this->attributes = $this->original;
-        $this->changes = [];
+        [$this->attributes, $this->changes] = [$this->original, []];
 
         return $this;
     }
