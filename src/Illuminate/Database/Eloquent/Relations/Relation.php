@@ -161,7 +161,7 @@ abstract class Relation implements BuilderContract
      */
     public function getEager()
     {
-        if ($this->eagerImplicitlyEmpty ?? false) {
+        if ($this->eagerImplicitlyEmpty) {
             return $this->query->getModel()->newCollection();
         }
 
