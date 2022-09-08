@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
+use Illuminate\Support\EmptyArgument;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Testing\Assert as PHPUnit;
 use Illuminate\Testing\Constraints\SeeInOrder;
@@ -48,13 +49,13 @@ class TestView
      * @param  mixed  $value
      * @return $this
      */
-    public function assertViewHas($key, $value = null)
+    public function assertViewHas($key, $value = new EmptyArgument)
     {
         if (is_array($key)) {
             return $this->assertViewHasAll($key);
         }
 
-        if (is_null($value)) {
+        if ($value instanceof EmptyArgument) {
             PHPUnit::assertTrue(Arr::has($this->view->gatherData(), $key));
         } elseif ($value instanceof Closure) {
             PHPUnit::assertTrue($value(Arr::get($this->view->gatherData(), $key)));
