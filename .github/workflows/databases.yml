@@ -1,6 +1,10 @@
 name: databases
 
-on: [push, pull_request]
+on:
+  push:
+    - master
+    - '*.x'
+  pull_request:
 
 jobs:
   mysql_57:

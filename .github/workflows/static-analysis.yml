@@ -2,6 +2,8 @@ name: static analysis
 
 on:
   push:
+    - master
+    - '*.x'
   pull_request:
   schedule:
     - cron: '0 0 * * *'
