@@ -2423,6 +2423,23 @@ class DatabaseEloquentModelTest extends TestCase
 
         $this->assertNull($user->name);
     }
+
+    public function testDiscardChanges()
+    {
+        $user = new EloquentModelStub([
+            'name' => 'Taylor Otwell',
+        ]);
+
+        $this->assertNotEmpty($user->isDirty());
+        $this->assertNull($user->getOriginal('name'));
+        $this->assertSame('Taylor Otwell', $user->getAttribute('name'));
+
+        $user->discardChanges();
+
+        $this->assertEmpty($user->isDirty());
+        $this->assertNull($user->getOriginal('name'));
+        $this->assertNull($user->getAttribute('name'));
+    }
 }
 
 class EloquentTestObserverStub
