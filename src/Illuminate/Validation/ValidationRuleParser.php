@@ -68,7 +68,7 @@ class ValidationRuleParser
 
         foreach ($rules as $key => $rule) {
             if (is_array($rule) && Arr::isAssoc($rule)) {
-                $nestedRules = Arr::prependKeysWith($this->explodeNestedAssociativeArrays($rule), $key . '.');
+                $nestedRules = Arr::prependKeysWith($this->explodeNestedAssociativeArrays($rule), $key.'.');
                 $exploded = array_merge($exploded, [$key => 'array'], $nestedRules);
             } else {
                 $exploded[$key] = $rule;

@@ -162,8 +162,8 @@ class ValidationRuleParserTest extends TestCase
                 'items' => [
                     '*' => [
                         'id' => 'numeric',
-                        'description' => 'string'
-                    ]
+                        'description' => 'string',
+                    ],
                 ],
             ],
         ];
@@ -182,8 +182,8 @@ class ValidationRuleParserTest extends TestCase
                 'items' => [
                     ['id' => 1, 'description' => 'foo'],
                     ['id' => 2, 'description' => 'bar'],
-                ]
-            ]
+                ],
+            ],
         ]));
 
         $exploded = $parser->explode($rules);
