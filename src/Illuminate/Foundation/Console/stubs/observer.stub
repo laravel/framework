@@ -12,7 +12,7 @@ class {{ class }}
      * @param  \{{ namespacedModel }}  ${{ modelVariable }}
      * @return void
      */
-    public function created({{ model }} ${{ modelVariable }})
+    public function created({{ model }} ${{ modelVariable }}): void
     {
         //
     }
@@ -23,7 +23,7 @@ class {{ class }}
      * @param  \{{ namespacedModel }}  ${{ modelVariable }}
      * @return void
      */
-    public function updated({{ model }} ${{ modelVariable }})
+    public function updated({{ model }} ${{ modelVariable }}): void
     {
         //
     }
@@ -34,7 +34,7 @@ class {{ class }}
      * @param  \{{ namespacedModel }}  ${{ modelVariable }}
      * @return void
      */
-    public function deleted({{ model }} ${{ modelVariable }})
+    public function deleted({{ model }} ${{ modelVariable }}): void
     {
         //
     }
@@ -45,7 +45,7 @@ class {{ class }}
      * @param  \{{ namespacedModel }}  ${{ modelVariable }}
      * @return void
      */
-    public function restored({{ model }} ${{ modelVariable }})
+    public function restored({{ model }} ${{ modelVariable }}): void
     {
         //
     }
@@ -56,7 +56,7 @@ class {{ class }}
      * @param  \{{ namespacedModel }}  ${{ modelVariable }}
      * @return void
      */
-    public function forceDeleted({{ model }} ${{ modelVariable }})
+    public function forceDeleted({{ model }} ${{ modelVariable }}): void
     {
         //
     }

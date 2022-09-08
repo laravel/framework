@@ -24,7 +24,7 @@ class {{ class }}
      * @param  \{{ eventNamespace }}  $event
      * @return void
      */
-    public function handle({{ event }} $event)
+    public function handle({{ event }} $event): void
     {
         //
     }
