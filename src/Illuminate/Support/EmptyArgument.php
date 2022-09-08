@@ -2,4 +2,6 @@
 
 namespace Illuminate\Support;
 
-class EmptyArgument{}
+class EmptyArgument
+{
+}
