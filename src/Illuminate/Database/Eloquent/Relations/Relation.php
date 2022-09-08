@@ -41,6 +41,13 @@ abstract class Relation implements BuilderContract
     protected $related;
 
     /**
+     * Indicates whether the eagerly loaded relation should implicitly return an empty collection.
+     *
+     * @var bool
+     */
+    protected $eagerImplicitlyEmpty = false;
+
+    /**
      * Indicates if the relation is adding constraints.
      *
      * @var bool
