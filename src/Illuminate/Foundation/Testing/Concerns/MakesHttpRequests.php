@@ -566,7 +566,7 @@ trait MakesHttpRequests
             $uri = substr($uri, 1);
         }
 
-        return trim(url($uri), '/');
+        return url($uri);
     }
 
     /**
