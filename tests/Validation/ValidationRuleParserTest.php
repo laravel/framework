@@ -144,6 +144,68 @@ class ValidationRuleParserTest extends TestCase
         $this->assertSame('bar)$/i', $exploded->rules['items.0.type'][2]);
     }
 
+    public function testExplodeAssociativeArraysOfRules()
+    {
+        $rules = [
+            'invoice' => [
+                'state' => ['string', Rule::in(['foo', 'bar'])],
+
+                'user' => [
+                    'name' => 'string',
+                    'email' => ['email'],
+                ],
+
+                'coupons' => [
+                    '*' => ['string'],
+                ],
+
+                'items' => [
+                    '*' => [
+                        'id' => 'numeric',
+                        'description' => 'string'
+                    ]
+                ],
+            ],
+        ];
+
+        $parser = (new ValidationRuleParser([
+            'invoice' => [
+                'state' => 'foo',
+
+                'user' => [
+                    'name' => 'Taylor Otwell',
+                    'email' => '',
+                ],
+
+                'coupons' => ['foo', 'bar'],
+
+                'items' => [
+                    ['id' => 1, 'description' => 'foo'],
+                    ['id' => 2, 'description' => 'bar'],
+                ]
+            ]
+        ]));
+
+        $exploded = $parser->explode($rules);
+
+        $this->assertSame(['array'], $exploded->rules['invoice']);
+        $this->assertSame(['string', 'in:"foo","bar"'], $exploded->rules['invoice.state']);
+
+        $this->assertSame(['string'], $exploded->rules['invoice.user.name']);
+        $this->assertSame(['email'], $exploded->rules['invoice.user.email']);
+
+        $this->assertSame(['string'], $exploded->rules['invoice.coupons.0']);
+        $this->assertSame(['string'], $exploded->rules['invoice.coupons.1']);
+
+        $this->assertSame(['array'], $exploded->rules['invoice.items.0']);
+        $this->assertSame(['numeric'], $exploded->rules['invoice.items.0.id']);
+        $this->assertSame(['string'], $exploded->rules['invoice.items.0.description']);
+
+        $this->assertSame(['array'], $exploded->rules['invoice.items.1']);
+        $this->assertSame(['numeric'], $exploded->rules['invoice.items.1.id']);
+        $this->assertSame(['string'], $exploded->rules['invoice.items.1.description']);
+    }
+
     public function testExplodeProperlyFlattensRuleArraysOfArrays()
     {
         $data = ['items' => [['type' => 'foo']]];

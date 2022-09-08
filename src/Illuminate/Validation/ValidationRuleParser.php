@@ -47,12 +47,35 @@ class ValidationRuleParser
     {
         $this->implicitAttributes = [];
 
+        $rules = $this->explodeNestedAssociativeArrays($rules);
         $rules = $this->explodeRules($rules);
 
         return (object) [
             'rules' => $rules,
             'implicitAttributes' => $this->implicitAttributes,
         ];
+    }
+
+    /**
+     * Expands nested associative arrays into dot notation rules.
+     *
+     * @param  array  $rules
+     * @return array
+     */
+    public function explodeNestedAssociativeArrays($rules)
+    {
+        $exploded = [];
+
+        foreach ($rules as $key => $rule) {
+            if (is_array($rule) && Arr::isAssoc($rule)) {
+                $nestedRules = Arr::prependKeysWith($this->explodeNestedAssociativeArrays($rule), $key . '.');
+                $exploded = array_merge($exploded, [$key => 'array'], $nestedRules);
+            } else {
+                $exploded[$key] = $rule;
+            }
+        }
+
+        return $exploded;
     }
 
     /**
