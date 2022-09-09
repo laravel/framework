@@ -4,6 +4,7 @@ namespace Illuminate\Auth;
 
 use Closure;
 use Illuminate\Contracts\Auth\Factory as FactoryContract;
+use Illuminate\Support\Timebox;
 use InvalidArgumentException;
 
 class AuthManager implements FactoryContract
@@ -122,7 +123,7 @@ class AuthManager implements FactoryContract
     {
         $provider = $this->createUserProvider($config['provider'] ?? null);
 
-        $guard = new SessionGuard($name, $provider, $this->app['session.store']);
+        $guard = new SessionGuard($name, $provider, $this->app['session.store'], null, new Timebox);
 
         // When using the remember me functionality of the authentication services we
         // will need to be set the encryption instance of the guard, which allows
