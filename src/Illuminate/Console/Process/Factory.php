@@ -2,15 +2,18 @@
 
 namespace Illuminate\Console\Process;
 
+use Illuminate\Console\Contracts\ProcessResult;
 use Illuminate\Console\Exceptions\ProcessNotRunningException;
 use Illuminate\Console\Process;
 use Illuminate\Console\Process\Results\FakeResult;
+use Illuminate\Console\Process\Results\Result;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use PHPUnit\Framework\Assert as PHPUnit;
 
 /**
  * @method \Illuminate\Console\Contracts\ProcessResult run(array|string|null $command = null, callable|null $output = null)
+ * @method \Illuminate\Console\Process\PendingProcess async(bool $async = true)
  * @method \Illuminate\Console\Process\PendingProcess command(array|string $command)
  * @method \Illuminate\Console\Process\PendingProcess dd()
  * @method \Illuminate\Console\Process\PendingProcess dump()
@@ -191,13 +194,11 @@ class Factory
      */
     public function pool($callback)
     {
-        $results = $callback(new Pool($this));
-
-        return collect($results)->each(function ($result) {
-            if (! $result instanceof DelayedStart) {
+        return collect($callback(new Pool($this)))->each(function ($result) {
+            if (! $result instanceof ProcessResult) {
                 throw new ProcessNotRunningException('Process has not been started. Did you forget to call "run"?');
             }
-        })->map->start()->values();
+        })->each->wait();
     }
 
     /**

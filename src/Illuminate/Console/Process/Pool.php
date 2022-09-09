@@ -34,6 +34,6 @@ class Pool
      */
     public function __call($method, $parameters)
     {
-        return $this->factory->delayStart()->$method(...$parameters);
+        return $this->factory->async()->$method(...$parameters);
     }
 }

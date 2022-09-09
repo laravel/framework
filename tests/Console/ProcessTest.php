@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests;
 
+use Illuminate\Console\Contracts\ProcessResult;
 use Illuminate\Console\Exceptions\ProcessFailedException;
 use Illuminate\Console\Exceptions\ProcessNotRunningException;
 use Illuminate\Console\Exceptions\ProcessNotStartedException;
 use Illuminate\Console\Process;
-use Illuminate\Console\Process\DelayedStart;
 use Illuminate\Console\Process\Factory;
 use Illuminate\Console\Process\Pool;
 use Illuminate\Console\Process\Results\FakeResult;
@@ -238,7 +238,7 @@ class ProcessTest extends TestCase
             $this->expectExceptionMessage("The process \"'{$this->ls()}'\" failed to start.");
         }
 
-        new Result($this->factory, new Process([$this->ls()]));
+        new Result(new Process([$this->ls()]));
     }
 
     public function testFakeResultEnsuresTheProcessStarts()
@@ -298,7 +298,7 @@ class ProcessTest extends TestCase
             $this->markTestSkipped('Test requires pcntl extension.');
         }
 
-        $result = $this->factory->path(__DIR__)->run($this->ls());
+        $result = $this->factory->path(__DIR__)->async()->run($this->ls());
         $result->process()->signal(SIGKILL);
 
         $this->assertTrue($result->failed());
@@ -326,6 +326,11 @@ class ProcessTest extends TestCase
     public function testResultRunning()
     {
         $result = $this->factory->run($this->ls());
+        $this->assertFalse($result->running());
+        $this->assertTrue($result->ok());
+        $this->assertFalse($result->running());
+
+        $result = $this->factory->async()->run($this->ls());
         $this->assertTrue($result->running());
         $this->assertTrue($result->ok());
         $this->assertFalse($result->running());
@@ -333,7 +338,11 @@ class ProcessTest extends TestCase
         $this->factory->fake();
 
         $result = $this->factory->run($this->ls());
+        $this->assertFalse($result->running());
+        $this->assertTrue($result->ok());
+        $this->assertFalse($result->running());
 
+        $result = $this->factory->async()->run($this->ls());
         $this->assertTrue($result->running());
         $this->assertTrue($result->ok());
         $this->assertFalse($result->running());
@@ -417,14 +426,15 @@ class ProcessTest extends TestCase
         $this->assertTrue($result->ok());
     }
 
-    public function testDelayedRun()
+    public function testAsync()
     {
         $this->factory->fake();
 
-        $result = $this->factory->delayStart()->run($this->ls());
-        $this->assertInstanceOf(DelayedStart::class, $result);
-        $this->assertFalse($result->process()->isRunning()); // because of fake...
+        $result = $this->factory->async()->run($this->ls());
+        $this->assertInstanceOf(ProcessResult::class, $result);
+        $this->assertTrue($result->running()); // because of fake...
         $this->assertTrue($result->ok());
+        $this->assertFalse($result->running());
     }
 
     public function testProcessesOnPoolMustCallRun()

@@ -18,11 +18,11 @@ class PendingProcess
     protected $command = [];
 
     /**
-     * Whether the process should be have a delayed run.
+     * Whether the process should be asynchronous.
      *
      * @var bool
      */
-    protected $delayStart = false;
+    protected $async = false;
 
     /**
      * The factory instance.
@@ -78,13 +78,14 @@ class PendingProcess
     }
 
     /**
-     * Ensures the process's run is delayed.
+     * Toggle asynchronicity in the process..
      *
+     * @param  bool  $async
      * @return $this
      */
-    public function delayStart()
+    public function async($async = true)
     {
-        $this->delayStart = true;
+        $this->async = $async;
 
         return $this;
     }
@@ -200,7 +201,11 @@ class PendingProcess
         $process->setWorkingDirectory((string) ($this->path ?? getcwd()));
         $process->setTimeout($this->timeout);
 
-        return $this->start($process, $this->output);
+        return tap($this->start($process, $this->output), function ($result) {
+            if (! $this->async) {
+                $result->wait();
+            }
+        });
     }
 
     /**

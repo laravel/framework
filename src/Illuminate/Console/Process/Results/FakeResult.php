@@ -61,7 +61,7 @@ class FakeResult implements ProcessResult
     }
 
     /**
-     * Simulates a start of the fake result underlying process.
+     * Simulates a "start" of the fake result underlying process.
      *
      * @param  \Illuminate\Console\Process  $process
      * @param  (callable(int, string): mixed)|null  $onOutput
