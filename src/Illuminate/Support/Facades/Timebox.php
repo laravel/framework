@@ -2,7 +2,6 @@
 
 namespace Illuminate\Support\Facades;
 
-
 /**
  * @method static \Illuminate\Support\Timebox make(callable $callback, int $microseconds): mixed
  *

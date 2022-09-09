@@ -5,7 +5,7 @@ namespace Illuminate\Support;
 class Timebox
 {
     /**
-     * Is the timebox allowed to do an early return
+     * Is the timebox allowed to do an early return.
      *
      * @var bool
      */

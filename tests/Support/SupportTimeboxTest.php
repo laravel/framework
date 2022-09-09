@@ -3,8 +3,8 @@
 namespace Illuminate\Tests\Support;
 
 use Illuminate\Support\Timebox;
-use PHPUnit\Framework\TestCase;
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class SupportTimeboxTest extends TestCase
 {
@@ -22,7 +22,8 @@ class SupportTimeboxTest extends TestCase
         $mock = m::spy(Timebox::class)->shouldAllowMockingProtectedMethods()->makePartial();
         $mock->shouldReceive('usleep')->once();
 
-        $mock->make(function () {}, 10000);
+        $mock->make(function () {
+        }, 10000);
 
         $mock->shouldHaveReceived('usleep')->once();
     }
