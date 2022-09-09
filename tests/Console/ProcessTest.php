@@ -529,6 +529,33 @@ class ProcessTest extends TestCase
         $this->assertSame(['My line 1', 'My line 2', 'My line 3'], $results[2]->toArray());
     }
 
+    public function testPoolResultsMayBeAsserted()
+    {
+        $this->factory->fake([
+            'one' => $this->factory::result(['My line 1']),
+            'two' => $this->factory::result(['My line 1', 'My line 2'], 1),
+            'three' => $this->factory::result(['My line 1', 'My line 2', 'My line 3'], 143),
+        ]);
+
+        $this->factory->pool(fn (Pool $pool) => [
+            $pool->run('one'),
+            $pool->run('two'),
+            $pool->run('three'),
+        ]);
+
+        $this->factory->assertRanInOrder([
+            'one',
+            'two',
+            'three',
+        ]);
+
+        $this->factory->assertRanInOrder([
+            fn ($process, $response) => $process->command() === 'one' && $response->ok(),
+            fn ($process, $response) => $process->command() === 'two' && $response->failed(),
+            fn ($process, $response) => $process->command() === 'three' && $response->failed(),
+        ]);
+    }
+
     public function testProcessGetters()
     {
         $this->factory->fake();
