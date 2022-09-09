@@ -454,6 +454,20 @@ class SupportTestingBusFakeTest extends TestCase
             return $job->id === 1;
         });
     }
+
+    public function testAssertNothingBatched()
+    {
+        $this->fake->assertNothingBatched();
+
+        $this->fake->batch([])->dispatch();
+
+        try {
+            $this->fake->assertNothingBatched();
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('Batched jobs were dispatched unexpectedly.'));
+        }
+    }
 }
 
 class BusJobStub
