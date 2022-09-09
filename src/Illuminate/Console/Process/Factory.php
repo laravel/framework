@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console\Process;
 
+use Illuminate\Console\Exceptions\ProcessNotRunningException;
 use Illuminate\Console\Process;
 use Illuminate\Console\Process\Results\FakeResult;
 use Illuminate\Support\Str;
@@ -180,6 +181,23 @@ class Factory
         $this->stubs[] = $callback;
 
         return $this;
+    }
+
+    /**
+     * Send a pool of processes concurrently.
+     *
+     * @param  callable(\Illuminate\Console\Process\Pool): iterable<array-key, \Illuminate\Console\Contracts\ProcessResult>  $callback
+     * @return array<array-key, \Illuminate\Console\Contracts\ProcessResult>
+     */
+    public function pool($callback)
+    {
+        $results = $callback(new Pool($this));
+
+        return collect($results)->each(function ($result) {
+            if (! $result instanceof DelayedStart) {
+                throw new ProcessNotRunningException('Process has not been started. Did you forget to call "run"?');
+            }
+        })->map->start()->values();
     }
 
     /**

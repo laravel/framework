@@ -19,6 +19,7 @@ use Illuminate\Console\Process\Factory;
  * @method static \Illuminate\Console\Process\Factory assertNotRan(callable|string $command)
  * @method static \Illuminate\Console\Process\Factory assertNothingRan()
  * @method static \Illuminate\Console\Process\Factory assertRanCount(int $count)
+ * @method static \Illuminate\Support\Collection pool(callable $callback)
  *
  * @see \Illuminate\Console\Process\Factory
  */
