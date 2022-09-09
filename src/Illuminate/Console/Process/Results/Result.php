@@ -12,6 +12,13 @@ class Result implements ProcessResult
     use Concerns\Arrayable, Concerns\Exitable, Concerns\Stringable, Concerns\Throwable;
 
     /**
+     * The "after wait" callbacks.
+     *
+     * @var array<int, callable(\Illuminate\Console\Process, \Illuminate\Console\Contracts\ProcessResult): mixed>
+     */
+    protected $afterWaitCallbacks = [];
+
+    /**
      * The underlying process instance.
      *
      * @var \Illuminate\Console\Process
@@ -22,10 +29,13 @@ class Result implements ProcessResult
      * Creates a new Process Result instance.
      *
      * @param  \Illuminate\Console\Process  $process
+     * @param  array<int, callable(\Illuminate\Console\Process, \Illuminate\Console\Contracts\ProcessResult): mixed>  $afterWaitCallbacks
      * @return void
      */
-    public function __construct($process)
+    public function __construct($process, $afterWaitCallbacks)
     {
+        $this->afterWaitCallbacks = $afterWaitCallbacks;
+
         $this->ensureProcessIsRunning($this->process = $process);
     }
 
@@ -52,11 +62,15 @@ class Result implements ProcessResult
      */
     public function wait()
     {
-        if ($this->process->isRunning()) {
+        if ($this->running()) {
             try {
                 $this->process->wait();
             } catch (SymfonyProcessTimedOutException $e) {
                 throw new ProcessTimedOutException($this->process, $this, $e);
+            }
+
+            foreach ($this->afterWaitCallbacks as $callback) {
+                $callback($this->process, $this);
             }
         }
 

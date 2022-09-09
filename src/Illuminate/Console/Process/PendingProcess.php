@@ -67,6 +67,13 @@ class PendingProcess
     protected $beforeStartCallbacks = [];
 
     /**
+     * The callbacks that should execute after the process waits.
+     *
+     * @var array<int, callable(\Illuminate\Console\Process, \Illuminate\Console\Contracts\ProcessResult): mixed>
+     */
+    protected $afterWaitCallbacks = [];
+
+    /**
      * Creates a new Pending Process instance.
      *
      * @param  \Illuminate\Console\Process\Factory  $factory
@@ -113,7 +120,7 @@ class PendingProcess
     /**
      * Register a stub callable that will intercept processes and be able to return stub process result.
      *
-     * @param  array<int, callable(\Illuminate\Console\Process): \Illuminate\Console\Contracts\ProcessResult>  $callbacks
+     * @param  array<int, callable(\Illuminate\Console\Process): (\Illuminate\Console\Contracts\ProcessResult|null)>  $callbacks
      * @return $this
      */
     public function stubs($callbacks)
@@ -222,11 +229,11 @@ class PendingProcess
         foreach ($this->stubs as $callback) {
             if ($result = $callback($process)) {
                 /** @var \Illuminate\Console\Process\Results\FakeResult $result */
-                return $result->start($process, $output);
+                return value($result)->start($process, $output, $this->afterWaitCallbacks);
             }
         }
 
-        return new Result(tap($process)->start($output));
+        return new Result(tap($process)->start($output), $this->afterWaitCallbacks);
     }
 
     /**
@@ -238,5 +245,16 @@ class PendingProcess
     public function beforeStart($callback)
     {
         return tap($this, fn () => $this->beforeStartCallbacks[] = $callback);
+    }
+
+    /**
+     * Add a new "after wait" callback to the process.
+     *
+     * @param  callable(\Illuminate\Console\Process, \Illuminate\Console\Contracts\ProcessResult): mixed  $callback
+     * @return $this
+     */
+    public function afterWait($callback)
+    {
+        return tap($this, fn () => $this->afterWaitCallbacks[] = $callback);
     }
 }

@@ -223,7 +223,8 @@ class ProcessTest extends TestCase
 
         $this->assertInstanceOf(ProcessFailedException::class, $exception);
 
-        $this->assertSame($result, $exception->result());
+        $this->assertSame(value($result)->output(), $exception->result()->output());
+        $this->assertSame(value($result)->exitCode(), $exception->result()->exitCode());
         $this->assertStringContainsString($this->ls(), $exception->process()->getCommandLine());
         $this->assertNull($exception->getPrevious());
     }
@@ -238,7 +239,7 @@ class ProcessTest extends TestCase
             $this->expectExceptionMessage("The process \"'{$this->ls()}'\" failed to start.");
         }
 
-        new Result(new Process([$this->ls()]));
+        new Result(new Process([$this->ls()]), []);
     }
 
     public function testFakeResultEnsuresTheProcessStarts()

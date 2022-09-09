@@ -33,7 +33,7 @@ class Factory
     /**
      * The stub callables that will handle processes.
      *
-     * @var array<int, callable(\Illuminate\Console\Process): \Illuminate\Console\Contracts\ProcessResult>
+     * @var array<int, callable(\Illuminate\Console\Process): (\Illuminate\Console\Contracts\ProcessResult|null)>
      */
     protected $stubs = [];
 
@@ -47,14 +47,14 @@ class Factory
     /**
      * The recorded request array.
      *
-     * @var array<int, \Illuminate\Console\Process>
+     * @var array<int, array{0: \Illuminate\Console\Process, 1: \Illuminate\Console\Contracts\ProcessResult}>
      */
     protected $recorded = [];
 
     /**
      * Assert that a process was recorded matching a given truth test.
      *
-     * @param  (callable(\Illuminate\Console\Process): bool)|string  $command
+     * @param  (callable(\Illuminate\Console\Process, \Illuminate\Console\Contracts\ProcessResult): bool)|string  $command
      * @return $this
      */
     public function assertRan($command)
@@ -72,7 +72,7 @@ class Factory
     /**
      * Assert that the given process was ram in the given order.
      *
-     * @param  array<int, (callable(\Illuminate\Console\Process): bool)|string>  $commands
+     * @param  array<int, (callable(\Illuminate\Console\Process, \Illuminate\Console\Contracts\ProcessResult): bool)|string>  $commands
      * @return $this
      */
     public function assertRanInOrder($commands)
@@ -83,7 +83,8 @@ class Factory
             $callback = $this->makeAssertCallback($command);
 
             PHPUnit::assertTrue($callback(
-                $this->recorded[$index],
+                $this->recorded[$index][0],
+                $this->recorded[$index][1]
             ), 'An expected process (#'.($index + 1).') was not recorded.');
         }
 
@@ -93,7 +94,7 @@ class Factory
     /**
      * Assert that a process was not recorded matching a given truth test.
      *
-     * @param  (callable(\Illuminate\Console\Process): bool)|string  $command
+     * @param  (callable(\Illuminate\Console\Process, \Illuminate\Console\Contracts\ProcessResult): bool)|string  $command
      * @return $this
      */
     public function assertNotRan($command)
@@ -111,20 +112,20 @@ class Factory
     /**
      * Makes an assert callback for the given command "expectation".
      *
-     * @param  array<array-key, string>|(callable(\Illuminate\Console\Process): bool)|string $command
-     * @return callable(\Illuminate\Console\Process): bool
+     * @param  array<array-key, string>|(callable(\Illuminate\Console\Process, \Illuminate\Console\Contracts\ProcessResult): bool)|string $command
+     * @return callable(\Illuminate\Console\Process, \Illuminate\Console\Contracts\ProcessResult): bool
      */
     protected function makeAssertCallback($command)
     {
         if (is_string($command)) {
-            return fn ($process) => $process->command() === $command;
+            return fn ($process, $result) => $process->command() === $command;
         }
 
         if (is_callable($command)) {
             return $command;
         }
 
-        return fn ($process) => $process->command() === with(new Process($command))->command();
+        return fn ($process, $result) => $process->command() === with(new Process($command))->command();
     }
 
     /**
@@ -158,7 +159,7 @@ class Factory
     /**
      * Register a stub callable that will intercept requests and be able to return stub results.
      *
-     * @param  (iterable<string, callable(\Illuminate\Console\Process): \Illuminate\Console\Contracts\ProcessResult>)|(callable(\Illuminate\Console\Process): \Illuminate\Console\Contracts\ProcessResult)|null  $callback
+     * @param  (array<int, callable(\Illuminate\Console\Process): \Illuminate\Console\Contracts\ProcessResult|null>)|(callable(\Illuminate\Console\Process): \Illuminate\Console\Contracts\ProcessResult|null)|null  $callback
      * @return $this
      */
     public function fake($callback = null)
@@ -166,7 +167,7 @@ class Factory
         $this->recording = true;
 
         if (is_null($callback)) {
-            $callback = fn () => static::result();
+            $callback = static::result();
         }
 
         if (is_iterable($callback)) {
@@ -204,13 +205,13 @@ class Factory
     /**
      * Get a collection of the processes pairs matching the given truth test.
      *
-     * @param  (callable(\Illuminate\Console\Process): bool)  $callback
-     * @return \Illuminate\Support\Collection<int, \Illuminate\Console\Process>
+     * @param  (callable(\Illuminate\Console\Process, \Illuminate\Console\Contracts\ProcessResult): bool)  $callback
+     * @return \Illuminate\Support\Collection<int, array{0: \Illuminate\Console\Process, 1: \Illuminate\Console\Contracts\ProcessResult}>
      */
     public function recorded($callback)
     {
         return collect($this->recorded)
-            ->filter(fn ($process) => $callback($process))
+            ->filter(fn ($pair) => $callback($pair[0], $pair[1]))
             ->values();
     }
 
@@ -230,19 +231,21 @@ class Factory
      * @param  array<array-key, string>|string  $output
      * @param  int  $exitCode
      * @param  array<array-key, string>|string  $errorOutput
-     * @return \Illuminate\Console\Contracts\ProcessResult
+     * @return callable(): \Illuminate\Console\Contracts\ProcessResult
      */
     public static function result($output = '', $exitCode = 0, $errorOutput = '')
     {
-        if (is_array($output)) {
-            $output = collect($output)->map(fn ($line) => "$line\n")->implode('');
-        }
+        return function () use ($output, $exitCode, $errorOutput) {
+            if (is_array($output)) {
+                $output = collect($output)->map(fn ($line) => "$line\n")->implode('');
+            }
 
-        if (is_array($errorOutput)) {
-            $errorOutput = collect($errorOutput)->map(fn ($line) => "$line\n")->implode('');
-        }
+            if (is_array($errorOutput)) {
+                $errorOutput = collect($errorOutput)->map(fn ($line) => "$line\n")->implode('');
+            }
 
-        return new FakeResult($output, $exitCode, $errorOutput);
+            return new FakeResult($output, $exitCode, $errorOutput);
+        };
     }
 
     /**
@@ -259,9 +262,9 @@ class Factory
         }
 
         return $this->newPendingProcess()
-            ->beforeStart(function ($process) {
+            ->afterWait(function ($process, $result) {
                 if ($this->recording) {
-                    $this->recorded[] = $process;
+                    $this->recorded[] = [$process, $result];
                 }
             })
             ->stubs($this->stubs)

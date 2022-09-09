@@ -11,6 +11,20 @@ class FakeResult implements ProcessResult
     use Concerns\Arrayable, Concerns\Exitable, Concerns\Stringable, Concerns\Throwable;
 
     /**
+     * The "after wait" callbacks.
+     *
+     * @var array<int, callable(\Illuminate\Console\Process, \Illuminate\Console\Contracts\ProcessResult): mixed>
+     */
+    protected $afterWaitCallbacks = [];
+
+    /**
+     * The "on output" callback.
+     *
+     * @var (callable(int, string): mixed)|null 
+     */
+    protected $onOutput;
+
+    /**
      * The underlying process instance.
      *
      * @var \Illuminate\Console\Process|null
@@ -65,21 +79,16 @@ class FakeResult implements ProcessResult
      *
      * @param  \Illuminate\Console\Process  $process
      * @param  (callable(int, string): mixed)|null  $onOutput
+     * @param  array<int, callable(\Illuminate\Console\Process, \Illuminate\Console\Contracts\ProcessResult): mixed>  $afterWaitCallbacks
      * @return $this
      *
      * @internal
      */
-    public function start($process, $onOutput)
+    public function start($process, $onOutput, $afterWaitCallbacks)
     {
+        $this->afterWaitCallbacks = $afterWaitCallbacks;
         $this->process = $process;
-
-        if ($onOutput && $this->output !== '') {
-            $onOutput(Process::STDOUT, $this->output);
-        }
-
-        if ($onOutput && $this->errorOutput !== '') {
-            $onOutput(Process::STDERR, $this->errorOutput);
-        }
+        $this->onOutput = $onOutput;
 
         return $this;
     }
@@ -97,9 +106,23 @@ class FakeResult implements ProcessResult
      */
     public function wait()
     {
-        $this->ensureProcessExists();
+        if ($this->running) {
+            $this->ensureProcessExists();
 
-        $this->running = false;
+            if ($this->onOutput && $this->output !== '') {
+                ($this->onOutput)(Process::STDOUT, $this->output);
+            }
+
+            if ($this->onOutput && $this->errorOutput !== '') {
+                ($this->onOutput)(Process::STDERR, $this->errorOutput);
+            }
+
+            $this->running = false;
+
+            foreach ($this->afterWaitCallbacks as $callback) {
+                $callback($this->process, $this);
+            }
+        }
 
         return $this;
     }
@@ -144,6 +167,9 @@ class FakeResult implements ProcessResult
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function running()
     {
         return $this->running;
