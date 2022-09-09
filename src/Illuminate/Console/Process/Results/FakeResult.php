@@ -20,7 +20,7 @@ class FakeResult implements ProcessResult
     /**
      * The "on output" callback.
      *
-     * @var (callable(int, string): mixed)|null 
+     * @var (callable(int, string): mixed)|null
      */
     protected $onOutput;
 
