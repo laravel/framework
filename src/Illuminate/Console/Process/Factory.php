@@ -174,7 +174,7 @@ class Factory
             foreach ($callback as $command => $result) {
                 $this->stubs[] = (function ($process) use ($command, $result) {
                     if (Str::is($command, $process->command())) {
-                        return $result;
+                        return value($result);
                     }
                 });
             }

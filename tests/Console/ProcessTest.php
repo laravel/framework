@@ -250,6 +250,58 @@ class ProcessTest extends TestCase
         tap(new FakeResult('foo', 0, ''))->wait();
     }
 
+    public function testFakes()
+    {
+        $this->factory->fake();
+        $this->assertSame('', $this->factory->run()->output());
+        $this->assertSame('', $this->factory->run()->output());
+        $this->factory->assertRanCount(2);
+        (fn () => $this->stubs = [])->call($this->factory);
+        (fn () => $this->recorded = [])->call($this->factory);
+
+        $this->factory->fake($this->factory::result('output 1'));
+        $this->assertSame('output 1', $this->factory->run()->output());
+        $this->assertSame('output 1', $this->factory->run()->output());
+        $this->factory->assertRanCount(2);
+        (fn () => $this->stubs = [])->call($this->factory);
+        (fn () => $this->recorded = [])->call($this->factory);
+
+        $this->factory->fake(fn () => $this->factory::result('output 1'));
+        $this->assertSame('output 1', $this->factory->run()->output());
+        $this->assertSame('output 1', $this->factory->run()->output());
+        $this->factory->assertRanCount(2);
+        (fn () => $this->stubs = [])->call($this->factory);
+        (fn () => $this->recorded = [])->call($this->factory);
+
+        $this->factory->fake(fn () => null);
+        $this->assertStringContainsString('ProcessTest', $this->factory->path(__DIR__)->run($this->ls())->output());
+        $this->assertStringContainsString('ProcessTest', $this->factory->path(__DIR__)->run($this->ls())->output());
+        $this->factory->assertRanCount(2);
+        (fn () => $this->stubs = [])->call($this->factory);
+        (fn () => $this->recorded = [])->call($this->factory);
+
+        $this->factory->fake(['' => $this->factory::result('output 1')]);
+        $this->assertSame('output 1', $this->factory->run()->output());
+        $this->assertSame('output 1', $this->factory->run()->output());
+        $this->factory->assertRanCount(2);
+        (fn () => $this->stubs = [])->call($this->factory);
+        (fn () => $this->recorded = [])->call($this->factory);
+
+        $this->factory->fake(['' => fn () => $this->factory::result('output 1')]);
+        $this->assertSame('output 1', $this->factory->run()->output());
+        $this->assertSame('output 1', $this->factory->run()->output());
+        $this->factory->assertRanCount(2);
+        (fn () => $this->stubs = [])->call($this->factory);
+        (fn () => $this->recorded = [])->call($this->factory);
+
+        $this->factory->fake(['' => fn () => null]);
+        $this->assertStringContainsString('ProcessTest', $this->factory->path(__DIR__)->run($this->ls())->output());
+        $this->assertStringContainsString('ProcessTest', $this->factory->path(__DIR__)->run($this->ls())->output());
+        $this->factory->assertRanCount(2);
+        (fn () => $this->stubs = [])->call($this->factory);
+        (fn () => $this->recorded = [])->call($this->factory);
+    }
+
     public function testWait()
     {
         $result = $this->factory->path(__DIR__)->run($this->ls());
