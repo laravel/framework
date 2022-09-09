@@ -298,7 +298,7 @@ class Builder implements BuilderContract
     
     public function whereLike($column, $value = null)
     {
-        $this->where($column,'Like','%'.$value.'%');
+        $this->where($column,'LIKE','%'.$value.'%');
 
         return $this;
     }
