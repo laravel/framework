@@ -152,10 +152,8 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function pushRaw($payload, $queue = null, array $options = [])
     {
-        $this->getConnection()->eval(
-            LuaScripts::push(), 2, $this->getQueue($queue),
-            $this->getQueue($queue).':notify', $payload
-        );
+        $this->getConnection()->rpush($this->getQueue($queue), $payload);
+        $this->getConnection()->rpush($this->getQueue($queue).':notify', 1);
 
         return json_decode($payload, true)['id'] ?? null;
     }
