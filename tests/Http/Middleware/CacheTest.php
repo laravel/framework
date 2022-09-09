@@ -36,8 +36,9 @@ class CacheTest extends TestCase
 
     public function testSetHeaderToFileEvenWithNoContent()
     {
-        $response = (new Cache)->handle(new Request, function ()  {
+        $response = (new Cache)->handle(new Request, function () {
             $filePath = __DIR__.'/../fixtures/test.txt';
+
             return new BinaryFileResponse($filePath);
         }, 'max_age=120;s_maxage=60');
 
