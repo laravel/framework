@@ -64,13 +64,15 @@ class FakeResult implements ProcessResult
      * Simulates a start of the fake result underlying process.
      *
      * @param  \Illuminate\Console\Process  $process
-     * @param  (callable(string, int): mixed)|null  $onOutput
+     * @param  (callable(int, string): mixed)|null  $onOutput
      * @return $this
      *
      * @internal
      */
     public function start($process, $onOutput)
     {
+        $this->process = $process;
+
         if ($onOutput && $this->output !== '') {
             $onOutput(Process::STDOUT, $this->output);
         }
@@ -79,7 +81,7 @@ class FakeResult implements ProcessResult
             $onOutput(Process::STDERR, $this->errorOutput);
         }
 
-        return tap($this, fn () => $this->process = $process);
+        return $this;
     }
 
     /**
@@ -123,6 +125,8 @@ class FakeResult implements ProcessResult
      */
     public function process()
     {
+        $this->ensureProcessExists();
+
         return $this->process;
     }
 

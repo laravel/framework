@@ -68,7 +68,7 @@ class Factory
     /**
      * Assert that the given process was ram in the given order.
      *
-     * @param  iterable<int, (callable(\Illuminate\Console\Process): bool)|string>  $commands
+     * @param  array<int, (callable(\Illuminate\Console\Process): bool)|string>  $commands
      * @return $this
      */
     public function assertRanInOrder($commands)

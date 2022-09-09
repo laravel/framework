@@ -200,9 +200,7 @@ class PendingProcess
         $process->setWorkingDirectory((string) ($this->path ?? getcwd()));
         $process->setTimeout($this->timeout);
 
-        $start = fn () => $this->start($process, $this->output);
-
-        return $this->delayStart ? new DelayedStart($start) : value($start);
+        return $this->start($process, $this->output);
     }
 
     /**
