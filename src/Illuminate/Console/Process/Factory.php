@@ -215,8 +215,13 @@ class Factory
      */
     public static function result($output = '', $exitCode = 0, $errorOutput = '')
     {
-        $output = is_array($output) ? implode("\n", $output) : $output;
-        $errorOutput = is_array($errorOutput) ? implode("\n", $errorOutput) : $errorOutput;
+        if (is_array($output)) {
+            $output = collect($output)->map(fn ($line) => "$line\n")->implode('');
+        }
+
+        if (is_array($errorOutput)) {
+            $errorOutput = collect($errorOutput)->map(fn ($line) => "$line\n")->implode('');
+        }
 
         return new FakeResult($output, $exitCode, $errorOutput);
     }

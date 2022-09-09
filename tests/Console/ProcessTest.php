@@ -128,7 +128,7 @@ class ProcessTest extends TestCase
         })->run('ls')->output();
 
         $this->assertSame($outputViaCallback, $output);
-        $this->assertSame("my stdout line 1\nmy stdout line 2", $outputViaCallback);
+        $this->assertSame("my stdout line 1\nmy stdout line 2\n", $outputViaCallback);
         $this->assertSame(Process::STDOUT, $typeViaCallback);
     }
 
@@ -147,7 +147,7 @@ class ProcessTest extends TestCase
         })->run('ls')->errorOutput();
 
         $this->assertSame($outputViaCallback, $output);
-        $this->assertSame("my stderr line 1\nmy stderr line 2", $outputViaCallback);
+        $this->assertSame("my stderr line 1\nmy stderr line 2\n", $outputViaCallback);
         $this->assertSame(Process::STDERR, $typeViaCallback);
     }
 
@@ -235,7 +235,7 @@ class ProcessTest extends TestCase
             $this->expectExceptionMessage("The process \"'{$this->ls()}'\" failed to start.");
         }
 
-        new Result(new Process([$this->ls()]));
+        new Result($this->factory, new Process([$this->ls()]));
     }
 
     public function testFakeResultEnsuresTheProcessStarts()
@@ -356,7 +356,7 @@ class ProcessTest extends TestCase
         $this->factory->fake([
             'one' => $this->factory::result(['My line 1']),
             'two' => $this->factory::result(['My line 1', 'My line 2']),
-            'three' => $this->factory::result("My line 1\nMy line 2\nMy line 3"),
+            'three' => $this->factory::result("My line 1\nMy line 2\nMy line 3\n"),
         ]);
 
         $result = $this->factory->run('one');
