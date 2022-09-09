@@ -164,7 +164,8 @@
         "symfony/http-client": "Required to enable support for the Symfony API mail transports (^6.0).",
         "symfony/mailgun-mailer": "Required to enable support for the Mailgun mail transport (^6.0).",
         "symfony/postmark-mailer": "Required to enable support for the Postmark mail transport (^6.0).",
-        "symfony/psr-http-message-bridge": "Required to use PSR-7 bridging features (^2.0)."
+        "symfony/psr-http-message-bridge": "Required to use PSR-7 bridging features (^2.0).",
+        "symfony/uid": "Required to use the ULID features (^6.0)."
     },
     "config": {
         "sort-packages": true,
