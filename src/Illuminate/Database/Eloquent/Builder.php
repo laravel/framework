@@ -289,6 +289,21 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a basic where Like clause to the query, and return the All Like results.
+     *
+     * @param  \Closure|string|array|\Illuminate\Database\Query\Expression  $column
+     * @param  mixed  $value
+     * @return \Illuminate\Database\Eloquent\Model|static|null
+     */
+    
+    public function whereLike($column, $value = null)
+    {
+        $this->where($column,'Like','%'.$value.'%');
+
+        return $this;
+    }
+    
+    /**
      * Add a basic where clause to the query, and return the first result.
      *
      * @param  \Closure|string|array|\Illuminate\Database\Query\Expression  $column
