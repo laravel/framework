@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Queue;
 
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Redis\Factory;
-use Illuminate\Queue\LuaScripts;
 use Illuminate\Queue\Queue;
 use Illuminate\Queue\RedisQueue;
 use Illuminate\Support\Carbon;
