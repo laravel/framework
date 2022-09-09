@@ -26,9 +26,6 @@ class EloquentPrimaryUuidTest extends DatabaseTestCase
     }
 }
 
-/**
- * Eloquent Models...
- */
 class UserWithPrimaryUuid extends Eloquent
 {
     use HasPrimaryUuid;
