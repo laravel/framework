@@ -2,7 +2,9 @@
 
 namespace Illuminate\Support\Facades;
 
+use Closure;
 use Illuminate\Queue\Worker;
+use Illuminate\Support\Testing\Fakes\AsyncQueueFake;
 use Illuminate\Support\Testing\Fakes\QueueFake;
 
 /**
@@ -50,6 +52,21 @@ class Queue extends Facade
         static::swap($fake = new QueueFake(static::getFacadeApplication(), $jobsToFake, static::getFacadeRoot()));
 
         return $fake;
+    }
+
+    /**
+     * Replace the bound instance with a fake.
+     *
+     * @param  array|string  $jobsToFake
+     * @return \Illuminate\Support\Testing\Fakes\AsyncQueueFake
+     */
+    public static function async(Closure $callback, $jobsToRunAsynchronously = [])
+    {
+        static::swap($fake = new AsyncQueueFake(static::getFacadeApplication(), $jobsToRunAsynchronously, static::getFacadeRoot()));
+
+        $callback();
+
+        return $fake->dispatch();
     }
 
     /**
