@@ -1973,7 +1973,7 @@ trait HasAttributes
 
         if ($attribute === $original) {
             return true;
-        } elseif (is_null($attribute)) {
+        } elseif (is_null($attribute) || is_null($original)) {
             return false;
         } elseif ($this->isDateAttribute($key) || $this->isDateCastableWithCustomFormat($key)) {
             return $this->fromDateTime($attribute) ===
@@ -1982,18 +1982,16 @@ trait HasAttributes
             return $this->fromJson($attribute) ===
                 $this->fromJson($original);
         } elseif ($this->hasCast($key, ['real', 'float', 'double'])) {
-            if ($original === null) {
-                return false;
-            }
-
             return abs($this->castAttribute($key, $attribute) - $this->castAttribute($key, $original)) < PHP_FLOAT_EPSILON * 4;
         } elseif ($this->hasCast($key, static::$primitiveCastTypes)) {
             return $this->castAttribute($key, $attribute) ===
                 $this->castAttribute($key, $original);
         } elseif ($this->isClassCastable($key) && in_array($this->getCasts()[$key], [AsArrayObject::class, AsCollection::class])) {
-            return $this->fromJson($attribute) === $this->fromJson($original);
-        } elseif ($this->isClassCastable($key) && $original !== null && in_array($this->getCasts()[$key], [AsEncryptedArrayObject::class, AsEncryptedCollection::class])) {
-            return $this->fromEncryptedString($attribute) === $this->fromEncryptedString($original);
+            return $this->fromJson($attribute) ===
+                $this->fromJson($original);
+        } elseif ($this->isClassCastable($key) && in_array($this->getCasts()[$key], [AsEncryptedArrayObject::class, AsEncryptedCollection::class])) {
+            return $this->fromEncryptedString($attribute) ===
+                $this->fromEncryptedString($original);
         }
 
         return is_numeric($attribute) && is_numeric($original)
