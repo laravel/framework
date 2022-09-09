@@ -16,7 +16,9 @@ trait Arrayable
      */
     public function toArray()
     {
-        return str($this->output())->explode("\n")->toArray();
+        $array = str($this->output())->explode("\n");
+
+        return $array->slice(0, -1)->values()->all();
     }
 
     /**
