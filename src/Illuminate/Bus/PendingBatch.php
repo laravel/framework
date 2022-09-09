@@ -229,6 +229,19 @@ class PendingBatch
     }
 
     /**
+     * Set the desired delay in seconds for the pending batch.
+     *
+     * @param  \DateTimeInterface|\DateInterval|int|null  $delay
+     * @return $this
+     */
+    public function delay($delay)
+    {
+        $this->options['delay'] = $delay;
+
+        return $this;
+    }
+
+    /**
      * Add additional data into the batch's options array.
      *
      * @param  string  $key

@@ -172,10 +172,11 @@ class Batch implements Arrayable, JsonSerializable
                     return $chain->first()
                             ->allOnQueue($this->options['queue'] ?? null)
                             ->allOnConnection($this->options['connection'] ?? null)
+                            ->delay($this->options['delay'] ?? null)
                             ->chain($chain->slice(1)->values()->all());
                 });
             } else {
-                $job->withBatchId($this->id);
+                $job->withBatchId($this->id)->delay($this->options['delay'] ?? null);
 
                 $count++;
             }

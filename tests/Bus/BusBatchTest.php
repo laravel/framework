@@ -87,12 +87,12 @@ class BusBatchTest extends TestCase
 
         $job = new class
         {
-            use Batchable;
+            use Batchable, Queueable;
         };
 
         $secondJob = new class
         {
-            use Batchable;
+            use Batchable, Queueable;
         };
 
         $thirdJob = function () {
@@ -125,14 +125,14 @@ class BusBatchTest extends TestCase
 
         $job = new class
         {
-            use Batchable;
+            use Batchable, Queueable;
         };
         $batch->add([$job]);
         $this->assertCount(1, $batch->jobs);
 
         $secondJob = new class
         {
-            use Batchable;
+            use Batchable, Queueable;
 
             public $anotherProperty;
         };
@@ -150,7 +150,7 @@ class BusBatchTest extends TestCase
             for ($i = 0; $i < $jobsCount; $i++) {
                 yield new class
                 {
-                    use Batchable;
+                    use Batchable, Queueable;
                 };
             }
         };
@@ -180,12 +180,12 @@ class BusBatchTest extends TestCase
 
         $job = new class
         {
-            use Batchable;
+            use Batchable, Queueable;
         };
 
         $secondJob = new class
         {
-            use Batchable;
+            use Batchable, Queueable;
         };
 
         $queue->shouldReceive('connection')->once()
@@ -218,12 +218,12 @@ class BusBatchTest extends TestCase
 
         $job = new class
         {
-            use Batchable;
+            use Batchable, Queueable;
         };
 
         $secondJob = new class
         {
-            use Batchable;
+            use Batchable, Queueable;
         };
 
         $queue->shouldReceive('connection')->once()
@@ -259,12 +259,12 @@ class BusBatchTest extends TestCase
 
         $job = new class
         {
-            use Batchable;
+            use Batchable, Queueable;
         };
 
         $secondJob = new class
         {
-            use Batchable;
+            use Batchable, Queueable;
         };
 
         $queue->shouldReceive('connection')->once()
