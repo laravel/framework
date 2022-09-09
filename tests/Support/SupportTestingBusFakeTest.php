@@ -488,6 +488,15 @@ class SupportTestingBusFakeTest extends TestCase
 
         $this->assertTrue($batch->cancelled());
     }
+
+    public function testFakeBatch()
+    {
+        $batch = $this->fake->fakeBatch();
+
+        $this->assertInstanceOf(\Illuminate\Bus\Batch::class, $batch);
+        $this->assertSame($batch, $this->fake->findBatch($batch->id));
+        $this->assertSame(0, $batch->totalJobs);
+    }
 }
 
 class BusJobStub
