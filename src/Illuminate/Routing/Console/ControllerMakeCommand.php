@@ -119,6 +119,10 @@ class ControllerMakeCommand extends GeneratorCommand
             $replace = $this->buildParentReplacements();
         }
 
+        if ($this->option('resource') && $this->option('route')) {
+            $this->buildResourceRoute($controllerNamespace);
+        }
+
         if ($this->option('model')) {
             $replace = $this->buildModelReplacements($replace);
         }
@@ -270,6 +274,48 @@ class ControllerMakeCommand extends GeneratorCommand
     }
 
     /**
+     * Build a resource route for the created resource controller class.
+     *
+     * @param  string  $controllerNamespace
+     * @return void
+     */
+    protected function buildResourceRoute($controllerNamespace)
+    {
+        $result = file_put_contents(
+            base_path('routes/web.php'),
+            PHP_EOL.$this->generateResourceRoute($controllerNamespace),
+            FILE_APPEND
+        );
+
+        if ($result > 0) {
+            $this->components->info('Resource route generated successfully.');
+        } else {
+            $this->components->error('Resource route does not generated.');
+        }
+    }
+
+    /**
+     * Generate the resource route for the given resource controller class.
+     *
+     * @param  string  $controllerNamespace
+     * @return string
+     */
+    protected function generateResourceRoute($controllerNamespace)
+    {
+        $controllerName = $this->argument('name');
+
+        if (str_ends_with(strtolower($controllerName), 'controller')) {
+            $route = lcfirst(explode('controller', strtolower($controllerName))[0]);
+
+            return "Route::resource('{$route}s', {$controllerNamespace}\\{$controllerName}::class);";
+        }
+
+        $route = lcfirst($controllerName);
+
+        return "Route::resource('{$route}s', {$controllerNamespace}\\{$controllerName}::class);";
+    }
+
+    /**
      * Get the console command options.
      *
      * @return array
@@ -285,6 +331,7 @@ class ControllerMakeCommand extends GeneratorCommand
             ['parent', 'p', InputOption::VALUE_OPTIONAL, 'Generate a nested resource controller class'],
             ['resource', 'r', InputOption::VALUE_NONE, 'Generate a resource controller class'],
             ['requests', 'R', InputOption::VALUE_NONE, 'Generate FormRequest classes for store and update'],
+            ['route', null, InputOption::VALUE_NONE, 'Generate a resource route for the created resource controller class'],
         ];
     }
 }
