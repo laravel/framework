@@ -3013,11 +3013,11 @@ class Builder implements BuilderContract
      * Retrieve the "count" result of the query for distinct column values.
      *
      * @param  string  $columns
-     * @return void
+     * @return int
      */
     public function countDistinct($columns)
     {
-        return $this->distinct()->count($columns)
+        return $this->distinct()->count($columns);
     }
 
     /**
