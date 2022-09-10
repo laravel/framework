@@ -3010,6 +3010,21 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Retrieve the "count" of each group of results from the query.
+     *
+     * @param  string  $columns
+     * @return \Illuminate\Support\Collection<int, int>
+     */
+    public function countGroupsBy($columns)
+    {
+        return $this->cloneWithout($this->unions || $this->havings ? [] : ['columns'])
+                    ->cloneWithoutBindings($this->unions || $this->havings ? [] : ['select'])
+                    ->setAggregate($function, $columns)
+                    ->get($columns)
+                    ->map('array_change_key_case');
+    }
+
+    /**
      * Retrieve the minimum value of a given column.
      *
      * @param  string  $column
