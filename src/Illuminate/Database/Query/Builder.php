@@ -3010,6 +3010,17 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Retrieve the "count" result of the query for distinct column values.
+     *
+     * @param  string  $columns
+     * @return void
+     */
+    public function countDistinct($columns)
+    {
+        return $this->distinct()->count($columns)
+    }
+
+    /**
      * Retrieve the minimum value of a given column.
      *
      * @param  string  $column
