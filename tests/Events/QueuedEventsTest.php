@@ -123,7 +123,7 @@ class QueuedEventsTest extends TestCase
         $d->listen('some.event', TestDispatcherGetConnectionDynamically::class.'@handle');
         $d->dispatch('some.event', [
             ['shouldUseRedisConnection' => true],
-            'bar'
+            'bar',
         ]);
     }
 
