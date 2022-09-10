@@ -1267,6 +1267,16 @@ class Route
     }
 
     /**
+     * Get the container instance.
+     *
+     * @return \Illuminate\Container\Container|null
+     */
+    public function getContainer()
+    {
+        return $this->container;
+    }
+
+    /**
      * Prepare the route instance for serialization.
      *
      * @return void
