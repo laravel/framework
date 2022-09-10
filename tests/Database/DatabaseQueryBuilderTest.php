@@ -2268,6 +2268,14 @@ class DatabaseQueryBuilderTest extends TestCase
         });
         $results = $builder->from('users')->countDistinct('country');
         $this->assertEquals(1, $results);
+
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('select')->once()->with('select count(distinct "country", "favorite_color") as aggregate from "users"', [], true)->andReturn([['aggregate' => 1]]);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) {
+            return $results;
+        });
+        $results = $builder->select('name')->distinct()->from('users')->countDistinct(['country', 'favorite_color']);
+        $this->assertEquals(1, $results);
     }
 
     public function testSqlServerExists()
