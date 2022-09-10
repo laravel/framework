@@ -894,7 +894,9 @@ class Builder implements BuilderContract
      */
     public function whereNot($column, $operator = null, $value = null, $boolean = 'and')
     {
-        return $this->where($column, $operator, $value, $boolean.' not');
+        return $this->whereNested(function($query) use ($column, $operator, $value, $boolean) {
+            $query->where($column, $operator, $value, $boolean);
+        }, $boolean.' not');
     }
 
     /**
