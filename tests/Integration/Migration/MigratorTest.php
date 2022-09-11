@@ -131,9 +131,9 @@ class MigratorTest extends TestCase
 
     protected function expectTask($description, $result): void
     {
-        // Ignore dots...
+        // Ignore dots and dashes...
         $this->output->shouldReceive('write')->with(m::on(
-            fn ($argument) => str($argument)->contains(['<fg=gray></>', '<fg=gray>.</>']),
+            fn ($argument) => str($argument)->contains(['<fg=gray></>', '<fg=gray>.</>', '<fg=gray>-</>']),
         ), m::any(), m::any());
 
         // Ignore duration...
