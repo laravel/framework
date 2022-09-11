@@ -9,6 +9,13 @@ use Throwable;
 class Task extends Component
 {
     /**
+     * The counter of class instances
+     *
+     * @var int $counter
+     */
+    private static $counter = 0;
+
+    /**
      * Renders the component using the given arguments.
      *
      * @param  string  $description
@@ -45,7 +52,10 @@ class Task extends Component
             $width = min(terminal()->width(), 150);
             $dots = max($width - $descriptionWidth - $runTimeWidth - 10, 0);
 
-            $this->output->write(str_repeat('<fg=gray>.</>', $dots), false, $verbosity);
+            self::$counter++;
+            $separator = (self::$counter % 2) ? '.' : '-' ;
+
+            $this->output->write(str_repeat("<fg=gray>$separator</>", $dots), false, $verbosity);
             $this->output->write("<fg=gray>$runTime</>", false, $verbosity);
 
             $this->output->writeln(

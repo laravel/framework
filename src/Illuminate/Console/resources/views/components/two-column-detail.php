@@ -2,7 +2,7 @@
     <span>
         <?php echo htmlspecialchars($first) ?>
     </span>
-    <span class="flex-1 content-repeat-[.] text-gray ml-1"></span>
+    <span class="flex-1 content-repeat-[<?php echo $separator ?>] text-gray ml-1"></span>
     <?php if ($second !== '') { ?>
         <span class="ml-1">
             <?php echo htmlspecialchars($second) ?>

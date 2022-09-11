@@ -7,6 +7,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 class TwoColumnDetail extends Component
 {
     /**
+     * The counter of class instances
+     *
+     * @var int $counter
+     */
+    private static $counter = 0;
+
+    /**
      * Renders the component using the given arguments.
      *
      * @param  string  $first
@@ -28,9 +35,13 @@ class TwoColumnDetail extends Component
             Mutators\EnsureRelativePaths::class,
         ]);
 
+        self::$counter++;
+        $separator = (self::$counter % 2) ? '.' : '-' ;
+
         $this->renderView('two-column-detail', [
             'first' => $first,
             'second' => $second,
+            'separator' => $separator,
         ], $verbosity);
     }
 }
