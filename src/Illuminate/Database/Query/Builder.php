@@ -3017,11 +3017,14 @@ class Builder implements BuilderContract
      */
     public function countGroupsBy($columns)
     {
-        return $this->cloneWithout($this->unions || $this->havings ? [] : ['columns'])
+        return $this->cloneWithout($this->unions || $this->havings || $this->groupBy ? [] : ['columns'])
                     ->cloneWithoutBindings($this->unions || $this->havings ? [] : ['select'])
                     ->setAggregate($function, $columns)
                     ->get($columns)
-                    ->map('array_change_key_case');
+                    ->each(function (array $results) {
+                        $results['count'] = $results['aggregate'];
+                        unset ($results['aggregate'])
+                    });
     }
 
     /**
