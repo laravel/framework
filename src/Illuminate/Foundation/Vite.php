@@ -213,9 +213,22 @@ class Vite implements Htmlable
         foreach ($entrypoints as $entrypoint) {
             $chunk = $this->chunk($manifest, $entrypoint);
 
+            foreach ($chunk['imports'] ?? [] as $import) {
+                foreach ($manifest[$import]['css'] ?? [] as $css) {
+                    $partialManifest = Collection::make($manifest)->where('file', $css);
+
+                    $tags->push($this->makeTagForChunk(
+                        $partialManifest->keys()->first(),
+                        $this->assetPath("{$buildDirectory}/{$css}"),
+                        $partialManifest->first(),
+                        $manifest
+                    ));
+                }
+            }
+
             $tags->push($this->makeTagForChunk(
                 $entrypoint,
-                asset("{$buildDirectory}/{$chunk['file']}"),
+                $this->assetPath("{$buildDirectory}/{$chunk['file']}"),
                 $chunk,
                 $manifest
             ));
@@ -225,23 +238,10 @@ class Vite implements Htmlable
 
                 $tags->push($this->makeTagForChunk(
                     $partialManifest->keys()->first(),
-                    asset("{$buildDirectory}/{$css}"),
+                    $this->assetPath("{$buildDirectory}/{$css}"),
                     $partialManifest->first(),
                     $manifest
                 ));
-            }
-
-            foreach ($chunk['imports'] ?? [] as $import) {
-                foreach ($manifest[$import]['css'] ?? [] as $css) {
-                    $partialManifest = Collection::make($manifest)->where('file', $css);
-
-                    $tags->push($this->makeTagForChunk(
-                        $partialManifest->keys()->first(),
-                        asset("{$buildDirectory}/{$css}"),
-                        $partialManifest->first(),
-                        $manifest
-                    ));
-                }
             }
         }
 
@@ -487,7 +487,19 @@ class Vite implements Htmlable
 
         $chunk = $this->chunk($this->manifest($buildDirectory), $asset);
 
-        return asset($buildDirectory.'/'.$chunk['file']);
+        return $this->assetPath($buildDirectory.'/'.$chunk['file']);
+    }
+
+    /**
+     * Generate an asset path for the application.
+     *
+     * @param  string  $path
+     * @param  bool|null  $secure
+     * @return string
+     */
+    protected function assetPath($path, $secure = null)
+    {
+        return asset($path, $secure);
     }
 
     /**

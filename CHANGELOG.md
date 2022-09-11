@@ -1,6 +1,32 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.27.0...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.28.0...9.x)
+
+
+## [v9.28.0](https://github.com/laravel/framework/compare/v9.27.0...v9.28.0) - 2022-09-06
+
+### Added
+- Added view data assertions to TestView ([#43923](https://github.com/laravel/framework/pull/43923))
+- Added `Illuminate/Routing/Redirector::getIntendedUrl()` ([#43938](https://github.com/laravel/framework/pull/43938))
+- Added Eloquent mode to prevent prevently silently discarding fills for attributes not in $fillable ([#43893](https://github.com/laravel/framework/pull/43893))
+- Added `Illuminate/Testing/PendingCommand::assertOk()` ([#43968](https://github.com/laravel/framework/pull/43968))
+- Make Application macroable ([#43966](https://github.com/laravel/framework/pull/43966))
+- Introducing Signal Traps ([#43933](https://github.com/laravel/framework/pull/43933))
+- Allow registering instances of commands ([#43986](https://github.com/laravel/framework/pull/43986))
+- Support Enumerable in Stringable ([#44012](https://github.com/laravel/framework/pull/44012))
+
+### Fixed
+- Fixed RoueGroup::merge to format merged prefixes correctly. ([#44011](https://github.com/laravel/framework/pull/44011))
+- Fixes providesTemporaryUrls on AwsS3V3Adapter ([#44009](https://github.com/laravel/framework/pull/44009))
+- Fix ordering of stylesheets when using @vite ([#43962](https://github.com/laravel/framework/pull/43962))
+
+### Changed
+- Allow invokable rules to specify custom messsages ([#43925](https://github.com/laravel/framework/pull/43925))
+- Support objects like GMP for custom Model casts ([#43959](https://github.com/laravel/framework/pull/43959))
+- Default 404 message on denyAsNotFound ([#43901](https://github.com/laravel/framework/pull/43901))
+- Changed `Illuminate/Container/Container::resolvePrimitive()` for isVariadic() ([#43985](https://github.com/laravel/framework/pull/43985))
+- Allow validator messages to use nested arrays ([#43981](https://github.com/laravel/framework/pull/43981))
+- Ensure freezeUuids always resets UUID creation after exception in callback ([#44018](https://github.com/laravel/framework/pull/44018))
 
 
 ## [v9.27.0](https://github.com/laravel/framework/compare/v9.26.1...v9.27.0) - 2022-08-30

@@ -146,7 +146,7 @@ class ObserverMakeCommand extends GeneratorCommand
     protected function getOptions()
     {
         return [
-            ['model', 'm', InputOption::VALUE_OPTIONAL, 'The model that the observer applies to.'],
+            ['model', 'm', InputOption::VALUE_OPTIONAL, 'The model that the observer applies to'],
         ];
     }
 }

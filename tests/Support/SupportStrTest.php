@@ -92,6 +92,7 @@ class SupportStrTest extends TestCase
         $this->assertTrue(Str::startsWith('jason', 'jason'));
         $this->assertTrue(Str::startsWith('jason', ['jas']));
         $this->assertTrue(Str::startsWith('jason', ['day', 'jas']));
+        $this->assertTrue(Str::startsWith('jason', collect(['day', 'jas'])));
         $this->assertFalse(Str::startsWith('jason', 'day'));
         $this->assertFalse(Str::startsWith('jason', ['day']));
         $this->assertFalse(Str::startsWith('jason', null));
@@ -125,6 +126,7 @@ class SupportStrTest extends TestCase
         $this->assertTrue(Str::endsWith('jason', 'jason'));
         $this->assertTrue(Str::endsWith('jason', ['on']));
         $this->assertTrue(Str::endsWith('jason', ['no', 'on']));
+        $this->assertTrue(Str::endsWith('jason', collect(['no', 'on'])));
         $this->assertFalse(Str::endsWith('jason', 'no'));
         $this->assertFalse(Str::endsWith('jason', ['no']));
         $this->assertFalse(Str::endsWith('jason', ''));
@@ -524,6 +526,7 @@ class SupportStrTest extends TestCase
         $this->assertSame('foo bar baz 8.x', Str::replace('?', '8.x', 'foo bar baz ?'));
         $this->assertSame('foo/bar/baz', Str::replace(' ', '/', 'foo bar baz'));
         $this->assertSame('foo bar baz', Str::replace(['?1', '?2', '?3'], ['foo', 'bar', 'baz'], '?1 ?2 ?3'));
+        $this->assertSame(['foo', 'bar', 'baz'], Str::replace(collect(['?1', '?2', '?3']), collect(['foo', 'bar', 'baz']), collect(['?1', '?2', '?3'])));
     }
 
     public function testReplaceArray()
@@ -875,6 +878,7 @@ class SupportStrTest extends TestCase
             ['Taylor', ['ylo'], true, true],
             ['Taylor', ['ylo'], true, false],
             ['Taylor', ['xxx', 'ylo'], true, true],
+            ['Taylor', collect(['xxx', 'ylo']), true, true],
             ['Taylor', ['xxx', 'ylo'], true, false],
             ['Taylor', 'xxx', false],
             ['Taylor', ['xxx'], false],
@@ -988,6 +992,19 @@ class SupportStrTest extends TestCase
         $this->assertNotSame((string) Str::uuid(), (string) Str::uuid());
 
         Str::createUuidsNormally();
+    }
+
+    public function testItCreatesUuidsNormallyAfterFailureWithinFreezeMethod()
+    {
+        try {
+            Str::freezeUuids(function () {
+                Str::createUuidsUsing(fn () => Str::of('1234'));
+                $this->assertSame('1234', Str::uuid()->toString());
+                throw new \Exception('Something failed.');
+            });
+        } catch (\Exception $e) {
+            $this->assertNotSame('1234', Str::uuid()->toString());
+        }
     }
 
     public function testItCanSpecifyASequenceOfUuidsToUtilise()

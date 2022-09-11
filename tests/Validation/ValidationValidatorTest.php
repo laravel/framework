@@ -70,6 +70,36 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame('post name is required', $v->errors()->all()[0]);
     }
 
+    public function testNestedArrayErrorMessagesAreRetrievedFromLocalArray()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [
+            'users' => [
+                [
+                    'name' => 'Taylor Otwell',
+                    'posts' => [
+                        [
+                            'name' => '',
+                        ],
+                    ],
+                ],
+            ],
+        ], [
+            'users.*.name' => ['required'],
+            'users.*.posts.*.name' => ['required'],
+        ], [
+            'users.*.name' => [
+                'required' => 'user name is required',
+            ],
+            'users.*.posts.*.name' => [
+                'required' => 'post name is required',
+            ],
+        ]);
+
+        $this->assertFalse($v->passes());
+        $this->assertSame('post name is required', $v->errors()->all()[0]);
+    }
+
     public function testSometimesWorksOnNestedArrays()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -1940,6 +1970,22 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['foo' => 'true'], ['foo' => 'Accepted']);
         $this->assertTrue($v->passes());
+    }
+
+    public function testValidateRequiredAcceptedIf()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'no', 'bar' => 'baz'], ['bar' => 'required_if_accepted:foo']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'yes', 'bar' => 'baz'], ['bar' => 'required_if_accepted:foo']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'no', 'bar' => ''], ['bar' => 'required_if_accepted:foo']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'yes', 'bar' => ''], ['bar' => 'required_if_accepted:foo']);
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateAcceptedIf()
