@@ -641,6 +641,27 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['first' => 'taylor', 'last' => 'otwell'], $data);
     }
 
+    public function testMove()
+    {
+        $data = ['first' => 'taylor', 'last' => 'otwell'];
+        $moved = Arr::move($data, 'first', 'last');
+
+        $this->assertEquals(['last' => 'taylor'], $data);
+        $this->assertSame($data, $moved);
+
+        $data = ['first' => 'taylor', 'sports' => ['football' => 'richmond']];
+        $moved = Arr::move($data, 'sports.football', 'first');
+
+        $this->assertEquals(['first' => 'richmond', 'sports' => []]);
+        $this->assertSame($data, $moved);
+
+        $data = ['first' => 'taylor', 'last' => 'otwell'];
+        $moved = Arr::move($data, 'second', 'last', 'default');
+
+        $this->assertEquals(['last' => 'default'], $data);
+        $this->assertSame($data, $moved);
+    }
+
     public function testPrepend()
     {
         $array = Arr::prepend(['one', 'two', 'three', 'four'], 'zero');

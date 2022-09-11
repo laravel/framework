@@ -566,6 +566,20 @@ class Arr
     }
 
     /**
+     * Moves a key value to another key.
+     *
+     * @param  array  $array
+     * @param  string  $origin
+     * @param  string  $destination
+     * @param  mixed  $default
+     * @return array
+     */
+    public static function move(&$array, $origin, $destination, $default = null)
+    {
+        return static::set($array, $destination, static::pull($array, $origin, $default));
+    }
+
+    /**
      * Push an item onto the beginning of an array.
      *
      * @param  array  $array
