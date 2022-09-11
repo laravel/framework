@@ -658,7 +658,7 @@ class SupportArrTest extends TestCase
         $data = ['first' => 'taylor', 'last' => 'otwell'];
         $moved = Arr::move($data, 'second', 'last', 'default');
 
-        $this->assertEquals(['last' => 'default'], $data);
+        $this->assertEquals(['first' => 'taylor', 'last' => 'default'], $data);
         $this->assertSame($data, $moved);
     }
 
