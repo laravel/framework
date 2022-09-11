@@ -3013,7 +3013,7 @@ class Builder implements BuilderContract
      * Retrieve the "count" of each group of results from the query.
      *
      * @param  string  $columns
-     * @return \Illuminate\Support\Collection<int, int>
+     * @return \Illuminate\Support\Collection
      */
     public function countGroupsBy($columns)
     {
@@ -3021,9 +3021,10 @@ class Builder implements BuilderContract
                     ->cloneWithoutBindings($this->unions || $this->havings ? [] : ['select'])
                     ->setAggregate($function, $columns)
                     ->get($columns)
-                    ->each(function (array $results) {
-                        $results['count'] = $results['aggregate'];
-                        unset ($results['aggregate'])
+                    ->map(function (array $results) {
+                        $results = array_change_key_case($results);
+
+                        return Arr::set($results, 'count', (int) Arr::pull($results, 'aggregate', 0));
                     });
     }
 
