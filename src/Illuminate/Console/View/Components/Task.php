@@ -16,6 +16,13 @@ class Task extends Component
     private static $counter = 0;
 
     /**
+     * The list of separators
+     *
+     * @var array $separators
+     */
+    private $separators = ['.', '-'];
+
+    /**
      * Renders the component using the given arguments.
      *
      * @param  string  $description
@@ -53,7 +60,7 @@ class Task extends Component
             $dots = max($width - $descriptionWidth - $runTimeWidth - 10, 0);
 
             self::$counter++;
-            $separator = (self::$counter % 2) ? '.' : '-' ;
+            $separator = $this->separators[(self::$counter % 2)];
 
             $this->output->write(str_repeat("<fg=gray>$separator</>", $dots), false, $verbosity);
             $this->output->write("<fg=gray>$runTime</>", false, $verbosity);

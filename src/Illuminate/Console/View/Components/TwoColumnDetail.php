@@ -14,6 +14,14 @@ class TwoColumnDetail extends Component
     private static $counter = 0;
 
     /**
+     * The list of separators
+     *
+     * @var array $separators
+     */
+    private $separators = ['.', '-'];
+
+
+    /**
      * Renders the component using the given arguments.
      *
      * @param  string  $first
@@ -36,7 +44,7 @@ class TwoColumnDetail extends Component
         ]);
 
         self::$counter++;
-        $separator = (self::$counter % 2) ? '.' : '-' ;
+        $separator = $this->separators[(self::$counter % 2)];
 
         $this->renderView('two-column-detail', [
             'first' => $first,
