@@ -17,16 +17,6 @@ class Process extends BaseProcess
     }
 
     /**
-     * Get the process's exit code.
-     *
-     * @return int|null
-     */
-    public function exitCode()
-    {
-        return $this->getExitCode();
-    }
-
-    /**
      * Get the process's path.
      *
      * @return string|null
