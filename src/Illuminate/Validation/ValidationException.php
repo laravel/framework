@@ -87,16 +87,16 @@ class ValidationException extends Exception
     {
         $messages = $validator->errors()->all();
 
-        if (! count($messages)) {
-            return 'The given data was invalid.';
+        if (! count($messages) || ! is_string($messages[0])) {
+            return $validator->getTranslator()->get('The given data was invalid.');
         }
 
         $message = array_shift($messages);
 
-        if ($additional = count($messages)) {
-            $pluralized = $additional === 1 ? 'error' : 'errors';
+        if ($count = count($messages)) {
+            $pluralized = $count === 1 ? 'error' : 'errors';
 
-            $message .= " (and {$additional} more {$pluralized})";
+            $message .= ' '.$validator->getTranslator()->get("(and :count more $pluralized)", compact('count'));
         }
 
         return $message;

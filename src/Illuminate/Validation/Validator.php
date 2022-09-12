@@ -210,6 +210,7 @@ class Validator implements ValidatorContract
         'Present',
         'Required',
         'RequiredIf',
+        'RequiredIfAccepted',
         'RequiredUnless',
         'RequiredWith',
         'RequiredWithAll',
@@ -240,6 +241,7 @@ class Validator implements ValidatorContract
         'AcceptedIf',
         'DeclinedIf',
         'RequiredIf',
+        'RequiredIfAccepted',
         'RequiredUnless',
         'RequiredWith',
         'RequiredWithAll',
@@ -810,17 +812,21 @@ class Validator implements ValidatorContract
         }
 
         if (! $rule->passes($attribute, $value)) {
-            $this->failedRules[$attribute][get_class($rule)] = [];
+            $ruleClass = $rule instanceof InvokableValidationRule ?
+                get_class($rule->invokable()) :
+                get_class($rule);
 
-            $messages = $this->getFromLocalArray($attribute, get_class($rule)) ?? $rule->message();
+            $this->failedRules[$attribute][$ruleClass] = [];
 
-            $messages = $messages ? (array) $messages : [get_class($rule)];
+            $messages = $this->getFromLocalArray($attribute, $ruleClass) ?? $rule->message();
+
+            $messages = $messages ? (array) $messages : [$ruleClass];
 
             foreach ($messages as $key => $message) {
                 $key = is_string($key) ? $key : $attribute;
 
                 $this->messages->add($key, $this->makeReplacements(
-                    $message, $key, get_class($rule), []
+                    $message, $key, $ruleClass, []
                 ));
             }
         }

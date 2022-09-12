@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Broadcasting;
 
+use Ably\AblyRest;
 use Illuminate\Broadcasting\Broadcasters\AblyBroadcaster;
 use Illuminate\Http\Request;
 use Mockery as m;
@@ -19,12 +20,22 @@ class AblyBroadcasterTest extends TestCase
 
     protected function setUp(): void
     {
+        if (phpversion() >= '8.2') {
+            $this->markTestSkipped('Tests are broken on PHP 8.2');
+        }
+
         parent::setUp();
 
-        $this->ably = m::mock('Ably\AblyRest');
-        $this->ably->options = (object) ['key' => 'abcd:efgh'];
+        $this->ably = m::mock(AblyRest::class, ['abcd:efgh']);
 
         $this->broadcaster = m::mock(AblyBroadcaster::class, [$this->ably])->makePartial();
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        m::close();
     }
 
     public function testAuthCallValidAuthenticationResponseWithPrivateChannelWhenCallbackReturnTrue()

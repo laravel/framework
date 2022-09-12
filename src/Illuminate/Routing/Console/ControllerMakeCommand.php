@@ -140,7 +140,7 @@ class ControllerMakeCommand extends GeneratorCommand
         $parentModelClass = $this->parseModel($this->option('parent'));
 
         if (! class_exists($parentModelClass) &&
-            $this->confirm("A {$parentModelClass} model does not exist. Do you want to generate it?", true)) {
+            $this->components->confirm("A {$parentModelClass} model does not exist. Do you want to generate it?", true)) {
             $this->call('make:model', ['name' => $parentModelClass]);
         }
 
@@ -167,7 +167,7 @@ class ControllerMakeCommand extends GeneratorCommand
     {
         $modelClass = $this->parseModel($this->option('model'));
 
-        if (! class_exists($modelClass) && $this->confirm("A {$modelClass} model does not exist. Do you want to generate it?", true)) {
+        if (! class_exists($modelClass) && $this->components->confirm("A {$modelClass} model does not exist. Do you want to generate it?", true)) {
             $this->call('make:model', ['name' => $modelClass]);
         }
 
@@ -277,14 +277,14 @@ class ControllerMakeCommand extends GeneratorCommand
     protected function getOptions()
     {
         return [
-            ['api', null, InputOption::VALUE_NONE, 'Exclude the create and edit methods from the controller.'],
-            ['type', null, InputOption::VALUE_REQUIRED, 'Manually specify the controller stub file to use.'],
+            ['api', null, InputOption::VALUE_NONE, 'Exclude the create and edit methods from the controller'],
+            ['type', null, InputOption::VALUE_REQUIRED, 'Manually specify the controller stub file to use'],
             ['force', null, InputOption::VALUE_NONE, 'Create the class even if the controller already exists'],
-            ['invokable', 'i', InputOption::VALUE_NONE, 'Generate a single method, invokable controller class.'],
-            ['model', 'm', InputOption::VALUE_OPTIONAL, 'Generate a resource controller for the given model.'],
-            ['parent', 'p', InputOption::VALUE_OPTIONAL, 'Generate a nested resource controller class.'],
-            ['resource', 'r', InputOption::VALUE_NONE, 'Generate a resource controller class.'],
-            ['requests', 'R', InputOption::VALUE_NONE, 'Generate FormRequest classes for store and update.'],
+            ['invokable', 'i', InputOption::VALUE_NONE, 'Generate a single method, invokable controller class'],
+            ['model', 'm', InputOption::VALUE_OPTIONAL, 'Generate a resource controller for the given model'],
+            ['parent', 'p', InputOption::VALUE_OPTIONAL, 'Generate a nested resource controller class'],
+            ['resource', 'r', InputOption::VALUE_NONE, 'Generate a resource controller class'],
+            ['requests', 'R', InputOption::VALUE_NONE, 'Generate FormRequest classes for store and update'],
         ];
     }
 }

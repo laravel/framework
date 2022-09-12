@@ -19,6 +19,8 @@
         "illuminate/contracts": "^9.0",
         "illuminate/macroable": "^9.0",
         "illuminate/support": "^9.0",
+        "illuminate/view": "^9.0",
+        "nunomaduro/termwind": "^1.13",
         "symfony/console": "^6.0",
         "symfony/process": "^6.0"
     },

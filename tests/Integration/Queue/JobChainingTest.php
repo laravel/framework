@@ -372,3 +372,13 @@ class JobChainAddingAddedJob implements ShouldQueue
         static::$ranAt = now();
     }
 }
+
+class JobChainingTestThrowJob implements ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable;
+
+    public function handle()
+    {
+        throw new \Exception();
+    }
+}

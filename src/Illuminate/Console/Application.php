@@ -262,7 +262,7 @@ class Application extends SymfonyApplication implements ApplicationContract
     /**
      * Add a command, resolving through the application.
      *
-     * @param  string  $command
+     * @param  \Illuminate\Console\Command|string  $command
      * @return \Symfony\Component\Console\Command\Command|null
      */
     public function resolve($command)
@@ -271,6 +271,10 @@ class Application extends SymfonyApplication implements ApplicationContract
             $this->commandMap[$commandName] = $command;
 
             return null;
+        }
+
+        if ($command instanceof Command) {
+            return $this->add($command);
         }
 
         return $this->add($this->laravel->make($command));

@@ -151,6 +151,14 @@ class SupportMessageBagTest extends TestCase
         $this->assertFalse($container->hasAny('baz', 'biz'));
     }
 
+    public function testHasAnyWithKeyNull()
+    {
+        $container = new MessageBag;
+        $container->setFormat(':message');
+        $container->add('foo', 'bar');
+        $this->assertTrue($container->hasAny(null));
+    }
+
     public function testHasIndicatesExistenceOfAllKeys()
     {
         $container = new MessageBag;

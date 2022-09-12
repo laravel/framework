@@ -163,6 +163,11 @@ class PostgresConnector extends Connector implements ConnectorInterface
 
         $host = isset($host) ? "host={$host};" : '';
 
+        // Sometimes - users may need to connect to a database that has a different
+        // name than the database used for "information_schema" queries. This is
+        // typically the case if using "pgbouncer" type software when pooling.
+        $database = $connect_via_database ?? $database;
+
         $dsn = "pgsql:{$host}dbname='{$database}'";
 
         // If a port was specified, we will add it to this Postgres DSN connections

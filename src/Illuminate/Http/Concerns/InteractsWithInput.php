@@ -344,6 +344,25 @@ trait InteractsWithInput
     }
 
     /**
+     * Retrieve input from the request as an enum.
+     *
+     * @param  string  $key
+     * @param  string  $enumClass
+     * @return mixed|null
+     */
+    public function enum($key, $enumClass)
+    {
+        if ($this->isNotFilled($key) ||
+            ! function_exists('enum_exists') ||
+            ! enum_exists($enumClass) ||
+            ! method_exists($enumClass, 'tryFrom')) {
+            return null;
+        }
+
+        return $enumClass::tryFrom($this->input($key));
+    }
+
+    /**
      * Retrieve input from the request as a collection.
      *
      * @param  array|string|null  $key
@@ -543,7 +562,7 @@ trait InteractsWithInput
      * Dump the request items and end the script.
      *
      * @param  mixed  $keys
-     * @return void
+     * @return never
      */
     public function dd(...$keys)
     {

@@ -478,6 +478,7 @@ class HttpClientTest extends TestCase
 
         $response = $this->factory->get('https://example.com');
         $this->assertSame(['fact' => 'Cats are great!'], $response->json());
+        $this->assertSame('application/json', $response->header('Content-Type'));
         $this->assertSame(200, $response->status());
 
         $response = $this->factory->get('https://example.com');

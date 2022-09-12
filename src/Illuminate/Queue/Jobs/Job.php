@@ -302,7 +302,7 @@ abstract class Job
      */
     public function retryUntil()
     {
-        return $this->payload()['retryUntil'] ?? $this->payload()['timeoutAt'] ?? null;
+        return $this->payload()['retryUntil'] ?? null;
     }
 
     /**

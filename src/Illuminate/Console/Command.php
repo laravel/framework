@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console;
 
+use Illuminate\Console\View\Components\Factory;
 use Illuminate\Support\Traits\Macroable;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -12,6 +13,7 @@ class Command extends SymfonyCommand
     use Concerns\CallsCommands,
         Concerns\HasParameters,
         Concerns\InteractsWithIO,
+        Concerns\InteractsWithSignals,
         Macroable;
 
     /**
@@ -117,9 +119,15 @@ class Command extends SymfonyCommand
             OutputStyle::class, ['input' => $input, 'output' => $output]
         );
 
-        return parent::run(
-            $this->input = $input, $this->output
-        );
+        $this->components = $this->laravel->make(Factory::class, ['output' => $this->output]);
+
+        try {
+            return parent::run(
+                $this->input = $input, $this->output
+            );
+        } finally {
+            $this->untrap();
+        }
     }
 
     /**

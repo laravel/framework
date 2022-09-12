@@ -54,17 +54,19 @@ class EventListCommand extends Command
         $events = $this->getEvents()->sortKeys();
 
         if ($events->isEmpty()) {
-            $this->comment("Your application doesn't have any events matching the given criteria.");
+            $this->components->info("Your application doesn't have any events matching the given criteria.");
 
             return;
         }
 
-        $this->line(
-            $events->map(fn ($listeners, $event) => [
-                sprintf('  <fg=white>%s</>', $this->appendEventInterfaces($event)),
-                collect($listeners)->map(fn ($listener) => sprintf('    <fg=#6C7280>⇂ %s</>', $listener)),
-            ])->flatten()->filter()->prepend('')->push('')->toArray()
-        );
+        $this->newLine();
+
+        $events->each(function ($listeners, $event) {
+            $this->components->twoColumnDetail($this->appendEventInterfaces($event));
+            $this->components->bulletList($listeners);
+        });
+
+        $this->newLine();
     }
 
     /**

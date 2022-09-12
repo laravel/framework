@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Mail;
 
 use Illuminate\Mail\Attachment;
+use Illuminate\Mail\Mailable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Storage;
 use Orchestra\Testbench\TestCase;
@@ -52,5 +53,26 @@ class AttachingFromStorageTest extends TestCase
         ], $mail->rawAttachments[0]);
 
         Storage::disk('local')->delete('/dir/foo.png');
+    }
+
+    public function testItCanChainAttachWithMailMessage()
+    {
+        Storage::disk('local')->put('/dir/foo.png', 'expected body contents');
+        $message = new MailMessage();
+
+        $result = $message->attach(
+            Attachment::fromStorageDisk('local', '/dir/foo.png')
+        );
+
+        $this->assertSame($message, $result);
+    }
+
+    public function testItCanCheckForStorageBasedAttachments()
+    {
+        Storage::disk()->put('/dir/foo.png', 'expected body contents');
+        $mailable = new Mailable();
+        $mailable->attach(Attachment::fromStorage('/dir/foo.png'));
+
+        $this->assertTrue($mailable->hasAttachment(Attachment::fromStorage('/dir/foo.png')));
     }
 }

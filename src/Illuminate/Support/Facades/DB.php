@@ -6,6 +6,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Doctrine\DBAL\Driver\PDOConnection getPdo()
  * @method static \Illuminate\Database\ConnectionInterface connection(string $name = null)
  * @method static \Illuminate\Database\Query\Builder table(string $table, string $as = null)
+ * @method static \Illuminate\Database\Query\Builder query()
  * @method static \Illuminate\Database\Query\Expression raw($value)
  * @method static array getQueryLog()
  * @method static array prepareBindings(array $bindings)
