@@ -88,6 +88,7 @@
         "guzzlehttp/guzzle": "^7.2",
         "league/flysystem-aws-s3-v3": "^3.0",
         "league/flysystem-ftp": "^3.0",
+        "league/flysystem-path-prefixing": "^3.3",
         "league/flysystem-read-only": "^3.3",
         "league/flysystem-sftp-v3": "^3.0",
         "mockery/mockery": "^1.4.4",

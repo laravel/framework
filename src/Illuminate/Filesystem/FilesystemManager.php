@@ -14,6 +14,7 @@ use League\Flysystem\FilesystemAdapter as FlysystemAdapter;
 use League\Flysystem\Ftp\FtpAdapter;
 use League\Flysystem\Ftp\FtpConnectionOptions;
 use League\Flysystem\Local\LocalFilesystemAdapter as LocalAdapter;
+use League\Flysystem\PathPrefixing\PathPrefixedAdapter;
 use League\Flysystem\PhpseclibV3\SftpAdapter;
 use League\Flysystem\PhpseclibV3\SftpConnectionProvider;
 use League\Flysystem\ReadOnly\ReadOnlyFilesystemAdapter;
@@ -203,6 +204,26 @@ class FilesystemManager implements FactoryContract
     }
 
     /**
+     * @param array $config
+     * @return \Illuminate\Contracts\Filesystem\Filesystem
+     */
+    public function createScopedDriver(array $config)
+    {
+        if (empty($config['disk'])) {
+            throw new InvalidArgumentException("Missing disk for scoped driver.");
+        }
+
+        if (empty($config['prefix'])) {
+            throw new InvalidArgumentException("Prefix is missing for scoped driver.");
+        }
+
+        $diskConfig = $this->getConfig($config['disk']);
+        $diskConfig['prefix'] = $config['prefix'];
+
+        return $this->build($diskConfig);
+    }
+
+    /**
      * Create an instance of the sftp driver.
      *
      * @param  array  $config
@@ -278,6 +299,10 @@ class FilesystemManager implements FactoryContract
     {
         if ($config['read-only'] ?? false === true) {
             $adapter = new ReadOnlyFilesystemAdapter($adapter);
+        }
+
+        if (! empty($config['prefix'])) {
+            $adapter = new PathPrefixedAdapter($adapter, $config['prefix']);
         }
 
         return new Flysystem($adapter, Arr::only($config, [
