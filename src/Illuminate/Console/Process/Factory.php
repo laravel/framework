@@ -231,11 +231,12 @@ class Factory
      * @param  array<array-key, string>|string  $output
      * @param  int  $exitCode
      * @param  array<array-key, string>|string  $errorOutput
+     * @param  int  $pid
      * @return callable(): \Illuminate\Console\Contracts\ProcessResult
      */
-    public static function result($output = '', $exitCode = 0, $errorOutput = '')
+    public static function result($output = '', $exitCode = 0, $errorOutput = '', $pid = 0)
     {
-        return function () use ($output, $exitCode, $errorOutput) {
+        return function () use ($output, $exitCode, $errorOutput, $pid) {
             if (is_array($output)) {
                 $output = collect($output)->map(fn ($line) => "$line\n")->implode('');
             }
@@ -244,7 +245,7 @@ class Factory
                 $errorOutput = collect($errorOutput)->map(fn ($line) => "$line\n")->implode('');
             }
 
-            return new FakeResult($output, $exitCode, $errorOutput);
+            return new FakeResult($output, $exitCode, $errorOutput, $pid);
         };
     }
 

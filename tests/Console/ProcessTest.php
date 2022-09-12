@@ -281,7 +281,7 @@ class ProcessTest extends TestCase
         $this->expectException(ProcessNotStartedException::class);
         $this->expectExceptionMessage('The process failed to start.');
 
-        tap(new FakeResult('foo', 0, ''))->wait();
+        tap(new FakeResult('foo', 0, '', 0))->wait();
     }
 
     public function testFakes()
@@ -363,7 +363,7 @@ class ProcessTest extends TestCase
         $this->assertSame(1, $called);
 
         $called = 0;
-        $result = new FakeResult('', 0, '');
+        $result = new FakeResult('', 0, '', 0);
         $result->start(new Process([$this->ls()]), null, [function () use (&$called) {
             $called++;
         }]);
@@ -433,6 +433,27 @@ class ProcessTest extends TestCase
         $result = $this->factory->forever()->run($this->ls());
 
         $this->assertNull($result->process()->timeout());
+    }
+
+    public function testPid()
+    {
+        $result = $this->factory->run($this->ls());
+        $this->assertNull($result->pid());
+
+        $result = $this->factory->async()->run($this->ls());
+        $this->assertNotNull($result->pid());
+        $result->wait();
+        $this->assertNull($result->pid());
+
+        $this->factory->fake($this->factory::result('', 0, '', 9873));
+
+        $result = $this->factory->run($this->ls());
+        $this->assertNull($result->pid());
+
+        $result = $this->factory->async()->run($this->ls());
+        $this->assertSame(9873, $result->pid());
+        $result->wait();
+        $this->assertNull($result->pid());
     }
 
     public function testRunning()

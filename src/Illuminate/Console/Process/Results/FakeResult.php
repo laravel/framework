@@ -60,18 +60,27 @@ class FakeResult implements ProcessResult
     protected $errorOutput;
 
     /**
+     * The process's pid (process identifier), when running.
+     *
+     * @var int
+     */
+    protected $pid;
+
+    /**
      * Creates a new Process Result instance.
      *
      * @param  string  $output
      * @param  int  $exitCode
      * @param  string  $errorOutput
+     * @param  int  $pid
      * @return void
      */
-    public function __construct($output, $exitCode, $errorOutput)
+    public function __construct($output, $exitCode, $errorOutput, $pid)
     {
         $this->output = $output;
         $this->exitCode = $exitCode;
         $this->errorOutput = $errorOutput;
+        $this->pid = $pid;
     }
 
     /**
@@ -171,6 +180,16 @@ class FakeResult implements ProcessResult
         if (! $this->process) {
             throw new ProcessNotStartedException;
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function pid()
+    {
+        return $this->running()
+            ? $this->pid
+            : null;
     }
 
     /**

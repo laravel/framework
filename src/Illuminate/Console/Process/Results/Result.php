@@ -100,6 +100,14 @@ class Result implements ProcessResult
     /**
      * {@inheritDoc}
      */
+    public function pid()
+    {
+        return $this->process->getPid();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function process()
     {
         return $this->process;

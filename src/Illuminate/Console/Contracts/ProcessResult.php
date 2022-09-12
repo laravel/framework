@@ -64,6 +64,13 @@ interface ProcessResult extends Arrayable, Stringable, ArrayAccess, IteratorAggr
     public function exitCode();
 
     /**
+     * Get the process's pid (process identifier), or null if the process is not running.
+     *
+     * @return int|null
+     */
+    public function pid();
+
+    /**
      * Get the underlying process.
      *
      * @return \Illuminate\Console\Process
