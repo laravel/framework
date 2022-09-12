@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Illuminate\Database\Eloquent\Concerns\HasPrimaryUuid;
+use Illuminate\Database\Eloquent\Concerns\HasUuidPrimaryKey;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
-class EloquentPrimaryUuidTest extends DatabaseTestCase
+class EloquentUuidPrimaryKeyTest extends DatabaseTestCase
 {
     protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
@@ -18,17 +18,17 @@ class EloquentPrimaryUuidTest extends DatabaseTestCase
         });
     }
 
-    public function testUserWithPrimaryUuidCanBeCreated()
+    public function testUserWithUuidPrimaryKeyCanBeCreated()
     {
-        $user = UserWithPrimaryUuid::create();
+        $user = UserWithUuidPrimaryKey::create();
 
         $this->assertTrue(Str::isUuid($user->id));
     }
 }
 
-class UserWithPrimaryUuid extends Eloquent
+class UserWithUuidPrimaryKey extends Eloquent
 {
-    use HasPrimaryUuid;
+    use HasUuidPrimaryKey;
 
     protected $table = 'users';
 

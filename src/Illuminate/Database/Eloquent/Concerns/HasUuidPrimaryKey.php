@@ -4,30 +4,30 @@ namespace Illuminate\Database\Eloquent\Concerns;
 
 use Illuminate\Support\Str;
 
-trait HasPrimaryUlid
+trait HasUuidPrimaryKey
 {
     /**
-     * Generate a primary ULID for the model.
+     * Generate a primary UUID for the model.
      *
      * @return void
      */
-    public static function bootHasPrimaryUlid()
+    public static function bootHasUuidPrimaryKey()
     {
         static::creating(function (self $model) {
             if (empty($model->{$model->getKeyName()})) {
-                $model->{$model->getKeyName()} = $model->generatePrimaryUlid();
+                $model->{$model->getKeyName()} = $model->generatePrimaryUuid();
             }
         });
     }
 
     /**
-     * Generate the primary ULID key for the model.
+     * Generate the primary UUID key for the model.
      *
      * @return string
      */
-    public function generatePrimaryUlid()
+    public function generatePrimaryUuid()
     {
-        return (string) Str::ulid();
+        return (string) Str::orderedUuid();
     }
 
     /**
