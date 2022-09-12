@@ -6,6 +6,8 @@ use Illuminate\Support\Str;
 
 trait HasUuidPrimaryKey
 {
+    protected $uuidVersion = 'v4';
+
     /**
      * Generate a primary UUID for the model.
      *
@@ -15,7 +17,7 @@ trait HasUuidPrimaryKey
     {
         static::creating(function (self $model) {
             if (empty($model->{$model->getKeyName()})) {
-                $model->{$model->getKeyName()} = $model->generatePrimaryUuid();
+                $model->{$model->getKeyName()} = $model->generatePrimaryKey();
             }
         });
     }
@@ -25,7 +27,7 @@ trait HasUuidPrimaryKey
      *
      * @return string
      */
-    public function generatePrimaryUuid()
+    public function generatePrimaryKey()
     {
         return (string) Str::orderedUuid();
     }

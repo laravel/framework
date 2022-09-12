@@ -15,7 +15,7 @@ trait HasUlidPrimaryKey
     {
         static::creating(function (self $model) {
             if (empty($model->{$model->getKeyName()})) {
-                $model->{$model->getKeyName()} = $model->generatePrimaryUlid();
+                $model->{$model->getKeyName()} = $model->generatePrimaryKey();
             }
         });
     }
@@ -25,7 +25,7 @@ trait HasUlidPrimaryKey
      *
      * @return string
      */
-    public function generatePrimaryUlid()
+    public function generatePrimaryKey()
     {
         return (string) Str::ulid();
     }
