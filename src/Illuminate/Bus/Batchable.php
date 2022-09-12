@@ -84,7 +84,9 @@ trait Batchable
                                   int $failedJobs = 0,
                                   array $failedJobIds = [],
                                   array $options = [],
-                                  CarbonImmutable $createdAt = null)
+                                  CarbonImmutable $createdAt = null,
+                                  ?CarbonImmutable $cancelledAt = null,
+                                  ?CarbonImmutable $finishedAt = null)
     {
         $this->fakeBatch = new BatchFake(
             empty($id) ? (string) Str::uuid() : $id,
@@ -94,7 +96,9 @@ trait Batchable
             $failedJobs,
             $failedJobIds,
             $options,
-            $createdAt ?? CarbonImmutable::now()
+            $createdAt ?? CarbonImmutable::now(),
+            $cancelledAt,
+            $finishedAt,
         );
 
         return $this->fakeBatch;
