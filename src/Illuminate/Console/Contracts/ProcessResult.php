@@ -84,21 +84,23 @@ interface ProcessResult extends Arrayable, Stringable, ArrayAccess, IteratorAggr
      * Throw an exception if the process fails and the given condition evaluates to true.
      *
      * @param  bool  $condition
+     * @param  (callable(\Illuminate\Console\Exceptions\ProcessFailedException): mixed)|null  $callback
      * @return $this
      *
      * @throws \Illuminate\Console\Exceptions\ProcessFailedException
      */
-    public function throwIf($condition);
+    public function throwIf($condition, $callback = null);
 
     /**
      * Throw an exception if the process fails and the given condition evaluates to false.
      *
      * @param  bool  $condition
+     * @param  (callable(\Illuminate\Console\Exceptions\ProcessFailedException): mixed)|null  $callback
      * @return $this
      *
      * @throws \Illuminate\Console\Exceptions\ProcessFailedException
      */
-    public function throwUnless($condition);
+    public function throwUnless($condition, $callback = null);
 
     /**
      * Get the process's output.

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console\Process;
 
+use Illuminate\Console\Exceptions\ProcessAlreadyStarted;
 use Illuminate\Console\Process;
 use Illuminate\Console\Process\Results\Result;
 use Illuminate\Support\Traits\Macroable;
@@ -74,6 +75,13 @@ class PendingProcess
     protected $afterWaitCallbacks = [];
 
     /**
+     * If the process already started.
+     *
+     * @var bool
+     */
+    protected $started = false;
+
+    /**
      * Creates a new Pending Process instance.
      *
      * @param  \Illuminate\Console\Process\Factory  $factory
@@ -125,9 +133,7 @@ class PendingProcess
      */
     public function stubs($callbacks)
     {
-        $this->stubs = $callbacks;
-
-        return $this;
+        return tap($this, fn () => $this->stubs = $callbacks);
     }
 
     /**
@@ -193,6 +199,12 @@ class PendingProcess
      */
     public function run($command = null, $output = null)
     {
+        if ($this->started) {
+            throw new ProcessAlreadyStarted();
+        }
+
+        $this->started = true;
+
         if (! is_null($command)) {
             $this->command($command);
         }

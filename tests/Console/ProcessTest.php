@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests;
 
-use Illuminate\Console\Contracts\ProcessResult;
+use Illuminate\Console\Exceptions\ProcessAlreadyStarted;
 use Illuminate\Console\Exceptions\ProcessFailedException;
 use Illuminate\Console\Exceptions\ProcessNotRunningException;
 use Illuminate\Console\Exceptions\ProcessNotStartedException;
@@ -34,7 +34,7 @@ class ProcessTest extends TestCase
         m::close();
     }
 
-    public function testResultOk()
+    public function testOk()
     {
         $this->factory->fake();
 
@@ -43,11 +43,9 @@ class ProcessTest extends TestCase
         $this->assertTrue($result->ok());
     }
 
-    public function testResultFailed()
+    public function testFailed()
     {
-        $this->factory->fake(function () {
-            return $this->factory::result('my-process-output', 1);
-        });
+        $this->factory->fake($this->factory::result('my-process-output', 1));
 
         $result = $this->factory->run($this->ls());
 
@@ -65,7 +63,7 @@ class ProcessTest extends TestCase
         });
     }
 
-    public function testResultOutput()
+    public function testOutput()
     {
         $this->factory->fake(function ($process) {
             if (str($process->getCommandLine())->contains('fooo')) {
@@ -116,26 +114,19 @@ class ProcessTest extends TestCase
         $this->assertSame(Process::STDOUT, $typeViaCallback);
     }
 
-    public function testOutput()
+    public function testResultErrorOutput()
     {
-        $this->factory->fake(function ($process) {
-            return $this->factory::result(['my stdout line 1', 'my stdout line 2']);
+        $this->factory->fake(function () {
+            return $this->factory::result('my stdout output', 1, 'my stderr output');
         });
 
-        $outputViaCallback = '';
-        $typeViaCallback = null;
-
-        $output = $this->factory->output(function ($output, $type) use (&$outputViaCallback, &$typeViaCallback) {
-            $typeViaCallback = $type;
-            $outputViaCallback = $output;
-        })->run('ls')->output();
-
-        $this->assertSame($outputViaCallback, $output);
-        $this->assertSame("my stdout line 1\nmy stdout line 2\n", $outputViaCallback);
-        $this->assertSame(Process::STDOUT, $typeViaCallback);
+        $result = $this->factory->run('');
+        $this->assertSame('my stdout output', $result->output());
+        $this->assertTrue($result->failed());
+        $this->assertSame('my stderr output', $result->errorOutput());
     }
 
-    public function testErrorOutput()
+    public function testErrorOutputAsCallback()
     {
         $this->factory->fake(function ($process) {
             return $this->factory::result('', 1, ['my stderr line 1', 'my stderr line 2']);
@@ -154,38 +145,7 @@ class ProcessTest extends TestCase
         $this->assertSame(Process::STDERR, $typeViaCallback);
     }
 
-    public function testResultErrorOutput()
-    {
-        $this->factory->fake(function () {
-            return $this->factory::result('my stdout output', 1, 'my stderr output');
-        });
-
-        $result = $this->factory->run('');
-        $this->assertSame('my stdout output', $result->output());
-        $this->assertTrue($result->failed());
-        $this->assertSame('my stderr output', $result->errorOutput());
-    }
-
-    public function testErrorOutputAsCallback()
-    {
-        $this->factory->fake(function ($process) {
-            return $this->factory::result('', 1, 'my stderr output');
-        });
-
-        $outputViaCallback = '';
-        $typeViaCallback = null;
-
-        $output = $this->factory->run('ls', function ($output, $type) use (&$outputViaCallback, &$typeViaCallback) {
-            $typeViaCallback = $type;
-            $outputViaCallback = $output;
-        })->errorOutput();
-
-        $this->assertSame($outputViaCallback, $output);
-        $this->assertSame('my stderr output', $output);
-        $this->assertSame(Process::STDERR, $typeViaCallback);
-    }
-
-    public function testResultOutputWhenFakeDoesNotExist()
+    public function testOutputWhenFakeDoesNotExist()
     {
         $this->factory->fake([
             'nuno' => $this->factory::result('drwxr-xr-x   25 nunomaduro'),
@@ -208,25 +168,99 @@ class ProcessTest extends TestCase
         $this->assertTrue($result->ok());
     }
 
-    public function testProcessExceptionIsThrownIfTheProcessFails()
+    public function testResultExceptionIsThrownIfTheProcessFails()
     {
-        $exception = null;
-        $result = $this->factory::result('my-failure', 1);
+        $this->factory->fake($this->factory->result('', 1, ['Hello World']));
 
-        $this->factory->fake(fn () => $result);
+        $exception = null;
+        $exceptionViaCallback = null;
 
         try {
-            $this->factory->run($this->ls())->throw();
+            $this->factory->run('echo "Hello World" >&2; exit 1;')->throw(function ($e) use (&$exceptionViaCallback) {
+                $exceptionViaCallback = $e;
+            });
         } catch (ProcessFailedException $exception) {
             // ..
         }
 
         $this->assertInstanceOf(ProcessFailedException::class, $exception);
+        $this->assertSame($exception, $exceptionViaCallback);
 
-        $this->assertSame(value($result)->output(), $exception->result()->output());
-        $this->assertSame(value($result)->exitCode(), $exception->result()->exitCode());
-        $this->assertStringContainsString($this->ls(), $exception->process()->getCommandLine());
+        $this->assertSame('', $exception->result()->output());
+        $this->assertSame("Hello World\n", $exception->result()->errorOutput());
+        $this->assertSame(1, $exception->result()->exitCode());
+        $this->assertStringContainsString('Hello World', $exception->process()->getCommandLine());
         $this->assertNull($exception->getPrevious());
+    }
+
+    public function testResultExceptionIsThrownIfTheProcessFailsAndTheGivenConditionIsTrue()
+    {
+        $this->factory->fake($this->factory->result('', 1, ['Hello World']));
+
+        $exception = null;
+        $exceptionViaCallback = null;
+
+        try {
+            $this->factory->run('echo "Hello World" >&2; exit 1;')->throwIf(true, function ($e) use (&$exceptionViaCallback) {
+                $exceptionViaCallback = $e;
+            });
+        } catch (ProcessFailedException $exception) {
+            // ..
+        }
+
+        $this->assertInstanceOf(ProcessFailedException::class, $exception);
+        $this->assertSame($exception, $exceptionViaCallback);
+
+        $this->factory->fake($this->factory->result('', 1, ['Hello World']));
+
+        $exception = null;
+        $exceptionViaCallback = null;
+
+        try {
+            $this->factory->run('echo "Hello World" >&2; exit 1;')->throwIf(false, function ($e) use (&$exceptionViaCallback) {
+                $exceptionViaCallback = $e;
+            });
+        } catch (ProcessFailedException $exception) {
+            // ..
+        }
+
+        $this->assertNull($exception);
+        $this->assertNull($exceptionViaCallback);
+    }
+
+    public function testResultExceptionIsThrownIfTheProcessFailsAndTheGivenConditionIsFalse()
+    {
+        $this->factory->fake($this->factory->result('', 1, ['Hello World']));
+
+        $exception = null;
+        $exceptionViaCallback = null;
+
+        try {
+            $this->factory->run('echo "Hello World" >&2; exit 1;')->throwUnless(false, function ($e) use (&$exceptionViaCallback) {
+                $exceptionViaCallback = $e;
+            });
+        } catch (ProcessFailedException $exception) {
+            // ..
+        }
+
+        $this->assertInstanceOf(ProcessFailedException::class, $exception);
+        $this->assertSame($exception, $exceptionViaCallback);
+
+        $this->factory->fake($this->factory->result('', 1, ['Hello World']));
+
+        $exception = null;
+        $exceptionViaCallback = null;
+
+        try {
+            $this->factory->run('echo "Hello World" >&2; exit 1;')->throwUnless(true, function ($e) use (&$exceptionViaCallback) {
+                $exceptionViaCallback = $e;
+            });
+        } catch (ProcessFailedException $exception) {
+            // ..
+        }
+
+        $this->assertNull($exception);
+        $this->assertNull($exceptionViaCallback);
     }
 
     public function testResultEnsuresTheProcessStarts()
@@ -315,7 +349,32 @@ class ProcessTest extends TestCase
         $this->assertTrue($result->ok());
     }
 
-    public function testDoesNotThrow()
+    public function testWaitDoesNotWaitTwice()
+    {
+        $called = 0;
+        $result = new Result(tap(new Process([$this->ls()]))->start(), [function () use (&$called) {
+            $called++;
+        }]);
+
+        $result->wait();
+        $result->wait();
+        $result->wait();
+
+        $this->assertSame(1, $called);
+
+        $called = 0;
+        $result = new FakeResult('', 0, '');
+        $result->start(new Process([$this->ls()]), null, [function () use (&$called) {
+            $called++;
+        }]);
+        $result->wait();
+        $result->wait();
+        $result->wait();
+
+        $this->assertSame(1, $called);
+    }
+
+    public function testDoesNotThrowOnOkProcesses()
     {
         $result = $this->factory->path(__DIR__)->run($this->ls())->throw();
         $this->assertStringContainsString('ProcessTest', $result->wait()->output());
@@ -376,15 +435,10 @@ class ProcessTest extends TestCase
         $this->assertNull($result->process()->getTimeout());
     }
 
-    public function testResultRunning()
+    public function testRunning()
     {
         $result = $this->factory->run($this->ls());
         $this->assertFalse($result->running());
-        $this->assertTrue($result->ok());
-        $this->assertFalse($result->running());
-
-        $result = $this->factory->async()->run($this->ls());
-        $this->assertTrue($result->running());
         $this->assertTrue($result->ok());
         $this->assertFalse($result->running());
 
@@ -394,6 +448,16 @@ class ProcessTest extends TestCase
         $this->assertFalse($result->running());
         $this->assertTrue($result->ok());
         $this->assertFalse($result->running());
+    }
+
+    public function testAsyncRunning()
+    {
+        $result = $this->factory->async()->run($this->ls());
+        $this->assertTrue($result->running());
+        $this->assertTrue($result->ok());
+        $this->assertFalse($result->running());
+
+        $this->factory->fake();
 
         $result = $this->factory->async()->run($this->ls());
         $this->assertTrue($result->running());
@@ -401,14 +465,14 @@ class ProcessTest extends TestCase
         $this->assertFalse($result->running());
     }
 
-    public function testResultToString()
+    public function testToString()
     {
         $result = $this->factory->path(__DIR__)->run($this->ls());
         $this->assertStringContainsString('ProcessTest', (string) $result);
         $this->assertStringContainsString('ProcessTest', $result->toString());
         $this->assertTrue($result->ok());
 
-        $this->factory->fake(fn () => $this->factory::result('ProcessOutput'));
+        $this->factory->fake($this->factory::result('ProcessOutput'));
 
         $result = $this->factory->path(__DIR__)->run($this->ls());
         $this->assertStringContainsString('ProcessOutput', (string) $result);
@@ -471,7 +535,9 @@ class ProcessTest extends TestCase
         $this->assertStringContainsString('ProcessTest', $result->toString());
         $this->assertTrue($result->ok());
 
-        $this->factory->fake(fn () => $this->factory::result('ProcessOutput'));
+        $this->factory->fake([
+            $this->ls() => $this->factory::result('ProcessOutput'),
+        ]);
 
         $result = $this->factory->path(__DIR__)->command($this->ls())->run();
         $this->assertStringContainsString('ProcessOutput', (string) $result);
@@ -479,15 +545,17 @@ class ProcessTest extends TestCase
         $this->assertTrue($result->ok());
     }
 
-    public function testAsync()
+    public function testPendingProcessMayNotStartTwice()
     {
+        $this->expectException(ProcessAlreadyStarted::class);
+        $this->expectExceptionMessage('The process has already been started.');
+
         $this->factory->fake();
 
-        $result = $this->factory->async()->run($this->ls());
-        $this->assertInstanceOf(ProcessResult::class, $result);
-        $this->assertTrue($result->running()); // because of fake...
-        $this->assertTrue($result->ok());
-        $this->assertFalse($result->running());
+        $pending = $this->factory->async(false);
+
+        $pending->run();
+        $pending->run();
     }
 
     public function testProcessesOnPoolMustCallRun()

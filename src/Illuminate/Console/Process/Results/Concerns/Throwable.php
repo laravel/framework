@@ -17,7 +17,12 @@ trait Throwable
         $this->wait();
 
         if ($this->failed()) {
-            throw new ProcessFailedException($this->process, $this);
+            $exception = new ProcessFailedException($this->process, $this);
+            if ($callback) {
+                $callback($exception);
+            }
+
+            throw $exception;
         }
 
         return $this;
@@ -26,16 +31,16 @@ trait Throwable
     /**
      * {@see \Illuminate\Console\Contracts\ProcessResult::throwIf}.
      */
-    public function throwIf($condition)
+    public function throwIf($condition, $callback = null)
     {
-        return $condition ? $this->throw() : $this;
+        return $condition ? $this->throw($callback) : $this;
     }
 
     /**
      * {@see \Illuminate\Console\Contracts\ProcessResult::throwUnless}.
      */
-    public function throwUnless($condition)
+    public function throwUnless($condition, $callback = null)
     {
-        return $condition ? $this : $this->throw();
+        return $condition ? $this : $this->throw($callback);
     }
 }
