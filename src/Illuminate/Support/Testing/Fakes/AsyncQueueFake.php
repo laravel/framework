@@ -45,7 +45,7 @@ class AsyncQueueFake extends QueueFake
             $db = app('db');
             $queue = app('queue');
 
-            $app = require getcwd().'/bootstrap/app.php'
+            $app = require getcwd().'/bootstrap/app.php';
             $app->make(Kernel::class)->bootstrap();
 
             Queue::swap($queue);

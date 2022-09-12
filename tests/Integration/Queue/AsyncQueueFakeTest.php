@@ -14,7 +14,7 @@ use Illuminate\Support\Testing\Fakes\AsyncQueueFake;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
 
-class SupportTestingAsyncQueueFakeTest extends TestCase
+class AsyncQueueFakeTest extends TestCase
 {
     /**
      * @var \Illuminate\Support\Testing\Fakes\AsyncQueueFake
