@@ -7,7 +7,7 @@ use Symfony\Component\Process\Exception\LogicException;
 class ProcessNotStartedException extends LogicException
 {
     /**
-     * Creates a new Process Not Started Exception instance.
+     * Creates a new Process Exception instance.
      *
      * @param  \Illuminate\Console\Process|null  $process
      * @return void

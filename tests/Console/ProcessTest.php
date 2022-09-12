@@ -4,7 +4,7 @@ namespace Illuminate\Tests;
 
 use Illuminate\Console\Exceptions\ProcessAlreadyStarted;
 use Illuminate\Console\Exceptions\ProcessFailedException;
-use Illuminate\Console\Exceptions\ProcessNotRunningException;
+use Illuminate\Console\Exceptions\ProcessInPoolNotStartedException;
 use Illuminate\Console\Exceptions\ProcessNotStartedException;
 use Illuminate\Console\Process;
 use Illuminate\Console\Process\Factory;
@@ -562,7 +562,7 @@ class ProcessTest extends TestCase
     {
         $this->factory->fake();
 
-        $this->expectException(ProcessNotRunningException::class);
+        $this->expectException(ProcessInPoolNotStartedException::class);
 
         $this->factory->pool(function (Pool $pool) {
             return [$pool->path(__DIR__)];

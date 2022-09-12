@@ -3,7 +3,7 @@
 namespace Illuminate\Console\Process;
 
 use Illuminate\Console\Contracts\ProcessResult;
-use Illuminate\Console\Exceptions\ProcessNotRunningException;
+use Illuminate\Console\Exceptions\ProcessInPoolNotStartedException;
 use Illuminate\Console\Process;
 use Illuminate\Console\Process\Results\FakeResult;
 use Illuminate\Console\Process\Results\Result;
@@ -197,7 +197,7 @@ class Factory
     {
         return collect($callback(new Pool($this)))->each(function ($result) {
             if (! $result instanceof ProcessResult) {
-                throw new ProcessNotRunningException('Process has not been started. Did you forget to call "run"?');
+                throw new ProcessInPoolNotStartedException('Process has not been started. Did you forget to call "run"?');
             }
         })->each->wait();
     }

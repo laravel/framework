@@ -3,19 +3,19 @@
 namespace Illuminate\Console\Process;
 
 /**
- * @mixin \Illuminate\Console\Process\Factory
+ * @mixin \Illuminate\Console\Process\PendingProcess
  */
 class Pool
 {
     /**
-     * The factory instance.
+     * The process factory instance.
      *
      * @var \Illuminate\Console\Process\Factory
      */
     protected $factory;
 
     /**
-     * Create a new requests pool.
+     * Create a new Process Pool.
      *
      * @param  \Illuminate\Console\Process\Factory  $factory
      * @return void
@@ -26,7 +26,7 @@ class Pool
     }
 
     /**
-     * Add a process to the pool with a numeric index.
+     * Execute the given method against a new Async Pending Process instance.
      *
      * @param  string  $method
      * @param  iterable<int, mixed>  $parameters
