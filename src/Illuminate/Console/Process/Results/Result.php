@@ -36,7 +36,7 @@ class Result implements ProcessResult
     {
         $this->afterWaitCallbacks = $afterWaitCallbacks;
 
-        $this->ensureProcessIsRunning($this->process = $process);
+        $this->ensureProcessStarted($this->process = $process);
     }
 
     /**
@@ -113,7 +113,7 @@ class Result implements ProcessResult
      *
      * @throws \Illuminate\Console\Exceptions\ProcessNotStartedException
      */
-    protected function ensureProcessIsRunning($process)
+    protected function ensureProcessStarted($process)
     {
         if (! $process->isStarted()) {
             throw new ProcessNotStartedException($process);
