@@ -29,6 +29,13 @@ class BusFake implements QueueingDispatcher
     protected $jobsToFake;
 
     /**
+     * The job types that should be dispatched instead of intercepted.
+     *
+     * @var array
+     */
+    protected $jobsToDispatch;
+
+    /**
      * The commands that have been dispatched.
      *
      * @var array
@@ -63,11 +70,13 @@ class BusFake implements QueueingDispatcher
      * @param  array|string  $jobsToFake
      * @return void
      */
-    public function __construct(QueueingDispatcher $dispatcher, $jobsToFake = [])
+    public function __construct(QueueingDispatcher $dispatcher, $jobsToFake = [], $jobsToDispatch = [])
     {
         $this->dispatcher = $dispatcher;
 
         $this->jobsToFake = Arr::wrap($jobsToFake);
+
+        $this->jobsToDispatch = Arr::wrap($jobsToDispatch);
     }
 
     /**
@@ -659,6 +668,10 @@ class BusFake implements QueueingDispatcher
      */
     protected function shouldFakeJob($command)
     {
+        if ($this->shouldDispatchCommand($command)) {
+            return false;
+        }
+
         if (empty($this->jobsToFake)) {
             return true;
         }
@@ -668,6 +681,22 @@ class BusFake implements QueueingDispatcher
                 return $job instanceof Closure
                             ? $job($command)
                             : $job === get_class($command);
+            })->isNotEmpty();
+    }
+
+    /**
+     * Determine if a command should be dispatched or not.
+     *
+     * @param  mixed  $command
+     * @return bool
+     */
+    protected function shouldDispatchCommand($command)
+    {
+        return collect($this->jobsToDispatch)
+            ->filter(function ($job) use ($command) {
+                return $job instanceof Closure
+                    ? $job($command)
+                    : $job === get_class($command);
             })->isNotEmpty();
     }
 

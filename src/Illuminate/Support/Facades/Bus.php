@@ -39,11 +39,25 @@ class Bus extends Facade
      * Replace the bound instance with a fake.
      *
      * @param  array|string  $jobsToFake
+     * @param  array|string  $jobsToDispatch
      * @return \Illuminate\Support\Testing\Fakes\BusFake
      */
-    public static function fake($jobsToFake = [])
+    public static function fake($jobsToFake = [], $jobsToDispatch = [])
     {
-        static::swap($fake = new BusFake(static::getFacadeRoot(), $jobsToFake));
+        static::swap($fake = new BusFake(static::getFacadeRoot(), $jobsToFake, $jobsToDispatch));
+
+        return $fake;
+    }
+
+    /**
+     * Replace the bound instance with a fake.
+     *
+     * @param  array|string  $jobsToDispatch
+     * @return \Illuminate\Support\Testing\Fakes\BusFake
+     */
+    public static function fakeAllExcept($jobsToDispatch = [])
+    {
+        static::swap($fake = new BusFake(static::getFacadeRoot(), [], $jobsToDispatch));
 
         return $fake;
     }
