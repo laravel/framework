@@ -88,5 +88,4 @@ class ChannelMakeCommand extends GeneratorCommand
             ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the channel already exists'],
         ];
     }
-
 }
