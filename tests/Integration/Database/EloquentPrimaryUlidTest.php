@@ -18,7 +18,7 @@ class EloquentPrimaryUlidTest extends DatabaseTestCase
         });
     }
 
-    public function testUserWithPrimaryUuidCanBeCreated()
+    public function testUserWithPrimaryUlidCanBeCreated()
     {
         $user = UserWithPrimaryUlid::create();
 
