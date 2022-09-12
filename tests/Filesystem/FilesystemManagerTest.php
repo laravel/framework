@@ -2,16 +2,11 @@
 
 namespace Illuminate\Tests\Filesystem;
 
-use function fclose;
-use function file_put_contents;
-use function fopen;
-use function fwrite;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Foundation\Application;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use function unlink;
 
 class FilesystemManagerTest extends TestCase
 {
