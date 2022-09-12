@@ -17,8 +17,8 @@ use PHPUnit\Framework\Assert as PHPUnit;
  * @method \Illuminate\Console\Process\PendingProcess command(array|string $command)
  * @method \Illuminate\Console\Process\PendingProcess dd()
  * @method \Illuminate\Console\Process\PendingProcess dump()
- * @method \Illuminate\Console\Process\PendingProcess output(callable $output)
  * @method \Illuminate\Console\Process\PendingProcess forever()
+ * @method \Illuminate\Console\Process\PendingProcess output(callable $output)
  * @method \Illuminate\Console\Process\PendingProcess path(string $path)
  * @method \Illuminate\Console\Process\PendingProcess timeout(float|null $seconds)
  *
@@ -197,7 +197,7 @@ class Factory
     {
         return collect($callback(new Pool($this)))->each(function ($result) {
             if (! $result instanceof ProcessResult) {
-                throw new ProcessInPoolNotStartedException('Process has not been started. Did you forget to call "run"?');
+                throw new ProcessInPoolNotStartedException('One or more processes added to the pool have not been started. Did you forget to call "run"?');
             }
         })->each->wait();
     }

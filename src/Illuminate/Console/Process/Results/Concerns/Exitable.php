@@ -12,8 +12,6 @@ trait Exitable
      */
     public function ok()
     {
-        $this->wait();
-
         return $this->exitCode() == 0;
     }
 

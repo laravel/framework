@@ -106,6 +106,17 @@ class PendingProcess
     }
 
     /**
+     * Sets the process's command.
+     *
+     * @param  array<array-key, string>|string  $command
+     * @return $this
+     */
+    public function command($command)
+    {
+        return tap($this, fn () => $this->command = $command);
+    }
+
+    /**
      * Dump the process and end the script before start the process.
      *
      * @return $this
@@ -123,50 +134,6 @@ class PendingProcess
     public function dump()
     {
         return $this->beforeStart(fn ($process) => dump($process));
-    }
-
-    /**
-     * Register a stub callable that will intercept processes and be able to return stub process result.
-     *
-     * @param  array<int, callable(\Illuminate\Console\Process): (\Illuminate\Console\Contracts\ProcessResult|null)>  $callbacks
-     * @return $this
-     */
-    public function stubs($callbacks)
-    {
-        return tap($this, fn () => $this->stubs = $callbacks);
-    }
-
-    /**
-     * Sets the process's command.
-     *
-     * @param  array<array-key, string>|string  $command
-     * @return $this
-     */
-    public function command($command)
-    {
-        return tap($this, fn () => $this->command = $command);
-    }
-
-    /**
-     * Sets the process's path.
-     *
-     * @param  string  $path
-     * @return $this
-     */
-    public function path($path)
-    {
-        return tap($this, fn () => $this->path = $path);
-    }
-
-    /**
-     * Sets the process's timeout.
-     *
-     * @param  float|null  $timeout
-     * @return $this
-     */
-    public function timeout($timeout)
-    {
-        return tap($this, fn () => $this->timeout = $timeout);
     }
 
     /**
@@ -191,7 +158,40 @@ class PendingProcess
     }
 
     /**
-     * Starts a new process with the given arguments.
+     * Sets the process's path.
+     *
+     * @param  string  $path
+     * @return $this
+     */
+    public function path($path)
+    {
+        return tap($this, fn () => $this->path = $path);
+    }
+
+    /**
+     * Register a stub callable that will intercept processes and be able to return stub process result.
+     *
+     * @param  array<int, callable(\Illuminate\Console\Process): (\Illuminate\Console\Contracts\ProcessResult|null)>  $callbacks
+     * @return $this
+     */
+    public function stubs($callbacks)
+    {
+        return tap($this, fn () => $this->stubs = $callbacks);
+    }
+
+    /**
+     * Sets the process's timeout.
+     *
+     * @param  float|null  $timeout
+     * @return $this
+     */
+    public function timeout($timeout)
+    {
+        return tap($this, fn () => $this->timeout = $timeout);
+    }
+
+    /**
+     * Runs the process and returns the process's result.
      *
      * @param  array<array-key, string>|string|null  $command
      * @param  (callable(string, int): mixed)|null  $output
@@ -228,7 +228,7 @@ class PendingProcess
     }
 
     /**
-     * Starts the given process.
+     * Starts the process internally and returns and "waitable" process's result instance.
      *
      * @param  \Illuminate\Console\Process  $process
      * @param  (callable(string, int): mixed)|null  $output

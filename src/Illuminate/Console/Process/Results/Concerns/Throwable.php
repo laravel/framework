@@ -18,6 +18,7 @@ trait Throwable
 
         if ($this->failed()) {
             $exception = new ProcessFailedException($this);
+
             if ($callback) {
                 $callback($exception);
             }

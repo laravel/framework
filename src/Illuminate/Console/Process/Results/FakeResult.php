@@ -98,6 +98,8 @@ class FakeResult implements ProcessResult
      */
     public function output()
     {
+        $this->wait();
+
         return $this->output;
     }
 
@@ -107,7 +109,7 @@ class FakeResult implements ProcessResult
     public function wait()
     {
         if ($this->running) {
-            $this->ensureProcessExists();
+            $this->ensureProcessStarted();
 
             if ($this->onOutput && $this->output !== '') {
                 ($this->onOutput)(Process::STDOUT, $this->output);
@@ -132,6 +134,8 @@ class FakeResult implements ProcessResult
      */
     public function exitCode()
     {
+        $this->wait();
+
         return $this->exitCode;
     }
 
@@ -140,6 +144,8 @@ class FakeResult implements ProcessResult
      */
     public function errorOutput()
     {
+        $this->wait();
+
         return $this->errorOutput;
     }
 
@@ -148,7 +154,7 @@ class FakeResult implements ProcessResult
      */
     public function process()
     {
-        $this->ensureProcessExists();
+        $this->ensureProcessStarted();
 
         return $this->process;
     }
@@ -160,7 +166,7 @@ class FakeResult implements ProcessResult
      *
      * @throws \Illuminate\Console\Exceptions\ProcessNotStartedException
      */
-    protected function ensureProcessExists()
+    protected function ensureProcessStarted()
     {
         if (! $this->process) {
             throw new ProcessNotStartedException;
