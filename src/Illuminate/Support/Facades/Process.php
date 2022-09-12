@@ -5,7 +5,7 @@ namespace Illuminate\Support\Facades;
 use Illuminate\Console\Process\Factory;
 
 /**
- * @method static \Illuminate\Console\Contracts\ProcessResult result(string $output = '', int $exitCode = 0, string $errorOutput = '')
+ * @method static \Illuminate\Console\Contracts\ProcessResult result(array|string $output = '', int $exitCode = 0, array|string $errorOutput = '')
  * @method static \Illuminate\Console\Contracts\ProcessResult run(array|string|null $command = null, callable|null $output = null)
  * @method static \Illuminate\Console\Process\PendingProcess async(bool $async = true)
  * @method static \Illuminate\Console\Process\PendingProcess command(array|string $command)
