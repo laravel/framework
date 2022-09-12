@@ -6,8 +6,6 @@ use Illuminate\Support\Str;
 
 trait HasUuidPrimaryKey
 {
-    protected $uuidVersion = 'v4';
-
     /**
      * Generate a primary UUID for the model.
      *
