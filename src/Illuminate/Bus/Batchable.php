@@ -100,6 +100,6 @@ trait Batchable
             $finishedAt,
         );
 
-        return $this->fakeBatch;
+        return [$this, $this->fakeBatch];
     }
 }
