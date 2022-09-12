@@ -101,6 +101,7 @@ class RuleMakeCommand extends GeneratorCommand
         return [
             ['implicit', 'i', InputOption::VALUE_NONE, 'Generate an implicit rule'],
             ['invokable', null, InputOption::VALUE_NONE, 'Generate a single method, invokable rule class'],
+            ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the rule already exists'],
         ];
     }
 }

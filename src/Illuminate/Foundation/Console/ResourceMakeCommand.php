@@ -111,6 +111,7 @@ class ResourceMakeCommand extends GeneratorCommand
     {
         return [
             ['collection', 'c', InputOption::VALUE_NONE, 'Create a resource collection'],
+            ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the resource already exists'],
         ];
     }
 }
