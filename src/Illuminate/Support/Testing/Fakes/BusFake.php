@@ -73,10 +73,8 @@ class BusFake implements QueueingDispatcher
     public function __construct(QueueingDispatcher $dispatcher, $jobsToFake = [])
     {
         $this->dispatcher = $dispatcher;
-
         $this->jobsToFake = Arr::wrap($jobsToFake);
-
-        $this->batchRepository = new BatchRepositoryFake();
+        $this->batchRepository = new BatchRepositoryFake;
     }
 
     /**
