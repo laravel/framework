@@ -208,7 +208,7 @@ class Factory
      * @param  (callable(\Illuminate\Console\Process, \Illuminate\Console\Contracts\ProcessResult): bool)  $callback
      * @return \Illuminate\Support\Collection<int, array{0: \Illuminate\Console\Process, 1: \Illuminate\Console\Contracts\ProcessResult}>
      */
-    public function recorded($callback)
+    protected function recorded($callback)
     {
         return collect($this->recorded)
             ->filter(fn ($pair) => $callback($pair[0], $pair[1]))
