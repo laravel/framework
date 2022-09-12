@@ -656,16 +656,6 @@ class BusFake implements QueueingDispatcher
     }
 
     /**
-     * Create a new, empty batch for testing.
-     *
-     * @return \Illuminate\Bus\Batch
-     */
-    public function fakeBatch()
-    {
-        return $this->batch([])->dispatch();
-    }
-
-    /**
      * Record the fake pending batch dispatch.
      *
      * @param  \Illuminate\Bus\PendingBatch  $pendingBatch
