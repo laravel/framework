@@ -4,7 +4,6 @@ namespace Illuminate\Bus;
 
 use Carbon\CarbonImmutable;
 use Illuminate\Container\Container;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Support\Testing\Fakes\BatchFake;
 
