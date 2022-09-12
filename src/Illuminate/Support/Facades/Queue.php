@@ -62,15 +62,11 @@ class Queue extends Facade
      */
     public static function fakeAsync(Closure $callback, $jobsToRunAsynchronously = [])
     {
-        $instance = static::getFacadeRoot();
-
         static::swap($fake = new AsyncQueueFake(static::getFacadeApplication(), $jobsToRunAsynchronously, static::getFacadeRoot()));
 
         $callback();
 
         $fake->dispatch();
-
-        static::swap($instance);
 
         return $fake;
     }

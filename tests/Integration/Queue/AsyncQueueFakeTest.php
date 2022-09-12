@@ -7,22 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Testing\Fakes\AsyncQueueFake;
-use Mockery as m;
 use Orchestra\Testbench\TestCase;
 
 class AsyncQueueFakeTest extends TestCase
 {
     /**
-     * @var \Illuminate\Support\Testing\Fakes\AsyncQueueFake
-     */
-    private $fake;
-
-    /**
-     * @var \Illuminate\Tests\Support\JobStub
+     * @var \Illuminate\Tests\Support\AsyncJobStub
      */
     private $job;
 
@@ -45,97 +37,86 @@ class AsyncQueueFakeTest extends TestCase
         $this->post = Post::create(['title' => 'xyz', 'slug' => 'xyz']);
     }
 
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        m::close();
-    }
-
     public function testModelRehydrated()
     {
-        $job = new JobStub($this->post);
-        $queue = $this->mockQueueManager();
+        Queue::fakeAsync(function () {
+            Queue::resolveApplicationUsing(fn () => $this->queueApplication());
 
-        $queue->push($job);
-        $queue->dispatch();
+            Queue::push(
+                new AsyncJobStub($this->post)
+            );
+        });
 
-        $queue->assertPushed(JobStub::class);
+        Queue::assertPushed(AsyncJobStub::class);
     }
 
     public function testDeletedModelIsNotRehydrated()
     {
         $this->expectException(ModelNotFoundException::class);
 
-        $job = new JobStub($this->post);
-        $queue = $this->mockQueueManager();
+        Queue::fakeAsync(function () {
+            Queue::resolveApplicationUsing(fn () => $this->queueApplication());
 
-        $queue->push($job);
-        $this->post->delete();
-        $queue->dispatch();
+            Queue::push(new AsyncJobStub($this->post));
+            $this->post->delete();
+        });
+    }
+
+    public function testSingletonsAreReset()
+    {
+        $instance = new AsyncSingletonStub;
+        $instance->title = 'def';
+        $this->app->singleton(AsyncSingletonStub::class, fn () => $instance);
+
+        Queue::fakeAsync(function () {
+            Queue::resolveApplicationUsing(fn () => $this->queueApplication());
+
+            Queue::push(new ThirdAsyncJobStub($this->post));
+        });
+
+        $this->assertSame('abc', $this->post->fresh()->title);
     }
 
     public function testJobsAreAllDispatchedInANewProcess()
     {
-        $job = new JobStub($this->post);
-        $queue = $this->mockQueueManager();
+        $job = new AsyncJobStub($this->post);
 
-        $queue->push($job);
-        $queue->push($job);
-        $queue->dispatch();
+        Queue::fakeAsync(function () use ($job) {
+            Queue::resolveApplicationUsing(fn () => $this->queueApplication());
 
-        $queue->assertPushed(JobStub::class, 2);
+            Queue::push($job);
+            Queue::push($job);
+        });
+
+        Queue::assertPushed(AsyncJobStub::class, 2);
         $this->assertSame(2, $this->applicationRefreshes);
     }
 
     public function testOnlySpecifiedJobsAreRunAsynchronously()
     {
-        $job = new JobStub($this->post);
-        $queue = $this->mockQueueManager([JobStub::class]);
+        $job = new AsyncJobStub($this->post);
 
-        $queue->push($job);
-        $queue->push($job);
-        $queue->push(new SecondJobStub);
-        $queue->dispatch();
+        $queue = Queue::fakeAsync(function () use ($job) {
+            Queue::resolveApplicationUsing(fn () => $this->queueApplication());
 
-        $queue->assertPushed(JobStub::class, 2);
+            Queue::push($job);
+            Queue::push($job);
+            Queue::push(new SecondAsyncJobStub);
+        }, [AsyncJobStub::class]);
+
+        Queue::assertPushed(AsyncJobStub::class, 2);
         $this->assertSame(2, $this->applicationRefreshes);
     }
 
-    protected function refreshQueueApplication()
+    protected function queueApplication()
     {
-        $db = $this->app->make('db');
-        $queue = $this->app->make('queue');
-
-        $app = parent::refreshApplication();
-
-        Queue::swap($queue);
-        DB::swap($db);
-        Model::setConnectionResolver($db);
-
         $this->applicationRefreshes++;
 
-        return $app;
-    }
-
-    protected function mockQueueManager($jobsToRunAsynchronously = [], $app = null, $queue = null)
-    {
-        $queueManager = m::mock(
-            AsyncQueueFake::class, [
-                $app ?: $this->app,
-                $jobsToRunAsynchronously,
-                $queue ?: $this->app->make('queue'),
-            ])
-        ->makePartial();
-        $queueManager->shouldAllowMockingProtectedMethods();
-        $queueManager->shouldReceive('refreshApplication')
-            ->andReturnUsing(fn () => $this->refreshQueueApplication());
-
-        return $queueManager;
+        return $this->createApplication();
     }
 }
 
-class JobStub implements ShouldQueue
+class AsyncJobStub implements ShouldQueue
 {
     use SerializesModels;
 
@@ -152,11 +133,28 @@ class JobStub implements ShouldQueue
     }
 }
 
-class SecondJobStub implements ShouldQueue
+class SecondAsyncJobStub implements ShouldQueue
 {
     public function handle()
     {
         //
+    }
+}
+
+class ThirdAsyncJobStub implements ShouldQueue
+{
+    use SerializesModels;
+
+    public $post;
+
+    public function __construct(Post $post)
+    {
+        $this->post = $post;
+    }
+
+    public function handle()
+    {
+        $this->post->update(['title' => app(AsyncSingletonStub::class)->title]);
     }
 }
 
@@ -165,4 +163,9 @@ class Post extends Model
     protected $guarded = [];
 
     public $table = 'posts';
+}
+
+class AsyncSingletonStub
+{
+    public $title = 'abc';
 }
