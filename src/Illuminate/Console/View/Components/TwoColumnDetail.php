@@ -7,19 +7,18 @@ use Symfony\Component\Console\Output\OutputInterface;
 class TwoColumnDetail extends Component
 {
     /**
-     * The counter of class instances
+     * The counter of class instances.
      *
-     * @var int $counter
+     * @var int
      */
     private static $counter = 0;
 
     /**
-     * The list of separators
+     * The list of separators.
      *
-     * @var array $separators
+     * @var array
      */
     private $separators = ['.', '-'];
-
 
     /**
      * Renders the component using the given arguments.
