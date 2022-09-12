@@ -11,6 +11,8 @@ use PHPUnit\Framework\TestCase;
 
 class SupportTestingEventFakeTest extends TestCase
 {
+    protected $fake;
+
     protected function setUp(): void
     {
         parent::setUp();

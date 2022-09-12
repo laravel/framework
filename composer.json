@@ -81,6 +81,7 @@
         "illuminate/view": "self.version"
     },
     "require-dev": {
+        "ably/ably-php": "^1.0",
         "aws/aws-sdk-php": "^3.198.1",
         "doctrine/dbal": "^2.13.3|^3.1.4",
         "fakerphp/faker": "^1.9.2",

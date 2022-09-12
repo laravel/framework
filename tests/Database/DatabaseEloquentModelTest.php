@@ -46,6 +46,8 @@ class DatabaseEloquentModelTest extends TestCase
 {
     use InteractsWithTime;
 
+    protected $encrypter;
+
     protected function tearDown(): void
     {
         parent::tearDown();

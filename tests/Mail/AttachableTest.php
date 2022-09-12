@@ -81,6 +81,8 @@ class AttachableTest extends TestCase
         {
             public $pathArgs;
 
+            public $dataArgs;
+
             public function withDataAttachment()
             {
                 $this->dataArgs = func_get_args();
