@@ -66,7 +66,7 @@ class Result implements ProcessResult
             try {
                 $this->process->wait();
             } catch (SymfonyProcessTimedOutException $e) {
-                throw new ProcessTimedOutException($this->process, $this, $e);
+                throw new ProcessTimedOutException($this, $e);
             }
 
             foreach ($this->afterWaitCallbacks as $callback) {

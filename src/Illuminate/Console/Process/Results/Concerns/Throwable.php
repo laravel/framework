@@ -17,7 +17,7 @@ trait Throwable
         $this->wait();
 
         if ($this->failed()) {
-            $exception = new ProcessFailedException($this->process, $this);
+            $exception = new ProcessFailedException($this);
             if ($callback) {
                 $callback($exception);
             }

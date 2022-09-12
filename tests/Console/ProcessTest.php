@@ -66,7 +66,7 @@ class ProcessTest extends TestCase
     public function testOutput()
     {
         $this->factory->fake(function ($process) {
-            if (str($process->getCommandLine())->contains('fooo')) {
+            if (str($process->command())->contains('fooo')) {
                 return $this->factory::result('some failure', 1);
             }
         });
@@ -189,7 +189,7 @@ class ProcessTest extends TestCase
         $this->assertSame('', $exception->result()->output());
         $this->assertSame("Hello World\n", $exception->result()->errorOutput());
         $this->assertSame(1, $exception->result()->exitCode());
-        $this->assertStringContainsString('Hello World', $exception->process()->getCommandLine());
+        $this->assertStringContainsString('Hello World', $exception->result()->process()->command());
         $this->assertNull($exception->getPrevious());
     }
 
@@ -392,16 +392,16 @@ class ProcessTest extends TestCase
         $this->factory->fake();
 
         $result = $this->factory->run('sleep 2');
-        $this->assertSame(60.0, $result->process()->getTimeout());
+        $this->assertSame(60.0, $result->process()->timeout());
 
         $result = $this->factory->forever()->run('sleep 2');
-        $this->assertSame(null, $result->process()->getTimeout());
+        $this->assertSame(null, $result->process()->timeout());
 
         $result = $this->factory->timeout(1)->run('sleep 2');
-        $this->assertSame(1.0, $result->process()->getTimeout());
+        $this->assertSame(1.0, $result->process()->timeout());
 
         $result = $this->factory->timeout(500)->run('sleep 2');
-        $this->assertSame(500.0, $result->process()->getTimeout());
+        $this->assertSame(500.0, $result->process()->timeout());
     }
 
     public function testSignals()
@@ -423,7 +423,7 @@ class ProcessTest extends TestCase
 
         $result = $this->factory->path(__DIR__)->run($this->ls());
 
-        $this->assertSame(__DIR__, $result->process()->getWorkingDirectory());
+        $this->assertSame(__DIR__, $result->process()->path());
     }
 
     public function testForever()
@@ -432,7 +432,7 @@ class ProcessTest extends TestCase
 
         $result = $this->factory->forever()->run($this->ls());
 
-        $this->assertNull($result->process()->getTimeout());
+        $this->assertNull($result->process()->timeout());
     }
 
     public function testRunning()
