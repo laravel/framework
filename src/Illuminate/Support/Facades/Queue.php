@@ -55,18 +55,24 @@ class Queue extends Facade
     }
 
     /**
-     * Replace the bound instance with a fake.
+     * Execute all the jobs run during the callback in a clean application.
      *
-     * @param  array|string  $jobsToFake
+     * @param  array|string  $jobsToRunAsynchronously
      * @return \Illuminate\Support\Testing\Fakes\AsyncQueueFake
      */
-    public static function async(Closure $callback, $jobsToRunAsynchronously = [])
+    public static function fakeAsync(Closure $callback, $jobsToRunAsynchronously = [])
     {
+        $instance = static::getFacadeRoot();
+
         static::swap($fake = new AsyncQueueFake(static::getFacadeApplication(), $jobsToRunAsynchronously, static::getFacadeRoot()));
 
         $callback();
 
-        return $fake->dispatch();
+        $fake->dispatch();
+
+        static::swap($instance);
+
+        return $fake;
     }
 
     /**
