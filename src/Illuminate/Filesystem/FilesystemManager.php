@@ -204,17 +204,17 @@ class FilesystemManager implements FactoryContract
     }
 
     /**
-     * @param array $config
+     * @param  array  $config
      * @return \Illuminate\Contracts\Filesystem\Filesystem
      */
     public function createScopedDriver(array $config)
     {
         if (empty($config['disk'])) {
-            throw new InvalidArgumentException("Missing disk for scoped driver.");
+            throw new InvalidArgumentException('Missing disk for scoped driver.');
         }
 
         if (empty($config['prefix'])) {
-            throw new InvalidArgumentException("Prefix is missing for scoped driver.");
+            throw new InvalidArgumentException('Prefix is missing for scoped driver.');
         }
 
         $diskConfig = $this->getConfig($config['disk']);
