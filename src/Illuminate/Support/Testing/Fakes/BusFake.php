@@ -29,6 +29,13 @@ class BusFake implements QueueingDispatcher
     protected $jobsToFake;
 
     /**
+     * The fake repository to track batched jobs.
+     *
+     * @var \Illuminate\Bus\BatchRepository
+     */
+    protected $batchRepository;
+
+    /**
      * The commands that have been dispatched.
      *
      * @var array
@@ -66,8 +73,8 @@ class BusFake implements QueueingDispatcher
     public function __construct(QueueingDispatcher $dispatcher, $jobsToFake = [])
     {
         $this->dispatcher = $dispatcher;
-
         $this->jobsToFake = Arr::wrap($jobsToFake);
+        $this->batchRepository = new BatchRepositoryFake;
     }
 
     /**
@@ -634,7 +641,7 @@ class BusFake implements QueueingDispatcher
      */
     public function findBatch(string $batchId)
     {
-        //
+        return $this->batchRepository->find($batchId);
     }
 
     /**
@@ -658,7 +665,7 @@ class BusFake implements QueueingDispatcher
     {
         $this->batches[] = $pendingBatch;
 
-        return (new BatchRepositoryFake)->store($pendingBatch);
+        return $this->batchRepository->store($pendingBatch);
     }
 
     /**
