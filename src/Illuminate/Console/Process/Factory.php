@@ -191,11 +191,11 @@ class Factory
      * Send a pool of processes concurrently.
      *
      * @param  callable(\Illuminate\Console\Process\Pool): iterable<array-key, \Illuminate\Console\Contracts\ProcessResult>  $callback
-     * @return array<array-key, \Illuminate\Console\Contracts\ProcessResult>
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Console\Contracts\ProcessResult>
      */
     public function pool($callback)
     {
-        return collect($callback(new Pool($this)))->each(function ($result) {
+        return collect($callback(new Pool($this)))->values()->each(function ($result) {
             if (! $result instanceof ProcessResult) {
                 throw new ProcessInPoolNotStartedException('One or more processes added to the pool have not been started. Did you forget to call "run"?');
             }

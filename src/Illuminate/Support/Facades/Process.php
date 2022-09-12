@@ -12,7 +12,7 @@ use Illuminate\Console\Process\Factory;
  * @method static \Illuminate\Console\Process\PendingProcess dd()
  * @method static \Illuminate\Console\Process\PendingProcess dump()
  * @method static \Illuminate\Console\Process\PendingProcess forever()
- * @method static \Illuminate\Console\Process\PendingProcess output(callable)
+ * @method static \Illuminate\Console\Process\PendingProcess output(callable $output)
  * @method static \Illuminate\Console\Process\PendingProcess path(string $path)
  * @method static \Illuminate\Console\Process\PendingProcess timeout(float|null $seconds)
  * @method static \Illuminate\Console\Process\Factory assertRan(callable|string $command)

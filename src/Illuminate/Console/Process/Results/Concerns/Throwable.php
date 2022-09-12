@@ -14,8 +14,6 @@ trait Throwable
      */
     public function throw($callback = null)
     {
-        $this->wait();
-
         if ($this->failed()) {
             $exception = new ProcessFailedException($this);
 
