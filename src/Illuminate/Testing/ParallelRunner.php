@@ -2,24 +2,18 @@
 
 namespace Illuminate\Testing;
 
-use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\ParallelTesting;
+use Illuminate\Testing\Concerns\CreatesApplication;
 use ParaTest\Runners\PHPUnit\Options;
 use ParaTest\Runners\PHPUnit\RunnerInterface;
 use ParaTest\Runners\PHPUnit\WrapperRunner;
 use PHPUnit\TextUI\XmlConfiguration\PhpHandler;
-use RuntimeException;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class ParallelRunner implements RunnerInterface
 {
-    /**
-     * The application resolver callback.
-     *
-     * @var \Closure|null
-     */
-    protected static $applicationResolver;
+    use CreatesApplication;
 
     /**
      * The runner resolver callback.
@@ -69,17 +63,6 @@ class ParallelRunner implements RunnerInterface
         };
 
         $this->runner = $runnerResolver($options, $output);
-    }
-
-    /**
-     * Set the application resolver callback.
-     *
-     * @param  \Closure|null  $resolver
-     * @return void
-     */
-    public static function resolveApplicationUsing($resolver)
-    {
-        static::$applicationResolver = $resolver;
     }
 
     /**
@@ -140,36 +123,5 @@ class ParallelRunner implements RunnerInterface
                 $callback($app);
             })->flush();
         });
-    }
-
-    /**
-     * Creates the application.
-     *
-     * @return \Illuminate\Contracts\Foundation\Application
-     *
-     * @throws \RuntimeException
-     */
-    protected function createApplication()
-    {
-        $applicationResolver = static::$applicationResolver ?: function () {
-            if (trait_exists(\Tests\CreatesApplication::class)) {
-                $applicationCreator = new class
-                {
-                    use \Tests\CreatesApplication;
-                };
-
-                return $applicationCreator->createApplication();
-            } elseif (file_exists(getcwd().'/bootstrap/app.php')) {
-                $app = require getcwd().'/bootstrap/app.php';
-
-                $app->make(Kernel::class)->bootstrap();
-
-                return $app;
-            }
-
-            throw new RuntimeException('Parallel Runner unable to resolve application.');
-        };
-
-        return $applicationResolver();
     }
 }

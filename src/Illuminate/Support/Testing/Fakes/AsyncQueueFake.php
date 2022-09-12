@@ -2,14 +2,16 @@
 
 namespace Illuminate\Support\Testing\Fakes;
 
-use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Testing\Concerns\CreatesApplication;
 use RuntimeException;
 
 class AsyncQueueFake extends QueueFake
 {
+    use CreatesApplication;
+
     /**
      * Process all of the jobs on the queue using a fresh application instance.
      *
@@ -41,20 +43,15 @@ class AsyncQueueFake extends QueueFake
      */
     protected function refreshApplication()
     {
-        if (file_exists(getcwd().'/bootstrap/app.php')) {
-            $db = app('db');
-            $queue = app('queue');
+        $db = app('db');
+        $queue = app('queue');
 
-            $app = require getcwd().'/bootstrap/app.php';
-            $app->make(Kernel::class)->bootstrap();
+        $app = $this->createApplication();
 
-            Queue::swap($queue);
-            DB::swap($db);
-            Model::setConnectionResolver($db);
+        Queue::swap($queue);
+        DB::swap($db);
+        Model::setConnectionResolver($db);
 
-            return $app;
-        }
-
-        throw new RuntimeException('Unable to resolve application.');
+        return $app;
     }
 }
