@@ -41,12 +41,6 @@ class TimestampType extends Type implements PhpDateTimeMappingType
             $columnType = 'TIMESTAMP('.$fieldDeclaration['precision'].')';
         }
 
-        $notNull = $fieldDeclaration['notnull'] ?? false;
-
-        if (! $notNull) {
-            return $columnType.' NULL';
-        }
-
         return $columnType;
     }
 
