@@ -147,4 +147,14 @@ class BatchFake extends Batch
     {
         $this->deleted = true;
     }
+
+    /**
+     * Determine if the batch has been deleted.
+     *
+     * @return bool
+     */
+    public function deleted()
+    {
+        return $this->deleted;
+    }
 }
