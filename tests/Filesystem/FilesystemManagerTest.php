@@ -73,26 +73,29 @@ class FilesystemManagerTest extends TestCase
 
     public function testCanBuildScopedDisks()
     {
-        $filesystem = new FilesystemManager(tap(new Application, function ($app) {
-            $app['config'] = [
-                'filesystems.disks.local' => [
-                    'driver' => 'local',
-                    'root' => 'to-be-scoped',
-                ],
-            ];
-        }));
+        try {
+            $filesystem = new FilesystemManager(tap(new Application, function ($app) {
+                $app['config'] = [
+                    'filesystems.disks.local' => [
+                        'driver' => 'local',
+                        'root' => 'to-be-scoped',
+                    ],
+                ];
+            }));
 
-        $local = $filesystem->disk('local');
-        $scoped = $filesystem->build([
-            'driver' => 'scoped',
-            'disk' => 'local',
-            'prefix' => 'path-prefix',
-        ]);
+            $local = $filesystem->disk('local');
+            $scoped = $filesystem->build([
+                'driver' => 'scoped',
+                'disk' => 'local',
+                'prefix' => 'path-prefix',
+            ]);
 
-        $scoped->put('dirname/filename.txt', 'file content');
-        $this->assertEquals('file content', $local->get('path-prefix/dirname/filename.txt'));
-        $local->deleteDirectory('path-prefix');
+            $scoped->put('dirname/filename.txt', 'file content');
+            $this->assertEquals('file content', $local->get('path-prefix/dirname/filename.txt'));
+            $local->deleteDirectory('path-prefix');
+        } finally {
+            rmdir(__DIR__.'/../../to-be-scoped');
+        }
 
-        rmdir(__DIR__.'/../../to-be-scoped');
     }
 }

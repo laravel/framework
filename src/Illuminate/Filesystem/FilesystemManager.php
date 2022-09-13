@@ -204,26 +204,6 @@ class FilesystemManager implements FactoryContract
     }
 
     /**
-     * @param  array  $config
-     * @return \Illuminate\Contracts\Filesystem\Filesystem
-     */
-    public function createScopedDriver(array $config)
-    {
-        if (empty($config['disk'])) {
-            throw new InvalidArgumentException('Missing disk for scoped driver.');
-        }
-
-        if (empty($config['prefix'])) {
-            throw new InvalidArgumentException('Prefix is missing for scoped driver.');
-        }
-
-        $diskConfig = $this->getConfig($config['disk']);
-        $diskConfig['prefix'] = $config['prefix'];
-
-        return $this->build($diskConfig);
-    }
-
-    /**
      * Create an instance of the sftp driver.
      *
      * @param  array  $config
@@ -286,6 +266,26 @@ class FilesystemManager implements FactoryContract
         }
 
         return $config;
+    }
+
+    /**
+     * Create a scoped driver.
+     *
+     * @param  array  $config
+     * @return \Illuminate\Contracts\Filesystem\Filesystem
+     */
+    public function createScopedDriver(array $config)
+    {
+        if (empty($config['disk'])) {
+            throw new InvalidArgumentException('Scoped disk is missing "disk" configuration option.');
+        } elseif (empty($config['prefix'])) {
+            throw new InvalidArgumentException('Scoped disk is missing "prefix" configuration option.');
+        }
+
+        return $this->build(tap(
+            $this->getConfig($config['disk']),
+            fn (&$parent) => $parent['prefix'] = $config['prefix']
+        ));
     }
 
     /**
