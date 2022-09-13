@@ -58,4 +58,19 @@ class BelongsToManyRelationship
             );
         });
     }
+
+    /**
+     * Specify the model instances to always use when creating relationships.
+     *
+     * @param  \Illuminate\Support\Collection  $recycle
+     * @return $this
+     */
+    public function recycle($recycle)
+    {
+        if ($this->factory instanceof Factory) {
+            $this->factory = $this->factory->recycle($recycle);
+        }
+
+        return $this;
+    }
 }
