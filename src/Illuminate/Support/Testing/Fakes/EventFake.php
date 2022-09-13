@@ -329,7 +329,6 @@ class EventFake implements Dispatcher
             ->isNotEmpty();
     }
 
-
     /**
      * Remove a set of listeners from the dispatcher.
      *
