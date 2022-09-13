@@ -99,6 +99,7 @@ class RuleMakeCommand extends GeneratorCommand
     protected function getOptions()
     {
         return [
+            ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the rule already exists'],
             ['implicit', 'i', InputOption::VALUE_NONE, 'Generate an implicit rule'],
             ['invokable', null, InputOption::VALUE_NONE, 'Generate a single method, invokable rule class'],
         ];
