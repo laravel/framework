@@ -97,7 +97,8 @@
         "phpstan/phpstan": "^1.4.7",
         "phpunit/phpunit": "^9.5.8",
         "predis/predis": "^1.1.9|^2.0",
-        "symfony/cache": "^6.0"
+        "symfony/cache": "^6.0",
+        "symfony/uid": "^6.0"
     },
     "provide": {
         "psr/container-implementation": "1.1|2.0",
@@ -168,7 +169,8 @@
         "symfony/http-client": "Required to enable support for the Symfony API mail transports (^6.0).",
         "symfony/mailgun-mailer": "Required to enable support for the Mailgun mail transport (^6.0).",
         "symfony/postmark-mailer": "Required to enable support for the Postmark mail transport (^6.0).",
-        "symfony/psr-http-message-bridge": "Required to use PSR-7 bridging features (^2.0)."
+        "symfony/psr-http-message-bridge": "Required to use PSR-7 bridging features (^2.0).",
+        "symfony/uid": "Required to generate ULIDs for Eloquent (^6.0)."
     },
     "config": {
         "sort-packages": true,
