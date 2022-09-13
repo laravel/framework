@@ -1,6 +1,23 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.29.0...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.30.0...9.x)
+
+
+## [v9.30.0](https://github.com/laravel/framework/compare/v9.29.0...v9.30.0) - 2022-09-13
+
+### Added
+- Added stop_buffering config option to logger ([#44071](https://github.com/laravel/framework/pull/44071))
+- Added read-only filesystem adapter decoration as a config option ([#44079](https://github.com/laravel/framework/pull/44079))
+- Added scoped filesystem driver ([#44105](https://github.com/laravel/framework/pull/44105))
+- Add force option to all make commands ([#44100](https://github.com/laravel/framework/pull/44100))
+
+### Fixed
+- Fixed QueryBuilder whereNot with array conditions ([#44083](https://github.com/laravel/framework/pull/44083))
+
+### Changed
+- Passing event into viaQueue and viaConnection of Queued Listener ([#44080](https://github.com/laravel/framework/pull/44080))
+- Improve testability of batched jobs ([#44075](https://github.com/laravel/framework/pull/44075))
+- Allow any kind of whitespace in cron expression ([#44110](https://github.com/laravel/framework/pull/44110))
 
 
 ## [v9.29.0](https://github.com/laravel/framework/compare/v9.28.0...v9.29.0) - 2022-09-09
