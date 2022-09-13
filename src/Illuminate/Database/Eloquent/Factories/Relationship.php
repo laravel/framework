@@ -36,13 +36,6 @@ class Relationship
         $this->relationship = $relationship;
     }
 
-    public function using($using)
-    {
-        $this->factory = $this->factory->using($using);
-
-        return $this;
-    }
-
     /**
      * Create the child relationship for the given parent model.
      *
@@ -65,5 +58,18 @@ class Relationship
         } elseif ($relationship instanceof BelongsToMany) {
             $relationship->attach($this->factory->create([], $parent));
         }
+    }
+
+    /**
+     * Specify the model instances to always use when creating relationships.
+     *
+     * @param  \Illuminate\Support\Collection  $using
+     * @return $this
+     */
+    public function using($using)
+    {
+        $this->factory = $this->factory->using($using);
+
+        return $this;
     }
 }

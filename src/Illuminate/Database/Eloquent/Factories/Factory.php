@@ -64,9 +64,9 @@ abstract class Factory
     protected $for;
 
     /**
-     * The model instances to use instead of any nested factories.
+     * The model instances to always use when creating relationships.
      *
-     * @var \Illuminate\Support\Collection
+     * @var  \Illuminate\Support\Collection
      */
     protected $using;
 
@@ -129,6 +129,7 @@ abstract class Factory
      * @param  \Illuminate\Support\Collection|null  $afterMaking
      * @param  \Illuminate\Support\Collection|null  $afterCreating
      * @param  string|null  $connection
+     * @param  \Illuminate\Support\Collection|null  $using
      * @return void
      */
     public function __construct($count = null,
@@ -463,11 +464,9 @@ abstract class Factory
         return collect($definition)
             ->map($evaluateRelations = function ($attribute) {
                 if ($attribute instanceof self) {
-                    if ($this->using->has($attribute->modelName())) {
-                        $attribute = $this->using->get($attribute->modelName());
-                    } else {
-                        $attribute = $attribute->using($this->using)->create()->getKey();
-                    }
+                    $attribute = $this->using->has($attribute->modelName())
+                            ? $this->using->get($attribute->modelName())
+                            : $attribute->using($this->using)->create()->getKey();
                 } elseif ($attribute instanceof Model) {
                     $attribute = $attribute->getKey();
                 }
@@ -620,7 +619,7 @@ abstract class Factory
     }
 
     /**
-     * Provide a model instance to use instead of any nested factory calls.
+     * Provide a model instance to use instead of any nested factory calls when creating relationships.
      *
      * @param  \Illuminate\Eloquent\Model|\Illuminate\Support\Collection|array  $model
      * @return static

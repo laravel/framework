@@ -41,15 +41,6 @@ class BelongsToRelationship
         $this->relationship = $relationship;
     }
 
-    public function using($using)
-    {
-        if ($this->factory instanceof Factory) {
-            $this->factory = $this->factory->using($using);
-        }
-
-        return $this;
-    }
-
     /**
      * Get the parent model attributes and resolvers for the given child model.
      *
@@ -85,5 +76,20 @@ class BelongsToRelationship
 
             return $this->resolved;
         };
+    }
+
+    /**
+     * Specify the model instances to always use when creating relationships.
+     *
+     * @param  \Illuminate\Support\Collection  $using
+     * @return $this
+     */
+    public function using($using)
+    {
+        if ($this->factory instanceof Factory) {
+            $this->factory = $this->factory->using($using);
+        }
+
+        return $this;
     }
 }

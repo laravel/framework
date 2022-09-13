@@ -43,15 +43,6 @@ class BelongsToManyRelationship
         $this->relationship = $relationship;
     }
 
-    public function using($using)
-    {
-        if ($this->factory instanceof Factory) {
-            $this->factory = $this->factory->using($using);
-        }
-
-        return $this;
-    }
-
     /**
      * Create the attached relationship for the given model.
      *
@@ -66,5 +57,20 @@ class BelongsToManyRelationship
                 is_callable($this->pivot) ? call_user_func($this->pivot, $model) : $this->pivot
             );
         });
+    }
+
+    /**
+     * Specify the model instances to always use when creating relationships.
+     *
+     * @param  \Illuminate\Support\Collection  $using
+     * @return $this
+     */
+    public function using($using)
+    {
+        if ($this->factory instanceof Factory) {
+            $this->factory = $this->factory->using($using);
+        }
+
+        return $this;
     }
 }
