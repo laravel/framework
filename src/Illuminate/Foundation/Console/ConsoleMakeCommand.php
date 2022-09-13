@@ -104,8 +104,8 @@ class ConsoleMakeCommand extends GeneratorCommand
     protected function getOptions()
     {
         return [
-            ['command', null, InputOption::VALUE_OPTIONAL, 'The terminal command that should be assigned', 'command:name'],
             ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the console command already exists'],
+            ['command', null, InputOption::VALUE_OPTIONAL, 'The terminal command that should be assigned', 'command:name'],
         ];
     }
 }
