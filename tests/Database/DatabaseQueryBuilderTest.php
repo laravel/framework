@@ -29,6 +29,8 @@ use stdClass;
 
 class DatabaseQueryBuilderTest extends TestCase
 {
+    protected $called;
+
     protected function tearDown(): void
     {
         m::close();
@@ -1744,6 +1746,24 @@ class DatabaseQueryBuilderTest extends TestCase
         });
         $this->assertSame('select * from "users" where "name" = ? or not ("email" = ?)', $builder->toSql());
         $this->assertEquals([0 => 'bar', 1 => 'foo'], $builder->getBindings());
+    }
+
+    public function testWhereNotWithArrayConditions()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereNot([['foo', 1], ['bar', 2]]);
+        $this->assertSame('select * from "users" where not (("foo" = ? and "bar" = ?))', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereNot(['foo' => 1, 'bar' => 2]);
+        $this->assertSame('select * from "users" where not (("foo" = ? and "bar" = ?))', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereNot([['foo', 1], ['bar', '<', 2]]);
+        $this->assertSame('select * from "users" where not (("foo" = ? and "bar" < ?))', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
     }
 
     public function testFullSubSelects()

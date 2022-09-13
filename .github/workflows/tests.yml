@@ -2,6 +2,9 @@ name: tests
 
 on:
   push:
+    branches:
+      - master
+      - '*.x'
   pull_request:
   schedule:
     - cron: '0 0 * * *'
@@ -38,6 +41,9 @@ jobs:
       matrix:
         php: [8.1]
         stability: [prefer-lowest, prefer-stable]
+        include:
+          - php: 8.2
+            stability: prefer-stable --ignore-platform-req=php+
 
     name: PHP ${{ matrix.php }} - ${{ matrix.stability }}
 
@@ -98,6 +104,9 @@ jobs:
       matrix:
         php: [8.1]
         stability: [prefer-lowest, prefer-stable]
+        include:
+          - php: 8.2
+            stability: prefer-stable --ignore-platform-req=php+
 
     name: PHP ${{ matrix.php }} - ${{ matrix.stability }} - Windows
 

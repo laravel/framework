@@ -487,6 +487,67 @@ class LogManagerTest extends TestCase
         $this->assertEquals(Level::Debug, $expectedStreamHandler->getLevel());
     }
 
+    public function testFingersCrossedHandlerStopsRecordBufferingAfterFirstFlushByDefault()
+    {
+        $config = $this->app['config'];
+
+        $config->set('logging.channels.fingerscrossed', [
+            'driver' => 'monolog',
+            'handler' => StreamHandler::class,
+            'level' => 'debug',
+            'action_level' => 'critical',
+            'with' => [
+                'stream' => 'php://stderr',
+                'bubble' => false,
+            ],
+        ]);
+
+        $manager = new LogManager($this->app);
+
+        // create logger with handler specified from configuration
+        $logger = $manager->channel('fingerscrossed');
+        $handlers = $logger->getLogger()->getHandlers();
+
+        $expectedFingersCrossedHandler = $handlers[0];
+
+        $stopBufferingProp = new ReflectionProperty(get_class($expectedFingersCrossedHandler), 'stopBuffering');
+        $stopBufferingProp->setAccessible(true);
+        $stopBufferingValue = $stopBufferingProp->getValue($expectedFingersCrossedHandler);
+
+        $this->assertTrue($stopBufferingValue);
+    }
+
+    public function testFingersCrossedHandlerCanBeConfiguredToResumeBufferingAfterFlushing()
+    {
+        $config = $this->app['config'];
+
+        $config->set('logging.channels.fingerscrossed', [
+            'driver' => 'monolog',
+            'handler' => StreamHandler::class,
+            'level' => 'debug',
+            'action_level' => 'critical',
+            'stop_buffering' => false,
+            'with' => [
+                'stream' => 'php://stderr',
+                'bubble' => false,
+            ],
+        ]);
+
+        $manager = new LogManager($this->app);
+
+        // create logger with handler specified from configuration
+        $logger = $manager->channel('fingerscrossed');
+        $handlers = $logger->getLogger()->getHandlers();
+
+        $expectedFingersCrossedHandler = $handlers[0];
+
+        $stopBufferingProp = new ReflectionProperty(get_class($expectedFingersCrossedHandler), 'stopBuffering');
+        $stopBufferingProp->setAccessible(true);
+        $stopBufferingValue = $stopBufferingProp->getValue($expectedFingersCrossedHandler);
+
+        $this->assertFalse($stopBufferingValue);
+    }
+
     public function testItSharesContextWithAlreadyResolvedChannels()
     {
         $manager = new LogManager($this->app);

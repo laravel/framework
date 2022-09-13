@@ -61,9 +61,11 @@ class DatabaseSoftDeletingTraitTest extends TestCase
 class DatabaseSoftDeletingTraitStub
 {
     use SoftDeletes;
+
     public $deleted_at;
     public $updated_at;
     public $timestamps = true;
+    public $exists = false;
 
     public function newQuery()
     {
