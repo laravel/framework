@@ -66,7 +66,7 @@ abstract class Factory
     /**
      * The model instances to always use when creating relationships.
      *
-     * @var  \Illuminate\Support\Collection
+     * @var \Illuminate\Support\Collection
      */
     protected $using;
 
