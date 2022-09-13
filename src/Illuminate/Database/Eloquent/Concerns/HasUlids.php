@@ -4,30 +4,42 @@ namespace Illuminate\Database\Eloquent\Concerns;
 
 use Illuminate\Support\Str;
 
-trait HasUuidPrimaryKey
+trait HasUlids
 {
     /**
-     * Generate a primary UUID for the model.
+     * Boot the trait.
      *
      * @return void
      */
-    public static function bootHasUuidPrimaryKey()
+    public static function bootHasUlids()
     {
         static::creating(function (self $model) {
-            if (empty($model->{$model->getKeyName()})) {
-                $model->{$model->getKeyName()} = $model->generatePrimaryKey();
+            foreach ($model->uniqueIds() as $column) {
+                if (empty($model->{$column})) {
+                    $model->{$column} = $model->newUniqueId();
+                }
             }
         });
     }
 
     /**
-     * Generate the primary UUID key for the model.
+     * Generate a new ULID for the model.
      *
      * @return string
      */
-    public function generatePrimaryKey()
+    public function newUniqueId()
     {
-        return (string) Str::orderedUuid();
+        return strtolower((string) Str::ulid());
+    }
+
+    /**
+     * Get the columns that should receive a unique identifier.
+     *
+     * @return array
+     */
+    public function uniqueIds()
+    {
+        return [$this->getKeyName()];
     }
 
     /**

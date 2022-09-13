@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Illuminate\Database\Eloquent\Concerns\HasUuidPrimaryKey;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -28,7 +28,7 @@ class EloquentUuidPrimaryKeyTest extends DatabaseTestCase
 
 class UserWithUuidPrimaryKey extends Eloquent
 {
-    use HasUuidPrimaryKey;
+    use HasUuids;
 
     protected $table = 'users';
 

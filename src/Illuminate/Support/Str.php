@@ -411,21 +411,6 @@ class Str
     }
 
     /**
-     * Determine if a given string is a valid ULID.
-     *
-     * @param  string  $value
-     * @return bool
-     */
-    public static function isUlid($value)
-    {
-        if (! is_string($value)) {
-            return false;
-        }
-
-        return Ulid::isValid($value);
-    }
-
-    /**
      * Determine if a given string is a valid UUID.
      *
      * @param  string  $value
@@ -438,6 +423,21 @@ class Str
         }
 
         return preg_match('/^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/iD', $value) > 0;
+    }
+
+    /**
+     * Determine if a given string is a valid ULID.
+     *
+     * @param  string  $value
+     * @return bool
+     */
+    public static function isUlid($value)
+    {
+        if (! is_string($value)) {
+            return false;
+        }
+
+        return Ulid::isValid($value);
     }
 
     /**
@@ -1323,7 +1323,7 @@ class Str
     }
 
     /**
-     * Generate a UILID.
+     * Generate a ULID.
      *
      * @return \Symfony\Component\Uid\Ulid
      */
