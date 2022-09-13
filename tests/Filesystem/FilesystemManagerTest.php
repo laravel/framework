@@ -96,6 +96,5 @@ class FilesystemManagerTest extends TestCase
         } finally {
             rmdir(__DIR__.'/../../to-be-scoped');
         }
-
     }
 }
