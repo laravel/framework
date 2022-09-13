@@ -329,7 +329,7 @@ class SupportTestingQueueFakeTest extends TestCase
         }
     }
 
-    public function testItDoesntFakeJobsViaPassedOnExcept()
+    public function testItDoesntFakeJobsPassedViaExcept()
     {
         $job = new JobStub;
 
