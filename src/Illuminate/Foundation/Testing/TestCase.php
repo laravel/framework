@@ -271,7 +271,7 @@ abstract class TestCase extends BaseTestCase
     /**
      * This method is called when a test method did not execute successfully.
      *
-     * @param  Throwable  $exception
+     * @param  \Throwable  $exception
      * @return void
      */
     protected function onNotSuccessfulTest(Throwable $exception): void
@@ -312,9 +312,9 @@ abstract class TestCase extends BaseTestCase
     /**
      * Append an exception to the message of another exception.
      *
-     * @param  Throwable  $exceptionToAppend
-     * @param  Throwable  $exception
-     * @return Throwable
+     * @param  \Throwable  $exceptionToAppend
+     * @param  \Throwable  $exception
+     * @return \Throwable
      */
     protected function appendExceptionToException($exceptionToAppend, $exception)
     {
@@ -337,9 +337,9 @@ abstract class TestCase extends BaseTestCase
      * Append errors to an exception message.
      *
      * @param  array  $errors
-     * @param  Throwable  $exception
+     * @param  \Throwable  $exception
      * @param  bool  $json
-     * @return Throwable
+     * @return \Throwable
      */
     protected function appendErrorsToException($errors, $exception, $json = false)
     {
@@ -365,8 +365,8 @@ abstract class TestCase extends BaseTestCase
      * Append a message to an exception.
      *
      * @param  string  $message
-     * @param  Throwable  $exception
-     * @return Throwable
+     * @param  \Throwable  $exception
+     * @return \Throwable
      */
     protected function appendMessageToException($message, $exception)
     {
