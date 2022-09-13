@@ -177,11 +177,11 @@ class Stringable implements JsonSerializable
     /**
      * Determine if a given string contains all array values.
      *
-     * @param  iterable<string>  $needles
+     * @param  string|iterable<string>  $needles
      * @param  bool  $ignoreCase
      * @return bool
      */
-    public function containsAll(array $needles, $ignoreCase = false)
+    public function containsAll($needles, $ignoreCase = false)
     {
         return Str::containsAll($this->value, $needles, $ignoreCase);
     }
