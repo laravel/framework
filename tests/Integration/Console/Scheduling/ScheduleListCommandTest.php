@@ -47,7 +47,7 @@ class ScheduleListCommandTest extends TestCase
             ->expectsOutput('  0 14,18 * *      *  php artisan inspire ........ Next Due: 14 hours from now')
             ->expectsOutput('  * *     * *      *  php artisan foobar a='.ProcessUtils::escapeArgument('b').' ... Next Due: 1 minute from now')
             ->expectsOutput('  * *     * *      *  Illuminate\Tests\Integration\Console\Scheduling\FooJob  Next Due: 1 minute from now')
-            ->expectsOutput('  0 9,17  * *      *  php artisan inspire ........ Next Due: 9 hours from now')
+            ->expectsOutput('  0 9,17  * *      *  php artisan inspire ......... Next Due: 9 hours from now')
             ->expectsOutput('  0 10    * *      *  php artisan inspire ........ Next Due: 10 hours from now')
             ->expectsOutput('  * *     * *      *  Closure at: '.$closureFilePath.':'.$closureLineNumber.'  Next Due: 1 minute from now');
     }
