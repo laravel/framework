@@ -88,27 +88,6 @@ class SchemaBuilderTest extends DatabaseTestCase
         $this->assertSame('tinyinteger', Schema::getColumnType('test', 'test_column'));
     }
 
-    public function testChangeToBinaryColumn()
-    {
-        if ($this->driver !== 'mysql') {
-            $this->markTestSkipped('Test requires a MySQL connection.');
-        }
-
-        Schema::create('test', function (Blueprint $table) {
-            $table->integer('test_column');
-        });
-
-        $blueprint = new Blueprint('test', function ($table) {
-            $table->binary('test_column')->change();
-        });
-
-        $queries = $blueprint->toSql($this->getConnection(), $this->getConnection()->getSchemaGrammar());
-
-        $expected = ['ALTER TABLE test CHANGE test_column test_column BLOB NOT NULL'];
-
-        $this->assertEquals($expected, $queries);
-    }
-
     public function testChangeToTextColumn()
     {
         if ($this->driver !== 'mysql') {

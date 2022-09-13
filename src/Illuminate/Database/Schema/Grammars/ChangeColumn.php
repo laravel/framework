@@ -125,10 +125,6 @@ class ChangeColumn
             $options['length'] = static::calculateDoctrineTextLength($fluent['type']);
         }
 
-        if ($fluent['type'] === 'binary') {
-            $options['length'] = 65535;
-        }
-
         if ($fluent['type'] === 'char') {
             $options['fixed'] = true;
         }
