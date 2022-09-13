@@ -430,7 +430,7 @@ class SupportTestingBusFakeTest extends TestCase
         $dispatcher->shouldReceive('dispatch')->never()->with($thirdJob);
         $dispatcher->shouldReceive('dispatchNow')->never()->with($thirdJob, null);
 
-        $fake = new BusFake($dispatcher, [], OtherBusJobStub::class);
+        $fake = (new BusFake($dispatcher))->except(OtherBusJobStub::class);
 
         $fake->dispatch($job);
         $fake->dispatchNow($job);

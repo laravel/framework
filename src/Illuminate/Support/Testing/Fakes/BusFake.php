@@ -40,7 +40,7 @@ class BusFake implements QueueingDispatcher
      *
      * @var array
      */
-    protected $jobsToDispatch;
+    protected $jobsToDispatch = [];
 
     /**
      * The commands that have been dispatched.
@@ -77,11 +77,10 @@ class BusFake implements QueueingDispatcher
      * @param  array|string  $jobsToFake
      * @return void
      */
-    public function __construct(QueueingDispatcher $dispatcher, $jobsToFake = [], $jobsToDispatch = [])
+    public function __construct(QueueingDispatcher $dispatcher, $jobsToFake = [])
     {
         $this->dispatcher = $dispatcher;
         $this->jobsToFake = Arr::wrap($jobsToFake);
-        $this->jobsToDispatch = Arr::wrap($jobsToDispatch);
         $this->batchRepository = new BatchRepositoryFake;
     }
 
@@ -626,6 +625,19 @@ class BusFake implements QueueingDispatcher
         } else {
             return $this->dispatcher->dispatch($command);
         }
+    }
+
+    /**
+     * Set the jobs that should be dispatched instead of intercepted.
+     *
+     * @param  array|string  $jobsToDispatch
+     * @return void
+     */
+    public function except($jobsToDispatch)
+    {
+        $this->jobsToDispatch = array_merge($this->jobsToDispatch, Arr::wrap($jobsToDispatch));
+
+        return $this;
     }
 
     /**
