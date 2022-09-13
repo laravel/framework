@@ -36,6 +36,13 @@ class Relationship
         $this->relationship = $relationship;
     }
 
+    public function using($using)
+    {
+        $this->factory = $this->factory->using($using);
+
+        return $this;
+    }
+
     /**
      * Create the child relationship for the given parent model.
      *

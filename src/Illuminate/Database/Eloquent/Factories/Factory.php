@@ -64,6 +64,13 @@ abstract class Factory
     protected $for;
 
     /**
+     * The model instances to use instead of any nested factories.
+     *
+     * @var \Illuminate\Support\Collection
+     */
+    protected $using;
+
+    /**
      * The "after making" callbacks that will be applied to the model.
      *
      * @var \Illuminate\Support\Collection
@@ -130,7 +137,8 @@ abstract class Factory
                                 ?Collection $for = null,
                                 ?Collection $afterMaking = null,
                                 ?Collection $afterCreating = null,
-                                $connection = null)
+                                $connection = null,
+                                ?Collection $using = null)
     {
         $this->count = $count;
         $this->states = $states ?? new Collection;
@@ -139,6 +147,7 @@ abstract class Factory
         $this->afterMaking = $afterMaking ?? new Collection;
         $this->afterCreating = $afterCreating ?? new Collection;
         $this->connection = $connection;
+        $this->using = $using ?? new Collection;
         $this->faker = $this->withFaker();
     }
 
@@ -332,7 +341,7 @@ abstract class Factory
     {
         Model::unguarded(function () use ($model) {
             $this->has->each(function ($has) use ($model) {
-                $has->createFor($model);
+                $has->using($this->using)->createFor($model);
             });
         });
     }
@@ -439,7 +448,7 @@ abstract class Factory
         $model = $this->newModel();
 
         return $this->for->map(function (BelongsToRelationship $for) use ($model) {
-            return $for->attributesFor($model);
+            return $for->using($this->using)->attributesFor($model);
         })->collapse()->all();
     }
 
@@ -454,7 +463,11 @@ abstract class Factory
         return collect($definition)
             ->map($evaluateRelations = function ($attribute) {
                 if ($attribute instanceof self) {
-                    $attribute = $attribute->create()->getKey();
+                    if ($this->using->has($attribute->modelName())) {
+                        $attribute = $this->using->get($attribute->modelName());
+                    } else {
+                        $attribute = $attribute->using($this->using)->create()->getKey();
+                    }
                 } elseif ($attribute instanceof Model) {
                     $attribute = $attribute->getKey();
                 }
@@ -607,6 +620,22 @@ abstract class Factory
     }
 
     /**
+     * Provide a model instance to use instead of any nested factory calls.
+     *
+     * @param  \Illuminate\Eloquent\Model|\Illuminate\Support\Collection|array  $model
+     * @return static
+     */
+    public function using($model)
+    {
+        return $this->newInstance([
+            'using' => $this->using->merge(
+                Collection::wrap($model instanceof Model ? func_get_args() : $model)
+                    ->keyBy(fn ($model) => get_class($model))
+            ),
+        ]);
+    }
+
+    /**
      * Add a new "after making" callback to the model definition.
      *
      * @param  \Closure(\Illuminate\Database\Eloquent\Model|TModel): mixed  $callback
@@ -697,6 +726,7 @@ abstract class Factory
             'afterMaking' => $this->afterMaking,
             'afterCreating' => $this->afterCreating,
             'connection' => $this->connection,
+            'using' => $this->using,
         ], $arguments)));
     }
 

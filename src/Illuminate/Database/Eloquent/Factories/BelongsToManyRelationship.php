@@ -43,6 +43,15 @@ class BelongsToManyRelationship
         $this->relationship = $relationship;
     }
 
+    public function using($using)
+    {
+        if ($this->factory instanceof Factory) {
+            $this->factory = $this->factory->using($using);
+        }
+
+        return $this;
+    }
+
     /**
      * Create the attached relationship for the given model.
      *
