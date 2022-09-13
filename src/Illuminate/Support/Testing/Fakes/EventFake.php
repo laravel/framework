@@ -26,7 +26,7 @@ class EventFake implements Dispatcher
      *
      * @var array
      */
-    protected $eventsToFake;
+    protected $eventsToFake = [];
 
     /**
      * The event types that should be dispatched instead of intercepted.
@@ -54,6 +54,22 @@ class EventFake implements Dispatcher
         $this->dispatcher = $dispatcher;
 
         $this->eventsToFake = Arr::wrap($eventsToFake);
+    }
+
+    /**
+     * Specify the events that should be dispatched instead of faked.
+     *
+     * @param  array|string  $eventsToDispatch
+     * @return $this
+     */
+    public function except($eventsToDispatch)
+    {
+        $this->eventsToDispatch = array_merge(
+            $this->eventsToDispatch,
+            Arr::wrap($eventsToDispatch)
+        );
+
+        return $this;
     }
 
     /**
@@ -360,18 +376,5 @@ class EventFake implements Dispatcher
     public function until($event, $payload = [])
     {
         return $this->dispatch($event, $payload, true);
-    }
-
-    /**
-     * Specify the events that should be dispatched instead of faked.
-     *
-     * @param  array|string  $eventsToDispatch
-     * @return $this
-     */
-    public function except($eventsToDispatch)
-    {
-        $this->eventsToDispatch = array_merge($this->eventsToDispatch, Arr::wrap($eventsToDispatch));
-
-        return $this;
     }
 }
