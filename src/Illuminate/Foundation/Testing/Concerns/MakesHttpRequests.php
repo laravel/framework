@@ -66,7 +66,7 @@ trait MakesHttpRequests
     /**
      * The latest test response.
      *
-     * @var \Illuminate\Testing\TestResponse
+     * @var \Illuminate\Testing\TestResponse|null
      */
     public $latestResponse;
 

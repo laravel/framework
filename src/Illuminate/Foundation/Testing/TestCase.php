@@ -86,6 +86,8 @@ abstract class TestCase extends BaseTestCase
      */
     protected function setUp(): void
     {
+        $this->latestResponse = null;
+
         Facade::clearResolvedInstances();
 
         if (! $this->app) {
