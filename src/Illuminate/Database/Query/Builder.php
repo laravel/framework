@@ -3272,6 +3272,19 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Insert new records with timestamps into the database.
+     *
+     * @param  array  $values
+     * @return bool
+     */
+    public function insertWithTimestamps(array $values)
+    {
+        $timestamps = ['created_at' => now(), 'updated_at' => now()];
+
+        return $this->insert(array_merge($values, $timestamps));
+    }
+
+    /**
      * Update records in the database.
      *
      * @param  array  $values
