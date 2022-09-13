@@ -62,13 +62,13 @@ class BelongsToManyRelationship
     /**
      * Specify the model instances to always use when creating relationships.
      *
-     * @param  \Illuminate\Support\Collection  $using
+     * @param  \Illuminate\Support\Collection  $recycle
      * @return $this
      */
-    public function using($using)
+    public function recycle($recycle)
     {
         if ($this->factory instanceof Factory) {
-            $this->factory = $this->factory->using($using);
+            $this->factory = $this->factory->recycle($recycle);
         }
 
         return $this;

@@ -660,7 +660,7 @@ class DatabaseEloquentFactoryTest extends TestCase
 
         $user = FactoryTestUserFactory::new()->create();
         $post = FactoryTestPostFactory::new()
-            ->using($user)
+            ->recycle($user)
             ->hasComments(2)
             ->create();
 

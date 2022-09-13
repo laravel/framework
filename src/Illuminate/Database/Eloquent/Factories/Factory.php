@@ -68,7 +68,7 @@ abstract class Factory
      *
      * @var \Illuminate\Support\Collection
      */
-    protected $using;
+    protected $recycle;
 
     /**
      * The "after making" callbacks that will be applied to the model.
@@ -129,7 +129,7 @@ abstract class Factory
      * @param  \Illuminate\Support\Collection|null  $afterMaking
      * @param  \Illuminate\Support\Collection|null  $afterCreating
      * @param  string|null  $connection
-     * @param  \Illuminate\Support\Collection|null  $using
+     * @param  \Illuminate\Support\Collection|null  $recycle
      * @return void
      */
     public function __construct($count = null,
@@ -139,7 +139,7 @@ abstract class Factory
                                 ?Collection $afterMaking = null,
                                 ?Collection $afterCreating = null,
                                 $connection = null,
-                                ?Collection $using = null)
+                                ?Collection $recycle = null)
     {
         $this->count = $count;
         $this->states = $states ?? new Collection;
@@ -148,7 +148,7 @@ abstract class Factory
         $this->afterMaking = $afterMaking ?? new Collection;
         $this->afterCreating = $afterCreating ?? new Collection;
         $this->connection = $connection;
-        $this->using = $using ?? new Collection;
+        $this->recycle = $recycle ?? new Collection;
         $this->faker = $this->withFaker();
     }
 
@@ -342,7 +342,7 @@ abstract class Factory
     {
         Model::unguarded(function () use ($model) {
             $this->has->each(function ($has) use ($model) {
-                $has->using($this->using)->createFor($model);
+                $has->recycle($this->recycle)->createFor($model);
             });
         });
     }
@@ -449,7 +449,7 @@ abstract class Factory
         $model = $this->newModel();
 
         return $this->for->map(function (BelongsToRelationship $for) use ($model) {
-            return $for->using($this->using)->attributesFor($model);
+            return $for->recycle($this->recycle)->attributesFor($model);
         })->collapse()->all();
     }
 
@@ -464,9 +464,9 @@ abstract class Factory
         return collect($definition)
             ->map($evaluateRelations = function ($attribute) {
                 if ($attribute instanceof self) {
-                    $attribute = $this->using->has($attribute->modelName())
-                            ? $this->using->get($attribute->modelName())
-                            : $attribute->using($this->using)->create()->getKey();
+                    $attribute = $this->recycle->has($attribute->modelName())
+                            ? $this->recycle->get($attribute->modelName())
+                            : $attribute->recycle($this->recycle)->create()->getKey();
                 } elseif ($attribute instanceof Model) {
                     $attribute = $attribute->getKey();
                 }
@@ -624,10 +624,10 @@ abstract class Factory
      * @param  \Illuminate\Eloquent\Model|\Illuminate\Support\Collection|array  $model
      * @return static
      */
-    public function using($model)
+    public function recycle($model)
     {
         return $this->newInstance([
-            'using' => $this->using->merge(
+            'recycle' => $this->recycle->merge(
                 Collection::wrap($model instanceof Model ? func_get_args() : $model)
                     ->keyBy(fn ($model) => get_class($model))
             ),
@@ -725,7 +725,7 @@ abstract class Factory
             'afterMaking' => $this->afterMaking,
             'afterCreating' => $this->afterCreating,
             'connection' => $this->connection,
-            'using' => $this->using,
+            'recycle' => $this->recycle,
         ], $arguments)));
     }
 
