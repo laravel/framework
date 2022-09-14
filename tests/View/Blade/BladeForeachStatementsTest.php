@@ -112,9 +112,11 @@ test
         return [
             ['@foreach'],
             ['@foreach()'],
+            ['@foreach ()'],
             ['@foreach($test)'],
             ['@foreach($test as)'],
             ['@foreach(as)'],
+            ['@foreach ( as )'],
         ];
     }
 }
