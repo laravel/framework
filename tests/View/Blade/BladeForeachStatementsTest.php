@@ -107,7 +107,7 @@ test
         $this->compiler->compileString($string);
     }
 
-    private function invalidForeachStatementsDataProvider()
+    public function invalidForeachStatementsDataProvider()
     {
         return [
             ['@foreach'],

@@ -95,7 +95,7 @@ tag empty
         $this->compiler->compileString($string);
     }
 
-    private function invalidForelseStatementsDataProvider()
+    public function invalidForelseStatementsDataProvider()
     {
         return [
             ['@forelse'],
