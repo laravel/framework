@@ -34,6 +34,17 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertEquals($expected, (array) DB::table('posts')->where('title', 'Foo Post')->select('id', 'title')->sole());
     }
 
+    public function testSoleWithParameters()
+    {
+        $expected = ['id' => '1'];
+
+        $this->assertEquals($expected, (array)DB::table('posts')->where('title', 'Foo Post')->sole('id'));
+        $this->assertEquals($expected, (array)DB::table('posts')->where('title', 'Foo Post')->sole(['id']));
+
+        $expected = ['id' => '1', 'title' => 'Foo Post'];
+        $this->assertEquals($expected, (array)DB::table('posts')->where('title', 'Foo Post')->sole(['id', 'title']));
+    }
+
     public function testSoleFailsForMultipleRecords()
     {
         DB::table('posts')->insert([
