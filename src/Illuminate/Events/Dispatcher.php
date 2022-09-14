@@ -9,6 +9,8 @@ use Illuminate\Contracts\Broadcasting\Factory as BroadcastFactory;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
+use Illuminate\Contracts\Notifications\Dispatcher as NotificationsDispatcher;
+use Illuminate\Contracts\Notifications\ShouldNotify;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Arr;
@@ -243,6 +245,10 @@ class Dispatcher implements DispatcherContract
             $this->broadcastEvent($payload[0]);
         }
 
+        if ($this->shouldNotify($payload)) {
+            $this->notifyEvent($payload[0]);
+        }
+
         $responses = [];
 
         foreach ($this->getListeners($event) as $listener) {
@@ -318,6 +324,46 @@ class Dispatcher implements DispatcherContract
     protected function broadcastEvent($event)
     {
         $this->container->make(BroadcastFactory::class)->queue($event);
+    }
+
+    /**
+     * Determine if the payload has a notificatable event.
+     *
+     * @param  array  $payload
+     * @return bool
+     */
+    protected function shouldNotify(array $payload)
+    {
+        return isset($payload[0]) &&
+            $payload[0] instanceof ShouldNotify &&
+            $this->notifyWhen($payload[0]);
+    }
+
+    /**
+     * Check if the event should dispatch notifications by the condition.
+     *
+     * @param  mixed  $event
+     * @return bool
+     */
+    protected function notifyWhen($event)
+    {
+        return method_exists($event, 'notifyWhen')
+            ? $event->notifyWhen() : true;
+    }
+
+    /**
+     * Notify the given event class.
+     *
+     * @param  \Illuminate\Contracts\Notifications\ShouldNotify  $event  // TODO:
+     * @return void
+     */
+    protected function notifyEvent($event)
+    {
+        $notifiables = Arr::wrap($event->notifyTo());
+
+        foreach ($notifiables as $notifiable) {
+            $this->container->make(NotificationsDispatcher::class)->send($notifiable, $event);
+        }
     }
 
     /**
