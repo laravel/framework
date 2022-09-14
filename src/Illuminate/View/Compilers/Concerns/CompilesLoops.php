@@ -2,6 +2,8 @@
 
 namespace Illuminate\View\Compilers\Concerns;
 
+use Illuminate\Contracts\View\ViewCompilationException;
+
 trait CompilesLoops
 {
     /**
@@ -87,10 +89,15 @@ trait CompilesLoops
      *
      * @param  string  $expression
      * @return string
+     * @throws ViewCompilationException
      */
     protected function compileForeach($expression)
     {
-        preg_match('/\( *(.*) +as *(.*)\)$/is', $expression, $matches);
+        preg_match('/\( *(.*) +as +(.*)\)$/is', $expression, $matches);
+
+        if (count($matches) === 0) {
+            throw new ViewCompilationException('Malformed @foreach statement');
+        }
 
         $iteratee = trim($matches[1]);
 
