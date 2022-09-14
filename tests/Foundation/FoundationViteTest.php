@@ -535,6 +535,36 @@ class FoundationViteTest extends TestCase
         ViteFacade::asset('resources/js/missing.js');
     }
 
+    public function testItDoesNotReturnHashInDevMode()
+    {
+        $this->makeViteHotFile();
+
+        $this->assertNull(ViteFacade::hash());
+
+        $this->cleanViteHotFile();
+    }
+
+    public function testItGetsHashInBuildMode()
+    {
+        $this->makeViteManifest(['a.js' => ['src' => 'a.js']]);
+
+        $this->assertSame('98ca5a789544599b562c9978f3147a0f', ViteFacade::hash());
+
+        $this->cleanViteManifest();
+    }
+
+    public function testItGetsDifferentHashesForDifferentManifestsInBuildMode()
+    {
+        $this->makeViteManifest(['a.js' => ['src' => 'a.js']]);
+        $this->makeViteManifest(['b.js' => ['src' => 'b.js']], 'admin');
+
+        $this->assertSame('98ca5a789544599b562c9978f3147a0f', ViteFacade::hash());
+        $this->assertSame('928a60835978bae84e5381fbb08a38b2', ViteFacade::hash('admin'));
+
+        $this->cleanViteManifest();
+        $this->cleanViteManifest('admin');
+    }
+
     public function testViteCanSetEntryPointsWithFluentBuilder()
     {
         $this->makeViteManifest();

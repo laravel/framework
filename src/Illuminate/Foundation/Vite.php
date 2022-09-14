@@ -184,6 +184,26 @@ class Vite implements Htmlable
     }
 
     /**
+     * Get a unique hash or null if there is no manifest.
+     *
+     * @return string|null
+     */
+    public function hash($buildDirectory = null)
+    {
+        $buildDirectory ??= $this->buildDirectory;
+
+        if ($this->isRunningHot()) {
+            return null;
+        }
+
+        if (! is_file($path = $this->manifestPath($buildDirectory))) {
+            return null;
+        }
+
+        return md5_file($path) ?: null;
+    }
+
+    /**
      * Generate Vite tags for an entrypoint.
      *
      * @param  string|string[]  $entrypoints
