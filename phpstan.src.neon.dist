@@ -18,3 +18,4 @@ parameters:
   excludePaths:
     - "src/Illuminate/Testing/ParallelRunner.php"
     - "src/Illuminate/Testing/Constraints/ArraySubset.php"
+    - "src/Illuminate/Support/Testing/Fakes/AsyncQueueFake.php"
