@@ -354,15 +354,16 @@ class Dispatcher implements DispatcherContract
     /**
      * Notify the given event class.
      *
-     * @param  \Illuminate\Contracts\Notifications\ShouldNotify  $event  // TODO:
+     * @param  \Illuminate\Contracts\Notifications\ShouldNotify  $event
      * @return void
      */
     protected function notifyEvent($event)
     {
+        $dispatcher = $this->container->make(NotificationsDispatcher::class);
         $notifiables = Arr::wrap($event->notifyTo());
 
         foreach ($notifiables as $notifiable) {
-            $this->container->make(NotificationsDispatcher::class)->send($notifiable, $event);
+            $dispatcher->send($notifiable, $event);
         }
     }
 
