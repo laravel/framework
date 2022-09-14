@@ -69,6 +69,10 @@ class QueryBuilderTest extends DatabaseTestCase
 
         $this->assertEquals($expected, (array) DB::table('posts')->select('id', 'title')->first());
         $this->assertEquals($expected, (array) DB::table('posts')->select(['id', 'title'])->first());
+
+        $expected = ['id' => '1', 'title' => 'Foo Post', 'content' => 'Lorem Ipsum.', 'created_at' => '2017-11-12 13:14:15'];
+        $this->assertEquals($expected, (array)DB::table('posts')->select()->first());
+        $this->assertCount(4, (array)DB::table('posts')->select()->first());
     }
 
     public function testSelectReplacesExistingSelects()
@@ -96,6 +100,11 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertEquals($expected, (array) DB::table('posts')->select('id')->addSelect('title', 'content')->first());
         $this->assertEquals($expected, (array) DB::table('posts')->select('id')->addSelect(['title', 'content'])->first());
         $this->assertEquals($expected, (array) DB::table('posts')->addSelect(['id', 'title', 'content'])->first());
+
+        $expected = ['id' => '1', 'title' => 'Foo Post', 'content' => 'Lorem Ipsum.', 'created_at' => '2017-11-12 13:14:15'];
+        $this->assertEquals($expected, (array)DB::table('posts')->addSelect([])->first());
+
+        $this->assertEquals(['id' => '1'], (array)DB::table('posts')->select('id')->addSelect([])->first());
     }
 
     public function testAddSelectWithSubQuery()
