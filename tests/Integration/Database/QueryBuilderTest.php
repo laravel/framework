@@ -34,6 +34,17 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertEquals($expected, (array) DB::table('posts')->where('title', 'Foo Post')->select('id', 'title')->sole());
     }
 
+    public function testSoleWithParameters()
+    {
+        $expected = ['id' => '1'];
+
+        $this->assertEquals($expected, (array) DB::table('posts')->where('title', 'Foo Post')->sole('id'));
+        $this->assertEquals($expected, (array) DB::table('posts')->where('title', 'Foo Post')->sole(['id']));
+
+        $expected = ['id' => '1', 'title' => 'Foo Post'];
+        $this->assertEquals($expected, (array) DB::table('posts')->where('title', 'Foo Post')->sole(['id', 'title']));
+    }
+
     public function testSoleFailsForMultipleRecords()
     {
         DB::table('posts')->insert([
@@ -58,6 +69,8 @@ class QueryBuilderTest extends DatabaseTestCase
 
         $this->assertEquals($expected, (array) DB::table('posts')->select('id', 'title')->first());
         $this->assertEquals($expected, (array) DB::table('posts')->select(['id', 'title'])->first());
+
+        $this->assertCount(4, (array) DB::table('posts')->select()->first());
     }
 
     public function testSelectReplacesExistingSelects()
@@ -85,6 +98,9 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertEquals($expected, (array) DB::table('posts')->select('id')->addSelect('title', 'content')->first());
         $this->assertEquals($expected, (array) DB::table('posts')->select('id')->addSelect(['title', 'content'])->first());
         $this->assertEquals($expected, (array) DB::table('posts')->addSelect(['id', 'title', 'content'])->first());
+
+        $this->assertCount(4, (array) DB::table('posts')->addSelect([])->first());
+        $this->assertEquals(['id' => '1'], (array) DB::table('posts')->select('id')->addSelect([])->first());
     }
 
     public function testAddSelectWithSubQuery()
