@@ -87,11 +87,11 @@ empty
     {
         $this->expectException(ViewCompilationException::class);
         $this->expectExceptionMessage('Malformed @forelse statement');
-        $string = $initialStatement.'
+        $string = "$initialStatement
 breeze
 @empty
 tag empty
-@endforelse';
+@endforelse";
         $this->compiler->compileString($string);
     }
 

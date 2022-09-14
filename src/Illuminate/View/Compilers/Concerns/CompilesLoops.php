@@ -18,6 +18,8 @@ trait CompilesLoops
      *
      * @param  string  $expression
      * @return string
+     *
+     * @throws ViewCompilationException
      */
     protected function compileForelse($expression)
     {
@@ -93,6 +95,7 @@ trait CompilesLoops
      *
      * @param  string  $expression
      * @return string
+     *
      * @throws ViewCompilationException
      */
     protected function compileForeach($expression)

@@ -97,13 +97,13 @@ tag info
     /**
      * @dataProvider invalidForeachStatementsDataProvider
      */
-    public function testForeachStatementsThrowHumanizedMessageWhenInvalidStatement($statement)
+    public function testForeachStatementsThrowHumanizedMessageWhenInvalidStatement($initialStatement)
     {
         $this->expectException(ViewCompilationException::class);
         $this->expectExceptionMessage('Malformed @foreach statement');
-        $string = $statement . '
+        $string = "$initialStatement
 test
-@endforeach';
+@endforeach";
         $this->compiler->compileString($string);
     }
 
