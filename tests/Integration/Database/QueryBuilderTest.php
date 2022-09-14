@@ -38,11 +38,11 @@ class QueryBuilderTest extends DatabaseTestCase
     {
         $expected = ['id' => '1'];
 
-        $this->assertEquals($expected, (array)DB::table('posts')->where('title', 'Foo Post')->sole('id'));
-        $this->assertEquals($expected, (array)DB::table('posts')->where('title', 'Foo Post')->sole(['id']));
+        $this->assertEquals($expected, (array) DB::table('posts')->where('title', 'Foo Post')->sole('id'));
+        $this->assertEquals($expected, (array) DB::table('posts')->where('title', 'Foo Post')->sole(['id']));
 
         $expected = ['id' => '1', 'title' => 'Foo Post'];
-        $this->assertEquals($expected, (array)DB::table('posts')->where('title', 'Foo Post')->sole(['id', 'title']));
+        $this->assertEquals($expected, (array) DB::table('posts')->where('title', 'Foo Post')->sole(['id', 'title']));
     }
 
     public function testSoleFailsForMultipleRecords()
@@ -71,8 +71,8 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertEquals($expected, (array) DB::table('posts')->select(['id', 'title'])->first());
 
         $expected = ['id' => '1', 'title' => 'Foo Post', 'content' => 'Lorem Ipsum.', 'created_at' => '2017-11-12 13:14:15'];
-        $this->assertEquals($expected, (array)DB::table('posts')->select()->first());
-        $this->assertCount(4, (array)DB::table('posts')->select()->first());
+        $this->assertEquals($expected, (array) DB::table('posts')->select()->first());
+        $this->assertCount(4, (array) DB::table('posts')->select()->first());
     }
 
     public function testSelectReplacesExistingSelects()
@@ -102,9 +102,9 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertEquals($expected, (array) DB::table('posts')->addSelect(['id', 'title', 'content'])->first());
 
         $expected = ['id' => '1', 'title' => 'Foo Post', 'content' => 'Lorem Ipsum.', 'created_at' => '2017-11-12 13:14:15'];
-        $this->assertEquals($expected, (array)DB::table('posts')->addSelect([])->first());
+        $this->assertEquals($expected, (array) DB::table('posts')->addSelect([])->first());
 
-        $this->assertEquals(['id' => '1'], (array)DB::table('posts')->select('id')->addSelect([])->first());
+        $this->assertEquals(['id' => '1'], (array) DB::table('posts')->select('id')->addSelect([])->first());
     }
 
     public function testAddSelectWithSubQuery()
