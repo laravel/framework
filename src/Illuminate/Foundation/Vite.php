@@ -537,6 +537,26 @@ class Vite implements Htmlable
     }
 
     /**
+     * Get a unique hash representing the current manifest, or null if there is no manifest.
+     *
+     * @return string|null
+     */
+    public function manifestHash($buildDirectory = null)
+    {
+        $buildDirectory ??= $this->buildDirectory;
+
+        if ($this->isRunningHot()) {
+            return null;
+        }
+
+        if (! is_file($path = $this->manifestPath($buildDirectory))) {
+            return null;
+        }
+
+        return md5_file($path) ?: null;
+    }
+
+    /**
      * Get the chunk for the given entry point / asset.
      *
      * @param  array  $manifest
