@@ -539,7 +539,7 @@ class FoundationViteTest extends TestCase
     {
         $this->makeViteHotFile();
 
-        $this->assertNull(ViteFacade::hash());
+        $this->assertNull(ViteFacade::manifestHash());
 
         $this->cleanViteHotFile();
     }
@@ -548,7 +548,7 @@ class FoundationViteTest extends TestCase
     {
         $this->makeViteManifest(['a.js' => ['src' => 'a.js']]);
 
-        $this->assertSame('98ca5a789544599b562c9978f3147a0f', ViteFacade::hash());
+        $this->assertSame('98ca5a789544599b562c9978f3147a0f', ViteFacade::manifestHash());
 
         $this->cleanViteManifest();
     }
@@ -558,8 +558,8 @@ class FoundationViteTest extends TestCase
         $this->makeViteManifest(['a.js' => ['src' => 'a.js']]);
         $this->makeViteManifest(['b.js' => ['src' => 'b.js']], 'admin');
 
-        $this->assertSame('98ca5a789544599b562c9978f3147a0f', ViteFacade::hash());
-        $this->assertSame('928a60835978bae84e5381fbb08a38b2', ViteFacade::hash('admin'));
+        $this->assertSame('98ca5a789544599b562c9978f3147a0f', ViteFacade::manifestHash());
+        $this->assertSame('928a60835978bae84e5381fbb08a38b2', ViteFacade::manifestHash('admin'));
 
         $this->cleanViteManifest();
         $this->cleanViteManifest('admin');

@@ -188,7 +188,7 @@ class Vite implements Htmlable
      *
      * @return string|null
      */
-    public function hash($buildDirectory = null)
+    public function manifestHash($buildDirectory = null)
     {
         $buildDirectory ??= $this->buildDirectory;
 
