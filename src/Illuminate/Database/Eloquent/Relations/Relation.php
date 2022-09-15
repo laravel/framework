@@ -41,6 +41,13 @@ abstract class Relation implements BuilderContract
     protected $related;
 
     /**
+     * Indicates whether the eagerly loaded relation should implicitly return an empty collection.
+     *
+     * @var bool
+     */
+    protected $eagerKeysWereEmpty = false;
+
+    /**
      * Indicates if the relation is adding constraints.
      *
      * @var bool
@@ -154,7 +161,9 @@ abstract class Relation implements BuilderContract
      */
     public function getEager()
     {
-        return $this->get();
+        return $this->eagerKeysWereEmpty
+                    ? $this->query->getModel()->newCollection()
+                    : $this->get();
     }
 
     /**
@@ -375,6 +384,24 @@ abstract class Relation implements BuilderContract
     public function relatedUpdatedAt()
     {
         return $this->related->getUpdatedAtColumn();
+    }
+
+    /**
+     * Add a whereIn eager constraint for the given set of model keys to be loaded.
+     *
+     * @param  string  $whereIn
+     * @param  string  $key
+     * @param  array  $modelKeys
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return void
+     */
+    protected function whereInEager(string $whereIn, string $key, array $modelKeys, $query = null)
+    {
+        ($query ?? $this->query)->{$whereIn}($key, $modelKeys);
+
+        if ($modelKeys === []) {
+            $this->eagerKeysWereEmpty = true;
+        }
     }
 
     /**
