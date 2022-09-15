@@ -822,4 +822,76 @@ class Arr
 
         return is_array($value) ? $value : [$value];
     }
+
+    /**
+     * Move the first element to the end.
+     *
+     * @param  array  $array
+     * @param  int  $times
+     * @param  bool  $preserveKeys
+     * @return array
+     *
+     * @throws InvalidArgumentException
+     */
+    public static function rotate($array, $times = 1, $preserveKeys = false)
+    {
+        if (!is_numeric($times) || $times < 0) {
+            throw new InvalidArgumentException(
+                "You requested to rotate but \$times can only be a number greater or equals to 0."
+            );
+        }
+
+        for ($i = 0; $i < $times; $i++) {
+            $index = array_key_first($array);
+            $value = $array[$index];
+            unset($array[$index]);
+            $array[$index] = $value;
+        }
+
+        return $preserveKeys ? $array : array_values($array);
+    }
+
+    /**
+     * Move the last element to the beginning.
+     *
+     * @param  array  $array
+     * @param  int  $times
+     * @param  bool  $preserveKeys
+     * @return array
+     *
+     * @throws InvalidArgumentException
+     */
+    public static function rotateReverse($array, $times = 1, $preserveKeys = false)
+    {
+        if (!is_numeric($times) || $times < 0) {
+            throw new InvalidArgumentException(
+                "You requested to rotate reverse but \$times can only be a number greater or equals to 0."
+            );
+        }
+
+        if ($preserveKeys) {
+            for ($i = 0; $i < $times; $i++) {
+                $index = array_key_last($array);
+                $value = $array[$index];
+                unset($array[$index]);
+
+                $result = [];
+                $result[$index] = $value;
+                foreach ($array as $key => $value) {
+                    $result[$key] = $value;
+                }
+
+                $array = $result;
+            }
+        } else {
+            for ($i = 0; $i < $times; $i++) {
+                $value = array_pop($array);
+                array_unshift($array, $value);
+            }
+
+            $array = array_values($array);
+        }
+
+        return $array;
+    }
 }

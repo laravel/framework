@@ -1112,4 +1112,156 @@ class SupportArrTest extends TestCase
             ],
         ], Arr::prependKeysWith($array, 'test.'));
     }
+
+    public function testRotate()
+    {
+        // numeric keys
+        $array = [
+            10 => 'a',
+            20 => 'b',
+            30 => 'c',
+        ];
+        $this->assertSame([
+            0 => 'b',
+            1 => 'c',
+            2 => 'a',
+        ], Arr::rotate($array));
+
+        // alphanumeric keys
+        $array = [
+            10 => 'a',
+            'i' => 'b',
+            30 => 'c',
+        ];
+        $this->assertSame([
+            0 => 'b',
+            1 => 'c',
+            2 => 'a',
+        ], Arr::rotate($array));
+
+        // numeric keys, preserve keys
+        $array = [
+            10 => 'a',
+            20 => 'b',
+            30 => 'c',
+        ];
+        $this->assertSame([
+            20 => 'b',
+            30 => 'c',
+            10 => 'a',
+        ], Arr::rotate($array, 1, true));
+
+        // rotates 2 times, preserve keys
+        $this->assertSame([
+            30 => 'c',
+            10 => 'a',
+            20 => 'b',
+        ], Arr::rotate($array, 2, true));
+
+        // rotates 0 times
+        $this->assertSame([
+            0 => 'a',
+            1 => 'b',
+            2 => 'c',
+        ], Arr::rotate($array, 0));
+
+        // rotates 0 times, preserve keys
+        $this->assertSame([
+            10 => 'a',
+            20 => 'b',
+            30 => 'c',
+        ], Arr::rotate($array, 0, true));
+
+        // exceptions
+        $array = ['a', 'b', 'c'];
+        $exceptions = 0;
+
+        $timesArgs = [-1, 'a', new stdClass, null];
+
+        foreach ($timesArgs as $times) {
+            try {
+                Arr::rotate($array, $times);
+            } catch (InvalidArgumentException $e) {
+                $exceptions++;
+            }
+        }
+
+        $this->assertSame(count($timesArgs), $exceptions);
+    }
+
+    public function testRotateReverse()
+    {
+        // numeric keys
+        $array = [
+            10 => 'a',
+            20 => 'b',
+            30 => 'c',
+        ];
+        $this->assertSame([
+            0 => 'c',
+            1 => 'a',
+            2 => 'b',
+        ], Arr::rotateReverse($array));
+
+        // alphanumeric keys
+        $array = [
+            10 => 'a',
+            'i' => 'b',
+            30 => 'c',
+        ];
+        $this->assertSame([
+            0 => 'c',
+            1 => 'a',
+            2 => 'b',
+        ], Arr::rotateReverse($array));
+
+        // numeric keys, preserve keys
+        $array = [
+            10 => 'a',
+            20 => 'b',
+            30 => 'c',
+        ];
+        $this->assertSame([
+            30 => 'c',
+            10 => 'a',
+            20 => 'b',
+        ], Arr::rotateReverse($array, 1, true));
+
+        // rotates 2 times, preserve keys
+        $this->assertSame([
+            20 => 'b',
+            30 => 'c',
+            10 => 'a',
+        ], Arr::rotateReverse($array, 2, true));
+
+        // rotates 0 times
+        $this->assertSame([
+            0 => 'a',
+            1 => 'b',
+            2 => 'c',
+        ], Arr::rotateReverse($array, 0));
+
+        // rotates 0 times, preserve keys
+        $this->assertSame([
+            10 => 'a',
+            20 => 'b',
+            30 => 'c',
+        ], Arr::rotateReverse($array, 0, true));
+
+        // exceptions
+        $array = ['a', 'b', 'c'];
+        $exceptions = 0;
+
+        $timesArgs = [-1, 'a', new stdClass, null];
+
+        foreach ($timesArgs as $times) {
+            try {
+                Arr::rotateReverse($array, $times);
+            } catch (InvalidArgumentException $e) {
+                $exceptions++;
+            }
+        }
+
+        $this->assertSame(count($timesArgs), $exceptions);
+    }
 }
