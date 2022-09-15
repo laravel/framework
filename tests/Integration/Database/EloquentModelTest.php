@@ -7,7 +7,6 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
-use RuntimeException;
 
 class EloquentModelTest extends DatabaseTestCase
 {
@@ -22,12 +21,6 @@ class EloquentModelTest extends DatabaseTestCase
             $table->increments('id');
             $table->string('name');
             $table->string('title');
-        });
-
-        Schema::create('test_model3', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('name');
-            $table->timestamps();
         });
     }
 
@@ -71,53 +64,6 @@ class EloquentModelTest extends DatabaseTestCase
         $this->assertTrue($user->wasChanged());
         $this->assertTrue($user->wasChanged('name'));
     }
-
-    public function testWithoutTimestamp()
-    {
-        Carbon::setTestNow($now = Carbon::now()->setYear(1995)->startOfYear());
-        $user = TestModel3::create(['name' => 'foo']);
-        Carbon::setTestNow(Carbon::now()->addHour());
-
-        $this->assertTrue($user->timestamps);
-
-        $user->withoutTimestamps(fn () => $user->update([
-            'name' => 'bar',
-        ]));
-
-        $this->assertTrue($user->timestamps);
-        $this->assertTrue($now->equalTo($user->updated_at));
-    }
-
-    public function testWithoutTimestampWhenAlreadyIgnoringTimestamps()
-    {
-        Carbon::setTestNow($now = Carbon::now()->setYear(1995)->startOfYear());
-        $user = TestModel3::create(['name' => 'foo']);
-        Carbon::setTestNow(Carbon::now()->addHour());
-
-        $user->timestamps = false;
-
-        $user->withoutTimestamps(fn () => $user->update([
-            'name' => 'bar',
-        ]));
-
-        $this->assertFalse($user->timestamps);
-        $this->assertTrue($now->equalTo($user->updated_at));
-    }
-
-    public function testWithoutTimestampRestoresWhenClosureThrowsException()
-    {
-        $user = TestModel3::create(['name' => 'foo']);
-        $user->timestamps = true;
-
-        try {
-            $user->withoutTimestamps(fn () => throw new RuntimeException());
-            $this->fail();
-        } catch (RuntimeException) {
-            //
-        }
-
-        $this->assertTrue($user->timestamps);
-    }
 }
 
 class TestModel1 extends Model
@@ -132,12 +78,5 @@ class TestModel2 extends Model
 {
     public $table = 'test_model2';
     public $timestamps = false;
-    protected $guarded = [];
-}
-
-class TestModel3 extends Model
-{
-    public $table = 'test_model3';
-    public $timestamps = true;
     protected $guarded = [];
 }
