@@ -321,7 +321,9 @@ abstract class TestCase extends BaseTestCase
     protected function appendExceptionToException($exceptionToAppend, $exception)
     {
         $exceptionMessage = $exceptionToAppend->getMessage();
+
         $exceptionToAppend = (string) $exceptionToAppend;
+
         $message = <<<"EOF"
             The following exception occurred during the last request:
 
@@ -349,7 +351,7 @@ abstract class TestCase extends BaseTestCase
             ? json_encode($errors, JSON_PRETTY_PRINT)
             : implode(PHP_EOL, Arr::flatten($errors));
 
-        // JSON error messages may already contain the errors, so we shouldn't duplicate them.
+        // JSON error messages may already contain the errors, so we shouldn't duplicate them...
         if (str_contains($exception->getMessage(), $errors)) {
             return $exception;
         }
@@ -373,7 +375,9 @@ abstract class TestCase extends BaseTestCase
     protected function appendMessageToException($message, $exception)
     {
         $property = new ReflectionProperty($exception, 'message');
+
         $property->setAccessible(true);
+
         $property->setValue(
             $exception,
             $exception->getMessage().PHP_EOL.PHP_EOL.$message.PHP_EOL
