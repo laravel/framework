@@ -2,7 +2,9 @@
 
 namespace Illuminate\Foundation;
 
+use Carbon\CarbonInterval;
 use Closure;
+use DateTimeInterface;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 use Illuminate\Contracts\Foundation\CachesConfiguration;
@@ -17,8 +19,10 @@ use Illuminate\Http\Request;
 use Illuminate\Log\LogServiceProvider;
 use Illuminate\Routing\RoutingServiceProvider;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Env;
+use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
@@ -31,7 +35,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class Application extends Container implements ApplicationContract, CachesConfiguration, CachesRoutes, HttpKernelInterface
 {
-    use Macroable;
+    use Macroable, InteractsWithTime;
 
     /**
      * The Laravel framework version.
@@ -53,6 +57,20 @@ class Application extends Container implements ApplicationContract, CachesConfig
      * @var bool
      */
     protected $hasBeenBootstrapped = false;
+
+    /**
+     * When the bootstrapping started.
+     *
+     * @var \Illuminate\Support\Carbon|null
+     */
+    protected $bootstrappingStartedAt;
+
+    /**
+     * All of the registered bootstrapping duration handlers.
+     *
+     * @var array
+     */
+    protected $bootstrappingDurationHandlers = [];
 
     /**
      * Indicates if the application has "booted".
@@ -236,6 +254,8 @@ class Application extends Container implements ApplicationContract, CachesConfig
     {
         $this->hasBeenBootstrapped = true;
 
+        $this->bootstrappingStartedAt = Carbon::now();
+
         foreach ($bootstrappers as $bootstrapper) {
             $this['events']->dispatch('bootstrapping: '.$bootstrapper, [$this]);
 
@@ -243,6 +263,49 @@ class Application extends Container implements ApplicationContract, CachesConfig
 
             $this['events']->dispatch('bootstrapped: '.$bootstrapper, [$this]);
         }
+
+        foreach ($this->bootstrappingDurationHandlers as ['threshold' => $threshold, 'handler' => $handler]) {
+            $end ??= Carbon::now();
+
+            if ($this->bootstrappingStartedAt->diffInMilliseconds($end) > $threshold) {
+                $handler($this->bootstrappingStartedAt);
+            }
+        }
+
+        $this->bootstrappingStartedAt = null;
+    }
+
+    /**
+     * Register a callback to be invoked when the bootstrapping duration exceeds a given amount of time.
+     *
+     * @param  \DateTimeInterface|\Carbon\CarbonInterval|float|int  $threshold
+     * @param  callable  $handler
+     * @return void
+     */
+    public function whenBootstrappingLongerThan($threshold, $handler)
+    {
+        $threshold = $threshold instanceof DateTimeInterface
+            ? $this->secondsUntil($threshold) * 1000
+            : $threshold;
+
+        $threshold = $threshold instanceof CarbonInterval
+            ? $threshold->totalMilliseconds
+            : $threshold;
+
+        $this->bootstrappingDurationHandlers[] = [
+            'threshold' => $threshold,
+            'handler' => $handler,
+        ];
+    }
+
+    /**
+     * When the bootstrapping started.
+     *
+     * @return \Illuminate\Support\Carbon|null
+     */
+    public function bootstrappingStartedAt()
+    {
+        return $this->bootstrappingStartedAt;
     }
 
     /**
