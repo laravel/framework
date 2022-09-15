@@ -45,7 +45,7 @@ abstract class Relation implements BuilderContract
      *
      * @var bool
      */
-    protected $eagerImplicitlyEmpty = false;
+    protected $eagerKeysWereEmpty = false;
 
     /**
      * Indicates if the relation is adding constraints.
@@ -161,11 +161,9 @@ abstract class Relation implements BuilderContract
      */
     public function getEager()
     {
-        if ($this->eagerImplicitlyEmpty) {
-            return $this->query->getModel()->newCollection();
-        }
-
-        return $this->get();
+        return $this->eagerKeysWereEmpty
+                    ? $this->query->getModel()->newCollection()
+                    : $this->get();
     }
 
     /**
@@ -389,6 +387,24 @@ abstract class Relation implements BuilderContract
     }
 
     /**
+     * Add a whereIn eager constraint for the given set of model keys to be loaded.
+     *
+     * @param  string  $whereIn
+     * @param  string  $key
+     * @param  array  $modelKeys
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return void
+     */
+    protected function whereInEager(string $whereIn, string $key, array $modelKeys, $query = null)
+    {
+        ($query ?? $this->query)->{$whereIn}($key, $modelKeys);
+
+        if ($modelKeys === []) {
+            $this->eagerKeysWereEmpty = true;
+        }
+    }
+
+    /**
      * Get the name of the "where in" method for eager loading.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
@@ -401,24 +417,6 @@ abstract class Relation implements BuilderContract
                     && in_array($model->getKeyType(), ['int', 'integer'])
                         ? 'whereIntegerInRaw'
                         : 'whereIn';
-    }
-
-    /**
-     * Add a whereIn eager constraint for the given set of model keys to be loaded.
-     *
-     * @param  string  $whereIn
-     * @param  string  $key
-     * @param  array  $modelKeys
-     * @param  Builder  $query
-     * @return void
-     */
-    protected function whereInEager(string $whereIn, $key, array $modelKeys, $query = null)
-    {
-        ($query ?? $this->query)->{$whereIn}($key, $modelKeys);
-
-        if ($modelKeys === []) {
-            $this->eagerImplicitlyEmpty = true;
-        }
     }
 
     /**
