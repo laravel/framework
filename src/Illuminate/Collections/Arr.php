@@ -837,7 +837,7 @@ class Arr
     {
         if (! is_numeric($times) || $times < 0) {
             throw new InvalidArgumentException(
-                "You requested to rotate but \$times can only be a number greater or equals to 0."
+                'You requested to rotate but $times can only be a number greater or equals to 0.'
             );
         }
 
@@ -865,7 +865,7 @@ class Arr
     {
         if (! is_numeric($times) || $times < 0) {
             throw new InvalidArgumentException(
-                "You requested to rotate reverse but \$times can only be a number greater or equals to 0."
+                'You requested to rotate reverse but $times can only be a number greater or equals to 0.'
             );
         }
 
