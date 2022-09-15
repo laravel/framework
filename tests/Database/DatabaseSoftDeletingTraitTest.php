@@ -29,6 +29,7 @@ class DatabaseSoftDeletingTraitTest extends TestCase
             'deleted_at',
             'updated_at',
         ]);
+        $model->shouldReceive('usesTimestamps')->once()->andReturn(true);
         $model->delete();
 
         $this->assertInstanceOf(Carbon::class, $model->deleted_at);
