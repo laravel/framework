@@ -582,12 +582,16 @@ class Dispatcher implements DispatcherContract
             ? $listener->viaConnection($arguments[0])
             : $listener->viaConnection();
 
+        $viaQueue = isset($arguments[0])
+            ? $listener->viaQueue($arguments[0])
+            : $listener->viaQueue();
+
         $connection = $this->resolveQueue()->connection(method_exists($listener, 'viaConnection')
                     ? $viaConnection
                     : $listener->connection ?? null);
 
         $queue = method_exists($listener, 'viaQueue')
-                    ? $listener->viaQueue($arguments[0])
+                    ? $viaQueue
                     : $listener->queue ?? null;
 
         isset($listener->delay)
