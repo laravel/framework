@@ -77,7 +77,7 @@ class Kernel implements KernelContract
     protected $requestLifecycleDurationHandlers = [];
 
     /**
-     * When the currently handled request started.
+     * When the kernel starting handling the current request.
      *
      * @var \Illuminate\Support\Carbon|null
      */
