@@ -2214,8 +2214,10 @@ class DatabaseEloquentModelTest extends TestCase
     public function testStringKeyTypePreserved()
     {
         $model = $this->getMockBuilder(EloquentKeyTypeModelStub::class)->onlyMethods(['newModelQuery', 'updateTimestamps', 'refresh'])->getMock();
+        $model->id = 'string id';
+
         $query = m::mock(Builder::class);
-        $query->shouldReceive('insertGetId')->once()->with([], 'id')->andReturn('string id');
+        $query->shouldReceive('insert')->once()->with(['id' => 'string id']);
         $query->shouldReceive('getConnection')->once();
         $model->expects($this->once())->method('newModelQuery')->willReturn($query);
 
