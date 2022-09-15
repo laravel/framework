@@ -13,7 +13,7 @@ class EloquentUlidPrimaryKeyTest extends DatabaseTestCase
     protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->char('id', 26)->primary();
+            $table->ulid('id')->primary();
             $table->timestamps();
         });
     }

@@ -1243,6 +1243,18 @@ class Blueprint
     }
 
     /**
+     * Create a new ulid column on the table.
+     *
+     * @param  string  $column
+     * @param  int|null  $length
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function ulid($column = 'uuid', $length = 26)
+    {
+        return $this->char($column, $length);
+    }
+
+    /**
      * Create a new uuid column on the table.
      *
      * @param  string  $column
