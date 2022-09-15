@@ -158,6 +158,21 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertSame('Bar Post', $results[0]->title);
     }
 
+    public function testWhereNotInputStringParameter()
+    {
+        $results = DB::table('posts')->whereNot('title', 'Foo Post')->get();
+
+        $this->assertCount(1, $results);
+        $this->assertSame('Bar Post', $results[0]->title);
+
+        DB::table('posts')->insert([
+            ['title' => 'Baz Post', 'content' => 'Lorem Ipsum.', 'created_at' => new Carbon('2017-11-12 13:14:15')],
+        ]);
+
+        $results = DB::table('posts')->whereNot('title', 'Foo Post')->whereNot('title', 'Bar Post')->get();
+        $this->assertSame('Baz Post', $results[0]->title);
+    }
+
     public function testOrWhereNot()
     {
         $results = DB::table('posts')->where('id', 1)->orWhereNot(function ($query) {
@@ -231,6 +246,15 @@ class QueryBuilderTest extends DatabaseTestCase
     {
         $this->assertSame(2, DB::table('posts')->where('id', 1)->orWhereTime('created_at', '03:04:05')->count());
         $this->assertSame(2, DB::table('posts')->where('id', 1)->orWhereTime('created_at', new Carbon('2018-01-02 03:04:05'))->count());
+    }
+
+    public function testWhereNested()
+    {
+        $results = DB::table('posts')->where('content', 'Lorem Ipsum.')->whereNested(function ($query) {
+            $query->where('title', 'Foo Post')
+                ->orWhere('title', 'Bar Post');
+        })->count();
+        $this->assertSame(2, $results);
     }
 
     public function testPaginateWithSpecificColumns()
