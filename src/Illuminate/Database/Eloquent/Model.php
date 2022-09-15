@@ -1851,6 +1851,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function getIncrementing()
     {
+        if ($this->getKeyType() === 'string') {
+            return false;
+        }
+
         return $this->incrementing;
     }
 

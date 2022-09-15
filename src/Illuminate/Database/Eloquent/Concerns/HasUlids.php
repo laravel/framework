@@ -51,14 +51,4 @@ trait HasUlids
     {
         return 'string';
     }
-
-    /**
-     * Get the value indicating whether the IDs are incrementing.
-     *
-     * @return bool
-     */
-    public function getIncrementing()
-    {
-        return false;
-    }
 }
