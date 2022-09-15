@@ -835,7 +835,7 @@ class Arr
      */
     public static function rotate($array, $times = 1, $preserveKeys = false)
     {
-        if (!is_numeric($times) || $times < 0) {
+        if (! is_numeric($times) || $times < 0) {
             throw new InvalidArgumentException(
                 "You requested to rotate but \$times can only be a number greater or equals to 0."
             );
@@ -863,7 +863,7 @@ class Arr
      */
     public static function rotateReverse($array, $times = 1, $preserveKeys = false)
     {
-        if (!is_numeric($times) || $times < 0) {
+        if (! is_numeric($times) || $times < 0) {
             throw new InvalidArgumentException(
                 "You requested to rotate reverse but \$times can only be a number greater or equals to 0."
             );
