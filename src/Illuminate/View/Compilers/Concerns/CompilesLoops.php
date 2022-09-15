@@ -19,7 +19,7 @@ trait CompilesLoops
      * @param  string  $expression
      * @return string
      *
-     * @throws ViewCompilationException
+     * @throws \Illuminate\Contracts\View\ViewCompilationException
      */
     protected function compileForelse($expression)
     {
@@ -28,7 +28,7 @@ trait CompilesLoops
         preg_match('/\( *(.+) +as +(.+)\)$/is', $expression ?? '', $matches);
 
         if (count($matches) === 0) {
-            throw new ViewCompilationException('Malformed @forelse statement');
+            throw new ViewCompilationException('Malformed @forelse statement.');
         }
 
         $iteratee = trim($matches[1]);
@@ -96,14 +96,14 @@ trait CompilesLoops
      * @param  string  $expression
      * @return string
      *
-     * @throws ViewCompilationException
+     * @throws \Illuminate\Contracts\View\ViewCompilationException
      */
     protected function compileForeach($expression)
     {
         preg_match('/\( *(.+) +as +(.*)\)$/is', $expression ?? '', $matches);
 
         if (count($matches) === 0) {
-            throw new ViewCompilationException('Malformed @foreach statement');
+            throw new ViewCompilationException('Malformed @foreach statement.');
         }
 
         $iteratee = trim($matches[1]);
