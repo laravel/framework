@@ -98,6 +98,18 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertTrue($model->isDirty(['foo', 'bar']));
     }
 
+    public function testOriginalIsEquivalentWhenOriginalIsNull()
+    {
+        // test is not equivalent
+        $model = new EloquentModelStub(['nullAttribute' => null]);
+        $model->syncOriginal();
+        $model->nullAttribute = '';
+        $this->assertFalse($model->originalIsEquivalent('nullAttribute'));
+        // test is equivalent
+        $model->nullAttribute = null;
+        $this->assertTrue($model->originalIsEquivalent('nullAttribute'));
+    }
+
     public function testIntAndNullComparisonWhenDirty()
     {
         $model = new EloquentModelCastingStub;
