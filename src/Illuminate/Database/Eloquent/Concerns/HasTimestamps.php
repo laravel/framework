@@ -14,7 +14,7 @@ trait HasTimestamps
     public $timestamps = true;
 
     /**
-     * The list of models classes that should have timestamps disabled.
+     * The list of models classes that have timestamps temporarily disabled.
      *
      * @var array
      */
@@ -164,7 +164,7 @@ trait HasTimestamps
     }
 
     /**
-     * Disables timestamps for the current class during given callback scope.
+     * Disable timestamps for the current class during the given callback scope.
      *
      * @param  callable  $callback
      * @return void
@@ -175,7 +175,7 @@ trait HasTimestamps
     }
 
     /**
-     * Disables timestamps for the given model classes during given callback scope.
+     * Disable timestamps for the given model classes during the given callback scope.
      *
      * @param  array  $models
      * @param  callable  $callback
@@ -193,7 +193,7 @@ trait HasTimestamps
     }
 
     /**
-     * Determine if the given model is ignoring touches.
+     * Determine if the given model is ignoring timestamps / touches.
      *
      * @param  string|null  $class
      * @return bool
