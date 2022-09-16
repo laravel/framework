@@ -23,6 +23,7 @@
         "illuminate/contracts": "^9.0",
         "illuminate/macroable": "^9.0",
         "nesbot/carbon": "^2.53.1",
+        "symfony/uid": "^6.0",
         "voku/portable-ascii": "^2.0"
     },
     "conflict": {
