@@ -77,7 +77,7 @@ trait InteractsWithInput
     }
 
     /**
-     * Determine if the request contains given input item keys.
+     * Determine if the request contains all the given input item keys.
      *
      * @param  string|array  $keys
      * @return bool
