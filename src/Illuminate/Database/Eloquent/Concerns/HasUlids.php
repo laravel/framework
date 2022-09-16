@@ -49,6 +49,10 @@ trait HasUlids
      */
     public function getKeyType()
     {
-        return 'string';
+        if (in_array($this->getKeyName(), $this->uniqueIds())) {
+            return 'string';
+        }
+
+        return $this->keyType;
     }
 }
