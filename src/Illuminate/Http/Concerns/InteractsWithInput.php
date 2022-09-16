@@ -77,14 +77,14 @@ trait InteractsWithInput
     }
 
     /**
-     * Determine if the request contains a given input item key.
+     * Determine if the request contains given input item keys.
      *
-     * @param  string|array  $key
+     * @param  string|array  $keys
      * @return bool
      */
-    public function has($key)
+    public function has($keys)
     {
-        $keys = is_array($key) ? $key : func_get_args();
+        $keys = is_array($keys) ? $keys : func_get_args();
 
         $input = $this->all();
 
@@ -134,14 +134,14 @@ trait InteractsWithInput
     }
 
     /**
-     * Determine if the request contains a non-empty value for an input item.
+     * Determine if the request contains a non-empty value for all the given input items.
      *
-     * @param  string|array  $key
+     * @param  string|array  $keys
      * @return bool
      */
-    public function filled($key)
+    public function filled($keys)
     {
-        $keys = is_array($key) ? $key : func_get_args();
+        $keys = is_array($keys) ? $keys : func_get_args();
 
         foreach ($keys as $value) {
             if ($this->isEmptyString($value)) {
@@ -153,14 +153,14 @@ trait InteractsWithInput
     }
 
     /**
-     * Determine if the request contains an empty value for an input item.
+     * Determine if the request contains an empty value for all the given input items.
      *
-     * @param  string|array  $key
+     * @param  string|array  $keys
      * @return bool
      */
-    public function isNotFilled($key)
+    public function isNotFilled($keys)
     {
-        $keys = is_array($key) ? $key : func_get_args();
+        $keys = is_array($keys) ? $keys : func_get_args();
 
         foreach ($keys as $value) {
             if (! $this->isEmptyString($value)) {
@@ -212,14 +212,14 @@ trait InteractsWithInput
     }
 
     /**
-     * Determine if the request is missing a given input item key.
+     * Determine if the request is missing any of the given input item keys.
      *
-     * @param  string|array  $key
+     * @param  string|array  $keys
      * @return bool
      */
-    public function missing($key)
+    public function missing($keys)
     {
-        $keys = is_array($key) ? $key : func_get_args();
+        $keys = is_array($keys) ? $keys : func_get_args();
 
         return ! $this->has($keys);
     }
