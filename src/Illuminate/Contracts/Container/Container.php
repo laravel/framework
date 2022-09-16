@@ -36,6 +36,16 @@ interface Container extends ContainerInterface
     public function tag($abstracts, $tags);
 
     /**
+     * Assign a set of tags to classes that extends or implements one of the provided classes
+     *
+     * @param array|string $intanceofFQCN
+     * @param array|string $tags
+     *
+     * @return void
+     */
+    public function tagInstanceof(array|string $intanceofFQCN, array|string $tags): void;
+
+    /**
      * Resolve all of the bindings for a given tag.
      *
      * @param  string  $tag

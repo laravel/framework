@@ -12,6 +12,7 @@ use LogicException;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionParameter;
+use RuntimeException;
 use TypeError;
 
 class Container implements ArrayAccess, ContainerContract
@@ -155,6 +156,13 @@ class Container implements ArrayAccess, ContainerContract
      * @var array[]
      */
     protected $afterResolvingCallbacks = [];
+
+    /**
+     * The classes loaded from the composer classmapper
+     *
+     * @var array<int, string>
+     */
+    protected array $classmap;
 
     /**
      * Define a contextual binding.
@@ -523,6 +531,54 @@ class Container implements ArrayAccess, ContainerContract
             foreach ((array) $abstracts as $abstract) {
                 $this->tags[$tag][] = $abstract;
             }
+        }
+    }
+
+    /**
+     * Assign a set of tags to classes that extends or implements one of the provided classes
+     *
+     * @param  array|string $intanceofFQCN
+     * @param  array|string $tags
+     * @return void
+     */
+    public function tagInstanceof(array|string $intanceofFQCN, array|string $tags): void
+    {
+        if (!isset($this->classmap)) {
+            $classmapFile = app()->basePath('vendor/composer/autoload_classmap.php');
+            if ( ! file_exists($classmapFile)) {
+                throw new RuntimeException('tagInstanceof relies on the autoload_classmap file from composer.');
+            }
+            $classmap = require $classmapFile;
+            $this->classmap = array_keys($classmap);
+        }
+
+        if (is_string($intanceofFQCN)) {
+            $intanceofFQCN = [$intanceofFQCN];
+        }
+        if (is_string($tags)) {
+            $tags = [$tags];
+        }
+
+        foreach ($this->classmap as $class) {
+            if (!class_exists($class, false)) {
+                continue;
+            }
+
+            $classImplementations = array_merge(
+                [$class], // In case the class itself is passed
+                class_implements($class, false) ?: [], // For provided interface FQCN
+                class_parents($class, false) ?: [] // For provided parent class FQCN
+            );
+
+            if (count(array_intersect($intanceofFQCN, $classImplementations)) === 0) {
+                continue;
+            }
+
+            if ((new ReflectionClass($class))->isAbstract()) {
+                continue;
+            }
+
+            $this->tag($class, $tags);
         }
     }
 
