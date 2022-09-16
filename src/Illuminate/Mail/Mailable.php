@@ -1106,6 +1106,18 @@ class Mailable implements MailableContract, Renderable
     }
 
     /**
+     * Determine if the mailable has the given tag.
+     *
+     * @param  string  $value
+     * @return bool
+     */
+    public function hasTag($value)
+    {
+        return in_array($value, $this->tags) ||
+               (method_exists($this, 'envelope') && in_array($value, $this->envelope()->tags));
+    }
+
+    /**
      * Add a metadata header to the message when supported by the underlying transport.
      *
      * @param  string  $key
@@ -1117,6 +1129,19 @@ class Mailable implements MailableContract, Renderable
         $this->metadata[$key] = $value;
 
         return $this;
+    }
+
+    /**
+     * Determine if the mailable has the given metadata.
+     *
+     * @param  string  $key
+     * @param  string  $value
+     * @return bool
+     */
+    public function hasMetadata($key, $value)
+    {
+        return (isset($this->metadata[$key]) && $this->metadata[$key] === $value) ||
+               (method_exists($this, 'envelope') && $this->envelope()->hasMetadata($key, $value));
     }
 
     /**
@@ -1373,6 +1398,14 @@ class Mailable implements MailableContract, Renderable
 
             if ($envelope->subject) {
                 $this->subject($envelope->subject);
+            }
+
+            foreach ($envelope->tags as $tag) {
+                $this->tag($tag);
+            }
+
+            foreach ($envelope->metadata as $key => $value) {
+                $this->metadata($key, $value);
             }
         }
 

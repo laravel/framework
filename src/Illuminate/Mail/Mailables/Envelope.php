@@ -10,8 +10,10 @@ class Envelope
     public $bcc;
     public $replyTo;
     public $subject;
+    public $tags = [];
+    public $metadata = [];
 
-    public function __construct(Address|string $from = null, $to = [], $cc = [], $bcc = [], $replyTo = [], string $subject = null)
+    public function __construct(Address|string $from = null, $to = [], $cc = [], $bcc = [], $replyTo = [], string $subject = null, array $tags = [], array $metadata = [])
     {
         $this->from = is_string($from) ? new Address($from) : $from;
         $this->to = $this->normalizeAddresses($to);
@@ -19,6 +21,8 @@ class Envelope
         $this->bcc = $this->normalizeAddresses($bcc);
         $this->replyTo = $this->normalizeAddresses($replyTo);
         $this->subject = $subject;
+        $this->tags = $tags;
+        $this->metadata = $metadata;
     }
 
     protected function normalizeAddresses($addresses)
@@ -73,5 +77,10 @@ class Envelope
     public function hasSubject($subject)
     {
         return $this->subject === $subject;
+    }
+
+    public function hasMetadata($key, $value)
+    {
+        return isset($this->metadata[$key]) && $this->metadata[$key] === $value;
     }
 }
