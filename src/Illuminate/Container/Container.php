@@ -158,7 +158,7 @@ class Container implements ArrayAccess, ContainerContract
     protected $afterResolvingCallbacks = [];
 
     /**
-     * The classes loaded from the composer classmapper
+     * The classes loaded from the composer classmapper.
      *
      * @var array<int, string>
      */
@@ -535,17 +535,17 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
-     * Assign a set of tags to classes that extends or implements one of the provided classes
+     * Assign a set of tags to classes that extends or implements one of the provided classes.
      *
-     * @param  array|string $intanceofFQCN
-     * @param  array|string $tags
+     * @param  array|string  $intanceofFQCN
+     * @param  array|string  $tags
      * @return void
      */
     public function tagInstanceof(array|string $intanceofFQCN, array|string $tags): void
     {
-        if (!isset($this->classmap)) {
+        if (! isset($this->classmap)) {
             $classmapFile = app()->basePath('vendor/composer/autoload_classmap.php');
-            if ( ! file_exists($classmapFile)) {
+            if (! file_exists($classmapFile)) {
                 throw new RuntimeException('tagInstanceof relies on the autoload_classmap file from composer.');
             }
             $classmap = require $classmapFile;
@@ -560,7 +560,7 @@ class Container implements ArrayAccess, ContainerContract
         }
 
         foreach ($this->classmap as $class) {
-            if (!class_exists($class, false)) {
+            if (! class_exists($class, false)) {
                 continue;
             }
 
