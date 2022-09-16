@@ -211,6 +211,23 @@ class TestResponseTest extends TestCase
         $response->assertViewMissing('foo.baz');
     }
 
+    public function testAssertViewRendered()
+    {
+        $response = $this->makeMockResponse(['render' => ''])
+             ->withRenderedViews(['foo' => 1]);
+
+        $response->assertViewRendered('foo');
+        $response->assertViewRendered('foo', 1);
+    }
+
+    public function testAssertViewHasntRendered()
+    {
+        $response = $this->makeMockResponse(['render' => ''])
+             ->withRenderedViews(['baz' => 1]);
+
+        $response->assertViewHasntRendered('foo');
+    }
+
     public function testAssertSee()
     {
         $response = $this->makeMockResponse([

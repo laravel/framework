@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Testing\Concerns;
 
 use Illuminate\Contracts\Http\Kernel as HttpKernel;
+use Illuminate\Contracts\View\View;
 use Illuminate\Cookie\CookieValuePrefix;
 use Illuminate\Http\Request;
 use Illuminate\Testing\LoggedExceptionCollection;
@@ -541,6 +542,23 @@ trait MakesHttpRequests
             $cookies, $files, array_replace($this->serverVariables, $server), $content
         );
 
+        $renderedViews = [];
+
+        $this->app->make('events')->listen(
+            'composing:*',
+            function(string $event, array $data = []) use (&$renderedViews) {
+                $view = data_get($data, 0);
+
+                if (! $view instanceof View) {
+                    return;
+                }
+
+                $name = $view->getName();
+
+                $renderedViews[$name] = ($renderedViews[$name] ?? 0) + 1;
+            }
+        );
+
         $response = $kernel->handle(
             $request = Request::createFromBase($symfonyRequest)
         );
@@ -551,7 +569,7 @@ trait MakesHttpRequests
             $response = $this->followRedirects($response);
         }
 
-        return $this->latestResponse = $this->createTestResponse($response);
+        return $this->latestResponse = $this->createTestResponse($response)->withRenderedViews($renderedViews);
     }
 
     /**

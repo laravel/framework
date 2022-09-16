@@ -46,6 +46,13 @@ class TestResponse implements ArrayAccess
     public $exceptions;
 
     /**
+     * The array of rendered views for the request.
+     *
+     * @var array
+     */
+    public $renderedViews = [];
+
+    /**
      * The streamed content of the response.
      *
      * @var string
@@ -1039,6 +1046,49 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Assert that the given view has been rendered during the response.
+     *
+     * @param  string  $view
+     * @param  int|null  $expectedCount
+     * @return $this
+     */
+    public function assertViewRendered($view, $expectedCount = null)
+    {
+        PHPUnit::assertArrayHasKey(
+            $view,
+            $this->renderedViews,
+            "[{$view}] was not rendered"
+        );
+
+        if ($expectedCount !== null) {
+            PHPUnit::assertEquals(
+                $expectedCount,
+                $actualCount = ($this->renderedViews[$view] ?? 0),
+                "[{$view}] was rendered {$actualCount} times instead of {$expectedCount}"
+            );
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert that the given view has not been rendered during the response.
+     *
+     * @param  string  $view
+     * @return $this
+     */
+    public function assertViewHasntRendered($view)
+    {
+        PHPUnit::assertArrayNotHasKey(
+            $view,
+            $this->renderedViews,
+            "[{$view}] was rendered"
+        );
+
+        return $this;
+    }
+
+    /**
      * Ensure that the response has a view as its original content.
      *
      * @return $this
@@ -1503,6 +1553,19 @@ class TestResponse implements ArrayAccess
     public function withExceptions(Collection $exceptions)
     {
         $this->exceptions = $exceptions;
+
+        return $this;
+    }
+
+    /**
+     * Set the previous rendered views on the response.
+     *
+     * @param  array  $renderedViews
+     * @return $this
+     */
+    public function withRenderedViews(array $renderedViews)
+    {
+        $this->renderedViews = $renderedViews;
 
         return $this;
     }
