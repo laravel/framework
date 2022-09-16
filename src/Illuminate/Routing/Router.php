@@ -238,18 +238,28 @@ class Router implements BindingRegistrar, RegistrarContract
     }
 
     /**
-     * Create a redirect from one URI to another.
+     * Create a redirect from one or many URIs to another.
      *
-     * @param  string  $uri
+     * @param  string|string[]  $uri
      * @param  string  $destination
      * @param  int  $status
-     * @return \Illuminate\Routing\Route
+     * @return \Illuminate\Routing\Route|\Illuminate\Routing\Route[]
      */
     public function redirect($uri, $destination, $status = 302)
     {
-        return $this->any($uri, '\Illuminate\Routing\RedirectController')
+        if(is_string($uri)) {
+            $uri = [$uri];
+        }
+
+        $routes = [];
+
+        foreach ($uri as $value) {
+            $routes[] = $this->any($value, '\Illuminate\Routing\RedirectController')
                 ->defaults('destination', $destination)
                 ->defaults('status', $status);
+        }
+
+        return count($routes) > 1 ? $routes : $routes[0];
     }
 
     /**

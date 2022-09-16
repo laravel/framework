@@ -1882,6 +1882,31 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals(302, $response->getStatusCode());
     }
 
+    public function testRouteRedirectForManyUris()
+    {
+        $container = new Container;
+        $router = new Router(new Dispatcher, $container);
+        $container->singleton(Registrar::class, function () use ($router) {
+            return $router;
+        });
+        $request = Request::create('contact-us-2', 'GET');
+        $container->singleton(Request::class, function () use ($request) {
+            return $request;
+        });
+        $urlGenerator = new UrlGenerator(new RouteCollection, $request);
+        $container->singleton(UrlGenerator::class, function () use ($urlGenerator) {
+            return $urlGenerator;
+        });
+        $router->get('contact_us', function () {
+            throw new Exception('Route should not be reachable.');
+        });
+        $router->redirect(['contact_us', 'contact-us-2'], 'contact');
+
+        $response = $router->dispatch($request);
+        $this->assertTrue($response->isRedirect('contact'));
+        $this->assertEquals(302, $response->getStatusCode());
+    }
+
     public function testRouteRedirectRetainsExistingStartingForwardSlash()
     {
         $container = new Container;

@@ -18,7 +18,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Routing\Route permanentRedirect(string $uri, string $destination)
  * @method static \Illuminate\Routing\Route post(string $uri, array|string|callable|null $action = null)
  * @method static \Illuminate\Routing\Route put(string $uri, array|string|callable|null $action = null)
- * @method static \Illuminate\Routing\Route redirect(string $uri, string $destination, int $status = 302)
+ * @method static \Illuminate\Routing\Route|\Illuminate\Routing\Route[] redirect(string|string[] $uri, string $destination, int $status = 302)
  * @method static \Illuminate\Routing\Route substituteBindings(\Illuminate\Support\Facades\Route $route)
  * @method static \Illuminate\Routing\Route view(string $uri, string $view, array $data = [], int|array $status = 200, array $headers = [])
  * @method static \Illuminate\Routing\RouteRegistrar as(string $value)
