@@ -247,13 +247,9 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function redirect($uri, $destination, $status = 302)
     {
-        if(is_string($uri)) {
-            $uri = [$uri];
-        }
-
         $routes = [];
 
-        foreach ($uri as $value) {
+        foreach ((array) $uri as $value) {
             $routes[] = $this->any($value, '\Illuminate\Routing\RedirectController')
                 ->defaults('destination', $destination)
                 ->defaults('status', $status);
