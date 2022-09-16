@@ -25,6 +25,14 @@ class InteractsWithContainerTest extends TestCase
         $this->assertSame($this, $instance);
     }
 
+    public function testWithoutViteHandlesAsset()
+    {
+        $instance = $this->withoutVite();
+
+        $this->assertSame('', app(Vite::class)->asset('path/to/asset.png'));
+        $this->assertSame($this, $instance);
+    }
+
     public function testWithViteRestoresOriginalHandlerAndReturnsInstance()
     {
         $handler = new stdClass;

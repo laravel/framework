@@ -121,7 +121,7 @@ class ChangeColumn
     {
         $options = ['type' => static::getDoctrineColumnType($fluent['type'])];
 
-        if (in_array($fluent['type'], ['text', 'mediumText', 'longText'])) {
+        if (in_array($fluent['type'], ['tinyText', 'text', 'mediumText', 'longText'])) {
             $options['length'] = static::calculateDoctrineTextLength($fluent['type']);
         }
 
@@ -152,10 +152,11 @@ class ChangeColumn
         return Type::getType(match ($type) {
             'biginteger' => 'bigint',
             'smallinteger' => 'smallint',
-            'mediumtext', 'longtext' => 'text',
+            'tinytext', 'mediumtext', 'longtext' => 'text',
             'binary' => 'blob',
             'uuid' => 'guid',
             'char' => 'string',
+            'double' => 'float',
             default => $type,
         });
     }
@@ -169,6 +170,7 @@ class ChangeColumn
     protected static function calculateDoctrineTextLength($type)
     {
         return match ($type) {
+            'tinyText' => 1,
             'mediumText' => 65535 + 1,
             'longText' => 16777215 + 1,
             default => 255 + 1,
@@ -197,6 +199,7 @@ class ChangeColumn
             'mediumInteger',
             'smallInteger',
             'time',
+            'timestamp',
             'tinyInteger',
         ]);
     }

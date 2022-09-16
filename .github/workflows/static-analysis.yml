@@ -2,13 +2,14 @@ name: static analysis
 
 on:
   push:
+    branches:
+      - master
+      - '*.x'
   pull_request:
-  schedule:
-    - cron: '0 0 * * *'
 
 jobs:
   src:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     strategy:
       fail-fast: true

@@ -70,6 +70,7 @@ class DatabaseEloquentFactoryTest extends TestCase
             $table->increments('id');
             $table->foreignId('commentable_id');
             $table->string('commentable_type');
+            $table->foreignId('user_id');
             $table->string('body');
             $table->softDeletes();
             $table->timestamps();
@@ -651,6 +652,24 @@ class DatabaseEloquentFactoryTest extends TestCase
         FactoryTestUserFactory::new()->trashed()->create();
     }
 
+    public function test_model_instances_can_be_used_in_place_of_nested_factories()
+    {
+        Factory::guessFactoryNamesUsing(function ($model) {
+            return $model.'Factory';
+        });
+
+        $user = FactoryTestUserFactory::new()->create();
+        $post = FactoryTestPostFactory::new()
+            ->recycle($user)
+            ->hasComments(2)
+            ->create();
+
+        $this->assertSame(1, FactoryTestUser::count());
+        $this->assertEquals($user->id, $post->user_id);
+        $this->assertEquals($user->id, $post->comments[0]->user_id);
+        $this->assertEquals($user->id, $post->comments[1]->user_id);
+    }
+
     /**
      * Get a database connection instance.
      *
@@ -756,6 +775,7 @@ class FactoryTestCommentFactory extends Factory
         return [
             'commentable_id' => FactoryTestPostFactory::new(),
             'commentable_type' => FactoryTestPost::class,
+            'user_id' => FactoryTestUserFactory::new(),
             'body' => $this->faker->name,
         ];
     }

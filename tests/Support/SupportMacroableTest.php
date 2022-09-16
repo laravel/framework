@@ -29,6 +29,16 @@ class SupportMacroableTest extends TestCase
         $this->assertSame('Taylor', $macroable::{__CLASS__}());
     }
 
+    public function testHasMacro()
+    {
+        $macroable = $this->macroable;
+        $macroable::macro('foo', function () {
+            return 'Taylor';
+        });
+        $this->assertTrue($macroable::hasMacro('foo'));
+        $this->assertFalse($macroable::hasMacro('bar'));
+    }
+
     public function testRegisterMacroAndCallWithoutStatic()
     {
         $macroable = $this->macroable;
@@ -75,18 +85,6 @@ class SupportMacroableTest extends TestCase
         $this->assertSame('foo', $instance->methodThree());
     }
 
-    public function testSettingMacroUsingStaticClosures()
-    {
-        TestMacroable::macro('staticFn', static function () {
-            return 'I am unbound.';
-        });
-        TestMacroable::macro('speed', static fn () => 'I am speed.');
-        $instance = new TestMacroable;
-
-        $this->assertSame('I am unbound.', $instance->staticFn());
-        $this->assertSame('I am speed.', $instance->speed());
-    }
-
     public function testFlushMacros()
     {
         TestMacroable::macro('flushMethod', function () {
@@ -102,6 +100,23 @@ class SupportMacroableTest extends TestCase
         $this->expectException(BadMethodCallException::class);
 
         $instance->flushMethod();
+    }
+
+    public function testFlushMacrosStatic()
+    {
+        TestMacroable::macro('flushMethod', function () {
+            return 'flushMethod';
+        });
+
+        $instance = new TestMacroable;
+
+        $this->assertSame('flushMethod', $instance::flushMethod());
+
+        TestMacroable::flushMacros();
+
+        $this->expectException(BadMethodCallException::class);
+
+        $instance::flushMethod();
     }
 }
 

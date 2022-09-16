@@ -38,11 +38,15 @@ class ShowCommand extends DatabaseInspectionCommand
      */
     public function handle(ConnectionResolverInterface $connections)
     {
-        $this->ensureDependenciesExist();
+        if (! $this->ensureDependenciesExist()) {
+            return 1;
+        }
 
         $connection = $connections->connection($database = $this->input->getOption('database'));
 
         $schema = $connection->getDoctrineSchemaManager();
+
+        $this->registerTypeMappings($schema->getDatabasePlatform());
 
         $data = [
             'platform' => [
@@ -75,7 +79,7 @@ class ShowCommand extends DatabaseInspectionCommand
             'table' => $table->getName(),
             'size' => $this->getTableSize($connection, $table->getName()),
             'rows' => $this->option('counts') ? $connection->table($table->getName())->count() : null,
-            'engine' => rescue(fn () => $table->getOption('engine')),
+            'engine' => rescue(fn () => $table->getOption('engine'), null, false),
             'comment' => $table->getComment(),
         ]);
     }
@@ -144,13 +148,13 @@ class ShowCommand extends DatabaseInspectionCommand
         $this->components->twoColumnDetail('Tables', $tables->count());
 
         if ($tableSizeSum = $tables->sum('size')) {
-            $this->components->twoColumnDetail('Total Size', number_format($tableSizeSum / 1024 / 1024, 2).'Mb');
+            $this->components->twoColumnDetail('Total Size', number_format($tableSizeSum / 1024 / 1024, 2).'MiB');
         }
 
         $this->newLine();
 
         if ($tables->isNotEmpty()) {
-            $this->components->twoColumnDetail('<fg=green;options=bold>Table</>', 'Size (Mb)'.($this->option('counts') ? ' <fg=gray;options=bold>/</> <fg=yellow;options=bold>Rows</>' : ''));
+            $this->components->twoColumnDetail('<fg=green;options=bold>Table</>', 'Size (MiB)'.($this->option('counts') ? ' <fg=gray;options=bold>/</> <fg=yellow;options=bold>Rows</>' : ''));
 
             $tables->each(function ($table) {
                 if ($tableSize = $table['size']) {

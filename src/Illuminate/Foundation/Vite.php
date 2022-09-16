@@ -3,11 +3,12 @@
 namespace Illuminate\Foundation;
 
 use Exception;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 
-class Vite
+class Vite implements Htmlable
 {
     /**
      * The Content Security Policy nonce to apply to all generated tags.
@@ -24,6 +25,27 @@ class Vite
     protected $integrityKey = 'integrity';
 
     /**
+     * The configured entry points.
+     *
+     * @var array
+     */
+    protected $entryPoints = [];
+
+    /**
+     * The path to the "hot" file.
+     *
+     * @var string|null
+     */
+    protected $hotFile;
+
+    /**
+     * The path to the build directory.
+     *
+     * @var string
+     */
+    protected $buildDirectory = 'build';
+
+    /**
      * The script tag attributes resolvers.
      *
      * @var array
@@ -36,6 +58,13 @@ class Vite
      * @var array
      */
     protected $styleTagAttributesResolvers = [];
+
+    /**
+     * The cached manifest files.
+     *
+     * @var array
+     */
+    protected static $manifests = [];
 
     /**
      * Get the Content Security Policy nonce applied to all generated tags.
@@ -67,6 +96,55 @@ class Vite
     public function useIntegrityKey($key)
     {
         $this->integrityKey = $key;
+
+        return $this;
+    }
+
+    /**
+     * Set the Vite entry points.
+     *
+     * @param  array  $entryPoints
+     * @return $this
+     */
+    public function withEntryPoints($entryPoints)
+    {
+        $this->entryPoints = $entryPoints;
+
+        return $this;
+    }
+
+    /**
+     * Get the Vite "hot" file path.
+     *
+     * @return string
+     */
+    public function hotFile()
+    {
+        return $this->hotFile ?? public_path('/hot');
+    }
+
+    /**
+     * Set the Vite "hot" file path.
+     *
+     * @param  string  $path
+     * @return $this
+     */
+    public function useHotFile($path)
+    {
+        $this->hotFile = $path;
+
+        return $this;
+    }
+
+    /**
+     * Set the Vite build directory.
+     *
+     * @param  string  $path
+     * @return $this
+     */
+    public function useBuildDirectory($path)
+    {
+        $this->buildDirectory = $path;
 
         return $this;
     }
@@ -109,75 +187,61 @@ class Vite
      * Generate Vite tags for an entrypoint.
      *
      * @param  string|string[]  $entrypoints
-     * @param  string  $buildDirectory
+     * @param  string|null  $buildDirectory
      * @return \Illuminate\Support\HtmlString
      *
      * @throws \Exception
      */
-    public function __invoke($entrypoints, $buildDirectory = 'build')
+    public function __invoke($entrypoints, $buildDirectory = null)
     {
-        static $manifests = [];
-
         $entrypoints = collect($entrypoints);
-        $buildDirectory = Str::start($buildDirectory, '/');
+        $buildDirectory ??= $this->buildDirectory;
 
-        if (is_file(public_path('/hot'))) {
-            $url = rtrim(file_get_contents(public_path('/hot')));
-
+        if ($this->isRunningHot()) {
             return new HtmlString(
                 $entrypoints
                     ->prepend('@vite/client')
-                    ->map(fn ($entrypoint) => $this->makeTagForChunk($entrypoint, "{$url}/{$entrypoint}", null, null))
+                    ->map(fn ($entrypoint) => $this->makeTagForChunk($entrypoint, $this->hotAsset($entrypoint), null, null))
                     ->join('')
             );
         }
 
-        $manifestPath = public_path($buildDirectory.'/manifest.json');
-
-        if (! isset($manifests[$manifestPath])) {
-            if (! is_file($manifestPath)) {
-                throw new Exception("Vite manifest not found at: {$manifestPath}");
-            }
-
-            $manifests[$manifestPath] = json_decode(file_get_contents($manifestPath), true);
-        }
-
-        $manifest = $manifests[$manifestPath];
+        $manifest = $this->manifest($buildDirectory);
 
         $tags = collect();
 
         foreach ($entrypoints as $entrypoint) {
-            if (! isset($manifest[$entrypoint])) {
-                throw new Exception("Unable to locate file in Vite manifest: {$entrypoint}.");
-            }
+            $chunk = $this->chunk($manifest, $entrypoint);
 
-            $tags->push($this->makeTagForChunk(
-                $entrypoint,
-                asset("{$buildDirectory}/{$manifest[$entrypoint]['file']}"),
-                $manifest[$entrypoint],
-                $manifest
-            ));
-
-            foreach ($manifest[$entrypoint]['css'] ?? [] as $css) {
-                $tags->push($this->makeTagForChunk(
-                    $entrypoint,
-                    asset("{$buildDirectory}/{$css}"),
-                    $manifest[$entrypoint],
-                    $manifest
-                ));
-            }
-
-            foreach ($manifest[$entrypoint]['imports'] ?? [] as $import) {
+            foreach ($chunk['imports'] ?? [] as $import) {
                 foreach ($manifest[$import]['css'] ?? [] as $css) {
                     $partialManifest = Collection::make($manifest)->where('file', $css);
 
                     $tags->push($this->makeTagForChunk(
                         $partialManifest->keys()->first(),
-                        asset("{$buildDirectory}/{$css}"),
+                        $this->assetPath("{$buildDirectory}/{$css}"),
                         $partialManifest->first(),
                         $manifest
                     ));
                 }
+            }
+
+            $tags->push($this->makeTagForChunk(
+                $entrypoint,
+                $this->assetPath("{$buildDirectory}/{$chunk['file']}"),
+                $chunk,
+                $manifest
+            ));
+
+            foreach ($chunk['css'] ?? [] as $css) {
+                $partialManifest = Collection::make($manifest)->where('file', $css);
+
+                $tags->push($this->makeTagForChunk(
+                    $partialManifest->keys()->first(),
+                    $this->assetPath("{$buildDirectory}/{$css}"),
+                    $partialManifest->first(),
+                    $manifest
+                ));
             }
         }
 
@@ -376,25 +440,157 @@ class Vite
      */
     public function reactRefresh()
     {
-        if (! is_file(public_path('/hot'))) {
+        if (! $this->isRunningHot()) {
             return;
         }
-
-        $url = rtrim(file_get_contents(public_path('/hot')));
 
         return new HtmlString(
             sprintf(
                 <<<'HTML'
                 <script type="module">
-                    import RefreshRuntime from '%s/@react-refresh'
+                    import RefreshRuntime from '%s'
                     RefreshRuntime.injectIntoGlobalHook(window)
                     window.$RefreshReg$ = () => {}
                     window.$RefreshSig$ = () => (type) => type
                     window.__vite_plugin_react_preamble_installed__ = true
                 </script>
                 HTML,
-                $url
+                $this->hotAsset('@react-refresh')
             )
         );
+    }
+
+    /**
+     * Get the path to a given asset when running in HMR mode.
+     *
+     * @return string
+     */
+    protected function hotAsset($asset)
+    {
+        return rtrim(file_get_contents($this->hotFile())).'/'.$asset;
+    }
+
+    /**
+     * Get the URL for an asset.
+     *
+     * @param  string  $asset
+     * @param  string|null  $buildDirectory
+     * @return string
+     */
+    public function asset($asset, $buildDirectory = null)
+    {
+        $buildDirectory ??= $this->buildDirectory;
+
+        if ($this->isRunningHot()) {
+            return $this->hotAsset($asset);
+        }
+
+        $chunk = $this->chunk($this->manifest($buildDirectory), $asset);
+
+        return $this->assetPath($buildDirectory.'/'.$chunk['file']);
+    }
+
+    /**
+     * Generate an asset path for the application.
+     *
+     * @param  string  $path
+     * @param  bool|null  $secure
+     * @return string
+     */
+    protected function assetPath($path, $secure = null)
+    {
+        return asset($path, $secure);
+    }
+
+    /**
+     * Get the the manifest file for the given build directory.
+     *
+     * @param  string  $buildDirectory
+     * @return array
+     *
+     * @throws \Exception
+     */
+    protected function manifest($buildDirectory)
+    {
+        $path = $this->manifestPath($buildDirectory);
+
+        if (! isset(static::$manifests[$path])) {
+            if (! is_file($path)) {
+                throw new Exception("Vite manifest not found at: {$path}");
+            }
+
+            static::$manifests[$path] = json_decode(file_get_contents($path), true);
+        }
+
+        return static::$manifests[$path];
+    }
+
+    /**
+     * Get the path to the manifest file for the given build directory.
+     *
+     * @param  string  $buildDirectory
+     * @return string
+     */
+    protected function manifestPath($buildDirectory)
+    {
+        return public_path($buildDirectory.'/manifest.json');
+    }
+
+    /**
+     * Get a unique hash representing the current manifest, or null if there is no manifest.
+     *
+     * @return string|null
+     */
+    public function manifestHash($buildDirectory = null)
+    {
+        $buildDirectory ??= $this->buildDirectory;
+
+        if ($this->isRunningHot()) {
+            return null;
+        }
+
+        if (! is_file($path = $this->manifestPath($buildDirectory))) {
+            return null;
+        }
+
+        return md5_file($path) ?: null;
+    }
+
+    /**
+     * Get the chunk for the given entry point / asset.
+     *
+     * @param  array  $manifest
+     * @param  string  $file
+     * @return array
+     *
+     * @throws \Exception
+     */
+    protected function chunk($manifest, $file)
+    {
+        if (! isset($manifest[$file])) {
+            throw new Exception("Unable to locate file in Vite manifest: {$file}.");
+        }
+
+        return $manifest[$file];
+    }
+
+    /**
+     * Determine if the HMR server is running.
+     *
+     * @return bool
+     */
+    protected function isRunningHot()
+    {
+        return is_file($this->hotFile());
+    }
+
+    /**
+     * Get the Vite tag content as a string of HTML.
+     *
+     * @return string
+     */
+    public function toHtml()
+    {
+        return $this->__invoke($this->entryPoints)->toHtml();
     }
 }

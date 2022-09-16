@@ -59,4 +59,17 @@ class Relationship
             $relationship->attach($this->factory->create([], $parent));
         }
     }
+
+    /**
+     * Specify the model instances to always use when creating relationships.
+     *
+     * @param  \Illuminate\Support\Collection  $recycle
+     * @return $this
+     */
+    public function recycle($recycle)
+    {
+        $this->factory = $this->factory->recycle($recycle);
+
+        return $this;
+    }
 }

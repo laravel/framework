@@ -151,7 +151,7 @@ class ValidationRuleParser
 
         foreach ($data as $key => $value) {
             if (Str::startsWith($key, $attribute) || (bool) preg_match('/^'.$pattern.'\z/', $key)) {
-                foreach (Arr::flatten((array) $rules) as $rule) {
+                foreach ((array) $rules as $rule) {
                     if ($rule instanceof NestedRules) {
                         $compiled = $rule->compile($key, $value, $data);
 

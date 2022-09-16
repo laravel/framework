@@ -33,12 +33,27 @@ class ArtisanCommandTest extends TestCase
             $this->line($this->ask('Huh?'));
         });
 
+        Artisan::command('exit {code}', fn () => (int) $this->argument('code'));
+
         Artisan::command('contains', function () {
             $this->line('My name is Taylor Otwell');
         });
     }
 
     public function test_console_command_that_passes()
+    {
+        $this->artisan('exit', ['code' => 0])->assertOk();
+    }
+
+    public function test_console_command_that_fails()
+    {
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Expected status code 0 but received 1.');
+
+        $this->artisan('exit', ['code' => 1])->assertOk();
+    }
+
+    public function test_console_command_that_passes_with_output()
     {
         $this->artisan('survey')
              ->expectsQuestion('What is your name?', 'Taylor Otwell')

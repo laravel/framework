@@ -87,4 +87,29 @@ class SchemaBuilderTest extends DatabaseTestCase
         $this->assertArrayHasKey(TinyInteger::NAME, Type::getTypesMap());
         $this->assertSame('tinyinteger', Schema::getColumnType('test', 'test_column'));
     }
+
+    public function testChangeToTextColumn()
+    {
+        if ($this->driver !== 'mysql') {
+            $this->markTestSkipped('Test requires a MySQL connection.');
+        }
+
+        Schema::create('test', function (Blueprint $table) {
+            $table->integer('test_column');
+        });
+
+        foreach (['tinyText', 'text', 'mediumText', 'longText'] as $type) {
+            $blueprint = new Blueprint('test', function ($table) use ($type) {
+                $table->$type('test_column')->change();
+            });
+
+            $queries = $blueprint->toSql($this->getConnection(), $this->getConnection()->getSchemaGrammar());
+
+            $uppercase = strtoupper($type);
+
+            $expected = ["ALTER TABLE test CHANGE test_column test_column $uppercase NOT NULL"];
+
+            $this->assertEquals($expected, $queries);
+        }
+    }
 }

@@ -46,6 +46,8 @@ class DatabaseEloquentModelTest extends TestCase
 {
     use InteractsWithTime;
 
+    protected $encrypter;
+
     protected function tearDown(): void
     {
         parent::tearDown();
@@ -1280,10 +1282,23 @@ class DatabaseEloquentModelTest extends TestCase
         $model->guard(['name', 'age']);
         $model->fill(['Foo' => 'bar']);
         $this->assertFalse(isset($model->Foo));
+
+        $handledMassAssignmentExceptions = 0;
+
+        Model::preventSilentlyDiscardingAttributes();
+
+        $this->expectException(MassAssignmentException::class);
+        $model = new EloquentModelStub;
+        $model->guard(['name', 'age']);
+        $model->fill(['Foo' => 'bar']);
+
+        Model::preventSilentlyDiscardingAttributes(false);
     }
 
     public function testFillableOverridesGuarded()
     {
+        Model::preventSilentlyDiscardingAttributes(false);
+
         $model = new EloquentModelStub;
         $model->guard([]);
         $model->fillable(['age', 'foo']);
@@ -2413,6 +2428,23 @@ class DatabaseEloquentModelTest extends TestCase
         $user->name = null;
 
         $this->assertNull($user->name);
+    }
+
+    public function testDiscardChanges()
+    {
+        $user = new EloquentModelStub([
+            'name' => 'Taylor Otwell',
+        ]);
+
+        $this->assertNotEmpty($user->isDirty());
+        $this->assertNull($user->getOriginal('name'));
+        $this->assertSame('Taylor Otwell', $user->getAttribute('name'));
+
+        $user->discardChanges();
+
+        $this->assertEmpty($user->isDirty());
+        $this->assertNull($user->getOriginal('name'));
+        $this->assertNull($user->getAttribute('name'));
     }
 }
 

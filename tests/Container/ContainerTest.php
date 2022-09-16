@@ -116,6 +116,20 @@ class ContainerTest extends TestCase
         $this->assertSame($firstInstantiation, $secondInstantiation);
     }
 
+    public function testScopedIf()
+    {
+        $container = new Container;
+        $container->scopedIf('class', function () {
+            return 'foo';
+        });
+        $this->assertSame('foo', $container->make('class'));
+        $container->scopedIf('class', function () {
+            return 'bar';
+        });
+        $this->assertSame('foo', $container->make('class'));
+        $this->assertNotSame('bar', $container->make('class'));
+    }
+
     public function testScopedClosureResets()
     {
         $container = new Container;
@@ -273,6 +287,21 @@ class ContainerTest extends TestCase
         $instance = $container->make(ContainerDefaultValueStub::class);
         $this->assertInstanceOf(ContainerConcreteStub::class, $instance->stub);
         $this->assertSame('taylor', $instance->default);
+    }
+
+    public function testBound()
+    {
+        $container = new Container;
+        $container->bind(ContainerConcreteStub::class, function () {
+            //
+        });
+        $this->assertTrue($container->bound(ContainerConcreteStub::class));
+        $this->assertFalse($container->bound(IContainerContractStub::class));
+
+        $container = new Container;
+        $container->bind(IContainerContractStub::class, ContainerConcreteStub::class);
+        $this->assertTrue($container->bound(IContainerContractStub::class));
+        $this->assertFalse($container->bound(ContainerConcreteStub::class));
     }
 
     public function testUnsetRemoveBoundInstances()

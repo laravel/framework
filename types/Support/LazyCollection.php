@@ -502,21 +502,25 @@ assertType('Illuminate\Support\LazyCollection<int, int>', $collection->make([1])
 assertType('Illuminate\Support\LazyCollection<int, int>', $collection->make([1])->union([1]));
 assertType('Illuminate\Support\LazyCollection<string, string>', $collection->make(['string' => 'string'])->union(['string' => 'string']));
 
-assertType('int', $collection->make([1])->min());
-assertType('int', $collection->make([1])->min('string'));
-assertType('int', $collection->make([1])->min(function ($int) {
+assertType('mixed', $collection->make()->min());
+assertType('mixed', $collection->make([1])->min());
+assertType('mixed', $collection->make([1])->min('string'));
+assertType('mixed', $collection->make([1])->min(function ($int) {
     assertType('int', $int);
 
     return 1;
 }));
+assertType('mixed', $collection->make([new User])->min('id'));
 
-assertType('int', $collection->make([1])->max());
-assertType('int', $collection->make([1])->max('string'));
-assertType('int', $collection->make([1])->max(function ($int) {
+assertType('mixed', $collection->make()->max());
+assertType('mixed', $collection->make([1])->max());
+assertType('mixed', $collection->make([1])->max('string'));
+assertType('mixed', $collection->make([1])->max(function ($int) {
     assertType('int', $int);
 
     return 1;
 }));
+assertType('mixed', $collection->make([new User])->max('id'));
 
 assertType('Illuminate\Support\LazyCollection<int, User>', $collection->nth(1, 2));
 

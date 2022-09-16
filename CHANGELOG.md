@@ -1,6 +1,184 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.23.0...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.30.0...9.x)
+
+
+## [v9.30.0](https://github.com/laravel/framework/compare/v9.29.0...v9.30.0) - 2022-09-13
+
+### Added
+- Added stop_buffering config option to logger ([#44071](https://github.com/laravel/framework/pull/44071))
+- Added read-only filesystem adapter decoration as a config option ([#44079](https://github.com/laravel/framework/pull/44079))
+- Added scoped filesystem driver ([#44105](https://github.com/laravel/framework/pull/44105))
+- Add force option to all make commands ([#44100](https://github.com/laravel/framework/pull/44100))
+
+### Fixed
+- Fixed QueryBuilder whereNot with array conditions ([#44083](https://github.com/laravel/framework/pull/44083))
+
+### Changed
+- Passing event into viaQueue and viaConnection of Queued Listener ([#44080](https://github.com/laravel/framework/pull/44080))
+- Improve testability of batched jobs ([#44075](https://github.com/laravel/framework/pull/44075))
+- Allow any kind of whitespace in cron expression ([#44110](https://github.com/laravel/framework/pull/44110))
+
+
+## [v9.29.0](https://github.com/laravel/framework/compare/v9.28.0...v9.29.0) - 2022-09-09
+
+### Added
+- Added RequiredIfAccepted validation rule ([#44035](https://github.com/laravel/framework/pull/44035))
+- Added `Illuminate/Foundation/Vite::assetPath()` ([#44037](https://github.com/laravel/framework/pull/44037))
+- Added ability to discard Eloquent Model changes ([#43772](https://github.com/laravel/framework/pull/43772))
+- Added ability to determine if attachments exist to `Illuminate/Mail/Mailable` ([#43967](https://github.com/laravel/framework/pull/43967))
+- Added `Illuminate/Support/Testing/Fakes/BusFake::assertNothingBatched()` ([#44056](https://github.com/laravel/framework/pull/44056))
+
+### Reverted
+- Reverted [Fixed RoueGroup::merge to format merged prefixes correctly](https://github.com/laravel/framework/pull/44011). ([#44072](https://github.com/laravel/framework/pull/44072))
+
+### Fixed
+- Avoid Passing null to parameter exception on PHP 8.1 ([#43951](https://github.com/laravel/framework/pull/43951))
+- Align Remember Me Cookie Duration with CookieJar expiration ([#44026](https://github.com/laravel/framework/pull/44026))
+- Fix Stringable typehints with Enumerable ([#44030](https://github.com/laravel/framework/pull/44030))
+- Fixed middleware "SetCacheHeaders" with file responses ([#44063](https://github.com/laravel/framework/pull/44063))
+
+### Changed
+- Don't use locks for queue job popping for PlanetScale's MySQL-compatible Vitess engine ([#44027](https://github.com/laravel/framework/pull/44027))
+- Avoid matching 'use' in custom Stub templates in `Illuminate/Console/GeneratorCommand.php` ([#44049](https://github.com/laravel/framework/pull/44049))
+
+
+## [v9.28.0](https://github.com/laravel/framework/compare/v9.27.0...v9.28.0) - 2022-09-06
+
+### Added
+- Added view data assertions to TestView ([#43923](https://github.com/laravel/framework/pull/43923))
+- Added `Illuminate/Routing/Redirector::getIntendedUrl()` ([#43938](https://github.com/laravel/framework/pull/43938))
+- Added Eloquent mode to prevent prevently silently discarding fills for attributes not in $fillable ([#43893](https://github.com/laravel/framework/pull/43893))
+- Added `Illuminate/Testing/PendingCommand::assertOk()` ([#43968](https://github.com/laravel/framework/pull/43968))
+- Make Application macroable ([#43966](https://github.com/laravel/framework/pull/43966))
+- Introducing Signal Traps ([#43933](https://github.com/laravel/framework/pull/43933))
+- Allow registering instances of commands ([#43986](https://github.com/laravel/framework/pull/43986))
+- Support Enumerable in Stringable ([#44012](https://github.com/laravel/framework/pull/44012))
+
+### Fixed
+- Fixed RoueGroup::merge to format merged prefixes correctly. ([#44011](https://github.com/laravel/framework/pull/44011))
+- Fixes providesTemporaryUrls on AwsS3V3Adapter ([#44009](https://github.com/laravel/framework/pull/44009))
+- Fix ordering of stylesheets when using @vite ([#43962](https://github.com/laravel/framework/pull/43962))
+
+### Changed
+- Allow invokable rules to specify custom messsages ([#43925](https://github.com/laravel/framework/pull/43925))
+- Support objects like GMP for custom Model casts ([#43959](https://github.com/laravel/framework/pull/43959))
+- Default 404 message on denyAsNotFound ([#43901](https://github.com/laravel/framework/pull/43901))
+- Changed `Illuminate/Container/Container::resolvePrimitive()` for isVariadic() ([#43985](https://github.com/laravel/framework/pull/43985))
+- Allow validator messages to use nested arrays ([#43981](https://github.com/laravel/framework/pull/43981))
+- Ensure freezeUuids always resets UUID creation after exception in callback ([#44018](https://github.com/laravel/framework/pull/44018))
+
+
+## [v9.27.0](https://github.com/laravel/framework/compare/v9.26.1...v9.27.0) - 2022-08-30
+
+### Added
+- Add getter and setter for connection in the DatabaseBatchRepository class ([#43869](https://github.com/laravel/framework/pull/43869))
+
+### Fixed
+- Fix for potential bug with non-backed enums ([#43842](https://github.com/laravel/framework/pull/43842))
+- Patch nested array validation rule regression bug ([#43897](https://github.com/laravel/framework/pull/43897))
+- Fix registering event listeners with array callback ([#43890](https://github.com/laravel/framework/pull/43890))
+
+### Changed
+- Explicitly add column name to SQLite query in `Illuminate/Database/Console/DatabaseInspectionCommand::getSqliteTableSize()` ([#43832](https://github.com/laravel/framework/pull/43832))
+- Allow broadcast on demand notifications ([d2b1446](https://github.com/laravel/framework/commit/d2b14466c27a3d62219256cea27088e6ecd9d32f))
+- Make Vite::hotFile() public ([#43875](https://github.com/laravel/framework/pull/43875))
+- Prompt to create sqlite db when migrating ([#43867](https://github.com/laravel/framework/pull/43867))
+- Call prepare() on HttpException responses ([#43895](https://github.com/laravel/framework/pull/43895))
+- Make the model:prune command easier to extend ([#43919](https://github.com/laravel/framework/pull/43919))
+
+
+## [v9.26.1](https://github.com/laravel/framework/compare/v9.26.0...v9.26.1) - 2022-08-23
+
+### Revert
+- Revert "[9.x] Add statusText for an assertion message" ([#43831](https://github.com/laravel/framework/pull/43831))
+
+### Fixed
+- Fixed `withoutVite` ([#43826](https://github.com/laravel/framework/pull/43826))
+
+
+## [v9.26.0](https://github.com/laravel/framework/compare/v9.25.1...v9.26.0) - 2022-08-23
+
+### Added
+- Adding support for non-backed enums in Models ([#43728](https://github.com/laravel/framework/pull/43728))
+- Added vite asset url helpers ([#43702](https://github.com/laravel/framework/pull/43702))
+- Added Authentication keyword for SqlServerConnector.php ([#43757](https://github.com/laravel/framework/pull/43757))
+- Added support for additional where* methods to route groups ([#43731](https://github.com/laravel/framework/pull/43731))
+- Added min_digits and max_digits validation ([#43797](https://github.com/laravel/framework/pull/43797))
+- Added closure support to dispatch conditionals in bus ([#43784](https://github.com/laravel/framework/pull/43784))
+- Added configurable paths to Vite ([#43620](https://github.com/laravel/framework/pull/43620))
+
+### Fixed
+- Fix unique lock release for broadcast events ([#43738](https://github.com/laravel/framework/pull/43738))
+- Fix empty collection class serialization ([#43758](https://github.com/laravel/framework/pull/43758))
+- Fixes creation of deprecations channel ([#43812](https://github.com/laravel/framework/pull/43812))
+
+### Changed
+- Improve display of failures for assertDatabaseHas ([#43736](https://github.com/laravel/framework/pull/43736))
+- Always use the write PDO connection to read the just stored pending batch in bus ([#43737](https://github.com/laravel/framework/pull/43737))
+- Move unique lock release to method ([#43740](https://github.com/laravel/framework/pull/43740))
+- Remove timeoutAt fallback from Job base class ([#43749](https://github.com/laravel/framework/pull/43749))
+- Convert closures to arrow functions ([#43778](https://github.com/laravel/framework/pull/43778))
+- Use except also in `Illuminate/Routing/Middleware/ValidateSignature::handle()` ([e554d47](https://github.com/laravel/framework/commit/e554d471daab568877c039e955a01cb2f06a2e7b))
+- Adjust forever time for cookies ([#43806](https://github.com/laravel/framework/pull/43806))
+- Make string padding UTF-8 safe ([f1762ed](https://github.com/laravel/framework/commit/f1762ed1660f2a71189f1a32efe5b410ec428268))
+
+
+## [v9.25.1](https://github.com/laravel/framework/compare/v9.25.0...v9.25.1) - 2022-08-16
+
+### Fixes
+- [Fixed typos](https://github.com/laravel/framework/compare/v9.25.0...v9.25.1) 
+
+
+## [v9.25.0](https://github.com/laravel/framework/compare/v9.24.0...v9.25.0) - 2022-08-16
+
+### Added
+- Added whenNotExactly to Stringable ([#43700](https://github.com/laravel/framework/pull/43700))
+- Added ability to Model::query()->touch() to mass update timestamps ([#43665](https://github.com/laravel/framework/pull/43665))
+
+### Fixed
+- Prevent error in db/model commands when using unsupported columns ([#43635](https://github.com/laravel/framework/pull/43635))
+- Fixes ensureDependenciesExist runtime error ([#43626](https://github.com/laravel/framework/pull/43626))
+- Null value for auto-cast field caused deprication warning in php 8.1 ([#43706](https://github.com/laravel/framework/pull/43706))
+- db:table command properly handle table who doesn't exist ([#43669](https://github.com/laravel/framework/pull/43669))
+
+### Changed
+- Handle assoc mode within db commands ([#43636](https://github.com/laravel/framework/pull/43636))
+- Allow chunkById on Arrays, as well as Models ([#43666](https://github.com/laravel/framework/pull/43666))
+- Allow for int value parameters to whereMonth() and whereDay() ([#43668](https://github.com/laravel/framework/pull/43668))
+- Cleaning up old if-else statement ([#43712](https://github.com/laravel/framework/pull/43712))
+- Ensure correct 'integrity' value is used for css assets ([#43714](https://github.com/laravel/framework/pull/43714))
+
+
+## [v9.24.0](https://github.com/laravel/framework/compare/v9.23.0...v9.24.0) - 2022-08-09
+
+### Added
+- New db:show, db:table and db:monitor commands ([#43367](https://github.com/laravel/framework/pull/43367))
+- Added validation doesnt_end_with rule ([#43518](https://github.com/laravel/framework/pull/43518))
+- Added `Illuminate/Database/Eloquent/SoftDeletes::restoreQuietly()` ([#43550](https://github.com/laravel/framework/pull/43550))
+- Added mergeUnless to resource ConditionallyLoadsAttributes trait ([#43567](https://github.com/laravel/framework/pull/43567))
+- Added `Illuminate/Support/Testing/Fakes/NotificationFake::sentNotifications()` ([#43558](https://github.com/laravel/framework/pull/43558))
+- Added `implode` to `Passthru` in `Illuminate/Database/Eloquent/Builder.php` ([#43574](https://github.com/laravel/framework/pull/43574))
+- Make Config repository macroable ([#43598](https://github.com/laravel/framework/pull/43598))
+- Add whenNull to ConditionallyLoadsAtrribute trait ([#43600](https://github.com/laravel/framework/pull/43600))
+- Extract child route model relationship name into a method ([#43597](https://github.com/laravel/framework/pull/43597))
+
+### Revert
+- Reverted [Added `whereIn` to  `Illuminate/Routing/RouteRegistrar::allowedAttributes`](https://github.com/laravel/framework/pull/43509) ([#43523](https://github.com/laravel/framework/pull/43523))
+
+### Fixed
+- Fix unique locking on broadcast events ([#43516](https://github.com/laravel/framework/pull/43516))
+- Fixes the issue of running docs command on windows ([#43566](https://github.com/laravel/framework/pull/43566), [#43585](https://github.com/laravel/framework/pull/43585))
+- Fixes output when running db:seed or using --seed in migrate commands ([#43593](https://github.com/laravel/framework/pull/43593))
+
+### Changed
+- Gracefully fail when unable to locate expected binary on the system for artisan docs command ([#43521](https://github.com/laravel/framework/pull/43521))
+- Improve output for some Artisan commands ([#43547](https://github.com/laravel/framework/pull/43547))
+- Alternative database name in Postgres DSN, allow pgbouncer aliased databases to continue working on 9.x ([#43542](https://github.com/laravel/framework/pull/43542))
+- Allow @class() for component tags ([#43140](https://github.com/laravel/framework/pull/43140))
+- Attribute Cast Performance Improvements ([#43554](https://github.com/laravel/framework/pull/43554))
+- Queue worker daemon should also listen for SIGQUIT ([#43607](https://github.com/laravel/framework/pull/43607))
+- Keep original keys when using Collection->sortBy() with an array of sort operations ([#43609](https://github.com/laravel/framework/pull/43609))
 
 
 ## [v9.23.0](https://github.com/laravel/framework/compare/v9.22.1...v9.23.0) - 2022-08-02

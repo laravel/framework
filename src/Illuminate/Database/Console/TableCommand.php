@@ -37,16 +37,24 @@ class TableCommand extends DatabaseInspectionCommand
      */
     public function handle(ConnectionResolverInterface $connections)
     {
-        $this->ensureDependenciesExist();
+        if (! $this->ensureDependenciesExist()) {
+            return 1;
+        }
 
         $connection = $connections->connection($this->input->getOption('database'));
 
         $schema = $connection->getDoctrineSchemaManager();
 
+        $this->registerTypeMappings($schema->getDatabasePlatform());
+
         $table = $this->argument('table') ?: $this->components->choice(
             'Which table would you like to inspect?',
             collect($schema->listTables())->flatMap(fn (Table $table) => [$table->getName()])->toArray()
         );
+
+        if (! $schema->tablesExist([$table])) {
+            return $this->components->warn("Table [{$table}] doesn't exist.");
+        }
 
         $table = $schema->listTableDetails($table);
 
@@ -191,7 +199,7 @@ class TableCommand extends DatabaseInspectionCommand
         $this->components->twoColumnDetail('Columns', $table['columns']);
 
         if ($size = $table['size']) {
-            $this->components->twoColumnDetail('Size', number_format($size / 1024 / 1024, 2).'Mb');
+            $this->components->twoColumnDetail('Size', number_format($size / 1024 / 1024, 2).'MiB');
         }
 
         $this->newLine();

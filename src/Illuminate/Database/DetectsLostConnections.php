@@ -60,6 +60,7 @@ trait DetectsLostConnections
             'TCP Provider: Error code 0x274C',
             'SQLSTATE[HY000] [2002] No such file or directory',
             'SSL: Operation timed out',
+            'Reason: Server is in script upgrade mode. Only administrator can connect at this time.',
         ]);
     }
 }
