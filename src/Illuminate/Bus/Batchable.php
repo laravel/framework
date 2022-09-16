@@ -74,7 +74,7 @@ trait Batchable
      * @param  int  $failedJobs
      * @param  array  $failedJobIds
      * @param  array  $options
-     * @return \Illuminate\Support\Testing\BatchFake
+     * @return array{0: $this, 1: \Illuminate\Support\Testing\BatchFake}
      */
     public function withFakeBatch(string $id = '',
                                   string $name = '',
