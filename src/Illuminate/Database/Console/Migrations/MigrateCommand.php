@@ -183,7 +183,7 @@ class MigrateCommand extends BaseCommand
     }
 
     /**
-     * Create missing MySQL database.
+     * Create a missing MySQL database.
      *
      * @return bool
      */
