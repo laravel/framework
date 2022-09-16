@@ -194,7 +194,7 @@ class Mailable implements MailableContract, Renderable
     public function send($mailer)
     {
         return $this->withLocale($this->locale, function () use ($mailer) {
-            Container::getInstance()->call([$this, 'build']);
+            $this->prepareMailableForDelivery();
 
             $mailer = $mailer instanceof MailFactory
                             ? $mailer->mailer($this->mailer)
@@ -275,7 +275,7 @@ class Mailable implements MailableContract, Renderable
     public function render()
     {
         return $this->withLocale($this->locale, function () {
-            Container::getInstance()->call([$this, 'build']);
+            $this->prepareMailableForDelivery();
 
             return Container::getInstance()->make('mailer')->render(
                 $this->buildView(), $this->buildViewData()
@@ -756,6 +756,10 @@ class Mailable implements MailableContract, Renderable
             'address' => $expected->email,
         ];
 
+        if ($this->hasEnvelopeRecipient($expected['address'], $expected['name'], $property)) {
+            return true;
+        }
+
         return collect($this->{$property})->contains(function ($actual) use ($expected) {
             if (! isset($expected['name'])) {
                 return $actual['address'] == $expected['address'];
@@ -763,6 +767,25 @@ class Mailable implements MailableContract, Renderable
 
             return $actual == $expected;
         });
+    }
+
+    /**
+     * Determine if the mailable "envelope" method defines a recipient.
+     *
+     * @param  string  $address
+     * @param  string|null  $name
+     * @param  string  $property
+     * @return bool
+     */
+    private function hasEnvelopeRecipient($address, $name, $property)
+    {
+        return method_exists($this, 'envelope') && match ($property) {
+            'from' => $this->envelope()->isFrom($address, $name),
+            'to' => $this->envelope()->hasTo($address, $name),
+            'cc' => $this->envelope()->hasCc($address, $name),
+            'bcc' => $this->envelope()->hasBcc($address, $name),
+            'replyTo' => $this->envelope()->hasReplyTo($address, $name),
+        };
     }
 
     /**
@@ -786,7 +809,8 @@ class Mailable implements MailableContract, Renderable
      */
     public function hasSubject($subject)
     {
-        return $this->subject === $subject;
+        return $this->subject === $subject ||
+               (method_exists($this, 'envelope') && $this->envelope()->hasSubject($subject));
     }
 
     /**
@@ -922,6 +946,10 @@ class Mailable implements MailableContract, Renderable
             $file = $file->toMailAttachment();
         }
 
+        if ($file instanceof Attachment && $this->hasEnvelopeAttachment($file)) {
+            return true;
+        }
+
         if ($file instanceof Attachment) {
             $parts = $file->attachWith(
                 fn ($path) => [$path, ['as' => $file->as, 'mime' => $file->mime]],
@@ -940,6 +968,24 @@ class Mailable implements MailableContract, Renderable
         return collect($this->attachments)->contains(
             fn ($attachment) => $attachment['file'] === $file && array_filter($attachment['options']) === array_filter($options)
         );
+    }
+
+    /**
+     * Determine if the mailable has the given envelope attachment.
+     *
+     * @param  \Illuminate\Mail\Attachment  $attachment
+     * @return bool
+     */
+    private function hasEnvelopeAttachment($attachment)
+    {
+        if (! method_exists($this, 'envelope')) {
+            return false;
+        }
+
+        $attachments = $this->attachments();
+
+        return Collection::make(is_object($attachments) ? [$attachments] : $attachments)
+                ->contains(fn ($attached) => $attached->isEquivalent($attachment));
     }
 
     /**
@@ -1269,7 +1315,7 @@ class Mailable implements MailableContract, Renderable
         }
 
         return $this->assertionableRenderStrings = $this->withLocale($this->locale, function () {
-            Container::getInstance()->call([$this, 'build']);
+            $this->prepareMailableForDelivery();
 
             $html = Container::getInstance()->make('mailer')->render(
                 $view = $this->buildView(), $this->buildViewData()
@@ -1289,6 +1335,75 @@ class Mailable implements MailableContract, Renderable
 
             return [(string) $html, (string) $text];
         });
+    }
+
+    /**
+     * Prepare the mailable instance for delivery.
+     *
+     * @return void
+     */
+    private function prepareMailableForDelivery()
+    {
+        if (method_exists($this, 'build')) {
+            Container::getInstance()->call([$this, 'build']);
+        }
+
+        if (method_exists($this, 'envelope')) {
+            $envelope = $this->envelope();
+
+            if (isset($envelope->from)) {
+                $this->from($envelope->from->address, $envelope->from->name);
+            }
+
+            foreach ($envelope->to as $to) {
+                $this->to($to->address, $to->name);
+            }
+
+            foreach ($envelope->cc as $cc) {
+                $this->cc($cc->address, $cc->name);
+            }
+
+            foreach ($envelope->bcc as $bcc) {
+                $this->bcc($bcc->address, $bcc->name);
+            }
+
+            foreach ($envelope->replyTo as $replyTo) {
+                $this->replyTo($replyTo->address, $replyTo->name);
+            }
+
+            if ($envelope->subject) {
+                $this->subject($envelope->subject);
+            }
+        }
+
+        if (method_exists($this, 'content')) {
+            $content = $this->content();
+
+            if ($content->view) {
+                $this->view($content->view);
+            }
+
+            if ($content->text) {
+                $this->text($content->text);
+            }
+
+            if ($content->markdown) {
+                $this->markdown($content->markdown);
+            }
+
+            foreach ($content->with as $key => $value) {
+                $this->with($key, $value);
+            }
+        }
+
+        if (method_exists($this, 'attachments')) {
+            $attachments = $this->attachments();
+
+            Collection::make(is_object($attachments) ? [$attachments] : $attachments)
+                ->each(function ($attachment) {
+                    $this->attach($attachment);
+                });
+        }
     }
 
     /**
