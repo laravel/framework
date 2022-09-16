@@ -49,16 +49,10 @@ trait HasUlids
      */
     public function getKeyType()
     {
-        return 'string';
-    }
+        if (in_array($this->getKeyName(), $this->uniqueIds())) {
+            return 'string';
+        }
 
-    /**
-     * Get the value indicating whether the IDs are incrementing.
-     *
-     * @return bool
-     */
-    public function getIncrementing()
-    {
-        return false;
+        return $this->keyType;
     }
 }
