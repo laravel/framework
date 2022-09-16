@@ -689,6 +689,17 @@ class BusFake implements QueueingDispatcher
     }
 
     /**
+     * Dispatch an empty job batch for testing.
+     *
+     * @param  string  $name
+     * @return \Illuminate\Bus\Batch
+     */
+    public function dispatchFakeBatch($name = '')
+    {
+        return $this->batch([])->name($name)->dispatch();
+    }
+
+    /**
      * Determine if a command should be faked or actually dispatched.
      *
      * @param  mixed  $command
