@@ -1150,7 +1150,7 @@ class HttpClientTest extends TestCase
         $middleware = Middleware::history($history);
 
         $responses = $this->factory->pool(fn (Pool $pool) => [
-            $pool->withMiddleware($middleware)->post('https://example.com', ['hyped-for' => 'laravel-movie'])
+            $pool->withMiddleware($middleware)->post('https://example.com', ['hyped-for' => 'laravel-movie']),
         ]);
 
         $response = $responses[0];
