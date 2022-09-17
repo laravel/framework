@@ -826,11 +826,15 @@ class Arr
     /**
      * Return the first non-null value in the parameters list.
      *
-     * @param  mixed  ...$parameters
+     * @param  array  $array
      * @return mixed
      */
-    public static function coalesce(...$parameters): mixed
+    public static function coalesce($array): mixed
     {
-        return static::first($parameters, fn ($value) => ! is_null($value));
+        if (is_null($array)) {
+            return null;
+        }
+
+        return static::first($array, fn ($value) => ! is_null($value));
     }
 }
