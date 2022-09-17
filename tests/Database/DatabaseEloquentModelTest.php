@@ -1790,6 +1790,8 @@ class DatabaseEloquentModelTest extends TestCase
     {
         $model = new EloquentModelAppendsStub;
 
+        $this->assertEquals(['is_admin', 'camelCased', 'StudlyCased'], $model->getAppends());
+
         $this->assertTrue(isset($model->is_admin));
         $this->assertTrue(isset($model->camelCased));
         $this->assertTrue(isset($model->StudlyCased));
