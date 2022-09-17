@@ -4,15 +4,75 @@ namespace Illuminate\Mail\Mailables;
 
 class Envelope
 {
+    /**
+     * The address sending the message.
+     *
+     * @var \Illuminate\Mail\Mailables\Address|string|null
+     */
     public $from;
+
+    /**
+     * The recipients of the message.
+     *
+     * @var array
+     */
     public $to;
+
+    /**
+     * The recipients receiving a copy of the message.
+     *
+     * @var array
+     */
     public $cc;
+
+    /**
+     * The recipients receiving a blind copy of the message.
+     *
+     * @var array
+     */
     public $bcc;
+
+    /**
+     * The recipients that should be replied to.
+     *
+     * @var array
+     */
     public $replyTo;
+
+    /**
+     * The subject of the message.
+     *
+     * @var string|null
+     */
     public $subject;
+
+    /**
+     * The message's tags.
+     *
+     * @var array
+     */
     public $tags = [];
+
+    /**
+     * The message's meta data.
+     *
+     * @var array
+     */
     public $metadata = [];
 
+    /**
+     * Create a new message envelope instance.
+     *
+     * @param  \Illuminate\Mail\Mailables\Address|string|null  $from
+     * @param  array  $to
+     * @param  array  $cc
+     * @param  array  $bcc
+     * @param  array  $replyTo
+     * @param  string|null  $subject
+     * @param  array  $tags
+     * @param  array  $metadata
+     * @return void
+     */
     public function __construct(Address|string $from = null, $to = [], $cc = [], $bcc = [], $replyTo = [], string $subject = null, array $tags = [], array $metadata = [])
     {
         $this->from = is_string($from) ? new Address($from) : $from;
@@ -25,6 +85,12 @@ class Envelope
         $this->metadata = $metadata;
     }
 
+    /**
+     * Normalize the given array of addresses.
+     *
+     * @param  array  $addresses
+     * @return array
+     */
     protected function normalizeAddresses($addresses)
     {
         return collect($addresses)->map(function ($address) {
@@ -32,7 +98,14 @@ class Envelope
         })->all();
     }
 
-    public function isFrom($address, $name = null)
+    /**
+     * Determine if the message is from the given address.
+     *
+     * @param  string  $address
+     * @param  string|null  $name
+     * @return bool
+     */
+    public function isFrom(string $address, string $name = null)
     {
         if (is_null($name)) {
             return $this->from->address === $address;
@@ -42,27 +115,63 @@ class Envelope
                $this->from->name === $name;
     }
 
-    public function hasTo($address, $name = null)
+    /**
+     * Determine if the message has the given address as a recipient.
+     *
+     * @param  string  $address
+     * @param  string|null  $name
+     * @return bool
+     */
+    public function hasTo(string $address, string $name = null)
     {
         return $this->hasRecipient($this->to, $address, $name);
     }
 
-    public function hasCc($address, $name = null)
+    /**
+     * Determine if the message has the given address as a "cc" recipient.
+     *
+     * @param  string  $address
+     * @param  string|null  $name
+     * @return bool
+     */
+    public function hasCc(string $address, string $name = null)
     {
         return $this->hasRecipient($this->cc, $address, $name);
     }
 
-    public function hasBcc($address, $name = null)
+    /**
+     * Determine if the message has the given address as a "bcc" recipient.
+     *
+     * @param  string  $address
+     * @param  string|null  $name
+     * @return bool
+     */
+    public function hasBcc(string $address, string $name = null)
     {
         return $this->hasRecipient($this->bcc, $address, $name);
     }
 
-    public function hasReplyTo($address, $name = null)
+    /**
+     * Determine if the message has the given address as a "reply to" recipient.
+     *
+     * @param  string  $address
+     * @param  string|null  $name
+     * @return bool
+     */
+    public function hasReplyTo(string $address, string $name = null)
     {
         return $this->hasRecipient($this->replyTo, $address, $name);
     }
 
-    protected function hasRecipient($recipients, $address, $name)
+    /**
+     * Determine if the message has the given recipient.
+     *
+     * @param  array  $recipients
+     * @param  string  $address
+     * @param  string|null  $name
+     * @return bool
+     */
+    protected function hasRecipient(array $recipients, string $address, ?string $name = null)
     {
         return collect($recipients)->contains(function ($recipient) use ($address, $name) {
             if (is_null($name)) {
@@ -74,12 +183,25 @@ class Envelope
         });
     }
 
-    public function hasSubject($subject)
+    /**
+     * Determine if the message has the given subject.
+     *
+     * @param  string  $subject
+     * @return bool
+     */
+    public function hasSubject(string $subject)
     {
         return $this->subject === $subject;
     }
 
-    public function hasMetadata($key, $value)
+    /**
+     * Determine if the message has the given metadata.
+     *
+     * @param  string  $key
+     * @param  string  $value
+     * @return bool
+     */
+    public function hasMetadata(string $key, string $value)
     {
         return isset($this->metadata[$key]) && $this->metadata[$key] === $value;
     }
