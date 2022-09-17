@@ -1373,6 +1373,24 @@ class Mailable implements MailableContract, Renderable
             Container::getInstance()->call([$this, 'build']);
         }
 
+        if (method_exists($this, 'headers')) {
+            $headers = $this->headers();
+
+            $this->withSymfonyMessage(function ($message) use ($headers) {
+                if ($headers->messageId) {
+                    $message->getHeaders()->addIdHeader('Message-Id', $headers->messageId);
+                }
+
+                if (count($headers->references) > 0) {
+                    $message->getHeaders()->addTextHeader('References', $headers->referencesString());
+                }
+
+                foreach ($headers->text as $key => $value) {
+                    $message->getHeaders()->addTextHeader($key, $value);
+                }
+            });
+        }
+
         if (method_exists($this, 'envelope')) {
             $envelope = $this->envelope();
 
