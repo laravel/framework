@@ -2092,6 +2092,16 @@ trait HasAttributes
     }
 
     /**
+     * Get the accessors to append to model arrays.
+     *
+     * @return array
+     */
+    public function getAppends()
+    {
+        return $this->appends;
+    }
+
+    /**
      * Return whether the accessor attribute has been appended.
      *
      * @param  string  $attribute
