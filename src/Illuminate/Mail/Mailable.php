@@ -1373,88 +1373,133 @@ class Mailable implements MailableContract, Renderable
             Container::getInstance()->call([$this, 'build']);
         }
 
-        if (method_exists($this, 'headers')) {
-            $headers = $this->headers();
+        $this->ensureHeadersAreHydrated();
+        $this->ensureEnvelopeIsHydrated();
+        $this->ensureContentIsHydrated();
+        $this->ensureAttachmentsAreHydrated();
+    }
 
-            $this->withSymfonyMessage(function ($message) use ($headers) {
-                if ($headers->messageId) {
-                    $message->getHeaders()->addIdHeader('Message-Id', $headers->messageId);
-                }
+    /**
+     * Ensure the mailable's headers are hydrated from the "headers" method.
+     *
+     * @return void
+     */
+    private function ensureHeadersAreHydrated()
+    {
+        if (! method_exists($this, 'headers')) {
+            return;
+        }
 
-                if (count($headers->references) > 0) {
-                    $message->getHeaders()->addTextHeader('References', $headers->referencesString());
-                }
+        $headers = $this->headers();
 
-                foreach ($headers->text as $key => $value) {
-                    $message->getHeaders()->addTextHeader($key, $value);
-                }
+        $this->withSymfonyMessage(function ($message) use ($headers) {
+            if ($headers->messageId) {
+                $message->getHeaders()->addIdHeader('Message-Id', $headers->messageId);
+            }
+
+            if (count($headers->references) > 0) {
+                $message->getHeaders()->addTextHeader('References', $headers->referencesString());
+            }
+
+            foreach ($headers->text as $key => $value) {
+                $message->getHeaders()->addTextHeader($key, $value);
+            }
+        });
+    }
+
+    /**
+     * Ensure the mailable's "envelope" data is hydrated from the "envelope" method.
+     *
+     * @return void
+     */
+    private function ensureEnvelopeIsHydrated()
+    {
+        if (! method_exists($this, 'envelope')) {
+            return;
+        }
+
+        $envelope = $this->envelope();
+
+        if (isset($envelope->from)) {
+            $this->from($envelope->from->address, $envelope->from->name);
+        }
+
+        foreach ($envelope->to as $to) {
+            $this->to($to->address, $to->name);
+        }
+
+        foreach ($envelope->cc as $cc) {
+            $this->cc($cc->address, $cc->name);
+        }
+
+        foreach ($envelope->bcc as $bcc) {
+            $this->bcc($bcc->address, $bcc->name);
+        }
+
+        foreach ($envelope->replyTo as $replyTo) {
+            $this->replyTo($replyTo->address, $replyTo->name);
+        }
+
+        if ($envelope->subject) {
+            $this->subject($envelope->subject);
+        }
+
+        foreach ($envelope->tags as $tag) {
+            $this->tag($tag);
+        }
+
+        foreach ($envelope->metadata as $key => $value) {
+            $this->metadata($key, $value);
+        }
+    }
+
+    /**
+     * Ensure the mailable's content is hydrated from the "content" method.
+     *
+     * @return void
+     */
+    private function ensureContentIsHydrated()
+    {
+        if (! method_exists($this, 'content')) {
+            return;
+        }
+
+        $content = $this->content();
+
+        if ($content->view) {
+            $this->view($content->view);
+        }
+
+        if ($content->text) {
+            $this->text($content->text);
+        }
+
+        if ($content->markdown) {
+            $this->markdown($content->markdown);
+        }
+
+        foreach ($content->with as $key => $value) {
+            $this->with($key, $value);
+        }
+    }
+
+    /**
+     * Ensure the mailable's attachments are hydrated from the "attachments" method.
+     *
+     * @return void
+     */
+    private function ensureAttachmentsAreHydrated()
+    {
+        if (! method_exists($this, 'attachments')) {
+            return;
+        }
+
+        $attachments = $this->attachments();
+
+        Collection::make(is_object($attachments) ? [$attachments] : $attachments)
+            ->each(function ($attachment) {
+                $this->attach($attachment);
             });
-        }
-
-        if (method_exists($this, 'envelope')) {
-            $envelope = $this->envelope();
-
-            if (isset($envelope->from)) {
-                $this->from($envelope->from->address, $envelope->from->name);
-            }
-
-            foreach ($envelope->to as $to) {
-                $this->to($to->address, $to->name);
-            }
-
-            foreach ($envelope->cc as $cc) {
-                $this->cc($cc->address, $cc->name);
-            }
-
-            foreach ($envelope->bcc as $bcc) {
-                $this->bcc($bcc->address, $bcc->name);
-            }
-
-            foreach ($envelope->replyTo as $replyTo) {
-                $this->replyTo($replyTo->address, $replyTo->name);
-            }
-
-            if ($envelope->subject) {
-                $this->subject($envelope->subject);
-            }
-
-            foreach ($envelope->tags as $tag) {
-                $this->tag($tag);
-            }
-
-            foreach ($envelope->metadata as $key => $value) {
-                $this->metadata($key, $value);
-            }
-        }
-
-        if (method_exists($this, 'content')) {
-            $content = $this->content();
-
-            if ($content->view) {
-                $this->view($content->view);
-            }
-
-            if ($content->text) {
-                $this->text($content->text);
-            }
-
-            if ($content->markdown) {
-                $this->markdown($content->markdown);
-            }
-
-            foreach ($content->with as $key => $value) {
-                $this->with($key, $value);
-            }
-        }
-
-        if (method_exists($this, 'attachments')) {
-            $attachments = $this->attachments();
-
-            Collection::make(is_object($attachments) ? [$attachments] : $attachments)
-                ->each(function ($attachment) {
-                    $this->attach($attachment);
-                });
-        }
     }
 
     /**
