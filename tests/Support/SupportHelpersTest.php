@@ -753,11 +753,10 @@ class SupportHelpersTest extends TestCase
     public function testCoalesce()
     {
         $this->assertEquals('W3Schools.com', coalesce(null, null, null, 'W3Schools.com', null, 'Example.com'));
-        $this->assertEquals('W3Schools.com', coalesce(... [null, null, null, 'W3Schools.com', null, 'Example.com']));
-        $this->assertNotNull(coalesce(null, null, null, new DateTime()));
+        $this->assertEquals('W3Schools.com', coalesce(...[null, null, null, 'W3Schools.com', null, 'Example.com']));        $this->assertNotNull(coalesce(null, null, null, new DateTime()));
         $this->assertNull(coalesce());
         $this->assertNull(coalesce(null));
-        $this->assertNull(coalesce(... []));
+        $this->assertNull(coalesce(...[]));
     }
 
     public function testEnv()

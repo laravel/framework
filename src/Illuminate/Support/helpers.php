@@ -426,8 +426,8 @@ if (! function_exists('coalesce')) {
      * @param  mixed  ...$parameters
      * @return mixed
      */
-    function coalesce(... $parameters): mixed
+    function coalesce(...$parameters): mixed
     {
-        return Arr::first($parameters, fn ($value) => !is_null($value));
+        return Arr::first($parameters, fn ($value) => ! is_null($value));
     }
 }
