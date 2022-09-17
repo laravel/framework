@@ -822,4 +822,15 @@ class Arr
 
         return is_array($value) ? $value : [$value];
     }
+
+    /**
+     * Return the first non-null value in the parameters list.
+     *
+     * @param  mixed  ...$parameters
+     * @return mixed
+     */
+    public static function coalesce(...$parameters): mixed
+    {
+        return static::first($parameters, fn ($value) => ! is_null($value));
+    }
 }

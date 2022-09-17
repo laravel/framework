@@ -1112,4 +1112,14 @@ class SupportArrTest extends TestCase
             ],
         ], Arr::prependKeysWith($array, 'test.'));
     }
+
+    public function testCoalesce()
+    {
+        $this->assertEquals('W3Schools.com', Arr::coalesce(null, null, null, 'W3Schools.com', null, 'Example.com'));
+        $this->assertEquals('W3Schools.com', Arr::coalesce(...[null, null, null, 'W3Schools.com', null, 'Example.com']));
+        $this->assertNotNull(Arr::coalesce(null, null, null, new \DateTime()));
+        $this->assertNull(Arr::coalesce());
+        $this->assertNull(Arr::coalesce(null));
+        $this->assertNull(Arr::coalesce(...[]));
+    }
 }

@@ -5,7 +5,6 @@ namespace Illuminate\Tests\Support;
 use ArrayAccess;
 use ArrayIterator;
 use Countable;
-use DateTime;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Env;
 use Illuminate\Support\Optional;
@@ -748,16 +747,6 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals(10, with(5, function ($five) {
             return $five + 5;
         }));
-    }
-
-    public function testCoalesce()
-    {
-        $this->assertEquals('W3Schools.com', coalesce(null, null, null, 'W3Schools.com', null, 'Example.com'));
-        $this->assertEquals('W3Schools.com', coalesce(...[null, null, null, 'W3Schools.com', null, 'Example.com']));
-        $this->assertNotNull(coalesce(null, null, null, new DateTime()));
-        $this->assertNull(coalesce());
-        $this->assertNull(coalesce(null));
-        $this->assertNull(coalesce(...[]));
     }
 
     public function testEnv()

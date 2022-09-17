@@ -418,16 +418,3 @@ if (! function_exists('with')) {
         return is_null($callback) ? $value : $callback($value);
     }
 }
-
-if (! function_exists('coalesce')) {
-    /**
-     * Return the first non-null value in the parameters list.
-     *
-     * @param  mixed  ...$parameters
-     * @return mixed
-     */
-    function coalesce(...$parameters): mixed
-    {
-        return Arr::first($parameters, fn ($value) => ! is_null($value));
-    }
-}
