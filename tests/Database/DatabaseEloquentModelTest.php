@@ -1798,6 +1798,8 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame('camelCased', $model->camelCased);
         $this->assertSame('StudlyCased', $model->StudlyCased);
 
+        $this->assertEquals(['is_admin', 'camelCased', 'StudlyCased'], $model->getAppends());
+
         $this->assertTrue($model->hasAppended('is_admin'));
         $this->assertTrue($model->hasAppended('camelCased'));
         $this->assertTrue($model->hasAppended('StudlyCased'));
