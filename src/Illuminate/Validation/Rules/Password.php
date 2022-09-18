@@ -384,9 +384,9 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
      */
     protected function fail($messages)
     {
-        $messages = collect(Arr::wrap($messages))->map(function ($message) {
-            return $this->validator->getTranslator()->get($message);
-        })->all();
+        $messages = collect(Arr::wrap($messages))
+            ->map(fn ($message) => $this->validator->getTranslator()->get($message))
+            ->all();
 
         $this->messages = array_merge($this->messages, $messages);
 

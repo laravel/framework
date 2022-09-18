@@ -49,9 +49,10 @@ class ValidationServiceProvider extends ServiceProvider implements DeferrablePro
      */
     protected function registerPresenceVerifier()
     {
-        $this->app->singleton('validation.presence', function ($app) {
-            return new DatabasePresenceVerifier($app['db']);
-        });
+        $this->app->singleton(
+            'validation.presence', 
+            fn ($app) => new DatabasePresenceVerifier($app['db'])
+        );
     }
 
     /**
@@ -61,9 +62,10 @@ class ValidationServiceProvider extends ServiceProvider implements DeferrablePro
      */
     protected function registerUncompromisedVerifier()
     {
-        $this->app->singleton(UncompromisedVerifier::class, function ($app) {
-            return new NotPwnedVerifier($app[HttpFactory::class]);
-        });
+        $this->app->singleton(
+            UncompromisedVerifier::class, 
+            fn ($app) => new NotPwnedVerifier($app[HttpFactory::class])
+        );
     }
 
     /**

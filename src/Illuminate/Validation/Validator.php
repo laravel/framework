@@ -1103,9 +1103,9 @@ class Validator implements ValidatorContract
      */
     public function setRules(array $rules)
     {
-        $rules = collect($rules)->mapWithKeys(function ($value, $key) {
-            return [str_replace('\.', $this->dotPlaceholder, $key) => $value];
-        })->toArray();
+        $rules = collect($rules)
+            ->mapWithKeys(fn ($value, $key) => [str_replace('\.', $this->dotPlaceholder, $key) => $value])
+            ->toArray();
 
         $this->initialRules = $rules;
 

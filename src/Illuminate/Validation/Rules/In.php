@@ -36,9 +36,10 @@ class In
      */
     public function __toString()
     {
-        $values = array_map(function ($value) {
-            return '"'.str_replace('"', '""', $value).'"';
-        }, $this->values);
+        $values = array_map(
+            fn ($value) => '"'.str_replace('"', '""', $value).'"', 
+            $this->values
+        );
 
         return $this->rule.':'.implode(',', $values);
     }

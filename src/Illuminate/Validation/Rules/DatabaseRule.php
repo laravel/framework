@@ -69,9 +69,13 @@ trait DatabaseRule
                 return $table;
             }
 
-            return implode('.', array_map(function (string $part) {
-                return trim($part, '.');
-            }, array_filter([$model->getConnectionName(), $model->getTable()])));
+            return implode(
+                '.', 
+                array_map(
+                    fn (string $part) => trim($part, '.'), 
+                    array_filter([$model->getConnectionName(), $model->getTable()])
+                )
+            );
         }
 
         return $table;
@@ -150,9 +154,7 @@ trait DatabaseRule
      */
     public function whereIn($column, $values)
     {
-        return $this->where(function ($query) use ($column, $values) {
-            $query->whereIn($column, $values);
-        });
+        return $this->where(fn ($query) => $query->whereIn($column, $values));
     }
 
     /**
@@ -164,9 +166,7 @@ trait DatabaseRule
      */
     public function whereNotIn($column, $values)
     {
-        return $this->where(function ($query) use ($column, $values) {
-            $query->whereNotIn($column, $values);
-        });
+        return $this->where(fn ($query) => $query->whereNotIn($column, $values));
     }
 
     /**
@@ -199,8 +199,8 @@ trait DatabaseRule
      */
     protected function formatWheres()
     {
-        return collect($this->wheres)->map(function ($where) {
-            return $where['column'].','.'"'.str_replace('"', '""', $where['value']).'"';
-        })->implode(',');
+        return collect($this->wheres)
+            ->map(fn ($where) => $where['column'].','.'"'.str_replace('"', '""', $where['value']).'"')
+            ->implode(',');
     }
 }
