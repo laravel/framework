@@ -25,19 +25,19 @@ class InteractsWithDatabaseTest extends TestCase
     {
         $grammar = new SQLiteGrammar();
 
-        $this->assertEquals(<<<TEXT
+        $this->assertEquals(<<<'TEXT'
         '["foo","bar"]'
         TEXT,
             $this->castAsJson(['foo', 'bar'], $grammar)
         );
 
-        $this->assertEquals(<<<TEXT
+        $this->assertEquals(<<<'TEXT'
         '["foo","bar"]'
         TEXT,
             $this->castAsJson(collect(['foo', 'bar']), $grammar)
         );
 
-        $this->assertEquals(<<<TEXT
+        $this->assertEquals(<<<'TEXT'
         '{"foo":"bar"}'
         TEXT,
             $this->castAsJson((object) ['foo' => 'bar'], $grammar)
@@ -48,19 +48,19 @@ class InteractsWithDatabaseTest extends TestCase
     {
         $grammar = new PostgresGrammar();
 
-        $this->assertEquals(<<<TEXT
+        $this->assertEquals(<<<'TEXT'
         '["foo","bar"]'
         TEXT,
             $this->castAsJson(['foo', 'bar'], $grammar)
         );
 
-        $this->assertEquals(<<<TEXT
+        $this->assertEquals(<<<'TEXT'
         '["foo","bar"]'
         TEXT,
             $this->castAsJson(collect(['foo', 'bar']), $grammar)
         );
 
-        $this->assertEquals(<<<TEXT
+        $this->assertEquals(<<<'TEXT'
         '{"foo":"bar"}'
         TEXT,
             $this->castAsJson((object) ['foo' => 'bar'], $grammar)
@@ -71,19 +71,19 @@ class InteractsWithDatabaseTest extends TestCase
     {
         $grammar = new SqlServerGrammar();
 
-        $this->assertEquals(<<<TEXT
+        $this->assertEquals(<<<'TEXT'
         json_query('["foo","bar"]')
         TEXT,
             $this->castAsJson(['foo', 'bar'], $grammar)
         );
 
-        $this->assertEquals(<<<TEXT
+        $this->assertEquals(<<<'TEXT'
         json_query('["foo","bar"]')
         TEXT,
             $this->castAsJson(collect(['foo', 'bar']), $grammar)
         );
 
-        $this->assertEquals(<<<TEXT
+        $this->assertEquals(<<<'TEXT'
         json_query('{"foo":"bar"}')
         TEXT,
             $this->castAsJson((object) ['foo' => 'bar'], $grammar)
@@ -94,19 +94,19 @@ class InteractsWithDatabaseTest extends TestCase
     {
         $grammar = new MySqlGrammar();
 
-        $this->assertEquals(<<<TEXT
+        $this->assertEquals(<<<'TEXT'
         cast('["foo","bar"]' as json)
         TEXT,
             $this->castAsJson(['foo', 'bar'], $grammar)
         );
 
-        $this->assertEquals(<<<TEXT
+        $this->assertEquals(<<<'TEXT'
         cast('["foo","bar"]' as json)
         TEXT,
             $this->castAsJson(collect(['foo', 'bar']), $grammar)
         );
 
-        $this->assertEquals(<<<TEXT
+        $this->assertEquals(<<<'TEXT'
         cast('{"foo":"bar"}' as json)
         TEXT,
             $this->castAsJson((object) ['foo' => 'bar'], $grammar)
@@ -115,10 +115,10 @@ class InteractsWithDatabaseTest extends TestCase
 
     protected function castAsJson($value, $grammar)
     {
-        $connection = m::mock(ConnectionInterface::class);    
+        $connection = m::mock(ConnectionInterface::class);
 
         $connection->shouldReceive('getQueryGrammar')->once()->andReturn($grammar);
-        
+
         $connection->shouldReceive('getPdo->quote')->once()->andReturnUsing(function ($value) {
             return "'".$value."'";
         });
