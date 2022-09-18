@@ -177,7 +177,8 @@ class RouteMiddleware
     ) {
     }
 
-    public function handle($request, $next) {
+    public function handle($request, $next)
+    {
         call_user_func($this->callback);
 
         return $next($request);
@@ -191,7 +192,8 @@ class ControllerMiddleware
     ) {
     }
 
-    public function handle($request, $next) {
+    public function handle($request, $next)
+    {
         call_user_func($this->callback);
 
         return $next($request);
