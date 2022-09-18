@@ -827,6 +827,47 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('taylorotwell@gmail.com', $results->first()->email);
     }
 
+    public function testWithWhereHasOnNestedRelationshipWithoutConstraints()
+    {
+        tap(EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']), function ($user) {
+            $post = $user->posts()->create(['name' => 'Post with Children']);
+            $post->childPosts()->create(['name' => 'Child Post', 'user_id' => $user->id]);
+            $post = $user->posts()->create(['name' => 'Post without Children']);
+        });
+
+        $results = EloquentTestUser::withWhereHas('posts.childPosts')->get();
+
+        $this->assertCount(1, $results);
+        tap($results->first(), function ($result) {
+            $this->assertSame('taylorotwell@gmail.com', $result->email);
+            $this->assertCount(1, $result->posts);
+            $this->assertSame('Post with Children', $result->posts()->first()->name);
+            $this->assertCount(1, $result->posts()->first()->childPosts);
+        });
+    }
+
+    public function testWithWhereHasOnDeeplyNestedRelationshipWithoutConstraints()
+    {
+        tap(EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']), function ($user) {
+            $grandParentPost = $user->posts()->create(['name' => 'Grandparent Post']);
+            $parentPost = $grandParentPost->childPosts()->create(['name' => 'Parent Post', 'user_id' => $user->id]);
+            $parentPost->childPosts()->create(['name' => 'Child Post', 'user_id' => $user->id]);
+            $user->posts()->create(['name' => 'Post without Children']);
+        });
+
+        $results = EloquentTestUser::withWhereHas('posts.childPosts.childPosts')->get();
+
+        $this->assertCount(1, $results);
+        tap($results->first(), function ($result) {
+            $this->assertSame('taylorotwell@gmail.com', $result->email);
+            $this->assertCount(1, $result->posts);
+            $this->assertSame('Grandparent Post', $result->posts->first()->name);
+            $this->assertCount(1, $result->posts->first()->childPosts);
+            $this->assertCount(1, $result->posts->first()->childPosts->first()->childPosts);
+            $this->assertSame('Child Post', $result->posts->first()->childPosts->first()->childPosts->first()->name);
+        });
+    }
+
     public function testWithWhereHasOnSelfReferencingBelongsToManyRelationship()
     {
         $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
