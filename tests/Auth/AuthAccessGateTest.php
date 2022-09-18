@@ -489,6 +489,15 @@ class AuthAccessGateTest extends TestCase
         $this->assertTrue($gate->check('update', new AccessGateTestDummy));
     }
 
+    public function testPoliciesMayHaveAfterMethodsToOverrideChecks()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithAfter::class);
+
+        $this->assertTrue($gate->check('update', new AccessGateTestDummy));
+    }
+
     public function testPoliciesAlwaysOverrideClosuresWithSameName()
     {
         $gate = $this->getBasicGate();
@@ -1240,6 +1249,19 @@ class AccessGateTestPolicyWithBefore
     public function update($user, AccessGateTestDummy $dummy)
     {
         return false;
+    }
+}
+
+class AccessGateTestPolicyWithAfter
+{
+    public function after($user, $ability)
+    {
+        return true;
+    }
+
+    public function update($user, AccessGateTestDummy $dummy)
+    {
+        return null;
     }
 }
 
