@@ -716,14 +716,29 @@ class Router implements BindingRegistrar, RegistrarContract
         $shouldSkipMiddleware = $this->container->bound('middleware.disable') &&
                                 $this->container->make('middleware.disable') === true;
 
-        $middleware = $shouldSkipMiddleware ? [] : $this->gatherRouteMiddleware($route);
+        if ($shouldSkipMiddleware) {
+            return $this->prepareResponse($request, $route->run());
+        }
+
+        $routeMiddleware = $this->resolveMiddleware($route->middleware(), $route->excludedMiddleware());
 
         return (new Pipeline($this->container))
-                        ->send($request)
-                        ->through($middleware)
-                        ->then(fn ($request) => $this->prepareResponse(
-                            $request, $route->run()
-                        ));
+            ->send($request)
+            ->through($routeMiddleware)
+            ->then(function ($request) use ($route, $routeMiddleware) {
+                $excludedMiddleware = Router::uniqueMiddleware(array_merge(
+                    $routeMiddleware, $route->excludedMiddleware()
+                ));
+
+                $controllerMiddleware = $this->resolveMiddleware(
+                    $route->controllerMiddleware(), $excludedMiddleware
+                );
+
+                return (new Pipeline($this->container))
+                    ->send($request)
+                    ->through($controllerMiddleware)
+                    ->then(fn ($request) => $this->prepareResponse($request, $route->run()));
+            });
     }
 
     /**
@@ -914,7 +929,7 @@ class Router implements BindingRegistrar, RegistrarContract
      * Register a short-hand name for a middleware.
      *
      * @param  string  $name
-     * @param  string  $class
+     * @param  string|\Closure  $class
      * @return $this
      */
     public function aliasMiddleware($name, $class)

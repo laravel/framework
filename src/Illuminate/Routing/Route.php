@@ -129,6 +129,13 @@ class Route
     public $computedMiddleware;
 
     /**
+     * The computed gathered controller middleware.
+     *
+     * @var array|null
+     */
+    public $computedControllerMiddleware;
+
+    /**
      * The compiled version of the route.
      *
      * @var \Symfony\Component\Routing\CompiledRoute
@@ -264,8 +271,12 @@ class Route
      */
     protected function runController()
     {
+        $controller = tap($this->getController(), function () {
+            $this->controller = null;
+        });
+
         return $this->controllerDispatcher()->dispatch(
-            $this, $this->getController(), $this->getControllerMethod()
+            $this, $controller, $this->getControllerMethod()
         );
     }
 
@@ -1094,7 +1105,11 @@ class Route
             return [];
         }
 
-        return $this->controllerDispatcher()->getMiddleware(
+        if (! is_null($this->computedControllerMiddleware)) {
+            return $this->computedControllerMiddleware;
+        }
+
+        return $this->computedControllerMiddleware = $this->controllerDispatcher()->getMiddleware(
             $this->getController(), $this->getControllerMethod()
         );
     }
