@@ -66,7 +66,8 @@ class RouteAndControllerMiddlewareTest extends TestCase
         $this->assertSame(1, $counter);
     }
 
-    public function testRouteMiddlewareAffectsControllerDependencies() {
+    public function testRouteMiddlewareAffectsControllerDependencies()
+    {
         $container = new Container;
         $router = $this->getRouter($container);
 
@@ -97,7 +98,8 @@ class RouteAndControllerMiddlewareTest extends TestCase
         $this->assertSame('bar', $response->getContent());
     }
 
-    public function testControllerIsRecreatedOnEveryDispatch() {
+    public function testControllerIsRecreatedOnEveryDispatch()
+    {
         $container = new Container;
         $router = $this->getRouter($container);
 
@@ -112,7 +114,8 @@ class RouteAndControllerMiddlewareTest extends TestCase
         $container->when(ControllerMiddleware::class)
             ->needs('$callback')
             ->give(function () {
-                return function () {};
+                return function () {
+                };
             });
 
         $router->get('/', TestController::class);
@@ -124,7 +127,8 @@ class RouteAndControllerMiddlewareTest extends TestCase
         $this->assertSame('2', $response->getContent());
     }
 
-    public function testControllerIsTheSameInstanceWhileRouteIsNotDispatched() {
+    public function testControllerIsTheSameInstanceWhileRouteIsNotDispatched()
+    {
         $container = new Container;
         $router = $this->getRouter($container);
         $route = $router->get('/', TestController::class);
@@ -144,7 +148,8 @@ class RouteAndControllerMiddlewareTest extends TestCase
     }
 }
 
-class TestController extends Controller {
+class TestController extends Controller
+{
     public function __construct(
         public readonly Dependency $dependency
     ) {
@@ -157,16 +162,20 @@ class TestController extends Controller {
     }
 }
 
-class Dependency {
+class Dependency
+{
     public function __construct(
         public readonly string $value = 'foo'
-    ) {}
+    ) {
+    }
 }
 
-class RouteMiddleware {
+class RouteMiddleware
+{
     public function __construct(
         public $callback
-    ) {}
+    ) {
+    }
 
     public function handle($request, $next) {
         call_user_func($this->callback);
@@ -175,10 +184,12 @@ class RouteMiddleware {
     }
 }
 
-class ControllerMiddleware {
+class ControllerMiddleware
+{
     public function __construct(
         public $callback
-    ) {}
+    ) {
+    }
 
     public function handle($request, $next) {
         call_user_func($this->callback);
