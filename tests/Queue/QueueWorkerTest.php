@@ -23,6 +23,7 @@ class QueueWorkerTest extends TestCase
 {
     public $events;
     public $exceptionHandler;
+    public $maintenanceFlags;
 
     protected function setUp(): void
     {

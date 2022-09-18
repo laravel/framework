@@ -800,7 +800,7 @@ class Builder implements BuilderContract
                 if (is_numeric($key) && is_array($value)) {
                     $query->{$method}(...array_values($value));
                 } else {
-                    $query->$method($key, '=', $value, $boolean);
+                    $query->{$method}($key, '=', $value, $boolean);
                 }
             }
         }, $boolean);
@@ -894,6 +894,12 @@ class Builder implements BuilderContract
      */
     public function whereNot($column, $operator = null, $value = null, $boolean = 'and')
     {
+        if (is_array($column)) {
+            return $this->whereNested(function ($query) use ($column, $operator, $value, $boolean) {
+                $query->where($column, $operator, $value, $boolean);
+            }, $boolean.' not');
+        }
+
         return $this->where($column, $operator, $value, $boolean.' not');
     }
 
@@ -2438,7 +2444,7 @@ class Builder implements BuilderContract
     /**
      * Add a union statement to the query.
      *
-     * @param  \Illuminate\Database\Query\Builder|\Closure  $query
+     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $query
      * @param  bool  $all
      * @return $this
      */
@@ -2458,7 +2464,7 @@ class Builder implements BuilderContract
     /**
      * Add a union all statement to the query.
      *
-     * @param  \Illuminate\Database\Query\Builder|\Closure  $query
+     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $query
      * @return $this
      */
     public function unionAll($query)

@@ -88,6 +88,7 @@ class JobMakeCommand extends GeneratorCommand
     protected function getOptions()
     {
         return [
+            ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the job already exists'],
             ['sync', null, InputOption::VALUE_NONE, 'Indicates that job should be synchronous'],
         ];
     }

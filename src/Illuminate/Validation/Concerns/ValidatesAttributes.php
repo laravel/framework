@@ -749,22 +749,14 @@ trait ValidatesAttributes
 
         $validations = collect($parameters)
             ->unique()
-            ->map(function ($validation) {
-                if ($validation === 'rfc') {
-                    return new RFCValidation;
-                } elseif ($validation === 'strict') {
-                    return new NoRFCWarningsValidation;
-                } elseif ($validation === 'dns') {
-                    return new DNSCheckValidation;
-                } elseif ($validation === 'spoof') {
-                    return new SpoofCheckValidation;
-                } elseif ($validation === 'filter') {
-                    return new FilterEmailValidation;
-                } elseif ($validation === 'filter_unicode') {
-                    return FilterEmailValidation::unicode();
-                } elseif (is_string($validation) && class_exists($validation)) {
-                    return $this->container->make($validation);
-                }
+            ->map(fn ($validation) => match (true) {
+                $validation === 'strict' => new NoRFCWarningsValidation(),
+                $validation === 'dns' => new DNSCheckValidation(),
+                $validation === 'spoof' => new SpoofCheckValidation(),
+                $validation === 'filter' => new FilterEmailValidation(),
+                $validation === 'filter_unicode' => FilterEmailValidation::unicode(),
+                is_string($validation) && class_exists($validation) => $this->container->make($validation),
+                default => new RFCValidation(),
             })
             ->values()
             ->all() ?: [new RFCValidation];
@@ -1595,6 +1587,25 @@ trait ValidatesAttributes
         [$values, $other] = $this->parseDependentRuleParameters($parameters);
 
         if (in_array($other, $values, is_bool($other) || is_null($other))) {
+            return $this->validateRequired($attribute, $value);
+        }
+
+        return true;
+    }
+
+    /**
+     * Validate that an attribute exists when another attribute was "accepted".
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  mixed  $parameters
+     * @return bool
+     */
+    public function validateRequiredIfAccepted($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'required_if_accepted');
+
+        if ($this->validateAccepted($parameters[0], $this->getValue($parameters[0]))) {
             return $this->validateRequired($attribute, $value);
         }
 

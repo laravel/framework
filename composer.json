@@ -81,12 +81,15 @@
         "illuminate/view": "self.version"
     },
     "require-dev": {
+        "ably/ably-php": "^1.0",
         "aws/aws-sdk-php": "^3.198.1",
         "doctrine/dbal": "^2.13.3|^3.1.4",
         "fakerphp/faker": "^1.9.2",
         "guzzlehttp/guzzle": "^7.2",
         "league/flysystem-aws-s3-v3": "^3.0",
         "league/flysystem-ftp": "^3.0",
+        "league/flysystem-path-prefixing": "^3.3",
+        "league/flysystem-read-only": "^3.3",
         "league/flysystem-sftp-v3": "^3.0",
         "mockery/mockery": "^1.4.4",
         "orchestra/testbench-core": "^7.1",
@@ -94,7 +97,8 @@
         "phpstan/phpstan": "^1.4.7",
         "phpunit/phpunit": "^9.5.8",
         "predis/predis": "^1.1.9|^2.0",
-        "symfony/cache": "^6.0"
+        "symfony/cache": "^6.0",
+        "symfony/uid": "^6.0"
     },
     "provide": {
         "psr/container-implementation": "1.1|2.0",
@@ -150,6 +154,8 @@
         "laravel/tinker": "Required to use the tinker console command (^2.0).",
         "league/flysystem-aws-s3-v3": "Required to use the Flysystem S3 driver (^3.0).",
         "league/flysystem-ftp": "Required to use the Flysystem FTP driver (^3.0).",
+        "league/flysystem-path-prefixing": "Required to use the scoped driver (^3.3).",
+        "league/flysystem-read-only": "Required to use read-only disks (^3.3)",
         "league/flysystem-sftp-v3": "Required to use the Flysystem SFTP driver (^3.0).",
         "mockery/mockery": "Required to use mocking (^1.4.4).",
         "nyholm/psr7": "Required to use PSR-7 bridging features (^1.2).",
@@ -163,7 +169,8 @@
         "symfony/http-client": "Required to enable support for the Symfony API mail transports (^6.0).",
         "symfony/mailgun-mailer": "Required to enable support for the Mailgun mail transport (^6.0).",
         "symfony/postmark-mailer": "Required to enable support for the Postmark mail transport (^6.0).",
-        "symfony/psr-http-message-bridge": "Required to use PSR-7 bridging features (^2.0)."
+        "symfony/psr-http-message-bridge": "Required to use PSR-7 bridging features (^2.0).",
+        "symfony/uid": "Required to generate ULIDs for Eloquent (^6.0)."
     },
     "config": {
         "sort-packages": true,

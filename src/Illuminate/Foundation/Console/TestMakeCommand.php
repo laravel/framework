@@ -115,8 +115,9 @@ class TestMakeCommand extends GeneratorCommand
     protected function getOptions()
     {
         return [
-            ['unit', 'u', InputOption::VALUE_NONE, 'Create a unit test.'],
-            ['pest', 'p', InputOption::VALUE_NONE, 'Create a Pest test.'],
+            ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the test already exists'],
+            ['unit', 'u', InputOption::VALUE_NONE, 'Create a unit test'],
+            ['pest', 'p', InputOption::VALUE_NONE, 'Create a Pest test'],
         ];
     }
 }
