@@ -16,9 +16,15 @@ use PHPUnit\Framework\TestCase;
 
 class InteractsWithDatabaseTest extends TestCase
 {
-    protected function tearDown(): void
+    protected function setUp(): void
     {
         Facade::clearResolvedInstances();
+        Facade::setFacadeApplication(null);
+    }
+
+    protected function tearDown(): void
+    {
+        m::close();
     }
 
     public function testCastToJsonSqlite()
@@ -117,15 +123,15 @@ class InteractsWithDatabaseTest extends TestCase
     {
         $connection = m::mock(ConnectionInterface::class);
 
-        $connection->shouldReceive('getQueryGrammar')->once()->andReturn($grammar);
+        $connection->shouldReceive('getQueryGrammar')->andReturn($grammar);
 
-        $connection->shouldReceive('getPdo->quote')->once()->andReturnUsing(function ($value) {
+        $connection->shouldReceive('getPdo->quote')->andReturnUsing(function ($value) {
             return "'".$value."'";
         });
 
-        DB::shouldReceive('connection')->once()->andReturn($connection);
+        DB::shouldReceive('connection')->andReturn($connection);
 
-        DB::shouldReceive('raw')->once()->andReturnUsing(function ($value) {
+        DB::shouldReceive('raw')->andReturnUsing(function ($value) {
             return new Expression($value);
         });
 
