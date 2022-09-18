@@ -165,8 +165,41 @@ trait QueriesRelationships
      */
     public function withWhereHas($relation, Closure $callback = null, $operator = '>=', $count = 1)
     {
+        $relations = explode('.', $relation);
+        if (! $callback && sizeof($relations) > 1) {
+            return $this->withWhereHasNested($this, $relations, $operator, $count);
+        }
+
         return $this->whereHas(Str::before($relation, ':'), $callback, $operator, $count)
             ->with($callback ? [$relation => fn ($query) => $callback($query)] : $relation);
+    }
+
+    /**
+     * Add a relationship count / exists condition to the query with where clauses.
+     *
+     * Also load the relationship with same condition for nested relationships.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder|static  $query
+     * @param  \Closure|null  $callback
+     * @param  string  $operator
+     * @param  int  $count
+     * @return \Illuminate\Database\Eloquent\Builder|static
+     */
+    protected function withWhereHasNested($query, $relations, $operator = '>=', $count = 1)
+    {
+        $topRelation = array_shift($relations);
+        if (empty($relations)) {
+            // At the bottom of the nested relationships
+            // we use the normal withWhereHas method
+            return $query->withWhereHas($topRelation, null, $operator, $count);
+        }
+
+        $callback = function ($query) use ($relations, $operator, $count) {
+            $this->withWhereHasNested($query, $relations, $operator, $count);
+        };
+
+        return $query->whereHas($topRelation, $callback, $operator, $count)
+                    ->with($topRelation, $callback);
     }
 
     /**
