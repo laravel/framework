@@ -155,6 +155,17 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile a "JSON cast" statement into SQL.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public function compileJsonCast($value)
+    {
+        return "json_query($value)";
+    }
+
+    /**
      * Prepare the binding for a "JSON contains" statement.
      *
      * @param  mixed  $binding

@@ -612,6 +612,17 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile a "JSON cast" statement into SQL.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public function compileJsonCast($value)
+    {
+        return $value;
+    }
+
+    /**
      * Prepare the binding for a "JSON contains" statement.
      *
      * @param  mixed  $binding
