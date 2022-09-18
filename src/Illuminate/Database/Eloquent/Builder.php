@@ -303,6 +303,20 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add an exist where clause to the query, and return true if result exist.
+     *
+     * @param  \Closure|string|array|\Illuminate\Database\Query\Expression  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @param  string  $boolean
+     * @return bool
+     */
+    public function existsWhere($column, $operator = null, $value = null, $boolean = 'and')
+    {
+        return $this->where(...func_get_args())->exists();
+    }
+
+    /**
      * Add an "or where" clause to the query.
      *
      * @param  \Closure|array|string|\Illuminate\Database\Query\Expression  $column
