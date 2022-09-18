@@ -66,7 +66,7 @@ class ServeCommand extends Command
         'SYSTEMROOT',
         'XDEBUG_CONFIG',
         'XDEBUG_MODE',
-        'XDEBUG_SESSION',
+        'XDEBUG_SESSION'
     ];
 
     /**
@@ -284,7 +284,7 @@ class ServeCommand extends Command
      */
     protected function getDateFromLine($line)
     {
-        $regex = \env(PHP_CLI_SERVER_WORKERS, 1) > 1
+        $regex = \env('PHP_CLI_SERVER_WORKERS', 1) > 1
             ? '/^\[\d+]\s\[(.*)]/'
             : '/^\[([^\]]+)\]/';
         preg_match($regex, $line, $matches);
