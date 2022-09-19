@@ -66,7 +66,7 @@ class ServeCommand extends Command
         'SYSTEMROOT',
         'XDEBUG_CONFIG',
         'XDEBUG_MODE',
-        'XDEBUG_SESSION'
+        'XDEBUG_SESSION',
     ];
 
     /**
