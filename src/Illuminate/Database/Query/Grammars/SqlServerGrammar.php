@@ -155,17 +155,6 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
-     * Compile a "JSON cast" statement into SQL.
-     *
-     * @param  string  $value
-     * @return string
-     */
-    public function compileJsonCast($value)
-    {
-        return 'json_query('.$value.')';
-    }
-
-    /**
      * Prepare the binding for a "JSON contains" statement.
      *
      * @param  mixed  $binding
@@ -214,6 +203,17 @@ class SqlServerGrammar extends Grammar
         [$field, $path] = $this->wrapJsonFieldAndPath($column);
 
         return '(select count(*) from openjson('.$field.$path.')) '.$operator.' '.$value;
+    }
+
+    /**
+     * Compile a "JSON value cast" statement into SQL.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public function compileJsonValueCast($value)
+    {
+        return 'json_query('.$value.')';
     }
 
     /**

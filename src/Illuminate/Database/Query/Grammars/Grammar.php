@@ -612,17 +612,6 @@ class Grammar extends BaseGrammar
     }
 
     /**
-     * Compile a "JSON cast" statement into SQL.
-     *
-     * @param  string  $value
-     * @return string
-     */
-    public function compileJsonCast($value)
-    {
-        return $value;
-    }
-
-    /**
      * Prepare the binding for a "JSON contains" statement.
      *
      * @param  mixed  $binding
@@ -691,6 +680,17 @@ class Grammar extends BaseGrammar
     protected function compileJsonLength($column, $operator, $value)
     {
         throw new RuntimeException('This database engine does not support JSON length operations.');
+    }
+
+    /**
+     * Compile a "JSON value cast" statement into SQL.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public function compileJsonValueCast($value)
+    {
+        return $value;
     }
 
     /**
