@@ -29,11 +29,11 @@ class CliDumper extends BaseCliDumper
     /**
      * Creates a new Cli Dumper instance.
      *
-     * @param  string  $basePath
      * @param  \Symfony\Component\Console\Output\OutputInterface  $output
+     * @param  string  $basePath
      * @return void
      */
-    public function __construct($basePath, $output)
+    public function __construct($output, $basePath)
     {
         parent::__construct();
 
@@ -50,9 +50,8 @@ class CliDumper extends BaseCliDumper
     public static function register($basePath)
     {
         $cloner = tap(new VarCloner())->addCasters(ReflectionCaster::UNSET_CLOSURE_FILE_INFO);
-        $output = new ConsoleOutput(OutputInterface::VERBOSITY_NORMAL);
 
-        $dumper = new static($basePath, $output);
+        $dumper = new static(new ConsoleOutput(), $basePath);
 
         VarDumper::setHandler(fn ($value) => $dumper->dumpWithSource($cloner->cloneVar($value)));
     }
