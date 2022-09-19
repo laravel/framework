@@ -316,6 +316,16 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Get the format for database stored dates.
+     *
+     * @return string
+     */
+    public function getDateFormat()
+    {
+        return 'Y-m-d H:i:s.u';
+    }
+
+    /**
      * Wrap a single string in keyword identifiers.
      *
      * @param  string  $value
