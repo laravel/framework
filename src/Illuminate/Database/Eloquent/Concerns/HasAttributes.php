@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Casts\AsCollection;
 use Illuminate\Database\Eloquent\Casts\AsEncryptedArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsEncryptedCollection;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Casts\Markdown;
 use Illuminate\Database\Eloquent\InvalidCastException;
 use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -102,6 +103,7 @@ trait HasAttributes
         'int',
         'integer',
         'json',
+        'markdown',
         'object',
         'real',
         'string',
@@ -720,6 +722,14 @@ trait HasAttributes
 
             $castType = Str::after($castType, 'encrypted:');
         }
+        
+        // If the key is markdown castable, we will pull cast parameters and update
+        // cast type so it will be handled later
+        if ($this->isMarkdownCastable($castType)){
+            $markdownOptions = Str::after($castType, 'markdown:');
+
+            $castType = "markdown";
+        }
 
         switch ($castType) {
             case 'int':
@@ -755,6 +765,8 @@ trait HasAttributes
                 return $this->asDateTime($value)->toImmutable();
             case 'timestamp':
                 return $this->asTimestamp($value);
+            case 'markdown':
+                return $this->asMarkdown($key, $value, $markdownOptions);
         }
 
         if ($this->isEnumCastable($key)) {
@@ -2186,5 +2198,31 @@ trait HasAttributes
 
             return false;
         })->map->name->values()->all();
+    }
+    
+    /**
+     * Determine if the cast type is Markdown castable.
+     *
+     * @param  string  $cast
+     * @return bool
+     */
+    protected function isMarkdownCastable($cast)
+    {
+        return str_starts_with($cast, 'markdown');
+    }
+
+    /**
+     * Return string as Markdown
+     *
+     * @param $key
+     * @param $value
+     * @param $options
+     * @return mixed
+     */
+    protected function asMarkdown($key, $value, $options)
+    {
+        $arguments = explode(',', $options);
+
+        return Markdown::castUsing($arguments)->get($this, $key, $value, $this->attributes);
     }
 }
