@@ -92,10 +92,10 @@ class Markdown implements Castable
             /**
              * Cast the given value into markdown.
              *
-             * @param   \Illuminate\Database\Eloquent\Model  $model
-             * @param   string  $key
-             * @param   mixed  $value
-             * @param   array  $attributes
+             * @param  \Illuminate\Database\Eloquent\Model  $model
+             * @param  string  $key
+             * @param  mixed  $value
+             * @param  array  $attributes
              * @return string
              */
             public function get($model, $key, $value, $attributes)
