@@ -2,13 +2,6 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-
-use Illuminate\Database\Capsule\Manager as DB;
-use Illuminate\Database\Eloquent\Model as Eloquent;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Database\Eloquent\Casts\Markdown;
-use PHPUnit\Framework\TestCase;
-
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Casts\Markdown;
 use Illuminate\Database\Eloquent\Model as Eloquent;
