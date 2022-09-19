@@ -97,6 +97,13 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     protected $timebox;
 
     /**
+     * The minimum time in microseconds to validate credentials.
+     *
+     * @var int
+     */
+    protected $validateCredentialsMinimumTime;
+
+    /**
      * Indicates if the logout method has been called.
      *
      * @var bool
@@ -118,19 +125,22 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * @param  \Illuminate\Contracts\Session\Session  $session
      * @param  \Symfony\Component\HttpFoundation\Request|null  $request
      * @param  \Illuminate\Support\Timebox|null  $timebox
+     * @param  int  $validateCredentialsMinimumTime
      * @return void
      */
     public function __construct($name,
                                 UserProvider $provider,
                                 Session $session,
                                 Request $request = null,
-                                Timebox $timebox = null)
+                                Timebox $timebox = null,
+                                $validateCredentialsMinimumTime = null)
     {
         $this->name = $name;
         $this->session = $session;
         $this->request = $request;
         $this->provider = $provider;
-        $this->timebox = $timebox;
+        $this->timebox = $timebox ?: new Timebox;
+        $this->validateCredentialsMinimumTime = $validateCredentialsMinimumTime ?: 200000;
     }
 
     /**
@@ -440,7 +450,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
             }
 
             return $validated;
-        }, 200000);
+        }, $this->validateCredentialsMinimumTime);
     }
 
     /**

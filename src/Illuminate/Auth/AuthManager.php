@@ -123,7 +123,14 @@ class AuthManager implements FactoryContract
     {
         $provider = $this->createUserProvider($config['provider'] ?? null);
 
-        $guard = new SessionGuard($name, $provider, $this->app['session.store'], null, new Timebox);
+        $guard = new SessionGuard(
+            $name,
+            $provider,
+            $this->app['session.store'],
+            null,
+            new Timebox,
+            $config['validate_credentials_minimum_time'] ?? null
+        );
 
         // When using the remember me functionality of the authentication services we
         // will need to be set the encryption instance of the guard, which allows
