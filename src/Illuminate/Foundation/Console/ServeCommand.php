@@ -54,7 +54,7 @@ class ServeCommand extends Command
     protected $requestsPool;
 
     /**
-     * If the "Server running on..." output message has been displayed.
+     * Indicates if the "Server running on..." output message has been displayed.
      *
      * @var bool
      */
