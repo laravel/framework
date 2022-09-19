@@ -301,12 +301,16 @@ class Arr
      * Get an item from an array using "dot" notation.
      *
      * @param  \ArrayAccess|array  $array
-     * @param  string|int|null  $key
+     * @param  array|string|int|null  $key
      * @param  mixed  $default
      * @return mixed
      */
     public static function get($array, $key, $default = null)
     {
+        if (is_array($key)) {
+            $key = implode('.', $key);
+        }
+
         if (! static::accessible($array)) {
             return value($default);
         }

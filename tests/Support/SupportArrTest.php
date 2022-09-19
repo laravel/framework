@@ -377,6 +377,20 @@ class SupportArrTest extends TestCase
         $this->assertSame('dayle', Arr::get($array, 'names.otherDeveloper', function () {
             return 'dayle';
         }));
+
+        // Test keys passed as array as per the depth
+        $array = ['products' => ['desk' => ['price' => 100]]];
+        $value = Arr::get($array, ['products', 'desk']);
+        $this->assertEquals(['price' => 100], $value);
+        
+        $array = [
+            'products' => [
+                ['name' => 'desk'],
+                ['name' => 'chair'],
+            ],
+        ];
+        $this->assertSame('desk', Arr::get($array, ['products', 0, 'name']));
+        $this->assertSame('chair', Arr::get($array, ['products', 1, 'name']));
     }
 
     public function testHas()
