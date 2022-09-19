@@ -64,8 +64,19 @@ class Markdown implements Castable
                         return [];
                     }
 
-                    // Properly type cast option integer value
-                    $value = is_numeric($parts[1]) ? (int) $parts[1] : $parts[1];
+                    $value = $parts[1];
+
+                    // Type cast integers properly
+                    if (is_numeric($value)) {
+                        $value = (int)$value;
+                    }
+                    // Type cast boolean properly
+                    elseif ($value == 'true'){
+                        $value = true;
+                    }
+                    elseif ($value == 'false'){
+                        $value = false;
+                    }
 
                     return [$parts[0] => $value];
                 });
