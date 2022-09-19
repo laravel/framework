@@ -121,7 +121,7 @@ class MySqlGrammar extends Grammar
      */
     public function compileJsonCast($value)
     {
-        return "cast($value as json)";
+        return 'cast('.$value.' as json)';
     }
 
     /**

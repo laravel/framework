@@ -162,7 +162,7 @@ class SqlServerGrammar extends Grammar
      */
     public function compileJsonCast($value)
     {
-        return "json_query($value)";
+        return 'json_query('.$value.')';
     }
 
     /**
