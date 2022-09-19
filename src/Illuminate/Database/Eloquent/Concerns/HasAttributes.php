@@ -2199,7 +2199,7 @@ trait HasAttributes
             return false;
         })->map->name->values()->all();
     }
-    
+
     /**
      * Determine if the cast type is Markdown castable.
      *
