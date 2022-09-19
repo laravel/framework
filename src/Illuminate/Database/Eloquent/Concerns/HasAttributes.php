@@ -2204,7 +2204,7 @@ trait HasAttributes
      * Determine if the cast type is Markdown castable.
      *
      * @param  string  $cast
-     * @return  bool
+     * @return bool
      */
     protected function isMarkdownCastable($cast)
     {
@@ -2214,9 +2214,9 @@ trait HasAttributes
     /**
      * Return string as Markdown.
      *
-     * @param $key
-     * @param $value
-     * @param $options
+     * @param  $key
+     * @param  $value
+     * @param  $options
      * @return mixed
      */
     protected function asMarkdown($key, $value, $options)
