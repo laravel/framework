@@ -3587,6 +3587,28 @@ SQL;
         $this->assertEquals(['foo', 'bar'], $builder->getBindings());
     }
 
+    public function testPrepareValueAndOperator()
+    {
+        $builder = $this->getBuilder();
+        [$value, $operator] = $builder->prepareValueAndOperator('>', '20');
+        $this->assertSame('>', $value);
+        $this->assertSame('20', $operator);
+
+        $builder = $this->getBuilder();
+        [$value, $operator] = $builder->prepareValueAndOperator('>', '20', true);
+        $this->assertSame('20', $value);
+        $this->assertSame('=', $operator);
+    }
+
+    public function testPrepareValueAndOperatorExpectException()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Illegal operator and value combination.');
+
+        $builder = $this->getBuilder();
+        $builder->prepareValueAndOperator(null, 'like');
+    }
+
     public function testProvidingNullWithOperatorsBuildsCorrectly()
     {
         $builder = $this->getBuilder();
