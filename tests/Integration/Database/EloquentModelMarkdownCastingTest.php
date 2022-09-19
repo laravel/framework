@@ -104,6 +104,18 @@ class EloquentModelMarkdownCastingTest extends TestCase
         $this->assertSame("<h1>Taylor Otwell</h1>\n", $model->content);
     }
 
+    public function testCommonMarkNestedOption(){
+        $model = MarkdownCustomCasts::firstOrCreate([
+            'content' => '# Taylor *Otwell*'
+        ]);
+
+        $model->mergeCasts([
+            'content' => Markdown::class . ':commonmark.enable_em=false'
+        ]);
+
+        $this->assertSame("<h1>Taylor *Otwell*</h1>\n", $model->content);
+    }
+
     public function testCastableClass(){
         $model = MarkdownCustomCasts::firstOrCreate([
             'content' => '# Taylor <b>Otwell</b>'
