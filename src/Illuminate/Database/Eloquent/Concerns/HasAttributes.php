@@ -722,7 +722,7 @@ trait HasAttributes
 
             $castType = Str::after($castType, 'encrypted:');
         }
-        
+
         // If the key is markdown castable, we will pull cast parameters and update
         // cast type so it will be handled later.
         if ($this->isMarkdownCastable($castType)) {
