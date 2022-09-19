@@ -50,7 +50,7 @@ class ValidationServiceProvider extends ServiceProvider implements DeferrablePro
     protected function registerPresenceVerifier()
     {
         $this->app->singleton(
-            'validation.presence', 
+            'validation.presence',
             fn ($app) => new DatabasePresenceVerifier($app['db'])
         );
     }
