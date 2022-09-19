@@ -14,6 +14,10 @@ use ReflectionClass;
 
 class HandleExceptionsTest extends TestCase
 {
+    protected $app;
+    protected $config;
+    protected $handleExceptions;
+
     protected function setUp(): void
     {
         $this->app = m::mock(Application::setInstance(new Application));

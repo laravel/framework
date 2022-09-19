@@ -1,6 +1,46 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.28.0...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.30.0...9.x)
+
+
+## [v9.30.0](https://github.com/laravel/framework/compare/v9.29.0...v9.30.0) - 2022-09-13
+
+### Added
+- Added stop_buffering config option to logger ([#44071](https://github.com/laravel/framework/pull/44071))
+- Added read-only filesystem adapter decoration as a config option ([#44079](https://github.com/laravel/framework/pull/44079))
+- Added scoped filesystem driver ([#44105](https://github.com/laravel/framework/pull/44105))
+- Add force option to all make commands ([#44100](https://github.com/laravel/framework/pull/44100))
+
+### Fixed
+- Fixed QueryBuilder whereNot with array conditions ([#44083](https://github.com/laravel/framework/pull/44083))
+
+### Changed
+- Passing event into viaQueue and viaConnection of Queued Listener ([#44080](https://github.com/laravel/framework/pull/44080))
+- Improve testability of batched jobs ([#44075](https://github.com/laravel/framework/pull/44075))
+- Allow any kind of whitespace in cron expression ([#44110](https://github.com/laravel/framework/pull/44110))
+
+
+## [v9.29.0](https://github.com/laravel/framework/compare/v9.28.0...v9.29.0) - 2022-09-09
+
+### Added
+- Added RequiredIfAccepted validation rule ([#44035](https://github.com/laravel/framework/pull/44035))
+- Added `Illuminate/Foundation/Vite::assetPath()` ([#44037](https://github.com/laravel/framework/pull/44037))
+- Added ability to discard Eloquent Model changes ([#43772](https://github.com/laravel/framework/pull/43772))
+- Added ability to determine if attachments exist to `Illuminate/Mail/Mailable` ([#43967](https://github.com/laravel/framework/pull/43967))
+- Added `Illuminate/Support/Testing/Fakes/BusFake::assertNothingBatched()` ([#44056](https://github.com/laravel/framework/pull/44056))
+
+### Reverted
+- Reverted [Fixed RoueGroup::merge to format merged prefixes correctly](https://github.com/laravel/framework/pull/44011). ([#44072](https://github.com/laravel/framework/pull/44072))
+
+### Fixed
+- Avoid Passing null to parameter exception on PHP 8.1 ([#43951](https://github.com/laravel/framework/pull/43951))
+- Align Remember Me Cookie Duration with CookieJar expiration ([#44026](https://github.com/laravel/framework/pull/44026))
+- Fix Stringable typehints with Enumerable ([#44030](https://github.com/laravel/framework/pull/44030))
+- Fixed middleware "SetCacheHeaders" with file responses ([#44063](https://github.com/laravel/framework/pull/44063))
+
+### Changed
+- Don't use locks for queue job popping for PlanetScale's MySQL-compatible Vitess engine ([#44027](https://github.com/laravel/framework/pull/44027))
+- Avoid matching 'use' in custom Stub templates in `Illuminate/Console/GeneratorCommand.php` ([#44049](https://github.com/laravel/framework/pull/44049))
 
 
 ## [v9.28.0](https://github.com/laravel/framework/compare/v9.27.0...v9.28.0) - 2022-09-06

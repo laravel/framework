@@ -46,6 +46,8 @@ class DatabaseEloquentModelTest extends TestCase
 {
     use InteractsWithTime;
 
+    protected $encrypter;
+
     protected function tearDown(): void
     {
         parent::tearDown();
@@ -1289,10 +1291,14 @@ class DatabaseEloquentModelTest extends TestCase
         $model = new EloquentModelStub;
         $model->guard(['name', 'age']);
         $model->fill(['Foo' => 'bar']);
+
+        Model::preventSilentlyDiscardingAttributes(false);
     }
 
     public function testFillableOverridesGuarded()
     {
+        Model::preventSilentlyDiscardingAttributes(false);
+
         $model = new EloquentModelStub;
         $model->guard([]);
         $model->fillable(['age', 'foo']);
@@ -1792,6 +1798,8 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame('camelCased', $model->camelCased);
         $this->assertSame('StudlyCased', $model->StudlyCased);
 
+        $this->assertEquals(['is_admin', 'camelCased', 'StudlyCased'], $model->getAppends());
+
         $this->assertTrue($model->hasAppended('is_admin'));
         $this->assertTrue($model->hasAppended('camelCased'));
         $this->assertTrue($model->hasAppended('StudlyCased'));
@@ -2208,8 +2216,10 @@ class DatabaseEloquentModelTest extends TestCase
     public function testStringKeyTypePreserved()
     {
         $model = $this->getMockBuilder(EloquentKeyTypeModelStub::class)->onlyMethods(['newModelQuery', 'updateTimestamps', 'refresh'])->getMock();
+        $model->id = 'string id';
+
         $query = m::mock(Builder::class);
-        $query->shouldReceive('insertGetId')->once()->with([], 'id')->andReturn('string id');
+        $query->shouldReceive('insert')->once()->with(['id' => 'string id']);
         $query->shouldReceive('getConnection')->once();
         $model->expects($this->once())->method('newModelQuery')->willReturn($query);
 

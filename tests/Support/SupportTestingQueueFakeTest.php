@@ -328,6 +328,24 @@ class SupportTestingQueueFakeTest extends TestCase
             )));
         }
     }
+
+    public function testItDoesntFakeJobsPassedViaExcept()
+    {
+        $job = new JobStub;
+
+        $manager = m::mock(QueueManager::class);
+        $manager->shouldReceive('push')->once()->withArgs(function ($passedJob) use ($job) {
+            return $passedJob === $job;
+        });
+
+        $fake = (new QueueFake(new Application, [], $manager))->except(JobStub::class);
+
+        $fake->push($job);
+        $fake->push(new JobToFakeStub());
+
+        $fake->assertNotPushed(JobStub::class);
+        $fake->assertPushed(JobToFakeStub::class);
+    }
 }
 
 class JobStub

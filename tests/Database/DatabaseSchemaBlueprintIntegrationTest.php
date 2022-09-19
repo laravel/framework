@@ -149,6 +149,29 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
         $this->assertEquals($expected, $queries);
     }
 
+    public function testChangingDoubleColumnsWork()
+    {
+        $this->db->connection()->getSchemaBuilder()->create('products', function ($table) {
+            $table->integer('price');
+        });
+
+        $blueprint = new Blueprint('products', function ($table) {
+            $table->double('price')->change();
+        });
+
+        $queries = $blueprint->toSql($this->db->connection(), new SQLiteGrammar);
+
+        $expected = [
+            'CREATE TEMPORARY TABLE __temp__products AS SELECT price FROM products',
+            'DROP TABLE products',
+            'CREATE TABLE products (price DOUBLE PRECISION NOT NULL)',
+            'INSERT INTO products (price) SELECT price FROM __temp__products',
+            'DROP TABLE __temp__products',
+        ];
+
+        $this->assertEquals($expected, $queries);
+    }
+
     public function testRenameIndexWorks()
     {
         $this->db->connection()->getSchemaBuilder()->create('users', function ($table) {

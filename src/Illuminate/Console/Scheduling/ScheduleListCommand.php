@@ -145,7 +145,7 @@ class ScheduleListCommand extends Command
      */
     private function getCronExpressionSpacing($events)
     {
-        $rows = $events->map(fn ($event) => array_map('mb_strlen', explode(' ', $event->expression)));
+        $rows = $events->map(fn ($event) => array_map('mb_strlen', preg_split("/\s+/", $event->expression)));
 
         return collect($rows[0] ?? [])->keys()->map(fn ($key) => $rows->max($key));
     }
@@ -159,7 +159,7 @@ class ScheduleListCommand extends Command
      */
     private function formatCronExpression($expression, $spacing)
     {
-        $expressions = explode(' ', $expression);
+        $expressions = preg_split("/\s+/", $expression);
 
         return collect($spacing)
             ->map(fn ($length, $index) => str_pad($expressions[$index], $length))

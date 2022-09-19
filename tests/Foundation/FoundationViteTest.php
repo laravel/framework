@@ -535,6 +535,36 @@ class FoundationViteTest extends TestCase
         ViteFacade::asset('resources/js/missing.js');
     }
 
+    public function testItDoesNotReturnHashInDevMode()
+    {
+        $this->makeViteHotFile();
+
+        $this->assertNull(ViteFacade::manifestHash());
+
+        $this->cleanViteHotFile();
+    }
+
+    public function testItGetsHashInBuildMode()
+    {
+        $this->makeViteManifest(['a.js' => ['src' => 'a.js']]);
+
+        $this->assertSame('98ca5a789544599b562c9978f3147a0f', ViteFacade::manifestHash());
+
+        $this->cleanViteManifest();
+    }
+
+    public function testItGetsDifferentHashesForDifferentManifestsInBuildMode()
+    {
+        $this->makeViteManifest(['a.js' => ['src' => 'a.js']]);
+        $this->makeViteManifest(['b.js' => ['src' => 'b.js']], 'admin');
+
+        $this->assertSame('98ca5a789544599b562c9978f3147a0f', ViteFacade::manifestHash());
+        $this->assertSame('928a60835978bae84e5381fbb08a38b2', ViteFacade::manifestHash('admin'));
+
+        $this->cleanViteManifest();
+        $this->cleanViteManifest('admin');
+    }
+
     public function testViteCanSetEntryPointsWithFluentBuilder()
     {
         $this->makeViteManifest();
@@ -582,6 +612,25 @@ class FoundationViteTest extends TestCase
         );
 
         $this->cleanViteHotFile('cold');
+    }
+
+    public function testViteIsMacroable()
+    {
+        $this->makeViteManifest([
+            'resources/images/profile.png' => [
+                'src' => 'resources/images/profile.png',
+                'file' => 'assets/profile.versioned.png',
+            ],
+        ], $buildDir = Str::random());
+        Vite::macro('image', function ($asset, $buildDir = null) {
+            return $this->asset("resources/images/{$asset}", $buildDir);
+        });
+
+        $path = ViteFacade::image('profile.png', $buildDir);
+
+        $this->assertSame("https://example.com/{$buildDir}/assets/profile.versioned.png", $path);
+
+        $this->cleanViteManifest($buildDir);
     }
 
     protected function makeViteManifest($contents = null, $path = 'build')

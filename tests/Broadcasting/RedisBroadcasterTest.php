@@ -167,7 +167,8 @@ class RedisBroadcasterTest extends TestCase
     protected function getMockRequestWithUserForChannel($channel)
     {
         $request = m::mock(Request::class);
-        $request->channel_name = $channel;
+        $request->shouldReceive('all')->andReturn(['channel_name' => $channel]);
+        $request->shouldReceive('all')->andReturn(['channel_name' => $channel]);
 
         $user = m::mock('User');
         $user->shouldReceive('getAuthIdentifierForBroadcasting')
@@ -188,7 +189,7 @@ class RedisBroadcasterTest extends TestCase
     protected function getMockRequestWithoutUserForChannel($channel)
     {
         $request = m::mock(Request::class);
-        $request->channel_name = $channel;
+        $request->shouldReceive('all')->andReturn(['channel_name' => $channel]);
 
         $request->shouldReceive('user')
                 ->andReturn(null);

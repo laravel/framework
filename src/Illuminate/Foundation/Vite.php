@@ -7,9 +7,12 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
+use Illuminate\Support\Traits\Macroable;
 
 class Vite implements Htmlable
 {
+    use Macroable;
+
     /**
      * The Content Security Policy nonce to apply to all generated tags.
      *
@@ -534,6 +537,26 @@ class Vite implements Htmlable
     protected function manifestPath($buildDirectory)
     {
         return public_path($buildDirectory.'/manifest.json');
+    }
+
+    /**
+     * Get a unique hash representing the current manifest, or null if there is no manifest.
+     *
+     * @return string|null
+     */
+    public function manifestHash($buildDirectory = null)
+    {
+        $buildDirectory ??= $this->buildDirectory;
+
+        if ($this->isRunningHot()) {
+            return null;
+        }
+
+        if (! is_file($path = $this->manifestPath($buildDirectory))) {
+            return null;
+        }
+
+        return md5_file($path) ?: null;
     }
 
     /**
