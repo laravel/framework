@@ -35,7 +35,7 @@ class Markdown implements Castable
             /**
              * Create a new instance of the class.
              *
-             * @param array $options
+             * @param  array  $options
              * @return void
              */
             public function __construct($options = [])
@@ -46,7 +46,7 @@ class Markdown implements Castable
             /**
              * Parse user defined options.
              *
-             * @param array $options
+             * @param  array  $options
              * @return void
              */
             protected function setOptions($options)
@@ -60,21 +60,18 @@ class Markdown implements Castable
                     }
 
                     // Execlude any option defined without value
-                    if (! isset($parts[1])){
+                    if (! isset($parts[1])) {
                         return [];
                     }
 
                     $value = $parts[1];
 
-                    // Type cast integers properly
+                    // Type cast option values properly
                     if (is_numeric($value)) {
                         $value = (int) $value;
-                    }
-                    // Type cast boolean properly
-                    elseif ($value == 'true') {
+                    } elseif ($value == 'true') {
                         $value = true;
-                    }
-                    elseif ($value == 'false') {
+                    } elseif ($value == 'false') {
                         $value = false;
                     }
 
@@ -95,11 +92,11 @@ class Markdown implements Castable
             /**
              * Cast the given value into markdown.
              *
-             * @param  \Illuminate\Database\Eloquent\Model  $model
-             * @param  string  $key
-             * @param  mixed  $value
-             * @param  array  $attributes
-             * @return  string
+             * @param   \Illuminate\Database\Eloquent\Model  $model
+             * @param   string  $key
+             * @param   mixed  $value
+             * @param   array  $attributes
+             * @return string
              */
             public function get($model, $key, $value, $attributes)
             {
@@ -117,7 +114,7 @@ class Markdown implements Castable
              * @param  string  $key
              * @param  mixed  $value
              * @param  array  $attributes
-             * @return  string
+             * @return string
              */
             public function set($model, $key, $value, $attributes)
             {
