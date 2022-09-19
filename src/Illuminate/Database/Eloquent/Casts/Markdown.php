@@ -2,9 +2,9 @@
 
 namespace Illuminate\Database\Eloquent\Casts;
 
-use Illuminate\Support\Str;
-use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Contracts\Database\Eloquent\Castable;
+use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
+use Illuminate\Support\Str;
 
 class Markdown implements Castable
 {
@@ -16,16 +16,17 @@ class Markdown implements Castable
      */
     public static function castUsing(array $arguments)
     {
-        return new class($arguments) implements CastsAttributes {
+        return new class($arguments) implements CastsAttributes
+        {
             /**
-             * Instruct it to convert string using inline HTML converter
+             * Instruct it to convert string using inline HTML converter.
              *
              * @var bool
              */
             protected $useInlineConverter = false;
 
             /**
-             * Hold user defined options
+             * Hold user defined options.
              *
              * @var array
              */
@@ -34,7 +35,6 @@ class Markdown implements Castable
             /**
              * Create a new instance of the class.
              *
-             * @param bool $useInlineConverter
              * @param array $options
              * @return void
              */
@@ -44,7 +44,7 @@ class Markdown implements Castable
             }
 
             /**
-             * Parse user defined options
+             * Parse user defined options.
              *
              * @param array $options
              * @return void
@@ -52,15 +52,15 @@ class Markdown implements Castable
             protected function setOptions($options)
             {
                 $this->options = collect($options)->flatMap(function ($values) {
-                    $parts = explode("=", $values);
+                    $parts = explode('=', $values);
 
                     // Use Inline HTML converter
-                    if ($parts[0] == "inline"){
+                    if ($parts[0] == 'inline') {
                         $this->useInlineConverter = true;
                     }
 
                     // Execlude any option defined without value
-                    if (!isset($parts[1])){
+                    if (! isset($parts[1])){
                         return [];
                     }
 
@@ -68,13 +68,13 @@ class Markdown implements Castable
 
                     // Type cast integers properly
                     if (is_numeric($value)) {
-                        $value = (int)$value;
+                        $value = (int) $value;
                     }
                     // Type cast boolean properly
-                    elseif ($value == 'true'){
+                    elseif ($value == 'true') {
                         $value = true;
                     }
-                    elseif ($value == 'false'){
+                    elseif ($value == 'false') {
                         $value = false;
                     }
 
@@ -83,7 +83,7 @@ class Markdown implements Castable
             }
 
             /**
-             * Get options as array
+             * Get options as array.
              *
              * @return mixed
              */
@@ -95,11 +95,11 @@ class Markdown implements Castable
             /**
              * Cast the given value into markdown.
              *
-             * @param \Illuminate\Database\Eloquent\Model $model
-             * @param string $key
-             * @param mixed $value
-             * @param array $attributes
-             * @return string
+             * @param  \Illuminate\Database\Eloquent\Model  $model
+             * @param  string  $key
+             * @param  mixed  $value
+             * @param  array  $attributes
+             * @return  string
              */
             public function get($model, $key, $value, $attributes)
             {
@@ -113,11 +113,11 @@ class Markdown implements Castable
             /**
              * Prepare the given value for storage.
              *
-             * @param \Illuminate\Database\Eloquent\Model $model
-             * @param string $key
-             * @param mixed $value
-             * @param array $attributes
-             * @return string
+             * @param  \Illuminate\Database\Eloquent\Model  $model
+             * @param  string  $key
+             * @param  mixed  $value
+             * @param  array  $attributes
+             * @return  string
              */
             public function set($model, $key, $value, $attributes)
             {
