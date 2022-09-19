@@ -73,7 +73,7 @@ class EloquentModelMarkdownCastingTest extends TestCase
      */
     public function testInit()
     {
-        $model = \Tests\Feature\MarkdownCustomCasts::firstOrCreate([
+        $model = MarkdownCustomCasts::firstOrCreate([
             'content' => '# Taylor <b>Otwell</b>',
         ]);
 
