@@ -18,7 +18,7 @@ class {{ class }}
      */
     public function viewAny({{ user }} $user)
     {
-        //
+        return true;
     }
 
     /**
@@ -30,7 +30,7 @@ class {{ class }}
      */
     public function view({{ user }} $user, {{ model }} ${{ modelVariable }})
     {
-        //
+        return true;
     }
 
     /**
@@ -41,7 +41,7 @@ class {{ class }}
      */
     public function create({{ user }} $user)
     {
-        //
+        return true;
     }
 
     /**
@@ -53,7 +53,7 @@ class {{ class }}
      */
     public function update({{ user }} $user, {{ model }} ${{ modelVariable }})
     {
-        //
+        return true;
     }
 
     /**
@@ -65,7 +65,7 @@ class {{ class }}
      */
     public function delete({{ user }} $user, {{ model }} ${{ modelVariable }})
     {
-        //
+        return true;
     }
 
     /**
@@ -77,7 +77,7 @@ class {{ class }}
      */
     public function restore({{ user }} $user, {{ model }} ${{ modelVariable }})
     {
-        //
+        return true;
     }
 
     /**
@@ -89,6 +89,6 @@ class {{ class }}
      */
     public function forceDelete({{ user }} $user, {{ model }} ${{ modelVariable }})
     {
-        //
+        return true;
     }
 }
