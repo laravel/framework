@@ -724,11 +724,11 @@ trait HasAttributes
         }
         
         // If the key is markdown castable, we will pull cast parameters and update
-        // cast type so it will be handled later
-        if ($this->isMarkdownCastable($castType)){
+        // cast type so it will be handled later.
+        if ($this->isMarkdownCastable($castType)) {
             $markdownOptions = Str::after($castType, 'markdown:');
 
-            $castType = "markdown";
+            $castType = 'markdown';
         }
 
         switch ($castType) {
@@ -2204,7 +2204,7 @@ trait HasAttributes
      * Determine if the cast type is Markdown castable.
      *
      * @param  string  $cast
-     * @return bool
+     * @return  bool
      */
     protected function isMarkdownCastable($cast)
     {
@@ -2212,7 +2212,7 @@ trait HasAttributes
     }
 
     /**
-     * Return string as Markdown
+     * Return string as Markdown.
      *
      * @param $key
      * @param $value
