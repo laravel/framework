@@ -63,7 +63,7 @@ class ValidationServiceProvider extends ServiceProvider implements DeferrablePro
     protected function registerUncompromisedVerifier()
     {
         $this->app->singleton(
-            UncompromisedVerifier::class, 
+            UncompromisedVerifier::class,
             fn ($app) => new NotPwnedVerifier($app[HttpFactory::class])
         );
     }

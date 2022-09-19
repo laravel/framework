@@ -37,7 +37,7 @@ class In
     public function __toString()
     {
         $values = array_map(
-            fn ($value) => '"'.str_replace('"', '""', $value).'"', 
+            fn ($value) => '"'.str_replace('"', '""', $value).'"',
             $this->values
         );
 
