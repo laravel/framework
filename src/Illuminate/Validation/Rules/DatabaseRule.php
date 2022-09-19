@@ -69,13 +69,10 @@ trait DatabaseRule
                 return $table;
             }
 
-            return implode(
-                '.',
-                array_map(
-                    fn (string $part) => trim($part, '.'),
-                    array_filter([$model->getConnectionName(), $model->getTable()])
-                )
-            );
+            return implode('.', array_map(
+                fn (string $part) => trim($part, '.'),
+                array_filter([$model->getConnectionName(), $model->getTable()])
+            ));
         }
 
         return $table;
