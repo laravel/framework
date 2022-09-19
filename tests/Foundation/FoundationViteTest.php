@@ -614,6 +614,25 @@ class FoundationViteTest extends TestCase
         $this->cleanViteHotFile('cold');
     }
 
+    public function testViteIsMacroable()
+    {
+        $this->makeViteManifest([
+            'resources/images/profile.png' => [
+                'src' => 'resources/images/profile.png',
+                'file' => 'assets/profile.versioned.png',
+            ],
+        ], $buildDir = Str::random());
+        Vite::macro('image', function ($asset, $buildDir = null) {
+            return $this->asset("resources/images/{$asset}", $buildDir);
+        });
+
+        $path = ViteFacade::image('profile.png', $buildDir);
+
+        $this->assertSame("https://example.com/{$buildDir}/assets/profile.versioned.png", $path);
+
+        $this->cleanViteManifest($buildDir);
+    }
+
     protected function makeViteManifest($contents = null, $path = 'build')
     {
         app()->singleton('path.public', fn () => __DIR__);
