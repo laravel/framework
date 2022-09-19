@@ -70,4 +70,31 @@ class FilesystemManagerTest extends TestCase
         unlink(__DIR__.'/../../my-custom-path/path.txt');
         rmdir(__DIR__.'/../../my-custom-path');
     }
+
+    public function testCanBuildScopedDisks()
+    {
+        try {
+            $filesystem = new FilesystemManager(tap(new Application, function ($app) {
+                $app['config'] = [
+                    'filesystems.disks.local' => [
+                        'driver' => 'local',
+                        'root' => 'to-be-scoped',
+                    ],
+                ];
+            }));
+
+            $local = $filesystem->disk('local');
+            $scoped = $filesystem->build([
+                'driver' => 'scoped',
+                'disk' => 'local',
+                'prefix' => 'path-prefix',
+            ]);
+
+            $scoped->put('dirname/filename.txt', 'file content');
+            $this->assertEquals('file content', $local->get('path-prefix/dirname/filename.txt'));
+            $local->deleteDirectory('path-prefix');
+        } finally {
+            rmdir(__DIR__.'/../../to-be-scoped');
+        }
+    }
 }

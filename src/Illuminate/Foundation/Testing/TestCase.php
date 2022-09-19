@@ -6,14 +6,19 @@ use Carbon\CarbonImmutable;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Bootstrap\HandleExceptions;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Queue\Queue;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\ParallelTesting;
 use Illuminate\Support\Str;
+use Illuminate\Testing\AssertableJsonString;
 use Mockery;
 use Mockery\Exception\InvalidCountException;
+use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase as BaseTestCase;
+use ReflectionProperty;
 use Throwable;
 
 abstract class TestCase extends BaseTestCase
@@ -80,6 +85,8 @@ abstract class TestCase extends BaseTestCase
      */
     protected function setUp(): void
     {
+        $this->latestResponse = null;
+
         Facade::clearResolvedInstances();
 
         if (! $this->app) {
@@ -260,5 +267,121 @@ abstract class TestCase extends BaseTestCase
                 }
             }
         }
+    }
+
+    /**
+     * This method is called when a test method did not execute successfully.
+     *
+     * @param  \Throwable  $exception
+     * @return void
+     */
+    protected function onNotSuccessfulTest(Throwable $exception): void
+    {
+        if (! $exception instanceof ExpectationFailedException || is_null($this->latestResponse)) {
+            parent::onNotSuccessfulTest($exception);
+        }
+
+        if ($lastException = $this->latestResponse->exceptions->last()) {
+            parent::onNotSuccessfulTest($this->appendExceptionToException($lastException, $exception));
+
+            return;
+        }
+
+        if ($this->latestResponse->baseResponse instanceof RedirectResponse) {
+            $session = $this->latestResponse->baseResponse->getSession();
+
+            if (! is_null($session) && $session->has('errors')) {
+                parent::onNotSuccessfulTest($this->appendErrorsToException($session->get('errors')->all(), $exception));
+
+                return;
+            }
+        }
+
+        if ($this->latestResponse->baseResponse->headers->get('Content-Type') === 'application/json') {
+            $testJson = new AssertableJsonString($this->latestResponse->getContent());
+
+            if (isset($testJson['errors'])) {
+                parent::onNotSuccessfulTest($this->appendErrorsToException($testJson->json(), $exception, true));
+
+                return;
+            }
+        }
+
+        parent::onNotSuccessfulTest($exception);
+    }
+
+    /**
+     * Append an exception to the message of another exception.
+     *
+     * @param  \Throwable  $exceptionToAppend
+     * @param  \Throwable  $exception
+     * @return \Throwable
+     */
+    protected function appendExceptionToException($exceptionToAppend, $exception)
+    {
+        $exceptionMessage = $exceptionToAppend->getMessage();
+
+        $exceptionToAppend = (string) $exceptionToAppend;
+
+        $message = <<<"EOF"
+            The following exception occurred during the last request:
+
+            $exceptionToAppend
+
+            ----------------------------------------------------------------------------------
+
+            $exceptionMessage
+            EOF;
+
+        return $this->appendMessageToException($message, $exception);
+    }
+
+    /**
+     * Append errors to an exception message.
+     *
+     * @param  array  $errors
+     * @param  \Throwable  $exception
+     * @param  bool  $json
+     * @return \Throwable
+     */
+    protected function appendErrorsToException($errors, $exception, $json = false)
+    {
+        $errors = $json
+            ? json_encode($errors, JSON_PRETTY_PRINT)
+            : implode(PHP_EOL, Arr::flatten($errors));
+
+        // JSON error messages may already contain the errors, so we shouldn't duplicate them...
+        if (str_contains($exception->getMessage(), $errors)) {
+            return $exception;
+        }
+
+        $message = <<<"EOF"
+            The following errors occurred during the last request:
+
+            $errors
+            EOF;
+
+        return $this->appendMessageToException($message, $exception);
+    }
+
+    /**
+     * Append a message to an exception.
+     *
+     * @param  string  $message
+     * @param  \Throwable  $exception
+     * @return \Throwable
+     */
+    protected function appendMessageToException($message, $exception)
+    {
+        $property = new ReflectionProperty($exception, 'message');
+
+        $property->setAccessible(true);
+
+        $property->setValue(
+            $exception,
+            $exception->getMessage().PHP_EOL.PHP_EOL.$message.PHP_EOL
+        );
+
+        return $exception;
     }
 }

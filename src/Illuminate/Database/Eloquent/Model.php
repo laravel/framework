@@ -460,7 +460,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         if (count($attributes) !== count($fillable) &&
             static::preventsSilentlyDiscardingAttributes()) {
             throw new MassAssignmentException(sprintf(
-                'Add fillable property to allow mass assignment on [%s].',
+                'Add fillable property [%s] to allow mass assignment on [%s].',
+                implode(', ', array_diff(array_keys($attributes), array_keys($fillable))),
                 get_class($this)
             ));
         }
@@ -1850,6 +1851,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function getIncrementing()
     {
+        if ($this->getKeyType() === 'string') {
+            return false;
+        }
+
         return $this->incrementing;
     }
 

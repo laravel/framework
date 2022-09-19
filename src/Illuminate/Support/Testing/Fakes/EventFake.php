@@ -26,7 +26,14 @@ class EventFake implements Dispatcher
      *
      * @var array
      */
-    protected $eventsToFake;
+    protected $eventsToFake = [];
+
+    /**
+     * The event types that should be dispatched instead of intercepted.
+     *
+     * @var array
+     */
+    protected $eventsToDispatch = [];
 
     /**
      * All of the events that have been intercepted keyed by type.
@@ -47,6 +54,22 @@ class EventFake implements Dispatcher
         $this->dispatcher = $dispatcher;
 
         $this->eventsToFake = Arr::wrap($eventsToFake);
+    }
+
+    /**
+     * Specify the events that should be dispatched instead of faked.
+     *
+     * @param  array|string  $eventsToDispatch
+     * @return $this
+     */
+    public function except($eventsToDispatch)
+    {
+        $this->eventsToDispatch = array_merge(
+            $this->eventsToDispatch,
+            Arr::wrap($eventsToDispatch)
+        );
+
+        return $this;
     }
 
     /**
@@ -283,6 +306,10 @@ class EventFake implements Dispatcher
      */
     protected function shouldFakeEvent($eventName, $payload)
     {
+        if ($this->shouldDispatchEvent($eventName, $payload)) {
+            return false;
+        }
+
         if (empty($this->eventsToFake)) {
             return true;
         }
@@ -292,6 +319,28 @@ class EventFake implements Dispatcher
                 return $event instanceof Closure
                             ? $event($eventName, $payload)
                             : $event === $eventName;
+            })
+            ->isNotEmpty();
+    }
+
+    /**
+     * Determine whether an event should be dispatched or not.
+     *
+     * @param  string  $eventName
+     * @param  mixed  $payload
+     * @return bool
+     */
+    protected function shouldDispatchEvent($eventName, $payload)
+    {
+        if (empty($this->eventsToDispatch)) {
+            return false;
+        }
+
+        return collect($this->eventsToDispatch)
+            ->filter(function ($event) use ($eventName, $payload) {
+                return $event instanceof Closure
+                    ? $event($eventName, $payload)
+                    : $event === $eventName;
             })
             ->isNotEmpty();
     }

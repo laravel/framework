@@ -700,6 +700,72 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
     }
 
+    public function testOrWhereBetween()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereBetween('id', [3, 5]);
+        $this->assertSame('select * from "users" where "id" = ? or "id" between ? and ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 3, 2 => 5], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereBetween('id', [[3, 4, 5]]);
+        $this->assertSame('select * from "users" where "id" = ? or "id" between ? and ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 3, 2 => 4], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereBetween('id', [[3, 5]]);
+        $this->assertSame('select * from "users" where "id" = ? or "id" between ? and ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 3, 2 => 5], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereBetween('id', [[4], [6, 8]]);
+        $this->assertSame('select * from "users" where "id" = ? or "id" between ? and ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 4, 2 => 6], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereBetween('id', collect([3, 4]));
+        $this->assertSame('select * from "users" where "id" = ? or "id" between ? and ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 3, 2 => 4], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereBetween('id', [new Raw(3), new Raw(4)]);
+        $this->assertSame('select * from "users" where "id" = ? or "id" between 3 and 4', $builder->toSql());
+        $this->assertEquals([0 => 1], $builder->getBindings());
+    }
+
+    public function testOrWhereNotBetween()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereNotBetween('id', [3, 5]);
+        $this->assertSame('select * from "users" where "id" = ? or "id" not between ? and ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 3, 2 => 5], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereNotBetween('id', [[3, 4, 5]]);
+        $this->assertSame('select * from "users" where "id" = ? or "id" not between ? and ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 3, 2 => 4], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereNotBetween('id', [[3, 5]]);
+        $this->assertSame('select * from "users" where "id" = ? or "id" not between ? and ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 3, 2 => 5], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereNotBetween('id', [[4], [6, 8]]);
+        $this->assertSame('select * from "users" where "id" = ? or "id" not between ? and ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 4, 2 => 6], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereNotBetween('id', collect([3, 4]));
+        $this->assertSame('select * from "users" where "id" = ? or "id" not between ? and ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 3, 2 => 4], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereNotBetween('id', [new Raw(3), new Raw(4)]);
+        $this->assertSame('select * from "users" where "id" = ? or "id" not between 3 and 4', $builder->toSql());
+        $this->assertEquals([0 => 1], $builder->getBindings());
+    }
+
     public function testWhereBetweenColumns()
     {
         $builder = $this->getBuilder();
@@ -3519,6 +3585,28 @@ SQL;
         $builder->mergeWheres(['wheres'], [12 => 'foo', 13 => 'bar']);
         $this->assertEquals(['foo', 'wheres'], $builder->wheres);
         $this->assertEquals(['foo', 'bar'], $builder->getBindings());
+    }
+
+    public function testPrepareValueAndOperator()
+    {
+        $builder = $this->getBuilder();
+        [$value, $operator] = $builder->prepareValueAndOperator('>', '20');
+        $this->assertSame('>', $value);
+        $this->assertSame('20', $operator);
+
+        $builder = $this->getBuilder();
+        [$value, $operator] = $builder->prepareValueAndOperator('>', '20', true);
+        $this->assertSame('20', $value);
+        $this->assertSame('=', $operator);
+    }
+
+    public function testPrepareValueAndOperatorExpectException()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Illegal operator and value combination.');
+
+        $builder = $this->getBuilder();
+        $builder->prepareValueAndOperator(null, 'like');
     }
 
     public function testProvidingNullWithOperatorsBuildsCorrectly()

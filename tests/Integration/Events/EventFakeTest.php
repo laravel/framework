@@ -121,6 +121,22 @@ class EventFakeTest extends TestCase
         Event::assertNotDispatched('non-fake-event');
     }
 
+    public function testEventsListedInExceptAreProperlyDispatched()
+    {
+        Event::fake()->except('important-event');
+
+        Event::listen('test', function () {
+            return 'test';
+        });
+
+        Event::listen('important-event', function () {
+            return 'important';
+        });
+
+        $this->assertEquals(null, Event::dispatch('test'));
+        $this->assertEquals(['important'], Event::dispatch('important-event'));
+    }
+
     public function testAssertListening()
     {
         Event::fake();

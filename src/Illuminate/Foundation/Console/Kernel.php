@@ -2,7 +2,9 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Carbon\CarbonInterval;
 use Closure;
+use DateTimeInterface;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Console\Command;
 use Illuminate\Console\Scheduling\Schedule;
@@ -11,7 +13,9 @@ use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Env;
+use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
 use ReflectionClass;
 use Symfony\Component\Finder\Finder;
@@ -19,6 +23,8 @@ use Throwable;
 
 class Kernel implements KernelContract
 {
+    use InteractsWithTime;
+
     /**
      * The application implementation.
      *
@@ -53,6 +59,20 @@ class Kernel implements KernelContract
      * @var bool
      */
     protected $commandsLoaded = false;
+
+    /**
+     * All of the registered command duration handlers.
+     *
+     * @var array
+     */
+    protected $commandLifecycleDurationHandlers = [];
+
+    /**
+     * When the currently handled command started.
+     *
+     * @var \Illuminate\Support\Carbon|null
+     */
+    protected $commandStartedAt;
 
     /**
      * The bootstrap classes for the application.
@@ -123,6 +143,8 @@ class Kernel implements KernelContract
      */
     public function handle($input, $output = null)
     {
+        $this->commandStartedAt = Carbon::now();
+
         try {
             $this->bootstrap();
 
@@ -146,6 +168,49 @@ class Kernel implements KernelContract
     public function terminate($input, $status)
     {
         $this->app->terminate();
+
+        foreach ($this->commandLifecycleDurationHandlers as ['threshold' => $threshold, 'handler' => $handler]) {
+            $end ??= Carbon::now();
+
+            if ($this->commandStartedAt->diffInMilliseconds($end) > $threshold) {
+                $handler($this->commandStartedAt, $input, $status);
+            }
+        }
+
+        $this->commandStartedAt = null;
+    }
+
+    /**
+     * Register a callback to be invoked when the command lifecyle duration exceeds a given amount of time.
+     *
+     * @param  \DateTimeInterface|\Carbon\CarbonInterval|float|int  $threshold
+     * @param  callable  $handler
+     * @return void
+     */
+    public function whenCommandLifecycleIsLongerThan($threshold, $handler)
+    {
+        $threshold = $threshold instanceof DateTimeInterface
+            ? $this->secondsUntil($threshold) * 1000
+            : $threshold;
+
+        $threshold = $threshold instanceof CarbonInterval
+            ? $threshold->totalMilliseconds
+            : $threshold;
+
+        $this->commandLifecycleDurationHandlers[] = [
+            'threshold' => $threshold,
+            'handler' => $handler,
+        ];
+    }
+
+    /**
+     * When the command being handled started.
+     *
+     * @return \Illuminate\Support\Carbon|null
+     */
+    public function commandStartedAt()
+    {
+        return $this->commandStartedAt;
     }
 
     /**
