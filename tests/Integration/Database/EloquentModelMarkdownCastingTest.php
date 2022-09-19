@@ -9,6 +9,12 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Eloquent\Casts\Markdown;
 use PHPUnit\Framework\TestCase;
 
+use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Eloquent\Casts\Markdown;
+use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Database\Schema\Blueprint;
+use PHPUnit\Framework\TestCase;
+
 class EloquentModelMarkdownCastingTest extends TestCase
 {
     protected function setUp(): void
@@ -72,57 +78,62 @@ class EloquentModelMarkdownCastingTest extends TestCase
     /**
      * Tests..
      */
-    public function testInit(){
-        $model = MarkdownCustomCasts::firstOrCreate([
-            'content' => '# Taylor <b>Otwell</b>'
+    public function testInit()
+    {
+        $model = \Tests\Feature\MarkdownCustomCasts::firstOrCreate([
+            'content' => '# Taylor <b>Otwell</b>',
         ]);
 
         $this->assertSame("<h1>Taylor <b>Otwell</b></h1>\n", $model->content);
     }
 
-    public function testInline(){
+    public function testInline()
+    {
         $model = MarkdownCustomCasts::firstOrCreate([
-            'content' => '**Taylor Otwell**'
+            'content' => '**Taylor Otwell**',
         ]);
 
         $model->mergeCasts([
-            'content' => 'markdown:inline'
+            'content' => 'markdown:inline',
         ]);
 
         $this->assertSame("<strong>Taylor Otwell</strong>\n", $model->content);
     }
 
-    public function testHtmlInputStrip(){
+    public function testHtmlInputStrip()
+    {
         $model = MarkdownCustomCasts::firstOrCreate([
-            'content' => '# Taylor <b>Otwell</b>'
+            'content' => '# Taylor <b>Otwell</b>',
         ]);
 
         $model->mergeCasts([
-            'content' => 'markdown:html_input=strip'
+            'content' => 'markdown:html_input=strip',
         ]);
 
         $this->assertSame("<h1>Taylor Otwell</h1>\n", $model->content);
     }
 
-    public function testCommonMarkNestedOption(){
+    public function testCommonMarkNestedOption()
+    {
         $model = MarkdownCustomCasts::firstOrCreate([
-            'content' => '# Taylor *Otwell*'
+            'content' => '# Taylor *Otwell*',
         ]);
 
         $model->mergeCasts([
-            'content' => Markdown::class . ':commonmark.enable_em=false'
+            'content' => Markdown::class.':commonmark.enable_em=false',
         ]);
 
         $this->assertSame("<h1>Taylor *Otwell*</h1>\n", $model->content);
     }
 
-    public function testCastableClass(){
+    public function testCastableClass()
+    {
         $model = MarkdownCustomCasts::firstOrCreate([
-            'content' => '# Taylor <b>Otwell</b>'
+            'content' => '# Taylor <b>Otwell</b>',
         ]);
 
         $model->mergeCasts([
-            'content' => Markdown::class . ':html_input=strip'
+            'content' => Markdown::class.':html_input=strip',
         ]);
 
         $this->assertSame("<h1>Taylor Otwell</h1>\n", $model->content);
