@@ -382,7 +382,7 @@ class SupportArrTest extends TestCase
         $array = ['products' => ['desk' => ['price' => 100]]];
         $value = Arr::get($array, ['products', 'desk']);
         $this->assertEquals(['price' => 100], $value);
-        
+
         $array = [
             'products' => [
                 ['name' => 'desk'],
