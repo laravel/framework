@@ -31,7 +31,7 @@ class Logger implements LoggerInterface
      *
      * @var array
      */
-    protected $context = [];
+    protected static $context = [];
 
     /**
      * Create a new log writer instance.
@@ -180,7 +180,7 @@ class Logger implements LoggerInterface
     {
         $this->logger->{$level}(
             $message = $this->formatMessage($message),
-            $context = array_merge($this->context, $context)
+            $context = array_merge(self::$context, $context)
         );
 
         $this->fireLogEvent($level, $message, $context);
@@ -194,7 +194,7 @@ class Logger implements LoggerInterface
      */
     public function withContext(array $context = [])
     {
-        $this->context = array_merge($this->context, $context);
+        self::$context = array_merge(self::$context, $context);
 
         return $this;
     }
@@ -206,7 +206,7 @@ class Logger implements LoggerInterface
      */
     public function withoutContext()
     {
-        $this->context = [];
+        self::$context = [];
 
         return $this;
     }
