@@ -32,6 +32,13 @@ class HtmlDumper extends BaseHtmlDumper
     protected $basePath;
 
     /**
+     * If the dumper is currently dumping.
+     *
+     * @var bool
+     */
+    protected $dumping = false;
+
+    /**
      * Creates a new Html Dumper instance.
      *
      * @param  string  $basePath
@@ -67,6 +74,14 @@ class HtmlDumper extends BaseHtmlDumper
      */
     public function dumpWithSource(Data $data)
     {
+        if ($this->dumping) {
+            $this->dump($data);
+
+            return;
+        }
+
+        $this->dumping = true;
+
         $output = (string) $this->dump($data, true);
 
         $output = match (true) {
@@ -84,6 +99,8 @@ class HtmlDumper extends BaseHtmlDumper
         };
 
         fwrite($this->outputStream, $output);
+
+        $this->dumping = false;
     }
 
     /**
@@ -121,8 +138,6 @@ class HtmlDumper extends BaseHtmlDumper
      */
     protected function editor()
     {
-        // TODO: Spatie\Ignition\Config\IgnitionConfig::loadFromConfigFile()->editor
-
         try {
             return config('app.editor');
         } catch (Throwable $e) {

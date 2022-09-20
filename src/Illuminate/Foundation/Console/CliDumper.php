@@ -29,6 +29,13 @@ class CliDumper extends BaseCliDumper
     protected $output;
 
     /**
+     * If the dumper is currently dumping.
+     *
+     * @var bool
+     */
+    protected $dumping = false;
+
+    /**
      * Creates a new Cli Dumper instance.
      *
      * @param  \Symfony\Component\Console\Output\OutputInterface  $output
@@ -66,6 +73,14 @@ class CliDumper extends BaseCliDumper
      */
     public function dumpWithSource(Data $data)
     {
+        if ($this->dumping) {
+            $this->dump($data);
+
+            return;
+        }
+
+        $this->dumping = true;
+
         $output = (string) $this->dump($data, true);
 
         $lines = explode("\n", $output);
@@ -73,6 +88,8 @@ class CliDumper extends BaseCliDumper
         $lines[0] .= $this->getDumpSourceContent();
 
         $this->output->write(implode("\n", $lines));
+
+        $this->dumping = false;
     }
 
     /**
