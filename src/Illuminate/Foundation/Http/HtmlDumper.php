@@ -64,7 +64,7 @@ class HtmlDumper extends BaseHtmlDumper
      */
     public function dumpWithSource(Data $data)
     {
-        $output = $this->dump($data, true);
+        $output = (string) $this->dump($data, true);
 
         $output = match (true) {
             str_contains($output, static::EXPANDED_SEPARATOR) => str_replace(
