@@ -1,6 +1,23 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.30.0...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.30.1...9.x)
+
+
+## [v9.30.1](https://github.com/laravel/framework/compare/v9.30.0...v9.30.1) - 2022-09-15
+
+### Added
+- Allow using a model instance in place of nested model factories ([#44107](https://github.com/laravel/framework/pull/44107))
+- Added UUID and ULID support for Eloquent ([#44074](https://github.com/laravel/framework/pull/44074))
+- Implement except method for fake classes to define what should not be faked ([#44117](https://github.com/laravel/framework/pull/44117))
+- Added interacts with queue middleware to send queued mailable ([#44124](https://github.com/laravel/framework/pull/44124))
+- Added new exception string to `Illuminate/Database/DetectsLostConnections` ([#44121](https://github.com/laravel/framework/pull/44121))
+
+### Fixed
+- Fixed BC from [Passing event into viaQueue and viaConnection of Queued Listener](https://github.com/laravel/framework/pull/44080) ([#44137](https://github.com/laravel/framework/pull/44137))
+
+### Changed
+- Enhance column modifying ([#44101](https://github.com/laravel/framework/pull/44101))
+- Allow to define which jobs should be actually dispatched when using Bus::fake ([#44106](https://github.com/laravel/framework/pull/44106))
 
 
 ## [v9.30.0](https://github.com/laravel/framework/compare/v9.29.0...v9.30.0) - 2022-09-13
