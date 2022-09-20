@@ -120,6 +120,10 @@ class ComponentTagCompiler
                             )
                             |
                             (?:
+                                (\:\\\$)(\w+)
+                            )
+                            |
+                            (?:
                                 [\w\-:.@]+
                                 (
                                     =
@@ -498,6 +502,7 @@ class ComponentTagCompiler
      */
     protected function getAttributesFromAttributeString(string $attributeString)
     {
+        $attributeString = $this->parseShortAttributeSyntax($attributeString);
         $attributeString = $this->parseAttributeBag($attributeString);
         $attributeString = $this->parseComponentTagClassStatements($attributeString);
         $attributeString = $this->parseBindAttributes($attributeString);
@@ -603,6 +608,21 @@ class ComponentTagCompiler
         /xm";
 
         return preg_replace($pattern, ' bind:$1=', $attributeString);
+    }
+
+    /**
+     * Parses a short attribute syntax like :$foo into a fully-qualified syntax like :foo="$foo".
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function parseShortAttributeSyntax(string $value)
+    {
+        $pattern = "/((\:\\\$)(\w+))/x";
+
+        return preg_replace_callback($pattern, function (array $matches) {
+            return ":{$matches[3]}=\"\${$matches[3]}\"";
+        }, $value);
     }
 
     /**
