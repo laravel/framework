@@ -28,6 +28,7 @@ abstract class DatabaseInspectionCommand extends Command
         'geometry' => 'string',
         'geomcollection' => 'string',
         'linestring' => 'string',
+        'ltree' => 'string',
         'multilinestring' => 'string',
         'multipoint' => 'string',
         'multipolygon' => 'string',
