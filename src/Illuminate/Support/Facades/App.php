@@ -15,6 +15,7 @@ namespace Illuminate\Support\Facades;
  * @method static bool isLocal()
  * @method static bool isProduction()
  * @method static bool routesAreCached()
+ * @method static bool isCachedRoutesLoaded()
  * @method static bool runningInConsole()
  * @method static bool runningUnitTests()
  * @method static bool shouldSkipMiddleware()
@@ -48,6 +49,7 @@ namespace Illuminate\Support\Facades;
  * @method static void registerDeferredProvider(string $provider, string $service = null)
  * @method static void setLocale(string $locale)
  * @method static void terminate()
+ * @method static void loadCachedRoutes()
  *
  * @see \Illuminate\Contracts\Foundation\Application
  */

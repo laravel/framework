@@ -62,6 +62,13 @@ class Application extends Container implements ApplicationContract, CachesConfig
     protected $booted = false;
 
     /**
+     * Indicates if the routes cache has loaded.
+     *
+     * @var bool
+     */
+    protected $isRoutesCacheLoaded = false;
+
+    /**
      * The array of booting callbacks.
      *
      * @var callable[]
@@ -1061,6 +1068,28 @@ class Application extends Container implements ApplicationContract, CachesConfig
     }
 
     /**
+     * Check if the routes cache file loaded.
+     *
+     * @return bool
+     */
+    public function isCachedRoutesLoaded()
+    {
+        return $this->isRoutesCacheLoaded;
+    }
+
+    /**
+     * Load the routes cache file.
+     *
+     * @return void
+     */
+    public function loadCachedRoutes()
+    {
+        require $this->getCachedRoutesPath();
+
+        $this->isCachedRoutesLoaded = true;
+    }
+
+    /**
      * Determine if the application events are cached.
      *
      * @return bool
@@ -1401,6 +1430,8 @@ class Application extends Container implements ApplicationContract, CachesConfig
         $this->globalBeforeResolvingCallbacks = [];
         $this->globalResolvingCallbacks = [];
         $this->globalAfterResolvingCallbacks = [];
+
+        $this->isCachedRoutesLoaded = false;
     }
 
     /**

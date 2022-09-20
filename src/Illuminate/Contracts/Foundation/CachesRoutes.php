@@ -17,4 +17,18 @@ interface CachesRoutes
      * @return string
      */
     public function getCachedRoutesPath();
+
+    /**
+     * Check if the routes cache file loaded.
+     *
+     * @return bool
+     */
+    public function isCachedRoutesLoaded();
+
+    /**
+     * Load the routes cache file.
+     *
+     * @return void
+     */
+    public function loadCachedRoutes();
 }
