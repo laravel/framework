@@ -7,7 +7,7 @@ trait ResolvesDumpSource
     /**
      * The source resolver.
      *
-     * @var callable(): (array{0: string, 1: string, 2: int}|null)
+     * @var (callable(): (array{0: string, 1: string, 2: int}|null))|null
      */
     protected static $dumpSourceResolver;
 
