@@ -10,10 +10,7 @@ use League\CommonMark\Extension\GithubFlavoredMarkdownExtension;
 use League\CommonMark\Extension\InlinesOnly\InlinesOnlyExtension;
 use League\CommonMark\GithubFlavoredMarkdownConverter;
 use League\CommonMark\MarkdownConverter;
-use Ramsey\Uuid\Codec\TimestampFirstCombCodec;
-use Ramsey\Uuid\Generator\CombGenerator;
 use Ramsey\Uuid\Uuid;
-use Ramsey\Uuid\UuidFactory;
 use Symfony\Component\Uid\Ulid;
 use Traversable;
 use voku\helper\ASCII;
@@ -1220,7 +1217,7 @@ class Str
     }
 
     /**
-     * Generate a UUID (version 4).
+     * Generate a UUID (version 7).
      *
      * @return \Ramsey\Uuid\UuidInterface
      */
@@ -1228,32 +1225,17 @@ class Str
     {
         return static::$uuidFactory
                     ? call_user_func(static::$uuidFactory)
-                    : Uuid::uuid4();
+                    : Uuid::uuid7();
     }
 
     /**
-     * Generate a time-ordered UUID (version 4).
+     * Generate a time-ordered UUID (version 7).
      *
      * @return \Ramsey\Uuid\UuidInterface
      */
     public static function orderedUuid()
     {
-        if (static::$uuidFactory) {
-            return call_user_func(static::$uuidFactory);
-        }
-
-        $factory = new UuidFactory;
-
-        $factory->setRandomGenerator(new CombGenerator(
-            $factory->getRandomGenerator(),
-            $factory->getNumberConverter()
-        ));
-
-        $factory->setCodec(new TimestampFirstCombCodec(
-            $factory->getUuidBuilder()
-        ));
-
-        return $factory->uuid4();
+        return Str::uuid();
     }
 
     /**
