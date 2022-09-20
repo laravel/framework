@@ -7,14 +7,14 @@ trait ResolvesDumpSource
     /**
      * The source resolver.
      *
-     * @var callable(): (array{0: string, 1: string: 2: int}|null)
+     * @var callable(): (array{0: string, 1: string, 2: int}|null)
      */
     protected static $dumpSourceResolver;
 
     /**
      * Resolves the source of the dump call.
      *
-     * @return array{0: string, 1: string: 2: int}|null
+     * @return array{0: string, 1: string, 2: int}|null
      */
     public function resolveDumpSource()
     {
@@ -43,7 +43,7 @@ trait ResolvesDumpSource
     /**
      * Sets the resolver that resolves the source of the dump call.
      *
-     * @param  (callable(): (array{0: string, 1: string: 2: int}|null))|null  $callable
+     * @param  (callable(): (array{0: string, 1: string, 2: int}|null))|null  $callable
      * @return void
      */
     public static function resolveDumpSourceUsing($callable)
