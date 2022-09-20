@@ -79,7 +79,7 @@ class HtmlDumper extends BaseHtmlDumper
             ),
             default => $output,
         };
-        
+
         fwrite($this->outputStream, $output);
     }
 
