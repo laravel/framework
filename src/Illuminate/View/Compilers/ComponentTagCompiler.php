@@ -618,10 +618,10 @@ class ComponentTagCompiler
      */
     protected function parseShortAttributeSyntax(string $value)
     {
-        $pattern = "/((\:\\\$)(\w+))/x";
+        $pattern = "/\:\\\$(\w+)/x";
 
         return preg_replace_callback($pattern, function (array $matches) {
-            return ":{$matches[3]}=\"\${$matches[3]}\"";
+            return ":{$matches[1]}=\"\${$matches[1]}\"";
         }, $value);
     }
 
