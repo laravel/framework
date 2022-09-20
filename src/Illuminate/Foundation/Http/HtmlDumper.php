@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Http;
 
+use Illuminate\Foundation\Concerns\ResolvesDumpSource;
 use Symfony\Component\VarDumper\Caster\ReflectionCaster;
 use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
@@ -11,6 +12,8 @@ use Throwable;
 
 class HtmlDumper extends BaseHtmlDumper
 {
+    use ResolvesDumpSource;
+
     /**
      * Where the source should be placed on "expanded" kind of dumps.
      */
@@ -69,12 +72,12 @@ class HtmlDumper extends BaseHtmlDumper
         $output = match (true) {
             str_contains($output, static::EXPANDED_SEPARATOR) => str_replace(
                 static::EXPANDED_SEPARATOR,
-                static::EXPANDED_SEPARATOR.$this->displayableDumpSource(),
+                static::EXPANDED_SEPARATOR.$this->getDumpSourceContent(),
                 $output,
             ),
             str_contains($output, static::NON_EXPANDED_SEPARATOR) => str_replace(
                 static::NON_EXPANDED_SEPARATOR,
-                $this->displayableDumpSource().static::NON_EXPANDED_SEPARATOR,
+                $this->getDumpSourceContent().static::NON_EXPANDED_SEPARATOR,
                 $output,
             ),
             default => $output,
@@ -84,26 +87,17 @@ class HtmlDumper extends BaseHtmlDumper
     }
 
     /**
-     * Gets a console "displayble" source for the dump.
+     * Gets the dump's source html content.
      *
      * @return string
      */
-    protected function displayableDumpSource()
+    protected function getDumpSourceContent()
     {
-        $trace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT | DEBUG_BACKTRACE_IGNORE_ARGS, 20);
-
-        $file = $trace[6]['file'] ?? null;
-        $line = $trace[6]['line'] ?? null;
-
-        if (is_null($file) || is_null($line)) {
+        if (is_null($dumpSource = $this->resolveDumpSource())) {
             return '';
         }
 
-        $relativeFile = $file;
-
-        if (str_starts_with($file, $this->basePath)) {
-            $relativeFile = substr($file, strlen($this->basePath) + 1);
-        }
+        [$file, $relativeFile, $line] = $dumpSource;
 
         $source = sprintf('%s:%s', $relativeFile, $line);
 
@@ -127,6 +121,8 @@ class HtmlDumper extends BaseHtmlDumper
      */
     protected function editor()
     {
+        // TODO: Spatie\Ignition\Config\IgnitionConfig::loadFromConfigFile()->editor
+
         try {
             return config('app.editor');
         } catch (Throwable $e) {

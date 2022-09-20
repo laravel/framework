@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Illuminate\Foundation\Concerns\ResolvesDumpSource;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\VarDumper\Caster\ReflectionCaster;
 use Symfony\Component\VarDumper\Cloner\Data;
@@ -11,6 +12,8 @@ use Symfony\Component\VarDumper\VarDumper;
 
 class CliDumper extends BaseCliDumper
 {
+    use ResolvesDumpSource;
+
     /**
      * The base path of the application.
      *
@@ -67,7 +70,7 @@ class CliDumper extends BaseCliDumper
 
         $lines = explode("\n", $output);
 
-        $lines[0] .= $this->displayableDumpSource();
+        $lines[0] .= $this->getDumpSourceContent();
 
         $this->output->write(implode("\n", $lines));
     }
@@ -81,26 +84,17 @@ class CliDumper extends BaseCliDumper
     }
 
     /**
-     * Gets a console "displayble" source for the dump.
+     * Gets the dump's source console content.
      *
      * @return string
      */
-    protected function displayableDumpSource()
+    protected function getDumpSourceContent()
     {
-        $trace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT | DEBUG_BACKTRACE_IGNORE_ARGS, 20);
-
-        $file = $trace[6]['file'] ?? null;
-        $line = $trace[6]['line'] ?? null;
-
-        if (is_null($file) || is_null($line)) {
+        if (is_null($dumpSource = $this->resolveDumpSource())) {
             return '';
         }
 
-        $relativeFile = $file;
-
-        if (str_starts_with($file, $this->basePath)) {
-            $relativeFile = substr($file, strlen($this->basePath) + 1);
-        }
+        [$file, $relativeFile, $line] = $dumpSource;
 
         return sprintf(' <fg=gray>// <fg=gray;href=file://%s#L%s>%s:%s</></>', $file, $line, $relativeFile, $line);
     }
