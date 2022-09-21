@@ -335,7 +335,7 @@ trait InteractsWithInput
     }
 
     /**
-     * Retrieve input as an float value.
+     * Retrieve input as a float value.
      *
      * @param  string  $key
      * @param  float  $default
