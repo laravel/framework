@@ -96,7 +96,7 @@ class AuthGuardTest extends TestCase
         $guard = $this->getGuard();
         $guard->setDispatcher($events = m::mock(Dispatcher::class));
         $timebox = $guard->getTimebox();
-        $timebox->shouldReceive('make')->once()->andReturnUsing(function ($callback) use ($timebox) {
+        $timebox->shouldReceive('call')->once()->andReturnUsing(function ($callback) use ($timebox) {
             return $callback($timebox);
         });
         $events->shouldReceive('dispatch')->once()->with(m::type(Attempting::class));
@@ -111,7 +111,7 @@ class AuthGuardTest extends TestCase
         [$session, $provider, $request, $cookie, $timebox] = $this->getMocks();
         $guard = $this->getMockBuilder(SessionGuard::class)->onlyMethods(['login'])->setConstructorArgs(['default', $provider, $session, $request, $timebox])->getMock();
         $guard->setDispatcher($events = m::mock(Dispatcher::class));
-        $timebox->shouldReceive('make')->once()->andReturnUsing(function ($callback, $microseconds) use ($timebox) {
+        $timebox->shouldReceive('call')->once()->andReturnUsing(function ($callback, $microseconds) use ($timebox) {
             return $callback($timebox->shouldReceive('returnEarly')->once()->getMock());
         });
         $events->shouldReceive('dispatch')->once()->with(m::type(Attempting::class));
@@ -128,7 +128,7 @@ class AuthGuardTest extends TestCase
         $mock = $this->getGuard();
         $mock->setDispatcher($events = m::mock(Dispatcher::class));
         $timebox = $mock->getTimebox();
-        $timebox->shouldReceive('make')->once()->andReturnUsing(function ($callback, $microseconds) use ($timebox) {
+        $timebox->shouldReceive('call')->once()->andReturnUsing(function ($callback, $microseconds) use ($timebox) {
             return $callback($timebox);
         });
         $events->shouldReceive('dispatch')->once()->with(m::type(Attempting::class));
@@ -143,7 +143,7 @@ class AuthGuardTest extends TestCase
         [$session, $provider, $request, $cookie, $timebox] = $this->getMocks();
         $mock = $this->getMockBuilder(SessionGuard::class)->onlyMethods(['getName'])->setConstructorArgs(['default', $provider, $session, $request, $timebox])->getMock();
         $mock->setDispatcher($events = m::mock(Dispatcher::class));
-        $timebox->shouldReceive('make')->andReturnUsing(function ($callback) use ($timebox) {
+        $timebox->shouldReceive('call')->andReturnUsing(function ($callback) use ($timebox) {
             return $callback($timebox->shouldReceive('returnEarly')->getMock());
         });
         $user = m::mock(Authenticatable::class);
@@ -228,7 +228,7 @@ class AuthGuardTest extends TestCase
         $guard = $this->getGuard();
         $guard->setDispatcher($events = m::mock(Dispatcher::class));
         $timebox = $guard->getTimebox();
-        $timebox->shouldReceive('make')->once()->andReturnUsing(function ($callback, $microseconds) use ($timebox) {
+        $timebox->shouldReceive('call')->once()->andReturnUsing(function ($callback, $microseconds) use ($timebox) {
             return $callback($timebox);
         });
         $events->shouldReceive('dispatch')->once()->with(m::type(Attempting::class));
@@ -566,7 +566,7 @@ class AuthGuardTest extends TestCase
         [$session, $provider, $request, $cookie, $timebox] = $this->getMocks();
         $guard = m::mock(SessionGuard::class, ['default', $provider, $session, $request, $timebox])->makePartial();
         $user = m::mock(Authenticatable::class);
-        $timebox->shouldReceive('make')->once()->andReturnUsing(function ($callback) use ($timebox) {
+        $timebox->shouldReceive('call')->once()->andReturnUsing(function ($callback) use ($timebox) {
             return $callback($timebox->shouldReceive('returnEarly')->once()->getMock());
         });
         $guard->getProvider()->shouldReceive('retrieveByCredentials')->once()->with(['foo'])->andReturn($user);
@@ -580,7 +580,7 @@ class AuthGuardTest extends TestCase
         [$session, $provider, $request, $cookie, $timebox] = $this->getMocks();
         $guard = m::mock(SessionGuard::class, ['default', $provider, $session, $request, $timebox])->makePartial();
         $user = m::mock(Authenticatable::class);
-        $timebox->shouldReceive('make')->once()->andReturnUsing(function ($callback) use ($timebox) {
+        $timebox->shouldReceive('call')->once()->andReturnUsing(function ($callback) use ($timebox) {
             return $callback($timebox);
         });
         $guard->getProvider()->shouldReceive('retrieveByCredentials')->once()->with(['foo'])->andReturn($user);
