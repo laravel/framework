@@ -118,7 +118,6 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * @param  \Illuminate\Contracts\Session\Session  $session
      * @param  \Symfony\Component\HttpFoundation\Request|null  $request
      * @param  \Illuminate\Support\Timebox|null  $timebox
-     * @param  int  $timeboxMicroseconds
      * @return void
      */
     public function __construct($name,
