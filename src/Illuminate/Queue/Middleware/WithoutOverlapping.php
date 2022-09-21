@@ -135,7 +135,12 @@ class WithoutOverlapping
         return $this;
     }
 
-    public function shareKey()
+    /**
+     * Indicate that the lock key should be shared across job classes.
+     *
+     * @return void
+     */
+    public function shared()
     {
         $this->shareKey = true;
 

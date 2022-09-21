@@ -118,7 +118,7 @@ class WithoutOverlappingJobsTest extends TestCase
         OverlappingTestJobWithSharedKeyOne::$handled = false;
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $lockKey = (new WithoutOverlapping)->shareKey()->getLockKey(new OverlappingTestJobWithSharedKeyTwo);
+        $lockKey = (new WithoutOverlapping)->shared()->getLockKey(new OverlappingTestJobWithSharedKeyTwo);
         $this->app->get(Cache::class)->lock($lockKey, 10)->acquire();
 
         $job = m::mock(Job::class);
@@ -146,7 +146,7 @@ class WithoutOverlappingJobsTest extends TestCase
 
         $this->assertSame(
             'laravel-queue-overlap:key',
-            (new WithoutOverlapping('key'))->shareKey()->getLockKey($job)
+            (new WithoutOverlapping('key'))->shared()->getLockKey($job)
         );
 
         $this->assertSame(
@@ -156,7 +156,7 @@ class WithoutOverlappingJobsTest extends TestCase
 
         $this->assertSame(
             'prefix:key',
-            (new WithoutOverlapping('key'))->withPrefix('prefix:')->shareKey()->getLockKey($job)
+            (new WithoutOverlapping('key'))->withPrefix('prefix:')->shared()->getLockKey($job)
         );
     }
 }
@@ -209,7 +209,7 @@ class OverlappingTestJobWithSharedKeyOne
 
     public function middleware()
     {
-        return [(new WithoutOverlapping)->shareKey()];
+        return [(new WithoutOverlapping)->shared()];
     }
 }
 
@@ -226,6 +226,6 @@ class OverlappingTestJobWithSharedKeyTwo
 
     public function middleware()
     {
-        return [(new WithoutOverlapping)->shareKey()];
+        return [(new WithoutOverlapping)->shared()];
     }
 }
