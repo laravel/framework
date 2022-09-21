@@ -11,8 +11,6 @@ use RuntimeException;
  * @method static \Illuminate\Contracts\Auth\Authenticatable loginUsingId(mixed $id, bool $remember = false)
  * @method static \Illuminate\Contracts\Auth\Authenticatable|null user()
  * @method static \Illuminate\Contracts\Auth\Guard|\Illuminate\Contracts\Auth\StatefulGuard guard(string|null $name = null)
- * @method static \Closure|null getQueryHandler()
- * @method static \Illuminate\Contracts\Auth\Guard|\Illuminate\Contracts\Auth\StatefulGuard setQueryHandler(\Closure $queryHandler = null)
  * @method static \Illuminate\Contracts\Auth\UserProvider|null createUserProvider(string $provider = null)
  * @method static \Symfony\Component\HttpFoundation\Response|null onceBasic(string $field = 'email',array $extraConditions = [])
  * @method static bool attempt(array $credentials = [], bool $remember = false)
