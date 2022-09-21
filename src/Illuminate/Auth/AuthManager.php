@@ -4,7 +4,6 @@ namespace Illuminate\Auth;
 
 use Closure;
 use Illuminate\Contracts\Auth\Factory as FactoryContract;
-use Illuminate\Support\Timebox;
 use InvalidArgumentException;
 
 class AuthManager implements FactoryContract
@@ -127,8 +126,6 @@ class AuthManager implements FactoryContract
             $name,
             $provider,
             $this->app['session.store'],
-            null,
-            new Timebox,
         );
 
         // When using the remember me functionality of the authentication services we
