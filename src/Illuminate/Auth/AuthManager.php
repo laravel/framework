@@ -129,7 +129,6 @@ class AuthManager implements FactoryContract
             $this->app['session.store'],
             null,
             new Timebox,
-            $config['validate_credentials_minimum_time'] ?? null
         );
 
         // When using the remember me functionality of the authentication services we

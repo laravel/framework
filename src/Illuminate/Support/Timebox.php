@@ -5,18 +5,20 @@ namespace Illuminate\Support;
 class Timebox
 {
     /**
-     * Is the timebox allowed to do an early return.
+     * Indicates if the timebox is allowed to return early.
      *
      * @var bool
      */
     public $earlyReturn = false;
 
     /**
+     * Invoke the given callback within the specified timebox minimum.
+     *
      * @param  callable  $callback
      * @param  int  $microseconds
      * @return mixed
      */
-    public function make(callable $callback, int $microseconds)
+    public function call(callable $callback, int $microseconds)
     {
         $start = microtime(true);
 
@@ -31,14 +33,24 @@ class Timebox
         return $result;
     }
 
-    public function returnEarly(): self
+    /**
+     * Indicate that the timebox can return early.
+     *
+     * @return $this
+     */
+    public function returnEarly()
     {
         $this->earlyReturn = true;
 
         return $this;
     }
 
-    public function dontReturnEarly(): self
+    /**
+     * Indicate that the timebox cannot return early.
+     *
+     * @return $this
+     */
+    public function dontReturnEarly()
     {
         $this->earlyReturn = false;
 
@@ -46,6 +58,8 @@ class Timebox
     }
 
     /**
+     * Sleep for the specified number of microseconds.
+     *
      * @param  $microseconds
      * @return void
      */

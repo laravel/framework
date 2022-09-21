@@ -90,18 +90,11 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     protected $events;
 
     /**
-     * The timebox implementation.
+     * The timebox instance.
      *
      * @var \Illuminate\Support\Timebox
      */
     protected $timebox;
-
-    /**
-     * The minimum time in microseconds to validate credentials.
-     *
-     * @var int
-     */
-    protected $validateCredentialsMinimumTime;
 
     /**
      * Indicates if the logout method has been called.
@@ -125,22 +118,20 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * @param  \Illuminate\Contracts\Session\Session  $session
      * @param  \Symfony\Component\HttpFoundation\Request|null  $request
      * @param  \Illuminate\Support\Timebox|null  $timebox
-     * @param  int  $validateCredentialsMinimumTime
+     * @param  int  $timeboxMicroseconds
      * @return void
      */
     public function __construct($name,
                                 UserProvider $provider,
                                 Session $session,
                                 Request $request = null,
-                                Timebox $timebox = null,
-                                $validateCredentialsMinimumTime = null)
+                                Timebox $timebox = null)
     {
         $this->name = $name;
         $this->session = $session;
         $this->request = $request;
         $this->provider = $provider;
         $this->timebox = $timebox ?: new Timebox;
-        $this->validateCredentialsMinimumTime = $validateCredentialsMinimumTime ?: 200000;
     }
 
     /**
@@ -440,7 +431,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      */
     protected function hasValidCredentials($user, $credentials)
     {
-        return $this->timebox->make(function ($timebox) use ($user, $credentials) {
+        return $this->timebox->call(function ($timebox) use ($user, $credentials) {
             $validated = ! is_null($user) && $this->provider->validateCredentials($user, $credentials);
 
             if ($validated) {
@@ -450,7 +441,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
             }
 
             return $validated;
-        }, $this->validateCredentialsMinimumTime);
+        }, 200 * 1000);
     }
 
     /**
@@ -930,16 +921,6 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     }
 
     /**
-     * Get the timebox instance used by the guard.
-     *
-     * @return \Illuminate\Support\Timebox
-     */
-    public function getTimebox()
-    {
-        return $this->timebox;
-    }
-
-    /**
      * Return the currently cached user.
      *
      * @return \Illuminate\Contracts\Auth\Authenticatable|null
@@ -987,5 +968,15 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         $this->request = $request;
 
         return $this;
+    }
+
+    /**
+     * Get the timebox instance used by the guard.
+     *
+     * @return \Illuminate\Support\Timebox
+     */
+    public function getTimebox()
+    {
+        return $this->timebox;
     }
 }
