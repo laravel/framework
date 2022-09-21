@@ -353,6 +353,8 @@ trait InteractsWithInput
      * @param  string|null  $format
      * @param  string|null  $tz
      * @return \Illuminate\Support\Carbon|null
+     *
+     * @throws \Carbon\Exceptions\InvalidFormatException
      */
     public function date($key, $format = null, $tz = null)
     {
