@@ -6,10 +6,11 @@ use BackedEnum;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Types\DecimalType;
-use Illuminate\Console\Command;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Database\Console\DatabaseInspectionCommand;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Env;
 use Illuminate\Support\Str;
 use ReflectionClass;
 use ReflectionMethod;
@@ -86,6 +87,12 @@ class ShowModelCommand extends DatabaseInspectionCommand
         }
 
         $class = $this->qualifyModel($this->argument('model'));
+
+        if (! $class) {
+            return $this->components->error(
+                "Unable to qualify model [{$this->argument('model')}]."
+            );
+        }
 
         try {
             $model = $this->laravel->make($class);
@@ -442,27 +449,55 @@ class ShowModelCommand extends DatabaseInspectionCommand
      *
      * @param  string  $model
      * @return string
-     *
-     * @see \Illuminate\Console\GeneratorCommand
      */
     protected function qualifyModel(string $model)
     {
-        if (str_contains($model, '\\') && class_exists($model)) {
+        if (str_contains($model, '\\') && is_subclass_of($model, Model::class)) {
             return $model;
         }
 
         $model = ltrim($model, '\\/');
-
         $model = str_replace('/', '\\', $model);
 
-        $rootNamespace = $this->laravel->getNamespace();
+        $vendorPath = Env::get(
+            'COMPOSER_VENDOR_DIR',
+            $this->laravel->basePath() . DIRECTORY_SEPARATOR . 'vendor',
+        );
+        $autoloadPath = $vendorPath . '/composer/autoload_classmap.php';
 
-        if (Str::startsWith($model, $rootNamespace)) {
-            return $model;
+        $classes = collect(require($autoloadPath))
+            ->reject(fn ($path) => Str::startsWith($path, $vendorPath))
+            ->filter(fn ($path, $class) => is_subclass_of($class, Model::class))
+            ->keys();
+
+        if (str_contains($model, '*')) {
+            // Match wildcards in namespace: App\*\User
+            if (str_contains($model, '\\')) {
+                $classes = $classes->filter(fn ($class) =>
+                    Str::containsAll($class, array_filter(explode('*', $model)))
+                );
+            }
+
+            // Match wildcards in basename if exists: App\*\User*, *User*, App\*\User
+            $pattern = str_replace('*', '.*', Str::afterLast($model, '\\'));
+            $classes = $classes->filter(fn ($class) =>
+                (bool) preg_match("/^{$pattern}$/", class_basename($class))
+            );
+        } else {
+            // Match basename and namespace if exists: Foo\User
+            $classes = $classes->filter(fn ($class) =>
+                class_basename($class) === Str::afterLast($model, '\\')
+                && Str::endsWith($class, $model)
+            );
         }
 
-        return is_dir(app_path('Models'))
-            ? $rootNamespace.'Models\\'.$model
-            : $rootNamespace.$model;
+        if ($classes->count() > 1) {
+            return $this->components->choice(
+                'Which model would you like to see?',
+                $classes->values()->toArray(),
+            );
+        }
+
+        return $classes->first();
     }
 }
