@@ -42,7 +42,9 @@ abstract class TrustHosts
     public function handle(Request $request, $next)
     {
         if ($this->shouldSpecifyTrustedHosts()) {
-            Request::setTrustedHosts(array_filter($this->hosts()));
+            Request::setTrustedHosts(
+                array_map(fn($host) => '^'.$host.'$', array_filter($this->hosts()))
+            );
         }
 
         return $next($request);
@@ -67,7 +69,7 @@ abstract class TrustHosts
     protected function allSubdomainsOfApplicationUrl()
     {
         if ($host = parse_url($this->app['config']->get('app.url'), PHP_URL_HOST)) {
-            return '^(.+\.)?'.preg_quote($host).'$';
+            return '(.+\.)?'.preg_quote($host);
         }
     }
 }
