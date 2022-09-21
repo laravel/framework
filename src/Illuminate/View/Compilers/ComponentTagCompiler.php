@@ -556,6 +556,21 @@ class ComponentTagCompiler
     }
 
     /**
+     * Parses a short attribute syntax like :$foo into a fully-qualified syntax like :foo="$foo".
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function parseShortAttributeSyntax(string $value)
+    {
+        $pattern = "/\:\\\$(\w+)/x";
+
+        return preg_replace_callback($pattern, function (array $matches) {
+            return ":{$matches[1]}=\"\${$matches[1]}\"";
+        }, $value);
+    }
+
+    /**
      * Parse the attribute bag in a given attribute string into its fully-qualified syntax.
      *
      * @param  string  $attributeString
@@ -608,21 +623,6 @@ class ComponentTagCompiler
         /xm";
 
         return preg_replace($pattern, ' bind:$1=', $attributeString);
-    }
-
-    /**
-     * Parses a short attribute syntax like :$foo into a fully-qualified syntax like :foo="$foo".
-     *
-     * @param  string  $value
-     * @return string
-     */
-    protected function parseShortAttributeSyntax(string $value)
-    {
-        $pattern = "/\:\\\$(\w+)/x";
-
-        return preg_replace_callback($pattern, function (array $matches) {
-            return ":{$matches[1]}=\"\${$matches[1]}\"";
-        }, $value);
     }
 
     /**
