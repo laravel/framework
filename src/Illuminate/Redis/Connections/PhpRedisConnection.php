@@ -255,13 +255,16 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     /**
      * Return elements with score between $min and $max.
      *
+     * [Since Redis 2.2.0]
+     * ZREVRANGEBYSCORE key max min [WITHSCORES] [LIMIT offset count]
+     *
      * @param  string  $key
      * @param  mixed  $min
      * @param  mixed  $max
      * @param  array  $options
      * @return array
      */
-    public function zrevrangebyscore($key, $min, $max, $options = [])
+    public function zrevrangebyscore($key, $max, $min, $options = [])
     {
         if (isset($options['limit']) && Arr::isAssoc($options['limit'])) {
             $options['limit'] = [
@@ -270,7 +273,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
             ];
         }
 
-        return $this->command('zRevRangeByScore', [$key, $min, $max, $options]);
+        return $this->command('zRevRangeByScore', [$key, $max, $min, $options]);
     }
 
     /**
