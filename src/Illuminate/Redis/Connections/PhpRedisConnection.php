@@ -253,9 +253,6 @@ class PhpRedisConnection extends Connection implements ConnectionContract
 
     /**
      * Return elements with score between $min and $max.
-     * 
-     * [Since redis 2.2.0]
-     * ZREVRANGEBYSCORE key max min [WITHSCORES] [LIMIT offset count]
      *
      * @param  string  $key
      * @param  mixed  $min
