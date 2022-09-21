@@ -1459,7 +1459,7 @@ trait HasAttributes
     }
 
     /**
-     * Return a UUID.
+     * Convert the given value into a UUID instance.
      *
      * @param  mixed  $value
      * @return \Ramsey\Uuid\UuidInterface
@@ -1470,7 +1470,7 @@ trait HasAttributes
     }
 
     /**
-     * Converts a UUID into a string.
+     * Convert a UUID into a string.
      *
      * @param  mixed  $value
      * @return mixed
@@ -1481,7 +1481,7 @@ trait HasAttributes
     }
 
     /**
-     * Determine if the given attribute is a UUID.
+     * Determine if the given attribute has a UUID cast assigned to it.
      *
      * @param  string  $key
      * @return bool
