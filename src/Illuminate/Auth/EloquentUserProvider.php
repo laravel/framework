@@ -25,6 +25,13 @@ class EloquentUserProvider implements UserProvider
     protected $model;
 
     /**
+     * The callback to modify the query to find the user.
+     *
+     * @var (\Closure(\Illuminate\Database\Eloquent\Builder):mixed)|null
+     */
+    protected $queryHandler;
+
+    /**
      * Create a new database user provider.
      *
      * @param  \Illuminate\Contracts\Hashing\Hasher  $hasher
@@ -155,9 +162,13 @@ class EloquentUserProvider implements UserProvider
      */
     protected function newModelQuery($model = null)
     {
-        return is_null($model)
+        $query = is_null($model)
                 ? $this->createModel()->newQuery()
                 : $model->newQuery();
+
+        with($query, $this->queryHandler);
+
+        return $query;
     }
 
     /**
@@ -214,6 +225,29 @@ class EloquentUserProvider implements UserProvider
     public function setModel($model)
     {
         $this->model = $model;
+
+        return $this;
+    }
+
+    /**
+     * Gets the callback to modify the query before retrieving the user.
+     *
+     * @return \Closure
+     */
+    public function getQueryHandler()
+    {
+        return $this->queryHandler;
+    }
+
+    /**
+     * Sets or removes a callback to modify the query before retrieving the user.
+     *
+     * @param  (\Closure(\Illuminate\Database\Eloquent\Builder):mixed)|null  $queryHandler
+     * @return $this
+     */
+    public function setQueryHandler($queryHandler = null)
+    {
+        $this->queryHandler = $queryHandler;
 
         return $this;
     }
