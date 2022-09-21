@@ -260,7 +260,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      * @param  array  $options
      * @return array
      */
-    public function zrevrangebyscore($key, $min, $max, $options = [])
+    public function zrevrangebyscore($key, $max, $min, $options = [])
     {
         if (isset($options['limit']) && Arr::isAssoc($options['limit'])) {
             $options['limit'] = [
@@ -269,7 +269,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
             ];
         }
 
-        return $this->command('zRevRangeByScore', [$key, $min, $max, $options]);
+        return $this->command('zRevRangeByScore', [$key, $max, $min, $options]);
     }
 
     /**
