@@ -269,7 +269,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
             ];
         }
 
-        return $this->command('zRevRangeByScore', [$key, $min, $max, $options]);
+        return $this->command('zRevRangeByScore', [$key, $max, $min, $options]);
     }
 
     /**
