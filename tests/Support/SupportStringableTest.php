@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Stringable;
@@ -1072,5 +1073,60 @@ class SupportStringableTest extends TestCase
         $this->assertFalse($this->stringable('Foo')->exactly('foo'));
         $this->assertFalse($this->stringable('[]')->exactly([]));
         $this->assertFalse($this->stringable('0')->exactly(0));
+    }
+
+    public function testToInteger()
+    {
+        $this->assertSame(123, $this->stringable('123')->toInteger());
+        $this->assertSame(456, $this->stringable(456)->toInteger());
+        $this->assertSame(78, $this->stringable('078')->toInteger());
+        $this->assertSame(901, $this->stringable(' 901')->toInteger());
+        $this->assertSame(0, $this->stringable('nan')->toInteger());
+        $this->assertSame(1, $this->stringable('1ab')->toInteger());
+        $this->assertSame(2, $this->stringable('2_000')->toInteger());
+    }
+
+    public function testToFloat()
+    {
+        $this->assertSame(1.23, $this->stringable('1.23')->toFloat());
+        $this->assertSame(45.6, $this->stringable(45.6)->toFloat());
+        $this->assertSame(.6, $this->stringable('.6')->toFloat());
+        $this->assertSame(0.78, $this->stringable('0.78')->toFloat());
+        $this->assertSame(90.1, $this->stringable(' 90.1')->toFloat());
+        $this->assertSame(0.0, $this->stringable('nan')->toFloat());
+        $this->assertSame(1.0, $this->stringable('1.ab')->toFloat());
+        $this->assertSame(1e3, $this->stringable('1e3')->toFloat());
+    }
+
+    public function testBooleanMethod()
+    {
+        $this->assertTrue($this->stringable(true)->toBoolean());
+        $this->assertTrue($this->stringable('true')->toBoolean());
+        $this->assertFalse($this->stringable('false')->toBoolean());
+        $this->assertTrue($this->stringable('1')->toBoolean());
+        $this->assertFalse($this->stringable('0')->toBoolean());
+        $this->assertTrue($this->stringable('on')->toBoolean());
+        $this->assertFalse($this->stringable('off')->toBoolean());
+        $this->assertTrue($this->stringable('yes')->toBoolean());
+        $this->assertFalse($this->stringable('no')->toBoolean());
+    }
+
+    public function testToDate()
+    {
+        $current = Carbon::create(2020, 1, 1, 16, 30, 25);
+
+        $this->assertEquals($current, $this->stringable('20-01-01 16:30:25')->toDate());
+        $this->assertEquals($current, $this->stringable('1577896225')->toDate('U'));
+        $this->assertEquals($current, $this->stringable('20-01-01 13:30:25')->toDate(null, 'America/Santiago'));
+
+        $this->assertTrue($this->stringable('2020-01-01')->toDate()->isSameDay($current));
+        $this->assertTrue($this->stringable('16:30:25')->toDate()->isSameSecond('16:30:25'));
+    }
+
+    public function testToDateThrowsException()
+    {
+        $this->expectException(\Carbon\Exceptions\InvalidFormatException::class);
+
+        $this->stringable('not a date')->toDate();
     }
 }
