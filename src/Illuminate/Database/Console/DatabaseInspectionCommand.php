@@ -24,6 +24,7 @@ abstract class DatabaseInspectionCommand extends Command
      */
     protected $typeMappings = [
         'bit' => 'string',
+        'citext' => 'string',
         'enum' => 'string',
         'geometry' => 'string',
         'geomcollection' => 'string',
