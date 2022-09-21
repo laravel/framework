@@ -1003,19 +1003,27 @@ class Builder implements BuilderContract
     /**
      * Insert new records or update the existing ones.
      *
-     * @param  array  $values
-     * @param  array|string  $uniqueBy
+     * @param  array|null  $values
+     * @param  array|string|null  $uniqueBy
      * @param  array|null  $update
      * @return int
      */
-    public function upsert(array $values, $uniqueBy, $update = null)
+    public function upsert(array $values = null, $uniqueBy = null, $update = null)
     {
         if (empty($values)) {
-            return 0;
+            if (is_null($this->model)) {
+                return 0;
+            }
+
+            $values = $this->model->getDirty();
         }
 
         if (! is_array(reset($values))) {
             $values = [$values];
+        }
+
+        if (is_null($uniqueBy) && $this->model) {
+            $uniqueBy = [$this->model->getKeyName()];
         }
 
         if (is_null($update)) {
