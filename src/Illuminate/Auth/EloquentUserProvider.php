@@ -25,11 +25,11 @@ class EloquentUserProvider implements UserProvider
     protected $model;
 
     /**
-     * The callback to modify the query to find the user.
+     * The callback that may modify the user retrieval queries.
      *
      * @var (\Closure(\Illuminate\Database\Eloquent\Builder):mixed)|null
      */
-    protected $queryHandler;
+    protected $queryCallback;
 
     /**
      * Create a new database user provider.
@@ -166,7 +166,7 @@ class EloquentUserProvider implements UserProvider
                 ? $this->createModel()->newQuery()
                 : $model->newQuery();
 
-        with($query, $this->queryHandler);
+        with($query, $this->queryCallback);
 
         return $query;
     }
@@ -230,24 +230,24 @@ class EloquentUserProvider implements UserProvider
     }
 
     /**
-     * Gets the callback to modify the query before retrieving the user.
+     * Get the callback that modifies the query before retrieving users.
      *
-     * @return \Closure
+     * @return \Closure|null
      */
-    public function getQueryHandler()
+    public function getQueryCallback()
     {
-        return $this->queryHandler;
+        return $this->queryCallback;
     }
 
     /**
-     * Sets or removes a callback to modify the query before retrieving the user.
+     * Sets the callback to modify the query before retrieving users.
      *
-     * @param  (\Closure(\Illuminate\Database\Eloquent\Builder):mixed)|null  $queryHandler
+     * @param  (\Closure(\Illuminate\Database\Eloquent\Builder):mixed)|null  $queryCallback
      * @return $this
      */
-    public function setQueryHandler($queryHandler = null)
+    public function withQuery($queryCallback = null)
     {
-        $this->queryHandler = $queryHandler;
+        $this->queryCallback = $queryCallback;
 
         return $this;
     }

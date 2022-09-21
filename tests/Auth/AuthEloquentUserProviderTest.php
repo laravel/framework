@@ -162,13 +162,13 @@ class AuthEloquentUserProviderTest extends TestCase
         $mock->shouldReceive('whereIn')->once()->with('group', ['one', 'two']);
         $mock->shouldReceive('first')->once()->andReturn('bar');
         $provider->expects($this->once())->method('createModel')->willReturn($mock);
-        $provider->setQueryHandler($callback);
+        $provider->withQuery($callback);
         $user = $provider->retrieveByCredentials([function ($builder) {
             $builder->where('username', 'dayle');
         }]);
 
         $this->assertSame('bar', $user);
-        $this->assertSame($callback, $provider->getQueryHandler());
+        $this->assertSame($callback, $provider->getQueryCallback());
     }
 
     protected function getProviderMock()
