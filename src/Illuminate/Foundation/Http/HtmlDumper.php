@@ -16,11 +16,15 @@ class HtmlDumper extends BaseHtmlDumper
 
     /**
      * Where the source should be placed on "expanded" kind of dumps.
+     *
+     * @var string
      */
     const EXPANDED_SEPARATOR = 'class=sf-dump-expanded>';
 
     /**
      * Where the source should be placed on "non expanded" kind of dumps.
+     *
+     * @var string
      */
     const NON_EXPANDED_SEPARATOR = "\n</pre><script>";
 
@@ -39,7 +43,7 @@ class HtmlDumper extends BaseHtmlDumper
     protected $dumping = false;
 
     /**
-     * Creates a new Html Dumper instance.
+     * Create a new HTML dumper instance.
      *
      * @param  string  $basePath
      * @return void
@@ -52,7 +56,7 @@ class HtmlDumper extends BaseHtmlDumper
     }
 
     /**
-     * Creates a new Html Dumper instance, and registers it as the default dumper.
+     * Create a new HTML dumper instance and register it as the default dumper.
      *
      * @param  string  $basePath
      * @return void
@@ -67,7 +71,7 @@ class HtmlDumper extends BaseHtmlDumper
     }
 
     /**
-     * Dumps a variable with its source file/line.
+     * Dump a variable with its source file / line.
      *
      * @param  \Symfony\Component\VarDumper\Cloner\Data  $data
      * @return void
@@ -104,7 +108,7 @@ class HtmlDumper extends BaseHtmlDumper
     }
 
     /**
-     * Gets the dump's source html content.
+     * Get the dump's source HTML content.
      *
      * @return string
      */
@@ -132,7 +136,7 @@ class HtmlDumper extends BaseHtmlDumper
     }
 
     /**
-     * Gets the application editor, if any.
+     * Get the application editor, if applicable.
      *
      * @return string|null
      */

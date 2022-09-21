@@ -12,7 +12,7 @@ trait ResolvesDumpSource
     protected static $dumpSourceResolver;
 
     /**
-     * Resolves the source of the dump call.
+     * Resolve the source of the dump call.
      *
      * @return array{0: string, 1: string, 2: int}|null
      */
@@ -41,7 +41,7 @@ trait ResolvesDumpSource
     }
 
     /**
-     * Sets the resolver that resolves the source of the dump call.
+     * Set the resolver that resolves the source of the dump call.
      *
      * @param  (callable(): (array{0: string, 1: string, 2: int}|null))|null  $callable
      * @return void

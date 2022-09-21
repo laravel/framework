@@ -36,7 +36,7 @@ class CliDumper extends BaseCliDumper
     protected $dumping = false;
 
     /**
-     * Creates a new Cli Dumper instance.
+     * Create a new CLI dumper instance.
      *
      * @param  \Symfony\Component\Console\Output\OutputInterface  $output
      * @param  string  $basePath
@@ -51,7 +51,7 @@ class CliDumper extends BaseCliDumper
     }
 
     /**
-     * Creates a new Cli Dumper instance, and registers it as the default dumper.
+     * Create a new CLI dumper instance and register it as the default dumper.
      *
      * @param  string  $basePath
      * @return void
@@ -66,7 +66,7 @@ class CliDumper extends BaseCliDumper
     }
 
     /**
-     * Dumps a variable with its source file/line.
+     * Dump a variable with its source file / line.
      *
      * @param  \Symfony\Component\VarDumper\Cloner\Data  $data
      * @return void
@@ -82,7 +82,6 @@ class CliDumper extends BaseCliDumper
         $this->dumping = true;
 
         $output = (string) $this->dump($data, true);
-
         $lines = explode("\n", $output);
 
         $lines[0] .= $this->getDumpSourceContent();
@@ -93,15 +92,7 @@ class CliDumper extends BaseCliDumper
     }
 
     /**
-     * {@inheritDoc}
-     */
-    protected function supportsColors(): bool
-    {
-        return $this->output->isDecorated();
-    }
-
-    /**
-     * Gets the dump's source console content.
+     * Get the dump's source console content.
      *
      * @return string
      */
@@ -114,5 +105,13 @@ class CliDumper extends BaseCliDumper
         [$file, $relativeFile, $line] = $dumpSource;
 
         return sprintf(' <fg=gray>// <fg=gray;href=file://%s#L%s>%s:%s</></>', $file, $line, $relativeFile, $line);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function supportsColors(): bool
+    {
+        return $this->output->isDecorated();
     }
 }

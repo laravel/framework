@@ -74,6 +74,7 @@ class FoundationServiceProvider extends AggregateServiceProvider
     public function registerDumper()
     {
         $basePath = $this->app->basePath();
+
         $format = $_SERVER['VAR_DUMPER_FORMAT'] ?? null;
 
         match (true) {
