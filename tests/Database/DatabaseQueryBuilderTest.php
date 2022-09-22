@@ -501,6 +501,35 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([], $builder->getBindings());
     }
 
+    public function testOrWhereTimeMySql()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereTime('created_at', '<=', '10:00')->orWhereTime('created_at', '>=', '22:00');
+        $this->assertSame('select * from `users` where time(`created_at`) <= ? or time(`created_at`) >= ?', $builder->toSql());
+        $this->assertEquals([0 => '10:00', 1 => '22:00'], $builder->getBindings());
+    }
+
+    public function testOrWhereTimePostgres()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereTime('created_at', '<=', '10:00')->orWhereTime('created_at', '>=', '22:00');
+        $this->assertSame('select * from "users" where "created_at"::time <= ? or "created_at"::time >= ?', $builder->toSql());
+        $this->assertEquals([0 => '10:00', 1 => '22:00'], $builder->getBindings());
+    }
+
+    public function testOrWhereTimeSqlServer()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereTime('created_at', '<=', '10:00')->orWhereTime('created_at', '>=', '22:00');
+        $this->assertSame('select * from [users] where cast([created_at] as time) <= ? or cast([created_at] as time) >= ?', $builder->toSql());
+        $this->assertEquals([0 => '10:00', 1 => '22:00'], $builder->getBindings());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereTime('created_at', '<=', '10:00')->orWhereTime('created_at', new Raw('NOW()'));
+        $this->assertSame('select * from [users] where cast([created_at] as time) <= ? or cast([created_at] as time) = NOW()', $builder->toSql());
+        $this->assertEquals([0 => '10:00'], $builder->getBindings());
+    }
+
     public function testWhereDatePostgres()
     {
         $builder = $this->getPostgresBuilder();
