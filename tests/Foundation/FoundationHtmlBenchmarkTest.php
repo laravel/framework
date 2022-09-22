@@ -73,7 +73,7 @@ class FoundationHtmlBenchmarkTest extends TestCase
             },
             function () {
                 $myExpensiveCallB = 2 + 2;
-            }
+            },
         ]);
 
         $this->assertStringContainsString('ms', $this->output['[1] $myExpensiveCallA = 1 + 1;']);

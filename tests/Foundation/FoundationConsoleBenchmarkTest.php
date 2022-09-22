@@ -59,7 +59,7 @@ class FoundationConsoleBenchmarkTest extends TestCase
 
         $buffer = $output->fetch();
 
-        $this->assertStringContainsString("  \$myExpensiveCallA = 1 + 1; ...", $buffer);
+        $this->assertStringContainsString('  $myExpensiveCallA = 1 + 1; ...', $buffer);
     }
 
     public function testMeasurePrefixesNumberOfCallbackWhenUsingMultipleCallbacks()
@@ -74,8 +74,8 @@ class FoundationConsoleBenchmarkTest extends TestCase
 
         $buffer = $output->fetch();
 
-        $this->assertStringContainsString("  [1] \$myExpensiveCallA = 1 + 1; ...", $buffer);
-        $this->assertStringContainsString("  [2] \$myExpensiveCallB = 2 + 2; ...", $buffer);
+        $this->assertStringContainsString('  [1] $myExpensiveCallA = 1 + 1; ...', $buffer);
+        $this->assertStringContainsString('  [2] $myExpensiveCallB = 2 + 2; ...', $buffer);
     }
 
     public function testMeasureAddsCodeDescriptionToCallbackByDefault()
