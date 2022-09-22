@@ -44,7 +44,7 @@ class OptimizeCommand extends Command
 
         collect([
             'events' => fn () => $this->callSilent('event:cache') == 0,
-            'views' => fn () => $this->callSilent('view:clear') == 0,
+            'views' => fn () => $this->callSilent('view:cache') == 0,
             'routes' => fn () => $this->callSilent('route:cache') == 0,
             'config' => fn () => $this->callSilent('config:cache') == 0,
         ])->each(fn ($task, $description) => $this->components->task($description, $task));
