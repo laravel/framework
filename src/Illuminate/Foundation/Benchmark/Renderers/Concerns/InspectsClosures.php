@@ -41,6 +41,6 @@ trait InspectsClosures
             $code = Str::limit($code, $limit, '…');
         }
 
-        return $code;
+        return (string) $code;
     }
 }
