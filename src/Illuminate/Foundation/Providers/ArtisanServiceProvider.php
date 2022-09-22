@@ -206,7 +206,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
 
         Signals::resolveAvailabilityUsing(function () {
             return $this->app->runningInConsole()
-                && !$this->app->runningUnitTests()
+                && ! $this->app->runningUnitTests()
                 && extension_loaded('pcntl');
         });
     }
