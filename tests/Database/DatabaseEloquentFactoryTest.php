@@ -670,6 +670,21 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertEquals($user->id, $post->comments[1]->user_id);
     }
 
+    public function test_for_method_with_recycle()
+    {
+        Factory::guessFactoryNamesUsing(function ($model) {
+            return $model.'Factory';
+        });
+
+        $user = FactoryTestUserFactory::new()->create();
+        $post = FactoryTestPostFactory::new()
+            ->recycle($user)
+            ->for(FactoryTestUserFactory::new())
+            ->create();
+
+        $this->assertSame(1, FactoryTestUser::count());
+    }
+
     /**
      * Get a database connection instance.
      *
