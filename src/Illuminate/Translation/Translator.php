@@ -70,6 +70,13 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      * @var bool
      */
     protected static $preventMissingTranslationKeyAllowFallback = true;
+
+    /**
+     * Indicates whether preventing missing translation keys will allow fallback locales.
+     *
+     * @var bool
+     */
+    protected static $preventMissingTranslationKeyAllowReplace = true;
   
     /**
      * Create a new translator instance.
@@ -91,10 +98,11 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      * @param  bool  $value
      * @return void
      */
-    public static function preventMissingTranslationKey($value = true, $allow_fallback = true)
+    public static function preventMissingTranslationKey($value = true, $allow_fallback = true, $allow_replace = true)
     {
       static::$preventMissingTranslationKey = $value;
       static::$preventMissingTranslationKeyAllowFallback = $allow_fallback;
+      static::$preventMissingTranslationKeyAllowReplace = $allow_replace;
     }
 
     /**
@@ -114,7 +122,17 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      */
     public static function preventsMissingTranslationKeyAllowFallback()
     {
-        return static::$preventMissingTranslationKeyAllowFallback;
+      return static::$preventMissingTranslationKeyAllowFallback;
+    }
+
+    /**
+     * Determine if missing translation key prevention should allow string replacement if no json string is found.
+     *
+     * @return bool
+     */
+    public static function preventsMissingTranslationKeyAllowReplace()
+    {
+        return static::$preventMissingTranslationKeyAllowReplace;
     }
 
     /**
@@ -179,7 +197,6 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
             }
 
             foreach ($locales as $locale) {
-              
                 if (! is_null($line = $this->getLine(
                     $namespace, $group, $locale, $item, $replace
                 ))) {
@@ -191,12 +208,18 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         // If the line doesn't exist, we will return back the key which was requested as
         // that will be quick to spot in the UI if language keys are wrong or missing
         // from the application's language files. Otherwise we can return the line.
-
-        if (is_null($line) && $this->preventsMissingTranslationKey()) {
-          throw new MissingTranslationKeyViolationException($key);
+        if ($this->preventsMissingTranslationKeyAllowReplace()) {
+          $line = $this->makeReplacements($line ?: $key, $replace);
+        } else {
+          $line = $key;
         }
 
-        return $this->makeReplacements($line ?: $key, $replace);
+        // Prevent Missing Key: if the line is just equals to the key, we will throw an error,
+        if ($this->preventsMissingTranslationKey() && $line === $key) {
+          throw new MissingTranslationKeyViolationException($key, $locales);
+        }
+
+        return $line;
     }
 
     /**
