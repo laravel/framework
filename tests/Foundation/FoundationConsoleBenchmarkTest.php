@@ -32,7 +32,7 @@ class FoundationConsoleBenchmarkTest extends TestCase
 
         $buffer = $output->fetch();
 
-        $this->assertStringContainsString('INFO  Benchmarking [2] script(s) using [5] repetitions.', $buffer);
+        $this->assertStringContainsString('INFO  Benchmarking [2] callbacks using [5] repetitions.', $buffer);
     }
 
     public function testMeasureUsesTenRepeatsByDefault()
@@ -46,7 +46,7 @@ class FoundationConsoleBenchmarkTest extends TestCase
 
         $buffer = $output->fetch();
 
-        $this->assertStringContainsString('INFO  Benchmarking [2] script(s) using [10] repetitions.', $buffer);
+        $this->assertStringContainsString('INFO  Benchmarking [2] callbacks using [10] repetitions.', $buffer);
     }
 
     public function testMeasureDoesNotPrefixesNumberOfCallbackWhenUsingOneCallback()
