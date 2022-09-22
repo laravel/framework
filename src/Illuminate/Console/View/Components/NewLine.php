@@ -14,6 +14,6 @@ class NewLine extends Component
      */
     public function render($verbosity = OutputInterface::VERBOSITY_NORMAL)
     {
-        $this->output->write("\n", false, $verbosity);
+        $this->output->write(PHP_EOL, false, $verbosity);
     }
 }

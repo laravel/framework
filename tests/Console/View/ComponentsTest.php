@@ -101,7 +101,7 @@ class ComponentsTest extends TestCase
 
         with(new Components\NewLine($output))->render();
 
-        $this->assertStringContainsString("\n", $output->fetch());
+        $this->assertStringContainsString(PHP_EOL, $output->fetch());
     }
 
     public function testTask()
