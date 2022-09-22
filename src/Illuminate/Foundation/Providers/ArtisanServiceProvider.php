@@ -219,8 +219,14 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerCommands(array $commands)
     {
-        foreach (array_keys($commands) as $command) {
-            $this->{"register{$command}Command"}();
+        foreach ($commands as $commandName => $command) {
+            $method = "register{$commandName}Command";
+
+            if (method_exists($this, $method)) {
+                $this->{$method}();
+            } else {
+                $this->app->singleton($command);
+            }
         }
 
         $this->commands(array_values($commands));
@@ -303,26 +309,6 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      *
      * @return void
      */
-    protected function registerClearCompiledCommand()
-    {
-        $this->app->singleton(ClearCompiledCommand::class);
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
-    protected function registerClearResetsCommand()
-    {
-        $this->app->singleton(ClearResetsCommand::class);
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
     protected function registerComponentMakeCommand()
     {
         $this->app->singleton(ComponentMakeCommand::class, function ($app) {
@@ -383,86 +369,6 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      *
      * @return void
      */
-    protected function registerDbCommand()
-    {
-        $this->app->singleton(DbCommand::class);
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
-    protected function registerDbMonitorCommand()
-    {
-        $this->app->singleton(DatabaseMonitorCommand::class);
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
-    protected function registerDbPruneCommand()
-    {
-        $this->app->singleton(PruneCommand::class);
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
-    protected function registerDbShowCommand()
-    {
-        $this->app->singleton(ShowCommand::class);
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
-    protected function registerDbTableCommand()
-    {
-        $this->app->singleton(DatabaseTableCommand::class);
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
-    protected function registerDbWipeCommand()
-    {
-        $this->app->singleton(WipeCommand::class);
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
-    protected function registerDocsCommand()
-    {
-        $this->app->singleton(DocsCommand::class);
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
-    protected function registerEventGenerateCommand()
-    {
-        $this->app->singleton(EventGenerateCommand::class);
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
     protected function registerEventMakeCommand()
     {
         $this->app->singleton(EventMakeCommand::class, function ($app) {
@@ -499,36 +405,6 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      *
      * @return void
      */
-    protected function registerDownCommand()
-    {
-        $this->app->singleton(DownCommand::class);
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
-    protected function registerEnvironmentCommand()
-    {
-        $this->app->singleton(EnvironmentCommand::class);
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
-    protected function registerEventCacheCommand()
-    {
-        $this->app->singleton(EventCacheCommand::class);
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
     protected function registerEventClearCommand()
     {
         $this->app->singleton(EventClearCommand::class, function ($app) {
@@ -541,31 +417,11 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      *
      * @return void
      */
-    protected function registerEventListCommand()
-    {
-        $this->app->singleton(EventListCommand::class);
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
     protected function registerJobMakeCommand()
     {
         $this->app->singleton(JobMakeCommand::class, function ($app) {
             return new JobMakeCommand($app['files']);
         });
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
-    protected function registerKeyGenerateCommand()
-    {
-        $this->app->singleton(KeyGenerateCommand::class);
     }
 
     /**
@@ -645,41 +501,11 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      *
      * @return void
      */
-    protected function registerOptimizeCommand()
-    {
-        $this->app->singleton(OptimizeCommand::class);
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
     protected function registerObserverMakeCommand()
     {
         $this->app->singleton(ObserverMakeCommand::class, function ($app) {
             return new ObserverMakeCommand($app['files']);
         });
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
-    protected function registerOptimizeClearCommand()
-    {
-        $this->app->singleton(OptimizeClearCommand::class);
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
-    protected function registerPackageDiscoverCommand()
-    {
-        $this->app->singleton(PackageDiscoverCommand::class);
     }
 
     /**
@@ -711,29 +537,9 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      *
      * @return void
      */
-    protected function registerQueueFailedCommand()
-    {
-        $this->app->singleton(ListFailedQueueCommand::class);
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
     protected function registerQueueForgetCommand()
     {
         $this->app->singleton(ForgetFailedQueueCommand::class);
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
-    protected function registerQueueFlushCommand()
-    {
-        $this->app->singleton(FlushFailedQueueCommand::class);
     }
 
     /**
@@ -801,26 +607,6 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      *
      * @return void
      */
-    protected function registerQueueRetryCommand()
-    {
-        $this->app->singleton(QueueRetryCommand::class);
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
-    protected function registerQueueRetryBatchCommand()
-    {
-        $this->app->singleton(QueueRetryBatchCommand::class);
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
     protected function registerQueueWorkCommand()
     {
         $this->app->singleton(QueueWorkCommand::class, function ($app) {
@@ -828,15 +614,6 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         });
     }
 
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
-    protected function registerQueueClearCommand()
-    {
-        $this->app->singleton(QueueClearCommand::class);
-    }
 
     /**
      * Register the command.
@@ -951,16 +728,6 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      *
      * @return void
      */
-    protected function registerStorageLinkCommand()
-    {
-        $this->app->singleton(StorageLinkCommand::class);
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
     protected function registerRouteCacheCommand()
     {
         $this->app->singleton(RouteCacheCommand::class, function ($app) {
@@ -992,15 +759,6 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         });
     }
 
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
-    protected function registerSchemaDumpCommand()
-    {
-        $this->app->singleton(DumpCommand::class);
-    }
 
     /**
      * Register the command.
@@ -1014,95 +772,6 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         });
     }
 
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
-    protected function registerScheduleClearCacheCommand()
-    {
-        $this->app->singleton(ScheduleClearCacheCommand::class);
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
-    protected function registerScheduleFinishCommand()
-    {
-        $this->app->singleton(ScheduleFinishCommand::class);
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
-    protected function registerScheduleListCommand()
-    {
-        $this->app->singleton(ScheduleListCommand::class);
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
-    protected function registerScheduleRunCommand()
-    {
-        $this->app->singleton(ScheduleRunCommand::class);
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
-    protected function registerScheduleTestCommand()
-    {
-        $this->app->singleton(ScheduleTestCommand::class);
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
-    protected function registerScheduleWorkCommand()
-    {
-        $this->app->singleton(ScheduleWorkCommand::class);
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
-    protected function registerShowModelCommand()
-    {
-        $this->app->singleton(ShowModelCommand::class);
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
-    protected function registerServeCommand()
-    {
-        $this->app->singleton(ServeCommand::class);
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
-    protected function registerStubPublishCommand()
-    {
-        $this->app->singleton(StubPublishCommand::class);
-    }
 
     /**
      * Register the command.
@@ -1116,15 +785,6 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         });
     }
 
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
-    protected function registerUpCommand()
-    {
-        $this->app->singleton(UpCommand::class);
-    }
 
     /**
      * Register the command.
@@ -1138,15 +798,6 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         });
     }
 
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
-    protected function registerViewCacheCommand()
-    {
-        $this->app->singleton(ViewCacheCommand::class);
-    }
 
     /**
      * Register the command.
