@@ -276,27 +276,23 @@ class TranslationTranslatorTest extends TestCase
         $this->assertSame('foo baz', $t->get('foo :message', ['message' => 'baz']));
     }
 
-    public function testGetJsonForNonExistingThrowsAnErrorWhenPreventingMissingTranslationKeys()
+    public function testGetJsonForNonExistingThrowsAnErrorWhenPreventingMissingTranslationKeysDisallowsReplace()
     {
         $this->expectException(MissingTranslationKeyViolationException::class);
-        Translator::preventMissingTranslationKey();
+        Translator::preventMissingTranslationKey(true, true, false);
         $t = new Translator($this->getLoader(), 'en');
         $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
         $t->getLoader()->shouldReceive('load')->once()->with('en', 'foo :message', '*')->andReturn([]);
         $t->get('foo :message', ['message' => 'baz']);
     }
 
-    public function testGetJsonForNonExistingThrowsAnErrorWhenPreventingMissingTranslationKeysDisallowsReplace()
+    public function testGetJsonForNonExistingThrowsAnErrorWhenPreventingMissingTranslationKeysAllowsReplace()
     {
-        $this->expectException(MissingTranslationKeyViolationException::class);
-        Translator::preventMissingTranslationKey();
+        Translator::preventMissingTranslationKey(true, true, true);
         $t = new Translator($this->getLoader(), 'en');
         $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
         $t->getLoader()->shouldReceive('load')->once()->with('en', 'foo :message', '*')->andReturn([]);
-        $this->assertSame('foo baz', $t->get('foo :message', ['message' => 'baz'])); 
-
-        Translator::preventMissingTranslationKey(true, true, false);
-        $t->get('foo :message', ['message' => 'baz']);
+        $this->assertSame('foo baz', $t->get('foo :message', ['message' => 'baz']));
     }
 
     public function testEmptyFallbacks()
