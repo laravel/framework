@@ -37,7 +37,12 @@ class ConsoleRenderer implements BenchmarkRenderer
                 $key = $this->getCodeDescription($result->callback);
             }
 
-            $key = sprintf('[%s] <fg=gray>%s</>', $index + 1, $key);
+            $key = sprintf('<fg=gray>%s</>', $key);
+
+            if ($results->count() > 1) {
+                $key = sprintf('[%s] %s', $index + 1, $key);
+            }
+
             $color = $index == $fasterIndex && $results->count() > 1 ? 'green' : 'default';
 
             $components->twoColumnDetail($key, sprintf('<fg=%s;options=bold>%s</>', $color, $average));

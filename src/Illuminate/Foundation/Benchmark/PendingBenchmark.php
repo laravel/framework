@@ -4,7 +4,7 @@ namespace Illuminate\Foundation\Benchmark;
 
 use Illuminate\Support\Arr;
 
-class Benchmark
+class PendingBenchmark
 {
     /**
      * The benchmark renderer.
@@ -45,7 +45,7 @@ class Benchmark
     }
 
     /**
-     * Measure the execution time of a callback.
+     * Measure the execution time of the given callbacks.
      *
      * @param  iterable<string|int, \Closure(): mixed>|\Closure(): mixed  $callbacks
      * @return never

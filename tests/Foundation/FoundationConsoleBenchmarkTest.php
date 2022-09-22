@@ -49,7 +49,7 @@ class FoundationConsoleBenchmarkTest extends TestCase
         $this->assertStringContainsString('INFO  Benchmarking [2] script(s) using [10] repetitions.', $buffer);
     }
 
-    public function testMeasurePrefixesNumberOfCallback()
+    public function testMeasureDoesNotPrefixesNumberOfCallbackWhenUsingOneCallback()
     {
         [$factory, $output] = $this->factory();
 
@@ -59,7 +59,23 @@ class FoundationConsoleBenchmarkTest extends TestCase
 
         $buffer = $output->fetch();
 
-        $this->assertStringContainsString('  [1] $myExpensiveCallA = 1 + 1; ...', $buffer);
+        $this->assertStringContainsString("  \$myExpensiveCallA = 1 + 1; ...", $buffer);
+    }
+
+    public function testMeasurePrefixesNumberOfCallbackWhenUsingMultipleCallbacks()
+    {
+        [$factory, $output] = $this->factory();
+
+        $factory->measure([function () {
+            $myExpensiveCallA = 1 + 1;
+        }, function () {
+            $myExpensiveCallB = 2 + 2;
+        }]);
+
+        $buffer = $output->fetch();
+
+        $this->assertStringContainsString("  [1] \$myExpensiveCallA = 1 + 1; ...", $buffer);
+        $this->assertStringContainsString("  [2] \$myExpensiveCallB = 2 + 2; ...", $buffer);
     }
 
     public function testMeasureAddsCodeDescriptionToCallbackByDefault()

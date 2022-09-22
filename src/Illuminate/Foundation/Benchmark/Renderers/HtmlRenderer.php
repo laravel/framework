@@ -21,12 +21,14 @@ class HtmlRenderer implements BenchmarkRenderer
      */
     public function render($results, $repeats)
     {
-        $results = $results->mapWithKeys(function ($result, $index) {
+        $results = $results->mapWithKeys(function ($result, $index) use ($results) {
             if (! is_string($key = $result->key)) {
                 $key = $this->getCodeDescription($result->callback);
             }
 
-            $key = sprintf('[%s] %s', $index + 1, $key);
+            if ($results->count() > 1) {
+                $key = sprintf('[%s] %s', $index + 1, $key);
+            }
 
             return [$key => number_format($result->average * 1000, 3).'ms'];
         });

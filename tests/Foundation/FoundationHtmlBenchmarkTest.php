@@ -52,7 +52,7 @@ class FoundationHtmlBenchmarkTest extends TestCase
         $this->assertSame(10, $this->output['repeats']);
     }
 
-    public function testMeasurePrefixesNumberOfCallback()
+    public function testMeasureDoesNotPrefixesNumberOfCallbackWhenUsingOneCallback()
     {
         $factory = $this->factory();
 
@@ -60,7 +60,24 @@ class FoundationHtmlBenchmarkTest extends TestCase
             $myExpensiveCallA = 1 + 1;
         });
 
+        $this->assertStringContainsString('ms', $this->output['$myExpensiveCallA = 1 + 1;']);
+    }
+
+    public function testMeasurePrefixesNumberOfCallbackWhenUsingMultipleCallbacks()
+    {
+        $factory = $this->factory();
+
+        $factory->measure([
+            function () {
+                $myExpensiveCallA = 1 + 1;
+            },
+            function () {
+                $myExpensiveCallB = 2 + 2;
+            }
+        ]);
+
         $this->assertStringContainsString('ms', $this->output['[1] $myExpensiveCallA = 1 + 1;']);
+        $this->assertStringContainsString('ms', $this->output['[2] $myExpensiveCallB = 2 + 2;']);
     }
 
     public function testMeasureAddsCodeDescriptionToCallbackByDefault()

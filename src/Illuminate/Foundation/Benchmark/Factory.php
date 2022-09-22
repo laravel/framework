@@ -6,7 +6,7 @@ namespace Illuminate\Foundation\Benchmark;
  * @method \Illuminate\Support\Benchmark repeat(int $times)
  * @method \Illuminate\Support\Benchmark measure(iterable|callable $callables)
  *
- * @see \Illuminate\Foundation\Benchmark\Benchmark
+ * @see \Illuminate\Foundation\Benchmark\PendingBenchmark
  */
 class Factory
 {
@@ -29,16 +29,24 @@ class Factory
     }
 
     /**
-     * Execute a method against a new pending benchmark instance.
+     * Creates a new "pending" benchmark instance.
+     *
+     * @return \Illuminate\Foundation\Benchmark\PendingBenchmark
+     */
+    public function newPendingBenchmark()
+    {
+        return new PendingBenchmark($this->renderer);
+    }
+
+    /**
+     * Execute a method against a new "pending" benchmark instance.
      *
      * @param  string  $method
      * @param  array<int, mixed>  $parameters
-     * @return mixed
+     * @return \Illuminate\Foundation\Benchmark\PendingBenchmark|\Illuminate\Foundation\Benchmark\Result
      */
     public function __call($method, $parameters)
     {
-        $benchmark = new Benchmark($this->renderer);
-
-        return $benchmark->{$method}(...$parameters);
+        return $this->newPendingBenchmark()->{$method}(...$parameters);
     }
 }
