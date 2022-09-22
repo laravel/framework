@@ -799,7 +799,33 @@ trait HasRelationships
      */
     public function relationLoaded($key)
     {
-        return array_key_exists($key, $this->relations);
+        // If the given relation is not a nested one, let's just check the key.
+        if (! Str::contains($key, '.')) {
+            return array_key_exists($key, $this->relations);
+        }
+
+        [$key, $sub] = explode('.', $key, 2);
+
+        // If the "root" relation is not loaded, we can stop the process here.
+        if (! array_key_exists($key, $this->relations)) {
+            return false;
+        }
+
+        // First, we get the "root" relation.
+        $relation = $this->getRelation($key);
+
+        // If the relation is a "many" relation, we check every model instance
+        // within the relation using this method recursively. All relations must
+        // have the requested relation loaded, otherwise the result will be false.
+        if ($relation instanceof Collection) {
+            return $relation->every(function ($item) use ($sub) {
+                return $item->relationLoaded($sub);
+            });
+        }
+
+        // In case of a "one" relation, we run this method recursively in
+        // that model instance.
+        return $relation->relationLoaded($sub);
     }
 
     /**
