@@ -25,6 +25,16 @@ class FoundationHtmlBenchmarkTest extends TestCase
         $factory->measure([]);
     }
 
+    public function testMeasureFailsWhenClosuresAreOnTheSameLine()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The given callbacks must be on separate lines.');
+
+        $factory = $this->factory();
+
+        $factory->measure([fn () => 1, fn () => 2]);
+    }
+
     public function testRepeats()
     {
         $factory = $this->factory();

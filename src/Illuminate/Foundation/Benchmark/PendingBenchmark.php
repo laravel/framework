@@ -3,6 +3,8 @@
 namespace Illuminate\Foundation\Benchmark;
 
 use Illuminate\Support\Arr;
+use InvalidArgumentException;
+use Laravel\SerializableClosure\Support\ReflectionClosure;
 
 class PendingBenchmark
 {
@@ -75,11 +77,22 @@ class PendingBenchmark
      * @param  iterable<string|int, \Closure(): mixed>|\Closure(): mixed  $callbacks
      * @return \Illuminate\Support\Collection<string|int, \Closure(): mixed>
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     protected function getClosures($callbacks)
     {
-        return collect(Arr::wrap($callbacks))
-            ->whenEmpty(fn () => throw new \InvalidArgumentException('You must provide at least one callback.'));
+        $callbacks = collect(Arr::wrap($callbacks));
+
+        return $callbacks->each(function ($callback, $index) use ($callbacks) {
+            $line = (new ReflectionClosure($callback))->getStartLine();
+
+            $duplicated = $callbacks->firstWhere(
+                fn ($subCallback, $subIndex) => $subIndex !== $index && (new ReflectionClosure($subCallback))->getStartLine() === $line,
+            );
+
+            if (! is_null($duplicated)) {
+                throw new InvalidArgumentException('The given callbacks must be on separate lines.');
+            }
+        })->whenEmpty(fn () => throw new InvalidArgumentException('You must provide at least one callback.'));
     }
 }
