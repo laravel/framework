@@ -95,6 +95,15 @@ class ComponentsTest extends TestCase
         $this->assertSame('a', $result);
     }
 
+    public function testNewLine()
+    {
+        $output = new BufferedOutput();
+
+        with(new Components\NewLine($output))->render();
+
+        $this->assertStringContainsString("\n", $output->fetch());
+    }
+
     public function testTask()
     {
         $output = new BufferedOutput();
