@@ -34,7 +34,7 @@ class HtmlRenderer implements BenchmarkRenderer
         HtmlDumper::resolveDumpSourceUsing(fn () => null);
 
         try {
-            (static::$dumpUsing ?: 'dump')(['repeats' => $repeats, ...$results->toArray()]);
+            (static::$dumpUsing ?: 'dump')($results->prepend($repeats, 'repeats')->toArray());
         } finally {
             HtmlDumper::resolveDumpSourceUsing(null);
         }
