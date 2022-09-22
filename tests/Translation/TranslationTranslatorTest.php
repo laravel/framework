@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Translation;
 
 use Illuminate\Contracts\Translation\Loader;
+use Illuminate\Translation\MissingTranslationKeyViolationException;
 use Illuminate\Support\Collection;
 use Illuminate\Translation\MessageSelector;
 use Illuminate\Translation\Translator;
@@ -14,6 +15,7 @@ class TranslationTranslatorTest extends TestCase
     protected function tearDown(): void
     {
         m::close();
+        Translator::preventMissingTranslationKey(false);
     }
 
     public function testHasMethodReturnsFalseWhenReturnedTranslationIsNull()
@@ -74,6 +76,48 @@ class TranslationTranslatorTest extends TestCase
         $this->assertSame('foo::unknown', $t->get('foo::unknown', ['foo' => 'bar'], 'en'));
         $this->assertSame('foo::bar.unknown', $t->get('foo::bar.unknown', ['foo' => 'bar'], 'en'));
         $this->assertSame('foo::unknown.bar', $t->get('foo::unknown.bar'));
+    }
+
+    public function testGetMethodForNonExistingThrowsErrorWhenPreventingMissingTranslationKeys_part1()
+    {
+        $this->expectException(MissingTranslationKeyViolationException::class);
+
+        Translator::preventMissingTranslationKey();
+
+        $t = new Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'unknown', 'foo')->andReturn([]);
+
+        // Act
+        $t->get('foo::unknown', ['foo' => 'bar'], 'en');
+    }
+
+    public function testGetMethodForNonExistingThrowsErrorWhenPreventingMissingTranslationKeys_part2()
+    {
+        $this->expectException(MissingTranslationKeyViolationException::class);
+
+        Translator::preventMissingTranslationKey();
+
+        $t = new Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'bar', 'foo')->andReturn(['foo' => 'foo', 'baz' => 'breeze :foo', 'qux' => ['tree :foo', 'breeze :foo']]);
+
+        // Act
+        $t->get('foo::bar.unknown', ['foo' => 'bar'], 'en');
+    }
+
+    public function testGetMethodForNonExistingThrowsErrorWhenPreventingMissingTranslationKeys_part3()
+    {
+        $this->expectException(MissingTranslationKeyViolationException::class);
+
+        Translator::preventMissingTranslationKey();
+
+        $t = new Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'unknown', 'foo')->andReturn([]);
+
+        // Act
+        $t->get('foo::unknown.bar');
     }
 
     public function testTransMethodProperlyLoadsAndRetrievesItemWithHTMLInTheMessage()
@@ -211,6 +255,16 @@ class TranslationTranslatorTest extends TestCase
         $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
         $t->getLoader()->shouldReceive('load')->once()->with('en', 'foo :message', '*')->andReturn([]);
         $this->assertSame('foo baz', $t->get('foo :message', ['message' => 'baz']));
+    }
+
+    public function testGetJsonForNonExistingThrowsAnErrorWhenPreventingMissingTranslationKeys()
+    {
+        $this->expectException(MissingTranslationKeyViolationException::class);
+        Translator::preventMissingTranslationKey();
+        $t = new Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'foo :message', '*')->andReturn([]);
+        $t->get('foo :message', ['message' => 'baz']);
     }
 
     public function testEmptyFallbacks()

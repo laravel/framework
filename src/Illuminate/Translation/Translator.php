@@ -4,6 +4,7 @@ namespace Illuminate\Translation;
 
 use Illuminate\Contracts\Translation\Loader;
 use Illuminate\Contracts\Translation\Translator as TranslatorContract;
+use Illuminate\Translation\MissingTranslationKeyViolationException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\NamespacedItemResolver;
 use Illuminate\Support\Str;
@@ -57,6 +58,13 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     protected $determineLocalesUsing;
 
     /**
+     * Indicates whether translation keys should throw an error when it's missing on a specific locale.
+     *
+     * @var bool
+     */
+    protected static $preventMissingTranslationKey = false;
+
+    /**
      * Create a new translator instance.
      *
      * @param  \Illuminate\Contracts\Translation\Loader  $loader
@@ -68,6 +76,27 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         $this->loader = $loader;
 
         $this->setLocale($locale);
+    }
+
+    /**
+     * Prevent translator from translating missing keys on a specific locale
+     *
+     * @param  bool  $value
+     * @return void
+     */
+    public static function preventMissingTranslationKey($value = true)
+    {
+      static::$preventMissingTranslationKey = $value;
+    }
+
+    /**
+     * Determine if missing translation key prevention is disabled.
+     *
+     * @return bool
+     */
+    public static function preventsMissingTranslationKey()
+    {
+        return static::$preventMissingTranslationKey;
     }
 
     /**
@@ -121,12 +150,14 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         if (! isset($line)) {
             [$namespace, $group, $item] = $this->parseKey($key);
 
+
             // Here we will get the locale that should be used for the language line. If one
             // was not passed, we will use the default locales which was given to us when
             // the translator was instantiated. Then, we can load the lines and return.
             $locales = $fallback ? $this->localeArray($locale) : [$locale];
 
             foreach ($locales as $locale) {
+              
                 if (! is_null($line = $this->getLine(
                     $namespace, $group, $locale, $item, $replace
                 ))) {
@@ -138,6 +169,11 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         // If the line doesn't exist, we will return back the key which was requested as
         // that will be quick to spot in the UI if language keys are wrong or missing
         // from the application's language files. Otherwise we can return the line.
+
+        if (is_null($line) && $this->preventsMissingTranslationKey()) {
+          throw new MissingTranslationKeyViolationException($key);
+        }
+
         return $this->makeReplacements($line ?: $key, $replace);
     }
 
