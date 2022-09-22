@@ -614,7 +614,6 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         });
     }
 
-
     /**
      * Register the command.
      *
@@ -759,7 +758,6 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         });
     }
 
-
     /**
      * Register the command.
      *
@@ -771,7 +769,6 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
             return new SeedCommand($app['db']);
         });
     }
-
 
     /**
      * Register the command.
@@ -785,7 +782,6 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         });
     }
 
-
     /**
      * Register the command.
      *
@@ -797,7 +793,6 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
             return new VendorPublishCommand($app['files']);
         });
     }
-
 
     /**
      * Register the command.
