@@ -58,12 +58,19 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     protected $determineLocalesUsing;
 
     /**
-     * Indicates whether translation keys should throw an error when it's missing on a specific locale.
+     * Indicates whether translation keys should throw an error when it's missing on a all locale.
      *
      * @var bool
      */
     protected static $preventMissingTranslationKey = false;
 
+    /**
+     * Indicates whether preventing missing translation keys will allow fallback locales.
+     *
+     * @var bool
+     */
+    protected static $preventMissingTranslationKeyAllowFallback = true;
+  
     /**
      * Create a new translator instance.
      *
@@ -84,19 +91,30 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      * @param  bool  $value
      * @return void
      */
-    public static function preventMissingTranslationKey($value = true)
+    public static function preventMissingTranslationKey($value = true, $allow_fallback = true)
     {
       static::$preventMissingTranslationKey = $value;
+      static::$preventMissingTranslationKeyAllowFallback = $allow_fallback;
     }
 
     /**
-     * Determine if missing translation key prevention is disabled.
+     * Determine if missing translation key prevention is enabled.
      *
      * @return bool
      */
     public static function preventsMissingTranslationKey()
     {
         return static::$preventMissingTranslationKey;
+    }
+
+    /**
+     * Determine if missing translation key prevention should allow fallback.
+     *
+     * @return bool
+     */
+    public static function preventsMissingTranslationKeyAllowFallback()
+    {
+        return static::$preventMissingTranslationKeyAllowFallback;
     }
 
     /**
@@ -154,7 +172,11 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
             // Here we will get the locale that should be used for the language line. If one
             // was not passed, we will use the default locales which was given to us when
             // the translator was instantiated. Then, we can load the lines and return.
-            $locales = $fallback ? $this->localeArray($locale) : [$locale];
+            if ($this->preventsMissingTranslationKeyAllowFallback()) {
+              $locales = $fallback ? $this->localeArray($locale) : [$locale];
+            } else {
+              $locales = [$locale];
+            }
 
             foreach ($locales as $locale) {
               

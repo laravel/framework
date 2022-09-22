@@ -120,6 +120,25 @@ class TranslationTranslatorTest extends TestCase
         $t->get('foo::unknown.bar');
     }
 
+    public function testGetMethodFindsLineUnderFallbackLocaleThrowsErrorWhenPreventingMissingTranslationKeysFallbackOveride()
+    {
+        $this->expectException(MissingTranslationKeyViolationException::class);
+
+        Translator::preventMissingTranslationKey(value: true, allow_fallback: true);
+
+        $t = new Translator($this->getLoader(), 'en');
+        $t->setFallback('lv');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'unknown', 'foo')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->with('lv', 'unknown', 'foo')->andReturn(['bar' => 'baz']);
+
+        // Act 
+        $this->assertSame('baz', $t->get('foo::unknown.bar'));
+
+        Translator::preventMissingTranslationKey(value: true, allow_fallback: false);
+        $t->get('foo::unknown.bar');
+    }
+
     public function testTransMethodProperlyLoadsAndRetrievesItemWithHTMLInTheMessage()
     {
         $t = new Translator($this->getLoader(), 'en');
