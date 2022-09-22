@@ -79,7 +79,7 @@ trait RouteDependencyResolverTrait
         // binding and we do not want to mess with those; otherwise, we resolve it here.
         if ($className && ! $this->alreadyInParameters($className, $parameters)) {
             $isEnum = method_exists(ReflectionClass::class, 'isEnum') ? (new ReflectionClass($className))->isEnum() : false;
-            
+
             return $parameter->isDefaultValueAvailable()
                 ? ($isEnum ? $parameter->getDefaultValue() : null)
                 : $this->container->make($className);
