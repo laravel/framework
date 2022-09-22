@@ -73,8 +73,6 @@ class DatabaseMigrationStatusCommandTest extends TestCase
 
         $method->setAccessible(true);
 
-        $command->flag = true;
-
         $value = $method->invoke($command, $ran, $batches);
 
         $this->assertEquals([
