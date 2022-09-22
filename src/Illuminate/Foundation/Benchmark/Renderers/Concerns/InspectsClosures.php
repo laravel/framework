@@ -19,16 +19,16 @@ trait InspectsClosures
     {
         $code = (new ReflectionClosure($callback))->getCode();
 
-        if (Str::startsWith($code, 'fn () => ')) {
-            $code = Str::after($code, 'fn () => ');
+        if (Str::startsWith($code, 'fn')) {
+            $code = Str::after($code, '=>');
         }
 
-        if (Str::startsWith($code, 'function () {')) {
-            $code = Str::after($code, 'function () {');
-        }
+        if (Str::startsWith($code, 'function')) {
+            $code = Str::after($code, '{');
 
-        if (Str::endsWith($code, '}')) {
-            $code = Str::beforeLast($code, '}');
+            if (Str::endsWith($code, '}')) {
+                $code = Str::beforeLast($code, '}');
+            }
         }
 
         $code = str($code)->trim();

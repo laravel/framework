@@ -131,6 +131,36 @@ class FoundationConsoleBenchmarkTest extends TestCase
         $this->assertStringEndsWith(sprintf('ms  %s%s', PHP_EOL, PHP_EOL), $buffer);
     }
 
+    public function testMeasureCodeDescription()
+    {
+        [$factory, $output] = $this->factory();
+
+        $factory->measure([
+            function () {
+                $myExpensiveCallA = 1 + 1;
+            },
+            function () {
+                $myExpensiveCallB = 2 + 2;
+            },
+            fn () => fn () => function () {
+                fn () => 1;
+            },
+            function () {
+                return function () {
+                    $myExpensiveCallA = 1 + 1;
+                };
+            },
+
+        ]);
+
+        $buffer = $output->fetch();
+
+        $this->assertStringContainsString('[1] $myExpensiveCallA = 1 + 1; ...', $buffer);
+        $this->assertStringContainsString('[2] $myExpensiveCallB = 2 + 2; ...', $buffer);
+        $this->assertStringContainsString('[3] fn () => function () { … ...', $buffer);
+        $this->assertStringContainsString('[4] return function () { … ...', $buffer);
+    }
+
     /**
      * @return array{0: \Illuminate\Foundation\Benchmark\Factory, 1: \Symfony\Component\Console\Output\BufferedOutput}
      */

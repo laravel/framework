@@ -116,6 +116,33 @@ class FoundationHtmlBenchmarkTest extends TestCase
         $this->assertStringContainsString('ms', $this->output['[2] class_exists(\App\Models\Team::class)']);
     }
 
+    public function testMeasureCodeDescription()
+    {
+        $factory = $this->factory();
+
+        $factory->measure([
+            function () {
+                $myExpensiveCallA = 1 + 1;
+            },
+            function () {
+                $myExpensiveCallB = 2 + 2;
+            },
+            fn () => fn () => function () {
+                fn () => 1;
+            },
+            function () {
+                return function () {
+                    $myExpensiveCallA = 1 + 1;
+                };
+            },
+
+        ]);
+        $this->assertStringContainsString('ms', $this->output['[1] $myExpensiveCallA = 1 + 1;']);
+        $this->assertStringContainsString('ms', $this->output['[2] $myExpensiveCallB = 2 + 2;']);
+        $this->assertStringContainsString('ms', $this->output['[3] fn () => function () { …']);
+        $this->assertStringContainsString('ms', $this->output['[4] return function () { …']);
+    }
+
     /**
      * @return \Illuminate\Foundation\Benchmark\Factory
      */
