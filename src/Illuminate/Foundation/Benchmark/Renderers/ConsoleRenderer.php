@@ -36,10 +36,7 @@ class ConsoleRenderer implements BenchmarkRenderer
             $average = number_format($result->average * 1000, 3).'ms';
 
             if (! is_string($key = $result->key)) {
-                $code = $this->getCode($result->callback);
-
-                $limit = terminal()->width() - strlen($average) - 16;
-                $key = Str::limit($code, $limit, '…');
+                $key = $this->getCodeDescription($result->callback);
             }
 
             $key = sprintf('[%s] <fg=gray>%s</>', $index + 1, $key);

@@ -2,8 +2,10 @@
 
 namespace Illuminate\Foundation\Benchmark\Renderers\Concerns;
 
+use Illuminate\Foundation\Benchmark\Renderers\ConsoleRenderer;
 use Illuminate\Support\Str;
 use Laravel\SerializableClosure\Support\ReflectionClosure;
+use function Termwind\terminal;
 
 trait InspectsClosures
 {
@@ -13,7 +15,7 @@ trait InspectsClosures
      * @param  \Closure  $callback
      * @return string
      */
-    protected function getCode($callback)
+    protected function getCodeDescription($callback)
     {
         $code = (new ReflectionClosure($callback))->getCode();
 
@@ -29,6 +31,16 @@ trait InspectsClosures
             $code = Str::beforeLast($code, '}');
         }
 
-        return trim($code);
+        $code = str($code)->trim();
+
+        $limit = $this instanceof ConsoleRenderer ? (terminal()->width() - 25) : 40;
+
+        if ($code->contains("\n")) {
+            $code = Str::limit($code->explode("\n")->first(), $limit, '').' …';
+        } else {
+            $code = Str::limit($code, $limit, '…');
+        }
+
+        return $code;
     }
 }

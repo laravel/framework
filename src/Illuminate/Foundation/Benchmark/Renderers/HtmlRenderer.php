@@ -4,7 +4,6 @@ namespace Illuminate\Foundation\Benchmark\Renderers;
 
 use Illuminate\Contracts\Foundation\BenchmarkRenderer;
 use Illuminate\Foundation\Http\HtmlDumper;
-use Illuminate\Support\Str;
 
 class HtmlRenderer implements BenchmarkRenderer
 {
@@ -24,9 +23,7 @@ class HtmlRenderer implements BenchmarkRenderer
     {
         $results = $results->mapWithKeys(function ($result, $index) {
             if (! is_string($key = $result->key)) {
-                $code = $this->getCode($result->callback);
-
-                $key = Str::limit($code, 100, '…');
+                $key = $this->getCodeDescription($result->callback);
             }
 
             $key = sprintf('[%s] %s', $index + 1, $key);
