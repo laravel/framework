@@ -4,9 +4,7 @@ namespace Illuminate\Foundation\Benchmark\Renderers;
 
 use Illuminate\Console\View\Components\Factory;
 use Illuminate\Contracts\Foundation\BenchmarkRenderer;
-use Illuminate\Support\Str;
 use Symfony\Component\Console\Output\ConsoleOutput;
-use function Termwind\terminal;
 
 class ConsoleRenderer implements BenchmarkRenderer
 {
