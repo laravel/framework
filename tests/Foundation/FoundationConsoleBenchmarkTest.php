@@ -59,7 +59,7 @@ class FoundationConsoleBenchmarkTest extends TestCase
 
         $buffer = $output->fetch();
 
-        $this->assertStringContainsString("  [1] \$myExpensiveCallA = 1 + 1; ...", $buffer);
+        $this->assertStringContainsString('  [1] $myExpensiveCallA = 1 + 1; ...', $buffer);
     }
 
     public function testMeasureAddsCodeDescriptionToCallbackByDefault()
