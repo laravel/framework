@@ -452,7 +452,9 @@ class ShowModelCommand extends DatabaseInspectionCommand
      */
     protected function qualifyModel(string $model)
     {
-        if (str_contains($model, '\\') && is_subclass_of($model, Model::class)) {
+        $modelHasNamespace = str_contains($model, '\\');
+
+        if ($modelHasNamespace && is_subclass_of($model, Model::class)) {
             return $model;
         }
 
@@ -461,40 +463,34 @@ class ShowModelCommand extends DatabaseInspectionCommand
 
         $vendorPath = Env::get(
             'COMPOSER_VENDOR_DIR',
-            $this->laravel->basePath() . DIRECTORY_SEPARATOR . 'vendor',
+            $this->laravel->basePath().DIRECTORY_SEPARATOR.'vendor',
         );
-        $autoloadPath = $vendorPath . '/composer/autoload_classmap.php';
+        $autoloadPath = $vendorPath.'/composer/autoload_classmap.php';
 
-        $classes = collect(require($autoloadPath))
+        $classes = collect(require $autoloadPath)
             ->reject(fn ($path) => Str::startsWith($path, $vendorPath))
             ->filter(fn ($path, $class) => is_subclass_of($class, Model::class))
             ->keys();
 
-        if (str_contains($model, '*')) {
-            // Match wildcards in namespace: App\*\User
-            if (str_contains($model, '\\')) {
-                $classes = $classes->filter(fn ($class) =>
-                    Str::containsAll($class, array_filter(explode('*', $model)))
-                );
-            }
-
-            // Match wildcards in basename if exists: App\*\User*, *User*, App\*\User
-            $pattern = str_replace('*', '.*', Str::afterLast($model, '\\'));
-            $classes = $classes->filter(fn ($class) =>
-                (bool) preg_match("/^{$pattern}$/", class_basename($class))
-            );
-        } else {
-            // Match basename and namespace if exists: Foo\User
-            $classes = $classes->filter(fn ($class) =>
-                class_basename($class) === Str::afterLast($model, '\\')
-                && Str::endsWith($class, $model)
-            );
+        if (str_contains($model, '*') && $modelHasNamespace) {
+            // Match wildcards in namespace: App\*\User, Bar*\User
+            $modelArray = array_filter(explode('*', $model));
+            $classes = $classes->filter(fn ($class) => Str::containsAll($class, $modelArray));
+        } elseif ($modelHasNamespace) {
+            $classes = $classes->filter(fn ($class) => Str::endsWith($class, $model));
         }
+
+        $modelBasename = Str::afterLast($model, '\\');
+
+        // Match wildcards in basename if exists: App\*\User*, *User*
+        $regexp = '/^'.str_replace('*', '.*', $modelBasename).'$/';
+        $classes = $classes->filter(fn ($class) => (bool) preg_match($regexp, class_basename($class)));
 
         if ($classes->count() > 1) {
             return $this->components->choice(
                 'Which model would you like to see?',
                 $classes->values()->toArray(),
+                0,
             );
         }
 
