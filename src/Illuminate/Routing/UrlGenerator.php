@@ -812,7 +812,7 @@ class UrlGenerator implements UrlGeneratorContract
     }
 
     /**
-     * Create a new instance of the UrlGenerator with a different encryption key resolver.
+     * Clone a new instance of the URL generator with a different encryption key resolver.
      *
      * @param  callable  $keyResolver
      * @return \Illuminate\Routing\UrlGenerator
