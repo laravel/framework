@@ -59,7 +59,7 @@ class FoundationConsoleBenchmarkTest extends TestCase
 
         $buffer = $output->fetch();
 
-        $this->assertStringContainsString("\n  [1] \$myExpensiveCallA = 1 + 1; ...", $buffer);
+        $this->assertStringContainsString("  [1] \$myExpensiveCallA = 1 + 1; ...", $buffer);
     }
 
     public function testMeasureAddsCodeDescriptionToCallbackByDefault()
@@ -102,7 +102,7 @@ class FoundationConsoleBenchmarkTest extends TestCase
 
         $buffer = $output->fetch();
 
-        $this->assertStringEndsWith("ms  \n\n", $buffer);
+        $this->assertStringEndsWith(sprintf('ms  %s%s', PHP_EOL, PHP_EOL), $buffer);
     }
 
     /**
