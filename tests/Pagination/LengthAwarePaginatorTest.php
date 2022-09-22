@@ -80,10 +80,10 @@ class LengthAwarePaginatorTest extends TestCase
         $this->assertSame('http://website.com?foo=2',
                             $this->p->url($this->p->currentPage()));
 
-        $this->assertSame('http://website.com?foo=1',
+        $this->assertSame('http://website.com',
                             $this->p->url($this->p->currentPage() - 1));
 
-        $this->assertSame('http://website.com?foo=1',
+        $this->assertSame('http://website.com',
                             $this->p->url($this->p->currentPage() - 2));
     }
 
@@ -104,10 +104,10 @@ class LengthAwarePaginatorTest extends TestCase
         $this->assertSame('http://website.com/test?foo=2',
                             $this->p->url($this->p->currentPage()));
 
-        $this->assertSame('http://website.com/test?foo=1',
+        $this->assertSame('http://website.com/test',
                             $this->p->url($this->p->currentPage() - 1));
 
-        $this->assertSame('http://website.com/test?foo=1',
+        $this->assertSame('http://website.com/test',
                             $this->p->url($this->p->currentPage() - 2));
     }
 

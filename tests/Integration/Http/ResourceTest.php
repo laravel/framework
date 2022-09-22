@@ -632,7 +632,7 @@ class ResourceTest extends TestCase
         );
 
         $this->assertEquals(
-            '{"data":[{"id":5,"title":"Test Title","reading_time":3.0}],"links":{"first":"\/?page=1","last":"\/?page=1","prev":null,"next":null},"meta":{"current_page":1,"from":1,"last_page":1,"links":[{"url":null,"label":"&laquo; Previous","active":false},{"url":"\/?page=1","label":"1","active":true},{"url":null,"label":"Next &raquo;","active":false}],"path":"\/","per_page":15,"to":1,"total":10}}',
+            '{"data":[{"id":5,"title":"Test Title","reading_time":3.0}],"links":{"first":"\/","last":"\/","prev":null,"next":null},"meta":{"current_page":1,"from":1,"last_page":1,"links":[{"url":null,"label":"&laquo; Previous","active":false},{"url":"\/","label":"1","active":true},{"url":null,"label":"Next &raquo;","active":false}],"path":"\/","per_page":15,"to":1,"total":10}}',
             $response->baseResponse->content()
         );
     }
@@ -744,8 +744,8 @@ class ResourceTest extends TestCase
                 ],
             ],
             'links' => [
-                'first' => '/?page=1',
-                'last' => '/?page=1',
+                'first' => '/',
+                'last' => '/',
                 'prev' => null,
                 'next' => null,
             ],
@@ -786,9 +786,9 @@ class ResourceTest extends TestCase
                 ],
             ],
             'links' => [
-                'first' => '/?framework=laravel&author=Otwell&page=1',
+                'first' => '/?framework=laravel&author=Otwell',
                 'last' => '/?framework=laravel&author=Otwell&page=3',
-                'prev' => '/?framework=laravel&author=Otwell&page=1',
+                'prev' => '/?framework=laravel&author=Otwell',
                 'next' => '/?framework=laravel&author=Otwell&page=3',
             ],
             'meta' => [
@@ -828,9 +828,9 @@ class ResourceTest extends TestCase
                 ],
             ],
             'links' => [
-                'first' => '/?author=Taylor&page=1',
+                'first' => '/?author=Taylor',
                 'last' => '/?author=Taylor&page=3',
-                'prev' => '/?author=Taylor&page=1',
+                'prev' => '/?author=Taylor',
                 'next' => '/?author=Taylor&page=3',
             ],
             'meta' => [
@@ -982,8 +982,8 @@ class ResourceTest extends TestCase
                 ],
             ],
             'links' => [
-                'first' => '/?page=1',
-                'last' => '/?page=1',
+                'first' => '/',
+                'last' => '/',
                 'prev' => null,
                 'next' => null,
             ],

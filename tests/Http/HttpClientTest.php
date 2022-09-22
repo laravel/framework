@@ -592,12 +592,12 @@ class HttpClientTest extends TestCase
     {
         $this->factory->fake();
 
-        $this->factory->get('http://foo.com/get?foo=bar&page=1');
+        $this->factory->get('http://foo.com/get?foo=bar');
 
         $this->factory->assertSent(function (Request $request) {
-            return $request->url() === 'http://foo.com/get?foo=bar&page=1'
+            return $request->url() === 'http://foo.com/get?foo=bar'
                 && $request['foo'] === 'bar'
-                && $request['page'] === '1';
+                && ! isset($request['page']);
         });
     }
 
@@ -605,13 +605,13 @@ class HttpClientTest extends TestCase
     {
         $this->factory->fake();
 
-        $this->factory->get('http://foo.com/get?foo;bar;1;5;10&page=1');
+        $this->factory->get('http://foo.com/get?foo;bar;1;5;10');
 
         $this->factory->assertSent(function (Request $request) {
-            return $request->url() === 'http://foo.com/get?foo;bar;1;5;10&page=1'
+            return $request->url() === 'http://foo.com/get?foo;bar;1;5;10'
                 && ! isset($request['foo'])
                 && ! isset($request['bar'])
-                && $request['page'] === '1';
+                && ! isset($request['page']);
         });
     }
 
@@ -619,7 +619,7 @@ class HttpClientTest extends TestCase
     {
         $this->factory->fake();
 
-        $this->factory->get('http://foo.com/get?foo=bar&page=1', ['hello' => 'world']);
+        $this->factory->get('http://foo.com/get?foo=bar', ['hello' => 'world']);
 
         $this->factory->assertSent(function (Request $request) {
             return $request->url() === 'http://foo.com/get?hello=world'
