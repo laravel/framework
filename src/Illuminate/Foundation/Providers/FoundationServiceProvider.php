@@ -23,6 +23,7 @@ class FoundationServiceProvider extends AggregateServiceProvider
      * @var string[]
      */
     protected $providers = [
+        BenchmarkServiceProvider::class,
         FormRequestServiceProvider::class,
         ParallelTestingServiceProvider::class,
     ];
