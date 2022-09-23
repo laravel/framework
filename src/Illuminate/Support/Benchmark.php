@@ -3,7 +3,6 @@
 namespace Illuminate\Support;
 
 use Closure;
-use Illuminate\Support\Arr;
 
 class Benchmark
 {
