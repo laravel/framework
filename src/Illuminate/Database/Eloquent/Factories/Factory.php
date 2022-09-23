@@ -68,7 +68,7 @@ abstract class Factory
      *
      * @var \Illuminate\Support\Collection
      */
-    protected $recycle;
+    public $recycle;
 
     /**
      * The "after making" callbacks that will be applied to the model.
