@@ -677,9 +677,9 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
-     * Get the identifiers for all of the entities.
+     * Get the identifiers for a single entity.
      *
-     * @return array<int, mixed>
+     * @return string
      */
     protected function getModelClass($model)
     {
