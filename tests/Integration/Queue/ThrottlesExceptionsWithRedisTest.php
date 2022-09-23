@@ -38,7 +38,10 @@ class ThrottlesExceptionsWithRedisTest extends TestCase
     {
         $this->assertJobWasReleasedImmediately(CircuitBreakerWithRedisTestJob::class, $key = Str::random());
         $this->assertJobWasReleasedImmediately(CircuitBreakerWithRedisTestJob::class, $key);
-        $this->assertJobWasReleasedWithDelay(CircuitBreakerWithRedisTestJob::class, $key);
+
+        retry(2, function () use ($key) {
+            $this->assertJobWasReleasedWithDelay(CircuitBreakerWithRedisTestJob::class, $key);
+        });
     }
 
     public function testCircuitStaysClosedForSuccessfulJobs()
