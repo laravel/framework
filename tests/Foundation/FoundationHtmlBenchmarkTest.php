@@ -39,27 +39,18 @@ class FoundationHtmlBenchmarkTest extends TestCase
     {
         $factory = $this->factory();
 
-        $factory->repeat(5)->measure([
-            fn () => $myExpensiveCallA = 1 + 1,
-            fn () => $myExpensiveCallB = 'foo',
-        ]);
+        $pendingBenchmark = $factory->repeat(5);
 
-        $this->assertSame(5, $this->output['repeats']);
-        $this->assertStringContainsString('ms', $this->output['[1] $myExpensiveCallA = 1 + 1']);
-        $this->assertStringContainsString('ms', $this->output["[2] \$myExpensiveCallB = 'foo'"]);
-        $this->assertCount(3, $this->output);
+        $this->assertSame(5, (fn () => $this->repeat)->call($pendingBenchmark));
     }
 
     public function testMeasureUsesTenRepeatsByDefault()
     {
         $factory = $this->factory();
 
-        $factory->measure([
-            fn () => $myExpensiveCallA = 1 + 1,
-            fn () => $myExpensiveCallB = 'foo',
-        ]);
+        $pendingBenchmark = $factory->newPendingBenchmark();
 
-        $this->assertSame(10, $this->output['repeats']);
+        $this->assertSame(10, (fn () => $this->repeat)->call($pendingBenchmark));
     }
 
     public function testMeasureDoesNotPrefixesNumberOfCallbackWhenUsingOneCallback()
