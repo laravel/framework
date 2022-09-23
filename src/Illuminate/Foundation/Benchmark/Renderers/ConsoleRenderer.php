@@ -4,7 +4,6 @@ namespace Illuminate\Foundation\Benchmark\Renderers;
 
 use Illuminate\Console\View\Components\Factory;
 use Illuminate\Contracts\Foundation\BenchmarkRenderer;
-use Symfony\Component\Console\Output\ConsoleOutput;
 
 class ConsoleRenderer implements BenchmarkRenderer
 {
