@@ -2322,6 +2322,8 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testAccessingMissingAttributes()
     {
+        Model::preventAccessingMissingAttributes(false);
+        
         $model = new EloquentModelStub(['id' => 1]);
         $model->exists = true;
 
@@ -2339,6 +2341,8 @@ class DatabaseEloquentModelTest extends TestCase
         $newModel = new EloquentModelStub(['id' => 2]);
         $this->assertEquals(2, $newModel->id);
         $this->assertNull($newModel->this_attribute_does_not_exist);
+
+        Model::preventAccessingMissingAttributes(false);
     }
 
     protected function addMockConnection($model)
