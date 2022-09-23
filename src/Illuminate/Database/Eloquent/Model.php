@@ -182,6 +182,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected static $modelsShouldPreventSilentlyDiscardingAttributes = false;
 
     /**
+     * Indicates if an exception should be thrown when trying to access a missing attribute on a retrieved model.
+     *
+     * @var bool
+     */
+    protected static $modelsShouldPreventAccessingMissingAttributes = false;
+
+    /**
      * Indicates if broadcasting is currently enabled.
      *
      * @var bool
@@ -408,6 +415,17 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public static function preventSilentlyDiscardingAttributes($value = true)
     {
         static::$modelsShouldPreventSilentlyDiscardingAttributes = $value;
+    }
+
+    /**
+     * Prevent non-fillable attributes from being silently discarded.
+     *
+     * @param  bool  $value
+     * @return void
+     */
+    public static function preventAccessingMissingAttributes($value = true)
+    {
+        static::$modelsShouldPreventAccessingMissingAttributes = $value;
     }
 
     /**
@@ -2098,6 +2116,16 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public static function preventsSilentlyDiscardingAttributes()
     {
         return static::$modelsShouldPreventSilentlyDiscardingAttributes;
+    }
+
+    /**
+     * Determine if accessing missing attributes is disabled.
+     *
+     * @return bool
+     */
+    public static function preventsAccessingMissingAttributes()
+    {
+        return static::$modelsShouldPreventAccessingMissingAttributes;
     }
 
     /**

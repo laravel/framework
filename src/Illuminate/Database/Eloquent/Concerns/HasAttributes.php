@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Casts\AsEncryptedCollection;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\InvalidCastException;
 use Illuminate\Database\Eloquent\JsonEncodingException;
+use Illuminate\Database\Eloquent\MissingAttributeException;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\LazyLoadingViolationException;
 use Illuminate\Support\Arr;
@@ -445,10 +446,31 @@ trait HasAttributes
         // since we don't want to treat any of those methods as relationships because
         // they are all intended as helper methods and none of these are relations.
         if (method_exists(self::class, $key)) {
-            return;
+            return $this->getMissingAttributeResponse($key);
         }
 
-        return $this->getRelationValue($key);
+        if ($this->isRelation($key) || $this->relationLoaded($key)) {
+            return $this->getRelationValue($key);
+        }
+
+        return $this->getMissingAttributeResponse($key);
+    }
+
+    /**
+     * Either throw and exception or return null depending on Eloquent configuration.
+     *
+     * @param  string  $key
+     * @return null
+     *
+     * @throws \Illuminate\Database\Eloquent\MissingAttributeException
+     */
+    protected function getMissingAttributeResponse($key)
+    {
+        if ($this->exists && static::preventsAccessingMissingAttributes()) {
+            throw new MissingAttributeException($key);
+        }
+
+        return null;
     }
 
     /**
