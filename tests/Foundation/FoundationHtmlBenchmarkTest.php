@@ -41,7 +41,7 @@ class FoundationHtmlBenchmarkTest extends TestCase
 
         $pendingBenchmark = $factory->repeat(5);
 
-        $this->assertSame(5, (fn () => $this->repeat)->call($pendingBenchmark));
+        $this->assertSame(5, (fn () => $this->repetitions)->call($pendingBenchmark));
     }
 
     public function testMeasureUsesTenRepeatsByDefault()
@@ -50,7 +50,7 @@ class FoundationHtmlBenchmarkTest extends TestCase
 
         $pendingBenchmark = $factory->newPendingBenchmark();
 
-        $this->assertSame(10, (fn () => $this->repeat)->call($pendingBenchmark));
+        $this->assertSame(10, (fn () => $this->repetitions)->call($pendingBenchmark));
     }
 
     public function testMeasureDoesNotPrefixesNumberOfCallbackWhenUsingOneCallback()
