@@ -58,11 +58,11 @@ class PendingBenchmark
             $average = (float) collect(range(1, $this->repeat))->map(function () use ($callback) {
                 gc_collect_cycles();
 
-                $start = microtime(true);
+                $start = hrtime(true);
 
                 $callback();
 
-                return microtime(true) - $start;
+                return (int) (hrtime(true) - $start);
             })->average();
 
             return new Result($callback, $key, $average);

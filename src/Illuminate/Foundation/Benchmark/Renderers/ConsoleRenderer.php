@@ -36,7 +36,7 @@ class ConsoleRenderer implements BenchmarkRenderer
         $fasterIndex = min(array_keys($averages, min($averages)));
 
         $results->each(function ($result, $index) use ($results, $components, $fasterIndex) {
-            $average = number_format($result->average * 1000, 3).'ms';
+            $average = number_format($result->average / 1000000, 3).'ms';
 
             if (! is_string($key = $result->key)) {
                 $key = $this->getCodeDescription($result->callback);
