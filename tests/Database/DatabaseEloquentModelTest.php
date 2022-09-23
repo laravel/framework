@@ -2322,27 +2322,29 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testAccessingMissingAttributes()
     {
-        Model::preventAccessingMissingAttributes(false);
+        try {
+            Model::preventAccessingMissingAttributes(false);
 
-        $model = new EloquentModelStub(['id' => 1]);
-        $model->exists = true;
+            $model = new EloquentModelStub(['id' => 1]);
+            $model->exists = true;
 
-        // Default behavior
-        $this->assertEquals(1, $model->id);
-        $this->assertNull($model->this_attribute_does_not_exist);
+            // Default behavior
+            $this->assertEquals(1, $model->id);
+            $this->assertNull($model->this_attribute_does_not_exist);
 
-        Model::preventAccessingMissingAttributes(true);
+            Model::preventAccessingMissingAttributes(true);
 
-        // "preventAccessingMissingAttributes" behavior
-        $this->expectException(MissingAttributeException::class);
-        $model->this_attribute_does_not_exist;
+            // "preventAccessingMissingAttributes" behavior
+            $this->expectException(MissingAttributeException::class);
+            $model->this_attribute_does_not_exist;
 
-        // Ensure that unsaved models do not trigger the exception
-        $newModel = new EloquentModelStub(['id' => 2]);
-        $this->assertEquals(2, $newModel->id);
-        $this->assertNull($newModel->this_attribute_does_not_exist);
-
-        Model::preventAccessingMissingAttributes(false);
+            // Ensure that unsaved models do not trigger the exception
+            $newModel = new EloquentModelStub(['id' => 2]);
+            $this->assertEquals(2, $newModel->id);
+            $this->assertNull($newModel->this_attribute_does_not_exist);
+        } finally {
+            Model::preventAccessingMissingAttributes(false);
+        }
     }
 
     protected function addMockConnection($model)
