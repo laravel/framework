@@ -25,10 +25,11 @@ class ConsoleRenderer implements BenchmarkRenderer
         $components = new Factory($this->output ?: new ConsoleOutput());
 
         $components->info(sprintf(
-            'Benchmarking [%s] %s using [%s] repetitions.',
+            'Benchmarking [%s] %s using [%s] %s.',
             $results->count(),
             str('callback')->plural($results->count()),
-            $repeats
+            $repeats,
+            str('repetition')->plural($repeats),
         ));
 
         $averages = $results->map(fn ($result) => $result->average)->toArray();
