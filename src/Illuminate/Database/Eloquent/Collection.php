@@ -665,16 +665,32 @@ class Collection extends BaseCollection implements QueueableCollection
             return;
         }
 
-        $class = get_class($this->first());
+        $class = $this->getModelClass($this->first());
 
         $this->each(function ($model) use ($class) {
-            if (get_class($model) !== $class) {
+            if ($this->getModelClass($model) !== $class) {
                 throw new LogicException('Queueing collections with multiple model types is not supported.');
             }
         });
 
         return $class;
     }
+
+    /**
+     * Get the identifiers for all of the entities.
+     *
+     * @return array<int, mixed>
+     */
+    protected function getModelClass($model)
+    {
+        if(method_exists($model,'getClassNameForSerialization')) {
+                return $model->getClassNameForSerialization();
+        }
+        
+        return get_class($model);
+    }
+    
+    
 
     /**
      * Get the identifiers for all of the entities.
