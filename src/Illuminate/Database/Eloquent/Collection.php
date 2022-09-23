@@ -665,10 +665,10 @@ class Collection extends BaseCollection implements QueueableCollection
             return;
         }
 
-        $class = $this->getModelClass($this->first());
+        $class = $this->getQueueableModelClass($this->first());
 
         $this->each(function ($model) use ($class) {
-            if ($this->getModelClass($model) !== $class) {
+            if ($this->getQueueableModelClass($model) !== $class) {
                 throw new LogicException('Queueing collections with multiple model types is not supported.');
             }
         });
@@ -677,17 +677,16 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
-     * Get the identifiers for a single entity.
+     * Get the queueable class name for the given model.
      *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return string
      */
-    protected function getModelClass($model)
+    protected function getQueueableModelClass($model)
     {
-        if (method_exists($model, 'getClassNameForSerialization')) {
-            return $model->getClassNameForSerialization();
-        }
-
-        return get_class($model);
+        return method_exists($model, 'getQueueableClassName')
+                ? $model->getQueueableClassName()
+                : get_class($model);
     }
 
     /**
