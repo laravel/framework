@@ -1478,6 +1478,36 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([1, 1, 'news', 'opinion'], $builder->getBindings());
     }
 
+    public function testLatest()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->latest();
+        $this->assertSame('select * from "users" order by "created_at" desc', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->latest()->limit(1);
+        $this->assertSame('select * from "users" order by "created_at" desc limit 1', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->latest('updated_at');
+        $this->assertSame('select * from "users" order by "updated_at" desc', $builder->toSql());
+    }
+
+    public function testOldest()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->oldest();
+        $this->assertSame('select * from "users" order by "created_at" asc', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->oldest()->limit(1);
+        $this->assertSame('select * from "users" order by "created_at" asc limit 1', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->oldest('updated_at');
+        $this->assertSame('select * from "users" order by "updated_at" asc', $builder->toSql());
+    }
+
     public function testOrderBysSqlServer()
     {
         $builder = $this->getSqlServerBuilder();
