@@ -466,7 +466,7 @@ trait HasAttributes
      */
     protected function getMissingAttributeResponse($key)
     {
-        if ($this->exists && static::preventsAccessingMissingAttributes()) {
+        if ($this->exists && ! $this->wasRecentlyCreated && static::preventsAccessingMissingAttributes()) {
             throw new MissingAttributeException($key);
         }
 
