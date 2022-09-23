@@ -1318,6 +1318,21 @@ class HttpClientTest extends TestCase
         $this->factory->assertSentCount(1);
     }
 
+    public function testRequestExceptionIsNotThrownWhenRetriesExhaustedAndRunningQuietly()
+    {
+        $this->factory->fake([
+            '*' => $this->factory->response(['error'], 403),
+        ]);
+
+        $response = $this->factory
+            ->retryQuietly(2, 1000)
+            ->get('http://foo.com/get');
+
+        $this->assertTrue($response->failed());
+
+        $this->factory->assertSentCount(2);
+    }
+
     public function testRequestExceptionIsNotThrownWhenDisabledAndRetriesExhausted()
     {
         $this->factory->fake([

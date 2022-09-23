@@ -542,6 +542,19 @@ class PendingRequest
     }
 
     /**
+     * Retry the request the specified number of times without throwing an exception on server or client errors.
+     *
+     * @param  int  $times
+     * @param  int  $sleepMilliseconds
+     * @param  callable|null  $when
+     * @return $this
+     */
+    public function retryQuietly(int $times, int $sleepMilliseconds = 0, ?callable $when = null)
+    {
+        return $this->retry($times, $sleepMilliseconds, $when, false);
+    }
+
+    /**
      * Replace the specified options on the request.
      *
      * @param  array  $options
