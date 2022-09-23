@@ -189,6 +189,14 @@ class FilesystemTest extends TestCase
         $files->prepend(self::$tempDir.'/file.txt', 'Hello World');
         $this->assertStringEqualsFile(self::$tempDir.'/file.txt', 'Hello World');
     }
+    
+    public function testExistsInDirectory()
+    {
+        mkdir(self::$tempDir.'/foo');
+        file_put_contents(self::$tempDir.'/foo/file.txt', 'Hello World');
+        $files = new Filesystem;
+        $this->assertTrue($files->existsInDirectory(self::$tempDir.'/foo/file.txt', self::$tempDir.'/foo'));
+    }
 
     public function testMissingFile()
     {

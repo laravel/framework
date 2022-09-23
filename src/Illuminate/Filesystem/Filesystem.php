@@ -31,6 +31,18 @@ class Filesystem
     }
 
     /**
+     * Determine if a file exists in a directory.
+     *
+     * @param  string  $file
+     * @param  string  $directory
+     * @return bool
+     */
+    public function existsInDirectory($file, $directory)
+    {
+        return in_array($file, $this->files($directory));
+    }
+
+    /**
      * Determine if a file or directory is missing.
      *
      * @param  string  $path

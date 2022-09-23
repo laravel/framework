@@ -181,6 +181,18 @@ class FilesystemAdapter implements CloudFilesystemContract
     }
 
     /**
+     * Determine if a file exists in a directory.
+     *
+     * @param  string  $file
+     * @param  string  $directory
+     * @return bool
+     */
+    public function existsInDirectory($file, $directory)
+    {
+        return $this->driver->fileExists($directory.'/'.$file);
+    }
+
+    /**
      * Determine if a file or directory is missing.
      *
      * @param  string  $path

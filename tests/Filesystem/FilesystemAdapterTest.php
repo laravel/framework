@@ -142,6 +142,13 @@ class FilesystemAdapterTest extends TestCase
         $this->assertTrue($filesystemAdapter->fileExists('file.txt'));
     }
 
+    public function testExistsInDirectory()
+    {
+        $this->filesystem->write('/foo/bar/file.txt', 'Hello World');
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+        $this->assertTrue($filesystemAdapter->existsInDirectory('file.txt', '/foo/bar'));
+    }
+
     public function testMissing()
     {
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
