@@ -1344,6 +1344,10 @@ trait ValidatesAttributes
      */
     public function validateMimes($attribute, $value, $parameters)
     {
+        if(is_array($value)) {
+            return $this->checkMultiValues(__FUNCTION__, $attribute, $value, $parameters);
+        }
+
         if (! $this->isValidFileInstance($value)) {
             return false;
         }
@@ -1369,6 +1373,10 @@ trait ValidatesAttributes
      */
     public function validateMimetypes($attribute, $value, $parameters)
     {
+        if(is_array($value)) {
+            return $this->checkMultiValues(__FUNCTION__, $attribute, $value, $parameters);
+        }
+        
         if (! $this->isValidFileInstance($value)) {
             return false;
         }
@@ -2246,5 +2254,25 @@ trait ValidatesAttributes
         if (is_numeric($this->getValue($attribute))) {
             $this->numericRules[] = $rule;
         }
+    }
+
+    /**
+     * Check the given value and loop over each file then return the result.
+     *
+     * @param  string  $functionName
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    protected function checkMultiValues($functionName, $attribute, $value, $parameters)
+    {
+        $isOk = true;
+
+        foreach ($value as $file) {
+            $isOk = $isOk && $this->$functionName($attribute, $file, $parameters);
+        }
+
+        return $isOk;
     }
 }
