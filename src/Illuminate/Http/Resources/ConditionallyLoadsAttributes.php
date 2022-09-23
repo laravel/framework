@@ -216,15 +216,15 @@ trait ConditionallyLoadsAttributes
             $default = new MissingValue;
         }
 
-        if (! $this->resource->relationLoaded($relationship)) {
+        if (! $this->resource->nestedRelationLoaded($relationship)) {
             return value($default);
         }
 
         if (func_num_args() === 1) {
-            return $this->resource->{$relationship};
+            return $this->resource->getNestedRelation($relationship);
         }
 
-        if ($this->resource->{$relationship} === null) {
+        if ($this->resource->getNestedRelation($relationship) === null) {
             return;
         }
 
