@@ -622,7 +622,7 @@ trait QueriesRelationships
             $relation = $this->getRelationWithoutConstraints($name);
 
             if ($function) {
-                $hashedColumn = $this->getAttributeHashedColumn($column, $relation);
+                $hashedColumn = $this->getRelationHashedColumn($column, $relation);
 
                 $wrappedColumn = $this->getQuery()->getGrammar()->wrap(
                     $column === '*' ? $column : $relation->getRelated()->qualifyColumn($hashedColumn)
@@ -678,7 +678,7 @@ trait QueriesRelationships
         return $this;
     }
 
-    protected function getAttributeHashedColumn($column, $relation)
+    protected function getRelationHashedColumn($column, $relation)
     {
         if (str_contains($column, '.')) {
             return $column;
