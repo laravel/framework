@@ -169,9 +169,7 @@ class FoundationConsoleBenchmarkTest extends TestCase
         ConsoleRenderer::terminateUsing(fn () => null);
 
         $output = new BufferedOutput();
-        $renderer = new ConsoleRenderer();
-
-        $renderer->setOutput($output);
+        $renderer = new ConsoleRenderer($output);
         $factory = new Factory($renderer);
 
         return [$factory, $output];

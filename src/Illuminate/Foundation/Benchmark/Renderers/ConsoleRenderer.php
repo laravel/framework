@@ -11,11 +11,22 @@ class ConsoleRenderer implements BenchmarkRenderer
     use Concerns\InspectsClosures, Concerns\Terminatable;
 
     /**
-     * The output implementation, if any.
+     * The console output implementation.
      *
-     * @var \Symfony\Component\Console\Output\OutputInterface|null
+     * @var \Symfony\Component\Console\Output\OutputInterface
      */
     protected $output;
+
+    /**
+     * Creates a new Renderer instance.
+     *
+     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
+     * @return void
+     */
+    public function __construct($output)
+    {
+        $this->output = $output;
+    }
 
     /**
      * {@inheritdoc}
@@ -57,16 +68,5 @@ class ConsoleRenderer implements BenchmarkRenderer
         $components->newLine();
 
         $this->terminate();
-    }
-
-    /**
-     * Sets the output implementation.
-     *
-     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
-     * @return void
-     */
-    public function setOutput($output)
-    {
-        $this->output = $output;
     }
 }
