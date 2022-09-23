@@ -683,14 +683,12 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     protected function getModelClass($model)
     {
-        if(method_exists($model,'getClassNameForSerialization')) {
-                return $model->getClassNameForSerialization();
+        if (method_exists($model, 'getClassNameForSerialization')) {
+            return $model->getClassNameForSerialization();
         }
-        
+
         return get_class($model);
     }
-    
-    
 
     /**
      * Get the identifiers for all of the entities.
