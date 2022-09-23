@@ -792,6 +792,37 @@ trait HasRelationships
     }
 
     /**
+     * Get a specified nested relationship.
+     *
+     * @param  string  $relation
+     * @return mixed
+     */
+    public function getNestedRelation($relation)
+    {
+        // If the specified relation is not nested, let's just fetch the
+        // relation.
+        if (! Str::contains($relation, '.')) {
+            return $this->getRelation($relation);
+        }
+
+        [$relation, $sub] = explode('.', $relation, 2);
+
+        // First, let's attempt to get the "root" relation.
+        $relation = $this->getRelation($relation);
+
+        // If the relation is a "many" relation, we map every model instance
+        // within the relation using this method recursively. The result
+        // will be a flattened collection.
+        if ($relation instanceof Collection) {
+            return $this->newCollection($relation->flatMap(function ($relation) use ($sub) {
+                return $relation->getNestedRelation($sub);
+            })->all());
+        }
+
+        return $relation->getNestedRelation($sub);
+    }
+
+    /**
      * Determine if the given relation is loaded.
      *
      * @param  string  $key
