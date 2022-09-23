@@ -2323,7 +2323,7 @@ class DatabaseEloquentModelTest extends TestCase
     public function testAccessingMissingAttributes()
     {
         Model::preventAccessingMissingAttributes(false);
-        
+
         $model = new EloquentModelStub(['id' => 1]);
         $model->exists = true;
 
