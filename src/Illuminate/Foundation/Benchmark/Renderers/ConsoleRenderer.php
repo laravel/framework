@@ -25,7 +25,7 @@ class ConsoleRenderer implements BenchmarkRenderer
      */
     public function __construct($output)
     {
-        $this->output = $output ?: new ConsoleOutput();
+        $this->output = $output;
     }
 
     /**
