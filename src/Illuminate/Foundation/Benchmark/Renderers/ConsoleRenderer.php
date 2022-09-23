@@ -20,7 +20,7 @@ class ConsoleRenderer implements BenchmarkRenderer
     /**
      * {@inheritdoc}
      */
-    public function render($results, $repeats)
+    public function render($results, $repetitions)
     {
         $components = new Factory($this->output ?: new ConsoleOutput());
 
@@ -28,8 +28,8 @@ class ConsoleRenderer implements BenchmarkRenderer
             'Benchmarking [%s] %s using [%s] %s.',
             $results->count(),
             str('callback')->plural($results->count()),
-            $repeats,
-            str('repetition')->plural($repeats),
+            $repetitions,
+            str('repetition')->plural($repetitions),
         ));
 
         $averages = $results->map(fn ($result) => $result->average)->toArray();

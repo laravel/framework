@@ -3,8 +3,8 @@
 namespace Illuminate\Foundation\Benchmark;
 
 /**
- * @method \Illuminate\Support\Benchmark repeat(int $times)
- * @method \Illuminate\Support\Benchmark measure(iterable|callable $callables)
+ * @method \Illuminate\Foundation\Benchmark\PendingBenchmark repeat(int $times)
+ * @method never measure(iterable|\Closure $callables)
  *
  * @see \Illuminate\Foundation\Benchmark\PendingBenchmark
  */

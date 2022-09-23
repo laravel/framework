@@ -3,8 +3,8 @@
 namespace Illuminate\Support\Facades;
 
 /**
- * @method static \Illuminate\Support\Benchmark repeat(int $times)
- * @method static \Illuminate\Support\Benchmark measure(iterable|callable $callables)
+ * @method static \Illuminate\Foundation\Benchmark\PendingBenchmark repeat(int $times)
+ * @method static never measure(iterable|\Closure $callables)
  *
  * @see \Illuminate\Foundation\Benchmark\Factory
  */

@@ -19,7 +19,7 @@ class HtmlRenderer implements BenchmarkRenderer
     /**
      * {@inheritdoc}
      */
-    public function render($results, $repeats)
+    public function render($results, $repetitions)
     {
         $results = $results->mapWithKeys(function ($result, $index) use ($results) {
             if (! is_string($key = $result->key)) {
@@ -33,7 +33,7 @@ class HtmlRenderer implements BenchmarkRenderer
             return [$key => number_format($result->average / 1000000, 3).'ms'];
         });
 
-        $source = sprintf('%s %s', $repeats, str('repetition')->plural($repeats));
+        $source = sprintf('%s %s', $repetitions, str('repetition')->plural($repetitions));
 
         HtmlDumper::resolveDumpSourceUsing(fn () => [
             $source, $source, '',

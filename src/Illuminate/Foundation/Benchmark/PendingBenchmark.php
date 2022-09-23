@@ -16,11 +16,11 @@ class PendingBenchmark
     protected $renderer;
 
     /**
-     * The number of repeats.
+     * The number of repetitions.
      *
      * @var int
      */
-    protected $repeat = 10;
+    protected $repetitions = 10;
 
     /**
      * Creates a new "pending" Benchmark instance.
@@ -34,14 +34,14 @@ class PendingBenchmark
     }
 
     /**
-     * The number of times a benchmark should be repeated.
+     * Sets the number of repetitions.
      *
      * @param  int  $times
      * @return $this
      */
     public function repeat($times)
     {
-        $this->repeat = $times;
+        $this->repetitions = $times;
 
         return $this;
     }
@@ -55,7 +55,7 @@ class PendingBenchmark
     public function measure($callbacks)
     {
         $results = $this->getClosures($callbacks)->map(function ($callback, $key) {
-            $average = (float) collect(range(1, $this->repeat))->map(function () use ($callback) {
+            $average = (float) collect(range(1, $this->repetitions))->map(function () use ($callback) {
                 gc_collect_cycles();
 
                 $start = hrtime(true);
@@ -68,7 +68,7 @@ class PendingBenchmark
             return new Result($callback, $key, $average);
         })->values();
 
-        $this->renderer->render($results, $this->repeat);
+        $this->renderer->render($results, $this->repetitions);
     }
 
     /**
