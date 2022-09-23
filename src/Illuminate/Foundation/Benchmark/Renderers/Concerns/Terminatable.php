@@ -27,7 +27,7 @@ trait Terminatable
      *
      * @return never
      */
-    public function terminate()
+    protected function terminate()
     {
         if (static::$terminateUsing) {
             return (static::$terminateUsing)();
