@@ -685,6 +685,22 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertSame(1, FactoryTestUser::count());
     }
 
+    public function test_has_method_does_not_reassign_the_parent()
+    {
+        Factory::guessFactoryNamesUsing(function ($model) {
+            return $model.'Factory';
+        });
+
+        $post = FactoryTestPostFactory::new()->create();
+        $user = FactoryTestUserFactory::new()
+            ->recycle($post)
+            // The recycled post already belongs to a user, so it shouldn't be recycled here.
+            ->has(FactoryTestPostFactory::new(), 'posts')
+            ->create();
+
+        $this->assertSame(2, FactoryTestPost::count());
+    }
+
     /**
      * Get a database connection instance.
      *
