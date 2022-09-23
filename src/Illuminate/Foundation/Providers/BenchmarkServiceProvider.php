@@ -17,7 +17,7 @@ class BenchmarkServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->bind(Factory::class, function ($app) {
+        $this->app->singleton(Factory::class, function ($app) {
             $renderer = $this->app->runningInConsole()
                 ? new ConsoleRenderer(new ConsoleOutput())
                 : new HtmlRenderer();
