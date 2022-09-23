@@ -25,7 +25,7 @@ class ConsoleRenderer implements BenchmarkRenderer
      */
     public function __construct($output)
     {
-        $this->output = $output;
+        $this->output = $output ?: new ConsoleOutput();
     }
 
     /**
@@ -33,7 +33,7 @@ class ConsoleRenderer implements BenchmarkRenderer
      */
     public function render($results, $repetitions)
     {
-        $components = new Factory($this->output ?: new ConsoleOutput());
+        $components = new Factory($this->output);
 
         $components->info(sprintf(
             'Benchmarking [%s] %s using [%s] %s.',
