@@ -830,19 +830,30 @@ trait HasRelationships
      */
     public function relationLoaded($key)
     {
+        return array_key_exists($key, $this->relations);
+    }
+
+    /**
+     * Determine if the given nested relation is loaded.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function nestedRelationLoaded($key)
+    {
         // If the given relation is not a nested one, let's just check the key.
         if (! Str::contains($key, '.')) {
-            return array_key_exists($key, $this->relations);
+            return $this->relationLoaded($key);
         }
 
         [$key, $sub] = explode('.', $key, 2);
 
         // If the "root" relation is not loaded, we can stop the process here.
-        if (! array_key_exists($key, $this->relations)) {
+        if (! $this->relationLoaded($key)) {
             return false;
         }
 
-        // First, we get the "root" relation.
+        // Now we can trust that the "root" relation is loaded, so let's get it.
         $relation = $this->getRelation($key);
 
         // If the relation is a "many" relation, we check every model instance
@@ -850,13 +861,13 @@ trait HasRelationships
         // have the requested relation loaded, otherwise the result will be false.
         if ($relation instanceof Collection) {
             return $relation->every(function ($item) use ($sub) {
-                return $item->relationLoaded($sub);
+                return $item->nestedRelationLoaded($sub);
             });
         }
 
         // In case of a "one" relation, we run this method recursively in
         // that model instance.
-        return $relation->relationLoaded($sub);
+        return $relation->nestedRelationLoaded($sub);
     }
 
     /**
