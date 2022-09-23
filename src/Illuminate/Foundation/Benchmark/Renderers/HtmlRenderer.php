@@ -30,13 +30,17 @@ class HtmlRenderer implements BenchmarkRenderer
                 $key = sprintf('[%s] %s', $index + 1, $key);
             }
 
-            return [$key => number_format($result->average * 1000, 3).'ms'];
+            return [$key => number_format($result->average / 1000000, 3).'ms'];
         });
 
-        HtmlDumper::resolveDumpSourceUsing(fn () => null);
+        $source = sprintf('%s %s', $repeats, str('repetition')->plural($repeats));
+
+        HtmlDumper::resolveDumpSourceUsing(fn () => [
+            $source, $source, '',
+        ]);
 
         try {
-            (static::$dumpUsing ?: 'dump')($results->prepend($repeats, 'repeats')->toArray());
+            (static::$dumpUsing ?: 'dump')($results->toArray());
         } finally {
             HtmlDumper::resolveDumpSourceUsing(null);
         }
