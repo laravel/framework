@@ -29,6 +29,13 @@ class BelongsToRelationship
     protected $resolved;
 
     /**
+     * Bypass the cache mechanism.
+     *
+     * @var mixed
+     */
+    protected $withoutCache = false;
+
+    /**
      * Create a new "belongs to" relationship definition.
      *
      * @param  \Illuminate\Database\Eloquent\Factories\Factory|\Illuminate\Database\Eloquent\Model  $factory
@@ -68,7 +75,7 @@ class BelongsToRelationship
     protected function resolver($key)
     {
         return function () use ($key) {
-            if (! $this->resolved) {
+            if (! $this->resolved || $this->withoutCache) {
                 $instance = $this->factory instanceof Factory
                     ? ($this->factory->recycle->get($this->factory->modelName()) ?? $this->factory->create())
                     : $this->factory;
@@ -91,6 +98,18 @@ class BelongsToRelationship
         if ($this->factory instanceof Factory) {
             $this->factory = $this->factory->recycle($recycle);
         }
+
+        return $this;
+    }
+
+    /**
+     * Don't reuse created parent instance for subsequent calls.
+     *
+     * @return $this
+     */
+    public function withoutCache()
+    {
+        $this->withoutCache = true;
 
         return $this;
     }

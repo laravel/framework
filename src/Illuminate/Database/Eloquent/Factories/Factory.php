@@ -619,6 +619,21 @@ abstract class Factory
     }
 
     /**
+     * Define a unique parent relationship for the model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Factories\Factory  $factory
+     * @param  string|null  $relationship
+     * @return static
+     */
+    public function eachFor(self $factory, $relationship = null)
+    {
+        return $this->newInstance(['for' => $this->for->concat([(new BelongsToRelationship(
+            $factory,
+            $relationship ?? Str::camel(class_basename($factory->modelName()))
+        ))->withoutCache()])]);
+    }
+
+    /**
      * Provide a model instance to use instead of any nested factory calls when creating relationships.
      *
      * @param  \Illuminate\Eloquent\Model|\Illuminate\Support\Collection|array  $model

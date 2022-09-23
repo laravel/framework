@@ -303,6 +303,20 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertCount(3, FactoryTestPost::all());
     }
 
+    public function test_each_belongs_to_relationship()
+    {
+        $posts = FactoryTestPostFactory::times(3)
+            ->eachFor(FactoryTestUserFactory::new(['name' => 'Taylor Otwell']), 'user')
+            ->create();
+
+        $this->assertCount(3, $posts->filter(function ($post) {
+            return $post->user->name === 'Taylor Otwell';
+        }));
+
+        $this->assertCount(3, FactoryTestUser::all());
+        $this->assertCount(3, FactoryTestPost::all());
+    }
+
     public function test_morph_to_relationship()
     {
         $posts = FactoryTestCommentFactory::times(3)
