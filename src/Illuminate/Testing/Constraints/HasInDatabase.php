@@ -81,7 +81,7 @@ class HasInDatabase extends Constraint
 
         $columns = array_values(Arr::map(
             $this->data,
-            fn($value, $key) => is_numeric($key) && is_array($value) ? $value[0] : $key,
+            fn ($value, $key) => is_numeric($key) && is_array($value) ? $value[0] : $key,
         ));
 
         $similarResults = $query->where(
