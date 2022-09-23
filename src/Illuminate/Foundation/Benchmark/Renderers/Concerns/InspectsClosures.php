@@ -10,7 +10,7 @@ use function Termwind\terminal;
 trait InspectsClosures
 {
     /**
-     * Get the code of the given callback.
+     * Get a code "description" from the given callback.
      *
      * @param  \Closure  $callback
      * @return string

@@ -11,14 +11,14 @@ namespace Illuminate\Foundation\Benchmark;
 class Factory
 {
     /**
-     * The renderer implementation..
+     * The renderer implementation.
      *
      * @var \Illuminate\Contracts\Foundation\BenchmarkRenderer
      */
     protected $renderer;
 
     /**
-     * Create a new benchmark factory instance.
+     * Create a new Benchmark Factory instance.
      *
      * @param  \Illuminate\Contracts\Foundation\BenchmarkRenderer  $renderer
      * @return void

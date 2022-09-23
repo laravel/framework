@@ -23,7 +23,7 @@ class PendingBenchmark
     protected $repetitions = 10;
 
     /**
-     * Creates a new "pending" Benchmark instance.
+     * Creates a new Pending Benchmark instance.
      *
      * @param  \Illuminate\Contracts\Foundation\BenchmarkRenderer  $renderer
      * @return void
@@ -51,6 +51,8 @@ class PendingBenchmark
      *
      * @param  iterable<string|int, \Closure(): mixed>|\Closure(): mixed  $callbacks
      * @return never
+     *
+     * @throws \InvalidArgumentException
      */
     public function measure($callbacks)
     {
@@ -77,7 +79,7 @@ class PendingBenchmark
      * @param  iterable<string|int, \Closure(): mixed>|\Closure(): mixed  $callbacks
      * @return \Illuminate\Support\Collection<string|int, \Closure(): mixed>
      *
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     protected function getClosures($callbacks)
     {
