@@ -4,6 +4,7 @@ namespace Illuminate\Testing\Constraints;
 
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Expression;
+use Illuminate\Support\Arr;
 use PHPUnit\Framework\Constraint\Constraint;
 
 class HasInDatabase extends Constraint
@@ -78,17 +79,21 @@ class HasInDatabase extends Constraint
     {
         $query = $this->database->table($table);
 
+        $columns = array_values(Arr::map(
+            $this->data,
+            fn($value, $key) => is_numeric($key) && is_array($value) ? $value[0] : $key,
+        ));
+
         $similarResults = $query->where(
-            array_key_first($this->data),
-            $this->data[array_key_first($this->data)]
-        )->select(array_keys($this->data))->limit($this->show)->get();
+            array_slice($this->data, 0, 1, true)
+        )->select($columns)->limit($this->show)->get();
 
         if ($similarResults->isNotEmpty()) {
             $description = 'Found similar results: '.json_encode($similarResults, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         } else {
             $query = $this->database->table($table);
 
-            $results = $query->select(array_keys($this->data))->limit($this->show)->get();
+            $results = $query->select($columns)->limit($this->show)->get();
 
             if ($results->isEmpty()) {
                 return 'The table is empty';

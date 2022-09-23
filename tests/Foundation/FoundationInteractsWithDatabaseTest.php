@@ -61,6 +61,15 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertDatabaseHas($this->table, $this->data);
     }
 
+    public function testAssertDatabaseHasSupportsArraySyntax()
+    {
+        $this->data = [['name', 'like', 'Larav%']];
+
+        $this->mockCountBuilder(1);
+
+        $this->assertDatabaseHas($this->table, $this->data);
+    }
+
     public function testSeeInDatabaseFindsNotMatchingResults()
     {
         $this->expectException(ExpectationFailedException::class);
@@ -82,6 +91,25 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->expectExceptionMessage('Found similar results: '.json_encode(['data', 'data', 'data'], JSON_PRETTY_PRINT).' and 2 others.');
 
         $builder = $this->mockCountBuilder(0);
+        $builder->shouldReceive('count')->andReturn(0, 5);
+
+        $builder->shouldReceive('take')->andReturnSelf();
+        $builder->shouldReceive('get')->andReturn(
+            collect(array_fill(0, 3, 'data'))
+        );
+
+        $this->assertDatabaseHas($this->table, $this->data);
+    }
+
+    public function testAssertDatabaseFindsManyNotMatchingResultsWithArraySyntax()
+    {
+        $this->data = [['name', 'like', 'Larav%']];
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Found similar results: '.json_encode(['data', 'data', 'data'], JSON_PRETTY_PRINT).' and 2 others.');
+
+        $builder = $this->mockCountBuilder(0);
+        $builder->shouldReceive('select')->with(['name'])->once()->andReturnSelf();
         $builder->shouldReceive('count')->andReturn(0, 5);
 
         $builder->shouldReceive('take')->andReturnSelf();
@@ -319,7 +347,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $key = array_key_first($this->data);
         $value = $this->data[$key];
 
-        $builder->shouldReceive('where')->with($key, $value)->andReturnSelf();
+        $builder->shouldReceive('where')->with(array_slice($this->data, 0, 1, true))->andReturnSelf();
 
         $builder->shouldReceive('select')->with(array_keys($this->data))->andReturnSelf();
 
