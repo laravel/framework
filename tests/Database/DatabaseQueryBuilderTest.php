@@ -1508,6 +1508,27 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select * from "users" order by "updated_at" asc', $builder->toSql());
     }
 
+    public function testInRandomOrderMySql()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->inRandomOrder();
+        $this->assertSame('select * from "users" order by RANDOM()', $builder->toSql());
+    }
+
+    public function testInRandomOrderPostgres()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->inRandomOrder();
+        $this->assertSame('select * from "users" order by RANDOM()', $builder->toSql());
+    }
+
+    public function testInRandomOrderSqlServer()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->inRandomOrder();
+        $this->assertSame('select * from [users] order by NEWID()', $builder->toSql());
+    }
+
     public function testOrderBysSqlServer()
     {
         $builder = $this->getSqlServerBuilder();
