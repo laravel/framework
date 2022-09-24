@@ -3161,6 +3161,42 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testEven($collection)
+    {
+        $data = new $collection([
+            'a',
+            'b',
+            'c',
+            'd',
+            'e',
+            'f',
+        ]);
+
+        $this->assertEquals(['b', 'd', 'f'], $data->even()->all());
+        $this->assertNotEquals(['a', 'c', 'e'], $data->even()->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testOdd($collection)
+    {
+        $data = new $collection([
+            'a',
+            'b',
+            'c',
+            'd',
+            'e',
+            'f',
+        ]);
+
+        $this->assertEquals(['a', 'c', 'e'], $data->odd()->all());
+        $this->assertNotEquals(['b', 'd', 'f'], $data->odd()->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testMapWithKeysOverwritingKeys($collection)
     {
         $data = new $collection([

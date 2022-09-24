@@ -850,6 +850,26 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Get the values that are in the even position
+     * 
+     * @return static
+     */
+    public function even()
+    {
+        return $this->nth(2, 1);
+    }
+
+    /**
+     * Get the values that are in the odd position
+     * 
+     * @return static
+     */
+    public function odd()
+    {
+        return $this->nth(2);
+    }
+
+    /**
      * Get the items with the specified keys.
      *
      * @param  \Illuminate\Support\Enumerable<array-key, TKey>|array<array-key, TKey>|string  $keys
