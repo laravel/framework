@@ -28,6 +28,12 @@ class HandleExceptions
      */
     protected static $app;
 
+    private static $globalShutdownFunctionRegistered = false;
+
+    private static $errorHandlerRegistered = false;
+
+    private static $exceptionHandlerRegistered = false;
+
     /**
      * Bootstrap the given application.
      *
@@ -42,11 +48,18 @@ class HandleExceptions
 
         error_reporting(-1);
 
+        if (! self::$globalShutdownFunctionRegistered) {
+            self::$globalShutdownFunctionRegistered = true;
+
+            register_shutdown_function($this->forwardsTo('handleShutdown'));
+        }
+
+        // error & exception handlers must be overwritten every time since PHPUnit registers its own
+        // beware, those handlers must be cleared as they are stored on top of each other
         set_error_handler($this->forwardsTo('handleError'));
-
+        static::$errorHandlerRegistered = true;
         set_exception_handler($this->forwardsTo('handleException'));
-
-        register_shutdown_function($this->forwardsTo('handleShutdown'));
+        static::$exceptionHandlerRegistered = true;
 
         if (! $app->environment('testing')) {
             ini_set('display_errors', 'Off');
@@ -300,5 +313,16 @@ class HandleExceptions
     public static function forgetApp()
     {
         static::$app = null;
+
+        // remove registered handlers to prevent memory leak
+        if (static::$errorHandlerRegistered) {
+            restore_error_handler();
+            static::$errorHandlerRegistered = false;
+        }
+
+        if (static::$exceptionHandlerRegistered) {
+            restore_exception_handler();
+            static::$exceptionHandlerRegistered = false;
+        }
     }
 }
