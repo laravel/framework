@@ -17,7 +17,7 @@ class TestCaseTest extends BaseTestCase
     public function test_it_includes_response_exceptions_on_test_failures()
     {
         $testCase = new ExampleTestCase();
-        $testCase->latestResponse = TestResponse::fromBaseResponse(new Response())
+        $testCase::$latestResponse = TestResponse::fromBaseResponse(new Response())
             ->withExceptions(collect([new Exception('Unexpected exception.')]));
 
         $this->expectException(ExpectationFailedException::class);
@@ -29,7 +29,7 @@ class TestCaseTest extends BaseTestCase
     public function test_it_includes_validation_errors_on_test_failures()
     {
         $testCase = new ExampleTestCase();
-        $testCase->latestResponse = TestResponse::fromBaseResponse(
+        $testCase::$latestResponse = TestResponse::fromBaseResponse(
             tap(new RedirectResponse('/'))
                 ->setSession(new Store('test-session', new NullSessionHandler()))
                 ->withErrors([
@@ -45,7 +45,7 @@ class TestCaseTest extends BaseTestCase
     public function test_it_includes_json_validation_errors_on_test_failures()
     {
         $testCase = new ExampleTestCase();
-        $testCase->latestResponse = TestResponse::fromBaseResponse(
+        $testCase::$latestResponse = TestResponse::fromBaseResponse(
             new Response(['errors' => ['first_name' => 'The first name field is required.']])
         );
 
@@ -57,7 +57,7 @@ class TestCaseTest extends BaseTestCase
     public function test_it_doesnt_fail_with_false_json()
     {
         $testCase = new ExampleTestCase();
-        $testCase->latestResponse = TestResponse::fromBaseResponse(
+        $testCase::$latestResponse = TestResponse::fromBaseResponse(
             new Response(false, 200, ['Content-Type' => 'application/json'])
         );
 
@@ -69,7 +69,7 @@ class TestCaseTest extends BaseTestCase
     public function test_it_doesnt_fail_with_encoded_json()
     {
         $testCase = new ExampleTestCase();
-        $testCase->latestResponse = TestResponse::fromBaseResponse(
+        $testCase::$latestResponse = TestResponse::fromBaseResponse(
             tap(new Response, function ($response) {
                 $response->header('Content-Type', 'application/json');
                 $response->header('Content-Encoding', 'gzip');
@@ -80,6 +80,11 @@ class TestCaseTest extends BaseTestCase
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessageMatches('/Assertion message/s');
         $testCase->onNotSuccessfulTest(new ExpectationFailedException('Assertion message.'));
+    }
+
+    public function tearDown(): void
+    {
+        ExampleTestCase::$latestResponse = null;
     }
 }
 
