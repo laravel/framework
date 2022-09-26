@@ -79,7 +79,7 @@ class EnvironmentDecryptCommandTest extends TestCase
             ->shouldReceive('get')
             ->once()
             ->andReturn(
-                (new Encrypter($key = Encrypter::generateKey('aes-128-cbc'), 'aes-128-cbc'))
+                (new Encrypter($key = Encrypter::generateKey('AES-256-CBC'), 'AES-256-CBC'))
                     ->encrypt('APP_NAME=Laravel')
             );
 
@@ -116,7 +116,7 @@ class EnvironmentDecryptCommandTest extends TestCase
 
     public function testItGeneratesTheEnvironmentFileWithKeyFromEnvironment()
     {
-        putenv('LARAVEL_ENV_ENCRYPTION_KEY=ponmlkjihgfedcba');
+        putenv('LARAVEL_ENV_ENCRYPTION_KEY=ponmlkjihgfedcbaponmlkjihgfedcba');
 
         $this->filesystem->shouldReceive('exists')
             ->once()
@@ -127,7 +127,7 @@ class EnvironmentDecryptCommandTest extends TestCase
             ->shouldReceive('get')
             ->once()
             ->andReturn(
-                (new Encrypter('ponmlkjihgfedcba', 'aes-128-cbc'))
+                (new Encrypter('ponmlkjihgfedcbaponmlkjihgfedcba', 'AES-256-CBC'))
                     ->encrypt('APP_NAME="Laravel Three"')
             );
 
@@ -214,11 +214,11 @@ class EnvironmentDecryptCommandTest extends TestCase
             ->shouldReceive('get')
             ->once()
             ->andReturn(
-                (new Encrypter('abcdefghijklmnop'))
+                (new Encrypter('abcdefghijklmnopabcdefghijklmnop', 'AES-256-CBC'))
                     ->encrypt('APP_NAME="Laravel Two"')
             );
 
-        $this->artisan('env:decrypt', ['--env' => 'production', '--key' => 'abcdefghijklmnop', '--filename' => '.env'])
+        $this->artisan('env:decrypt', ['--env' => 'production', '--key' => 'abcdefghijklmnopabcdefghijklmnop', '--filename' => '.env'])
             ->expectsOutputToContain('Environment successfully decrypted.')
             ->assertExitCode(0);
 
