@@ -1217,7 +1217,7 @@ class Str
     }
 
     /**
-     * Generate a UUID (version 7).
+     * Generate a UUID (version 4).
      *
      * @return \Ramsey\Uuid\UuidInterface
      */
@@ -1225,7 +1225,7 @@ class Str
     {
         return static::$uuidFactory
                     ? call_user_func(static::$uuidFactory)
-                    : Uuid::uuid7();
+                    : Uuid::uuid4();
     }
 
     /**
@@ -1235,7 +1235,7 @@ class Str
      */
     public static function orderedUuid()
     {
-        return Str::uuid();
+        return Uuid::uuid7();
     }
 
     /**
