@@ -37,6 +37,24 @@ class FoundationFormRequestTest extends TestCase
 
         $this->assertEquals(['name' => 'specified'], $request->validated());
     }
+    
+    public function testValidatedMethodReturnsTheValidatedDataWithoutExceptKey()
+    {
+        $request = $this->createRequest(['name' => 'specified', 'with' => 'extras']);
+
+        $request->validateResolved();
+
+        $this->assertEquals(['name' => 'specified'], $request->validatedExcept('with'));
+    }
+    
+    public function testValidatedMethodReturnsTheValidatedDataWithoutExceptKeys()
+    {
+        $request = $this->createRequest(['name' => 'specified', 'with' => 'extras']);
+
+        $request->validateResolved();
+        
+        $this->assertEquals([], $request->validatedExcept(['with', 'name']));
+    }
 
     public function testValidatedMethodReturnsTheValidatedDataNestedRules()
     {

@@ -10,6 +10,7 @@ use Illuminate\Contracts\Validation\ValidatesWhenResolved;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
+use Illuminate\Support\Arr;
 use Illuminate\Validation\ValidatesWhenResolvedTrait;
 use Illuminate\Validation\ValidationException;
 
@@ -214,6 +215,18 @@ class FormRequest extends Request implements ValidatesWhenResolved
     {
         return data_get($this->validator->validated(), $key, $default);
     }
+
+    /**
+     * Get the validated data Except keys from the request.
+     *
+     * @param  string|array  $keys
+     * @return array
+     */
+    public function validatedExcept($keys = [])
+    {
+        return Arr::except($this->validated(), $keys);
+    }
+    
 
     /**
      * Get custom messages for validator errors.
