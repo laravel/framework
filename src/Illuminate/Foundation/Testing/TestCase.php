@@ -217,6 +217,9 @@ abstract class TestCase extends BaseTestCase
         $this->afterApplicationCreatedCallbacks = [];
         $this->beforeApplicationDestroyedCallbacks = [];
 
+        $this->originalExceptionHandler = null;
+        $this->originalDeprecationHandler = null;
+
         Artisan::forgetBootstrappers();
         Queue::createPayloadUsing(null);
         HandleExceptions::forgetApp();
