@@ -404,6 +404,26 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
         });
     }
 
+    public function testItDoesNotSetPrecisionHigherThanSupportedWhenRenamingTimestamps()
+    {
+        $this->db->connection()->getSchemaBuilder()->create('users', function (Blueprint $table) {
+            $table->timestamp('created_at');
+        });
+
+        try {
+            // this would only fail in mysql, postgres and sql server
+            $this->db->connection()->getSchemaBuilder()->table('users', function (Blueprint $table) {
+                $table->renameColumn('created_at', 'new_created_at');
+            });
+            $this->addToAssertionCount(1); // it did not throw
+        } catch (\Exception $e) {
+            // Expecting something similar to:
+            // Illuminate\Database\QueryException
+            //   SQLSTATE[42000]: Syntax error or access violation: 1426 Too big precision 10 specified for 'my_timestamp'. Maximum is 6....
+            $this->fail('test_it_does_not_set_precision_higher_than_supported_when_renaming_timestamps has failed. Error: '.$e->getMessage());
+        }
+    }
+
     public function testItEnsuresDroppingForeignKeyIsAvailable()
     {
         $this->expectException(BadMethodCallException::class);

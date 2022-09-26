@@ -4,6 +4,17 @@ namespace Illuminate\Database\DBAL;
 
 use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Platforms\MariaDb1027Platform;
+use Doctrine\DBAL\Platforms\MariaDBPlatform;
+use Doctrine\DBAL\Platforms\MySQL57Platform;
+use Doctrine\DBAL\Platforms\MySQL80Platform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
+use Doctrine\DBAL\Platforms\PostgreSQL100Platform;
+use Doctrine\DBAL\Platforms\PostgreSQL94Platform;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+use Doctrine\DBAL\Platforms\SqlitePlatform;
+use Doctrine\DBAL\Platforms\SQLServer2012Platform;
+use Doctrine\DBAL\Platforms\SQLServerPlatform;
 use Doctrine\DBAL\Types\PhpDateTimeMappingType;
 use Doctrine\DBAL\Types\Type;
 
@@ -11,37 +22,42 @@ class TimestampType extends Type implements PhpDateTimeMappingType
 {
     /**
      * {@inheritdoc}
+     *
+     * @throws DBALException
      */
-    public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform)
+    public function getSQLDeclaration(array $column, AbstractPlatform $platform): string
     {
-        return match ($name = $platform->getName()) {
-            'mysql',
-            'mysql2' => $this->getMySqlPlatformSQLDeclaration($fieldDeclaration),
-            'postgresql',
-            'pgsql',
-            'postgres' => $this->getPostgresPlatformSQLDeclaration($fieldDeclaration),
-            'mssql' => $this->getSqlServerPlatformSQLDeclaration($fieldDeclaration),
-            'sqlite',
-            'sqlite3' => $this->getSQLitePlatformSQLDeclaration($fieldDeclaration),
-            default => throw new DBALException('Invalid platform: '.$name),
+        return match (get_class($platform)) {
+            MySQLPlatform::class,
+            MySQL57Platform::class,
+            MySQL80Platform::class,
+            MariaDBPlatform::class,
+            MariaDb1027Platform::class => $this->getMySqlPlatformSQLDeclaration($column),
+            PostgreSQLPlatform::class,
+            PostgreSQL94Platform::class,
+            PostgreSQL100Platform::class => $this->getPostgresPlatformSQLDeclaration($column),
+            SQLServerPlatform::class,
+            SQLServer2012Platform::class => $this->getSqlServerPlatformSQLDeclaration($column),
+            SqlitePlatform::class => 'DATETIME',
+            default => throw new DBALException('Invalid platform: '.substr(strrchr(get_class($platform), '\\'), 1)),
         };
     }
 
     /**
      * Get the SQL declaration for MySQL.
      *
-     * @param  array  $fieldDeclaration
+     * @param  array  $column
      * @return string
      */
-    protected function getMySqlPlatformSQLDeclaration(array $fieldDeclaration)
+    protected function getMySqlPlatformSQLDeclaration(array $column): string
     {
         $columnType = 'TIMESTAMP';
 
-        if ($fieldDeclaration['precision']) {
-            $columnType = 'TIMESTAMP('.$fieldDeclaration['precision'].')';
+        if ($column['precision']) {
+            $columnType = 'TIMESTAMP('.min((int) $column['precision'], 6).')';
         }
 
-        $notNull = $fieldDeclaration['notnull'] ?? false;
+        $notNull = $column['notnull'] ?? false;
 
         if (! $notNull) {
             return $columnType.' NULL';
@@ -53,36 +69,25 @@ class TimestampType extends Type implements PhpDateTimeMappingType
     /**
      * Get the SQL declaration for PostgreSQL.
      *
-     * @param  array  $fieldDeclaration
+     * @param  array  $column
      * @return string
      */
-    protected function getPostgresPlatformSQLDeclaration(array $fieldDeclaration)
+    protected function getPostgresPlatformSQLDeclaration(array $column): string
     {
-        return 'TIMESTAMP('.(int) $fieldDeclaration['precision'].')';
+        return 'TIMESTAMP('.min((int) $column['precision'], 6).')';
     }
 
     /**
      * Get the SQL declaration for SQL Server.
      *
-     * @param  array  $fieldDeclaration
+     * @param  array  $column
      * @return string
      */
-    protected function getSqlServerPlatformSQLDeclaration(array $fieldDeclaration)
+    protected function getSqlServerPlatformSQLDeclaration(array $column): string
     {
-        return $fieldDeclaration['precision'] ?? false
-                    ? 'DATETIME2('.$fieldDeclaration['precision'].')'
-                    : 'DATETIME';
-    }
-
-    /**
-     * Get the SQL declaration for SQLite.
-     *
-     * @param  array  $fieldDeclaration
-     * @return string
-     */
-    protected function getSQLitePlatformSQLDeclaration(array $fieldDeclaration)
-    {
-        return 'DATETIME';
+        return $column['precision'] ?? false
+            ? 'DATETIME2('.min((int) $column['precision'], 7).')'
+            : 'DATETIME';
     }
 
     /**
