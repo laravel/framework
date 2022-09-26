@@ -217,7 +217,7 @@ class SupportArrTest extends TestCase
         $array = [
             'name' => 'Taylor',
             'developer' => [
-                'name' => 'Abigail'
+                'name' => 'Abigail',
             ]
         ];
         $this->assertNull(Arr::firstNotEmpty($array, []));
