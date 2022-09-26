@@ -11,7 +11,7 @@ class Benchmark
      *
      * @param  \Closure|array  $benchmarkables
      * @param  int  $iterations
-     * @return array
+     * @return array|float
      */
     public static function measure(Closure|array $benchmarkables, int $iterations = 1): array|float
     {
@@ -28,7 +28,7 @@ class Benchmark
         })->when(
             $benchmarkables instanceof Closure,
             fn ($c) => $c->first(),
-            fn ($c) => $c->all()
+            fn ($c) => $c->all(),
         );
     }
 
