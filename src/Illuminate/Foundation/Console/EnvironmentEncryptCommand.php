@@ -67,7 +67,7 @@ class EnvironmentEncryptCommand extends Command
      */
     public function handle()
     {
-        $cipher = $this->option('cipher') ?: 'aes-128-cbc';
+        $cipher = $this->option('cipher') ?: 'AES-256-CBC';
 
         $key = $this->option('key');
 

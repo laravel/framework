@@ -78,7 +78,7 @@ class EnvironmentDecryptCommand extends Command
             return Command::FAILURE;
         }
 
-        $cipher = $this->option('cipher') ?: 'aes-128-cbc';
+        $cipher = $this->option('cipher') ?: 'AES-256-CBC';
 
         $key = $this->parseKey($key);
 
