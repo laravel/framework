@@ -20,7 +20,7 @@ class EnvironmentEncryptCommand extends Command
                     {--key= : The encryption key}
                     {--cipher= : The encryption cipher}
                     {--env= : The environment to be encrypted}
-                    {--force : Overwrite existing encrypted environment file}';
+                    {--force : Overwrite the existing encrypted environment file}';
 
     /**
      * The name of the console command.
@@ -47,6 +47,12 @@ class EnvironmentEncryptCommand extends Command
      */
     protected $files;
 
+    /**
+     * Create a new command instance.
+     *
+     * @param  \Illuminate\Filesystem\Filesystem  $files
+     * @return void
+     */
     public function __construct(Filesystem $files)
     {
         parent::__construct();
@@ -62,11 +68,15 @@ class EnvironmentEncryptCommand extends Command
     public function handle()
     {
         $cipher = $this->option('cipher') ?: 'aes-128-cbc';
+
         $key = $this->option('key');
+
         $keyPassed = $key !== null;
+
         $environmentFile = $this->option('env')
                             ? base_path('.env').'.'.$this->option('env')
                             : $this->laravel->environmentFilePath();
+
         $encryptedFile = $environmentFile.'.encrypted';
 
         if (! $keyPassed) {

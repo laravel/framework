@@ -22,8 +22,8 @@ class EnvironmentDecryptCommand extends Command
                     {--key= : The encryption key}
                     {--cipher= : The encryption cipher}
                     {--env= : The environment to be decrypted}
-                    {--force : Overwrite existing environment file}
-                    {--filename= : Filename to which to write the decrypted contents}';
+                    {--force : Overwrite the existing environment file}
+                    {--filename= : Where to write the decrypted file contents}';
 
     /**
      * The name of the console command.
@@ -50,6 +50,12 @@ class EnvironmentDecryptCommand extends Command
      */
     protected $files;
 
+    /**
+     * Create a new command instance.
+     *
+     * @param  \Illuminate\Filesystem\Filesystem  $files
+     * @return void
+     */
     public function __construct(Filesystem $files)
     {
         parent::__construct();
@@ -73,12 +79,18 @@ class EnvironmentDecryptCommand extends Command
         }
 
         $cipher = $this->option('cipher') ?: 'aes-128-cbc';
+
         $key = $this->parseKey($key);
+
         $environmentFile = $this->option('env')
-                            ? base_path('.env').'.'.$this->option('env')
-                            : $this->laravel->environmentFilePath();
+                    ? base_path('.env').'.'.$this->option('env')
+                    : $this->laravel->environmentFilePath();
+
         $encryptedFile = $environmentFile.'.encrypted';
-        $filename = $this->option('filename') ? base_path($this->option('filename')) : $environmentFile;
+
+        $filename = $this->option('filename')
+                    ? base_path($this->option('filename'))
+                    : $environmentFile;
 
         if (Str::endsWith($filename, '.encrypted')) {
             $this->components->error('Invalid filename.');
