@@ -850,7 +850,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
-     * Get the values that are in the even position
+     * Get the values that are in the even position.
      * 
      * @return static
      */
@@ -860,7 +860,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
-     * Get the values that are in the odd position
+     * Get the values that are in the odd position.
      * 
      * @return static
      */
