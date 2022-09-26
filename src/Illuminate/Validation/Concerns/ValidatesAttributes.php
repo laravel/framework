@@ -1308,6 +1308,10 @@ trait ValidatesAttributes
      */
     public function validateMax($attribute, $value, $parameters)
     {
+        if(is_array($value)) {
+            return $this->checkMultiValues(__FUNCTION__, $attribute, $value, $parameters);
+        }
+        
         $this->requireParameterCount(1, $parameters, 'max');
 
         if ($value instanceof UploadedFile && ! $value->isValid()) {
@@ -1376,7 +1380,7 @@ trait ValidatesAttributes
         if(is_array($value)) {
             return $this->checkMultiValues(__FUNCTION__, $attribute, $value, $parameters);
         }
-        
+
         if (! $this->isValidFileInstance($value)) {
             return false;
         }
@@ -1422,6 +1426,10 @@ trait ValidatesAttributes
      */
     public function validateMin($attribute, $value, $parameters)
     {
+        if(is_array($value)) {
+            return $this->checkMultiValues(__FUNCTION__, $attribute, $value, $parameters);
+        }
+
         $this->requireParameterCount(1, $parameters, 'min');
 
         return $this->getSize($attribute, $value) >= $parameters[0];
@@ -2267,12 +2275,12 @@ trait ValidatesAttributes
      */
     protected function checkMultiValues($functionName, $attribute, $value, $parameters)
     {
-        $isOk = true;
-
         foreach ($value as $file) {
-            $isOk = $isOk && $this->$functionName($attribute, $file, $parameters);
+            if (!$this->{$functionName}($attribute, $file, $parameters)) {
+                return false;
+            }
         }
 
-        return $isOk;
+        return true;
     }
 }
