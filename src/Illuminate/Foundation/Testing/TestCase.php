@@ -86,7 +86,7 @@ abstract class TestCase extends BaseTestCase
      */
     protected function setUp(): void
     {
-        $this->latestResponse = null;
+        static::$latestResponse = null;
 
         Facade::clearResolvedInstances();
 
@@ -227,6 +227,16 @@ abstract class TestCase extends BaseTestCase
     }
 
     /**
+     * Clean up the testing environment before the next test case.
+     *
+     * @return void
+     */
+    public static function tearDownAfterClass(): void
+    {
+        static::$latestResponse = null;
+    }
+
+    /**
      * Register a callback to be run after the application is created.
      *
      * @param  callable  $callback
@@ -278,18 +288,18 @@ abstract class TestCase extends BaseTestCase
      */
     protected function onNotSuccessfulTest(Throwable $exception): void
     {
-        if (! $exception instanceof ExpectationFailedException || is_null($this->latestResponse)) {
+        if (! $exception instanceof ExpectationFailedException || is_null(static::$latestResponse)) {
             parent::onNotSuccessfulTest($exception);
         }
 
-        if ($lastException = $this->latestResponse->exceptions->last()) {
+        if ($lastException = static::$latestResponse->exceptions->last()) {
             parent::onNotSuccessfulTest($this->appendExceptionToException($lastException, $exception));
 
             return;
         }
 
-        if ($this->latestResponse->baseResponse instanceof RedirectResponse) {
-            $session = $this->latestResponse->baseResponse->getSession();
+        if (static::$latestResponse->baseResponse instanceof RedirectResponse) {
+            $session = static::$latestResponse->baseResponse->getSession();
 
             if (! is_null($session) && $session->has('errors')) {
                 parent::onNotSuccessfulTest($this->appendErrorsToException($session->get('errors')->all(), $exception));
@@ -298,8 +308,8 @@ abstract class TestCase extends BaseTestCase
             }
         }
 
-        if ($this->latestResponse->baseResponse->headers->get('Content-Type') === 'application/json') {
-            $testJson = new AssertableJsonString($this->latestResponse->getContent());
+        if (static::$latestResponse->baseResponse->headers->get('Content-Type') === 'application/json') {
+            $testJson = new AssertableJsonString(static::$latestResponse->getContent());
 
             if (isset($testJson['errors'])) {
                 parent::onNotSuccessfulTest($this->appendErrorsToException($testJson->json(), $exception, true));
