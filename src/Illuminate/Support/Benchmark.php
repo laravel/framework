@@ -7,15 +7,15 @@ use Closure;
 class Benchmark
 {
     /**
-     * Measure a array of callables over the given number of iterations.
+     * Measure a callable or array of callables over the given number of iterations.
      *
-     * @param  array  $benchmarkables
+     * @param  \Closure|array  $benchmarkables
      * @param  int  $iterations
      * @return array
      */
-    public static function measure(array $benchmarkables, int $iterations = 1): array
+    public static function measure(Closure|array $benchmarkables, int $iterations = 1): array|float
     {
-        return collect($benchmarkables)->map(function ($callback) use ($iterations) {
+        return collect(Arr::wrap($benchmarkables))->map(function ($callback) use ($iterations) {
             return collect(range(1, $iterations))->map(function () use ($callback) {
                 gc_collect_cycles();
 
@@ -25,7 +25,11 @@ class Benchmark
 
                 return (hrtime(true) - $start) / 1000000;
             })->average();
-        })->all();
+        })->when(
+            $benchmarkables instanceof Closure,
+            fn ($c) => $c->first(),
+            fn ($c) => $c->all()
+        );
     }
 
     /**
