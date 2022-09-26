@@ -11,6 +11,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\InvalidKeyException;
 use Illuminate\Support\ItemNotFoundException;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\MultipleItemsFoundException;
@@ -161,6 +162,78 @@ class SupportCollectionTest extends TestCase
         $data->sole(function ($value) {
             return $value === 'bar';
         });
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testSoleValueReturnsFirstItemInCollectionIfOnlyOneArrayExists($collection)
+    {
+        $collection = new $collection([
+            ['name' => 'foo'],
+            ['name' => 'bar'],
+        ]);
+
+        $this->assertSame('foo', $collection->where('name', 'foo')->soleValue('name'));
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testSoleValueReturnsFirstItemInCollectionIfOnlyOneObjectExists($collection)
+    {
+        $collection = new $collection([
+            new TestCollectionMapIntoObject('foo'),
+            new TestCollectionMapIntoObject('bar'),
+        ]);
+
+        $this->assertSame('foo', $collection->where('value', 'foo')->soleValue('value'));
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testSoleValueThrowsExceptionIfNoItemsExist($collection)
+    {
+        $this->expectException(ItemNotFoundException::class);
+
+        $collection = new $collection([
+            ['name' => 'foo'],
+            ['name' => 'bar'],
+        ]);
+
+        $collection->where('name', 'INVALID')->soleValue('name');
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testSoleValueThrowsExceptionIfMoreThanOneItemExists($collection)
+    {
+        $this->expectExceptionObject(new MultipleItemsFoundException(2));
+
+        $collection = new $collection([
+            ['name' => 'foo'],
+            ['name' => 'foo'],
+            ['name' => 'bar'],
+        ]);
+
+        $collection->where('name', 'foo')->soleValue('name');
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testSoleValueThrowsExceptionIfTheKeyDoesNotExist($collection)
+    {
+        $this->expectException(InvalidKeyException::class);
+
+        $collection = new $collection([
+            ['name' => 'foo'],
+            ['name' => 'bar'],
+        ]);
+
+        $collection->where('name', 'foo')->soleValue('INVALID');
     }
 
     /**

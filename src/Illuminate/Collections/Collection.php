@@ -1225,6 +1225,25 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         return $items->first();
     }
 
+    public function soleValue($key)
+    {
+        $item = $this->sole();
+
+        $placeholder = new stdClass();
+
+        $value = data_get(
+            $item,
+            $key,
+            $placeholder,
+        );
+
+        if ($value === $placeholder) {
+            throw new InvalidKeyException;
+        }
+
+        return $value;
+    }
+
     /**
      * Get the first item in the collection but throw an exception if no matching items exist.
      *
