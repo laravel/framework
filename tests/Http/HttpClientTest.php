@@ -1595,6 +1595,39 @@ class HttpClientTest extends TestCase
         $this->factory->get('https://laravel.com');
     }
 
+    public function testUrlsCanBeFakedForSpecificHttpMethods()
+    {
+        $this->factory->preventStrayRequests();
+
+        $this->factory->fake([
+            $this->factory->fakeGet('https://forge.laravel.com') => Factory::response('GET', 200),
+            $this->factory->fakePost('https://docs.laravel.com') => Factory::response('POST', 200),
+            $this->factory->fakeDelete('https://vapor.laravel.com') => Factory::response('DELETE', 200),
+            $this->factory->fakePatch('https://laravel.com') => Factory::response('PATCH', 200),
+            $this->factory->fakePut('https://spark.laravel.com') => Factory::response('PUT', 200),
+        ]);
+
+        $this->assertSame('GET', $this->factory->get('https://forge.laravel.com')->body());
+        $this->assertSame('POST', $this->factory->post('https://docs.laravel.com')->body());
+        $this->assertSame('DELETE', $this->factory->delete('https://vapor.laravel.com')->body());
+        $this->assertSame('PATCH', $this->factory->patch('https://laravel.com')->body());
+        $this->assertSame('PUT', $this->factory->put('https://spark.laravel.com')->body());
+    }
+
+    public function testExceptionIsThrownIfUsingTheWrongHttpMethodAndPreventStrayRequestsIsEnabled()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Attempted request to [https://forge.laravel.com] without a matching fake.');
+
+        $this->factory->preventStrayRequests();
+
+        $this->factory->fake([
+            $this->factory->fakeGet('https://forge.laravel.com') => Factory::response('GET', 200)
+        ]);
+
+        $this->factory->post('https://forge.laravel.com')->body();
+    }
+
     public function testItCanAddAuthorizationHeaderIntoRequestUsingBeforeSendingCallback()
     {
         $this->factory->fake();

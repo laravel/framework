@@ -481,7 +481,7 @@ class Factory
      */
     public function fakeDelete($url)
     {
-        return self::FAKE_REQUEST_BASE.'POST:'.$url;
+        return self::FAKE_REQUEST_BASE.'DELETE:'.$url;
     }
 
     /**
