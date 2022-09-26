@@ -1863,6 +1863,92 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select * from "users" limit 0 offset 0', $builder->toSql());
     }
 
+    public function testForPageBeforeId()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->forPageBeforeId();
+        $this->assertSame('select * from "users" where "id" < ? order by "id" desc limit 15', $builder->toSql());
+        $this->assertEquals([0 => 0], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->forPageBeforeId(10, 0);
+        $this->assertSame('select * from "users" where "id" < ? order by "id" desc limit 10', $builder->toSql());
+        $this->assertEquals([0 => 0], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->forPageBeforeId(-2, 0);
+        $this->assertSame('select * from "users" where "id" < ? order by "id" desc', $builder->toSql());
+        $this->assertEquals([0 => 0], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->forPageBeforeId(10, 20);
+        $this->assertSame('select * from "users" where "id" < ? order by "id" desc limit 10', $builder->toSql());
+        $this->assertEquals([0 => 20], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->forPageBeforeId(0, 20);
+        $this->assertSame('select * from "users" where "id" < ? order by "id" desc limit 0', $builder->toSql());
+        $this->assertEquals([0 => 20], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->forPageBeforeId(-10, -20);
+        $this->assertSame('select * from "users" where "id" < ? order by "id" desc', $builder->toSql());
+        $this->assertEquals([0 => -20], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->forPageBeforeId(10, 20, 'name');
+        $this->assertSame('select * from "users" where "name" < ? order by "name" desc limit 10', $builder->toSql());
+        $this->assertEquals([0 => 20], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->orderBy('id', 'asc')->forPageBeforeId(10, 0, 'id');
+        $this->assertSame('select * from "users" where "id" < ? order by "id" desc limit 10', $builder->toSql());
+        $this->assertEquals([0 => 0], $builder->getBindings());
+    }
+
+    public function testForPageAfterId()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->forPageAfterId();
+        $this->assertSame('select * from "users" where "id" > ? order by "id" asc limit 15', $builder->toSql());
+        $this->assertEquals([0 => 0], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->forPageAfterId(10, 0);
+        $this->assertSame('select * from "users" where "id" > ? order by "id" asc limit 10', $builder->toSql());
+        $this->assertEquals([0 => 0], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->forPageAfterId(-2, 0);
+        $this->assertSame('select * from "users" where "id" > ? order by "id" asc', $builder->toSql());
+        $this->assertEquals([0 => 0], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->forPageAfterId(10, 20);
+        $this->assertSame('select * from "users" where "id" > ? order by "id" asc limit 10', $builder->toSql());
+        $this->assertEquals([0 => 20], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->forPageAfterId(0, 20);
+        $this->assertSame('select * from "users" where "id" > ? order by "id" asc limit 0', $builder->toSql());
+        $this->assertEquals([0 => 20], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->forPageAfterId(-10, -20);
+        $this->assertSame('select * from "users" where "id" > ? order by "id" asc', $builder->toSql());
+        $this->assertEquals([0 => -20], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->forPageAfterId(10, 20, 'name');
+        $this->assertSame('select * from "users" where "name" > ? order by "name" asc limit 10', $builder->toSql());
+        $this->assertEquals([0 => 20], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->orderBy('id', 'asc')->forPageAfterId(10, 0, 'id');
+        $this->assertSame('select * from "users" where "id" > ? order by "id" asc limit 10', $builder->toSql());
+        $this->assertEquals([0 => 0], $builder->getBindings());
+    }
+
     public function testGetCountForPaginationWithBindings()
     {
         $builder = $this->getBuilder();
