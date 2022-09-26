@@ -220,7 +220,7 @@ class SupportArrTest extends TestCase
                 'name' => 'Abigail'
             ]
         ];
-        $this->assertNull(Arr::firstNotEmpty($array, []))
+        $this->assertNull(Arr::firstNotEmpty($array, []));
         $this->assertNull(Arr::firstNotEmpty($array, ['real_name', 'developer.real_name']));
         $this->assertSame('Taylor', Arr::firstNotEmpty($array, ['name', 'developer.name']));
         $this->assertSame('Abigail', Arr::firstNotEmpty($array, ['real_name', 'developer.name']));
