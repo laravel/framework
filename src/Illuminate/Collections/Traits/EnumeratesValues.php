@@ -11,7 +11,9 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
 use Illuminate\Support\HigherOrderCollectionProxy;
+use Illuminate\Support\InvalidKeyException;
 use JsonSerializable;
+use stdClass;
 use Symfony\Component\VarDumper\VarDumper;
 use Traversable;
 use UnexpectedValueException;
@@ -336,6 +338,35 @@ trait EnumeratesValues
         }
 
         return value($default);
+    }
+
+    /**
+     * Get a single key's value from the first item in the collection,
+     * but only if exactly one item exists, and it contains the
+     * given key. Otherwise, throw an exception.
+     *
+     * @param  string  $key
+     * @return array|mixed
+     *
+     * @throws \Illuminate\Support\ItemNotFoundException
+     * @throws \Illuminate\Support\MultipleItemsFoundException
+     * @throws \Illuminate\Support\InvalidKeyException
+     */
+    public function soleValue($key)
+    {
+        $placeholder = new stdClass();
+
+        $value = data_get(
+            $this->sole(),
+            $key,
+            $placeholder,
+        );
+
+        if ($value === $placeholder) {
+            throw new InvalidKeyException;
+        }
+
+        return $value;
     }
 
     /**
