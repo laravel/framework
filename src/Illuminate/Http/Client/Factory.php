@@ -63,6 +63,11 @@ class Factory
     }
 
     /**
+     * The base string that can be used to specify the fake HTTP method that a URL supports.
+     */
+    protected const FAKE_REQUEST_BASE = 'LARAVEL_FAKE_REQUEST:';
+
+    /**
      * The event dispatcher implementation.
      *
      * @var \Illuminate\Contracts\Events\Dispatcher|null
@@ -220,7 +225,22 @@ class Factory
     public function stubUrl($url, $callback)
     {
         return $this->fake(function ($request, $options) use ($url, $callback) {
-            if (! Str::is(Str::start($url, '*'), $request->url())) {
+            $methodMatches = true;
+
+            // If the URL only supports a given HTTP method, then parse the
+            // string to find the supported method and the intended URL.
+            // We can then check whether the method is correct and if
+            // we should continue running the response callback.
+            if (Str::startsWith($url, static::FAKE_REQUEST_BASE)) {
+                $method = explode(':', $url)[1];
+                $methodMatches = $method === $request->method();
+
+                $url = Str::after($url, static::FAKE_REQUEST_BASE.$method.':');
+            }
+
+            $urlMatches = Str::is(Str::start($url, '*'), $request->url());
+
+            if (! $urlMatches || ! $methodMatches) {
                 return;
             }
 
@@ -407,6 +427,61 @@ class Factory
     public function getDispatcher()
     {
         return $this->dispatcher;
+    }
+
+    /**
+     * Build a string to only allow 'GET' requests to a faked URL.
+     *
+     * @param  string  $url
+     * @return string
+     */
+    public function fakeGet($url)
+    {
+        return self::FAKE_REQUEST_BASE.'GET:'.$url;
+    }
+
+    /**
+     * Build a string to only allow 'POST' requests to a faked URL.
+     *
+     * @param  string  $url
+     * @return string
+     */
+    public function fakePost($url)
+    {
+        return self::FAKE_REQUEST_BASE.'POST:'.$url;
+    }
+
+    /**
+     * Build a string to only allow 'PUT' requests to a faked URL.
+     *
+     * @param  string  $url
+     * @return string
+     */
+    public function fakePut($url)
+    {
+        return self::FAKE_REQUEST_BASE.'PUT:'.$url;
+    }
+
+    /**
+     * Build a string to only allow 'PATCH' requests to a faked URL.
+     *
+     * @param  string  $url
+     * @return string
+     */
+    public function fakePatch($url)
+    {
+        return self::FAKE_REQUEST_BASE.'PATCH:'.$url;
+    }
+
+    /**
+     * Build a string to only allow 'DELETE' requests to a faked URL.
+     *
+     * @param  string  $url
+     * @return string
+     */
+    public function fakeDelete($url)
+    {
+        return self::FAKE_REQUEST_BASE.'POST:'.$url;
     }
 
     /**
