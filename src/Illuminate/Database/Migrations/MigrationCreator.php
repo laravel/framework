@@ -50,11 +50,12 @@ class MigrationCreator
      * @param  string  $path
      * @param  string|null  $table
      * @param  bool  $create
+     * @param  string|null  $prefix
      * @return string
      *
      * @throws \Exception
      */
-    public function create($name, $path, $table = null, $create = false)
+    public function create($name, $path, $table = null, $create = false, $prefix = null)
     {
         $this->ensureMigrationDoesntAlreadyExist($name, $path);
 
@@ -63,7 +64,7 @@ class MigrationCreator
         // various place-holders, save the file, and run the post create event.
         $stub = $this->getStub($table, $create);
 
-        $path = $this->getPath($name, $path);
+        $path = $this->getPath($name, $path, $prefix);
 
         $this->files->ensureDirectoryExists(dirname($path));
 
@@ -167,11 +168,14 @@ class MigrationCreator
      *
      * @param  string  $name
      * @param  string  $path
+     * @param  string|null  $prefix
      * @return string
      */
-    protected function getPath($name, $path)
+    protected function getPath($name, $path, $prefix)
     {
-        return $path.'/'.$this->getDatePrefix().'_'.$name.'.php';
+        return is_null($prefix)
+            ? $path.'/'.$this->getDatePrefix().'_'.$name.'.php'
+            : $path.'/'.$prefix.'_'.$name.'.php';
     }
 
     /**

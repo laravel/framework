@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Console\Migrations;
 
 use Illuminate\Database\Migrations\MigrationCreator;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Composer;
 use Illuminate\Support\Str;
 
@@ -17,6 +18,7 @@ class MigrateMakeCommand extends BaseCommand
         {--create= : The table to be created}
         {--table= : The table to migrate}
         {--path= : The location where the migration file should be created}
+        {--before= : The name of table the migration file should be created before that}
         {--realpath : Indicate any provided migration file paths are pre-resolved absolute paths}
         {--fullpath : Output the full path of the migration}';
 
@@ -107,7 +109,11 @@ class MigrateMakeCommand extends BaseCommand
     protected function writeMigration($name, $table, $create)
     {
         $file = $this->creator->create(
-            $name, $this->getMigrationPath(), $table, $create
+            $name,
+            $this->getMigrationPath(),
+            $table,
+            $create,
+            $this->getMigrationPrefix()
         );
 
         if (! $this->option('fullpath')) {
@@ -131,5 +137,28 @@ class MigrateMakeCommand extends BaseCommand
         }
 
         return parent::getMigrationPath();
+    }
+
+    protected function getMigrationPrefix()
+    {
+        $before = $this->option('before');
+
+        if (! $before) {
+            return null;
+        }
+
+        $migrations = $this->creator->getFilesystem()->files($this->getMigrationPath());
+
+        foreach ($migrations as $migration) {
+            if (str_contains($migration->getFilename(), $before)) {
+                preg_match('/[0-9\_]*/', $migration->getFilename(), $timestamp);
+
+                $time = Carbon::createFromFormat('Y_m_d_His', trim($timestamp[0], '_'));
+
+                return $time->subSecond()->format('Y_m_d_His');
+            }
+        }
+
+        $this->components->alert(sprintf('Migration [%s] not found.', $before));
     }
 }
