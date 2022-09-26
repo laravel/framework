@@ -1235,7 +1235,7 @@ class Str
      */
     public static function orderedUuid()
     {
-        return Str::uuid();
+        return Uuid::uuid7();
     }
 
     /**
