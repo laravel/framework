@@ -181,8 +181,7 @@ trait ManagesFrequencies
      */
     public function everyOddHour()
     {
-        return $this->spliceIntoPosition(1, 0)
-            ->spliceIntoPosition(2, '1-23/2');
+        return $this->spliceIntoPosition(1, 0)->spliceIntoPosition(2, '1-23/2');
     }
 
     /**
