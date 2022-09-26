@@ -205,7 +205,7 @@ class Arr
 
         return value($default);
     }
-    
+
     /**
      * Return the first non-empty element in an array using a list of keys.
      *
@@ -219,17 +219,17 @@ class Arr
         if (! static::accessible($array) || $array === []) {
             return value($default);
         }
-        
+
         $keys = (array) $keys;
-        
+
         foreach ($keys as $key) {
             $value = static::get($array, $key);
-            
+
             if (! empty($value)) {
                 return $value;
             }
         }
-        
+
         return value($default);
     }
 
