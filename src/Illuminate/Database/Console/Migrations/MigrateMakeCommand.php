@@ -18,7 +18,7 @@ class MigrateMakeCommand extends BaseCommand
         {--create= : The table to be created}
         {--table= : The table to migrate}
         {--path= : The location where the migration file should be created}
-        {--before= : The name of table the migration file should be created before that}
+        {--before= : The name of the table that this migration should precede}
         {--realpath : Indicate any provided migration file paths are pre-resolved absolute paths}
         {--fullpath : Output the full path of the migration}';
 
