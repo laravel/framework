@@ -4,6 +4,7 @@ namespace Illuminate\Notifications\Messages;
 
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Notifications\Action;
+use Illuminate\Support\HtmlString;
 
 class SimpleMessage
 {
@@ -203,7 +204,75 @@ class SimpleMessage
 
         return $this;
     }
-
+    
+    /**
+     * Add an unordered list to the notification
+     * @param  iterable  $lines
+     * @return $this
+     */
+    public function unorderedList($lines)
+    {
+        $this->line(new HtmlString('<ul>'));
+        
+        foreach($lines as $line) {
+            $this->line(new HtmlString("<li>{$line}</li>");
+        }
+                        
+        $this->line(new HtmlString('</ul>'));
+                        
+        return $this;
+    }
+                        
+    /**
+     * Add an unorderedList to the notification if the given condition is true.
+     *
+     * @param  bool  $boolean
+     * @param  iterable  $lines
+     * @return $this
+     */       
+    public function unorderedListIf($boolean, $lines)
+    {
+        if ($boolean) {
+            return $this->unorderedList($lines);   
+        }
+        
+        return $this;
+    }
+                        
+    /**
+     * Add an ordered list to the notification
+     * @param iterable  $lines
+     * @return $this
+     */
+    public function orderedList($lines)
+    {
+        $this->line(new HtmlString('<ol>'));
+        
+        foreach($lines as $line) {
+            $this->line(new HtmlString("<li>{$line}</li>");
+        }
+                        
+        $this->line(new HtmlString('</ol>'));
+                        
+        return $this;
+    }
+     
+    /**
+     * Add an ordered list to the notification if the given condition is true.
+     *
+     * @param  bool  $boolean
+     * @param  iterable  $lines
+     * @return $this
+     */
+    public function orderedListIf($boolean, $lines)
+    {
+        if ($boolean) {
+            return $this->orderedList($lines);   
+        }
+        
+        return $this;
+    }
+                        
     /**
      * Add a line of text to the notification.
      *
