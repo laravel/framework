@@ -28,8 +28,8 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     /**
      * Send the given notification to the given notifiable entities.
      *
-     * @param  \Illuminate\Support\Collection|array|mixed  $notifiables
-     * @param  mixed  $notification
+     * @param \Illuminate\Support\Collection|array|mixed $notifiables
+     * @param mixed $notification
      * @return void
      */
     public function send($notifiables, $notification)
@@ -40,11 +40,41 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     }
 
     /**
+     * Send the given notification to the given notifiable entities, if the given truth test passes.
+     *
+     * @param bool $boolean
+     * @param \Illuminate\Support\Collection|array|mixed $notifiables
+     * @param mixed $notification
+     * @return void
+     */
+    public function sendIf($boolean, $notifiables, $notification)
+    {
+        if ($boolean) {
+            $this->send($notifiables, $notification);
+        }
+    }
+
+    /**
+     * Send the given notification to the given notifiable entities unless the given truth test passes.
+     *
+     * @param bool $boolean
+     * @param \Illuminate\Support\Collection|array|mixed $notifiables
+     * @param mixed $notification
+     * @return void
+     */
+    public function sendUnless($boolean, $notifiables, $notification)
+    {
+        if (!$boolean) {
+            $this->send($notifiables, $notification);
+        }
+    }
+
+    /**
      * Send the given notification immediately.
      *
-     * @param  \Illuminate\Support\Collection|array|mixed  $notifiables
-     * @param  mixed  $notification
-     * @param  array|null  $channels
+     * @param \Illuminate\Support\Collection|array|mixed $notifiables
+     * @param mixed $notification
+     * @param array|null $channels
      * @return void
      */
     public function sendNow($notifiables, $notification, array $channels = null)
@@ -54,10 +84,43 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
         )->sendNow($notifiables, $notification, $channels);
     }
 
+
+    /**
+     * Send the given notification immediately. if the given truth test passes.
+     *
+     * @param bool $boolean
+     * @param \Illuminate\Support\Collection|array|mixed $notifiables
+     * @param mixed $notification
+     * @param array|null $channels
+     * @return void
+     */
+    public function sendNowIf($boolean, $notifiables, $notification, array $channels = null)
+    {
+        if ($boolean) {
+            $this->sendNow($notifiables, $notification, $channels);
+        }
+    }
+
+    /**
+     * Send the given notification immediately. unless the given truth test passes.
+     *
+     * @param bool $boolean
+     * @param \Illuminate\Support\Collection|array|mixed $notifiables
+     * @param mixed $notification
+     * @param array|null $channels
+     * @return void
+     */
+    public function sendNowUnless($boolean, $notifiables, $notification, array $channels = null)
+    {
+        if (!$boolean) {
+            $this->sendNow($notifiables, $notification, $channels);
+        }
+    }
+
     /**
      * Get a channel instance.
      *
-     * @param  string|null  $name
+     * @param string|null $name
      * @return mixed
      */
     public function channel($name = null)
@@ -98,7 +161,7 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     /**
      * Create a new driver instance.
      *
-     * @param  string  $driver
+     * @param string $driver
      * @return mixed
      *
      * @throws \InvalidArgumentException
@@ -139,7 +202,7 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     /**
      * Set the default channel driver name.
      *
-     * @param  string  $channel
+     * @param string $channel
      * @return void
      */
     public function deliverVia($channel)
@@ -150,7 +213,7 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     /**
      * Set the locale of notifications.
      *
-     * @param  string  $locale
+     * @param string $locale
      * @return $this
      */
     public function locale($locale)
