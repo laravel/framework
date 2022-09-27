@@ -68,7 +68,7 @@ abstract class Factory
      *
      * @var \Illuminate\Support\Collection
      */
-    public $recycle;
+    protected $recycle;
 
     /**
      * The "after making" callbacks that will be applied to the model.
@@ -138,7 +138,7 @@ abstract class Factory
                                 ?Collection $for = null,
                                 ?Collection $afterMaking = null,
                                 ?Collection $afterCreating = null,
-                                $connection = null,
+        $connection = null,
                                 ?Collection $recycle = null)
     {
         $this->count = $count;
@@ -464,9 +464,8 @@ abstract class Factory
         return collect($definition)
             ->map($evaluateRelations = function ($attribute) {
                 if ($attribute instanceof self) {
-                    $attribute = $this->recycle->has($attribute->modelName())
-                            ? $this->recycle->get($attribute->modelName())
-                            : $attribute->recycle($this->recycle)->create()->getKey();
+                    $attribute = $this->getRandomRecycledModel($attribute->modelName())
+                        ?? $attribute->recycle($this->recycle)->create()->getKey();
                 } elseif ($attribute instanceof Model) {
                     $attribute = $attribute->getKey();
                 }
@@ -593,10 +592,10 @@ abstract class Factory
                 $factory,
                 $pivot,
                 $relationship ?? Str::camel(Str::plural(class_basename(
-                    $factory instanceof Factory
-                        ? $factory->modelName()
-                        : Collection::wrap($factory)->first()
-                )))
+                $factory instanceof Factory
+                    ? $factory->modelName()
+                    : Collection::wrap($factory)->first()
+            )))
             )]),
         ]);
     }
@@ -613,25 +612,39 @@ abstract class Factory
         return $this->newInstance(['for' => $this->for->concat([new BelongsToRelationship(
             $factory,
             $relationship ?? Str::camel(class_basename(
-                $factory instanceof Factory ? $factory->modelName() : $factory
-            ))
+            $factory instanceof Factory ? $factory->modelName() : $factory
+        ))
         )])]);
     }
 
     /**
-     * Provide a model instance to use instead of any nested factory calls when creating relationships.
+     * Provide model instances to use instead of any nested factory calls when creating relationships.
      *
      * @param  \Illuminate\Eloquent\Model|\Illuminate\Support\Collection|array  $model
      * @return static
      */
     public function recycle($model)
     {
+        // Group provided models by the type and merge them into existing recycle collection
         return $this->newInstance([
-            'recycle' => $this->recycle->merge(
-                Collection::wrap($model instanceof Model ? func_get_args() : $model)
-                    ->keyBy(fn ($model) => get_class($model))
-            ),
+            'recycle' => $this->recycle
+                ->flatten()
+                ->merge(
+                    Collection::wrap($model instanceof Model ? func_get_args() : $model)
+                        ->flatten()
+                )->groupBy(fn ($model) => get_class($model))
         ]);
+    }
+
+    /**
+     * Retrieves a random model of a given type from previously provided models to recycle.
+     *
+     * @param  string  $modelClassName
+     * @return  \Illuminate\Database\Eloquent\Model|null
+     */
+    public function getRandomRecycledModel($modelClassName)
+    {
+        return $this->recycle->get($modelClassName)?->random();
     }
 
     /**
@@ -759,8 +772,8 @@ abstract class Factory
             $appNamespace = static::appNamespace();
 
             return class_exists($appNamespace.'Models\\'.$namespacedFactoryBasename)
-                        ? $appNamespace.'Models\\'.$namespacedFactoryBasename
-                        : $appNamespace.$factoryBasename;
+                ? $appNamespace.'Models\\'.$namespacedFactoryBasename
+                : $appNamespace.$factoryBasename;
         };
 
         return $this->model ?? $resolver($this);
@@ -852,8 +865,8 @@ abstract class Factory
     {
         try {
             return Container::getInstance()
-                            ->make(Application::class)
-                            ->getNamespace();
+                ->make(Application::class)
+                ->getNamespace();
         } catch (Throwable $e) {
             return 'App\\';
         }
