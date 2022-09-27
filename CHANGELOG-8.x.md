@@ -1,6 +1,15 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.83.23...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.83.24...8.x)
+
+
+## [v8.83.24 (2022-09-22)](https://github.com/laravel/framework/compare/v8.83.23...v8.83.24)
+
+### Fixed
+- Avoid Passing null to parameter exception on PHP 8.1 ([#43951](https://github.com/laravel/framework/pull/43951))
+
+### Changed
+- Patch for timeless timing attack vulnerability in user login ([#44069](https://github.com/laravel/framework/pull/44069))
 
 
 ## [v8.83.23 (2022-07-26)](https://github.com/laravel/framework/compare/v8.83.22...v8.83.23)
