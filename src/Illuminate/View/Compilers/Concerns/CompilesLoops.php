@@ -191,4 +191,52 @@ trait CompilesLoops
     {
         return '<?php endwhile; ?>';
     }
+
+    /**
+     * Compile the continueIf statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     *
+     */
+    protected function compileContinueIf($expression)
+    {
+        return "<?php if{$expression} continue; ?>";
+    }
+
+    /**
+     * Compile the breakIf statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     *
+     */
+    protected function compileBreakIf($expression)
+    {
+        return "<?php if{$expression} break; ?>";
+    }
+
+    /**
+     * Compile the continueUnless statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     *
+     */
+    protected function compileContinueUnless($expression)
+    {
+        return "<?php if(!$expression) continue; ?>";
+    }
+
+    /**
+     * Compile the breakUnless statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     *
+     */
+    protected function compileBreakUnless($expression)
+    {
+        return "<?php if(!$expression) break; ?>";
+    }
 }

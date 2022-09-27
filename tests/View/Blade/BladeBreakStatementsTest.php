@@ -68,4 +68,30 @@ test
 <?php endfor; ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
+
+    public function testBreakIfStatementsAreCompiled()
+    {
+        $string = '@for ($i = 0; $i < 10; $i++)
+test
+@breakIf($i == 2)
+@endfor';
+        $expected = '<?php for($i = 0; $i < 10; $i++): ?>
+test
+<?php if($i == 2) break; ?>
+<?php endfor; ?>';
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
+    public function testBreakUnlessStatementsAreCompiled()
+    {
+        $string = '@for ($i = 0; $i < 10; $i++)
+test
+@breakUnless($i == 2)
+@endfor';
+        $expected = '<?php for($i = 0; $i < 10; $i++): ?>
+test
+<?php if(!($i == 2)) break; ?>
+<?php endfor; ?>';
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
 }
