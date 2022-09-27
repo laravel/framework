@@ -63,6 +63,15 @@ class SupportTestingMailFakeTest extends TestCase
         });
     }
 
+    public function testAssertCc()
+    {
+        $this->fake->cc('taylor@laravel.com')->send($this->mailable);
+
+        $this->fake->assertSent(MailableStub::class, function ($mail) {
+            return $mail->hasCc('taylor@laravel.com');
+        });
+    }
+
     public function testAssertBcc()
     {
         $this->fake->bcc('taylor@laravel.com')->send($this->mailable);
