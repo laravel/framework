@@ -37,6 +37,15 @@ trait ResolvesDumpSource
             $relativeFile = substr($file, strlen($this->basePath) + 1);
         }
 
+        if(str_starts_with($relativeFile,"storage/framework/views/")){
+            $fileArr = file($file);
+            $lastLine = end($fileArr);
+
+            $result = str_replace("<"."?php /**PATH ", "", $lastLine);
+            $result = str_replace(" ENDPATH**/ ?>", "", $result);
+            $relativeFile = substr($result, strlen($this->basePath) + 1);
+        }
+
         return [$file, $relativeFile, $line];
     }
 
