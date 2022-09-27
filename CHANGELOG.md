@@ -1,6 +1,37 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.31.0...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.32.0...9.x)
+
+
+## [v9.32.0](https://github.com/laravel/framework/compare/v9.31.0...v9.32.0) - 2022-09-27
+
+### Added
+- New env:encrypt and env:decrypt commands ([#44034](https://github.com/laravel/framework/pull/44034))
+- Share WithoutOverlapping key across jobs ([#44227](https://github.com/laravel/framework/pull/44227))
+- Add missing citext type mapping to `Illuminate/Database/Console/DatabaseInspectionCommand::$typeMappings` ([#44237](https://github.com/laravel/framework/pull/44237))
+- Short attribute syntax for Blade Components ([#44217](https://github.com/laravel/framework/pull/44217))
+- Adds source file to dd function output ([#44211](https://github.com/laravel/framework/pull/44211))
+- Add methods to get request data as integer or float ([#44239](https://github.com/laravel/framework/pull/44239))
+- Adds Eloquent User Provider query handler ([#44226](https://github.com/laravel/framework/pull/44226))
+- Added `Illuminate/Support/Testing/Fakes/BusFake::dispatchFakeBatch()` ([#44176](https://github.com/laravel/framework/pull/44176))
+- Added methods to cast Stringables ([#44238](https://github.com/laravel/framework/pull/44238))
+- Added `Illuminate/Routing/UrlGenerator::withKeyResolver()` ([#44254](https://github.com/laravel/framework/pull/44254))
+- Add a hook to the serialisation of collections ([#44272](https://github.com/laravel/framework/pull/44272))
+- Allow enum route bindings to have default values ([#44255](https://github.com/laravel/framework/pull/44255))
+- Added benchmark utility class ([b4293d7](https://github.com/laravel/framework/commit/b4293d7c18b08b363ac0af64ec04fb1d559b4698), [#44297](https://github.com/laravel/framework/pull/44297))
+- Added `Illuminate/Console/Scheduling/ManagesFrequencies::everyOddHour()` ([#44288](https://github.com/laravel/framework/pull/44288))
+
+### Fixed
+- Fix incrementing string keys ([#44247](https://github.com/laravel/framework/pull/44247))
+- Fix bug in Fluent Class with named arguments in migrations ([#44251](https://github.com/laravel/framework/pull/44251))
+- Fix "about" command caching report ([#44305](https://github.com/laravel/framework/pull/44305))
+- Fixes memory leaks ([#44306](https://github.com/laravel/framework/pull/44306), [#44307](https://github.com/laravel/framework/pull/44307))
+
+### Changed
+- Patch for timeless timing attack vulnerability in user login ([#44069](https://github.com/laravel/framework/pull/44069))
+- Refactor: register commands in artisan service ([#44257](https://github.com/laravel/framework/pull/44257))
+- Allow factories to recycle models with for method ([#44265](https://github.com/laravel/framework/pull/44265))
+- Use dedicated method for placeholder replacement in validator ([#44296](https://github.com/laravel/framework/pull/44296))
 
 
 ## [v9.31.0](https://github.com/laravel/framework/compare/v9.30.1...v9.31.0) - 2022-09-20
