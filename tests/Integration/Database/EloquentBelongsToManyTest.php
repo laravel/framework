@@ -491,6 +491,8 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testFirstOrNewMethod()
     {
+        Model::preventSilentlyDiscardingAttributes(false);
+
         $post = Post::create(['title' => Str::random()]);
 
         $tag = Tag::create(['name' => Str::random()]);
@@ -501,6 +503,8 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
         $this->assertNull($post->tags()->firstOrNew(['id' => 666])->id);
         $this->assertInstanceOf(Tag::class, $post->tags()->firstOrNew(['id' => 666]));
+
+        Model::preventSilentlyDiscardingAttributes(true);
     }
 
     // public function testFirstOrNewUnrelatedExisting()
@@ -608,6 +612,8 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testUpdateOrCreateMethod()
     {
+        Model::preventSilentlyDiscardingAttributes(false);
+
         $post = Post::create(['title' => Str::random()]);
 
         $tag = Tag::create(['name' => Str::random()]);
@@ -619,6 +625,8 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
         $post->tags()->updateOrCreate(['id' => 666], ['name' => 'dives']);
         $this->assertNotNull($post->tags()->whereName('dives')->first());
+
+        Model::preventSilentlyDiscardingAttributes(true);
     }
 
     public function testUpdateOrCreateUnrelatedExisting()
