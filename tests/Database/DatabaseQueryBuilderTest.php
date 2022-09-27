@@ -2507,6 +2507,22 @@ class DatabaseQueryBuilderTest extends TestCase
         });
         $results = $builder->from('users')->sum('id');
         $this->assertEquals(1, $results);
+
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('select')->once()->with('select avg("id") as aggregate from "users"', [], true)->andReturn([['aggregate' => 1]]);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) {
+            return $results;
+        });
+        $results = $builder->from('users')->avg('id');
+        $this->assertEquals(1, $results);
+
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('select')->once()->with('select avg("id") as aggregate from "users"', [], true)->andReturn([['aggregate' => 1]]);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) {
+            return $results;
+        });
+        $results = $builder->from('users')->average('id');
+        $this->assertEquals(1, $results);
     }
 
     public function testSqlServerExists()
