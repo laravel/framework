@@ -179,7 +179,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      *
      * @var bool
      */
-    protected static $modelsShouldPreventSilentlyDiscardingAttributes = false;
+    protected static $modelsShouldPreventSilentlyDiscardingAttributes = true;
 
     /**
      * Indicates if broadcasting is currently enabled.
