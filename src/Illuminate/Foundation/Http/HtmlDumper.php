@@ -132,7 +132,7 @@ class HtmlDumper extends BaseHtmlDumper
             );
         }
 
-        return sprintf('<span style="color: #A0A0A0; font-family: Menlo"> // %s</span>', $source);
+        return sprintf('<span style="color: #A0A0A0;"> // %s</span>', $source);
     }
 
     /**

@@ -25,7 +25,7 @@ class HtmlDumperTest extends TestCase
     {
         $output = $this->dump('string');
 
-        $expected = "string</span>\"<span style=\"color: #A0A0A0; font-family: Menlo\"> // app/routes/console.php:18</span>\n</pre>";
+        $expected = "string</span>\"<span style=\"color: #A0A0A0;\"> // app/routes/console.php:18</span>\n</pre>";
 
         $this->assertStringContainsString($expected, $output);
     }
@@ -34,7 +34,7 @@ class HtmlDumperTest extends TestCase
     {
         $output = $this->dump(1);
 
-        $expected = "1</span><span style=\"color: #A0A0A0; font-family: Menlo\"> // app/routes/console.php:18</span>\n</pre>";
+        $expected = "1</span><span style=\"color: #A0A0A0;\"> // app/routes/console.php:18</span>\n</pre>";
 
         $this->assertStringContainsString($expected, $output);
     }
@@ -43,7 +43,7 @@ class HtmlDumperTest extends TestCase
     {
         $output = $this->dump(1.1);
 
-        $expected = "1.1</span><span style=\"color: #A0A0A0; font-family: Menlo\"> // app/routes/console.php:18</span>\n</pre>";
+        $expected = "1.1</span><span style=\"color: #A0A0A0;\"> // app/routes/console.php:18</span>\n</pre>";
 
         $this->assertStringContainsString($expected, $output);
     }
@@ -52,7 +52,7 @@ class HtmlDumperTest extends TestCase
     {
         $output = $this->dump(['string', 1, 1.1, ['string', 1, 1.1]]);
 
-        $expected = '<samp data-depth=1 class=sf-dump-expanded><span style="color: #A0A0A0; font-family: Menlo"> // app/routes/console.php:18</span>';
+        $expected = '<samp data-depth=1 class=sf-dump-expanded><span style="color: #A0A0A0;"> // app/routes/console.php:18</span>';
 
         $this->assertStringContainsString($expected, $output);
     }
@@ -61,7 +61,7 @@ class HtmlDumperTest extends TestCase
     {
         $output = $this->dump(true);
 
-        $expected = "true</span><span style=\"color: #A0A0A0; font-family: Menlo\"> // app/routes/console.php:18</span>\n</pre>";
+        $expected = "true</span><span style=\"color: #A0A0A0;\"> // app/routes/console.php:18</span>\n</pre>";
 
         $this->assertStringContainsString($expected, $output);
     }
@@ -73,7 +73,7 @@ class HtmlDumperTest extends TestCase
 
         $output = $this->dump($user);
 
-        $expected = '<samp data-depth=1 class=sf-dump-expanded><span style="color: #A0A0A0; font-family: Menlo"> // app/routes/console.php:18</span>';
+        $expected = '<samp data-depth=1 class=sf-dump-expanded><span style="color: #A0A0A0;"> // app/routes/console.php:18</span>';
 
         $this->assertStringContainsString($expected, $output);
     }
@@ -82,7 +82,7 @@ class HtmlDumperTest extends TestCase
     {
         $output = $this->dump(null);
 
-        $expected = "null</span><span style=\"color: #A0A0A0; font-family: Menlo\"> // app/routes/console.php:18</span>\n</pre>";
+        $expected = "null</span><span style=\"color: #A0A0A0;\"> // app/routes/console.php:18</span>\n</pre>";
 
         $this->assertStringContainsString($expected, $output);
     }
