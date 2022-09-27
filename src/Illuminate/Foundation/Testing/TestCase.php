@@ -18,6 +18,7 @@ use Mockery;
 use Mockery\Exception\InvalidCountException;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase as BaseTestCase;
+use PHPUnit\Util\Annotation\Registry;
 use ReflectionProperty;
 use Throwable;
 
@@ -237,6 +238,11 @@ abstract class TestCase extends BaseTestCase
     public static function tearDownAfterClass(): void
     {
         static::$latestResponse = null;
+
+        (function () {
+            $this->classDocBlocks = [];
+            $this->methodDocBlocks = [];
+        })->call(Registry::getInstance());
     }
 
     /**
