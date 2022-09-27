@@ -282,7 +282,7 @@ class Builder implements BuilderContract
 
             $this->query->addNestedWhereQuery($query->getQuery(), $boolean);
         } else {
-            $this->query->where(...func_get_args());
+            $this->query->where($column, $operator, $value, $boolean);
         }
 
         return $this;
