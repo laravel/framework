@@ -34,19 +34,32 @@ trait ResolvesDumpSource
         $relativeFile = $file;
 
         if (str_starts_with($file, $this->basePath)) {
-            $relativeFile = substr($file, strlen($this->basePath) + 1);
+            $relativeFile = $this->getAbsolutePath($file);
         }
 
-        if (str_starts_with($relativeFile, 'storage/framework/views/')) {
+        $viewPath = $this->getAbsolutePath(config('view.compiled'));
+
+        if (str_starts_with($relativeFile, $viewPath)) {
             $fileArr = file($file);
             $lastLine = end($fileArr);
 
             $result = str_replace('<'.'?php /**PATH ', '', $lastLine);
             $result = str_replace(' ENDPATH**/ ?>', '', $result);
-            $relativeFile = substr($result, strlen($this->basePath) + 1);
+            $relativeFile = $this->getAbsolutePath($result);
         }
 
         return [$file, $relativeFile, $line];
+    }
+
+    /**
+     * Resolve the source of the dump call.
+     *
+     * @param string $path
+     * @return string
+     */
+    public function getAbsolutePath(string $path): string
+    {
+        return substr($path, strlen($this->basePath) + 1);
     }
 
     /**
