@@ -41,7 +41,7 @@ trait ResolvesDumpSource
             $fileArr = file($file);
             $lastLine = end($fileArr);
 
-            $result = str_replace('<' . '?php /**PATH ', '', $lastLine);
+            $result = str_replace('<'.'?php /**PATH ', '', $lastLine);
             $result = str_replace(' ENDPATH**/ ?>', '', $result);
             $relativeFile = substr($result, strlen($this->basePath) + 1);
         }
