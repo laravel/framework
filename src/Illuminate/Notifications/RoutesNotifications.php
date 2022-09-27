@@ -19,6 +19,34 @@ trait RoutesNotifications
     }
 
     /**
+     * Send the given notification if the given truth test passes.
+     *
+     * @param  bool  $boolean
+     * @param  mixed  $instance
+     * @return void
+     */
+    public function notifyIf($boolean, $instance)
+    {
+        if($boolean){
+            app(Dispatcher::class)->send($this, $instance);
+        }
+    }
+
+    /**
+     * Send the given notification unless the given truth test passes.
+     *
+     * @param  bool  $boolean
+     * @param  mixed  $instance
+     * @return void
+     */
+    public function notifyUnless($boolean, $instance)
+    {
+        if(! $boolean){
+            app(Dispatcher::class)->send($this, $instance);
+        }
+    }
+
+    /**
      * Send the given notification immediately.
      *
      * @param  mixed  $instance
@@ -28,6 +56,38 @@ trait RoutesNotifications
     public function notifyNow($instance, array $channels = null)
     {
         app(Dispatcher::class)->sendNow($this, $instance, $channels);
+    }
+
+    /**
+     * Send the given notification immediately if the given truth test passes.
+     *
+     * @param  bool  $boolean
+     * @param  mixed  $instance
+     * @param  array|null  $channels
+     * @return void
+     */
+    public function notifyNowIf($boolean, $instance, array $channels = null)
+    {
+        if($boolean)
+        {
+            app(Dispatcher::class)->sendNow($this, $instance, $channels);
+        }
+    }
+
+    /**
+     * Send the given notification immediately unless the given truth test passes.
+     *
+     * @param  bool  $boolean
+     * @param  mixed  $instance
+     * @param  array|null  $channels
+     * @return void
+     */
+    public function notifyNowUnless($boolean, $instance, array $channels = null)
+    {
+        if(! $boolean)
+        {
+            app(Dispatcher::class)->sendNow($this, $instance, $channels);
+        }
     }
 
     /**
