@@ -197,7 +197,6 @@ trait CompilesLoops
      *
      * @param  string  $expression
      * @return string
-     *
      */
     protected function compileContinueIf($expression)
     {
@@ -209,7 +208,6 @@ trait CompilesLoops
      *
      * @param  string  $expression
      * @return string
-     *
      */
     protected function compileBreakIf($expression)
     {
@@ -221,7 +219,6 @@ trait CompilesLoops
      *
      * @param  string  $expression
      * @return string
-     *
      */
     protected function compileContinueUnless($expression)
     {
@@ -233,7 +230,6 @@ trait CompilesLoops
      *
      * @param  string  $expression
      * @return string
-     *
      */
     protected function compileBreakUnless($expression)
     {
