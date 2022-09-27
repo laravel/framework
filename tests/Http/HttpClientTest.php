@@ -1622,7 +1622,7 @@ class HttpClientTest extends TestCase
         $this->factory->preventStrayRequests();
 
         $this->factory->fake([
-            $this->factory->fakeGet('https://forge.laravel.com') => Factory::response('GET', 200)
+            $this->factory->fakeGet('https://forge.laravel.com') => Factory::response('GET', 200),
         ]);
 
         $this->factory->post('https://forge.laravel.com')->body();
