@@ -121,7 +121,7 @@ class ListenerMakeCommand extends GeneratorCommand
     {
         return [
             ['event', 'e', InputOption::VALUE_OPTIONAL, 'The event class being listened for'],
-
+            ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the listener already exists'],
             ['queued', null, InputOption::VALUE_NONE, 'Indicates the event listener should be queued'],
         ];
     }

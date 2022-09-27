@@ -46,6 +46,15 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     protected $blockFor = null;
 
     /**
+     * The batch size to use when migrating delayed / expired jobs onto the primary queue.
+     *
+     * Negative values are infinite.
+     *
+     * @var int
+     */
+    protected $migrationBatchSize = -1;
+
+    /**
      * Create a new Redis queue instance.
      *
      * @param  \Illuminate\Contracts\Redis\Factory  $redis
@@ -54,6 +63,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      * @param  int  $retryAfter
      * @param  int|null  $blockFor
      * @param  bool  $dispatchAfterCommit
+     * @param  int  $migrationBatchSize
      * @return void
      */
     public function __construct(Redis $redis,
@@ -61,7 +71,8 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
                                 $connection = null,
                                 $retryAfter = 60,
                                 $blockFor = null,
-                                $dispatchAfterCommit = false)
+                                $dispatchAfterCommit = false,
+                                $migrationBatchSize = -1)
     {
         $this->redis = $redis;
         $this->default = $default;
@@ -69,6 +80,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
         $this->connection = $connection;
         $this->retryAfter = $retryAfter;
         $this->dispatchAfterCommit = $dispatchAfterCommit;
+        $this->migrationBatchSize = $migrationBatchSize;
     }
 
     /**
@@ -243,12 +255,13 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      *
      * @param  string  $from
      * @param  string  $to
+     * @param  int  $limit
      * @return array
      */
     public function migrateExpiredJobs($from, $to)
     {
         return $this->getConnection()->eval(
-            LuaScripts::migrateExpiredJobs(), 3, $from, $to, $to.':notify', $this->currentTime()
+            LuaScripts::migrateExpiredJobs(), 3, $from, $to, $to.':notify', $this->currentTime(), $this->migrationBatchSize
         );
     }
 

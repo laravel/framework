@@ -250,6 +250,16 @@ class PendingCommand
     }
 
     /**
+     * Assert that the command has the success exit code.
+     *
+     * @return $this
+     */
+    public function assertOk()
+    {
+        return $this->assertSuccessful();
+    }
+
+    /**
      * Assert that the command does not have the success exit code.
      *
      * @return $this

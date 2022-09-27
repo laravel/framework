@@ -9,6 +9,7 @@ use Illuminate\Http\File;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use League\Flysystem\FilesystemAdapter as FlysystemAdapter;
@@ -38,6 +39,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  */
 class FilesystemAdapter implements CloudFilesystemContract
 {
+    use Conditionable;
     use Macroable {
         __call as macroCall;
     }
@@ -90,10 +92,13 @@ class FilesystemAdapter implements CloudFilesystemContract
         $this->driver = $driver;
         $this->adapter = $adapter;
         $this->config = $config;
+        $separator = $config['directory_separator'] ?? DIRECTORY_SEPARATOR;
 
-        $this->prefixer = new PathPrefixer(
-            $config['root'] ?? '', $config['directory_separator'] ?? DIRECTORY_SEPARATOR
-        );
+        $this->prefixer = new PathPrefixer($config['root'] ?? '', $separator);
+
+        if (isset($config['prefix'])) {
+            $this->prefixer = new PathPrefixer($this->prefixer->prefixPath($config['prefix']), $separator);
+        }
     }
 
     /**

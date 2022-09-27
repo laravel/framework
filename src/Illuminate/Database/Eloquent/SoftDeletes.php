@@ -87,7 +87,7 @@ trait SoftDeletes
 
         $this->{$this->getDeletedAtColumn()} = $time;
 
-        if ($this->timestamps && ! is_null($this->getUpdatedAtColumn())) {
+        if ($this->usesTimestamps() && ! is_null($this->getUpdatedAtColumn())) {
             $this->{$this->getUpdatedAtColumn()} = $time;
 
             $columns[$this->getUpdatedAtColumn()] = $this->fromDateTime($time);
@@ -126,6 +126,16 @@ trait SoftDeletes
         $this->fireModelEvent('restored', false);
 
         return $result;
+    }
+
+    /**
+     * Restore a soft-deleted model instance without raising any events.
+     *
+     * @return bool|null
+     */
+    public function restoreQuietly()
+    {
+        return static::withoutEvents(fn () => $this->restore());
     }
 
     /**

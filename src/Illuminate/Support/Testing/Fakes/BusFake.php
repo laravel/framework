@@ -26,7 +26,21 @@ class BusFake implements QueueingDispatcher
      *
      * @var array
      */
-    protected $jobsToFake;
+    protected $jobsToFake = [];
+
+    /**
+     * The job types that should be dispatched instead of faked.
+     *
+     * @var array
+     */
+    protected $jobsToDispatch = [];
+
+    /**
+     * The fake repository to track batched jobs.
+     *
+     * @var \Illuminate\Bus\BatchRepository
+     */
+    protected $batchRepository;
 
     /**
      * The commands that have been dispatched.
@@ -66,8 +80,21 @@ class BusFake implements QueueingDispatcher
     public function __construct(QueueingDispatcher $dispatcher, $jobsToFake = [])
     {
         $this->dispatcher = $dispatcher;
-
         $this->jobsToFake = Arr::wrap($jobsToFake);
+        $this->batchRepository = new BatchRepositoryFake;
+    }
+
+    /**
+     * Specify the jobs that should be dispatched instead of faked.
+     *
+     * @param  array|string  $jobsToDispatch
+     * @return void
+     */
+    public function except($jobsToDispatch)
+    {
+        $this->jobsToDispatch = array_merge($this->jobsToDispatch, Arr::wrap($jobsToDispatch));
+
+        return $this;
     }
 
     /**
@@ -423,6 +450,16 @@ class BusFake implements QueueingDispatcher
     }
 
     /**
+     * Assert that no batched jobs were dispatched.
+     *
+     * @return void
+     */
+    public function assertNothingBatched()
+    {
+        PHPUnit::assertEmpty($this->batches, 'Batched jobs were dispatched unexpectedly.');
+    }
+
+    /**
      * Get all of the jobs matching a truth-test callback.
      *
      * @param  string  $command
@@ -624,7 +661,7 @@ class BusFake implements QueueingDispatcher
      */
     public function findBatch(string $batchId)
     {
-        //
+        return $this->batchRepository->find($batchId);
     }
 
     /**
@@ -639,6 +676,17 @@ class BusFake implements QueueingDispatcher
     }
 
     /**
+     * Dispatch an empty job batch for testing.
+     *
+     * @param  string  $name
+     * @return \Illuminate\Bus\Batch
+     */
+    public function dispatchFakeBatch($name = '')
+    {
+        return $this->batch([])->name($name)->dispatch();
+    }
+
+    /**
      * Record the fake pending batch dispatch.
      *
      * @param  \Illuminate\Bus\PendingBatch  $pendingBatch
@@ -648,7 +696,7 @@ class BusFake implements QueueingDispatcher
     {
         $this->batches[] = $pendingBatch;
 
-        return (new BatchRepositoryFake)->store($pendingBatch);
+        return $this->batchRepository->store($pendingBatch);
     }
 
     /**
@@ -659,6 +707,10 @@ class BusFake implements QueueingDispatcher
      */
     protected function shouldFakeJob($command)
     {
+        if ($this->shouldDispatchCommand($command)) {
+            return false;
+        }
+
         if (empty($this->jobsToFake)) {
             return true;
         }
@@ -668,6 +720,22 @@ class BusFake implements QueueingDispatcher
                 return $job instanceof Closure
                             ? $job($command)
                             : $job === get_class($command);
+            })->isNotEmpty();
+    }
+
+    /**
+     * Determine if a command should be dispatched or not.
+     *
+     * @param  mixed  $command
+     * @return bool
+     */
+    protected function shouldDispatchCommand($command)
+    {
+        return collect($this->jobsToDispatch)
+            ->filter(function ($job) use ($command) {
+                return $job instanceof Closure
+                    ? $job($command)
+                    : $job === get_class($command);
             })->isNotEmpty();
     }
 

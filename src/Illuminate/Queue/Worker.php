@@ -294,19 +294,15 @@ class Worker
      */
     protected function stopIfNecessary(WorkerOptions $options, $lastRestart, $startTime = 0, $jobsProcessed = 0, $job = null)
     {
-        if ($this->shouldQuit) {
-            return static::EXIT_SUCCESS;
-        } elseif ($this->memoryExceeded($options->memory)) {
-            return static::EXIT_MEMORY_LIMIT;
-        } elseif ($this->queueShouldRestart($lastRestart)) {
-            return static::EXIT_SUCCESS;
-        } elseif ($options->stopWhenEmpty && is_null($job)) {
-            return static::EXIT_SUCCESS;
-        } elseif ($options->maxTime && hrtime(true) / 1e9 - $startTime >= $options->maxTime) {
-            return static::EXIT_SUCCESS;
-        } elseif ($options->maxJobs && $jobsProcessed >= $options->maxJobs) {
-            return static::EXIT_SUCCESS;
-        }
+        return match (true) {
+            $this->shouldQuit => static::EXIT_SUCCESS,
+            $this->memoryExceeded($options->memory) => static::EXIT_MEMORY_LIMIT,
+            $this->queueShouldRestart($lastRestart) => static::EXIT_SUCCESS,
+            $options->stopWhenEmpty && is_null($job) => static::EXIT_SUCCESS,
+            $options->maxTime && hrtime(true) / 1e9 - $startTime >= $options->maxTime => static::EXIT_SUCCESS,
+            $options->maxJobs && $jobsProcessed >= $options->maxJobs => static::EXIT_SUCCESS,
+            default => null
+        };
     }
 
     /**
@@ -679,6 +675,10 @@ class Worker
     protected function listenForSignals()
     {
         pcntl_async_signals(true);
+
+        pcntl_signal(SIGQUIT, function () {
+            $this->shouldQuit = true;
+        });
 
         pcntl_signal(SIGTERM, function () {
             $this->shouldQuit = true;

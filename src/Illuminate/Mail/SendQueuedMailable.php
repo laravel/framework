@@ -6,10 +6,11 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Mail\Factory as MailFactory;
 use Illuminate\Contracts\Mail\Mailable as MailableContract;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
+use Illuminate\Queue\InteractsWithQueue;
 
 class SendQueuedMailable
 {
-    use Queueable;
+    use Queueable, InteractsWithQueue;
 
     /**
      * The mailable message instance.

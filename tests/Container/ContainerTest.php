@@ -116,6 +116,20 @@ class ContainerTest extends TestCase
         $this->assertSame($firstInstantiation, $secondInstantiation);
     }
 
+    public function testScopedIf()
+    {
+        $container = new Container;
+        $container->scopedIf('class', function () {
+            return 'foo';
+        });
+        $this->assertSame('foo', $container->make('class'));
+        $container->scopedIf('class', function () {
+            return 'bar';
+        });
+        $this->assertSame('foo', $container->make('class'));
+        $this->assertNotSame('bar', $container->make('class'));
+    }
+
     public function testScopedClosureResets()
     {
         $container = new Container;
@@ -199,11 +213,22 @@ class ContainerTest extends TestCase
     public function testArrayAccess()
     {
         $container = new Container;
+        $this->assertFalse(isset($container['something']));
         $container['something'] = function () {
             return 'foo';
         };
         $this->assertTrue(isset($container['something']));
+        $this->assertNotEmpty($container['something']);
         $this->assertSame('foo', $container['something']);
+        unset($container['something']);
+        $this->assertFalse(isset($container['something']));
+
+        //test offsetSet when it's not instanceof Closure
+        $container = new Container;
+        $container['something'] = 'text';
+        $this->assertTrue(isset($container['something']));
+        $this->assertNotEmpty($container['something']);
+        $this->assertSame('text', $container['something']);
         unset($container['something']);
         $this->assertFalse(isset($container['something']));
     }
@@ -262,6 +287,21 @@ class ContainerTest extends TestCase
         $instance = $container->make(ContainerDefaultValueStub::class);
         $this->assertInstanceOf(ContainerConcreteStub::class, $instance->stub);
         $this->assertSame('taylor', $instance->default);
+    }
+
+    public function testBound()
+    {
+        $container = new Container;
+        $container->bind(ContainerConcreteStub::class, function () {
+            //
+        });
+        $this->assertTrue($container->bound(ContainerConcreteStub::class));
+        $this->assertFalse($container->bound(IContainerContractStub::class));
+
+        $container = new Container;
+        $container->bind(IContainerContractStub::class, ContainerConcreteStub::class);
+        $this->assertTrue($container->bound(IContainerContractStub::class));
+        $this->assertFalse($container->bound(ContainerConcreteStub::class));
     }
 
     public function testUnsetRemoveBoundInstances()
@@ -441,6 +481,18 @@ class ContainerTest extends TestCase
         $this->assertSame('ConcreteStub', $container->getAlias('foo'));
     }
 
+    public function testGetAliasRecursive()
+    {
+        $container = new Container;
+        $container->alias('ConcreteStub', 'foo');
+        $container->alias('foo', 'bar');
+        $container->alias('bar', 'baz');
+        $this->assertSame('ConcreteStub', $container->getAlias('baz'));
+        $this->assertTrue($container->isAlias('baz'));
+        $this->assertTrue($container->isAlias('bar'));
+        $this->assertTrue($container->isAlias('foo'));
+    }
+
     public function testItThrowsExceptionWhenAbstractIsSameAsAlias()
     {
         $this->expectException('LogicException');
@@ -491,6 +543,16 @@ class ContainerTest extends TestCase
         });
 
         $this->assertEquals([1, 2, 3], $container->make('foo', [1, 2, 3]));
+    }
+
+    public function testResolvingWithArrayOfMixedParameters()
+    {
+        $container = new Container;
+        $instance = $container->make(ContainerMixedPrimitiveStub::class, ['first' => 1, 'last' => 2, 'third' => 3]);
+        $this->assertSame(1, $instance->first);
+        $this->assertInstanceOf(ContainerConcreteStub::class, $instance->stub);
+        $this->assertSame(2, $instance->last);
+        $this->assertFalse(isset($instance->third));
     }
 
     public function testResolvingWithUsingAnInterface()

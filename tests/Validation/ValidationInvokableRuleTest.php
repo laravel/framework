@@ -7,6 +7,7 @@ use Illuminate\Contracts\Validation\InvokableRule;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
+use Illuminate\Validation\InvokableValidationRule;
 use Illuminate\Validation\Validator;
 use PHPUnit\Framework\TestCase;
 
@@ -331,6 +332,85 @@ class ValidationInvokableRuleTest extends TestCase
                 'There are many errors.',
             ],
         ], $validator->messages()->messages());
+    }
+
+    public function testExplicitRuleCanUseInlineValidationMessages()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $rule = new class() implements InvokableRule
+        {
+            public $implicit = false;
+
+            public function __invoke($attribute, $value, $fail)
+            {
+                $fail('xxxx');
+            }
+        };
+
+        $validator = new Validator($trans, ['foo' => 'bar'], ['foo' => $rule], [$rule::class => ':attribute custom.']);
+
+        $this->assertFalse($validator->passes());
+        $this->assertSame([
+            'foo' => [
+                'foo custom.',
+            ],
+        ], $validator->messages()->messages());
+
+        $validator = new Validator($trans, ['foo' => 'bar'], ['foo' => $rule], ['foo.'.$rule::class => ':attribute custom with key.']);
+
+        $this->assertFalse($validator->passes());
+        $this->assertSame([
+            'foo' => [
+                'foo custom with key.',
+            ],
+        ], $validator->messages()->messages());
+    }
+
+    public function testImplicitRuleCanUseInlineValidationMessages()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $rule = new class() implements InvokableRule
+        {
+            public $implicit = true;
+
+            public function __invoke($attribute, $value, $fail)
+            {
+                $fail('xxxx');
+            }
+        };
+
+        $validator = new Validator($trans, ['foo' => ''], ['foo' => $rule], [$rule::class => ':attribute custom.']);
+
+        $this->assertFalse($validator->passes());
+        $this->assertSame([
+            'foo' => [
+                'foo custom.',
+            ],
+        ], $validator->messages()->messages());
+
+        $validator = new Validator($trans, ['foo' => ''], ['foo' => $rule], ['foo.'.$rule::class => ':attribute custom with key.']);
+
+        $this->assertFalse($validator->passes());
+        $this->assertSame([
+            'foo' => [
+                'foo custom with key.',
+            ],
+        ], $validator->messages()->messages());
+    }
+
+    public function testItCanReturnInvokableRule()
+    {
+        $rule = new class() implements InvokableRule
+        {
+            public function __invoke($attribute, $value, $fail)
+            {
+                $fail('xxxx');
+            }
+        };
+
+        $invokableValidationRule = InvokableValidationRule::make($rule);
+
+        $this->assertSame($rule, $invokableValidationRule->invokable());
     }
 
     private function getIlluminateArrayTranslator()

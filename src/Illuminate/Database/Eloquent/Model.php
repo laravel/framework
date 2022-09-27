@@ -175,6 +175,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected static $lazyLoadingViolationCallback;
 
     /**
+     * Indicates if an exception should be thrown instead of silently discarding non-fillable attributes.
+     *
+     * @var bool
+     */
+    protected static $modelsShouldPreventSilentlyDiscardingAttributes = false;
+
+    /**
      * Indicates if broadcasting is currently enabled.
      *
      * @var bool
@@ -393,6 +400,17 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Prevent non-fillable attributes from being silently discarded.
+     *
+     * @param  bool  $value
+     * @return void
+     */
+    public static function preventSilentlyDiscardingAttributes($value = true)
+    {
+        static::$modelsShouldPreventSilentlyDiscardingAttributes = $value;
+    }
+
+    /**
      * Execute a callback without broadcasting any model events for all model types.
      *
      * @param  callable  $callback
@@ -423,18 +441,29 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     {
         $totallyGuarded = $this->totallyGuarded();
 
-        foreach ($this->fillableFromArray($attributes) as $key => $value) {
+        $fillable = $this->fillableFromArray($attributes);
+
+        foreach ($fillable as $key => $value) {
             // The developers may choose to place some attributes in the "fillable" array
             // which means only those attributes may be set through mass assignment to
             // the model, and all others will just get ignored for security reasons.
             if ($this->isFillable($key)) {
                 $this->setAttribute($key, $value);
-            } elseif ($totallyGuarded) {
+            } elseif ($totallyGuarded || static::preventsSilentlyDiscardingAttributes()) {
                 throw new MassAssignmentException(sprintf(
                     'Add [%s] to fillable property to allow mass assignment on [%s].',
                     $key, get_class($this)
                 ));
             }
+        }
+
+        if (count($attributes) !== count($fillable) &&
+            static::preventsSilentlyDiscardingAttributes()) {
+            throw new MassAssignmentException(sprintf(
+                'Add fillable property [%s] to allow mass assignment on [%s].',
+                implode(', ', array_diff(array_keys($attributes), array_keys($fillable))),
+                get_class($this)
+            ));
         }
 
         return $this;
@@ -448,9 +477,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function forceFill(array $attributes)
     {
-        return static::unguarded(function () use ($attributes) {
-            return $this->fill($attributes);
-        });
+        return static::unguarded(fn () => $this->fill($attributes));
     }
 
     /**
@@ -551,7 +578,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Begin querying the model on the write connection.
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @return \Illuminate\Database\Eloquent\Builder
      */
     public static function onWriteConnection()
     {
@@ -987,9 +1014,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function saveQuietly(array $options = [])
     {
-        return static::withoutEvents(function () use ($options) {
-            return $this->save($options);
-        });
+        return static::withoutEvents(fn () => $this->save($options));
     }
 
     /**
@@ -1299,6 +1324,16 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         $this->fireModelEvent('deleted', false);
 
         return true;
+    }
+
+    /**
+     * Delete the model from the database without raising any events.
+     *
+     * @return bool
+     */
+    public function deleteQuietly()
+    {
+        return static::withoutEvents(fn () => $this->delete());
     }
 
     /**
@@ -1627,9 +1662,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function replicateQuietly(array $except = null)
     {
-        return static::withoutEvents(function () use ($except) {
-            return $this->replicate($except);
-        });
+        return static::withoutEvents(fn () => $this->replicate($except));
     }
 
     /**
@@ -1976,7 +2009,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     protected function resolveChildRouteBindingQuery($childType, $value, $field)
     {
-        $relationship = $this->{Str::plural(Str::camel($childType))}();
+        $relationship = $this->{$this->childRouteBindingRelationshipName($childType)}();
 
         $field = $field ?: $relationship->getRelated()->getRouteKeyName();
 
@@ -1988,6 +2021,17 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         return $relationship instanceof Model
                 ? $relationship->resolveRouteBindingQuery($relationship, $value, $field)
                 : $relationship->getRelated()->resolveRouteBindingQuery($relationship, $value, $field);
+    }
+
+    /**
+     * Retrieve the child route model binding relationship name for the given child type.
+     *
+     * @param  string  $childType
+     * @return string
+     */
+    protected function childRouteBindingRelationshipName($childType)
+    {
+        return Str::plural(Str::camel($childType));
     }
 
     /**
@@ -2044,6 +2088,16 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public static function preventsLazyLoading()
     {
         return static::$modelsShouldPreventLazyLoading;
+    }
+
+    /**
+     * Determine if discarding guarded attribute fills is disabled.
+     *
+     * @return bool
+     */
+    public static function preventsSilentlyDiscardingAttributes()
+    {
+        return static::$modelsShouldPreventSilentlyDiscardingAttributes;
     }
 
     /**

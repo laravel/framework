@@ -917,6 +917,18 @@ class SupportCollectionTest extends TestCase
         })->all());
     }
 
+    public function testAdd()
+    {
+        $c = new Collection([]);
+        $this->assertEquals([1], $c->add(1)->values()->all());
+        $this->assertEquals([1, 2], $c->add(2)->values()->all());
+        $this->assertEquals([1, 2, ''], $c->add('')->values()->all());
+        $this->assertEquals([1, 2, '', null], $c->add(null)->values()->all());
+        $this->assertEquals([1, 2, '', null, false], $c->add(false)->values()->all());
+        $this->assertEquals([1, 2, '', null, false, []], $c->add([])->values()->all());
+        $this->assertEquals([1, 2, '', null, false, [], 'name'], $c->add('name')->values()->all());
+    }
+
     /**
      * @dataProvider collectionClassProvider
      */
@@ -1237,6 +1249,15 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testValuesResetKey($collection)
+    {
+        $data = new $collection([1 => 'a', 2 => 'b', 3 => 'c']);
+        $this->assertEquals([0 => 'a', 1 => 'b', 2 => 'c'], $data->values()->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testValue($collection)
     {
         $c = new $collection([['id' => 1, 'name' => 'Hello'], ['id' => 2, 'name' => 'World']]);
@@ -1421,6 +1442,12 @@ class SupportCollectionTest extends TestCase
     {
         $c = new $collection(['a', 'b', 'c']);
         $this->assertEquals(['a', 'd', 'e'], $c->replace([1 => 'd', 2 => 'e'])->all());
+
+        $c = new $collection(['a', 'b', 'c']);
+        $this->assertEquals(['a', 'd', 'e', 'f', 'g'], $c->replace([1 => 'd', 2 => 'e', 3 => 'f', 4 => 'g'])->all());
+
+        $c = new $collection(['name' => 'amir', 'family' => 'otwell']);
+        $this->assertEquals(['name' => 'taylor', 'family' => 'otwell', 'age' => 26], $c->replace(['name' => 'taylor', 'age' => 26])->all());
     }
 
     /**
@@ -1432,6 +1459,18 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(
             ['a', 'd', 'e'],
             $c->replace(new $collection([1 => 'd', 2 => 'e']))->all()
+        );
+
+        $c = new $collection(['a', 'b', 'c']);
+        $this->assertEquals(
+            ['a', 'd', 'e', 'f', 'g'],
+            $c->replace(new $collection([1 => 'd', 2 => 'e', 3 => 'f', 4 => 'g']))->all()
+        );
+
+        $c = new $collection(['name' => 'amir', 'family' => 'otwell']);
+        $this->assertEquals(
+            ['name' => 'taylor', 'family' => 'otwell', 'age' => 26],
+            $c->replace(new $collection(['name' => 'taylor', 'age' => 26]))->all()
         );
     }
 
@@ -1451,6 +1490,9 @@ class SupportCollectionTest extends TestCase
     {
         $c = new $collection(['a', 'b', ['c', 'd']]);
         $this->assertEquals(['z', 'b', ['c', 'e']], $c->replaceRecursive(['z', 2 => [1 => 'e']])->all());
+
+        $c = new $collection(['a', 'b', ['c', 'd']]);
+        $this->assertEquals(['z', 'b', ['c', 'e'], 'f'], $c->replaceRecursive(['z', 2 => [1 => 'e'], 'f'])->all());
     }
 
     /**
@@ -2013,6 +2055,16 @@ class SupportCollectionTest extends TestCase
         });
 
         $this->assertEquals([1 => 'dayle', 0 => 'taylor'], $data->all());
+
+        $data = new $collection(['a' => ['sort' => 2], 'b' => ['sort' => 1]]);
+        $data = $data->sortBy([['sort', 'asc']]);
+
+        $this->assertEquals(['b' => ['sort' => 1], 'a' => ['sort' => 2]], $data->all());
+
+        $data = new $collection([['sort' => 2], ['sort' => 1]]);
+        $data = $data->sortBy([['sort', 'asc']]);
+
+        $this->assertEquals([1 => ['sort' => 1], 0 => ['sort' => 2]], $data->all());
     }
 
     /**
@@ -4658,6 +4710,11 @@ class SupportCollectionTest extends TestCase
     public function testSplitCollectionWithADivisableCount($collection)
     {
         $data = new $collection(['a', 'b', 'c', 'd']);
+        $split = $data->split(2);
+
+        $this->assertSame(['a', 'b'], $split->get(0)->all());
+        $this->assertSame(['c', 'd'], $split->get(1)->all());
+        $this->assertInstanceOf($collection, $split);
 
         $this->assertEquals(
             [['a', 'b'], ['c', 'd']],
@@ -4667,6 +4724,10 @@ class SupportCollectionTest extends TestCase
         );
 
         $data = new $collection([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+        $split = $data->split(2);
+
+        $this->assertSame([1, 2, 3, 4, 5], $split->get(0)->all());
+        $this->assertSame([6, 7, 8, 9, 10], $split->get(1)->all());
 
         $this->assertEquals(
             [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]],
@@ -4682,6 +4743,10 @@ class SupportCollectionTest extends TestCase
     public function testSplitCollectionWithAnUndivisableCount($collection)
     {
         $data = new $collection(['a', 'b', 'c']);
+        $split = $data->split(2);
+
+        $this->assertSame(['a', 'b'], $split->get(0)->all());
+        $this->assertSame(['c'], $split->get(1)->all());
 
         $this->assertEquals(
             [['a', 'b'], ['c']],
@@ -4697,6 +4762,10 @@ class SupportCollectionTest extends TestCase
     public function testSplitCollectionWithCountLessThenDivisor($collection)
     {
         $data = new $collection(['a']);
+        $split = $data->split(2);
+
+        $this->assertSame(['a'], $split->get(0)->all());
+        $this->assertNull($split->get(1));
 
         $this->assertEquals(
             [['a']],
@@ -4712,6 +4781,11 @@ class SupportCollectionTest extends TestCase
     public function testSplitCollectionIntoThreeWithCountOfFour($collection)
     {
         $data = new $collection(['a', 'b', 'c', 'd']);
+        $split = $data->split(3);
+
+        $this->assertSame(['a', 'b'], $split->get(0)->all());
+        $this->assertSame(['c'], $split->get(1)->all());
+        $this->assertSame(['d'], $split->get(2)->all());
 
         $this->assertEquals(
             [['a', 'b'], ['c'], ['d']],
@@ -4727,6 +4801,11 @@ class SupportCollectionTest extends TestCase
     public function testSplitCollectionIntoThreeWithCountOfFive($collection)
     {
         $data = new $collection(['a', 'b', 'c', 'd', 'e']);
+        $split = $data->split(3);
+
+        $this->assertSame(['a', 'b'], $split->get(0)->all());
+        $this->assertSame(['c', 'd'], $split->get(1)->all());
+        $this->assertSame(['e'], $split->get(2)->all());
 
         $this->assertEquals(
             [['a', 'b'], ['c', 'd'], ['e']],
@@ -4742,6 +4821,14 @@ class SupportCollectionTest extends TestCase
     public function testSplitCollectionIntoSixWithCountOfTen($collection)
     {
         $data = new $collection(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']);
+        $split = $data->split(6);
+
+        $this->assertSame(['a', 'b'], $split->get(0)->all());
+        $this->assertSame(['c', 'd'], $split->get(1)->all());
+        $this->assertSame(['e', 'f'], $split->get(2)->all());
+        $this->assertSame(['g', 'h'], $split->get(3)->all());
+        $this->assertSame(['i'], $split->get(4)->all());
+        $this->assertSame(['j'], $split->get(5)->all());
 
         $this->assertEquals(
             [['a', 'b'], ['c', 'd'], ['e', 'f'], ['g', 'h'], ['i'], ['j']],
@@ -4757,6 +4844,10 @@ class SupportCollectionTest extends TestCase
     public function testSplitEmptyCollection($collection)
     {
         $data = new $collection;
+        $split = $data->split(2);
+
+        $this->assertNull($split->get(0));
+        $this->assertNull($split->get(1));
 
         $this->assertEquals(
             [],

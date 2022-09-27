@@ -209,7 +209,6 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         );
     }
 
-    /** @group SkipMSSQL */
     public function testCustomPivotClassUpdatesTimestamps()
     {
         Carbon::setTestNow('2017-10-10 10:10:10');
@@ -233,8 +232,14 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         );
         foreach ($post->tagsWithCustomExtraPivot as $tag) {
             $this->assertSame('exclude', $tag->pivot->flag);
-            $this->assertSame('2017-10-10 10:10:10', $tag->pivot->getAttributes()['created_at']);
-            $this->assertSame('2017-10-10 10:10:20', $tag->pivot->getAttributes()['updated_at']); // +10 seconds
+
+            if ($this->driver === 'sqlsrv') {
+                $this->assertSame('2017-10-10 10:10:10.000', $tag->pivot->getAttributes()['created_at']);
+                $this->assertSame('2017-10-10 10:10:20.000', $tag->pivot->getAttributes()['updated_at']); // +10 seconds
+            } else {
+                $this->assertSame('2017-10-10 10:10:10', $tag->pivot->getAttributes()['created_at']);
+                $this->assertSame('2017-10-10 10:10:20', $tag->pivot->getAttributes()['updated_at']); // +10 seconds
+            }
         }
     }
 
@@ -528,7 +533,6 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testFirstOrCreateUnrelatedExisting()
     {
-        /** @var Post $post */
         $post = Post::create(['title' => Str::random()]);
 
         $name = Str::random();
@@ -791,39 +795,37 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertNotSame('2017-10-10 10:10:10', $tag->fresh()->updated_at->toDateTimeString());
     }
 
-    /** @group SkipMSSQL */
     public function testCanRetrieveRelatedIds()
     {
         $post = Post::create(['title' => Str::random()]);
 
         DB::table('tags')->insert([
-            ['id' => 200, 'name' => 'excluded'],
-            ['id' => 300, 'name' => Str::random()],
+            ['name' => 'excluded'],
+            ['name' => Str::random()],
         ]);
 
         DB::table('posts_tags')->insert([
-            ['post_id' => $post->id, 'tag_id' => 200, 'flag' => ''],
-            ['post_id' => $post->id, 'tag_id' => 300, 'flag' => 'exclude'],
-            ['post_id' => $post->id, 'tag_id' => 400, 'flag' => ''],
+            ['post_id' => $post->id, 'tag_id' => 1, 'flag' => ''],
+            ['post_id' => $post->id, 'tag_id' => 2, 'flag' => 'exclude'],
+            ['post_id' => $post->id, 'tag_id' => 3, 'flag' => ''],
         ]);
 
-        $this->assertEquals([200, 400], $post->tags()->allRelatedIds()->toArray());
+        $this->assertEquals([1, 3], $post->tags()->allRelatedIds()->toArray());
     }
 
-    /** @group SkipMSSQL */
     public function testCanTouchRelatedModels()
     {
         $post = Post::create(['title' => Str::random()]);
 
         DB::table('tags')->insert([
-            ['id' => 200, 'name' => Str::random()],
-            ['id' => 300, 'name' => Str::random()],
+            ['name' => Str::random()],
+            ['name' => Str::random()],
         ]);
 
         DB::table('posts_tags')->insert([
-            ['post_id' => $post->id, 'tag_id' => 200, 'flag' => ''],
-            ['post_id' => $post->id, 'tag_id' => 300, 'flag' => 'exclude'],
-            ['post_id' => $post->id, 'tag_id' => 400, 'flag' => ''],
+            ['post_id' => $post->id, 'tag_id' => 1, 'flag' => ''],
+            ['post_id' => $post->id, 'tag_id' => 2, 'flag' => 'exclude'],
+            ['post_id' => $post->id, 'tag_id' => 3, 'flag' => ''],
         ]);
 
         Carbon::setTestNow('2017-10-10 10:10:10');
@@ -831,13 +833,16 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $post->tags()->touch();
 
         foreach ($post->tags()->pluck('tags.updated_at') as $date) {
-            $this->assertSame('2017-10-10 10:10:10', $date);
+            if ($this->driver === 'sqlsrv') {
+                $this->assertSame('2017-10-10 10:10:10.000', $date);
+            } else {
+                $this->assertSame('2017-10-10 10:10:10', $date);
+            }
         }
 
-        $this->assertNotSame('2017-10-10 10:10:10', Tag::find(300)->updated_at);
+        $this->assertNotSame('2017-10-10 10:10:10', Tag::find(2)->updated_at);
     }
 
-    /** @group SkipMSSQL */
     public function testWherePivotOnString()
     {
         $tag = Tag::create(['name' => Str::random()])->fresh();
@@ -854,7 +859,6 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertEquals($relationTag->getAttributes(), $tag->getAttributes());
     }
 
-    /** @group SkipMSSQL */
     public function testFirstWhere()
     {
         $tag = Tag::create(['name' => 'foo'])->fresh();
@@ -871,7 +875,6 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertEquals($relationTag->getAttributes(), $tag->getAttributes());
     }
 
-    /** @group SkipMSSQL */
     public function testWherePivotOnBoolean()
     {
         $tag = Tag::create(['name' => Str::random()])->fresh();
@@ -888,7 +891,6 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertEquals($relationTag->getAttributes(), $tag->getAttributes());
     }
 
-    /** @group SkipMSSQL */
     public function testWherePivotInMethod()
     {
         $tag = Tag::create(['name' => Str::random()])->fresh();
@@ -923,7 +925,6 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertEquals($relationTags->pluck('id')->toArray(), [$tag1->id, $tag3->id]);
     }
 
-    /** @group SkipMSSQL */
     public function testWherePivotNotInMethod()
     {
         $tag1 = Tag::create(['name' => Str::random()]);
@@ -962,7 +963,6 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertEquals($relationTags->pluck('id')->toArray(), [$tag1->id, $tag2->id]);
     }
 
-    /** @group SkipMSSQL */
     public function testWherePivotNullMethod()
     {
         $tag1 = Tag::create(['name' => Str::random()]);
@@ -980,7 +980,6 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertEquals($relationTag->getAttributes(), $tag2->getAttributes());
     }
 
-    /** @group SkipMSSQL */
     public function testWherePivotNotNullMethod()
     {
         $tag1 = Tag::create(['name' => Str::random()])->fresh();
@@ -1105,7 +1104,6 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertEquals(0, $user->postsWithCustomPivot()->first()->pivot->is_draft);
     }
 
-    /** @group SkipMSSQL */
     public function testOrderByPivotMethod()
     {
         $tag1 = Tag::create(['name' => Str::random()]);

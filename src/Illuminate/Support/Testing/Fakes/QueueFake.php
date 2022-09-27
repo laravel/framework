@@ -24,9 +24,16 @@ class QueueFake extends QueueManager implements Queue
     /**
      * The job types that should be intercepted instead of pushed to the queue.
      *
-     * @var array
+     * @var \Illuminate\Support\Collection
      */
     protected $jobsToFake;
+
+    /**
+     * The job types that should be pushed to the queue and not intercepted.
+     *
+     * @var \Illuminate\Support\Collection
+     */
+    protected $jobsToBeQueued;
 
     /**
      * All of the jobs that have been pushed.
@@ -48,7 +55,21 @@ class QueueFake extends QueueManager implements Queue
         parent::__construct($app);
 
         $this->jobsToFake = Collection::wrap($jobsToFake);
+        $this->jobsToBeQueued = Collection::make();
         $this->queue = $queue;
+    }
+
+    /**
+     * Specify the jobs that should be queued instead of faked.
+     *
+     * @param  array|string  $jobsToBeQueued
+     * @return $this
+     */
+    public function except($jobsToBeQueued)
+    {
+        $this->jobsToBeQueued = Collection::wrap($jobsToBeQueued)->merge($this->jobsToBeQueued);
+
+        return $this;
     }
 
     /**
@@ -323,12 +344,33 @@ class QueueFake extends QueueManager implements Queue
      */
     public function shouldFakeJob($job)
     {
+        if ($this->shouldDispatchJob($job)) {
+            return false;
+        }
+
         if ($this->jobsToFake->isEmpty()) {
             return true;
         }
 
         return $this->jobsToFake->contains(
             fn ($jobToFake) => $job instanceof ((string) $jobToFake)
+        );
+    }
+
+    /**
+     * Determine if a job should be pushed to the queue instead of faked.
+     *
+     * @param  object  $job
+     * @return bool
+     */
+    protected function shouldDispatchJob($job)
+    {
+        if ($this->jobsToBeQueued->isEmpty()) {
+            return false;
+        }
+
+        return $this->jobsToBeQueued->contains(
+            fn ($jobToQueue) => $job instanceof ((string) $jobToQueue)
         );
     }
 

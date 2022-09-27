@@ -55,6 +55,18 @@ class Inspiring
      */
     public static function quote()
     {
+        return static::quotes()
+            ->map(fn ($quote) => static::formatForConsole($quote))
+            ->random();
+    }
+
+    /**
+     * Get the collection of inspiring quotes.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public static function quotes()
+    {
         return Collection::make([
             'Act only according to that maxim whereby you can, at the same time, will that it should become a universal law. - Immanuel Kant',
             'An unexamined life is not worth living. - Socrates',
@@ -95,7 +107,7 @@ class Inspiring
             'The biggest battle is the war against ignorance. - Mustafa Kemal Atatürk',
             'Always remember that you are absolutely unique. Just like everyone else. - Margaret Mead',
             'You must be the change you wish to see in the world. - Mahatma Gandhi',
-        ])->map(fn ($quote) => static::formatForConsole($quote))->random();
+        ]);
     }
 
     /**
