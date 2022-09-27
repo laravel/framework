@@ -329,11 +329,7 @@ class Validator implements ValidatorContract
                 $value = $this->parseData($value);
             }
 
-            $key = str_replace(
-                ['.', '*'],
-                [$this->dotPlaceholder, '__asterisk__'],
-                $key
-            );
+            $key = $this->replaceDotsAndAsterisksInString($key);
 
             $newData[$key] = $value;
         }
@@ -371,6 +367,21 @@ class Validator implements ValidatorContract
         return str_replace(
             [$this->dotPlaceholder, '__asterisk__'],
             ['.', '*'],
+            $value
+        );
+    }
+
+    /**
+     * Replace the dots and asterisks in the given string.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function replaceDotsAndAsterisksInString(string $value)
+    {
+        return str_replace(
+            ['.', '*'],
+            [$this->dotPlaceholder, '__asterisk__'],
             $value
         );
     }
@@ -1082,7 +1093,15 @@ class Validator implements ValidatorContract
      */
     protected function getValue($attribute)
     {
-        return Arr::get($this->data, $attribute);
+        if (Arr::has($this->data, $attribute)) {
+            return Arr::get($this->data, $attribute);
+        }
+
+        if (Arr::has($this->data, $key = $this->replaceDotsAndAsterisksInString($attribute))) {
+            return Arr::get($this->data, $key);
+        }
+
+        return null;
     }
 
     /**

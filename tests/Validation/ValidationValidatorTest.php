@@ -5176,6 +5176,17 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->fails());
     }
 
+    public function testParsingReplacedArrayKeysWithDot()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, ['foo.bar' => 'valid'], ['foo.bar' => 'required']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo.bar' => ''], ['foo.bar' => 'required']);
+        $this->assertFalse($v->passes());
+    }
+
     public function testParsingArrayKeysWithDotWhenTestingExistence()
     {
         $trans = $this->getIlluminateArrayTranslator();
