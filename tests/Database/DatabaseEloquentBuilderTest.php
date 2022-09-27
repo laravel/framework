@@ -2079,6 +2079,61 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(2, $result);
     }
 
+    public function testTouch()
+    {
+        Carbon::setTestNow($now = '2017-10-10 10:10:10');
+
+        $query = m::mock(BaseBuilder::class);
+        $query->shouldReceive('from')->with('foo_table')->andReturn('foo_table');
+        $query->from = 'foo_table';
+
+        $builder = new Builder($query);
+        $model = new EloquentBuilderTestStubStringPrimaryKey;
+        $builder->setModel($model);
+
+        $query->shouldReceive('update')->once()->with(['updated_at' => $now])->andReturn(2);
+
+        $result = $builder->touch();
+
+        $this->assertEquals(2, $result);
+    }
+
+    public function testTouchWithCustomColumn()
+    {
+        Carbon::setTestNow($now = '2017-10-10 10:10:10');
+
+        $query = m::mock(BaseBuilder::class);
+        $query->shouldReceive('from')->with('foo_table')->andReturn('foo_table');
+        $query->from = 'foo_table';
+
+        $builder = new Builder($query);
+        $model = new EloquentBuilderTestStubStringPrimaryKey;
+        $builder->setModel($model);
+
+        $query->shouldReceive('update')->once()->with(['published_at' => $now])->andReturn(2);
+
+        $result = $builder->touch('published_at');
+
+        $this->assertEquals(2, $result);
+    }
+
+    public function testTouchWithoutUpdatedAtColumn()
+    {
+        $query = m::mock(BaseBuilder::class);
+        $query->shouldReceive('from')->with('table')->andReturn('table');
+        $query->from = 'table';
+
+        $builder = new Builder($query);
+        $model = new EloquentBuilderTestStubWithoutTimestamp;
+        $builder->setModel($model);
+
+        $query->shouldNotReceive('update');
+
+        $result = $builder->touch();
+
+        $this->assertFalse($result);
+    }
+
     public function testWithCastsMethod()
     {
         $builder = new Builder($this->getMockQueryBuilder());

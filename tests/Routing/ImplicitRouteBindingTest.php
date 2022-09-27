@@ -39,6 +39,21 @@ class ImplicitRouteBindingTest extends TestCase
     /**
      * @requires PHP >= 8.1
      */
+    public function test_it_can_resolve_the_backed_enum_default_value_for_the_given_route()
+    {
+        $action = ['uses' => function (CategoryBackedEnum $category = CategoryBackedEnum::Fruits) {
+            return $category->value;
+        }];
+
+        $route = new Route('GET', '/test', $action);
+        $route->parameters = [];
+
+        $this->assertSame('fruits', $route->run());
+    }
+
+    /**
+     * @requires PHP >= 8.1
+     */
     public function test_it_does_not_resolve_implicit_non_backed_enum_route_bindings_for_the_given_route()
     {
         $action = ['uses' => function (CategoryEnum $category) {

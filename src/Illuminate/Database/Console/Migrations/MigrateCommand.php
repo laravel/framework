@@ -7,7 +7,10 @@ use Illuminate\Console\View\Components\Task;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Events\SchemaLoaded;
 use Illuminate\Database\Migrations\Migrator;
+use Illuminate\Database\SQLiteDatabaseDoesNotExistException;
 use Illuminate\Database\SqlServerConnection;
+use PDOException;
+use Throwable;
 
 class MigrateCommand extends BaseCommand
 {
@@ -91,10 +94,6 @@ class MigrateCommand extends BaseCommand
             // seed task to re-populate the database, which is convenient when adding
             // a migration and a seed at the same time, as it is only this command.
             if ($this->option('seed') && ! $this->option('pretend')) {
-                if (! empty($migrations)) {
-                    $this->newLine();
-                }
-
                 $this->call('db:seed', [
                     '--class' => $this->option('seeder') ?: 'Database\\Seeders\\DatabaseSeeder',
                     '--force' => true,
@@ -112,7 +111,7 @@ class MigrateCommand extends BaseCommand
      */
     protected function prepareDatabase()
     {
-        if (! $this->migrator->repositoryExists()) {
+        if (! $this->repositoryExists()) {
             $this->components->info('Preparing database.');
 
             $this->components->task('Creating migration table', function () {
@@ -126,6 +125,98 @@ class MigrateCommand extends BaseCommand
 
         if (! $this->migrator->hasRunAnyMigrations() && ! $this->option('pretend')) {
             $this->loadSchemaState();
+        }
+    }
+
+    /**
+     * Determine if the migrator repository exists.
+     *
+     * @return bool
+     */
+    protected function repositoryExists()
+    {
+        return retry(2, fn () => $this->migrator->repositoryExists(), 0, function ($e) {
+            try {
+                if ($e->getPrevious() instanceof SQLiteDatabaseDoesNotExistException) {
+                    return $this->createMissingSqliteDatbase($e->getPrevious()->path);
+                }
+
+                $connection = $this->migrator->resolveConnection($this->option('database'));
+
+                if (
+                    $e->getPrevious() instanceof PDOException &&
+                    $e->getPrevious()->getCode() === 1049 &&
+                    $connection->getDriverName() === 'mysql') {
+                    return $this->createMissingMysqlDatabase($connection);
+                }
+
+                return false;
+            } catch (Throwable) {
+                return false;
+            }
+        });
+    }
+
+    /**
+     * Create a missing SQLite database.
+     *
+     * @param  string  $path
+     * @return bool
+     */
+    protected function createMissingSqliteDatbase($path)
+    {
+        if ($this->option('force')) {
+            return touch($path);
+        }
+
+        if ($this->option('no-interaction')) {
+            return false;
+        }
+
+        $this->components->warn('The SQLite database does not exist: '.$path);
+
+        if (! $this->components->confirm('Would you like to create it?')) {
+            return false;
+        }
+
+        return touch($path);
+    }
+
+    /**
+     * Create a missing MySQL database.
+     *
+     * @return bool
+     */
+    protected function createMissingMysqlDatabase($connection)
+    {
+        if ($this->laravel['config']->get("database.connections.{$connection->getName()}.database") !== $connection->getDatabaseName()) {
+            return false;
+        }
+
+        if (! $this->option('force') && $this->option('no-interaction')) {
+            return false;
+        }
+
+        if (! $this->option('force') && ! $this->option('no-interaction')) {
+            $this->components->warn("The database '{$connection->getDatabaseName()}' does not exist on the '{$connection->getName()}' connection.");
+
+            if (! $this->components->confirm('Would you like to create it?')) {
+                return false;
+            }
+        }
+
+        try {
+            $this->laravel['config']->set("database.connections.{$connection->getName()}.database", null);
+
+            $this->laravel['db']->purge();
+
+            $freshConnection = $this->migrator->resolveConnection($this->option('database'));
+
+            return tap($freshConnection->unprepared("CREATE DATABASE IF NOT EXISTS {$connection->getDatabaseName()}"), function () {
+                $this->laravel['db']->purge();
+            });
+        } finally {
+            $this->laravel['config']->set("database.connections.{$connection->getName()}.database", $connection->getDatabaseName());
         }
     }
 

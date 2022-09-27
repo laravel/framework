@@ -974,7 +974,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Get one or a specified number of items randomly from the collection.
      *
-     * @param  (callable(TValue): int)|int|null  $number
+     * @param  (callable(self<TKey, TValue>): int)|int|null  $number
      * @return static<int, TValue>|TValue
      *
      * @throws \InvalidArgumentException
@@ -1366,7 +1366,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     {
         $items = $this->items;
 
-        usort($items, function ($a, $b) use ($comparisons) {
+        uasort($items, function ($a, $b) use ($comparisons) {
             foreach ($comparisons as $comparison) {
                 $comparison = Arr::wrap($comparison);
 

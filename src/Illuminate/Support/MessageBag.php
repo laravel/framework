@@ -139,7 +139,7 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
     /**
      * Determine if messages exist for any of the given keys.
      *
-     * @param  array|string  $keys
+     * @param  array|string|null  $keys
      * @return bool
      */
     public function hasAny($keys = [])

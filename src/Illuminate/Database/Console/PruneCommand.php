@@ -71,22 +71,33 @@ class PruneCommand extends Command
         });
 
         $models->each(function ($model) {
-            $instance = new $model;
-
-            $chunkSize = property_exists($instance, 'prunableChunkSize')
-                            ? $instance->prunableChunkSize
-                            : $this->option('chunk');
-
-            $total = $this->isPrunable($model)
-                        ? $instance->pruneAll($chunkSize)
-                        : 0;
-
-            if ($total == 0) {
-                $this->components->info("No prunable [$model] records found.");
-            }
+            $this->pruneModel($model);
         });
 
         $events->forget(ModelsPruned::class);
+    }
+
+    /**
+     * Prune the given model.
+     *
+     * @param  string  $model
+     * @return void
+     */
+    protected function pruneModel(string $model)
+    {
+        $instance = new $model;
+
+        $chunkSize = property_exists($instance, 'prunableChunkSize')
+            ? $instance->prunableChunkSize
+            : $this->option('chunk');
+
+        $total = $this->isPrunable($model)
+            ? $instance->pruneAll($chunkSize)
+            : 0;
+
+        if ($total == 0) {
+            $this->components->info("No prunable [$model] records found.");
+        }
     }
 
     /**
@@ -131,7 +142,7 @@ class PruneCommand extends Command
     /**
      * Get the default path where models are located.
      *
-     * @return string
+     * @return string|string[]
      */
     protected function getDefaultPath()
     {

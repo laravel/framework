@@ -8,7 +8,6 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Cookie\CookieValuePrefix;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
@@ -44,7 +43,7 @@ class TestResponse implements ArrayAccess
      *
      * @var \Illuminate\Support\Collection
      */
-    protected $exceptions;
+    public $exceptions;
 
     /**
      * The streamed content of the response.
@@ -190,81 +189,7 @@ class TestResponse implements ArrayAccess
      */
     protected function statusMessageWithDetails($expected, $actual)
     {
-        $lastException = $this->exceptions->last();
-
-        if ($lastException) {
-            return $this->statusMessageWithException($expected, $actual, $lastException);
-        }
-
-        if ($this->baseResponse instanceof RedirectResponse) {
-            $session = $this->baseResponse->getSession();
-
-            if (! is_null($session) && $session->has('errors')) {
-                return $this->statusMessageWithErrors($expected, $actual, $session->get('errors')->all());
-            }
-        }
-
-        if ($this->baseResponse->headers->get('Content-Type') === 'application/json') {
-            $testJson = new AssertableJsonString($this->getContent());
-
-            if (isset($testJson['errors'])) {
-                return $this->statusMessageWithErrors($expected, $actual, $testJson->json());
-            }
-        }
-
         return "Expected response status code [{$expected}] but received {$actual}.";
-    }
-
-    /**
-     * Get an assertion message for a status assertion that has an unexpected exception.
-     *
-     * @param  string|int  $expected
-     * @param  string|int  $actual
-     * @param  \Throwable  $exception
-     * @return string
-     */
-    protected function statusMessageWithException($expected, $actual, $exception)
-    {
-        $message = $exception->getMessage();
-
-        $exception = (string) $exception;
-
-        return <<<EOF
-Expected response status code [$expected] but received $actual.
-
-The following exception occurred during the request:
-
-$exception
-
-----------------------------------------------------------------------------------
-
-$message
-
-EOF;
-    }
-
-    /**
-     * Get an assertion message for a status assertion that contained errors.
-     *
-     * @param  string|int  $expected
-     * @param  string|int  $actual
-     * @param  array  $errors
-     * @return string
-     */
-    protected function statusMessageWithErrors($expected, $actual, $errors)
-    {
-        $errors = $this->baseResponse->headers->get('Content-Type') === 'application/json'
-            ? json_encode($errors, JSON_PRETTY_PRINT)
-            : implode(PHP_EOL, Arr::flatten($errors));
-
-        return <<<EOF
-Expected response status code [$expected] but received $actual.
-
-The following errors occurred during the request:
-
-$errors
-
-EOF;
     }
 
     /**

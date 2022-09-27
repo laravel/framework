@@ -159,7 +159,7 @@ class Factory
     /**
      * Register a stub callable that will intercept requests and be able to return stub responses.
      *
-     * @param  callable|array  $callback
+     * @param  callable|array|null  $callback
      * @return $this
      */
     public function fake($callback = null)
