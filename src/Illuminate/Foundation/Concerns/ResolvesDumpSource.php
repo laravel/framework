@@ -54,7 +54,7 @@ trait ResolvesDumpSource
     /**
      * Resolve the source of the dump call.
      *
-     * @param string $path
+     * @param  string  $path
      * @return string
      */
     public function getAbsolutePath(string $path): string
