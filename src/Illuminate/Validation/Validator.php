@@ -1097,11 +1097,7 @@ class Validator implements ValidatorContract
             return Arr::get($this->data, $attribute);
         }
 
-        if (Arr::has($this->data, $key = $this->replaceDotsAndAsterisksInString($attribute))) {
-            return Arr::get($this->data, $key);
-        }
-
-        return null;
+        return Arr::get($this->data, $this->replaceDotsAndAsterisksInString($attribute));
     }
 
     /**
