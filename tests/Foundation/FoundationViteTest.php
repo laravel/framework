@@ -680,15 +680,15 @@ class FoundationViteTest extends TestCase
             .'<script type="module" src="https://example.com/'.$buildDir.'/assets/Login.8c52c4a3.js"></script>', $result->toHtml()
         );
         $this->assertSame([
+            'https://example.com/'.$buildDir.'/assets/app.9842b564.css' => [
+                'rel="preload"',
+                'as="style"',
+            ],
             'https://example.com/'.$buildDir.'/assets/Login.8c52c4a3.js' => [
                 'rel="modulepreload"',
             ],
             'https://example.com/'.$buildDir.'/assets/app.a26d8e4d.js' => [
                 'rel="modulepreload"',
-            ],
-            'https://example.com/'.$buildDir.'/assets/app.9842b564.css' => [
-                'rel="preload"',
-                'as="style"',
             ],
             'https://example.com/'.$buildDir.'/assets/AuthenticationCard.47ef70cc.js' => [
                 'rel="modulepreload"',
@@ -813,6 +813,16 @@ class FoundationViteTest extends TestCase
         $result->toHtml());
 
         $this->assertSame([
+            "https://example.com/$buildDir/assets/app.versioned.css" => [
+                'rel="preload"',
+                'as="style"',
+                'general="attribute"',
+                'crossorigin',
+                'data-persistent-across-pages="YES"',
+                'keep-me',
+                'empty-string=""',
+                'zero="0"',
+            ],
             "https://example.com/$buildDir/assets/app.versioned.js" => [
                 'rel="modulepreload"',
                 'general="attribute"',
@@ -824,16 +834,6 @@ class FoundationViteTest extends TestCase
             ],
             "https://example.com/$buildDir/assets/import.versioned.js" => [
                 'rel="modulepreload"',
-                'general="attribute"',
-                'crossorigin',
-                'data-persistent-across-pages="YES"',
-                'keep-me',
-                'empty-string=""',
-                'zero="0"',
-            ],
-            "https://example.com/$buildDir/assets/app.versioned.css" => [
-                'rel="preload"',
-                'as="style"',
                 'general="attribute"',
                 'crossorigin',
                 'data-persistent-across-pages="YES"',

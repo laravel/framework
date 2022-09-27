@@ -258,30 +258,30 @@ class Vite implements Htmlable
         foreach ($entrypoints as $entrypoint) {
             $chunk = $this->chunk($manifest, $entrypoint);
 
-            $preloads->push($this->makePreloadTagForChunk(
+            $preloads->push([
                 $chunk['src'],
                 $this->assetPath("{$buildDirectory}/{$chunk['file']}"),
                 $chunk,
                 $manifest
-            ));
+            ]);
 
             foreach ($chunk['imports'] ?? [] as $import) {
-                $preloads->push($this->makePreloadTagForChunk(
+                $preloads->push([
                     $import,
                     $this->assetPath("{$buildDirectory}/{$manifest[$import]['file']}"),
                     $manifest[$import],
                     $manifest
-                ));
+                ]);
 
                 foreach ($manifest[$import]['css'] ?? [] as $css) {
                     $partialManifest = Collection::make($manifest)->where('file', $css);
 
-                    $preloads->push($this->makePreloadTagForChunk(
+                    $preloads->push([
                         $partialManifest->keys()->first(),
                         $this->assetPath("{$buildDirectory}/{$css}"),
                         $partialManifest->first(),
                         $manifest
-                    ));
+                    ]);
 
                     $tags->push($this->makeTagForChunk(
                         $partialManifest->keys()->first(),
@@ -302,12 +302,12 @@ class Vite implements Htmlable
             foreach ($chunk['css'] ?? [] as $css) {
                 $partialManifest = Collection::make($manifest)->where('file', $css);
 
-                $preloads->push($this->makePreloadTagForChunk(
+                $preloads->push([
                     $partialManifest->keys()->first(),
                     $this->assetPath("{$buildDirectory}/{$css}"),
                     $partialManifest->first(),
                     $manifest
-                ));
+                ]);
 
                 $tags->push($this->makeTagForChunk(
                     $partialManifest->keys()->first(),
@@ -320,7 +320,8 @@ class Vite implements Htmlable
 
         [$stylesheets, $scripts] = $tags->partition(fn ($tag) => str_starts_with($tag, '<link'));
 
-        $preloads = $preloads->sortByDesc(fn ($link) => str_contains($link, 'rel="preload"'));
+        $preloads = $preloads->sortByDesc(fn ($args) => $this->isCssPath($args[1]))
+            ->map(fn ($args) => $this->makePreloadTagForChunk(...$args));
 
         return new HtmlString($preloads->join('').$stylesheets->join('').$scripts->join(''));
     }

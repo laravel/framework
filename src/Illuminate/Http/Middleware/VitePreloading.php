@@ -20,7 +20,6 @@ class VitePreloading
             if (Vite::preloadedAssets() !== []) {
                 $response->header('Link', Collection::make(Vite::preloadedAssets())
                     ->map(fn ($attributes, $url) => "<{$url}>; ".implode('; ', $attributes))
-                    ->sortByDesc(fn ($link) => str_contains($link, 'rel="preload"'))
                     ->join(', '));
             }
         });
