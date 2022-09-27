@@ -1259,13 +1259,19 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testUnderscorePropertiesAreNotFilled()
     {
+        Model::preventSilentlyDiscardingAttributes(false);
+
         $model = new EloquentModelStub;
         $model->fill(['_method' => 'PUT']);
         $this->assertEquals([], $model->getAttributes());
+
+        Model::preventSilentlyDiscardingAttributes(true);
     }
 
     public function testGuarded()
     {
+        Model::preventSilentlyDiscardingAttributes(false);
+
         $model = new EloquentModelStub;
 
         EloquentModelStub::setConnectionResolver($resolver = m::mock(Resolver::class));
@@ -1285,14 +1291,15 @@ class DatabaseEloquentModelTest extends TestCase
 
         $handledMassAssignmentExceptions = 0;
 
-        Model::preventSilentlyDiscardingAttributes();
+        Model::preventSilentlyDiscardingAttributes(true);
+    }
 
+    public function testGuardedException()
+    {
         $this->expectException(MassAssignmentException::class);
         $model = new EloquentModelStub;
         $model->guard(['name', 'age']);
         $model->fill(['Foo' => 'bar']);
-
-        Model::preventSilentlyDiscardingAttributes(false);
     }
 
     public function testFillableOverridesGuarded()
