@@ -37,12 +37,12 @@ trait ResolvesDumpSource
             $relativeFile = substr($file, strlen($this->basePath) + 1);
         }
 
-        if(str_starts_with($relativeFile,"storage/framework/views/")){
+        if (str_starts_with($relativeFile, 'storage/framework/views/')) {
             $fileArr = file($file);
             $lastLine = end($fileArr);
 
-            $result = str_replace("<"."?php /**PATH ", "", $lastLine);
-            $result = str_replace(" ENDPATH**/ ?>", "", $result);
+            $result = str_replace('<' . '?php /**PATH ', '', $lastLine);
+            $result = str_replace(' ENDPATH**/ ?>', '', $result);
             $relativeFile = substr($result, strlen($this->basePath) + 1);
         }
 
@@ -52,7 +52,7 @@ trait ResolvesDumpSource
     /**
      * Set the resolver that resolves the source of the dump call.
      *
-     * @param  (callable(): (array{0: string, 1: string, 2: int}|null))|null  $callable
+     * @param (callable(): (array{0: string, 1: string, 2: int}|null))|null $callable
      * @return void
      */
     public static function resolveDumpSourceUsing($callable)
