@@ -875,13 +875,18 @@ class PrecognitionTestRequest extends FormRequest
 {
     public function rules()
     {
-        return [
+        $rules = [
             'required_integer' => 'required|integer',
-            ...! $this->isPrecognitive() ? ['required_integer_when_not_precognitive' => 'required|integer'] : [],
             'optional_integer_1' => 'integer',
             'optional_integer_2' => 'integer',
             ' input with spaces ' => 'integer',
         ];
+
+        if (! $this->isPrecognitive()) {
+            $rules['required_integer_when_not_precognitive'] = 'required|integer';
+        }
+
+        return $rules;
     }
 }
 
