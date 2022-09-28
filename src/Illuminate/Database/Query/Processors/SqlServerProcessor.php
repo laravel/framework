@@ -17,8 +17,8 @@ class SqlServerProcessor extends Processor
      */
     public function processSelect(Builder $query, $results)
     {
-        if(str_ends_with($query->toSql(), '/* remove_temp_row_num */')){
-            array_map(function($row){
+        if (str_ends_with($query->toSql(), '/* remove_temp_row_num */')) {
+            array_map(function ($row) {
                 unset($row->temp_row_num);
             }, $results);
         }
