@@ -3957,6 +3957,39 @@ SQL;
         $this->assertEquals(['foo', 'bar', 'baz'], $builder->getBindings());
     }
 
+    public function testAddBindingExpectException()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("Invalid binding type: groupby.");
+
+        $builder = $this->getBuilder();
+        $builder->addBinding(['foo', 'bar'], 'groupby');
+    }
+
+    public function testSetBinding()
+    {
+        $builder = $this->getBuilder();
+        $this->assertEquals([], $builder->getBindings());
+
+        $builder->setBindings(['id', 10], 'where');
+        $this->assertEquals(['id', 10], $builder->getBindings());
+
+        $builder->setBindings(['id', 20], 'where');
+        $this->assertEquals(['id', 20], $builder->getBindings());
+
+        $builder->setBindings(['id', 20], 'order');
+        $this->assertEquals(['id', 20, 'id', 20], $builder->getBindings());
+    }
+
+    public function testSetBindingExpectException()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("Invalid binding type: groupby.");
+
+        $builder = $this->getBuilder();
+        $builder->setBindings(['id', 10], 'groupby');
+    }
+
     public function testMergeBuilders()
     {
         $builder = $this->getBuilder();
