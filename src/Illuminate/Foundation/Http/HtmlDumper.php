@@ -36,6 +36,13 @@ class HtmlDumper extends BaseHtmlDumper
     protected $basePath;
 
     /**
+     * The view compiled path of the application.
+     *
+     * @var string
+     */
+    protected $viewCompiledPath;
+
+    /**
      * If the dumper is currently dumping.
      *
      * @var bool
@@ -46,26 +53,29 @@ class HtmlDumper extends BaseHtmlDumper
      * Create a new HTML dumper instance.
      *
      * @param  string  $basePath
+     * @param  string  $viewCompiledPath
      * @return void
      */
-    public function __construct($basePath)
+    public function __construct($basePath, $viewCompiledPath)
     {
         parent::__construct();
 
         $this->basePath = $basePath;
+        $this->viewCompiledPath = $viewCompiledPath;
     }
 
     /**
      * Create a new HTML dumper instance and register it as the default dumper.
      *
      * @param  string  $basePath
+     * @param  string  $viewCompiledPath
      * @return void
      */
-    public static function register($basePath)
+    public static function register($basePath, $viewCompiledPath)
     {
         $cloner = tap(new VarCloner())->addCasters(ReflectionCaster::UNSET_CLOSURE_FILE_INFO);
 
-        $dumper = new static($basePath);
+        $dumper = new static($basePath, $viewCompiledPath);
 
         VarDumper::setHandler(fn ($value) => $dumper->dumpWithSource($cloner->cloneVar($value)));
     }

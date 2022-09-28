@@ -31,6 +31,10 @@ trait ResolvesDumpSource
             return;
         }
 
+        if ($this->isFileViewCompiled($file)) {
+            $file = $this->getOriginalViewCompiledFile($file);
+        }
+
         $relativeFile = $file;
 
         if (str_starts_with($file, $this->basePath)) {
@@ -38,6 +42,34 @@ trait ResolvesDumpSource
         }
 
         return [$file, $relativeFile, $line];
+    }
+
+    /**
+     * Checks if the given file is a view compiled.
+     *
+     * @param  string  $file
+     * @return bool
+     */
+    protected function isFileViewCompiled($file)
+    {
+        return str_starts_with($file, $this->viewCompiledPath);
+    }
+
+    /**
+     * Gets the original view compiled file by the given compiled file.
+     *
+     * @param  string  $file
+     * @return string
+     */
+    protected function getOriginalViewCompiledFile($file)
+    {
+        preg_match('/\/\*\*PATH\s(.*)\sENDPATH/', file_get_contents($file), $matches);
+
+        if (isset($matches[1])) {
+            $file = $matches[1];
+        }
+
+        return $file;
     }
 
     /**

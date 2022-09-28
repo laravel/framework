@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Foundation\Http;
 
 use Illuminate\Foundation\Http\HtmlDumper;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 use stdClass;
 use Symfony\Component\VarDumper\Caster\ReflectionCaster;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
@@ -98,11 +99,83 @@ class HtmlDumperTest extends TestCase
         $this->assertStringContainsString($expected, $output);
     }
 
+    public function testWhenIsFileViewIsNotViewCompiled()
+    {
+        $file = '/my-work-directory/routes/web.php';
+
+        $dumper = new HtmlDumper(
+            '/my-work-directory',
+            '/my-work-directory/storage/framework/views'
+        );
+
+        $reflection = new ReflectionClass($dumper);
+        $method = $reflection->getMethod('isFileViewCompiled');
+        $method->setAccessible(true);
+        $isFileViewCompiled = $method->invoke($dumper, $file);
+
+        $this->assertFalse($isFileViewCompiled);
+    }
+
+    public function testWhenIsFileViewIsViewCompiled()
+    {
+        $file = '/my-work-directory/storage/framework/views/6687c33c38b71a8560.php';
+
+        $dumper = new HtmlDumper(
+            '/my-work-directory',
+            '/my-work-directory/storage/framework/views'
+        );
+
+        $reflection = new ReflectionClass($dumper);
+        $method = $reflection->getMethod('isFileViewCompiled');
+        $method->setAccessible(true);
+        $isFileViewCompiled = $method->invoke($dumper, $file);
+
+        $this->assertTrue($isFileViewCompiled);
+    }
+
+    public function testGetOriginalViewCompiledFile()
+    {
+        $compiled = __DIR__ . '/../fixtures/fake-compiled-view.php';
+        $original = '/my-work-directory/resources/views/welcome.blade.php';
+
+        $dumper = new HtmlDumper(
+            '/my-work-directory',
+            '/my-work-directory/storage/framework/views'
+        );
+
+        $reflection = new ReflectionClass($dumper);
+        $method = $reflection->getMethod('getOriginalViewCompiledFile');
+        $method->setAccessible(true);
+
+        $this->assertSame($original, $method->invoke($dumper, $compiled));
+    }
+
+    public function testWhenGetOriginalViewCompiledFileFails()
+    {
+        $compiled = __DIR__ . '/../fixtures/fake-compiled-view-without-source-map.php';
+        $original = $compiled;
+
+        $dumper = new HtmlDumper(
+            '/my-work-directory',
+            '/my-work-directory/storage/framework/views'
+        );
+
+        $reflection = new ReflectionClass($dumper);
+        $method = $reflection->getMethod('getOriginalViewCompiledFile');
+        $method->setAccessible(true);
+
+        $this->assertSame($original, $method->invoke($dumper, $compiled));
+    }
+
     protected function dump($value)
     {
         $outputFile = stream_get_meta_data(tmpfile())['uri'];
 
-        $dumper = new HtmlDumper('/my-work-directory');
+        $dumper = new HtmlDumper(
+            '/my-work-directory',
+            '/my-work-directory/storage/framework/views'
+        );
+
         $dumper->setOutput($outputFile);
 
         $cloner = tap(new VarCloner())->addCasters(ReflectionCaster::UNSET_CLOSURE_FILE_INFO);
