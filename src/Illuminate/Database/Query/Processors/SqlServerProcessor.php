@@ -9,6 +9,24 @@ use Illuminate\Database\Query\Builder;
 class SqlServerProcessor extends Processor
 {
     /**
+     * Process the results of a "select" query.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $results
+     * @return array
+     */
+    public function processSelect(Builder $query, $results)
+    {
+        if(str_ends_with($query->toSql(), '/* remove_temp_row_num */')){
+            array_map(function($row){
+                unset($row->temp_row_num);
+            }, $results);
+        }
+
+        return $results;
+    }
+
+    /**
      * Process an "insert get ID" query.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

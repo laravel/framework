@@ -289,7 +289,7 @@ class SqlServerGrammar extends Grammar
      */
     protected function compileOver($orderings)
     {
-        return ", row_number() over ({$orderings}) as row_num";
+        return ", row_number() over ({$orderings}) as temp_row_num";
     }
 
     /**
@@ -333,7 +333,7 @@ class SqlServerGrammar extends Grammar
     {
         $constraint = $this->compileRowConstraint($query);
 
-        return "select * from ({$sql}) as temp_table where row_num {$constraint} order by row_num";
+        return "select * from ({$sql}) as temp_table where temp_row_num {$constraint} order by temp_row_num /* remove_temp_row_num */";
     }
 
     /**
