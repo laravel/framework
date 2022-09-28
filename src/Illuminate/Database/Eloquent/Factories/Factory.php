@@ -632,7 +632,7 @@ abstract class Factory
                 ->merge(
                     Collection::wrap($model instanceof Model ? func_get_args() : $model)
                         ->flatten()
-                )->groupBy(fn ($model) => get_class($model))
+                )->groupBy(fn ($model) => get_class($model)),
         ]);
     }
 
@@ -640,7 +640,7 @@ abstract class Factory
      * Retrieves a random model of a given type from previously provided models to recycle.
      *
      * @param  string  $modelClassName
-     * @return  \Illuminate\Database\Eloquent\Model|null
+     * @return \Illuminate\Database\Eloquent\Model|null
      */
     public function getRandomRecycledModel($modelClassName)
     {

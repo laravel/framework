@@ -741,7 +741,6 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertSame(3, FactoryTestUser::count());
         $this->assertSame(3, FactoryTestPost::count());
 
-
         $comments = FactoryTestCommentFactory::new()
             ->recycle($users)
             ->recycle($posts)
