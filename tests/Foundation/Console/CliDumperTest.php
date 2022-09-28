@@ -120,11 +120,11 @@ class CliDumperTest extends TestCase
         );
 
         $reflection = new ReflectionClass($dumper);
-        $method = $reflection->getMethod('isFileViewCompiled');
+        $method = $reflection->getMethod('isCompiledViewFile');
         $method->setAccessible(true);
-        $isFileViewCompiled = $method->invoke($dumper, $file);
+        $isCompiledViewFile = $method->invoke($dumper, $file);
 
-        $this->assertFalse($isFileViewCompiled);
+        $this->assertFalse($isCompiledViewFile);
     }
 
     public function testWhenIsFileViewIsViewCompiled()
@@ -139,11 +139,11 @@ class CliDumperTest extends TestCase
         );
 
         $reflection = new ReflectionClass($dumper);
-        $method = $reflection->getMethod('isFileViewCompiled');
+        $method = $reflection->getMethod('isCompiledViewFile');
         $method->setAccessible(true);
-        $isFileViewCompiled = $method->invoke($dumper, $file);
+        $isCompiledViewFile = $method->invoke($dumper, $file);
 
-        $this->assertTrue($isFileViewCompiled);
+        $this->assertTrue($isCompiledViewFile);
     }
 
     public function testGetOriginalViewCompiledFile()
@@ -159,7 +159,7 @@ class CliDumperTest extends TestCase
         );
 
         $reflection = new ReflectionClass($dumper);
-        $method = $reflection->getMethod('getOriginalViewCompiledFile');
+        $method = $reflection->getMethod('getOriginalFileForCompiledView');
         $method->setAccessible(true);
 
         $this->assertSame($original, $method->invoke($dumper, $compiled));
@@ -178,7 +178,7 @@ class CliDumperTest extends TestCase
         );
 
         $reflection = new ReflectionClass($dumper);
-        $method = $reflection->getMethod('getOriginalViewCompiledFile');
+        $method = $reflection->getMethod('getOriginalFileForCompiledView');
         $method->setAccessible(true);
 
         $this->assertSame($original, $method->invoke($dumper, $compiled));
