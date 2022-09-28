@@ -179,7 +179,7 @@ class HtmlDumperTest extends TestCase
 
         $output = $this->dump('hey from view');
 
-        $expected = "hey from view</span>\"<span style=\"color: #A0A0A0; font-family: Menlo\"> // resources/views/welcome.blade.php</span>\n</pre>";
+        $expected = "hey from view</span>\"<span style=\"color: #A0A0A0;\"> // resources/views/welcome.blade.php</span>\n</pre>";
 
         $this->assertStringContainsString($expected, $output);
     }
