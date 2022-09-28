@@ -114,7 +114,13 @@ class CliDumper extends BaseCliDumper
 
         [$file, $relativeFile, $line] = $dumpSource;
 
-        return sprintf(' <fg=gray>// <fg=gray;href=file://%s#L%s>%s:%s</></>', $file, $line, $relativeFile, $line);
+        return sprintf(
+            ' <fg=gray>// <fg=gray;href=file://%s%s>%s%s</></>',
+            $file,
+            is_null($line) ? '' : "#L$line",
+            $relativeFile,
+            is_null($line) ? '' : ":$line"
+        );
     }
 
     /**

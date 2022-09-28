@@ -130,14 +130,14 @@ class HtmlDumper extends BaseHtmlDumper
 
         [$file, $relativeFile, $line] = $dumpSource;
 
-        $source = sprintf('%s:%s', $relativeFile, $line);
+        $source = sprintf('%s%s', $relativeFile, is_null($line) ? '' : ":$line");
 
         if ($editor = $this->editor()) {
             $source = sprintf(
-                '<a href="%s://open?file=%s&line=%s">%s</a>',
+                '<a href="%s://open?file=%s%s">%s</a>',
                 $editor,
                 $file,
-                $line,
+                is_null($line) ? '' : "&line=$line",
                 $source,
             );
         }

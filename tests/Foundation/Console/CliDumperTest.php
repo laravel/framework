@@ -148,7 +148,7 @@ class CliDumperTest extends TestCase
 
     public function testGetOriginalViewCompiledFile()
     {
-        $compiled = __DIR__ . '/../fixtures/fake-compiled-view.php';
+        $compiled = __DIR__.'/../fixtures/fake-compiled-view.php';
         $original = '/my-work-directory/resources/views/welcome.blade.php';
 
         $output = new BufferedOutput();
@@ -167,7 +167,7 @@ class CliDumperTest extends TestCase
 
     public function testWhenGetOriginalViewCompiledFileFails()
     {
-        $compiled = __DIR__ . '/../fixtures/fake-compiled-view-without-source-map.php';
+        $compiled = __DIR__.'/../fixtures/fake-compiled-view-without-source-map.php';
         $original = $compiled;
 
         $output = new BufferedOutput();
@@ -191,6 +191,23 @@ class CliDumperTest extends TestCase
         $output = $this->dump('string');
 
         $expected = "\"string\"\n";
+
+        $this->assertSame($expected, $output);
+    }
+
+    public function testUnresolvableLine()
+    {
+        CliDumper::resolveDumpSourceUsing(function () {
+            return [
+                '/my-work-directory/resources/views/welcome.blade.php',
+                'resources/views/welcome.blade.php',
+                null,
+            ];
+        });
+
+        $output = $this->dump('hey from view');
+
+        $expected = "\"hey from view\" // resources/views/welcome.blade.php\n";
 
         $this->assertSame($expected, $output);
     }
