@@ -998,7 +998,7 @@ class Builder implements BuilderContract
     /**
      * Add a "where in" clause to the query.
      *
-     * @param  string  $column
+     * @param  string|Expression  $column
      * @param  mixed  $values
      * @param  string  $boolean
      * @param  bool  $not
