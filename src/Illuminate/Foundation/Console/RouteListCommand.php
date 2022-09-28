@@ -146,12 +146,25 @@ class RouteListCommand extends Command
      */
     protected function getRouteInformation(Route $route)
     {
+        $action = ltrim($route->getActionName(), '\\');
+
+        if ($this->option('check')) {
+            if (strpos($action, '@') !== false) {
+                $parts = explode('@', $action);
+                if (!method_exists($parts[0], $parts[1])) {
+                    $this->newLine();
+                    $this->error(sprintf('Error method "%1$s" not found in class (%2$s)', $parts[1], $parts[0]));
+                    throw new \Exception("ERR_METHOD_NOT_FOUND", 1);
+                }
+            }
+        }
+
         return $this->filterRoute([
             'domain' => $route->domain(),
             'method' => implode('|', $route->methods()),
             'uri' => $route->uri(),
             'name' => $route->getName(),
-            'action' => ltrim($route->getActionName(), '\\'),
+            'action' => $action,
             'middleware' => $this->getMiddleware($route),
             'vendor' => $this->isVendorRoute($route),
         ]);
@@ -503,6 +516,7 @@ class RouteListCommand extends Command
             ['sort', null, InputOption::VALUE_OPTIONAL, 'The column (domain, method, uri, name, action, middleware) to sort by', 'uri'],
             ['except-vendor', null, InputOption::VALUE_NONE, 'Do not display routes defined by vendor packages'],
             ['only-vendor', null, InputOption::VALUE_NONE, 'Only display routes defined by vendor packages'],
+            ['check', null, InputOption::VALUE_NONE, 'Check action exists within class'],
         ];
     }
 }
