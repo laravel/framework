@@ -93,7 +93,7 @@
         "league/flysystem-read-only": "^3.3",
         "league/flysystem-sftp-v3": "^3.0",
         "mockery/mockery": "^1.4.4",
-        "orchestra/testbench-core": "^7.1",
+        "orchestra/testbench-core": "^7.8",
         "pda/pheanstalk": "^4.0",
         "phpstan/phpstan": "^1.4.7",
         "phpunit/phpunit": "^9.5.8",
