@@ -3960,7 +3960,7 @@ SQL;
     public function testAddBindingExpectException()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage("Invalid binding type: groupby.");
+        $this->expectExceptionMessage('Invalid binding type: groupby.');
 
         $builder = $this->getBuilder();
         $builder->addBinding(['foo', 'bar'], 'groupby');
@@ -3984,7 +3984,7 @@ SQL;
     public function testSetBindingExpectException()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage("Invalid binding type: groupby.");
+        $this->expectExceptionMessage('Invalid binding type: groupby.');
 
         $builder = $this->getBuilder();
         $builder->setBindings(['id', 10], 'groupby');
