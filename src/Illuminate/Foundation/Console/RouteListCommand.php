@@ -146,28 +146,38 @@ class RouteListCommand extends Command
      */
     protected function getRouteInformation(Route $route)
     {
-        $action = ltrim($route->getActionName(), '\\');
+        $data = [
+            'domain' => $route->domain(),
+            'method' => implode('|', $route->methods()),
+            'uri' => $route->uri(),
+            'name' => $route->getName(),
+            'action' => ltrim($route->getActionName(), '\\'),
+            'middleware' => $this->getMiddleware($route),
+        ];
 
-        if ($this->option('check')) {
+        $action = $data['action'];
+        if (true || $this->option('check')) {
             if (strpos($action, '@') !== false) {
                 $parts = explode('@', $action);
                 if (! method_exists($parts[0], $parts[1])) {
                     $this->newLine();
-                    $this->error(sprintf('Error method "%1$s" not found in class (%2$s)', $parts[1], $parts[0]));
+                    $this->error(sprintf('ERROR method "%1$s" not found in class (%2$s)', $parts[1], $parts[0]));
+                    $this->line('Route info:');
+                    foreach ($data as $key => $value) {
+                        if ('action' === $key) {
+                            $this->warn(sprintf('  %s: %s', $key, $value));
+                            $this->line(sprintf('    %s: %s', 'class', $parts[0]));
+                            $this->line(sprintf('    %s: %s', 'classMethod', $parts[1]));
+                        } else {
+                            $this->line(sprintf('  %s: %s', $key, $value));
+                        }
+                    }
                     throw new \Exception('ERR_METHOD_NOT_FOUND', 1);
                 }
             }
         }
 
-        return $this->filterRoute([
-            'domain' => $route->domain(),
-            'method' => implode('|', $route->methods()),
-            'uri' => $route->uri(),
-            'name' => $route->getName(),
-            'action' => $action,
-            'middleware' => $this->getMiddleware($route),
-            'vendor' => $this->isVendorRoute($route),
-        ]);
+        return $this->filterRoute($data);
     }
 
     /**
