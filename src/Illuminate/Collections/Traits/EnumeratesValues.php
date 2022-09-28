@@ -806,6 +806,17 @@ trait EnumeratesValues
     }
 
     /**
+     * Spread a collection into more members using given callback
+     * 
+     * @param  callable $callback
+     * @return static
+     */
+    public function spread(callable $callback)
+    {
+        return $this->reduce(fn ($carry, $row) => array_merge($carry, Arr::wrap($callback($row))), []);
+    }
+
+    /**
      * Pass the collection to the given callback and then return it.
      *
      * @param  callable($this): mixed  $callback

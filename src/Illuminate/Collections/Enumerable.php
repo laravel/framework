@@ -915,6 +915,14 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function split($numberOfGroups);
 
     /**
+     * Spread a collection into more members using given callback
+     * 
+     * @param callable $callback
+     * @return static
+     */
+    public function spread(callable $callback);
+
+    /**
      * Get the first item in the collection, but only if exactly one item exists. Otherwise, throw an exception.
      *
      * @param  (callable(TValue, TKey): bool)|string  $key

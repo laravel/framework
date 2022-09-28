@@ -3843,6 +3843,30 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testSpreadReturnsExpandedItems($collection)
+    {
+        $data = new $collection([1, 2, 3]);
+        $this->assertSame(
+            [1, 1.5, 2, 2.5, 3, 3.5],
+            $data->spread(fn ($i) => [$i, $i + 0.5])
+        );
+
+        $data = new $collection([1, 2, 3]);
+        $this->assertSame(
+            [1, 1.5, 2, 3, 3.5],
+            $data->spread(fn ($i) => $i === 2 ? 2 : [$i, $i + 0.5])
+        );
+
+        $data = new $collection([1, 2, 3]);
+        $this->assertSame(
+            [1, 2, 3],
+            $data->spread(fn ($i) => $i)
+        );
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testSearchReturnsIndexOfFirstFoundItem($collection)
     {
         $c = new $collection([1, 2, 3, 4, 5, 2, 5, 'foo' => 'bar']);
