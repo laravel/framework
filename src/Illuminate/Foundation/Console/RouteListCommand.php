@@ -151,10 +151,10 @@ class RouteListCommand extends Command
         if ($this->option('check')) {
             if (strpos($action, '@') !== false) {
                 $parts = explode('@', $action);
-                if (!method_exists($parts[0], $parts[1])) {
+                if (! method_exists($parts[0], $parts[1])) {
                     $this->newLine();
                     $this->error(sprintf('Error method "%1$s" not found in class (%2$s)', $parts[1], $parts[0]));
-                    throw new \Exception("ERR_METHOD_NOT_FOUND", 1);
+                    throw new \Exception('ERR_METHOD_NOT_FOUND', 1);
                 }
             }
         }
