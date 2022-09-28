@@ -156,7 +156,7 @@ class RouteListCommand extends Command
         ];
 
         $action = $data['action'];
-        if (true || $this->option('check')) {
+        if ($this->option('check')) {
             if (strpos($action, '@') !== false) {
                 $parts = explode('@', $action);
                 if (! method_exists($parts[0], $parts[1])) {
