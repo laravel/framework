@@ -2,8 +2,6 @@
 
 namespace Illuminate\Foundation;
 
-use Illuminate\Http\Response;
-
 class Precognition
 {
     /**

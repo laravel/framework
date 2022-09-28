@@ -17,7 +17,6 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Laravel\SerializableClosure\SerializableClosure;
 use LogicException;
-use ReflectionFunction;
 use Symfony\Component\Routing\Route as SymfonyRoute;
 
 class Route

@@ -2,7 +2,6 @@
 
 namespace Illuminate\Foundation\Routing;
 
-use Illuminate\Http\Response;
 use Illuminate\Routing\ControllerDispatcher;
 use Illuminate\Routing\Route;
 use RuntimeException;

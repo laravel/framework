@@ -786,7 +786,7 @@ class PrecognitionTestController
         precognitive(function () use ($request) {
             $this->validateWith([
                 'required_integer' => 'required|integer',
-                ... ! $request->isPrecognitive() ? ['required_integer_when_not_precognitive' => 'required|integer'] : [],
+                ...! $request->isPrecognitive() ? ['required_integer_when_not_precognitive' => 'required|integer'] : [],
                 'optional_integer_1' => 'integer',
                 'optional_integer_2' => 'integer',
             ]);
@@ -833,7 +833,7 @@ class PrecognitionTestController
 
     public function methodWherePredictionReturnsResponseWithControllerValidateWith(Request $request)
     {
-        precognitive(function ($bail) use ($request) {
+        precognitive(function ($bail) {
             $this->validateWith([
                 'required_integer' => 'required|integer',
                 'optional_integer_1' => 'integer',

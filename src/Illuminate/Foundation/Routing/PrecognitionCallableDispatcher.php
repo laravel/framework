@@ -2,7 +2,6 @@
 
 namespace Illuminate\Foundation\Routing;
 
-use Illuminate\Http\Response;
 use Illuminate\Routing\CallableDispatcher;
 use Illuminate\Routing\Route;
 
