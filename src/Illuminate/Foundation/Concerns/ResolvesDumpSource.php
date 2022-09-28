@@ -7,14 +7,14 @@ trait ResolvesDumpSource
     /**
      * The source resolver.
      *
-     * @var (callable(): (array{0: string, 1: string, 2: int}|null))|null
+     * @var (callable(): (array{0: string, 1: string, 2: int|null}|null))|null
      */
     protected static $dumpSourceResolver;
 
     /**
      * Resolve the source of the dump call.
      *
-     * @return array{0: string, 1: string, 2: int}|null
+     * @return array{0: string, 1: string, 2: int|null}|null
      */
     public function resolveDumpSource()
     {
@@ -33,6 +33,11 @@ trait ResolvesDumpSource
 
         $relativeFile = $file;
 
+        if ($this->isCompiledViewFile($file)) {
+            $file = $this->getOriginalFileForCompiledView($file);
+            $line = null;
+        }
+
         if (str_starts_with($file, $this->basePath)) {
             $relativeFile = substr($file, strlen($this->basePath) + 1);
         }
@@ -41,9 +46,37 @@ trait ResolvesDumpSource
     }
 
     /**
+     * Determine if the given file is a view compiled.
+     *
+     * @param  string  $file
+     * @return bool
+     */
+    protected function isCompiledViewFile($file)
+    {
+        return str_starts_with($file, $this->compiledViewPath);
+    }
+
+    /**
+     * Get the original view compiled file by the given compiled file.
+     *
+     * @param  string  $file
+     * @return string
+     */
+    protected function getOriginalFileForCompiledView($file)
+    {
+        preg_match('/\/\*\*PATH\s(.*)\sENDPATH/', file_get_contents($file), $matches);
+
+        if (isset($matches[1])) {
+            $file = $matches[1];
+        }
+
+        return $file;
+    }
+
+    /**
      * Set the resolver that resolves the source of the dump call.
      *
-     * @param  (callable(): (array{0: string, 1: string, 2: int}|null))|null  $callable
+     * @param  (callable(): (array{0: string, 1: string, 2: int|null}|null))|null  $callable
      * @return void
      */
     public static function resolveDumpSourceUsing($callable)

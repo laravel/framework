@@ -29,6 +29,13 @@ class CliDumper extends BaseCliDumper
     protected $output;
 
     /**
+     * The compiled view path for the application.
+     *
+     * @var string
+     */
+    protected $compiledViewPath;
+
+    /**
      * If the dumper is currently dumping.
      *
      * @var bool
@@ -40,27 +47,30 @@ class CliDumper extends BaseCliDumper
      *
      * @param  \Symfony\Component\Console\Output\OutputInterface  $output
      * @param  string  $basePath
+     * @param  string  $compiledViewPath
      * @return void
      */
-    public function __construct($output, $basePath)
+    public function __construct($output, $basePath, $compiledViewPath)
     {
         parent::__construct();
 
         $this->basePath = $basePath;
         $this->output = $output;
+        $this->compiledViewPath = $compiledViewPath;
     }
 
     /**
      * Create a new CLI dumper instance and register it as the default dumper.
      *
      * @param  string  $basePath
+     * @param  string  $compiledViewPath
      * @return void
      */
-    public static function register($basePath)
+    public static function register($basePath, $compiledViewPath)
     {
         $cloner = tap(new VarCloner())->addCasters(ReflectionCaster::UNSET_CLOSURE_FILE_INFO);
 
-        $dumper = new static(new ConsoleOutput(), $basePath);
+        $dumper = new static(new ConsoleOutput(), $basePath, $compiledViewPath);
 
         VarDumper::setHandler(fn ($value) => $dumper->dumpWithSource($cloner->cloneVar($value)));
     }
@@ -104,7 +114,13 @@ class CliDumper extends BaseCliDumper
 
         [$file, $relativeFile, $line] = $dumpSource;
 
-        return sprintf(' <fg=gray>// <fg=gray;href=file://%s#L%s>%s:%s</></>', $file, $line, $relativeFile, $line);
+        return sprintf(
+            ' <fg=gray>// <fg=gray;href=file://%s%s>%s%s</></>',
+            $file,
+            is_null($line) ? '' : "#L$line",
+            $relativeFile,
+            is_null($line) ? '' : ":$line"
+        );
     }
 
     /**
