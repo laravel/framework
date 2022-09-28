@@ -29,11 +29,11 @@ class CliDumper extends BaseCliDumper
     protected $output;
 
     /**
-     * The view compiled path of the application.
+     * The compiled view path for the application.
      *
      * @var string
      */
-    protected $viewCompiledPath;
+    protected $compiledViewPath;
 
     /**
      * If the dumper is currently dumping.
@@ -47,30 +47,30 @@ class CliDumper extends BaseCliDumper
      *
      * @param  \Symfony\Component\Console\Output\OutputInterface  $output
      * @param  string  $basePath
-     * @param  string  $viewCompiledPath
+     * @param  string  $compiledViewPath
      * @return void
      */
-    public function __construct($output, $basePath, $viewCompiledPath)
+    public function __construct($output, $basePath, $compiledViewPath)
     {
         parent::__construct();
 
         $this->basePath = $basePath;
         $this->output = $output;
-        $this->viewCompiledPath = $viewCompiledPath;
+        $this->compiledViewPath = $compiledViewPath;
     }
 
     /**
      * Create a new CLI dumper instance and register it as the default dumper.
      *
      * @param  string  $basePath
-     * @param  string  $viewCompiledPath
+     * @param  string  $compiledViewPath
      * @return void
      */
-    public static function register($basePath, $viewCompiledPath)
+    public static function register($basePath, $compiledViewPath)
     {
         $cloner = tap(new VarCloner())->addCasters(ReflectionCaster::UNSET_CLOSURE_FILE_INFO);
 
-        $dumper = new static(new ConsoleOutput(), $basePath, $viewCompiledPath);
+        $dumper = new static(new ConsoleOutput(), $basePath, $compiledViewPath);
 
         VarDumper::setHandler(fn ($value) => $dumper->dumpWithSource($cloner->cloneVar($value)));
     }
