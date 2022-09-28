@@ -138,7 +138,7 @@ abstract class Factory
                                 ?Collection $for = null,
                                 ?Collection $afterMaking = null,
                                 ?Collection $afterCreating = null,
-        $connection = null,
+                                $connection = null,
                                 ?Collection $recycle = null)
     {
         $this->count = $count;
@@ -592,10 +592,10 @@ abstract class Factory
                 $factory,
                 $pivot,
                 $relationship ?? Str::camel(Str::plural(class_basename(
-                $factory instanceof Factory
-                    ? $factory->modelName()
-                    : Collection::wrap($factory)->first()
-            )))
+                    $factory instanceof Factory
+                        ? $factory->modelName()
+                        : Collection::wrap($factory)->first()
+                )))
             )]),
         ]);
     }
@@ -612,8 +612,8 @@ abstract class Factory
         return $this->newInstance(['for' => $this->for->concat([new BelongsToRelationship(
             $factory,
             $relationship ?? Str::camel(class_basename(
-            $factory instanceof Factory ? $factory->modelName() : $factory
-        ))
+                $factory instanceof Factory ? $factory->modelName() : $factory
+            ))
         )])]);
     }
 
@@ -772,8 +772,8 @@ abstract class Factory
             $appNamespace = static::appNamespace();
 
             return class_exists($appNamespace.'Models\\'.$namespacedFactoryBasename)
-                ? $appNamespace.'Models\\'.$namespacedFactoryBasename
-                : $appNamespace.$factoryBasename;
+                        ? $appNamespace.'Models\\'.$namespacedFactoryBasename
+                        : $appNamespace.$factoryBasename;
         };
 
         return $this->model ?? $resolver($this);
@@ -865,8 +865,8 @@ abstract class Factory
     {
         try {
             return Container::getInstance()
-                ->make(Application::class)
-                ->getNamespace();
+                            ->make(Application::class)
+                            ->getNamespace();
         } catch (Throwable $e) {
             return 'App\\';
         }
