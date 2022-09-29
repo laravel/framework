@@ -79,7 +79,7 @@ class Builder
     public static function defaultMorphKeyType(string $type)
     {
         if (! in_array($type, ['int', 'uuid', 'ulid'])) {
-            throw new InvalidArgumentException("Morph key type must be 'int', 'uuid' or 'ulid'.");
+            throw new InvalidArgumentException("Morph key type must be 'int', 'uuid', or 'ulid'.");
         }
 
         static::$defaultMorphKeyType = $type;
