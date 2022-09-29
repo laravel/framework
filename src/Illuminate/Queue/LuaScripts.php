@@ -32,11 +32,20 @@ LUA;
     public static function push()
     {
         return <<<'LUA'
+-- Get queue length before push
+local count = redis.call('llen', KEYS[1])
 -- Push the job onto the queue...
-redis.call('rpush', KEYS[1], ARGV[1])
+local countAfterPush = redis.call('rpush', KEYS[1], ARGV[1])
 -- Push a notification onto the "notify" queue...
-redis.call('rpush', KEYS[2], 1)
-LUA;
+local notifCountAfterPush = redis.call('rpush', KEYS[2], 1)
+if (count ~= countAfterPush) then
+    if (count == notifCountAfterPush) then
+        redis.call('rpop', KEYS[1])
+    else
+        return true
+    end
+end
+return false
     }
 
     /**
