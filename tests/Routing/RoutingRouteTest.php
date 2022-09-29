@@ -1880,7 +1880,7 @@ class RoutingRouteTest extends TestCase
         $response = $router->dispatch($request);
         $this->assertSame(2, (int) $response->getContent());
 
-        $request->route()->flush();
+        $request->route()->flushController();
         $response = $router->dispatch($request);
         $this->assertSame(1, (int) $response->getContent());
     }
