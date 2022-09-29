@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Validation;
 
 use Illuminate\Contracts\Validation\Factory;
+use Illuminate\Foundation\Precognition;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
@@ -22,10 +23,22 @@ trait ValidatesRequests
         $request = $request ?: request();
 
         if (is_array($validator)) {
-            $validator = $this->getValidationFactory()->make($request->all(), $validator);
+            $rules = $request->isPrecognitive()
+                ? $request->filterPrecognitiveRules($validator)
+                : $validator;
+
+            $validator = $this->getValidationFactory()->make($request->all(), $rules);
+        } elseif ($request->isPrecognitive()) {
+            $validator->setRules(
+                $request->filterPrecognitiveRules($validator->getRules())
+            );
         }
 
-        return $validator->validate();
+        return tap($validator, function ($validator) use ($request) {
+            if ($request->isPrecognitive()) {
+                $validator->after(Precognition::afterValidationHook($request));
+            }
+        })->validate();
     }
 
     /**
@@ -42,9 +55,19 @@ trait ValidatesRequests
     public function validate(Request $request, array $rules,
                              array $messages = [], array $customAttributes = [])
     {
-        return $this->getValidationFactory()->make(
+        $rules = $request->isPrecognitive()
+            ? $request->filterPrecognitiveRules($rules)
+            : $rules;
+
+        $validator = $this->getValidationFactory()->make(
             $request->all(), $rules, $messages, $customAttributes
-        )->validate();
+        );
+
+        return tap($validator, function ($validator) use ($request) {
+            if ($request->isPrecognitive()) {
+                $validator->after(Precognition::afterValidationHook($request));
+            }
+        })->validate();
     }
 
     /**

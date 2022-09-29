@@ -6,6 +6,7 @@ use Illuminate\Contracts\Foundation\MaintenanceMode as MaintenanceModeContract;
 use Illuminate\Foundation\Console\CliDumper;
 use Illuminate\Foundation\Http\HtmlDumper;
 use Illuminate\Foundation\MaintenanceModeManager;
+use Illuminate\Foundation\Precognition;
 use Illuminate\Foundation\Vite;
 use Illuminate\Http\Request;
 use Illuminate\Log\Events\MessageLogged;
@@ -98,7 +99,15 @@ class FoundationServiceProvider extends AggregateServiceProvider
     public function registerRequestValidation()
     {
         Request::macro('validate', function (array $rules, ...$params) {
-            return validator()->validate($this->all(), $rules, ...$params);
+            $rules = $this->isPrecognitive()
+                ? $this->filterPrecognitiveRules($rules)
+                : $rules;
+
+            return tap(validator($this->all(), $rules, ...$params), function ($validator) {
+                if ($this->isPrecognitive()) {
+                    $validator->after(Precognition::afterValidationHook($this));
+                }
+            })->validate();
         });
 
         Request::macro('validateWithBag', function (string $errorBag, array $rules, ...$params) {
