@@ -24,10 +24,12 @@ abstract class DatabaseInspectionCommand extends Command
      */
     protected $typeMappings = [
         'bit' => 'string',
+        'citext' => 'string',
         'enum' => 'string',
         'geometry' => 'string',
         'geomcollection' => 'string',
         'linestring' => 'string',
+        'ltree' => 'string',
         'multilinestring' => 'string',
         'multipoint' => 'string',
         'multipolygon' => 'string',

@@ -55,4 +55,18 @@ trait HasUuids
 
         return $this->keyType;
     }
+
+    /**
+     * Get the value indicating whether the IDs are incrementing.
+     *
+     * @return bool
+     */
+    public function getIncrementing()
+    {
+        if (in_array($this->getKeyName(), $this->uniqueIds())) {
+            return false;
+        }
+
+        return $this->incrementing;
+    }
 }
