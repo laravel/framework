@@ -120,4 +120,24 @@ class EnvironmentEncryptCommandTest extends TestCase
         $this->filesystem->shouldHaveReceived('put')
             ->with(base_path('.env.encrypted'), m::any());
     }
+
+    public function testItGeneratesTheEncryptionFileCustomPath()
+    {
+        $path = 'path/environment/';
+
+        $this->filesystem->shouldReceive('exists')
+            ->once()
+            ->andReturn(true)
+            ->shouldReceive('exists')
+            ->once()
+            ->andReturn(false)
+            ->shouldReceive('get');
+
+        $this->artisan('env:encrypt', ['--path' => $path])
+            ->expectsOutputToContain('.env.encrypted')
+            ->assertExitCode(0);
+
+        $this->filesystem->shouldHaveReceived('put')
+            ->with(base_path($path.'.env.encrypted'), m::any());
+    }
 }

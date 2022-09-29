@@ -236,4 +236,29 @@ class EnvironmentDecryptCommandTest extends TestCase
             ->expectsOutputToContain('Invalid filename.')
             ->assertExitCode(1);
     }
+
+    public function testItWritesTheEnvironmentFileCustomPath()
+    {
+        $path = 'path/environment/';
+
+        $this->filesystem->shouldReceive('exists')
+            ->once()
+            ->andReturn(true)
+            ->shouldReceive('exists')
+            ->once()
+            ->andReturn(true)
+            ->shouldReceive('get')
+            ->once()
+            ->andReturn(
+                (new Encrypter($key = Encrypter::generateKey('AES-256-CBC'), 'AES-256-CBC'))
+                    ->encrypt('APP_NAME=Laravel Two')
+            );
+
+        $this->artisan('env:decrypt', ['--force' => true, '--path' => $path, '--key' => 'base64:'.base64_encode($key)])
+            ->expectsOutputToContain('Environment successfully decrypted.')
+            ->assertExitCode(0);
+
+        $this->filesystem->shouldHaveReceived('put')
+            ->with(base_path($path.'.env'), 'APP_NAME=Laravel Two');
+    }
 }

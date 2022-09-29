@@ -20,6 +20,7 @@ class EnvironmentEncryptCommand extends Command
                     {--key= : The encryption key}
                     {--cipher= : The encryption cipher}
                     {--env= : The environment to be encrypted}
+                    {--path= : Where is the environment file path is located}
                     {--force : Overwrite the existing encrypted environment file}';
 
     /**
@@ -73,9 +74,14 @@ class EnvironmentEncryptCommand extends Command
 
         $keyPassed = $key !== null;
 
-        $environmentFile = $this->option('env')
-                            ? base_path('.env').'.'.$this->option('env')
-                            : $this->laravel->environmentFilePath();
+        $filePath = ltrim(rtrim($this->option('path'), '/'), '/');
+
+        $this->laravel->useEnvironmentPath(base_path($filePath));
+
+        $environmentFile = rtrim(
+            $this->laravel->environmentFilePath().'.'.$this->option('env'),
+            '.'
+        );
 
         $encryptedFile = $environmentFile.'.encrypted';
 
