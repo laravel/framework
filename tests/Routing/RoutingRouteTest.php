@@ -1866,6 +1866,25 @@ class RoutingRouteTest extends TestCase
         $this->assertInstanceOf(JsonResponse::class, $response);
     }
 
+    public function testRouteFlush()
+    {
+        $container = new Container;
+        $router = $this->getRouter();
+
+        $router->get('count', ActionCountStub::class);
+        $request = Request::create('count', 'GET');
+
+        $response = $router->dispatch($request);
+        $this->assertSame(1, (int) $response->getContent());
+
+        $response = $router->dispatch($request);
+        $this->assertSame(2, (int) $response->getContent());
+
+        $request->route()->flushController();
+        $response = $router->dispatch($request);
+        $this->assertSame(1, (int) $response->getContent());
+    }
+
     public function testRouteRedirect()
     {
         $container = new Container;
@@ -2415,6 +2434,18 @@ class ActionStub
     public function __invoke()
     {
         return 'hello';
+    }
+}
+
+class ActionCountStub
+{
+    protected $count = 0;
+
+    public function __invoke()
+    {
+        $this->count++;
+
+        return $this->count;
     }
 }
 

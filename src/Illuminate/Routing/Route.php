@@ -307,6 +307,16 @@ class Route
     }
 
     /**
+     * Flush the cached container instance on the route.
+     *
+     * @return void
+     */
+    public function flushController()
+    {
+        $this->controller = null;
+    }
+
+    /**
      * Determine if the route matches a given request.
      *
      * @param  \Illuminate\Http\Request  $request
