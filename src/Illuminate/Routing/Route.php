@@ -889,6 +889,21 @@ class Route
     }
 
     /**
+     * Add or change the route enviroments.
+     *
+     * @param  array  $env
+     * @return $this
+     */
+
+    public function env(...$env)
+    {
+        $this->action['env'] = array_merge(
+            (array) ($this->action['env'] ?? []), $env
+        );
+        return $this;
+    }
+
+    /**
      * Set the handler for the route.
      *
      * @param  \Closure|array|string  $action
