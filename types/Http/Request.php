@@ -9,6 +9,6 @@ enum TestEnum : string
 }
 
 $request = Request::create('/', 'GET', [
-    'key' => 'test'
+    'key' => 'test',
 ]);
 assertType('TestEnum|null', $request->enum('key', TestEnum::class));

@@ -373,6 +373,7 @@ trait InteractsWithInput
      * Retrieve input from the request as an enum.
      *
      * @template T
+     *
      * @param  string  $key
      * @param  class-string<T>  $enumClass
      * @return T|null
