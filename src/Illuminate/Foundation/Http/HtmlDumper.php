@@ -134,6 +134,7 @@ class HtmlDumper extends BaseHtmlDumper
 
         if ($editor = $this->editor()) {
             $editorProjectPath = $this->editorProjectPath();
+
             $source = sprintf(
                 '<a href="%s://open?file=%s%s">%s</a>',
                 $editor,
@@ -168,7 +169,7 @@ class HtmlDumper extends BaseHtmlDumper
     protected function editorProjectPath()
     {
         try {
-            return config('app.editor_project_path');
+            return config('app.editor_base_path');
         } catch (Throwable $e) {
             // ...
         }
