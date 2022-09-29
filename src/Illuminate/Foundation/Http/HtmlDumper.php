@@ -133,10 +133,11 @@ class HtmlDumper extends BaseHtmlDumper
         $source = sprintf('%s%s', $relativeFile, is_null($line) ? '' : ":$line");
 
         if ($editor = $this->editor()) {
+            $editorProjectPath = $this->editorProjectPath();
             $source = sprintf(
                 '<a href="%s://open?file=%s%s">%s</a>',
                 $editor,
-                $file,
+                $editorProjectPath ? "$editorProjectPath/$relativeFile" : $file,
                 is_null($line) ? '' : "&line=$line",
                 $source,
             );
@@ -154,6 +155,20 @@ class HtmlDumper extends BaseHtmlDumper
     {
         try {
             return config('app.editor');
+        } catch (Throwable $e) {
+            // ...
+        }
+    }
+
+    /**
+     * Get the base path for the editor, if applicable.
+     *
+     * @return string|null
+     */
+    protected function editorProjectPath()
+    {
+        try {
+            return config('app.editor_project_path');
         } catch (Throwable $e) {
             // ...
         }
