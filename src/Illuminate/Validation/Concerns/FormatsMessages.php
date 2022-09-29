@@ -438,8 +438,18 @@ trait FormatsMessages
      */
     public function getDisplayableValue($attribute, $value)
     {
-        if (isset($this->customValues[$attribute][$value])) {
-            return $this->customValues[$attribute][$value];
+        $primaryAttribute = $this->getPrimaryAttribute($attribute);
+
+        $expectedAttributes = $attribute != $primaryAttribute
+            ? [$attribute, $primaryAttribute] : [$attribute];
+
+        foreach ($expectedAttributes as $name) {
+            // The developer may dynamically specify the array of custom displayable values on this
+            // validator instance. If the displayable value exists in this array it is used over
+            // the other ways of pulling the displayable value for the given attributes.
+            if (isset($this->customValues[$name][$value])) {
+                return $this->customValues[$name][$value];
+            }
         }
 
         $key = "validation.values.{$attribute}.{$value}";

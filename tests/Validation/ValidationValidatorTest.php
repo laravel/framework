@@ -518,6 +518,45 @@ class ValidationValidatorTest extends TestCase
 
         $this->assertFalse($v->passes());
         $this->assertSame('Rails is not a valid PHP Framework', $v->messages()->first('framework'));
+
+        // custom values for primary attributes (foo.*, foo.*.key, etc...)
+        $countries = [
+            'AQ' => 'Antarctica',
+            'GB' => 'Great Britain',
+            'US' => 'United States',
+        ];
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.shipping_country' => ':input is not a valid shipping country'], 'en');
+
+        $v = new Validator(
+            $trans,
+            [
+                'packages' => [['country' => 'US'],['country' => 'AQ'],['country' => 'GB']],
+                'country_mapping' => [
+                    'foo' => 'EE',
+                    'bar' => 'AQ',
+                    'baz' => 'AQ',
+                ]
+            ],
+            [
+                'packages.*.country' => 'shipping_country',
+                'country_mapping.*' => 'shipping_country',
+            ]
+        );
+        $v->addExtension('shipping_country', function ($attribute, $value, $parameters, $validator) {
+            return in_array($value, ['US', 'GB']);
+        });
+        $v->addCustomValues([
+            'packages.*.country' => $countries,
+            'country_mapping.*' => $countries,
+            'country_mapping.baz' => ['AQ' => 'Antarktis'], // different value for a specific attribute
+        ]);
+
+        $this->assertFalse($v->passes());
+        $this->assertSame('Antarctica is not a valid shipping country', $v->messages()->first('packages.1.country'));
+        $this->assertSame('Antarctica is not a valid shipping country', $v->messages()->first('country_mapping.bar'));
+        $this->assertSame('Antarktis is not a valid shipping country', $v->messages()->first('country_mapping.baz'));
     }
 
     public function testDisplayableValuesAreReplaced()
