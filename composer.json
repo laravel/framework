@@ -26,7 +26,7 @@
         "league/commonmark": "^2.2",
         "league/flysystem": "^3.0.16",
         "monolog/monolog": "^2.0",
-        "nesbot/carbon": "^2.53.1",
+        "nesbot/carbon": "^2.62.1",
         "nunomaduro/termwind": "^1.13",
         "psr/container": "^1.1.1|^2.0.1",
         "psr/log": "^1.0|^2.0|^3.0",
