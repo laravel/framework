@@ -623,6 +623,7 @@ class SupportStringableTest extends TestCase
         $this->assertTrue($this->stringable('taylor')->contains(['ylo']));
         $this->assertTrue($this->stringable('taylor')->contains(['xxx', 'ylo']));
         $this->assertTrue($this->stringable('taylor')->contains(collect(['xxx', 'ylo'])));
+        $this->assertTrue($this->stringable('taylor')->contains(['LOR'], true));
         $this->assertFalse($this->stringable('taylor')->contains('xxx'));
         $this->assertFalse($this->stringable('taylor')->contains(['xxx']));
         $this->assertFalse($this->stringable('taylor')->contains(''));
@@ -631,6 +632,7 @@ class SupportStringableTest extends TestCase
     public function testContainsAll()
     {
         $this->assertTrue($this->stringable('taylor otwell')->containsAll(['taylor', 'otwell']));
+        $this->assertTrue($this->stringable('taylor otwell')->containsAll(['TAYLOR', 'OTWELL'], true));
         $this->assertTrue($this->stringable('taylor otwell')->containsAll(collect(['taylor', 'otwell'])));
         $this->assertTrue($this->stringable('taylor otwell')->containsAll(['taylor']));
         $this->assertFalse($this->stringable('taylor otwell')->containsAll(['taylor', 'xxx']));
