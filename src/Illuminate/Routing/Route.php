@@ -1291,6 +1291,16 @@ class Route
     }
 
     /**
+     * Clears the temporary state associated to the route instance.
+     *
+     * @return void
+     */
+    public function flush()
+    {
+        $this->controller = null;
+    }
+
+    /**
      * Dynamically access route parameters.
      *
      * @param  string  $key
