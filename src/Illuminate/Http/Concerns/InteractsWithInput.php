@@ -372,9 +372,11 @@ trait InteractsWithInput
     /**
      * Retrieve input from the request as an enum.
      *
+     * @template TEnum
+     *
      * @param  string  $key
-     * @param  string  $enumClass
-     * @return mixed|null
+     * @param  class-string<TEnum>  $enumClass
+     * @return TEnum|null
      */
     public function enum($key, $enumClass)
     {
