@@ -19,5 +19,4 @@ class {{ class }} implements Scope
     {
         //
     }
-
 }
