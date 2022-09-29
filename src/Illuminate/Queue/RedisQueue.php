@@ -2,6 +2,7 @@
 
 namespace Illuminate\Queue;
 
+use Exception;
 use Illuminate\Contracts\Queue\ClearableQueue;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Contracts\Redis\Factory as Redis;
@@ -152,10 +153,13 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function pushRaw($payload, $queue = null, array $options = [])
     {
-        $this->getConnection()->eval(
+        $success = $this->getConnection()->eval(
             LuaScripts::push(), 2, $this->getQueue($queue),
             $this->getQueue($queue).':notify', $payload
         );
+        if (! $success) {
+            throw new Exception('Failed push job to the queue');
+        }
 
         return json_decode($payload, true)['id'] ?? null;
     }
