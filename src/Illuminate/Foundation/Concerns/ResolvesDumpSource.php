@@ -22,10 +22,27 @@ trait ResolvesDumpSource
             return call_user_func(static::$dumpSourceResolver);
         }
 
-        $trace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT | DEBUG_BACKTRACE_IGNORE_ARGS, 20);
+        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 20);
 
-        $file = $trace[7]['file'] ?? null;
-        $line = $trace[7]['line'] ?? null;
+        $sourceKey = null;
+
+        foreach ($trace as $traceKey => $traceFile) {
+            if (isset($traceFile['file']) && str_ends_with(
+                $traceFile['file'],
+                'symfony/var-dumper/Resources/functions/dump.php'
+            )) {
+                $sourceKey = $traceKey + 1;
+
+                break;
+            }
+        }
+
+        if (is_null($sourceKey)) {
+            return;
+        }
+
+        $file = $trace[$sourceKey]['file'] ?? null;
+        $line = $trace[$sourceKey]['line'] ?? null;
 
         if (is_null($file) || is_null($line)) {
             return;
