@@ -75,4 +75,15 @@ trait CompilesHelpers
 
         return "<?php echo app('$class')->reactRefresh(); ?>";
     }
+
+    /**
+     * Compile the "__" statements into valid PHP.
+     *
+     * @param  string  $arguments
+     * @return string
+     */
+    protected function compile__($arguments)
+    {
+        return "<?php echo __{$arguments}; ?>";
+    }
 }
