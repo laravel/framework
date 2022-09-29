@@ -532,12 +532,12 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator(
             $trans,
             [
-                'packages' => [['country' => 'US'],['country' => 'AQ'],['country' => 'GB']],
+                'packages' => [['country' => 'US'], ['country' => 'AQ'], ['country' => 'GB']],
                 'country_mapping' => [
                     'foo' => 'EE',
                     'bar' => 'AQ',
                     'baz' => 'AQ',
-                ]
+                ],
             ],
             [
                 'packages.*.country' => 'shipping_country',
