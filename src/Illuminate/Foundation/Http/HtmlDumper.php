@@ -133,16 +133,30 @@ class HtmlDumper extends BaseHtmlDumper
         $source = sprintf('%s%s', $relativeFile, is_null($line) ? '' : ":$line");
 
         if ($editor = $this->editor()) {
-            $source = sprintf(
-                '<a href="%s://open?file=%s%s">%s</a>',
-                $editor,
-                $file,
-                is_null($line) ? '' : "&line=$line",
-                $source,
+            $href = str_replace(
+                ['{file}', '{line}'],
+                [$file, is_null($line) ? 1 : $line],
+                $this->editorHref()
             );
+
+            $source = sprintf('<a href="%s://%s">%s</a>', $editor, $href, $source);
         }
 
         return sprintf('<span style="color: #A0A0A0;"> // %s</span>', $source);
+    }
+
+    /**
+     * Get the application editor href, if applicable.
+     *
+     * @return string
+     */
+    protected function editorHref()
+    {
+        try {
+            return config('app.editor_href', 'open?file={file}&line={line}');
+        } catch (Throwable $e) {
+            // ...
+        }
     }
 
     /**
