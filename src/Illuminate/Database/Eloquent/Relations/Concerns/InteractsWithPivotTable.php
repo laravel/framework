@@ -15,10 +15,11 @@ trait InteractsWithPivotTable
      * Each existing model is detached, and non existing ones are attached.
      *
      * @param  mixed  $ids
+     * @param  array  $attributes 
      * @param  bool  $touch
      * @return array
      */
-    public function toggle($ids, $touch = true)
+    public function toggle($ids, array $attributes = [], $touch = true)
     {
         $changes = [
             'attached' => [], 'detached' => [],
@@ -46,7 +47,7 @@ trait InteractsWithPivotTable
         $attach = array_diff_key($records, array_flip($detach));
 
         if (count($attach) > 0) {
-            $this->attach($attach, [], false);
+            $this->attach($attach, $attributes, false);
 
             $changes['attached'] = array_keys($attach);
         }
