@@ -114,7 +114,7 @@ class AssertableJsonString implements ArrayAccess, Countable
     public function assertSimilar(array $data)
     {
         $actual = json_encode(
-            Arr::sortRecursive((array)$this->decoded),
+            Arr::sortRecursive((array) $this->decoded),
             JSON_UNESCAPED_UNICODE
         );
 
@@ -132,7 +132,7 @@ class AssertableJsonString implements ArrayAccess, Countable
     public function assertFragment(array $data)
     {
         $actual = json_encode(
-            Arr::sortRecursive((array)$this->decoded),
+            Arr::sortRecursive((array) $this->decoded),
             JSON_UNESCAPED_UNICODE
         );
 
@@ -141,9 +141,9 @@ class AssertableJsonString implements ArrayAccess, Countable
 
             PHPUnit::assertTrue(
                 Str::contains($actual, $expected),
-                'Unable to find JSON fragment: ' . PHP_EOL . PHP_EOL .
-                '[' . json_encode([$key => $value]) . ']' . PHP_EOL . PHP_EOL .
-                'within' . PHP_EOL . PHP_EOL .
+                'Unable to find JSON fragment: '.PHP_EOL.PHP_EOL.
+                '['.json_encode([$key => $value], JSON_UNESCAPED_UNICODE).']'.PHP_EOL.PHP_EOL.
+                'within'.PHP_EOL.PHP_EOL.
                 "[{$actual}]."
             );
         }
@@ -165,7 +165,7 @@ class AssertableJsonString implements ArrayAccess, Countable
         }
 
         $actual = json_encode(
-            Arr::sortRecursive((array)$this->decoded),
+            Arr::sortRecursive((array) $this->decoded),
             JSON_UNESCAPED_UNICODE
         );
 
@@ -174,9 +174,9 @@ class AssertableJsonString implements ArrayAccess, Countable
 
             PHPUnit::assertFalse(
                 Str::contains($actual, $unexpected),
-                'Found unexpected JSON fragment: ' . PHP_EOL . PHP_EOL .
-                '[' . json_encode([$key => $value], JSON_UNESCAPED_UNICODE) . ']' . PHP_EOL . PHP_EOL .
-                'within' . PHP_EOL . PHP_EOL .
+                'Found unexpected JSON fragment: '.PHP_EOL.PHP_EOL.
+                '['.json_encode([$key => $value], JSON_UNESCAPED_UNICODE).']'.PHP_EOL.PHP_EOL.
+                'within'.PHP_EOL.PHP_EOL.
                 "[{$actual}]."
             );
         }
@@ -193,22 +193,22 @@ class AssertableJsonString implements ArrayAccess, Countable
     public function assertMissingExact(array $data)
     {
         $actual = json_encode(
-            Arr::sortRecursive((array)$this->decoded),
+            Arr::sortRecursive((array) $this->decoded),
             JSON_UNESCAPED_UNICODE
         );
 
         foreach (Arr::sortRecursive($data) as $key => $value) {
             $unexpected = $this->jsonSearchStrings($key, $value);
 
-            if (!Str::contains($actual, $unexpected)) {
+            if (! Str::contains($actual, $unexpected)) {
                 return $this;
             }
         }
 
         PHPUnit::fail(
-            'Found unexpected JSON fragment: ' . PHP_EOL . PHP_EOL .
-            '[' . json_encode($data, JSON_UNESCAPED_UNICODE) . ']' . PHP_EOL . PHP_EOL .
-            'within' . PHP_EOL . PHP_EOL .
+            'Found unexpected JSON fragment: '.PHP_EOL.PHP_EOL.
+            '['.json_encode($data, JSON_UNESCAPED_UNICODE).']'.PHP_EOL.PHP_EOL.
+            'within'.PHP_EOL.PHP_EOL.
             "[{$actual}]."
         );
 
