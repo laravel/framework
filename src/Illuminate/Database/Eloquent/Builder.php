@@ -1001,6 +1001,17 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Update records in the database.
+     *
+     * @param  array  $values
+     * @return int
+     */
+    public function updateFrom(array $values)
+    {
+        return $this->toBase()->updateFrom($this->addUpdatedAtColumn($values));
+    }
+
+    /**
      * Insert new records or update the existing ones.
      *
      * @param  array  $values
