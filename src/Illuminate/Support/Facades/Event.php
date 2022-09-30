@@ -10,6 +10,7 @@ use Illuminate\Support\Testing\Fakes\EventFake;
  * @method static \Closure makeListener(\Closure|string $listener, bool $wildcard = false)
  * @method static \Illuminate\Events\Dispatcher setQueueResolver(callable $resolver)
  * @method static array getListeners(string $eventName)
+ * @method static array getRawListeners()
  * @method static array|null dispatch(string|object $event, mixed $payload = [], bool $halt = false)
  * @method static array|null until(string|object $event, mixed $payload = [])
  * @method static bool hasListeners(string $eventName)
