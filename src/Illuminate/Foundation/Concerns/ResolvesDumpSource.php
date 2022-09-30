@@ -2,6 +2,8 @@
 
 namespace Illuminate\Foundation\Concerns;
 
+use Throwable;
+
 trait ResolvesDumpSource
 {
     /**
