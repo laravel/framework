@@ -63,6 +63,48 @@ trait ResolvesDumpSource
     }
 
     /**
+     * Resolves the source href, if possible.
+     *
+     * @param  string  $file
+     * @param  int|null  $line
+     * @return string|null
+     */
+    protected function resolveSourceHref($file, $line)
+    {
+        try {
+            $editor = config('app.editor');
+        } catch (Throwable $e) {
+            // ..
+        }
+
+        if (! isset($editor)) {
+            return;
+        }
+
+        $href = is_array($editor) ? ($editor['href'] ?? null) : $editor;
+
+        if (empty($href)) {
+            return;
+        }
+
+        if ($basePath = $editor['base_path'] ?? false) {
+            $file = str_replace($this->basePath, $basePath, $file);
+        }
+
+        if (! str_contains($href, '://')) {
+            $href = sprintf('%s://open?file={file}&line={line}', $href);
+        }
+
+        $href = str_replace(
+            ['{file}', '{line}'],
+            [$file, is_null($line) ? 1 : $line],
+            $href,
+        );
+
+        return $href;
+    }
+
+    /**
      * Determine if the given file is a view compiled.
      *
      * @param  string  $file

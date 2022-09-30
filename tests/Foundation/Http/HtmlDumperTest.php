@@ -2,6 +2,8 @@
 
 namespace Illuminate\Tests\Foundation\Http;
 
+use Illuminate\Config\Repository;
+use Illuminate\Container\Container;
 use Illuminate\Foundation\Http\HtmlDumper;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -11,6 +13,8 @@ use Symfony\Component\VarDumper\Cloner\VarCloner;
 
 class HtmlDumperTest extends TestCase
 {
+    protected $app;
+
     protected function setUp(): void
     {
         HtmlDumper::resolveDumpSourceUsing(function () {
@@ -20,6 +24,8 @@ class HtmlDumperTest extends TestCase
                 18,
             ];
         });
+
+        $this->app = Container::getInstance();
     }
 
     public function testString()
@@ -184,6 +190,81 @@ class HtmlDumperTest extends TestCase
         $this->assertStringContainsString($expected, $output);
     }
 
+    public function testHref()
+    {
+        $dumper = new HtmlDumper(
+            '/my-work-directory',
+            '/my-work-directory/storage/framework/views'
+        );
+
+        // Failure...
+        $href = (fn () => $this->href(
+            '/my-work-directory/app/my-file',
+            10,
+        ))->call($dumper);
+        $this->assertNull($href);
+
+        $config = new Repository();
+        $this->app->instance('config', $config);
+        $href = fn () => (fn () => $this->href(
+            '/my-work-directory/app/my-file',
+            10,
+        ))->call($dumper);
+
+        // Empty...
+        $this->assertNull($href());
+
+        // When editor is provided...
+        $config->set('app.editor', 'phpstorm');
+        $this->assertSame(
+            'phpstorm://open?file=/my-work-directory/app/my-file&line=10', $href()
+        );
+
+        // When href is provided...
+        $config->set('app.editor', 'vscode://open?file={file}&line={line}');
+        $this->assertSame(
+            'vscode://open?file=/my-work-directory/app/my-file&line=10', $href()
+        );
+
+        // When editoe is provided on array format...
+        $config->set('app.editor', ['href' => 'phpstorm']);
+        $this->assertSame(
+            'phpstorm://open?file=/my-work-directory/app/my-file&line=10', $href()
+        );
+
+        // When editor and base path is provided on array format...
+        $config->set('app.editor', ['href' => 'phpstorm', 'base_path' => '/my-docker-work-directory']);
+        $this->assertSame(
+            'phpstorm://open?file=/my-docker-work-directory/app/my-file&line=10', $href());
+
+        // When base path is provided on array format...
+        $config->set('app.editor', ['base_path' => '/my-docker-work-directory']);
+        $this->assertNull($href());
+
+        // When href is provided on array format...
+        $config->set('app.editor', ['href' => 'vscode://open?file={file}&line={line}']);
+        $this->assertSame(
+            'vscode://open?file=/my-work-directory/app/my-file&line=10', $href()
+        );
+
+        // Array with href and base path
+        $config->set('app.editor', ['href' => 'vscode://open?file={file}&line={line}', 'base_path' => '/my-docker-work-directory']);
+        $this->assertSame(
+            'vscode://open?file=/my-docker-work-directory/app/my-file&line=10', $href()
+        );
+
+        // Missing line
+        $href = (fn () => $this->href(
+            '/my-work-directory/app/my-file',
+            null,
+        ))->call($dumper);
+        $config->set('app.editor', ['href' => 'vscode', 'base_path' => '/my-docker-work-directory']);
+        $this->assertSame(
+            'vscode://open?file=/my-docker-work-directory/app/my-file&line=1',
+            $href,
+        );
+    }
+
     protected function dump($value)
     {
         $outputFile = stream_get_meta_data(tmpfile())['uri'];
@@ -205,5 +286,6 @@ class HtmlDumperTest extends TestCase
     protected function tearDown(): void
     {
         HtmlDumper::resolveDumpSourceUsing(null);
+        Container::setInstance(null);
     }
 }
