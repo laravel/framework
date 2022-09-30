@@ -230,7 +230,7 @@ class PendingResourceRegistration
     /**
      * Set which methods should load trashed models.
      *
-     * @param  array $methods
+     * @param  array  $methods
      * @return \Illuminate\Routing\PendingResourceRegistration
      */
     public function withTrashed(array $methods = [])
