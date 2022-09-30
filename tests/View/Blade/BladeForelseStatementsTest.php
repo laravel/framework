@@ -41,7 +41,9 @@ empty
         $string = '@forelse ([
 foo,
 bar,
-] as $label)
+]
+as
+$label)
 breeze
 @empty
 empty

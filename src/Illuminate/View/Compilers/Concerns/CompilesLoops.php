@@ -25,7 +25,7 @@ trait CompilesLoops
     {
         $empty = '$__empty_'.++$this->forElseCounter;
 
-        preg_match('/\( *(.+) +as +(.+)\)$/is', $expression ?? '', $matches);
+        preg_match('/\( *(.+)\s+as\s+(.+)\)$/is', $expression ?? '', $matches);
 
         if (count($matches) === 0) {
             throw new ViewCompilationException('Malformed @forelse statement.');
@@ -100,7 +100,7 @@ trait CompilesLoops
      */
     protected function compileForeach($expression)
     {
-        preg_match('/\( *(.+) +as +(.*)\)$/is', $expression ?? '', $matches);
+        preg_match('/\( *(.+)\s+as\s+(.*)\)$/is', $expression ?? '', $matches);
 
         if (count($matches) === 0) {
             throw new ViewCompilationException('Malformed @foreach statement.');

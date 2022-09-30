@@ -33,7 +33,9 @@ test
         $string = '@foreach ([
 foo,
 bar,
-] as $label)
+]
+as
+$label)
 test
 @endforeach';
         $expected = '<?php $__currentLoopData = [
