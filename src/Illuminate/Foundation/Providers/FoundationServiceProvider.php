@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\URL;
 use Illuminate\Testing\LoggedExceptionCollection;
 use Illuminate\Testing\ParallelTestingServiceProvider;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\Console\Output\ConsoleOutput;
 
 class FoundationServiceProvider extends AggregateServiceProvider
 {
@@ -68,24 +69,30 @@ class FoundationServiceProvider extends AggregateServiceProvider
     }
 
     /**
-     * Register an var dumper (with source) to debug variables.
+     * Register a var dumper (with source and Laravel-specific casters) to debug variables.
      *
      * @return void
      */
     public function registerDumper()
     {
-        $basePath = $this->app->basePath();
+        $this->app->singleton(HtmlDumper::class, fn() => new HtmlDumper(
+            $this->app->basePath(),
+            $this->app['config']->get('view.compiled')
+        ));
 
-        $compiledViewPath = $this->app['config']->get('view.compiled');
+        $this->app->singleton(CliDumper::class, fn() => new CliDumper(
+            new ConsoleOutput(),
+            $this->app->basePath(),
+            $this->app['config']->get('view.compiled')
+        ));
 
         $format = $_SERVER['VAR_DUMPER_FORMAT'] ?? null;
 
-        match (true) {
-            'html' == $format => HtmlDumper::register($basePath, $compiledViewPath),
-            'cli' == $format => CliDumper::register($basePath, $compiledViewPath),
-            'server' == $format => null,
-            $format && 'tcp' == parse_url($format, PHP_URL_SCHEME) => null,
-            default => in_array(PHP_SAPI, ['cli', 'phpdbg']) ? CliDumper::register($basePath, $compiledViewPath) : HtmlDumper::register($basePath, $compiledViewPath),
+        match ($format) {
+            'server', 'tcp' === parse_url((string) $format, PHP_URL_SCHEME) => null,
+            'html' => $this->app->make(HtmlDumper::class)->register(),
+            'cli', in_array(PHP_SAPI, ['cli', 'phpdbg']) => $this->app->make(CliDumper::class)->register(),
+            default => $this->app->make(HtmlDumper::class)->register(),
         };
     }
 

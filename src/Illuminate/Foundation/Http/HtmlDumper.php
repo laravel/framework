@@ -3,15 +3,14 @@
 namespace Illuminate\Foundation\Http;
 
 use Illuminate\Foundation\Concerns\ResolvesDumpSource;
-use Symfony\Component\VarDumper\Caster\ReflectionCaster;
+use Illuminate\Foundation\VarDumper\Concerns\HandlesDumps;
 use Symfony\Component\VarDumper\Cloner\Data;
-use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper as BaseHtmlDumper;
-use Symfony\Component\VarDumper\VarDumper;
 use Throwable;
 
 class HtmlDumper extends BaseHtmlDumper
 {
+    use HandlesDumps;
     use ResolvesDumpSource;
 
     /**
@@ -62,22 +61,6 @@ class HtmlDumper extends BaseHtmlDumper
 
         $this->basePath = $basePath;
         $this->compiledViewPath = $compiledViewPath;
-    }
-
-    /**
-     * Create a new HTML dumper instance and register it as the default dumper.
-     *
-     * @param  string  $basePath
-     * @param  string  $compiledViewPath
-     * @return void
-     */
-    public static function register($basePath, $compiledViewPath)
-    {
-        $cloner = tap(new VarCloner())->addCasters(ReflectionCaster::UNSET_CLOSURE_FILE_INFO);
-
-        $dumper = new static($basePath, $compiledViewPath);
-
-        VarDumper::setHandler(fn ($value) => $dumper->dumpWithSource($cloner->cloneVar($value)));
     }
 
     /**

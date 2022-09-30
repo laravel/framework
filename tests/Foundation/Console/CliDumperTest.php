@@ -2,13 +2,12 @@
 
 namespace Illuminate\Tests\Foundation\Console;
 
+use Illuminate\Container\Container;
 use Illuminate\Foundation\Console\CliDumper;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use stdClass;
 use Symfony\Component\Console\Output\BufferedOutput;
-use Symfony\Component\VarDumper\Caster\ReflectionCaster;
-use Symfony\Component\VarDumper\Cloner\VarCloner;
 
 class CliDumperTest extends TestCase
 {
@@ -104,6 +103,28 @@ class CliDumperTest extends TestCase
         $output = $this->dump(null);
 
         $expected = "null // app/routes/console.php:18\n";
+
+        $this->assertSame($expected, $output);
+    }
+
+    public function testContainer()
+    {
+        $container = new Container();
+
+        $output = $this->dump($container);
+
+        $objectId = spl_object_id($container);
+
+        $expected = <<<EOF
+        Illuminate\Container\Container {#$objectId // app/routes/console.php:18
+          #bindings: []
+          #aliases: []
+          #resolved: []
+          #extenders: []
+           …15
+        }
+
+        EOF;
 
         $this->assertSame($expected, $output);
     }
@@ -221,9 +242,7 @@ class CliDumperTest extends TestCase
             '/my-work-directory/storage/framework/views',
         );
 
-        $cloner = tap(new VarCloner())->addCasters(ReflectionCaster::UNSET_CLOSURE_FILE_INFO);
-
-        $dumper->dumpWithSource($cloner->cloneVar($value));
+        $dumper->handle($value);
 
         return $output->fetch();
     }

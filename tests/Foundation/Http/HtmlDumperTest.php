@@ -2,12 +2,11 @@
 
 namespace Illuminate\Tests\Foundation\Http;
 
+use Illuminate\Container\Container;
 use Illuminate\Foundation\Http\HtmlDumper;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use stdClass;
-use Symfony\Component\VarDumper\Caster\ReflectionCaster;
-use Symfony\Component\VarDumper\Cloner\VarCloner;
 
 class HtmlDumperTest extends TestCase
 {
@@ -86,6 +85,26 @@ class HtmlDumperTest extends TestCase
         $expected = "null</span><span style=\"color: #A0A0A0;\"> // app/routes/console.php:18</span>\n</pre>";
 
         $this->assertStringContainsString($expected, $output);
+    }
+
+    public function testContainer()
+    {
+        $container = new Container();
+
+        $output = $this->dump($container);
+
+        $expectations = [
+            '<samp data-depth=1 class=sf-dump-expanded><span style="color: #A0A0A0;"> // app/routes/console.php:18</span>',
+            '#<span class=sf-dump-protected title="Protected property">bindings</span>: []',
+            '#<span class=sf-dump-protected title="Protected property">aliases</span>: []',
+            '#<span class=sf-dump-protected title="Protected property">resolved</span>: []',
+            '#<span class=sf-dump-protected title="Protected property">extenders</span>: []',
+            '&hellip;15',
+        ];
+
+        foreach ($expectations as $expected) {
+            $this->assertStringContainsString($expected, $output);
+        }
     }
 
     public function testUnresolvableSource()
@@ -195,9 +214,7 @@ class HtmlDumperTest extends TestCase
 
         $dumper->setOutput($outputFile);
 
-        $cloner = tap(new VarCloner())->addCasters(ReflectionCaster::UNSET_CLOSURE_FILE_INFO);
-
-        $dumper->dumpWithSource($cloner->cloneVar($value));
+        $dumper->handle($value);
 
         return tap(file_get_contents($outputFile), fn () => @unlink($outputFile));
     }

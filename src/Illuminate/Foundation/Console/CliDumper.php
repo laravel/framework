@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Foundation\Concerns\ResolvesDumpSource;
+use Illuminate\Foundation\VarDumper\Concerns\HandlesDumps;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\VarDumper\Caster\ReflectionCaster;
 use Symfony\Component\VarDumper\Cloner\Data;
@@ -12,6 +13,7 @@ use Symfony\Component\VarDumper\VarDumper;
 
 class CliDumper extends BaseCliDumper
 {
+    use HandlesDumps;
     use ResolvesDumpSource;
 
     /**
@@ -57,22 +59,6 @@ class CliDumper extends BaseCliDumper
         $this->basePath = $basePath;
         $this->output = $output;
         $this->compiledViewPath = $compiledViewPath;
-    }
-
-    /**
-     * Create a new CLI dumper instance and register it as the default dumper.
-     *
-     * @param  string  $basePath
-     * @param  string  $compiledViewPath
-     * @return void
-     */
-    public static function register($basePath, $compiledViewPath)
-    {
-        $cloner = tap(new VarCloner())->addCasters(ReflectionCaster::UNSET_CLOSURE_FILE_INFO);
-
-        $dumper = new static(new ConsoleOutput(), $basePath, $compiledViewPath);
-
-        VarDumper::setHandler(fn ($value) => $dumper->dumpWithSource($cloner->cloneVar($value)));
     }
 
     /**
