@@ -564,7 +564,7 @@ class Dispatcher implements DispatcherContract
         $traits = class_uses_recursive($instance);
 
         foreach ($traits as $trait) {
-            $method = 'shouldQueue' . $trait;
+            $method = 'shouldQueue'.$trait;
 
             if (method_exists($instance, $method)) {
                 $condition = $condition && call_user_func([$instance, $method], $arguments[0]);
