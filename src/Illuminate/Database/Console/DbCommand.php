@@ -36,7 +36,7 @@ class DbCommand extends Command
 
         if (! isset($connection['host'])) {
             $this->components->error('No host specified for this database connection.');
-            $this->line('  '.'Use the <options=bold>[--read]</> and <options=bold>[--write]</> options to specify a read or write connection.');
+            $this->line('  Use the <options=bold>[--read]</> and <options=bold>[--write]</> options to specify a read or write connection.');
             $this->newLine();
 
             return Command::FAILURE;
