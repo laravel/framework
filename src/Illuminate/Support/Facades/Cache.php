@@ -6,7 +6,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Cache\TaggedCache tags(array|mixed $names)
  * @method static \Illuminate\Contracts\Cache\Lock lock(string $name, int $seconds = 0, mixed $owner = null)
  * @method static \Illuminate\Contracts\Cache\Lock restoreLock(string $name, string $owner)
- * @method static \Illuminate\Contracts\Cache\Repository  store(string|null $name = null)
+ * @method static \Illuminate\Contracts\Cache\Repository store(string|null $name = null)
  * @method static \Illuminate\Contracts\Cache\Store getStore()
  * @method static bool add(string $key, $value, \DateTimeInterface|\DateInterval|int $ttl = null)
  * @method static bool flush()
