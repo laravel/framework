@@ -17,7 +17,7 @@ class HeaderBagCaster extends Caster
                     ? $headers[0]
                     : $headers;
             })
-            ->mapWithKeys(fn($value, $key) => [Key::virtual($key) => $value])
+            ->mapWithKeys(fn ($value, $key) => [Key::virtual($key) => $value])
             ->all();
 
         $result[Key::protected('cacheControl')] = $properties[Key::protected('cacheControl')];

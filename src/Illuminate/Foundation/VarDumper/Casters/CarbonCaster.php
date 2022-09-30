@@ -11,7 +11,7 @@ class CarbonCaster extends Caster
     {
         return $properties
             ->putVirtual('date', $target->format($this->getFormat($target)))
-            ->when($isNested, fn($properties) => $properties->only('date'))
+            ->when($isNested, fn ($properties) => $properties->only('date'))
             ->filter()
             ->reorder(['date', '*'])
             ->applyCutsToStub($stub, $properties)

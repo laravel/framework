@@ -75,12 +75,12 @@ class FoundationServiceProvider extends AggregateServiceProvider
      */
     public function registerDumper()
     {
-        $this->app->singleton(HtmlDumper::class, fn() => new HtmlDumper(
+        $this->app->singleton(HtmlDumper::class, fn () => new HtmlDumper(
             $this->app->basePath(),
             $this->app['config']->get('view.compiled')
         ));
 
-        $this->app->singleton(CliDumper::class, fn() => new CliDumper(
+        $this->app->singleton(CliDumper::class, fn () => new CliDumper(
             new ConsoleOutput(),
             $this->app->basePath(),
             $this->app['config']->get('view.compiled')

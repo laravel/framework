@@ -2,7 +2,6 @@
 
 namespace Illuminate\Foundation\VarDumper;
 
-use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
@@ -454,6 +453,6 @@ class Properties extends Collection
             return [$key];
         }
 
-        return array_merge([$key], array_map(fn($prefix) => $prefix.$key, $this->prefixes));
+        return array_merge([$key], array_map(fn ($prefix) => $prefix.$key, $this->prefixes));
     }
 }

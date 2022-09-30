@@ -12,7 +12,7 @@ class ParameterBagCaster extends Caster
     protected function cast($target, $properties, $stub, $isNested, $filter = 0)
     {
         return collect($target->all())
-            ->mapWithKeys(fn($value, $key) => [Key::virtual($key) => $value])
+            ->mapWithKeys(fn ($value, $key) => [Key::virtual($key) => $value])
             ->all();
     }
 }

@@ -4,12 +4,8 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Foundation\Concerns\ResolvesDumpSource;
 use Illuminate\Foundation\VarDumper\Concerns\HandlesDumps;
-use Symfony\Component\Console\Output\ConsoleOutput;
-use Symfony\Component\VarDumper\Caster\ReflectionCaster;
 use Symfony\Component\VarDumper\Cloner\Data;
-use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper as BaseCliDumper;
-use Symfony\Component\VarDumper\VarDumper;
 
 class CliDumper extends BaseCliDumper
 {
