@@ -198,7 +198,7 @@ class HtmlDumperTest extends TestCase
         );
 
         // Failure...
-        $href = (fn () => $this->href(
+        $href = (fn () => $this->resolveSourceHref(
             '/my-work-directory/app/my-file',
             10,
         ))->call($dumper);
@@ -206,55 +206,55 @@ class HtmlDumperTest extends TestCase
 
         $config = new Repository();
         $this->app->instance('config', $config);
-        $href = fn () => (fn () => $this->href(
+        $resolveSourceHref = fn () => (fn () => $this->resolveSourceHref(
             '/my-work-directory/app/my-file',
             10,
         ))->call($dumper);
 
         // Empty...
-        $this->assertNull($href());
+        $this->assertNull($resolveSourceHref());
 
         // When editor is provided...
         $config->set('app.editor', 'phpstorm');
         $this->assertSame(
-            'phpstorm://open?file=/my-work-directory/app/my-file&line=10', $href()
+            'phpstorm://open?file=/my-work-directory/app/my-file&line=10', $resolveSourceHref()
         );
 
         // When href is provided...
         $config->set('app.editor', 'vscode://open?file={file}&line={line}');
         $this->assertSame(
-            'vscode://open?file=/my-work-directory/app/my-file&line=10', $href()
+            'vscode://open?file=/my-work-directory/app/my-file&line=10', $resolveSourceHref()
         );
 
         // When editoe is provided on array format...
         $config->set('app.editor', ['href' => 'phpstorm']);
         $this->assertSame(
-            'phpstorm://open?file=/my-work-directory/app/my-file&line=10', $href()
+            'phpstorm://open?file=/my-work-directory/app/my-file&line=10', $resolveSourceHref()
         );
 
         // When editor and base path is provided on array format...
         $config->set('app.editor', ['href' => 'phpstorm', 'base_path' => '/my-docker-work-directory']);
         $this->assertSame(
-            'phpstorm://open?file=/my-docker-work-directory/app/my-file&line=10', $href());
+            'phpstorm://open?file=/my-docker-work-directory/app/my-file&line=10', $resolveSourceHref());
 
         // When base path is provided on array format...
         $config->set('app.editor', ['base_path' => '/my-docker-work-directory']);
-        $this->assertNull($href());
+        $this->assertNull($resolveSourceHref());
 
         // When href is provided on array format...
         $config->set('app.editor', ['href' => 'vscode://open?file={file}&line={line}']);
         $this->assertSame(
-            'vscode://open?file=/my-work-directory/app/my-file&line=10', $href()
+            'vscode://open?file=/my-work-directory/app/my-file&line=10', $resolveSourceHref()
         );
 
         // Array with href and base path
         $config->set('app.editor', ['href' => 'vscode://open?file={file}&line={line}', 'base_path' => '/my-docker-work-directory']);
         $this->assertSame(
-            'vscode://open?file=/my-docker-work-directory/app/my-file&line=10', $href()
+            'vscode://open?file=/my-docker-work-directory/app/my-file&line=10', $resolveSourceHref()
         );
 
         // Missing line
-        $href = (fn () => $this->href(
+        $href = (fn () => $this->resolveSourceHref(
             '/my-work-directory/app/my-file',
             null,
         ))->call($dumper);
