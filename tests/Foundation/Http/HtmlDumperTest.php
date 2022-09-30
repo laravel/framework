@@ -214,32 +214,22 @@ class HtmlDumperTest extends TestCase
         // Empty...
         $this->assertNull($resolveSourceHref());
 
-        // When editor is provided...
+        // When editor name is provided...
         $config->set('app.editor', 'phpstorm');
         $this->assertSame(
             'phpstorm://open?file=/my-work-directory/app/my-file&line=10', $resolveSourceHref()
         );
 
-        // When href is provided...
-        $config->set('app.editor', 'vscode://open?file={file}&line={line}');
-        $this->assertSame(
-            'vscode://open?file=/my-work-directory/app/my-file&line=10', $resolveSourceHref()
-        );
-
-        // When editoe is provided on array format...
-        $config->set('app.editor', ['href' => 'phpstorm']);
+        // When editor name is provided on array format...
+        $config->set('app.editor', ['name' => 'phpstorm']);
         $this->assertSame(
             'phpstorm://open?file=/my-work-directory/app/my-file&line=10', $resolveSourceHref()
         );
 
-        // When editor and base path is provided on array format...
-        $config->set('app.editor', ['href' => 'phpstorm', 'base_path' => '/my-docker-work-directory']);
+        // When editor name and base path is provided on array format...
+        $config->set('app.editor', ['name' => 'phpstorm', 'base_path' => '/my-docker-work-directory']);
         $this->assertSame(
             'phpstorm://open?file=/my-docker-work-directory/app/my-file&line=10', $resolveSourceHref());
-
-        // When base path is provided on array format...
-        $config->set('app.editor', ['base_path' => '/my-docker-work-directory']);
-        $this->assertNull($resolveSourceHref());
 
         // When href is provided on array format...
         $config->set('app.editor', ['href' => 'vscode://open?file={file}&line={line}']);
@@ -247,7 +237,7 @@ class HtmlDumperTest extends TestCase
             'vscode://open?file=/my-work-directory/app/my-file&line=10', $resolveSourceHref()
         );
 
-        // Array with href and base path
+        // When href and base path is provided on array format...
         $config->set('app.editor', ['href' => 'vscode://open?file={file}&line={line}', 'base_path' => '/my-docker-work-directory']);
         $this->assertSame(
             'vscode://open?file=/my-docker-work-directory/app/my-file&line=10', $resolveSourceHref()
@@ -258,7 +248,7 @@ class HtmlDumperTest extends TestCase
             '/my-work-directory/app/my-file',
             null,
         ))->call($dumper);
-        $config->set('app.editor', ['href' => 'vscode', 'base_path' => '/my-docker-work-directory']);
+        $config->set('app.editor', ['name' => 'vscode', 'base_path' => '/my-docker-work-directory']);
         $this->assertSame(
             'vscode://open?file=/my-docker-work-directory/app/my-file&line=1',
             $href,

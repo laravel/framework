@@ -83,18 +83,12 @@ trait ResolvesDumpSource
             return;
         }
 
-        $href = is_array($editor) ? ($editor['href'] ?? null) : $editor;
-
-        if (empty($href)) {
-            return;
-        }
+        $href = is_array($editor) && isset($editor['href'])
+            ? $editor['href']
+            : sprintf('%s://open?file={file}&line={line}', $editor['name'] ?? $editor);
 
         if ($basePath = $editor['base_path'] ?? false) {
             $file = str_replace($this->basePath, $basePath, $file);
-        }
-
-        if (! str_contains($href, '://')) {
-            $href = sprintf('%s://open?file={file}&line={line}', $href);
         }
 
         $href = str_replace(
