@@ -559,11 +559,23 @@ class Dispatcher implements DispatcherContract
     {
         $instance = $this->container->make($class);
 
-        if (method_exists($instance, 'shouldQueue')) {
-            return $instance->shouldQueue($arguments[0]);
+        $condition = true;
+
+        $traits = class_uses_recursive($instance);
+
+        foreach ($traits as $trait) {
+            $method = 'shouldQueue' . $trait;
+
+            if (method_exists($instance, $method)) {
+                $condition = $condition && call_user_func([$instance, $method], $arguments[0]);
+            }
         }
 
-        return true;
+        if (method_exists($instance, 'shouldQueue')) {
+            $condition = $condition && $instance->shouldQueue($arguments[0]);
+        }
+
+        return $condition;
     }
 
     /**
