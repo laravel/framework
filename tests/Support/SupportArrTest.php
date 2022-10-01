@@ -805,8 +805,9 @@ class SupportArrTest extends TestCase
         Arr::set($array, 'products.desk.price', 300);
         $this->assertSame(['products' => ['desk' => ['price' => 300]]], $array);
 
-        $array = [1 => 'test'];
-        $this->assertEquals([1 => 'hAz'], Arr::set($array, 1, 'hAz'));
+        $array = [1 => 'foo'];
+        Arr::set($array, 1, 'bar');
+        $this->assertSame([1 => 'bar'], $array);
     }
 
     public function testShuffleWithSeed()
