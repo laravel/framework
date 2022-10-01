@@ -21,6 +21,7 @@ namespace Illuminate\Support\Facades;
  * @method static string to(string $path, $extra = [], bool $secure = null)
  * @method static void defaults(array $defaults)
  * @method static void forceScheme(string $scheme)
+ * @method static void forceRootUrl(string $root)
  * @method static bool isValidUrl(string $path)
  *
  * @see \Illuminate\Routing\UrlGenerator
