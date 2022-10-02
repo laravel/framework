@@ -106,6 +106,7 @@ trait HasAttributes
         'real',
         'string',
         'timestamp',
+        'time',
     ];
 
     /**
@@ -721,6 +722,10 @@ trait HasAttributes
             $castType = Str::after($castType, 'encrypted:');
         }
 
+        if (str_starts_with($castType, 'time')) {
+            [$castType, $format] = $this->fromTimeString($key);
+        }
+
         switch ($castType) {
             case 'int':
             case 'integer':
@@ -755,6 +760,8 @@ trait HasAttributes
                 return $this->asDateTime($value)->toImmutable();
             case 'timestamp':
                 return $this->asTimestamp($value);
+            case 'time':
+                return $this->asTime($value, $format);
         }
 
         if ($this->isEnumCastable($key)) {
@@ -1391,6 +1398,43 @@ trait HasAttributes
     protected function asTimestamp($value)
     {
         return $this->asDateTime($value)->getTimestamp();
+    }
+
+    /**
+     * Format time format and castType.
+     *
+     * @param  string  $key
+     * @return array
+     */
+    public function fromTimeString($key)
+    {
+        $castType = $this->getCasts()[$key];
+
+        $format = null;
+
+        if (is_string($castType) && str_contains($castType, ':')) {
+            [$castType, $format] = explode(':', $castType, 2);
+        }
+
+        return [$castType, $format];
+    }
+
+    /**
+     * Return a timestamp as DateTime object with time set to 00:00:00.
+     *
+     * @param  mixed  $value
+     * @param  string|null  $format
+     * @return \Illuminate\Support\Carbon|string
+     */
+    protected function asTime($value, $format)
+    {
+        $instance = Carbon::parse($value);
+
+        if (!is_null($format)) {
+            return $instance->format($format);
+        }
+
+        return $instance;
     }
 
     /**
