@@ -1404,6 +1404,65 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('foo/{foo}/modifier', $routes->getByName('foo.edit')->uri());
     }
 
+    public function testResourceWithSoftDeletesRouting()
+    {
+        $router = $this->getRouter();
+        $router->resource('foo', 'FooController')->withSoftDeletes();
+        $routes = $router->getRoutes();
+        $this->assertCount(9, $routes);
+
+        $router = $this->getRouter();
+        $router->resource('foo', 'FooController', ['only' => ['trashed']])->withSoftDeletes();
+        $routes = $router->getRoutes();
+
+        $this->assertCount(1, $routes);
+
+        $router = $this->getRouter();
+        $router->resource('foo', 'FooController', ['only' => ['trashed', 'restore']])->withSoftDeletes();
+        $routes = $router->getRoutes();
+
+        $this->assertCount(2, $routes);
+
+        $router = $this->getRouter();
+        $router->resource('foo', 'FooController', ['except' => ['trashed', 'restore']])->withSoftDeletes();
+        $routes = $router->getRoutes();
+
+        $this->assertCount(7, $routes);
+
+        $router = $this->getRouter();
+        $router->resource('foo-bars', 'FooController', ['only' => ['restore']])->withSoftDeletes();
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+
+        $this->assertSame('foo-bars/{foo_bar}/restore', $routes[0]->uri());
+
+        $router = $this->getRouter();
+        $router->resource('foo-bar.foo-baz', 'FooController', ['only' => ['restore']])->withSoftDeletes();
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+
+        $this->assertSame('foo-bar/{foo_bar}/foo-baz/{foo_baz}/restore', $routes[0]->uri());
+
+        $router = $this->getRouter();
+        $router->resource('foo-bars', 'FooController', ['only' => ['restore'], 'as' => 'prefix'])->withSoftDeletes();
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+
+        $this->assertSame('foo-bars/{foo_bar}/restore', $routes[0]->uri());
+        $this->assertSame('prefix.foo-bars.restore', $routes[0]->getName());
+
+        ResourceRegistrar::verbs([
+            'trashed' => 'saccagé',
+            'restore' => 'restaurer',
+        ]);
+        $router = $this->getRouter();
+        $router->resource('foo', 'FooController')->withSoftDeletes();
+        $routes = $router->getRoutes();
+
+        $this->assertSame('foo/saccagé', $routes->getByName('foo.trashed')->uri());
+        $this->assertSame('foo/{foo}/restaurer', $routes->getByName('foo.restore')->uri());
+    }
+
     public function testResourceRoutingParameters()
     {
         ResourceRegistrar::singularParameters();
@@ -1456,7 +1515,7 @@ class RoutingRouteTest extends TestCase
     public function testResourceRouteNaming()
     {
         $router = $this->getRouter();
-        $router->resource('foo', 'FooController');
+        $router->resource('foo', 'FooController')->withSoftDeletes();
 
         $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.index'));
         $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.show'));
@@ -1465,9 +1524,11 @@ class RoutingRouteTest extends TestCase
         $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.edit'));
         $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.update'));
         $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.destroy'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.trashed'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.restore'));
 
         $router = $this->getRouter();
-        $router->resource('foo.bar', 'FooController');
+        $router->resource('foo.bar', 'FooController')->withSoftDeletes();
 
         $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.index'));
         $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.show'));
@@ -1476,9 +1537,11 @@ class RoutingRouteTest extends TestCase
         $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.edit'));
         $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.update'));
         $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.destroy'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.trashed'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.restore'));
 
         $router = $this->getRouter();
-        $router->resource('prefix/foo.bar', 'FooController');
+        $router->resource('prefix/foo.bar', 'FooController')->withSoftDeletes();
 
         $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.index'));
         $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.show'));
@@ -1487,18 +1550,20 @@ class RoutingRouteTest extends TestCase
         $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.edit'));
         $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.update'));
         $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.destroy'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.trashed'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.restore'));
 
         $router = $this->getRouter();
         $router->resource('foo', 'FooController', ['names' => [
             'index' => 'foo',
             'show' => 'bar',
-        ]]);
+        ]])->withSoftDeletes();
 
         $this->assertTrue($router->getRoutes()->hasNamedRoute('foo'));
         $this->assertTrue($router->getRoutes()->hasNamedRoute('bar'));
 
         $router = $this->getRouter();
-        $router->resource('foo', 'FooController', ['names' => 'bar']);
+        $router->resource('foo', 'FooController', ['names' => 'bar'])->withSoftDeletes();
 
         $this->assertTrue($router->getRoutes()->hasNamedRoute('bar.index'));
         $this->assertTrue($router->getRoutes()->hasNamedRoute('bar.show'));
@@ -1507,6 +1572,8 @@ class RoutingRouteTest extends TestCase
         $this->assertTrue($router->getRoutes()->hasNamedRoute('bar.edit'));
         $this->assertTrue($router->getRoutes()->hasNamedRoute('bar.update'));
         $this->assertTrue($router->getRoutes()->hasNamedRoute('bar.destroy'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('bar.trashed'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('bar.restore'));
     }
 
     public function testRouterFiresRoutedEvent()

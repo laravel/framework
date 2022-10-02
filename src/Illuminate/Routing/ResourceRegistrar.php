@@ -21,6 +21,13 @@ class ResourceRegistrar
     protected $resourceDefaults = ['index', 'create', 'store', 'show', 'edit', 'update', 'destroy'];
 
     /**
+     * The actions for a resource full controller with a model with softDelete.
+     *
+     * @var string[]
+     */
+    protected $resourceSoftDeletes = ['index', 'create', 'store', 'show', 'edit', 'update', 'destroy', 'trashed', 'restore'];
+
+    /**
      * The parameters set for this resource instance.
      *
      * @var array|string
@@ -49,6 +56,8 @@ class ResourceRegistrar
     protected static $verbs = [
         'create' => 'create',
         'edit' => 'edit',
+        'trashed' => 'trashed',
+        'restore' => 'restore',
     ];
 
     /**
@@ -91,6 +100,10 @@ class ResourceRegistrar
         $base = $this->getResourceWildcard(last(explode('.', $name)));
 
         $defaults = $this->resourceDefaults;
+
+        if (isset($options['withSoftDeletes']) && $options['withSoftDeletes']) {
+            $defaults = $this->resourceSoftDeletes;
+        }
 
         $collection = new RouteCollection;
 
@@ -309,6 +322,46 @@ class ResourceRegistrar
         $action = $this->getResourceAction($name, $controller, 'destroy', $options);
 
         return $this->router->delete($uri, $action);
+    }
+
+    /**
+     * Add the trashed method for a resourceful route.
+     *
+     * @param  string  $name
+     * @param  string  $base
+     * @param  string  $controller
+     * @param  array  $options
+     * @return \Illuminate\Routing\Route
+     */
+    protected function addResourceTrashed($name, $base, $controller, $options)
+    {
+        $name = $this->getShallowName($name, $options);
+
+        $uri = $this->getResourceUri($name).'/'.static::$verbs['trashed'];
+
+        $action = $this->getResourceAction($name, $controller, 'trashed', $options);
+
+        return $this->router->get($uri, $action);
+    }
+
+    /**
+     * Add the restore method for a resourceful route.
+     *
+     * @param  string  $name
+     * @param  string  $base
+     * @param  string  $controller
+     * @param  array  $options
+     * @return \Illuminate\Routing\Route
+     */
+    protected function addResourceRestore($name, $base, $controller, $options)
+    {
+        $name = $this->getShallowName($name, $options);
+
+        $uri = $this->getResourceUri($name).'/{'.$base.'}/'.static::$verbs['restore'];
+
+        $action = $this->getResourceAction($name, $controller, 'restore', $options);
+
+        return $this->router->match(['PUT', 'PATCH'], $uri, $action);
     }
 
     /**
