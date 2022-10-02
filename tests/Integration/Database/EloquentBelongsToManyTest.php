@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Integration;
+namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
