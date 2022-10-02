@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Database\EloquentCollectionLoadMissingTest;
+namespace Illuminate\Tests\Integration\Database;
 
 use DB;
 use Illuminate\Database\Eloquent\Model;

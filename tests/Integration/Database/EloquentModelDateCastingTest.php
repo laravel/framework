@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Database\EloquentModelDateCastingTest;
+namespace Illuminate\Tests\Integration\Database;
 
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
