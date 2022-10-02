@@ -330,7 +330,7 @@ class ResourceRegistrar
      * @param  string  $name
      * @param  string  $base
      * @param  string  $controller
-     * @param  array   $options
+     * @param  array  $options
      * @return \Illuminate\Routing\Route
      */
     protected function addResourceTrashed($name, $base, $controller, $options)
@@ -348,7 +348,7 @@ class ResourceRegistrar
      * @param  string  $name
      * @param  string  $base
      * @param  string  $controller
-     * @param  array   $options
+     * @param  array  $options
      * @return \Illuminate\Routing\Route
      */
     protected function addResourceRestore($name, $base, $controller, $options)
