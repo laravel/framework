@@ -27,7 +27,7 @@ class EloquentModelTimeCastingTest extends DatabaseTestCase
         ]);
 
         $this->assertSame('10:30', $user->toArray()['start_at']);
-        // $this->assertSame('10:15:20', $user->toArray()['end_at']);
+        $this->assertSame('10:15:20', $user->toArray()['end_at']->format('H:i:s'));
         $this->assertInstanceOf(Carbon::class, $user->end_at);
     }
 
