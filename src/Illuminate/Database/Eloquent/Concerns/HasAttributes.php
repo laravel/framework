@@ -1430,7 +1430,7 @@ trait HasAttributes
     {
         $instance = Carbon::parse($value);
 
-        if (!is_null($format)) {
+        if (! is_null($format)) {
             return $instance->format($format);
         }
 
