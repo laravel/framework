@@ -743,6 +743,20 @@ class PrecognitionTest extends TestCase
         $response->assertOk();
         $this->assertSame('http://localhost/expected-route-2', session()->previousUrl());
     }
+
+    public function testItHandlesSymfonyResponses()
+    {
+        Route::get('test-route', function () {
+            return response()->streamDownload(function () {
+                echo 'foo';
+            }, 'bar', ['Expected' => 'Header']);
+        })->middleware(HandlePrecognitiveRequests::class);
+
+        $response = $this->get('test-route');
+
+        $response->assertOk();
+        $response->assertHeader('Expected', 'Header');
+    }
 }
 
 class PrecognitionTestController
