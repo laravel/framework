@@ -19,6 +19,13 @@ class Attribute
     public $set;
 
     /**
+     * Indicates if need to add this attribute in append.
+     *
+     * @var bool
+     */
+    public $withAppend = false;
+
+    /**
      * Indicates if caching is enabled for this attribute.
      *
      * @var bool
@@ -77,6 +84,18 @@ class Attribute
     public static function set(callable $set)
     {
         return new static(null, $set);
+    }
+
+    /**
+     * Enable append for the attribute.
+     *
+     * @return static
+     */
+    public function withAppend()
+    {
+        $this->withAppend = true;
+
+        return $this;
     }
 
     /**
