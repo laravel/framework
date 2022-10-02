@@ -1420,7 +1420,7 @@ trait HasAttributes
     }
 
     /**
-     * Return a timestamp as DateTime object with time set to 00:00:00.
+     * Return a times as Carbon object with time or return formatted as string.
      *
      * @param  mixed  $value
      * @param  string|null  $format
