@@ -75,9 +75,7 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
      */
     protected function matchAgainstRoutes(array $routes, $request, $includingMethod = true)
     {
-        [$fallbacks, $routes] = collect($routes)->partition(function ($route) {
-            return $route->isFallback;
-        });
+        [$fallbacks, $routes] = collect($routes)->partition(fn($route) => $route->isFallback);
 
         return $routes->merge($fallbacks)->first(
             fn (Route $route) => $route->matches($request, $includingMethod)
@@ -176,15 +174,7 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
         $routes = $this->getRoutes();
 
         foreach ($routes as $route) {
-            if (! $route->isFallback) {
-                $symfonyRoutes = $this->addToSymfonyRoutesCollection($symfonyRoutes, $route);
-            }
-        }
-
-        foreach ($routes as $route) {
-            if ($route->isFallback) {
-                $symfonyRoutes = $this->addToSymfonyRoutesCollection($symfonyRoutes, $route);
-            }
+            $symfonyRoutes = $this->addToSymfonyRoutesCollection($symfonyRoutes, $route);
         }
 
         return $symfonyRoutes;
