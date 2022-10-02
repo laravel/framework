@@ -1396,6 +1396,63 @@ class RoutingRouteTest extends TestCase
         ResourceRegistrar::verbs([
             'create' => 'ajouter',
             'edit' => 'modifier',
+        ]);
+        $router = $this->getRouter();
+        $router->resource('foo', 'FooController');
+        $routes = $router->getRoutes();
+
+        $this->assertSame('foo/ajouter', $routes->getByName('foo.create')->uri());
+        $this->assertSame('foo/{foo}/modifier', $routes->getByName('foo.edit')->uri());
+    }
+
+    public function testResourceWithSoftDeletesRouting()
+    {
+        $router = $this->getRouter();
+        $router->resource('foo', 'FooController')->withSoftDeletes();
+        $routes = $router->getRoutes();
+        $this->assertCount(9, $routes);
+
+        $router = $this->getRouter();
+        $router->resource('foo', 'FooController', ['only' => ['trashed']])->withSoftDeletes();
+        $routes = $router->getRoutes();
+
+        $this->assertCount(1, $routes);
+
+        $router = $this->getRouter();
+        $router->resource('foo', 'FooController', ['only' => ['trashed', 'restore']])->withSoftDeletes();
+        $routes = $router->getRoutes();
+
+        $this->assertCount(2, $routes);
+
+        $router = $this->getRouter();
+        $router->resource('foo', 'FooController', ['except' => ['trashed', 'restore']])->withSoftDeletes();
+        $routes = $router->getRoutes();
+
+        $this->assertCount(7, $routes);
+
+        $router = $this->getRouter();
+        $router->resource('foo-bars', 'FooController', ['only' => ['restore']])->withSoftDeletes();
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+
+        $this->assertSame('foo-bars/{foo_bar}/restore', $routes[0]->uri());
+
+        $router = $this->getRouter();
+        $router->resource('foo-bar.foo-baz', 'FooController', ['only' => ['restore']])->withSoftDeletes();
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+
+        $this->assertSame('foo-bar/{foo_bar}/foo-baz/{foo_baz}/restore', $routes[0]->uri());
+
+        $router = $this->getRouter();
+        $router->resource('foo-bars', 'FooController', ['only' => ['restore'], 'as' => 'prefix'])->withSoftDeletes();
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+
+        $this->assertSame('foo-bars/{foo_bar}/restore', $routes[0]->uri());
+        $this->assertSame('prefix.foo-bars.restore', $routes[0]->getName());
+
+        ResourceRegistrar::verbs([
             'trashed' => 'saccagé',
             'restore' => 'restaurer',
         ]);
@@ -1403,8 +1460,6 @@ class RoutingRouteTest extends TestCase
         $router->resource('foo', 'FooController')->withSoftDeletes();
         $routes = $router->getRoutes();
 
-        $this->assertSame('foo/ajouter', $routes->getByName('foo.create')->uri());
-        $this->assertSame('foo/{foo}/modifier', $routes->getByName('foo.edit')->uri());
         $this->assertSame('foo/saccagé', $routes->getByName('foo.trashed')->uri());
         $this->assertSame('foo/{foo}/restaurer', $routes->getByName('foo.restore')->uri());
     }
@@ -2331,10 +2386,6 @@ class RoutingTestMiddlewareGroupTwo
     }
 }
 
-class RoutingTestUserSoftDeleteModel extends Model
-{
-    use SoftDeletes;
-}
 class RoutingTestUserModel extends Model
 {
     public function posts()
