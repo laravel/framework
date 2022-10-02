@@ -55,7 +55,7 @@ class UpCommand extends Command
                 unlink(storage_path('framework/maintenance.php'));
             }
 
-            $this->laravel->get('events')->dispatch(MaintenanceModeDisabled::class);
+            $this->laravel->get('events')->dispatch(new MaintenanceModeDisabled());
 
             $this->components->info('Application is now live.');
         } catch (Exception $e) {
