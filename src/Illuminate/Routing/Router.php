@@ -359,7 +359,7 @@ class Router implements BindingRegistrar, RegistrarContract
     {
         $only = ['index', 'show', 'store', 'update', 'destroy'];
 
-        if (isset($options['withSoftDelete']) && $options['withSoftDelete'] == true) {
+        if (isset($options['withSoftDeletes']) && $options['withSoftDeletes'] == true) {
             array_merge($only, ['trashed', 'restore']);
         }
 

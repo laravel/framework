@@ -142,13 +142,13 @@ class PendingResourceRegistration
     }
 
     /**
-     * Tell the resource to include softDelete routes.
+     * Tell the resource to include softDeletes routes.
      *
      * @return \Illuminate\Routing\PendingResourceRegistration
      */
-    public function withSoftDelete()
+    public function withSoftDeletes()
     {
-        $this->options['withSoftDelete'] = true;
+        $this->options['withSoftDeletes'] = true;
 
         return $this;
     }

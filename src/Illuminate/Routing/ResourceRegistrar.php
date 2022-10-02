@@ -25,7 +25,7 @@ class ResourceRegistrar
      *
      * @var string[]
      */
-    protected $resourceSoftDelete = ['index', 'create', 'store', 'show', 'edit', 'update', 'destroy', 'trashed', 'restore'];
+    protected $resourceSoftDeletes = ['index', 'create', 'store', 'show', 'edit', 'update', 'destroy', 'trashed', 'restore'];
 
     /**
      * The parameters set for this resource instance.
@@ -101,8 +101,8 @@ class ResourceRegistrar
 
         $defaults = $this->resourceDefaults;
 
-        if (isset($options['withSoftDelete']) && $options['withSoftDelete'] == true) {
-            $defaults = $this->resourceSoftDelete;
+        if (isset($options['withSoftDeletes']) && $options['withSoftDeletes'] == true) {
+            $defaults = $this->resourceSoftDeletes;
         }
 
         $collection = new RouteCollection;

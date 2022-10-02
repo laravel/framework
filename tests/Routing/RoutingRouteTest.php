@@ -12,6 +12,7 @@ use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
@@ -1456,7 +1457,7 @@ class RoutingRouteTest extends TestCase
     public function testResourceRouteNaming()
     {
         $router = $this->getRouter();
-        $router->resource('foo', 'FooController');
+        $router->resource('foo', 'FooController')->withSoftDeletes();
 
         $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.index'));
         $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.show'));
@@ -1465,9 +1466,11 @@ class RoutingRouteTest extends TestCase
         $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.edit'));
         $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.update'));
         $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.destroy'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.trashed'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.restore'));
 
         $router = $this->getRouter();
-        $router->resource('foo.bar', 'FooController');
+        $router->resource('foo.bar', 'FooController')->withSoftDeletes();
 
         $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.index'));
         $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.show'));
@@ -1476,9 +1479,11 @@ class RoutingRouteTest extends TestCase
         $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.edit'));
         $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.update'));
         $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.destroy'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.trashed'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.restore'));
 
         $router = $this->getRouter();
-        $router->resource('prefix/foo.bar', 'FooController');
+        $router->resource('prefix/foo.bar', 'FooController')->withSoftDeletes();
 
         $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.index'));
         $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.show'));
@@ -1487,12 +1492,14 @@ class RoutingRouteTest extends TestCase
         $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.edit'));
         $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.update'));
         $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.destroy'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.trashed'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.bar.restore'));
 
         $router = $this->getRouter();
         $router->resource('foo', 'FooController', ['names' => [
             'index' => 'foo',
             'show' => 'bar',
-        ]]);
+        ]])->withSoftDeletes();
 
         $this->assertTrue($router->getRoutes()->hasNamedRoute('foo'));
         $this->assertTrue($router->getRoutes()->hasNamedRoute('bar'));
@@ -1507,6 +1514,8 @@ class RoutingRouteTest extends TestCase
         $this->assertTrue($router->getRoutes()->hasNamedRoute('bar.edit'));
         $this->assertTrue($router->getRoutes()->hasNamedRoute('bar.update'));
         $this->assertTrue($router->getRoutes()->hasNamedRoute('bar.destroy'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('bar.trashed'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('bar.restore'));
     }
 
     public function testRouterFiresRoutedEvent()
@@ -2318,6 +2327,10 @@ class RoutingTestMiddlewareGroupTwo
     }
 }
 
+class RoutingTestUserSoftDeleteModel extends Model
+{
+    use SoftDeletes;
+}
 class RoutingTestUserModel extends Model
 {
     public function posts()
