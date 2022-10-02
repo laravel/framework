@@ -45,7 +45,9 @@ class HandlePrecognitiveRequests
         $this->prepareForPrecognition($request);
 
         return tap($next($request), function ($response) use ($request) {
-            $this->appendVaryHeader($request, $response->header('Precognition', 'true'));
+            $response->headers->set('Precognition', 'true');
+
+            $this->appendVaryHeader($request, $response);
         });
     }
 
