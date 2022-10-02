@@ -142,6 +142,18 @@ class PendingResourceRegistration
     }
 
     /**
+     * Tell the resource to include softDelete routes.
+     *
+     * @return \Illuminate\Routing\PendingResourceRegistration
+     */
+    public function withSoftDelete()
+    {
+        $this->options['withSoftDelete'] = true;
+
+        return $this;
+    }
+
+    /**
      * Add middleware to the resource routes.
      *
      * @param  mixed  $middleware
