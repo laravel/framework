@@ -1,11 +1,12 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Database;
+namespace Illuminate\Tests\Integration\Database\EloquentModelTimeCastingTest;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentModelTimeCastingTest extends DatabaseTestCase
 {
@@ -66,7 +67,7 @@ class EloquentModelTimeCastingTest extends DatabaseTestCase
 
     public function testCustomDateCastsAreComparedAsTimesForCarbonInstances()
     {
-        $user = TestModel1::create([
+        $user = TestModel2::create([
             'start_at' => '10:30',
             'end_at' => '10:15:20',
         ]);
