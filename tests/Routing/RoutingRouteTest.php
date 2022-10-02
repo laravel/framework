@@ -1396,13 +1396,17 @@ class RoutingRouteTest extends TestCase
         ResourceRegistrar::verbs([
             'create' => 'ajouter',
             'edit' => 'modifier',
+            'trashed' => 'saccagé',
+            'restore' => 'restaurer',
         ]);
         $router = $this->getRouter();
-        $router->resource('foo', 'FooController');
+        $router->resource('foo', 'FooController')->withSoftDeletes();
         $routes = $router->getRoutes();
 
         $this->assertSame('foo/ajouter', $routes->getByName('foo.create')->uri());
         $this->assertSame('foo/{foo}/modifier', $routes->getByName('foo.edit')->uri());
+        $this->assertSame('foo/saccagé', $routes->getByName('foo.trashed')->uri());
+        $this->assertSame('foo/{foo}/restaurer', $routes->getByName('foo.restore')->uri());
     }
 
     public function testResourceRoutingParameters()
@@ -1505,7 +1509,7 @@ class RoutingRouteTest extends TestCase
         $this->assertTrue($router->getRoutes()->hasNamedRoute('bar'));
 
         $router = $this->getRouter();
-        $router->resource('foo', 'FooController', ['names' => 'bar']);
+        $router->resource('foo', 'FooController', ['names' => 'bar'])->withSoftDeletes();
 
         $this->assertTrue($router->getRoutes()->hasNamedRoute('bar.index'));
         $this->assertTrue($router->getRoutes()->hasNamedRoute('bar.show'));
