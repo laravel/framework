@@ -637,7 +637,7 @@ abstract class Factory
     }
 
     /**
-     * Retrieves a random model of a given type from previously provided models to recycle.
+     * Retrieve a random model of a given type from previously provided models to recycle.
      *
      * @param  string  $modelClassName
      * @return \Illuminate\Database\Eloquent\Model|null
