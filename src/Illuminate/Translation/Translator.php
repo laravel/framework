@@ -52,7 +52,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     /**
      * Create a new translator instance.
      *
-     * @param  \Illuminate\Contracts\Translation\Loader  $loader The loader implementation.
+     * @param  \Illuminate\Contracts\Translation\Loader  $loader  The loader implementation.
      * @param  string  $locale
      * @return void
      */

@@ -25,8 +25,8 @@ class FileLoader implements Loader
     /**
      * Create a new file loader instance.
      *
-     * @param  \Illuminate\Filesystem\Filesystem  $files The filesystem instance.
-     * @param  string  $path The default path for the loader.
+     * @param  \Illuminate\Filesystem\Filesystem  $files  The filesystem instance.
+     * @param  string  $path  The default path for the loader.
      * @return void
      */
     public function __construct(protected Filesystem $files, protected string $path)
