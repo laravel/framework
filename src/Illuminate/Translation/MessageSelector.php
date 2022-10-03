@@ -8,11 +8,11 @@ class MessageSelector
      * Select a proper translation string based on the given number.
      *
      * @param  string  $line
-     * @param  int  $number
+     * @param  int|float  $number
      * @param  string  $locale
      * @return mixed
      */
-    public function choose($line, $number, $locale)
+    public function choose(string $line, int|float $number, string $locale): mixed
     {
         $segments = explode('|', $line);
 
@@ -35,26 +35,41 @@ class MessageSelector
      * Extract a translation string using inline conditions.
      *
      * @param  array  $segments
-     * @param  int  $number
-     * @return mixed
+     * @param  int|float  $number
+     * @return string|null
      */
-    private function extract($segments, $number)
+    private function extract(array $segments, int|float $number): string|null
     {
         foreach ($segments as $part) {
             if (! is_null($line = $this->extractFromString($part, $number))) {
                 return $line;
             }
         }
+
+        return null;
+    }
+
+    /**
+     * Strip the inline conditions from each segment, just leaving the text.
+     *
+     * @param  array  $segments
+     * @return array
+     */
+    private function stripConditions(array $segments): array
+    {
+        return collect($segments)->map(function ($part) {
+            return preg_replace('/^[\{\[]([^\[\]\{\}]*)[\}\]]/', '', $part);
+        })->all();
     }
 
     /**
      * Get the translation string if the condition matches.
      *
      * @param  string  $part
-     * @param  int  $number
-     * @return mixed
+     * @param  int|float  $number
+     * @return string|null
      */
-    private function extractFromString($part, $number)
+    private function extractFromString(string $part, int|float $number): string|null
     {
         preg_match('/^[\{\[]([^\[\]\{\}]*)[\}\]](.*)/s', $part, $matches);
 
@@ -82,19 +97,6 @@ class MessageSelector
     }
 
     /**
-     * Strip the inline conditions from each segment, just leaving the text.
-     *
-     * @param  array  $segments
-     * @return array
-     */
-    private function stripConditions($segments)
-    {
-        return collect($segments)->map(function ($part) {
-            return preg_replace('/^[\{\[]([^\[\]\{\}]*)[\}\]]/', '', $part);
-        })->all();
-    }
-
-    /**
      * Get the index to use for pluralization.
      *
      * The plural rules are derived from code of the Zend Framework (2010-09-25), which
@@ -105,7 +107,7 @@ class MessageSelector
      * @param  int  $number
      * @return int
      */
-    public function getPluralIndex($locale, $number)
+    public function getPluralIndex(string $locale, int $number): int
     {
         switch ($locale) {
             case 'az':

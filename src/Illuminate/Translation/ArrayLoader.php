@@ -11,7 +11,7 @@ class ArrayLoader implements Loader
      *
      * @var array
      */
-    protected $messages = [];
+    protected array $messages = [];
 
     /**
      * Load the messages for the given locale.
@@ -21,7 +21,7 @@ class ArrayLoader implements Loader
      * @param  string|null  $namespace
      * @return array
      */
-    public function load($locale, $group, $namespace = null)
+    public function load(string $locale, string $group, string|null $namespace = null): array
     {
         $namespace = $namespace ?: '*';
 
@@ -35,7 +35,7 @@ class ArrayLoader implements Loader
      * @param  string  $hint
      * @return void
      */
-    public function addNamespace($namespace, $hint)
+    public function addNamespace(string $namespace, string $hint): void
     {
         //
     }
@@ -46,7 +46,7 @@ class ArrayLoader implements Loader
      * @param  string  $path
      * @return void
      */
-    public function addJsonPath($path)
+    public function addJsonPath(string $path): void
     {
         //
     }
@@ -60,7 +60,7 @@ class ArrayLoader implements Loader
      * @param  string|null  $namespace
      * @return $this
      */
-    public function addMessages($locale, $group, array $messages, $namespace = null)
+    public function addMessages(string $locale, string $group, array $messages, string|null $namespace = null): self
     {
         $namespace = $namespace ?: '*';
 
@@ -74,7 +74,7 @@ class ArrayLoader implements Loader
      *
      * @return array
      */
-    public function namespaces()
+    public function namespaces(): array
     {
         return [];
     }

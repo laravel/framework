@@ -10,14 +10,14 @@ class TranslationMessageSelectorTest extends TestCase
     /**
      * @dataProvider chooseTestData
      */
-    public function testChoose($expected, $id, $number)
+    public function testChoose($expected, $id, $number): void
     {
         $selector = new MessageSelector;
 
         $this->assertEquals($expected, $selector->choose($id, $number, 'en'));
     }
 
-    public function chooseTestData()
+    public function chooseTestData(): array
     {
         return [
             ['first', 'first', 1],

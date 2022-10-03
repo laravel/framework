@@ -6,38 +6,22 @@ use Stringable;
 
 class PotentiallyTranslatedString implements Stringable
 {
-    /**
-     * The string that may be translated.
-     *
-     * @var string
-     */
-    protected $string;
 
     /**
      * The translated string.
      *
      * @var string|null
      */
-    protected $translation;
-
-    /**
-     * The validator that may perform the translation.
-     *
-     * @var \Illuminate\Contracts\Translation\Translator
-     */
-    protected $translator;
+    protected string|null $translation;
 
     /**
      * Create a new potentially translated string.
      *
-     * @param  string  $string
-     * @param  \Illuminate\Contracts\Translation\Translator  $translator
+     * @param  string  $string The string that may be translated.
+     * @param  \Illuminate\Contracts\Translation\Translator  $translator The validator that may perform the translation.
      */
-    public function __construct($string, $translator)
+    public function __construct(protected string $string, protected \Illuminate\Contracts\Translation\Translator $translator)
     {
-        $this->string = $string;
-
-        $this->translator = $translator;
     }
 
     /**
@@ -47,7 +31,7 @@ class PotentiallyTranslatedString implements Stringable
      * @param  string|null  $locale
      * @return $this
      */
-    public function translate($replace = [], $locale = null)
+    public function translate(array $replace = [], string|null $locale = null): self
     {
         $this->translation = $this->translator->get($this->string, $replace, $locale);
 
@@ -62,7 +46,7 @@ class PotentiallyTranslatedString implements Stringable
      * @param  string|null  $locale
      * @return $this
      */
-    public function translateChoice($number, array $replace = [], $locale = null)
+    public function translateChoice(\Countable|int|array $number, array $replace = [], string|null $locale = null): self
     {
         $this->translation = $this->translator->choice($this->string, $number, $replace, $locale);
 
@@ -74,7 +58,7 @@ class PotentiallyTranslatedString implements Stringable
      *
      * @return string
      */
-    public function original()
+    public function original(): string
     {
         return $this->string;
     }
@@ -84,7 +68,7 @@ class PotentiallyTranslatedString implements Stringable
      *
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->translation ?? $this->string;
     }
@@ -94,7 +78,7 @@ class PotentiallyTranslatedString implements Stringable
      *
      * @return string
      */
-    public function toString()
+    public function toString(): string
     {
         return (string) $this;
     }

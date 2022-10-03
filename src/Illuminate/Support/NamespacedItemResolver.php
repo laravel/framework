@@ -9,7 +9,7 @@ class NamespacedItemResolver
      *
      * @var array
      */
-    protected $parsed = [];
+    protected array $parsed = [];
 
     /**
      * Parse a key into namespace, group, and item.
@@ -17,7 +17,7 @@ class NamespacedItemResolver
      * @param  string  $key
      * @return array
      */
-    public function parseKey($key)
+    public function parseKey(string $key): array
     {
         // If we've already parsed the given key, we'll return the cached version we
         // already have, as this will save us some processing. We cache off every
@@ -49,7 +49,7 @@ class NamespacedItemResolver
      * @param  array  $segments
      * @return array
      */
-    protected function parseBasicSegments(array $segments)
+    protected function parseBasicSegments(array $segments): array
     {
         // The first segment in a basic array will always be the group, so we can go
         // ahead and grab that segment. If there is only one total segment we are
@@ -72,7 +72,7 @@ class NamespacedItemResolver
      * @param  string  $key
      * @return array
      */
-    protected function parseNamespacedSegments($key)
+    protected function parseNamespacedSegments(string $key): array
     {
         [$namespace, $item] = explode('::', $key);
 
@@ -95,7 +95,7 @@ class NamespacedItemResolver
      * @param  array  $parsed
      * @return void
      */
-    public function setParsedKey($key, $parsed)
+    public function setParsedKey(string $key, array $parsed): void
     {
         $this->parsed[$key] = $parsed;
     }
@@ -105,7 +105,7 @@ class NamespacedItemResolver
      *
      * @return void
      */
-    public function flushParsedKeys()
+    public function flushParsedKeys(): void
     {
         $this->parsed = [];
     }

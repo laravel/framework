@@ -12,7 +12,7 @@ interface Translator
      * @param  string|null  $locale
      * @return mixed
      */
-    public function get($key, array $replace = [], $locale = null);
+    public function get(string $key, array $replace = [], string|null $locale = null): mixed;
 
     /**
      * Get a translation according to an integer value.
@@ -23,14 +23,14 @@ interface Translator
      * @param  string|null  $locale
      * @return string
      */
-    public function choice($key, $number, array $replace = [], $locale = null);
+    public function choice(string $key, \Countable|int|array $number, array $replace = [], string|null $locale = null): string;
 
     /**
      * Get the default locale being used.
      *
      * @return string
      */
-    public function getLocale();
+    public function getLocale(): string;
 
     /**
      * Set the default locale.
@@ -38,5 +38,5 @@ interface Translator
      * @param  string  $locale
      * @return void
      */
-    public function setLocale($locale);
+    public function setLocale(string $locale): void;
 }

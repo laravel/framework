@@ -9,44 +9,28 @@ use RuntimeException;
 class FileLoader implements Loader
 {
     /**
-     * The filesystem instance.
-     *
-     * @var \Illuminate\Filesystem\Filesystem
-     */
-    protected $files;
-
-    /**
-     * The default path for the loader.
-     *
-     * @var string
-     */
-    protected $path;
-
-    /**
      * All of the registered paths to JSON translation files.
      *
      * @var array
      */
-    protected $jsonPaths = [];
+    protected array $jsonPaths = [];
 
     /**
      * All of the namespace hints.
      *
      * @var array
      */
-    protected $hints = [];
+    protected array $hints = [];
 
     /**
      * Create a new file loader instance.
      *
-     * @param  \Illuminate\Filesystem\Filesystem  $files
-     * @param  string  $path
+     * @param  \Illuminate\Filesystem\Filesystem  $files The filesystem instance.
+     * @param  string  $path The default path for the loader.
      * @return void
      */
-    public function __construct(Filesystem $files, $path)
+    public function __construct(protected Filesystem $files, protected string $path)
     {
-        $this->path = $path;
-        $this->files = $files;
     }
 
     /**
@@ -57,7 +41,7 @@ class FileLoader implements Loader
      * @param  string|null  $namespace
      * @return array
      */
-    public function load($locale, $group, $namespace = null)
+    public function load(string $locale, string $group, string|null $namespace = null): array
     {
         if ($group === '*' && $namespace === '*') {
             return $this->loadJsonPaths($locale);
@@ -78,7 +62,7 @@ class FileLoader implements Loader
      * @param  string  $namespace
      * @return array
      */
-    protected function loadNamespaced($locale, $group, $namespace)
+    protected function loadNamespaced(string $locale, string $group, string $namespace): array
     {
         if (isset($this->hints[$namespace])) {
             $lines = $this->loadPath($this->hints[$namespace], $locale, $group);
@@ -98,7 +82,7 @@ class FileLoader implements Loader
      * @param  string  $namespace
      * @return array
      */
-    protected function loadNamespaceOverrides(array $lines, $locale, $group, $namespace)
+    protected function loadNamespaceOverrides(array $lines, string $locale, string $group, string $namespace): array
     {
         $file = "{$this->path}/vendor/{$namespace}/{$locale}/{$group}.php";
 
@@ -117,7 +101,7 @@ class FileLoader implements Loader
      * @param  string  $group
      * @return array
      */
-    protected function loadPath($path, $locale, $group)
+    protected function loadPath(string $path, string $locale, string $group): array
     {
         if ($this->files->exists($full = "{$path}/{$locale}/{$group}.php")) {
             return $this->files->getRequire($full);
@@ -134,7 +118,7 @@ class FileLoader implements Loader
      *
      * @throws \RuntimeException
      */
-    protected function loadJsonPaths($locale)
+    protected function loadJsonPaths(string $locale): array
     {
         return collect(array_merge($this->jsonPaths, [$this->path]))
             ->reduce(function ($output, $path) use ($locale) {
@@ -159,7 +143,7 @@ class FileLoader implements Loader
      * @param  string  $hint
      * @return void
      */
-    public function addNamespace($namespace, $hint)
+    public function addNamespace(string $namespace, string $hint): void
     {
         $this->hints[$namespace] = $hint;
     }
@@ -169,7 +153,7 @@ class FileLoader implements Loader
      *
      * @return array
      */
-    public function namespaces()
+    public function namespaces(): array
     {
         return $this->hints;
     }
@@ -180,7 +164,7 @@ class FileLoader implements Loader
      * @param  string  $path
      * @return void
      */
-    public function addJsonPath($path)
+    public function addJsonPath(string $path): void
     {
         $this->jsonPaths[] = $path;
     }
@@ -190,7 +174,7 @@ class FileLoader implements Loader
      *
      * @return array
      */
-    public function jsonPaths()
+    public function jsonPaths(): array
     {
         return $this->jsonPaths;
     }

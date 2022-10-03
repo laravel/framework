@@ -12,7 +12,7 @@ interface Loader
      * @param  string|null  $namespace
      * @return array
      */
-    public function load($locale, $group, $namespace = null);
+    public function load(string $locale, string $group, string|null $namespace = null): array;
 
     /**
      * Add a new namespace to the loader.
@@ -21,7 +21,7 @@ interface Loader
      * @param  string  $hint
      * @return void
      */
-    public function addNamespace($namespace, $hint);
+    public function addNamespace(string $namespace, string $hint): void;
 
     /**
      * Add a new JSON path to the loader.
@@ -29,12 +29,12 @@ interface Loader
      * @param  string  $path
      * @return void
      */
-    public function addJsonPath($path);
+    public function addJsonPath(string $path): void;
 
     /**
      * Get an array of all the registered namespaces.
      *
      * @return array
      */
-    public function namespaces();
+    public function namespaces(): array;
 }
