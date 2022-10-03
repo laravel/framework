@@ -344,7 +344,7 @@ class DatabaseEloquentModelAttributeCastingTest extends DatabaseTestCase
         $this->assertTrue(isset($model->firstName));
         $this->assertSame('Michael', $model->firstName);
 
-        $this->assertSame(['firstName'], $model->getAppends());
+        $this->assertSame(['first_name'], $model->getAppends());
     }
 }
 
