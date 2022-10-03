@@ -6,7 +6,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Env;
 use Illuminate\Support\HigherOrderTapProxy;
 use Illuminate\Support\Optional;
-use Illuminate\Support\Reflector;
 use Illuminate\Support\Str;
 
 if (! function_exists('append_config')) {
