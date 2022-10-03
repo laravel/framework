@@ -181,6 +181,10 @@ class ComponentTagCompiler
                             )
                             |
                             (?:
+                                (\:\\\$)(\w+)
+                            )
+                            |
+                            (?:
                                 [\w\-:.@]+
                                 (
                                     =
