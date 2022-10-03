@@ -5,6 +5,7 @@ namespace Illuminate\Routing;
 use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Http\Middleware\VerifyEnvironment;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Contracts\CallableDispatcher;
 use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
@@ -1027,6 +1028,22 @@ class Route
         return $this->computedMiddleware = Router::uniqueMiddleware(array_merge(
             $this->middleware(), $this->controllerMiddleware()
         ));
+    }
+
+    /**
+     * Sets the list of allowed environments.
+     *
+     * @param  array<int, string>|string  $names
+     * @return $this
+     */
+    public function environment($names)
+    {
+        $this->action['middleware'] = array_merge(
+            [sprintf('%s:%s', VerifyEnvironment::class, implode(',', Arr::wrap($names)))],
+            (array) ($this->action['middleware'] ?? []),
+        );
+
+        return $this;
     }
 
     /**
