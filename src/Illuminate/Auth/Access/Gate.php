@@ -386,10 +386,11 @@ class Gate implements GateContract
      * Inspect the user for the given ability.
      *
      * @param  string  $ability
+     * @param  string|null  $message
      * @param  array|mixed  $arguments
      * @return \Illuminate\Auth\Access\Response
      */
-    public function inspect($ability, $arguments = [])
+    public function inspect($ability, $message = null, $arguments = [])
     {
         try {
             $result = $this->raw($ability, $arguments);
@@ -398,7 +399,7 @@ class Gate implements GateContract
                 return $result;
             }
 
-            return $result ? Response::allow() : Response::deny();
+            return $result ? Response::allow() : Response::deny($message);
         } catch (AuthorizationException $e) {
             return $e->toResponse();
         }

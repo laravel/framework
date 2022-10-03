@@ -121,12 +121,11 @@ class Response implements Arrayable
     /**
      * Get the response message.
      *
-     * @param  string|null  $message
      * @return string|null
      */
-    public function message($message = null)
+    public function message()
     {
-        return $this->message ?? $message;
+        return $this->message;
     }
 
     /**

@@ -107,10 +107,11 @@ interface Gate
      * Inspect the user for the given ability.
      *
      * @param  string  $ability
+     * @param  string|null  $message
      * @param  array|mixed  $arguments
      * @return \Illuminate\Auth\Access\Response
      */
-    public function inspect($ability, $arguments = []);
+    public function inspect($ability, $message = null, $arguments = []);
 
     /**
      * Get the raw result from the authorization callback.
