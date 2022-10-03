@@ -8,7 +8,6 @@ use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper as BaseHtmlDumper;
 use Symfony\Component\VarDumper\VarDumper;
-use Throwable;
 
 class HtmlDumper extends BaseHtmlDumper
 {
@@ -132,30 +131,10 @@ class HtmlDumper extends BaseHtmlDumper
 
         $source = sprintf('%s%s', $relativeFile, is_null($line) ? '' : ":$line");
 
-        if ($editor = $this->editor()) {
-            $source = sprintf(
-                '<a href="%s://open?file=%s%s">%s</a>',
-                $editor,
-                $file,
-                is_null($line) ? '' : "&line=$line",
-                $source,
-            );
+        if ($href = $this->resolveSourceHref($file, $line)) {
+            $source = sprintf('<a href="%s">%s</a>', $href, $source);
         }
 
         return sprintf('<span style="color: #A0A0A0;"> // %s</span>', $source);
-    }
-
-    /**
-     * Get the application editor, if applicable.
-     *
-     * @return string|null
-     */
-    protected function editor()
-    {
-        try {
-            return config('app.editor');
-        } catch (Throwable $e) {
-            // ...
-        }
     }
 }
