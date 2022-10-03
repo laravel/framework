@@ -29,9 +29,13 @@ class SupportHelpersTest extends TestCase
     {
         $str = 'A \'quote\' is <b>bold</b>';
         $this->assertSame('A &#039;quote&#039; is &lt;b&gt;bold&lt;/b&gt;', e($str));
+
         $html = m::mock(Htmlable::class);
         $html->shouldReceive('toHtml')->andReturn($str);
         $this->assertEquals($str, e($html));
+
+        $enumValue = SupportTestEnum::ADMIN;
+        $this->assertSame('Admin', e($enumValue));
     }
 
     public function testBlank()
@@ -933,6 +937,11 @@ class SupportTestArrayIterable implements IteratorAggregate
     {
         return new ArrayIterator($this->items);
     }
+}
+
+enum SupportTestEnum: string
+{
+    case ADMIN = 'Admin';
 }
 
 class SupportTestCountable implements Countable

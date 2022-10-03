@@ -6,6 +6,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Env;
 use Illuminate\Support\HigherOrderTapProxy;
 use Illuminate\Support\Optional;
+use Illuminate\Support\Reflector;
 use Illuminate\Support\Str;
 
 if (! function_exists('append_config')) {
@@ -114,6 +115,10 @@ if (! function_exists('e')) {
 
         if ($value instanceof Htmlable) {
             return $value->toHtml();
+        }
+
+        if (is_object($value) && enum_exists($value::class)) {
+            $value = $value->value;
         }
 
         return htmlspecialchars($value ?? '', ENT_QUOTES, 'UTF-8', $doubleEncode);
