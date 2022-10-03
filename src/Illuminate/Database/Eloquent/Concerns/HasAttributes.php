@@ -243,9 +243,7 @@ trait HasAttributes
             })
             ->map(function ($match) {
                 return lcfirst(static::$snakeAttributes ? Str::snake($match) : $match);
-            })
-            ->values()
-            ->all();
+            })->all();
     }
 
     /**
