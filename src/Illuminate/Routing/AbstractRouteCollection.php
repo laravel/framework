@@ -75,7 +75,7 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
      */
     protected function matchAgainstRoutes(array $routes, $request, $includingMethod = true)
     {
-        [$fallbacks, $routes] = collect($routes)->partition(fn($route) => $route->isFallback);
+        [$fallbacks, $routes] = collect($routes)->partition(fn ($route) => $route->isFallback);
 
         return $routes->merge($fallbacks)->first(
             fn (Route $route) => $route->matches($request, $includingMethod)
