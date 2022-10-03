@@ -6,7 +6,6 @@ use Stringable;
 
 class PotentiallyTranslatedString implements Stringable
 {
-
     /**
      * The translated string.
      *
