@@ -243,14 +243,19 @@ class HtmlDumperTest extends TestCase
             'vscode://open?file=/my-docker-work-directory/app/my-file&line=10', $resolveSourceHref()
         );
 
+        // When editor name is provided...
+        $config->set('app.editor', 'sublime');
+        $this->assertSame('subl://open?url=file:///my-work-directory/app/my-file&line=10', $resolveSourceHref());
+
         // Missing line
+        $config->set('app.editor', ['name' => 'vscode', 'base_path' => '/my-docker-work-directory']);
+
         $href = (fn () => $this->resolveSourceHref(
             '/my-work-directory/app/my-file',
             null,
         ))->call($dumper);
-        $config->set('app.editor', ['name' => 'vscode', 'base_path' => '/my-docker-work-directory']);
         $this->assertSame(
-            'vscode://open?file=/my-docker-work-directory/app/my-file&line=1',
+            'vscode://file//my-docker-work-directory/app/my-file:1',
             $href,
         );
     }

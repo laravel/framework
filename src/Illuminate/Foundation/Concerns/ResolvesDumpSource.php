@@ -7,6 +7,29 @@ use Throwable;
 trait ResolvesDumpSource
 {
     /**
+     * The most common editor's href format.
+     *
+     * @var array<string, string>
+     */
+    protected $editorsHref = [
+        'sublime' => 'subl://open?url=file://{file}&line={line}',
+        'textmate' => 'txmt://open?url=file://{file}&line={line}',
+        'emacs' => 'emacs://open?url=file://{file}&line={line}',
+        'macvim' => 'mvim://open/?url=file://{file}&line={line}',
+        'phpstorm' => 'phpstorm://open?file={file}&line={line}',
+        'idea' => 'idea://open?file={file}&line={line}',
+        'vscode' => 'vscode://file/{file}:{line}',
+        'vscode-insiders' => 'vscode-insiders://file/{file}:{line}',
+        'vscode-remote' => 'vscode://vscode-remote/{file}:{line}',
+        'vscode-insiders-remote' => 'vscode-insiders://vscode-remote/{file}:{line}',
+        'vscodium' => 'vscodium://file/{file}:{line}',
+        'atom' => 'atom://core/open/file?filename={file}&line={line}',
+        'nova' => 'nova://core/open/file?filename={file}&line={line}',
+        'netbeans' => 'netbeans://open/?f={file}:{line}',
+        'xdebug' => 'xdebug://{file}@{line}',
+    ];
+
+    /**
      * The source resolver.
      *
      * @var (callable(): (array{0: string, 1: string, 2: int|null}|null))|null
@@ -85,7 +108,7 @@ trait ResolvesDumpSource
 
         $href = is_array($editor) && isset($editor['href'])
             ? $editor['href']
-            : sprintf('%s://open?file={file}&line={line}', $editor['name'] ?? $editor);
+            : ($this->editorsHref[$editor['name'] ?? $editor] ?? sprintf('%s://open?file={file}&line={line}', $editor['name'] ?? $editor));
 
         if ($basePath = $editor['base_path'] ?? false) {
             $file = str_replace($this->basePath, $basePath, $file);
