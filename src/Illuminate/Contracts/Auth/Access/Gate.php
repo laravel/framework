@@ -96,12 +96,13 @@ interface Gate
      * Determine if the given ability should be granted for the current user.
      *
      * @param  string  $ability
+     * @param  string  $message
      * @param  array|mixed  $arguments
      * @return \Illuminate\Auth\Access\Response
      *
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function authorize($ability, $arguments = []);
+    public function authorize($ability, $message = null, $arguments = []);
 
     /**
      * Inspect the user for the given ability.

@@ -372,14 +372,15 @@ class Gate implements GateContract
      * Determine if the given ability should be granted for the current user.
      *
      * @param  string  $ability
+     * @param  string  $message
      * @param  array|mixed  $arguments
      * @return \Illuminate\Auth\Access\Response
      *
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function authorize($ability, $arguments = [])
+    public function authorize($ability, $message = null, $arguments = [])
     {
-        return $this->inspect($ability, $arguments)->authorize();
+        return $this->inspect($ability, $message, $arguments)->authorize();
     }
 
     /**
