@@ -9,6 +9,8 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Env;
 use Illuminate\Support\Optional;
 use Illuminate\Support\Stringable;
+use Illuminate\Tests\Support\Fixtures\IntBackedEnum;
+use Illuminate\Tests\Support\Fixtures\StringBackedEnum;
 use IteratorAggregate;
 use LogicException;
 use Mockery as m;
@@ -33,11 +35,17 @@ class SupportHelpersTest extends TestCase
         $html = m::mock(Htmlable::class);
         $html->shouldReceive('toHtml')->andReturn($str);
         $this->assertEquals($str, e($html));
+    }
 
-        $enumValue = SupportTestStringEnum::ADMIN_LABEL;
+    /**
+     * @requires PHP >= 8.1
+     */
+    public function testEWithEnums()
+    {
+        $enumValue = StringBackedEnum::ADMIN_LABEL;
         $this->assertSame('I am &#039;admin&#039;', e($enumValue));
 
-        $enumValue = SupportTestIntEnum::ROLE_ADMIN;
+        $enumValue = IntBackedEnum::ROLE_ADMIN;
         $this->assertSame('1', e($enumValue));
     }
 
@@ -940,16 +948,6 @@ class SupportTestArrayIterable implements IteratorAggregate
     {
         return new ArrayIterator($this->items);
     }
-}
-
-enum SupportTestStringEnum: string
-{
-    case ADMIN_LABEL = 'I am \'admin\'';
-}
-
-enum SupportTestIntEnum: int
-{
-    case ROLE_ADMIN = 1;
 }
 
 class SupportTestCountable implements Countable
