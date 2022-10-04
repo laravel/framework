@@ -5,8 +5,10 @@ use function PHPStan\Testing\assertType;
 $collection = User::all();
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection);
 
-assertType('Illuminate\Database\Eloquent\Collection<int, User>|User|null', $collection->find(1));
-assertType('Illuminate\Database\Eloquent\Collection<int, User>|string|User', $collection->find(1, 'string'));
+assertType('User|null', $collection->find(1));
+assertType('string|User', $collection->find(1, 'string'));
+assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->find([1]));
+assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->find([1], 'string'));
 
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->load('string'));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->load(['string']));
