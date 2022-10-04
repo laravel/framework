@@ -306,6 +306,7 @@ class Route
      */
     public function flushController()
     {
+        $this->computedMiddleware = null;
         $this->controller = null;
     }
 
