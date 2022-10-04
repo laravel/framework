@@ -24,7 +24,7 @@
         "illuminate/filesystem": "^9.0",
         "illuminate/pipeline": "^9.0",
         "illuminate/support": "^9.0",
-        "laravel/serializable-closure": "^1.0",
+        "laravel/serializable-closure": "^1.2.2",
         "ramsey/uuid": "^4.2.2",
         "symfony/process": "^6.0"
     },
@@ -41,7 +41,7 @@
     "suggest": {
         "ext-pcntl": "Required to use all features of the queue worker.",
         "ext-posix": "Required to use all features of the queue worker.",
-        "aws/aws-sdk-php": "Required to use the SQS queue driver and DynamoDb failed job storage (^3.198.1).",
+        "aws/aws-sdk-php": "Required to use the SQS queue driver and DynamoDb failed job storage (^3.235.5).",
         "illuminate/redis": "Required to use the Redis queue driver (^9.0).",
         "pda/pheanstalk": "Required to use the Beanstalk queue driver (^4.0)."
     },

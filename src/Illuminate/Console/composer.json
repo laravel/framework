@@ -21,7 +21,7 @@
         "illuminate/support": "^9.0",
         "illuminate/view": "^9.0",
         "nunomaduro/termwind": "^1.13",
-        "symfony/console": "^6.0",
+        "symfony/console": "^6.0.9",
         "symfony/process": "^6.0"
     },
     "autoload": {
@@ -35,8 +35,8 @@
         }
     },
     "suggest": {
-        "dragonmantank/cron-expression": "Required to use scheduler (^3.1).",
-        "guzzlehttp/guzzle": "Required to use the ping methods on schedules (^7.2).",
+        "dragonmantank/cron-expression": "Required to use scheduler (^3.3.2).",
+        "guzzlehttp/guzzle": "Required to use the ping methods on schedules (^7.5).",
         "illuminate/bus": "Required to use the scheduled job dispatcher (^9.0).",
         "illuminate/container": "Required to use the scheduler (^9.0).",
         "illuminate/filesystem": "Required to use the generator command (^9.0).",
