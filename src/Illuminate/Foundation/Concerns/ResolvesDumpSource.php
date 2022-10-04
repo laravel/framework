@@ -54,7 +54,7 @@ trait ResolvesDumpSource
         foreach ($trace as $traceKey => $traceFile) {
             if (isset($traceFile['file']) && str_ends_with(
                 $traceFile['file'],
-                'symfony/var-dumper/Resources/functions/dump.php'
+                'dump.php'
             )) {
                 $sourceKey = $traceKey + 1;
 
