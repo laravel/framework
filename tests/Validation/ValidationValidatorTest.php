@@ -2559,10 +2559,26 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => '3'], ['foo' => 'Min:3']);
         $this->assertFalse($v->passes());
 
+        // an equal value qualifies.
+        $v = new Validator($trans, ['foo' => '3'], ['foo' => 'Numeric|Min:3']);
+        $this->assertTrue($v->passes());
+
         $v = new Validator($trans, ['foo' => 'anc'], ['foo' => 'Min:3']);
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['foo' => '2'], ['foo' => 'Numeric|Min:3']);
+        $this->assertFalse($v->passes());
+
+        // '2.001' is considered as a float when the "Numeric" rule exists.
+        $v = new Validator($trans, ['foo' => '2.001'], ['foo' => 'Numeric|Min:3']);
+        $this->assertFalse($v->passes());
+
+        // '2.001' is a string of length 5 in absence of the "Numeric" rule.
+        $v = new Validator($trans, ['foo' => '2.001'], ['foo' => 'Min:3']);
+        $this->assertTrue($v->passes());
+
+        // '20' is a string of length 2 in absence of the "Numeric" rule.
+        $v = new Validator($trans, ['foo' => '20'], ['foo' => 'Min:3']);
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['foo' => '5'], ['foo' => 'Numeric|Min:3']);
@@ -2595,6 +2611,18 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['foo' => '211'], ['foo' => 'Numeric|Max:100']);
+        $this->assertFalse($v->passes());
+
+        // an equal value qualifies.
+        $v = new Validator($trans, ['foo' => '3'], ['foo' => 'Numeric|Max:3']);
+        $this->assertTrue($v->passes());
+
+        // '2.001' is considered as a float when the "Numeric" rule exists.
+        $v = new Validator($trans, ['foo' => '2.001'], ['foo' => 'Numeric|Max:3']);
+        $this->assertTrue($v->passes());
+
+        // '2.001' is a string of length 5 in absence of the "Numeric" rule.
+        $v = new Validator($trans, ['foo' => '2.001'], ['foo' => 'Max:3']);
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['foo' => '22'], ['foo' => 'Numeric|Max:33']);
