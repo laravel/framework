@@ -35,7 +35,7 @@
         "illuminate/console": "Required to assert console commands (^9.0).",
         "illuminate/database": "Required to assert databases (^9.0).",
         "illuminate/http": "Required to assert responses (^9.0).",
-        "mockery/mockery": "Required to use mocking (^1.4.4).",
+        "mockery/mockery": "Required to use mocking (^1.5.1).",
         "phpunit/phpunit": "Required to use assertions and run tests (^9.5.8)."
     },
     "config": {
