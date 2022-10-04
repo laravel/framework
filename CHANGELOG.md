@@ -1,6 +1,25 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.33.0...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.34.0...9.x)
+
+
+## [v9.34.0](https://github.com/laravel/framework/compare/v9.33.0...v9.34.0) - 2022-10-04
+
+### Added
+- Short attribute syntax for Self Closing Blade Components ([#44413](https://github.com/laravel/framework/pull/44413))
+- Adds support for PHP's BackedEnum to be "rendered" on blade views ([#44445](https://github.com/laravel/framework/pull/44445))
+
+### Fixed
+- Fixed Precognition headers for Symfony responses ([#44424](https://github.com/laravel/framework/pull/44424))
+- Allow to create databases with dots ([#44436](https://github.com/laravel/framework/pull/44436))
+- Fixes dd source on windows ([#44451](https://github.com/laravel/framework/pull/44451))
+
+### Changed
+- Adds error output to db command when missing host ([#44394](https://github.com/laravel/framework/pull/44394))
+- Changed `Illuminate/Database/Schema/ForeignIdColumnDefinition::constrained()` ([#44425](https://github.com/laravel/framework/pull/44425))
+- Allow maintenance mode events to be listened to in closure based listeners ([#44417](https://github.com/laravel/framework/pull/44417))
+- Allow factories to recycle multiple models of a given typ ([#44328](https://github.com/laravel/framework/pull/44328))
+- Improves dd clickable link on multiple editors and docker environments ([#44406](https://github.com/laravel/framework/pull/44406))
 
 
 ## [v9.33.0](https://github.com/laravel/framework/compare/v9.32.0...v9.33.0) - 2022-09-30
