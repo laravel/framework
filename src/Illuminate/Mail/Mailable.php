@@ -728,6 +728,8 @@ class Mailable implements MailableContract, Renderable
             return (object) ['email' => $recipient];
         } elseif ($recipient instanceof Address) {
             return (object) ['email' => $recipient->getAddress(), 'name' => $recipient->getName()];
+        } elseif ($recipient instanceof Mailables\Address) {
+            return (object) ['email' => $recipient->address, 'name' => $recipient->name];
         }
 
         return $recipient;
@@ -1424,20 +1426,10 @@ class Mailable implements MailableContract, Renderable
             $this->from($envelope->from->address, $envelope->from->name);
         }
 
-        foreach ($envelope->to as $to) {
-            $this->to($to->address, $to->name);
-        }
-
-        foreach ($envelope->cc as $cc) {
-            $this->cc($cc->address, $cc->name);
-        }
-
-        foreach ($envelope->bcc as $bcc) {
-            $this->bcc($bcc->address, $bcc->name);
-        }
-
-        foreach ($envelope->replyTo as $replyTo) {
-            $this->replyTo($replyTo->address, $replyTo->name);
+        foreach (['to', 'cc', 'bcc', 'replyTo'] as $type) {
+            foreach ($envelope->{$type} as $address) {
+                $this->{$type}($address->address, $address->name);
+            }
         }
 
         if ($envelope->subject) {
