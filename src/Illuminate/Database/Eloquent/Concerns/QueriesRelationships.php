@@ -678,6 +678,13 @@ trait QueriesRelationships
         return $this;
     }
 
+    /**
+     * Get the relation hashed column name for the given column and relation.
+     *
+     * @param  string  $column
+     * @param  \Illuminate\Database\Eloquent\Relations\Relationship  $relation
+     * @return string
+     */
     protected function getRelationHashedColumn($column, $relation)
     {
         if (str_contains($column, '.')) {
