@@ -6,7 +6,6 @@ use Illuminate\Foundation\Concerns\ResolvesDumpSource;
 use Illuminate\Foundation\VarDumper\Concerns\HandlesDumps;
 use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper as BaseHtmlDumper;
-use Throwable;
 
 class HtmlDumper extends BaseHtmlDumper
 {
