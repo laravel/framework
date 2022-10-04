@@ -34,8 +34,11 @@ class SupportHelpersTest extends TestCase
         $html->shouldReceive('toHtml')->andReturn($str);
         $this->assertEquals($str, e($html));
 
-        $enumValue = SupportTestEnum::ADMIN;
-        $this->assertSame('Admin', e($enumValue));
+        $enumValue = SupportTestStringEnum::ADMIN_LABEL;
+        $this->assertSame('I am &#039;admin&#039;', e($enumValue));
+
+        $enumValue = SupportTestIntEnum::ROLE_ADMIN;
+        $this->assertSame('1', e($enumValue));
     }
 
     public function testBlank()
@@ -939,9 +942,14 @@ class SupportTestArrayIterable implements IteratorAggregate
     }
 }
 
-enum SupportTestEnum: string
+enum SupportTestStringEnum: string
 {
-    case ADMIN = 'Admin';
+    case ADMIN_LABEL = 'I am \'admin\'';
+}
+
+enum SupportTestIntEnum: int
+{
+    case ROLE_ADMIN = 1;
 }
 
 class SupportTestCountable implements Countable
