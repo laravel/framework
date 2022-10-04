@@ -1,6 +1,12 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.83.24...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.83.25...8.x)
+
+
+## [v8.83.25 (2022-09-30)](https://github.com/laravel/framework/compare/v8.83.24...v8.83.25)
+
+### Added
+- Added `Illuminate/Routing/Route::flushController()` ([#44393](https://github.com/laravel/framework/pull/44393))
 
 
 ## [v8.83.24 (2022-09-22)](https://github.com/laravel/framework/compare/v8.83.23...v8.83.24)
