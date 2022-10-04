@@ -19,7 +19,7 @@
         "ext-mbstring": "*",
         "ext-openssl": "*",
         "doctrine/inflector": "^2.0",
-        "dragonmantank/cron-expression": "^3.1",
+        "dragonmantank/cron-expression": "^3.3.2",
         "egulias/email-validator": "^3.2.1",
         "fruitcake/php-cors": "^1.2",
         "laravel/serializable-closure": "^1.2.2",
