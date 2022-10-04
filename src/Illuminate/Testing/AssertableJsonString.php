@@ -345,7 +345,7 @@ class AssertableJsonString implements ArrayAccess, Countable
      */
     protected function jsonSearchStrings($key, $value)
     {
-        $needle = substr(json_encode([$key => $value], JSON_UNESCAPED_UNICODE), 1, -1);
+        $needle = Str::substr(json_encode([$key => $value], JSON_UNESCAPED_UNICODE), 1, -1);
 
         return [
             $needle.']',
