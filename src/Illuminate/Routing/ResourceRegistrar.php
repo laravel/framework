@@ -105,7 +105,8 @@ class ResourceRegistrar
                 $this->setResourceBindingFields($route, $options['bindingFields']);
             }
 
-            if (isset($options['trashed']) && in_array($m, ! empty($options['trashed']) ? $options['trashed'] : $resourceMethods)) {
+            if (isset($options['trashed']) &&
+                in_array($m, ! empty($options['trashed']) ? $options['trashed'] : $resourceMethods)) {
                 $route->withTrashed();
             }
 

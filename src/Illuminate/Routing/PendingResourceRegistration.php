@@ -228,7 +228,7 @@ class PendingResourceRegistration
     }
 
     /**
-     * Set which methods should load trashed models.
+     * Define which routes should allow "trashed" models to be retrieved when resolving implicit model bindings.
      *
      * @param  array  $methods
      * @return \Illuminate\Routing\PendingResourceRegistration
