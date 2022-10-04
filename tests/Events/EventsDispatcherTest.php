@@ -294,6 +294,16 @@ class EventsDispatcherTest extends TestCase
         $this->assertFalse(isset($_SERVER['__event.test']));
     }
 
+    public function testHasWildcardListeners()
+    {
+        $d = new Dispatcher;
+        $d->listen('foo', 'listener1');
+        $this->assertFalse($d->hasWildcardListeners('foo'));
+
+        $d->listen('foo*', 'listener1');
+        $this->assertTrue($d->hasWildcardListeners('foo'));
+    }
+
     public function testListenersCanBeFound()
     {
         $d = new Dispatcher;
@@ -436,6 +446,19 @@ class EventsDispatcherTest extends TestCase
 
         $this->assertEquals(4, TestListener::$counter);
         TestListener::$counter = 0;
+    }
+
+    public function testGetListeners()
+    {
+        $d = new Dispatcher;
+        $d->listen(ExampleEvent::class, 'Listener1');
+        $d->listen(ExampleEvent::class, 'Listener2');
+        $listeners = $d->getListeners(ExampleEvent::class);
+        $this->assertCount(2, $listeners);
+
+        $d->listen(ExampleEvent::class, 'Listener3');
+        $listeners = $d->getListeners(ExampleEvent::class);
+        $this->assertCount(3, $listeners);
     }
 }
 

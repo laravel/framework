@@ -1866,7 +1866,7 @@ class RoutingRouteTest extends TestCase
         $this->assertInstanceOf(JsonResponse::class, $response);
     }
 
-    public function testRouteFlush()
+    public function testRouteFlushController()
     {
         $container = new Container;
         $router = $this->getRouter();

@@ -1090,7 +1090,7 @@ class Route
      * Specify middleware that should be removed from the given route.
      *
      * @param  array|string  $middleware
-     * @return $this|array
+     * @return $this
      */
     public function withoutMiddleware($middleware)
     {

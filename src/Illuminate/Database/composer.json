@@ -22,7 +22,7 @@
         "illuminate/contracts": "^9.0",
         "illuminate/macroable": "^9.0",
         "illuminate/support": "^9.0",
-        "symfony/console": "^6.0"
+        "symfony/console": "^6.0.9"
     },
     "autoload": {
         "psr-4": {

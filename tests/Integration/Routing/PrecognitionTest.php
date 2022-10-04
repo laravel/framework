@@ -743,6 +743,34 @@ class PrecognitionTest extends TestCase
         $response->assertOk();
         $this->assertSame('http://localhost/expected-route-2', session()->previousUrl());
     }
+
+    public function testItAppendsVaryHeaderToSymfonyResponse()
+    {
+        Route::get('test-route', function () {
+            return response()->streamDownload(function () {
+                echo 'foo';
+            }, null, ['Expected' => 'Header']);
+        })->middleware(HandlePrecognitiveRequests::class);
+
+        $response = $this->get('test-route');
+        $response->assertOk();
+        $response->assertHeader('Expected', 'Header');
+    }
+
+    public function testItAppendsPrecognitionHeaderToSymfonyResponse()
+    {
+        Route::get('test-route', function () {
+            //
+        })->middleware([
+            HandlePrecognitiveRequests::class,
+            MiddlewareReturningSymfonyResponse::class,
+        ]);
+
+        $response = $this->get('test-route', ['Precognition' => 'true']);
+        $response->assertOk();
+        $response->assertHeader('Expected', 'Header');
+        $response->assertHeader('Precognition', 'true');
+    }
 }
 
 class PrecognitionTestController
@@ -906,5 +934,15 @@ class PrecognitionInvokingController extends HandlePrecognitiveRequests
 
         app()->bind(CallableDispatcherContract::class, fn ($app) => new CallableDispatcher($app));
         app()->bind(ControllerDispatcherContract::class, fn ($app) => new ControllerDispatcher($app));
+    }
+}
+
+class MiddlewareReturningSymfonyResponse
+{
+    public function handle($request, $next)
+    {
+        return response()->streamDownload(function () {
+            //
+        }, null, ['Expected' => 'Header']);
     }
 }
