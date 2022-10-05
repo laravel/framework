@@ -570,7 +570,7 @@ class ComponentTagCompiler
         $pattern = "/\s\:\\\$(\w+)/x";
 
         return preg_replace_callback($pattern, function (array $matches) {
-            return ":{$matches[1]}=\"\${$matches[1]}\"";
+            return " :{$matches[1]}=\"\${$matches[1]}\"";
         }, $value);
     }
 
