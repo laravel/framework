@@ -169,9 +169,9 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 <?php endif; ?>
 <?php \$component->withAttributes([]); ?> @endComponentClass##END-COMPONENT-CLASS##", trim($result));
 
-    $result = $this->compiler(['input' => TestInputComponent::class])->compileTags('<x-input value="Joe" :$name :label="Input::$label"></x-input>');
+        $result = $this->compiler(['input' => TestInputComponent::class])->compileTags('<x-input value="Joe" :$name :label="Input::$label"></x-input>');
 
-            $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestInputComponent', 'input', ['value' => 'Joe','name' => \$name,'label' => Input::\$label])
+        $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestInputComponent', 'input', ['value' => 'Joe','name' => \$name,'label' => Input::\$label])
 <?php if (isset(\$attributes) && \$constructor = (new ReflectionClass(Illuminate\Tests\View\Blade\TestInputComponent::class))->getConstructor()): ?>
 <?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
@@ -213,7 +213,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 <?php \$component->withAttributes([]); ?>\n".
 '@endComponentClass##END-COMPONENT-CLASS##', trim($result));
 
-$result = $this->compiler(['input' => TestInputComponent::class])->compileTags('<x-input :$name :label="Input::$label" value="Joe" />');
+        $result = $this->compiler(['input' => TestInputComponent::class])->compileTags('<x-input :$name :label="Input::$label" value="Joe" />');
 
         $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestInputComponent', 'input', ['name' => \$name,'label' => Input::\$label,'value' => 'Joe'])
 <?php if (isset(\$attributes) && \$constructor = (new ReflectionClass(Illuminate\Tests\View\Blade\TestInputComponent::class))->getConstructor()): ?>
