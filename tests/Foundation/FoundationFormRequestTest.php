@@ -6,12 +6,15 @@ use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Validation\Factory as ValidationFactoryContract;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Redirector;
+use Illuminate\Routing\Route;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Validation\Factory as ValidationFactory;
 use Illuminate\Validation\ValidationException;
@@ -147,6 +150,29 @@ class FoundationFormRequestTest extends TestCase
         $request->validateResolved();
 
         $this->assertSame('bar', $request->validated('nested.foo'));
+    }
+
+    public function testRuleMethodReceivesRouteParameters()
+    {
+        $payload = ['name' => 'foo'];
+
+        $container = tap(new Container, function ($container) {
+            $container->instance(
+                ValidationFactoryContract::class,
+                $this->createValidationFactory($container)
+            );
+        });
+
+        $route = new Route('GET','{min}', fn(int $min) => 'ok');
+        $request = FoundationTestFormRequestReceivesRouteParameters::create('10', 'GET', $payload);
+        $request->setRedirector($this->createMockRedirector($request))
+            ->setContainer($container)
+            ->setRouteResolver(fn() => $route);
+        $route->bind($request);
+
+        $request->validateResolved();
+
+        $this->assertSame(10, $request->min);
     }
 
     /**
@@ -375,5 +401,22 @@ class FoundationTestFormRequestPassesWithResponseStub extends FormRequest
     public function authorize()
     {
         return Response::allow('baz');
+    }
+}
+
+class FoundationTestFormRequestReceivesRouteParameters extends FormRequest
+{
+    public $min = null;
+
+    public function rules(int $min)
+    {
+        $this->min = $min;
+
+        return ['name' => 'required'];
+    }
+
+    public function authorize()
+    {
+        return true;
     }
 }
