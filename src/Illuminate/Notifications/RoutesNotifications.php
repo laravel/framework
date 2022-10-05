@@ -45,7 +45,7 @@ trait RoutesNotifications
 
         return match ($driver) {
             'database' => $this->notifications(),
-            'mail' => $this->email,
+            'mail' => $this->getEmailForPasswordReset(),
             default => null,
         };
     }
