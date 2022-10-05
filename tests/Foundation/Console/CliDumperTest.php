@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Foundation\Console;
 
 use Illuminate\Container\Container;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Console\CliDumper;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -248,6 +249,28 @@ class CliDumperTest extends TestCase
         $this->assertDumpMatchesFormat($expected, $response);
     }
 
+    public function testModel()
+    {
+        $model = new CliDumperModel();
+
+        $expected = <<<EOD
+        Illuminate\Tests\Foundation\Console\CliDumperModel { // app/routes/console.php:18
+          #attributes: []
+          +exists: false
+          +wasRecentlyCreated: false
+          #relations: []
+          #connection: null
+          #table: null
+          #original: []
+          #changes: []
+           …%d
+        }
+
+        EOD;
+
+        $this->assertDumpMatchesFormat($expected, $model);
+    }
+
     public function testWhenIsFileViewIsNotViewCompiled()
     {
         $file = '/my-work-directory/routes/console.php';
@@ -395,4 +418,9 @@ class CliDumperTest extends TestCase
     {
         CliDumper::resolveDumpSourceUsing(null);
     }
+}
+
+class CliDumperModel extends Model
+{
+
 }
