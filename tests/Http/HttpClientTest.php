@@ -1139,6 +1139,31 @@ class HttpClientTest extends TestCase
         $this->assertSame(500, $responses['test500']->status());
     }
 
+    public function testMiddlewareRunsInPool()
+    {
+        $this->factory->fake(function (Request $request) {
+            return $this->factory->response('Fake');
+        });
+
+        $history = [];
+
+        $middleware = Middleware::history($history);
+
+        $responses = $this->factory->pool(fn (Pool $pool) => [
+            $pool->withMiddleware($middleware)->post('https://example.com', ['hyped-for' => 'laravel-movie']),
+        ]);
+
+        $response = $responses[0];
+
+        $this->assertSame('Fake', $response->body());
+
+        $this->assertCount(1, $history);
+
+        $this->assertSame('Fake', tap($history[0]['response']->getBody())->rewind()->getContents());
+
+        $this->assertSame(['hyped-for' => 'laravel-movie'], json_decode(tap($history[0]['request']->getBody())->rewind()->getContents(), true));
+    }
+
     public function testTheRequestSendingAndResponseReceivedEventsAreFiredWhenARequestIsSent()
     {
         $events = m::mock(Dispatcher::class);

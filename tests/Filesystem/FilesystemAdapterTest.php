@@ -564,4 +564,11 @@ class FilesystemAdapterTest extends TestCase
 
         $this->assertFalse($filesystemAdapter->providesTemporaryUrls());
     }
+
+    public function testPrefixesUrls()
+    {
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter, ['url' => 'https://example.org/', 'prefix' => 'images']);
+
+        $this->assertEquals('https://example.org/images/picture.jpeg', $filesystemAdapter->url('picture.jpeg'));
+    }
 }

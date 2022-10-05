@@ -4,6 +4,7 @@ namespace Illuminate\Routing;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Reflector;
+use ReflectionClass;
 use ReflectionFunctionAbstract;
 use ReflectionMethod;
 use ReflectionParameter;
@@ -77,7 +78,11 @@ trait RouteDependencyResolverTrait
         // the list of parameters. If it is we will just skip it as it is probably a model
         // binding and we do not want to mess with those; otherwise, we resolve it here.
         if ($className && ! $this->alreadyInParameters($className, $parameters)) {
-            return $parameter->isDefaultValueAvailable() ? null : $this->container->make($className);
+            $isEnum = method_exists(ReflectionClass::class, 'isEnum') && (new ReflectionClass($className))->isEnum();
+
+            return $parameter->isDefaultValueAvailable()
+                ? ($isEnum ? $parameter->getDefaultValue() : null)
+                : $this->container->make($className);
         }
 
         return $skippableValue;

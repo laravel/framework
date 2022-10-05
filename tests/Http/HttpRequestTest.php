@@ -562,6 +562,50 @@ class HttpRequestTest extends TestCase
         $this->assertTrue($request->boolean('with_yes'));
     }
 
+    public function testIntegerMethod()
+    {
+        $request = Request::create('/', 'GET', [
+            'int' => '123',
+            'raw_int' => 456,
+            'zero_padded' => '078',
+            'space_padded' => ' 901',
+            'nan' => 'nan',
+            'mixed'=> '1ab',
+            'underscore_notation'=> '2_000',
+        ]);
+        $this->assertSame(123, $request->integer('int'));
+        $this->assertSame(456, $request->integer('raw_int'));
+        $this->assertSame(78, $request->integer('zero_padded'));
+        $this->assertSame(901, $request->integer('space_padded'));
+        $this->assertSame(0, $request->integer('nan'));
+        $this->assertSame(1, $request->integer('mixed'));
+        $this->assertSame(2, $request->integer('underscore_notation'));
+        $this->assertSame(123456, $request->integer('unknown_key', 123456));
+    }
+
+    public function testFloatMethod()
+    {
+        $request = Request::create('/', 'GET', [
+            'float' => '1.23',
+            'raw_float' => 45.6,
+            'decimal_only' => '.6',
+            'zero_padded' => '0.78',
+            'space_padded' => ' 90.1',
+            'nan' => 'nan',
+            'mixed'=> '1.ab',
+            'scientific_notation'=> '1e3',
+        ]);
+        $this->assertSame(1.23, $request->float('float'));
+        $this->assertSame(45.6, $request->float('raw_float'));
+        $this->assertSame(.6, $request->float('decimal_only'));
+        $this->assertSame(0.78, $request->float('zero_padded'));
+        $this->assertSame(90.1, $request->float('space_padded'));
+        $this->assertSame(0.0, $request->float('nan'));
+        $this->assertSame(1.0, $request->float('mixed'));
+        $this->assertSame(1e3, $request->float('scientific_notation'));
+        $this->assertSame(123.456, $request->float('unknown_key', 123.456));
+    }
+
     public function testCollectMethod()
     {
         $request = Request::create('/', 'GET', ['users' => [1, 2, 3]]);

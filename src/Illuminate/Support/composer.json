@@ -22,7 +22,7 @@
         "illuminate/conditionable": "^9.0",
         "illuminate/contracts": "^9.0",
         "illuminate/macroable": "^9.0",
-        "nesbot/carbon": "^2.53.1",
+        "nesbot/carbon": "^2.62.1",
         "voku/portable-ascii": "^2.0"
     },
     "conflict": {
@@ -46,7 +46,7 @@
         "league/commonmark": "Required to use Str::markdown() and Stringable::markdown() (^2.0.2).",
         "ramsey/uuid": "Required to use Str::uuid() (^4.2.2).",
         "symfony/process": "Required to use the composer class (^6.0).",
-        "symfony/uid": "Required to generate ULIDs for Eloquent (^6.0).",
+        "symfony/uid": "Required to use Str::ulid() (^6.0).",
         "symfony/var-dumper": "Required to use the dd function (^6.0).",
         "vlucas/phpdotenv": "Required to use the Env class and env helper (^5.4.1)."
     },

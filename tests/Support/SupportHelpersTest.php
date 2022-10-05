@@ -9,6 +9,8 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Env;
 use Illuminate\Support\Optional;
 use Illuminate\Support\Stringable;
+use Illuminate\Tests\Support\Fixtures\IntBackedEnum;
+use Illuminate\Tests\Support\Fixtures\StringBackedEnum;
 use IteratorAggregate;
 use LogicException;
 use Mockery as m;
@@ -29,9 +31,22 @@ class SupportHelpersTest extends TestCase
     {
         $str = 'A \'quote\' is <b>bold</b>';
         $this->assertSame('A &#039;quote&#039; is &lt;b&gt;bold&lt;/b&gt;', e($str));
+
         $html = m::mock(Htmlable::class);
         $html->shouldReceive('toHtml')->andReturn($str);
         $this->assertEquals($str, e($html));
+    }
+
+    /**
+     * @requires PHP >= 8.1
+     */
+    public function testEWithEnums()
+    {
+        $enumValue = StringBackedEnum::ADMIN_LABEL;
+        $this->assertSame('I am &#039;admin&#039;', e($enumValue));
+
+        $enumValue = IntBackedEnum::ROLE_ADMIN;
+        $this->assertSame('1', e($enumValue));
     }
 
     public function testBlank()
@@ -637,7 +652,7 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals(2, $attempts);
 
         // Make sure we waited 100ms for the first attempt
-        $this->assertEqualsWithDelta(0.1, microtime(true) - $startTime, 0.05);
+        $this->assertEqualsWithDelta(0.1, microtime(true) - $startTime, 0.03);
     }
 
     public function testRetryWithPassingSleepCallback()
@@ -660,7 +675,7 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals(3, $attempts);
 
         // Make sure we waited 300ms for the first two attempts
-        $this->assertEqualsWithDelta(0.3, microtime(true) - $startTime, 0.05);
+        $this->assertEqualsWithDelta(0.3, microtime(true) - $startTime, 0.03);
     }
 
     public function testRetryWithPassingWhenCallback()
@@ -681,7 +696,7 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals(2, $attempts);
 
         // Make sure we waited 100ms for the first attempt
-        $this->assertEqualsWithDelta(0.1, microtime(true) - $startTime, 0.05);
+        $this->assertEqualsWithDelta(0.1, microtime(true) - $startTime, 0.03);
     }
 
     public function testRetryWithFailingWhenCallback()

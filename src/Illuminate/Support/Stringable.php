@@ -3,6 +3,7 @@
 namespace Illuminate\Support;
 
 use Closure;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\Tappable;
@@ -167,22 +168,24 @@ class Stringable implements JsonSerializable
      * Determine if a given string contains a given substring.
      *
      * @param  string|iterable<string>  $needles
+     * @param  bool  $ignoreCase
      * @return bool
      */
-    public function contains($needles)
+    public function contains($needles, $ignoreCase = false)
     {
-        return Str::contains($this->value, $needles);
+        return Str::contains($this->value, $needles, $ignoreCase);
     }
 
     /**
      * Determine if a given string contains all array values.
      *
      * @param  iterable<string>  $needles
+     * @param  bool  $ignoreCase
      * @return bool
      */
-    public function containsAll($needles)
+    public function containsAll($needles, $ignoreCase = false)
     {
-        return Str::containsAll($this->value, $needles);
+        return Str::containsAll($this->value, $needles, $ignoreCase);
     }
 
     /**
@@ -1060,7 +1063,7 @@ class Stringable implements JsonSerializable
      */
     public function wrap($before, $after = null)
     {
-        return new static($before.$this->value.($after ??= $before));
+        return new static(Str::wrap($this->value, $before, $after));
     }
 
     /**
@@ -1115,6 +1118,56 @@ class Stringable implements JsonSerializable
     public function toString()
     {
         return $this->value;
+    }
+
+    /**
+     * Get the underlying string value as an integer.
+     *
+     * @return int
+     */
+    public function toInteger()
+    {
+        return intval($this->value);
+    }
+
+    /**
+     * Get the underlying string value as a float.
+     *
+     * @return float
+     */
+    public function toFloat()
+    {
+        return floatval($this->value);
+    }
+
+    /**
+     * Get the underlying string value as a boolean.
+     *
+     * Returns true when value is "1", "true", "on", and "yes". Otherwise, returns false.
+     *
+     * @return bool
+     */
+    public function toBoolean()
+    {
+        return filter_var($this->value, FILTER_VALIDATE_BOOLEAN);
+    }
+
+    /**
+     * Get the underlying string value as a Carbon instance.
+     *
+     * @param  string|null  $format
+     * @param  string|null  $tz
+     * @return \Illuminate\Support\Carbon
+     *
+     * @throws \Carbon\Exceptions\InvalidFormatException
+     */
+    public function toDate($format = null, $tz = null)
+    {
+        if (is_null($format)) {
+            return Date::parse($this->value, $tz);
+        }
+
+        return Date::createFromFormat($format, $this->value, $tz);
     }
 
     /**

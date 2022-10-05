@@ -7,9 +7,12 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
+use Illuminate\Support\Traits\Macroable;
 
 class Vite implements Htmlable
 {
+    use Macroable;
+
     /**
      * The Content Security Policy nonce to apply to all generated tags.
      *

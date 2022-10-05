@@ -146,7 +146,7 @@ class VerifyCsrfToken
      * Get the CSRF token from the request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return string
+     * @return string|null
      */
     protected function getTokenFromRequest($request)
     {

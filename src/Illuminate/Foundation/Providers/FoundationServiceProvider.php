@@ -3,7 +3,10 @@
 namespace Illuminate\Foundation\Providers;
 
 use Illuminate\Contracts\Foundation\MaintenanceMode as MaintenanceModeContract;
+use Illuminate\Foundation\Console\CliDumper;
+use Illuminate\Foundation\Http\HtmlDumper;
 use Illuminate\Foundation\MaintenanceModeManager;
+use Illuminate\Foundation\Precognition;
 use Illuminate\Foundation\Vite;
 use Illuminate\Http\Request;
 use Illuminate\Log\Events\MessageLogged;
@@ -57,10 +60,33 @@ class FoundationServiceProvider extends AggregateServiceProvider
     {
         parent::register();
 
+        $this->registerDumper();
         $this->registerRequestValidation();
         $this->registerRequestSignatureValidation();
         $this->registerExceptionTracking();
         $this->registerMaintenanceModeManager();
+    }
+
+    /**
+     * Register an var dumper (with source) to debug variables.
+     *
+     * @return void
+     */
+    public function registerDumper()
+    {
+        $basePath = $this->app->basePath();
+
+        $compiledViewPath = $this->app['config']->get('view.compiled');
+
+        $format = $_SERVER['VAR_DUMPER_FORMAT'] ?? null;
+
+        match (true) {
+            'html' == $format => HtmlDumper::register($basePath, $compiledViewPath),
+            'cli' == $format => CliDumper::register($basePath, $compiledViewPath),
+            'server' == $format => null,
+            $format && 'tcp' == parse_url($format, PHP_URL_SCHEME) => null,
+            default => in_array(PHP_SAPI, ['cli', 'phpdbg']) ? CliDumper::register($basePath, $compiledViewPath) : HtmlDumper::register($basePath, $compiledViewPath),
+        };
     }
 
     /**
@@ -73,7 +99,15 @@ class FoundationServiceProvider extends AggregateServiceProvider
     public function registerRequestValidation()
     {
         Request::macro('validate', function (array $rules, ...$params) {
-            return validator()->validate($this->all(), $rules, ...$params);
+            $rules = $this->isPrecognitive()
+                ? $this->filterPrecognitiveRules($rules)
+                : $rules;
+
+            return tap(validator($this->all(), $rules, ...$params), function ($validator) {
+                if ($this->isPrecognitive()) {
+                    $validator->after(Precognition::afterValidationHook($this));
+                }
+            })->validate();
         });
 
         Request::macro('validateWithBag', function (string $errorBag, array $rules, ...$params) {
