@@ -106,7 +106,7 @@ class ResourceRegistrar
             }
 
             if (isset($options['trashed']) &&
-                in_array($m, ! empty($options['trashed']) ? $options['trashed'] : $resourceMethods)) {
+                in_array($m, ! empty($options['trashed']) ? $options['trashed'] : array_intersect($resourceMethods, ['show', 'edit', 'update']))) {
                 $route->withTrashed();
             }
 
