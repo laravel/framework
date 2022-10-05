@@ -31,6 +31,18 @@ trait RoutesNotifications
     }
 
     /**
+     * Get the e-mail address field to notify through mail.
+     * This function will provide option to choose different field name 
+     * which contain email address.
+     * 
+     * @return string
+     */
+    public function getEmailForMailNotification()
+    {
+        return $this->email;
+    }
+
+    /**
      * Get the notification routing information for the given driver.
      *
      * @param  string  $driver
@@ -45,7 +57,7 @@ trait RoutesNotifications
 
         return match ($driver) {
             'database' => $this->notifications(),
-            'mail' => $this->getEmailForPasswordReset(),
+            'mail' => $this->getEmailForMailNotification(),
             default => null,
         };
     }
