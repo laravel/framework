@@ -110,6 +110,19 @@ class HtmlDumperTest extends TestCase
         foreach ($expectations as $expected) {
             $this->assertStringContainsString($expected, $output);
         }
+
+        $missing = [
+            'methodBindings',
+            'instances',
+            'scopedInstances',
+            'abstractAliases',
+            'tags',
+            'buildStack',
+        ];
+
+        foreach ($missing as $needle) {
+            $this->assertStringNotContainsString($needle, $output);
+        }
     }
 
     public function testUnresolvableSource()
