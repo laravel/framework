@@ -6,11 +6,9 @@ use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Validation\Factory as ValidationFactoryContract;
 use Illuminate\Contracts\Validation\Validator;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Redirector;
@@ -163,11 +161,11 @@ class FoundationFormRequestTest extends TestCase
             );
         });
 
-        $route = new Route('GET','{min}', fn(int $min) => 'ok');
+        $route = new Route('GET', '{min}', fn (int $min) => 'ok');
         $request = FoundationTestFormRequestReceivesRouteParameters::create('10', 'GET', $payload);
         $request->setRedirector($this->createMockRedirector($request))
             ->setContainer($container)
-            ->setRouteResolver(fn() => $route);
+            ->setRouteResolver(fn () => $route);
         $route->bind($request);
 
         $request->validateResolved();
