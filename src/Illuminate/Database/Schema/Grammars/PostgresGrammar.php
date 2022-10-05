@@ -104,8 +104,8 @@ class PostgresGrammar extends Grammar
     /**
      * Compile a create table command with its partitions.
      *
-     * @param  Blueprint $blueprint
-     * @param  Fluent $command
+     * @param  Blueprint  $blueprint
+     * @param  Fluent  $command
      * @return array
      */
     public function compileCreatePartitioned(Blueprint $blueprint, Fluent $command)
@@ -114,7 +114,7 @@ class PostgresGrammar extends Grammar
             $blueprint->temporary ? 'create temporary' : 'create',
             $this->wrapTable($blueprint),
             sprintf('%s, %s', implode(', ', $this->getColumns($blueprint)),
-                sprintf("primary key (%s, %s)", $blueprint->pkCompositeOne, $blueprint->pkCompositeTwo)),
+                sprintf('primary key (%s, %s)', $blueprint->pkCompositeOne, $blueprint->pkCompositeTwo)),
             $blueprint->rangeKey
 
         )], $this->compileAutoIncrementStartingValues($blueprint))));
