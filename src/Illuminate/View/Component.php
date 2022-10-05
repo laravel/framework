@@ -27,6 +27,13 @@ abstract class Component
     protected static $methodCache = [];
 
     /**
+     * The cache of blade view names, keyed by class.
+     *
+     * @var array
+     */
+    protected static $bladeViewCache = [];
+
+    /**
      * The properties / methods that should not be exposed to the component.
      *
      * @var array
@@ -74,9 +81,7 @@ abstract class Component
         $resolver = function ($view) {
             $factory = Container::getInstance()->make('view');
 
-            return strlen($view) <= PHP_MAXPATHLEN && $factory->exists($view)
-                        ? $view
-                        : $this->createBladeViewFromString($factory, $view);
+            return $this->extractBladeViewFromString($factory, $view);
         };
 
         return $view instanceof Closure ? function (array $data = []) use ($view, $resolver) {
@@ -92,8 +97,18 @@ abstract class Component
      * @param  string  $contents
      * @return string
      */
-    protected function createBladeViewFromString($factory, $contents)
+    protected function extractBladeViewFromString($factory, $contents)
     {
+        $class = get_class($this);
+
+        if (isset(static::$bladeViewCache[$class])) {
+            return static::$bladeViewCache[$class];
+        }
+
+        if (strlen($contents) <= PHP_MAXPATHLEN && $factory->exists($contents)) {
+            return static::$bladeViewCache[$class] = $contents;
+        }
+
         $factory->addNamespace(
             '__components',
             $directory = Container::getInstance()['config']->get('view.compiled')
@@ -107,7 +122,7 @@ abstract class Component
             file_put_contents($viewFile, $contents);
         }
 
-        return '__components::'.basename($viewFile, '.blade.php');
+        return static::$bladeViewCache[$class] = '__components::'.basename($viewFile, '.blade.php');
     }
 
     /**
