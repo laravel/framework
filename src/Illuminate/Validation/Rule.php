@@ -8,6 +8,9 @@ use Illuminate\Validation\Rules\Dimensions;
 use Illuminate\Validation\Rules\ExcludeIf;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\In;
+use Illuminate\Validation\Rules\MaxFilesSize;
+use Illuminate\Validation\Rules\MinFilesSize;
+use Illuminate\Validation\Rules\BetweenFilesSize;
 use Illuminate\Validation\Rules\NotIn;
 use Illuminate\Validation\Rules\ProhibitedIf;
 use Illuminate\Validation\Rules\RequiredIf;
@@ -137,5 +140,39 @@ class Rule
     public static function unique($table, $column = 'NULL')
     {
         return new Unique($table, $column);
+    }
+
+    /**
+     * Get a max multi files size constraint builder instance.
+     *
+     * @param  int  $size
+     * @return MaxFilesSize
+     */
+    public static function maxFilesSize(int $size): MaxFilesSize
+    {
+        return new MaxFilesSize($size);
+    }
+
+    /**
+     * Get a min multi files size constraint builder instance.
+     *
+     * @param  int  $size
+     * @return MinFilesSize
+     */
+    public static function minFilesSize(int $size): MinFilesSize
+    {
+        return new MinFilesSize($size);
+    }
+
+    /**
+     * Get a between multi files size constraint builder instance.
+     *
+     * @param  int $minSize
+     * @param  int $maxSize
+     * @return BetweenFilesSize
+     */
+    public static function betweenFilesSize(int $minSize, int $maxSize): BetweenFilesSize
+    {
+        return new BetweenFilesSize($minSize, $maxSize);
     }
 }
