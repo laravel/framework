@@ -575,6 +575,74 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('bar', $route->parameter('foo', 'bar'));
     }
 
+    public function testHasParameters()
+    {
+        $route = new Route('GET', 'images/{id}.{ext}', function () {
+            //
+        });
+        $request1 = Request::create('images/1.png', 'GET');
+        $this->assertFalse($route->hasParameters());
+        $this->assertTrue($route->matches($request1));
+        $route->bind($request1);
+        $this->assertTrue($route->hasParameters());
+    }
+
+    public function testForgetParameter()
+    {
+        $route = new Route('GET', 'images/{id}.{ext}', function () {
+            //
+        });
+        $request1 = Request::create('images/1.png', 'GET');
+        $route->bind($request1);
+        $this->assertTrue($route->hasParameter('id'));
+        $this->assertTrue($route->hasParameter('ext'));
+        $route->forgetParameter('id');
+        $this->assertFalse($route->hasParameter('id'));
+        $this->assertTrue($route->hasParameter('ext'));
+    }
+
+    public function testParameterNames()
+    {
+        $route = new Route('GET', 'images/{id}.{ext}', function () {
+            //
+        });
+        $this->assertSame(['id', 'ext'], $route->parameterNames());
+
+        $route = new Route('GET', 'foo/{bar?}', function () {
+            //
+        });
+        $this->assertSame(['bar'], $route->parameterNames());
+
+        $route = new Route('GET', '/', function () {
+            //
+        });
+        $this->assertSame([], $route->parameterNames());
+    }
+
+    public function testParametersWithoutNulls()
+    {
+        $route = new Route('GET', 'users/{id?}/{name?}/', function () {
+            //
+        });
+        $request1 = Request::create('users/12/amir', 'GET');
+        $route->bind($request1);
+        $this->assertSame(['id' => '12', 'name' => 'amir'], $route->parametersWithoutNulls());
+
+        $route = new Route('GET', 'users/{id?}/{name?}/', function () {
+            //
+        });
+        $request1 = Request::create('users/12', 'GET');
+        $route->bind($request1);
+        $this->assertSame(['id' => '12'], $route->parametersWithoutNulls());
+
+        $route = new Route('GET', 'users/{id?}/{name?}/', function () {
+            //
+        });
+        $request1 = Request::create('users/', 'GET');
+        $route->bind($request1);
+        $this->assertSame([], $route->parametersWithoutNulls());
+    }
+
     public function testRouteParametersDefaultValue()
     {
         $router = $this->getRouter();
