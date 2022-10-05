@@ -23,8 +23,8 @@ class BetweenFilesSize implements Rule
     /**
      * Determine if the validation rule passes.
      *
-     * @param string $attribute
-     * @param mixed $value
+     * @param  string  $attribute
+     * @param  mixed  $value
      * @return bool
      */
     public function passes($attribute, $value)
@@ -44,6 +44,6 @@ class BetweenFilesSize implements Rule
      */
     public function message()
     {
-        return 'The Files Size Should be between ' . $this->minSize / 1048576 . ' MegaByte and ' . $this->maxSize / 1048576 . ' MegaByte';
+        return 'The Files Size Should be between '.$this->minSize / 1048576 .' MegaByte and '.$this->maxSize / 1048576 .' MegaByte';
     }
 }
