@@ -4,6 +4,7 @@ namespace Illuminate\Support\Facades;
 
 /**
  * @method static \Illuminate\Database\Schema\Builder create(string $table, \Closure $callback)
+ * @method static \Illuminate\Database\Schema\Builder createPartitioned(string $table, \Closure $callback, string $pkCompositeOne, string $pkCompositeTwo, string $rangeKey)
  * @method static \Illuminate\Database\Schema\Builder createDatabase(string $name)
  * @method static \Illuminate\Database\Schema\Builder disableForeignKeyConstraints()
  * @method static \Illuminate\Database\Schema\Builder drop(string $table)
