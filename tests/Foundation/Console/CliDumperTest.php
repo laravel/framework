@@ -118,9 +118,9 @@ class CliDumperTest extends TestCase
     {
         $container = new Container();
 
-        $container->bind(static::class, fn() => $this);
+        $container->bind(static::class, fn () => $this);
         $container->alias(static::class, 'bar');
-        $container->extend('bar', fn() => $this);
+        $container->extend('bar', fn () => $this);
         $container->make('bar');
 
         $fqcn = static::class;
@@ -422,5 +422,4 @@ class CliDumperTest extends TestCase
 
 class CliDumperModel extends Model
 {
-
 }
