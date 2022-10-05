@@ -148,11 +148,34 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 <?php \$component->withAttributes([]); ?> @endComponentClass##END-COMPONENT-CLASS##", trim($result));
     }
 
+    public function testColonDataWithStaticClassProperty()
+    {
+        $result = $this->compiler(['profile' => TestProfileComponent::class])->compileTags('<x-profile :userId="User::$id"></x-profile>');
+
+        $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestProfileComponent', 'profile', ['userId' => User::\$id])
+<?php if (isset(\$attributes) && \$constructor = (new ReflectionClass(Illuminate\Tests\View\Blade\TestProfileComponent::class))->getConstructor()): ?>
+<?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php \$component->withAttributes([]); ?> @endComponentClass##END-COMPONENT-CLASS##", trim($result));
+    }
+
     public function testSelfClosingComponentWithColonDataShortSyntax()
     {
         $result = $this->compiler(['profile' => TestProfileComponent::class])->compileTags('<x-profile :$userId/>');
 
         $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestProfileComponent', 'profile', ['userId' => \$userId])
+<?php if (isset(\$attributes) && \$constructor = (new ReflectionClass(Illuminate\Tests\View\Blade\TestProfileComponent::class))->getConstructor()): ?>
+<?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php \$component->withAttributes([]); ?>\n".
+'@endComponentClass##END-COMPONENT-CLASS##', trim($result));
+    }
+
+    public function testSelfClosingComponentWithColonDataAndStaticClassPropertyShortSyntax()
+    {
+        $result = $this->compiler(['profile' => TestProfileComponent::class])->compileTags('<x-profile :userId="User::$id"/>');
+
+        $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestProfileComponent', 'profile', ['userId' => User::\$id])
 <?php if (isset(\$attributes) && \$constructor = (new ReflectionClass(Illuminate\Tests\View\Blade\TestProfileComponent::class))->getConstructor()): ?>
 <?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
@@ -491,7 +514,9 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
             }
         };
 
-        $model = new class extends Model {};
+        $model = new class extends Model
+        {
+        };
 
         $this->assertEquals(e('<hi>'), BladeCompiler::sanitizeComponentAttribute('<hi>'));
         $this->assertEquals(e('1'), BladeCompiler::sanitizeComponentAttribute('1'));
