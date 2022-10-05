@@ -270,17 +270,15 @@ class Builder
     /**
      * Create a new table on the schema with partitions.
      *
-     * @param string $table
-     * @param \Closure $callback
-     * @param string $pkCompositeOne
-     * @param string $pkCompositeTwo
-     * @param string $rangeKey
-     * @return void
+     * @param  string  $table
+     * @param  \Closure  $callback
+     * @param  string  $pkCompositeOne
+     * @param  string  $pkCompositeTwo
+     * @param  string  $rangeKey
      */
     public function createPartitioned($table, Closure $callback, string $pkCompositeOne, string $pkCompositeTwo, string $rangeKey)
     {
-        $this->build(tap($this->createBlueprint($table), function ($blueprint)
-        use ($callback, $pkCompositeOne, $pkCompositeTwo, $rangeKey) {
+        $this->build(tap($this->createBlueprint($table), function ($blueprint) use ($callback, $pkCompositeOne, $pkCompositeTwo, $rangeKey) {
             $blueprint->createPartitioned();
             $blueprint->pkCompositeOne = $pkCompositeOne;
             $blueprint->pkCompositeTwo = $pkCompositeTwo;

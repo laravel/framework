@@ -106,7 +106,7 @@ class PostgresGrammar extends Grammar
      *
      * @param  Blueprint $blueprint
      * @param  Fluent $command
-     * @return  array
+     * @return array
      */
     public function compileCreatePartitioned(Blueprint $blueprint, Fluent $command)
     {
