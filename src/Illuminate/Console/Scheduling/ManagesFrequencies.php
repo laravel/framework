@@ -175,6 +175,16 @@ trait ManagesFrequencies
     }
 
     /**
+     * Schedule the event to run every odd hour.
+     *
+     * @return $this
+     */
+    public function everyOddHour()
+    {
+        return $this->spliceIntoPosition(1, 0)->spliceIntoPosition(2, '1-23/2');
+    }
+
+    /**
      * Schedule the event to run every two hours.
      *
      * @return $this

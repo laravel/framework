@@ -8,7 +8,6 @@ use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper as BaseHtmlDumper;
 use Symfony\Component\VarDumper\VarDumper;
-use Throwable;
 
 class HtmlDumper extends BaseHtmlDumper
 {
@@ -36,6 +35,13 @@ class HtmlDumper extends BaseHtmlDumper
     protected $basePath;
 
     /**
+     * The compiled view path of the application.
+     *
+     * @var string
+     */
+    protected $compiledViewPath;
+
+    /**
      * If the dumper is currently dumping.
      *
      * @var bool
@@ -46,26 +52,29 @@ class HtmlDumper extends BaseHtmlDumper
      * Create a new HTML dumper instance.
      *
      * @param  string  $basePath
+     * @param  string  $compiledViewPath
      * @return void
      */
-    public function __construct($basePath)
+    public function __construct($basePath, $compiledViewPath)
     {
         parent::__construct();
 
         $this->basePath = $basePath;
+        $this->compiledViewPath = $compiledViewPath;
     }
 
     /**
      * Create a new HTML dumper instance and register it as the default dumper.
      *
      * @param  string  $basePath
+     * @param  string  $compiledViewPath
      * @return void
      */
-    public static function register($basePath)
+    public static function register($basePath, $compiledViewPath)
     {
         $cloner = tap(new VarCloner())->addCasters(ReflectionCaster::UNSET_CLOSURE_FILE_INFO);
 
-        $dumper = new static($basePath);
+        $dumper = new static($basePath, $compiledViewPath);
 
         VarDumper::setHandler(fn ($value) => $dumper->dumpWithSource($cloner->cloneVar($value)));
     }
@@ -120,32 +129,12 @@ class HtmlDumper extends BaseHtmlDumper
 
         [$file, $relativeFile, $line] = $dumpSource;
 
-        $source = sprintf('%s:%s', $relativeFile, $line);
+        $source = sprintf('%s%s', $relativeFile, is_null($line) ? '' : ":$line");
 
-        if ($editor = $this->editor()) {
-            $source = sprintf(
-                '<a href="%s://open?file=%s&line=%s">%s</a>',
-                $editor,
-                $file,
-                $line,
-                $source,
-            );
+        if ($href = $this->resolveSourceHref($file, $line)) {
+            $source = sprintf('<a href="%s">%s</a>', $href, $source);
         }
 
-        return sprintf('<span style="color: #A0A0A0; font-family: Menlo"> // %s</span>', $source);
-    }
-
-    /**
-     * Get the application editor, if applicable.
-     *
-     * @return string|null
-     */
-    protected function editor()
-    {
-        try {
-            return config('app.editor');
-        } catch (Throwable $e) {
-            // ...
-        }
+        return sprintf('<span style="color: #A0A0A0;"> // %s</span>', $source);
     }
 }

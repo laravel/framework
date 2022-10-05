@@ -701,6 +701,72 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertSame(2, FactoryTestPost::count());
     }
 
+    public function test_multiple_models_can_be_provided_to_recycle()
+    {
+        Factory::guessFactoryNamesUsing(function ($model) {
+            return $model.'Factory';
+        });
+
+        $users = FactoryTestUserFactory::new()->count(3)->create();
+
+        $posts = FactoryTestPostFactory::new()
+            ->recycle($users)
+            ->for(FactoryTestUserFactory::new())
+            ->has(FactoryTestCommentFactory::new()->count(5), 'comments')
+            ->count(2)
+            ->create();
+
+        $this->assertSame(3, FactoryTestUser::count());
+    }
+
+    public function test_recycled_models_can_be_combined_with_multiple_calls()
+    {
+        Factory::guessFactoryNamesUsing(function ($model) {
+            return $model.'Factory';
+        });
+
+        $users = FactoryTestUserFactory::new()
+            ->count(2)
+            ->create();
+        $posts = FactoryTestPostFactory::new()
+            ->recycle($users)
+            ->count(2)
+            ->create();
+        $additionalUser = FactoryTestUserFactory::new()
+            ->create();
+        $additionalPost = FactoryTestPostFactory::new()
+            ->recycle($additionalUser)
+            ->create();
+
+        $this->assertSame(3, FactoryTestUser::count());
+        $this->assertSame(3, FactoryTestPost::count());
+
+        $comments = FactoryTestCommentFactory::new()
+            ->recycle($users)
+            ->recycle($posts)
+            ->recycle([$additionalUser, $additionalPost])
+            ->count(5)
+            ->create();
+
+        $this->assertSame(3, FactoryTestUser::count());
+        $this->assertSame(3, FactoryTestPost::count());
+    }
+
+    public function test_no_models_can_be_provided_to_recycle()
+    {
+        Factory::guessFactoryNamesUsing(function ($model) {
+            return $model.'Factory';
+        });
+
+        $posts = FactoryTestPostFactory::new()
+            ->recycle([])
+            ->count(2)
+            ->create();
+
+        $this->assertSame(2, FactoryTestPost::count());
+        $this->assertSame(2, FactoryTestUser::count());
+    }
+
     /**
      * Get a database connection instance.
      *

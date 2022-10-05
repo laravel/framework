@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Foundation\Console;
 
 use Illuminate\Foundation\Console\CliDumper;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 use stdClass;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\VarDumper\Caster\ReflectionCaster;
@@ -107,6 +108,82 @@ class CliDumperTest extends TestCase
         $this->assertSame($expected, $output);
     }
 
+    public function testWhenIsFileViewIsNotViewCompiled()
+    {
+        $file = '/my-work-directory/routes/console.php';
+
+        $output = new BufferedOutput();
+        $dumper = new CliDumper(
+            $output,
+            '/my-work-directory',
+            '/my-work-directory/storage/framework/views'
+        );
+
+        $reflection = new ReflectionClass($dumper);
+        $method = $reflection->getMethod('isCompiledViewFile');
+        $method->setAccessible(true);
+        $isCompiledViewFile = $method->invoke($dumper, $file);
+
+        $this->assertFalse($isCompiledViewFile);
+    }
+
+    public function testWhenIsFileViewIsViewCompiled()
+    {
+        $file = '/my-work-directory/storage/framework/views/6687c33c38b71a8560.php';
+
+        $output = new BufferedOutput();
+        $dumper = new CliDumper(
+            $output,
+            '/my-work-directory',
+            '/my-work-directory/storage/framework/views'
+        );
+
+        $reflection = new ReflectionClass($dumper);
+        $method = $reflection->getMethod('isCompiledViewFile');
+        $method->setAccessible(true);
+        $isCompiledViewFile = $method->invoke($dumper, $file);
+
+        $this->assertTrue($isCompiledViewFile);
+    }
+
+    public function testGetOriginalViewCompiledFile()
+    {
+        $compiled = __DIR__.'/../fixtures/fake-compiled-view.php';
+        $original = '/my-work-directory/resources/views/welcome.blade.php';
+
+        $output = new BufferedOutput();
+        $dumper = new CliDumper(
+            $output,
+            '/my-work-directory',
+            '/my-work-directory/storage/framework/views'
+        );
+
+        $reflection = new ReflectionClass($dumper);
+        $method = $reflection->getMethod('getOriginalFileForCompiledView');
+        $method->setAccessible(true);
+
+        $this->assertSame($original, $method->invoke($dumper, $compiled));
+    }
+
+    public function testWhenGetOriginalViewCompiledFileFails()
+    {
+        $compiled = __DIR__.'/../fixtures/fake-compiled-view-without-source-map.php';
+        $original = $compiled;
+
+        $output = new BufferedOutput();
+        $dumper = new CliDumper(
+            $output,
+            '/my-work-directory',
+            '/my-work-directory/storage/framework/views'
+        );
+
+        $reflection = new ReflectionClass($dumper);
+        $method = $reflection->getMethod('getOriginalFileForCompiledView');
+        $method->setAccessible(true);
+
+        $this->assertSame($original, $method->invoke($dumper, $compiled));
+    }
+
     public function testUnresolvableSource()
     {
         CliDumper::resolveDumpSourceUsing(fn () => null);
@@ -118,10 +195,31 @@ class CliDumperTest extends TestCase
         $this->assertSame($expected, $output);
     }
 
+    public function testUnresolvableLine()
+    {
+        CliDumper::resolveDumpSourceUsing(function () {
+            return [
+                '/my-work-directory/resources/views/welcome.blade.php',
+                'resources/views/welcome.blade.php',
+                null,
+            ];
+        });
+
+        $output = $this->dump('hey from view');
+
+        $expected = "\"hey from view\" // resources/views/welcome.blade.php\n";
+
+        $this->assertSame($expected, $output);
+    }
+
     protected function dump($value)
     {
         $output = new BufferedOutput();
-        $dumper = new CliDumper($output, '/my-work-directory');
+        $dumper = new CliDumper(
+            $output,
+            '/my-work-directory',
+            '/my-work-directory/storage/framework/views',
+        );
 
         $cloner = tap(new VarCloner())->addCasters(ReflectionCaster::UNSET_CLOSURE_FILE_INFO);
 

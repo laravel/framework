@@ -865,6 +865,16 @@ class TestResponseTest extends TestCase
         $response->assertJsonFragment(['id' => 1]);
     }
 
+    public function testAssertJsonFragmentUnicodeCanFail()
+    {
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessageMatches('/Привет|Мир/');
+
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithUnicodeStub));
+
+        $response->assertJsonFragment(['id' => 1]);
+    }
+
     public function testAssertJsonStructure()
     {
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
@@ -1947,6 +1957,18 @@ class JsonSerializableSingleResourceWithIntegersStub implements JsonSerializable
             ['id' => 10, 'foo' => 'bar'],
             ['id' => 20, 'foo' => 'bar'],
             ['id' => 30, 'foo' => 'bar'],
+        ];
+    }
+}
+
+class JsonSerializableSingleResourceWithUnicodeStub implements JsonSerializable
+{
+    public function jsonSerialize(): array
+    {
+        return [
+            ['id' => 10, 'foo' => 'bar'],
+            ['id' => 20, 'foo' => 'Привет'],
+            ['id' => 30, 'foo' => 'Мир'],
         ];
     }
 }

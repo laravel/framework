@@ -540,6 +540,38 @@ class SupportTestingBusFakeTest extends TestCase
         $this->assertSame('', $batch->name);
         $this->assertSame(0, $batch->totalJobs);
     }
+
+    public function testIncrementFailedJobsInFakeBatch()
+    {
+        $this->fake->assertNothingBatched();
+        $batch = $this->fake->dispatchFakeBatch('my fake job batch');
+
+        $this->fake->assertBatchCount(1);
+        $this->assertInstanceOf(Batch::class, $batch);
+        $this->assertSame('my fake job batch', $batch->name);
+        $this->assertSame(0, $batch->totalJobs);
+
+        $batch->incrementFailedJobs($batch->id);
+
+        $this->assertSame(0, $batch->failedJobs);
+        $this->assertSame(0, $batch->pendingJobs);
+    }
+
+    public function testDecrementPendingJobsInFakeBatch()
+    {
+        $this->fake->assertNothingBatched();
+        $batch = $this->fake->dispatchFakeBatch('my fake job batch');
+
+        $this->fake->assertBatchCount(1);
+        $this->assertInstanceOf(Batch::class, $batch);
+        $this->assertSame('my fake job batch', $batch->name);
+        $this->assertSame(0, $batch->totalJobs);
+
+        $batch->decrementPendingJobs($batch->id);
+
+        $this->assertSame(0, $batch->failedJobs);
+        $this->assertSame(0, $batch->pendingJobs);
+    }
 }
 
 class BusJobStub

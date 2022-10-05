@@ -260,6 +260,42 @@ class DatabaseSchemaBlueprintTest extends TestCase
         ], $blueprint->toSql($connection, new MySqlGrammar));
     }
 
+    public function testDefaultUsingUlidMorph()
+    {
+        Builder::defaultMorphKeyType('ulid');
+
+        $base = new Blueprint('comments', function ($table) {
+            $table->morphs('commentable');
+        });
+
+        $connection = m::mock(Connection::class);
+
+        $blueprint = clone $base;
+
+        $this->assertEquals([
+            'alter table `comments` add `commentable_type` varchar(255) not null, add `commentable_id` char(26) not null',
+            'alter table `comments` add index `comments_commentable_type_commentable_id_index`(`commentable_type`, `commentable_id`)',
+        ], $blueprint->toSql($connection, new MySqlGrammar));
+    }
+
+    public function testDefaultUsingNullableUlidMorph()
+    {
+        Builder::defaultMorphKeyType('ulid');
+
+        $base = new Blueprint('comments', function ($table) {
+            $table->nullableMorphs('commentable');
+        });
+
+        $connection = m::mock(Connection::class);
+
+        $blueprint = clone $base;
+
+        $this->assertEquals([
+            'alter table `comments` add `commentable_type` varchar(255) null, add `commentable_id` char(26) null',
+            'alter table `comments` add index `comments_commentable_type_commentable_id_index`(`commentable_type`, `commentable_id`)',
+        ], $blueprint->toSql($connection, new MySqlGrammar));
+    }
+
     public function testGenerateRelationshipColumnWithIncrementalModel()
     {
         $base = new Blueprint('posts', function ($table) {
