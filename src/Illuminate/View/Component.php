@@ -27,7 +27,7 @@ abstract class Component
     protected static $methodCache = [];
 
     /**
-     * The cache of blade view names, keyed by class.
+     * The cache of blade view names, keyed by contents.
      *
      * @var array
      */
@@ -81,7 +81,7 @@ abstract class Component
         $resolver = function ($view) {
             $factory = Container::getInstance()->make('view');
 
-            return $this->extractBladeViewFromString($factory, $view);
+            return $this->extractBladeViewFromString($factory, (string) $view);
         };
 
         return $view instanceof Closure ? function (array $data = []) use ($view, $resolver) {
@@ -99,14 +99,12 @@ abstract class Component
      */
     protected function extractBladeViewFromString($factory, $contents)
     {
-        $class = get_class($this);
-
-        if (isset(static::$bladeViewCache[$class])) {
-            return static::$bladeViewCache[$class];
+        if (isset(static::$bladeViewCache[$contents])) {
+            return static::$bladeViewCache[$contents];
         }
 
         if (strlen($contents) <= PHP_MAXPATHLEN && $factory->exists($contents)) {
-            return static::$bladeViewCache[$class] = $contents;
+            return static::$bladeViewCache[$contents] = $contents;
         }
 
         $factory->addNamespace(
@@ -122,7 +120,7 @@ abstract class Component
             file_put_contents($viewFile, $contents);
         }
 
-        return static::$bladeViewCache[$class] = '__components::'.basename($viewFile, '.blade.php');
+        return static::$bladeViewCache[$contents] = '__components::'.basename($viewFile, '.blade.php');
     }
 
     /**
@@ -306,5 +304,17 @@ abstract class Component
     public function shouldRender()
     {
         return true;
+    }
+
+    /**
+     * Flush the cache of components.
+     *
+     * @return void
+     */
+    public static function flushCache()
+    {
+        static::$propertyCache = [];
+        static::$methodCache = [];
+        static::$bladeViewCache = [];
     }
 }
