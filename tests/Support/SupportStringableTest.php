@@ -948,16 +948,15 @@ class SupportStringableTest extends TestCase
 
     public function testExplode()
     {
-        $this->assertInstanceOf(Collection::class, $this->stringable("Foo Bar Baz")->explode(" "));
-        
-        $this->assertSame('["Foo","Bar","Baz"]', (string) $this->stringable("Foo Bar Baz")->explode(" "));
-        
-        //  with limit
-        $this->assertSame('["Foo","Bar Baz"]', (string) $this->stringable("Foo Bar Baz")->explode(" ", 2));
-        $this->assertSame('["Foo","Bar"]', (string) $this->stringable("Foo Bar Baz")->explode(" ", -1));
+        $this->assertInstanceOf(Collection::class, $this->stringable('Foo Bar Baz')->explode(' '));
 
+        $this->assertSame('["Foo","Bar","Baz"]', (string) $this->stringable('Foo Bar Baz')->explode(' '));
+
+        //  with limit
+        $this->assertSame('["Foo","Bar Baz"]', (string) $this->stringable('Foo Bar Baz')->explode(' ', 2));
+        $this->assertSame('["Foo","Bar"]', (string) $this->stringable('Foo Bar Baz')->explode(' ', -1));
     }
-    
+
     public function testChunk()
     {
         $chunks = $this->stringable('foobarbaz')->split(3);
