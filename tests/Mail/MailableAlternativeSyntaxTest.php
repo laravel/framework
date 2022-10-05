@@ -30,9 +30,9 @@ class MailableAlternativeSyntaxTest extends TestCase
         $this->assertTrue($mailable->hasMetadata('test-meta', 'test-meta-value'));
 
         $reflection = new ReflectionClass($mailable);
-        $reflection->getMethod('prepareMailableForDelivery')->setAccessible(true);
-
-        $reflection->getMethod('prepareMailableForDelivery')->invoke($mailable);
+        $method = $reflection->getMethod('prepareMailableForDelivery');
+        $method->setAccessible(true);
+        $method->invoke($mailable);
 
         $this->assertEquals('test-view', $mailable->view);
         $this->assertEquals(['test-data-key' => 'test-data-value'], $mailable->viewData);
