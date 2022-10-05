@@ -99,12 +99,14 @@ abstract class Component
      */
     protected function extractBladeViewFromString($factory, $contents)
     {
-        if (isset(static::$bladeViewCache[$contents])) {
-            return static::$bladeViewCache[$contents];
+        $key = sprintf('%s::%s', static::class, $contents);
+
+        if (isset(static::$bladeViewCache[$key])) {
+            return static::$bladeViewCache[$key];
         }
 
         if (strlen($contents) <= PHP_MAXPATHLEN && $factory->exists($contents)) {
-            return static::$bladeViewCache[$contents] = $contents;
+            return static::$bladeViewCache[$key] = $contents;
         }
 
         $factory->addNamespace(
@@ -120,7 +122,7 @@ abstract class Component
             file_put_contents($viewFile, $contents);
         }
 
-        return static::$bladeViewCache[$contents] = '__components::'.basename($viewFile, '.blade.php');
+        return static::$bladeViewCache[$key] = '__components::'.basename($viewFile, '.blade.php');
     }
 
     /**
