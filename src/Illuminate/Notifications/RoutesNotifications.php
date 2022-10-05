@@ -32,9 +32,9 @@ trait RoutesNotifications
 
     /**
      * Get the e-mail address field to notify through mail.
-     * This function will provide option to choose different field name 
+     * This function will provide option to choose different field name
      * which contain email address.
-     * 
+     *
      * @return string
      */
     public function getEmailForMailNotification()
