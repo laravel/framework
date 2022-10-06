@@ -13,6 +13,13 @@ use ReflectionProperty;
 abstract class Component
 {
     /**
+     * The view factory instance, if any.
+     *
+     * @var \Illuminate\Contracts\View\Factory
+     */
+    protected static $factory;
+
+    /**
      * The cache of public property names, keyed by class.
      *
      * @var array
@@ -79,9 +86,7 @@ abstract class Component
         }
 
         $resolver = function ($view) {
-            $factory = Container::getInstance()->make('view');
-
-            return $this->extractBladeViewFromString($factory, (string) $view);
+            return $this->extractBladeViewFromString($view);
         };
 
         return $view instanceof Closure ? function (array $data = []) use ($view, $resolver) {
@@ -93,7 +98,6 @@ abstract class Component
     /**
      * Create a Blade view with the raw component string content.
      *
-     * @param  \Illuminate\Contracts\View\Factory  $factory
      * @param  string  $contents
      * @return string
      */
@@ -105,11 +109,11 @@ abstract class Component
             return static::$bladeViewCache[$key];
         }
 
-        if (strlen($contents) <= PHP_MAXPATHLEN && $factory->exists($contents)) {
+        if (strlen($contents) <= PHP_MAXPATHLEN && $this->factory()->exists($contents)) {
             return static::$bladeViewCache[$key] = $contents;
         }
 
-        $factory->addNamespace(
+        $this->factory()->addNamespace(
             '__components',
             $directory = Container::getInstance()['config']->get('view.compiled')
         );
@@ -318,5 +322,53 @@ abstract class Component
         static::$propertyCache = [];
         static::$methodCache = [];
         static::$bladeViewCache = [];
+    }
+
+    /**
+     * Set the component's view.
+     *
+     * @param  string|null  $view
+     * @param  \Illuminate\Contracts\Support\Arrayable|array  $data
+     * @param  array  $mergeData
+     * @return \Illuminate\Contracts\View\View
+     */
+    public function view($view, $data = [], $mergeData = [])
+    {
+        return $this->factory()->make($view, $data, $mergeData);
+    }
+
+    /**
+     * Get the view factory.
+     *
+     * @return \Illuminate\Contracts\View\Factory
+     */
+    protected function factory()
+    {
+        if (is_null(static::$factory)) {
+            static::$factory = Container::getInstance()->make('view');
+        }
+
+        return static::$factory;
+    }
+
+    /**
+     * Forget the component's factory.
+     *
+     * @return void
+     */
+    public static function forgetFactory()
+    {
+        static::$factory = null;
+    }
+
+    /**
+     * Acts as static factory for the component.
+     *
+     * @param  array
+     * @return static
+     */
+    public static function resolve($data)
+    {
+        return Container::getInstance()->make(static::class, $data);
     }
 }

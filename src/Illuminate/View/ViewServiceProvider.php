@@ -48,6 +48,10 @@ class ViewServiceProvider extends ServiceProvider
 
             $factory->share('app', $app);
 
+            $app->terminating(static function () {
+                Component::forgetFactory();
+            });
+
             return $factory;
         });
     }
