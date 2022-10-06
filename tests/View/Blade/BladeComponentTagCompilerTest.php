@@ -636,7 +636,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         $__env = m::mock(\Illuminate\View\Factory::class);
         $__env->shouldReceive('startComponent')->once();
-        $__env->shouldReceive('renderComponent')->once();;
+        $__env->shouldReceive('renderComponent')->once();
 
         $template = $this->compiler(['profile' => TestProfileComponent::class])->compileTags('<x-profile {{ $attributes }} />');
         $template = $this->compiler->compileString($template);

@@ -5,7 +5,6 @@ namespace Illuminate\Tests\View\Blade;
 use Illuminate\Container\Container;
 use Illuminate\View\Component;
 use Illuminate\View\ComponentAttributeBag;
-use Illuminate\View\Factory;
 use Mockery as m;
 
 class BladeComponentsTest extends AbstractBladeTestCase
@@ -78,7 +77,7 @@ class BladeComponentsTest extends AbstractBladeTestCase
 
 class ComponentStub extends Component
 {
-    function render()
+    public function render()
     {
         return '';
     }
