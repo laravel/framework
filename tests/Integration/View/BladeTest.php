@@ -12,6 +12,7 @@ class BladeTest extends TestCase
     public function tearDown(): void
     {
         Component::flushCache();
+        Component::forgetFactory();
 
         parent::tearDown();
     }
