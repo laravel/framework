@@ -47,7 +47,7 @@ class JobDispatchingTest extends TestCase
         $this->assertTrue(Job::$ran);
     }
 
-    public function testDoesNotDispatchesConditionallyWithBoolean()
+    public function testDoesNotDispatchConditionallyWithBoolean()
     {
         Job::dispatchUnless(true, 'test')->replaceValue('new-test');
 
@@ -60,7 +60,7 @@ class JobDispatchingTest extends TestCase
         $this->assertSame('new-test', Job::$value);
     }
 
-    public function testDoesNotDispatchesConditionallyWithClosure()
+    public function testDoesNotDispatchConditionallyWithClosure()
     {
         Job::dispatchUnless(fn ($job) => $job instanceof Job ? 1 : 0, 'test')->replaceValue('new-test');
 
