@@ -24,6 +24,21 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
 {
     use SerializesAndRestoresModelIdentifiers;
 
+
+    /**
+     * All Connectors
+     *
+     * @var string[]
+     */
+    protected $connectors = [
+        'Null',
+        'Sync',
+        'Database',
+        'Redis',
+        'Beanstalkd',
+        'Sqs'
+    ];
+
     /**
      * Register the service provider.
      *
@@ -101,7 +116,7 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
      */
     public function registerConnectors($manager)
     {
-        foreach (['Null', 'Sync', 'Database', 'Redis', 'Beanstalkd', 'Sqs'] as $connector) {
+        foreach ($this->connectors as $connector) {
             $this->{"register{$connector}Connector"}($manager);
         }
     }
