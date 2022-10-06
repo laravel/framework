@@ -952,9 +952,12 @@ class Route
      */
     public function getActionMethod()
     {
-        $lastExplode = Arr::last(explode('@', $this->getActionName()));
+        $actionNames = explode('@', $this->getActionName());
+        $lastExplode = Arr::last($actionNames);
 
-        return Str::contains($lastExplode, "Controller") ? "__invoke" : $lastExplode;
+        return (count($actionNames) == 1 || Str::contains($lastExplode, "Controller"))
+            ? "__invoke"
+            : $lastExplode;
     }
 
     /**
