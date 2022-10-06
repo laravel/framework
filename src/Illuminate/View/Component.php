@@ -101,7 +101,7 @@ abstract class Component
      * @param  string  $contents
      * @return string
      */
-    protected function extractBladeViewFromString($factory, $contents)
+    protected function extractBladeViewFromString($contents)
     {
         $key = sprintf('%s::%s', static::class, $contents);
 
