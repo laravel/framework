@@ -63,6 +63,14 @@ class SupportTestingMailFakeTest extends TestCase
         });
     }
 
+    public function testAssertFrom() {
+        $this->fake->to('taylor@laravel.com')->send($this->mailable);
+
+        $this->fake->assertSent(MailableStub::class, function($mail) {
+            return $mail->hasFrom('from@laravel.com');
+        });
+    }
+
     public function testAssertCc()
     {
         $this->fake->cc('taylor@laravel.com')->send($this->mailable);
@@ -138,6 +146,23 @@ class SupportTestingMailFakeTest extends TestCase
         $this->fake->to('taylor@laravel.com')->queue($this->mailable);
 
         $this->fake->assertQueued(MailableStub::class);
+    }
+
+    public function testAssertQueuedFrom() {
+        try {
+            $this->fake->assertQueued(MailableStub::class, function($mail) {
+                return $mail->hasFrom('from@laravel.com');
+            });
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\MailableStub] mailable was not queued.'));
+        }
+
+        $this->fake->to('taylor@laravel.com')->queue($this->mailable);
+
+        $this->fake->assertQueued(MailableStub::class, function($mail) {
+            return $mail->hasFrom('from@laravel.com');
+        });
     }
 
     public function testAssertQueuedTimes()
@@ -230,7 +255,8 @@ class MailableStub extends Mailable
     public function build()
     {
         $this->with('first_name', 'Taylor')
-             ->withLastName('Otwell');
+             ->withLastName('Otwell')
+             ->from('from@laravel.com');
     }
 }
 
@@ -248,7 +274,8 @@ class QueueableMailableStub extends Mailable implements ShouldQueue
     public function build()
     {
         $this->with('first_name', 'Taylor')
-             ->withLastName('Otwell');
+             ->withLastName('Otwell')
+             ->from('from@laravel.com');
     }
 }
 

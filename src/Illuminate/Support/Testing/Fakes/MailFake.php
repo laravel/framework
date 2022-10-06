@@ -3,6 +3,7 @@
 namespace Illuminate\Support\Testing\Fakes;
 
 use Closure;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Mail\Factory;
 use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Contracts\Mail\Mailer;
@@ -360,6 +361,10 @@ class MailFake implements Factory, Mailer, MailQueue
             return;
         }
 
+        if (method_exists($view, 'build')) {
+            Container::getInstance()->call([$view, 'build']);
+        }
+
         $view->mailer($this->currentMailer);
 
         if ($view instanceof ShouldQueue) {
@@ -382,6 +387,10 @@ class MailFake implements Factory, Mailer, MailQueue
     {
         if (! $view instanceof Mailable) {
             return;
+        }
+
+        if (method_exists($view, 'build')) {
+            Container::getInstance()->call([$view, 'build']);
         }
 
         $view->mailer($this->currentMailer);
