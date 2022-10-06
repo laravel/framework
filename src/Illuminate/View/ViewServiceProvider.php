@@ -3,7 +3,6 @@
 namespace Illuminate\View;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\View\Component;
 use Illuminate\View\Compilers\BladeCompiler;
 use Illuminate\View\Engines\CompilerEngine;
 use Illuminate\View\Engines\EngineResolver;
