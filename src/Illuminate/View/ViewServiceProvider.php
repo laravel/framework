@@ -3,6 +3,7 @@
 namespace Illuminate\View;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\View\Component;
 use Illuminate\View\Compilers\BladeCompiler;
 use Illuminate\View\Engines\CompilerEngine;
 use Illuminate\View\Engines\EngineResolver;
@@ -47,6 +48,10 @@ class ViewServiceProvider extends ServiceProvider
             $factory->setContainer($app);
 
             $factory->share('app', $app);
+
+            $app->terminating(static function () {
+                Component::forgetFactory();
+            });
 
             return $factory;
         });
