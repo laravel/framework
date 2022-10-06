@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\View\Blade;
 
+use Illuminate\Container\Container;
 use Illuminate\View\Component;
 use Illuminate\View\ComponentAttributeBag;
 use Illuminate\View\Factory;
@@ -17,11 +18,11 @@ class BladeComponentsTest extends AbstractBladeTestCase
 
     public function testClassComponentsAreCompiled()
     {
-        $this->assertSame('<?php if (isset($component)) { $__componentOriginal35bda42cbf6f9717b161c4f893644ac7a48b0d98 = $component; } ?>
-<?php $component = $__env->getContainer()->make(Test::class, ["foo" => "bar"] + (isset($attributes) ? (array) $attributes->getIterator() : [])); ?>
+        $this->assertSame('<?php if (isset($component)) { $__componentOriginal32877a641c21ac6579f6376333c8770674a6058f = $component; } ?>
+<?php $component = Illuminate\Tests\View\Blade\ComponentStub::class::resolve(["foo" => "bar"] + (isset($attributes) ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName(\'test\'); ?>
 <?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>', $this->compiler->compileString('@component(\'Test::class\', \'test\', ["foo" => "bar"])'));
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>', $this->compiler->compileString('@component(\'Illuminate\Tests\View\Blade\ComponentStub::class\', \'test\', ["foo" => "bar"])'));
     }
 
     public function testEndComponentsAreCompiled()
@@ -62,13 +63,23 @@ class BladeComponentsTest extends AbstractBladeTestCase
         $component->shouldReceive('withName', 'test');
         $component->shouldReceive('shouldRender')->andReturn(false);
 
-        $__env = m::mock(Factory::class);
-        $__env->shouldReceive('getContainer->make')->with('Test', ['foo' => 'bar', 'other' => 'ok'])->andReturn($component);
+        $mock = m::mock(Container::class);
+        Container::setInstance($mock);
 
-        $template = $this->compiler->compileString('@component(\'Test::class\', \'test\', ["foo" => "bar"])');
+        $mock->shouldReceive('make')->with(ComponentStub::class, ['foo' => 'bar', 'other' => 'ok'])->andReturn($component);
+
+        $template = $this->compiler->compileString('@component(\'Illuminate\Tests\View\Blade\ComponentStub::class\', \'test\', ["foo" => "bar"])');
 
         ob_start();
         eval(" ?> $template <?php endif; ");
         ob_get_clean();
+    }
+}
+
+class ComponentStub extends Component
+{
+    function render()
+    {
+        return '';
     }
 }

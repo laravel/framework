@@ -21,6 +21,8 @@ class ComponentTest extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->config = m::mock(Config::class);
 
         $container = new Container;
@@ -33,8 +35,6 @@ class ComponentTest extends TestCase
 
         Container::setInstance($container);
         Facade::setFacadeApplication($container);
-
-        parent::setUp();
     }
 
     protected function tearDown(): void
@@ -44,6 +44,10 @@ class ComponentTest extends TestCase
         Facade::clearResolvedInstances();
         Facade::setFacadeApplication(null);
         Container::setInstance(null);
+        Component::flushCache();
+        Component::forgetFactory();
+
+        parent::tearDown();
     }
 
     public function testInlineViewsGetCreated()

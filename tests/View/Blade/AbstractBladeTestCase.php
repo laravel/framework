@@ -2,7 +2,9 @@
 
 namespace Illuminate\Tests\View\Blade;
 
+use Illuminate\Container\Container;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\View\Component;
 use Illuminate\View\Compilers\BladeCompiler;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -16,12 +18,17 @@ abstract class AbstractBladeTestCase extends TestCase
 
     protected function setUp(): void
     {
-        $this->compiler = new BladeCompiler($this->getFiles(), __DIR__);
         parent::setUp();
+
+        $this->compiler = new BladeCompiler($this->getFiles(), __DIR__);
     }
 
     protected function tearDown(): void
-    {
+     {
+        Container::setInstance(null);
+        Component::flushCache();
+        Component::forgetFactory();
+
         m::close();
 
         parent::tearDown();
