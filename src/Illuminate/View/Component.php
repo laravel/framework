@@ -34,6 +34,13 @@ abstract class Component
     protected static $methodCache = [];
 
     /**
+     * The cache of blade view names, keyed by contents.
+     *
+     * @var array
+     */
+    protected static $bladeViewCache = [];
+
+    /**
      * The properties / methods that should not be exposed to the component.
      *
      * @var array
@@ -79,9 +86,7 @@ abstract class Component
         }
 
         $resolver = function ($view) {
-            return strlen($view) <= PHP_MAXPATHLEN && $this->factory()->exists($view)
-                        ? $view
-                        : $this->createBladeViewFromString($view);
+            return $this->extractBladeViewFromString($view);
         };
 
         return $view instanceof Closure ? function (array $data = []) use ($view, $resolver) {
@@ -96,8 +101,18 @@ abstract class Component
      * @param  string  $contents
      * @return string
      */
-    protected function createBladeViewFromString($contents)
+    protected function extractBladeViewFromString($factory, $contents)
     {
+        $key = sprintf('%s::%s', static::class, $contents);
+
+        if (isset(static::$bladeViewCache[$key])) {
+            return static::$bladeViewCache[$key];
+        }
+
+        if (strlen($contents) <= PHP_MAXPATHLEN && $this->factory()->exists($contents)) {
+            return static::$bladeViewCache[$key] = $contents;
+        }
+
         $this->factory()->addNamespace(
             '__components',
             $directory = Container::getInstance()['config']->get('view.compiled')
@@ -111,7 +126,7 @@ abstract class Component
             file_put_contents($viewFile, $contents);
         }
 
-        return '__components::'.basename($viewFile, '.blade.php');
+        return static::$bladeViewCache[$key] = '__components::'.basename($viewFile, '.blade.php');
     }
 
     /**
@@ -295,6 +310,18 @@ abstract class Component
     public function shouldRender()
     {
         return true;
+    }
+
+    /**
+     * Flush the cache of components.
+     *
+     * @return void
+     */
+    public static function flushCache()
+    {
+        static::$propertyCache = [];
+        static::$methodCache = [];
+        static::$bladeViewCache = [];
     }
 
     /**
