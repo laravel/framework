@@ -112,7 +112,7 @@ class ViewServiceProvider extends ServiceProvider
      */
     public function registerEngineResolver()
     {
-        $this->app->singleton('view.engine.resolver', function ($app) {
+        $this->app->singleton('view.engine.resolver', function () {
             $resolver = new EngineResolver;
 
             // Next, we will register the various view engines with the resolver so that the
