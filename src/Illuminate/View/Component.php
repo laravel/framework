@@ -13,6 +13,20 @@ use ReflectionProperty;
 abstract class Component
 {
     /**
+     * The components resolver used withing views.
+     *
+     * @var (\Closure(string, array $data): Component)|null
+     */
+    protected static $componentsResolver;
+
+    /**
+     * The cache of blade view names, keyed by contents.
+     *
+     * @var array
+     */
+    protected static $bladeViewCache = [];
+
+    /**
      * The view factory instance, if any.
      *
      * @var \Illuminate\Contracts\View\Factory
@@ -34,11 +48,11 @@ abstract class Component
     protected static $methodCache = [];
 
     /**
-     * The cache of blade view names, keyed by contents.
+     * The cache of constructor parameters, keyed by class.
      *
      * @var array
      */
-    protected static $bladeViewCache = [];
+    protected static $constructorParametersCache = [];
 
     /**
      * The properties / methods that should not be exposed to the component.
@@ -362,13 +376,67 @@ abstract class Component
     }
 
     /**
+     * Forget the component resolver.
+     *
+     * @return void
+     *
+     * @internal
+     */
+    public static function forgetComponentsResolver()
+    {
+        static::$componentsResolver = null;
+    }
+
+    /**
      * Acts as static factory for the component.
      *
-     * @param  array
+     * @param  array  $data
      * @return static
      */
     public static function resolve($data)
     {
+        if (static::$componentsResolver) {
+            return call_user_func(static::$componentsResolver, static::class, $data);
+        }
+
+        $parameters = static::extractConstructorParameters();
+
+        $dataKeys = array_keys($data);
+
+        if (empty(array_diff($parameters, $dataKeys))) {
+            return new static(...array_intersect_key($data, array_flip($parameters)));
+        }
+
         return Container::getInstance()->make(static::class, $data);
+    }
+
+    /**
+     * Set the callback to be used to resolve components within views.
+     *
+     * @param  \Closure(string $component, array $data): Component  $resolver
+     * @return void
+     */
+    public static function resolveComponentsUsing($resolver)
+    {
+        static::$componentsResolver = $resolver;
+    }
+
+    /**
+     * Extract the constructor parameters for the component.
+     *
+     * @return array
+     */
+    protected static function extractConstructorParameters()
+    {
+        if (! isset(static::$constructorParametersCache[static::class])) {
+            $class = new ReflectionClass(static::class);
+            $constructor = $class->getConstructor();
+
+            static::$constructorParametersCache[static::class] = $constructor
+                ? collect($constructor->getParameters())->map->getName()->all()
+                : [];
+        }
+
+        return static::$constructorParametersCache[static::class];
     }
 }

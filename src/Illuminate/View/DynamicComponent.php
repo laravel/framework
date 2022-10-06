@@ -169,15 +169,4 @@ EOF;
 
         return static::$compiler;
     }
-
-    /**
-     * Acts as static factory for the component.
-     *
-     * @param  array
-     * @return static
-     */
-    public static function resolve($data)
-    {
-        return new static($data['component']);
-    }
 }

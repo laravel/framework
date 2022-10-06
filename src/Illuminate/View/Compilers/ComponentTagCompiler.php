@@ -408,6 +408,7 @@ class ComponentTagCompiler
             return [collect($attributes), collect($attributes)];
         }
 
+        // @todo Reuse paramters...
         $constructor = (new ReflectionClass($class))->getConstructor();
 
         $parameterNames = $constructor

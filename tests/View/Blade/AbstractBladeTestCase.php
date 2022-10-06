@@ -27,6 +27,7 @@ abstract class AbstractBladeTestCase extends TestCase
     {
         Container::setInstance(null);
         Component::flushCache();
+        Component::forgetComponentsResolver();
         Component::forgetFactory();
 
         m::close();

@@ -62,10 +62,7 @@ class BladeComponentsTest extends AbstractBladeTestCase
         $component->shouldReceive('withName', 'test');
         $component->shouldReceive('shouldRender')->andReturn(false);
 
-        $mock = m::mock(Container::class);
-        Container::setInstance($mock);
-
-        $mock->shouldReceive('make')->with(ComponentStub::class, ['foo' => 'bar', 'other' => 'ok'])->andReturn($component);
+        Component::resolveComponentsUsing(fn () => $component);
 
         $template = $this->compiler->compileString('@component(\'Illuminate\Tests\View\Blade\ComponentStub::class\', \'test\', ["foo" => "bar"])');
 
