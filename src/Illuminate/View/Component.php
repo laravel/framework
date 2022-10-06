@@ -15,7 +15,7 @@ abstract class Component
     /**
      * The components resolver used withing views.
      *
-     * @var (\Closure(string, array $data): Component)|null
+     * @var (\Closure(string, array): Component)|null
      */
     protected static $componentsResolver;
 

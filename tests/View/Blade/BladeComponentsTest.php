@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\View\Blade;
 
-use Illuminate\Container\Container;
 use Illuminate\View\Component;
 use Illuminate\View\ComponentAttributeBag;
 use Mockery as m;
