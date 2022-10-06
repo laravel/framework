@@ -1825,6 +1825,21 @@ trait HasAttributes
     }
 
     /**
+     * Get all of the model's visible attributes except specified attributes.
+     * Does not return any attributes marked as hidden.
+     *
+     * @param  array|mixed  $attributes
+     * @return array
+     */
+    public function except($attributes)
+    {
+        $modelAsArray = array_merge($this->attributesToArray(), $this->relationsToArray());
+        $excludedAttributes = is_array($attributes) ? $attributes : func_get_args();
+
+        return Arr::except($modelAsArray, $excludedAttributes);
+    }
+
+    /**
      * Sync the original attributes with the current.
      *
      * @return $this

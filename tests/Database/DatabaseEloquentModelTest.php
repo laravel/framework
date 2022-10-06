@@ -372,6 +372,27 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(['first_name' => 'taylor', 'last_name' => 'otwell'], $model->only(['first_name', 'last_name']));
     }
 
+    public function testExcept()
+    {
+        // Arrange
+        $model = new EloquentModelDynamicHiddenStub();
+        $model->first_name = 'taylor';
+        $model->last_name = 'otwell';
+        $model->project = 'laravel';
+        // Hidden 'age' attribute
+        $model->age = 30;
+
+        // Act
+        $exceptUsingOneField = $model->except('project');
+        $exceptUsingFieldsInCommaDelimitedList = $model->except('first_name', 'project');
+        $exceptUsingFieldsInArray = $model->except(['first_name', 'project']);
+
+        // Assert
+        $this->assertEquals(['first_name' => 'taylor', 'last_name' => 'otwell'], $exceptUsingOneField);
+        $this->assertEquals(['last_name' => 'otwell'], $exceptUsingFieldsInCommaDelimitedList);
+        $this->assertEquals(['last_name' => 'otwell'], $exceptUsingFieldsInArray);
+    }
+
     public function testNewInstanceReturnsNewInstanceWithAttributesSet()
     {
         $model = new EloquentModelStub;
