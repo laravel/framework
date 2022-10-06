@@ -112,7 +112,7 @@ class ViewServiceProvider extends ServiceProvider
      */
     public function registerEngineResolver()
     {
-        $this->app->singleton('view.engine.resolver', function () {
+        $this->app->singleton('view.engine.resolver', function ($app) {
             $resolver = new EngineResolver;
 
             // Next, we will register the various view engines with the resolver so that the
@@ -161,7 +161,11 @@ class ViewServiceProvider extends ServiceProvider
     public function registerBladeEngine($resolver)
     {
         $resolver->register('blade', function () {
-            return new CompilerEngine($this->app['blade.compiler'], $this->app['files']);
+            $compiler = new CompilerEngine($this->app['blade.compiler'], $this->app['files']);
+
+            $this->app->terminating(fn () => $compiler->forgetCompiledOrNotExpired());
+
+            return $compiler;
         });
     }
 }
