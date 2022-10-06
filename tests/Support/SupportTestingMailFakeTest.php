@@ -63,10 +63,11 @@ class SupportTestingMailFakeTest extends TestCase
         });
     }
 
-    public function testAssertFrom() {
+    public function testAssertFrom()
+    {
         $this->fake->to('taylor@laravel.com')->send($this->mailable);
 
-        $this->fake->assertSent(MailableStub::class, function($mail) {
+        $this->fake->assertSent(MailableStub::class, function ($mail) {
             return $mail->hasFrom('from@laravel.com');
         });
     }
@@ -148,9 +149,10 @@ class SupportTestingMailFakeTest extends TestCase
         $this->fake->assertQueued(MailableStub::class);
     }
 
-    public function testAssertQueuedFrom() {
+    public function testAssertQueuedFrom()
+    {
         try {
-            $this->fake->assertQueued(MailableStub::class, function($mail) {
+            $this->fake->assertQueued(MailableStub::class, function ($mail) {
                 return $mail->hasFrom('from@laravel.com');
             });
             $this->fail();
@@ -160,7 +162,7 @@ class SupportTestingMailFakeTest extends TestCase
 
         $this->fake->to('taylor@laravel.com')->queue($this->mailable);
 
-        $this->fake->assertQueued(MailableStub::class, function($mail) {
+        $this->fake->assertQueued(MailableStub::class, function ($mail) {
             return $mail->hasFrom('from@laravel.com');
         });
     }
