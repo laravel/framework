@@ -101,7 +101,7 @@ class PostgresGrammar extends Grammar
      * Compile a create table (if not exists) command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param \Illuminate\Support\Fluent $command
+     * @param  \Illuminate\Support\Fluent  $command
      * @return array
      */
     public function compileCreateIfNotExists(Blueprint $blueprint, Fluent $command)
@@ -112,8 +112,8 @@ class PostgresGrammar extends Grammar
     /**
      * Create the actual create table clause.
      *
-     * @param \Illuminate\Database\Schema\Blueprint $blueprint
-     * @param bool $ifNotExists
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  bool  $ifNotExists
      * @return array
      */
     protected function compileCreateTable($blueprint, $ifNotExists = false)

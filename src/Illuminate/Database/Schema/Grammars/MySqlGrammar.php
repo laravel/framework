@@ -140,8 +140,8 @@ class MySqlGrammar extends Grammar
      * Create the main create table clause.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent $command
-     * @param  \Illuminate\Database\Connection $connection
+     * @param  \Illuminate\Support\Fluent  $command
+     * @param  \Illuminate\Database\Connection  $connection
      * @return string
      */
     protected function compileCreateTable($blueprint, $command, $connection)
@@ -157,8 +157,8 @@ class MySqlGrammar extends Grammar
      * Create the main create table if not exists clause.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent $command
-     * @param  \Illuminate\Database\Connection $connection
+     * @param  \Illuminate\Support\Fluent  $command
+     * @param  \Illuminate\Database\Connection  $connection
      * @return string
      */
     protected function compileCreateTableIfNotExists($blueprint, $command, $connection)
