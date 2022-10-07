@@ -2,7 +2,12 @@
 
 namespace Illuminate\Foundation\Providers;
 
+use Illuminate\Contracts\Container\Container;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\MaintenanceMode as MaintenanceModeContract;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Database\ConnectionInterface;
+use Illuminate\Database\Grammar;
 use Illuminate\Foundation\Console\CliDumper;
 use Illuminate\Foundation\Http\HtmlDumper;
 use Illuminate\Foundation\MaintenanceModeManager;
@@ -15,6 +20,8 @@ use Illuminate\Support\Facades\URL;
 use Illuminate\Testing\LoggedExceptionCollection;
 use Illuminate\Testing\ParallelTestingServiceProvider;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\VarDumper\Caster\StubCaster;
+use Symfony\Component\VarDumper\Cloner\AbstractCloner;
 
 class FoundationServiceProvider extends AggregateServiceProvider
 {
@@ -74,6 +81,12 @@ class FoundationServiceProvider extends AggregateServiceProvider
      */
     public function registerDumper()
     {
+        AbstractCloner::$defaultCasters[ConnectionInterface::class] = [StubCaster::class, 'cutInternals'];
+        AbstractCloner::$defaultCasters[Container::class] = [StubCaster::class, 'cutInternals'];
+        AbstractCloner::$defaultCasters[Dispatcher::class] = [StubCaster::class, 'cutInternals'];
+        AbstractCloner::$defaultCasters[Factory::class] = [StubCaster::class, 'cutInternals'];
+        AbstractCloner::$defaultCasters[Grammar::class] = [StubCaster::class, 'cutInternals'];
+
         $basePath = $this->app->basePath();
 
         $compiledViewPath = $this->app['config']->get('view.compiled');
