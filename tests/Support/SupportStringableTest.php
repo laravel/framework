@@ -174,6 +174,18 @@ class SupportStringableTest extends TestCase
         }));
     }
 
+    public function testDirname()
+    {
+        $this->assertSame('/framework/tests', (string) $this->stringable('/framework/tests/Support')->dirname());
+        $this->assertSame('/framework', (string) $this->stringable('/framework/tests/Support')->dirname(2));
+        $this->assertSame('.', (string) $this->stringable('framework')->dirname());
+        
+        $this->assertSame('.', (string) $this->stringable('.')->dirname());
+
+        $this->assertSame(DIRECTORY_SEPARATOR, (string) $this->stringable('/framework/')->dirname());
+        $this->assertSame(DIRECTORY_SEPARATOR, (string) $this->stringable('/')->dirname());
+    }
+
     public function testUcsplitOnStringable()
     {
         $this->assertSame(['Taylor', 'Otwell'], $this->stringable('TaylorOtwell')->ucsplit()->toArray());
