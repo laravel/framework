@@ -2281,7 +2281,6 @@ class Builder implements BuilderContract
         return $this->orderByRaw($this->grammar->compileRandom($seed));
     }
 
-
     /**
      * Add a raw "order by" clause to the query.
      *
