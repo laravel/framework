@@ -385,6 +385,23 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Indicate that models should prevent lazy loading, silently discarding attributes, and accessing missing attributes.
+     *
+     * @param  bool  $shouldBeStrict
+     * @return void
+     */
+    public static function shouldBeStrict(bool $shouldBeStrict = true)
+    {
+        if (! $shouldBeStrict) {
+            return;
+        }
+
+        static::preventLazyLoading();
+        static::preventSilentlyDiscardingAttributes();
+        static::preventsAccessingMissingAttributes();
+    }
+
+    /**
      * Prevent model relationships from being lazy loaded.
      *
      * @param  bool  $value
