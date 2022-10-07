@@ -99,9 +99,9 @@ class Envelope
     }
 
     /**
-     * Add additional recipients to the message
+     * Add additional recipients to the message.
      *
-     * @param string|\Illuminate\Mail\Mailables\Address|array $address
+     * @param string|\Illuminate\Mail\Mailables\Address|array  $address
      * @return $this
      */
     public function addTo($address)
@@ -114,7 +114,7 @@ class Envelope
     /**
      * Add "cc" recipients to the message.
      *
-     * @param string|\Illuminate\Mail\Mailables\Address|array $address
+     * @param string|\Illuminate\Mail\Mailables\Address|array  $address
      * @return $this
      */
     public function addCc($address)
@@ -127,7 +127,7 @@ class Envelope
     /**
      * Add "bcc" recipients to the message.
      *
-     * @param string|\Illuminate\Mail\Mailables\Address|array $address
+     * @param string|\Illuminate\Mail\Mailables\Address|array  $address
      * @return $this
      */
     public function addBcc($address)
@@ -140,7 +140,7 @@ class Envelope
     /**
      * Add "reply to" recipients to the message.
      *
-     * @param string|\Illuminate\Mail\Mailables\Address|array $address
+     * @param string|\Illuminate\Mail\Mailables\Address|array  $address
      * @return $this
      */
     public function addReplyTo($address)
@@ -153,19 +153,21 @@ class Envelope
     /**
      * Add additional recipients to the message
      *
-     * @param string|\Illuminate\Mail\Mailables\Address|array $address
+     * @param string|\Illuminate\Mail\Mailables\Address|array  $address
      * @param $type
      * @return $this
+     *
      * @throws \InvalidArgumentException
      */
-    protected function addRecipient($address, $type) {
-        if (!in_array($type, ['to', 'cc', 'bcc', 'replyTo'])) {
+    protected function addRecipient($address, $type)
+    {
+        if (! in_array($type, ['to', 'cc', 'bcc', 'replyTo'])) {
             throw new \InvalidArgumentException("$type is not a valid recipient type.");
         }
 
         $this->{$type} = [
             ...$this->{$type},
-            ...$this->normalizeAddresses(is_array($address) ? $address : [$address])
+            ...$this->normalizeAddresses(is_array($address) ? $address : [$address]),
         ];
 
         return $this;
