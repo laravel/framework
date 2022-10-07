@@ -449,24 +449,24 @@ trait HasAttributes
             return $this->getMissingAttributeResponse($key);
         }
 
-        if ($this->isRelation($key) || $this->relationLoaded($key)) {
-            return $this->getRelationValue($key);
-        }
-
-        return $this->getMissingAttributeResponse($key);
+        return $this->isRelation($key) || $this->relationLoaded($key)
+                    ? $this->getRelationValue($key)
+                    : $this->throwMissingAttributeExceptionIfApplicable($key);
     }
 
     /**
-     * Either throw and exception or return null depending on Eloquent configuration.
+     * Either throw a missing attribute exception or return null depending on Eloquent's configuration.
      *
      * @param  string  $key
      * @return null
      *
      * @throws \Illuminate\Database\Eloquent\MissingAttributeException
      */
-    protected function getMissingAttributeResponse($key)
+    protected function throwMissingAttributeExceptionIfApplicable($key)
     {
-        if ($this->exists && ! $this->wasRecentlyCreated && static::preventsAccessingMissingAttributes()) {
+        if ($this->exists &&
+            ! $this->wasRecentlyCreated &&
+            static::preventsAccessingMissingAttributes()) {
             throw new MissingAttributeException($this, $key);
         }
 

@@ -418,7 +418,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
-     * Prevent non-fillable attributes from being silently discarded.
+     * Prevent accessing missing attributes on retrieved models.
      *
      * @param  bool  $value
      * @return void
