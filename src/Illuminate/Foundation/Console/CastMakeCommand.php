@@ -86,7 +86,7 @@ class CastMakeCommand extends GeneratorCommand
     {
         return [
             ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the cast already exists'],
-            ['inbound', null, InputOption::VALUE_OPTIONAL, 'Generate an inbound cast class'],
+            ['inbound', null, InputOption::VALUE_NONE, 'Generate an inbound cast class'],
         ];
     }
 }
