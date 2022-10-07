@@ -36,7 +36,6 @@ class Headers
      * @return void
      *
      * @named-arguments-supported
-     *
      */
     public function __construct(string $messageId = null, array $references = [], array $text = [])
     {
