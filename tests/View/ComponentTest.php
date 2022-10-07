@@ -17,6 +17,7 @@ use PHPUnit\Framework\TestCase;
 class ComponentTest extends TestCase
 {
     protected $viewFactory;
+
     protected $config;
 
     protected function setUp(): void
@@ -60,12 +61,22 @@ class ComponentTest extends TestCase
         $this->assertSame('__components::c6327913fef3fca4518bcd7df1d0ff630758e241', $component->resolveView());
     }
 
-    public function testRegularViewsGetReturned()
+    public function testRegularViewsGetReturnedUsingViewHelper()
     {
         $view = m::mock(View::class);
         $this->viewFactory->shouldReceive('make')->once()->with('alert', [], [])->andReturn($view);
 
-        $component = new TestRegularViewComponent;
+        $component = new TestRegularViewComponentUsingViewHelper;
+
+        $this->assertSame($view, $component->resolveView());
+    }
+
+    public function testRegularViewsGetReturnedUsingViewMethod()
+    {
+        $view = m::mock(View::class);
+        $this->viewFactory->shouldReceive('make')->once()->with('alert', [], [])->andReturn($view);
+
+        $component = new TestRegularViewComponentUsingViewMethod;
 
         $this->assertSame($view, $component->resolveView());
     }
@@ -89,6 +100,114 @@ class ComponentTest extends TestCase
         $this->assertInstanceOf(Htmlable::class, $view);
         $this->assertSame('<p>Hello foo</p>', $view->toHtml());
     }
+
+    public function testResolveComponentsUsing()
+    {
+        $component = new TestInlineViewComponent;
+
+        Component::resolveComponentsUsing(fn () => $component);
+
+        $this->assertSame($component, Component::resolve('bar'));
+    }
+
+    public function testBladeViewCacheWithRegularViewNameViewComponent()
+    {
+        $component = new TestRegularViewNameViewComponent;
+
+        $this->viewFactory->shouldReceive('exists')->twice()->andReturn(true);
+
+        $this->assertSame('alert', $component->resolveView());
+        $this->assertSame('alert', $component->resolveView());
+        $this->assertSame('alert', $component->resolveView());
+        $this->assertSame('alert', $component->resolveView());
+
+        $cache = (fn () => $component::$bladeViewCache)->call($component);
+        $this->assertSame([$component::class.'::alert' => 'alert'], $cache);
+
+        $component::flushCache();
+
+        $cache = (fn () => $component::$bladeViewCache)->call($component);
+        $this->assertSame([], $cache);
+
+        $this->assertSame('alert', $component->resolveView());
+        $this->assertSame('alert', $component->resolveView());
+        $this->assertSame('alert', $component->resolveView());
+        $this->assertSame('alert', $component->resolveView());
+    }
+
+    public function testBladeViewCacheWithInlineViewComponent()
+    {
+        $component = new TestInlineViewComponent;
+
+        $this->viewFactory->shouldReceive('exists')->twice()->andReturn(false);
+
+        $this->config->shouldReceive('get')->twice()->with('view.compiled')->andReturn('/tmp');
+
+        $this->viewFactory->shouldReceive('addNamespace')
+            ->with('__components', '/tmp')
+            ->twice();
+
+        $compiledViewName = '__components::c6327913fef3fca4518bcd7df1d0ff630758e241';
+        $contents = '::Hello {{ $title }}';
+        $cacheKey = $component::class.$contents;
+
+        $this->assertSame($compiledViewName, $component->resolveView());
+        $this->assertSame($compiledViewName, $component->resolveView());
+        $this->assertSame($compiledViewName, $component->resolveView());
+        $this->assertSame($compiledViewName, $component->resolveView());
+
+        $cache = (fn () => $component::$bladeViewCache)->call($component);
+        $this->assertSame([$cacheKey => $compiledViewName], $cache);
+
+        $component::flushCache();
+
+        $cache = (fn () => $component::$bladeViewCache)->call($component);
+        $this->assertSame([], $cache);
+
+        $this->assertSame($compiledViewName, $component->resolveView());
+        $this->assertSame($compiledViewName, $component->resolveView());
+        $this->assertSame($compiledViewName, $component->resolveView());
+        $this->assertSame($compiledViewName, $component->resolveView());
+    }
+
+    public function testBladeViewCacheWithInlineViewComponentWhereRenderDependsOnProps()
+    {
+        $componentA = new TestInlineViewComponentWhereRenderDependsOnProps('A');
+        $componentB = new TestInlineViewComponentWhereRenderDependsOnProps('B');
+
+        $this->viewFactory->shouldReceive('exists')->twice()->andReturn(false);
+
+        $this->config->shouldReceive('get')->twice()->with('view.compiled')->andReturn('/tmp');
+
+        $this->viewFactory->shouldReceive('addNamespace')
+            ->with('__components', '/tmp')
+            ->twice();
+
+        $compiledViewNameA = '__components::6dcd4ce23d88e2ee9568ba546c007c63d9131c1b';
+        $compiledViewNameB = '__components::ae4f281df5a5d0ff3cad6371f76d5c29b6d953ec';
+        $cacheAKey = $componentA::class.'::A';
+        $cacheBKey = $componentB::class.'::B';
+
+        $this->assertSame($compiledViewNameA, $componentA->resolveView());
+        $this->assertSame($compiledViewNameA, $componentA->resolveView());
+        $this->assertSame($compiledViewNameB, $componentB->resolveView());
+        $this->assertSame($compiledViewNameB, $componentB->resolveView());
+
+        $cacheA = (fn () => $componentA::$bladeViewCache)->call($componentA);
+        $cacheB = (fn () => $componentB::$bladeViewCache)->call($componentB);
+        $this->assertSame($cacheA, $cacheB);
+        $this->assertSame([
+            $cacheAKey => $compiledViewNameA,
+            $cacheBKey => $compiledViewNameB,
+        ], $cacheA);
+
+        $componentA::flushCache();
+
+        $cacheA = (fn () => $componentA::$bladeViewCache)->call($componentA);
+        $cacheB = (fn () => $componentB::$bladeViewCache)->call($componentB);
+        $this->assertSame($cacheA, $cacheB);
+        $this->assertSame([], $cacheA);
+    }
 }
 
 class TestInlineViewComponent extends Component
@@ -106,7 +225,22 @@ class TestInlineViewComponent extends Component
     }
 }
 
-class TestRegularViewComponent extends Component
+class TestInlineViewComponentWhereRenderDependsOnProps extends Component
+{
+    public $content;
+
+    public function __construct($content)
+    {
+        $this->content = $content;
+    }
+
+    public function render()
+    {
+        return $this->content;
+    }
+}
+
+class TestRegularViewComponentUsingViewHelper extends Component
 {
     public $title;
 
@@ -118,6 +252,21 @@ class TestRegularViewComponent extends Component
     public function render()
     {
         return view('alert');
+    }
+}
+
+class TestRegularViewComponentUsingViewMethod extends Component
+{
+    public $title;
+
+    public function __construct($title = 'foo')
+    {
+        $this->title = $title;
+    }
+
+    public function render()
+    {
+        return $this->view('alert');
     }
 }
 
