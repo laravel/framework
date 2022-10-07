@@ -14,6 +14,7 @@ use Illuminate\Database\Query\Grammars\MySqlGrammar;
 use Illuminate\Database\Query\Grammars\PostgresGrammar;
 use Illuminate\Database\Query\Grammars\SQLiteGrammar;
 use Illuminate\Database\Query\Grammars\SqlServerGrammar;
+use Illuminate\Database\Query\IllegalOperatorAndValueException;
 use Illuminate\Database\Query\Processors\MySqlProcessor;
 use Illuminate\Database\Query\Processors\PostgresProcessor;
 use Illuminate\Database\Query\Processors\Processor;
@@ -3785,8 +3786,15 @@ SQL;
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Illegal operator and value combination.');
 
-        $builder = $this->getBuilder();
-        $builder->prepareValueAndOperator(null, 'like');
+        $this->getBuilder()->prepareValueAndOperator(null, 'like');
+    }
+
+    public function testOperatorAndValueExpectException()
+    {
+        $this->expectException(IllegalOperatorAndValueException::class);
+        $this->expectExceptionMessage('Illegal operator and value combination.');
+
+        $this->getBuilder()->prepareValueAndOperator(null, '>');
     }
 
     public function testProvidingNullWithOperatorsBuildsCorrectly()

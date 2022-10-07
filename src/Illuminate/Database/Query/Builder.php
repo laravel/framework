@@ -814,14 +814,14 @@ class Builder implements BuilderContract
      * @param  bool  $useDefault
      * @return array
      *
-     * @throws \InvalidArgumentException
+     * @throws \Illuminate\Database\Query\IllegalOperatorAndValueException
      */
     public function prepareValueAndOperator($value, $operator, $useDefault = false)
     {
         if ($useDefault) {
             return [$operator, '='];
         } elseif ($this->invalidOperatorAndValue($operator, $value)) {
-            throw new InvalidArgumentException('Illegal operator and value combination.');
+            throw new IllegalOperatorAndValueException();
         }
 
         return [$value, $operator];
