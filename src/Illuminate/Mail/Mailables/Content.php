@@ -49,6 +49,9 @@ class Content
      * @param  string|null  $text
      * @param  string|null  $markdown
      * @param  array  $with
+     *
+     * @named-arguments-supported
+     *
      */
     public function __construct(string $view = null, string $html = null, string $text = null, $markdown = null, array $with = [])
     {
