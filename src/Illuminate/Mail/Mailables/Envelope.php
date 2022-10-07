@@ -2,6 +2,7 @@
 
 namespace Illuminate\Mail\Mailables;
 
+use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\Conditionable;
 
@@ -66,6 +67,13 @@ class Envelope
     public $metadata = [];
 
     /**
+     * The message's Symfony Message customization callbacks.
+     *
+     * @var array
+     */
+    public $using = [];
+
+    /**
      * Create a new message envelope instance.
      *
      * @param  \Illuminate\Mail\Mailables\Address|string|null  $from
@@ -76,11 +84,12 @@ class Envelope
      * @param  string|null  $subject
      * @param  array  $tags
      * @param  array  $metadata
+     * @param  \Closure|array  $using
      * @return void
      *
      * @named-arguments-supported
      */
-    public function __construct(Address|string $from = null, $to = [], $cc = [], $bcc = [], $replyTo = [], string $subject = null, array $tags = [], array $metadata = [])
+    public function __construct(Address|string $from = null, $to = [], $cc = [], $bcc = [], $replyTo = [], string $subject = null, array $tags = [], array $metadata = [], Closure|array $using = [])
     {
         $this->from = is_string($from) ? new Address($from) : $from;
         $this->to = $this->normalizeAddresses($to);
@@ -90,6 +99,7 @@ class Envelope
         $this->subject = $subject;
         $this->tags = $tags;
         $this->metadata = $metadata;
+        $this->using = Arr::wrap($using);
     }
 
     /**

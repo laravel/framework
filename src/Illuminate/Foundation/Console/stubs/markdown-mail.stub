@@ -50,7 +50,7 @@ class {{ class }} extends Mailable
     /**
      * Get the attachments for the message.
      *
-     * @return \Illuminate\Mail\Mailables\Attachment[]
+     * @return array
      */
     public function attachments()
     {

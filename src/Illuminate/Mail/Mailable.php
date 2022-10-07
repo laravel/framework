@@ -1443,6 +1443,10 @@ class Mailable implements MailableContract, Renderable
         foreach ($envelope->metadata as $key => $value) {
             $this->metadata($key, $value);
         }
+
+        foreach ($envelope->using as $callback) {
+            $this->withSymfonyMessage($callback);
+        }
     }
 
     /**
