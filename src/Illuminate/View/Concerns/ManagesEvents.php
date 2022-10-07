@@ -212,7 +212,7 @@ trait ManagesEvents
         if ($this->shouldCallComposers === true || isset($this->shouldCallComposers[
             $this->normalizeName((string) $view->name())
         ])) {
-           $this->events->dispatch('composing: '.$view->name(), [$view]);
+            $this->events->dispatch('composing: '.$view->name(), [$view]);
         }
     }
 
