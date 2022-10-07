@@ -140,7 +140,7 @@ class Envelope
     /**
      * Add "reply to" recipients to the message.
      *
-     * @param string|\Illuminate\Mail\Mailables\Address|array  $address
+     * @param  string|\Illuminate\Mail\Mailables\Address|array  $address
      * @return $this
      */
     public function addReplyTo($address)
