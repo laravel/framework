@@ -4268,9 +4268,7 @@ SQL;
         $builder->shouldReceive('forPage')->once()->with($page, $perPage)->andReturnSelf();
         $builder->shouldReceive('get')->once()->andReturn($results);
 
-        Paginator::currentPathResolver(function () use ($path) {
-            return $path;
-        });
+        Paginator::currentPathResolver(fn () => $path);
 
         $result = $builder->paginate($perPage, $columns, $pageName, $page);
 
@@ -4294,13 +4292,9 @@ SQL;
         $builder->shouldReceive('forPage')->once()->with($page, $perPage)->andReturnSelf();
         $builder->shouldReceive('get')->once()->andReturn($results);
 
-        Paginator::currentPageResolver(function () {
-            return 1;
-        });
+        Paginator::currentPageResolver(fn () => 1);
 
-        Paginator::currentPathResolver(function () use ($path) {
-            return $path;
-        });
+        Paginator::currentPathResolver(fn () => $path);
 
         $result = $builder->paginate();
 
@@ -4324,13 +4318,9 @@ SQL;
         $builder->shouldNotReceive('forPage');
         $builder->shouldNotReceive('get');
 
-        Paginator::currentPageResolver(function () {
-            return 1;
-        });
+        Paginator::currentPageResolver(fn () => 1);
 
-        Paginator::currentPathResolver(function () use ($path) {
-            return $path;
-        });
+        Paginator::currentPathResolver(fn () => $path);
 
         $result = $builder->paginate();
 
@@ -4355,9 +4345,7 @@ SQL;
         $builder->shouldReceive('forPage')->once()->with($page, $perPage)->andReturnSelf();
         $builder->shouldReceive('get')->once()->andReturn($results);
 
-        Paginator::currentPathResolver(function () use ($path) {
-            return $path;
-        });
+        Paginator::currentPathResolver(fn () => $path);
 
         $result = $builder->paginate($perPage, $columns, $pageName, $page);
 
@@ -4375,9 +4363,9 @@ SQL;
         $cursor = new Cursor(['test' => 'bar']);
         $builder = $this->getMockQueryBuilder();
         $builder->from('foobar')->orderBy('test');
-        $builder->shouldReceive('newQuery')->andReturnUsing(function () use ($builder) {
-            return new Builder($builder->connection, $builder->grammar, $builder->processor);
-        });
+        $builder->shouldReceive('newQuery')->andReturnUsing(
+            fn () => new Builder($builder->connection, $builder->grammar, $builder->processor)
+        );
 
         $path = 'http://foo.bar?cursor='.$cursor->encode();
 
@@ -4392,9 +4380,7 @@ SQL;
             return $results;
         });
 
-        Paginator::currentPathResolver(function () use ($path) {
-            return $path;
-        });
+        Paginator::currentPathResolver(fn () => $path);
 
         $result = $builder->cursorPaginate($perPage, $columns, $cursorName, $cursor);
 
@@ -4413,9 +4399,9 @@ SQL;
         $cursor = new Cursor(['test' => 'bar', 'another' => 'foo']);
         $builder = $this->getMockQueryBuilder();
         $builder->from('foobar')->orderBy('test')->orderBy('another');
-        $builder->shouldReceive('newQuery')->andReturnUsing(function () use ($builder) {
-            return new Builder($builder->connection, $builder->grammar, $builder->processor);
-        });
+        $builder->shouldReceive('newQuery')->andReturnUsing(
+            fn () => new Builder($builder->connection, $builder->grammar, $builder->processor)
+        );
 
         $path = 'http://foo.bar?cursor='.$cursor->encode();
 
@@ -4431,9 +4417,7 @@ SQL;
             return $results;
         });
 
-        Paginator::currentPathResolver(function () use ($path) {
-            return $path;
-        });
+        Paginator::currentPathResolver(fn () => $path);
 
         $result = $builder->cursorPaginate($perPage, $columns, $cursorName, $cursor);
 
@@ -4451,9 +4435,9 @@ SQL;
         $cursor = new Cursor(['test' => 'bar']);
         $builder = $this->getMockQueryBuilder();
         $builder->from('foobar')->orderBy('test');
-        $builder->shouldReceive('newQuery')->andReturnUsing(function () use ($builder) {
-            return new Builder($builder->connection, $builder->grammar, $builder->processor);
-        });
+        $builder->shouldReceive('newQuery')->andReturnUsing(
+            fn () => new Builder($builder->connection, $builder->grammar, $builder->processor)
+        );
 
         $path = 'http://foo.bar?cursor='.$cursor->encode();
 
@@ -4468,13 +4452,9 @@ SQL;
             return $results;
         });
 
-        CursorPaginator::currentCursorResolver(function () use ($cursor) {
-            return $cursor;
-        });
+        CursorPaginator::currentCursorResolver(fn () => $cursor);
 
-        Paginator::currentPathResolver(function () use ($path) {
-            return $path;
-        });
+        Paginator::currentPathResolver(fn () => $path);
 
         $result = $builder->cursorPaginate();
 
@@ -4496,13 +4476,9 @@ SQL;
 
         $builder->shouldReceive('get')->once()->andReturn($results);
 
-        CursorPaginator::currentCursorResolver(function () {
-            return null;
-        });
+        CursorPaginator::currentCursorResolver(fn () => null);
 
-        Paginator::currentPathResolver(function () use ($path) {
-            return $path;
-        });
+        Paginator::currentPathResolver(fn () => $path);
 
         $result = $builder->cursorPaginate();
 
@@ -4521,9 +4497,9 @@ SQL;
         $cursor = new Cursor(['id' => 2]);
         $builder = $this->getMockQueryBuilder();
         $builder->from('foobar')->orderBy('id');
-        $builder->shouldReceive('newQuery')->andReturnUsing(function () use ($builder) {
-            return new Builder($builder->connection, $builder->grammar, $builder->processor);
-        });
+        $builder->shouldReceive('newQuery')->andReturnUsing(
+            fn () => new Builder($builder->connection, $builder->grammar, $builder->processor)
+        );
 
         $path = 'http://foo.bar?cursor=3';
 
@@ -4538,9 +4514,7 @@ SQL;
             return $results;
         });
 
-        Paginator::currentPathResolver(function () use ($path) {
-            return $path;
-        });
+        Paginator::currentPathResolver(fn () => $path);
 
         $result = $builder->cursorPaginate($perPage, $columns, $cursorName, $cursor);
 
@@ -4559,9 +4533,9 @@ SQL;
         $cursor = new Cursor(['foo' => 1, 'bar' => 2, 'baz' => 3]);
         $builder = $this->getMockQueryBuilder();
         $builder->from('foobar')->orderBy('foo')->orderByDesc('bar')->orderBy('baz');
-        $builder->shouldReceive('newQuery')->andReturnUsing(function () use ($builder) {
-            return new Builder($builder->connection, $builder->grammar, $builder->processor);
-        });
+        $builder->shouldReceive('newQuery')->andReturnUsing(
+            fn () => new Builder($builder->connection, $builder->grammar, $builder->processor)
+        );
 
         $path = 'http://foo.bar?cursor='.$cursor->encode();
 
@@ -4577,9 +4551,7 @@ SQL;
             return $results;
         });
 
-        Paginator::currentPathResolver(function () use ($path) {
-            return $path;
-        });
+        Paginator::currentPathResolver(fn () => $path);
 
         $result = $builder->cursorPaginate($perPage, $columns, $cursorName, $cursor);
 
@@ -4597,9 +4569,9 @@ SQL;
         $cursor = new Cursor(['test' => 'bar']);
         $builder = $this->getMockQueryBuilder();
         $builder->from('foobar')->select('*')->selectRaw('(CONCAT(firstname, \' \', lastname)) as test')->orderBy('test');
-        $builder->shouldReceive('newQuery')->andReturnUsing(function () use ($builder) {
-            return new Builder($builder->connection, $builder->grammar, $builder->processor);
-        });
+        $builder->shouldReceive('newQuery')->andReturnUsing(
+            fn () => new Builder($builder->connection, $builder->grammar, $builder->processor)
+        );
 
         $path = 'http://foo.bar?cursor='.$cursor->encode();
 
@@ -4614,13 +4586,9 @@ SQL;
             return $results;
         });
 
-        CursorPaginator::currentCursorResolver(function () use ($cursor) {
-            return $cursor;
-        });
+        CursorPaginator::currentCursorResolver(fn () => $cursor);
 
-        Paginator::currentPathResolver(function () use ($path) {
-            return $path;
-        });
+        Paginator::currentPathResolver(fn () => $path);
 
         $result = $builder->cursorPaginate();
 
@@ -4638,9 +4606,9 @@ SQL;
         $cursor = new Cursor(['test' => 'bar']);
         $builder = $this->getMockQueryBuilder();
         $builder->from('foobar')->select('*')->selectSub('CONCAT(firstname, \' \', lastname)', 'test')->orderBy('test');
-        $builder->shouldReceive('newQuery')->andReturnUsing(function () use ($builder) {
-            return new Builder($builder->connection, $builder->grammar, $builder->processor);
-        });
+        $builder->shouldReceive('newQuery')->andReturnUsing(
+            fn () => new Builder($builder->connection, $builder->grammar, $builder->processor)
+        );
 
         $path = 'http://foo.bar?cursor='.$cursor->encode();
 
@@ -4655,13 +4623,9 @@ SQL;
             return $results;
         });
 
-        CursorPaginator::currentCursorResolver(function () use ($cursor) {
-            return $cursor;
-        });
+        CursorPaginator::currentCursorResolver(fn () => $cursor);
 
-        Paginator::currentPathResolver(function () use ($path) {
-            return $path;
-        });
+        Paginator::currentPathResolver(fn () => $path);
 
         $result = $builder->cursorPaginate();
 
@@ -4685,9 +4649,9 @@ SQL;
         $builder->union($this->getBuilder()->select('id', 'created_at')->selectRaw("'news' as type")->from('news'));
         $builder->orderBy('created_at');
 
-        $builder->shouldReceive('newQuery')->andReturnUsing(function () use ($builder) {
-            return new Builder($builder->connection, $builder->grammar, $builder->processor);
-        });
+        $builder->shouldReceive('newQuery')->andReturnUsing(
+            fn () => new Builder($builder->connection, $builder->grammar, $builder->processor)
+        );
 
         $path = 'http://foo.bar?cursor='.$cursor->encode();
 
@@ -4706,9 +4670,7 @@ SQL;
             return $results;
         });
 
-        Paginator::currentPathResolver(function () use ($path) {
-            return $path;
-        });
+        Paginator::currentPathResolver(fn () => $path);
 
         $result = $builder->cursorPaginate($perPage, $columns, $cursorName, $cursor);
 
@@ -4732,9 +4694,9 @@ SQL;
         $builder->union($this->getBuilder()->select('id', 'is_published', 'created_at')->selectRaw("'news' as type")->where('is_published', true)->from('news'));
         $builder->orderByRaw('case when (id = 3 and type="news" then 0 else 1 end)')->orderBy('created_at');
 
-        $builder->shouldReceive('newQuery')->andReturnUsing(function () use ($builder) {
-            return new Builder($builder->connection, $builder->grammar, $builder->processor);
-        });
+        $builder->shouldReceive('newQuery')->andReturnUsing(
+            fn () => new Builder($builder->connection, $builder->grammar, $builder->processor)
+        );
 
         $path = 'http://foo.bar?cursor='.$cursor->encode();
 
@@ -4753,9 +4715,7 @@ SQL;
             return $results;
         });
 
-        Paginator::currentPathResolver(function () use ($path) {
-            return $path;
-        });
+        Paginator::currentPathResolver(fn () => $path);
 
         $result = $builder->cursorPaginate($perPage, $columns, $cursorName, $cursor);
 
@@ -4779,9 +4739,9 @@ SQL;
         $builder->union($this->getBuilder()->select('id', 'created_at')->selectRaw("'news' as type")->from('news'));
         $builder->orderBy('created_at');
 
-        $builder->shouldReceive('newQuery')->andReturnUsing(function () use ($builder) {
-            return new Builder($builder->connection, $builder->grammar, $builder->processor);
-        });
+        $builder->shouldReceive('newQuery')->andReturnUsing(
+            fn () => new Builder($builder->connection, $builder->grammar, $builder->processor)
+        );
 
         $path = 'http://foo.bar?cursor='.$cursor->encode();
 
@@ -4800,9 +4760,7 @@ SQL;
             return $results;
         });
 
-        Paginator::currentPathResolver(function () use ($path) {
-            return $path;
-        });
+        Paginator::currentPathResolver(fn () => $path);
 
         $result = $builder->cursorPaginate($perPage, $columns, $cursorName, $cursor);
 
@@ -4826,9 +4784,9 @@ SQL;
         $builder->union($this->getBuilder()->select('id', 'created_at')->selectRaw("'news' as type")->from('news'));
         $builder->orderByDesc('created_at')->orderBy('id');
 
-        $builder->shouldReceive('newQuery')->andReturnUsing(function () use ($builder) {
-            return new Builder($builder->connection, $builder->grammar, $builder->processor);
-        });
+        $builder->shouldReceive('newQuery')->andReturnUsing(
+            fn () => new Builder($builder->connection, $builder->grammar, $builder->processor)
+        );
 
         $path = 'http://foo.bar?cursor='.$cursor->encode();
 
@@ -4847,9 +4805,7 @@ SQL;
             return $results;
         });
 
-        Paginator::currentPathResolver(function () use ($path) {
-            return $path;
-        });
+        Paginator::currentPathResolver(fn () => $path);
 
         $result = $builder->cursorPaginate($perPage, $columns, $cursorName, $cursor);
 
