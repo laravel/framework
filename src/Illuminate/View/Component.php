@@ -334,6 +334,7 @@ abstract class Component
     public static function flushCache()
     {
         static::$bladeViewCache = [];
+        static::$constructorParametersCache = p[]
         static::$methodCache = [];
         static::$propertyCache = [];
     }
