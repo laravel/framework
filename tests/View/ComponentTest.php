@@ -208,6 +208,22 @@ class ComponentTest extends TestCase
         $this->assertSame($cacheA, $cacheB);
         $this->assertSame([], $cacheA);
     }
+
+    public function testFactoryGetsSharedBetweenComponents()
+    {
+        $regular = new TestRegularViewNameViewComponent;
+        $inline = new TestInlineViewComponent;
+
+        $getFactory = fn ($component) => (fn () => $component->factory())->call($component);
+
+        $this->assertSame($this->viewFactory, $getFactory($regular));
+
+        Container::getInstance()->instance('view', 'foo');
+        $this->assertSame($this->viewFactory, $getFactory($inline));
+
+        Component::forgetFactory();
+        $this->assertNotSame($this->viewFactory, $getFactory($inline));
+    }
 }
 
 class TestInlineViewComponent extends Component
