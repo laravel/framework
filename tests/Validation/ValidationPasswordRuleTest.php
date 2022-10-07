@@ -137,7 +137,7 @@ class ValidationPasswordRuleTest extends TestCase
     public function testStrong()
     {
         $this->fails(Password::strong(), ['a1B#'], [
-            'validation.min.string'
+            'validation.min.string',
         ]);
 
         $this->fails(Password::strong(), ['1234567898765$'], [
@@ -145,15 +145,15 @@ class ValidationPasswordRuleTest extends TestCase
         ]);
 
         $this->fails(Password::strong(), ['aaaaaabbbbbb1$'], [
-            'The my password must contain at least one uppercase and one lowercase letter.'
+            'The my password must contain at least one uppercase and one lowercase letter.',
         ]);
 
         $this->fails(Password::strong(), ['aaaaaaBBBBBBB$'], [
-            'The my password must contain at least one number.'
+            'The my password must contain at least one number.',
         ]);
 
         $this->fails(Password::strong(), ['aaaaaaBBBBBBB1'], [
-            'The my password must contain at least one symbol.'
+            'The my password must contain at least one symbol.',
         ]);
 
         $this->passes(Password::strong(), [
@@ -167,7 +167,7 @@ class ValidationPasswordRuleTest extends TestCase
             '&xe6VeKWF#n4Re',
             '%HurHUnw7zM!Re',
         ], [
-            'validation.min.string'
+            'validation.min.string',
         ]);
 
         $this->passes(Password::strong(16), [
