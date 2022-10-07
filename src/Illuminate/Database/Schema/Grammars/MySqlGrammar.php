@@ -87,7 +87,9 @@ class MySqlGrammar extends Grammar
      */
     public function compileCreate(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
-        $sql = $this->compileCreateTable($blueprint);
+        $sql = $this->compileCreateTable(
+            $blueprint, $command, $connection
+        );
 
         return $this->completeCreateTableStatement($sql, $connection, $blueprint);
     }
@@ -102,7 +104,9 @@ class MySqlGrammar extends Grammar
      */
     public function compileCreateIfNotExists(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
-        $sql = $this->compileCreateTable($blueprint, true);
+        $sql = $this->compileCreateTableIfNotExists(
+            $blueprint, $command, $connection
+        );
 
         return $this->completeCreateTableStatement($sql, $connection, $blueprint);
     }
@@ -136,14 +140,31 @@ class MySqlGrammar extends Grammar
      * Create the main create table clause.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  bool $ifNotExists
-     * @return array
+     * @param  \Illuminate\Support\Fluent $command
+     * @param  \Illuminate\Database\Connection $connection
+     * @return string
      */
-    protected function compileCreateTable($blueprint, $ifNotExists = false)
+    protected function compileCreateTable($blueprint, $command, $connection)
     {
-        return trim(sprintf('%s table %s%s (%s)',
+        return trim(sprintf('%s table %s (%s)',
             $blueprint->temporary ? 'create temporary' : 'create',
-            $ifNotExists ? 'if not exists ' : '',
+            $this->wrapTable($blueprint),
+            implode(', ', $this->getColumns($blueprint))
+        ));
+    }
+
+    /**
+     * Create the main create table if not exists clause.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent $command
+     * @param  \Illuminate\Database\Connection $connection
+     * @return string
+     */
+    protected function compileCreateTableIfNotExists($blueprint, $command, $connection)
+    {
+        return trim(sprintf('%s table if not exists %s (%s)',
+            $blueprint->temporary ? 'create temporary' : 'create',
             $this->wrapTable($blueprint),
             implode(', ', $this->getColumns($blueprint))
         ));
