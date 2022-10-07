@@ -114,6 +114,23 @@ class ComponentTest extends TestCase
     {
         $component = TestInlineViewComponentWhereRenderDependsOnProps::resolve(['content' => 'foo']);
         $this->assertSame('foo', $component->render());
+
+        $component = new class extends Component
+        {
+            public function __construct($a = null, $b = null)
+            {
+                $this->content = $a.$b;
+            }
+
+            public function render()
+            {
+                return $this->content;
+            }
+        };
+
+        $component = $component::resolve(['a' => 'a', 'b' => 'b']);
+        $component = $component::resolve(['b' => 'b', 'a' => 'a']);
+        $this->assertSame('ab', $component->render());
     }
 
     public function testResolveDependenciesWithContainerIfNecessary()
@@ -284,6 +301,7 @@ class TestInlineViewComponentWithContainerDependencies extends Component
 class TestInlineViewComponentWithContainerDependenciesAndProps extends Component
 {
     public $content;
+
     public $dependency;
 
     public function __construct(FactoryContract $dependency, $content)
