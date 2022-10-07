@@ -108,10 +108,10 @@ class ModelMakeCommand extends GeneratorCommand
      */
     protected function createMigration()
     {
-        $table = Str::snake(Str::pluralStudly(class_basename($this->argument('name'))));
+        $table = Str::of(class_basename($this->argument('name')))->snake()->pluralStudly();
 
         if ($this->option('pivot')) {
-            $table = Str::singular($table);
+            $table = $table->singular();
         }
 
         $this->call('make:migration', [

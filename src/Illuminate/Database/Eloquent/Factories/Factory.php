@@ -572,7 +572,7 @@ abstract class Factory
      */
     protected function guessRelationship(string $related)
     {
-        $guess = Str::camel(Str::plural(class_basename($related)));
+        $guess = Str::of(class_basename($related))->plural()->camel();
 
         return method_exists($this->modelName(), $guess) ? $guess : Str::singular($guess);
     }
@@ -591,11 +591,13 @@ abstract class Factory
             'has' => $this->has->concat([new BelongsToManyRelationship(
                 $factory,
                 $pivot,
-                $relationship ?? Str::camel(Str::plural(class_basename(
+                $relationship ?? Str::of(class_basename(
                     $factory instanceof Factory
                         ? $factory->modelName()
                         : Collection::wrap($factory)->first()
-                )))
+                ))
+                    ->plural()
+                    ->camel()
             )]),
         ]);
     }
@@ -895,7 +897,7 @@ abstract class Factory
             static::throwBadMethodCallException($method);
         }
 
-        $relationship = Str::camel(Str::substr($method, 3));
+        $relationship = Str::of($method)->substr(3)->camel();
 
         $relatedModel = get_class($this->newModel()->{$relationship}()->getRelated());
 

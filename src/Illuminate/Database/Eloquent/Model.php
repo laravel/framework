@@ -1772,7 +1772,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function getTable()
     {
-        return $this->table ?? Str::snake(Str::pluralStudly(class_basename($this)));
+        return $this->table ?? Str::of(class_basename($this))->pluralStudly()->snake();
     }
 
     /**
@@ -2031,7 +2031,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     protected function childRouteBindingRelationshipName($childType)
     {
-        return Str::plural(Str::camel($childType));
+        return Str::of($childType)->camel()->plural();
     }
 
     /**

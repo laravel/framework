@@ -220,7 +220,7 @@ class Factory
     public function stubUrl($url, $callback)
     {
         return $this->fake(function ($request, $options) use ($url, $callback) {
-            if (! Str::is(Str::start($url, '*'), $request->url())) {
+            if (! Str::of($url)->start('*')->is($request->url())) {
                 return;
             }
 

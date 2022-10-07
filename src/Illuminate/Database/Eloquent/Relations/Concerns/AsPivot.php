@@ -160,9 +160,7 @@ trait AsPivot
     public function getTable()
     {
         if (! isset($this->table)) {
-            $this->setTable(str_replace(
-                '\\', '', Str::snake(Str::singular(class_basename($this)))
-            ));
+            $this->setTable(Str::of(class_basename($this))->singular()->snake()->replace('\\', ''));
         }
 
         return $this->table;

@@ -156,7 +156,7 @@ class MySqlSchemaState extends SchemaState
                 ), $output, $variables);
             }
 
-            if (str_contains($e->getMessage(), 'set-gtid-purged')) {
+            if (Str::contains($e->getMessage(), 'set-gtid-purged')) {
                 return $this->executeDumpProcess(Process::fromShellCommandLine(
                     str_replace(' --set-gtid-purged=OFF', '', $process->getCommandLine())
                 ), $output, $variables);

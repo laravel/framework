@@ -415,7 +415,7 @@ class Mailable implements MailableContract, Renderable
         if ($this->subject) {
             $message->subject($this->subject);
         } else {
-            $message->subject(Str::title(Str::snake(class_basename($this), ' ')));
+            $message->subject(Str::of(class_basename($this))->snake(' ')->title());
         }
 
         return $this;

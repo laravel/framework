@@ -1141,7 +1141,7 @@ class BelongsToMany extends Relation
      */
     protected function guessInverseRelation()
     {
-        return Str::camel(Str::pluralStudly(class_basename($this->getParent())));
+        return Str::of(class_basename($this->getParent()))->camel()->pluralStudly();
     }
 
     /**
