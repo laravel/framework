@@ -37,7 +37,7 @@ class MigrationCreator
      * @param  string  $customStubPath
      * @return void
      */
-    public function __construct(Filesystem $files, $customStubPath)
+    public function __construct(Filesystem $files, string $customStubPath = '')
     {
         $this->files = $files;
         $this->customStubPath = $customStubPath;
