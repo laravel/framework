@@ -24,6 +24,7 @@ use RuntimeException;
  * @method static bool|null logoutOtherDevices(string $password, string $attribute = 'password')
  * @method static int|string|null id()
  * @method static void login(\Illuminate\Contracts\Auth\Authenticatable $user, bool $remember = false)
+ * @method static void loginOnce(\Illuminate\Contracts\Auth\Authenticatable $user)
  * @method static void logout()
  * @method static void logoutCurrentDevice()
  * @method static void setUser(\Illuminate\Contracts\Auth\Authenticatable $user)

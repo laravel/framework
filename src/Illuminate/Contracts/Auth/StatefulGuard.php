@@ -31,6 +31,14 @@ interface StatefulGuard extends Guard
     public function login(Authenticatable $user, $remember = false);
 
     /**
+     * Log a user into the application.
+     *
+     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @return void
+     */
+    public function loginOnce(Authenticatable $user);
+
+    /**
      * Log the given user ID into the application.
      *
      * @param  mixed  $id

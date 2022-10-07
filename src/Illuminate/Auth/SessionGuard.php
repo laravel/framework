@@ -512,6 +512,19 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     }
 
     /**
+     * Log a user into the application once.
+     *
+     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @return void
+     */
+    public function loginOnce(AuthenticatableContract $user)
+    {
+        if (! is_null($user)) {
+            $this->setUser($user);
+        }
+    }
+
+    /**
      * Update the session with the given ID.
      *
      * @param  string  $id
