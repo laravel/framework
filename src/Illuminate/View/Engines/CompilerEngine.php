@@ -26,7 +26,7 @@ class CompilerEngine extends PhpEngine
     /**
      * A stack of the last compiled templates.
      *
-     * @var array
+     * @var array<string, true>
      */
     protected $lastCompiled = [];
 

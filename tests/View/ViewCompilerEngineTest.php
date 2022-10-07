@@ -39,6 +39,22 @@ class ViewCompilerEngineTest extends TestCase
 ', $results);
     }
 
+    public function testThatViewsAreNotAskTwiceIfTheyAreExpired()
+    {
+        $engine = $this->getEngine();
+        $engine->getCompiler()->shouldReceive('getCompiledPath')->with(__DIR__.'/fixtures/foo.php')->andReturn(__DIR__.'/fixtures/basic.php');
+        $engine->getCompiler()->shouldReceive('isExpired')->twice()->andReturn(false);
+        $engine->getCompiler()->shouldReceive('compile')->never();
+
+        $engine->get(__DIR__.'/fixtures/foo.php');
+        $engine->get(__DIR__.'/fixtures/foo.php');
+        $engine->get(__DIR__.'/fixtures/foo.php');
+
+        $engine->forgetCompiledOrNotExpired();
+
+        $engine->get(__DIR__.'/fixtures/foo.php');
+    }
+
     protected function getEngine()
     {
         return new CompilerEngine(m::mock(CompilerInterface::class), new Filesystem);
