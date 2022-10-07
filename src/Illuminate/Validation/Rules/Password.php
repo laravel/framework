@@ -147,6 +147,25 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
     }
 
     /**
+     * Provide a reasonably strong password rule.
+     *
+     * @param  int  $minLength
+     * @return static
+     */
+    public static function strong($minLength = 12)
+    {
+        if ($minLength < 12) {
+            throw new InvalidArgumentException('A strong password should be at least 12 characters long.');
+        }
+
+        return static::min($minLength)
+            ->mixedCase()
+            ->numbers()
+            ->symbols()
+            ->uncompromised();
+    }
+
+    /**
      * Get the default configuration of the password rule and mark the field as required.
      *
      * @return array

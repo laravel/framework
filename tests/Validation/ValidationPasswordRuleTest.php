@@ -134,6 +134,55 @@ class ValidationPasswordRuleTest extends TestCase
         ]);
     }
 
+    public function testStrong()
+    {
+        $this->fails(Password::strong(), ['a1B#'], [
+            'validation.min.string'
+        ]);
+
+        $this->fails(Password::strong(), ['1234567898765$'], [
+            'The my password must contain at least one uppercase and one lowercase letter.',
+        ]);
+
+        $this->fails(Password::strong(), ['aaaaaabbbbbb1$'], [
+            'The my password must contain at least one uppercase and one lowercase letter.'
+        ]);
+
+        $this->fails(Password::strong(), ['aaaaaaBBBBBBB$'], [
+            'The my password must contain at least one number.'
+        ]);
+
+        $this->fails(Password::strong(), ['aaaaaaBBBBBBB1'], [
+            'The my password must contain at least one symbol.'
+        ]);
+
+        $this->passes(Password::strong(), [
+            '&xe6VeKWF#n4Re',
+            '%HurHUnw7zM!Re',
+            '7Z^k5EvqQ9g%c!Jt9$ufnNpQy#Kf',
+            'NRs*Gz2@hSmB$vVBSPDfqbRtEzk4nF7ZAbM29VMW$BPD%b2U%3VmJAcrY5eZGVxP%z%apnwSX',
+        ]);
+
+        $this->fails(Password::strong(16), [
+            '&xe6VeKWF#n4Re',
+            '%HurHUnw7zM!Re',
+        ], [
+            'validation.min.string'
+        ]);
+
+        $this->passes(Password::strong(16), [
+            '7Z^k5EvqQ9g%c!Jt9$ufnNpQy#Kf',
+            'NRs*Gz2@hSmB$vVBSPDfqbRtEzk4nF7ZAbM29VMW$BPD%b2U%3VmJAcrY5eZGVxP%z%apnwSX',
+        ]);
+
+        $this->expectException(\InvalidArgumentException::class);
+        new Validator(
+            resolve('translator'),
+            ['my_password' => 'pwd', 'my_password_confirmation' => 'pwd'],
+            ['my_password' => Password::strong(8)]
+        );
+    }
+
     public function testMessagesOrder()
     {
         $makeRules = function () {
