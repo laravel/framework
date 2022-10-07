@@ -4,6 +4,7 @@ namespace Illuminate\Tests\View;
 
 use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\View\Factory as FactoryContract;
 use Illuminate\Support\Facades\Facade;
@@ -99,6 +100,31 @@ class ComponentTest extends TestCase
 
         $this->assertInstanceOf(Htmlable::class, $view);
         $this->assertSame('<p>Hello foo</p>', $view->toHtml());
+    }
+
+    public function testResolveWithUnresolvableDependency()
+    {
+        $this->expectException(BindingResolutionException::class);
+        $this->expectExceptionMessage('Unresolvable dependency resolving');
+
+        TestInlineViewComponentWhereRenderDependsOnProps::resolve([]);
+    }
+
+    public function testResolveDependenciesWithoutContainer()
+    {
+        $component = TestInlineViewComponentWhereRenderDependsOnProps::resolve(['content' => 'foo']);
+        $this->assertSame('foo', $component->render());
+    }
+
+    public function testResolveDependenciesWithContainerIfNecessary()
+    {
+        $component = TestInlineViewComponentWithContainerDependencies::resolve([]);
+        $this->assertSame($this->viewFactory, $component->dependency);
+
+        $component = TestInlineViewComponentWithContainerDependenciesAndProps::resolve(['content' => 'foo']);
+        $this->assertSame($this->viewFactory, $component->dependency);
+        $this->assertSame('foo', $component->render());
+
     }
 
     public function testResolveComponentsUsing()
@@ -238,6 +264,44 @@ class TestInlineViewComponent extends Component
     public function render()
     {
         return 'Hello {{ $title }}';
+    }
+}
+
+class TestInlineViewComponentWithContainerDependencies extends Component
+{
+    public $dependency;
+
+    public function __construct(FactoryContract $dependency) {
+        $this->dependency = $dependency;
+    }
+
+    public function render()
+    {
+        return '';
+    }
+}
+
+class TestInlineViewComponentWithContainerDependenciesAndProps extends Component
+{
+    public $content;
+    public $dependency;
+
+    public function __construct(FactoryContract $dependency, $content) {
+        $this->content = $content;
+        $this->dependency = $dependency;
+    }
+
+    public function render()
+    {
+        return $this->content;
+    }
+}
+
+class TestInlineViewComponentWithoutDependencies extends Component
+{
+    public function render()
+    {
+        return 'alert';
     }
 }
 
