@@ -99,6 +99,79 @@ class Envelope
     }
 
     /**
+     * Add additional recipients to the message
+     *
+     * @param string|\Illuminate\Mail\Mailables\Address|array $address
+     * @return $this
+     */
+    public function addTo($address)
+    {
+        $this->addRecipient($address, 'to');
+
+        return $this;
+    }
+
+    /**
+     * Add "cc" recipients to the message.
+     *
+     * @param string|\Illuminate\Mail\Mailables\Address|array $address
+     * @return $this
+     */
+    public function addCc($address)
+    {
+        $this->addRecipient($address, 'cc');
+
+        return $this;
+    }
+
+    /**
+     * Add "bcc" recipients to the message.
+     *
+     * @param string|\Illuminate\Mail\Mailables\Address|array $address
+     * @return $this
+     */
+    public function addBcc($address)
+    {
+        $this->addRecipient($address, 'bcc');
+
+        return $this;
+    }
+
+    /**
+     * Add "reply to" recipients to the message.
+     *
+     * @param string|\Illuminate\Mail\Mailables\Address|array $address
+     * @return $this
+     */
+    public function addReplyTo($address)
+    {
+        $this->addRecipient($address, 'replyTo');
+
+        return $this;
+    }
+
+    /**
+     * Add additional recipients to the message
+     *
+     * @param string|\Illuminate\Mail\Mailables\Address|array $address
+     * @param $type
+     * @return $this
+     * @throws \InvalidArgumentException
+     */
+    protected function addRecipient($address, $type) {
+        if (!in_array($type, ['to', 'cc', 'bcc', 'replyTo'])) {
+            throw new \InvalidArgumentException("$type is not a valid recipient type.");
+        }
+
+        $this->{$type} = [
+            ...$this->{$type},
+            ...$this->normalizeAddresses(is_array($address) ? $address : [$address])
+        ];
+
+        return $this;
+    }
+
+    /**
      * Determine if the message is from the given address.
      *
      * @param  string  $address
