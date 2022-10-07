@@ -40,6 +40,32 @@ class MailableAlternativeSyntaxTest extends TestCase
         $this->assertEquals(1, count($mailable->cc));
         $this->assertEquals(1, count($mailable->bcc));
     }
+
+    public function testEnvelopesCanReceiveAdditionalRecipients()
+    {
+        $envelope = new Envelope(to: ['taylor@example.com']);
+        $envelope->to(new Address('taylorotwell@example.com'));
+
+        $this->assertCount(2, $envelope->to);
+        $this->assertEquals('taylor@example.com', $envelope->to[0]->address);
+        $this->assertEquals('taylorotwell@example.com', $envelope->to[1]->address);
+
+        $envelope->to('abigailotwell@example.com', 'Abigail Otwell');
+        $this->assertEquals('abigailotwell@example.com', $envelope->to[2]->address);
+        $this->assertEquals('Abigail Otwell', $envelope->to[2]->name);
+
+        $envelope->to('adam@example.com');
+        $this->assertEquals('adam@example.com', $envelope->to[3]->address);
+        $this->assertNull($envelope->to[3]->name);
+
+        $envelope->to(['jeffrey@example.com', 'tyler@example.com']);
+        $this->assertEquals('jeffrey@example.com', $envelope->to[4]->address);
+        $this->assertEquals('tyler@example.com', $envelope->to[5]->address);
+
+        $envelope->from('dries@example.com', 'Dries Vints');
+        $this->assertEquals('dries@example.com', $envelope->from->address);
+        $this->assertEquals('Dries Vints', $envelope->from->name);
+    }
 }
 
 class MailableWithAlternativeSyntax extends Mailable

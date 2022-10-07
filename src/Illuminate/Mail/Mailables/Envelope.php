@@ -2,8 +2,13 @@
 
 namespace Illuminate\Mail\Mailables;
 
+use Illuminate\Support\Arr;
+use Illuminate\Support\Traits\Conditionable;
+
 class Envelope
 {
+    use Conditionable;
+
     /**
      * The address sending the message.
      *
@@ -98,6 +103,137 @@ class Envelope
         return collect($addresses)->map(function ($address) {
             return is_string($address) ? new Address($address) : $address;
         })->all();
+    }
+
+    /**
+     * Specify who the message will be "from".
+     *
+     * @param  \Illuminate\Mail\Mailables\Address|string  $address
+     * @param  string|null  $name
+     * @return $this
+     */
+    public function from(Address|string $address, $name = null)
+    {
+        $this->from = is_string($address) ? new Address($address, $name) : $address;
+
+        return $this;
+    }
+
+    /**
+     * Add a "to" recipient to the message envelope.
+     *
+     * @param  \Illuminate\Mail\Mailables\Address|array|string  $address
+     * @param  string|null  $name
+     * @return $this
+     */
+    public function to(Address|array|string $address, $name = null)
+    {
+        $this->to = array_merge($this->to, $this->normalizeAddresses(
+            is_string($name) ? [new Address($address, $name)] : Arr::wrap($address),
+        ));
+
+        return $this;
+    }
+
+    /**
+     * Add a "cc" recipient to the message envelope.
+     *
+     * @param  \Illuminate\Mail\Mailables\Address|array|string  $address
+     * @param  string|null  $name
+     * @return $this
+     */
+    public function cc(Address|array|string $address, $name = null)
+    {
+        $this->cc = array_merge($this->cc, $this->normalizeAddresses(
+            is_string($name) ? [new Address($address, $name)] : Arr::wrap($address),
+        ));
+
+        return $this;
+    }
+
+    /**
+     * Add a "bcc" recipient to the message envelope.
+     *
+     * @param  \Illuminate\Mail\Mailables\Address|array|string  $address
+     * @param  string|null  $name
+     * @return $this
+     */
+    public function bcc(Address|array|string $address, $name = null)
+    {
+        $this->bcc = array_merge($this->bcc, $this->normalizeAddresses(
+            is_string($name) ? [new Address($address, $name)] : Arr::wrap($address),
+        ));
+
+        return $this;
+    }
+
+    /**
+     * Add a "reply to" recipient to the message envelope.
+     *
+     * @param  \Illuminate\Mail\Mailables\Address|array|string  $address
+     * @param  string|null  $name
+     * @return $this
+     */
+    public function replyTo(Address|array|string $address, $name = null)
+    {
+        $this->replyTo = array_merge($this->replyTo, $this->normalizeAddresses(
+            is_string($name) ? [new Address($address, $name)] : Arr::wrap($address),
+        ));
+
+        return $this;
+    }
+
+    /**
+     * Set the subject of the message.
+     *
+     * @param  string  $subject
+     * @return $this
+     */
+    public function subject(string $subject)
+    {
+        $this->subject = $subject;
+
+        return $this;
+    }
+
+    /**
+     * Add "tags" to the message.
+     *
+     * @param  array  $tags
+     * @return $this
+     */
+    public function tags(array $tags)
+    {
+        $this->tags = array_merge($this->tags, $tags);
+
+        return $this;
+    }
+
+    /**
+     * Add a "tag" to the message.
+     *
+     * @param  string  $tag
+     * @return $this
+     */
+    public function tag(string $tag)
+    {
+        $this->tags[] = $tag;
+
+        return $this;
+    }
+
+    /**
+     * Add metadata to the message.
+     *
+     * @param  string  $key
+     * @param  string|int  $value
+     * @return $this
+     */
+    public function metadata(string $key, string|int $value)
+    {
+        $this->metadata[$key] = $value;
+
+        return $this;
     }
 
     /**
