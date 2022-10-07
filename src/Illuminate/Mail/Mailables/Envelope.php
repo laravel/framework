@@ -72,6 +72,9 @@ class Envelope
      * @param  array  $tags
      * @param  array  $metadata
      * @return void
+     *
+     * @named-arguments-supported
+     *
      */
     public function __construct(Address|string $from = null, $to = [], $cc = [], $bcc = [], $replyTo = [], string $subject = null, array $tags = [], array $metadata = [])
     {
