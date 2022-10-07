@@ -1146,6 +1146,16 @@ class Route
     }
 
     /**
+     * Determine if the route should prevent scoping of multiple implicit Eloquent bindings.
+     *
+     * @return bool
+     */
+    public function preventsScopedBindings()
+    {
+        return isset($this->action['scope_bindings']) && $this->action['scope_bindings'] === false;
+    }
+
+    /**
      * Specify that the route should not allow concurrent requests from the same session.
      *
      * @param  int|null  $lockSeconds
