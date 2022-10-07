@@ -186,6 +186,8 @@ class ViewFactoryTest extends TestCase
     {
         $factory = $this->getFactory();
         $factory->getDispatcher()->shouldReceive('listen')->never();
+        $factory->getDispatcher()->shouldReceive('dispatch')->never();
+
         $view = m::mock(View::class);
         $view->shouldReceive('name')->once()->andReturn('name');
 
@@ -258,9 +260,12 @@ class ViewFactoryTest extends TestCase
     public function testCallComposersDoesNotDispatchEventsWhenIsNotNecessary()
     {
         $factory = $this->getFactory();
+        $factory->getDispatcher()->shouldReceive('listen')->never();
+        $factory->getDispatcher()->shouldReceive('dispatch')->never();
 
         $view = m::mock(View::class);
         $view->shouldReceive('name')->once()->andReturn('name');
+
         $factory->callComposer($view);
     }
 
