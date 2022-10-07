@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\Casts\AsStringable;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Database\Eloquent\MassAssignmentException;
+use Illuminate\Database\Eloquent\MissingAttributeException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -2317,6 +2318,33 @@ class DatabaseEloquentModelTest extends TestCase
         });
 
         $this->assertTrue($called);
+    }
+
+    public function testAccessingMissingAttributes()
+    {
+        try {
+            Model::preventAccessingMissingAttributes(false);
+
+            $model = new EloquentModelStub(['id' => 1]);
+            $model->exists = true;
+
+            // Default behavior
+            $this->assertEquals(1, $model->id);
+            $this->assertNull($model->this_attribute_does_not_exist);
+
+            Model::preventAccessingMissingAttributes(true);
+
+            // "preventAccessingMissingAttributes" behavior
+            $this->expectException(MissingAttributeException::class);
+            $model->this_attribute_does_not_exist;
+
+            // Ensure that unsaved models do not trigger the exception
+            $newModel = new EloquentModelStub(['id' => 2]);
+            $this->assertEquals(2, $newModel->id);
+            $this->assertNull($newModel->this_attribute_does_not_exist);
+        } finally {
+            Model::preventAccessingMissingAttributes(false);
+        }
     }
 
     protected function addMockConnection($model)
