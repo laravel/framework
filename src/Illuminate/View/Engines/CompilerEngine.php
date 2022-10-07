@@ -19,14 +19,14 @@ class CompilerEngine extends PhpEngine
     /**
      * The caches paths that were compiled or are not expired, keyed by paths.
      *
-     * @var array
+     * @var array<string, true>
      */
     protected $compiledOrNotExpired = [];
 
     /**
      * A stack of the last compiled templates.
      *
-     * @var array<string, true>
+     * @var array
      */
     protected $lastCompiled = [];
 
