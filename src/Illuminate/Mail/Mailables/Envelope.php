@@ -101,7 +101,7 @@ class Envelope
     /**
      * Add additional recipients to the message.
      *
-     * @param string|\Illuminate\Mail\Mailables\Address|array  $address
+     * @param  string|\Illuminate\Mail\Mailables\Address|array  $address
      * @return $this
      */
     public function addTo($address)
@@ -114,7 +114,7 @@ class Envelope
     /**
      * Add "cc" recipients to the message.
      *
-     * @param string|\Illuminate\Mail\Mailables\Address|array  $address
+     * @param  string|\Illuminate\Mail\Mailables\Address|array  $address
      * @return $this
      */
     public function addCc($address)
@@ -127,7 +127,7 @@ class Envelope
     /**
      * Add "bcc" recipients to the message.
      *
-     * @param string|\Illuminate\Mail\Mailables\Address|array  $address
+     * @param  string|\Illuminate\Mail\Mailables\Address|array  $address
      * @return $this
      */
     public function addBcc($address)
@@ -151,9 +151,9 @@ class Envelope
     }
 
     /**
-     * Add additional recipients to the message
+     * Add additional recipients to the message.
      *
-     * @param string|\Illuminate\Mail\Mailables\Address|array  $address
+     * @param  string|\Illuminate\Mail\Mailables\Address|array  $address
      * @param $type
      * @return $this
      *
