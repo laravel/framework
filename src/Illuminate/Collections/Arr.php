@@ -476,7 +476,7 @@ class Arr
      */
     public static function prependKeysWith($array, $prependWith)
     {
-      return array_combine(array_map(fn (string $key): string => "$prependWith$key", array_keys($array)), $array);
+        return array_combine(array_map(fn (string $key): string => "$prependWith$key", array_keys($array)), $array);
     }
 
     /**
