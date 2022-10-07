@@ -500,13 +500,17 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
             return;
         }
 
-        foreach ($this as $outerKey => $outerValue) {
-            if ($outerKey == $key) {
-                return $outerValue;
+        return array_reduce(explode('.', $key), function ($carry, $key) use ($default) {
+            if (is_iterable($carry)) {
+                foreach ($carry as $outerKey => $outerValue) {
+                    if ($outerKey == $key) {
+                        return $outerValue;
+                    }
+                }
             }
-        }
 
-        return value($default);
+            return value($default);
+        }, $this);
     }
 
     /**

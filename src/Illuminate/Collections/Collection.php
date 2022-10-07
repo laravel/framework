@@ -432,11 +432,15 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function get($key, $default = null)
     {
+        if (is_null($key)) {
+            return;
+        }
+
         if (array_key_exists($key, $this->items)) {
             return $this->items[$key];
         }
 
-        return value($default);
+        return data_get($this->items, $key, $default);
     }
 
     /**

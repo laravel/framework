@@ -5336,6 +5336,46 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testGetWithDotNotation($collection)
+    {
+        $data = new $collection([
+            'emails' => [
+                'test' => 'taylor@example.com',
+            ]
+        ]);
+        $result = $data->get('emails.test');
+        $this->assertEquals('taylor@example.com', $result);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testGetWithDeeperDotNotation($collection)
+    {
+        $data = new $collection([
+            'emails' => [
+                'test' => ['taylor' => 'taylor@example.com'],
+            ]
+        ]);
+        $result = $data->get('emails.test');
+        $this->assertEquals(['taylor' => 'taylor@example.com'], $result);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testGetWithDotNotationButTooFlat($collection)
+    {
+        $data = new $collection([
+            'emails' => 'taylor@example.com',
+        ]);
+        $result = $data->get('emails.test');
+        $this->assertNull($result);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testWhereNull($collection)
     {
         $data = new $collection([
