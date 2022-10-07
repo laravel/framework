@@ -557,6 +557,18 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Put the query's results in random order and take the first.
+     *
+     * @param  string  $seed
+     * @param  array|string  $columns
+     * @return \Illuminate\Database\Eloquent\Model|object|static|null
+     */
+    public function randomFirst($seed = '', $columns = ['*'])
+    {
+        return $this->model->inRandomOrder($seed)->first($columns);
+    }
+
+    /**
      * Create or update a record matching the attributes, and fill it with values.
      *
      * @param  array  $attributes

@@ -2281,17 +2281,6 @@ class Builder implements BuilderContract
         return $this->orderByRaw($this->grammar->compileRandom($seed));
     }
 
-    /**
-     * Put the query's results in random order and take the first.
-     *
-     * @param  string  $seed
-     * @param  array|string  $columns
-     * @return \Illuminate\Database\Eloquent\Model|object|static|null
-     */
-    public function randomFirst($seed = '', $columns = ['*'])
-    {
-        return $this->inRandomOrder($seed)->first($columns);
-    }
 
     /**
      * Add a raw "order by" clause to the query.
