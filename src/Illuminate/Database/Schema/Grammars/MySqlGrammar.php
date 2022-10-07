@@ -122,7 +122,7 @@ class MySqlGrammar extends Grammar
     protected function completeCreateTableStatement($sql, $connection, $blueprint)
     {
         // Once we have the primary SQL, we can add the encoding option to the SQL for
-        // the table. Then, we can check if a storage engine has been supplied for
+        // the table.  Then, we can check if a storage engine has been supplied for
         // the table. If so, we will add the engine declaration to the SQL query.
         $sql = $this->compileCreateEncoding(
             $sql, $connection, $blueprint
