@@ -22,14 +22,14 @@ abstract class Component
     /**
      * The cache of blade view names, keyed by contents.
      *
-     * @var array
+     * @var array<string, string>
      */
     protected static $bladeViewCache = [];
 
     /**
      * The view factory instance, if any.
      *
-     * @var \Illuminate\Contracts\View\Factory
+     * @var \Illuminate\Contracts\View\Factory|null
      */
     protected static $factory;
 
@@ -50,7 +50,7 @@ abstract class Component
     /**
      * The cache of constructor parameters, keyed by class.
      *
-     * @var array
+     * @var array<class-string, array<int, string>>
      */
     protected static $constructorParametersCache = [];
 
@@ -327,7 +327,7 @@ abstract class Component
     }
 
     /**
-     * Flush the cache of components.
+     * Flush the components cache.
      *
      * @return void
      */
@@ -339,7 +339,7 @@ abstract class Component
     }
 
     /**
-     * Set the component's view.
+     * Get the evaluated view contents for the given view.
      *
      * @param  string|null  $view
      * @param  \Illuminate\Contracts\Support\Arrayable|array  $data
@@ -415,6 +415,8 @@ abstract class Component
      *
      * @param  \Closure(string $component, array $data): Component  $resolver
      * @return void
+     *
+     * @internal
      */
     public static function resolveComponentsUsing($resolver)
     {

@@ -260,7 +260,7 @@ class ViewFactoryTest extends TestCase
         $factory = $this->getFactory();
 
         $view = m::mock(View::class);
-        $view->shouldReceive('name')->once();
+        $view->shouldReceive('name')->once()->andReturn('name');
         $factory->callComposer($view);
     }
 
