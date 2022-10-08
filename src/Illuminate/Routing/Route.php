@@ -1093,9 +1093,13 @@ class Route
             );
         }
 
-        return $this->controllerDispatcher()->getMiddleware(
-            $this->getController(), $controllerMethod
-        );
+        if (is_a($controllerClass, Controller::class, true)) {
+            return $this->controllerDispatcher()->getMiddleware(
+                $this->getController(), $controllerMethod
+            );
+        }
+
+        return [];
     }
 
     /**
