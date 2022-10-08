@@ -398,7 +398,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
         static::preventLazyLoading();
         static::preventSilentlyDiscardingAttributes();
-        static::preventsAccessingMissingAttributes();
+        static::preventAccessingMissingAttributes();
     }
 
     /**
