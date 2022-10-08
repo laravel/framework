@@ -2,8 +2,12 @@
 
 namespace Illuminate\Mail\Mailables;
 
+use Illuminate\Support\Traits\Conditionable;
+
 class Content
 {
+    use Conditionable;
+
     /**
      * The Blade view that should be rendered for the mailable.
      *
@@ -59,5 +63,73 @@ class Content
         $this->text = $text;
         $this->markdown = $markdown;
         $this->with = $with;
+    }
+
+    /**
+     * Set the view for the message.
+     *
+     * @param  string  $view
+     * @return $this
+     */
+    public function view(string $view)
+    {
+        $this->view = $view;
+
+        return $this;
+    }
+
+    /**
+     * Set the view for the message.
+     *
+     * @param  string  $view
+     * @return $this
+     */
+    public function html(string $view)
+    {
+        return $this->view($view);
+    }
+
+    /**
+     * Set the plain text view for the message.
+     *
+     * @param  string  $view
+     * @return $this
+     */
+    public function text(string $view)
+    {
+        $this->text = $view;
+
+        return $this;
+    }
+
+    /**
+     * Set the Markdown view for the message.
+     *
+     * @param  string  $view
+     * @return $this
+     */
+    public function markdown(string $view)
+    {
+        $this->markdown = $view;
+
+        return $this;
+    }
+
+    /**
+     * Add a piece of view data to the message.
+     *
+     * @param  string  $key
+     * @param  mixed|null  $value
+     * @return $this
+     */
+    public function with($key, $value = null)
+    {
+        if (is_array($key)) {
+            $this->with = array_merge($this->with, $key);
+        } else {
+            $this->with[$key] = $value;
+        }
+
+        return $this;
     }
 }
