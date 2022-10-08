@@ -752,6 +752,17 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('hello', $router->dispatch(Request::create('http://api.baz.boom/foo/bar', 'GET'))->getContent());
     }
 
+    public function testRoutesSetUri()
+    {
+        $route = new Route('GET', 'foo/{bar}', function () {
+            //
+        });
+        $this->assertSame('foo/{bar}', $route->uri);
+        $route->setUri('api.foo.bar');
+        $this->assertNotSame('foo/{bar}', $route->uri);
+        $this->assertSame('api.foo.bar', $route->uri);
+    }
+
     public function testRouteDomainRegistration()
     {
         $router = $this->getRouter();
