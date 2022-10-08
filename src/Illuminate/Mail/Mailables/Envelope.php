@@ -247,6 +247,19 @@ class Envelope
     }
 
     /**
+     * Add a Symfony Message customization callback to the message.
+     *
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function using(Closure $callback)
+    {
+        $this->using[] = $callback;
+
+        return $this;
+    }
+
+    /**
      * Determine if the message is from the given address.
      *
      * @param  string  $address
