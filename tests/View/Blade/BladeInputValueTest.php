@@ -16,6 +16,18 @@ class BladeInputValueTest extends AbstractBladeTestCase
     {
         $string = '<input @value(1)/>';
         $expected = "<input <?php echo 'value=\"' . 1 . '\"'; ?>/>";
+
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
+    public function testValuesAreCompiledWithObjectAttribute()
+    {
+        $object = new \stdClass();
+        $object->id = 1;
+
+        $string = "<input @value($object->id)/>";
+        $expected = "<input <?php echo 'value=\"' . 1 . '\"'; ?>/>";
+
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 }
