@@ -1111,11 +1111,11 @@ class Route
      */
     protected function staticallyProvidedControllerMiddleware(string $class, string $method)
     {
-        return collect($class::resolveMiddleware())->reject(function ($middleware) use ($method) {
+        return collect($class::middleware())->reject(function ($middleware) use ($method) {
             return $this->controllerDispatcher()::methodExcludedByOptions(
                 $method, ['only' => $middleware->only, 'except' => $middleware->except]
             );
-        })->map->middleware->all();
+        })->map->middleware->values()->all();
     }
 
     /**
