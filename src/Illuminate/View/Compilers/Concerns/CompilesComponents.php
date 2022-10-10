@@ -149,7 +149,8 @@ trait CompilesComponents
      */
     protected function compileProps($expression)
     {
-        return "<?php foreach(\$attributes->onlyProps{$expression} as \$__key => \$__value) {
+        return "<?php \$attributes ??= new \\Illuminate\\View\\ComponentAttributeBag; ?>
+<?php foreach(\$attributes->onlyProps{$expression} as \$__key => \$__value) {
     \$\$__key = \$\$__key ?? \$__value;
 } ?>
 <?php \$attributes = \$attributes->exceptProps{$expression}; ?>

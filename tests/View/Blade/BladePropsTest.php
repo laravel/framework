@@ -8,7 +8,8 @@ class BladePropsTest extends AbstractBladeTestCase
 {
     public function testPropsAreCompiled()
     {
-        $this->assertSame('<?php foreach($attributes->onlyProps([\'one\' => true, \'two\' => \'string\']) as $__key => $__value) {
+        $this->assertSame('<?php $attributes ??= new \Illuminate\View\ComponentAttributeBag; ?>
+<?php foreach($attributes->onlyProps([\'one\' => true, \'two\' => \'string\']) as $__key => $__value) {
     $$__key = $$__key ?? $__value;
 } ?>
 <?php $attributes = $attributes->exceptProps([\'one\' => true, \'two\' => \'string\']); ?>
