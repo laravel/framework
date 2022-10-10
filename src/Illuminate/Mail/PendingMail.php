@@ -127,7 +127,7 @@ class PendingMail
     /**
      * Send a new mailable message instance if the given truth test passes.
      *
-     * @param bool|\Closure  $boolean
+     * @param  bool|\Closure  $boolean
      * @param  \Illuminate\Contracts\Mail\Mailable  $mailable
      * @return \Illuminate\Mail\SentMessage|null
      */
