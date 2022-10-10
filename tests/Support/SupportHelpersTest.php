@@ -437,7 +437,7 @@ class SupportHelpersTest extends TestCase
     {
         $this->assertSame([
             'Illuminate\Tests\Support\SupportTestTraitTwo' => 'Illuminate\Tests\Support\SupportTestTraitTwo',
-            'Illuminate\Tests\Support\SupportTestTraitOne' => 'Illuminate\Tests\Support\SupportTestTraitOne'
+            'Illuminate\Tests\Support\SupportTestTraitOne' => 'Illuminate\Tests\Support\SupportTestTraitOne',
         ],
             trait_uses_recursive(SupportTestClassOne::class));
 
