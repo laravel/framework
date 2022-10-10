@@ -37,6 +37,20 @@ class GatePolicyResolutionTest extends TestCase
         );
     }
 
+    public function testPolicyCanBeGuessedUsingContainerResolution()
+    {
+        app()->bind('AuthenticationTestUser', AuthenticationTestUserPolicy::class);
+
+        $this->assertInstanceOf(
+            AuthenticationTestUserPolicy::class,
+            Gate::getPolicyFor('AuthenticationTestUser')
+        );
+
+        $this->assertNull(
+            Gate::getPolicyFor('NonExistingBinding')
+        );
+    }
+
     public function testPolicyCanBeGuessedUsingCallback()
     {
         Gate::guessPolicyNamesUsing(function () {
