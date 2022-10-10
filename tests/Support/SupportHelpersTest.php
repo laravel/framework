@@ -433,6 +433,17 @@ class SupportHelpersTest extends TestCase
         class_uses_recursive(SupportTestClassThree::class));
     }
 
+    public function testTraitUsesRecursive()
+    {
+        $this->assertSame([
+            'Illuminate\Tests\Support\SupportTestTraitTwo' => 'Illuminate\Tests\Support\SupportTestTraitTwo',
+            'Illuminate\Tests\Support\SupportTestTraitOne' => 'Illuminate\Tests\Support\SupportTestTraitOne',
+        ],
+            trait_uses_recursive(SupportTestClassOne::class));
+
+        $this->assertSame([], trait_uses_recursive(SupportTestClassTwo::class));
+    }
+
     public function testStr()
     {
         $stringable = str('string-value');
@@ -762,6 +773,15 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals(10, with(5, function ($five) {
             return $five + 5;
         }));
+    }
+
+    public function testAppendConfig()
+    {
+        $this->assertSame([10000 => 'name', 10001 => 'family'], append_config([1 => 'name', 2 => 'family']));
+        $this->assertSame([10000 => 'name', 10001 => 'family'], append_config(['name', 'family']));
+
+        $array = ['name' => 'Taylor', 'family' => 'Otwell'];
+        $this->assertSame($array, append_config($array));
     }
 
     public function testEnv()
