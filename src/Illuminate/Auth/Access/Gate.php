@@ -6,6 +6,7 @@ use Closure;
 use Exception;
 use Illuminate\Auth\Access\Events\GateEvaluated;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Arr;
@@ -678,6 +679,14 @@ class Gate implements GateContract
         }
 
         $classDirname = str_replace('/', '\\', dirname(str_replace('\\', '/', $class)));
+
+        if ($classDirname === '.') {
+            try {
+                $classDirname = get_class(app($class));
+            } catch (BindingResolutionException) {
+                // Do nothing if resolution failed.
+            }
+        }
 
         $classDirnameSegments = explode('\\', $classDirname);
 
