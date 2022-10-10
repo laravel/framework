@@ -37,6 +37,5 @@ class HasMiddlewareTestController implements HasMiddleware
 
     public function show()
     {
-
     }
 }
