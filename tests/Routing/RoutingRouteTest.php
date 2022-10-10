@@ -772,6 +772,29 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('hello', $router->dispatch(Request::create('http://api.foo.bar/foo/bar', 'GET'))->getContent());
     }
 
+    public function testRoutegetDomain()
+    {
+        $route = new Route('GET', 'foo/{bar}', ['domain' => 'foo.com', function () {
+            //
+        }]);
+        $this->assertSame('foo.com', $route->getDomain());
+
+        $route = new Route('GET', 'foo/{bar}', ['domain' => 'http://foo.com', function () {
+            //
+        }]);
+        $this->assertSame('foo.com', $route->getDomain());
+
+        $route = new Route('GET', 'foo/{bar}', ['domain' => 'https://foo.com', function () {
+            //
+        }]);
+        $this->assertSame('foo.com', $route->getDomain());
+
+        $route = new Route('GET', 'foo/{bar}', function () {
+            //
+        });
+        $this->assertNull($route->getDomain());
+    }
+
     public function testMatchesMethodAgainstRequests()
     {
         /*
