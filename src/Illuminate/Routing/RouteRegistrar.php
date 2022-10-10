@@ -71,7 +71,6 @@ class RouteRegistrar
         'scopeBindings',
         'where',
         'withoutMiddleware',
-        'withoutScopeBindings',
     ];
 
     /**
