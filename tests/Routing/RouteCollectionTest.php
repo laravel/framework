@@ -281,4 +281,32 @@ class RouteCollectionTest extends TestCase
         );
         $this->routeCollection->match($request);
     }
+
+    public function testHasNameRouteMehod()
+    {
+        $this->routeCollection->add(
+            new Route('GET', 'users', ['uses' => 'UsersController@index', 'as' => 'users'])
+        );
+        $this->routeCollection->add(
+            new Route('GET', 'posts/{post}', ['uses' => 'PostController@show', 'as' => 'posts'])
+        );
+
+        $this->routeCollection->add(
+            new Route('GET', 'books/{book}', ['uses' => 'BookController@show'])
+        );
+
+        $this->assertTrue($this->routeCollection->hasNamedRoute('users'));
+        $this->assertTrue($this->routeCollection->hasNamedRoute('posts'));
+        $this->assertFalse($this->routeCollection->hasNamedRoute('article'));
+        $this->assertFalse($this->routeCollection->hasNamedRoute('books'));
+    }
+
+    public function testToSymfonyRouteCollection()
+    {
+        $this->routeCollection->add(
+            new Route('GET', 'users', ['uses' => 'UsersController@index', 'as' => 'users'])
+        );
+
+        $this->assertInstanceOf("\Symfony\Component\Routing\RouteCollection", $this->routeCollection->toSymfonyRouteCollection());
+    }
 }

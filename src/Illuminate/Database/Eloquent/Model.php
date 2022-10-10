@@ -182,6 +182,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected static $modelsShouldPreventSilentlyDiscardingAttributes = false;
 
     /**
+     * Indicates if an exception should be thrown when trying to access a missing attribute on a retrieved model.
+     *
+     * @var bool
+     */
+    protected static $modelsShouldPreventAccessingMissingAttributes = false;
+
+    /**
      * Indicates if broadcasting is currently enabled.
      *
      * @var bool
@@ -378,6 +385,23 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Indicate that models should prevent lazy loading, silently discarding attributes, and accessing missing attributes.
+     *
+     * @param  bool  $shouldBeStrict
+     * @return void
+     */
+    public static function shouldBeStrict(bool $shouldBeStrict = true)
+    {
+        if (! $shouldBeStrict) {
+            return;
+        }
+
+        static::preventLazyLoading();
+        static::preventSilentlyDiscardingAttributes();
+        static::preventAccessingMissingAttributes();
+    }
+
+    /**
      * Prevent model relationships from being lazy loaded.
      *
      * @param  bool  $value
@@ -408,6 +432,17 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public static function preventSilentlyDiscardingAttributes($value = true)
     {
         static::$modelsShouldPreventSilentlyDiscardingAttributes = $value;
+    }
+
+    /**
+     * Prevent accessing missing attributes on retrieved models.
+     *
+     * @param  bool  $value
+     * @return void
+     */
+    public static function preventAccessingMissingAttributes($value = true)
+    {
+        static::$modelsShouldPreventAccessingMissingAttributes = $value;
     }
 
     /**
@@ -2098,6 +2133,16 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public static function preventsSilentlyDiscardingAttributes()
     {
         return static::$modelsShouldPreventSilentlyDiscardingAttributes;
+    }
+
+    /**
+     * Determine if accessing missing attributes is disabled.
+     *
+     * @return bool
+     */
+    public static function preventsAccessingMissingAttributes()
+    {
+        return static::$modelsShouldPreventAccessingMissingAttributes;
     }
 
     /**

@@ -39,11 +39,8 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: ['8.0', 8.1]
+        php: ['8.0', 8.1, 8.2]
         stability: [prefer-lowest, prefer-stable]
-        include:
-          - php: 8.2
-            stability: prefer-stable --ignore-platform-req=php+
 
     name: PHP ${{ matrix.php }} - ${{ matrix.stability }}
 
@@ -79,6 +76,14 @@ jobs:
           command: composer require ramsey/collection:^1.2 brick/math:^0.9.3 --no-interaction --no-update
         if: matrix.php >= 8.1
 
+      - name: Set Minimum PHP 8.2 Versions
+        uses: nick-invision/retry@v1
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer require guzzlehttp/guzzle:^7.5 guzzlehttp/psr7:^2.4 predis/predis:^2.0.2 --no-interaction --no-update
+        if: matrix.php >= 8.2
+
       - name: Install dependencies
         uses: nick-invision/retry@v1
         with:
@@ -110,11 +115,8 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: ['8.0', 8.1]
+        php: ['8.0', 8.1, 8.2]
         stability: [prefer-lowest, prefer-stable]
-        include:
-          - php: 8.2
-            stability: prefer-stable --ignore-platform-req=php+
 
     name: PHP ${{ matrix.php }} - ${{ matrix.stability }} - Windows
 
@@ -140,8 +142,16 @@ jobs:
         with:
           timeout_minutes: 5
           max_attempts: 5
-          command: composer require guzzlehttp/guzzle:^7.2 --no-interaction --no-update
+          command: composer require guzzlehttp/guzzle:~7.2 --no-interaction --no-update
         if: matrix.php >= 8
+
+      - name: Set Minimum PHP 8.2 Versions
+        uses: nick-invision/retry@v1
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer require guzzlehttp/guzzle:~7.5 guzzlehttp/psr7:~2.4 predis/predis:^2.0.2 --no-interaction --no-update
+        if: matrix.php >= 8.2
 
       - name: Install dependencies
         uses: nick-invision/retry@v1

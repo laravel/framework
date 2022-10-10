@@ -1440,6 +1440,8 @@ class Blueprint
     {
         if (Builder::$defaultMorphKeyType === 'uuid') {
             $this->uuidMorphs($name, $indexName);
+        } elseif (Builder::$defaultMorphKeyType === 'ulid') {
+            $this->ulidMorphs($name, $indexName);
         } else {
             $this->numericMorphs($name, $indexName);
         }
@@ -1456,6 +1458,8 @@ class Blueprint
     {
         if (Builder::$defaultMorphKeyType === 'uuid') {
             $this->nullableUuidMorphs($name, $indexName);
+        } elseif (Builder::$defaultMorphKeyType === 'ulid') {
+            $this->nullableUlidMorphs($name, $indexName);
         } else {
             $this->nullableNumericMorphs($name, $indexName);
         }
@@ -1521,6 +1525,38 @@ class Blueprint
         $this->string("{$name}_type")->nullable();
 
         $this->uuid("{$name}_id")->nullable();
+
+        $this->index(["{$name}_type", "{$name}_id"], $indexName);
+    }
+
+    /**
+     * Add the proper columns for a polymorphic table using ULIDs.
+     *
+     * @param  string  $name
+     * @param  string|null  $indexName
+     * @return void
+     */
+    public function ulidMorphs($name, $indexName = null)
+    {
+        $this->string("{$name}_type");
+
+        $this->ulid("{$name}_id");
+
+        $this->index(["{$name}_type", "{$name}_id"], $indexName);
+    }
+
+    /**
+     * Add nullable columns for a polymorphic table using ULIDs.
+     *
+     * @param  string  $name
+     * @param  string|null  $indexName
+     * @return void
+     */
+    public function nullableUlidMorphs($name, $indexName = null)
+    {
+        $this->string("{$name}_type")->nullable();
+
+        $this->ulid("{$name}_id")->nullable();
 
         $this->index(["{$name}_type", "{$name}_id"], $indexName);
     }

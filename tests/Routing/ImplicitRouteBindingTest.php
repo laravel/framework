@@ -4,6 +4,8 @@ namespace Illuminate\Tests\Routing;
 
 use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Routing\CallableDispatcher;
+use Illuminate\Routing\Contracts\CallableDispatcher as CallableDispatcherContract;
 use Illuminate\Routing\Exceptions\BackedEnumCaseNotFoundException;
 use Illuminate\Routing\ImplicitRouteBinding;
 use Illuminate\Routing\Route;
@@ -41,11 +43,15 @@ class ImplicitRouteBindingTest extends TestCase
      */
     public function test_it_can_resolve_the_backed_enum_default_value_for_the_given_route()
     {
+        $container = Container::getInstance();
+        $container->bind(CallableDispatcherContract::class, fn ($app) => new CallableDispatcher($app));
+
         $action = ['uses' => function (CategoryBackedEnum $category = CategoryBackedEnum::Fruits) {
             return $category->value;
         }];
 
         $route = new Route('GET', '/test', $action);
+        $route->setContainer($container);
         $route->parameters = [];
 
         $this->assertSame('fruits', $route->run());

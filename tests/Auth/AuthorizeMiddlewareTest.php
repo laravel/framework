@@ -11,6 +11,8 @@ use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Http\Request;
+use Illuminate\Routing\CallableDispatcher;
+use Illuminate\Routing\Contracts\CallableDispatcher as CallableDispatcherContract;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Routing\Router;
 use Mockery as m;
@@ -38,6 +40,8 @@ class AuthorizeMiddlewareTest extends TestCase
         });
 
         $this->router = new Router(new Dispatcher, $this->container);
+
+        $this->container->bind(CallableDispatcherContract::class, fn ($app) => new CallableDispatcher($app));
 
         $this->container->singleton(Registrar::class, function () {
             return $this->router;

@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Contracts\CallableDispatcher;
 use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
 use Illuminate\Routing\Matching\HostValidator;
 use Illuminate\Routing\Matching\MethodValidator;
@@ -16,7 +17,6 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Laravel\SerializableClosure\SerializableClosure;
 use LogicException;
-use ReflectionFunction;
 use Symfony\Component\Routing\Route as SymfonyRoute;
 
 class Route
@@ -233,9 +233,7 @@ class Route
             $callable = unserialize($this->action['uses'])->getClosure();
         }
 
-        return $callable(...array_values($this->resolveMethodDependencies(
-            $this->parametersWithoutNulls(), new ReflectionFunction($callable)
-        )));
+        return $this->container[CallableDispatcher::class]->dispatch($this, $callable);
     }
 
     /**
@@ -306,6 +304,16 @@ class Route
     protected function parseControllerCallback()
     {
         return Str::parseCallback($this->action['uses']);
+    }
+
+    /**
+     * Flush the cached container instance on the route.
+     *
+     * @return void
+     */
+    public function flushController()
+    {
+        $this->controller = null;
     }
 
     /**
@@ -1082,7 +1090,7 @@ class Route
      * Specify middleware that should be removed from the given route.
      *
      * @param  array|string  $middleware
-     * @return $this|array
+     * @return $this
      */
     public function withoutMiddleware($middleware)
     {

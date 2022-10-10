@@ -174,6 +174,18 @@ class SupportStringableTest extends TestCase
         }));
     }
 
+    public function testDirname()
+    {
+        $this->assertSame('/framework/tests', (string) $this->stringable('/framework/tests/Support')->dirname());
+        $this->assertSame('/framework', (string) $this->stringable('/framework/tests/Support')->dirname(2));
+        $this->assertSame('.', (string) $this->stringable('framework')->dirname());
+
+        $this->assertSame('.', (string) $this->stringable('.')->dirname());
+
+        $this->assertSame(DIRECTORY_SEPARATOR, (string) $this->stringable('/framework/')->dirname());
+        $this->assertSame(DIRECTORY_SEPARATOR, (string) $this->stringable('/')->dirname());
+    }
+
     public function testUcsplitOnStringable()
     {
         $this->assertSame(['Taylor', 'Otwell'], $this->stringable('TaylorOtwell')->ucsplit()->toArray());
@@ -623,6 +635,7 @@ class SupportStringableTest extends TestCase
         $this->assertTrue($this->stringable('taylor')->contains(['ylo']));
         $this->assertTrue($this->stringable('taylor')->contains(['xxx', 'ylo']));
         $this->assertTrue($this->stringable('taylor')->contains(collect(['xxx', 'ylo'])));
+        $this->assertTrue($this->stringable('taylor')->contains(['LOR'], true));
         $this->assertFalse($this->stringable('taylor')->contains('xxx'));
         $this->assertFalse($this->stringable('taylor')->contains(['xxx']));
         $this->assertFalse($this->stringable('taylor')->contains(''));
@@ -631,6 +644,7 @@ class SupportStringableTest extends TestCase
     public function testContainsAll()
     {
         $this->assertTrue($this->stringable('taylor otwell')->containsAll(['taylor', 'otwell']));
+        $this->assertTrue($this->stringable('taylor otwell')->containsAll(['TAYLOR', 'OTWELL'], true));
         $this->assertTrue($this->stringable('taylor otwell')->containsAll(collect(['taylor', 'otwell'])));
         $this->assertTrue($this->stringable('taylor otwell')->containsAll(['taylor']));
         $this->assertFalse($this->stringable('taylor otwell')->containsAll(['taylor', 'xxx']));
@@ -942,6 +956,17 @@ class SupportStringableTest extends TestCase
         $this->assertSame('Alien-----', (string) $this->stringable('Alien')->padRight(10, '-'));
         $this->assertSame('Alien     ', (string) $this->stringable('Alien')->padRight(10));
         $this->assertSame('❤MultiByte☆     ', (string) $this->stringable('❤MultiByte☆')->padRight(16));
+    }
+
+    public function testExplode()
+    {
+        $this->assertInstanceOf(Collection::class, $this->stringable('Foo Bar Baz')->explode(' '));
+
+        $this->assertSame('["Foo","Bar","Baz"]', (string) $this->stringable('Foo Bar Baz')->explode(' '));
+
+        //  with limit
+        $this->assertSame('["Foo","Bar Baz"]', (string) $this->stringable('Foo Bar Baz')->explode(' ', 2));
+        $this->assertSame('["Foo","Bar"]', (string) $this->stringable('Foo Bar Baz')->explode(' ', -1));
     }
 
     public function testChunk()

@@ -22,7 +22,8 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
  */
 class Request extends SymfonyRequest implements Arrayable, ArrayAccess
 {
-    use Concerns\InteractsWithContentTypes,
+    use Concerns\CanBePrecognitive,
+        Concerns\InteractsWithContentTypes,
         Concerns\InteractsWithFlashData,
         Concerns\InteractsWithInput,
         Macroable;

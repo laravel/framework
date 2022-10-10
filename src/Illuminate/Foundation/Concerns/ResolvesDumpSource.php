@@ -2,8 +2,33 @@
 
 namespace Illuminate\Foundation\Concerns;
 
+use Throwable;
+
 trait ResolvesDumpSource
 {
+    /**
+     * All of the href formats for common editors.
+     *
+     * @var array<string, string>
+     */
+    protected $editorHrefs = [
+        'atom' => 'atom://core/open/file?filename={file}&line={line}',
+        'emacs' => 'emacs://open?url=file://{file}&line={line}',
+        'idea' => 'idea://open?file={file}&line={line}',
+        'macvim' => 'mvim://open/?url=file://{file}&line={line}',
+        'netbeans' => 'netbeans://open/?f={file}:{line}',
+        'nova' => 'nova://core/open/file?filename={file}&line={line}',
+        'phpstorm' => 'phpstorm://open?file={file}&line={line}',
+        'sublime' => 'subl://open?url=file://{file}&line={line}',
+        'textmate' => 'txmt://open?url=file://{file}&line={line}',
+        'vscode' => 'vscode://file/{file}:{line}',
+        'vscode-insiders' => 'vscode-insiders://file/{file}:{line}',
+        'vscode-insiders-remote' => 'vscode-insiders://vscode-remote/{file}:{line}',
+        'vscode-remote' => 'vscode://vscode-remote/{file}:{line}',
+        'vscodium' => 'vscodium://file/{file}:{line}',
+        'xdebug' => 'xdebug://{file}@{line}',
+    ];
+
     /**
      * The source resolver.
      *
@@ -22,10 +47,27 @@ trait ResolvesDumpSource
             return call_user_func(static::$dumpSourceResolver);
         }
 
-        $trace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT | DEBUG_BACKTRACE_IGNORE_ARGS, 20);
+        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 20);
 
-        $file = $trace[7]['file'] ?? null;
-        $line = $trace[7]['line'] ?? null;
+        $sourceKey = null;
+
+        foreach ($trace as $traceKey => $traceFile) {
+            if (isset($traceFile['file']) && str_ends_with(
+                $traceFile['file'],
+                'dump.php'
+            )) {
+                $sourceKey = $traceKey + 1;
+
+                break;
+            }
+        }
+
+        if (is_null($sourceKey)) {
+            return;
+        }
+
+        $file = $trace[$sourceKey]['file'] ?? null;
+        $line = $trace[$sourceKey]['line'] ?? null;
 
         if (is_null($file) || is_null($line)) {
             return;
@@ -71,6 +113,42 @@ trait ResolvesDumpSource
         }
 
         return $file;
+    }
+
+    /**
+     * Resolve the source href, if possible.
+     *
+     * @param  string  $file
+     * @param  int|null  $line
+     * @return string|null
+     */
+    protected function resolveSourceHref($file, $line)
+    {
+        try {
+            $editor = config('app.editor');
+        } catch (Throwable $e) {
+            // ..
+        }
+
+        if (! isset($editor)) {
+            return;
+        }
+
+        $href = is_array($editor) && isset($editor['href'])
+            ? $editor['href']
+            : ($this->editorHrefs[$editor['name'] ?? $editor] ?? sprintf('%s://open?file={file}&line={line}', $editor['name'] ?? $editor));
+
+        if ($basePath = $editor['base_path'] ?? false) {
+            $file = str_replace($this->basePath, $basePath, $file);
+        }
+
+        $href = str_replace(
+            ['{file}', '{line}'],
+            [$file, is_null($line) ? 1 : $line],
+            $href,
+        );
+
+        return $href;
     }
 
     /**

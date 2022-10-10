@@ -2,10 +2,16 @@
 
 namespace Illuminate\Foundation\Providers;
 
+use Illuminate\Contracts\Container\Container;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\MaintenanceMode as MaintenanceModeContract;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Database\ConnectionInterface;
+use Illuminate\Database\Grammar;
 use Illuminate\Foundation\Console\CliDumper;
 use Illuminate\Foundation\Http\HtmlDumper;
 use Illuminate\Foundation\MaintenanceModeManager;
+use Illuminate\Foundation\Precognition;
 use Illuminate\Foundation\Vite;
 use Illuminate\Http\Request;
 use Illuminate\Log\Events\MessageLogged;
@@ -14,6 +20,8 @@ use Illuminate\Support\Facades\URL;
 use Illuminate\Testing\LoggedExceptionCollection;
 use Illuminate\Testing\ParallelTestingServiceProvider;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\VarDumper\Caster\StubCaster;
+use Symfony\Component\VarDumper\Cloner\AbstractCloner;
 
 class FoundationServiceProvider extends AggregateServiceProvider
 {
@@ -73,6 +81,12 @@ class FoundationServiceProvider extends AggregateServiceProvider
      */
     public function registerDumper()
     {
+        AbstractCloner::$defaultCasters[ConnectionInterface::class] = [StubCaster::class, 'cutInternals'];
+        AbstractCloner::$defaultCasters[Container::class] = [StubCaster::class, 'cutInternals'];
+        AbstractCloner::$defaultCasters[Dispatcher::class] = [StubCaster::class, 'cutInternals'];
+        AbstractCloner::$defaultCasters[Factory::class] = [StubCaster::class, 'cutInternals'];
+        AbstractCloner::$defaultCasters[Grammar::class] = [StubCaster::class, 'cutInternals'];
+
         $basePath = $this->app->basePath();
 
         $compiledViewPath = $this->app['config']->get('view.compiled');
@@ -98,7 +112,15 @@ class FoundationServiceProvider extends AggregateServiceProvider
     public function registerRequestValidation()
     {
         Request::macro('validate', function (array $rules, ...$params) {
-            return validator()->validate($this->all(), $rules, ...$params);
+            $rules = $this->isPrecognitive()
+                ? $this->filterPrecognitiveRules($rules)
+                : $rules;
+
+            return tap(validator($this->all(), $rules, ...$params), function ($validator) {
+                if ($this->isPrecognitive()) {
+                    $validator->after(Precognition::afterValidationHook($this));
+                }
+            })->validate();
         });
 
         Request::macro('validateWithBag', function (string $errorBag, array $rules, ...$params) {

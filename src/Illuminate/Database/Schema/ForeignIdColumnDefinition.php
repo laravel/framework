@@ -36,7 +36,7 @@ class ForeignIdColumnDefinition extends ColumnDefinition
      */
     public function constrained($table = null, $column = 'id')
     {
-        return $this->references($column)->on($table ?? Str::plural(Str::beforeLast($this->name, '_'.$column)));
+        return $this->references($column)->on($table ?? Str::of($this->name)->beforeLast('_'.$column)->plural());
     }
 
     /**
