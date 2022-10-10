@@ -653,6 +653,16 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Shuffle the string.
+     *
+     * @return static
+     */
+    public function shuffle()
+    {
+        return new static(Str::shuffle($this->value));
+    }
+
+    /**
      * Remove all "extra" blank space from the given string.
      *
      * @return static
