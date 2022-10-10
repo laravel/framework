@@ -683,7 +683,7 @@ class Gate implements GateContract
         if ($classDirname === '.') {
             try {
                 $classDirname = get_class(app($class));
-            } catch (BindingResolutionException) {
+            } catch (\Throwable) {
                 // Do nothing if resolution failed.
             }
         }
