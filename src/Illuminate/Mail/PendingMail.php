@@ -125,6 +125,30 @@ class PendingMail
     }
 
     /**
+     * Send a new mailable message instance if the given truth test passes.
+     *
+     * @param bool|\Closure  $boolean
+     * @param  \Illuminate\Contracts\Mail\Mailable  $mailable
+     * @return \Illuminate\Mail\SentMessage|null
+     */
+    public function sendIf($boolean, MailableContract $mailable)
+    {
+        return $this->when($boolean, fn () => $this->mailer->send($this->fill($mailable)));
+    }
+
+    /**
+     * Send a new mailable message instance unless the given truth test passes.
+     *
+     * @param  bool|\Closure  $boolean
+     * @param  \Illuminate\Contracts\Mail\Mailable  $mailable
+     * @return \Illuminate\Mail\SentMessage|null
+     */
+    public function sendUnless($boolean, MailableContract $mailable)
+    {
+        return $this->unless($boolean, fn () => $this->mailer->send($this->fill($mailable)));
+    }
+
+    /**
      * Push the given mailable onto the queue.
      *
      * @param  \Illuminate\Contracts\Mail\Mailable  $mailable
