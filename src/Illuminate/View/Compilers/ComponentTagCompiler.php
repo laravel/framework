@@ -312,7 +312,7 @@ class ComponentTagCompiler
             return $guess;
         }
 
-        if (Str::startsWith($component, 'mail::') && $viewFactory->exists($component)) {
+        if (Str::startsWith($component, 'mail::')) {
             return $component;
         }
 

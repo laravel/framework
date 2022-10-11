@@ -492,7 +492,7 @@ abstract class Relation implements BuilderContract
     }
 
     /**
-     * Clone the Relationship
+     * Clone the Relationship.
      *
      * @return static
      */
