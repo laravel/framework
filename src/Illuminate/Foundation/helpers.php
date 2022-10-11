@@ -12,6 +12,7 @@ use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Contracts\View\Factory as ViewFactory;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Foundation\Bus\PendingClosureDispatch;
 use Illuminate\Foundation\Bus\PendingDispatch;
 use Illuminate\Foundation\Mix;
@@ -85,6 +86,19 @@ if (! function_exists('abort_unless')) {
         if (! $boolean) {
             abort($code, $message, $headers);
         }
+    }
+}
+
+if (! function_exists('accessor')) {
+    /**
+     * Returns an Attribute instance used as an accessor.
+     *
+     * @param  callable  $get
+     * @return \Illuminate\Database\Eloquent\Casts\Attribute
+     */
+    function accessor(callable $get)
+    {
+        return Attribute::get($get);
     }
 }
 
@@ -557,6 +571,20 @@ if (! function_exists('mix')) {
     function mix($path, $manifestDirectory = '')
     {
         return app(Mix::class)(...func_get_args());
+    }
+}
+
+if (! function_exists('mutator')) {
+    /**
+     * Returns an Attribute instance used as a mutator.
+     *
+     * @param  callable|null  $get
+     * @param  callable|null  $set
+     * @return \Illuminate\Database\Eloquent\Casts\Attribute
+     */
+    function mutator(callable $get = null, callable $set = null)
+    {
+        return Attribute::make($get, $set);
     }
 }
 
