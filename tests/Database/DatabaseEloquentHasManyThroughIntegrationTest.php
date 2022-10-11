@@ -489,9 +489,9 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         $this->seedData();
         $country = HasManyThroughTestCountry::first();
 
-        $posts = $country->posts()->get()->map(fn($post) => [$post->id, $post->title]);
-        $postsFromCloneKeyword = (clone $country->posts())->get()->map(fn($post) => [$post->id, $post->title]);
-        $postsFromCloneMethod = $country->posts()->clone()->get()->map(fn($post) => [$post->id, $post->title]);
+        $posts = $country->posts()->get()->map(fn ($post) => [$post->id, $post->title]);
+        $postsFromCloneKeyword = (clone $country->posts())->get()->map(fn ($post) => [$post->id, $post->title]);
+        $postsFromCloneMethod = $country->posts()->clone()->get()->map(fn ($post) => [$post->id, $post->title]);
 
         $this->assertEquals($posts, $postsFromCloneKeyword);
         $this->assertEquals($posts, $postsFromCloneMethod);
