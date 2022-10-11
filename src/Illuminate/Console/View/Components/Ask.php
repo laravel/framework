@@ -13,7 +13,7 @@ class Ask extends Component
     public function render($question)
     {
         return $this->askView('ask', [
-                'content' => $question
+            'content' => $question
         ]);
     }
 }
