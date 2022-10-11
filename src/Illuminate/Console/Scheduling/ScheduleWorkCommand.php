@@ -47,7 +47,7 @@ class ScheduleWorkCommand extends Command
         [$lastExecutionStartedAt, $keyOfLastExecutionWithOutput, $executions] = [null, null, []];
 
         while (true) {
-            usleep(100 * 1000);
+            usleep(500 * 1000); // 0.5 seconds
 
             if (Carbon::now()->second === 0 &&
                 ! Carbon::now()->startOfMinute()->equalTo($lastExecutionStartedAt)) {
