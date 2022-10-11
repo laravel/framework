@@ -13,6 +13,6 @@ class ProcessAlreadyStarted extends LogicException
      */
     public function __construct()
     {
-        parent::__construct('The process has already been started.');
+        parent::__construct('The process has already started.');
     }
 }
