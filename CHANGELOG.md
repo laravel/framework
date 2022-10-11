@@ -1,6 +1,32 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.34.0...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.35.0...9.x)
+
+
+## [v9.35.0](https://github.com/laravel/framework/compare/v9.34.0...v9.35.0) - 2022-10-11
+
+### Added
+- Allow loading trashed models for resource routes ([#44405](https://github.com/laravel/framework/pull/44405))
+- Added `Illuminate/Database/Eloquent/Model::shouldBeStrict()` and other ([#44283](https://github.com/laravel/framework/pull/44283))
+- Controller middleware without resolving controller ([#44516](https://github.com/laravel/framework/pull/44516))
+- Alternative Mailable Syntax ([#44462](https://github.com/laravel/framework/pull/44462))
+
+### Fixed
+- Fix issue with aggregates (withSum, etc.) for pivot columns on self-referencing many-to-many relations ([#44286](https://github.com/laravel/framework/pull/44286))
+- Fixes issue using static class properties as blade attributes ([#44473](https://github.com/laravel/framework/pull/44473))
+- Traversable should have priority over JsonSerializable in EnumerateValues ([#44456](https://github.com/laravel/framework/pull/44456))
+- Fixed `make:cast --inbound` so it's a boolean option, not value ([#44505](https://github.com/laravel/framework/pull/44505))
+
+### Changed
+- Testing methods. Making error messages with json_encode more readable ([#44397](https://github.com/laravel/framework/pull/44397))
+- Have 'Model::withoutTimestamps()' return the callback's return value ([#44457](https://github.com/laravel/framework/pull/44457))
+- only load trashed models on relevant routes ([#44478](https://github.com/laravel/framework/pull/44478))
+- Adding additional PHP extensions to shouldBlockPhpUpload Function ([#44512](https://github.com/laravel/framework/pull/44512))
+- Register cutInternals casters for particularly noisy objects ([#44514](https://github.com/laravel/framework/pull/44514))
+- Use get methods to access application locale ([#44521](https://github.com/laravel/framework/pull/44521))
+- return only on non empty response from channels ([09d53ee](https://github.com/laravel/framework/commit/09d53eea674db7daa8bb65aa8fa7f2ca95e62b8d), [3944a3e](https://github.com/laravel/framework/commit/3944a3e34fe860633c77b574bbfbbcdabcf7d1e7))
+- Correct channel matching ([#44531](https://github.com/laravel/framework/pull/44531))
+- Migrate mail components ([#44527](https://github.com/laravel/framework/pull/44527))
 
 
 ## [v9.34.0](https://github.com/laravel/framework/compare/v9.33.0...v9.34.0) - 2022-10-04
