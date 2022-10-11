@@ -6,8 +6,8 @@ use Illuminate\Console\OutputStyle;
 use Illuminate\Console\QuestionHelper;
 use ReflectionClass;
 use Symfony\Component\Console\Helper\SymfonyQuestionHelper;
-use function Termwind\render;
 use function Termwind\ask;
+use function Termwind\render;
 use function Termwind\renderUsing;
 
 abstract class Component
@@ -123,6 +123,7 @@ abstract class Component
 
     /**
      * Renders the ask view.
+     *
      * @param  string  $view
      * @param  \Illuminate\Contracts\Support\Arrayable|array  $data
      * @return mixed
