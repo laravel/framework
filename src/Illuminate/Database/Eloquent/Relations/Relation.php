@@ -492,6 +492,16 @@ abstract class Relation implements BuilderContract
     }
 
     /**
+     * Clone the Relationship.
+     *
+     * @return static
+     */
+    public function clone()
+    {
+        return clone $this;
+    }
+
+    /**
      * Force a clone of the underlying query builder when cloning.
      *
      * @return void
