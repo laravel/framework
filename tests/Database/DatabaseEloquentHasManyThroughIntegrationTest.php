@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
@@ -472,6 +473,28 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         $this->assertSame('us', $country->shortname);
         $this->assertSame('A title', $country->posts[0]->title);
         $this->assertCount(2, $country->posts);
+    }
+
+    public function testCloneReturnsCorrectClass()
+    {
+        $country = HasManyThroughDefaultTestCountry::make();
+        $relation = $country->posts();
+        $clone = $relation->clone();
+
+        $this->assertInstanceOf(HasManyThrough::class, $clone);
+    }
+
+    public function testAfterCloneIdsArePreserved()
+    {
+        $this->seedData();
+        $country = HasManyThroughTestCountry::first();
+
+        $posts = $country->posts()->get()->map(fn($post) => [$post->id, $post->title]);
+        $postsFromCloneKeyword = (clone $country->posts())->get()->map(fn($post) => [$post->id, $post->title]);
+        $postsFromCloneMethod = $country->posts()->clone()->get()->map(fn($post) => [$post->id, $post->title]);
+
+        $this->assertEquals($posts, $postsFromCloneKeyword);
+        $this->assertEquals($posts, $postsFromCloneMethod);
     }
 
     /**
