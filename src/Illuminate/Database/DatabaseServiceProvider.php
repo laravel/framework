@@ -43,6 +43,8 @@ class DatabaseServiceProvider extends ServiceProvider
         $this->registerConnectionServices();
         $this->registerEloquentFactory();
         $this->registerQueueableEntityResolver();
+
+        $this->app->register(MigrationServiceProvider::class);
     }
 
     /**
