@@ -236,8 +236,12 @@ class ComponentTagCompiler
         // component and pass the component as a view parameter to the data so it
         // can be accessed within the component and we can render out the view.
         if (! class_exists($class)) {
+            $view = Str::startsWith($component, 'mail::')
+                ? "\$__env->getContainer()->make(Illuminate\\View\\Factory::class)->make('{$component}')"
+                : "'$class'";
+
             $parameters = [
-                'view' => "'$class'",
+                'view' => $view,
                 'data' => '['.$this->attributesToString($data->all(), $escapeBound = false).']',
             ];
 
