@@ -1148,7 +1148,7 @@ class Mailable implements MailableContract, Renderable
     }
 
     /**
-     * Assert that the mailable has the given recipient.
+     * Assert that the mailable is from the given address.
      *
      * @param  object|array|string  $address
      * @param  string|null  $name
