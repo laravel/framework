@@ -301,7 +301,7 @@ class MailMailableTest extends TestCase
             $mailable->assertHasReplyTo('taylor@laravel.com', 'Taylor Otwell');
             $this->fail();
         } catch (AssertionFailedError $e) {
-            $this->assertSame("Did not see expected address [taylor@laravel.com (Taylor Otwell)] in email replyTo.\nFailed asserting that false is true.", $e->getMessage());
+            $this->assertSame("Did not see expected address [taylor@laravel.com (Taylor Otwell)] as email 'reply to' recipient.\nFailed asserting that false is true.", $e->getMessage());
         }
 
         $mailable = new WelcomeMailableStub;
@@ -348,7 +348,7 @@ class MailMailableTest extends TestCase
                 if (! is_string($address)) {
                     $address = json_encode($address);
                 }
-                $this->assertSame("Did not see expected address [{$address}] in email replyTo.\nFailed asserting that false is true.", $e->getMessage());
+                $this->assertSame("Did not see expected address [{$address}] as email 'reply to' recipient.\nFailed asserting that false is true.", $e->getMessage());
             }
         }
     }
@@ -359,27 +359,27 @@ class MailMailableTest extends TestCase
         $mailable->from('taylor@laravel.com');
         $this->assertEquals([['name' => null, 'address' => 'taylor@laravel.com']], $mailable->from);
         $this->assertTrue($mailable->hasFrom('taylor@laravel.com'));
-        $mailable->assertHasFrom('taylor@laravel.com');
+        $mailable->assertFrom('taylor@laravel.com');
 
         $mailable = new WelcomeMailableStub;
         $mailable->from('taylor@laravel.com', 'Taylor Otwell');
         $this->assertEquals([['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com']], $mailable->from);
         $this->assertTrue($mailable->hasFrom('taylor@laravel.com', 'Taylor Otwell'));
         $this->assertTrue($mailable->hasFrom('taylor@laravel.com'));
-        $mailable->assertHasFrom('taylor@laravel.com', 'Taylor Otwell');
-        $mailable->assertHasFrom('taylor@laravel.com');
+        $mailable->assertFrom('taylor@laravel.com', 'Taylor Otwell');
+        $mailable->assertFrom('taylor@laravel.com');
 
         $mailable = new WelcomeMailableStub;
         $mailable->from(['taylor@laravel.com']);
         $this->assertEquals([['name' => null, 'address' => 'taylor@laravel.com']], $mailable->from);
         $this->assertTrue($mailable->hasFrom('taylor@laravel.com'));
         $this->assertFalse($mailable->hasFrom('taylor@laravel.com', 'Taylor Otwell'));
-        $mailable->assertHasFrom('taylor@laravel.com');
+        $mailable->assertFrom('taylor@laravel.com');
         try {
-            $mailable->assertHasFrom('taylor@laravel.com', 'Taylor Otwell');
+            $mailable->assertFrom('taylor@laravel.com', 'Taylor Otwell');
             $this->fail();
         } catch (AssertionFailedError $e) {
-            $this->assertSame("Did not see expected recipient [taylor@laravel.com (Taylor Otwell)] in email recipients.\nFailed asserting that false is true.", $e->getMessage());
+            $this->assertSame("Email was not from expected address [taylor@laravel.com (Taylor Otwell)].\nFailed asserting that false is true.", $e->getMessage());
         }
 
         $mailable = new WelcomeMailableStub;
@@ -387,22 +387,22 @@ class MailMailableTest extends TestCase
         $this->assertEquals([['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com']], $mailable->from);
         $this->assertTrue($mailable->hasFrom('taylor@laravel.com', 'Taylor Otwell'));
         $this->assertTrue($mailable->hasFrom('taylor@laravel.com'));
-        $mailable->assertHasFrom('taylor@laravel.com', 'Taylor Otwell');
-        $mailable->assertHasFrom('taylor@laravel.com');
+        $mailable->assertFrom('taylor@laravel.com', 'Taylor Otwell');
+        $mailable->assertFrom('taylor@laravel.com');
 
         $mailable = new WelcomeMailableStub;
         $mailable->from(new MailableTestUserStub);
         $this->assertEquals([['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com']], $mailable->from);
         $this->assertTrue($mailable->hasFrom(new MailableTestUserStub));
         $this->assertTrue($mailable->hasFrom('taylor@laravel.com'));
-        $mailable->assertHasFrom('taylor@laravel.com');
+        $mailable->assertFrom('taylor@laravel.com');
 
         $mailable = new WelcomeMailableStub;
         $mailable->from(collect([new MailableTestUserStub]));
         $this->assertEquals([['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com']], $mailable->from);
         $this->assertTrue($mailable->hasFrom(new MailableTestUserStub));
         $this->assertTrue($mailable->hasFrom('taylor@laravel.com'));
-        $mailable->assertHasFrom('taylor@laravel.com');
+        $mailable->assertFrom('taylor@laravel.com');
 
         $mailable = new WelcomeMailableStub;
         $mailable->from(collect([new MailableTestUserStub, new MailableTestUserStub]));
@@ -412,7 +412,7 @@ class MailMailableTest extends TestCase
         ], $mailable->from);
         $this->assertTrue($mailable->hasFrom(new MailableTestUserStub));
         $this->assertTrue($mailable->hasFrom('taylor@laravel.com'));
-        $mailable->assertHasFrom('taylor@laravel.com');
+        $mailable->assertFrom('taylor@laravel.com');
 
         foreach (['', null, [], false] as $address) {
             $mailable = new WelcomeMailableStub;
@@ -420,13 +420,13 @@ class MailMailableTest extends TestCase
             $this->assertFalse($mailable->hasFrom(new MailableTestUserStub));
             $this->assertFalse($mailable->hasFrom($address));
             try {
-                $mailable->assertHasfrom($address);
+                $mailable->assertFrom($address);
                 $this->fail();
             } catch (AssertionFailedError $e) {
                 if (! is_string($address)) {
                     $address = json_encode($address);
                 }
-                $this->assertSame("Did not see expected recipient [{$address}] in email recipients.\nFailed asserting that false is true.", $e->getMessage());
+                $this->assertSame("Email was not from expected address [{$address}].\nFailed asserting that false is true.", $e->getMessage());
             }
         }
     }
