@@ -27,7 +27,7 @@ class {{ class }}
      *
      * @return array<int, \Illuminate\Broadcasting\Channel>|\Illuminate\Broadcasting\Channel
      */
-    public function broadcastOn(): Channel|array
+    public function broadcastOn(): array|Channel
     {
         return new PrivateChannel('channel-name');
     }
