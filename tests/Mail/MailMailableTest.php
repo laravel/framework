@@ -991,7 +991,6 @@ class MailMailableTest extends TestCase
 
     public function testAssertHasSubject()
     {
-
     }
 }
 
