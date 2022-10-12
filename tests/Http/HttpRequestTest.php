@@ -660,6 +660,9 @@ class HttpRequestTest extends TestCase
 
         $this->assertTrue($request->date('as_date')->isSameDay($current));
         $this->assertTrue($request->date('as_time')->isSameSecond('16:30:25'));
+
+        $this->assertEquals($current, $request->date('as_null', null, null, $current));
+        $this->assertEquals($current, $request->date('doesnt_exists', null, null, $current));
     }
 
     public function testDateMethodExceptionWhenValueInvalid()
