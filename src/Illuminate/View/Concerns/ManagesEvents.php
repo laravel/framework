@@ -10,14 +10,14 @@ use Illuminate\Support\Str;
 trait ManagesEvents
 {
     /**
-     * If the factory should call the creators.
+     * An array of views and whether they have registered "creators".
      *
      * @var array<string, true>|true
      */
     protected $shouldCallCreators = [];
 
     /**
-     * If the factory should call the composers.
+     * An array of views and whether they have registered "composers".
      *
      * @var array<string, true>|true
      */

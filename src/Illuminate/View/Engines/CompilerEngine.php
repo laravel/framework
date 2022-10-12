@@ -17,18 +17,18 @@ class CompilerEngine extends PhpEngine
     protected $compiler;
 
     /**
-     * The caches paths that were compiled or are not expired, keyed by paths.
-     *
-     * @var array<string, true>
-     */
-    protected $compiledOrNotExpired = [];
-
-    /**
      * A stack of the last compiled templates.
      *
      * @var array
      */
     protected $lastCompiled = [];
+
+    /**
+     * The view paths that were compiled or are not expired, keyed by the path.
+     *
+     * @var array<string, true>
+     */
+    protected $compiledOrNotExpired = [];
 
     /**
      * Create a new compiler engine instance.
@@ -112,7 +112,7 @@ class CompilerEngine extends PhpEngine
     }
 
     /**
-     * Forgets the views that were compiled or not expired.
+     * Clear the cache of views that were compiled or not expired.
      *
      * @return void
      */
