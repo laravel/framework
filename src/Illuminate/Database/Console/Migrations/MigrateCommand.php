@@ -244,7 +244,6 @@ class MigrateCommand extends BaseCommand
             $this->components->warn("Create your database'{$connection->getDatabaseName()}' first, then run this command again.");
             exit();
         }
-        exit();
     }
 
     /**
