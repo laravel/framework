@@ -352,14 +352,15 @@ trait InteractsWithInput
      * @param  string  $key
      * @param  string|null  $format
      * @param  string|null  $tz
+     * @param  \Illuminate\Support\Carbon|null  $default
      * @return \Illuminate\Support\Carbon|null
      *
      * @throws \Carbon\Exceptions\InvalidFormatException
      */
-    public function date($key, $format = null, $tz = null)
+    public function date($key, $format = null, $tz = null, \Illuminate\Support\Carbon $default = null)
     {
         if ($this->isNotFilled($key)) {
-            return null;
+            return $default ?? null;
         }
 
         if (is_null($format)) {
