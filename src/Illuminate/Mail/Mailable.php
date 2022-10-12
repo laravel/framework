@@ -1148,6 +1148,147 @@ class Mailable implements MailableContract, Renderable
     }
 
     /**
+     * Assert that the mailable has the given subject line.
+     *
+     * @param  string  $subject
+     * @return $this
+     */
+    public function assertHasSubject($subject)
+    {
+        PHPUnit::assertTrue(
+            $this->hasSubject($subject),
+            "Did not see expected text [{$subject}] in email subject."
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert that the mailable has the given recipient.
+     *
+     * @param  object|array|string  $address
+     * @param  string|null  $name
+     * @return $this
+     */
+    public function assertHasFrom($address, $name = null)
+    {
+        $recipient = $address;
+        if (! is_string($recipient)) {
+            $recipient = json_encode($recipient);
+        }
+        if (filled($name)) {
+            $recipient .= ' ('.$name.')';
+        }
+
+        PHPUnit::assertTrue(
+            $this->hasFrom($address, $name),
+            "Did not see expected recipient [{$recipient}] in email recipients."
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert that the mailable has the given recipient.
+     *
+     * @param  object|array|string  $address
+     * @param  string|null  $name
+     * @return $this
+     */
+    public function assertHasTo($address, $name = null)
+    {
+        $recipient = $address;
+        if (! is_string($recipient)) {
+            $recipient = json_encode($recipient);
+        }
+        if (filled($name)) {
+            $recipient .= ' ('.$name.')';
+        }
+
+        PHPUnit::assertTrue(
+            $this->hasTo($address, $name),
+            "Did not see expected recipient [{$recipient}] in email recipients."
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert that the mailable has the given recipient.
+     *
+     * @param  object|array|string  $address
+     * @param  string|null  $name
+     * @return $this
+     */
+    public function assertHasCc($address, $name = null)
+    {
+        $recipient = $address;
+        if (! is_string($recipient)) {
+            $recipient = json_encode($recipient);
+        }
+        if (filled($name)) {
+            $recipient .= ' ('.$name.')';
+        }
+
+        PHPUnit::assertTrue(
+            $this->hasCc($address, $name),
+            "Did not see expected recipient [{$recipient}] in email recipients."
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert that the mailable has the given recipient.
+     *
+     * @param  object|array|string  $address
+     * @param  string|null  $name
+     * @return $this
+     */
+    public function assertHasBcc($address, $name = null)
+    {
+        $recipient = $address;
+        if (! is_string($recipient)) {
+            $recipient = json_encode($recipient);
+        }
+        if (filled($name)) {
+            $recipient .= ' ('.$name.')';
+        }
+
+        PHPUnit::assertTrue(
+            $this->hasBcc($address, $name),
+            "Did not see expected recipient [{$recipient}] in email recipients."
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert that the mailable has the given replyTo.
+     *
+     * @param  object|array|string  $address
+     * @param  string|null  $name
+     * @return $this
+     */
+    public function assertHasReplyTo($address, $name = null)
+    {
+        $replyTo = $address;
+        if (! is_string($replyTo)) {
+            $replyTo = json_encode($replyTo);
+        }
+        if (filled($name)) {
+            $replyTo .= ' ('.$name.')';
+        }
+
+        PHPUnit::assertTrue(
+            $this->hasReplyTo($address, $name),
+            "Did not see expected address [{$replyTo}] in email replyTo."
+        );
+
+        return $this;
+    }
+
+    /**
      * Assert that the given text is present in the HTML email body.
      *
      * @param  string  $string
@@ -1324,6 +1465,39 @@ class Mailable implements MailableContract, Renderable
         PHPUnit::assertTrue(
             $this->hasAttachmentFromStorageDisk($disk, $path, $name, $options),
             'Did not find the expected attachment.'
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert that the mailable has the given tag.
+     *
+     * @param  string  $tag
+     * @return $this
+     */
+    public function assertHasTag($tag)
+    {
+        PHPUnit::assertTrue(
+            $this->hasTag($tag),
+            "Did not see expected tag [{$tag}] in email tags."
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert that the mailable has the given metadata.
+     *
+     * @param  string  $key
+     * @param  string  $value
+     * @return $this
+     */
+    public function assertHasMetadata($key, $value)
+    {
+        PHPUnit::assertTrue(
+            $this->hasMetadata($key, $value),
+            "Did not see expected key [{$key}] and value [{$value}] in email metadata."
         );
 
         return $this;
