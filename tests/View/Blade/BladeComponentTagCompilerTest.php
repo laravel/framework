@@ -15,13 +15,9 @@ use Mockery as m;
 
 class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testSlotsCanBeCompiled()
     {
+        $this->mockViewFactory();
         $result = $this->compiler()->compileSlots('<x-slot name="foo">
 </x-slot>');
 
@@ -30,6 +26,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
     public function testInlineSlotsCanBeCompiled()
     {
+        $this->mockViewFactory();
         $result = $this->compiler()->compileSlots('<x-slot:foo>
 </x-slot>');
 
@@ -38,6 +35,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
     public function testDynamicSlotsCanBeCompiled()
     {
+        $this->mockViewFactory();
         $result = $this->compiler()->compileSlots('<x-slot :name="$foo">
 </x-slot>');
 
@@ -46,6 +44,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
     public function testDynamicSlotsCanBeCompiledWithKeyOfObjects()
     {
+        $this->mockViewFactory();
         $result = $this->compiler()->compileSlots('<x-slot :name="$foo->name">
 </x-slot>');
 
@@ -54,6 +53,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
     public function testSlotsWithAttributesCanBeCompiled()
     {
+        $this->mockViewFactory();
         $result = $this->compiler()->compileSlots('<x-slot name="foo" class="font-bold">
 </x-slot>');
 
@@ -62,6 +62,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
     public function testInlineSlotsWithAttributesCanBeCompiled()
     {
+        $this->mockViewFactory();
         $result = $this->compiler()->compileSlots('<x-slot:foo class="font-bold">
 </x-slot>');
 
@@ -70,6 +71,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
     public function testSlotsWithDynamicAttributesCanBeCompiled()
     {
+        $this->mockViewFactory();
         $result = $this->compiler()->compileSlots('<x-slot name="foo" :class="$classes">
 </x-slot>');
 
@@ -78,6 +80,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
     public function testSlotsWithClassDirectiveCanBeCompiled()
     {
+        $this->mockViewFactory();
         $result = $this->compiler()->compileSlots('<x-slot name="foo" @class($classes)>
 </x-slot>');
 
@@ -105,6 +108,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
     public function testBasicComponentWithEmptyAttributesParsing()
     {
+        $this->mockViewFactory();
         $result = $this->compiler(['alert' => TestAlertComponent::class])->compileTags('<div><x-alert type="" limit=\'\' @click="" required /></div>');
 
         $this->assertSame("<div>##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestAlertComponent', 'alert', [])
@@ -117,6 +121,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
     public function testDataCamelCasing()
     {
+        $this->mockViewFactory();
         $result = $this->compiler(['profile' => TestProfileComponent::class])->compileTags('<x-profile user-id="1"></x-profile>');
 
         $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestProfileComponent', 'profile', ['userId' => '1'])
@@ -128,6 +133,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
     public function testColonData()
     {
+        $this->mockViewFactory();
         $result = $this->compiler(['profile' => TestProfileComponent::class])->compileTags('<x-profile :user-id="1"></x-profile>');
 
         $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestProfileComponent', 'profile', ['userId' => 1])
@@ -139,6 +145,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
     public function testColonDataShortSyntax()
     {
+        $this->mockViewFactory();
         $result = $this->compiler(['profile' => TestProfileComponent::class])->compileTags('<x-profile :$userId></x-profile>');
 
         $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestProfileComponent', 'profile', ['userId' => \$userId])
@@ -150,6 +157,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
     public function testColonDataWithStaticClassProperty()
     {
+        $this->mockViewFactory();
         $result = $this->compiler(['profile' => TestProfileComponent::class])->compileTags('<x-profile :userId="User::$id"></x-profile>');
 
         $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestProfileComponent', 'profile', ['userId' => User::\$id])
@@ -161,6 +169,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
     public function testColonDataWithStaticClassPropertyAndMultipleAttributes()
     {
+        $this->mockViewFactory();
         $result = $this->compiler(['input' => TestInputComponent::class])->compileTags('<x-input :label="Input::$label" :$name value="Joe"></x-input>');
 
         $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestInputComponent', 'input', ['label' => Input::\$label,'name' => \$name,'value' => 'Joe'])
@@ -180,6 +189,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
     public function testSelfClosingComponentWithColonDataShortSyntax()
     {
+        $this->mockViewFactory();
         $result = $this->compiler(['profile' => TestProfileComponent::class])->compileTags('<x-profile :$userId/>');
 
         $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestProfileComponent', 'profile', ['userId' => \$userId])
@@ -192,6 +202,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
     public function testSelfClosingComponentWithColonDataAndStaticClassPropertyShortSyntax()
     {
+        $this->mockViewFactory();
         $result = $this->compiler(['profile' => TestProfileComponent::class])->compileTags('<x-profile :userId="User::$id"/>');
 
         $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestProfileComponent', 'profile', ['userId' => User::\$id])
@@ -204,6 +215,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
     public function testSelfClosingComponentWithColonDataMultipleAttributesAndStaticClassPropertyShortSyntax()
     {
+        $this->mockViewFactory();
         $result = $this->compiler(['input' => TestInputComponent::class])->compileTags('<x-input :label="Input::$label" value="Joe" :$name />');
 
         $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestInputComponent', 'input', ['label' => Input::\$label,'value' => 'Joe','name' => \$name])
@@ -225,6 +237,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
     public function testEscapedColonAttribute()
     {
+        $this->mockViewFactory();
         $result = $this->compiler(['profile' => TestProfileComponent::class])->compileTags('<x-profile :user-id="1" ::title="user.name"></x-profile>');
 
         $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestProfileComponent', 'profile', ['userId' => 1])
@@ -236,6 +249,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
     public function testColonAttributesIsEscapedIfStrings()
     {
+        $this->mockViewFactory();
         $result = $this->compiler(['profile' => TestProfileComponent::class])->compileTags('<x-profile :src="\'foo\'"></x-profile>');
 
         $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestProfileComponent', 'profile', [])
@@ -259,6 +273,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
     public function testColonNestedComponentParsing()
     {
+        $this->mockViewFactory();
         $result = $this->compiler(['foo:alert' => TestAlertComponent::class])->compileTags('<x-foo:alert></x-foo:alert>');
 
         $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestAlertComponent', 'foo:alert', [])
@@ -270,6 +285,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
     public function testColonStartingNestedComponentParsing()
     {
+        $this->mockViewFactory();
         $result = $this->compiler(['foo:alert' => TestAlertComponent::class])->compileTags('<x:foo:alert></x-foo:alert>');
 
         $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestAlertComponent', 'foo:alert', [])
@@ -281,6 +297,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
     public function testSelfClosingComponentsCanBeCompiled()
     {
+        $this->mockViewFactory();
         $result = $this->compiler(['alert' => TestAlertComponent::class])->compileTags('<div><x-alert/></div>');
 
         $this->assertSame("<div>##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestAlertComponent', 'alert', [])
@@ -295,7 +312,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     {
         $container = new Container;
         $container->instance(Application::class, $app = m::mock(Application::class));
-        $app->shouldReceive('getNamespace')->andReturn('App\\');
+        $app->shouldReceive('getNamespace')->once()->andReturn('App\\');
         Container::setInstance($container);
 
         $result = $this->compiler()->guessClassName('alert');
@@ -309,7 +326,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     {
         $container = new Container;
         $container->instance(Application::class, $app = m::mock(Application::class));
-        $app->shouldReceive('getNamespace')->andReturn('App\\');
+        $app->shouldReceive('getNamespace')->once()->andReturn('App\\');
         Container::setInstance($container);
 
         $result = $this->compiler()->guessClassName('base.alert');
@@ -335,6 +352,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
     public function testSelfClosingComponentsCanBeCompiledWithDataAndAttributes()
     {
+        $this->mockViewFactory();
         $result = $this->compiler(['alert' => TestAlertComponent::class])->compileTags('<x-alert title="foo" class="bar" wire:model="foo" />');
 
         $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestAlertComponent', 'alert', ['title' => 'foo'])
@@ -348,6 +366,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     public function testComponentCanReceiveAttributeBag()
     {
         $this->mockViewFactory();
+
         $result = $this->compiler(['profile' => TestProfileComponent::class])->compileTags('<x-profile class="bar" {{ $attributes }} wire:model="foo"></x-profile>');
 
         $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestProfileComponent', 'profile', [])
@@ -373,6 +392,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
     public function testComponentsCanHaveAttachedWord()
     {
+        $this->mockViewFactory();
         $result = $this->compiler(['profile' => TestProfileComponent::class])->compileTags('<x-profile></x-profile>Words');
 
         $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestProfileComponent', 'profile', [])
@@ -384,6 +404,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
     public function testSelfClosingComponentsCanHaveAttachedWord()
     {
+        $this->mockViewFactory();
         $result = $this->compiler(['alert' => TestAlertComponent::class])->compileTags('<x-alert/>Words');
 
         $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestAlertComponent', 'alert', [])
@@ -396,6 +417,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
     public function testSelfClosingComponentsCanBeCompiledWithBoundData()
     {
+        $this->mockViewFactory();
         $result = $this->compiler(['alert' => TestAlertComponent::class])->compileTags('<x-alert :title="$title" class="bar" />');
 
         $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestAlertComponent', 'alert', ['title' => \$title])
@@ -408,6 +430,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
     public function testPairedComponentTags()
     {
+        $this->mockViewFactory();
         $result = $this->compiler(['alert' => TestAlertComponent::class])->compileTags('<x-alert>
 </x-alert>');
 
@@ -424,8 +447,8 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $container = new Container;
         $container->instance(Application::class, $app = m::mock(Application::class));
         $container->instance(Factory::class, $factory = m::mock(Factory::class));
-        $app->shouldReceive('getNamespace')->andReturn('App\\');
-        $factory->shouldReceive('exists')->andReturn(true);
+        $app->shouldReceive('getNamespace')->once()->andReturn('App\\');
+        $factory->shouldReceive('exists')->once()->andReturn(true);
         Container::setInstance($container);
 
         $result = $this->compiler()->compileTags('<x-anonymous-component :name="\'Taylor\'" :age="31" wire:model="foo" />');
@@ -483,8 +506,8 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $container->instance(Application::class, $app = m::mock(Application::class));
         $container->instance(Factory::class, $factory = m::mock(Factory::class));
 
-        $app->shouldReceive('getNamespace')->andReturn('App\\');
-        $factory->shouldReceive('exists')->andReturnUsing(function ($arg) {
+        $app->shouldReceive('getNamespace')->once()->andReturn('App\\');
+        $factory->shouldReceive('exists')->times(3)->andReturnUsing(function ($arg) {
             // In our test, we'll do as if the 'public.frontend.anonymous-component'
             // view exists and not the others.
             return $arg === 'public.frontend.anonymous-component';
@@ -494,7 +517,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         $blade = m::mock(BladeCompiler::class)->makePartial();
 
-        $blade->shouldReceive('getAnonymousComponentNamespaces')->andReturn([
+        $blade->shouldReceive('getAnonymousComponentNamespaces')->once()->andReturn([
             'frontend' => 'public.frontend',
         ]);
 
@@ -517,8 +540,8 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $container->instance(Application::class, $app = m::mock(Application::class));
         $container->instance(Factory::class, $factory = m::mock(Factory::class));
 
-        $app->shouldReceive('getNamespace')->andReturn('App\\');
-        $factory->shouldReceive('exists')->andReturnUsing(function (string $viewNameBeingCheckedForExistence) {
+        $app->shouldReceive('getNamespace')->once()->andReturn('App\\');
+        $factory->shouldReceive('exists')->times(4)->andReturnUsing(function (string $viewNameBeingCheckedForExistence) {
             // In our test, we'll do as if the 'public.frontend.anonymous-component'
             // view exists and not the others.
             return $viewNameBeingCheckedForExistence === 'admin.auth.components.anonymous-component.index';
@@ -528,7 +551,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         $blade = m::mock(BladeCompiler::class)->makePartial();
 
-        $blade->shouldReceive('getAnonymousComponentNamespaces')->andReturn([
+        $blade->shouldReceive('getAnonymousComponentNamespaces')->once()->andReturn([
             'admin.auth' => 'admin.auth.components',
         ]);
 
@@ -546,6 +569,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
     public function testAttributeSanitization()
     {
+        $this->mockViewFactory();
         $class = new class
         {
             public function __toString()
@@ -567,12 +591,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
     public function testItThrowsAnExceptionForNonExistingAliases()
     {
-        $container = new Container;
-        $container->instance(Application::class, $app = m::mock(Application::class));
-        $container->instance(Factory::class, $factory = m::mock(Factory::class));
-        $app->shouldReceive('getNamespace')->andReturn('App\\');
-        $factory->shouldReceive('exists')->andReturn(false);
-        Container::setInstance($container);
+        $this->mockViewFactory(false);
 
         $this->expectException(InvalidArgumentException::class);
 
@@ -584,8 +603,8 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $container = new Container;
         $container->instance(Application::class, $app = m::mock(Application::class));
         $container->instance(Factory::class, $factory = m::mock(Factory::class));
-        $app->shouldReceive('getNamespace')->andReturn('App\\');
-        $factory->shouldReceive('exists')->andReturn(false);
+        $app->shouldReceive('getNamespace')->once()->andReturn('App\\');
+        $factory->shouldReceive('exists')->twice()->andReturn(false);
         Container::setInstance($container);
 
         $this->expectException(InvalidArgumentException::class);
@@ -598,23 +617,26 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $container = new Container;
         $container->instance(Application::class, $app = m::mock(Application::class));
         $container->instance(Factory::class, $factory = m::mock(Factory::class));
-        $app->shouldReceive('getNamespace')->andReturn('App\\');
-        $factory->shouldReceive('exists')->andReturn(false);
+        $container->alias(Factory::class, 'view');
+        $app->shouldReceive('getNamespace')->never()->andReturn('App\\');
+        $factory->shouldReceive('exists')->never();
+
         Container::setInstance($container);
 
         $attributes = new ComponentAttributeBag(['userId' => 'bar', 'other' => 'ok']);
 
         $component = m::mock(Component::class);
-        $component->shouldReceive('withName', 'test');
-        $component->shouldReceive('shouldRender')->andReturn(true);
-        $component->shouldReceive('resolveView')->andReturn('');
-        $component->shouldReceive('data')->andReturn([]);
-        $component->shouldReceive('withAttributes');
+        $component->shouldReceive('withName')->with('profile')->once();
+        $component->shouldReceive('shouldRender')->once()->andReturn(true);
+        $component->shouldReceive('resolveView')->once()->andReturn('');
+        $component->shouldReceive('data')->once()->andReturn([]);
+        $component->shouldReceive('withAttributes')->once();
+
+        Component::resolveComponentsUsing(fn () => $component);
 
         $__env = m::mock(\Illuminate\View\Factory::class);
-        $__env->shouldReceive('getContainer->make')->with(TestProfileComponent::class, ['userId' => 'bar', 'other' => 'ok'])->andReturn($component);
-        $__env->shouldReceive('startComponent');
-        $__env->shouldReceive('renderComponent');
+        $__env->shouldReceive('startComponent')->once();
+        $__env->shouldReceive('renderComponent')->once();
 
         $template = $this->compiler(['profile' => TestProfileComponent::class])->compileTags('<x-profile {{ $attributes }} />');
         $template = $this->compiler->compileString($template);
@@ -631,6 +653,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     {
         $container = new Container;
         $container->instance(Factory::class, $factory = m::mock(Factory::class));
+        $container->alias(Factory::class, 'view');
         $factory->shouldReceive('exists')->andReturn($existsSucceeds);
         Container::setInstance($container);
     }

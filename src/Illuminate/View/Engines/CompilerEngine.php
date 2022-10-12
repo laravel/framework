@@ -24,6 +24,13 @@ class CompilerEngine extends PhpEngine
     protected $lastCompiled = [];
 
     /**
+     * The view paths that were compiled or are not expired, keyed by the path.
+     *
+     * @var array<string, true>
+     */
+    protected $compiledOrNotExpired = [];
+
+    /**
      * Create a new compiler engine instance.
      *
      * @param  \Illuminate\View\Compilers\CompilerInterface  $compiler
@@ -51,9 +58,11 @@ class CompilerEngine extends PhpEngine
         // If this given view has expired, which means it has simply been edited since
         // it was last compiled, we will re-compile the views so we can evaluate a
         // fresh copy of the view. We'll pass the compiler the path of the view.
-        if ($this->compiler->isExpired($path)) {
+        if (! isset($this->compiledOrNotExpired[$path]) && $this->compiler->isExpired($path)) {
             $this->compiler->compile($path);
         }
+
+        $this->compiledOrNotExpired[$path] = true;
 
         // Once we have the path to the compiled file, we will evaluate the paths with
         // typical PHP just like any other templates. We also keep a stack of views
@@ -100,5 +109,15 @@ class CompilerEngine extends PhpEngine
     public function getCompiler()
     {
         return $this->compiler;
+    }
+
+    /**
+     * Clear the cache of views that were compiled or not expired.
+     *
+     * @return void
+     */
+    public function forgetCompiledOrNotExpired()
+    {
+        $this->compiledOrNotExpired = [];
     }
 }

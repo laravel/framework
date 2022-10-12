@@ -182,6 +182,156 @@ class ViewFactoryTest extends TestCase
         $this->assertSame('baz', key($extensions));
     }
 
+    public function testCallCreatorsDoesNotDispatchEventsWhenIsNotNecessary()
+    {
+        $factory = $this->getFactory();
+        $factory->getDispatcher()->shouldReceive('listen')->never();
+        $factory->getDispatcher()->shouldReceive('dispatch')->never();
+
+        $view = m::mock(View::class);
+        $view->shouldReceive('name')->once()->andReturn('name');
+
+        $factory->callCreator($view);
+    }
+
+    public function testCallCreatorsDoesDispatchEventsWhenIsNecessary()
+    {
+        $factory = $this->getFactory();
+        $factory->getDispatcher()
+            ->shouldReceive('listen')
+            ->with('creating: name', m::type(Closure::class))
+            ->once();
+
+        $factory->getDispatcher()
+            ->shouldReceive('dispatch')
+            ->with('creating: name', m::type('array'))
+            ->once();
+
+        $view = m::mock(View::class);
+        $view->shouldReceive('name')->twice()->andReturn('name');
+
+        $factory->creator('name', fn () => true);
+
+        $factory->callCreator($view);
+    }
+
+    public function testCallCreatorsDoesDispatchEventsWhenIsNecessaryUsingWildcards()
+    {
+        $factory = $this->getFactory();
+        $factory->getDispatcher()
+            ->shouldReceive('listen')
+            ->with('creating: *', m::type(Closure::class))
+            ->once();
+
+        $factory->getDispatcher()
+            ->shouldReceive('dispatch')
+            ->with('creating: name', m::type('array'))
+            ->once();
+
+        $view = m::mock(View::class);
+        $view->shouldReceive('name')->once()->andReturn('name');
+
+        $factory->creator('*', fn () => true);
+
+        $factory->callCreator($view);
+    }
+
+    public function testCallCreatorsDoesDispatchEventsWhenIsNecessaryUsingNormalizedNames()
+    {
+        $factory = $this->getFactory();
+        $factory->getDispatcher()
+            ->shouldReceive('listen')
+            ->with('creating: components.button', m::type(Closure::class))
+            ->once();
+
+        $factory->getDispatcher()
+            ->shouldReceive('dispatch')
+            ->with('creating: components/button', m::type('array'))
+            ->once();
+
+        $view = m::mock(View::class);
+        $view->shouldReceive('name')->twice()->andReturn('components/button');
+
+        $factory->creator('components.button', fn () => true);
+
+        $factory->callCreator($view);
+    }
+
+    public function testCallComposersDoesNotDispatchEventsWhenIsNotNecessary()
+    {
+        $factory = $this->getFactory();
+        $factory->getDispatcher()->shouldReceive('listen')->never();
+        $factory->getDispatcher()->shouldReceive('dispatch')->never();
+
+        $view = m::mock(View::class);
+        $view->shouldReceive('name')->once()->andReturn('name');
+
+        $factory->callComposer($view);
+    }
+
+    public function testCallComposerDoesDispatchEventsWhenIsNecessary()
+    {
+        $factory = $this->getFactory();
+        $factory->getDispatcher()
+            ->shouldReceive('listen')
+            ->with('composing: name', m::type(Closure::class))
+            ->once();
+
+        $factory->getDispatcher()
+            ->shouldReceive('dispatch')
+            ->with('composing: name', m::type('array'))
+            ->once();
+
+        $view = m::mock(View::class);
+        $view->shouldReceive('name')->twice()->andReturn('name');
+
+        $factory->composer('name', fn () => true);
+
+        $factory->callComposer($view);
+    }
+
+    public function testCallComposersDoesDispatchEventsWhenIsNecessaryUsingWildcards()
+    {
+        $factory = $this->getFactory();
+        $factory->getDispatcher()
+            ->shouldReceive('listen')
+            ->with('composing: *', m::type(Closure::class))
+            ->once();
+
+        $factory->getDispatcher()
+            ->shouldReceive('dispatch')
+            ->with('composing: name', m::type('array'))
+            ->once();
+
+        $view = m::mock(View::class);
+        $view->shouldReceive('name')->once()->andReturn('name');
+
+        $factory->composer('*', fn () => true);
+
+        $factory->callComposer($view);
+    }
+
+    public function testCallComposersDoesDispatchEventsWhenIsNecessaryUsingNormalizedNames()
+    {
+        $factory = $this->getFactory();
+        $factory->getDispatcher()
+            ->shouldReceive('listen')
+            ->with('composing: components.button', m::type(Closure::class))
+            ->once();
+
+        $factory->getDispatcher()
+            ->shouldReceive('dispatch')
+            ->with('composing: components/button', m::type('array'))
+            ->once();
+
+        $view = m::mock(View::class);
+        $view->shouldReceive('name')->twice()->andReturn('components/button');
+
+        $factory->composer('components.button', fn () => true);
+
+        $factory->callComposer($view);
+    }
+
     public function testComposersAreProperlyRegistered()
     {
         $factory = $this->getFactory();
@@ -244,7 +394,15 @@ class ViewFactoryTest extends TestCase
     {
         $factory = $this->getFactory();
         $view = m::mock(View::class);
-        $view->shouldReceive('name')->once()->andReturn('name');
+        $dispatcher = m::mock(DispatcherContract::class);
+        $factory->setDispatcher($dispatcher);
+
+        $dispatcher->shouldReceive('listen', m::any())->once();
+
+        $view->shouldReceive('name')->twice()->andReturn('name');
+
+        $factory->composer('name', fn () => true);
+
         $factory->getDispatcher()->shouldReceive('dispatch')->once()->with('composing: name', [$view]);
 
         $factory->callComposer($view);
@@ -589,7 +747,7 @@ class ViewFactoryTest extends TestCase
         $factory->getEngineResolver()->shouldReceive('resolve')->twice()->andReturn($engine);
         $factory->getFinder()->shouldReceive('find')->once()->with('layout')->andReturn(__DIR__.'/fixtures/section-exception-layout.php');
         $factory->getFinder()->shouldReceive('find')->once()->with('view')->andReturn(__DIR__.'/fixtures/section-exception.php');
-        $factory->getDispatcher()->shouldReceive('dispatch')->times(4);
+        $factory->getDispatcher()->shouldReceive('dispatch')->never();
 
         $factory->make('view')->render();
     }

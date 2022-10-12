@@ -4,10 +4,25 @@ namespace Illuminate\View\Concerns;
 
 use Closure;
 use Illuminate\Contracts\View\View as ViewContract;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 trait ManagesEvents
 {
+    /**
+     * An array of views and whether they have registered "creators".
+     *
+     * @var array<string, true>|true
+     */
+    protected $shouldCallCreators = [];
+
+    /**
+     * An array of views and whether they have registered "composers".
+     *
+     * @var array<string, true>|true
+     */
+    protected $shouldCallComposers = [];
+
     /**
      * Register a view creator event.
      *
@@ -17,6 +32,16 @@ trait ManagesEvents
      */
     public function creator($views, $callback)
     {
+        if (is_array($this->shouldCallCreators)) {
+            if ($views == '*') {
+                $this->shouldCallCreators = true;
+            } else {
+                foreach (Arr::wrap($views) as $view) {
+                    $this->shouldCallCreators[$this->normalizeName($view)] = true;
+                }
+            }
+        }
+
         $creators = [];
 
         foreach ((array) $views as $view) {
@@ -52,6 +77,16 @@ trait ManagesEvents
      */
     public function composer($views, $callback)
     {
+        if (is_array($this->shouldCallComposers)) {
+            if ($views == '*') {
+                $this->shouldCallComposers = true;
+            } else {
+                foreach (Arr::wrap($views) as $view) {
+                    $this->shouldCallComposers[$this->normalizeName($view)] = true;
+                }
+            }
+        }
+
         $composers = [];
 
         foreach ((array) $views as $view) {
@@ -174,7 +209,11 @@ trait ManagesEvents
      */
     public function callComposer(ViewContract $view)
     {
-        $this->events->dispatch('composing: '.$view->name(), [$view]);
+        if ($this->shouldCallComposers === true || isset($this->shouldCallComposers[
+            $this->normalizeName($view->name())
+        ])) {
+            $this->events->dispatch('composing: '.$view->name(), [$view]);
+        }
     }
 
     /**
@@ -185,6 +224,10 @@ trait ManagesEvents
      */
     public function callCreator(ViewContract $view)
     {
-        $this->events->dispatch('creating: '.$view->name(), [$view]);
+        if ($this->shouldCallCreators === true || isset($this->shouldCallCreators[
+            $this->normalizeName((string) $view->name())
+        ])) {
+            $this->events->dispatch('creating: '.$view->name(), [$view]);
+        }
     }
 }
