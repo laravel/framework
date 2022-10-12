@@ -150,6 +150,13 @@ class MigrateCommand extends BaseCommand
                     return $this->createMissingMysqlDatabase($connection);
                 }
 
+                if (
+                    $e->getPrevious() instanceof PDOException &&
+                    $e->getPrevious()->getCode() === 7 &&
+                    $connection->getDriverName() === 'pgsql') {
+                    return $this->createFriendlyPostgresqlDatabaseError($connection);
+                }
+
                 return false;
             } catch (Throwable) {
                 return false;
@@ -218,6 +225,26 @@ class MigrateCommand extends BaseCommand
         } finally {
             $this->laravel['config']->set("database.connections.{$connection->getName()}.database", $connection->getDatabaseName());
         }
+    }
+
+    /**
+     * Create a missing friendly PostgreSQL database missing error message.
+     *
+     * @return bool
+     */
+    protected function createFriendlyPostgresqlDatabaseError($connection)
+    {
+        if ($this->laravel['config']->get("database.connections.{$connection->getName()}.database") !== $connection->getDatabaseName()) {
+            return false;
+        }
+
+        if (! $this->option('force') && ! $this->option('no-interaction')) {
+            $this->components->warn("The database '{$connection->getDatabaseName()}' does not exist on the '{$connection->getName()}' connection.");
+
+            $this->components->warn("Create your database'{$connection->getDatabaseName()}' first, then run this command again.");
+            exit();
+        }
+        exit();
     }
 
     /**
