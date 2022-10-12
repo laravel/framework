@@ -394,6 +394,26 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile the SQL needed to retrieve all table names.
+     *
+     * @return string
+     */
+    public function compileGetAllTables()
+    {
+        return "select name, type from sys.tables where type = 'U'";
+    }
+
+    /**
+     * Compile the SQL needed to retrieve all view names.
+     *
+     * @return string
+     */
+    public function compileGetAllViews()
+    {
+        return "select name, type from sys.objects where type = 'V'";
+    }
+
+    /**
      * Create the column definition for a char type.
      *
      * @param  \Illuminate\Support\Fluent  $column

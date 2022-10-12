@@ -12,13 +12,8 @@ use Illuminate\Validation\ValidationServiceProvider;
 use Illuminate\Validation\Validator;
 use PHPUnit\Framework\TestCase;
 
-if (PHP_VERSION_ID >= 80100) {
-    include 'Enums.php';
-}
+include 'Enums.php';
 
-/**
- * @requires PHP >= 8.1
- */
 class ValidationEnumRuleTest extends TestCase
 {
     public function testvalidationPassesWhenPassingCorrectEnum()
@@ -32,6 +27,21 @@ class ValidationEnumRuleTest extends TestCase
             [
                 'status' => new Enum(StringStatus::class),
                 'int_status' => new Enum(IntegerStatus::class),
+            ]
+        );
+
+        $this->assertFalse($v->fails());
+    }
+
+    public function testvalidationPassesWhenPassingInstanceOfEnum()
+    {
+        $v = new Validator(
+            resolve('translator'),
+            [
+                'status' => StringStatus::done,
+            ],
+            [
+                'status' => new Enum(StringStatus::class),
             ]
         );
 

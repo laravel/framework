@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Routing;
 
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Exceptions\InvalidSignatureException;
 use Illuminate\Routing\Middleware\ValidateSignature;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Route;
@@ -250,6 +251,35 @@ class UrlSigningTest extends TestCase
 
         $response = $this->get('/foo/relative');
         $response->assertStatus(403);
+    }
+
+    public function testSignedMiddlewareIgnoringParameter()
+    {
+        Route::get('/foo/{id}}', function (Request $request, $id) {
+        })->name('foo')->middleware('signed:relative');
+
+        $this->assertIsString($url = URL::signedRoute('foo', ['id' => 1]).'&ignore=me');
+        $request = Request::create($url);
+        $middleware = $this->createValidateSignatureMiddleware(['ignore']);
+
+        try {
+            $middleware->handle($request, function ($request) {
+                $this->assertTrue($request->hasValidSignatureWhileIgnoring(['ignore']));
+            });
+        } catch (InvalidSignatureException $exception) {
+            $this->fail($exception->getMessage());
+        }
+    }
+
+    protected function createValidateSignatureMiddleware(array $ignore)
+    {
+        return new class($ignore) extends ValidateSignature
+        {
+            public function __construct(array $ignore)
+            {
+                $this->ignore = $ignore;
+            }
+        };
     }
 }
 

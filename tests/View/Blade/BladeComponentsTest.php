@@ -2,7 +2,9 @@
 
 namespace Illuminate\Tests\View\Blade;
 
+use Illuminate\View\Component;
 use Illuminate\View\ComponentAttributeBag;
+use Illuminate\View\Factory;
 use Mockery as m;
 
 class BladeComponentsTest extends AbstractBladeTestCase
@@ -56,11 +58,11 @@ class BladeComponentsTest extends AbstractBladeTestCase
     {
         $attributes = new ComponentAttributeBag(['foo' => 'baz', 'other' => 'ok']);
 
-        $component = m::mock(\Illuminate\View\Component::class);
+        $component = m::mock(Component::class);
         $component->shouldReceive('withName', 'test');
         $component->shouldReceive('shouldRender')->andReturn(false);
 
-        $__env = m::mock(\Illuminate\View\Factory::class);
+        $__env = m::mock(Factory::class);
         $__env->shouldReceive('getContainer->make')->with('Test', ['foo' => 'bar', 'other' => 'ok'])->andReturn($component);
 
         $template = $this->compiler->compileString('@component(\'Test::class\', \'test\', ["foo" => "bar"])');

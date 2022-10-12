@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support;
 
+use ArgumentCountError;
 use ArrayAccess;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
@@ -25,7 +26,7 @@ class Arr
      * Add an element to an array using "dot" notation if it doesn't exist.
      *
      * @param  array  $array
-     * @param  string  $key
+     * @param  string|int|float  $key
      * @param  mixed  $value
      * @return array
      */
@@ -142,7 +143,7 @@ class Arr
      * Get all of the given array except for a specified array of keys.
      *
      * @param  array  $array
-     * @param  array|string  $keys
+     * @param  array|string|int|float  $keys
      * @return array
      */
     public static function except($array, $keys)
@@ -167,6 +168,10 @@ class Arr
 
         if ($array instanceof ArrayAccess) {
             return $array->offsetExists($key);
+        }
+
+        if (is_float($key)) {
+            $key = (string) $key;
         }
 
         return array_key_exists($key, $array);
@@ -252,7 +257,7 @@ class Arr
      * Remove one or many array items from a given array using "dot" notation.
      *
      * @param  array  $array
-     * @param  array|string  $keys
+     * @param  array|string|int|float  $keys
      * @return void
      */
     public static function forget(&$array, $keys)
@@ -281,7 +286,7 @@ class Arr
             while (count($parts) > 1) {
                 $part = array_shift($parts);
 
-                if (isset($array[$part]) && is_array($array[$part])) {
+                if (isset($array[$part]) && static::accessible($array[$part])) {
                     $array = &$array[$part];
                 } else {
                     continue 2;
@@ -405,9 +410,7 @@ class Arr
      */
     public static function isAssoc(array $array)
     {
-        $keys = array_keys($array);
-
-        return array_keys($keys) !== $keys;
+        return ! array_is_list($array);
     }
 
     /**
@@ -420,7 +423,60 @@ class Arr
      */
     public static function isList($array)
     {
-        return ! self::isAssoc($array);
+        return array_is_list($array);
+    }
+
+    /**
+     * Join all items using a string. The final items can use a separate glue string.
+     *
+     * @param  array  $array
+     * @param  string  $glue
+     * @param  string  $finalGlue
+     * @return string
+     */
+    public static function join($array, $glue, $finalGlue = '')
+    {
+        if ($finalGlue === '') {
+            return implode($glue, $array);
+        }
+
+        if (count($array) === 0) {
+            return '';
+        }
+
+        if (count($array) === 1) {
+            return end($array);
+        }
+
+        $finalItem = array_pop($array);
+
+        return implode($glue, $array).$finalGlue.$finalItem;
+    }
+
+    /**
+     * Key an associative array by a field or using a callback.
+     *
+     * @param  array  $array
+     * @param  callable|array|string  $keyBy
+     * @return array
+     */
+    public static function keyBy($array, $keyBy)
+    {
+        return Collection::make($array)->keyBy($keyBy)->all();
+    }
+
+    /**
+     * Prepend the key names of an associative array.
+     *
+     * @param  array  $array
+     * @param  string  $prependWith
+     * @return array
+     */
+    public static function prependKeysWith($array, $prependWith)
+    {
+        return Collection::make($array)->mapWithKeys(function ($item, $key) use ($prependWith) {
+            return [$prependWith.$key => $item];
+        })->all();
     }
 
     /**
@@ -488,6 +544,26 @@ class Arr
     }
 
     /**
+     * Run a map over each of the items in the array.
+     *
+     * @param  array  $array
+     * @param  callable  $callback
+     * @return array
+     */
+    public static function map(array $array, callable $callback)
+    {
+        $keys = array_keys($array);
+
+        try {
+            $items = array_map($callback, $array, $keys);
+        } catch (ArgumentCountError) {
+            $items = array_map($callback, $array);
+        }
+
+        return array_combine($keys, $items);
+    }
+
+    /**
      * Push an item onto the beginning of an array.
      *
      * @param  array  $array
@@ -510,7 +586,7 @@ class Arr
      * Get a value from the array, and remove it.
      *
      * @param  array  $array
-     * @param  string  $key
+     * @param  string|int  $key
      * @param  mixed  $default
      * @return mixed
      */
@@ -587,7 +663,7 @@ class Arr
      * If no key is given to the method, the entire array will be replaced.
      *
      * @param  array  $array
-     * @param  string|null  $key
+     * @param  string|int|null  $key
      * @param  mixed  $value
      * @return array
      */
@@ -669,7 +745,7 @@ class Arr
             }
         }
 
-        if (static::isAssoc($array)) {
+        if (! array_is_list($array)) {
             $descending
                     ? krsort($array, $options)
                     : ksort($array, $options);

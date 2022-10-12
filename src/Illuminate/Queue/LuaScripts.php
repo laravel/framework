@@ -106,7 +106,7 @@ LUA;
     {
         return <<<'LUA'
 -- Get all of the jobs with an expired "score"...
-local val = redis.call('zrangebyscore', KEYS[1], '-inf', ARGV[1])
+local val = redis.call('zrangebyscore', KEYS[1], '-inf', ARGV[1], 'limit', 0, ARGV[2])
 
 -- If we have values in the array, we will remove them from the first queue
 -- and add them onto the destination queue in chunks of 100, which moves

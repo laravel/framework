@@ -14,8 +14,10 @@ use League\Flysystem\FilesystemAdapter as FlysystemAdapter;
 use League\Flysystem\Ftp\FtpAdapter;
 use League\Flysystem\Ftp\FtpConnectionOptions;
 use League\Flysystem\Local\LocalFilesystemAdapter as LocalAdapter;
+use League\Flysystem\PathPrefixing\PathPrefixedAdapter;
 use League\Flysystem\PhpseclibV3\SftpAdapter;
 use League\Flysystem\PhpseclibV3\SftpConnectionProvider;
+use League\Flysystem\ReadOnly\ReadOnlyFilesystemAdapter;
 use League\Flysystem\UnixVisibility\PortableVisibilityConverter;
 use League\Flysystem\Visibility;
 
@@ -128,7 +130,7 @@ class FilesystemManager implements FactoryContract
      */
     protected function resolve($name, $config = null)
     {
-        $config = $config ?? $this->getConfig($name);
+        $config ??= $this->getConfig($name);
 
         if (empty($config['driver'])) {
             throw new InvalidArgumentException("Disk [{$name}] does not have a configured driver.");
@@ -242,7 +244,7 @@ class FilesystemManager implements FactoryContract
 
         $client = new S3Client($s3Config);
 
-        $adapter = new S3Adapter($client, $s3Config['bucket'], $root, $visibility, null, [], $streamReads);
+        $adapter = new S3Adapter($client, $s3Config['bucket'], $root, $visibility, null, $config['options'] ?? [], $streamReads);
 
         return new AwsS3V3Adapter(
             $this->createFlysystem($adapter, $config), $adapter, $s3Config, $client
@@ -267,6 +269,26 @@ class FilesystemManager implements FactoryContract
     }
 
     /**
+     * Create a scoped driver.
+     *
+     * @param  array  $config
+     * @return \Illuminate\Contracts\Filesystem\Filesystem
+     */
+    public function createScopedDriver(array $config)
+    {
+        if (empty($config['disk'])) {
+            throw new InvalidArgumentException('Scoped disk is missing "disk" configuration option.');
+        } elseif (empty($config['prefix'])) {
+            throw new InvalidArgumentException('Scoped disk is missing "prefix" configuration option.');
+        }
+
+        return $this->build(tap(
+            $this->getConfig($config['disk']),
+            fn (&$parent) => $parent['prefix'] = $config['prefix']
+        ));
+    }
+
+    /**
      * Create a Flysystem instance with the given adapter.
      *
      * @param  \League\Flysystem\FilesystemAdapter  $adapter
@@ -275,6 +297,14 @@ class FilesystemManager implements FactoryContract
      */
     protected function createFlysystem(FlysystemAdapter $adapter, array $config)
     {
+        if ($config['read-only'] ?? false === true) {
+            $adapter = new ReadOnlyFilesystemAdapter($adapter);
+        }
+
+        if (! empty($config['prefix'])) {
+            $adapter = new PathPrefixedAdapter($adapter, $config['prefix']);
+        }
+
         return new Flysystem($adapter, Arr::only($config, [
             'directory_visibility',
             'disable_asserts',
@@ -352,7 +382,7 @@ class FilesystemManager implements FactoryContract
      */
     public function purge($name = null)
     {
-        $name = $name ?? $this->getDefaultDriver();
+        $name ??= $this->getDefaultDriver();
 
         unset($this->disks[$name]);
     }

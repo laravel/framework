@@ -3,11 +3,14 @@
 namespace Illuminate\Filesystem;
 
 use Aws\S3\S3Client;
+use Illuminate\Support\Traits\Conditionable;
 use League\Flysystem\AwsS3V3\AwsS3V3Adapter as S3Adapter;
 use League\Flysystem\FilesystemOperator;
 
 class AwsS3V3Adapter extends FilesystemAdapter
 {
+    use Conditionable;
+
     /**
      * The AWS S3 client.
      *
@@ -54,6 +57,16 @@ class AwsS3V3Adapter extends FilesystemAdapter
     }
 
     /**
+     * Determine if temporary URLs can be generated.
+     *
+     * @return bool
+     */
+    public function providesTemporaryUrls()
+    {
+        return true;
+    }
+
+    /**
      * Get a temporary URL for the file at the given path.
      *
      * @param  string  $path
@@ -69,7 +82,7 @@ class AwsS3V3Adapter extends FilesystemAdapter
         ], $options));
 
         $uri = $this->client->createPresignedRequest(
-            $command, $expiration
+            $command, $expiration, $options
         )->getUri();
 
         // If an explicit base URL has been set on the disk configuration then we will use
@@ -80,5 +93,15 @@ class AwsS3V3Adapter extends FilesystemAdapter
         }
 
         return (string) $uri;
+    }
+
+    /**
+     * Get the underlying S3 client.
+     *
+     * @return \Aws\S3\S3Client
+     */
+    public function getClient()
+    {
+        return $this->client;
     }
 }

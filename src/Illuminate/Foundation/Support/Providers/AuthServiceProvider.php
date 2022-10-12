@@ -10,7 +10,7 @@ class AuthServiceProvider extends ServiceProvider
     /**
      * The policy mappings for the application.
      *
-     * @var array
+     * @var array<class-string, class-string>
      */
     protected $policies = [];
 
@@ -21,15 +21,15 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function registerPolicies()
     {
-        foreach ($this->policies() as $key => $value) {
-            Gate::policy($key, $value);
+        foreach ($this->policies() as $model => $policy) {
+            Gate::policy($model, $policy);
         }
     }
 
     /**
      * Get the policies defined on the provider.
      *
-     * @return array
+     * @return array<class-string, class-string>
      */
     public function policies()
     {

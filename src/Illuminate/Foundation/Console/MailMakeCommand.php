@@ -5,8 +5,10 @@ namespace Illuminate\Foundation\Console;
 use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Str;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
 
+#[AsCommand(name: 'make:mail')]
 class MailMakeCommand extends GeneratorCommand
 {
     use CreatesMatchingTest;
@@ -17,15 +19,6 @@ class MailMakeCommand extends GeneratorCommand
      * @var string
      */
     protected $name = 'make:mail';
-
-    /**
-     * The name of the console command.
-     *
-     * This name is used to identify the command during lazy loading.
-     *
-     * @var string|null
-     */
-    protected static $defaultName = 'make:mail';
 
     /**
      * The console command description.
@@ -102,7 +95,11 @@ class MailMakeCommand extends GeneratorCommand
         $view = $this->option('markdown');
 
         if (! $view) {
-            $view = 'mail.'.Str::kebab(class_basename($this->argument('name')));
+            $name = str_replace('\\', '/', $this->argument('name'));
+
+            $view = 'mail.'.collect(explode('/', $name))
+                ->map(fn ($part) => Str::kebab($part))
+                ->implode('.');
         }
 
         return $view;
@@ -154,7 +151,6 @@ class MailMakeCommand extends GeneratorCommand
     {
         return [
             ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the mailable already exists'],
-
             ['markdown', 'm', InputOption::VALUE_OPTIONAL, 'Create a new Markdown template for the mailable', false],
         ];
     }

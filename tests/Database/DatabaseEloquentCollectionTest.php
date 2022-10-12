@@ -2,9 +2,11 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Support\Collection as BaseCollection;
 use LogicException;
 use Mockery as m;
@@ -13,8 +15,51 @@ use stdClass;
 
 class DatabaseEloquentCollectionTest extends TestCase
 {
+    /**
+     * Setup the database schema.
+     *
+     * @return void
+     */
+    protected function setUp(): void
+    {
+        $db = new DB;
+
+        $db->addConnection([
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+        ]);
+
+        $db->bootEloquent();
+        $db->setAsGlobal();
+
+        $this->createSchema();
+    }
+
+    protected function createSchema()
+    {
+        $this->schema()->create('users', function ($table) {
+            $table->increments('id');
+            $table->string('email')->unique();
+        });
+
+        $this->schema()->create('articles', function ($table) {
+            $table->increments('id');
+            $table->integer('user_id');
+            $table->string('title');
+        });
+
+        $this->schema()->create('comments', function ($table) {
+            $table->increments('id');
+            $table->integer('article_id');
+            $table->string('content');
+        });
+    }
+
     protected function tearDown(): void
     {
+        $this->schema()->drop('users');
+        $this->schema()->drop('articles');
+        $this->schema()->drop('comments');
         m::close();
     }
 
@@ -536,6 +581,54 @@ class DatabaseEloquentCollectionTest extends TestCase
         $c = new Collection;
         $c->toQuery();
     }
+
+    public function testLoadExistsShouldCastBool()
+    {
+        $this->seedData();
+        $user = EloquentTestUserModel::with('articles')->first();
+        $user->articles->loadExists('comments');
+        $commentsExists = $user->articles->pluck('comments_exists')->toArray();
+        $this->assertContainsOnly('bool', $commentsExists);
+    }
+
+    /**
+     * Helpers...
+     */
+    protected function seedData()
+    {
+        $user = EloquentTestUserModel::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+
+        EloquentTestArticleModel::query()->insert([
+            ['user_id' => 1, 'title' => 'Another title'],
+            ['user_id' => 1, 'title' => 'Another title'],
+            ['user_id' => 1, 'title' => 'Another title'],
+        ]);
+
+        EloquentTestCommentModel::query()->insert([
+            ['article_id' => 1, 'content' => 'Another comment'],
+            ['article_id' => 2, 'content' => 'Another comment'],
+        ]);
+    }
+
+    /**
+     * Get a database connection instance.
+     *
+     * @return \Illuminate\Database\ConnectionInterface
+     */
+    protected function connection()
+    {
+        return Eloquent::getConnectionResolver()->connection();
+    }
+
+    /**
+     * Get a schema builder instance.
+     *
+     * @return \Illuminate\Database\Schema\Builder
+     */
+    protected function schema()
+    {
+        return $this->connection()->getSchemaBuilder();
+    }
 }
 
 class TestEloquentCollectionModel extends Model
@@ -547,4 +640,35 @@ class TestEloquentCollectionModel extends Model
     {
         return 'test';
     }
+}
+
+class EloquentTestUserModel extends Model
+{
+    protected $table = 'users';
+    protected $guarded = [];
+    public $timestamps = false;
+
+    public function articles()
+    {
+        return $this->hasMany(EloquentTestArticleModel::class, 'user_id');
+    }
+}
+
+class EloquentTestArticleModel extends Model
+{
+    protected $table = 'articles';
+    protected $guarded = [];
+    public $timestamps = false;
+
+    public function comments()
+    {
+        return $this->hasMany(EloquentTestCommentModel::class, 'article_id');
+    }
+}
+
+class EloquentTestCommentModel extends Model
+{
+    protected $table = 'comments';
+    protected $guarded = [];
+    public $timestamps = false;
 }

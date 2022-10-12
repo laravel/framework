@@ -5,13 +5,8 @@ namespace Illuminate\Tests\Integration\Routing;
 use Illuminate\Support\Facades\Route;
 use Orchestra\Testbench\TestCase;
 
-if (PHP_VERSION_ID >= 80100) {
-    include 'Enums.php';
-}
+include 'Enums.php';
 
-/**
- * @requires PHP >= 8.1
- */
 class ImplicitBackedEnumRouteBindingTest extends TestCase
 {
     public function testWithRouteCachingEnabled()

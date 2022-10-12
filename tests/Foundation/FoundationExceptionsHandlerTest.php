@@ -7,21 +7,26 @@ use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Routing\ResponseFactory as ResponseFactoryContract;
 use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler;
+use Illuminate\Foundation\Testing\Concerns\InteractsWithExceptionHandling;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Routing\ResponseFactory;
 use Illuminate\Support\MessageBag;
+use Illuminate\Testing\Assert;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
+use InvalidArgumentException;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery as m;
+use OutOfRangeException;
+use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use RuntimeException;
 use stdClass;
 use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
@@ -32,6 +37,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 class FoundationExceptionsHandlerTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
+    use InteractsWithExceptionHandling;
 
     protected $config;
 
@@ -49,16 +55,12 @@ class FoundationExceptionsHandlerTest extends TestCase
 
         $this->container = Container::setInstance(new Container);
 
-        $this->container->singleton('config', function () {
-            return $this->config;
-        });
+        $this->container->instance('config', $this->config);
 
-        $this->container->singleton(ResponseFactoryContract::class, function () {
-            return new ResponseFactory(
-                m::mock(Factory::class),
-                m::mock(Redirector::class)
-            );
-        });
+        $this->container->instance(ResponseFactoryContract::class, new ResponseFactory(
+            m::mock(ViewFactory::class),
+            m::mock(Redirector::class)
+        ));
 
         $this->handler = new Handler($this->container);
     }
@@ -95,6 +97,34 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->handler->report(new UnReportableException('Exception message'));
     }
 
+    public function testHandlerReportsExceptionWithCustomLogLevel()
+    {
+        $logger = m::mock(LoggerInterface::class);
+        $this->container->instance(LoggerInterface::class, $logger);
+
+        $logger->shouldReceive('critical')->withArgs(['Critical message', m::hasKey('exception')])->once();
+        $logger->shouldReceive('error')->withArgs(['Error message', m::hasKey('exception')])->once();
+        $logger->shouldReceive('log')->withArgs(['custom', 'Custom message', m::hasKey('exception')])->once();
+
+        $this->handler->level(InvalidArgumentException::class, LogLevel::CRITICAL);
+        $this->handler->level(OutOfRangeException::class, 'custom');
+
+        $this->handler->report(new InvalidArgumentException('Critical message'));
+        $this->handler->report(new RuntimeException('Error message'));
+        $this->handler->report(new OutOfRangeException('Custom message'));
+    }
+
+    public function testHandlerIgnoresNotReportableExceptions()
+    {
+        $logger = m::mock(LoggerInterface::class);
+        $this->container->instance(LoggerInterface::class, $logger);
+        $logger->shouldNotReceive('log');
+
+        $this->handler->ignore(RuntimeException::class);
+
+        $this->handler->report(new RuntimeException('Exception message'));
+    }
+
     public function testHandlerCallsReportMethodWithDependencies()
     {
         $reporter = m::mock(ReportingService::class);
@@ -103,7 +133,7 @@ class FoundationExceptionsHandlerTest extends TestCase
 
         $logger = m::mock(LoggerInterface::class);
         $this->container->instance(LoggerInterface::class, $logger);
-        $logger->shouldNotReceive('error');
+        $logger->shouldNotReceive('log');
 
         $this->handler->report(new ReportableException('Exception message'));
     }
@@ -115,7 +145,7 @@ class FoundationExceptionsHandlerTest extends TestCase
 
         $logger = m::mock(LoggerInterface::class);
         $this->container->instance(LoggerInterface::class, $logger);
-        $logger->shouldNotReceive('error');
+        $logger->shouldNotReceive('log');
 
         $this->handler->reportable(new CustomReporter($reporter));
 
@@ -265,7 +295,7 @@ class FoundationExceptionsHandlerTest extends TestCase
 
         $logger = m::mock(LoggerInterface::class);
         $this->container->instance(LoggerInterface::class, $logger);
-        $logger->shouldNotReceive('error');
+        $logger->shouldNotReceive('log');
 
         $this->handler->report(new SuspiciousOperationException('Invalid method override "__CONSTRUCT"'));
     }
@@ -282,7 +312,7 @@ class FoundationExceptionsHandlerTest extends TestCase
 
         $logger = m::mock(LoggerInterface::class);
         $this->container->instance(LoggerInterface::class, $logger);
-        $logger->shouldNotReceive('error');
+        $logger->shouldNotReceive('log');
 
         $this->handler->report(new RecordsNotFoundException);
     }
@@ -292,9 +322,7 @@ class FoundationExceptionsHandlerTest extends TestCase
         $viewFactory = m::mock(stdClass::class);
         $viewFactory->shouldReceive('exists')->with('errors::502')->andReturn(true);
 
-        $this->container->singleton(ViewFactory::class, function () use ($viewFactory) {
-            return $viewFactory;
-        });
+        $this->container->instance(ViewFactory::class, $viewFactory);
 
         $handler = new class($this->container) extends Handler
         {
@@ -313,9 +341,7 @@ class FoundationExceptionsHandlerTest extends TestCase
         $viewFactory->shouldReceive('exists')->once()->with('errors::502')->andReturn(false);
         $viewFactory->shouldReceive('exists')->once()->with('errors::5xx')->andReturn(true);
 
-        $this->container->singleton(ViewFactory::class, function () use ($viewFactory) {
-            return $viewFactory;
-        });
+        $this->container->instance(ViewFactory::class, $viewFactory);
 
         $handler = new class($this->container) extends Handler
         {
@@ -334,9 +360,7 @@ class FoundationExceptionsHandlerTest extends TestCase
         $viewFactory->shouldReceive('exists')->once()->with('errors::404')->andReturn(false);
         $viewFactory->shouldReceive('exists')->once()->with('errors::4xx')->andReturn(false);
 
-        $this->container->singleton(ViewFactory::class, function () use ($viewFactory) {
-            return $viewFactory;
-        });
+        $this->container->instance(ViewFactory::class, $viewFactory);
 
         $handler = new class($this->container) extends Handler
         {
@@ -347,6 +371,54 @@ class FoundationExceptionsHandlerTest extends TestCase
         };
 
         $this->assertNull($handler->getErrorView(new HttpException(404)));
+    }
+
+    public function testAssertExceptionIsThrown()
+    {
+        $this->assertThrows(function () {
+            throw new Exception;
+        });
+        $this->assertThrows(function () {
+            throw new CustomException;
+        });
+        $this->assertThrows(function () {
+            throw new CustomException;
+        }, CustomException::class);
+        $this->assertThrows(function () {
+            throw new Exception('Some message.');
+        }, expectedMessage: 'Some message.');
+        $this->assertThrows(function () {
+            throw new CustomException('Some message.');
+        }, expectedMessage: 'Some message.');
+        $this->assertThrows(function () {
+            throw new CustomException('Some message.');
+        }, expectedClass: CustomException::class, expectedMessage: 'Some message.');
+
+        try {
+            $this->assertThrows(function () {
+                throw new Exception;
+            }, CustomException::class);
+            $testFailed = true;
+        } catch (AssertionFailedError $exception) {
+            $testFailed = false;
+        }
+
+        if ($testFailed) {
+            Assert::fail('assertThrows failed: non matching exceptions are thrown.');
+        }
+
+        try {
+            $this->assertThrows(function () {
+                throw new Exception('Some message.');
+            }, expectedClass: Exception::class, expectedMessage: 'Other message.');
+            $testFailed = true;
+        } catch (AssertionFailedError $exception) {
+            $testFailed = false;
+        }
+
+        if ($testFailed) {
+            Assert::fail('assertThrows failed: non matching message are thrown.');
+        }
     }
 }
 

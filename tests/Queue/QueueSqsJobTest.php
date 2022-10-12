@@ -12,6 +12,24 @@ use stdClass;
 
 class QueueSqsJobTest extends TestCase
 {
+    protected $key;
+    protected $secret;
+    protected $service;
+    protected $region;
+    protected $account;
+    protected $queueName;
+    protected $baseUrl;
+    protected $releaseDelay;
+    protected $queueUrl;
+    protected $mockedSqsClient;
+    protected $mockedContainer;
+    protected $mockedJob;
+    protected $mockedData;
+    protected $mockedPayload;
+    protected $mockedMessageId;
+    protected $mockedReceiptHandle;
+    protected $mockedJobData;
+
     protected function setUp(): void
     {
         $this->key = 'AMAZONSQSKEY';

@@ -41,6 +41,8 @@ interface ExceptionHandler
      * @param  \Symfony\Component\Console\Output\OutputInterface  $output
      * @param  \Throwable  $e
      * @return void
+     *
+     * @internal This method is not meant to be used or overwritten outside the framework.
      */
     public function renderForConsole($output, Throwable $e);
 }

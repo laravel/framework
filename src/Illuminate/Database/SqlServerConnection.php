@@ -27,7 +27,7 @@ class SqlServerConnection extends Connection
     {
         for ($a = 1; $a <= $attempts; $a++) {
             if ($this->getDriverName() === 'sqlsrv') {
-                return parent::transaction($callback);
+                return parent::transaction($callback, $attempts);
             }
 
             $this->getPdo()->exec('BEGIN TRAN');

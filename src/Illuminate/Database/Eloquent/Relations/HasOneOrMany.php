@@ -98,8 +98,11 @@ abstract class HasOneOrMany extends Relation
     {
         $whereIn = $this->whereInMethod($this->parent, $this->localKey);
 
-        $this->getRelationQuery()->{$whereIn}(
-            $this->foreignKey, $this->getKeys($models, $this->localKey)
+        $this->whereInEager(
+            $whereIn,
+            $this->foreignKey,
+            $this->getKeys($models, $this->localKey),
+            $this->getRelationQuery()
         );
     }
 
@@ -308,6 +311,19 @@ abstract class HasOneOrMany extends Relation
 
             $instance->save();
         });
+    }
+
+    /**
+     * Create a new instance of the related model. Allow mass-assignment.
+     *
+     * @param  array  $attributes
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function forceCreate(array $attributes = [])
+    {
+        $attributes[$this->getForeignKeyName()] = $this->getParentKey();
+
+        return $this->related->forceCreate($attributes);
     }
 
     /**

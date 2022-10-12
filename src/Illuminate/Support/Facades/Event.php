@@ -17,12 +17,12 @@ use Illuminate\Support\Testing\Fakes\EventFake;
  * @method static void assertDispatchedTimes(string $event, int $times = 1)
  * @method static void assertNotDispatched(string|\Closure $event, callable|int $callback = null)
  * @method static void assertNothingDispatched()
- * @method static void assertListening(string $expectedEvent, string $expectedListener)
+ * @method static void assertListening(string $expectedEvent, string|array $expectedListener)
  * @method static void flush(string $event)
  * @method static void forget(string $event)
  * @method static void forgetPushed()
  * @method static void listen(\Closure|string|array $events, \Closure|string|array $listener = null)
- * @method static void push(string $event, array $payload = [])
+ * @method static void push(string $event, object|array $payload = [])
  * @method static void subscribe(object|string $subscriber)
  *
  * @see \Illuminate\Events\Dispatcher

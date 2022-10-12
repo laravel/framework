@@ -64,6 +64,36 @@ class EloquentModelTest extends DatabaseTestCase
         $this->assertTrue($user->wasChanged());
         $this->assertTrue($user->wasChanged('name'));
     }
+
+    public function testDiscardChanges()
+    {
+        $user = TestModel2::create([
+            'name' => $originalName = Str::random(), 'title' => Str::random(),
+        ]);
+
+        $this->assertEmpty($user->getDirty());
+        $this->assertEmpty($user->getChanges());
+        $this->assertFalse($user->isDirty());
+        $this->assertFalse($user->wasChanged());
+
+        $user->name = $overideName = Str::random();
+
+        $this->assertEquals(['name' => $overideName], $user->getDirty());
+        $this->assertEmpty($user->getChanges());
+        $this->assertTrue($user->isDirty());
+        $this->assertFalse($user->wasChanged());
+        $this->assertSame($originalName, $user->getOriginal('name'));
+        $this->assertSame($overideName, $user->getAttribute('name'));
+
+        $user->discardChanges();
+
+        $this->assertEmpty($user->getDirty());
+        $this->assertSame($originalName, $user->getOriginal('name'));
+        $this->assertSame($originalName, $user->getAttribute('name'));
+
+        $user->save();
+        $this->assertFalse($user->wasChanged());
+    }
 }
 
 class TestModel1 extends Model

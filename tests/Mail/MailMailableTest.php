@@ -2,11 +2,15 @@
 
 namespace Illuminate\Tests\Mail;
 
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Mail\Attachable;
 use Illuminate\Contracts\View\Factory;
+use Illuminate\Mail\Attachment;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailer;
 use Illuminate\Mail\Transport\ArrayTransport;
 use Mockery as m;
+use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
 
 class MailMailableTest extends TestCase
@@ -304,6 +308,13 @@ class MailMailableTest extends TestCase
         }
     }
 
+    public function testMailableSetsSubjectCorrectly()
+    {
+        $mailable = new WelcomeMailableStub;
+        $mailable->subject('foo');
+        $this->assertTrue($mailable->hasSubject('foo'));
+    }
+
     public function testItIgnoresDuplicatedRawAttachments()
     {
         $mailable = new WelcomeMailableStub;
@@ -445,6 +456,391 @@ class MailMailableTest extends TestCase
         $this->assertSame('hello@laravel.com', $sentMessage->getEnvelope()->getRecipients()[0]->getAddress());
         $this->assertStringContainsString('X-Priority: 1 (Highest)', $sentMessage->toString());
     }
+
+    public function testMailableMetadataGetsSent()
+    {
+        $view = m::mock(Factory::class);
+
+        $mailer = new Mailer('array', $view, new ArrayTransport);
+
+        $mailable = new WelcomeMailableStub;
+        $mailable->to('hello@laravel.com');
+        $mailable->from('taylor@laravel.com');
+        $mailable->html('test content');
+
+        $mailable->metadata('origin', 'test-suite');
+        $mailable->metadata('user_id', 1);
+
+        $sentMessage = $mailer->send($mailable);
+
+        $this->assertSame('hello@laravel.com', $sentMessage->getEnvelope()->getRecipients()[0]->getAddress());
+        $this->assertStringContainsString('X-Metadata-origin: test-suite', $sentMessage->toString());
+        $this->assertStringContainsString('X-Metadata-user_id: 1', $sentMessage->toString());
+    }
+
+    public function testMailableTagGetsSent()
+    {
+        $view = m::mock(Factory::class);
+
+        $mailer = new Mailer('array', $view, new ArrayTransport);
+
+        $mailable = new WelcomeMailableStub;
+        $mailable->to('hello@laravel.com');
+        $mailable->from('taylor@laravel.com');
+        $mailable->html('test content');
+
+        $mailable->tag('test');
+        $mailable->tag('foo');
+
+        $sentMessage = $mailer->send($mailable);
+
+        $this->assertSame('hello@laravel.com', $sentMessage->getEnvelope()->getRecipients()[0]->getAddress());
+        $this->assertStringContainsString('X-Tag: test', $sentMessage->toString());
+        $this->assertStringContainsString('X-Tag: foo', $sentMessage->toString());
+    }
+
+    public function testItCanAttachMultipleFiles()
+    {
+        $mailable = new WelcomeMailableStub;
+
+        $mailable->attachMany([
+            '/forge.svg',
+            '/vapor.svg' => ['as' => 'Vapor Logo.svg', 'mime' => 'text/css'],
+            new class() implements Attachable
+            {
+                public function toMailAttachment()
+                {
+                    return Attachment::fromPath('/foo.jpg')->as('bar')->withMime('image/png');
+                }
+            },
+        ]);
+
+        $this->assertCount(3, $mailable->attachments);
+        $this->assertSame([
+            'file' => '/forge.svg',
+            'options' => [],
+        ], $mailable->attachments[0]);
+        $this->assertSame([
+            'file' => '/vapor.svg',
+            'options' => [
+                'as' => 'Vapor Logo.svg',
+                'mime' => 'text/css',
+            ],
+        ], $mailable->attachments[1]);
+        $this->assertSame([
+            'file' => '/foo.jpg',
+            'options' => [
+                'as' => 'bar',
+                'mime' => 'image/png',
+            ],
+        ], $mailable->attachments[2]);
+    }
+
+    public function testItAttachesFilesViaAttachableContractFromPath()
+    {
+        $mailable = new WelcomeMailableStub;
+
+        $mailable->attach(new class() implements Attachable
+        {
+            public function toMailAttachment()
+            {
+                return Attachment::fromPath('/foo.jpg')->as('bar')->withMime('image/png');
+            }
+        });
+
+        $this->assertSame([
+            'file' => '/foo.jpg',
+            'options' => [
+                'as' => 'bar',
+                'mime' => 'image/png',
+            ],
+        ], $mailable->attachments[0]);
+    }
+
+    public function testItAttachesFilesViaAttachableContractFromData()
+    {
+        $mailable = new WelcomeMailableStub;
+
+        $mailable->attach(new class() implements Attachable
+        {
+            public function toMailAttachment()
+            {
+                return Attachment::fromData(fn () => 'bar', 'foo.jpg')->withMime('image/png');
+            }
+        });
+
+        $this->assertSame([
+            'data' => 'bar',
+            'name' => 'foo.jpg',
+            'options' => [
+                'mime' => 'image/png',
+            ],
+        ], $mailable->rawAttachments[0]);
+    }
+
+    public function testItCanCheckForPathBasedAttachments()
+    {
+        $mailable = new WelcomeMailableStub;
+        $mailable->attach('foo.jpg');
+
+        $this->assertTrue($mailable->hasAttachment('foo.jpg'));
+        $this->assertTrue($mailable->hasAttachment(Attachment::fromPath('foo.jpg')));
+        $this->assertTrue($mailable->hasAttachment(new MailTestAttachable(Attachment::fromPath('foo.jpg'))));
+
+        $this->assertFalse($mailable->hasAttachment('bar.jpg'));
+        $this->assertFalse($mailable->hasAttachment(Attachment::fromPath('bar.jpg')));
+        $this->assertFalse($mailable->hasAttachment(new MailTestAttachable(Attachment::fromPath('bar.jpg'))));
+
+        $this->assertFalse($mailable->hasAttachment('foo.jpg', ['mime' => 'text/css']));
+        $this->assertFalse($mailable->hasAttachment(Attachment::fromPath('foo.jpg')->withMime('text/css')));
+        $this->assertFalse($mailable->hasAttachment(new MailTestAttachable(Attachment::fromPath('foo.jpg')->withMime('text/css'))));
+
+        $mailable = new WelcomeMailableStub;
+        $mailable->attach('bar.jpg', ['mime' => 'text/css']);
+
+        $this->assertTrue($mailable->hasAttachment('bar.jpg', ['mime' => 'text/css']));
+        $this->assertTrue($mailable->hasAttachment(Attachment::fromPath('bar.jpg')->withMime('text/css')));
+        $this->assertTrue($mailable->hasAttachment(new MailTestAttachable(Attachment::fromPath('bar.jpg')->withMime('text/css'))));
+
+        $this->assertFalse($mailable->hasAttachment('bar.jpg'));
+        $this->assertFalse($mailable->hasAttachment(Attachment::fromPath('bar.jpg')));
+        $this->assertFalse($mailable->hasAttachment(new MailTestAttachable(Attachment::fromPath('bar.jpg'))));
+
+        $this->assertFalse($mailable->hasAttachment('bar.jpg', ['mime' => 'text/html']));
+        $this->assertFalse($mailable->hasAttachment(Attachment::fromPath('bar.jpg')->withMime('text/html')));
+        $this->assertFalse($mailable->hasAttachment(new MailTestAttachable(Attachment::fromPath('bar.jpg')->withMime('text/html'))));
+    }
+
+    public function testItCanCheckForAttachmentBasedAttachments()
+    {
+        $mailable = new WelcomeMailableStub;
+        $mailable->attach(Attachment::fromPath('foo.jpg'));
+
+        $this->assertTrue($mailable->hasAttachment('foo.jpg'));
+        $this->assertTrue($mailable->hasAttachment(Attachment::fromPath('foo.jpg')));
+        $this->assertTrue($mailable->hasAttachment(new MailTestAttachable(Attachment::fromPath('foo.jpg'))));
+
+        $this->assertFalse($mailable->hasAttachment('bar.jpg'));
+        $this->assertFalse($mailable->hasAttachment(Attachment::fromPath('bar.jpg')));
+        $this->assertFalse($mailable->hasAttachment(new MailTestAttachable(Attachment::fromPath('bar.jpg'))));
+
+        $this->assertFalse($mailable->hasAttachment('foo.jpg', ['mime' => 'text/css']));
+        $this->assertFalse($mailable->hasAttachment(Attachment::fromPath('foo.jpg')->withMime('text/css')));
+        $this->assertFalse($mailable->hasAttachment(new MailTestAttachable(Attachment::fromPath('foo.jpg')->withMime('text/css'))));
+
+        $mailable = new WelcomeMailableStub;
+        $mailable->attach(Attachment::fromPath('bar.jpg')->withMime('text/css'));
+
+        $this->assertTrue($mailable->hasAttachment('bar.jpg', ['mime' => 'text/css']));
+        $this->assertTrue($mailable->hasAttachment(Attachment::fromPath('bar.jpg')->withMime('text/css')));
+        $this->assertTrue($mailable->hasAttachment(new MailTestAttachable(Attachment::fromPath('bar.jpg')->withMime('text/css'))));
+
+        $this->assertFalse($mailable->hasAttachment('bar.jpg'));
+        $this->assertFalse($mailable->hasAttachment(Attachment::fromPath('bar.jpg')));
+        $this->assertFalse($mailable->hasAttachment(new MailTestAttachable(Attachment::fromPath('bar.jpg'))));
+
+        $this->assertFalse($mailable->hasAttachment('bar.jpg', ['mime' => 'text/html']));
+        $this->assertFalse($mailable->hasAttachment(Attachment::fromPath('bar.jpg')->withMime('text/html')));
+        $this->assertFalse($mailable->hasAttachment(new MailTestAttachable(Attachment::fromPath('bar.jpg')->withMime('text/html'))));
+    }
+
+    public function testItCanCheckForAttachableBasedAttachments()
+    {
+        $mailable = new WelcomeMailableStub;
+        $mailable->attach(new MailTestAttachable(Attachment::fromPath('foo.jpg')));
+
+        $this->assertTrue($mailable->hasAttachment('foo.jpg'));
+        $this->assertTrue($mailable->hasAttachment(Attachment::fromPath('foo.jpg')));
+        $this->assertTrue($mailable->hasAttachment(new MailTestAttachable(Attachment::fromPath('foo.jpg'))));
+
+        $this->assertFalse($mailable->hasAttachment('bar.jpg'));
+        $this->assertFalse($mailable->hasAttachment(Attachment::fromPath('bar.jpg')));
+        $this->assertFalse($mailable->hasAttachment(new MailTestAttachable(Attachment::fromPath('bar.jpg'))));
+
+        $this->assertFalse($mailable->hasAttachment('foo.jpg', ['mime' => 'text/css']));
+        $this->assertFalse($mailable->hasAttachment(Attachment::fromPath('foo.jpg')->withMime('text/css')));
+        $this->assertFalse($mailable->hasAttachment(new MailTestAttachable(Attachment::fromPath('foo.jpg')->withMime('text/css'))));
+
+        $mailable = new WelcomeMailableStub;
+        $mailable->attach(new MailTestAttachable(Attachment::fromPath('bar.jpg')->withMime('text/css')));
+
+        $this->assertTrue($mailable->hasAttachment('bar.jpg', ['mime' => 'text/css']));
+        $this->assertTrue($mailable->hasAttachment(Attachment::fromPath('bar.jpg')->withMime('text/css')));
+        $this->assertTrue($mailable->hasAttachment(new MailTestAttachable(Attachment::fromPath('bar.jpg')->withMime('text/css'))));
+
+        $this->assertFalse($mailable->hasAttachment('bar.jpg'));
+        $this->assertFalse($mailable->hasAttachment(Attachment::fromPath('bar.jpg')));
+        $this->assertFalse($mailable->hasAttachment(new MailTestAttachable(Attachment::fromPath('bar.jpg'))));
+
+        $this->assertFalse($mailable->hasAttachment('bar.jpg', ['mime' => 'text/html']));
+        $this->assertFalse($mailable->hasAttachment(Attachment::fromPath('bar.jpg')->withMime('text/html')));
+        $this->assertFalse($mailable->hasAttachment(new MailTestAttachable(Attachment::fromPath('bar.jpg')->withMime('text/html'))));
+    }
+
+    public function testItCanCheckForDataBasedAttachments()
+    {
+        $mailable = new WelcomeMailableStub;
+        $mailable->attachData('data', 'foo.jpg');
+
+        $this->assertTrue($mailable->hasAttachedData('data', 'foo.jpg'));
+        $this->assertFalse($mailable->hasAttachedData('xxxx', 'foo.jpg'));
+        $this->assertFalse($mailable->hasAttachedData('data', 'bar.jpg'));
+        $this->assertFalse($mailable->hasAttachedData('data', 'foo.jpg', ['mime' => 'text/css']));
+
+        $mailable = new WelcomeMailableStub;
+        $mailable->attachData('data', 'bar.jpg', ['mime' => 'text/css']);
+
+        $this->assertTrue($mailable->hasAttachedData('data', 'bar.jpg', ['mime' => 'text/css']));
+        $this->assertFalse($mailable->hasAttachedData('xxxx', 'bar.jpg', ['mime' => 'text/css']));
+        $this->assertFalse($mailable->hasAttachedData('data', 'bar.jpg'));
+        $this->assertFalse($mailable->hasAttachedData('data', 'bar.jpg', ['mime' => 'text/html']));
+
+        $mailable = new WelcomeMailableStub;
+        $mailable->attach(Attachment::fromData(fn () => 'data', 'foo.jpg'));
+
+        $this->assertTrue($mailable->hasAttachedData('data', 'foo.jpg'));
+        $this->assertFalse($mailable->hasAttachedData('xxxx', 'foo.jpg'));
+        $this->assertFalse($mailable->hasAttachedData('data', 'bar.jpg'));
+        $this->assertFalse($mailable->hasAttachedData('data', 'foo.jpg', ['mime' => 'text/css']));
+
+        $mailable = new WelcomeMailableStub;
+        $mailable->attach(Attachment::fromData(fn () => 'data', 'bar.jpg')->withMime('text/css'));
+
+        $this->assertTrue($mailable->hasAttachedData('data', 'bar.jpg', ['mime' => 'text/css']));
+        $this->assertFalse($mailable->hasAttachedData('xxxx', 'bar.jpg', ['mime' => 'text/css']));
+        $this->assertFalse($mailable->hasAttachedData('data', 'bar.jpg'));
+        $this->assertFalse($mailable->hasAttachedData('data', 'bar.jpg', ['mime' => 'text/html']));
+    }
+
+    public function testItCanCheckForStorageBasedAttachments()
+    {
+        $mailable = new WelcomeMailableStub;
+        $mailable->attachFromStorageDisk('disk', '/path/to/foo.jpg');
+
+        $this->assertTrue($mailable->hasAttachmentFromStorageDisk('disk', '/path/to/foo.jpg'));
+        $this->assertFalse($mailable->hasAttachmentFromStorageDisk('xxxx', '/path/to/foo.jpg'));
+        $this->assertFalse($mailable->hasAttachmentFromStorageDisk('disk', 'bar.jpg'));
+        $this->assertFalse($mailable->hasAttachmentFromStorageDisk('disk', '/path/to/foo.jpg', 'bar.jpg'));
+        $this->assertFalse($mailable->hasAttachmentFromStorageDisk('disk', '/path/to/foo.jpg', null, ['mime' => 'text/css']));
+
+        $mailable = new WelcomeMailableStub;
+        $mailable->attachFromStorageDisk('disk', '/path/to/foo.jpg', 'bar.jpg');
+
+        $this->assertTrue($mailable->hasAttachmentFromStorageDisk('disk', '/path/to/foo.jpg', 'bar.jpg'));
+        $this->assertFalse($mailable->hasAttachmentFromStorageDisk('xxxx', '/path/to/foo.jpg', 'bar.jpg'));
+        $this->assertFalse($mailable->hasAttachmentFromStorageDisk('disk', 'bar.jpg', 'bar.jpg'));
+        $this->assertFalse($mailable->hasAttachmentFromStorageDisk('disk', '/path/to/foo.jpg', 'foo.jpg'));
+        $this->assertFalse($mailable->hasAttachmentFromStorageDisk('disk', '/path/to/foo.jpg', 'bar.jpg', ['mime' => 'text/css']));
+
+        $mailable = new WelcomeMailableStub;
+        $mailable->attachFromStorageDisk('disk', '/path/to/foo.jpg', 'bar.jpg', ['mime' => 'text/css']);
+
+        $this->assertTrue($mailable->hasAttachmentFromStorageDisk('disk', '/path/to/foo.jpg', 'bar.jpg', ['mime' => 'text/css']));
+        $this->assertFalse($mailable->hasAttachmentFromStorageDisk('xxxx', '/path/to/foo.jpg', 'bar.jpg', ['mime' => 'text/css']));
+        $this->assertFalse($mailable->hasAttachmentFromStorageDisk('disk', 'bar.jpg', 'bar.jpg', ['mime' => 'text/css']));
+        $this->assertFalse($mailable->hasAttachmentFromStorageDisk('disk', '/path/to/foo.jpg', 'foo.jpg', ['mime' => 'text/css']));
+        $this->assertFalse($mailable->hasAttachmentFromStorageDisk('disk', '/path/to/foo.jpg', 'bar.jpg', ['mime' => 'text/html']));
+    }
+
+    public function testAssertHasAttachment()
+    {
+        Container::getInstance()->instance('mailer', new class
+        {
+            public function render()
+            {
+                //
+            }
+        });
+
+        $mailable = new class() extends Mailable
+        {
+            public function build()
+            {
+                //
+            }
+        };
+
+        try {
+            $mailable->assertHasAttachment('/path/to/foo.jpg');
+            $this->fail();
+        } catch (AssertionFailedError $e) {
+            $this->assertSame("Did not find the expected attachment.\nFailed asserting that false is true.", $e->getMessage());
+        }
+
+        $mailable = new class() extends Mailable
+        {
+            public function build()
+            {
+                $this->attach('/path/to/foo.jpg');
+            }
+        };
+
+        $mailable->assertHasAttachment('/path/to/foo.jpg');
+    }
+
+    public function testAssertHasAttachedData()
+    {
+        Container::getInstance()->instance('mailer', new class
+        {
+            public function render()
+            {
+                //
+            }
+        });
+
+        $mailable = new class() extends Mailable
+        {
+            public function build()
+            {
+                //
+            }
+        };
+
+        try {
+            $mailable->assertHasAttachedData('data', 'foo.jpg');
+            $this->fail();
+        } catch (AssertionFailedError $e) {
+            $this->assertSame("Did not find the expected attachment.\nFailed asserting that false is true.", $e->getMessage());
+        }
+
+        $mailable = new class() extends Mailable
+        {
+            public function build()
+            {
+                $this->attachData('data', 'foo.jpg');
+            }
+        };
+
+        $mailable->assertHasAttachedData('data', 'foo.jpg');
+    }
+
+    public function testAssertHasAttachmentFromStorage()
+    {
+        $mailable = new class() extends Mailable
+        {
+            public function build()
+            {
+                //
+            }
+        };
+
+        try {
+            $mailable->assertHasAttachmentFromStorage('/path/to/foo.jpg');
+            $this->fail();
+        } catch (AssertionFailedError $e) {
+            $this->assertSame("Did not find the expected attachment.\nFailed asserting that false is true.", $e->getMessage());
+        }
+
+        $mailable = new class() extends Mailable
+        {
+            public function build()
+            {
+                $this->attachFromStorage('/path/to/foo.jpg');
+            }
+        };
+
+        $mailable->assertHasAttachmentFromStorage('/path/to/foo.jpg');
+    }
 }
 
 class WelcomeMailableStub extends Mailable
@@ -469,4 +865,17 @@ class MailableTestUserStub
 {
     public $name = 'Taylor Otwell';
     public $email = 'taylor@laravel.com';
+}
+
+class MailTestAttachable implements Attachable
+{
+    public function __construct(protected $attachment)
+    {
+        //
+    }
+
+    public function toMailAttachment()
+    {
+        return $this->attachment;
+    }
 }

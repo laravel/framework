@@ -6,13 +6,8 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-if (PHP_VERSION_ID >= 80100) {
-    include_once 'Enums.php';
-}
+include_once 'Enums.php';
 
-/**
- * @requires PHP >= 8.1
- */
 class QueryingWithEnumsTest extends DatabaseTestCase
 {
     protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
@@ -38,7 +33,7 @@ class QueryingWithEnumsTest extends DatabaseTestCase
         $this->assertNotNull($record);
         $this->assertNotNull($record2);
         $this->assertNotNull($record3);
-        $this->assertEquals('pending', $record->string_status);
+        $this->assertSame('pending', $record->string_status);
         $this->assertEquals(1, $record2->integer_status);
     }
 
@@ -52,7 +47,7 @@ class QueryingWithEnumsTest extends DatabaseTestCase
         $record = DB::table('enum_casts')->where('string_status', StringStatus::pending)->first();
 
         $this->assertNotNull($record);
-        $this->assertEquals('pending', $record->string_status);
+        $this->assertSame('pending', $record->string_status);
         $this->assertEquals(1, $record->integer_status);
     }
 }

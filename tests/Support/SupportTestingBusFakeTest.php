@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
+use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Bus\QueueingDispatcher;
 use Illuminate\Support\Testing\Fakes\BusFake;
 use Mockery as m;
@@ -376,6 +377,19 @@ class SupportTestingBusFakeTest extends TestCase
         }
     }
 
+    public function testAssertChained()
+    {
+        $this->fake->chain([
+            new ChainedJobStub,
+            new OtherBusJobStub,
+        ])->dispatch();
+
+        $this->fake->assertChained([
+            ChainedJobStub::class,
+            OtherBusJobStub::class,
+        ]);
+    }
+
     public function testAssertDispatchedWithIgnoreClass()
     {
         $dispatcher = m::mock(QueueingDispatcher::class);
@@ -398,6 +412,38 @@ class SupportTestingBusFakeTest extends TestCase
 
         $fake->assertNotDispatched(BusJobStub::class);
         $fake->assertDispatchedTimes(OtherBusJobStub::class, 2);
+    }
+
+    public function testDispatchedFakingOnlyGivenJobs()
+    {
+        $dispatcher = m::mock(QueueingDispatcher::class);
+
+        $job = new BusJobStub;
+        $dispatcher->shouldReceive('dispatch')->never()->with($job);
+        $dispatcher->shouldReceive('dispatchNow')->never()->with($job, null);
+
+        $otherJob = new OtherBusJobStub;
+        $dispatcher->shouldReceive('dispatch')->once()->with($otherJob);
+        $dispatcher->shouldReceive('dispatchNow')->once()->with($otherJob, null);
+
+        $thirdJob = new ThirdJob;
+        $dispatcher->shouldReceive('dispatch')->never()->with($thirdJob);
+        $dispatcher->shouldReceive('dispatchNow')->never()->with($thirdJob, null);
+
+        $fake = (new BusFake($dispatcher))->except(OtherBusJobStub::class);
+
+        $fake->dispatch($job);
+        $fake->dispatchNow($job);
+
+        $fake->dispatch($otherJob);
+        $fake->dispatchNow($otherJob);
+
+        $fake->dispatch($thirdJob);
+        $fake->dispatchNow($thirdJob);
+
+        $fake->assertNotDispatched(OtherBusJobStub::class);
+        $fake->assertDispatchedTimes(BusJobStub::class, 2);
+        $fake->assertDispatchedTimes(ThirdJob::class, 2);
     }
 
     public function testAssertDispatchedWithIgnoreCallback()
@@ -440,11 +486,50 @@ class SupportTestingBusFakeTest extends TestCase
             return $job->id === 1;
         });
     }
+
+    public function testAssertNothingBatched()
+    {
+        $this->fake->assertNothingBatched();
+
+        $this->fake->batch([])->dispatch();
+
+        try {
+            $this->fake->assertNothingBatched();
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('Batched jobs were dispatched unexpectedly.'));
+        }
+    }
+
+    public function testFindBatch()
+    {
+        $this->assertNull($this->fake->findBatch('non-existent-batch'));
+
+        $batch = $this->fake->batch([])->dispatch();
+
+        $this->assertSame($batch, $this->fake->findBatch($batch->id));
+    }
+
+    public function testBatchesCanBeCancelled()
+    {
+        $batch = $this->fake->batch([])->dispatch();
+
+        $this->assertFalse($batch->cancelled());
+
+        $batch->cancel();
+
+        $this->assertTrue($batch->cancelled());
+    }
 }
 
 class BusJobStub
 {
     //
+}
+
+class ChainedJobStub
+{
+    use Queueable;
 }
 
 class OtherBusJobStub
@@ -455,4 +540,9 @@ class OtherBusJobStub
     {
         $this->id = $id;
     }
+}
+
+class ThirdJob
+{
+    //
 }

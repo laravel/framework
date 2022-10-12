@@ -270,12 +270,22 @@ class Route
     public function getController()
     {
         if (! $this->controller) {
-            $class = $this->parseControllerCallback()[0];
+            $class = $this->getControllerClass();
 
             $this->controller = $this->container->make(ltrim($class, '\\'));
         }
 
         return $this->controller;
+    }
+
+    /**
+     * Get the controller class used for the route.
+     *
+     * @return string
+     */
+    public function getControllerClass()
+    {
+        return $this->parseControllerCallback()[0];
     }
 
     /**
@@ -469,9 +479,7 @@ class Route
      */
     public function parametersWithoutNulls()
     {
-        return array_filter($this->parameters(), function ($p) {
-            return ! is_null($p);
-        });
+        return array_filter($this->parameters(), fn ($p) => ! is_null($p));
     }
 
     /**
@@ -497,9 +505,7 @@ class Route
     {
         preg_match_all('/\{(.*?)\}/', $this->getDomain().$this->uri, $matches);
 
-        return array_map(function ($m) {
-            return trim($m, '?');
-        }, $matches[1]);
+        return array_map(fn ($m) => trim($m, '?'), $matches[1]);
     }
 
     /**
@@ -780,7 +786,7 @@ class Route
      */
     public function prefix($prefix)
     {
-        $prefix = $prefix ?? '';
+        $prefix ??= '';
 
         $this->updatePrefixOnAction($prefix);
 
@@ -1100,7 +1106,7 @@ class Route
     /**
      * Indicate that the route should enforce scoping of multiple implicit Eloquent bindings.
      *
-     * @return bool
+     * @return $this
      */
     public function scopeBindings()
     {

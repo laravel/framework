@@ -406,22 +406,6 @@ if (! function_exists('dispatch_sync')) {
     }
 }
 
-if (! function_exists('dispatch_now')) {
-    /**
-     * Dispatch a command to its appropriate handler in the current process.
-     *
-     * @param  mixed  $job
-     * @param  mixed  $handler
-     * @return mixed
-     *
-     * @deprecated Will be removed in a future Laravel version.
-     */
-    function dispatch_now($job, $handler = null)
-    {
-        return app(Dispatcher::class)->dispatchNow($job, $handler);
-    }
-}
-
 if (! function_exists('encrypt')) {
     /**
      * Encrypt the given value.
@@ -448,6 +432,27 @@ if (! function_exists('event')) {
     function event(...$args)
     {
         return app('events')->dispatch(...$args);
+    }
+}
+
+if (! function_exists('fake') && class_exists(\Faker\Factory::class)) {
+    /**
+     * Get a faker instance.
+     *
+     * @param  ?string  $locale
+     * @return \Faker\Generator
+     */
+    function fake($locale = null)
+    {
+        $locale ??= app('config')->get('app.faker_locale') ?? 'en_US';
+
+        $abstract = \Faker\Generator::class.':'.$locale;
+
+        if (! app()->bound($abstract)) {
+            app()->singleton($abstract, fn () => \Faker\Factory::create($locale));
+        }
+
+        return app()->make($abstract);
     }
 }
 
@@ -636,7 +641,7 @@ if (! function_exists('request')) {
      *
      * @param  array|string|null  $key
      * @param  mixed  $default
-     * @return \Illuminate\Http\Request|string|array|null
+     * @return mixed|\Illuminate\Http\Request|string|array|null
      */
     function request($key = null, $default = null)
     {

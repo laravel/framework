@@ -14,7 +14,7 @@
         }
     ],
     "require": {
-        "php": "^8.0.2",
+        "php": "^8.1",
         "illuminate/conditionable": "^10.0",
         "illuminate/contracts": "^10.0",
         "illuminate/macroable": "^10.0"
@@ -33,7 +33,7 @@
         }
     },
     "suggest": {
-        "symfony/var-dumper": "Required to use the dump method (^6.1)."
+        "symfony/var-dumper": "Required to use the dump method (^6.2)."
     },
     "config": {
         "sort-packages": true

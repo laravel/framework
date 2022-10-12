@@ -5,8 +5,10 @@ namespace Illuminate\Mail\Transport;
 use Aws\Exception\AwsException;
 use Aws\Ses\SesClient;
 use Exception;
+use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractTransport;
+use Symfony\Component\Mime\Message;
 
 class SesTransport extends AbstractTransport
 {
@@ -44,11 +46,26 @@ class SesTransport extends AbstractTransport
      */
     protected function doSend(SentMessage $message): void
     {
+        $options = $this->options;
+
+        if ($message->getOriginalMessage() instanceof Message) {
+            foreach ($message->getOriginalMessage()->getHeaders()->all() as $header) {
+                if ($header instanceof MetadataHeader) {
+                    $options['Tags'][] = ['Name' => $header->getKey(), 'Value' => $header->getValue()];
+                }
+            }
+        }
+
         try {
-            $this->ses->sendRawEmail(
+            $result = $this->ses->sendRawEmail(
                 array_merge(
-                    $this->options, [
+                    $options, [
                         'Source' => $message->getEnvelope()->getSender()->toString(),
+                        'Destinations' => collect($message->getEnvelope()->getRecipients())
+                                ->map
+                                ->toString()
+                                ->values()
+                                ->all(),
                         'RawMessage' => [
                             'Data' => $message->toString(),
                         ],
@@ -56,8 +73,19 @@ class SesTransport extends AbstractTransport
                 )
             );
         } catch (AwsException $e) {
-            throw new Exception('Request to AWS SES API failed.', $e->getCode(), $e);
+            $reason = $e->getAwsErrorMessage() ?? $e->getMessage();
+
+            throw new Exception(
+                sprintf('Request to AWS SES API failed. Reason: %s.', $reason),
+                is_int($e->getCode()) ? $e->getCode() : 0,
+                $e
+            );
         }
+
+        $messageId = $result->get('MessageId');
+
+        $message->getOriginalMessage()->getHeaders()->addHeader('X-Message-ID', $messageId);
+        $message->getOriginalMessage()->getHeaders()->addHeader('X-SES-Message-ID', $messageId);
     }
 
     /**

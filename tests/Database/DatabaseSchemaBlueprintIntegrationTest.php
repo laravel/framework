@@ -126,6 +126,52 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
         $this->assertEquals($expected2, $queries2);
     }
 
+    public function testChangingCharColumnsWork()
+    {
+        $this->db->connection()->getSchemaBuilder()->create('users', function ($table) {
+            $table->string('name');
+        });
+
+        $blueprint = new Blueprint('users', function ($table) {
+            $table->char('name', 50)->change();
+        });
+
+        $queries = $blueprint->toSql($this->db->connection(), new SQLiteGrammar);
+
+        $expected = [
+            'CREATE TEMPORARY TABLE __temp__users AS SELECT name FROM users',
+            'DROP TABLE users',
+            'CREATE TABLE users (name CHAR(50) NOT NULL COLLATE BINARY)',
+            'INSERT INTO users (name) SELECT name FROM __temp__users',
+            'DROP TABLE __temp__users',
+        ];
+
+        $this->assertEquals($expected, $queries);
+    }
+
+    public function testChangingDoubleColumnsWork()
+    {
+        $this->db->connection()->getSchemaBuilder()->create('products', function ($table) {
+            $table->integer('price');
+        });
+
+        $blueprint = new Blueprint('products', function ($table) {
+            $table->double('price')->change();
+        });
+
+        $queries = $blueprint->toSql($this->db->connection(), new SQLiteGrammar);
+
+        $expected = [
+            'CREATE TEMPORARY TABLE __temp__products AS SELECT price FROM products',
+            'DROP TABLE products',
+            'CREATE TABLE products (price DOUBLE PRECISION NOT NULL)',
+            'INSERT INTO products (price) SELECT price FROM __temp__products',
+            'DROP TABLE __temp__products',
+        ];
+
+        $this->assertEquals($expected, $queries);
+    }
+
     public function testRenameIndexWorks()
     {
         $this->db->connection()->getSchemaBuilder()->create('users', function ($table) {
@@ -356,6 +402,26 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
             $table->dropColumn('name');
             $table->renameColumn('name2', 'last_name');
         });
+    }
+
+    public function testItDoesNotSetPrecisionHigherThanSupportedWhenRenamingTimestamps()
+    {
+        $this->db->connection()->getSchemaBuilder()->create('users', function (Blueprint $table) {
+            $table->timestamp('created_at');
+        });
+
+        try {
+            // this would only fail in mysql, postgres and sql server
+            $this->db->connection()->getSchemaBuilder()->table('users', function (Blueprint $table) {
+                $table->renameColumn('created_at', 'new_created_at');
+            });
+            $this->addToAssertionCount(1); // it did not throw
+        } catch (\Exception $e) {
+            // Expecting something similar to:
+            // Illuminate\Database\QueryException
+            //   SQLSTATE[42000]: Syntax error or access violation: 1426 Too big precision 10 specified for 'my_timestamp'. Maximum is 6....
+            $this->fail('test_it_does_not_set_precision_higher_than_supported_when_renaming_timestamps has failed. Error: '.$e->getMessage());
+        }
     }
 
     public function testItEnsuresDroppingForeignKeyIsAvailable()

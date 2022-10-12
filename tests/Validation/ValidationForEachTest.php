@@ -201,6 +201,62 @@ class ValidationForEachTest extends TestCase
         ], $v->getMessageBag()->toArray());
     }
 
+    public function testForEachCallbacksDoNotBreakRegexRules()
+    {
+        $data = [
+            'items' => [
+                ['users' => [['type' => 'super'], ['type' => 'invalid']]],
+            ],
+        ];
+
+        $rules = [
+            'items.*' => Rule::forEach(function () {
+                return ['users.*.type' => 'regex:/^(super|admin)$/i'];
+            }),
+        ];
+
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, $data, $rules);
+
+        $this->assertFalse($v->passes());
+
+        $this->assertEquals([
+            'items.0.users.1.type' => ['validation.regex'],
+        ], $v->getMessageBag()->toArray());
+    }
+
+    public function testForEachCallbacksCanContainMultipleRegexRules()
+    {
+        $data = [
+            'items' => [
+                ['users' => [['type' => 'super'], ['type' => 'invalid']]],
+            ],
+        ];
+
+        $rules = [
+            'items.*' => Rule::forEach(function () {
+                return ['users.*.type' => [
+                    'regex:/^(super)$/i',
+                    'notregex:/^(invalid)$/i',
+                ]];
+            }),
+        ];
+
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, $data, $rules);
+
+        $this->assertFalse($v->passes());
+
+        $this->assertEquals([
+            'items.0.users.1.type' => [
+                'validation.regex',
+                'validation.notregex',
+            ],
+        ], $v->getMessageBag()->toArray());
+    }
+
     protected function getTranslator()
     {
         return m::mock(TranslatorContract::class);

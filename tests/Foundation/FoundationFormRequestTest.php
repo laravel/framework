@@ -135,7 +135,7 @@ class FoundationFormRequestTest extends TestCase
 
         $request->validateResolved();
 
-        $this->assertEquals('specified', $request->validated('name'));
+        $this->assertSame('specified', $request->validated('name'));
     }
 
     public function testValidatedMethodReturnsOnlyRequestedNestedValidatedData()
@@ -146,7 +146,7 @@ class FoundationFormRequestTest extends TestCase
 
         $request->validateResolved();
 
-        $this->assertEquals('bar', $request->validated('nested.foo'));
+        $this->assertSame('bar', $request->validated('nested.foo'));
     }
 
     /**

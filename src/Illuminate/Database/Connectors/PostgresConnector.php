@@ -2,10 +2,13 @@
 
 namespace Illuminate\Database\Connectors;
 
+use Illuminate\Database\Concerns\ParsesSearchPath;
 use PDO;
 
 class PostgresConnector extends Connector implements ConnectorInterface
 {
+    use ParsesSearchPath;
+
     /**
      * The default PDO connection options.
      *
@@ -119,32 +122,9 @@ class PostgresConnector extends Connector implements ConnectorInterface
     }
 
     /**
-     * Parse the "search_path" configuration value into an array.
-     *
-     * @param  string|array  $searchPath
-     * @return array
-     */
-    protected function parseSearchPath($searchPath)
-    {
-        if (is_string($searchPath)) {
-            preg_match_all('/[a-zA-z0-9$]{1,}/i', $searchPath, $matches);
-
-            $searchPath = $matches[0];
-        }
-
-        $searchPath = $searchPath ?? [];
-
-        array_walk($searchPath, function (&$schema) {
-            $schema = trim($schema, '\'"');
-        });
-
-        return $searchPath;
-    }
-
-    /**
      * Format the search path for the DSN.
      *
-     * @param  array|string  $searchPath
+     * @param  array  $searchPath
      * @return string
      */
     protected function quoteSearchPath($searchPath)
@@ -182,6 +162,11 @@ class PostgresConnector extends Connector implements ConnectorInterface
         extract($config, EXTR_SKIP);
 
         $host = isset($host) ? "host={$host};" : '';
+
+        // Sometimes - users may need to connect to a database that has a different
+        // name than the database used for "information_schema" queries. This is
+        // typically the case if using "pgbouncer" type software when pooling.
+        $database = $connect_via_database ?? $database;
 
         $dsn = "pgsql:{$host}dbname='{$database}'";
 

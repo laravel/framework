@@ -125,9 +125,14 @@ class SupportConditionableTest extends TestCase
             ->when(function ($logger) {
                 return $logger->has('missing');
             })
-            ->log('two');
+            ->log('two')
+            ->when()->has('init')->log('three')
+            ->when()->has('missing')->log('four')
+            ->when()->toggle->log('five')
+            ->toggle()
+            ->when()->toggle->log('six');
 
-        $this->assertSame(['init', 'one'], $logger->values);
+        $this->assertSame(['init', 'one', 'three', 'six'], $logger->values);
     }
 
     public function testUnlessProxy()
@@ -148,9 +153,14 @@ class SupportConditionableTest extends TestCase
             ->unless(function ($logger) {
                 return $logger->has('missing');
             })
-            ->log('two');
+            ->log('two')
+            ->unless()->has('init')->log('three')
+            ->unless()->has('missing')->log('four')
+            ->unless()->toggle->log('five')
+            ->toggle()
+            ->unless()->toggle->log('six');
 
-        $this->assertSame(['init', 'two'], $logger->values);
+        $this->assertSame(['init', 'two', 'four', 'five'], $logger->values);
     }
 }
 
@@ -159,6 +169,8 @@ class ConditionableLogger
     use Conditionable;
 
     public $values = [];
+
+    public $toggle = false;
 
     public function log(...$values)
     {
@@ -170,5 +182,12 @@ class ConditionableLogger
     public function has($value)
     {
         return in_array($value, $this->values);
+    }
+
+    public function toggle()
+    {
+        $this->toggle = ! $this->toggle;
+
+        return $this;
     }
 }

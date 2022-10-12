@@ -124,7 +124,7 @@ class ConsoleEventSchedulerTest extends TestCase
     {
         $schedule = $this->schedule;
         $event = $schedule->command(ConsoleCommandStub::class);
-        $this->assertEquals('This is a description about the command', $event->description);
+        $this->assertSame('This is a description about the command', $event->description);
     }
 
     public function testItShouldBePossibleToOverwriteTheDescription()
@@ -132,7 +132,7 @@ class ConsoleEventSchedulerTest extends TestCase
         $schedule = $this->schedule;
         $event = $schedule->command(ConsoleCommandStub::class)
             ->description('This is an alternative description');
-        $this->assertEquals('This is an alternative description', $event->description);
+        $this->assertSame('This is an alternative description', $event->description);
     }
 
     public function testCallCreatesNewJobWithTimezone()

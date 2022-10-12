@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Foundation\Testing;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\RefreshDatabaseState;
-use Mockery;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 
@@ -17,12 +17,12 @@ class RefreshDatabaseTest extends TestCase
     {
         RefreshDatabaseState::$migrated = false;
 
-        $this->traitObject = $this->getMockForTrait(RefreshDatabase::class, [], '', true, true, true, [
+        $this->traitObject = $this->getMockForAbstractClass(RefreshDatabaseTestMockClass::class, [], '', true, true, true, [
             'artisan',
             'beginDatabaseTransaction',
         ]);
 
-        $kernelObj = Mockery::mock();
+        $kernelObj = m::mock();
         $kernelObj->shouldReceive('setArtisan')
             ->with(null);
 
@@ -94,4 +94,15 @@ class RefreshDatabaseTest extends TestCase
 
         $refreshTestDatabaseReflection->invoke($this->traitObject);
     }
+}
+
+class RefreshDatabaseTestMockClass
+{
+    use RefreshDatabase;
+
+    public $app;
+
+    public $dropViews = false;
+
+    public $dropTypes = false;
 }

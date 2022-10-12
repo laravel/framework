@@ -172,6 +172,7 @@ class MailMailerTest extends TestCase
         });
 
         $this->assertSame('taylor@laravel.com', $sentMessage->getEnvelope()->getRecipients()[0]->getAddress());
+        $this->assertSame('hello@laravel.com', $sentMessage->getEnvelope()->getSender()->getAddress());
     }
 
     public function testGlobalReplyToIsRespectedOnAllMessages()
@@ -200,6 +201,7 @@ class MailMailerTest extends TestCase
 
         $sentMessage = $mailer->send('foo', ['data'], function (Message $message) {
             $message->from('hello@laravel.com');
+            $message->to('nuno@laravel.com');
             $message->cc('dries@laravel.com');
             $message->bcc('james@laravel.com');
         });
@@ -209,8 +211,13 @@ class MailMailerTest extends TestCase
         });
 
         $this->assertSame('taylor@laravel.com', $sentMessage->getEnvelope()->getRecipients()[0]->getAddress());
-        $this->assertStringNotContainsString('dries@laravel.com', $sentMessage->toString());
-        $this->assertStringNotContainsString('james@laravel.com', $sentMessage->toString());
+        $this->assertDoesNotMatchRegularExpression('/^To: nuno@laravel.com/m', $sentMessage->toString());
+        $this->assertDoesNotMatchRegularExpression('/^Cc: dries@laravel.com/m', $sentMessage->toString());
+        $this->assertMatchesRegularExpression('/^X-To: nuno@laravel.com/m', $sentMessage->toString());
+        $this->assertMatchesRegularExpression('/^X-Cc: dries@laravel.com/m', $sentMessage->toString());
+        $this->assertMatchesRegularExpression('/^X-Bcc: james@laravel.com/m', $sentMessage->toString());
+        $this->assertFalse($recipients->contains('nuno@laravel.com'));
+        $this->assertFalse($recipients->contains('dries@laravel.com'));
         $this->assertFalse($recipients->contains('james@laravel.com'));
     }
 

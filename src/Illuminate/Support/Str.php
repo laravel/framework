@@ -2,12 +2,17 @@
 
 namespace Illuminate\Support;
 
+use Closure;
 use Illuminate\Support\Traits\Macroable;
+use JsonException;
+use League\CommonMark\Environment\Environment;
+use League\CommonMark\Extension\GithubFlavoredMarkdownExtension;
+use League\CommonMark\Extension\InlinesOnly\InlinesOnlyExtension;
 use League\CommonMark\GithubFlavoredMarkdownConverter;
-use Ramsey\Uuid\Codec\TimestampFirstCombCodec;
-use Ramsey\Uuid\Generator\CombGenerator;
+use League\CommonMark\MarkdownConverter;
 use Ramsey\Uuid\Uuid;
-use Ramsey\Uuid\UuidFactory;
+use Symfony\Component\Uid\Ulid;
+use Traversable;
 use voku\helper\ASCII;
 
 class Str
@@ -38,9 +43,16 @@ class Str
     /**
      * The callback that should be used to generate UUIDs.
      *
-     * @var callable
+     * @var callable|null
      */
     protected static $uuidFactory;
+
+    /**
+     * The callback that should be used to generate random strings.
+     *
+     * @var callable|null
+     */
+    protected static $randomStringFactory;
 
     /**
      * Get a new stringable object from the given string.
@@ -170,6 +182,23 @@ class Str
     }
 
     /**
+     * Get the smallest possible portion of a string between two given values.
+     *
+     * @param  string  $subject
+     * @param  string  $from
+     * @param  string  $to
+     * @return string
+     */
+    public static function betweenFirst($subject, $from, $to)
+    {
+        if ($from === '' || $to === '') {
+            return $subject;
+        }
+
+        return static::before(static::after($subject, $from), $to);
+    }
+
+    /**
      * Convert a value to camel case.
      *
      * @param  string  $value
@@ -188,7 +217,7 @@ class Str
      * Determine if a given string contains a given substring.
      *
      * @param  string  $haystack
-     * @param  string|string[]  $needles
+     * @param  string|iterable<string>  $needles
      * @param  bool  $ignoreCase
      * @return bool
      */
@@ -196,10 +225,17 @@ class Str
     {
         if ($ignoreCase) {
             $haystack = mb_strtolower($haystack);
-            $needles = array_map('mb_strtolower', (array) $needles);
         }
 
-        foreach ((array) $needles as $needle) {
+        if (! is_iterable($needles)) {
+            $needles = (array) $needles;
+        }
+
+        foreach ($needles as $needle) {
+            if ($ignoreCase) {
+                $needle = mb_strtolower($needle);
+            }
+
             if ($needle !== '' && str_contains($haystack, $needle)) {
                 return true;
             }
@@ -212,19 +248,14 @@ class Str
      * Determine if a given string contains all array values.
      *
      * @param  string  $haystack
-     * @param  string[]  $needles
+     * @param  iterable<string>  $needles
      * @param  bool  $ignoreCase
      * @return bool
      */
-    public static function containsAll($haystack, array $needles, $ignoreCase = false)
+    public static function containsAll($haystack, $needles, $ignoreCase = false)
     {
-        if ($ignoreCase) {
-            $haystack = mb_strtolower($haystack);
-            $needles = array_map('mb_strtolower', $needles);
-        }
-
         foreach ($needles as $needle) {
-            if (! static::contains($haystack, $needle)) {
+            if (! static::contains($haystack, $needle, $ignoreCase)) {
                 return false;
             }
         }
@@ -236,21 +267,58 @@ class Str
      * Determine if a given string ends with a given substring.
      *
      * @param  string  $haystack
-     * @param  string|string[]  $needles
+     * @param  string|iterable<string>  $needles
      * @return bool
      */
     public static function endsWith($haystack, $needles)
     {
-        foreach ((array) $needles as $needle) {
-            if (
-                $needle !== '' && $needle !== null
-                && str_ends_with($haystack, $needle)
-            ) {
+        if (! is_iterable($needles)) {
+            $needles = (array) $needles;
+        }
+
+        foreach ($needles as $needle) {
+            if ((string) $needle !== '' && str_ends_with($haystack, $needle)) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    /**
+     * Extracts an excerpt from text that matches the first instance of a phrase.
+     *
+     * @param  string  $text
+     * @param  string  $phrase
+     * @param  array  $options
+     * @return string|null
+     */
+    public static function excerpt($text, $phrase = '', $options = [])
+    {
+        $radius = $options['radius'] ?? 100;
+        $omission = $options['omission'] ?? '...';
+
+        preg_match('/^(.*?)('.preg_quote((string) $phrase).')(.*)$/iu', (string) $text, $matches);
+
+        if (empty($matches)) {
+            return null;
+        }
+
+        $start = ltrim($matches[1]);
+
+        $start = str(mb_substr($start, max(mb_strlen($start, 'UTF-8') - $radius, 0), $radius, 'UTF-8'))->ltrim()->unless(
+            fn ($startWithRadius) => $startWithRadius->exactly($start),
+            fn ($startWithRadius) => $startWithRadius->prepend($omission),
+        );
+
+        $end = rtrim($matches[3]);
+
+        $end = str(mb_substr($end, 0, $radius, 'UTF-8'))->rtrim()->unless(
+            fn ($endWithRadius) => $endWithRadius->exactly($end),
+            fn ($endWithRadius) => $endWithRadius->append($omission),
+        );
+
+        return $start->append($matches[2], $end)->toString();
     }
 
     /**
@@ -268,23 +336,33 @@ class Str
     }
 
     /**
+     * Wrap the string with the given strings.
+     *
+     * @param  string  $before
+     * @param  string|null  $after
+     * @return string
+     */
+    public static function wrap($value, $before, $after = null)
+    {
+        return $before.$value.($after ??= $before);
+    }
+
+    /**
      * Determine if a given string matches a given pattern.
      *
-     * @param  string|array  $pattern
+     * @param  string|iterable<string>  $pattern
      * @param  string  $value
      * @return bool
      */
     public static function is($pattern, $value)
     {
-        $patterns = Arr::wrap($pattern);
-
         $value = (string) $value;
 
-        if (empty($patterns)) {
-            return false;
+        if (! is_iterable($pattern)) {
+            $pattern = [$pattern];
         }
 
-        foreach ($patterns as $pattern) {
+        foreach ($pattern as $pattern) {
             $pattern = (string) $pattern;
 
             // If the given value is an exact match we can of course return true right
@@ -321,6 +399,27 @@ class Str
     }
 
     /**
+     * Determine if a given string is valid JSON.
+     *
+     * @param  string  $value
+     * @return bool
+     */
+    public static function isJson($value)
+    {
+        if (! is_string($value)) {
+            return false;
+        }
+
+        try {
+            json_decode($value, true, 512, JSON_THROW_ON_ERROR);
+        } catch (JsonException) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Determine if a given string is a valid UUID.
      *
      * @param  string  $value
@@ -333,6 +432,21 @@ class Str
         }
 
         return preg_match('/^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/iD', $value) > 0;
+    }
+
+    /**
+     * Determine if a given string is a valid ULID.
+     *
+     * @param  string  $value
+     * @return bool
+     */
+    public static function isUlid($value)
+    {
+        if (! is_string($value)) {
+            return false;
+        }
+
+        return Ulid::isValid($value);
     }
 
     /**
@@ -420,7 +534,26 @@ class Str
     {
         $converter = new GithubFlavoredMarkdownConverter($options);
 
-        return (string) $converter->convertToHtml($string);
+        return (string) $converter->convert($string);
+    }
+
+    /**
+     * Converts inline Markdown into HTML.
+     *
+     * @param  string  $string
+     * @param  array  $options
+     * @return string
+     */
+    public static function inlineMarkdown($string, array $options = [])
+    {
+        $environment = new Environment($options);
+
+        $environment->addExtension(new GithubFlavoredMarkdownExtension());
+        $environment->addExtension(new InlinesOnlyExtension());
+
+        $converter = new MarkdownConverter($environment);
+
+        return (string) $converter->convert($string);
     }
 
     /**
@@ -439,20 +572,24 @@ class Str
             return $string;
         }
 
-        if (is_null($length) && PHP_MAJOR_VERSION < 8) {
-            $length = mb_strlen($string, $encoding);
-        }
-
         $segment = mb_substr($string, $index, $length, $encoding);
 
         if ($segment === '') {
             return $string;
         }
 
-        $start = mb_substr($string, 0, mb_strpos($string, $segment, 0, $encoding), $encoding);
-        $end = mb_substr($string, mb_strpos($string, $segment, 0, $encoding) + mb_strlen($segment, $encoding));
+        $strlen = mb_strlen($string, $encoding);
+        $startIndex = $index;
 
-        return $start.str_repeat(mb_substr($character, 0, 1, $encoding), mb_strlen($segment, $encoding)).$end;
+        if ($index < 0) {
+            $startIndex = $index < -$strlen ? 0 : $strlen + $index;
+        }
+
+        $start = mb_substr($string, 0, $startIndex, $encoding);
+        $segmentLen = mb_strlen($segment, $encoding);
+        $end = mb_substr($string, $startIndex + $segmentLen);
+
+        return $start.str_repeat(mb_substr($character, 0, 1, $encoding), $segmentLen).$end;
     }
 
     /**
@@ -501,7 +638,13 @@ class Str
      */
     public static function padBoth($value, $length, $pad = ' ')
     {
-        return str_pad($value, $length, $pad, STR_PAD_BOTH);
+        $short = max(0, $length - mb_strlen($value));
+        $shortLeft = floor($short / 2);
+        $shortRight = ceil($short / 2);
+
+        return mb_substr(str_repeat($pad, $shortLeft), 0, $shortLeft).
+               $value.
+               mb_substr(str_repeat($pad, $shortRight), 0, $shortRight);
     }
 
     /**
@@ -514,7 +657,9 @@ class Str
      */
     public static function padLeft($value, $length, $pad = ' ')
     {
-        return str_pad($value, $length, $pad, STR_PAD_LEFT);
+        $short = max(0, $length - mb_strlen($value));
+
+        return mb_substr(str_repeat($pad, $short), 0, $short).$value;
     }
 
     /**
@@ -527,7 +672,9 @@ class Str
      */
     public static function padRight($value, $length, $pad = ' ')
     {
-        return str_pad($value, $length, $pad, STR_PAD_RIGHT);
+        $short = max(0, $length - mb_strlen($value));
+
+        return $value.mb_substr(str_repeat($pad, $short), 0, $short);
     }
 
     /**
@@ -578,17 +725,74 @@ class Str
      */
     public static function random($length = 16)
     {
-        $string = '';
+        return (static::$randomStringFactory ?? function ($length) {
+            $string = '';
 
-        while (($len = strlen($string)) < $length) {
-            $size = $length - $len;
+            while (($len = strlen($string)) < $length) {
+                $size = $length - $len;
 
-            $bytes = random_bytes($size);
+                $bytes = random_bytes($size);
 
-            $string .= substr(str_replace(['/', '+', '='], '', base64_encode($bytes)), 0, $size);
-        }
+                $string .= substr(str_replace(['/', '+', '='], '', base64_encode($bytes)), 0, $size);
+            }
 
-        return $string;
+            return $string;
+        })($length);
+    }
+
+    /**
+     * Set the callable that will be used to generate random strings.
+     *
+     * @param  callable|null  $factory
+     * @return void
+     */
+    public static function createRandomStringsUsing(callable $factory = null)
+    {
+        static::$randomStringFactory = $factory;
+    }
+
+    /**
+     * Set the sequence that will be used to generate random strings.
+     *
+     * @param  array  $sequence
+     * @param  callable|null  $whenMissing
+     * @return void
+     */
+    public static function createRandomStringsUsingSequence(array $sequence, $whenMissing = null)
+    {
+        $next = 0;
+
+        $whenMissing ??= function ($length) use (&$next) {
+            $factoryCache = static::$randomStringFactory;
+
+            static::$randomStringFactory = null;
+
+            $randomString = static::random($length);
+
+            static::$randomStringFactory = $factoryCache;
+
+            $next++;
+
+            return $randomString;
+        };
+
+        static::createRandomStringsUsing(function ($length) use (&$next, $sequence, $whenMissing) {
+            if (array_key_exists($next, $sequence)) {
+                return $sequence[$next++];
+            }
+
+            return $whenMissing($length);
+        });
+    }
+
+    /**
+     * Indicate that random strings should be created normally and not using a custom factory.
+     *
+     * @return void
+     */
+    public static function createRandomStringsNormally()
+    {
+        static::$randomStringFactory = null;
     }
 
     /**
@@ -607,12 +811,16 @@ class Str
      * Replace a given value in the string sequentially with an array.
      *
      * @param  string  $search
-     * @param  array<int|string, string>  $replace
+     * @param  iterable<string>  $replace
      * @param  string  $subject
      * @return string
      */
-    public static function replaceArray($search, array $replace, $subject)
+    public static function replaceArray($search, $replace, $subject)
     {
+        if ($replace instanceof Traversable) {
+            $replace = collect($replace)->all();
+        }
+
         $segments = explode($search, $subject);
 
         $result = array_shift($segments);
@@ -627,13 +835,25 @@ class Str
     /**
      * Replace the given value in the given string.
      *
-     * @param  string|string[]  $search
-     * @param  string|string[]  $replace
-     * @param  string|string[]  $subject
+     * @param  string|iterable<string>  $search
+     * @param  string|iterable<string>  $replace
+     * @param  string|iterable<string>  $subject
      * @return string
      */
     public static function replace($search, $replace, $subject)
     {
+        if ($search instanceof Traversable) {
+            $search = collect($search)->all();
+        }
+
+        if ($replace instanceof Traversable) {
+            $replace = collect($replace)->all();
+        }
+
+        if ($subject instanceof Traversable) {
+            $subject = collect($subject)->all();
+        }
+
         return str_replace($search, $replace, $subject);
     }
 
@@ -688,13 +908,17 @@ class Str
     /**
      * Remove any occurrence of the given string in the subject.
      *
-     * @param  string|array<string>  $search
+     * @param  string|iterable<string>  $search
      * @param  string  $subject
      * @param  bool  $caseSensitive
      * @return string
      */
     public static function remove($search, $subject, $caseSensitive = true)
     {
+        if ($search instanceof Traversable) {
+            $search = collect($search)->all();
+        }
+
         $subject = $caseSensitive
                     ? str_replace($search, '', $subject)
                     : str_ireplace($search, '', $subject);
@@ -760,8 +984,8 @@ class Str
         $parts = explode(' ', $value);
 
         $parts = count($parts) > 1
-            ? $parts = array_map([static::class, 'title'], $parts)
-            : $parts = array_map([static::class, 'title'], static::ucsplit(implode('_', $parts)));
+            ? array_map([static::class, 'title'], $parts)
+            : array_map([static::class, 'title'], static::ucsplit(implode('_', $parts)));
 
         $collapsed = static::replace(['-', '_', ' '], '_', implode('_', $parts));
 
@@ -833,15 +1057,30 @@ class Str
     }
 
     /**
+     * Remove all "extra" blank space from the given string.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public static function squish($value)
+    {
+        return preg_replace('~(\s|\x{3164})+~u', ' ', preg_replace('~^[\s﻿]+|[\s﻿]+$~u', '', $value));
+    }
+
+    /**
      * Determine if a given string starts with a given substring.
      *
      * @param  string  $haystack
-     * @param  string|string[]  $needles
+     * @param  string|iterable<string>  $needles
      * @return bool
      */
     public static function startsWith($haystack, $needles)
     {
-        foreach ((array) $needles as $needle) {
+        if (! is_iterable($needles)) {
+            $needles = [$needles];
+        }
+
+        foreach ($needles as $needle) {
             if ((string) $needle !== '' && str_starts_with($haystack, $needle)) {
                 return true;
             }
@@ -866,9 +1105,7 @@ class Str
 
         $words = explode(' ', static::replace(['-', '_'], ' ', $value));
 
-        $studlyWords = array_map(function ($word) {
-            return static::ucfirst($word);
-        }, $words);
+        $studlyWords = array_map(fn ($word) => static::ucfirst($word), $words);
 
         return static::$studlyCache[$key] = implode($studlyWords);
     }
@@ -907,11 +1144,11 @@ class Str
     /**
      * Replace text within a portion of a string.
      *
-     * @param  string|array  $string
-     * @param  string|array  $replace
-     * @param  array|int  $offset
-     * @param  array|int|null  $length
-     * @return string|array
+     * @param  string|string[]  $string
+     * @param  string|string[]  $replace
+     * @param  int|int[]  $offset
+     * @param  int|int[]|null  $length
+     * @return string|string[]
      */
     public static function substrReplace($string, $replace, $offset = 0, $length = null)
     {
@@ -935,6 +1172,17 @@ class Str
     }
 
     /**
+     * Make a string's first character lowercase.
+     *
+     * @param  string  $string
+     * @return string
+     */
+    public static function lcfirst($string)
+    {
+        return static::lower(static::substr($string, 0, 1)).static::substr($string, 1);
+    }
+
+    /**
      * Make a string's first character uppercase.
      *
      * @param  string  $string
@@ -949,7 +1197,7 @@ class Str
      * Split a string into pieces by uppercase characters.
      *
      * @param  string  $string
-     * @return array
+     * @return string[]
      */
     public static function ucsplit($string)
     {
@@ -960,11 +1208,12 @@ class Str
      * Get the number of words a string contains.
      *
      * @param  string  $string
+     * @param  string|null  $characters
      * @return int
      */
-    public static function wordCount($string)
+    public static function wordCount($string, $characters = null)
     {
-        return str_word_count($string);
+        return str_word_count($string, 0, $characters);
     }
 
     /**
@@ -980,28 +1229,13 @@ class Str
     }
 
     /**
-     * Generate a time-ordered UUID (version 4).
+     * Generate a time-ordered UUID (version 7).
      *
      * @return \Ramsey\Uuid\UuidInterface
      */
     public static function orderedUuid()
     {
-        if (static::$uuidFactory) {
-            return call_user_func(static::$uuidFactory);
-        }
-
-        $factory = new UuidFactory;
-
-        $factory->setRandomGenerator(new CombGenerator(
-            $factory->getRandomGenerator(),
-            $factory->getNumberConverter()
-        ));
-
-        $factory->setCodec(new TimestampFirstCombCodec(
-            $factory->getUuidBuilder()
-        ));
-
-        return $factory->uuid4();
+        return Uuid::uuid7();
     }
 
     /**
@@ -1016,6 +1250,63 @@ class Str
     }
 
     /**
+     * Set the sequence that will be used to generate UUIDs.
+     *
+     * @param  array  $sequence
+     * @param  callable|null  $whenMissing
+     * @return void
+     */
+    public static function createUuidsUsingSequence(array $sequence, $whenMissing = null)
+    {
+        $next = 0;
+
+        $whenMissing ??= function () use (&$next) {
+            $factoryCache = static::$uuidFactory;
+
+            static::$uuidFactory = null;
+
+            $uuid = static::uuid();
+
+            static::$uuidFactory = $factoryCache;
+
+            $next++;
+
+            return $uuid;
+        };
+
+        static::createUuidsUsing(function () use (&$next, $sequence, $whenMissing) {
+            if (array_key_exists($next, $sequence)) {
+                return $sequence[$next++];
+            }
+
+            return $whenMissing();
+        });
+    }
+
+    /**
+     * Always return the same UUID when generating new UUIDs.
+     *
+     * @param  \Closure|null  $callback
+     * @return \Ramsey\Uuid\UuidInterface
+     */
+    public static function freezeUuids(Closure $callback = null)
+    {
+        $uuid = Str::uuid();
+
+        Str::createUuidsUsing(fn () => $uuid);
+
+        if ($callback !== null) {
+            try {
+                $callback($uuid);
+            } finally {
+                Str::createUuidsNormally();
+            }
+        }
+
+        return $uuid;
+    }
+
+    /**
      * Indicate that UUIDs should be created normally and not using a custom factory.
      *
      * @return void
@@ -1023,6 +1314,16 @@ class Str
     public static function createUuidsNormally()
     {
         static::$uuidFactory = null;
+    }
+
+    /**
+     * Generate a ULID.
+     *
+     * @return \Symfony\Component\Uid\Ulid
+     */
+    public static function ulid()
+    {
+        return new Ulid();
     }
 
     /**

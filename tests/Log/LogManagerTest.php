@@ -13,6 +13,7 @@ use Monolog\Handler\NewRelicHandler;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogHandler;
+use Monolog\Level;
 use Monolog\Logger as Monolog;
 use Monolog\Processor\UidProcessor;
 use Orchestra\Testbench\TestCase;
@@ -29,6 +30,20 @@ class LogManagerTest extends TestCase
         $logger2 = $manager->channel('single')->getLogger();
 
         $this->assertSame($logger1, $logger2);
+    }
+
+    public function testLogManagerGetDefaultDriver()
+    {
+        $config = $this->app['config'];
+        $config->set('logging.default', 'single');
+
+        $manager = new LogManager($this->app);
+        $this->assertEmpty($manager->getChannels());
+
+        //we don't specify any channel name
+        $manager->channel();
+        $this->assertCount(1, $manager->getChannels());
+        $this->assertEquals('single', $manager->getDefaultDriver());
     }
 
     public function testStackChannel()
@@ -70,8 +85,8 @@ class LogManagerTest extends TestCase
         $this->assertCount(2, $handlers);
         $this->assertInstanceOf(StreamHandler::class, $handlers[0]);
         $this->assertInstanceOf(StreamHandler::class, $handlers[1]);
-        $this->assertEquals(Monolog::NOTICE, $handlers[0]->getLevel());
-        $this->assertEquals(Monolog::INFO, $handlers[1]->getLevel());
+        $this->assertEquals(Level::Notice, $handlers[0]->getLevel());
+        $this->assertEquals(Level::Info, $handlers[1]->getLevel());
         $this->assertFalse($handlers[0]->getBubble());
         $this->assertTrue($handlers[1]->getBubble());
     }
@@ -100,7 +115,7 @@ class LogManagerTest extends TestCase
         $this->assertSame('foobar', $logger->getName());
         $this->assertCount(1, $handlers);
         $this->assertInstanceOf(StreamHandler::class, $handlers[0]);
-        $this->assertEquals(Monolog::NOTICE, $handlers[0]->getLevel());
+        $this->assertEquals(Level::Notice, $handlers[0]->getLevel());
         $this->assertFalse($handlers[0]->getBubble());
 
         $url = new ReflectionProperty(get_class($handlers[0]), 'url');
@@ -183,12 +198,7 @@ class LogManagerTest extends TestCase
         $logger = $manager->channel('null');
         $handler = $logger->getLogger()->getHandlers()[0];
 
-        if (Monolog::API === 1) {
-            $this->assertInstanceOf(NullHandler::class, $handler);
-            $this->assertInstanceOf(HtmlFormatter::class, $handler->getFormatter());
-        } else {
-            $this->assertInstanceOf(NullHandler::class, $handler);
-        }
+        $this->assertInstanceOf(NullHandler::class, $handler);
 
         $config->set('logging.channels.null2', [
             'driver' => 'monolog',
@@ -198,12 +208,7 @@ class LogManagerTest extends TestCase
         $logger = $manager->channel('null2');
         $handler = $logger->getLogger()->getHandlers()[0];
 
-        if (Monolog::API === 1) {
-            $this->assertInstanceOf(NullHandler::class, $handler);
-            $this->assertInstanceOf(LineFormatter::class, $handler->getFormatter());
-        } else {
-            $this->assertInstanceOf(NullHandler::class, $handler);
-        }
+        $this->assertInstanceOf(NullHandler::class, $handler);
     }
 
     public function testItUtilisesTheNullDriverDuringTestsWhenNullDriverUsed()
@@ -459,7 +464,7 @@ class LogManagerTest extends TestCase
         $this->assertCount(1, $handlers);
 
         $expectedFingersCrossedHandler = $handlers[0];
-        $this->assertInstanceOf(FingersCrossedHandler::class, $expectedFingersCrossedHandler, );
+        $this->assertInstanceOf(FingersCrossedHandler::class, $expectedFingersCrossedHandler);
 
         $activationStrategyProp = new ReflectionProperty(get_class($expectedFingersCrossedHandler), 'activationStrategy');
         $activationStrategyProp->setAccessible(true);
@@ -469,7 +474,7 @@ class LogManagerTest extends TestCase
         $actionLevelProp->setAccessible(true);
         $actionLevelValue = $actionLevelProp->getValue($activationStrategyValue);
 
-        $this->assertEquals(Monolog::CRITICAL, $actionLevelValue);
+        $this->assertEquals(Level::Critical, $actionLevelValue);
 
         if (method_exists($expectedFingersCrossedHandler, 'getHandler')) {
             $expectedStreamHandler = $expectedFingersCrossedHandler->getHandler();
@@ -479,6 +484,207 @@ class LogManagerTest extends TestCase
             $expectedStreamHandler = $handlerProp->getValue($expectedFingersCrossedHandler);
         }
         $this->assertInstanceOf(StreamHandler::class, $expectedStreamHandler);
-        $this->assertEquals(Monolog::DEBUG, $expectedStreamHandler->getLevel());
+        $this->assertEquals(Level::Debug, $expectedStreamHandler->getLevel());
+    }
+
+    public function testFingersCrossedHandlerStopsRecordBufferingAfterFirstFlushByDefault()
+    {
+        $config = $this->app['config'];
+
+        $config->set('logging.channels.fingerscrossed', [
+            'driver' => 'monolog',
+            'handler' => StreamHandler::class,
+            'level' => 'debug',
+            'action_level' => 'critical',
+            'with' => [
+                'stream' => 'php://stderr',
+                'bubble' => false,
+            ],
+        ]);
+
+        $manager = new LogManager($this->app);
+
+        // create logger with handler specified from configuration
+        $logger = $manager->channel('fingerscrossed');
+        $handlers = $logger->getLogger()->getHandlers();
+
+        $expectedFingersCrossedHandler = $handlers[0];
+
+        $stopBufferingProp = new ReflectionProperty(get_class($expectedFingersCrossedHandler), 'stopBuffering');
+        $stopBufferingProp->setAccessible(true);
+        $stopBufferingValue = $stopBufferingProp->getValue($expectedFingersCrossedHandler);
+
+        $this->assertTrue($stopBufferingValue);
+    }
+
+    public function testFingersCrossedHandlerCanBeConfiguredToResumeBufferingAfterFlushing()
+    {
+        $config = $this->app['config'];
+
+        $config->set('logging.channels.fingerscrossed', [
+            'driver' => 'monolog',
+            'handler' => StreamHandler::class,
+            'level' => 'debug',
+            'action_level' => 'critical',
+            'stop_buffering' => false,
+            'with' => [
+                'stream' => 'php://stderr',
+                'bubble' => false,
+            ],
+        ]);
+
+        $manager = new LogManager($this->app);
+
+        // create logger with handler specified from configuration
+        $logger = $manager->channel('fingerscrossed');
+        $handlers = $logger->getLogger()->getHandlers();
+
+        $expectedFingersCrossedHandler = $handlers[0];
+
+        $stopBufferingProp = new ReflectionProperty(get_class($expectedFingersCrossedHandler), 'stopBuffering');
+        $stopBufferingProp->setAccessible(true);
+        $stopBufferingValue = $stopBufferingProp->getValue($expectedFingersCrossedHandler);
+
+        $this->assertFalse($stopBufferingValue);
+    }
+
+    public function testItSharesContextWithAlreadyResolvedChannels()
+    {
+        $manager = new LogManager($this->app);
+        $channel = $manager->channel('single');
+        $context = null;
+
+        $channel->listen(function ($message) use (&$context) {
+            $context = $message->context;
+        });
+        $manager->shareContext([
+            'invocation-id' => 'expected-id',
+        ]);
+        $channel->info('xxxx');
+
+        $this->assertSame(['invocation-id' => 'expected-id'], $context);
+    }
+
+    public function testItSharesContextWithFreshlyResolvedChannels()
+    {
+        $manager = new LogManager($this->app);
+        $context = null;
+
+        $manager->shareContext([
+            'invocation-id' => 'expected-id',
+        ]);
+        $manager->channel('single')->listen(function ($message) use (&$context) {
+            $context = $message->context;
+        });
+        $manager->channel('single')->info('xxxx');
+
+        $this->assertSame(['invocation-id' => 'expected-id'], $context);
+    }
+
+    public function testContextCanBePublicallyAccessedByOtherLoggingSystems()
+    {
+        $manager = new LogManager($this->app);
+        $context = null;
+
+        $manager->shareContext([
+            'invocation-id' => 'expected-id',
+        ]);
+
+        $this->assertSame($manager->sharedContext(), ['invocation-id' => 'expected-id']);
+    }
+
+    public function testItSharesContextWithStacksWhenTheyAreResolved()
+    {
+        $manager = new LogManager($this->app);
+        $context = null;
+
+        $manager->shareContext([
+            'invocation-id' => 'expected-id',
+        ]);
+        $stack = $manager->stack(['single']);
+        $stack->listen(function ($message) use (&$context) {
+            $context = $message->context;
+        });
+        $stack->info('xxxx');
+
+        $this->assertSame(['invocation-id' => 'expected-id'], $context);
+    }
+
+    public function testItMergesSharedContextRatherThanReplacing()
+    {
+        $manager = new LogManager($this->app);
+        $context = null;
+
+        $manager->shareContext([
+            'invocation-id' => 'expected-id',
+        ]);
+        $manager->shareContext([
+            'invocation-start' => 1651800456,
+        ]);
+        $manager->channel('single')->listen(function ($message) use (&$context) {
+            $context = $message->context;
+        });
+        $manager->channel('single')->info('xxxx', [
+            'logged' => 'context',
+        ]);
+
+        $this->assertSame([
+            'invocation-id' => 'expected-id',
+            'invocation-start' => 1651800456,
+            'logged' => 'context',
+        ], $context);
+        $this->assertSame([
+            'invocation-id' => 'expected-id',
+            'invocation-start' => 1651800456,
+        ], $manager->sharedContext());
+    }
+
+    public function testFlushSharedContext()
+    {
+        $manager = new LogManager($this->app);
+
+        $manager->shareContext($context = ['foo' => 'bar']);
+
+        $this->assertSame($context, $manager->sharedContext());
+
+        $manager->flushSharedContext();
+
+        $this->assertEmpty($manager->sharedContext());
+    }
+
+    public function testLogManagerCreateCustomFormatterWithTap()
+    {
+        $config = $this->app['config'];
+        $config->set('logging.channels.custom', [
+            'driver' => 'single',
+            'tap' => [CustomizeFormatter::class],
+        ]);
+
+        $manager = new LogManager($this->app);
+
+        $logger = $manager->channel('custom');
+        $handler = $logger->getLogger()->getHandlers()[0];
+        $formatter = $handler->getFormatter();
+
+        $this->assertInstanceOf(LineFormatter::class, $formatter);
+
+        $format = new ReflectionProperty(get_class($formatter), 'format');
+        $format->setAccessible(true);
+
+        $this->assertEquals(
+            '[%datetime%] %channel%.%level_name%: %message% %context% %extra%',
+            rtrim($format->getValue($formatter)));
+    }
+}
+
+class CustomizeFormatter
+{
+    public function __invoke($logger)
+    {
+        foreach ($logger->getHandlers() as $handler) {
+            $handler->setFormatter(new LineFormatter(
+                '[%datetime%] %channel%.%level_name%: %message% %context% %extra%'
+            ));
+        }
     }
 }

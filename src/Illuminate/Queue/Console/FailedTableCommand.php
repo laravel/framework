@@ -5,7 +5,9 @@ namespace Illuminate\Queue\Console;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Composer;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'queue:failed-table')]
 class FailedTableCommand extends Command
 {
     /**
@@ -14,15 +16,6 @@ class FailedTableCommand extends Command
      * @var string
      */
     protected $name = 'queue:failed-table';
-
-    /**
-     * The name of the console command.
-     *
-     * This name is used to identify the command during lazy loading.
-     *
-     * @var string|null
-     */
-    protected static $defaultName = 'queue:failed-table';
 
     /**
      * The console command description.
@@ -71,7 +64,7 @@ class FailedTableCommand extends Command
             $this->createBaseMigration($table), $table
         );
 
-        $this->info('Migration created successfully!');
+        $this->components->info('Migration created successfully.');
 
         $this->composer->dumpAutoloads();
     }

@@ -39,7 +39,7 @@ class SyncJob extends Job implements JobContract
     }
 
     /**
-     * Release the job back into the queue.
+     * Release the job back into the queue after (n) seconds.
      *
      * @param  int  $delay
      * @return void

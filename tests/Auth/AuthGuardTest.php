@@ -222,7 +222,8 @@ class AuthGuardTest extends TestCase
     public function testAuthenticateReturnsUserWhenUserIsNotNull()
     {
         $user = m::mock(Authenticatable::class);
-        $guard = $this->getGuard()->setUser($user);
+        $guard = $this->getGuard();
+        $guard->setUser($user);
 
         $this->assertEquals($user, $guard->authenticate());
     }
@@ -250,7 +251,8 @@ class AuthGuardTest extends TestCase
     public function testHasUserReturnsTrueWhenUserIsNotNull()
     {
         $user = m::mock(Authenticatable::class);
-        $guard = $this->getGuard()->setUser($user);
+        $guard = $this->getGuard();
+        $guard->setUser($user);
 
         $this->assertTrue($guard->hasUser());
     }
@@ -427,7 +429,7 @@ class AuthGuardTest extends TestCase
         $guard = new SessionGuard('default', $provider, $session, $request);
         $guard->setCookieJar($cookie);
         $foreverCookie = new Cookie($guard->getRecallerName(), 'foo');
-        $cookie->shouldReceive('make')->once()->with($guard->getRecallerName(), 'foo|recaller|bar', 2628000)->andReturn($foreverCookie);
+        $cookie->shouldReceive('make')->once()->with($guard->getRecallerName(), 'foo|recaller|bar', 576000)->andReturn($foreverCookie);
         $cookie->shouldReceive('queue')->once()->with($foreverCookie);
         $guard->getSession()->shouldReceive('put')->once()->with($guard->getName(), 'foo');
         $session->shouldReceive('migrate')->once();

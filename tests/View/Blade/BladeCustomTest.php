@@ -223,4 +223,11 @@ class BladeCustomTest extends AbstractBladeTestCase
         $expected = '<?php echo $__env->make(\'app.includes.foreach\', [], \Illuminate\Support\Arr::except(get_defined_vars(), [\'__data\', \'__path\']))->render(); ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
+
+    public function testUnescapedNonRegisteredDirective()
+    {
+        $string = '@media only screen and (min-width:480px) {';
+        $expected = '@media only screen and (min-width:480px) {';
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
 }

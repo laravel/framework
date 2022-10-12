@@ -14,7 +14,7 @@
         }
     ],
     "require": {
-        "php": "^8.0.2",
+        "php": "^8.1",
         "illuminate/collections": "^10.0",
         "illuminate/contracts": "^10.0",
         "illuminate/macroable": "^10.0",
@@ -27,7 +27,7 @@
     },
     "suggest": {
         "ext-redis": "Required to use the phpredis connector (^4.0|^5.0).",
-        "predis/predis": "Required to use the predis connector (^1.1.9)."
+        "predis/predis": "Required to use the predis connector (^2.0)."
     },
     "extra": {
         "branch-alias": {

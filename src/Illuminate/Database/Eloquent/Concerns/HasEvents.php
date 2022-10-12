@@ -338,7 +338,7 @@ trait HasEvents
     }
 
     /**
-     * Remove all of the event listeners for the model.
+     * Remove all the event listeners for the model.
      *
      * @return void
      */

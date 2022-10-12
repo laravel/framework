@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Foundation\Testing;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\RefreshDatabaseState;
-use Mockery;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 
@@ -17,12 +17,12 @@ class DatabaseMigrationsTest extends TestCase
     {
         RefreshDatabaseState::$migrated = false;
 
-        $this->traitObject = $this->getMockForTrait(DatabaseMigrations::class, [], '', true, true, true, [
+        $this->traitObject = $this->getMockForAbstractClass(DatabaseMigrationsTestMockClass::class, [], '', true, true, true, [
             'artisan',
             'beforeApplicationDestroyed',
         ]);
 
-        $kernelObj = Mockery::mock();
+        $kernelObj = m::mock();
         $kernelObj->shouldReceive('setArtisan')
             ->with(null);
 
@@ -94,4 +94,15 @@ class DatabaseMigrationsTest extends TestCase
 
         $refreshTestDatabaseReflection->invoke($this->traitObject);
     }
+}
+
+class DatabaseMigrationsTestMockClass
+{
+    use DatabaseMigrations;
+
+    public $app;
+
+    public $dropViews = false;
+
+    public $dropTypes = false;
 }

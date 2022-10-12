@@ -63,4 +63,20 @@ class StorageTest extends TestCase
         Storage::disk('public')->assertMissing('StardewTaylor.png');
         $this->assertFalse(Storage::disk('public')->exists('StardewTaylor.png'));
     }
+
+    public function testConditionable()
+    {
+        Storage::disk('public')->assertExists('StardewTaylor.png');
+        $this->assertTrue(Storage::disk('public')->exists('StardewTaylor.png'));
+
+        Storage::disk('public')->when(false)->delete('StardewTaylor.png');
+
+        Storage::disk('public')->assertExists('StardewTaylor.png');
+        $this->assertTrue(Storage::disk('public')->exists('StardewTaylor.png'));
+
+        Storage::disk('public')->when(true)->delete('StardewTaylor.png');
+
+        Storage::disk('public')->assertMissing('StardewTaylor.png');
+        $this->assertFalse(Storage::disk('public')->exists('StardewTaylor.png'));
+    }
 }

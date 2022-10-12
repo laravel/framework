@@ -178,6 +178,24 @@ class AuthorizeMiddlewareTest extends TestCase
         $this->assertSame('success', $response->content());
     }
 
+    public function testSimpleAbilityWithStringParameter0FromRouteParameter()
+    {
+        $this->gate()->define('view-dashboard', function ($user, $param) {
+            return $param === '0';
+        });
+
+        $this->router->get('dashboard/{route_parameter}', [
+            'middleware' => Authorize::class.':view-dashboard,route_parameter',
+            'uses' => function () {
+                return 'success';
+            },
+        ]);
+
+        $response = $this->router->dispatch(Request::create('dashboard/0', 'GET'));
+
+        $this->assertSame('success', $response->content());
+    }
+
     public function testModelTypeUnauthorized()
     {
         $this->expectException(AuthorizationException::class);

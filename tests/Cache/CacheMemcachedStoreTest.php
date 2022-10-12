@@ -71,9 +71,6 @@ class CacheMemcachedStoreTest extends TestCase
 
     public function testIncrementMethodProperlyCallsMemcache()
     {
-        /** @link https://github.com/php-memcached-dev/php-memcached/pull/468 */
-        $this->markTestSkipped('Test broken due to parse error in PHP Memcached.');
-
         $memcached = m::mock(Memcached::class);
         $memcached->shouldReceive('increment')->with('foo', 5)->once()->andReturn(5);
 
@@ -83,9 +80,6 @@ class CacheMemcachedStoreTest extends TestCase
 
     public function testDecrementMethodProperlyCallsMemcache()
     {
-        /** @link https://github.com/php-memcached-dev/php-memcached/pull/468 */
-        $this->markTestSkipped('Test broken due to parse error in PHP Memcached.');
-
         $memcached = m::mock(Memcached::class);
         $memcached->shouldReceive('decrement')->with('foo', 5)->once()->andReturn(0);
 

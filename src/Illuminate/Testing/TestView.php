@@ -2,6 +2,10 @@
 
 namespace Illuminate\Testing;
 
+use Closure;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Testing\Assert as PHPUnit;
 use Illuminate\Testing\Constraints\SeeInOrder;
@@ -35,6 +39,71 @@ class TestView
     {
         $this->view = $view;
         $this->rendered = $view->render();
+    }
+
+    /**
+     * Assert that the response view has a given piece of bound data.
+     *
+     * @param  string|array  $key
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function assertViewHas($key, $value = null)
+    {
+        if (is_array($key)) {
+            return $this->assertViewHasAll($key);
+        }
+
+        if (is_null($value)) {
+            PHPUnit::assertTrue(Arr::has($this->view->gatherData(), $key));
+        } elseif ($value instanceof Closure) {
+            PHPUnit::assertTrue($value(Arr::get($this->view->gatherData(), $key)));
+        } elseif ($value instanceof Model) {
+            PHPUnit::assertTrue($value->is(Arr::get($this->view->gatherData(), $key)));
+        } elseif ($value instanceof Collection) {
+            $actual = Arr::get($this->view->gatherData(), $key);
+
+            PHPUnit::assertInstanceOf(Collection::class, $actual);
+            PHPUnit::assertSameSize($value, $actual);
+
+            $value->each(fn ($item, $index) => PHPUnit::assertTrue($actual->get($index)->is($item)));
+        } else {
+            PHPUnit::assertEquals($value, Arr::get($this->view->gatherData(), $key));
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert that the response view has a given list of bound data.
+     *
+     * @param  array  $bindings
+     * @return $this
+     */
+    public function assertViewHasAll(array $bindings)
+    {
+        foreach ($bindings as $key => $value) {
+            if (is_int($key)) {
+                $this->assertViewHas($value);
+            } else {
+                $this->assertViewHas($key, $value);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert that the response view is missing a piece of bound data.
+     *
+     * @param  string  $key
+     * @return $this
+     */
+    public function assertViewMissing($key)
+    {
+        PHPUnit::assertFalse(Arr::has($this->view->gatherData(), $key));
+
+        return $this;
     }
 
     /**

@@ -26,7 +26,8 @@ use PHPUnit\Framework\Assert as PHPUnit;
  * @method \Illuminate\Http\Client\PendingRequest contentType(string $contentType)
  * @method \Illuminate\Http\Client\PendingRequest dd()
  * @method \Illuminate\Http\Client\PendingRequest dump()
- * @method \Illuminate\Http\Client\PendingRequest retry(int $times, int $sleep = 0, ?callable $when = null, bool $throw = true)
+ * @method \Illuminate\Http\Client\PendingRequest maxRedirects(int $max)
+ * @method \Illuminate\Http\Client\PendingRequest retry(int $times, int $sleepMilliseconds = 0, ?callable $when = null, bool $throw = true)
  * @method \Illuminate\Http\Client\PendingRequest sink(string|resource $to)
  * @method \Illuminate\Http\Client\PendingRequest stub(callable $callback)
  * @method \Illuminate\Http\Client\PendingRequest timeout(int $seconds)
@@ -41,6 +42,9 @@ use PHPUnit\Framework\Assert as PHPUnit;
  * @method \Illuminate\Http\Client\PendingRequest withUserAgent(string $userAgent)
  * @method \Illuminate\Http\Client\PendingRequest withoutRedirecting()
  * @method \Illuminate\Http\Client\PendingRequest withoutVerifying()
+ * @method \Illuminate\Http\Client\PendingRequest throw(callable $callback = null)
+ * @method \Illuminate\Http\Client\PendingRequest throwIf($condition)
+ * @method \Illuminate\Http\Client\PendingRequest throwUnless($condition)
  * @method array pool(callable $callback)
  * @method \Illuminate\Http\Client\Response delete(string $url, array $data = [])
  * @method \Illuminate\Http\Client\Response get(string $url, array|string|null $query = null)
@@ -94,6 +98,13 @@ class Factory
     protected $responseSequences = [];
 
     /**
+     * Indicates that an exception should be thrown if any request is not faked.
+     *
+     * @var bool
+     */
+    protected $preventStrayRequests = false;
+
+    /**
      * Create a new factory instance.
      *
      * @param  \Illuminate\Contracts\Events\Dispatcher|null  $dispatcher
@@ -109,7 +120,7 @@ class Factory
     /**
      * Create a new response instance for use during stubbing.
      *
-     * @param  array|string  $body
+     * @param  array|string|null  $body
      * @param  int  $status
      * @param  array  $headers
      * @return \GuzzleHttp\Promise\PromiseInterface
@@ -143,7 +154,7 @@ class Factory
     /**
      * Register a stub callable that will intercept requests and be able to return stub responses.
      *
-     * @param  callable|array  $callback
+     * @param  callable|array|null  $callback
      * @return $this
      */
     public function fake($callback = null)
@@ -217,6 +228,29 @@ class Factory
                         ? $callback($request, $options)
                         : $callback;
         });
+    }
+
+    /**
+     * Indicate that an exception should be thrown if any request is not faked.
+     *
+     * @param  bool  $prevent
+     * @return $this
+     */
+    public function preventStrayRequests($prevent = true)
+    {
+        $this->preventStrayRequests = $prevent;
+
+        return $this;
+    }
+
+    /**
+     * Indicate that an exception should not be thrown if any request is not faked.
+     *
+     * @return $this
+     */
+    public function allowStrayRequests()
+    {
+        return $this->preventStrayRequests(false);
     }
 
     /**
@@ -389,7 +423,7 @@ class Factory
         }
 
         return tap($this->newPendingRequest(), function ($request) {
-            $request->stub($this->stubCallbacks);
+            $request->stub($this->stubCallbacks)->preventStrayRequests($this->preventStrayRequests);
         })->{$method}(...$parameters);
     }
 }

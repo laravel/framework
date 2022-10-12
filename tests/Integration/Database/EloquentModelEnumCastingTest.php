@@ -7,13 +7,8 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-if (PHP_VERSION_ID >= 80100) {
-    include 'Enums.php';
-}
+include 'Enums.php';
 
-/**
- * @requires PHP >= 8.1
- */
 class EloquentModelEnumCastingTest extends DatabaseTestCase
 {
     protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
@@ -22,6 +17,7 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
             $table->increments('id');
             $table->string('string_status', 100)->nullable();
             $table->integer('integer_status')->nullable();
+            $table->string('arrayable_status')->nullable();
         });
     }
 
@@ -30,12 +26,14 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
         DB::table('enum_casts')->insert([
             'string_status' => 'pending',
             'integer_status' => 1,
+            'arrayable_status' => 'pending',
         ]);
 
         $model = EloquentModelEnumCastingTestModel::first();
 
         $this->assertEquals(StringStatus::pending, $model->string_status);
         $this->assertEquals(IntegerStatus::pending, $model->integer_status);
+        $this->assertEquals(ArrayableStatus::pending, $model->arrayable_status);
     }
 
     public function testEnumsReturnNullWhenNull()
@@ -43,12 +41,14 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
         DB::table('enum_casts')->insert([
             'string_status' => null,
             'integer_status' => null,
+            'arrayable_status' => null,
         ]);
 
         $model = EloquentModelEnumCastingTestModel::first();
 
         $this->assertEquals(null, $model->string_status);
         $this->assertEquals(null, $model->integer_status);
+        $this->assertEquals(null, $model->arrayable_status);
     }
 
     public function testEnumsAreCastableToArray()
@@ -56,11 +56,17 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
         $model = new EloquentModelEnumCastingTestModel([
             'string_status' => StringStatus::pending,
             'integer_status' => IntegerStatus::pending,
+            'arrayable_status' => ArrayableStatus::pending,
         ]);
 
         $this->assertEquals([
             'string_status' => 'pending',
             'integer_status' => 1,
+            'arrayable_status' => [
+                'name' => 'pending',
+                'value' => 'pending',
+                'description' => 'pending status description',
+            ],
         ], $model->toArray());
     }
 
@@ -69,11 +75,13 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
         $model = new EloquentModelEnumCastingTestModel([
             'string_status' => null,
             'integer_status' => null,
+            'arrayable_status' => null,
         ]);
 
         $this->assertEquals([
             'string_status' => null,
             'integer_status' => null,
+            'arrayable_status' => null,
         ], $model->toArray());
     }
 
@@ -82,6 +90,7 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
         $model = new EloquentModelEnumCastingTestModel([
             'string_status' => StringStatus::pending,
             'integer_status' => IntegerStatus::pending,
+            'arrayable_status' => ArrayableStatus::pending,
         ]);
 
         $model->save();
@@ -90,6 +99,7 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
             'id' => $model->id,
             'string_status' => 'pending',
             'integer_status' => 1,
+            'arrayable_status' => 'pending',
         ], DB::table('enum_casts')->where('id', $model->id)->first());
     }
 
@@ -98,6 +108,7 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
         $model = new EloquentModelEnumCastingTestModel([
             'string_status' => null,
             'integer_status' => null,
+            'arrayable_status' => null,
         ]);
 
         $model->save();
@@ -106,6 +117,7 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
             'id' => $model->id,
             'string_status' => null,
             'integer_status' => null,
+            'arrayable_status' => null,
         ], DB::table('enum_casts')->where('id', $model->id)->first());
     }
 
@@ -114,6 +126,7 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
         $model = new EloquentModelEnumCastingTestModel([
             'string_status' => 'pending',
             'integer_status' => 1,
+            'arrayable_status' => 'pending',
         ]);
 
         $model->save();
@@ -122,6 +135,7 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
 
         $this->assertEquals(StringStatus::pending, $model->string_status);
         $this->assertEquals(IntegerStatus::pending, $model->integer_status);
+        $this->assertEquals(ArrayableStatus::pending, $model->arrayable_status);
     }
 
     public function testFirstOrNew()
@@ -129,6 +143,7 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
         DB::table('enum_casts')->insert([
             'string_status' => 'pending',
             'integer_status' => 1,
+            'arrayable_status' => 'pending',
         ]);
 
         $model = EloquentModelEnumCastingTestModel::firstOrNew([
@@ -176,5 +191,6 @@ class EloquentModelEnumCastingTestModel extends Model
     public $casts = [
         'string_status' => StringStatus::class,
         'integer_status' => IntegerStatus::class,
+        'arrayable_status' => ArrayableStatus::class,
     ];
 }

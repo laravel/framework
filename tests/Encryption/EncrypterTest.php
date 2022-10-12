@@ -160,6 +160,18 @@ class EncrypterTest extends TestCase
         $e->decrypt($payload);
     }
 
+    public function testDecryptionExceptionIsThrownWhenUnexpectedTagIsAdded()
+    {
+        $this->expectException(DecryptException::class);
+        $this->expectExceptionMessage('Unable to use tag because the cipher algorithm does not support AEAD.');
+
+        $e = new Encrypter(str_repeat('a', 16));
+        $payload = $e->encrypt('foo');
+        $decodedPayload = json_decode(base64_decode($payload));
+        $decodedPayload->tag = 'set-manually';
+        $e->decrypt(base64_encode(json_encode($decodedPayload)));
+    }
+
     public function testExceptionThrownWithDifferentKey()
     {
         $this->expectException(DecryptException::class);

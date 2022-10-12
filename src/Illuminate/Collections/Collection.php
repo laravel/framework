@@ -104,9 +104,8 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     public function median($key = null)
     {
         $values = (isset($key) ? $this->pluck($key) : $this)
-            ->filter(function ($item) {
-                return ! is_null($item);
-            })->sort()->values();
+            ->filter(fn ($item) => ! is_null($item))
+            ->sort()->values();
 
         $count = $values->count();
 
@@ -141,17 +140,14 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
 
         $counts = new static;
 
-        $collection->each(function ($value) use ($counts) {
-            $counts[$value] = isset($counts[$value]) ? $counts[$value] + 1 : 1;
-        });
+        $collection->each(fn ($value) => $counts[$value] = isset($counts[$value]) ? $counts[$value] + 1 : 1);
 
         $sorted = $counts->sort();
 
         $highestValue = $sorted->last();
 
-        return $sorted->filter(function ($value) use ($highestValue) {
-            return $value == $highestValue;
-        })->sort()->keys()->all();
+        return $sorted->filter(fn ($value) => $value == $highestValue)
+            ->sort()->keys()->all();
     }
 
     /**
@@ -167,7 +163,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Determine if an item exists in the collection.
      *
-     * @param  (callable(TValue): bool)|TValue|string  $key
+     * @param  (callable(TValue, TKey): bool)|TValue|string  $key
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return bool
@@ -231,7 +227,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      * Get the items in the collection that are not present in the given items, using the callback.
      *
      * @param  \Illuminate\Contracts\Support\Arrayable<array-key, TValue>|iterable<array-key, TValue>  $items
-     * @param  callable(TValue): int  $callback
+     * @param  callable(TValue, TValue): int  $callback
      * @return static
      */
     public function diffUsing($items, callable $callback)
@@ -254,7 +250,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      * Get the items in the collection whose keys and values are not present in the given items, using the callback.
      *
      * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>  $items
-     * @param  callable(TKey): int  $callback
+     * @param  callable(TKey, TKey): int  $callback
      * @return static
      */
     public function diffAssocUsing($items, callable $callback)
@@ -277,7 +273,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      * Get the items in the collection whose keys are not present in the given items, using the callback.
      *
      * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>  $items
-     * @param  callable(TKey): int  $callback
+     * @param  callable(TKey, TKey): int  $callback
      * @return static
      */
     public function diffKeysUsing($items, callable $callback)
@@ -488,7 +484,11 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
             }
 
             foreach ($groupKeys as $groupKey) {
-                $groupKey = is_bool($groupKey) ? (int) $groupKey : $groupKey;
+                $groupKey = match (true) {
+                    is_bool($groupKey) => (int) $groupKey,
+                    $groupKey instanceof \Stringable => (string) $groupKey,
+                    default => $groupKey,
+                };
 
                 if (! array_key_exists($groupKey, $results)) {
                     $results[$groupKey] = new static;
@@ -577,12 +577,16 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Concatenate values of a given key as a string.
      *
-     * @param  string  $value
+     * @param  callable|string  $value
      * @param  string|null  $glue
      * @return string
      */
     public function implode($value, $glue = null)
     {
+        if ($this->useAsCallable($value)) {
+            return implode($glue ?? '', $this->map($value)->all());
+        }
+
         $first = $this->first();
 
         if (is_array($first) || (is_object($first) && ! $first instanceof Stringable)) {
@@ -693,7 +697,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Get the values of a given key.
      *
-     * @param  string|array<array-key, string>  $value
+     * @param  string|int|array<array-key, string>  $value
      * @param  string|null  $key
      * @return static<int, mixed>
      */
@@ -712,11 +716,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function map(callable $callback)
     {
-        $keys = array_keys($this->items);
-
-        $items = array_map($callback, $this->items, $keys);
-
-        return new static(array_combine($keys, $items));
+        return new static(Arr::map($this->items, $callback));
     }
 
     /**
@@ -838,8 +838,8 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
 
         $position = 0;
 
-        foreach ($this->items as $item) {
-            if ($position % $step === $offset) {
+        foreach ($this->slice($offset)->items as $item) {
+            if ($position % $step === 0) {
                 $new[] = $item;
             }
 
@@ -852,7 +852,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Get the items with the specified keys.
      *
-     * @param  \Illuminate\Support\Enumerable<array-key, TKey>|array<array-key, TKey>  $keys
+     * @param  \Illuminate\Support\Enumerable<array-key, TKey>|array<array-key, TKey>|string  $keys
      * @return static
      */
     public function only($keys)
@@ -974,18 +974,23 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Get one or a specified number of items randomly from the collection.
      *
-     * @param  int|null  $number
+     * @param  (callable(self<TKey, TValue>): int)|int|null  $number
+     * @param  bool  $preserveKeys
      * @return static<int, TValue>|TValue
      *
      * @throws \InvalidArgumentException
      */
-    public function random($number = null)
+    public function random($number = null, $preserveKeys = false)
     {
         if (is_null($number)) {
             return Arr::random($this->items);
         }
 
-        return new static(Arr::random($this->items, $number));
+        if (is_callable($number)) {
+            return new static(Arr::random($this->items, $number($this), $preserveKeys));
+        }
+
+        return new static(Arr::random($this->items, $number, $preserveKeys));
     }
 
     /**
@@ -1208,12 +1213,14 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
 
         $items = $this->unless($filter == null)->filter($filter);
 
-        if ($items->isEmpty()) {
+        $count = $items->count();
+
+        if ($count === 0) {
             throw new ItemNotFoundException;
         }
 
-        if ($items->count() > 1) {
-            throw new MultipleItemsFoundException;
+        if ($count > 1) {
+            throw new MultipleItemsFoundException($count);
         }
 
         return $items->first();
@@ -1283,7 +1290,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Sort through each item with a callback.
      *
-     * @param  (callable(TValue, TValue): bool)|null|int  $callback
+     * @param  (callable(TValue, TValue): int)|null|int  $callback
      * @return static
      */
     public function sort($callback = null)
@@ -1315,7 +1322,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Sort the collection using the given callback.
      *
-     * @param  array<array-key, (callable(TValue, TKey): mixed)|array<array-key, string>|(callable(TValue, TKey): mixed)|string  $callback
+     * @param  array<array-key, (callable(TValue, TValue): mixed)|(callable(TValue, TKey): mixed)|string|array{string, string}>|(callable(TValue, TKey): mixed)|string  $callback
      * @param  int  $options
      * @param  bool  $descending
      * @return static
@@ -1353,14 +1360,14 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Sort the collection using multiple comparisons.
      *
-     * @param  array<array-key, (callable(TValue, TKey): mixed)|array<array-key, string>  $comparisons
+     * @param  array<array-key, (callable(TValue, TValue): mixed)|(callable(TValue, TKey): mixed)|string|array{string, string}>  $comparisons
      * @return static
      */
     protected function sortByMany(array $comparisons = [])
     {
         $items = $this->items;
 
-        usort($items, function ($a, $b) use ($comparisons) {
+        uasort($items, function ($a, $b) use ($comparisons) {
             foreach ($comparisons as $comparison) {
                 $comparison = Arr::wrap($comparison);
 
@@ -1368,8 +1375,6 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
 
                 $ascending = Arr::get($comparison, 1, true) === true ||
                              Arr::get($comparison, 1, true) === 'asc';
-
-                $result = 0;
 
                 if (! is_string($prop) && is_callable($prop)) {
                     $result = $prop($a, $b);
@@ -1397,7 +1402,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Sort the collection in descending order using the given callback.
      *
-     * @param  array<array-key, (callable(TValue, TKey): mixed)|array<array-key, string>|(callable(TValue, TKey): mixed)|string  $callback
+     * @param  array<array-key, (callable(TValue, TValue): mixed)|(callable(TValue, TKey): mixed)|string|array{string, string}>|(callable(TValue, TKey): mixed)|string  $callback
      * @param  int  $options
      * @return static
      */
@@ -1436,7 +1441,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Sort the collection keys using a callback.
      *
-     * @param  callable  $callback
+     * @param  callable(TKey, TKey): int  $callback
      * @return static
      */
     public function sortKeysUsing(callable $callback)
