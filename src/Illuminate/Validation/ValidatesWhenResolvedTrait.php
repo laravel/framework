@@ -24,7 +24,7 @@ trait ValidatesWhenResolvedTrait
 
         $instance = $this->getValidatorInstance();
 
-        if ($this->isPrecognitive()) {
+        if (method_exists($this, 'isPrecognitive') && $this->isPrecognitive()) {
             $instance->after(Precognition::afterValidationHook($this));
         }
 
