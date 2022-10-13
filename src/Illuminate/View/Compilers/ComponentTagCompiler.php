@@ -86,6 +86,15 @@ class ComponentTagCompiler
      */
     public function compileTags(string $value)
     {
+        $hasOpeningTag = preg_match($this->getOpeningTagsPattern(), $value, $matches);
+        $hasClosingTag = preg_match($this->getClosingTagsPattern(), $value);
+
+        if ($hasOpeningTag === 1 && $hasClosingTag === 0) {
+            throw new InvalidArgumentException(
+                "Missing Closing Tag for component [{$matches[1]}]."
+            );
+        }
+
         $value = $this->compileSelfClosingTags($value);
         $value = $this->compileOpeningTags($value);
         $value = $this->compileClosingTags($value);
