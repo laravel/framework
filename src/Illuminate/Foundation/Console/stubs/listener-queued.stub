@@ -12,8 +12,6 @@ class {{ class }} implements ShouldQueue
 
     /**
      * Create the event listener.
-     *
-     * @return void
      */
     public function __construct()
     {
@@ -22,11 +20,8 @@ class {{ class }} implements ShouldQueue
 
     /**
      * Handle the event.
-     *
-     * @param  {{ eventNamespace }}  $event
-     * @return void
      */
-    public function handle({{ event }} $event)
+    public function handle({{ event }} $event): void
     {
         //
     }
