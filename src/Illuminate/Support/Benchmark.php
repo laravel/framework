@@ -37,7 +37,7 @@ class Benchmark
      *
      * @param  \Closure|array  $benchmarkables
      * @param  int  $iterations
-     * @return void
+     * @return never
      */
     public static function dd(Closure|array $benchmarkables, int $iterations = 1): void
     {
