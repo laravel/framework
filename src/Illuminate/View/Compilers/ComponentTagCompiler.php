@@ -442,7 +442,17 @@ class ComponentTagCompiler
      */
     protected function compileClosingTags(string $value)
     {
-        return preg_replace("/<\/\s*x[-\:][\w\-\:\.]*\s*>/", ' @endComponentClass##END-COMPONENT-CLASS##', $value);
+        return preg_replace($this->getClosingTagsPattern(), ' @endComponentClass##END-COMPONENT-CLASS##', $value);
+    }
+
+    /**
+     * Get the closing tags pattern.
+     *
+     * @return string
+     */
+    protected function getClosingTagsPattern()
+    {
+        return "/<\/\s*x[-\:][\w\-\:\.]*\s*>/";
     }
 
     /**
