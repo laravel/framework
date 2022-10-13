@@ -103,7 +103,26 @@ class ComponentTagCompiler
      */
     protected function compileOpeningTags(string $value)
     {
-        $pattern = "/
+        $pattern = $this->getOpeningTagsPattern();
+
+        return preg_replace_callback($pattern, function (array $matches) {
+            $this->boundAttributes = [];
+
+            $attributes = $this->getAttributesFromAttributeString($matches['attributes']);
+
+            return $this->componentString($matches[1], $attributes);
+        }, $value);
+    }
+
+    /**
+     * Get the opening tags pattern.
+     *
+     * @return string
+     *
+     */
+    protected function getOpeningTagsPattern()
+    {
+        return "/
             <
                 \s*
                 x[-\:]([\w\-\:\.]*)
@@ -143,14 +162,6 @@ class ComponentTagCompiler
                 (?<![\/=\-])
             >
         /x";
-
-        return preg_replace_callback($pattern, function (array $matches) {
-            $this->boundAttributes = [];
-
-            $attributes = $this->getAttributesFromAttributeString($matches['attributes']);
-
-            return $this->componentString($matches[1], $attributes);
-        }, $value);
     }
 
     /**
