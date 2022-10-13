@@ -127,7 +127,6 @@ class ComponentTagCompiler
      * Get the opening tags pattern.
      *
      * @return string
-     *
      */
     protected function getOpeningTagsPattern()
     {
