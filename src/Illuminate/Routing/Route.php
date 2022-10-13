@@ -18,6 +18,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Laravel\SerializableClosure\SerializableClosure;
 use LogicException;
+use ReflectionFunction;
 use Symfony\Component\Routing\Route as SymfonyRoute;
 
 class Route
@@ -234,7 +235,16 @@ class Route
             $callable = unserialize($this->action['uses'])->getClosure();
         }
 
-        return $this->container[CallableDispatcher::class]->dispatch($this, $callable);
+        return $this->container[CallableDispatcher::class]
+            ->dispatch($this, 
+                $callable(...array_values(
+                    $this->resolveMethodDependencies(
+                        $this->parametersWithoutNulls(), 
+                        new ReflectionFunction($callable
+                        )
+                    )
+                ))
+            );
     }
 
     /**
