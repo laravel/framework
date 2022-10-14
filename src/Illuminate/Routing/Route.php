@@ -1128,7 +1128,7 @@ class Route
      *
      * @return $this
      */
-    public function withoutScopeBindings()
+    public function withoutScopedBindings()
     {
         $this->action['scope_bindings'] = false;
 
