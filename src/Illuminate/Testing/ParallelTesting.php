@@ -245,7 +245,7 @@ class ParallelTesting
      */
     public function option($option)
     {
-        $optionsResolver = $this->optionsResolver ?: function ($option) {
+        $optionsResolver = $this->optionsResolver ?: static function ($option) {
             $option = 'LARAVEL_PARALLEL_TESTING_'.Str::upper($option);
 
             return $_SERVER[$option] ?? false;

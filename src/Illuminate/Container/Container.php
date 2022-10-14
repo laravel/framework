@@ -287,7 +287,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function getClosure($abstract, $concrete)
     {
-        return function ($container, $parameters = []) use ($abstract, $concrete) {
+        return static function ($container, $parameters = []) use ($abstract, $concrete) {
             if ($abstract == $concrete) {
                 return $container->build($concrete);
             }
@@ -1428,7 +1428,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function offsetSet($key, $value): void
     {
-        $this->bind($key, $value instanceof Closure ? $value : function () use ($value) {
+        $this->bind($key, $value instanceof Closure ? $value : static function () use ($value) {
             return $value;
         });
     }

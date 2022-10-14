@@ -186,7 +186,7 @@ class PhpRedisConnector implements Connector
             $parameters[] = $context;
         }
 
-        return tap(new RedisCluster(...$parameters), function ($client) use ($options) {
+        return tap(new RedisCluster(...$parameters), static function ($client) use ($options) {
             if (! empty($options['prefix'])) {
                 $client->setOption(RedisCluster::OPT_PREFIX, $options['prefix']);
             }

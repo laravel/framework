@@ -627,7 +627,7 @@ class Gate implements GateContract
             return $this->abilities[$ability];
         }
 
-        return function () {
+        return static function () {
             //
         };
     }
@@ -681,7 +681,7 @@ class Gate implements GateContract
 
         $classDirnameSegments = explode('\\', $classDirname);
 
-        return Arr::wrap(Collection::times(count($classDirnameSegments), function ($index) use ($class, $classDirnameSegments) {
+        return Arr::wrap(Collection::times(count($classDirnameSegments), static function ($index) use ($class, $classDirnameSegments) {
             $classDirname = implode('\\', array_slice($classDirnameSegments, 0, $index));
 
             return $classDirname.'\\Policies\\'.class_basename($class).'Policy';

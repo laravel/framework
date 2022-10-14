@@ -496,7 +496,7 @@ abstract class Factory
     {
         return $this->newInstance([
             'states' => $this->states->concat([
-                is_callable($state) ? $state : function () use ($state) {
+                is_callable($state) ? $state : static function () use ($state) {
                     return $state;
                 },
             ]),
@@ -762,7 +762,7 @@ abstract class Factory
      */
     public function modelName()
     {
-        $resolver = static::$modelNameResolver ?? function (self $factory) {
+        $resolver = static::$modelNameResolver ?? static function (self $factory) {
             $namespacedFactoryBasename = Str::replaceLast(
                 'Factory', '', Str::replaceFirst(static::$namespace, '', get_class($factory))
             );
@@ -843,7 +843,7 @@ abstract class Factory
      */
     public static function resolveFactoryName(string $modelName)
     {
-        $resolver = static::$factoryNameResolver ?? function (string $modelName) {
+        $resolver = static::$factoryNameResolver ?? static function (string $modelName) {
             $appNamespace = static::appNamespace();
 
             $modelName = Str::startsWith($modelName, $appNamespace.'Models\\')

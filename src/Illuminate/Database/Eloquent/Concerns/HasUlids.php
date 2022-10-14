@@ -13,7 +13,7 @@ trait HasUlids
      */
     public static function bootHasUlids()
     {
-        static::creating(function (self $model) {
+        static::creating(static function (self $model) {
             foreach ($model->uniqueIds() as $column) {
                 if (empty($model->{$column})) {
                     $model->{$column} = $model->newUniqueId();

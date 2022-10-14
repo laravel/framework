@@ -133,7 +133,7 @@ class LogManager implements LoggerInterface
                 return $this->channels[$name] = $this->tap($name, new Logger($logger, $this->app['events']))->withContext($this->sharedContext);
             });
         } catch (Throwable $e) {
-            return tap($this->createEmergencyLogger(), function ($logger) use ($e) {
+            return tap($this->createEmergencyLogger(), static function ($logger) use ($e) {
                 $logger->emergency('Unable to create configured logger. Using emergency logger.', [
                     'exception' => $e,
                 ]);
@@ -446,7 +446,7 @@ class LogManager implements LoggerInterface
      */
     protected function formatter()
     {
-        return tap(new LineFormatter(null, $this->dateFormat, true, true), function ($formatter) {
+        return tap(new LineFormatter(null, $this->dateFormat, true, true), static function ($formatter) {
             $formatter->includeStacktraces();
         });
     }

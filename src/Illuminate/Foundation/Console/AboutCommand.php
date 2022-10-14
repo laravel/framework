@@ -194,7 +194,7 @@ class AboutCommand extends Command
             $logs = $logChannel;
         }
 
-        static::addToSection('Drivers', fn () => array_filter([
+        static::addToSection('Drivers', static fn () => array_filter([
             'Broadcasting' => config('broadcasting.default'),
             'Cache' => config('cache.default'),
             'Database' => config('database.default'),
@@ -230,7 +230,7 @@ class AboutCommand extends Command
      */
     public static function add(string $section, $data, string $value = null)
     {
-        static::$customDataResolvers[] = fn () => static::addToSection($section, $data, $value);
+        static::$customDataResolvers[] = static fn () => static::addToSection($section, $data, $value);
     }
 
     /**

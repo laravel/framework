@@ -39,13 +39,13 @@ assertType('Illuminate\Support\Collection<int, User>', $collection::make($collec
 assertType('Illuminate\Support\Collection<int, int>', $collection::make($iterable));
 assertType('Illuminate\Support\Collection<int, string>', $collection::make($traversable));
 
-assertType('Illuminate\Support\Collection<int, User>', $collection::times(10, function ($int) {
+assertType('Illuminate\Support\Collection<int, User>', $collection::times(10, static function ($int) {
     // assertType('int', $int);
 
     return new User;
 }));
 
-assertType('Illuminate\Support\Collection<int, User>', $collection::times(10, function () {
+assertType('Illuminate\Support\Collection<int, User>', $collection::times(10, static function () {
     return new User;
 }));
 
@@ -223,7 +223,7 @@ assertType('Illuminate\Support\Collection<int, array{string}>', $collection::mak
         return null;
     }));
 assertType('Illuminate\Support\Collection<int, array{int, string}>', $collection::make([[1, 'string']])
-    ->eachSpread(function ($int, $string) {
+    ->eachSpread(static function ($int, $string) {
         // assertType('int', $int);
         // assertType('int', $string);
     }));

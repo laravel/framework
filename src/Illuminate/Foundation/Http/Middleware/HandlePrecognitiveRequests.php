@@ -74,7 +74,7 @@ class HandlePrecognitiveRequests
      */
     protected function appendVaryHeader($request, $response)
     {
-        return tap($response, fn () => $response->headers->set('Vary', implode(', ', array_filter([
+        return tap($response, static fn () => $response->headers->set('Vary', implode(', ', array_filter([
             $response->headers->get('Vary'),
             'Precognition',
         ]))));

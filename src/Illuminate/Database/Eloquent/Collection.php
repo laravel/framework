@@ -44,7 +44,7 @@ class Collection extends BaseCollection implements QueueableCollection
             return $this->whereIn($this->first()->getKeyName(), $key);
         }
 
-        return Arr::first($this->items, function ($model) use ($key) {
+        return Arr::first($this->items, static function ($model) use ($key) {
             return $model->getKey() == $key;
         }, $default);
     }
@@ -307,12 +307,12 @@ class Collection extends BaseCollection implements QueueableCollection
         }
 
         if ($key instanceof Model) {
-            return parent::contains(function ($model) use ($key) {
+            return parent::contains(static function ($model) use ($key) {
                 return $model->is($key);
             });
         }
 
-        return parent::contains(function ($model) use ($key) {
+        return parent::contains(static function ($model) use ($key) {
             return $model->getKey() == $key;
         });
     }
@@ -324,7 +324,7 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function modelKeys()
     {
-        return array_map(function ($model) {
+        return array_map(static function ($model) {
             return $model->getKey();
         }, $this->items);
     }
@@ -647,7 +647,7 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     protected function duplicateComparator($strict)
     {
-        return function ($a, $b) {
+        return static function ($a, $b) {
             return $a->is($b);
         };
     }

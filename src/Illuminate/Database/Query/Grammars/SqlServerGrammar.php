@@ -317,7 +317,7 @@ class SqlServerGrammar extends Grammar
      */
     protected function sortBindingsForSubqueryOrderBy($query)
     {
-        return Arr::sort($query->bindings, function ($bindings, $key) {
+        return Arr::sort($query->bindings, static function ($bindings, $key) {
             return array_search($key, ['select', 'order', 'from', 'join', 'where', 'groupBy', 'having', 'union', 'unionOrder']);
         });
     }

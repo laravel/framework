@@ -284,7 +284,7 @@ class FilesystemManager implements FactoryContract
 
         return $this->build(tap(
             $this->getConfig($config['disk']),
-            fn (&$parent) => $parent['prefix'] = $config['prefix']
+            static fn (&$parent) => $parent['prefix'] = $config['prefix']
         ));
     }
 

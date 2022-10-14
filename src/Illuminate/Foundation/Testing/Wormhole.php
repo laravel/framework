@@ -237,7 +237,7 @@ class Wormhole
     protected function handleCallback($callback)
     {
         if ($callback) {
-            return tap($callback(), function () {
+            return tap($callback(), static function () {
                 Carbon::setTestNow();
             });
         }

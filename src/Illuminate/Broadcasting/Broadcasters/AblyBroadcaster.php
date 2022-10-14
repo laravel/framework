@@ -147,7 +147,7 @@ class AblyBroadcaster extends Broadcaster
      */
     protected function buildAblyMessage($event, array $payload = [])
     {
-        return tap(new AblyMessage, function ($message) use ($event, $payload) {
+        return tap(new AblyMessage, static function ($message) use ($event, $payload) {
             $message->name = $event;
             $message->data = $payload;
             $message->connectionKey = data_get($payload, 'socket');
@@ -190,7 +190,7 @@ class AblyBroadcaster extends Broadcaster
      */
     protected function formatChannels(array $channels)
     {
-        return array_map(function ($channel) {
+        return array_map(static function ($channel) {
             $channel = (string) $channel;
 
             if (Str::startsWith($channel, ['private-', 'presence-'])) {

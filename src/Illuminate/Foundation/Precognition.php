@@ -12,7 +12,7 @@ class Precognition
      */
     public static function afterValidationHook($request)
     {
-        return function ($validator) use ($request) {
+        return static function ($validator) use ($request) {
             if ($validator->messages()->isEmpty() && $request->headers->has('Precognition-Validate-Only')) {
                 abort(204);
             }

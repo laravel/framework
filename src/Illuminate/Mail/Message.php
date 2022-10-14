@@ -258,7 +258,7 @@ class Message
     {
         $this->message->getHeaders()->addTextHeader(
             $header,
-            implode(', ', array_map(fn ($a) => $a->toString(), $addresses)),
+            implode(', ', array_map(static fn ($a) => $a->toString(), $addresses)),
         );
 
         return $this;

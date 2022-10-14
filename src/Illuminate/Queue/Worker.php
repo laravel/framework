@@ -338,7 +338,7 @@ class Worker
      */
     protected function getNextJob($connection, $queue)
     {
-        $popJobCallback = function ($queue) use ($connection) {
+        $popJobCallback = static function ($queue) use ($connection) {
             return $connection->pop($queue);
         };
 

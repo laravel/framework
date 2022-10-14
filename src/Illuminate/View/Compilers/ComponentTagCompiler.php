@@ -363,7 +363,7 @@ class ComponentTagCompiler
      */
     public function formatClassName(string $component)
     {
-        $componentPieces = array_map(function ($componentPiece) {
+        $componentPieces = array_map(static function ($componentPiece) {
             return ucfirst(Str::camel($componentPiece));
         }, explode('.', $component));
 
@@ -569,7 +569,7 @@ class ComponentTagCompiler
     {
         $pattern = "/\s\:\\\$(\w+)/x";
 
-        return preg_replace_callback($pattern, function (array $matches) {
+        return preg_replace_callback($pattern, static function (array $matches) {
             return " :{$matches[1]}=\"\${$matches[1]}\"";
         }, $value);
     }
@@ -599,7 +599,7 @@ class ComponentTagCompiler
     protected function parseComponentTagClassStatements(string $attributeString)
     {
         return preg_replace_callback(
-             '/@(class)(\( ( (?>[^()]+) | (?2) )* \))/x', function ($match) {
+             '/@(class)(\( ( (?>[^()]+) | (?2) )* \))/x', static function ($match) {
                  if ($match[1] === 'class') {
                      $match[2] = str_replace('"', "'", $match[2]);
 

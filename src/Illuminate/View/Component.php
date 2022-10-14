@@ -79,7 +79,7 @@ abstract class Component
                         : $this->createBladeViewFromString($factory, $view);
         };
 
-        return $view instanceof Closure ? function (array $data = []) use ($view, $resolver) {
+        return $view instanceof Closure ? static function (array $data = []) use ($view, $resolver) {
             return $resolver($view($data));
         }
         : $resolver($view);

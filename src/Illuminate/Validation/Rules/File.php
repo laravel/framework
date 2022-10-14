@@ -125,7 +125,7 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
      */
     public static function types($mimetypes)
     {
-        return tap(new static(), fn ($file) => $file->allowedMimetypes = (array) $mimetypes);
+        return tap(new static(), static fn ($file) => $file->allowedMimetypes = (array) $mimetypes);
     }
 
     /**
@@ -258,7 +258,7 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
 
         $mimetypes = array_filter(
             $this->allowedMimetypes,
-            fn ($type) => str_contains($type, '/')
+            static fn ($type) => str_contains($type, '/')
         );
 
         $mimes = array_diff($this->allowedMimetypes, $mimetypes);

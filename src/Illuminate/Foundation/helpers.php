@@ -611,11 +611,11 @@ if (! function_exists('precognitive')) {
      */
     function precognitive($callable = null)
     {
-        $callable ??= function () {
+        $callable ??= static function () {
             //
         };
 
-        $payload = $callable(function ($default, $precognition = null) {
+        $payload = $callable(static function ($default, $precognition = null) {
             $response = request()->isPrecognitive()
                 ? ($precognition ?? $default)
                 : $default;

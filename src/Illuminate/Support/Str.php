@@ -728,7 +728,7 @@ class Str
      */
     public static function random($length = 16)
     {
-        return (static::$randomStringFactory ?? function ($length) {
+        return (static::$randomStringFactory ?? static function ($length) {
             $string = '';
 
             while (($len = strlen($string)) < $length) {
@@ -765,7 +765,7 @@ class Str
     {
         $next = 0;
 
-        $whenMissing ??= function ($length) use (&$next) {
+        $whenMissing ??= static function ($length) use (&$next) {
             $factoryCache = static::$randomStringFactory;
 
             static::$randomStringFactory = null;
@@ -779,7 +779,7 @@ class Str
             return $randomString;
         };
 
-        static::createRandomStringsUsing(function ($length) use (&$next, $sequence, $whenMissing) {
+        static::createRandomStringsUsing(static function ($length) use (&$next, $sequence, $whenMissing) {
             if (array_key_exists($next, $sequence)) {
                 return $sequence[$next++];
             }
@@ -1108,7 +1108,7 @@ class Str
 
         $words = explode(' ', static::replace(['-', '_'], ' ', $value));
 
-        $studlyWords = array_map(fn ($word) => static::ucfirst($word), $words);
+        $studlyWords = array_map(static fn ($word) => static::ucfirst($word), $words);
 
         return static::$studlyCache[$key] = implode($studlyWords);
     }
@@ -1278,7 +1278,7 @@ class Str
     {
         $next = 0;
 
-        $whenMissing ??= function () use (&$next) {
+        $whenMissing ??= static function () use (&$next) {
             $factoryCache = static::$uuidFactory;
 
             static::$uuidFactory = null;
@@ -1292,7 +1292,7 @@ class Str
             return $uuid;
         };
 
-        static::createUuidsUsing(function () use (&$next, $sequence, $whenMissing) {
+        static::createUuidsUsing(static function () use (&$next, $sequence, $whenMissing) {
             if (array_key_exists($next, $sequence)) {
                 return $sequence[$next++];
             }
@@ -1311,7 +1311,7 @@ class Str
     {
         $uuid = Str::uuid();
 
-        Str::createUuidsUsing(fn () => $uuid);
+        Str::createUuidsUsing(static fn () => $uuid);
 
         if ($callback !== null) {
             try {

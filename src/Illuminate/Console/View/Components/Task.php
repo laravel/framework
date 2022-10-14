@@ -33,7 +33,7 @@ class Task extends Component
         $result = false;
 
         try {
-            $result = ($task ?: fn () => true)();
+            $result = ($task ?: static fn () => true)();
         } catch (Throwable $e) {
             throw $e;
         } finally {

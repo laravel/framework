@@ -334,7 +334,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     {
         $locales = array_filter([$locale ?: $this->locale, $this->fallback]);
 
-        return call_user_func($this->determineLocalesUsing ?: fn () => $locales, $locales);
+        return call_user_func($this->determineLocalesUsing ?: static fn () => $locales, $locales);
     }
 
     /**

@@ -98,7 +98,7 @@ class RoutingServiceProvider extends ServiceProvider
      */
     protected function requestRebinder()
     {
-        return function ($app, $request) {
+        return static function ($app, $request) {
             $app['url']->setRequest($request);
         };
     }

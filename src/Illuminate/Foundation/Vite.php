@@ -161,7 +161,7 @@ class Vite implements Htmlable
     public function useScriptTagAttributes($attributes)
     {
         if (! is_callable($attributes)) {
-            $attributes = fn () => $attributes;
+            $attributes = static fn () => $attributes;
         }
 
         $this->scriptTagAttributesResolvers[] = $attributes;
@@ -178,7 +178,7 @@ class Vite implements Htmlable
     public function useStyleTagAttributes($attributes)
     {
         if (! is_callable($attributes)) {
-            $attributes = fn () => $attributes;
+            $attributes = static fn () => $attributes;
         }
 
         $this->styleTagAttributesResolvers[] = $attributes;

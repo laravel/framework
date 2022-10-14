@@ -563,7 +563,7 @@ class TestResponse implements ArrayAccess
 
         $values = $escape ? array_map('e', ($value)) : $value;
 
-        tap(strip_tags($this->getContent()), function ($content) use ($values) {
+        tap(strip_tags($this->getContent()), static function ($content) use ($values) {
             foreach ($values as $value) {
                 PHPUnit::assertStringContainsString((string) $value, $content);
             }
@@ -621,7 +621,7 @@ class TestResponse implements ArrayAccess
 
         $values = $escape ? array_map('e', ($value)) : $value;
 
-        tap(strip_tags($this->getContent()), function ($content) use ($values) {
+        tap(strip_tags($this->getContent()), static function ($content) use ($values) {
             foreach ($values as $value) {
                 PHPUnit::assertStringNotContainsString((string) $value, $content);
             }

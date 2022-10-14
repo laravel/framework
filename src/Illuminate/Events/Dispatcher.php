@@ -413,7 +413,7 @@ class Dispatcher implements DispatcherContract
             return $this->createClassListener($listener, $wildcard);
         }
 
-        return function ($event, $payload) use ($listener, $wildcard) {
+        return static function ($event, $payload) use ($listener, $wildcard) {
             if ($wildcard) {
                 return $listener($event, $payload);
             }
@@ -507,7 +507,7 @@ class Dispatcher implements DispatcherContract
     protected function createQueuedHandlerCallable($class, $method)
     {
         return function () use ($class, $method) {
-            $arguments = array_map(function ($a) {
+            $arguments = array_map(static function ($a) {
                 return is_object($a) ? clone $a : $a;
             }, func_get_args());
 
@@ -617,7 +617,7 @@ class Dispatcher implements DispatcherContract
      */
     protected function propagateListenerOptions($listener, $job)
     {
-        return tap($job, function ($job) use ($listener) {
+        return tap($job, static function ($job) use ($listener) {
             $data = array_values($job->data);
 
             $job->afterCommit = property_exists($listener, 'afterCommit') ? $listener->afterCommit : null;

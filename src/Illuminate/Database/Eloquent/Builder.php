@@ -390,7 +390,7 @@ class Builder implements BuilderContract
     {
         $instance = $this->newModelInstance();
 
-        return $instance->newCollection(array_map(function ($item) use ($items, $instance) {
+        return $instance->newCollection(array_map(static function ($item) use ($items, $instance) {
             $model = $instance->newFromBuilder($item);
 
             if (count($items) > 1) {
@@ -551,7 +551,7 @@ class Builder implements BuilderContract
             return $instance;
         }
 
-        return tap($this->newModelInstance(array_merge($attributes, $values)), function ($instance) {
+        return tap($this->newModelInstance(array_merge($attributes, $values)), static function ($instance) {
             $instance->save();
         });
     }
@@ -565,7 +565,7 @@ class Builder implements BuilderContract
      */
     public function updateOrCreate(array $attributes, array $values = [])
     {
-        return tap($this->firstOrNew($attributes), function ($instance) use ($values) {
+        return tap($this->firstOrNew($attributes), static function ($instance) use ($values) {
             $instance->fill($values)->save();
         });
     }
@@ -971,7 +971,7 @@ class Builder implements BuilderContract
      */
     public function create(array $attributes = [])
     {
-        return tap($this->newModelInstance($attributes), function ($instance) {
+        return tap($this->newModelInstance($attributes), static function ($instance) {
             $instance->save();
         });
     }
@@ -1533,7 +1533,7 @@ class Builder implements BuilderContract
      */
     protected function combineConstraints(array $constraints)
     {
-        return function ($builder) use ($constraints) {
+        return static function ($builder) use ($constraints) {
             foreach ($constraints as $constraint) {
                 $builder = $constraint($builder) ?? $builder;
             }

@@ -101,7 +101,7 @@ class DatabaseUserProvider implements UserProvider
     {
         $credentials = array_filter(
             $credentials,
-            fn ($key) => ! str_contains($key, 'password'),
+            static fn ($key) => ! str_contains($key, 'password'),
             ARRAY_FILTER_USE_KEY
         );
 

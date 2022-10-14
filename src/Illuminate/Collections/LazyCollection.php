@@ -404,7 +404,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     public function filter(callable $callback = null)
     {
         if (is_null($callback)) {
-            $callback = function ($value) {
+            $callback = static function ($value) {
                 return (bool) $value;
             };
         }
@@ -982,7 +982,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
         /** @var (callable(TValue,TKey): bool) $predicate */
         $predicate = $this->useAsCallable($value)
             ? $value
-            : function ($item) use ($value, $strict) {
+            : static function ($item) use ($value, $strict) {
                 return $strict ? $item === $value : $item == $value;
             };
 

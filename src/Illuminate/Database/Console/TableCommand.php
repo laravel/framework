@@ -154,8 +154,8 @@ class TableCommand extends DatabaseInspectionCommand
             'local_columns' => collect($foreignKey->getLocalColumns()),
             'foreign_table' => $foreignKey->getForeignTableName(),
             'foreign_columns' => collect($foreignKey->getForeignColumns()),
-            'on_update' => Str::lower(rescue(fn () => $foreignKey->getOption('onUpdate'), 'N/A')),
-            'on_delete' => Str::lower(rescue(fn () => $foreignKey->getOption('onDelete'), 'N/A')),
+            'on_update' => Str::lower(rescue(static fn () => $foreignKey->getOption('onUpdate'), 'N/A')),
+            'on_delete' => Str::lower(rescue(static fn () => $foreignKey->getOption('onDelete'), 'N/A')),
         ]);
     }
 

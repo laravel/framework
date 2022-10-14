@@ -400,7 +400,7 @@ abstract class ServiceProvider
     {
         $commands = is_array($commands) ? $commands : func_get_args();
 
-        Artisan::starting(function ($artisan) use ($commands) {
+        Artisan::starting(static function ($artisan) use ($commands) {
             $artisan->resolveCommands($commands);
         });
     }

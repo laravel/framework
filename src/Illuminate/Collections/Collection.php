@@ -329,12 +329,12 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     protected function duplicateComparator($strict)
     {
         if ($strict) {
-            return function ($a, $b) {
+            return static function ($a, $b) {
                 return $a === $b;
             };
         }
 
-        return function ($a, $b) {
+        return static function ($a, $b) {
             return $a == $b;
         };
     }
@@ -1366,7 +1366,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     {
         $items = $this->items;
 
-        uasort($items, function ($a, $b) use ($comparisons) {
+        uasort($items, static function ($a, $b) use ($comparisons) {
             foreach ($comparisons as $comparison) {
                 $comparison = Arr::wrap($comparison);
 

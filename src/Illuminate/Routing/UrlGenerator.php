@@ -723,7 +723,7 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function pathFormatter()
     {
-        return $this->formatPathUsing ?: function ($path) {
+        return $this->formatPathUsing ?: static function ($path) {
             return $path;
         };
     }

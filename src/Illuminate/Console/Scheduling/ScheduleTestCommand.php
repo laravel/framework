@@ -59,7 +59,7 @@ class ScheduleTestCommand extends Command
         if (! empty($name = $this->option('name'))) {
             $commandBinary = $phpBinary.' '.Application::artisanBinary();
 
-            $matches = array_filter($commandNames, function ($commandName) use ($commandBinary, $name) {
+            $matches = array_filter($commandNames, static function ($commandName) use ($commandBinary, $name) {
                 return trim(str_replace($commandBinary, '', $commandName)) === $name;
             });
 

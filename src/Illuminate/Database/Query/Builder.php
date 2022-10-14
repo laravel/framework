@@ -2793,7 +2793,7 @@ class Builder implements BuilderContract
      */
     protected function withoutSelectAliases(array $columns)
     {
-        return array_map(function ($column) {
+        return array_map(static function ($column) {
             return is_string($column) && ($aliasPosition = stripos($column, ' as ')) !== false
                     ? substr($column, 0, $aliasPosition) : $column;
         }, $columns);
@@ -3696,7 +3696,7 @@ class Builder implements BuilderContract
      */
     public function cloneWithout(array $properties)
     {
-        return tap($this->clone(), function ($clone) use ($properties) {
+        return tap($this->clone(), static function ($clone) use ($properties) {
             foreach ($properties as $property) {
                 $clone->{$property} = null;
             }
@@ -3711,7 +3711,7 @@ class Builder implements BuilderContract
      */
     public function cloneWithoutBindings(array $except)
     {
-        return tap($this->clone(), function ($clone) use ($except) {
+        return tap($this->clone(), static function ($clone) use ($except) {
             foreach ($except as $type) {
                 $clone->bindings[$type] = [];
             }

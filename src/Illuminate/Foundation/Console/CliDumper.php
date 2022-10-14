@@ -72,7 +72,7 @@ class CliDumper extends BaseCliDumper
 
         $dumper = new static(new ConsoleOutput(), $basePath, $compiledViewPath);
 
-        VarDumper::setHandler(fn ($value) => $dumper->dumpWithSource($cloner->cloneVar($value)));
+        VarDumper::setHandler(static fn ($value) => $dumper->dumpWithSource($cloner->cloneVar($value)));
     }
 
     /**

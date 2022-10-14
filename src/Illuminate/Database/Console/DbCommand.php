@@ -220,7 +220,7 @@ class DbCommand extends Command
      */
     protected function getOptionalArguments(array $args, array $connection)
     {
-        return array_values(array_filter($args, function ($key) use ($connection) {
+        return array_values(array_filter($args, static function ($key) use ($connection) {
             return ! empty($connection[$key]);
         }, ARRAY_FILTER_USE_KEY));
     }

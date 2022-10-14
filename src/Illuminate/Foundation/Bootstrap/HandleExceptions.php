@@ -119,7 +119,7 @@ class HandleExceptions
 
         $options = static::$app['config']->get('logging.deprecations') ?? [];
 
-        with($logger->channel('deprecations'), function ($log) use ($message, $file, $line, $level, $options) {
+        with($logger->channel('deprecations'), static function ($log) use ($message, $file, $line, $level, $options) {
             if ($options['trace'] ?? false) {
                 $log->warning((string) new ErrorException($message, 0, $level, $file, $line));
             } else {
@@ -161,7 +161,7 @@ class HandleExceptions
      */
     protected function ensureNullLogDriverIsConfigured()
     {
-        with(static::$app['config'], function ($config) {
+        with(static::$app['config'], static function ($config) {
             if ($config->get('logging.channels.null')) {
                 return;
             }

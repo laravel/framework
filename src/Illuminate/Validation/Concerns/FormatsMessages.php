@@ -366,7 +366,7 @@ trait FormatsMessages
     {
         $segments = explode('.', $attribute);
 
-        $modifier ??= fn ($value) => $value;
+        $modifier ??= static fn ($value) => $value;
 
         $numericIndex = 1;
 

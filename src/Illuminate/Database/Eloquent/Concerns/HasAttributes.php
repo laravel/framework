@@ -668,7 +668,7 @@ trait HasAttributes
 
         $attribute = $this->{Str::camel($key)}();
 
-        $value = call_user_func($attribute->get ?: function ($value) {
+        $value = call_user_func($attribute->get ?: static function ($value) {
             return $value;
         }, $value, $this->attributes);
 
@@ -1188,7 +1188,7 @@ trait HasAttributes
      */
     protected function getArrayAttributeWithValue($path, $key, $value)
     {
-        return tap($this->getArrayAttributeByKey($key), function (&$array) use ($path, $value) {
+        return tap($this->getArrayAttributeByKey($key), static function (&$array) use ($path, $value) {
             Arr::set($array, str_replace('->', '.', $path), $value);
         });
     }

@@ -249,7 +249,7 @@ class NotificationFake implements NotificationDispatcher, NotificationFactory
             return collect();
         }
 
-        $callback = $callback ?: fn () => true;
+        $callback = $callback ?: static fn () => true;
 
         $notifications = collect($this->notificationsFor($notifiable, $notification));
 
@@ -318,7 +318,7 @@ class NotificationFake implements NotificationDispatcher, NotificationFactory
             if (method_exists($notification, 'shouldSend')) {
                 $notifiableChannels = array_filter(
                     $notifiableChannels,
-                    fn ($channel) => $notification->shouldSend($notifiable, $channel) !== false
+                    static fn ($channel) => $notification->shouldSend($notifiable, $channel) !== false
                 );
 
                 if (empty($notifiableChannels)) {
@@ -330,7 +330,7 @@ class NotificationFake implements NotificationDispatcher, NotificationFactory
                 'notification' => $notification,
                 'channels' => $notifiableChannels,
                 'notifiable' => $notifiable,
-                'locale' => $notification->locale ?? $this->locale ?? value(function () use ($notifiable) {
+                'locale' => $notification->locale ?? $this->locale ?? value(static function () use ($notifiable) {
                     if ($notifiable instanceof HasLocalePreference) {
                         return $notifiable->preferredLocale();
                     }

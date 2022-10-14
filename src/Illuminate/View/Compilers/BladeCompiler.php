@@ -308,7 +308,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
                     ->make(ViewFactory::class)
                     ->make($component->resolveView(), $data);
 
-        return tap($view->render(), function () use ($view, $deleteCachedView) {
+        return tap($view->render(), static function () use ($view, $deleteCachedView) {
             if ($deleteCachedView) {
                 unlink($view->getPath());
             }

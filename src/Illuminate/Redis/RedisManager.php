@@ -191,7 +191,7 @@ class RedisManager implements Factory
             $parsed['scheme'] = $driver;
         }
 
-        return array_filter($parsed, function ($key) {
+        return array_filter($parsed, static function ($key) {
             return ! in_array($key, ['driver'], true);
         }, ARRAY_FILTER_USE_KEY);
     }

@@ -76,7 +76,7 @@ class HtmlDumper extends BaseHtmlDumper
 
         $dumper = new static($basePath, $compiledViewPath);
 
-        VarDumper::setHandler(fn ($value) => $dumper->dumpWithSource($cloner->cloneVar($value)));
+        VarDumper::setHandler(static fn ($value) => $dumper->dumpWithSource($cloner->cloneVar($value)));
     }
 
     /**

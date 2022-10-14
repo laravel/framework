@@ -34,7 +34,7 @@ trait ValidatesRequests
             );
         }
 
-        return tap($validator, function ($validator) use ($request) {
+        return tap($validator, static function ($validator) use ($request) {
             if ($request->isPrecognitive()) {
                 $validator->after(Precognition::afterValidationHook($request));
             }
@@ -63,7 +63,7 @@ trait ValidatesRequests
             $request->all(), $rules, $messages, $customAttributes
         );
 
-        return tap($validator, function ($validator) use ($request) {
+        return tap($validator, static function ($validator) use ($request) {
             if ($request->isPrecognitive()) {
                 $validator->after(Precognition::afterValidationHook($request));
             }

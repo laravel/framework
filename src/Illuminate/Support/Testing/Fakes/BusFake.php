@@ -339,7 +339,7 @@ class BusFake implements QueueingDispatcher
      */
     protected function resetChainPropertiesToDefaults($job)
     {
-        return tap(clone $job, function ($job) {
+        return tap(clone $job, static function ($job) {
             $job->chainConnection = null;
             $job->chainQueue = null;
             $job->chainCatchCallbacks = null;
@@ -472,7 +472,7 @@ class BusFake implements QueueingDispatcher
             return collect();
         }
 
-        $callback = $callback ?: fn () => true;
+        $callback = $callback ?: static fn () => true;
 
         return collect($this->commands[$command])->filter(fn ($command) => $callback($command));
     }
@@ -490,7 +490,7 @@ class BusFake implements QueueingDispatcher
             return collect();
         }
 
-        $callback = $callback ?: fn () => true;
+        $callback = $callback ?: static fn () => true;
 
         return collect($this->commandsSync[$command])->filter(fn ($command) => $callback($command));
     }
@@ -508,7 +508,7 @@ class BusFake implements QueueingDispatcher
             return collect();
         }
 
-        $callback = $callback ?: fn () => true;
+        $callback = $callback ?: static fn () => true;
 
         return collect($this->commandsAfterResponse[$command])->filter(fn ($command) => $callback($command));
     }

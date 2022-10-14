@@ -32,7 +32,7 @@ class ViewController extends Controller
      */
     public function __invoke(...$args)
     {
-        $routeParameters = array_filter($args, function ($key) {
+        $routeParameters = array_filter($args, static function ($key) {
             return ! in_array($key, ['view', 'data', 'status', 'headers']);
         }, ARRAY_FILTER_USE_KEY);
 

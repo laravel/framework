@@ -219,7 +219,7 @@ class MailFake implements Factory, Mailer, MailQueue
             return collect();
         }
 
-        $callback = $callback ?: fn () => true;
+        $callback = $callback ?: static fn () => true;
 
         return $this->mailablesOf($mailable)->filter(fn ($mailable) => $callback($mailable));
     }
@@ -250,7 +250,7 @@ class MailFake implements Factory, Mailer, MailQueue
             return collect();
         }
 
-        $callback = $callback ?: fn () => true;
+        $callback = $callback ?: static fn () => true;
 
         return $this->queuedMailablesOf($mailable)->filter(fn ($mailable) => $callback($mailable));
     }

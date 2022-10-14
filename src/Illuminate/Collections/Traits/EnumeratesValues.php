@@ -878,7 +878,7 @@ trait EnumeratesValues
      */
     public function jsonSerialize(): array
     {
-        return array_map(function ($value) {
+        return array_map(static function ($value) {
             if ($value instanceof JsonSerializable) {
                 return $value->jsonSerialize();
             } elseif ($value instanceof Jsonable) {
@@ -1019,10 +1019,10 @@ trait EnumeratesValues
             $operator = '=';
         }
 
-        return function ($item) use ($key, $operator, $value) {
+        return static function ($item) use ($key, $operator, $value) {
             $retrieved = data_get($item, $key);
 
-            $strings = array_filter([$retrieved, $value], function ($value) {
+            $strings = array_filter([$retrieved, $value], static function ($value) {
                 return is_string($value) || (is_object($value) && method_exists($value, '__toString'));
             });
 
@@ -1070,7 +1070,7 @@ trait EnumeratesValues
             return $value;
         }
 
-        return fn ($item) => data_get($item, $value);
+        return static fn ($item) => data_get($item, $value);
     }
 
     /**
@@ -1081,7 +1081,7 @@ trait EnumeratesValues
      */
     protected function equality($value)
     {
-        return fn ($item) => $item === $value;
+        return static fn ($item) => $item === $value;
     }
 
     /**
@@ -1092,7 +1092,7 @@ trait EnumeratesValues
      */
     protected function negate(Closure $callback)
     {
-        return fn (...$params) => ! $callback(...$params);
+        return static fn (...$params) => ! $callback(...$params);
     }
 
     /**
@@ -1102,6 +1102,6 @@ trait EnumeratesValues
      */
     protected function identity()
     {
-        return fn ($value) => $value;
+        return static fn ($value) => $value;
     }
 }

@@ -64,7 +64,7 @@ class ParallelRunner implements RunnerInterface
             $output = new ParallelConsoleOutput($output);
         }
 
-        $runnerResolver = static::$runnerResolver ?: function (Options $options, OutputInterface $output) {
+        $runnerResolver = static::$runnerResolver ?: static function (Options $options, OutputInterface $output) {
             return new WrapperRunner($options, $output);
         };
 
@@ -134,8 +134,8 @@ class ParallelRunner implements RunnerInterface
     protected function forEachProcess($callback)
     {
         collect(range(1, $this->options->processes()))->each(function ($token) use ($callback) {
-            tap($this->createApplication(), function ($app) use ($callback, $token) {
-                ParallelTesting::resolveTokenUsing(fn () => $token);
+            tap($this->createApplication(), static function ($app) use ($callback, $token) {
+                ParallelTesting::resolveTokenUsing(static fn () => $token);
 
                 $callback($app);
             })->flush();
@@ -151,7 +151,7 @@ class ParallelRunner implements RunnerInterface
      */
     protected function createApplication()
     {
-        $applicationResolver = static::$applicationResolver ?: function () {
+        $applicationResolver = static::$applicationResolver ?: static function () {
             if (trait_exists(\Tests\CreatesApplication::class)) {
                 $applicationCreator = new class
                 {

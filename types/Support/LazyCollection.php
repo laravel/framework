@@ -12,7 +12,7 @@ $iterable = [];
 /** @var Traversable<int, string> $traversable */
 $traversable = [];
 /** @var Closure(): Generator<int, User, mixed, void> $generator */
-$generator = function () {
+$generator = static function () {
     yield new User();
 };
 
@@ -32,13 +32,13 @@ assertType('Illuminate\Support\LazyCollection<int, int>', LazyCollection::make($
 assertType('Illuminate\Support\LazyCollection<int, string>', LazyCollection::make($traversable));
 assertType('Illuminate\Support\LazyCollection<int, User>', LazyCollection::make($generator));
 
-assertType('Illuminate\Support\LazyCollection<int, User>', $collection::times(10, function ($int) {
+assertType('Illuminate\Support\LazyCollection<int, User>', $collection::times(10, static function ($int) {
     // assertType('int', $int);
 
     return new User;
 }));
 
-assertType('Illuminate\Support\LazyCollection<int, User>', $collection::times(10, function () {
+assertType('Illuminate\Support\LazyCollection<int, User>', $collection::times(10, static function () {
     return new User;
 }));
 
@@ -209,7 +209,7 @@ assertType('Illuminate\Support\LazyCollection<int, array{string}>', $collection:
         return null;
     }));
 assertType('Illuminate\Support\LazyCollection<int, array{int, string}>', $collection::make([[1, 'string']])
-    ->eachSpread(function ($int, $string) {
+    ->eachSpread(static function ($int, $string) {
         // assertType('int', $int);
         // assertType('int', $string);
     }));

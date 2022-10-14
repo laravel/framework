@@ -686,7 +686,7 @@ class Validator implements ValidatorContract
      */
     protected function replaceAsterisksInParameters(array $parameters, array $keys)
     {
-        return array_map(function ($field) use ($keys) {
+        return array_map(static function ($field) use ($keys) {
             return vsprintf(str_replace('*', '%s', $field), $keys);
         }, $parameters);
     }

@@ -537,7 +537,7 @@ class Mailable implements MailableContract, Renderable
      */
     public function priority($level = 3)
     {
-        $this->callbacks[] = function ($message) use ($level) {
+        $this->callbacks[] = static function ($message) use ($level) {
             $message->priority($level);
         };
 
@@ -718,7 +718,7 @@ class Mailable implements MailableContract, Renderable
     {
         if (is_array($recipient)) {
             if (array_values($recipient) === $recipient) {
-                return (object) array_map(function ($email) {
+                return (object) array_map(static function ($email) {
                     return compact('email');
                 }, $recipient);
             }

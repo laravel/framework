@@ -30,7 +30,7 @@ class UserFactory extends Factory
 
 assertType('UserFactory', $factory = UserFactory::new());
 assertType('UserFactory', UserFactory::new(['string' => 'string']));
-assertType('UserFactory', UserFactory::new(function ($attributes) {
+assertType('UserFactory', UserFactory::new(static function ($attributes) {
     assertType('array<string, mixed>', $attributes);
 
     return ['string' => 'string'];
@@ -203,7 +203,7 @@ assertType('Illuminate\Database\Eloquent\Model', $factory->newModel(['string' =>
 // assertType('class-string<User>', $factory->modelName());
 assertType('class-string<Illuminate\Database\Eloquent\Model>', $factory->modelName());
 
-Factory::guessModelNamesUsing(function (Factory $factory) {
+Factory::guessModelNamesUsing(static function (Factory $factory) {
     return match (true) {
         $factory instanceof UserFactory => User::class,
         default => throw new LogicException('Unknown factory'),
@@ -216,7 +216,7 @@ assertType(Factory::class, $factory::factoryForModel(User::class));
 
 assertType('class-string<Illuminate\Database\Eloquent\Factories\Factory>', $factory->resolveFactoryName(User::class));
 
-Factory::guessFactoryNamesUsing(function (string $modelName) {
+Factory::guessFactoryNamesUsing(static function (string $modelName) {
     return match ($modelName) {
         User::class => UserFactory::class,
         default => throw new LogicException('Unknown factory'),
