@@ -602,6 +602,16 @@ class Application extends Container implements ApplicationContract, CachesConfig
     }
 
     /**
+     * Determine if the application is not in the production environment.
+     *
+     * @return bool
+     */
+    public function isNotProduction()
+    {
+        return ! $this->isProduction();
+    }
+
+    /**
      * Detect the application's current environment.
      *
      * @param  \Closure  $callback

@@ -14,6 +14,7 @@ namespace Illuminate\Support\Facades;
  * @method static bool isDownForMaintenance()
  * @method static bool isLocal()
  * @method static bool isProduction()
+ * @method static bool isNotProduction()
  * @method static bool routesAreCached()
  * @method static bool runningInConsole()
  * @method static bool runningUnitTests()
