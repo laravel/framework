@@ -48,6 +48,13 @@ class ComponentTagCompiler
     protected $boundAttributes = [];
 
     /**
+     * The "unpack:" attributes that have been compiled for the current component.
+     *
+     * @var array
+     */
+    protected $unpackedAttributes = [];
+
+    /**
      * Create a new component tag compiler.
      *
      * @param  array  $aliases
@@ -136,6 +143,10 @@ class ComponentTagCompiler
                                     )
                                 )?
                             )
+                            |
+                            (?:
+                                \.\.\.\\$[\w]+
+                            )
                         )
                     )*
                     \s*
@@ -146,6 +157,7 @@ class ComponentTagCompiler
 
         return preg_replace_callback($pattern, function (array $matches) {
             $this->boundAttributes = [];
+            $this->unpackedAttributes = [];
 
             $attributes = $this->getAttributesFromAttributeString($matches['attributes']);
 
@@ -197,6 +209,10 @@ class ComponentTagCompiler
                                     )
                                 )?
                             )
+                            |
+                            (?:
+                                \.\.\.\\$[\w]+
+                            )
                         )
                     )*
                     \s*
@@ -206,6 +222,7 @@ class ComponentTagCompiler
 
         return preg_replace_callback($pattern, function (array $matches) {
             $this->boundAttributes = [];
+            $this->unpackedAttributes = [];
 
             $attributes = $this->getAttributesFromAttributeString($matches['attributes']);
 
@@ -473,6 +490,10 @@ class ComponentTagCompiler
                                     )
                                 )?
                             )
+                            |
+                            (?:
+                                \.\.\.\\$[\w]+
+                            )
                         )
                     )*
                     \s*
@@ -493,6 +514,7 @@ class ComponentTagCompiler
             }
 
             $this->boundAttributes = [];
+            $this->unpackedAttributes = [];
 
             $attributes = $this->getAttributesFromAttributeString($matches['attributes']);
 
@@ -514,6 +536,7 @@ class ComponentTagCompiler
         $attributeString = $this->parseAttributeBag($attributeString);
         $attributeString = $this->parseComponentTagClassStatements($attributeString);
         $attributeString = $this->parseBindAttributes($attributeString);
+        $attributeString = $this->parseUnpackAttributes($attributeString);
 
         $pattern = '/
             (?<attribute>[\w\-:.@]+)
@@ -538,6 +561,12 @@ class ComponentTagCompiler
         return collect($matches)->mapWithKeys(function ($match) {
             $attribute = $match['attribute'];
             $value = $match['value'] ?? null;
+
+            if (str_starts_with($attribute, 'unpack:')) {
+                $this->unpackedAttributes[$attribute] = '...$' . Str::after($attribute, 'unpack:');
+
+                return [$attribute => 'true'];
+            }
 
             if (is_null($value)) {
                 $value = 'true';
@@ -634,6 +663,24 @@ class ComponentTagCompiler
     }
 
     /**
+     * Parse the variables to be unpacked in a given attribute string into their fully-qualified syntax.
+     *
+     * @param  string  $attributeString
+     * @return string
+     */
+    protected function parseUnpackAttributes(string $attributeString)
+    {
+        $pattern = "/
+            (?:^|\s+)  # start of the string or whitespace between attributes
+            \.\.\.     # spread operator
+            \\$        # sigil
+            (\w+)      # variable name
+        /xm";
+
+        return preg_replace($pattern, ' unpack:$1', $attributeString);
+    }
+
+    /**
      * Compile any Blade echo statements that are present in the attribute string.
      *
      * These echo statements need to be converted to string concatenation statements.
@@ -683,6 +730,10 @@ class ComponentTagCompiler
     {
         return collect($attributes)
                 ->map(function (string $value, string $attribute) use ($escapeBound) {
+                    if (isset($this->unpackedAttributes[$attribute])) {
+                        return $this->unpackedAttributes[$attribute];
+                    }
+
                     return $escapeBound && isset($this->boundAttributes[$attribute]) && $value !== 'true' && ! is_numeric($value)
                                 ? "'{$attribute}' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute({$value})"
                                 : "'{$attribute}' => {$value}";

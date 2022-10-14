@@ -649,6 +649,59 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $this->assertSame($attributes->get('other'), 'ok');
     }
 
+    public function testSlotSupportsAttributeUnpacking()
+    {
+        $result = $this->compiler()->compileSlots('<x-slot:foo ...$test>
+</x-slot>');
+
+        $this->assertSame("@slot('foo', null, [...\$test]) \n".' @endslot', trim($result));
+    }
+
+    public function testComponentSupportsAttributeUnpacking()
+    {
+        $this->mockViewFactory();
+        $result = $this->compiler(['profile' => TestProfileComponent::class])->compileTags('<x-profile ...$test class="bar" wire:model="foo"></x-profile>');
+
+        $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestProfileComponent', 'profile', [])
+<?php if (isset(\$attributes) && \$constructor = (new ReflectionClass(Illuminate\Tests\View\Blade\TestProfileComponent::class))->getConstructor()): ?>
+<?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php \$component->withAttributes([...\$test,'class' => 'bar','wire:model' => 'foo']); ?> @endComponentClass##END-COMPONENT-CLASS##", trim($result));
+    }
+
+    public function testSelfClosingComponentSupportsAttributeUnpacking()
+    {
+        $this->mockViewFactory();
+
+        $result = $this->compiler(['alert' => TestAlertComponent::class])->compileTags('<div><x-alert ...$test title="foo" class="bar" wire:model="foo" /></div>');
+
+        $this->assertSame("<div>##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestAlertComponent', 'alert', ['title' => 'foo'])
+<?php if (isset(\$attributes) && \$constructor = (new ReflectionClass(Illuminate\Tests\View\Blade\TestAlertComponent::class))->getConstructor()): ?>
+<?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php \$component->withAttributes([...\$test,'class' => 'bar','wire:model' => 'foo']); ?>\n".
+            '@endComponentClass##END-COMPONENT-CLASS##</div>', trim($result));
+    }
+
+    public function testClasslessComponentSupportsAttributeUnpacking()
+    {
+        $container = new Container;
+        $container->instance(Application::class, $app = m::mock(Application::class));
+        $container->instance(Factory::class, $factory = m::mock(Factory::class));
+        $app->shouldReceive('getNamespace')->andReturn('App\\');
+        $factory->shouldReceive('exists')->andReturn(true);
+        Container::setInstance($container);
+
+        $result = $this->compiler()->compileTags('<x-anonymous-component ...$test :name="\'Taylor\'" :age="31" wire:model="foo" />');
+
+        $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\View\AnonymousComponent', 'anonymous-component', ['view' => 'components.anonymous-component','data' => [...\$test,'name' => 'Taylor','age' => 31,'wire:model' => 'foo']])
+<?php if (isset(\$attributes) && \$constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php \$component->withAttributes([...\$test,'name' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute('Taylor'),'age' => 31,'wire:model' => 'foo']); ?>\n".
+'@endComponentClass##END-COMPONENT-CLASS##', trim($result));
+    }
+
     protected function mockViewFactory($existsSucceeds = true)
     {
         $container = new Container;
