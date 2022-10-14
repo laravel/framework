@@ -1753,7 +1753,7 @@ class RoutingRouteTest extends TestCase
 
                 return $testTeam->value.'|'.$user->value;
             },
-        ])->withoutScopeBindings();
+        ])->withoutScopedBindings();
 
         $this->assertSame('1|4', $router->dispatch(Request::create('foo/1/4', 'GET'))->getContent());
     }
