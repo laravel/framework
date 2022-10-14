@@ -183,7 +183,7 @@ PHP);
 use Illuminate\Tests\Integration\Routing\ImplicitBindingUser;
 use Illuminate\Tests\Integration\Routing\ImplicitBindingPost;
 
-Route::group(['scoping' => true], function () {
+Route::group(['scope_bindings' => true], function () {
     Route::get('/user/{user}/post/{post}', function (ImplicitBindingUser \$user, ImplicitBindingPost \$post) {
         return [\$user, \$post];
     })->middleware(['web']);
@@ -203,7 +203,7 @@ PHP);
 
         config(['app.key' => str_repeat('a', 32)]);
 
-        Route::group(['scoping' => false], function () {
+        Route::group(['scope_bindings' => false], function () {
             Route::get('/user/{user}/post/{post}', function (ImplicitBindingUser $user, ImplicitBindingPost $post) {
                 return [$user, $post];
             })->middleware(['web']);
