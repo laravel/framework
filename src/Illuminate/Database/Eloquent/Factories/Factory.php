@@ -496,7 +496,7 @@ abstract class Factory
     {
         return $this->newInstance([
             'states' => $this->states->concat([
-                is_callable($state) ? $state : static function () use ($state) {
+                is_callable($state) ? $state : function () use ($state) {
                     return $state;
                 },
             ]),
