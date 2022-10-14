@@ -934,6 +934,39 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Inverse the column's value by a given condition.
+     *
+     * @param  string  $column
+     * @param  bool|null  $condition
+     * @param  array  $extra
+     * @return int
+     */
+    protected function inverse($column, $condition = null, array $extra = [])
+    {
+        $query = $this->newQueryWithoutRelationships();
+
+        if (! $this->exists) {
+            return $query->inverse($column);
+        }
+
+        $this->{$column} = $condition ? $condition : !$this->{$column};
+
+
+        if ($this->fireModelEvent('updating') === false) {
+            return false;
+        }
+
+        return tap($this->setKeysForSaveQuery($query)->inverse($column, $condition, $extra), function () use ($column) {
+            $this->syncChanges();
+
+            $this->fireModelEvent('updated', false);
+
+            $this->syncOriginalAttribute($column);
+        });
+
+    }
+
+    /**
      * Update the model in the database.
      *
      * @param  array  $attributes
@@ -2264,7 +2297,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function __call($method, $parameters)
     {
-        if (in_array($method, ['increment', 'decrement'])) {
+        if (in_array($method, ['increment', 'decrement', 'inverse'])) {
             return $this->$method(...$parameters);
         }
 
