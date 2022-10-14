@@ -515,6 +515,19 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Assert that the given string matches the response content.
+     *
+     * @param  string  $value
+     * @return $this
+     */
+    public function assertContent($value)
+    {
+        PHPUnit::assertSame($value, $this->content());
+
+        return $this;
+    }
+
+    /**
      * Assert that the given string or array of strings are contained within the response.
      *
      * @param  string|array  $value

@@ -211,6 +211,29 @@ class TestResponseTest extends TestCase
         $response->assertViewMissing('foo.baz');
     }
 
+    public function testAssertContent()
+    {
+        $response = $this->makeMockResponse([
+            'render' => 'expected response data',
+        ]);
+
+        $response->assertContent('expected response data');
+
+        try {
+            $response->assertContent('expected');
+            $this->fail('xxxx');
+        } catch (AssertionFailedError $e) {
+            $this->assertSame('Failed asserting that two strings are identical.', $e->getMessage());
+        }
+
+        try {
+            $response->assertContent('expected response data with extra');
+            $this->fail('xxxx');
+        } catch (AssertionFailedError $e) {
+            $this->assertSame('Failed asserting that two strings are identical.', $e->getMessage());
+        }
+    }
+
     public function testAssertSee()
     {
         $response = $this->makeMockResponse([
