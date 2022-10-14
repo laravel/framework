@@ -224,6 +224,29 @@ class Arr
     }
 
     /**
+     * Fill an array with values
+     *
+     * @param  int  $start
+     * @param  int  $count
+     * @param  mixed  $value
+     * @return array
+     */
+    public static function fill($start, $count, $value)
+    {
+        if (! is_callable($value)) {
+            return array_fill($start, $count, $value);
+        }
+
+        $array = array_fill($start, $count, '');
+
+        foreach ($array as $key => $v) {
+            $array[$key] = $value($key);
+        }
+
+        return $array;
+    }
+
+    /**
      * Flatten a multi-dimensional array into a single level.
      *
      * @param  iterable  $array

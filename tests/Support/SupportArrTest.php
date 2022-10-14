@@ -242,6 +242,24 @@ class SupportArrTest extends TestCase
         $this->assertEquals(300, Arr::last($array));
     }
 
+    public function testFill()
+    {
+        $this->assertEquals(
+            [1 => 'string', 2 => 'string'],
+            Arr::fill(1, 2, 'string')
+        );
+
+        $this->assertEquals(
+            [-1 => -1, 0 => 0],
+            Arr::fill(-1, 2, fn ($key) => $key)
+        );
+
+        $this->assertEquals(
+            [0 => 'Item: 0', 1 => 'Item: 1'],
+            Arr::fill(0, 2, fn ($key) => "Item: {$key}")
+        );
+    }
+
     public function testFlatten()
     {
         // Flat arrays are unaffected
