@@ -563,9 +563,10 @@ class ComponentTagCompiler
             $value = $match['value'] ?? null;
 
             if (str_starts_with($attribute, 'unpack:')) {
-                $this->unpackedAttributes[$attribute] = '...$'.Str::after($attribute, 'unpack:');
+                $key = Str::camel($attribute);
+                $this->unpackedAttributes[$key] = '...$'.Str::after($attribute, 'unpack:');
 
-                return [$attribute => 'true'];
+                return [$key => 'true'];
             }
 
             if (is_null($value)) {
