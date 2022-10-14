@@ -1083,6 +1083,21 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Inverse the column's value by a given condition.
+     *
+     * @param  string|\Illuminate\Database\Query\Expression  $column
+     * @param  bool|null  $condition
+     * @param  array  $extra
+     * @return int
+     */
+    public function inverse($column, $condition = null, array $extra = [])
+    {
+        return $this->toBase()->inverse(
+            $column, $condition, $this->addUpdatedAtColumn($extra)
+        );
+    }
+
+    /**
      * Add the "updated at" column to an array of values.
      *
      * @param  array  $values
