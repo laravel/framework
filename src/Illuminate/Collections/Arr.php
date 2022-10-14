@@ -224,7 +224,7 @@ class Arr
     }
 
     /**
-     * Fill an array with values
+     * Fill an array with values.
      *
      * @param  int  $start
      * @param  int  $count
