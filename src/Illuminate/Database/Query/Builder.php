@@ -3421,6 +3421,23 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Inverse the column's value by a given condition.
+     *
+     * @param  string  $column
+     * @param  bool|null  $condition
+     * @param  array  $extra
+     * @return int
+     */
+    public function inverse($column, $condition = null, array $extra = [])
+    {
+        $wrapped = $this->grammar->wrap($column);
+
+        $columns = array_merge([$column => $condition ? $condition : $this->raw("!$wrapped")], $extra);
+
+        return $this->update($columns);
+    }
+
+    /**
      * Delete records from the database.
      *
      * @param  mixed  $id
