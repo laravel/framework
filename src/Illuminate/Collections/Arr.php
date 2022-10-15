@@ -828,10 +828,10 @@ class Arr
      *
      * If no key is given to the method, the entire array will be replaced.
      *
-     * @param boolean $condition
-     * @param array $array
-     * @param string|int|null $key
-     * @param mixed $value
+     * @param  boolean  $condition
+     * @param  array  $array
+     * @param  string|int|null  $key
+     * @param  mixed  $value
      * @return array
      */
     public static function setWhen($condition, &$array, $key, $value): array
@@ -846,9 +846,9 @@ class Arr
     /**
      * Remove one or many array items from a given array using "dot" notation if the given condition is true.
      *
-     * @param boolean $condition
-     * @param array $array
-     * @param array|string|int|float $keys
+     * @param  boolean  $condition
+     * @param  array  $array
+     * @param  array|string|int|float  $keys
      * @return void
      */
     public static function forgetWhen($condition, &$array, $keys)
