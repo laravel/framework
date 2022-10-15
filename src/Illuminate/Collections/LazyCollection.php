@@ -92,6 +92,22 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
+     * Create a new collection with default starting key by invoking the callback a given range.
+     *
+     * @param  int  $start
+     * @param  int  $number
+     * @param  (callable(int): mixed)|null  $callback
+     * @return static<int, mixed>
+     */
+    public static function rangeByKey($start, $number, callable $callback = null)
+    {
+        return static::range($start, $number)
+            ->keyBy(fn ($item) => $item)
+            ->unless($callback == null)
+            ->map($callback);
+    }
+
+    /**
      * Get all items in the enumerable.
      *
      * @return array<TKey, TValue>
