@@ -822,4 +822,39 @@ class Arr
 
         return is_array($value) ? $value : [$value];
     }
+
+    /**
+     * Set an array item to a given value using "dot" notation if the given condition is true.
+     *
+     * If no key is given to the method, the entire array will be replaced.
+     *
+     * @param boolean $condition
+     * @param array $array
+     * @param string|int|null $key
+     * @param mixed $value
+     * @return array
+     */
+    public static function setWhen($condition, &$array, $key, $value): array
+    {
+        if ($condition) {
+            return self::set($array, $key, $value);
+        }
+
+        return $array;
+    }
+
+    /**
+     * Remove one or many array items from a given array using "dot" notation if the given condition is true.
+     *
+     * @param boolean $condition
+     * @param array $array
+     * @param array|string|int|float $keys
+     * @return void
+     */
+    public static function forgetWhen($condition, &$array, $keys)
+    {
+        if ($condition) {
+            self::forget($array, $keys);
+        }
+    }
 }

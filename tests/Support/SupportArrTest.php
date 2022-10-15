@@ -1112,4 +1112,38 @@ class SupportArrTest extends TestCase
             ],
         ], Arr::prependKeysWith($array, 'test.'));
     }
+
+    public function testSetWhen()
+    {
+        $user = [
+            'name' => 'Taylor',
+        ];
+
+        Arr::setWhen(true, $user, 'role', 'OWNER');
+        Arr::setWhen(false, $user, 'role', 'USER');
+        Arr::setWhen(null, $user, 'role', 'GUEST');
+
+        $this->assertEquals(['name' => 'Taylor', 'role' => 'OWNER'], $user);
+    }
+
+    public function testForgetWhen()
+    {
+        $user = [
+            'name' => 'Taylor',
+            'role' => 'GUEST',
+        ];
+
+        Arr::forgetWhen(true, $user, 'role');
+        $this->assertEquals(['name' => 'Taylor'], $user);
+
+        $user = [
+            'name' => 'Taylor',
+            'role' => 'OWNER',
+        ];
+
+        Arr::forgetWhen(false, $user, 'role');
+        Arr::forgetWhen(null, $user, 'role');
+
+        $this->assertEquals(['name' => 'Taylor', 'role' => 'OWNER'], $user);
+    }
 }
