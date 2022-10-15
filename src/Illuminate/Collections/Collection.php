@@ -63,7 +63,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      * @return static<int, mixed>
      */
     public static function rangeByKey($start, $number, callable $callback = null)
-    { 
+    {
         return static::range($start, $number)
             ->keyBy(fn ($item) => $item)
             ->unless($callback == null)
