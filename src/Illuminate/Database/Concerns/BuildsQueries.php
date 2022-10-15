@@ -297,6 +297,17 @@ trait BuildsQueries
     }
 
     /**
+     * Execute the query and get the first result in Array.
+     *
+     * @param  array|string  $columns
+     * @return \Illuminate\Database\Eloquent\Model|array|static|null
+     */
+    public function firstToArray($columns = ['*'])
+    {
+        return (array)$this->take(1)->get($columns)->first();
+    }
+
+    /**
      * Execute the query and get the first result if it's the sole matching record.
      *
      * @param  array|string  $columns
