@@ -2812,6 +2812,52 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testRangeByKeyMethod($collection)
+    {
+        $this->assertSame(
+            [1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5],
+            $collection::rangeByKey(1, 5)->all()
+        );
+
+        $this->assertSame(
+            [-2 => -2, -1 => -1, 0 => 0, 1 => 1, 2 => 2],
+            $collection::rangeByKey(-2, 2)->all()
+        );
+
+        $this->assertSame(
+            [-4 => -4, -3 => -3, -2 => -2],
+            $collection::rangeByKey(-4, -2)->all()
+        );
+
+        $this->assertSame(
+            [5 => 5, 4, 3, 2, 1],
+            $collection::rangeByKey(5, 1)->all()
+        );
+
+        $this->assertSame(
+            [2 => 2, 1 => 1, 0 => 0, -1 => -1, -2 => -2],
+            $collection::rangeByKey(2, -2)->all()
+        );
+
+        $this->assertSame(
+            [-2 => -2, -3 => -3, -4 => -4],
+            $collection::rangeByKey(-2, -4)->all()
+        );
+
+        $this->assertSame(
+            [1 => 1],
+            $collection::rangeByKey(1, 1)->all()
+        );
+
+        $this->assertSame(
+            [-1 => -2, 0 => 0, 1 => 2],
+            $collection::rangeByKey(-1, 1, fn ($key) => $key * 2)->all()
+        );
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testConstructMakeFromObject($collection)
     {
         $object = new stdClass;
