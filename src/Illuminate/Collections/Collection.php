@@ -55,7 +55,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
-     * Create a new collection with default starting key by invoking the callback a given amount of times.
+     * Create a new collection with default starting key by invoking the callback a given range.
      *
      * @param  int  $start
      * @param  int  $number
