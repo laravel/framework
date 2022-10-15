@@ -49,6 +49,16 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public static function range($from, $to);
 
     /**
+     * Create a new collection with default starting key by invoking the callback a given amount of times.
+     *
+     * @param  int  $start
+     * @param  int  $number
+     * @param  (callable(int): mixed)|null  $callback
+     * @return static<int, mixed>
+     */
+    public static function rangeByKey($start, $number, callable $callback = null);
+
+    /**
      * Wrap the given value in a collection if applicable.
      *
      * @template TWrapKey of array-key
