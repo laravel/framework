@@ -828,7 +828,7 @@ class Arr
      *
      * If no key is given to the method, the entire array will be replaced.
      *
-     * @param  boolean  $condition
+     * @param  bool  $condition
      * @param  array  $array
      * @param  string|int|null  $key
      * @param  mixed  $value
@@ -846,7 +846,7 @@ class Arr
     /**
      * Remove one or many array items from a given array using "dot" notation if the given condition is true.
      *
-     * @param  boolean  $condition
+     * @param  bool  $condition
      * @param  array  $array
      * @param  array|string|int|float  $keys
      * @return void
