@@ -75,4 +75,16 @@ trait CompilesHelpers
 
         return "<?php echo app('$class')->reactRefresh(); ?>";
     }
+
+    /**
+     * Compile the "viteNonce" statements into valid PHP.
+     *
+     * @return string
+     */
+    protected function compileViteNonce()
+    {
+        $class = Vite::class;
+
+        return "<?php echo 'nonce=\"'.app('$class')->cspNonce().'\"'; ?>";
+    }
 }
