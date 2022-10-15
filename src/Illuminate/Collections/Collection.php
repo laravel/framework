@@ -57,12 +57,10 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Create a new collection with default starting key by invoking the callback a given amount of times.
      *
-     * @template TTimesValue
-     *
      * @param  int  $start
      * @param  int  $number
-     * @param  (callable(int): TTimesValue)|null  $callback
-     * @return static<int, TTimesValue>
+     * @param  (callable(int): mixed)|null  $callback
+     * @return static<int, mixed>
      */
     public static function rangeByKey($start, $number, callable $callback = null)
     { 
