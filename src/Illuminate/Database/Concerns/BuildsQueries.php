@@ -304,7 +304,7 @@ trait BuildsQueries
      */
     public function firstToArray($columns = ['*'])
     {
-        return (array)$this->take(1)->get($columns)->first();
+        return (array) $this->first($columns);
     }
 
     /**
