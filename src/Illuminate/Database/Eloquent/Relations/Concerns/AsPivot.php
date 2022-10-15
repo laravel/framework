@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent\Relations\Concerns;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use LogicException;
 
 trait AsPivot
 {
@@ -146,6 +147,8 @@ trait AsPivot
      */
     protected function getDeleteQuery()
     {
+        $this->checkPivotKeys();
+
         return $this->newQueryWithoutRelationships()->where([
             $this->foreignKey => $this->getOriginal($this->foreignKey, $this->getAttribute($this->foreignKey)),
             $this->relatedKey => $this->getOriginal($this->relatedKey, $this->getAttribute($this->relatedKey)),
@@ -260,6 +263,8 @@ trait AsPivot
             return $this->getKey();
         }
 
+        $this->checkPivotKeys();
+
         return sprintf(
             '%s:%s:%s:%s',
             $this->foreignKey, $this->getAttribute($this->foreignKey),
@@ -329,5 +334,12 @@ trait AsPivot
         $this->relations = [];
 
         return $this;
+    }
+
+    protected function checkPivotKeys()
+    {
+        if (! $this->foreignKey || ! $this->relatedKey) {
+            throw new LogicException('Pivot keys must be set on the model. ('.get_class($this).')');
+        }
     }
 }
