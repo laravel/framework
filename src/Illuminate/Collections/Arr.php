@@ -834,7 +834,7 @@ class Arr
      * @param  mixed  $value
      * @return array
      */
-    public static function setWhen($condition, &$array, $key, $value): array
+    public static function setIf($condition, &$array, $key, $value): array
     {
         if ($condition) {
             return self::set($array, $key, $value);
@@ -851,7 +851,7 @@ class Arr
      * @param  array|string|int|float  $keys
      * @return void
      */
-    public static function forgetWhen($condition, &$array, $keys)
+    public static function forgetIf($condition, &$array, $keys)
     {
         if ($condition) {
             self::forget($array, $keys);
