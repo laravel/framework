@@ -231,6 +231,18 @@ class Factory
     }
 
     /**
+     * Clear all the stub callbacks.
+     *
+     * @return $this
+     */
+    public function clearStubs()
+    {
+        $this->stubCallbacks = collect();
+
+        return $this;
+    }
+
+    /**
      * Indicate that an exception should be thrown if any request is not faked.
      *
      * @param  bool  $prevent

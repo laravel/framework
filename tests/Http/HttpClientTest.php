@@ -1654,4 +1654,21 @@ class HttpClientTest extends TestCase
 
         $this->assertSame(['connect_timeout' => 10, 'http_errors' => false, 'timeout' => 30, 'allow_redirects' => ['max' => 10]], $request->getOptions());
     }
+
+    public function testItCanClearStubCallbacks()
+    {
+        $this->factory->preventStrayRequests();
+        $this->factory->fake(['https://laravel.com' => Factory::response('ok', 200)]);
+
+        $response = $this->factory->get('https://laravel.com');
+
+        $this->assertTrue($response->ok());
+
+        $this->factory->clearStubs();
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Attempted request to [https://laravel.com] without a matching fake.');
+
+        $this->factory->get('https://laravel.com');
+    }
 }
