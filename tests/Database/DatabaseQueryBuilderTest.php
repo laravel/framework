@@ -5331,6 +5331,27 @@ SQL;
         $this->assertEquals([], $clone->getBindings());
     }
 
+    public function testCustomComponents()
+    {
+        $expected = new stdClass();
+
+        $builder = $this->getBuilder();
+
+        $this->assertFalse($builder->hasComponent('foo'));
+        $this->assertSame($expected, $builder->getComponent('foo', $expected));
+        $this->assertSame($expected, $builder->getComponent('foo', fn($builder) => $builder instanceof Builder ? $expected : false));
+
+        $builder->setComponent('foo', $expected);
+
+        $this->assertTrue($builder->hasComponent('foo'));
+        $this->assertSame($expected, $builder->getComponent('foo', false));
+
+        $builder->setComponent('foo', null);
+
+        $this->assertFalse($builder->hasComponent('foo'));
+        $this->assertFalse($builder->getComponent('foo', false));
+    }
+
     protected function getConnection()
     {
         $connection = m::mock(ConnectionInterface::class);
