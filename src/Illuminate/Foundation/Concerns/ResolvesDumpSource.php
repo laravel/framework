@@ -32,7 +32,7 @@ trait ResolvesDumpSource
     /**
      * The source resolver.
      *
-     * @var (callable(): (array{0: string, 1: string, 2: int|null}|null))|null
+     * @var (callable(): (array{0: string, 1: string, 2: int|null}|null))|null|false
      */
     protected static $dumpSourceResolver;
 
@@ -43,6 +43,10 @@ trait ResolvesDumpSource
      */
     public function resolveDumpSource()
     {
+        if (static::$dumpSourceResolver === false) {
+            return null;
+        }
+
         if (static::$dumpSourceResolver) {
             return call_user_func(static::$dumpSourceResolver);
         }
@@ -160,5 +164,15 @@ trait ResolvesDumpSource
     public static function resolveDumpSourceUsing($callable)
     {
         static::$dumpSourceResolver = $callable;
+    }
+
+    /**
+     * Prevent dumping the source of the dump call.
+     *
+     * @return void
+     */
+    public static function preventDumpingSource()
+    {
+        static::$dumpSourceResolver = false;
     }
 }
