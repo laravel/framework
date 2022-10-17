@@ -1093,9 +1093,27 @@ class Route
             );
         }
 
-        return $this->controllerDispatcher()->getMiddleware(
-            $this->getController(), $controllerMethod
-        );
+        if ($this->hasInstanceMiddleware($controllerClass)) {
+            return $this->controllerDispatcher()->getMiddleware(
+                $this->getController(), $controllerMethod
+            );
+        }
+
+        return [];
+    }
+
+    /**
+     * Whether the controller class contains middleware to load.
+     *
+     * @param  string  $controllerClass
+     * @return boolean
+     */
+    public function hasInstanceMiddleware(string $controllerClass)
+    {
+        $usedTraits = class_uses_recursive($controllerClass);
+
+        return is_a($controllerClass, Controller::class, true)
+            || in_array("Lorisleiva\Actions\Concerns\AsController", $usedTraits);
     }
 
     /**
