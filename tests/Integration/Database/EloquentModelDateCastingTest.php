@@ -116,7 +116,7 @@ class EloquentModelDateCastingTest extends DatabaseTestCase
 
     public function testDatesCanBeEmptyOrNull()
     {
-        $user = TestModel1::create([
+        $user = TestModel1::make([
             'date_field' => '',
             'datetime_field' => null,
         ]);
