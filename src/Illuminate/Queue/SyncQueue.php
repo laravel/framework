@@ -13,6 +13,24 @@ use Throwable;
 class SyncQueue extends Queue implements QueueContract
 {
     /**
+     * The job handler name.
+     *
+     * @var string
+     */
+    protected $job;
+
+    /**
+     * Create a new Sync queue instance.
+     *
+     * @param  string|null  $job
+     * @return void
+     */
+    public function __construct($job = null)
+    {
+        $this->job = $job;
+    }
+
+    /**
      * Get the size of the queue.
      *
      * @param  string|null  $queue
@@ -59,7 +77,9 @@ class SyncQueue extends Queue implements QueueContract
      */
     protected function resolveJob($payload, $queue)
     {
-        return new SyncJob($this->container, $payload, $this->connectionName, $queue);
+        $jobClass = $this->getJobClass();
+
+        return new $jobClass($this->container, $payload, $this->connectionName, $queue);
     }
 
     /**
@@ -156,5 +176,15 @@ class SyncQueue extends Queue implements QueueContract
     public function pop($queue = null)
     {
         //
+    }
+
+    /**
+     * Get the class of handler job.
+     *
+     * @return string
+     */
+    public function getJobClass()
+    {
+        return $this->job ?? SyncJob::class;
     }
 }

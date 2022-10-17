@@ -25,6 +25,13 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     protected $default;
 
     /**
+     * The job handler name.
+     *
+     * @var string
+     */
+    protected $job;
+
+    /**
      * The queue URL prefix.
      *
      * @var string
@@ -43,6 +50,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      *
      * @param  \Aws\Sqs\SqsClient  $sqs
      * @param  string  $default
+     * @param  string|null  $job
      * @param  string  $prefix
      * @param  string  $suffix
      * @param  bool  $dispatchAfterCommit
@@ -50,13 +58,15 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function __construct(SqsClient $sqs,
                                 $default,
+                                $job,
                                 $prefix = '',
                                 $suffix = '',
                                 $dispatchAfterCommit = false)
     {
         $this->sqs = $sqs;
-        $this->prefix = $prefix;
         $this->default = $default;
+        $this->job = $job;
+        $this->prefix = $prefix;
         $this->suffix = $suffix;
         $this->dispatchAfterCommit = $dispatchAfterCommit;
     }
@@ -174,7 +184,9 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
         ]);
 
         if (! is_null($response['Messages']) && count($response['Messages']) > 0) {
-            return new SqsJob(
+            $jobClass = $this->getJobClass();
+
+            return new $jobClass(
                 $this->container, $this->sqs, $response['Messages'][0],
                 $this->connectionName, $queue
             );
@@ -237,5 +249,15 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     public function getSqs()
     {
         return $this->sqs;
+    }
+
+    /**
+     * Get the class of handler job.
+     *
+     * @return string
+     */
+    public function getJobClass()
+    {
+        return $this->job ?? SqsJob::class;
     }
 }

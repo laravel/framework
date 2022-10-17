@@ -31,6 +31,13 @@ class BeanstalkdQueue extends Queue implements QueueContract
     protected $timeToRun;
 
     /**
+     * The job handler name.
+     *
+     * @var string
+     */
+    protected $job;
+
+    /**
      * The maximum number of seconds to block for a job.
      *
      * @var int
@@ -43,6 +50,7 @@ class BeanstalkdQueue extends Queue implements QueueContract
      * @param  \Pheanstalk\Pheanstalk  $pheanstalk
      * @param  string  $default
      * @param  int  $timeToRun
+     * @param  string|null  $job
      * @param  int  $blockFor
      * @param  bool  $dispatchAfterCommit
      * @return void
@@ -50,13 +58,15 @@ class BeanstalkdQueue extends Queue implements QueueContract
     public function __construct(Pheanstalk $pheanstalk,
                                 $default,
                                 $timeToRun,
+                                $job = null,
                                 $blockFor = 0,
                                 $dispatchAfterCommit = false)
     {
-        $this->default = $default;
-        $this->blockFor = $blockFor;
-        $this->timeToRun = $timeToRun;
         $this->pheanstalk = $pheanstalk;
+        $this->default = $default;
+        $this->timeToRun = $timeToRun;
+        $this->job = $job;
+        $this->blockFor = $blockFor;
         $this->dispatchAfterCommit = $dispatchAfterCommit;
     }
 
@@ -168,7 +178,9 @@ class BeanstalkdQueue extends Queue implements QueueContract
         $job = $this->pheanstalk->watchOnly($queue)->reserveWithTimeout($this->blockFor);
 
         if ($job instanceof PheanstalkJob) {
-            return new BeanstalkdJob(
+            $jobClass = $this->getJobClass();
+
+            return new $jobClass(
                 $this->container, $this->pheanstalk, $job, $this->connectionName, $queue
             );
         }
@@ -207,5 +219,15 @@ class BeanstalkdQueue extends Queue implements QueueContract
     public function getPheanstalk()
     {
         return $this->pheanstalk;
+    }
+
+    /**
+     * Get the class of handler job.
+     *
+     * @return string
+     */
+    public function getJobClass()
+    {
+        return $this->job ?? BeanstalkdJob::class;
     }
 }

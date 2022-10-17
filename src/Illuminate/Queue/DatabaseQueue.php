@@ -35,6 +35,13 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
     protected $default;
 
     /**
+     * The job handler name.
+     *
+     * @var string
+     */
+    protected $job;
+
+    /**
      * The expiration time of a job.
      *
      * @var int|null
@@ -47,6 +54,7 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
      * @param  \Illuminate\Database\Connection  $database
      * @param  string  $table
      * @param  string  $default
+     * @param  string  $job
      * @param  int  $retryAfter
      * @param  bool  $dispatchAfterCommit
      * @return void
@@ -54,12 +62,14 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
     public function __construct(Connection $database,
                                 $table,
                                 $default = 'default',
+                                $job = null,
                                 $retryAfter = 60,
                                 $dispatchAfterCommit = false)
     {
+        $this->database = $database;
         $this->table = $table;
         $this->default = $default;
-        $this->database = $database;
+        $this->job = $job;
         $this->retryAfter = $retryAfter;
         $this->dispatchAfterCommit = $dispatchAfterCommit;
     }
@@ -319,7 +329,9 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
     {
         $job = $this->markJobAsReserved($job);
 
-        return new DatabaseJob(
+        $jobClass = $this->getJobClass();
+
+        return new $jobClass(
             $this->container, $this, $job, $this->connectionName, $queue
         );
     }
@@ -409,5 +421,15 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
     public function getDatabase()
     {
         return $this->database;
+    }
+
+    /**
+     * Get the class of handler job.
+     *
+     * @return string
+     */
+    public function getJobClass()
+    {
+        return $this->job ?? DatabaseJob::class;
     }
 }

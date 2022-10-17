@@ -25,6 +25,13 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     protected $connection;
 
     /**
+     * The job handler name.
+     *
+     * @var string
+     */
+    protected $job;
+
+    /**
      * The name of the default queue.
      *
      * @var string
@@ -60,6 +67,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      * @param  \Illuminate\Contracts\Redis\Factory  $redis
      * @param  string  $default
      * @param  string|null  $connection
+     * @param  string|null  $job
      * @param  int  $retryAfter
      * @param  int|null  $blockFor
      * @param  bool  $dispatchAfterCommit
@@ -69,6 +77,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     public function __construct(Redis $redis,
                                 $default = 'default',
                                 $connection = null,
+                                $job = null,
                                 $retryAfter = 60,
                                 $blockFor = null,
                                 $dispatchAfterCommit = false,
@@ -76,9 +85,10 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     {
         $this->redis = $redis;
         $this->default = $default;
-        $this->blockFor = $blockFor;
         $this->connection = $connection;
+        $this->job = $job;
         $this->retryAfter = $retryAfter;
+        $this->blockFor = $blockFor;
         $this->dispatchAfterCommit = $dispatchAfterCommit;
         $this->migrationBatchSize = $migrationBatchSize;
     }
@@ -228,7 +238,9 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
         [$job, $reserved] = $this->retrieveNextJob($prefixed);
 
         if ($reserved) {
-            return new RedisJob(
+            $jobClass = $this->getJobClass();
+
+            return new $jobClass(
                 $this->container, $this, $job,
                 $reserved, $this->connectionName, $queue ?: $this->default
             );
@@ -378,5 +390,15 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     public function getRedis()
     {
         return $this->redis;
+    }
+
+    /**
+     * Get the class of handler job.
+     *
+     * @return string
+     */
+    public function getJobClass()
+    {
+        return $this->job ?? RedisJob::class;
     }
 }
