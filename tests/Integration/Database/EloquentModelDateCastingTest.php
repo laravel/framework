@@ -113,6 +113,17 @@ class EloquentModelDateCastingTest extends DatabaseTestCase
         $this->assertArrayNotHasKey('immutable_date_field', $user->getDirty());
         $this->assertArrayNotHasKey('immutable_datetime_field', $user->getDirty());
     }
+
+    public function testDatesCanBeEmptyOrNull()
+    {
+        $user = TestModel1::create([
+            'date_field' => '',
+            'datetime_field' => null,
+        ]);
+
+        $this->assertSame(null, $user->toArray()['date_field']);
+        $this->assertSame(null, $user->toArray()['datetime_field']);
+    }
 }
 
 class TestModel1 extends Model
