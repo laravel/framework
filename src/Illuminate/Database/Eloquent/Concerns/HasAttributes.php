@@ -891,10 +891,7 @@ trait HasAttributes
     protected function serializeClassCastableAttribute($key, $value)
     {
         return $this->resolveCasterClass($key)->serialize(
-            $this,
-            $key,
-            $value,
-            $this->attributes
+            $this, $key, $value, $this->attributes
         );
     }
 
@@ -1092,9 +1089,7 @@ trait HasAttributes
         [$key, $path] = explode('->', $key, 2);
 
         $value = $this->asJson($this->getArrayAttributeWithValue(
-            $path,
-            $key,
-            $value
+            $path, $key, $value
         ));
 
         $this->attributes[$key] = $this->isEncryptedCastable($key)
@@ -1229,9 +1224,7 @@ trait HasAttributes
 
         if ($value === false) {
             throw JsonEncodingException::forAttribute(
-                $this,
-                $key,
-                json_last_error_msg()
+                $this, $key, json_last_error_msg()
             );
         }
 
@@ -1799,8 +1792,7 @@ trait HasAttributes
     public function getOriginal($key = null, $default = null)
     {
         return (new static)->setRawAttributes(
-            $this->original,
-            $sync = true
+            $this->original, $sync = true
         )->getOriginalWithoutRewindingModel($key, $default);
     }
 
