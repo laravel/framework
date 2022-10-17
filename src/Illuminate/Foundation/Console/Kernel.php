@@ -146,6 +146,14 @@ class Kernel implements KernelContract
         $this->commandStartedAt = Carbon::now();
 
         try {
+            if ($input->getFirstArgument() === 'env:decrypt') {
+                $this->app->bootstrapWith(
+                    collect($this->bootstrappers())->reject(function ($bootstrapper) {
+                        return $bootstrapper === \Illuminate\Foundation\Bootstrap\BootProviders::class;
+                    })->all()
+                );
+            }
+
             $this->bootstrap();
 
             return $this->getArtisan()->run($input, $output);
