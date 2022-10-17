@@ -166,6 +166,21 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Assert that the response is a server error.
+     *
+     * @return $this
+     */
+    public function assertServerError()
+    {
+        PHPUnit::assertTrue(
+            $this->isServerError(),
+            $this->statusMessageWithDetails('>=500, < 600', $this->getStatusCode())
+        );
+
+        return $this;
+    }
+
+    /**
      * Assert that the response has the given status code.
      *
      * @param  int  $status
