@@ -298,8 +298,7 @@ trait HasAttributes
                 $attributes[$key] = $this->serializeDate($attributes[$key]);
             }
 
-            if (isset($attributes[$key]) && ($this->isCustomDateTimeCast($value) ||
-                $this->isImmutableCustomDateTimeCast($value))) {
+            if (isset($attributes[$key]) && ($this->isCustomDateTimeCast($value) || $this->isImmutableCustomDateTimeCast($value)) && method_exists($attributes[$key], 'format')) {
                 $attributes[$key] = $attributes[$key]->format(explode(':', $value, 2)[1]);
             }
 
@@ -1400,7 +1399,7 @@ trait HasAttributes
             $date = false;
         }
 
-        return $date ?: Date::make($value);
+        return $date ?: Date::make($value) ?: $value;
     }
 
     /**
