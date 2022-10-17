@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Queue;
 use Illuminate\Container\Container;
 use Illuminate\Database\Connection;
 use Illuminate\Queue\DatabaseQueue;
+use Illuminate\Queue\Jobs\DatabaseJob;
 use Illuminate\Queue\Queue;
 use Illuminate\Support\Str;
 use Mockery as m;
@@ -14,9 +15,16 @@ use stdClass;
 
 class QueueDatabaseQueueUnitTest extends TestCase
 {
+    protected $job;
+
     protected function tearDown(): void
     {
         m::close();
+    }
+
+    protected function setUp(): void
+    {
+        $this->job = m::mock(DatabaseJob::class);
     }
 
     public function testPushProperlyPushesJobOntoDatabase()
@@ -27,7 +35,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
             return $uuid;
         });
 
-        $queue = $this->getMockBuilder(DatabaseQueue::class)->onlyMethods(['currentTime'])->setConstructorArgs([$database = m::mock(Connection::class), 'table', 'default'])->getMock();
+        $queue = $this->getMockBuilder(DatabaseQueue::class)->onlyMethods(['currentTime'])->setConstructorArgs([$database = m::mock(Connection::class), 'table', 'default', $this->job])->getMock();
         $queue->expects($this->any())->method('currentTime')->willReturn('time');
         $queue->setContainer($container = m::spy(Container::class));
         $database->shouldReceive('table')->with('table')->andReturn($query = m::mock(stdClass::class));
@@ -57,7 +65,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $queue = $this->getMockBuilder(
             DatabaseQueue::class)->onlyMethods(
             ['currentTime'])->setConstructorArgs(
-            [$database = m::mock(Connection::class), 'table', 'default']
+            [$database = m::mock(Connection::class), 'table', 'default', $this->job]
         )->getMock();
         $queue->expects($this->any())->method('currentTime')->willReturn('time');
         $queue->setContainer($container = m::spy(Container::class));
@@ -119,7 +127,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         });
 
         $database = m::mock(Connection::class);
-        $queue = $this->getMockBuilder(DatabaseQueue::class)->onlyMethods(['currentTime', 'availableAt'])->setConstructorArgs([$database, 'table', 'default'])->getMock();
+        $queue = $this->getMockBuilder(DatabaseQueue::class)->onlyMethods(['currentTime', 'availableAt'])->setConstructorArgs([$database, 'table', 'default', $this->job])->getMock();
         $queue->expects($this->any())->method('currentTime')->willReturn('created');
         $queue->expects($this->any())->method('availableAt')->willReturn('available');
         $database->shouldReceive('table')->with('table')->andReturn($query = m::mock(stdClass::class));

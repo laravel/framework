@@ -16,6 +16,8 @@ use PHPUnit\Framework\TestCase;
 
 class QueueSyncQueueTest extends TestCase
 {
+    protected $job;
+
     protected function tearDown(): void
     {
         m::close();
@@ -23,11 +25,16 @@ class QueueSyncQueueTest extends TestCase
         Container::setInstance(null);
     }
 
+    protected function setUp(): void
+    {
+        $this->job = m::mock(SyncJob::class);
+    }
+
     public function testPushShouldFireJobInstantly()
     {
         unset($_SERVER['__sync.test']);
 
-        $sync = new SyncQueue;
+        $sync = new SyncQueue($this->job);
         $container = new Container;
         $sync->setContainer($container);
 
@@ -40,7 +47,7 @@ class QueueSyncQueueTest extends TestCase
     {
         unset($_SERVER['__sync.failed']);
 
-        $sync = new SyncQueue;
+        $sync = new SyncQueue($this->job);
         $container = new Container;
         Container::setInstance($container);
         $events = m::mock(Dispatcher::class);
@@ -60,7 +67,7 @@ class QueueSyncQueueTest extends TestCase
 
     public function testCreatesPayloadObject()
     {
-        $sync = new SyncQueue;
+        $sync = new SyncQueue($this->job);
         $container = new Container;
         $container->bind(\Illuminate\Contracts\Events\Dispatcher::class, \Illuminate\Events\Dispatcher::class);
         $container->bind(\Illuminate\Contracts\Bus\Dispatcher::class, \Illuminate\Bus\Dispatcher::class);

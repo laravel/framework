@@ -28,6 +28,11 @@ class QueueBeanstalkdQueueTest extends TestCase
         m::close();
     }
 
+    protected function setUp(): void
+    {
+        $this->job = m::mock(BeanstalkdJob::class);
+    }
+
     public function testPushProperlyPushesJobOntoBeanstalkd()
     {
         $uuid = Str::uuid();
@@ -118,7 +123,7 @@ class QueueBeanstalkdQueueTest extends TestCase
      */
     private function setQueue($default, $timeToRun, $blockFor = 0)
     {
-        $this->queue = new BeanstalkdQueue(m::mock(Pheanstalk::class), $default, $timeToRun, $blockFor);
+        $this->queue = new BeanstalkdQueue(m::mock(Pheanstalk::class), $default, $timeToRun, $this->job, $blockFor);
         $this->container = m::spy(Container::class);
         $this->queue->setContainer($this->container);
     }

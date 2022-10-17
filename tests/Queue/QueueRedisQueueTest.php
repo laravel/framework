@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Queue;
 
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Redis\Factory;
+use Illuminate\Queue\Jobs\RedisJob;
 use Illuminate\Queue\LuaScripts;
 use Illuminate\Queue\Queue;
 use Illuminate\Queue\RedisQueue;
@@ -14,9 +15,16 @@ use PHPUnit\Framework\TestCase;
 
 class QueueRedisQueueTest extends TestCase
 {
+    protected $job;
+
     protected function tearDown(): void
     {
         m::close();
+    }
+
+    protected function setUp(): void
+    {
+        $this->job = m::mock(RedisJob::class);
     }
 
     public function testPushProperlyPushesJobOntoRedis()
@@ -27,7 +35,7 @@ class QueueRedisQueueTest extends TestCase
             return $uuid;
         });
 
-        $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['getRandomId'])->setConstructorArgs([$redis = m::mock(Factory::class), 'default'])->getMock();
+        $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['getRandomId'])->setConstructorArgs([$redis = m::mock(Factory::class), $this->job, 'default'])->getMock();
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
         $queue->setContainer($container = m::spy(Container::class));
         $redis->shouldReceive('connection')->once()->andReturn($redis);
@@ -48,7 +56,7 @@ class QueueRedisQueueTest extends TestCase
             return $uuid;
         });
 
-        $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['getRandomId'])->setConstructorArgs([$redis = m::mock(Factory::class), 'default'])->getMock();
+        $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['getRandomId'])->setConstructorArgs([$redis = m::mock(Factory::class), $this->job, 'default'])->getMock();
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
         $queue->setContainer($container = m::spy(Container::class));
         $redis->shouldReceive('connection')->once()->andReturn($redis);
@@ -75,7 +83,7 @@ class QueueRedisQueueTest extends TestCase
             return $uuid;
         });
 
-        $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['getRandomId'])->setConstructorArgs([$redis = m::mock(Factory::class), 'default'])->getMock();
+        $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['getRandomId'])->setConstructorArgs([$redis = m::mock(Factory::class), $this->job, 'default'])->getMock();
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
         $queue->setContainer($container = m::spy(Container::class));
         $redis->shouldReceive('connection')->once()->andReturn($redis);
@@ -106,7 +114,7 @@ class QueueRedisQueueTest extends TestCase
             return $uuid;
         });
 
-        $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['availableAt', 'getRandomId'])->setConstructorArgs([$redis = m::mock(Factory::class), 'default'])->getMock();
+        $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['availableAt', 'getRandomId'])->setConstructorArgs([$redis = m::mock(Factory::class), $this->job, 'default'])->getMock();
         $queue->setContainer($container = m::spy(Container::class));
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
         $queue->expects($this->once())->method('availableAt')->with(1)->willReturn(2);
@@ -134,7 +142,7 @@ class QueueRedisQueueTest extends TestCase
         });
 
         $date = Carbon::now();
-        $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['availableAt', 'getRandomId'])->setConstructorArgs([$redis = m::mock(Factory::class), 'default'])->getMock();
+        $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['availableAt', 'getRandomId'])->setConstructorArgs([$redis = m::mock(Factory::class), $this->job, 'default'])->getMock();
         $queue->setContainer($container = m::spy(Container::class));
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
         $queue->expects($this->once())->method('availableAt')->with($date)->willReturn(2);
