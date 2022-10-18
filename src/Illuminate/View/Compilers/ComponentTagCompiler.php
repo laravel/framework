@@ -258,7 +258,6 @@ class ComponentTagCompiler
                 : "'$class'";
 
             $parameters = [
-                'view' => "'$class'",
                 'view' => $view,
                 'data' => $this->mergeAttributeSpreads($this->attributesToString($data->all(), $escapeBound = false)),
             ];
@@ -730,7 +729,9 @@ class ComponentTagCompiler
     protected function mergeAttributeSpreads(string $attributeString)
     {
         if ($this->attributeSpreads) {
-            return "array_merge(".implode(",", $this->attributeSpreads).",[$attributeString])";
+            $spreads = implode(',', $this->attributeSpreads);
+
+            return "array_merge({$spreads},[{$attributeString}])";
         }
 
         return "[$attributeString]";
