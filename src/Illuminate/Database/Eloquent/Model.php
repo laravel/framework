@@ -392,13 +392,9 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public static function shouldBeStrict(bool $shouldBeStrict = true)
     {
-        if (! $shouldBeStrict) {
-            return;
-        }
-
-        static::preventLazyLoading();
-        static::preventSilentlyDiscardingAttributes();
-        static::preventAccessingMissingAttributes();
+        static::preventLazyLoading($shouldBeStrict);
+        static::preventSilentlyDiscardingAttributes($shouldBeStrict);
+        static::preventAccessingMissingAttributes($shouldBeStrict);
     }
 
     /**
