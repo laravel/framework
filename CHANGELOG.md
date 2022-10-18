@@ -1,6 +1,12 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.36.0...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.36.1...9.x)
+
+
+## [v9.36.1](https://github.com/laravel/framework/compare/v9.36.0...v9.36.1) - 2022-10-18
+
+### Fixed
+- Fixes livewire components that were using createBladeViewFromString ([#pull](https://github.com/laravel/framework/pull))
 
 
 ## [v9.36.0](https://github.com/laravel/framework/compare/v9.35.1...v9.36.0) - 2022-10-18
