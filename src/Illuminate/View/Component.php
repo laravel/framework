@@ -170,7 +170,19 @@ abstract class Component
             return static::$bladeViewCache[$key] = $contents;
         }
 
-        $this->factory()->addNamespace(
+        return $this->createBladeViewFromString($this->factory(), $contents);
+    }
+
+    /**
+     * Create a Blade view with the raw component string content.
+     *
+     * @param  \Illuminate\Contracts\View\Factory  $factory
+     * @param  string  $contents
+     * @return string
+     */
+    protected function createBladeViewFromString($factory, $contents)
+    {
+        $factory->addNamespace(
             '__components',
             $directory = Container::getInstance()['config']->get('view.compiled')
         );
