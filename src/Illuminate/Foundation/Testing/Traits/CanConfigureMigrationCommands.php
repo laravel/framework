@@ -12,7 +12,7 @@ trait CanConfigureMigrationCommands
     protected function migrateFreshUsing()
     {
         $seeder = $this->seeder();
-        $database = $this->database();
+        $database = $this->connectionToMigrate();
 
         return array_merge(
             [
@@ -69,8 +69,8 @@ trait CanConfigureMigrationCommands
      *
      * @return mixed
      */
-    protected function database()
+    protected function connectionToMigrate()
     {
-        return property_exists($this, 'database') ? $this->database : false;
+        return property_exists($this, 'connectionToMigrate') ? $this->connectionToMigrate : false;
     }
 }
