@@ -62,6 +62,8 @@ class CompilerEngine extends PhpEngine
             (isset($this->compiledOrNotExpired[$path]) && $this->compiler->isExpired($path))
             || ! isset($this->compiledOrNotExpired[$path])
         ) {
+            $this->compiler->compile($path);
+        }
 
         $this->compiledOrNotExpired[$path] = true;
 
