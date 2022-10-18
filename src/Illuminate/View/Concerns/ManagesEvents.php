@@ -33,7 +33,7 @@ trait ManagesEvents
     public function creator($views, $callback)
     {
         if (is_array($this->shouldCallCreators)) {
-            if ($views == '*') {
+            if (is_string($views) && str_contains($views, '*')) {
                 $this->shouldCallCreators = true;
             } else {
                 foreach (Arr::wrap($views) as $view) {
@@ -78,7 +78,7 @@ trait ManagesEvents
     public function composer($views, $callback)
     {
         if (is_array($this->shouldCallComposers)) {
-            if ($views == '*') {
+            if (is_string($views) && str_contains($views, '*')) {
                 $this->shouldCallComposers = true;
             } else {
                 foreach (Arr::wrap($views) as $view) {
