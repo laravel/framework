@@ -442,6 +442,24 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Execute a callback without triggering a missing attribute exception.
+     *
+     * @param  callable  $callback
+     * @return mixed
+     */
+    public static function ignoringMissingAttributes(callable $callback)
+    {
+        $preventsAccessingMissingAttributes = static::preventsAccessingMissingAttributes();
+
+        try {
+            static::preventAccessingMissingAttributes(false);
+            return $callback();
+        } finally {
+            static::preventAccessingMissingAttributes($preventsAccessingMissingAttributes);
+        }
+    }
+
+    /**
      * Execute a callback without broadcasting any model events for all model types.
      *
      * @param  callable  $callback

@@ -10,6 +10,7 @@ use Illuminate\Contracts\Mail\Mailable as MailableContract;
 use Illuminate\Contracts\Queue\Factory as Queue;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
@@ -730,6 +731,8 @@ class Mailable implements MailableContract, Renderable
             return (object) ['email' => $recipient->getAddress(), 'name' => $recipient->getName()];
         } elseif ($recipient instanceof Mailables\Address) {
             return (object) ['email' => $recipient->address, 'name' => $recipient->name];
+        } elseif ($recipient instanceof Model) {
+            return $recipient::ignoringMissingAttributes(fn() => (object) $recipient->only(['name', 'email']));
         }
 
         return $recipient;

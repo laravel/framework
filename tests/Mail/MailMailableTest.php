@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Mail;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Mail\Attachable;
 use Illuminate\Contracts\View\Factory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Mail\Attachment;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailer;
@@ -94,6 +95,30 @@ class MailMailableTest extends TestCase
                 }
                 $this->assertSame("Did not see expected recipient [{$address}] in email recipients.\nFailed asserting that false is true.", $e->getMessage());
             }
+        }
+    }
+
+    public function testMailableAccountsForPreventAccessingMissingAttributes()
+    {
+        if (! class_exists(Model::class)) {
+            $this->markTestSkipped('Eloquent is not available.');
+        }
+
+        $preventsAccessingMissingAttributes = Model::preventsAccessingMissingAttributes();
+
+        try {
+            Model::preventAccessingMissingAttributes();
+
+            $mailable = new WelcomeMailableStub;
+            $mailable->to(new class extends Model {
+                public $exists = true;
+                public $wasRecentlyCreated = false;
+                protected $attributes = ['email' => 'taylor@laravel.com'];
+            });
+
+            $this->assertEquals([['name' => null, 'address' => 'taylor@laravel.com']], $mailable->to);
+        } finally {
+            Model::preventAccessingMissingAttributes($preventsAccessingMissingAttributes);
         }
     }
 
