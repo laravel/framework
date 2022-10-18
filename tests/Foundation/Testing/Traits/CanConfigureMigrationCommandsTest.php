@@ -75,6 +75,19 @@ class CanConfigureMigrationCommandsTest extends TestCase
         $this->traitObject->dropTypes = true;
 
         $this->assertEquals($expected, $migrateFreshUsingReflection->invoke($this->traitObject));
+
+        $expected = [
+            '--drop-views' => true,
+            '--drop-types' => true,
+            '--seed' => false,
+            '--database' => 'db-connection',
+        ];
+
+        $this->traitObject->dropViews = true;
+        $this->traitObject->dropTypes = true;
+        $this->traitObject->databse = 'db-connection';
+
+        $this->assertEquals($expected, $migrateFreshUsingReflection->invoke($this->traitObject));
     }
 }
 
