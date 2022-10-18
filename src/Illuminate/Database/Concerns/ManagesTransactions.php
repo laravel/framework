@@ -42,15 +42,7 @@ trait ManagesTransactions
             }
 
             try {
-                if ($this->transactions == 1) {
-                    $this->getPdo()->commit();
-                }
-
-                $this->transactions = max(0, $this->transactions - 1);
-
-                if ($this->afterCommitCallbacksShouldBeExecuted()) {
-                    $this->transactionsManager?->commit($this->getName());
-                }
+                $this->performCommit();
             } catch (Throwable $e) {
                 $this->handleCommitTransactionException(
                     $e, $currentAttempt, $attempts
@@ -188,6 +180,20 @@ trait ManagesTransactions
      */
     public function commit()
     {
+        $this->performCommit();
+
+        $this->fireConnectionEvent('committed');
+    }
+
+    /**
+     * Perform a commit within the database.
+     *
+     * @return void
+     *
+     * @throws \Throwable
+     */
+    protected function performCommit()
+    {
         if ($this->transactions == 1) {
             $this->getPdo()->commit();
         }
@@ -197,8 +203,6 @@ trait ManagesTransactions
         if ($this->afterCommitCallbacksShouldBeExecuted()) {
             $this->transactionsManager?->commit($this->getName());
         }
-
-        $this->fireConnectionEvent('committed');
     }
 
     /**
