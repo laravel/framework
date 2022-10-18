@@ -170,7 +170,7 @@ abstract class Component
             return static::$bladeViewCache[$key] = $contents;
         }
 
-        return $this->createBladeViewFromString($this->factory(), $contents);
+        return static::$bladeViewCache[$key] = $this->createBladeViewFromString($this->factory(), $contents);
     }
 
     /**
@@ -186,16 +186,14 @@ abstract class Component
             '__components',
             $directory = Container::getInstance()['config']->get('view.compiled')
         );
-
         if (! is_file($viewFile = $directory.'/'.sha1($contents).'.blade.php')) {
             if (! is_dir($directory)) {
                 mkdir($directory, 0755, true);
             }
-
             file_put_contents($viewFile, $contents);
         }
 
-        return static::$bladeViewCache[$key] = '__components::'.basename($viewFile, '.blade.php');
+        return '__components::'.basename($viewFile, '.blade.php');
     }
 
     /**
