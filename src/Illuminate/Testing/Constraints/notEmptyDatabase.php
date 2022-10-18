@@ -28,7 +28,7 @@ class notEmptyDatabase extends Constraint
     }
 
     /**
-     * Check if the data is found in the given table.
+     * Check if the table is not empty.
      *
      * @param string $table
      * @return bool
