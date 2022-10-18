@@ -323,7 +323,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
     public function testAssertDatabaseIsEmptyFailure()
     {
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('the table [products] is not empty.');
+        $this->expectExceptionMessage('table [products] is not empty, expected to be empty.');
 
         $this->mockCountBuilder(1);
 
@@ -343,7 +343,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
     public function testAssertDatabaseIsNotEmptyFailure()
     {
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('the table [products] is empty.');
+        $this->expectExceptionMessage('table [products] is empty, expected to not be empty');
 
         $this->mockCountBuilder(0);
 

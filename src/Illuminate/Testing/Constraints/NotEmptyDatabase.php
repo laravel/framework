@@ -7,7 +7,7 @@ use Illuminate\Database\Connection;
 use PHPUnit\Framework\Constraint\Constraint;
 use ReflectionClass;
 
-class notEmptyDatabase extends Constraint
+class NotEmptyDatabase extends Constraint
 {
     /**
      * The database connection.
@@ -47,7 +47,7 @@ class notEmptyDatabase extends Constraint
     public function failureDescription($table): string
     {
         return sprintf(
-            'the table [%s] is empty.', $table
+            'table [%s] is empty, expected to not be empty.', $table
         );
     }
 

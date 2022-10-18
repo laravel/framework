@@ -42,7 +42,7 @@ trait InteractsWithDatabase
      */
     protected function assertDatabaseIsEmpty($table, $connection = null)
     {
-        $this->assertThat($this->getTable($table), new emptyDatabase($this->getConnection($connection, $table)));
+        $this->assertThat($this->getTable($table), new EmptyDatabase($this->getConnection($connection, $table)));
 
         return $this;
     }
@@ -54,7 +54,7 @@ trait InteractsWithDatabase
      */
     protected function assertDatabaseIsNotEmpty($table, $connection = null)
     {
-        $this->assertThat($this->getTable($table), new notEmptyDatabase($this->getConnection($connection, $table)));
+        $this->assertThat($this->getTable($table), new NotEmptyDatabase($this->getConnection($connection, $table)));
 
         return $this;
     }
