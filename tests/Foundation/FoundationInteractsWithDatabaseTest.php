@@ -312,6 +312,45 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertEquals($this->table, $this->getTable($this->table));
     }
 
+    public function testAssertDatabaseIsEmpty()
+    {
+        $this->mockCountBuilder(0);
+
+        $this->assertDatabaseIsEmpty(ProductStub::class);
+        $this->assertDatabaseIsEmpty(new ProductStub);
+    }
+
+    public function testAssertDatabaseIsEmptyFailure()
+    {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('the table [products] is not empty.');
+
+        $this->mockCountBuilder(1);
+
+        $this->assertDatabaseIsEmpty(ProductStub::class);
+        $this->assertDatabaseIsEmpty(new ProductStub);
+    }
+
+
+    public function testAssertDatabaseIsNotEmpty()
+    {
+        $this->mockCountBuilder(1);
+
+        $this->assertDatabaseIsNotEmpty(ProductStub::class);
+        $this->assertDatabaseIsNotEmpty(new ProductStub);
+    }
+
+    public function testAssertDatabaseIsNotEmptyFailure()
+    {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('the table [products] is empty.');
+
+        $this->mockCountBuilder(0);
+
+        $this->assertDatabaseIsNotEmpty(ProductStub::class);
+        $this->assertDatabaseIsNotEmpty(new ProductStub);
+    }
+
     protected function mockCountBuilder($countResult, $deletedAtColumn = 'deleted_at')
     {
         $builder = m::mock(Builder::class);

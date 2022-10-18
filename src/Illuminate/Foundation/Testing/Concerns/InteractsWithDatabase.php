@@ -8,7 +8,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Testing\Constraints\CountInDatabase;
+use Illuminate\Testing\Constraints\emptyDatabase;
 use Illuminate\Testing\Constraints\HasInDatabase;
+use Illuminate\Testing\Constraints\notEmptyDatabase;
 use Illuminate\Testing\Constraints\NotSoftDeletedInDatabase;
 use Illuminate\Testing\Constraints\SoftDeletedInDatabase;
 use PHPUnit\Framework\Constraint\LogicalNot as ReverseConstraint;
@@ -28,6 +30,31 @@ trait InteractsWithDatabase
         $this->assertThat(
             $this->getTable($table), new HasInDatabase($this->getConnection($connection, $table), $data)
         );
+
+        return $this;
+    }
+
+
+    /**
+     * @param \Illuminate\Database\Eloquent\Model|string $table
+     * @param string|null $connection
+     * @return $this
+     */
+    protected function assertDatabaseIsEmpty($table, $connection = null)
+    {
+        $this->assertThat($this->getTable($table), new emptyDatabase($this->getConnection($connection, $table)));
+
+        return $this;
+    }
+
+    /**
+     * @param \Illuminate\Database\Eloquent\Model|string $table
+     * @param string|null $connection
+     * @return $this
+     */
+    protected function assertDatabaseIsNotEmpty($table, $connection = null)
+    {
+        $this->assertThat($this->getTable($table), new notEmptyDatabase($this->getConnection($connection, $table)));
 
         return $this;
     }
