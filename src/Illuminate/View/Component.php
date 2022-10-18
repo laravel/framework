@@ -186,10 +186,12 @@ abstract class Component
             '__components',
             $directory = Container::getInstance()['config']->get('view.compiled')
         );
+
         if (! is_file($viewFile = $directory.'/'.sha1($contents).'.blade.php')) {
             if (! is_dir($directory)) {
                 mkdir($directory, 0755, true);
             }
+
             file_put_contents($viewFile, $contents);
         }
 
