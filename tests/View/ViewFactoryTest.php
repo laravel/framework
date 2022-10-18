@@ -337,6 +337,27 @@ class ViewFactoryTest extends TestCase
         $factory->callComposer($view);
     }
 
+    public function testCallComposerDoesDispatchEventsWhenIsNecessaryAndUsingTheArrayFormat()
+    {
+        $factory = $this->getFactory();
+        $factory->getDispatcher()
+            ->shouldReceive('listen')
+            ->with('composing: name', m::type(Closure::class))
+            ->once();
+
+        $factory->getDispatcher()
+            ->shouldReceive('dispatch')
+            ->with('composing: name', m::type('array'))
+            ->once();
+
+        $view = m::mock(View::class);
+        $view->shouldReceive('name')->twice()->andReturn('name');
+
+        $factory->composer(['name'], fn () => true);
+
+        $factory->callComposer($view);
+    }
+
     public function testCallComposersDoesDispatchEventsWhenIsNecessaryUsingNamespacedWildcards()
     {
         $factory = $this->getFactory();
