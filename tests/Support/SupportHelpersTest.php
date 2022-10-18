@@ -68,6 +68,25 @@ class SupportHelpersTest extends TestCase
     {
         $this->assertSame('Baz', class_basename('Foo\Bar\Baz'));
         $this->assertSame('Baz', class_basename('Baz'));
+        // back-slash
+        $this->assertSame('Baz', class_basename('\Baz'));
+        $this->assertSame('Baz', class_basename('\\\\Baz\\'));
+        $this->assertSame('Baz', class_basename('\Foo\Bar\Baz\\'));
+        $this->assertSame('Baz', class_basename('\Foo/Bar\Baz/'));
+        // forward-slash
+        $this->assertSame('Baz', class_basename('/Foo/Bar/Baz/'));
+        $this->assertSame('Baz', class_basename('/Foo///Bar/Baz//'));
+        // accepts objects
+        $this->assertSame('stdClass', class_basename(new stdClass()));
+        // edge-cases
+        $this->assertSame('1', class_basename(1));
+        $this->assertSame('1', class_basename('1'));
+        $this->assertSame('', class_basename(''));
+        $this->assertSame('', class_basename('\\'));
+        $this->assertSame('', class_basename('\\\\'));
+        $this->assertSame('', class_basename('/'));
+        $this->assertSame('', class_basename('///'));
+        $this->assertSame('..', class_basename('\Foo\Bar\Baz\\..\\'));
     }
 
     public function testFilled()
@@ -87,6 +106,15 @@ class SupportHelpersTest extends TestCase
 
     public function testValue()
     {
+        $callable = new class
+        {
+            public function __call($method, $arguments)
+            {
+                return $arguments;
+            }
+        };
+
+        $this->assertSame($callable, value($callable, 'foo'));
         $this->assertSame('foo', value('foo'));
         $this->assertSame('foo', value(function () {
             return 'foo';

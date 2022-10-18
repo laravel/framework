@@ -170,7 +170,19 @@ abstract class Component
             return static::$bladeViewCache[$key] = $contents;
         }
 
-        $this->factory()->addNamespace(
+        return static::$bladeViewCache[$key] = $this->createBladeViewFromString($this->factory(), $contents);
+    }
+
+    /**
+     * Create a Blade view with the raw component string content.
+     *
+     * @param  \Illuminate\Contracts\View\Factory  $factory
+     * @param  string  $contents
+     * @return string
+     */
+    protected function createBladeViewFromString($factory, $contents)
+    {
+        $factory->addNamespace(
             '__components',
             $directory = Container::getInstance()['config']->get('view.compiled')
         );
@@ -183,7 +195,7 @@ abstract class Component
             file_put_contents($viewFile, $contents);
         }
 
-        return static::$bladeViewCache[$key] = '__components::'.basename($viewFile, '.blade.php');
+        return '__components::'.basename($viewFile, '.blade.php');
     }
 
     /**

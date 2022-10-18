@@ -1741,6 +1741,23 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('taylor', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
     }
 
+    public function testImplicitBindingsWhereScopedBindingsArePrevented()
+    {
+        $router = $this->getRouter();
+
+        $router->get('foo/{test_team}/{user:id}', [
+            'middleware' => SubstituteBindings::class,
+            'uses' => function (RoutingTestTeamWithoutUserModel $testTeam, RoutingTestUserModel $user) {
+                $this->assertInstanceOf(RoutingTestTeamWithoutUserModel::class, $testTeam);
+                $this->assertInstanceOf(RoutingTestUserModel::class, $user);
+
+                return $testTeam->value.'|'.$user->value;
+            },
+        ])->withoutScopedBindings();
+
+        $this->assertSame('1|4', $router->dispatch(Request::create('foo/1/4', 'GET'))->getContent());
+    }
+
     public function testParentChildImplicitBindings()
     {
         $router = $this->getRouter();
