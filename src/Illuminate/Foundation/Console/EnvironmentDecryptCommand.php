@@ -24,7 +24,7 @@ class EnvironmentDecryptCommand extends Command
                     {--env= : The environment to be decrypted}
                     {--force : Overwrite the existing environment file}
                     {--filename= : Filename to write the decrypted file contents}
-                    {--path= : Path to write the decrypted file}';
+                    {--path= : Path to write the decrypted file contents}';
 
     /**
      * The name of the console command.
@@ -90,7 +90,7 @@ class EnvironmentDecryptCommand extends Command
         $encryptedFile = $environmentFile.'.encrypted';
 
         $path = $this->option('path') ?: base_path();
-        $filename = $path.($this->option('filename') ?: $environmentFile);
+        $filename = $path.($this->option('filename') ?: str_replace(base_path(), '', $environmentFile));
 
         if (Str::endsWith($filename, '.encrypted')) {
             $this->components->error('Invalid filename.');
