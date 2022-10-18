@@ -379,7 +379,7 @@ class ViewFactoryTest extends TestCase
         $view = m::mock(View::class);
         $view->shouldReceive('name')->once()->andReturn('namespaced::my-package-view');
 
-        $factory->composer(['namespaced::*', 'welcome'] , fn () => true);
+        $factory->composer(['namespaced::*', 'welcome'], fn () => true);
 
         $factory->callComposer($view);
     }
