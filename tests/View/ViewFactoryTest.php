@@ -215,6 +215,53 @@ class ViewFactoryTest extends TestCase
         $factory->callCreator($view);
     }
 
+    public function testCallCreatorsDoesDispatchEventsWhenIsNecessaryUsingNamespacedWildcards()
+    {
+        $factory = $this->getFactory();
+        $factory->getDispatcher()
+            ->shouldReceive('listen')
+            ->with('creating: namespaced::*', m::type(Closure::class))
+            ->once();
+
+        $factory->getDispatcher()
+            ->shouldReceive('dispatch')
+            ->with('creating: namespaced::my-package-view', m::type('array'))
+            ->once();
+
+        $view = m::mock(View::class);
+        $view->shouldReceive('name')->once()->andReturn('namespaced::my-package-view');
+
+        $factory->creator('namespaced::*', fn () => true);
+
+        $factory->callCreator($view);
+    }
+
+    public function testCallCreatorsDoesDispatchEventsWhenIsNecessaryUsingNamespacedNestedWildcards()
+    {
+        $factory = $this->getFactory();
+        $factory->getDispatcher()
+            ->shouldReceive('listen')
+            ->with('creating: namespaced::*', m::type(Closure::class))
+            ->once();
+
+        $factory->getDispatcher()
+            ->shouldReceive('listen')
+            ->with('creating: welcome', m::type(Closure::class))
+            ->once();
+
+        $factory->getDispatcher()
+            ->shouldReceive('dispatch')
+            ->with('creating: namespaced::my-package-view', m::type('array'))
+            ->once();
+
+        $view = m::mock(View::class);
+        $view->shouldReceive('name')->once()->andReturn('namespaced::my-package-view');
+
+        $factory->creator(['namespaced::*', 'welcome'], fn () => true);
+
+        $factory->callCreator($view);
+    }
+
     public function testCallCreatorsDoesDispatchEventsWhenIsNecessaryUsingWildcards()
     {
         $factory = $this->getFactory();
@@ -286,6 +333,74 @@ class ViewFactoryTest extends TestCase
         $view->shouldReceive('name')->twice()->andReturn('name');
 
         $factory->composer('name', fn () => true);
+
+        $factory->callComposer($view);
+    }
+
+    public function testCallComposerDoesDispatchEventsWhenIsNecessaryAndUsingTheArrayFormat()
+    {
+        $factory = $this->getFactory();
+        $factory->getDispatcher()
+            ->shouldReceive('listen')
+            ->with('composing: name', m::type(Closure::class))
+            ->once();
+
+        $factory->getDispatcher()
+            ->shouldReceive('dispatch')
+            ->with('composing: name', m::type('array'))
+            ->once();
+
+        $view = m::mock(View::class);
+        $view->shouldReceive('name')->twice()->andReturn('name');
+
+        $factory->composer(['name'], fn () => true);
+
+        $factory->callComposer($view);
+    }
+
+    public function testCallComposersDoesDispatchEventsWhenIsNecessaryUsingNamespacedWildcards()
+    {
+        $factory = $this->getFactory();
+        $factory->getDispatcher()
+            ->shouldReceive('listen')
+            ->with('composing: namespaced::*', m::type(Closure::class))
+            ->once();
+
+        $factory->getDispatcher()
+            ->shouldReceive('dispatch')
+            ->with('composing: namespaced::my-package-view', m::type('array'))
+            ->once();
+
+        $view = m::mock(View::class);
+        $view->shouldReceive('name')->once()->andReturn('namespaced::my-package-view');
+
+        $factory->composer('namespaced::*', fn () => true);
+
+        $factory->callComposer($view);
+    }
+
+    public function testCallComposersDoesDispatchEventsWhenIsNecessaryUsingNamespacedNestedWildcards()
+    {
+        $factory = $this->getFactory();
+        $factory->getDispatcher()
+            ->shouldReceive('listen')
+            ->with('composing: namespaced::*', m::type(Closure::class))
+            ->once();
+
+        $factory->getDispatcher()
+            ->shouldReceive('listen')
+            ->with('composing: welcome', m::type(Closure::class))
+            ->once();
+
+        $factory->getDispatcher()
+            ->shouldReceive('dispatch')
+            ->with('composing: namespaced::my-package-view', m::type('array'))
+            ->once();
+
+        $view = m::mock(View::class);
+        $view->shouldReceive('name')->once()->andReturn('namespaced::my-package-view');
+
+        $factory->composer(['namespaced::*', 'welcome'], fn () => true);
 
         $factory->callComposer($view);
     }

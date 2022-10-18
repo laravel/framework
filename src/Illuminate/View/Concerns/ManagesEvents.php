@@ -33,12 +33,14 @@ trait ManagesEvents
     public function creator($views, $callback)
     {
         if (is_array($this->shouldCallCreators)) {
-            if ($views == '*') {
-                $this->shouldCallCreators = true;
-            } else {
-                foreach (Arr::wrap($views) as $view) {
-                    $this->shouldCallCreators[$this->normalizeName($view)] = true;
+            foreach (Arr::wrap($views) as $view) {
+                if (str_contains($view, '*')) {
+                    $this->shouldCallCreators = true;
+
+                    break;
                 }
+
+                $this->shouldCallCreators[$this->normalizeName($view)] = true;
             }
         }
 
@@ -78,12 +80,14 @@ trait ManagesEvents
     public function composer($views, $callback)
     {
         if (is_array($this->shouldCallComposers)) {
-            if ($views == '*') {
-                $this->shouldCallComposers = true;
-            } else {
-                foreach (Arr::wrap($views) as $view) {
-                    $this->shouldCallComposers[$this->normalizeName($view)] = true;
+            foreach (Arr::wrap($views) as $view) {
+                if (str_contains($view, '*')) {
+                    $this->shouldCallComposers = true;
+
+                    break;
                 }
+
+                $this->shouldCallComposers[$this->normalizeName($view)] = true;
             }
         }
 
