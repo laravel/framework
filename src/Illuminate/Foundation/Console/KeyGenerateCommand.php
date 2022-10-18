@@ -61,7 +61,7 @@ class KeyGenerateCommand extends Command
 
         $this->laravel['config']['app.key'] = $key;
 
-        $this->components->info('Application key set successfully.');
+        $this->info('Application key set successfully.');
     }
 
     /**
@@ -90,24 +90,36 @@ class KeyGenerateCommand extends Command
             return false;
         }
 
-        $this->writeNewEnvironmentFileWith($key);
-
-        return true;
+        return $this->writeNewEnvironmentFileWith($key);
     }
 
     /**
      * Write a new environment file with the given key.
      *
      * @param  string  $key
-     * @return void
+     * @return bool
      */
     protected function writeNewEnvironmentFileWith($key)
     {
-        file_put_contents($this->laravel->environmentFilePath(), preg_replace(
+        $envPath = $this->laravel->environmentFilePath();
+
+        if (! file_exists($envPath)) {
+            if (! $this->createEnvFile($envPath)) {
+                $this->info("<fg=yellow>The '.env' does not exist.</>");
+
+                return false;
+            }
+
+            $this->info("<fg=yellow>Created '.env' file from '.env.example'</>");
+        }
+
+        file_put_contents($envPath, preg_replace(
             $this->keyReplacementPattern(),
             'APP_KEY='.$key,
-            file_get_contents($this->laravel->environmentFilePath())
+            file_get_contents($envPath)
         ));
+
+        return true;
     }
 
     /**
@@ -120,5 +132,20 @@ class KeyGenerateCommand extends Command
         $escaped = preg_quote('='.$this->laravel['config']['app.key'], '/');
 
         return "/^APP_KEY{$escaped}/m";
+    }
+
+    /**
+     * Creates an environment file.
+     *
+     * @param  string  $envPath
+     * @return bool
+     */
+    protected function createEnvFile($envPath)
+    {
+        if (! file_exists($envPath.'.example')) {
+            return false;
+        }
+
+        return copy($envPath.'.example', $envPath);
     }
 }
