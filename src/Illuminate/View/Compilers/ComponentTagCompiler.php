@@ -48,11 +48,11 @@ class ComponentTagCompiler
     protected $boundAttributes = [];
 
     /**
-     * The "unpack:" attributes that have been compiled for the current component.
+     * The variables to be merged with the current component's attributes.
      *
      * @var array
      */
-    protected $unpackedAttributes = [];
+    protected $attributeSpreads = [];
 
     /**
      * Create a new component tag compiler.
@@ -157,7 +157,7 @@ class ComponentTagCompiler
 
         return preg_replace_callback($pattern, function (array $matches) {
             $this->boundAttributes = [];
-            $this->unpackedAttributes = [];
+            $this->attributeSpreads = [];
 
             $attributes = $this->getAttributesFromAttributeString($matches['attributes']);
 
@@ -222,7 +222,7 @@ class ComponentTagCompiler
 
         return preg_replace_callback($pattern, function (array $matches) {
             $this->boundAttributes = [];
-            $this->unpackedAttributes = [];
+            $this->attributeSpreads = [];
 
             $attributes = $this->getAttributesFromAttributeString($matches['attributes']);
 
@@ -255,7 +255,7 @@ class ComponentTagCompiler
         if (! class_exists($class)) {
             $parameters = [
                 'view' => "'$class'",
-                'data' => '['.$this->attributesToString($data->all(), $escapeBound = false).']',
+                'data' => $this->mergeAttributeSpreads($this->attributesToString($data->all(), $escapeBound = false)),
             ];
 
             $class = AnonymousComponent::class;
@@ -267,7 +267,7 @@ class ComponentTagCompiler
 <?php if (isset($attributes) && $constructor = (new ReflectionClass('.$class.'::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['.$this->attributesToString($attributes->all(), $escapeAttributes = $class !== DynamicComponent::class).']); ?>';
+<?php $component->withAttributes('.$this->mergeAttributeSpreads($this->attributesToString($attributes->all(), $escapeAttributes = $class !== DynamicComponent::class)).'); ?>';
     }
 
     /**
@@ -514,11 +514,11 @@ class ComponentTagCompiler
             }
 
             $this->boundAttributes = [];
-            $this->unpackedAttributes = [];
+            $this->attributeSpreads = [];
 
             $attributes = $this->getAttributesFromAttributeString($matches['attributes']);
 
-            return " @slot({$name}, null, [".$this->attributesToString($attributes).']) ';
+            return " @slot({$name}, null, ".$this->mergeAttributeSpreads($this->attributesToString($attributes)).') ';
         }, $value);
 
         return preg_replace('/<\/\s*x[\-\:]slot[^>]*>/', ' @endslot', $value);
@@ -532,11 +532,11 @@ class ComponentTagCompiler
      */
     protected function getAttributesFromAttributeString(string $attributeString)
     {
+        $attributeString = $this->parseAttributeSpreads($attributeString);
         $attributeString = $this->parseShortAttributeSyntax($attributeString);
         $attributeString = $this->parseAttributeBag($attributeString);
         $attributeString = $this->parseComponentTagClassStatements($attributeString);
         $attributeString = $this->parseBindAttributes($attributeString);
-        $attributeString = $this->parseUnpackAttributes($attributeString);
 
         $pattern = '/
             (?<attribute>[\w\-:.@]+)
@@ -561,13 +561,6 @@ class ComponentTagCompiler
         return collect($matches)->mapWithKeys(function ($match) {
             $attribute = $match['attribute'];
             $value = $match['value'] ?? null;
-
-            if (str_starts_with($attribute, 'unpack:')) {
-                $key = Str::camel($attribute);
-                $this->unpackedAttributes[$key] = '...$'.Str::after($attribute, 'unpack:');
-
-                return [$key => 'true'];
-            }
 
             if (is_null($value)) {
                 $value = 'true';
@@ -664,21 +657,24 @@ class ComponentTagCompiler
     }
 
     /**
-     * Parse the variables to be unpacked in a given attribute string into their fully-qualified syntax.
+     * Extract the variables to be merged with the current component's attributes.
      *
      * @param  string  $attributeString
      * @return string
      */
-    protected function parseUnpackAttributes(string $attributeString)
+    protected function parseAttributeSpreads(string $attributeString)
     {
         $pattern = "/
             (?:^|\s+)  # start of the string or whitespace between attributes
             \.\.\.     # spread operator
-            \\$        # sigil
-            (\w+)      # variable name
+            (\\$\w+)   # variable expression
         /xm";
 
-        return preg_replace($pattern, ' unpack:$1', $attributeString);
+        return preg_replace_callback($pattern, function ($matches) {
+            $this->attributeSpreads[] = $matches[1];
+
+            return '';
+        }, $attributeString);
     }
 
     /**
@@ -721,6 +717,21 @@ class ComponentTagCompiler
     }
 
     /**
+     * Ensure the compiled attribute spreads are merged with a given attribute string.
+     *
+     * @param  string  $attributeString
+     * @return string
+     */
+    protected function mergeAttributeSpreads(string $attributeString)
+    {
+        if ($this->attributeSpreads) {
+            return "array_merge(".implode(",", $this->attributeSpreads).",[$attributeString])";
+        }
+
+        return "[$attributeString]";
+    }
+
+    /**
      * Convert an array of attributes to a string.
      *
      * @param  array  $attributes
@@ -731,10 +742,6 @@ class ComponentTagCompiler
     {
         return collect($attributes)
                 ->map(function (string $value, string $attribute) use ($escapeBound) {
-                    if (isset($this->unpackedAttributes[$attribute])) {
-                        return $this->unpackedAttributes[$attribute];
-                    }
-
                     return $escapeBound && isset($this->boundAttributes[$attribute]) && $value !== 'true' && ! is_numeric($value)
                                 ? "'{$attribute}' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute({$value})"
                                 : "'{$attribute}' => {$value}";

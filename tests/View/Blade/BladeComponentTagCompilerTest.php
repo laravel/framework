@@ -654,7 +654,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $this->compiler()->compileSlots('<x-slot:foo ...$test>
 </x-slot>');
 
-        $this->assertSame("@slot('foo', null, [...\$test]) \n".' @endslot', trim($result));
+        $this->assertSame("@slot('foo', null, array_merge(\$test,[])) \n".' @endslot', trim($result));
     }
 
     public function testComponentSupportsAttributeUnpacking()
@@ -666,7 +666,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 <?php if (isset(\$attributes) && \$constructor = (new ReflectionClass(Illuminate\Tests\View\Blade\TestProfileComponent::class))->getConstructor()): ?>
 <?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php \$component->withAttributes([...\$test,'class' => 'bar','wire:model' => 'foo']); ?> @endComponentClass##END-COMPONENT-CLASS##", trim($result));
+<?php \$component->withAttributes(array_merge(\$test,['class' => 'bar','wire:model' => 'foo'])); ?> @endComponentClass##END-COMPONENT-CLASS##", trim($result));
     }
 
     public function testSelfClosingComponentSupportsAttributeUnpacking()
@@ -679,7 +679,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 <?php if (isset(\$attributes) && \$constructor = (new ReflectionClass(Illuminate\Tests\View\Blade\TestAlertComponent::class))->getConstructor()): ?>
 <?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php \$component->withAttributes([...\$test,'class' => 'bar','wire:model' => 'foo']); ?>\n".
+<?php \$component->withAttributes(array_merge(\$test,['class' => 'bar','wire:model' => 'foo'])); ?>\n".
             '@endComponentClass##END-COMPONENT-CLASS##</div>', trim($result));
     }
 
@@ -694,11 +694,11 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         $result = $this->compiler()->compileTags('<x-anonymous-component ...$test :name="\'Taylor\'" :age="31" wire:model="foo" />');
 
-        $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\View\AnonymousComponent', 'anonymous-component', ['view' => 'components.anonymous-component','data' => [...\$test,'name' => 'Taylor','age' => 31,'wire:model' => 'foo']])
+        $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\View\AnonymousComponent', 'anonymous-component', ['view' => 'components.anonymous-component','data' => array_merge(\$test,['name' => 'Taylor','age' => 31,'wire:model' => 'foo'])])
 <?php if (isset(\$attributes) && \$constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php \$component->withAttributes([...\$test,'name' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute('Taylor'),'age' => 31,'wire:model' => 'foo']); ?>\n".
+<?php \$component->withAttributes(array_merge(\$test,['name' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute('Taylor'),'age' => 31,'wire:model' => 'foo'])); ?>\n".
 '@endComponentClass##END-COMPONENT-CLASS##', trim($result));
     }
 
@@ -711,7 +711,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 <?php if (isset(\$attributes) && \$constructor = (new ReflectionClass(Illuminate\Tests\View\Blade\TestProfileComponent::class))->getConstructor()): ?>
 <?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php \$component->withAttributes([...\$my_test,'class' => 'bar','wire:model' => 'foo']); ?> @endComponentClass##END-COMPONENT-CLASS##", trim($result));
+<?php \$component->withAttributes(array_merge(\$my_test,['class' => 'bar','wire:model' => 'foo'])); ?> @endComponentClass##END-COMPONENT-CLASS##", trim($result));
     }
 
     protected function mockViewFactory($existsSucceeds = true)
