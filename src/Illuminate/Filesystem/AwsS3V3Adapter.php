@@ -48,7 +48,12 @@ class AwsS3V3Adapter extends FilesystemAdapter
         // it as the base URL instead of the default path. This allows the developer to
         // have full control over the base path for this filesystem's generated URLs.
         if (isset($this->config['url'])) {
-            return $this->concatPathToUrl($this->config['url'], $this->prefixer->prefixPath($path));
+            return $this->concatPathToUrl($this->config['url'], parse_url(
+                $this->client->getObjectUrl(
+                  $this->config['bucket'], $this->prefixer->prefixPath($path)
+                ),
+                PHP_URL_PATH
+            ));
         }
 
         return $this->client->getObjectUrl(
