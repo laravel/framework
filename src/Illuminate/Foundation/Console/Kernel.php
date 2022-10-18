@@ -147,11 +147,7 @@ class Kernel implements KernelContract
 
         try {
             if ($input->getFirstArgument() === 'env:decrypt') {
-                $this->app->bootstrapWith(
-                    collect($this->bootstrappers())->reject(function ($bootstrapper) {
-                        return $bootstrapper === \Illuminate\Foundation\Bootstrap\BootProviders::class;
-                    })->all()
-                );
+                $this->bootstrapWithoutProviders($input->getFirstArgument());
             }
 
             $this->bootstrap();
@@ -331,6 +327,10 @@ class Kernel implements KernelContract
      */
     public function call($command, array $parameters = [], $outputBuffer = null)
     {
+        if ($command === 'env:decrypt') {
+            $this->bootstrapWithoutProviders();
+        }
+
         $this->bootstrap();
 
         return $this->getArtisan()->call($command, $parameters, $outputBuffer);
@@ -390,6 +390,20 @@ class Kernel implements KernelContract
 
             $this->commandsLoaded = true;
         }
+    }
+
+    /**
+     * Bootstrap the application without booting service providers.
+     *
+     * @return void
+     */
+    protected function bootstrapWithoutProviders()
+    {
+        $this->app->bootstrapWith(
+            collect($this->bootstrappers())->reject(function ($bootstrapper) {
+                return $bootstrapper === \Illuminate\Foundation\Bootstrap\BootProviders::class;
+            })->all()
+        );
     }
 
     /**
