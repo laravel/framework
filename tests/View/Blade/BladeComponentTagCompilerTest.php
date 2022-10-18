@@ -649,15 +649,15 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $this->assertSame($attributes->get('other'), 'ok');
     }
 
-    public function testSlotSupportsAttributeUnpacking()
+    public function testAttributeSpreadsCanBeCompiledForSlots()
     {
-        $result = $this->compiler()->compileSlots('<x-slot:foo ...$test>
+        $result = $this->compiler()->compileSlots('<x-slot:foo ...$test class="bar">
 </x-slot>');
 
-        $this->assertSame("@slot('foo', null, array_merge(\$test,[])) \n".' @endslot', trim($result));
+        $this->assertSame("@slot('foo', null, array_merge(\$test,['class' => 'bar'])) \n".' @endslot', trim($result));
     }
 
-    public function testComponentSupportsAttributeUnpacking()
+    public function testAttributeSpreadsCanBeCompiledForComponents()
     {
         $this->mockViewFactory();
         $result = $this->compiler(['profile' => TestProfileComponent::class])->compileTags('<x-profile ...$test class="bar" wire:model="foo"></x-profile>');
@@ -669,7 +669,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 <?php \$component->withAttributes(array_merge(\$test,['class' => 'bar','wire:model' => 'foo'])); ?> @endComponentClass##END-COMPONENT-CLASS##", trim($result));
     }
 
-    public function testSelfClosingComponentSupportsAttributeUnpacking()
+    public function testAttributeSpreadsCanBeCompiledForSelfClosingComponents()
     {
         $this->mockViewFactory();
 
@@ -683,7 +683,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
             '@endComponentClass##END-COMPONENT-CLASS##</div>', trim($result));
     }
 
-    public function testClasslessComponentSupportsAttributeUnpacking()
+    public function testAttributeSpreadsCanBeCompiledForClasslessComponents()
     {
         $container = new Container;
         $container->instance(Application::class, $app = m::mock(Application::class));
@@ -702,7 +702,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 '@endComponentClass##END-COMPONENT-CLASS##', trim($result));
     }
 
-    public function testCanUnpackAttributesFromSnakeCaseVariables()
+    public function testAttributeSpreadsSupportSnakeCaseVariables()
     {
         $this->mockViewFactory();
         $result = $this->compiler(['profile' => TestProfileComponent::class])->compileTags('<x-profile ...$my_test class="bar" wire:model="foo"></x-profile>');
@@ -712,6 +712,52 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 <?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
 <?php \$component->withAttributes(array_merge(\$my_test,['class' => 'bar','wire:model' => 'foo'])); ?> @endComponentClass##END-COMPONENT-CLASS##", trim($result));
+    }
+
+    public function testAttributeSpreadsSupportMultipleVariables()
+    {
+        $this->mockViewFactory();
+        $result = $this->compiler(['profile' => TestProfileComponent::class])->compileTags('<x-profile ...$one class="bar" ...$two wire:model="foo" ...$three></x-profile>');
+
+        $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestProfileComponent', 'profile', [])
+<?php if (isset(\$attributes) && \$constructor = (new ReflectionClass(Illuminate\Tests\View\Blade\TestProfileComponent::class))->getConstructor()): ?>
+<?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php \$component->withAttributes(array_merge(\$one,\$two,\$three,['class' => 'bar','wire:model' => 'foo'])); ?> @endComponentClass##END-COMPONENT-CLASS##", trim($result));
+    }
+
+    public function testAttributeSpreadsAreCorrectlyMergedWithComponentAttributes()
+    {
+        $container = new Container;
+        $container->instance(Application::class, $app = m::mock(Application::class));
+        $container->instance(Factory::class, $factory = m::mock(Factory::class));
+        $container->alias(Factory::class, 'view');
+        $app->shouldReceive('getNamespace')->never()->andReturn('App\\');
+        $factory->shouldReceive('exists')->never();
+
+        Container::setInstance($container);
+
+        $component = m::mock(Component::class);
+        $component->shouldReceive('withName')->with('profile')->once();
+        $component->shouldReceive('shouldRender')->once()->andReturn(true);
+        $component->shouldReceive('resolveView')->once()->andReturn('');
+        $component->shouldReceive('data')->once()->andReturn([]);
+        $component->shouldReceive('withAttributes')->with(['name' => 'Bob', 'class' => 'bar'])->once();
+
+        Component::resolveComponentsUsing(fn () => $component);
+
+        $__env = m::mock(\Illuminate\View\Factory::class);
+        $__env->shouldReceive('startComponent')->once();
+        $__env->shouldReceive('renderComponent')->once();
+
+        $profile = ['name' => 'Bob'];
+
+        $template = $this->compiler(['profile' => TestProfileComponent::class])->compileTags('<x-profile ...$profile class="bar" />');
+        $template = $this->compiler->compileString($template);
+
+        ob_start();
+        eval(" ?> $template <?php ");
+        ob_get_clean();
     }
 
     protected function mockViewFactory($existsSucceeds = true)
