@@ -182,18 +182,6 @@ class ViewFactoryTest extends TestCase
         $this->assertSame('baz', key($extensions));
     }
 
-    public function testCallCreatorsDoesNotDispatchEventsWhenIsNotNecessary()
-    {
-        $factory = $this->getFactory();
-        $factory->getDispatcher()->shouldReceive('listen')->never();
-        $factory->getDispatcher()->shouldReceive('dispatch')->never();
-
-        $view = m::mock(View::class);
-        $view->shouldReceive('name')->once()->andReturn('name');
-
-        $factory->callCreator($view);
-    }
-
     public function testCallCreatorsDoesDispatchEventsWhenIsNecessary()
     {
         $factory = $this->getFactory();
@@ -208,7 +196,7 @@ class ViewFactoryTest extends TestCase
             ->once();
 
         $view = m::mock(View::class);
-        $view->shouldReceive('name')->twice()->andReturn('name');
+        $view->shouldReceive('name')->once()->andReturn('name');
 
         $factory->creator('name', fn () => true);
 
@@ -297,23 +285,13 @@ class ViewFactoryTest extends TestCase
             ->once();
 
         $view = m::mock(View::class);
-        $view->shouldReceive('name')->twice()->andReturn('components/button');
+        $view->shouldReceive('name')
+            ->once()
+            ->andReturn('components/button');
 
         $factory->creator('components.button', fn () => true);
 
         $factory->callCreator($view);
-    }
-
-    public function testCallComposersDoesNotDispatchEventsWhenIsNotNecessary()
-    {
-        $factory = $this->getFactory();
-        $factory->getDispatcher()->shouldReceive('listen')->never();
-        $factory->getDispatcher()->shouldReceive('dispatch')->never();
-
-        $view = m::mock(View::class);
-        $view->shouldReceive('name')->once()->andReturn('name');
-
-        $factory->callComposer($view);
     }
 
     public function testCallComposerDoesDispatchEventsWhenIsNecessary()
@@ -330,7 +308,7 @@ class ViewFactoryTest extends TestCase
             ->once();
 
         $view = m::mock(View::class);
-        $view->shouldReceive('name')->twice()->andReturn('name');
+        $view->shouldReceive('name')->once()->andReturn('name');
 
         $factory->composer('name', fn () => true);
 
@@ -351,7 +329,7 @@ class ViewFactoryTest extends TestCase
             ->once();
 
         $view = m::mock(View::class);
-        $view->shouldReceive('name')->twice()->andReturn('name');
+        $view->shouldReceive('name')->once()->andReturn('name');
 
         $factory->composer(['name'], fn () => true);
 
@@ -440,7 +418,7 @@ class ViewFactoryTest extends TestCase
             ->once();
 
         $view = m::mock(View::class);
-        $view->shouldReceive('name')->twice()->andReturn('components/button');
+        $view->shouldReceive('name')->once()->andReturn('components/button');
 
         $factory->composer('components.button', fn () => true);
 
@@ -514,7 +492,7 @@ class ViewFactoryTest extends TestCase
 
         $dispatcher->shouldReceive('listen', m::any())->once();
 
-        $view->shouldReceive('name')->twice()->andReturn('name');
+        $view->shouldReceive('name')->once()->andReturn('name');
 
         $factory->composer('name', fn () => true);
 
@@ -862,7 +840,7 @@ class ViewFactoryTest extends TestCase
         $factory->getEngineResolver()->shouldReceive('resolve')->twice()->andReturn($engine);
         $factory->getFinder()->shouldReceive('find')->once()->with('layout')->andReturn(__DIR__.'/fixtures/section-exception-layout.php');
         $factory->getFinder()->shouldReceive('find')->once()->with('view')->andReturn(__DIR__.'/fixtures/section-exception.php');
-        $factory->getDispatcher()->shouldReceive('dispatch')->never();
+        $factory->getDispatcher()->shouldReceive('dispatch')->times(4); // 2 "creating" + 2 "composing"...
 
         $factory->make('view')->render();
     }
