@@ -556,6 +556,24 @@ class FilesystemAdapter implements CloudFilesystemContract
     }
 
     /**
+     * Get the checksum for a file.
+     *
+     * @return string|false string checksum or false on error
+     *
+     * @throws UnableToProvideChecksum
+     */
+    public function checksum(string $path, array $options = []): string|false
+    {
+        try {
+            return $this->driver->checksum($path, $options);
+        } catch (UnableToProvideChecksum $e) {
+            throw_if($this->throwsExceptions(), $e);
+
+            return false;
+        }
+    }
+
+    /**
      * Get the mime-type of a given file.
      *
      * @param  string  $path
@@ -841,24 +859,6 @@ class FilesystemAdapter implements CloudFilesystemContract
         }
 
         return true;
-    }
-
-    /**
-     * Get the checksum for a file.
-     *
-     * @return string|false string checksum or false on error
-     *
-     * @throws UnableToProvideChecksum
-     */
-    public function checksum(string $path, array $options = []): string|false
-    {
-        try {
-            return $this->driver->checksum($path, $options);
-        } catch (UnableToProvideChecksum $e) {
-            throw_if($this->throwsExceptions(), $e);
-
-            return false;
-        }
     }
 
     /**
