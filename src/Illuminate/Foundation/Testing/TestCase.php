@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\ParallelTesting;
 use Illuminate\Support\Str;
 use Illuminate\Testing\AssertableJsonString;
+use Illuminate\View\Component;
 use Mockery;
 use Mockery\Exception\InvalidCountException;
 use PHPUnit\Framework\ExpectationFailedException;
@@ -222,6 +223,9 @@ abstract class TestCase extends BaseTestCase
         $this->originalDeprecationHandler = null;
 
         Artisan::forgetBootstrappers();
+        Component::flushCache();
+        Component::forgetComponentsResolver();
+        Component::forgetFactory();
         Queue::createPayloadUsing(null);
         HandleExceptions::forgetApp();
 
