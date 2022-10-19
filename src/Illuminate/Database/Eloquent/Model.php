@@ -175,13 +175,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected static $lazyLoadingViolationCallback;
 
     /**
-     * The callback that is responsible for handling missing attribute violations.
-     *
-     * @var callable|null
-     */
-    protected static $missingAttributeViolationCallback;
-
-    /**
      * Indicates if an exception should be thrown instead of silently discarding non-fillable attributes.
      *
      * @var bool
@@ -189,11 +182,25 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected static $modelsShouldPreventSilentlyDiscardingAttributes = false;
 
     /**
+     * The callback that is responsible for handling discarded attribute violations.
+     *
+     * @var callable|null
+     */
+    protected static $discardedAttributeViolationCallback;
+
+    /**
      * Indicates if an exception should be thrown when trying to access a missing attribute on a retrieved model.
      *
      * @var bool
      */
     protected static $modelsShouldPreventAccessingMissingAttributes = false;
+
+    /**
+     * The callback that is responsible for handling missing attribute violations.
+     *
+     * @var callable|null
+     */
+    protected static $missingAttributeViolationCallback;
 
     /**
      * Indicates if broadcasting is currently enabled.
@@ -438,6 +445,17 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Register a callback that is responsible for handling discarded attribute violations.
+     *
+     * @param  callable|null  $callback
+     * @return void
+     */
+    public static function handleDiscardedAttributeViolationUsing(?callable $callback)
+    {
+        static::$discardedAttributeViolationCallback = $callback;
+    }
+
+    /**
      * Prevent accessing missing attributes on retrieved models.
      *
      * @param  bool  $value
@@ -499,20 +517,31 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             if ($this->isFillable($key)) {
                 $this->setAttribute($key, $value);
             } elseif ($totallyGuarded || static::preventsSilentlyDiscardingAttributes()) {
-                throw new MassAssignmentException(sprintf(
-                    'Add [%s] to fillable property to allow mass assignment on [%s].',
-                    $key, get_class($this)
-                ));
+                if (isset(static::$discardedAttributeViolationCallback)) {
+                    call_user_func(static::$discardedAttributeViolationCallback, $this, [$key]);
+                } else {
+                    throw new MassAssignmentException(sprintf(
+                        'Add [%s] to fillable property to allow mass assignment on [%s].',
+                        $key, get_class($this)
+                    ));
+                }
             }
         }
 
         if (count($attributes) !== count($fillable) &&
             static::preventsSilentlyDiscardingAttributes()) {
-            throw new MassAssignmentException(sprintf(
-                'Add fillable property [%s] to allow mass assignment on [%s].',
-                implode(', ', array_diff(array_keys($attributes), array_keys($fillable))),
-                get_class($this)
-            ));
+
+            $keys = array_diff(array_keys($attributes), array_keys($fillable));
+
+            if (isset(static::$discardedAttributeViolationCallback)) {
+                call_user_func(static::$discardedAttributeViolationCallback, $this, $keys);
+            } else {
+                throw new MassAssignmentException(sprintf(
+                    'Add fillable property [%s] to allow mass assignment on [%s].',
+                    implode(', ', $keys),
+                    get_class($this)
+                ));
+            }
         }
 
         return $this;
