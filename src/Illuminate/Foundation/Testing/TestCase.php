@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Bootstrap\HandleExceptions;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Queue\Queue;
+use Illuminate\View\Component;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Facade;
@@ -222,6 +223,8 @@ abstract class TestCase extends BaseTestCase
         $this->originalDeprecationHandler = null;
 
         Artisan::forgetBootstrappers();
+        Component::flushCache();
+        Component::forgetFactory();
         Queue::createPayloadUsing(null);
         HandleExceptions::forgetApp();
 
