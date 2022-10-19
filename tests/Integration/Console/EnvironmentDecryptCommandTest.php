@@ -246,7 +246,7 @@ class EnvironmentDecryptCommandTest extends TestCase
             ->assertExitCode(0);
 
         $this->filesystem->shouldHaveReceived('put')
-            ->with('/tmp/.env.production', 'APP_NAME="Laravel Two"');
+            ->with('/tmp'.DIRECTORY_SEPARATOR.'.env.production', 'APP_NAME="Laravel Two"');
     }
 
     public function testItWritesTheEnvironmentFileCustomPathAndFilename()
@@ -264,12 +264,12 @@ class EnvironmentDecryptCommandTest extends TestCase
                     ->encrypt('APP_NAME="Laravel Two"')
             );
 
-        $this->artisan('env:decrypt', ['--env' => 'production', '--key' => 'abcdefghijklmnopabcdefghijklmnop', '--filename' => '.env', '--path' => '/tmp/'])
+        $this->artisan('env:decrypt', ['--env' => 'production', '--key' => 'abcdefghijklmnopabcdefghijklmnop', '--filename' => '.env', '--path' => '/tmp'])
             ->expectsOutputToContain('Environment successfully decrypted.')
             ->assertExitCode(0);
 
         $this->filesystem->shouldHaveReceived('put')
-            ->with('/tmp/.env', 'APP_NAME="Laravel Two"');
+            ->with('/tmp'.DIRECTORY_SEPARATOR.'.env', 'APP_NAME="Laravel Two"');
     }
 
     public function testItCannotOverwriteEncryptedFiles()
