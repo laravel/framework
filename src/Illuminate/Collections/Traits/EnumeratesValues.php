@@ -857,9 +857,9 @@ trait EnumeratesValues
      * @param  string|null  $key
      * @return \Illuminate\Support\Collection<TKey, TValue>
      */
-    public function collect($key = null)
+    public function collect($key = null, $default = null)
     {
-        return Collection::make(is_null($key) ? $this->all() : $this->get($key));
+        return Collection::make(is_null($key) ? $this->all() : $this->get($key, $default));
     }
 
     /**
