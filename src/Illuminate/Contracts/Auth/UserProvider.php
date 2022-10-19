@@ -10,7 +10,7 @@ interface UserProvider
      * @param  mixed  $identifier
      * @return \Illuminate\Contracts\Auth\Authenticatable|null
      */
-    public function retrieveById($identifier);
+    public function retrieveById(mixed $identifier);
 
     /**
      * Retrieve a user by their unique identifier and "remember me" token.
@@ -19,7 +19,7 @@ interface UserProvider
      * @param  string  $token
      * @return \Illuminate\Contracts\Auth\Authenticatable|null
      */
-    public function retrieveByToken($identifier, $token);
+    public function retrieveByToken(mixed $identifier, string $token);
 
     /**
      * Update the "remember me" token for the given user in storage.
@@ -28,7 +28,7 @@ interface UserProvider
      * @param  string  $token
      * @return void
      */
-    public function updateRememberToken(Authenticatable $user, $token);
+    public function updateRememberToken(Authenticatable $user, string $token);
 
     /**
      * Retrieve a user by the given credentials.
