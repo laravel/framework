@@ -167,11 +167,11 @@ trait ResolvesDumpSource
     }
 
     /**
-     * Prevent dumping the source of the dump call.
+     * Don't include the location / file of the dump in dumps.
      *
      * @return void
      */
-    public static function preventDumpingSource()
+    public static function dontIncludeSource()
     {
         static::$dumpSourceResolver = false;
     }
