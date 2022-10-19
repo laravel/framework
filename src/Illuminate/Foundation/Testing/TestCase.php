@@ -224,6 +224,7 @@ abstract class TestCase extends BaseTestCase
 
         Artisan::forgetBootstrappers();
         Component::flushCache();
+        Component::forgetComponentsResolver();
         Component::forgetFactory();
         Queue::createPayloadUsing(null);
         HandleExceptions::forgetApp();
