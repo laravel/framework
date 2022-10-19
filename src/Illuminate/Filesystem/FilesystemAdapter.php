@@ -843,6 +843,13 @@ class FilesystemAdapter implements CloudFilesystemContract
         return true;
     }
 
+    /**
+     * Get the checksum for a file.
+     *
+     * @return string|false string checksum or false on error
+     *
+     * @throws UnableToProvideChecksum
+     */
     public function checksum(string $path, array $options = []): string|false
     {
         try {
