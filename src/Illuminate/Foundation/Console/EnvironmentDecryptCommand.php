@@ -24,7 +24,7 @@ class EnvironmentDecryptCommand extends Command
                     {--env= : The environment to be decrypted}
                     {--force : Overwrite the existing environment file}
                     {--filename= : Filename to write the decrypted file contents}
-                    {--path= : Path to write the decrypted file contents}';
+                    {--path= : Path to write the decrypted file}';
 
     /**
      * The name of the console command.
