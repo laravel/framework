@@ -105,7 +105,7 @@ class EnvironmentDecryptCommand extends Command
             return Command::FAILURE;
         }
 
-        if ($this->files->exists($environmentFile) && ! $this->option('force')) {
+        if ($this->files->exists($filename) && ! $this->option('force')) {
             $this->components->error('Environment file already exists.');
 
             return Command::FAILURE;
