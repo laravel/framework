@@ -487,11 +487,7 @@ class TestResponseTest extends TestCase
 
     public function testAssertOk()
     {
-        $statusCode = 500;
-
-        $this->expectException(AssertionFailedError::class);
-
-        $this->expectExceptionMessage('Expected response status code');
+        $statusCode = 200;
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
@@ -503,11 +499,7 @@ class TestResponseTest extends TestCase
 
     public function testAssertCreated()
     {
-        $statusCode = 500;
-
-        $this->expectException(AssertionFailedError::class);
-
-        $this->expectExceptionMessage('Expected response status code');
+        $statusCode = 201;
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
@@ -519,10 +511,7 @@ class TestResponseTest extends TestCase
 
     public function testAssertNotFound()
     {
-        $statusCode = 500;
-
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Expected response status code');
+        $statusCode = 404;
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
@@ -534,11 +523,7 @@ class TestResponseTest extends TestCase
 
     public function testAssertForbidden()
     {
-        $statusCode = 500;
-
-        $this->expectException(AssertionFailedError::class);
-
-        $this->expectExceptionMessage('Expected response status code');
+        $statusCode = 403;
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
@@ -550,11 +535,7 @@ class TestResponseTest extends TestCase
 
     public function testAssertUnauthorized()
     {
-        $statusCode = 500;
-
-        $this->expectException(AssertionFailedError::class);
-
-        $this->expectExceptionMessage('Expected response status code');
+        $statusCode = 401;
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
@@ -566,11 +547,7 @@ class TestResponseTest extends TestCase
 
     public function testAssertUnprocessable()
     {
-        $statusCode = 500;
-
-        $this->expectException(AssertionFailedError::class);
-
-        $this->expectExceptionMessage('Expected response status code');
+        $statusCode = 422;
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
@@ -594,11 +571,7 @@ class TestResponseTest extends TestCase
 
     public function testAssertNoContentAsserts204StatusCodeByDefault()
     {
-        $statusCode = 500;
-
-        $this->expectException(AssertionFailedError::class);
-
-        $this->expectExceptionMessage('Expected response status code');
+        $statusCode = 204;
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
@@ -642,12 +615,8 @@ class TestResponseTest extends TestCase
 
     public function testAssertStatus()
     {
-        $statusCode = 500;
+        $statusCode = 401;
         $expectedStatusCode = 401;
-
-        $this->expectException(AssertionFailedError::class);
-
-        $this->expectExceptionMessage('Expected response status code');
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
