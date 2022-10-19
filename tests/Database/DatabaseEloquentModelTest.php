@@ -2338,6 +2338,32 @@ class DatabaseEloquentModelTest extends TestCase
         }
     }
 
+    public function testUsesOverriddenHandlerWhenAccessingMissingAttributes()
+    {
+        $originalMode = Model::preventsAccessingMissingAttributes();
+        Model::preventAccessingMissingAttributes();
+
+        $callbackModel = null;
+        $callbackKey = null;
+
+        Model::handleMissingAttributeViolationUsing(function ($model, $key) use (&$callbackModel, &$callbackKey) {
+            $callbackModel = $model;
+            $callbackKey = $key;
+        });
+
+        $model = new EloquentModelStub(['id' => 1]);
+        $model->exists = true;
+
+        $this->assertEquals(1, $model->id);
+
+        $model->this_attribute_does_not_exist;
+
+        $this->assertInstanceOf(EloquentModelStub::class, $callbackModel);
+        $this->assertEquals('this_attribute_does_not_exist', $callbackKey);
+
+        Model::preventAccessingMissingAttributes($originalMode);
+    }
+
     public function testDoesntThrowWhenAccessingMissingAttributesOnModelThatIsNotSaved()
     {
         $originalMode = Model::preventsAccessingMissingAttributes();
