@@ -9,14 +9,6 @@ use Orchestra\Testbench\TestCase;
 
 class BladeTest extends TestCase
 {
-    public function tearDown(): void
-    {
-        Component::flushCache();
-        Component::forgetFactory();
-
-        parent::tearDown();
-    }
-
     public function test_rendering_blade_string()
     {
         $this->assertSame('Hello Taylor', Blade::render('Hello {{ $name }}', ['name' => 'Taylor']));
