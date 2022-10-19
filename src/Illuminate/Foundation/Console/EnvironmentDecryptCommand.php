@@ -91,7 +91,7 @@ class EnvironmentDecryptCommand extends Command
 
         $path = Str::finish($this->option('path') ?: base_path(), DIRECTORY_SEPARATOR);
         $filename = ltrim($this->option('filename') ?: Str::replace(base_path(), '', $environmentFile), DIRECTORY_SEPARATOR);
-        $filename = Str::finish($path, '/').$filename;
+        $filename = $path.$filename;
 
         if (Str::endsWith($filename, '.encrypted')) {
             $this->components->error('Invalid filename.');
