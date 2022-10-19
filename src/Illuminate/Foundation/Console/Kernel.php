@@ -147,7 +147,7 @@ class Kernel implements KernelContract
 
         try {
             if ($input->getFirstArgument() === 'env:decrypt') {
-                $this->bootstrapWithoutProviders($input->getFirstArgument());
+                $this->bootstrapWithoutProviders();
             }
 
             $this->bootstrap();
