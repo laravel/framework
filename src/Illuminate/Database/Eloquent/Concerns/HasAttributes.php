@@ -1346,7 +1346,7 @@ trait HasAttributes
             $date = false;
         }
 
-        return $date ?: Date::parse($value);
+        return $date ?: Date::make($value) ?: $value;
     }
 
     /**
