@@ -2605,9 +2605,9 @@ class Builder implements BuilderContract
      */
     public function rawValue(string $expression, array $bindings = [])
     {
-        if ($result = $this->selectRaw($expression, $bindings)->take(1)->first()) {
-            return reset($result);
-        }
+        $result = (array) $this->selectRaw($expression, $bindings)->first();
+
+        return count($result) > 0 ? reset($result) : null;
     }
 
     /**
