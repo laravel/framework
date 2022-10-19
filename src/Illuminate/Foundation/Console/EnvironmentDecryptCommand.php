@@ -83,17 +83,13 @@ class EnvironmentDecryptCommand extends Command
 
         $key = $this->parseKey($key);
 
-        $environmentFile = $this->option('env')
+        $encryptedFile = ($this->option('env')
                     ? base_path('.env').'.'.$this->option('env')
-                    : $this->laravel->environmentFilePath();
+                    : $this->laravel->environmentFilePath()).'.encrypted';
 
-        $encryptedFile = $environmentFile.'.encrypted';
+        $outputFile = $this->generateOutputFile();
 
-        $path = Str::finish($this->option('path') ?: base_path(), DIRECTORY_SEPARATOR);
-        $filename = ltrim($this->option('filename') ?: Str::replace(base_path(), '', $environmentFile), DIRECTORY_SEPARATOR);
-        $filename = $path.$filename;
-
-        if (Str::endsWith($filename, '.encrypted')) {
+        if (Str::endsWith($outputFile, '.encrypted')) {
             $this->components->error('Invalid filename.');
 
             return Command::FAILURE;
@@ -105,7 +101,7 @@ class EnvironmentDecryptCommand extends Command
             return Command::FAILURE;
         }
 
-        if ($this->files->exists($filename) && ! $this->option('force')) {
+        if ($this->files->exists($outputFile) && ! $this->option('force')) {
             $this->components->error('Environment file already exists.');
 
             return Command::FAILURE;
@@ -115,7 +111,7 @@ class EnvironmentDecryptCommand extends Command
             $encrypter = new Encrypter($key, $cipher);
 
             $this->files->put(
-                $filename,
+                $outputFile,
                 $encrypter->decrypt($this->files->get($encryptedFile))
             );
         } catch (Exception $e) {
@@ -126,7 +122,7 @@ class EnvironmentDecryptCommand extends Command
 
         $this->components->info('Environment successfully decrypted.');
 
-        $this->components->twoColumnDetail('Decrypted file', $filename);
+        $this->components->twoColumnDetail('Decrypted file', $outputFile);
 
         $this->newLine();
     }
@@ -144,5 +140,14 @@ class EnvironmentDecryptCommand extends Command
         }
 
         return $key;
+    }
+
+    protected function generateOutputFile()
+    {
+        $path = Str::finish($this->option('path') ?: base_path(), DIRECTORY_SEPARATOR);
+        $outputFile = $this->option('filename') ?: '.env'.($this->option('env') ? '.'.$this->option('env') : '');
+        $outputFile = ltrim($outputFile, DIRECTORY_SEPARATOR);
+
+        return $path.$outputFile;
     }
 }
