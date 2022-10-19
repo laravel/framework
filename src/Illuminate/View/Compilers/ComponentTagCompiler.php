@@ -674,7 +674,7 @@ class ComponentTagCompiler
             (\\$\w+)   # variable expression
         /xm";
 
-        return preg_replace_callback($pattern, function ($matches) {
+        return preg_replace_callback($pattern, function (array $matches) {
             $this->attributeSpreads[] = $matches[1];
 
             return '';
@@ -728,13 +728,13 @@ class ComponentTagCompiler
      */
     protected function mergeAttributeSpreads(string $attributeString)
     {
-        if ($this->attributeSpreads) {
-            $spreads = implode(',', $this->attributeSpreads);
-
-            return "array_merge({$spreads},[{$attributeString}])";
+        if (! $this->attributeSpreads) {
+            return "[{$attributeString}]";
         }
 
-        return "[$attributeString]";
+        $spreads = implode(',', $this->attributeSpreads);
+
+        return "array_merge({$spreads},[{$attributeString}])";
     }
 
     /**
