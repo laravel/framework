@@ -2597,6 +2597,20 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Get a single expression value from the first result of a query.
+     *
+     * @param  string  $expression
+     * @param  array  $bindings
+     * @return mixed
+     */
+    public function rawValue(string $expression, array $bindings = [])
+    {
+        $result = (array) $this->selectRaw($expression, $bindings)->first();
+
+        return count($result) > 0 ? reset($result) : null;
+    }
+
+    /**
      * Get a single column's value from the first result of a query if it's the sole matching record.
      *
      * @param  string  $column

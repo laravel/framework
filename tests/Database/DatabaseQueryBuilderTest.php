@@ -2464,6 +2464,15 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('bar', $results);
     }
 
+    public function testRawValueMethodReturnsSingleColumn()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('select')->once()->with('select UPPER("foo") from "users" where "id" = ? limit 1', [1], true)->andReturn([['UPPER("foo")' => 'BAR']]);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [['UPPER("foo")' => 'BAR']])->andReturn([['UPPER("foo")' => 'BAR']]);
+        $results = $builder->from('users')->where('id', '=', 1)->rawValue('UPPER("foo")');
+        $this->assertSame('BAR', $results);
+    }
+
     public function testAggregateFunctions()
     {
         $builder = $this->getBuilder();
