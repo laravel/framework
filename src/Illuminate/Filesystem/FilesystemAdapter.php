@@ -558,7 +558,7 @@ class FilesystemAdapter implements CloudFilesystemContract
     /**
      * Get the checksum for a file.
      *
-     * @return string|false string checksum or false on error
+     * @return string|false
      *
      * @throws UnableToProvideChecksum
      */
