@@ -2320,30 +2320,85 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertTrue($called);
     }
 
-    public function testAccessingMissingAttributes()
+    public function testThrowsWhenAccessingMissingAttributes()
     {
-        try {
-            Model::preventAccessingMissingAttributes(false);
+        $originalMode = Model::preventsAccessingMissingAttributes();
+        Model::preventAccessingMissingAttributes();
 
+        try {
             $model = new EloquentModelStub(['id' => 1]);
             $model->exists = true;
 
-            // Default behavior
+            $this->assertEquals(1, $model->id);
+            $this->expectException(MissingAttributeException::class);
+
+            $model->this_attribute_does_not_exist;
+        } finally {
+            Model::preventAccessingMissingAttributes($originalMode);
+        }
+    }
+
+    public function testDoesntThrowWhenAccessingMissingAttributesOnModelThatIsNotSaved()
+    {
+        $originalMode = Model::preventsAccessingMissingAttributes();
+        Model::preventAccessingMissingAttributes();
+
+        try {
+            $model = new EloquentModelStub(['id' => 1]);
+            $model->exists = false;
+
             $this->assertEquals(1, $model->id);
             $this->assertNull($model->this_attribute_does_not_exist);
-
-            Model::preventAccessingMissingAttributes(true);
-
-            // "preventAccessingMissingAttributes" behavior
-            $this->expectException(MissingAttributeException::class);
-            $model->this_attribute_does_not_exist;
-
-            // Ensure that unsaved models do not trigger the exception
-            $newModel = new EloquentModelStub(['id' => 2]);
-            $this->assertEquals(2, $newModel->id);
-            $this->assertNull($newModel->this_attribute_does_not_exist);
         } finally {
-            Model::preventAccessingMissingAttributes(false);
+            Model::preventAccessingMissingAttributes($originalMode);
+        }
+    }
+
+    public function testDoesntThrowWhenAccessingMissingAttributesOnModelThatWasRecentlyCreated()
+    {
+        $originalMode = Model::preventsAccessingMissingAttributes();
+        Model::preventAccessingMissingAttributes();
+
+        try {
+            $model = new EloquentModelStub(['id' => 1]);
+            $model->exists = true;
+            $model->wasRecentlyCreated = true;
+
+            $this->assertEquals(1, $model->id);
+            $this->assertNull($model->this_attribute_does_not_exist);
+        } finally {
+            Model::preventAccessingMissingAttributes($originalMode);
+        }
+    }
+
+    public function testDoesntThrowWhenAssigningMissingAttributes()
+    {
+        $originalMode = Model::preventsAccessingMissingAttributes();
+        Model::preventAccessingMissingAttributes();
+
+        try {
+            $model = new EloquentModelStub(['id' => 1]);
+            $model->exists = true;
+
+            $model->this_attribute_does_not_exist = 'now it does';
+        } finally {
+            Model::preventAccessingMissingAttributes($originalMode);
+        }
+    }
+
+    public function testDoesntThrowWhenTestingMissingAttributes()
+    {
+        $originalMode = Model::preventsAccessingMissingAttributes();
+        Model::preventAccessingMissingAttributes();
+
+        try {
+            $model = new EloquentModelStub(['id' => 1]);
+            $model->exists = true;
+
+            $this->assertTrue(isset($model->id));
+            $this->assertFalse(isset($model->this_attribute_does_not_exist));
+        } finally {
+            Model::preventAccessingMissingAttributes($originalMode);
         }
     }
 
