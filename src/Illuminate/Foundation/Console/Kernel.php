@@ -75,13 +75,6 @@ class Kernel implements KernelContract
     protected $commandStartedAt;
 
     /**
-     * Indicates whether the application should reboot.
-     *
-     * @var bool
-     */
-    protected $shouldReboot = false;
-
-    /**
      * The bootstrap classes for the application.
      *
      * @var string[]
@@ -155,9 +148,9 @@ class Kernel implements KernelContract
         try {
             if ($input->getFirstArgument() === 'env:decrypt') {
                 $this->bootstrapWithoutProviders();
-            } else {
-                $this->bootstrap();
             }
+
+            $this->bootstrap();
 
             return $this->getArtisan()->run($input, $output);
         } catch (Throwable $e) {
@@ -336,9 +329,9 @@ class Kernel implements KernelContract
     {
         if ($command === 'env:decrypt') {
             $this->bootstrapWithoutProviders();
-        } else {
-            $this->bootstrap();
         }
+
+        $this->bootstrap();
 
         return $this->getArtisan()->call($command, $parameters, $outputBuffer);
     }
@@ -386,7 +379,7 @@ class Kernel implements KernelContract
      */
     public function bootstrap()
     {
-        if (! $this->app->hasBeenBootstrapped() || $this->shouldReboot()) {
+        if (! $this->app->hasBeenBootstrapped()) {
             $this->app->bootstrapWith($this->bootstrappers());
         }
 
@@ -397,8 +390,6 @@ class Kernel implements KernelContract
 
             $this->commandsLoaded = true;
         }
-
-        $this->shouldReboot = false;
     }
 
     /**
@@ -413,20 +404,6 @@ class Kernel implements KernelContract
                 return $bootstrapper === \Illuminate\Foundation\Bootstrap\BootProviders::class;
             })->all()
         );
-
-        $this->bootstrap();
-
-        $this->shouldReboot = true;
-    }
-
-    /**
-     * Determine if the application should be rebooted.
-     *
-     * @return bool
-     */
-    protected function shouldReboot()
-    {
-        return $this->shouldReboot;
     }
 
     /**
