@@ -854,11 +854,12 @@ trait EnumeratesValues
     /**
      * Collect the values into a collection.
      *
+     * @param  string|null  $key
      * @return \Illuminate\Support\Collection<TKey, TValue>
      */
-    public function collect()
+    public function collect($key = null)
     {
-        return new Collection($this->all());
+        return Collection::make(is_null($key) ? $this->all() : $this->get($key));
     }
 
     /**

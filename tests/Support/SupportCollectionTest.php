@@ -5426,6 +5426,28 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testCollectWithKey($collection)
+    {
+        $data = $collection::make([
+            'a' => [
+                1,
+                2,
+                3,
+            ],
+        ])->collect('a');
+
+        $this->assertInstanceOf(Collection::class, $data);
+
+        $this->assertSame([
+            1,
+            2,
+            3,
+        ], $data->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testUndot($collection)
     {
         $data = $collection::make([
