@@ -24,7 +24,7 @@
         "fruitcake/php-cors": "^1.2",
         "laravel/serializable-closure": "^1.2.2",
         "league/commonmark": "^2.2",
-        "league/flysystem": "^3.0.16",
+        "league/flysystem": "^3.8.0",
         "monolog/monolog": "^2.0",
         "nesbot/carbon": "^2.62.1",
         "nunomaduro/termwind": "^1.13",
