@@ -47,7 +47,6 @@ class ViewCacheCommand extends Command
         $this->callSilent('view:clear');
 
         $this->paths()->each(function ($path) {
-
             $prefix = $this->output->isVeryVerbose() ? '<fg=yellow;options=bold>DIR</> ' : '';
 
             $this->components->task($prefix.$path, null, OutputInterface::VERBOSITY_VERBOSE);
@@ -71,7 +70,6 @@ class ViewCacheCommand extends Command
         $compiler = $this->laravel['view']->getEngineResolver()->resolve('blade')->getCompiler();
 
         $views->map(function (SplFileInfo $file) use ($compiler) {
-
             $this->components->task('    '.$file->getRelativePathname(), null, OutputInterface::VERBOSITY_VERY_VERBOSE);
 
             $compiler->compile($file->getRealPath());
