@@ -1296,6 +1296,32 @@ class DatabaseEloquentModelTest extends TestCase
         Model::preventSilentlyDiscardingAttributes(false);
     }
 
+    public function testUsesOverriddenHandlerWhenDiscardingAttributes()
+    {
+        EloquentModelStub::setConnectionResolver($resolver = m::mock(Resolver::class));
+        $resolver->shouldReceive('connection')->andReturn($connection = m::mock(stdClass::class));
+        $connection->shouldReceive('getSchemaBuilder->getColumnListing')->andReturn(['name', 'age', 'foo']);
+
+        Model::preventSilentlyDiscardingAttributes();
+
+        $callbackModel = null;
+        $callbackKeys = null;
+        Model::handleDiscardedAttributeViolationUsing(function ($model, $keys) use (&$callbackModel, &$callbackKeys) {
+            $callbackModel = $model;
+            $callbackKeys = $keys;
+        });
+
+        $model = new EloquentModelStub;
+        $model->guard(['name', 'age']);
+        $model->fill(['Foo' => 'bar']);
+
+        $this->assertInstanceOf(EloquentModelStub::class, $callbackModel);
+        $this->assertEquals(['Foo'], $callbackKeys);
+
+        Model::preventSilentlyDiscardingAttributes(false);
+        Model::handleDiscardedAttributeViolationUsing(null);
+    }
+
     public function testFillableOverridesGuarded()
     {
         Model::preventSilentlyDiscardingAttributes(false);
@@ -2336,6 +2362,33 @@ class DatabaseEloquentModelTest extends TestCase
         } finally {
             Model::preventAccessingMissingAttributes($originalMode);
         }
+    }
+
+    public function testUsesOverriddenHandlerWhenAccessingMissingAttributes()
+    {
+        $originalMode = Model::preventsAccessingMissingAttributes();
+        Model::preventAccessingMissingAttributes();
+
+        $callbackModel = null;
+        $callbackKey = null;
+
+        Model::handleMissingAttributeViolationUsing(function ($model, $key) use (&$callbackModel, &$callbackKey) {
+            $callbackModel = $model;
+            $callbackKey = $key;
+        });
+
+        $model = new EloquentModelStub(['id' => 1]);
+        $model->exists = true;
+
+        $this->assertEquals(1, $model->id);
+
+        $model->this_attribute_does_not_exist;
+
+        $this->assertInstanceOf(EloquentModelStub::class, $callbackModel);
+        $this->assertEquals('this_attribute_does_not_exist', $callbackKey);
+
+        Model::preventAccessingMissingAttributes($originalMode);
+        Model::handleMissingAttributeViolationUsing(null);
     }
 
     public function testDoesntThrowWhenAccessingMissingAttributesOnModelThatIsNotSaved()

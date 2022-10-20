@@ -467,6 +467,10 @@ trait HasAttributes
         if ($this->exists &&
             ! $this->wasRecentlyCreated &&
             static::preventsAccessingMissingAttributes()) {
+            if (isset(static::$missingAttributeViolationCallback)) {
+                return call_user_func(static::$missingAttributeViolationCallback, $this, $key);
+            }
+
             throw new MissingAttributeException($this, $key);
         }
 
