@@ -250,18 +250,6 @@ trait AsPivot
     }
 
     /**
-     * Get the value of the model's primary key.
-     *
-     * @return mixed
-     */
-    public function getKey()
-    {
-        if (isset($this->attributes[$this->getKeyName()])) {
-            return $this->attributes[$this->getKeyName()];
-        }
-    }
-
-    /**
      * Get the queueable identity for the entity.
      *
      * @return mixed
