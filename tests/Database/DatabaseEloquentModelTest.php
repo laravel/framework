@@ -1306,7 +1306,7 @@ class DatabaseEloquentModelTest extends TestCase
 
         $callbackModel = null;
         $callbackKeys = null;
-        Model::handleDiscardedAttributeViolationUsing(function($model, $keys) use (&$callbackModel, &$callbackKeys) {
+        Model::handleDiscardedAttributeViolationUsing(function ($model, $keys) use (&$callbackModel, &$callbackKeys) {
             $callbackModel = $model;
             $callbackKeys = $keys;
         });
