@@ -161,7 +161,7 @@ class ViewServiceProvider extends ServiceProvider
     public function registerBladeEngine($resolver)
     {
         $resolver->register('blade', function () {
-            $compiler = new CompilerEngine($this->app['blade.compiler'], $this->app['files']);
+            $compiler = new CompilerEngine($this->app['blade.compiler'], $this->app['files'], $this->app['config']['view.check_compiled'] ?? true);
 
             $this->app->terminating(static function () use ($compiler) {
                 $compiler->forgetCompiledOrNotExpired();

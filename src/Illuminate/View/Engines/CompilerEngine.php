@@ -31,17 +31,26 @@ class CompilerEngine extends PhpEngine
     protected $compiledOrNotExpired = [];
 
     /**
+     * Flag to check expired views.
+     *
+     * @var bool
+     */
+    protected $checkExpiredViews = true;
+
+    /**
      * Create a new compiler engine instance.
      *
      * @param  \Illuminate\View\Compilers\CompilerInterface  $compiler
      * @param  \Illuminate\Filesystem\Filesystem|null  $files
+     * @param  bool  $checkExpiredViews
      * @return void
      */
-    public function __construct(CompilerInterface $compiler, Filesystem $files = null)
+    public function __construct(CompilerInterface $compiler, Filesystem $files = null, $checkExpiredViews = true)
     {
         parent::__construct($files ?: new Filesystem);
 
         $this->compiler = $compiler;
+        $this->checkExpiredViews = $checkExpiredViews;
     }
 
     /**
@@ -58,7 +67,7 @@ class CompilerEngine extends PhpEngine
         // If this given view has expired, which means it has simply been edited since
         // it was last compiled, we will re-compile the views so we can evaluate a
         // fresh copy of the view. We'll pass the compiler the path of the view.
-        if (! isset($this->compiledOrNotExpired[$path]) && $this->compiler->isExpired($path)) {
+        if ($this->checkExpiredViews && ! isset($this->compiledOrNotExpired[$path]) && $this->compiler->isExpired($path)) {
             $this->compiler->compile($path);
         }
 

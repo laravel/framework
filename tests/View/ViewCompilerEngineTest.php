@@ -55,8 +55,20 @@ class ViewCompilerEngineTest extends TestCase
         $engine->get(__DIR__.'/fixtures/foo.php');
     }
 
-    protected function getEngine()
+    public function testViewsAreNotRecompiledIfWeDoNotWantThemRecompiled()
     {
-        return new CompilerEngine(m::mock(CompilerInterface::class), new Filesystem);
+        $engine = $this->getEngine(false);
+        $engine->getCompiler()->shouldReceive('getCompiledPath')->with(__DIR__.'/fixtures/foo.php')->andReturn(__DIR__.'/fixtures/basic.php');
+        $engine->getCompiler()->shouldReceive('isExpired')->never();
+        $engine->getCompiler()->shouldReceive('compile')->never();
+        $results = $engine->get(__DIR__.'/fixtures/foo.php');
+
+        $this->assertSame('Hello World
+', $results);
+    }
+
+    protected function getEngine($checkExpiredViews = true)
+    {
+        return new CompilerEngine(m::mock(CompilerInterface::class), new Filesystem, $checkExpiredViews);
     }
 }
