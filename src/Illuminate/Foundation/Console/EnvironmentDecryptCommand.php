@@ -23,8 +23,8 @@ class EnvironmentDecryptCommand extends Command
                     {--cipher= : The encryption cipher}
                     {--env= : The environment to be decrypted}
                     {--force : Overwrite the existing environment file}
-                    {--filename= : Filename to write the decrypted file contents}
-                    {--path= : Path to write the decrypted file}';
+                    {--path= : Path to write the decrypted file}
+                    {--filename= : Filename of the decrypted file}';
 
     /**
      * The name of the console command.
@@ -150,6 +150,7 @@ class EnvironmentDecryptCommand extends Command
     protected function outputFilePath()
     {
         $path = Str::finish($this->option('path') ?: base_path(), DIRECTORY_SEPARATOR);
+
         $outputFile = $this->option('filename') ?: ('.env'.($this->option('env') ? '.'.$this->option('env') : ''));
         $outputFile = ltrim($outputFile, DIRECTORY_SEPARATOR);
 
