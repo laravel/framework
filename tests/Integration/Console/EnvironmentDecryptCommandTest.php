@@ -226,6 +226,52 @@ class EnvironmentDecryptCommandTest extends TestCase
             ->with(base_path('.env'), 'APP_NAME="Laravel Two"');
     }
 
+    public function testItWritesTheEnvironmentFileCustomPath()
+    {
+        $this->filesystem->shouldReceive('exists')
+            ->once()
+            ->andReturn(true)
+            ->shouldReceive('exists')
+            ->once()
+            ->andReturn(false)
+            ->shouldReceive('get')
+            ->once()
+            ->andReturn(
+                (new Encrypter('abcdefghijklmnopabcdefghijklmnop', 'AES-256-CBC'))
+                    ->encrypt('APP_NAME="Laravel Two"')
+            );
+
+        $this->artisan('env:decrypt', ['--env' => 'production', '--key' => 'abcdefghijklmnopabcdefghijklmnop', '--path' => '/tmp'])
+            ->expectsOutputToContain('Environment successfully decrypted.')
+            ->assertExitCode(0);
+
+        $this->filesystem->shouldHaveReceived('put')
+            ->with('/tmp'.DIRECTORY_SEPARATOR.'.env.production', 'APP_NAME="Laravel Two"');
+    }
+
+    public function testItWritesTheEnvironmentFileCustomPathAndFilename()
+    {
+        $this->filesystem->shouldReceive('exists')
+            ->once()
+            ->andReturn(true)
+            ->shouldReceive('exists')
+            ->once()
+            ->andReturn(false)
+            ->shouldReceive('get')
+            ->once()
+            ->andReturn(
+                (new Encrypter('abcdefghijklmnopabcdefghijklmnop', 'AES-256-CBC'))
+                    ->encrypt('APP_NAME="Laravel Two"')
+            );
+
+        $this->artisan('env:decrypt', ['--env' => 'production', '--key' => 'abcdefghijklmnopabcdefghijklmnop', '--filename' => '.env', '--path' => '/tmp'])
+            ->expectsOutputToContain('Environment successfully decrypted.')
+            ->assertExitCode(0);
+
+        $this->filesystem->shouldHaveReceived('put')
+            ->with('/tmp'.DIRECTORY_SEPARATOR.'.env', 'APP_NAME="Laravel Two"');
+    }
+
     public function testItCannotOverwriteEncryptedFiles()
     {
         $this->artisan('env:decrypt', ['--env' => 'production', '--key' => 'abcdefghijklmnop', '--filename' => '.env.production.encrypted'])
