@@ -147,7 +147,7 @@ class Kernel implements KernelContract
 
         try {
             if ($input->getFirstArgument() === 'env:decrypt') {
-                $this->bootstrapWithoutProviders();
+                $this->bootstrapWithoutBootingProviders();
             }
 
             $this->bootstrap();
@@ -328,7 +328,7 @@ class Kernel implements KernelContract
     public function call($command, array $parameters = [], $outputBuffer = null)
     {
         if ($command === 'env:decrypt') {
-            $this->bootstrapWithoutProviders();
+            $this->bootstrapWithoutBootingProviders();
         }
 
         $this->bootstrap();
@@ -397,7 +397,7 @@ class Kernel implements KernelContract
      *
      * @return void
      */
-    public function bootstrapWithoutProviders()
+    public function bootstrapWithoutBootingProviders()
     {
         $this->app->bootstrapWith(
             collect($this->bootstrappers())->reject(function ($bootstrapper) {
