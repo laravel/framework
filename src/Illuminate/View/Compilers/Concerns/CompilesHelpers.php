@@ -75,4 +75,19 @@ trait CompilesHelpers
 
         return "<?php echo app('$class')->reactRefresh(); ?>";
     }
+
+    /**
+     * Compile the "dd_if" statements into valid PHP.
+     *
+     * @param  string  $arguments
+     * @return string
+     */
+    protected function compileDdIf($arguments)
+    {
+        [$condition, $arguments] = explode(',', $arguments);
+        $condition = substr($condition, 1);
+        $arguments = trim(substr($arguments, 0, -1));
+      
+        return "<?php if ($condition) { dd({$arguments}); } ?>";
+    }
 }
