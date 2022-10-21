@@ -313,6 +313,19 @@ trait ManagesFrequencies
     }
 
     /**
+     * Schedule the event to run every day except for those specified.
+     *
+     * @param array|int $days
+     * @return $this
+     */
+    public function everyDayExcept($days)
+    {
+        $days = is_array($days) ? $days : func_get_args();
+
+        return $this->days(join(',', array_diff(range(0,6), $days)));
+    }
+
+    /**
      * Schedule the event to run only on Mondays.
      *
      * @return $this
