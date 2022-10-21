@@ -697,10 +697,10 @@ class Builder implements BuilderContract
     public function getExcept(array $except)
     {
         $table = $this->getModel()->getTable();
-        $columns = $this->getModel()->getConnection()->getSchemaBuilder()
+        $allColumns = $this->getModel()->getConnection()->getSchemaBuilder()
             ->getColumnListing($table);
 
-        $columns = array_diff($columns, $except);
+        $columns = array_diff($allColumns, $except);
 
         return $this->get($columns);
     }
