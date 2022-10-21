@@ -2640,6 +2640,20 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Execute the query as a "select" statement.
+     *
+     * @param  array  $except
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     */
+    public function getExcept(array $except)
+    {
+        $allColumns = $this->getConnection()->getSchemaBuilder()->getColumnListing($this->from);
+        $columns = array_diff($allColumns, $except);
+
+        return $this->get($columns);
+    }
+
+    /**
      * Run the query as a "select" statement against the connection.
      *
      * @return array
