@@ -75,6 +75,19 @@ class CanConfigureMigrationCommandsTest extends TestCase
         $this->traitObject->dropTypes = true;
 
         $this->assertEquals($expected, $migrateFreshUsingReflection->invoke($this->traitObject));
+
+        $expected = [
+            '--drop-views' => false,
+            '--drop-types' => false,
+            '--seed' => false,
+            '--schema-path' => 'database/schema/mysql-schema.dump',
+        ];
+
+        $this->traitObject->dropViews = false;
+        $this->traitObject->dropTypes = false;
+        $this->traitObject->dump = 'database/schema/mysql-schema.dump';
+
+        $this->assertEquals($expected, $migrateFreshUsingReflection->invoke($this->traitObject));
     }
 }
 
@@ -85,4 +98,6 @@ class CanConfigureMigrationCommandsTestMockClass
     public $dropViews = false;
 
     public $dropTypes = false;
+
+    public $dump = false;
 }

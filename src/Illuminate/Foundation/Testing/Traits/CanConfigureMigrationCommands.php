@@ -2,6 +2,8 @@
 
 namespace Illuminate\Foundation\Testing\Traits;
 
+use Illuminate\Support\Collection;
+
 trait CanConfigureMigrationCommands
 {
     /**
@@ -12,14 +14,17 @@ trait CanConfigureMigrationCommands
     protected function migrateFreshUsing()
     {
         $seeder = $this->seeder();
+        $dump = $this->dump();
 
-        return array_merge(
-            [
-                '--drop-views' => $this->shouldDropViews(),
-                '--drop-types' => $this->shouldDropTypes(),
-            ],
-            $seeder ? ['--seeder' => $seeder] : ['--seed' => $this->shouldSeed()]
-        );
+        return collect([
+            '--drop-views' => $this->shouldDropViews(),
+            '--drop-types' => $this->shouldDropTypes(),
+        ])->when($seeder,
+            fn(Collection $collection) => $collection->put('--seeder', $seeder),
+            fn(Collection $collection) => $collection->put('--seed', $this->shouldSeed())
+        )->when($dump,
+            fn(Collection $collection) => $collection->put('--schema-path', $dump)
+        )->toArray();
     }
 
     /**
@@ -60,5 +65,15 @@ trait CanConfigureMigrationCommands
     protected function seeder()
     {
         return property_exists($this, 'seeder') ? $this->seeder : false;
+    }
+
+    /**
+     * Determine the specific schema dump path that should be used when refreshing the database.
+     * Otherwise laravel will use the default dump as per your connection name.
+     * @return mixed
+     */
+    protected function dump()
+    {
+        return property_exists($this, 'dump') ? $this->dump : false;
     }
 }
