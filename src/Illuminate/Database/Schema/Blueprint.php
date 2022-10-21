@@ -446,6 +446,25 @@ class Blueprint
     }
 
     /**
+     * Drop foreign index if exist
+     *
+     * @param  string|array  $index  Name index or array columns
+     * @return \Illuminate\Support\Fluent
+     */
+    public function dropForeignIfExists($index)
+    {
+        $columns = [];
+
+        if (is_array($index)) {
+            $index = $this->createIndexName('foreign', $columns = $index);
+        }
+
+        return $this->addCommand(
+            'dropForeignIfExists', compact('index', 'columns')
+        );
+    }
+
+    /**
      * Indicate that the given indexes should be renamed.
      *
      * @param  string  $from

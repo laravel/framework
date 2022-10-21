@@ -155,6 +155,20 @@ abstract class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile a drop foreign if exist command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function compileDropForeignIfExists(Blueprint $blueprint, Fluent $command)
+    {
+        throw new RuntimeException('The database driver in use does not support drop foreign if exist.');
+    }
+
+    /**
      * Compile the blueprint's column definitions.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint

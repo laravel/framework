@@ -172,6 +172,23 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertSame('alter table "users" drop constraint "foo"', $statements[0]);
     }
 
+    public function testDropForeignIfExists()
+    {
+        // Check when param string
+        $blueprint = new Blueprint('users');
+        $blueprint->dropForeignIfExists('order_id_foreign');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "users" drop constraint if exists "order_id_foreign"', $statements[0]);
+
+        // Check when param array
+        $blueprint = new Blueprint('users');
+        $blueprint->dropForeignIfExists(['order_id']);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "users" drop constraint if exists "users_order_id_foreign"', $statements[0]);
+    }
+
     public function testDropTimestamps()
     {
         $blueprint = new Blueprint('users');

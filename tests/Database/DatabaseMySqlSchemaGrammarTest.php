@@ -261,6 +261,14 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame('alter table `users` drop foreign key `foo`', $statements[0]);
     }
 
+    public function testDropForeignIfExists()
+    {
+        $this->expectException(\RuntimeException::class);
+        $blueprint = new Blueprint('users');
+        $blueprint->dropForeignIfExists(['order_id']);
+        $blueprint->toSql($this->getConnection(), $this->getGrammar());
+    }
+
     public function testDropTimestamps()
     {
         $blueprint = new Blueprint('users');

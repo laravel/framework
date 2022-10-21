@@ -203,6 +203,14 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertSame('create table "users" ("foo" varchar not null, "order_id" varchar not null, foreign key("order_id") references "orders"("id"), primary key ("foo"))', $statements[0]);
     }
 
+    public function testDropForeignIfExists()
+    {
+        $this->expectException(\RuntimeException::class);
+        $blueprint = new Blueprint('users');
+        $blueprint->dropForeignIfExists(['order_id']);
+        $blueprint->toSql($this->getConnection(), $this->getGrammar());
+    }
+
     public function testAddingUniqueKey()
     {
         $blueprint = new Blueprint('users');

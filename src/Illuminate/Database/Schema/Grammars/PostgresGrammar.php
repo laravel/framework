@@ -251,6 +251,18 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Compile a drop foreign if exist command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileDropForeignIfExists(Blueprint $blueprint, Fluent $command)
+    {
+        return "alter table {$this->wrapTable($blueprint)} drop constraint if exists {$this->wrap($command->index)}";
+    }
+
+    /**
      * Compile a drop table command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint

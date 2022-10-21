@@ -187,6 +187,14 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertSame('DECLARE @sql NVARCHAR(MAX) = \'\';SELECT @sql += \'ALTER TABLE [dbo].[users] DROP CONSTRAINT \' + OBJECT_NAME([default_object_id]) + \';\' FROM sys.columns WHERE [object_id] = OBJECT_ID(\'[dbo].[users]\') AND [name] in (\'foo\') AND [default_object_id] <> 0;EXEC(@sql);alter table "users" drop column "foo"', $statements[1]);
     }
 
+    public function testDropForeignIfExists()
+    {
+        $this->expectException(\RuntimeException::class);
+        $blueprint = new Blueprint('users');
+        $blueprint->dropForeignIfExists(['order_id']);
+        $blueprint->toSql($this->getConnection(), $this->getGrammar());
+    }
+
     public function testDropTimestamps()
     {
         $blueprint = new Blueprint('users');
