@@ -689,6 +689,23 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Execute the query as a "select" statement.
+     *
+     * @param  array  $except
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     */
+    public function getExcept(array $except)
+    {
+        $table = $this->getModel()->getTable();
+        $columns = $this->getModel()->getConnection()->getSchemaBuilder()
+            ->getColumnListing($table);
+
+        $columns = array_diff($columns, $except);
+
+        return $this->get($columns);
+    }
+
+    /**
      * Get the hydrated models without eager loading.
      *
      * @param  array|string  $columns
