@@ -20,10 +20,10 @@ trait CanConfigureMigrationCommands
             '--drop-views' => $this->shouldDropViews(),
             '--drop-types' => $this->shouldDropTypes(),
         ])->when($seeder,
-            fn(Collection $collection) => $collection->put('--seeder', $seeder),
-            fn(Collection $collection) => $collection->put('--seed', $this->shouldSeed())
+            fn (Collection $collection) => $collection->put('--seeder', $seeder),
+            fn (Collection $collection) => $collection->put('--seed', $this->shouldSeed())
         )->when($dump,
-            fn(Collection $collection) => $collection->put('--schema-path', $dump)
+            fn (Collection $collection) => $collection->put('--schema-path', $dump)
         )->toArray();
     }
 
@@ -70,6 +70,7 @@ trait CanConfigureMigrationCommands
     /**
      * Determine the specific schema dump path that should be used when refreshing the database.
      * Otherwise laravel will use the default dump as per your connection name.
+     *
      * @return mixed
      */
     protected function dump()
