@@ -358,6 +358,15 @@ class SupportStrTest extends TestCase
         $this->assertEquals('foo-bar-baz', Str::wrap('-bar-', 'foo', 'baz'));
     }
 
+    public function testIn()
+    {
+        $this->assertTrue(Str::in('foo', ['foo']));
+        $this->assertTrue(Str::in('foo', ['foo', 'bar']));
+        $this->assertFalse(Str::in('foo', ['bar']));
+        $this->assertFalse(Str::in('foo', ['bar', 'baz']));
+        $this->assertFalse(Str::in('foo', [' foo']));
+    }
+
     public function testIs()
     {
         $this->assertTrue(Str::is('/', '/'));

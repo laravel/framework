@@ -351,6 +351,18 @@ class Str
     }
 
     /**
+     * Determine if a given string matches any of the given values.
+     *
+     * @param  string  $value
+     * @param  array  $sequence
+     * @return bool
+     */
+    public static function in($value, array $options = [])
+    {
+        return in_array($value, $options);
+    }
+
+    /**
      * Determine if a given string matches a given pattern.
      *
      * @param  string|iterable<string>  $pattern

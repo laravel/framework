@@ -280,6 +280,17 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Determine if a given string matches any of the given values.
+     *
+     * @param  array  $options
+     * @return bool
+     */
+    public function in(array $options = [])
+    {
+        return Str::in($this->value, $options);
+    }
+
+    /**
      * Determine if a given string matches a given pattern.
      *
      * @param  string|iterable<string>  $pattern

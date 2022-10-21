@@ -702,6 +702,15 @@ class SupportStringableTest extends TestCase
         $this->assertSame('abcbbc', (string) $this->stringable('abcbbcbc')->finish('bc'));
     }
 
+    public function testIn()
+    {
+        $this->assertTrue($this->stringable('foo')->in(['foo']));
+        $this->assertTrue($this->stringable('foo')->in(['foo', 'bar']));
+        $this->assertFalse($this->stringable('foo')->in(['bar']));
+        $this->assertFalse($this->stringable('foo')->in(['bar', 'baz']));
+        $this->assertFalse($this->stringable('foo')->in([' foo']));
+    }
+
     public function testIs()
     {
         $this->assertTrue($this->stringable('/')->is('/'));
