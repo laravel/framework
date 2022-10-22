@@ -410,9 +410,7 @@ class Arr
      */
     public static function isAssoc(array $array)
     {
-        $keys = array_keys($array);
-
-        return array_keys($keys) !== $keys;
+        return ! self::isList($array);
     }
 
     /**
@@ -425,7 +423,7 @@ class Arr
      */
     public static function isList($array)
     {
-        return ! self::isAssoc($array);
+        return array_is_list($array);
     }
 
     /**
