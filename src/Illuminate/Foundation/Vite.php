@@ -360,7 +360,7 @@ class Vite implements Htmlable
     }
 
     /**
-     * Make preload tag for the given chunk.
+     * Make a preload tag for the given chunk.
      *
      * @param  string  $src
      * @param  string  $url

@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Http\Middleware;
 
 use Illuminate\Container\Container;
 use Illuminate\Foundation\Vite;
-use Illuminate\Http\Middleware\VitePreloading;
+use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Facade;
@@ -21,13 +21,12 @@ class VitePreloadingTest extends TestCase
     public function testItDoesNotSetLinkTagWhenNoTagsHaveBeenPreloaded()
     {
         $app = new Container();
-        $app->instance(Vite::class, new class extends Vite
-        {
+        $app->instance(Vite::class, new class extends Vite {
             protected $preloadedAssets = [];
         });
         Facade::setFacadeApplication($app);
 
-        $response = (new VitePreloading)->handle(new Request, function () {
+        $response = (new AddLinkHeadersForPreloadedAssets)->handle(new Request, function () {
             return new Response('Hello Laravel');
         });
 
@@ -37,8 +36,7 @@ class VitePreloadingTest extends TestCase
     public function testItAddsPreloadLinkHeader()
     {
         $app = new Container();
-        $app->instance(Vite::class, new class extends Vite
-        {
+        $app->instance(Vite::class, new class extends Vite {
             protected $preloadedAssets = [
                 'https://laravel.com/app.js' => [
                     'rel="modulepreload"',
@@ -48,7 +46,7 @@ class VitePreloadingTest extends TestCase
         });
         Facade::setFacadeApplication($app);
 
-        $response = (new VitePreloading)->handle(new Request, function () {
+        $response = (new AddLinkHeadersForPreloadedAssets)->handle(new Request, function () {
             return new Response('Hello Laravel');
         });
 

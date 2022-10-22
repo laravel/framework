@@ -5,7 +5,7 @@ namespace Illuminate\Http\Middleware;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Vite;
 
-class VitePreloading
+class AddLinkHeadersForPreloadedAssets
 {
     /**
      * Handle the incoming request.
