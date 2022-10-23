@@ -933,6 +933,22 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertSame('https://foo.com/other/page?b=3', $url->canonical('other/page?b=3'));
         $this->assertSame('https://foo.com/my/page', $url->canonical($request->path()));
     }
+
+    public function testCanonicalGenerationWithCustomDomain()
+    {
+        $request = Request::create('http://www.foo.com/my/page?a=1');
+
+        $url = new UrlGenerator(
+            new RouteCollection,
+            $request,
+            appRoot: 'https://foo.com',
+        );
+
+        $this->assertSame('http://foo.net/my/page?a=1', $url->canonical(domain: 'http://foo.net'));
+        $this->assertSame('http://foo.net/other/page', $url->canonical('other/page', 'http://foo.net'));
+        $this->assertSame('http://foo.net/other/page?b=3', $url->canonical('other/page?b=3', 'http://foo.net'));
+        $this->assertSame('http://foo.net/my/page', $url->canonical($request->path(), 'http://foo.net'));
+    }
 }
 
 class RoutableInterfaceStub implements UrlRoutable
