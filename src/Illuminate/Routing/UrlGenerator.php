@@ -34,6 +34,11 @@ class UrlGenerator implements UrlGeneratorContract
     protected $request;
 
     /**
+     * The app root URL.
+     */
+    protected $appRoot;
+
+    /**
      * The asset root URL.
      *
      * @var string
@@ -118,10 +123,11 @@ class UrlGenerator implements UrlGeneratorContract
      * @param  string|null  $assetRoot
      * @return void
      */
-    public function __construct(RouteCollectionInterface $routes, Request $request, $assetRoot = nully)
+    public function __construct(RouteCollectionInterface $routes, Request $request, $assetRoot = null, ?string $appRoot = null)
     {
         $this->routes = $routes;
         $this->assetRoot = $assetRoot;
+        $this->appRoot = $appRoot;
 
         $this->setRequest($request);
     }
@@ -235,6 +241,17 @@ class UrlGenerator implements UrlGeneratorContract
     public function secure($path, $parameters = [])
     {
         return $this->to($path, $parameters, true);
+    }
+
+    /**
+     * Generate the canonical URL.
+     */
+    public function canonical(?string $uri = null, ?string $domain = null): string
+    {
+        $uri ??= $this->request->getRequestUri();
+        $domain ??= $this->appRoot ?: $this->formatRoot($this->formatScheme());
+
+        return $this->to($path, root: $domain);
     }
 
     /**
