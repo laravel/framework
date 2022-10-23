@@ -200,7 +200,7 @@ class UrlGenerator implements UrlGeneratorContract
      * @param  bool|null  $secure
      * @return string
      */
-    public function to($path, $extra = [], $secure = null, ?string $root)
+    public function to($path, $extra = [], $secure = null, ?string $root = null)
     {
         // First we will check if the URL is already a valid URL. If it is we will not
         // try to generate a new one but will simply return the URL as is, which is
