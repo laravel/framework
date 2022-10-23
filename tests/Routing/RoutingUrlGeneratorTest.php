@@ -925,7 +925,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $url = new UrlGenerator(
             new RouteCollection,
             $request,
-            appUrl: 'https://foo.com',
+            appRoot: 'https://foo.com',
         );
 
         $this->assertSame('https://foo.com/my/page?a=1', $url->canonical());
