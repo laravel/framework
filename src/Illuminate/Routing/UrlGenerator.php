@@ -118,7 +118,7 @@ class UrlGenerator implements UrlGeneratorContract
      * @param  string|null  $assetRoot
      * @return void
      */
-    public function __construct(RouteCollectionInterface $routes, Request $request, $assetRoot = null)
+    public function __construct(RouteCollectionInterface $routes, Request $request, $assetRoot = nully)
     {
         $this->routes = $routes;
         $this->assetRoot = $assetRoot;
@@ -200,7 +200,7 @@ class UrlGenerator implements UrlGeneratorContract
      * @param  bool|null  $secure
      * @return string
      */
-    public function to($path, $extra = [], $secure = null)
+    public function to($path, $extra = [], $secure = null, ?string $root)
     {
         // First we will check if the URL is already a valid URL. If it is we will not
         // try to generate a new one but will simply return the URL as is, which is
@@ -216,7 +216,7 @@ class UrlGenerator implements UrlGeneratorContract
         // Once we have the scheme we will compile the "tail" by collapsing the values
         // into a single string delimited by slashes. This just makes it convenient
         // for passing the array of parameters to this URL as a list of segments.
-        $root = $this->formatRoot($this->formatScheme($secure));
+        $root ??= $this->formatRoot($this->formatScheme($secure));
 
         [$path, $query] = $this->extractQueryString($path);
 
