@@ -251,7 +251,7 @@ class UrlGenerator implements UrlGeneratorContract
         $uri ??= $this->request->getRequestUri();
         $domain ??= $this->appRoot ?: $this->formatRoot($this->formatScheme());
 
-        return $this->to($path, root: $domain);
+        return $this->to($uri, root: $domain);
     }
 
     /**
