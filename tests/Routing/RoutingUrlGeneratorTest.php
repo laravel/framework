@@ -902,7 +902,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertTrue($url2->hasValidSignature($request));
         $this->assertFalse($url->hasValidSignature($request));
     }
-    
+
     public function testCanonicalGeneration()
     {
         $request = Request::create('http://www.foo.com/my/page?a=1');
@@ -917,7 +917,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertSame('http://www.foo.com/other/page?b=3', $url->canonical('other/page?b=3'));
         $this->assertSame('http://www.foo.com/my/page', $url->canonical($request->path()));
     }
-    
+
     public function testCanonicalGenerationWithConfiguredDomain()
     {
         $request = Request::create('http://www.foo.com/my/page?a=1');
