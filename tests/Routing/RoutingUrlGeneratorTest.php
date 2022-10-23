@@ -902,6 +902,37 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertTrue($url2->hasValidSignature($request));
         $this->assertFalse($url->hasValidSignature($request));
     }
+    
+    public function testCanonicalGeneration()
+    {
+        $request = Request::create('http://www.foo.com/my/page?a=1');
+
+        $url = new UrlGenerator(
+            new RouteCollection,
+            $request,
+        );
+
+        $this->assertSame('http://www.foo.com/my/page?a=1', $url->canonical());
+        $this->assertSame('http://www.foo.com/other/page', $url->canonical('other/page'));
+        $this->assertSame('http://www.foo.com/other/page?b=3', $url->canonical('other/page?b=3'));
+        $this->assertSame('http://www.foo.com/my/page', $url->canonical($request->path()));
+    }
+    
+    public function testCanonicalGenerationWithConfiguredDomain()
+    {
+        $request = Request::create('http://www.foo.com/my/page?a=1');
+
+        $url = new UrlGenerator(
+            new RouteCollection,
+            $request,
+            appUrl: 'https://foo.com',
+        );
+
+        $this->assertSame('https://foo.com/my/page?a=1', $url->canonical());
+        $this->assertSame('https://foo.com/other/page', $url->canonical('other/page'));
+        $this->assertSame('https://foo.com/other/page?b=3', $url->canonical('other/page?b=3'));
+        $this->assertSame('https://foo.com/my/page', $url->canonical($request->path()));
+    }
 }
 
 class RoutableInterfaceStub implements UrlRoutable
