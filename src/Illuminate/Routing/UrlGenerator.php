@@ -36,7 +36,7 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * The app root URL.
      */
-    protected $appRoot;
+    protected string $appRoot;
 
     /**
      * The asset root URL.
