@@ -654,7 +654,13 @@ trait HasAttributes
      */
     protected function mutateAttribute($key, $value)
     {
-        return $this->{'get'.Str::studly($key).'Attribute'}($value);
+        $mutator = 'get'.Str::studly($key).'Attribute';
+
+        if (method_exists($this, $mutator)) {
+            return $this->{$mutator}($value);
+        } else {
+            return $this->{$key};
+        }
     }
 
     /**
