@@ -893,6 +893,26 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->assertEquals(1, SoftDeletesTestUser::whereHas('self_referencing')->count());
     }
 
+    public function testForceDeleteKeepsOtherScopes()
+    {
+        [$taylor, $abigail] = $this->createUsers();
+
+        $this->assertCount(0, SoftDeletesTestUserOdds::get(), "Finds 0 Odds because of soft-delete's global scope");
+
+        $oddsWithTrashedQuery = SoftDeletesTestUserOdds::withTrashed();
+        $this->assertSame(1, $oddsWithTrashedQuery->count(), "Finds 1 Odd, that is soft-deleted");
+        $this->assertTrue($oddsWithTrashedQuery->first()->is($taylor), "Odd global scope applies to Taylor (1), not Abigail (2)");
+
+        $affectedRows = $oddsWithTrashedQuery->forceDelete();
+        $this->assertSame(1, $affectedRows, 'Affected Rows from forceDelete() must equal the original count()');
+        // Correctly force-deleted Taylor, the only odd
+        $this->assertCount(0, SoftDeletesTestUserOdds::get());
+        $this->assertCount(0, SoftDeletesTestUserOdds::withTrashed()->get());
+        // Should not clobber Abigail, a who is not SoftDeletesTestUserOdds but is SoftDeletesTestUser
+        $this->assertCount(1, SoftDeletesTestUser::get());
+        $this->assertCount(1, SoftDeletesTestUser::withTrashed()->get());
+    }
+
     /**
      * Helpers...
      *
@@ -971,6 +991,16 @@ class SoftDeletesTestUser extends Eloquent
     public function group()
     {
         return $this->belongsTo(SoftDeletesTestGroup::class, 'group_id');
+    }
+}
+
+class SoftDeletesTestUserOdds extends SoftDeletesTestUser
+{
+    protected static function booted()
+    {
+        static::addGlobalScope('odds', function ($builder) {
+            $builder->whereRaw("(id % 2) = 1");
+        });
     }
 }
 

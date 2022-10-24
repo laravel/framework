@@ -1182,13 +1182,14 @@ class Builder implements BuilderContract
     /**
      * Run the default delete function on the builder.
      *
-     * Since we do not apply scopes here, the row will actually be deleted.
+     * Unlike `delete` this does not use onDelete behavior, so traits that `extend` Builder
+     * (like SoftDeletingScope) can't intercept the DELETE and turn it into an UPDATE.
      *
      * @return mixed
      */
     public function forceDelete()
     {
-        return $this->query->delete();
+        return $this->toBase()->delete();
     }
 
     /**
