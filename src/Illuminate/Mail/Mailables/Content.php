@@ -39,7 +39,7 @@ class Content
     public $markdown;
 
     /**
-     * The raw html of the message
+     * The raw html of the message.
      *
      * @var string|null
      */
