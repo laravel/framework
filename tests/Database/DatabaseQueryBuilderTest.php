@@ -5231,6 +5231,18 @@ SQL;
         $this->assertEquals([1], $builder->getBindings());
     }
 
+    public function testFrom()
+    {
+        $builder = $this->getBuilder();
+        $builder->from($this->getBuilder()->from('users'), 'u');
+        $this->assertSame('select * from (select * from "users") as "u"', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $eloquentBuilder = new EloquentBuilder($this->getBuilder());
+        $builder->from($eloquentBuilder->from('users'), 'u');
+        $this->assertSame('select * from (select * from "users") as "u"', $builder->toSql());
+    }
+
     public function testFromSub()
     {
         $builder = $this->getBuilder();
