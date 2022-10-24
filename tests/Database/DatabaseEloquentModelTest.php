@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Casts\AsCollection;
 use Illuminate\Database\Eloquent\Casts\AsEncryptedArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsEncryptedCollection;
 use Illuminate\Database\Eloquent\Casts\AsStringable;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Database\Eloquent\MassAssignmentException;
@@ -371,6 +372,49 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(['project' => 'laravel'], $model->only('project'));
         $this->assertEquals(['first_name' => 'taylor', 'last_name' => 'otwell'], $model->only('first_name', 'last_name'));
         $this->assertEquals(['first_name' => 'taylor', 'last_name' => 'otwell'], $model->only(['first_name', 'last_name']));
+    }
+
+    public function testHasAttributeWithAttributes()
+    {
+        $model = new EloquentModelStub;
+        $model->first_name = 'Taylor';
+        $model->last_name = 'Otwell';
+
+        $this->assertTrue($model->hasAttribute('first_name'));
+        $this->assertTrue($model->hasAttribute('last_name'));
+        $this->assertFalse($model->hasAttribute('project'));
+    }
+
+    public function testHasAttributeWithCasts()
+    {
+        $model = new EloquentModelStub;
+
+        $this->assertTrue($model->hasAttribute('castedFloat'));
+        $this->assertFalse($model->hasAttribute('project'));
+    }
+
+    public function testHasAttributeWithGetMutators()
+    {
+        $model = new EloquentModelGetMutatorsStub();
+
+        $this->assertTrue($model->hasAttribute('first_name'));
+        $this->assertFalse($model->hasAttribute('project'));
+    }
+
+    public function testHasAttributeWithAttributeMutators()
+    {
+        $model = new EloquentModelWithAttributeMutator();
+
+        $this->assertTrue($model->hasAttribute('first_name'));
+        $this->assertFalse($model->hasAttribute('project'));
+    }
+
+    public function testHasAttributeWithCastableCast()
+    {
+        $model = new EloquentModelCastingStub();
+
+        $this->assertTrue($model->hasAttribute('asarrayobjectAttribute'));
+        $this->assertFalse($model->hasAttribute('project'));
     }
 
     public function testNewInstanceReturnsNewInstanceWithAttributesSet()
@@ -3045,6 +3089,20 @@ class EloquentModelWithUpdatedAtNull extends Model
 {
     protected $table = 'stub';
     const UPDATED_AT = null;
+}
+
+class EloquentModelWithAttributeMutator extends Model
+{
+    protected $table = 'stub';
+
+    public function firstName(): Attribute
+    {
+        return Attribute::make(function (){
+            return 'Taylor';
+        },function ($value){
+            return $value;
+        });
+    }
 }
 
 class UnsavedModel extends Model

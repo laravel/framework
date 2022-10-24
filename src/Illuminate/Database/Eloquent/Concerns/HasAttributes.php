@@ -266,6 +266,40 @@ trait HasAttributes
     }
 
     /**
+     * Check if model has a given attribute.
+     *
+     * @param  string $key
+     * @return bool
+     */
+    public function hasAttribute($key)
+    {
+        // If the attribute exists in the attribute array or has a "get" mutator we will
+        // return the attribute's value. Otherwise, we will proceed as if the developers
+        // are asking for a relationship's value. This covers both types of values.
+        if (array_key_exists($key, $this->attributes)) {
+            return true;
+        }
+
+        if (array_key_exists($key, $this->casts)) {
+            return true;
+        }
+
+        if ($this->hasGetMutator($key)) {
+            return true;
+        }
+
+        if ($this->hasAttributeMutator($key)) {
+            return true;
+        }
+
+        if ($this->isClassCastable($key)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Add the casted attributes to the attributes array.
      *
      * @param  array  $attributes
@@ -431,14 +465,7 @@ trait HasAttributes
             return;
         }
 
-        // If the attribute exists in the attribute array or has a "get" mutator we will
-        // get the attribute's value. Otherwise, we will proceed as if the developers
-        // are asking for a relationship's value. This covers both types of values.
-        if (array_key_exists($key, $this->attributes) ||
-            array_key_exists($key, $this->casts) ||
-            $this->hasGetMutator($key) ||
-            $this->hasAttributeMutator($key) ||
-            $this->isClassCastable($key)) {
+        if($this->hasAttribute($key)) {
             return $this->getAttributeValue($key);
         }
 
