@@ -262,7 +262,7 @@ class Vite implements Htmlable
                 $chunk['src'],
                 $this->assetPath("{$buildDirectory}/{$chunk['file']}"),
                 $chunk,
-                $manifest
+                $manifest,
             ]);
 
             foreach ($chunk['imports'] ?? [] as $import) {
@@ -270,7 +270,7 @@ class Vite implements Htmlable
                     $import,
                     $this->assetPath("{$buildDirectory}/{$manifest[$import]['file']}"),
                     $manifest[$import],
-                    $manifest
+                    $manifest,
                 ]);
 
                 foreach ($manifest[$import]['css'] ?? [] as $css) {
@@ -280,7 +280,7 @@ class Vite implements Htmlable
                         $partialManifest->keys()->first(),
                         $this->assetPath("{$buildDirectory}/{$css}"),
                         $partialManifest->first(),
-                        $manifest
+                        $manifest,
                     ]);
 
                     $tags->push($this->makeTagForChunk(
@@ -306,7 +306,7 @@ class Vite implements Htmlable
                     $partialManifest->keys()->first(),
                     $this->assetPath("{$buildDirectory}/{$css}"),
                     $partialManifest->first(),
-                    $manifest
+                    $manifest,
                 ]);
 
                 $tags->push($this->makeTagForChunk(

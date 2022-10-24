@@ -21,7 +21,8 @@ class VitePreloadingTest extends TestCase
     public function testItDoesNotSetLinkTagWhenNoTagsHaveBeenPreloaded()
     {
         $app = new Container();
-        $app->instance(Vite::class, new class extends Vite {
+        $app->instance(Vite::class, new class extends Vite
+        {
             protected $preloadedAssets = [];
         });
         Facade::setFacadeApplication($app);
@@ -36,7 +37,8 @@ class VitePreloadingTest extends TestCase
     public function testItAddsPreloadLinkHeader()
     {
         $app = new Container();
-        $app->instance(Vite::class, new class extends Vite {
+        $app->instance(Vite::class, new class extends Vite
+        {
             protected $preloadedAssets = [
                 'https://laravel.com/app.js' => [
                     'rel="modulepreload"',
