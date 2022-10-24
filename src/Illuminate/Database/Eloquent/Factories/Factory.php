@@ -762,6 +762,10 @@ abstract class Factory
      */
     public function modelName()
     {
+        if ($this->model) {
+            return $this->model;
+        }
+
         $resolver = static::$modelNameResolver ?? function (self $factory) {
             $namespacedFactoryBasename = Str::replaceLast(
                 'Factory', '', Str::replaceFirst(static::$namespace, '', get_class($factory))
@@ -776,7 +780,7 @@ abstract class Factory
                         : $appNamespace.$factoryBasename;
         };
 
-        return $this->model ?? $resolver($this);
+        return $resolver($this);
     }
 
     /**
