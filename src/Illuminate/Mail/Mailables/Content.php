@@ -59,19 +59,19 @@ class Content
      * @param  string|null  $html
      * @param  string|null  $text
      * @param  string|null  $markdown
-     * @param  string|null  $raw
      * @param  array  $with
+     * @param  string|null  $raw
      *
      * @named-arguments-supported
      */
-    public function __construct(string $view = null, string $html = null, string $text = null, string $markdown = null, string $raw = null, array $with = [])
+    public function __construct(string $view = null, string $html = null, string $text = null, $markdown = null, array $with = [], string $raw = null)
     {
         $this->view = $view;
         $this->html = $html;
         $this->text = $text;
         $this->markdown = $markdown;
-        $this->raw = $raw;
         $this->with = $with;
+        $this->raw = $raw;
     }
 
     /**
