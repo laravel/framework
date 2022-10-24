@@ -327,6 +327,15 @@ class Router implements BindingRegistrar, RegistrarContract
         } else {
             $registrar = new ResourceRegistrar($this);
         }
+        
+       if($name == "/") {
+            $controllerName = last(explode("\\", $controller));
+            $name = explode("controller", strtolower($controllerName))[0];
+
+            return new PendingResourceRegistration(
+                $registrar, "{$name}s", $controller, $options
+            );
+        }
 
         return new PendingResourceRegistration(
             $registrar, $name, $controller, $options
