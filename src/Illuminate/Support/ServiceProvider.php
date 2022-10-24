@@ -172,7 +172,7 @@ abstract class ServiceProvider
                 }
             }
 
-            $view->addNamespace($namespace, $path);
+            $view->addNamespace($namespace, realpath($path) ?: $path);
         });
     }
 
