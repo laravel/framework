@@ -562,7 +562,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      *
      * @throws UnableToProvideChecksum
      */
-    public function checksum(string $path, array $options = []): string|false
+    public function checksum(string $path, array $options = [])
     {
         try {
             return $this->driver->checksum($path, $options);
