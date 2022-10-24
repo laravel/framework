@@ -719,7 +719,7 @@ if (! function_exists('rescue')) {
         try {
             return $callback();
         } catch (Throwable $e) {
-            if ($report) {
+            if (value($report)) {
                 report($e);
             }
 
