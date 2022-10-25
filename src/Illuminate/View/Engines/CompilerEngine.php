@@ -2,7 +2,6 @@
 
 namespace Illuminate\View\Engines;
 
-use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\View\Compilers\CompilerInterface;
 use Illuminate\View\ViewException;
