@@ -27,9 +27,9 @@ trait Conditionable
         }
 
         if ($value) {
-            return $callback($this, $value) ?? $this;
+            return $callback($this, $value);
         } elseif ($default) {
-            return $default($this, $value) ?? $this;
+            return $default($this, $value);
         }
 
         return $this;
