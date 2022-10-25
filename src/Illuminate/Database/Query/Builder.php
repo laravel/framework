@@ -3265,12 +3265,12 @@ class Builder implements BuilderContract
 
         return $this->processor->processInsertGetId($this, $sql, $values, $sequence);
     }
-    
+
     /**
      * Insert a new records and get the values of the result.
      *
      * @param  array  $values
-     * @param  string|null  $sequence    
+     * @param  string|null  $sequence
      * @return array
      */
     public function insertGetIds(array $values, $sequence = null)
