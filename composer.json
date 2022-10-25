@@ -84,7 +84,7 @@
     "require-dev": {
         "ably/ably-php": "^1.0",
         "aws/aws-sdk-php": "^3.235.5",
-        "doctrine/dbal": "^2.13.3|^3.1.4",
+        "doctrine/dbal": "^3.5.1",
         "fakerphp/faker": "^1.9.2",
         "guzzlehttp/guzzle": "^7.5",
         "league/flysystem-aws-s3-v3": "^3.0",
@@ -147,7 +147,7 @@
         "ably/ably-php": "Required to use the Ably broadcast driver (^1.0).",
         "aws/aws-sdk-php": "Required to use the SQS queue driver, DynamoDb failed job storage, and SES mail driver (^3.235.5).",
         "brianium/paratest": "Required to run tests in parallel (^6.0).",
-        "doctrine/dbal": "Required to rename columns and drop SQLite columns (^2.13.3|^3.1.4).",
+        "doctrine/dbal": "Required to rename columns and drop SQLite columns (^3.5.1).",
         "fakerphp/faker": "Required to use the eloquent factory builder (^1.9.1).",
         "filp/whoops": "Required for friendly error pages in development (^2.14.3).",
         "guzzlehttp/guzzle": "Required to use the HTTP Client and the ping methods on schedules (^7.5).",
