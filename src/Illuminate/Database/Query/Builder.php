@@ -3267,10 +3267,10 @@ class Builder implements BuilderContract
     }
     
     /**
-     * Insert a new records and get the values of the result
+     * Insert a new records and get the values of the result.
      *
-     * @param array $values
-     * @param string|null $sequence     
+     * @param  array  $values
+     * @param  string|null  $sequence    
      * @return array
      */
     public function insertGetIds(array $values, $sequence = null)
