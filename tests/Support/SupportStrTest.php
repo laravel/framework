@@ -320,6 +320,8 @@ class SupportStrTest extends TestCase
         $this->assertSame('sometext', Str::slug('some text', ''));
         $this->assertSame('', Str::slug('', ''));
         $this->assertSame('', Str::slug(''));
+        $this->assertSame('bsm-allah', Str::slug('بسم الله', '-', 'en', ['allh' => 'allah']));
+        $this->assertSame('500-dollar-bill', Str::slug('500$ bill', '-', 'en', ['$' => 'dollar']));
     }
 
     public function testStrStart()
