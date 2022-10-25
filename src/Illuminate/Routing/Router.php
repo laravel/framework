@@ -332,9 +332,9 @@ class Router implements BindingRegistrar, RegistrarContract
             $controllerName = last(explode("\\", $controller));
             $name = explode("controller", strtolower($controllerName))[0];
 
-            return new PendingResourceRegistration(
-                $registrar, "{$name}s", $controller, $options
-            );
+            return (new PendingResourceRegistration(
+                $registrar, "/", $controller, $options
+            ))->names("{$name}s")->parameters([null => $name]);
         }
 
         return new PendingResourceRegistration(
