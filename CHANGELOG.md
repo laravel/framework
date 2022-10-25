@@ -1,6 +1,12 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.36.1...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.36.2...9.x)
+
+
+## [v9.36.2](https://github.com/laravel/framework/compare/v9.36.1...v9.36.2) - 2022-10-18
+
+### Fixed
+- Ensures view creators and composers are called when * is present ([#44636](https://github.com/laravel/framework/pull/44636))
 
 
 ## [v9.36.1](https://github.com/laravel/framework/compare/v9.36.0...v9.36.1) - 2022-10-18
