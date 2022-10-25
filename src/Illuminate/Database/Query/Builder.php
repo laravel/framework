@@ -3270,8 +3270,7 @@ class Builder implements BuilderContract
      * Insert a new records and get the values of the result
      *
      * @param array $values
-     * @param string|null $sequence
-     *
+     * @param string|null $sequence     
      * @return array
      */
     public function insertGetIds(array $values, $sequence = null)
@@ -3280,7 +3279,7 @@ class Builder implements BuilderContract
             return [];
         }
 
-        if (!is_array(reset($values))) {
+        if (! is_array(reset($values))) {
             $values = [$values];
         } else {
             foreach ($values as $key => $value) {
