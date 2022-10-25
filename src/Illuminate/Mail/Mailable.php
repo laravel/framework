@@ -1655,8 +1655,8 @@ class Mailable implements MailableContract, Renderable
             $this->markdown($content->markdown);
         }
 
-        if ($content->raw) {
-            $this->html($content->raw);
+        if ($content->htmlString) {
+            $this->html($content->htmlString);
         }
 
         foreach ($content->with as $key => $value) {
