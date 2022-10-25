@@ -1,6 +1,23 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.36.3...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.36.4...9.x)
+
+
+## [v9.36.4](https://github.com/laravel/framework/compare/v9.36.3...v9.36.4) - 2022-10-20
+
+### Added
+- Added rawValue to Database Query Builder (and Eloquent as wrapper) ([#44631](https://github.com/laravel/framework/pull/44631))
+- Added TransactionCommitting ([#44608](https://github.com/laravel/framework/pull/44608))
+- Added dontIncludeSource to CliDumper and HtmlDumper ([#44623](https://github.com/laravel/framework/pull/44623))
+- Added `Illuminate/Filesystem/FilesystemAdapter::checksum()` ([#44660](https://github.com/laravel/framework/pull/44660))
+- Added handlers for silently discarded and missing attribute violations ([#44664](https://github.com/laravel/framework/pull/44664))
+
+### Reverted
+- Reverted ["Let MustVerifyEmail to be used on models without id as primary key"](https://github.com/laravel/framework/pull/44613) ([#44672](https://github.com/laravel/framework/pull/44672))
+
+### Changed
+- Create new Json ParameterBag Instance when cloning Request ([#44671](https://github.com/laravel/framework/pull/44671))
+- Prevents booting providers when running env:decrypt ([#44654](https://github.com/laravel/framework/pull/44654))
 
 
 ## [v9.36.3](https://github.com/laravel/framework/compare/v9.36.2...v9.36.3) - 2022-10-19
