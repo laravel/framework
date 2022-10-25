@@ -3265,6 +3265,38 @@ class Builder implements BuilderContract
 
         return $this->processor->processInsertGetId($this, $sql, $values, $sequence);
     }
+    
+    /**
+     * Insert a new records and get the values of the result
+     *
+     * @param array $values
+     * @param string|null $sequence
+     *
+     * @return array
+     */
+    public function insertGetIds(array $values, $sequence = null)
+    {
+        if (empty($values)) {
+            return [];
+        }
+
+        if (!is_array(reset($values))) {
+            $values = [$values];
+        } else {
+            foreach ($values as $key => $value) {
+                ksort($value);
+
+                $values[$key] = $value;
+            }
+        }
+
+        $this->applyBeforeQueryCallbacks();
+
+        return $this->connection->select(
+            $this->grammar->compileInsertGetId($this, $values, $sequence),
+            $this->cleanBindings(Arr::flatten($values, 1))
+        );
+    }
 
     /**
      * Insert new records into the table using a subquery.
