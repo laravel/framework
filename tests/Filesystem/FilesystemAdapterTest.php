@@ -564,4 +564,20 @@ class FilesystemAdapterTest extends TestCase
 
         $this->assertFalse($filesystemAdapter->providesTemporaryUrls());
     }
+
+    public function testPrefixesUrls()
+    {
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter, ['url' => 'https://example.org/', 'prefix' => 'images']);
+
+        $this->assertEquals('https://example.org/images/picture.jpeg', $filesystemAdapter->url('picture.jpeg'));
+    }
+
+    public function testGetChecksum()
+    {
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+        $filesystemAdapter->write('path.txt', 'contents of file');
+
+        $this->assertEquals('730bed78bccf58c2cfe44c29b71e5e6b', $filesystemAdapter->checksum('path.txt'));
+        $this->assertEquals('a5c3556d', $filesystemAdapter->checksum('path.txt', ['checksum_algo' => 'crc32']));
+    }
 }

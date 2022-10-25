@@ -812,6 +812,17 @@ class UrlGenerator implements UrlGeneratorContract
     }
 
     /**
+     * Clone a new instance of the URL generator with a different encryption key resolver.
+     *
+     * @param  callable  $keyResolver
+     * @return \Illuminate\Routing\UrlGenerator
+     */
+    public function withKeyResolver(callable $keyResolver)
+    {
+        return (clone $this)->setKeyResolver($keyResolver);
+    }
+
+    /**
      * Get the root controller namespace.
      *
      * @return string

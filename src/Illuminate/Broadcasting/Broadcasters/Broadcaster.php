@@ -11,7 +11,6 @@ use Illuminate\Contracts\Routing\BindingRegistrar;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Reflector;
-use Illuminate\Support\Str;
 use ReflectionClass;
 use ReflectionFunction;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -117,7 +116,11 @@ abstract class Broadcaster implements BroadcasterContract
 
             $handler = $this->normalizeChannelHandlerToCallable($callback);
 
-            if ($result = $handler($this->retrieveUser($request, $channel), ...$parameters)) {
+            $result = $handler($this->retrieveUser($request, $channel), ...$parameters);
+
+            if ($result === false) {
+                throw new AccessDeniedHttpException;
+            } elseif ($result) {
                 return $this->validAuthenticationResponse($request, $result);
             }
         }
@@ -368,6 +371,6 @@ abstract class Broadcaster implements BroadcasterContract
      */
     protected function channelNameMatchesPattern($channel, $pattern)
     {
-        return Str::is(preg_replace('/\{(.*?)\}/', '*', $pattern), $channel);
+        return preg_match('/'.preg_replace('/\{(.*?)\}/', '([^\.]+)', $pattern).'$/', $channel);
     }
 }

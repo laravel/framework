@@ -24,6 +24,7 @@ use League\Flysystem\UnableToCreateDirectory;
 use League\Flysystem\UnableToDeleteDirectory;
 use League\Flysystem\UnableToDeleteFile;
 use League\Flysystem\UnableToMoveFile;
+use League\Flysystem\UnableToProvideChecksum;
 use League\Flysystem\UnableToReadFile;
 use League\Flysystem\UnableToRetrieveMetadata;
 use League\Flysystem\UnableToSetVisibility;
@@ -555,6 +556,24 @@ class FilesystemAdapter implements CloudFilesystemContract
     }
 
     /**
+     * Get the checksum for a file.
+     *
+     * @return string|false
+     *
+     * @throws UnableToProvideChecksum
+     */
+    public function checksum(string $path, array $options = [])
+    {
+        try {
+            return $this->driver->checksum($path, $options);
+        } catch (UnableToProvideChecksum $e) {
+            throw_if($this->throwsExceptions(), $e);
+
+            return false;
+        }
+    }
+
+    /**
      * Get the mime-type of a given file.
      *
      * @param  string  $path
@@ -620,6 +639,10 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function url($path)
     {
+        if (isset($this->config['prefix'])) {
+            $path = $this->concatPathToUrl($this->config['prefix'], $path);
+        }
+
         $adapter = $this->adapter;
 
         if (method_exists($adapter, 'getUrl')) {
