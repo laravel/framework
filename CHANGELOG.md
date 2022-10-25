@@ -1,6 +1,19 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.36.4...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.37.0...9.x)
+
+
+## [v9.37.0](https://github.com/laravel/framework/compare/v9.36.4...v9.37.0) - 2022-10-25
+
+### Added
+- Added optional verbose output when view caching ([#44673](https://github.com/laravel/framework/pull/44673))
+- Allow passing closure to rescue $report parameter ([#44710](https://github.com/laravel/framework/pull/44710))
+- Support preloading assets with Vite ([#44096](https://github.com/laravel/framework/pull/44096))
+- Added `Illuminate/Mail/Mailables/Content::htmlString()` ([#44703](https://github.com/laravel/framework/pull/44703))
+
+### Fixed
+- Fixed model:show registering getAttribute() as a null accessor ([#44683](https://github.com/laravel/framework/pull/44683))
+- Fix expectations for output assertions in PendingCommand ([#44723](https://github.com/laravel/framework/pull/44723))
 
 
 ## [v9.36.4](https://github.com/laravel/framework/compare/v9.36.3...v9.36.4) - 2022-10-20
