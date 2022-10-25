@@ -70,7 +70,7 @@ class CompilerEngine extends PhpEngine
         try {
             $results = $this->evaluatePath($this->compiler->getCompiledPath($path), $data);
         } catch (ViewException $e) {
-            if (! $e->getPrevious() instanceof FileNotFoundException) {
+            if (! str($e->getMessage())->contains(['No such file or directory', 'File does not exist at path'])) {
                 throw $e;
             }
 
@@ -83,9 +83,9 @@ class CompilerEngine extends PhpEngine
             $results = $this->evaluatePath($this->compiler->getCompiledPath($path), $data);
         }
 
-        array_pop($this->lastCompiled);
-
         $this->compiledOrNotExpired[$path] = true;
+
+        array_pop($this->lastCompiled);
 
         return $results;
     }
