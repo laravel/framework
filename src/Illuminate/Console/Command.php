@@ -3,6 +3,7 @@
 namespace Illuminate\Console;
 
 use Illuminate\Console\View\Components\Factory;
+use Illuminate\Contracts\Console\Isolated;
 use Illuminate\Support\Traits\Macroable;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -139,6 +140,13 @@ class Command extends SymfonyCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        if ($this instanceof Isolated && ! $this->laravel->get(CommandMutex::class)->create($this)) {
+            $this->info(sprintf(
+                "Skipping [%s], as command already running.", $this->getName()
+            ));
+            return self::SUCCESS;
+        }
+
         $method = method_exists($this, 'handle') ? 'handle' : '__invoke';
 
         return (int) $this->laravel->call([$this, $method]);
