@@ -447,6 +447,10 @@ class Vite implements Htmlable
             ? array_merge($attributes, ['integrity' => $chunk[$this->integrityKey] ?? false])
             : $attributes;
 
+        $attributes = ! is_null($this->nonce)
+            ? array_merge($attributes, ['nonce' => $this->nonce])
+            : $attributes;
+
         foreach ($this->preloadTagAttributesResolvers as $resolver) {
             $attributes = array_merge($attributes, $resolver($src, $url, $chunk, $manifest));
         }
