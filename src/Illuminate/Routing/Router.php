@@ -334,9 +334,13 @@ class Router implements BindingRegistrar, RegistrarContract
                 ->each(function ($groupStack) use ($registrar, $controller, $options) {
                     $name = explode("/", $groupStack["prefix"])[1];
 
-                    return (new PendingResourceRegistration($registrar, "/", $controller, $options))
-                        ->names($name)
-                        ->parameters([null => $name]);
+                    if(str_ends_with($name, "s")) {
+                        $name = substr($name, 0, -1);
+                    }
+
+                    return (new PendingResourceRegistration(
+                        $registrar, "/", $controller, $options
+                    ))->names($name)->parameters([null => $name]);
                 });
 
             return;
