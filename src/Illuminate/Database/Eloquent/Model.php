@@ -2033,7 +2033,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * @param  string|null  $field
      * @return \Illuminate\Database\Eloquent\Model|null
      */
-    public function resolveRouteBinding($value, $field = null)
+    public function resolveRouteBinding(mixed $value, string $field = null)
     {
         return $this->resolveRouteBindingQuery($this, $value, $field)->first();
     }
@@ -2058,7 +2058,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * @param  string|null  $field
      * @return \Illuminate\Database\Eloquent\Model|null
      */
-    public function resolveChildRouteBinding($childType, $value, $field)
+    public function resolveChildRouteBinding(string $childType, mixed $value, string $field = null)
     {
         return $this->resolveChildRouteBindingQuery($childType, $value, $field)->first();
     }
