@@ -268,7 +268,7 @@ trait HasAttributes
     /**
      * Check if model has a given attribute.
      *
-     * @param  string $key
+     * @param  string  $key
      * @return bool
      */
     public function hasAttribute($key)
@@ -465,7 +465,7 @@ trait HasAttributes
             return;
         }
 
-        if($this->hasAttribute($key)) {
+        if ($this->hasAttribute($key)) {
             return $this->getAttributeValue($key);
         }
 

@@ -3097,9 +3097,9 @@ class EloquentModelWithAttributeMutator extends Model
 
     public function firstName(): Attribute
     {
-        return Attribute::make(function (){
+        return Attribute::make(function () {
             return 'Taylor';
-        },function ($value){
+        }, function ($value) {
             return $value;
         });
     }
