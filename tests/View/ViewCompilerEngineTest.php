@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\View;
 
 use Exception;
+use ErrorException;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\View\Compilers\CompilerInterface;
@@ -58,7 +59,7 @@ class ViewCompilerEngineTest extends TestCase
         $engine->get(__DIR__.'/fixtures/foo.php');
     }
 
-    public function testViewsAreRecompiledWhenCompiledViewIsMissing()
+    public function testViewsAreRecompiledWhenCompiledViewIsMissingViaFileNotFoundException()
     {
         $compiled = __DIR__.'/fixtures/basic.php';
         $path = __DIR__.'/fixtures/foo.php';
@@ -76,6 +77,51 @@ class ViewCompilerEngineTest extends TestCase
             ->with($compiled, [])
             ->andThrow(new FileNotFoundException(
                 "File does not exist at path {$path}."
+            ));
+
+        $files->shouldReceive('getRequire')
+            ->once()
+            ->with($compiled, [])
+            ->andReturn('compiled-content');
+
+        $engine->getCompiler()
+            ->shouldReceive('getCompiledPath')
+            ->times(3)
+            ->with($path)
+            ->andReturn($compiled);
+
+        $engine->getCompiler()
+            ->shouldReceive('isExpired')
+            ->once()
+            ->andReturn(true);
+
+        $engine->getCompiler()
+            ->shouldReceive('compile')
+            ->twice()
+            ->with($path);
+
+        $engine->get($path);
+        $engine->get($path);
+    }
+
+    public function testViewsAreRecompiledWhenCompiledViewIsMissingViaRequireException()
+    {
+        $compiled = __DIR__.'/fixtures/basic.php';
+        $path = __DIR__.'/fixtures/foo.php';
+
+        $files = m::mock(Filesystem::class);
+        $engine = $this->getEngine($files);
+
+        $files->shouldReceive('getRequire')
+            ->once()
+            ->with($compiled, [])
+            ->andReturn('compiled-content');
+
+        $files->shouldReceive('getRequire')
+            ->once()
+            ->with($compiled, [])
+            ->andThrow(new ErrorException(
+                "require({$path}): Failed to open stream: No such file or directory",
             ));
 
         $files->shouldReceive('getRequire')
