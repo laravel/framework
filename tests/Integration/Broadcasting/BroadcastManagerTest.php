@@ -3,7 +3,10 @@
 namespace Illuminate\Tests\Integration\Broadcasting;
 
 use Illuminate\Broadcasting\BroadcastEvent;
+use Illuminate\Broadcasting\BroadcastManager;
 use Illuminate\Broadcasting\UniqueBroadcastEvent;
+use Illuminate\Config\Repository;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Broadcasting\ShouldBeUnique;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
@@ -11,6 +14,7 @@ use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Queue;
+use InvalidArgumentException;
 use Orchestra\Testbench\TestCase;
 
 class BroadcastManagerTest extends TestCase
@@ -49,6 +53,36 @@ class BroadcastManagerTest extends TestCase
 
         $lockKey = 'laravel_unique_job:'.UniqueBroadcastEvent::class.TestEventUnique::class;
         $this->assertFalse($this->app->get(Cache::class)->lock($lockKey, 10)->get());
+    }
+
+    public function testThrowExceptionWhenUnknownStoreIsUsed()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Broadcast connection [alien_connection] is not defined.');
+
+        $userConfig = [
+            'broadcasting' => [
+                'connections' => [
+                    'my_connection' => [
+                        'driver' => 'pusher',
+                    ],
+                ],
+            ],
+        ];
+
+        $app = $this->getApp($userConfig);
+
+        $broadcastManager = new BroadcastManager($app);
+
+        $broadcastManager->connection('alien_connection');
+    }
+
+    protected function getApp(array $userConfig)
+    {
+        $app = new Container;
+        $app->singleton('config', fn () => new Repository($userConfig));
+
+        return $app;
     }
 }
 
