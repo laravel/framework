@@ -327,6 +327,20 @@ class Router implements BindingRegistrar, RegistrarContract
         } else {
             $registrar = new ResourceRegistrar($this);
         }
+        
+        if ($name == "/") {
+            collect($this->getGroupStack())
+                ->filter(fn ($groupStack) => array_key_exists("prefix", $groupStack))
+                ->each(function ($groupStack) use ($registrar, $controller, $options) {
+                    $name = explode("/", $groupStack["prefix"])[1];
+
+                    return (new PendingResourceRegistration($registrar, "/", $controller, $options))
+                        ->names($name)
+                        ->parameters([null => $name]);
+                });
+
+            return;
+        }
 
         return new PendingResourceRegistration(
             $registrar, $name, $controller, $options
