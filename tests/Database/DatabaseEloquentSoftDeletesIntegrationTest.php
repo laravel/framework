@@ -900,8 +900,8 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->assertCount(0, SoftDeletesTestUserOdds::get(), "Finds 0 Odds because of soft-delete's global scope");
 
         $oddsWithTrashedQuery = SoftDeletesTestUserOdds::withTrashed();
-        $this->assertSame(1, $oddsWithTrashedQuery->count(), "Finds 1 Odd, that is soft-deleted");
-        $this->assertTrue($oddsWithTrashedQuery->first()->is($taylor), "Odd global scope applies to Taylor (1), not Abigail (2)");
+        $this->assertSame(1, $oddsWithTrashedQuery->count(), 'Finds 1 Odd, that is soft-deleted');
+        $this->assertTrue($oddsWithTrashedQuery->first()->is($taylor), 'Odd global scope applies to Taylor (1), not Abigail (2)');
 
         $affectedRows = $oddsWithTrashedQuery->forceDelete();
         $this->assertSame(1, $affectedRows, 'Affected Rows from forceDelete() must equal the original count()');
@@ -999,7 +999,7 @@ class SoftDeletesTestUserOdds extends SoftDeletesTestUser
     protected static function booted()
     {
         static::addGlobalScope('odds', function ($builder) {
-            $builder->whereRaw("(id % 2) = 1");
+            $builder->whereRaw('(id % 2) = 1');
         });
     }
 }
