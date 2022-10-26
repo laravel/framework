@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\View;
 
-use Exception;
 use ErrorException;
+use Exception;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\View\Compilers\CompilerInterface;
