@@ -438,17 +438,15 @@ class Vite implements Htmlable
             'rel' => 'preload',
             'as' => 'style',
             'href' => $url,
+            'nonce' => $this->nonce ?? false,
         ] : [
             'rel' => 'modulepreload',
             'href' => $url,
+            'nonce' => $this->nonce ?? false,
         ];
 
         $attributes = $this->integrityKey !== false
             ? array_merge($attributes, ['integrity' => $chunk[$this->integrityKey] ?? false])
-            : $attributes;
-
-        $attributes = ! is_null($this->nonce)
-            ? array_merge($attributes, ['nonce' => $this->nonce])
             : $attributes;
 
         foreach ($this->preloadTagAttributesResolvers as $resolver) {
