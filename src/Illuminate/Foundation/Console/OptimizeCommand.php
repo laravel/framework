@@ -3,11 +3,14 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Console\ConfirmableTrait;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'optimize')]
 class OptimizeCommand extends Command
 {
+    use ConfirmableTrait;
+
     /**
      * The console command name.
      *
@@ -36,10 +39,14 @@ class OptimizeCommand extends Command
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return int
      */
     public function handle()
     {
+        if (! $this->confirmToProceed('Application Not In Production', $this->confirmCallback())) {
+            return 1;
+        }
+
         $this->components->info('Caching the framework bootstrap files');
 
         collect([
@@ -48,5 +55,19 @@ class OptimizeCommand extends Command
         ])->each(fn ($task, $description) => $this->components->task($description, $task));
 
         $this->newLine();
+
+        return 0;
+    }
+
+    /**
+     * Get the confirmation callback.
+     *
+     * @return \Closure
+     */
+    protected function confirmCallback()
+    {
+        return function () {
+            return $this->getLaravel()->environment('production') === false;
+        };
     }
 }
