@@ -29,7 +29,7 @@ class FoundationViteTest extends TestCase
 
         $result = app(Vite::class)('resources/js/app.js');
 
-        $this->assertSame('<script type="module" src="https://example.com/build/assets/app.versioned.js"></script>', $result->toHtml());
+        $this->assertStringEndsWith('<script type="module" src="https://example.com/build/assets/app.versioned.js"></script>', $result->toHtml());
     }
 
     public function testViteWithCssAndJs()
@@ -38,7 +38,7 @@ class FoundationViteTest extends TestCase
 
         $result = app(Vite::class)(['resources/css/app.css', 'resources/js/app.js']);
 
-        $this->assertSame(
+        $this->assertStringEndsWith(
             '<link rel="stylesheet" href="https://example.com/build/assets/app.versioned.css" />'
             .'<script type="module" src="https://example.com/build/assets/app.versioned.js"></script>',
             $result->toHtml()
@@ -51,7 +51,7 @@ class FoundationViteTest extends TestCase
 
         $result = app(Vite::class)('resources/js/app-with-css-import.js');
 
-        $this->assertSame(
+        $this->assertStringEndsWith(
             '<link rel="stylesheet" href="https://example.com/build/assets/imported-css.versioned.css" />'
             .'<script type="module" src="https://example.com/build/assets/app-with-css-import.versioned.js"></script>',
             $result->toHtml()
@@ -64,7 +64,7 @@ class FoundationViteTest extends TestCase
 
         $result = app(Vite::class)(['resources/js/app-with-shared-css.js']);
 
-        $this->assertSame(
+        $this->assertStringEndsWith(
             '<link rel="stylesheet" href="https://example.com/build/assets/shared-css.versioned.css" />'
             .'<script type="module" src="https://example.com/build/assets/app-with-shared-css.versioned.js"></script>',
             $result->toHtml()
@@ -128,7 +128,7 @@ class FoundationViteTest extends TestCase
 
         $this->assertSame('random-string-with-length:40', $nonce);
         $this->assertSame('random-string-with-length:40', ViteFacade::cspNonce());
-        $this->assertSame(
+        $this->assertStringEndsWith(
             '<link rel="stylesheet" href="https://example.com/build/assets/app.versioned.css" nonce="random-string-with-length:40" />'
             .'<script type="module" src="https://example.com/build/assets/app.versioned.js" nonce="random-string-with-length:40"></script>',
             $result->toHtml()
@@ -163,7 +163,7 @@ class FoundationViteTest extends TestCase
 
         $this->assertSame('expected-nonce', $nonce);
         $this->assertSame('expected-nonce', ViteFacade::cspNonce());
-        $this->assertSame(
+        $this->assertStringEndsWith(
             '<link rel="stylesheet" href="https://example.com/build/assets/app.versioned.css" nonce="expected-nonce" />'
             .'<script type="module" src="https://example.com/build/assets/app.versioned.js" nonce="expected-nonce"></script>',
             $result->toHtml()
@@ -175,10 +175,12 @@ class FoundationViteTest extends TestCase
         $buildDir = Str::random();
         $this->makeViteManifest([
             'resources/js/app.js' => [
+                'src' => 'resources/js/app.js',
                 'file' => 'assets/app.versioned.js',
                 'integrity' => 'expected-app.js-integrity',
             ],
             'resources/css/app.css' => [
+                'src' => 'resources/css/app.css',
                 'file' => 'assets/app.versioned.css',
                 'integrity' => 'expected-app.css-integrity',
             ],
@@ -186,7 +188,7 @@ class FoundationViteTest extends TestCase
 
         $result = app(Vite::class)(['resources/css/app.css', 'resources/js/app.js'], $buildDir);
 
-        $this->assertSame(
+        $this->assertStringEndsWith(
             '<link rel="stylesheet" href="https://example.com/'.$buildDir.'/assets/app.versioned.css" integrity="expected-app.css-integrity" />'
             .'<script type="module" src="https://example.com/'.$buildDir.'/assets/app.versioned.js" integrity="expected-app.js-integrity"></script>',
             $result->toHtml()
@@ -200,6 +202,7 @@ class FoundationViteTest extends TestCase
         $buildDir = Str::random();
         $this->makeViteManifest([
             'resources/js/app.js' => [
+                'src' => 'resources/js/app.js',
                 'file' => 'assets/app.versioned.js',
                 'css' => [
                     'assets/direct-css-dependency.aabbcc.css',
@@ -221,7 +224,7 @@ class FoundationViteTest extends TestCase
 
         $result = app(Vite::class)('resources/js/app.js', $buildDir);
 
-        $this->assertSame(
+        $this->assertStringEndsWith(
             '<link rel="stylesheet" href="https://example.com/'.$buildDir.'/assets/direct-css-dependency.aabbcc.css" integrity="expected-imported-css.css-integrity" />'
             .'<script type="module" src="https://example.com/'.$buildDir.'/assets/app.versioned.js" integrity="expected-app.js-integrity"></script>',
             $result->toHtml()
@@ -235,6 +238,7 @@ class FoundationViteTest extends TestCase
         $buildDir = Str::random();
         $this->makeViteManifest([
             'resources/js/app.js' => [
+                'src' => 'resources/js/app.js',
                 'file' => 'assets/app.versioned.js',
                 'imports' => [
                     '_import.versioned.js',
@@ -256,7 +260,7 @@ class FoundationViteTest extends TestCase
 
         $result = app(Vite::class)('resources/js/app.js', $buildDir);
 
-        $this->assertSame(
+        $this->assertStringEndsWith(
             '<link rel="stylesheet" href="https://example.com/'.$buildDir.'/assets/imported-css.versioned.css" integrity="expected-imported-css.css-integrity" />'
             .'<script type="module" src="https://example.com/'.$buildDir.'/assets/app.versioned.js" integrity="expected-app.js-integrity"></script>',
             $result->toHtml()
@@ -270,10 +274,12 @@ class FoundationViteTest extends TestCase
         $buildDir = Str::random();
         $this->makeViteManifest([
             'resources/js/app.js' => [
+                'src' => 'resources/js/app.js',
                 'file' => 'assets/app.versioned.js',
                 'different-integrity-key' => 'expected-app.js-integrity',
             ],
             'resources/css/app.css' => [
+                'src' => 'resources/css/app.css',
                 'file' => 'assets/app.versioned.css',
                 'different-integrity-key' => 'expected-app.css-integrity',
             ],
@@ -282,7 +288,7 @@ class FoundationViteTest extends TestCase
 
         $result = app(Vite::class)(['resources/css/app.css', 'resources/js/app.js'], $buildDir);
 
-        $this->assertSame(
+        $this->assertStringEndsWith(
             '<link rel="stylesheet" href="https://example.com/'.$buildDir.'/assets/app.versioned.css" integrity="expected-app.css-integrity" />'
             .'<script type="module" src="https://example.com/'.$buildDir.'/assets/app.versioned.js" integrity="expected-app.js-integrity"></script>',
             $result->toHtml()
@@ -300,12 +306,17 @@ class FoundationViteTest extends TestCase
         ViteFacade::useScriptTagAttributes(function ($src, $url, $chunk, $manifest) {
             $this->assertSame('resources/js/app.js', $src);
             $this->assertSame('https://example.com/build/assets/app.versioned.js', $url);
-            $this->assertSame(['file' => 'assets/app.versioned.js'], $chunk);
+            $this->assertSame([
+                'src' => 'resources/js/app.js',
+                'file' => 'assets/app.versioned.js',
+            ], $chunk);
             $this->assertSame([
                 'resources/js/app.js' => [
+                    'src' => 'resources/js/app.js',
                     'file' => 'assets/app.versioned.js',
                 ],
                 'resources/js/app-with-css-import.js' => [
+                    'src' => 'resources/js/app-with-css-import.js',
                     'file' => 'assets/app-with-css-import.versioned.js',
                     'css' => [
                         'assets/imported-css.versioned.css',
@@ -315,20 +326,24 @@ class FoundationViteTest extends TestCase
                     'file' => 'assets/imported-css.versioned.css',
                 ],
                 'resources/js/app-with-shared-css.js' => [
+                    'src' => 'resources/js/app-with-shared-css.js',
                     'file' => 'assets/app-with-shared-css.versioned.js',
                     'imports' => [
                         '_someFile.js',
                     ],
                 ],
                 'resources/css/app.css' => [
+                    'src' => 'resources/css/app.css',
                     'file' => 'assets/app.versioned.css',
                 ],
                 '_someFile.js' => [
+                    'file' => 'assets/someFile.versioned.js',
                     'css' => [
                         'assets/shared-css.versioned.css',
                     ],
                 ],
                 'resources/css/shared-css' => [
+                    'src' => 'resources/css/shared-css',
                     'file' => 'assets/shared-css.versioned.css',
                 ],
             ], $manifest);
@@ -346,7 +361,7 @@ class FoundationViteTest extends TestCase
 
         $result = app(Vite::class)(['resources/css/app.css', 'resources/js/app.js']);
 
-        $this->assertSame(
+        $this->assertStringEndsWith(
             '<link rel="stylesheet" href="https://example.com/build/assets/app.versioned.css" />'
             .'<script type="module" src="https://example.com/build/assets/app.versioned.js" general="attribute" crossorigin data-persistent-across-pages="YES" keep-me empty-string="" zero="0"></script>',
             $result->toHtml()
@@ -362,12 +377,17 @@ class FoundationViteTest extends TestCase
         ViteFacade::useStyleTagAttributes(function ($src, $url, $chunk, $manifest) {
             $this->assertSame('resources/css/app.css', $src);
             $this->assertSame('https://example.com/build/assets/app.versioned.css', $url);
-            $this->assertSame(['file' => 'assets/app.versioned.css'], $chunk);
+            $this->assertSame([
+                'src' => 'resources/css/app.css',
+                'file' => 'assets/app.versioned.css',
+            ], $chunk);
             $this->assertSame([
                 'resources/js/app.js' => [
+                    'src' => 'resources/js/app.js',
                     'file' => 'assets/app.versioned.js',
                 ],
                 'resources/js/app-with-css-import.js' => [
+                    'src' => 'resources/js/app-with-css-import.js',
                     'file' => 'assets/app-with-css-import.versioned.js',
                     'css' => [
                         'assets/imported-css.versioned.css',
@@ -377,20 +397,24 @@ class FoundationViteTest extends TestCase
                     'file' => 'assets/imported-css.versioned.css',
                 ],
                 'resources/js/app-with-shared-css.js' => [
+                    'src' => 'resources/js/app-with-shared-css.js',
                     'file' => 'assets/app-with-shared-css.versioned.js',
                     'imports' => [
                         '_someFile.js',
                     ],
                 ],
                 'resources/css/app.css' => [
+                    'src' => 'resources/css/app.css',
                     'file' => 'assets/app.versioned.css',
                 ],
                 '_someFile.js' => [
+                    'file' => 'assets/someFile.versioned.js',
                     'css' => [
                         'assets/shared-css.versioned.css',
                     ],
                 ],
                 'resources/css/shared-css' => [
+                    'src' => 'resources/css/shared-css',
                     'file' => 'assets/shared-css.versioned.css',
                 ],
             ], $manifest);
@@ -405,7 +429,7 @@ class FoundationViteTest extends TestCase
 
         $result = app(Vite::class)(['resources/css/app.css', 'resources/js/app.js']);
 
-        $this->assertSame(
+        $this->assertStringEndsWith(
             '<link rel="stylesheet" href="https://example.com/build/assets/app.versioned.css" general="attribute" crossorigin data-persistent-across-pages="YES" keep-me />'
             .'<script type="module" src="https://example.com/build/assets/app.versioned.js"></script>',
             $result->toHtml()
@@ -492,7 +516,7 @@ class FoundationViteTest extends TestCase
 
         $result = app(Vite::class)(['resources/css/app.css', 'resources/js/app.js']);
 
-        $this->assertSame(
+        $this->assertStringEndsWith(
             '<link rel="expected-rel" href="expected-href" />'
             .'<script type="expected-type" src="expected-src"></script>',
             $result->toHtml()
@@ -575,7 +599,7 @@ class FoundationViteTest extends TestCase
 
         $vite->withEntryPoints(['resources/js/app.js']);
 
-        $this->assertSame(
+        $this->assertStringEndsWith(
             '<script type="module" src="https://example.com/build/assets/app.versioned.js"></script>',
             $vite->toHtml()
         );
@@ -589,7 +613,7 @@ class FoundationViteTest extends TestCase
 
         $vite->withEntryPoints(['resources/js/app.js'])->useBuildDirectory('custom-build');
 
-        $this->assertSame(
+        $this->assertStringEndsWith(
             '<script type="module" src="https://example.com/custom-build/assets/app.versioned.js"></script>',
             $vite->toHtml()
         );
@@ -633,6 +657,195 @@ class FoundationViteTest extends TestCase
         $this->cleanViteManifest($buildDir);
     }
 
+    public function testItGeneratesPreloadDirectivesForJsAndCssImports()
+    {
+        $manifest = json_decode(file_get_contents(__DIR__.'/fixtures/jetstream-manifest.json'));
+        $buildDir = Str::random();
+        $this->makeViteManifest($manifest, $buildDir);
+
+        $result = app(Vite::class)(['resources/js/Pages/Auth/Login.vue'], $buildDir);
+
+        $this->assertSame(
+            '<link rel="preload" as="style" href="https://example.com/'.$buildDir.'/assets/app.9842b564.css" />'
+            .'<link rel="modulepreload" href="https://example.com/'.$buildDir.'/assets/Login.8c52c4a3.js" />'
+            .'<link rel="modulepreload" href="https://example.com/'.$buildDir.'/assets/app.a26d8e4d.js" />'
+            .'<link rel="modulepreload" href="https://example.com/'.$buildDir.'/assets/AuthenticationCard.47ef70cc.js" />'
+            .'<link rel="modulepreload" href="https://example.com/'.$buildDir.'/assets/AuthenticationCardLogo.9999a373.js" />'
+            .'<link rel="modulepreload" href="https://example.com/'.$buildDir.'/assets/Checkbox.33ba23f3.js" />'
+            .'<link rel="modulepreload" href="https://example.com/'.$buildDir.'/assets/TextInput.e2f0248c.js" />'
+            .'<link rel="modulepreload" href="https://example.com/'.$buildDir.'/assets/InputLabel.d245ec4e.js" />'
+            .'<link rel="modulepreload" href="https://example.com/'.$buildDir.'/assets/PrimaryButton.931d2859.js" />'
+            .'<link rel="modulepreload" href="https://example.com/'.$buildDir.'/assets/_plugin-vue_export-helper.cdc0426e.js" />'
+            .'<link rel="stylesheet" href="https://example.com/'.$buildDir.'/assets/app.9842b564.css" />'
+            .'<script type="module" src="https://example.com/'.$buildDir.'/assets/Login.8c52c4a3.js"></script>', $result->toHtml()
+        );
+        $this->assertSame([
+            'https://example.com/'.$buildDir.'/assets/app.9842b564.css' => [
+                'rel="preload"',
+                'as="style"',
+            ],
+            'https://example.com/'.$buildDir.'/assets/Login.8c52c4a3.js' => [
+                'rel="modulepreload"',
+            ],
+            'https://example.com/'.$buildDir.'/assets/app.a26d8e4d.js' => [
+                'rel="modulepreload"',
+            ],
+            'https://example.com/'.$buildDir.'/assets/AuthenticationCard.47ef70cc.js' => [
+                'rel="modulepreload"',
+            ],
+            'https://example.com/'.$buildDir.'/assets/AuthenticationCardLogo.9999a373.js' => [
+                'rel="modulepreload"',
+            ],
+            'https://example.com/'.$buildDir.'/assets/Checkbox.33ba23f3.js' => [
+                'rel="modulepreload"',
+            ],
+            'https://example.com/'.$buildDir.'/assets/TextInput.e2f0248c.js' => [
+                'rel="modulepreload"',
+            ],
+            'https://example.com/'.$buildDir.'/assets/InputLabel.d245ec4e.js' => [
+                'rel="modulepreload"',
+            ],
+            'https://example.com/'.$buildDir.'/assets/PrimaryButton.931d2859.js' => [
+                'rel="modulepreload"',
+            ],
+            'https://example.com/'.$buildDir.'/assets/_plugin-vue_export-helper.cdc0426e.js' => [
+                'rel="modulepreload"',
+            ],
+        ], ViteFacade::preloadedAssets());
+
+        $this->cleanViteManifest($buildDir);
+    }
+
+    public function testItCanSpecifyAttributesForPreloadedAssets()
+    {
+        $buildDir = Str::random();
+        $this->makeViteManifest([
+            'resources/js/app.js' => [
+                'src' => 'resources/js/app.js',
+                'file' => 'assets/app.versioned.js',
+                'imports' => [
+                    'import.js',
+                ],
+                'css' => [
+                    'assets/app.versioned.css',
+                ],
+            ],
+            'import.js' => [
+                'file' => 'assets/import.versioned.js',
+            ],
+            'resources/css/app.css' => [
+                'src' => 'resources/css/app.css',
+                'file' => 'assets/app.versioned.css',
+            ],
+        ], $buildDir);
+        ViteFacade::usePreloadTagAttributes([
+            'general' => 'attribute',
+        ]);
+        ViteFacade::usePreloadTagAttributes(function ($src, $url, $chunk, $manifest) use ($buildDir) {
+            $this->assertSame([
+                'resources/js/app.js' => [
+                    'src' => 'resources/js/app.js',
+                    'file' => 'assets/app.versioned.js',
+                    'imports' => [
+                        'import.js',
+                    ],
+                    'css' => [
+                        'assets/app.versioned.css',
+                    ],
+                ],
+                'import.js' => [
+                    'file' => 'assets/import.versioned.js',
+                ],
+                'resources/css/app.css' => [
+                    'src' => 'resources/css/app.css',
+                    'file' => 'assets/app.versioned.css',
+                ],
+            ], $manifest);
+
+            (match ($src) {
+                'resources/js/app.js' => function () use ($url, $chunk, $buildDir) {
+                    $this->assertSame("https://example.com/{$buildDir}/assets/app.versioned.js", $url);
+                    $this->assertSame([
+                        'src' => 'resources/js/app.js',
+                        'file' => 'assets/app.versioned.js',
+                        'imports' => [
+                            'import.js',
+                        ],
+                        'css' => [
+                            'assets/app.versioned.css',
+                        ],
+                    ], $chunk);
+                },
+                'import.js' => function () use ($url, $chunk, $buildDir) {
+                    $this->assertSame("https://example.com/{$buildDir}/assets/import.versioned.js", $url);
+                    $this->assertSame([
+                        'file' => 'assets/import.versioned.js',
+                    ], $chunk);
+                },
+                'resources/css/app.css' => function () use ($url, $chunk, $buildDir) {
+                    $this->assertSame("https://example.com/{$buildDir}/assets/app.versioned.css", $url);
+                    $this->assertSame([
+                        'src' => 'resources/css/app.css',
+                        'file' => 'assets/app.versioned.css',
+                    ], $chunk);
+                },
+            })();
+
+            return [
+                'crossorigin',
+                'data-persistent-across-pages' => 'YES',
+                'remove-me' => false,
+                'keep-me' => true,
+                'null' => null,
+                'empty-string' => '',
+                'zero' => 0,
+            ];
+        });
+
+        $result = app(Vite::class)(['resources/js/app.js'], $buildDir);
+
+        $this->assertSame(
+            '<link rel="preload" as="style" href="https://example.com/'.$buildDir.'/assets/app.versioned.css" general="attribute" crossorigin data-persistent-across-pages="YES" keep-me empty-string="" zero="0" />'
+            .'<link rel="modulepreload" href="https://example.com/'.$buildDir.'/assets/app.versioned.js" general="attribute" crossorigin data-persistent-across-pages="YES" keep-me empty-string="" zero="0" />'
+            .'<link rel="modulepreload" href="https://example.com/'.$buildDir.'/assets/import.versioned.js" general="attribute" crossorigin data-persistent-across-pages="YES" keep-me empty-string="" zero="0" />'
+            .'<link rel="stylesheet" href="https://example.com/'.$buildDir.'/assets/app.versioned.css" />'
+            .'<script type="module" src="https://example.com/'.$buildDir.'/assets/app.versioned.js"></script>',
+        $result->toHtml());
+
+        $this->assertSame([
+            "https://example.com/$buildDir/assets/app.versioned.css" => [
+                'rel="preload"',
+                'as="style"',
+                'general="attribute"',
+                'crossorigin',
+                'data-persistent-across-pages="YES"',
+                'keep-me',
+                'empty-string=""',
+                'zero="0"',
+            ],
+            "https://example.com/$buildDir/assets/app.versioned.js" => [
+                'rel="modulepreload"',
+                'general="attribute"',
+                'crossorigin',
+                'data-persistent-across-pages="YES"',
+                'keep-me',
+                'empty-string=""',
+                'zero="0"',
+            ],
+            "https://example.com/$buildDir/assets/import.versioned.js" => [
+                'rel="modulepreload"',
+                'general="attribute"',
+                'crossorigin',
+                'data-persistent-across-pages="YES"',
+                'keep-me',
+                'empty-string=""',
+                'zero="0"',
+            ],
+        ], ViteFacade::preloadedAssets());
+
+        $this->cleanViteManifest($buildDir);
+    }
+
     protected function makeViteManifest($contents = null, $path = 'build')
     {
         app()->singleton('path.public', fn () => __DIR__);
@@ -643,32 +856,39 @@ class FoundationViteTest extends TestCase
 
         $manifest = json_encode($contents ?? [
             'resources/js/app.js' => [
+                'src' => 'resources/js/app.js',
                 'file' => 'assets/app.versioned.js',
             ],
             'resources/js/app-with-css-import.js' => [
+                'src' => 'resources/js/app-with-css-import.js',
                 'file' => 'assets/app-with-css-import.versioned.js',
                 'css' => [
                     'assets/imported-css.versioned.css',
                 ],
             ],
             'resources/css/imported-css.css' => [
+                // 'src' => 'resources/css/imported-css.css',
                 'file' => 'assets/imported-css.versioned.css',
             ],
             'resources/js/app-with-shared-css.js' => [
+                'src' => 'resources/js/app-with-shared-css.js',
                 'file' => 'assets/app-with-shared-css.versioned.js',
                 'imports' => [
                     '_someFile.js',
                 ],
             ],
             'resources/css/app.css' => [
+                'src' => 'resources/css/app.css',
                 'file' => 'assets/app.versioned.css',
             ],
             '_someFile.js' => [
+                'file' => 'assets/someFile.versioned.js',
                 'css' => [
                     'assets/shared-css.versioned.css',
                 ],
             ],
             'resources/css/shared-css' => [
+                'src' => 'resources/css/shared-css',
                 'file' => 'assets/shared-css.versioned.css',
             ],
         ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);

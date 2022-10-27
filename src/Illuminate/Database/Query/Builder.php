@@ -439,7 +439,7 @@ class Builder implements BuilderContract
     /**
      * Set the table which the query is targeting.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|string  $table
+     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|string  $table
      * @param  string|null  $as
      * @return $this
      */
@@ -2592,6 +2592,20 @@ class Builder implements BuilderContract
     public function value($column)
     {
         $result = (array) $this->first([$column]);
+
+        return count($result) > 0 ? reset($result) : null;
+    }
+
+    /**
+     * Get a single expression value from the first result of a query.
+     *
+     * @param  string  $expression
+     * @param  array  $bindings
+     * @return mixed
+     */
+    public function rawValue(string $expression, array $bindings = [])
+    {
+        $result = (array) $this->selectRaw($expression, $bindings)->first();
 
         return count($result) > 0 ? reset($result) : null;
     }

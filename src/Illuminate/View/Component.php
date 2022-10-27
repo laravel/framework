@@ -13,20 +13,6 @@ use ReflectionProperty;
 abstract class Component
 {
     /**
-     * The cache of public property names, keyed by class.
-     *
-     * @var array
-     */
-    protected static $propertyCache = [];
-
-    /**
-     * The cache of public method names, keyed by class.
-     *
-     * @var array
-     */
-    protected static $methodCache = [];
-
-    /**
      * The properties / methods that should not be exposed to the component.
      *
      * @var array
@@ -48,11 +34,96 @@ abstract class Component
     public $attributes;
 
     /**
+     * The view factory instance, if any.
+     *
+     * @var \Illuminate\Contracts\View\Factory|null
+     */
+    protected static $factory;
+
+    /**
+     * The component resolver callback.
+     *
+     * @var (\Closure(string, array): Component)|null
+     */
+    protected static $componentsResolver;
+
+    /**
+     * The cache of blade view names, keyed by contents.
+     *
+     * @var array<string, string>
+     */
+    protected static $bladeViewCache = [];
+
+    /**
+     * The cache of public property names, keyed by class.
+     *
+     * @var array
+     */
+    protected static $propertyCache = [];
+
+    /**
+     * The cache of public method names, keyed by class.
+     *
+     * @var array
+     */
+    protected static $methodCache = [];
+
+    /**
+     * The cache of constructor parameters, keyed by class.
+     *
+     * @var array<class-string, array<int, string>>
+     */
+    protected static $constructorParametersCache = [];
+
+    /**
      * Get the view / view contents that represent the component.
      *
      * @return \Illuminate\Contracts\View\View|\Illuminate\Contracts\Support\Htmlable|\Closure|string
      */
     abstract public function render();
+
+    /**
+     * Resolve the component instance with the given data.
+     *
+     * @param  array  $data
+     * @return static
+     */
+    public static function resolve($data)
+    {
+        if (static::$componentsResolver) {
+            return call_user_func(static::$componentsResolver, static::class, $data);
+        }
+
+        $parameters = static::extractConstructorParameters();
+
+        $dataKeys = array_keys($data);
+
+        if (empty(array_diff($parameters, $dataKeys))) {
+            return new static(...array_intersect_key($data, array_flip($parameters)));
+        }
+
+        return Container::getInstance()->make(static::class, $data);
+    }
+
+    /**
+     * Extract the constructor parameters for the component.
+     *
+     * @return array
+     */
+    protected static function extractConstructorParameters()
+    {
+        if (! isset(static::$constructorParametersCache[static::class])) {
+            $class = new ReflectionClass(static::class);
+
+            $constructor = $class->getConstructor();
+
+            static::$constructorParametersCache[static::class] = $constructor
+                ? collect($constructor->getParameters())->map->getName()->all()
+                : [];
+        }
+
+        return static::$constructorParametersCache[static::class];
+    }
 
     /**
      * Resolve the Blade view or view file that should be used when rendering the component.
@@ -72,17 +143,34 @@ abstract class Component
         }
 
         $resolver = function ($view) {
-            $factory = Container::getInstance()->make('view');
-
-            return strlen($view) <= PHP_MAXPATHLEN && $factory->exists($view)
-                        ? $view
-                        : $this->createBladeViewFromString($factory, $view);
+            return $this->extractBladeViewFromString($view);
         };
 
         return $view instanceof Closure ? function (array $data = []) use ($view, $resolver) {
             return $resolver($view($data));
         }
         : $resolver($view);
+    }
+
+    /**
+     * Create a Blade view with the raw component string content.
+     *
+     * @param  string  $contents
+     * @return string
+     */
+    protected function extractBladeViewFromString($contents)
+    {
+        $key = sprintf('%s::%s', static::class, $contents);
+
+        if (isset(static::$bladeViewCache[$key])) {
+            return static::$bladeViewCache[$key];
+        }
+
+        if (strlen($contents) <= PHP_MAXPATHLEN && $this->factory()->exists($contents)) {
+            return static::$bladeViewCache[$key] = $contents;
+        }
+
+        return static::$bladeViewCache[$key] = $this->createBladeViewFromString($this->factory(), $contents);
     }
 
     /**
@@ -291,5 +379,80 @@ abstract class Component
     public function shouldRender()
     {
         return true;
+    }
+
+    /**
+     * Get the evaluated view contents for the given view.
+     *
+     * @param  string|null  $view
+     * @param  \Illuminate\Contracts\Support\Arrayable|array  $data
+     * @param  array  $mergeData
+     * @return \Illuminate\Contracts\View\View
+     */
+    public function view($view, $data = [], $mergeData = [])
+    {
+        return $this->factory()->make($view, $data, $mergeData);
+    }
+
+    /**
+     * Get the view factory instance.
+     *
+     * @return \Illuminate\Contracts\View\Factory
+     */
+    protected function factory()
+    {
+        if (is_null(static::$factory)) {
+            static::$factory = Container::getInstance()->make('view');
+        }
+
+        return static::$factory;
+    }
+
+    /**
+     * Flush the component's cached state.
+     *
+     * @return void
+     */
+    public static function flushCache()
+    {
+        static::$bladeViewCache = [];
+        static::$constructorParametersCache = [];
+        static::$methodCache = [];
+        static::$propertyCache = [];
+    }
+
+    /**
+     * Forget the component's factory instance.
+     *
+     * @return void
+     */
+    public static function forgetFactory()
+    {
+        static::$factory = null;
+    }
+
+    /**
+     * Forget the component's resolver callback.
+     *
+     * @return void
+     *
+     * @internal
+     */
+    public static function forgetComponentsResolver()
+    {
+        static::$componentsResolver = null;
+    }
+
+    /**
+     * Set the callback that should be used to resolve components within views.
+     *
+     * @param  \Closure(string $component, array $data): Component  $resolver
+     * @return void
+     *
+     * @internal
+     */
+    public static function resolveComponentsUsing($resolver)
+    {
+        static::$componentsResolver = $resolver;
     }
 }

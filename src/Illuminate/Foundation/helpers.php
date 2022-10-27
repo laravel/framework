@@ -711,7 +711,7 @@ if (! function_exists('rescue')) {
      *
      * @param  callable  $callback
      * @param  mixed  $rescue
-     * @param  bool  $report
+     * @param  bool|callable  $report
      * @return mixed
      */
     function rescue(callable $callback, $rescue = null, $report = true)
@@ -719,7 +719,7 @@ if (! function_exists('rescue')) {
         try {
             return $callback();
         } catch (Throwable $e) {
-            if ($report) {
+            if (value($report, $e)) {
                 report($e);
             }
 

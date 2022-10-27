@@ -146,6 +146,10 @@ class Kernel implements KernelContract
         $this->commandStartedAt = Carbon::now();
 
         try {
+            if ($input->getFirstArgument() === 'env:decrypt') {
+                $this->bootstrapWithoutBootingProviders();
+            }
+
             $this->bootstrap();
 
             return $this->getArtisan()->run($input, $output);
@@ -323,6 +327,10 @@ class Kernel implements KernelContract
      */
     public function call($command, array $parameters = [], $outputBuffer = null)
     {
+        if ($command === 'env:decrypt') {
+            $this->bootstrapWithoutBootingProviders();
+        }
+
         $this->bootstrap();
 
         return $this->getArtisan()->call($command, $parameters, $outputBuffer);
@@ -382,6 +390,20 @@ class Kernel implements KernelContract
 
             $this->commandsLoaded = true;
         }
+    }
+
+    /**
+     * Bootstrap the application without booting service providers.
+     *
+     * @return void
+     */
+    public function bootstrapWithoutBootingProviders()
+    {
+        $this->app->bootstrapWith(
+            collect($this->bootstrappers())->reject(function ($bootstrapper) {
+                return $bootstrapper === \Illuminate\Foundation\Bootstrap\BootProviders::class;
+            })->all()
+        );
     }
 
     /**
