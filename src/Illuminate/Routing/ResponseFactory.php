@@ -117,6 +117,18 @@ class ResponseFactory implements FactoryContract
     }
 
     /**
+     * Create a new "ok" response.
+     *
+     * @param  mixed  $content
+     * @param  array  $headers
+     * @return \Illuminate\Http\Response
+     */
+    public function ok(mixed $content = '', array $headers = [])
+    {
+        return $this->make($content, 200, $headers);
+    }
+
+    /**
      * Create a new streamed response instance.
      *
      * @param  \Closure  $callback
