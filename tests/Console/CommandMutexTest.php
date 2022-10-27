@@ -8,6 +8,8 @@ use Illuminate\Console\Command;
 use Illuminate\Console\CommandMutex;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Console\Isolated;
+use Mockery\LegacyMockInterface;
+use Mockery\MockInterface;
 use PHPUnit\Framework\TestCase;
 use Mockery as m;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -15,9 +17,15 @@ use Symfony\Component\Console\Output\NullOutput;
 
 class CommandMutexTest extends TestCase
 {
-    protected Command $command;
+    /**
+     * @var Command
+     */
+    protected $command;
 
-    protected CommandMutex $commandMutex;
+    /**
+     * @var CommandMutex
+     */
+    protected $commandMutex;
 
     protected function setUp(): void
     {

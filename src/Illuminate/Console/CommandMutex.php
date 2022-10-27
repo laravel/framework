@@ -4,14 +4,21 @@ declare(strict_types=1);
 
 namespace Illuminate\Console;
 
-use DateTimeInterface;
-
 interface CommandMutex
 {
     /**
      * Attempt to obtain a command mutex for the given command
+     *
+     * @param Command $command
+     * @return bool
      */
-    public function create(Command $command): bool;
+    public function create($command);
 
-    public function exists(Command $command): bool;
+    /**
+     * Determine if a command mutex exists for the given command.
+     *
+     * @param Command $command
+     * @return bool
+     */
+    public function exists($command);
 }

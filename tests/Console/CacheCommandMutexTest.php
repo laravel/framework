@@ -13,9 +13,24 @@ use Mockery as m;
 
 class CacheCommandMutexTest extends TestCase
 {
-    protected CacheCommandMutex $mutex;
-    protected Command $command;
-    protected Factory $cacheFactory;
+    /**
+     * @var CacheCommandMutex
+     */
+    protected $mutex;
+
+    /**
+     * @var Command
+     */
+    protected $command;
+
+    /**
+     * @var Factory
+     */
+    protected $cacheFactory;
+
+    /**
+     * @var Repository
+     */
     protected Repository $cacheRepository;
 
     protected function setUp(): void

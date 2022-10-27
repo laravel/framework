@@ -9,16 +9,31 @@ use Illuminate\Contracts\Cache\Factory as Cache;
 
 class CacheCommandMutex implements CommandMutex
 {
-    public string|null $store = null;
+    /**
+     * The cache store that should be used.
+     *
+     * @var string|null
+     */
+    public $store = null;
 
-    public Cache $cache;
+    /**
+     * The cache factory implementation.
+     *
+     * @var \Illuminate\Contracts\Cache\Factory
+     */
+    public $cache;
 
+    /**
+     * Create a new command mutex
+     *
+     * @param \Illuminate\Contracts\Cache\Factory $cache
+     */
     public function __construct(Cache $cache)
     {
         $this->cache = $cache;
     }
 
-    public function create(Command $command): bool
+    public function create($command)
     {
         return $this->cache->store($this->store)->add(
             $this->commandMutexName($command),
@@ -27,18 +42,29 @@ class CacheCommandMutex implements CommandMutex
         );
     }
 
-    public function exists(Command $command): bool
+    public function exists($command)
     {
         return $this->cache->store($this->store)->has(
             $this->commandMutexName($command)
         );
     }
 
-    protected function commandMutexName(Command $command): string
+    /**
+     * @param Command $command
+     * @return string
+     */
+    protected function commandMutexName($command): string
     {
         return 'framework'.DIRECTORY_SEPARATOR.'command-'.$command->getName();
     }
-    public function useStore(string|null $store): static
+
+    /**
+     * Specify the cache store that should be used.
+     *
+     * @param string|null $store
+     * @return $this
+     */
+    public function useStore($store): static
     {
         $this->store = $store;
 
