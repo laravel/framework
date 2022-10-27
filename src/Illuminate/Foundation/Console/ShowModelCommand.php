@@ -352,17 +352,6 @@ class ShowModelCommand extends DatabaseInspectionCommand
 
         $this->newLine();
 
-        $this->components->twoColumnDetail('<fg=green;options=bold>Eloquent Observers</>');
-
-        if ($observers->count()) {
-            foreach ($observers as $observer) {
-                $this->components->twoColumnDetail(
-                    sprintf('%s', $observer['event']), implode(', ', $observer['observer']));
-            }
-        }
-
-        $this->newLine();
-
         $this->components->twoColumnDetail('<fg=green;options=bold>Relations</>');
 
         foreach ($relations as $relation) {
@@ -370,6 +359,17 @@ class ShowModelCommand extends DatabaseInspectionCommand
                 sprintf('%s <fg=gray>%s</>', $relation['name'], $relation['type']),
                 $relation['related']
             );
+        }
+
+        $this->newLine();
+
+        $this->components->twoColumnDetail('<fg=green;options=bold>Observers</>');
+
+        if ($observers->count()) {
+            foreach ($observers as $observer) {
+                $this->components->twoColumnDetail(
+                    sprintf('%s', $observer['event']), implode(', ', $observer['observer']));
+            }
         }
 
         $this->newLine();
