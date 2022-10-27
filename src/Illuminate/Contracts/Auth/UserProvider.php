@@ -19,7 +19,7 @@ interface UserProvider
      * @param  string  $token
      * @return \Illuminate\Contracts\Auth\Authenticatable|null
      */
-    public function retrieveByToken($identifier, string $token);
+    public function retrieveByToken($identifier, $token);
 
     /**
      * Update the "remember me" token for the given user in storage.
