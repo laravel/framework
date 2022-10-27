@@ -8,6 +8,7 @@ use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\MorphPivot;
@@ -2109,6 +2110,9 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertFalse($user->preventsLazyLoading);
         $user->refresh();
         $this->assertTrue($user->preventsLazyLoading);
+
+        // revert ll prevention for other tests
+        Model::preventLazyLoading(false);
     }
 
     /**
