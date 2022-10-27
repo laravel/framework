@@ -38,7 +38,7 @@ interface Authenticatable
      * @param  string  $value
      * @return void
      */
-    public function setRememberToken(string $value);
+    public function setRememberToken($value);
 
     /**
      * Get the column name for the "remember me" token.
