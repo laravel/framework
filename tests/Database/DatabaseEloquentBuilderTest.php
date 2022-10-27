@@ -2156,6 +2156,18 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertSame('select * from "users" where "email" = ?', $clone->toSql());
     }
 
+    public function testLazyLoadingPrevention()
+    {
+
+        $builder = new Builder($this->getMockQueryBuilder());
+        $model = $this->getMockModel();
+        $builder->setModel($model);
+        Model::preventLazyLoading();
+        $instance = $builder->first();
+        $this->assertTrue($instance->preventsLazyLoading);
+
+    }
+
     protected function mockConnectionForModel($model, $database)
     {
         $grammarClass = 'Illuminate\Database\Query\Grammars\\'.$database.'Grammar';
