@@ -2101,6 +2101,16 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('primary', $pivot->taxonomy);
     }
 
+    public function testLazyLoadingPreventionWorksAsExpectedForSingleModels()
+    {
+
+        Model::preventLazyLoading();
+        $user = EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        $this->assertFalse($user->preventsLazyLoading);
+        $user->refresh();
+        $this->assertTrue($user->preventsLazyLoading);
+    }
+
     /**
      * Helpers...
      */
