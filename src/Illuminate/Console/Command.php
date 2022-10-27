@@ -140,7 +140,7 @@ class Command extends SymfonyCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if ($this instanceof Isolated && ! $this->laravel->get(CommandMutex::class)->create($this)) {
+        if ($this instanceof Isolated && ! $this->mutex()->create($this)) {
             $this->info(sprintf(
                 'Skipping [%s], as command already running.', $this->getName()
             ));
@@ -150,7 +150,20 @@ class Command extends SymfonyCommand
 
         $method = method_exists($this, 'handle') ? 'handle' : '__invoke';
 
-        return (int) $this->laravel->call([$this, $method]);
+        try {
+            return (int) $this->laravel->call([$this, $method]);
+        } finally {
+            if ($this instanceof Isolated) {
+                $this->mutex()->release($this);
+            }
+        }
+    }
+
+    protected function mutex()
+    {
+        return $this->laravel->bound(CommandMutex::class)
+            ? $this->laravel->make(CommandMutex::class)
+            : $this->laravel->make(CacheCommandMutex::class);
     }
 
     /**

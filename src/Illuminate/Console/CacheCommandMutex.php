@@ -49,6 +49,13 @@ class CacheCommandMutex implements CommandMutex
         );
     }
 
+    public function release($command)
+    {
+        return $this->cache->store($this->store)->forget(
+            $this->commandMutexName($command)
+        );
+    }
+
     /**
      * @param  Command  $command
      * @return string

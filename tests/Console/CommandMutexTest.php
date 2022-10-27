@@ -29,11 +29,11 @@ class CommandMutexTest extends TestCase
     {
         $this->command = new class extends Command implements Isolated
         {
-            public bool $ran = false;
+            public $ran = 0;
 
             public function __invoke()
             {
-                $this->ran = true;
+                $this->ran++;
             }
         };
 
@@ -46,23 +46,49 @@ class CommandMutexTest extends TestCase
 
     public function testCanRunIsolatedCommandIfNotBlocked()
     {
-        $this->commandMutex->shouldReceive('create')->andReturn(true);
+        $this->commandMutex->shouldReceive('create')
+            ->andReturn(true)
+            ->once();
+        $this->commandMutex->shouldReceive('release')
+            ->andReturn(true)
+            ->once();
 
-        $input = new ArrayInput([]);
-        $output = new NullOutput;
-        $this->command->run($input, $output);
+        $this->runCommand();
 
-        $this->assertTrue($this->command->ran);
+        $this->assertEquals(1, $this->command->ran);
     }
 
     public function testCannotRunIsolatedCommandIfBlocked()
     {
-        $this->commandMutex->shouldReceive('create')->andReturn(false);
+        $this->commandMutex->shouldReceive('create')
+            ->andReturn(false)
+            ->once();
 
+        $this->runCommand();
+
+        $this->assertEquals(0, $this->command->ran);
+    }
+
+    public function testCanRunCommandAgainAfterOtherCommandFinished()
+    {
+        $this->commandMutex->shouldReceive('create')
+            ->andReturn(true)
+            ->twice();
+        $this->commandMutex->shouldReceive('release')
+            ->andReturn(true)
+            ->twice();
+
+        $this->runCommand();
+        $this->runCommand();
+
+        $this->assertEquals(2, $this->command->ran);
+    }
+
+
+    protected function runCommand()
+    {
         $input = new ArrayInput([]);
         $output = new NullOutput;
         $this->command->run($input, $output);
-
-        $this->assertFalse($this->command->ran);
     }
 }
