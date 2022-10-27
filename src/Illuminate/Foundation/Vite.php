@@ -438,9 +438,11 @@ class Vite implements Htmlable
             'rel' => 'preload',
             'as' => 'style',
             'href' => $url,
+            'nonce' => $this->nonce ?? false,
         ] : [
             'rel' => 'modulepreload',
             'href' => $url,
+            'nonce' => $this->nonce ?? false,
         ];
 
         $attributes = $this->integrityKey !== false
