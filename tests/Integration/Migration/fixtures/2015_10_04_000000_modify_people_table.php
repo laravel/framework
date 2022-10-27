@@ -8,8 +8,10 @@ class ModifyPeopleTable extends Migration
 {
     /**
      * Run the migrations.
+     *
+     * @return void
      */
-    public function up(): void
+    public function up()
     {
         Schema::table('people', function (Blueprint $table) {
             $table->string('first_name')->nullable();
@@ -18,8 +20,10 @@ class ModifyPeopleTable extends Migration
 
     /**
      * Reverse the migrations.
+     *
+     * @return void
      */
-    public function down(): void
+    public function down()
     {
         Schema::table('people', function (Blueprint $table) {
             $table->dropColumn('first_name');

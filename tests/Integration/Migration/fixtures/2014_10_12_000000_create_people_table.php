@@ -8,8 +8,10 @@ class CreatePeopleTable extends Migration
 {
     /**
      * Run the migrations.
+     *
+     * @return void
      */
-    public function up(): void
+    public function up()
     {
         Schema::create('people', function (Blueprint $table) {
             $table->increments('id');
@@ -23,8 +25,10 @@ class CreatePeopleTable extends Migration
 
     /**
      * Reverse the migrations.
+     *
+     * @return void
      */
-    public function down(): void
+    public function down()
     {
         Schema::drop('people');
     }

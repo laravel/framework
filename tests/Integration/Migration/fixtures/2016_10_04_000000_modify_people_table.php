@@ -8,8 +8,10 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
+     *
+     * @return void
      */
-    public function up(): void
+    public function up()
     {
         Schema::table('people', function (Blueprint $table) {
             $table->string('last_name')->nullable();
@@ -18,8 +20,10 @@ return new class extends Migration
 
     /**
      * Reverse the migrations.
+     *
+     * @return void
      */
-    public function down(): void
+    public function down()
     {
         Schema::table('people', function (Blueprint $table) {
             $table->dropColumn('last_name');
