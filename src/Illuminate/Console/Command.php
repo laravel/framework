@@ -142,8 +142,9 @@ class Command extends SymfonyCommand
     {
         if ($this instanceof Isolated && ! $this->laravel->get(CommandMutex::class)->create($this)) {
             $this->info(sprintf(
-                "Skipping [%s], as command already running.", $this->getName()
+                'Skipping [%s], as command already running.', $this->getName()
             ));
+
             return self::SUCCESS;
         }
 

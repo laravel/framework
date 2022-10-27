@@ -24,9 +24,9 @@ class CacheCommandMutex implements CommandMutex
     public $cache;
 
     /**
-     * Create a new command mutex
+     * Create a new command mutex.
      *
-     * @param \Illuminate\Contracts\Cache\Factory $cache
+     * @param  \Illuminate\Contracts\Cache\Factory  $cache
      */
     public function __construct(Cache $cache)
     {
@@ -50,7 +50,7 @@ class CacheCommandMutex implements CommandMutex
     }
 
     /**
-     * @param Command $command
+     * @param  Command  $command
      * @return string
      */
     protected function commandMutexName($command): string
@@ -61,7 +61,7 @@ class CacheCommandMutex implements CommandMutex
     /**
      * Specify the cache store that should be used.
      *
-     * @param string|null $store
+     * @param  string|null  $store
      * @return $this
      */
     public function useStore($store): static

@@ -8,8 +8,8 @@ use Illuminate\Console\CacheCommandMutex;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Cache\Factory;
 use Illuminate\Contracts\Cache\Repository;
-use PHPUnit\Framework\TestCase;
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class CacheCommandMutexTest extends TestCase
 {
@@ -39,7 +39,8 @@ class CacheCommandMutexTest extends TestCase
         $this->cacheRepository = m::mock(Repository::class);
         $this->cacheFactory->shouldReceive('store')->andReturn($this->cacheRepository);
         $this->mutex = new CacheCommandMutex($this->cacheFactory);
-        $this->command = new class extends Command {
+        $this->command = new class extends Command
+        {
             protected $name = 'command-name';
         };
     }

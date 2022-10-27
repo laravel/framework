@@ -8,10 +8,8 @@ use Illuminate\Console\Command;
 use Illuminate\Console\CommandMutex;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Console\Isolated;
-use Mockery\LegacyMockInterface;
-use Mockery\MockInterface;
-use PHPUnit\Framework\TestCase;
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 
@@ -32,6 +30,7 @@ class CommandMutexTest extends TestCase
         $this->command = new class extends Command implements Isolated
         {
             public bool $ran = false;
+
             public function __invoke()
             {
                 $this->ran = true;
@@ -59,7 +58,6 @@ class CommandMutexTest extends TestCase
     public function testCannotRunIsolatedCommandIfBlocked()
     {
         $this->commandMutex->shouldReceive('create')->andReturn(false);
-
 
         $input = new ArrayInput([]);
         $output = new NullOutput;
