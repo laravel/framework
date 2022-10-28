@@ -8,7 +8,6 @@ use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\MorphPivot;
@@ -2102,17 +2101,59 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('primary', $pivot->taxonomy);
     }
 
-    public function testLazyLoadingPreventionWorksAsExpectedForSingleModels()
+    public function testLazyLoadingPreventionWorksAsExpected() :void
     {
+        EloquentTestUser::query()->delete();
 
         Model::preventLazyLoading();
-        $user = EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+
+        $user = EloquentTestUser::create(['id' => 1, 'email' => 'dev@need.coffee']);
+        EloquentTestUser::create(['id' => 2, 'email' => 'maintainer@need.coffee']);
+
         $this->assertFalse($user->preventsLazyLoading);
-        $user->refresh();
+
+        $user = EloquentTestUser::query()->first();
+        $this->assertFalse($user->preventsLazyLoading);
+
+        $users = EloquentTestUser::all();
+        foreach ($users as $user) {
+            self::assertTrue($user->preventsLazyLoading);
+        }
+
+        Model::preventLazyLoading(strict: true);
+        $user = EloquentTestUser::query()->first();
         $this->assertTrue($user->preventsLazyLoading);
 
         // revert ll prevention for other tests
         Model::preventLazyLoading(false);
+    }
+
+
+    public function testLazyLoadingPreventionWorksAsExpectedWhenShouldBeStrict() :void
+    {
+        EloquentTestUser::query()->delete();
+
+        Model::shouldBeStrict();
+
+        $user = EloquentTestUser::create(['id' => 1, 'email' => 'dev@need.coffee']);
+        EloquentTestUser::create(['id' => 2, 'email' => 'maintainer@need.coffee']);
+
+        $this->assertFalse($user->preventsLazyLoading);
+
+        $user = EloquentTestUser::query()->first();
+        $this->assertFalse($user->preventsLazyLoading);
+
+        $users = EloquentTestUser::all();
+        foreach ($users as $user) {
+            self::assertTrue($user->preventsLazyLoading);
+        }
+
+        Model::shouldBeStrict(enforceStrictness: true);
+        $user = EloquentTestUser::query()->first();
+        $this->assertTrue($user->preventsLazyLoading);
+
+        // revert ll prevention for other tests
+        Model::shouldBeStrict(false);
     }
 
     /**

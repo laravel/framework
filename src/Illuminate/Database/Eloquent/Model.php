@@ -168,6 +168,15 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected static $modelsShouldPreventLazyLoading = false;
 
     /**
+     * Indicates whether lazy loading should be restricted on all models.
+     *
+     * Strict mode will allow no exceptions to that rule
+     *
+     * @var bool
+     */
+    protected static $modelsShouldPreventLazyLoadingStrict = false;
+
+    /**
      * The callback that is responsible for handling lazy loading violations.
      *
      * @var callable|null
@@ -404,9 +413,9 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * @param  bool  $shouldBeStrict
      * @return void
      */
-    public static function shouldBeStrict(bool $shouldBeStrict = true)
+    public static function shouldBeStrict(bool $shouldBeStrict = true, bool $enforceStrictness = false) :void
     {
-        static::preventLazyLoading($shouldBeStrict);
+        static::preventLazyLoading(toggle: $shouldBeStrict, strict: $enforceStrictness);
         static::preventSilentlyDiscardingAttributes($shouldBeStrict);
         static::preventAccessingMissingAttributes($shouldBeStrict);
     }
@@ -414,12 +423,19 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Prevent model relationships from being lazy loaded.
      *
-     * @param  bool  $value
+     * @param  bool  $toggle
      * @return void
      */
-    public static function preventLazyLoading($value = true)
+    public static function preventLazyLoading(bool $toggle = true, bool $strict = false) :void
     {
-        static::$modelsShouldPreventLazyLoading = $value;
+        static::$modelsShouldPreventLazyLoading = $toggle;
+        if ($strict && $toggle) {
+            static::$modelsShouldPreventLazyLoadingStrict = $toggle;
+        }
+        if (!$toggle) {
+            static::$modelsShouldPreventLazyLoadingStrict = $toggle;
+        }
+
     }
 
     /**
@@ -2165,6 +2181,16 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public static function preventsLazyLoading()
     {
         return static::$modelsShouldPreventLazyLoading;
+    }
+
+    /**
+     * Determine if lazy loading is strict disabled.
+     *
+     * @return bool
+     */
+    public static function preventsLazyLoadingStrict()
+    {
+        return static::$modelsShouldPreventLazyLoadingStrict;
     }
 
     /**

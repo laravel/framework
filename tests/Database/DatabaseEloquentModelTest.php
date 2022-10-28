@@ -2585,6 +2585,59 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertNull($user->getOriginal('name'));
         $this->assertNull($user->getAttribute('name'));
     }
+
+
+
+    public function lazyLoadingPreventionToggleDataProvider() :array
+    {
+        return [
+            'disabled' => [
+                'toggle' => false,
+                'strict' => false,
+                'preventsLazy' => false,
+                'preventsLazyStrict' => false
+            ],
+            'enabled soft mode' => [
+                'toggle' => true,
+                'strict' => false,
+                'preventsLazy' => true,
+                'preventsLazyStrict' => false
+            ],
+            'enabled strict mode' => [
+                'toggle' => true,
+                'strict' => true,
+                'preventsLazy' => true,
+                'preventsLazyStrict' => true
+            ]
+        ];
+    }
+
+    /** @dataProvider lazyLoadingPreventionToggleDataProvider */
+    public function testLazyLoadiingPreventionToggles(bool $toggle, bool $strict, bool $preventsLazy, bool $preventsStrict) :void
+    {
+
+        Model::preventLazyLoading(false);
+        self::assertFalse(Model::preventsLazyLoading());
+        self::assertFalse(Model::preventsLazyLoadingStrict());
+
+        Model::preventLazyLoading(toggle: $toggle, strict: $strict);
+
+        self::assertEquals($preventsLazy, Model::preventsLazyLoading());
+        self::assertEquals($preventsStrict, Model::preventsLazyLoadingStrict());
+
+        Model::preventLazyLoading(false);
+        self::assertFalse(Model::preventsLazyLoading());
+        self::assertFalse(Model::preventsLazyLoadingStrict());
+
+        Model::shouldBeStrict(shouldBeStrict: $toggle, enforceStrictness: $strict);
+
+        self::assertEquals($preventsLazy, Model::preventsLazyLoading());
+        self::assertEquals($preventsStrict, Model::preventsLazyLoadingStrict());
+
+        // revert ll prevention for other tests
+        Model::preventLazyLoading(false);
+
+    }
 }
 
 class EloquentTestObserverStub
