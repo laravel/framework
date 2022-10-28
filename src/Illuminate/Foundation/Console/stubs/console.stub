@@ -23,8 +23,8 @@ class {{ class }} extends Command
     /**
      * Execute the console command.
      */
-    public function handle(): int
+    public function handle(): void
     {
-        return Command::SUCCESS;
+        //
     }
 }
