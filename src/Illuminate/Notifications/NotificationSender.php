@@ -215,8 +215,8 @@ class NotificationSender
 
                 if (method_exists($notification, 'middleware')) {
                     $middleware = array_merge(
-                        $middleware,
-                        $notification->middleware($notifiable, $channel)
+                        $notification->middleware($notifiable, $channel),
+                        $middleware
                     );
                 }
 
