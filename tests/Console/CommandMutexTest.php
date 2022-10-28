@@ -82,9 +82,18 @@ class CommandMutexTest extends TestCase
         $this->assertEquals(2, $this->command->ran);
     }
 
-    protected function runCommand()
+    public function testCanRunCommandAgainNonAutomated()
     {
-        $input = new ArrayInput([]);
+        $this->commandMutex->shouldNotHaveBeenCalled();
+
+        $this->runCommand(false);
+
+        $this->assertEquals(1, $this->command->ran);
+    }
+
+    protected function runCommand($withIsolated = true)
+    {
+        $input = new ArrayInput(['--isolated' => $withIsolated]);
         $output = new NullOutput;
         $this->command->run($input, $output);
     }

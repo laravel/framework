@@ -7,6 +7,7 @@ use Illuminate\Contracts\Console\Isolated;
 use Illuminate\Support\Traits\Macroable;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class Command extends SymfonyCommand
@@ -87,6 +88,15 @@ class Command extends SymfonyCommand
         if (! isset($this->signature)) {
             $this->specifyParameters();
         }
+
+        if ($this instanceof Isolated) {
+            $this->getDefinition()->addOption(new InputOption(
+                'isolated',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Limits the command to only have one instance running at once'
+            ));
+        }
     }
 
     /**
@@ -140,7 +150,7 @@ class Command extends SymfonyCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if ($this instanceof Isolated && ! $this->mutex()->create($this)) {
+        if ($this instanceof Isolated && $this->option('isolated') && ! $this->mutex()->create($this)) {
             $this->info(sprintf(
                 'Skipping [%s], as command already running.', $this->getName()
             ));
@@ -153,7 +163,7 @@ class Command extends SymfonyCommand
         try {
             return (int) $this->laravel->call([$this, $method]);
         } finally {
-            if ($this instanceof Isolated) {
+            if ($this instanceof Isolated && $this->option('isolated')) {
                 $this->mutex()->release($this);
             }
         }
