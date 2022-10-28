@@ -9,7 +9,7 @@ class {{ class }} extends Exception
     /**
      * Report the exception.
      */
-    public function report(): bool|null
+    public function report(): void
     {
         //
     }
