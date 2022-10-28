@@ -166,7 +166,7 @@ class DummyNotificationWithMiddleware extends Notification implements ShouldQueu
     public function middleware()
     {
         return [
-            new TestNotificationMiddleware
+            new TestNotificationMiddleware,
         ];
     }
 }
@@ -190,7 +190,7 @@ class DummyMultiChannelNotificationWithConditionalMiddlware extends Notification
             'mail' => [new TestMailNotificationMiddleware],
             'database' => [new TestDatabaseNotificationMiddleware],
             default => []
-        };       
+        };
     }
 }
 
