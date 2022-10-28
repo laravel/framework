@@ -44,6 +44,17 @@ trait HasTimestamps
     }
 
     /**
+     * Update the model's update timestamp without raising any events.
+     *
+     * @param  string|null  $attribute
+     * @return bool
+     */
+    public function touchQuietly($attribute = null)
+    {
+        return static::withoutEvents(fn () => $this->touch($attribute));
+    }
+
+    /**
      * Update the creation and update timestamps.
      *
      * @return $this
