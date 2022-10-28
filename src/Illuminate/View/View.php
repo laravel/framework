@@ -130,6 +130,19 @@ class View implements ArrayAccess, Htmlable, ViewContract
     }
 
     /**
+     * Get the evaluated contents of the fragment.
+     *
+     * @param string $fragment
+     * @return string
+     */
+    public function fragment(string $fragment)
+    {
+        return $this->render(function () use ($fragment) {
+            return $this->factory->getFragment($fragment);
+        });
+    }
+
+    /**
      * Get the evaluated contents of the view.
      *
      * @return string
