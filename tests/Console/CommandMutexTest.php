@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Illuminate\Tests\Console;
 
 use Illuminate\Console\Command;
@@ -83,7 +81,6 @@ class CommandMutexTest extends TestCase
 
         $this->assertEquals(2, $this->command->ran);
     }
-
 
     protected function runCommand()
     {

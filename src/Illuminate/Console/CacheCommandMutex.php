@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Illuminate\Console;
 
 use Carbon\CarbonInterval;
@@ -33,6 +31,12 @@ class CacheCommandMutex implements CommandMutex
         $this->cache = $cache;
     }
 
+    /**
+     * Attempt to obtain a command mutex for the given command.
+     *
+     * @param  \Illuminate\Console\Command  $command
+     * @return bool
+     */
     public function create($command)
     {
         return $this->cache->store($this->store)->add(
@@ -42,13 +46,12 @@ class CacheCommandMutex implements CommandMutex
         );
     }
 
-    public function exists($command)
-    {
-        return $this->cache->store($this->store)->has(
-            $this->commandMutexName($command)
-        );
-    }
-
+    /**
+     * Release the mutex for the given command.
+     *
+     * @param  \Illuminate\Console\Command  $command
+     * @return bool
+     */
     public function release($command)
     {
         return $this->cache->store($this->store)->forget(
@@ -57,10 +60,23 @@ class CacheCommandMutex implements CommandMutex
     }
 
     /**
-     * @param  Command  $command
+     * Determine if a command mutex exists for the given command.
+     *
+     * @param  \Illuminate\Console\Command  $command
+     * @return bool
+     */
+    public function exists($command)
+    {
+        return $this->cache->store($this->store)->has(
+            $this->commandMutexName($command)
+        );
+    }
+
+    /**
+     * @param  \Illuminate\Console\Command  $command
      * @return string
      */
-    protected function commandMutexName($command): string
+    protected function commandMutexName($command)
     {
         return 'framework'.DIRECTORY_SEPARATOR.'command-'.$command->getName();
     }
@@ -71,7 +87,7 @@ class CacheCommandMutex implements CommandMutex
      * @param  string|null  $store
      * @return $this
      */
-    public function useStore($store): static
+    public function useStore($store)
     {
         $this->store = $store;
 

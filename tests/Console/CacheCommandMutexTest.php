@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Illuminate\Tests\Console;
 
 use Illuminate\Console\CacheCommandMutex;
@@ -14,24 +12,24 @@ use PHPUnit\Framework\TestCase;
 class CacheCommandMutexTest extends TestCase
 {
     /**
-     * @var CacheCommandMutex
+     * @var \Illuminate\Console\CacheCommandMutex
      */
     protected $mutex;
 
     /**
-     * @var Command
+     * @var \Illuminate\Console\Command
      */
     protected $command;
 
     /**
-     * @var Factory
+     * @var \Illuminate\Contracts\Cache\Factory
      */
     protected $cacheFactory;
 
     /**
-     * @var Repository
+     * @var \Illuminate\Contracts\Cache\Repository
      */
-    protected Repository $cacheRepository;
+    protected $cacheRepository;
 
     protected function setUp(): void
     {
