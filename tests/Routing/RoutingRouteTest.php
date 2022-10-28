@@ -1939,6 +1939,28 @@ class RoutingRouteTest extends TestCase
         $this->assertNotInstanceOf(JsonResponse::class, $response);
     }
 
+    public function testRouteFlushController()
+    {
+        $container = new Container;
+        $router = $this->getRouter();
+
+        $router->get('count', ActionCountStub::class);
+        $request = Request::create('count', 'GET');
+
+        $response = $router->dispatch($request);
+        $this->assertSame(1, $response->original['invokedCount']);
+        $this->assertSame(1, $response->original['middlewareInvokedCount']);
+
+        $response = $router->dispatch($request);
+        $this->assertSame(2, $response->original['invokedCount']);
+        $this->assertSame(2, $response->original['middlewareInvokedCount']);
+
+        $request->route()->flushController();
+        $response = $router->dispatch($request);
+        $this->assertSame(1, $response->original['invokedCount']);
+        $this->assertSame(1, $response->original['middlewareInvokedCount']);
+    }
+
     public function testJsonResponseIsReturned()
     {
         $router = $this->getRouter();
@@ -2522,15 +2544,29 @@ class ActionStub
     }
 }
 
-class ActionCountStub
+class ActionCountStub extends Controller
 {
-    protected $count = 0;
+    protected $middlewareInvokedCount = 0;
+
+    protected $invokedCount = 0;
+
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            $this->middlewareInvokedCount++;
+
+            return $next($request);
+        });
+    }
 
     public function __invoke()
     {
-        $this->count++;
+        $this->invokedCount++;
 
-        return $this->count;
+        return [
+            'invokedCount' => $this->invokedCount,
+            'middlewareInvokedCount' => $this->middlewareInvokedCount,
+        ];
     }
 }
 
