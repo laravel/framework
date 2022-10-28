@@ -2613,7 +2613,7 @@ class DatabaseEloquentModelTest extends TestCase
     }
 
     /** @dataProvider lazyLoadingPreventionToggleDataProvider */
-    public function testLazyLoadiingPreventionToggles(bool $toggle, bool $strict, bool $preventsLazy, bool $preventsStrict) :void
+    public function testLazyLoadingPreventionToggles(bool $toggle, bool $strict, bool $preventsLazy, bool $preventsStrict) :void
     {
 
         Model::preventLazyLoading(false);
@@ -2636,6 +2636,8 @@ class DatabaseEloquentModelTest extends TestCase
 
         // revert ll prevention for other tests
         Model::preventLazyLoading(false);
+        // revert strictness for other tests
+        Model::shouldBeStrict(false);
 
     }
 }
