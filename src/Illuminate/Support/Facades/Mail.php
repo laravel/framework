@@ -13,6 +13,7 @@ use Illuminate\Support\Testing\Fakes\MailFake;
  * @method static \Illuminate\Mail\PendingMail cc($users)
  * @method static \Illuminate\Mail\PendingMail bcc($users)
  * @method static \Illuminate\Mail\PendingMail to($users)
+ * @method static \Illuminate\Mail\MailManager extend($driver, \Closure $callback)
  * @method static \Illuminate\Support\Collection queued(string $mailable, \Closure|string $callback = null)
  * @method static \Illuminate\Support\Collection sent(string $mailable, \Closure|string $callback = null)
  * @method static \Illuminate\Mail\SentMessage|null raw(string $text, $callback)
