@@ -317,11 +317,12 @@ trait MakesHttpRequests
      *
      * @param  string  $uri
      * @param  array  $headers
+     * @param  array  $body
      * @return \Illuminate\Testing\TestResponse
      */
-    public function getJson($uri, array $headers = [])
+    public function getJson($uri, array $headers = [], array $body = [])
     {
-        return $this->json('GET', $uri, [], $headers);
+        return $this->json('GET', $uri, $body, $headers);
     }
 
     /**
