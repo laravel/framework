@@ -2247,4 +2247,61 @@ trait ValidatesAttributes
             $this->numericRules[] = $rule;
         }
     }
+
+    /**
+     * Validate that an attribute exists when the size of attribute is greater than given value
+     *
+     * @param string $attribute
+     * @param mixed $value
+     * @param array<int, int|string> $parameters
+     * @return bool
+     */
+    public function validateRequiredIfMinSize($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'required_if_min_size');
+
+        if ($this->getSize($attribute, $value) >= $parameters[0]) {
+            return $this->validateRequired($attribute, $value);
+        }
+
+        return false;
+    }
+
+    /**
+     * Validate that an attribute exists when the size of attribute is less than given value
+     *
+     * @param string $attribute
+     * @param mixed $value
+     * @param array<int, int|string> $parameters
+     * @return bool
+     */
+    public function validateRequiredIfMaxSize($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'required_if_max_size');
+
+        if ($this->getSize($attribute, $value) <= $parameters[0]) {
+            return $this->validateRequired($attribute, $value);
+        }
+
+        return false;
+    }
+
+    /**
+     * Validate that an attribute exists when the size of attribute is equal to the given value
+     *
+     * @param string $attribute
+     * @param mixed $value
+     * @param array<int, int|string> $parameters
+     * @return bool
+     */
+    public function validateRequiredIfSizeEquals($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'required_if_size_equals');
+
+        if ($this->getSize($attribute, $value) === intval($parameters[0])) {
+            return $this->validateRequired($attribute, $value);
+        }
+
+        return false;
+    }
 }
