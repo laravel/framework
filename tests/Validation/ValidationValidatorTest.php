@@ -7539,6 +7539,9 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => 'asdad'], ['foo' => 'string|required_if_size_equals:5']);
         $this->assertTrue($v->passes());
 
+        $v = new Validator($trans, ['foo' => ['bar' => ['baz' => 'asdad']]], ['foo.bar.baz' => 'string|required_if_size_equals:5']);
+        $this->assertTrue($v->passes());
+
         $v = new Validator($trans, ['foo' => 'a'], ['foo' => 'string|required_if_size_equals:1']);
         $this->assertTrue($v->passes());
 
@@ -7546,6 +7549,9 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->fails());
 
         $v = new Validator($trans, ['foo' => ''], ['foo' => 'string|required_if_size_equals:1']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => ['bar' => ['baz' => '']]], ['foo.bar.baz' => 'string|required_if_size_equals:1']);
         $this->assertTrue($v->fails());
         // Arrays
         $v = new Validator($trans, ['foo' => [1, 2, 3]], ['foo' => 'array|required_if_size_equals:3']);
