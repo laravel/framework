@@ -7419,6 +7419,174 @@ class ValidationValidatorTest extends TestCase
             new ArrayLoader, 'en'
         );
     }
+
+    public function testValidateRequiredIfMinSize()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        // Strings
+        $v = new Validator($trans, ['foo' => 'asdad'], ['foo' => 'string|required_if_min_size:4']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'a'], ['foo' => 'string|required_if_min_size:0']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'anc'], ['foo' => 'string|required_if_min_size:4']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => ''], ['foo' => 'string|required_if_min_size:1']);
+        $this->assertTrue($v->fails());
+        // Arrays
+        $v = new Validator($trans, ['foo' => [1, 2, 3]], ['foo' => 'array|required_if_min_size:2']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => [1]], ['foo' => 'array|required_if_min_size:0']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => [1, 2, 3]], ['foo' => 'array|required_if_min_size:4']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => '[1, 2, 3]'], ['foo' => 'array|required_if_min_size:3']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => []], ['foo' => 'array|required_if_min_size:1']);
+        $this->assertTrue($v->fails());
+        // Numbers
+        $v = new Validator($trans, ['foo' => 123], ['foo' => 'numeric|required_if_min_size:2']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 0], ['foo' => 'numeric|required_if_min_size:1']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => 1], ['foo' => 'numeric|required_if_min_size:3']);
+        $this->assertTrue($v->fails());
+
+        // Uploaded Files
+        $file = $this->getMockBuilder(UploadedFile::class)->onlyMethods(['isValid', 'getSize'])->setConstructorArgs([__FILE__, false])->getMock();
+        $file->method('isValid')->willReturn(true);
+        $file->expects($this->any())->method('getSize')->willReturn(3072);
+        $v = new Validator($trans, ['photo' => $file], ['photo' => 'required_if_min_size:2']);
+        $this->assertTrue($v->passes());
+
+        $file = $this->getMockBuilder(UploadedFile::class)->onlyMethods(['isValid', 'getSize'])->setConstructorArgs([__FILE__, false])->getMock();
+        $file->method('isValid')->willReturn(true);
+        $file->expects($this->any())->method('getSize')->willReturn(3072);
+        $trans->addLines(['validation.required_if_min_size' => 'The :attribute field is required when size is less than :size.'], 'en');
+        $v = new Validator($trans, ['photo' => $file], ['photo' => 'required_if_min_size:4']);
+        $this->assertTrue($v->fails());
+        $this->assertSame('The photo field is required when size is less than 4.', $v->messages()->first('photo'));
+    }
+
+    public function testValidateRequiredIfMaxSize()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        // Strings
+        $v = new Validator($trans, ['foo' => 'asdad'], ['foo' => 'string|required_if_max_size:5']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'a'], ['foo' => 'string|required_if_max_size:2']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'anc'], ['foo' => 'string|required_if_max_size:2']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => ''], ['foo' => 'string|required_if_max_size:1']);
+        $this->assertTrue($v->fails());
+        // Arrays
+        $v = new Validator($trans, ['foo' => [1, 2, 3]], ['foo' => 'array|required_if_max_size:3']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => [1]], ['foo' => 'array|required_if_max_size:1']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => [1, 2, 3]], ['foo' => 'array|required_if_max_size:2']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => '[1, 2, 3]'], ['foo' => 'array|required_if_max_size:3']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => []], ['foo' => 'array|required_if_max_size:1']);
+        $this->assertTrue($v->fails());
+        // Numbers
+        $v = new Validator($trans, ['foo' => 123], ['foo' => 'numeric|required_if_max_size:130']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 2], ['foo' => 'numeric|required_if_max_size:1']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => -1], ['foo' => 'numeric|required_if_max_size:-2']);
+        $this->assertTrue($v->fails());
+
+        // Uploaded Files
+        $file = $this->getMockBuilder(UploadedFile::class)->onlyMethods(['isValid', 'getSize'])->setConstructorArgs([__FILE__, false])->getMock();
+        $file->method('isValid')->willReturn(true);
+        $file->expects($this->any())->method('getSize')->willReturn(3072);
+        $v = new Validator($trans, ['photo' => $file], ['photo' => 'required_if_max_size:3']);
+        $this->assertTrue($v->passes());
+
+        $file = $this->getMockBuilder(UploadedFile::class)->onlyMethods(['isValid', 'getSize'])->setConstructorArgs([__FILE__, false])->getMock();
+        $file->method('isValid')->willReturn(true);
+        $file->expects($this->any())->method('getSize')->willReturn(3072);
+        $trans->addLines(['validation.required_if_max_size' => 'The :attribute field is required when size is more than :size.'], 'en');
+        $v = new Validator($trans, ['photo' => $file], ['photo' => 'required_if_max_size:2']);
+        $this->assertTrue($v->fails());
+        $this->assertSame('The photo field is required when size is more than 2.', $v->messages()->first('photo'));
+    }
+
+    public function testValidateRequiredIfSizeEquals()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        // Strings
+        $v = new Validator($trans, ['foo' => 'asdad'], ['foo' => 'string|required_if_size_equals:5']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'a'], ['foo' => 'string|required_if_size_equals:1']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'anc'], ['foo' => 'string|required_if_size_equals:2']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => ''], ['foo' => 'string|required_if_size_equals:1']);
+        $this->assertTrue($v->fails());
+        // Arrays
+        $v = new Validator($trans, ['foo' => [1, 2, 3]], ['foo' => 'array|required_if_size_equals:3']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => [1]], ['foo' => 'array|required_if_size_equals:1']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => [1, 2, 3]], ['foo' => 'array|required_if_size_equals:4']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => '[1, 2, 3]'], ['foo' => 'array|required_if_size_equals:5']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => []], ['foo' => 'array|required_if_size_equals:1']);
+        $this->assertTrue($v->fails());
+        // Numbers
+        $v = new Validator($trans, ['foo' => 123], ['foo' => 'numeric|required_if_size_equals:123']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 2], ['foo' => 'numeric|required_if_size_equals:1']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => -1], ['foo' => 'numeric|required_if_size_equals:-2']);
+        $this->assertTrue($v->fails());
+
+        // Uploaded Files
+        $file = $this->getMockBuilder(UploadedFile::class)->onlyMethods(['isValid', 'getSize'])->setConstructorArgs([__FILE__, false])->getMock();
+        $file->method('isValid')->willReturn(true);
+        $file->expects($this->any())->method('getSize')->willReturn(3072);
+        $v = new Validator($trans, ['photo' => $file], ['photo' => 'required_if_size_equals:3']);
+        $this->assertTrue($v->passes());
+
+        $file = $this->getMockBuilder(UploadedFile::class)->onlyMethods(['isValid', 'getSize'])->setConstructorArgs([__FILE__, false])->getMock();
+        $file->method('isValid')->willReturn(true);
+        $file->expects($this->any())->method('getSize')->willReturn(3072);
+        $trans->addLines(['validation.required_if_size_equals' => 'The :attribute field is required when size is equal to :size.'], 'en');
+        $v = new Validator($trans, ['photo' => $file], ['photo' => 'required_if_size_equals:2']);
+        $this->assertTrue($v->fails());
+        $this->assertSame('The photo field is required when size is equal to 2.', $v->messages()->first('photo'));
+    }
 }
 
 class ImplicitTableModel extends Model
