@@ -543,7 +543,7 @@ class ViewFactoryTest extends TestCase
         $factory = $this->getFactory();
         $factory->startFragment('foo');
         echo 'hi';
-        $this->assertSame('hi',  $factory->stopFragment());
+        $this->assertSame('hi', $factory->stopFragment());
     }
 
     public function testBasicSectionHandling()
