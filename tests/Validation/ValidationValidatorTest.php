@@ -7454,10 +7454,16 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => 123], ['foo' => 'numeric|required_if_min_size:2']);
         $this->assertTrue($v->passes());
 
+        $v = new Validator($trans, ['foo' => ['bar' => ['baz' => 99]]], ['foo.bar.baz' => 'numeric|required_if_min_size:55']);
+        $this->assertTrue($v->passes());
+
         $v = new Validator($trans, ['foo' => 0], ['foo' => 'numeric|required_if_min_size:1']);
         $this->assertTrue($v->fails());
 
         $v = new Validator($trans, ['foo' => 1], ['foo' => 'numeric|required_if_min_size:3']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => ['bar' => ['baz' => 99]]], ['foo.bar.baz' => 'numeric|required_if_min_size:100']);
         $this->assertTrue($v->fails());
 
         // Uploaded Files
@@ -7498,6 +7504,9 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => [1]], ['foo' => 'array|required_if_max_size:1']);
         $this->assertTrue($v->passes());
 
+        $v = new Validator($trans, ['foo' => ['bar' => ['baz' => [1, 2, 3]]]], ['foo.bar.baz' => 'array|required_if_max_size:3']);
+        $this->assertTrue($v->passes());
+
         $v = new Validator($trans, ['foo' => [1, 2, 3]], ['foo' => 'array|required_if_max_size:2']);
         $this->assertTrue($v->fails());
 
@@ -7516,6 +7525,9 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => -1], ['foo' => 'numeric|required_if_max_size:-2']);
         $this->assertTrue($v->fails());
 
+        $v = new Validator($trans, ['foo' => ['bar' => ['baz' => [1, 2, 3]]]], ['foo.bar.baz' => 'array|required_if_max_size:2']);
+        $this->assertTrue($v->fails());
+
         // Uploaded Files
         $file = $this->getMockBuilder(UploadedFile::class)->onlyMethods(['isValid', 'getSize'])->setConstructorArgs([__FILE__, false])->getMock();
         $file->method('isValid')->willReturn(true);
@@ -7530,6 +7542,14 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['photo' => $file], ['photo' => 'required_if_max_size:2']);
         $this->assertTrue($v->fails());
         $this->assertSame('The photo field is required when size is more than 2.', $v->messages()->first('photo'));
+
+        $file = $this->getMockBuilder(UploadedFile::class)->onlyMethods(['isValid', 'getSize'])->setConstructorArgs([__FILE__, false])->getMock();
+        $file->method('isValid')->willReturn(true);
+        $file->expects($this->any())->method('getSize')->willReturn(8192);
+        $trans->addLines(['validation.required_if_max_size' => 'The :attribute field is required when size is more than :size.'], 'en');
+        $v = new Validator($trans, ['attachments' => ['photo' => $file]], ['attachments.photo' => 'required_if_max_size:4']);
+        $this->assertTrue($v->fails());
+        $this->assertSame('The attachments.photo field is required when size is more than 4.', $v->messages()->first('attachments.photo'));
     }
 
     public function testValidateRequiredIfSizeEquals()
