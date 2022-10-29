@@ -1020,11 +1020,32 @@ class RouteRegistrarTest extends TestCase
         $this->assertSame('users.index', $this->getRoute()->getName());
     }
 
-    public function testCanRemoveMiddlewareFromGroup()
+    public function testPushMiddlewareToGroup()
+    {
+        $this->router->middlewareGroup('web', []);
+        $this->router->pushMiddlewareToGroup('web', 'test-middleware');
+
+        $this->assertEquals(['test-middleware'], $this->router->getMiddlewareGroups()['web']);
+    }
+
+    public function testPushMiddlewareToGroupUnregisteredGroup()
     {
         $this->router->pushMiddlewareToGroup('web', 'test-middleware');
 
         $this->assertEquals(['test-middleware'], $this->router->getMiddlewareGroups()['web']);
+    }
+
+    public function testPushMiddlewareToGroupDuplicatedMiddleware()
+    {
+        $this->router->pushMiddlewareToGroup('web', 'test-middleware');
+        $this->router->pushMiddlewareToGroup('web', 'test-middleware');
+
+        $this->assertEquals(['test-middleware'], $this->router->getMiddlewareGroups()['web']);
+    }
+
+    public function testCanRemoveMiddlewareFromGroup()
+    {
+        $this->router->pushMiddlewareToGroup('web', 'test-middleware');
 
         $this->router->removeMiddlewareFromGroup('web', 'test-middleware');
 
