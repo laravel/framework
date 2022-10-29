@@ -1052,7 +1052,7 @@ class RouteRegistrarTest extends TestCase
         $this->assertEquals([], $this->router->getMiddlewareGroups()['web']);
     }
 
-    public function testCanRemoveMiddlewareFromGroupNotRegisteredMiddleware()
+    public function testCanRemoveMiddlewareFromGroupNotUnregisteredMiddleware()
     {
         $this->router->middlewareGroup('web', []);
 
@@ -1061,7 +1061,7 @@ class RouteRegistrarTest extends TestCase
         $this->assertEquals([], $this->router->getMiddlewareGroups()['web']);
     }
 
-    public function testCanRemoveMiddlewareFromGroupNotRegisteredGroup()
+    public function testCanRemoveMiddlewareFromGroupUnregisteredGroup()
     {
         $this->router->removeMiddlewareFromGroup('web', ['test-middleware']);
 
