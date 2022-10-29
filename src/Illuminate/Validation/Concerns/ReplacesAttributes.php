@@ -707,4 +707,46 @@ trait ReplacesAttributes
 
         return str_replace(':values', implode(', ', $parameters), $message);
     }
+
+    /**
+     * Replace all place-holders for the required_if_min_size rule.
+     *
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array<int,string> $parameters
+     * @return string
+     */
+    protected function replaceRequiredIfMinSize($message, $attribute, $rule, $parameters)
+    {
+        return str_replace(':size', $this->getDisplayableAttribute($parameters[0]), $message);
+    }
+
+    /**
+     * Replace all place-holders for the required_if_max_size rule.
+     *
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array<int,string> $parameters
+     * @return string
+     */
+    protected function replaceRequiredIfMaxSize($message, $attribute, $rule, $parameters)
+    {
+        return str_replace(':size', $this->getDisplayableAttribute($parameters[0]), $message);
+    }
+
+    /**
+     * Replace all place-holders for the required_if_size_equals rule.
+     *
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array<int,string> $parameters
+     * @return string
+     */
+    protected function replaceRequiredIfSizeEquals($message, $attribute, $rule, $parameters)
+    {
+        return str_replace(':size', $this->getDisplayableAttribute($parameters[0]), $message);
+    }
 }
