@@ -148,7 +148,7 @@ class ServeCommand extends Command
             return in_array($key, static::$passthroughVariables) ? [$key => $value] : [$key => false];
         })->all());
 
-        $outputHandler = $this->option('no-output-processing') ? fn($type, $buffer) => $this->output->write($buffer) : $this->handleProcessOutput();
+        $outputHandler = $this->option('no-output-processing') ? fn ($type, $buffer) => $this->output->write($buffer) : $this->handleProcessOutput();
         $process->start($outputHandler);
 
         return $process;
