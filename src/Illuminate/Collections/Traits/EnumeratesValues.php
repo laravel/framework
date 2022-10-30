@@ -995,12 +995,12 @@ trait EnumeratesValues
             return $items->all();
         } elseif ($items instanceof Arrayable) {
             return $items->toArray();
+        } elseif ($items instanceof Traversable) {
+            return iterator_to_array($items);
         } elseif ($items instanceof Jsonable) {
             return json_decode($items->toJson(), true);
         } elseif ($items instanceof JsonSerializable) {
             return (array) $items->jsonSerialize();
-        } elseif ($items instanceof Traversable) {
-            return iterator_to_array($items);
         } elseif ($items instanceof UnitEnum) {
             return [$items];
         }

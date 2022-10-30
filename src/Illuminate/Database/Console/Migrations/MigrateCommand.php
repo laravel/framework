@@ -212,7 +212,7 @@ class MigrateCommand extends BaseCommand
 
             $freshConnection = $this->migrator->resolveConnection($this->option('database'));
 
-            return tap($freshConnection->unprepared("CREATE DATABASE IF NOT EXISTS {$connection->getDatabaseName()}"), function () {
+            return tap($freshConnection->unprepared("CREATE DATABASE IF NOT EXISTS `{$connection->getDatabaseName()}`"), function () {
                 $this->laravel['db']->purge();
             });
         } finally {

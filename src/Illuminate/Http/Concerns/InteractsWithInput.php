@@ -323,12 +323,38 @@ trait InteractsWithInput
     }
 
     /**
+     * Retrieve input as an integer value.
+     *
+     * @param  string  $key
+     * @param  int  $default
+     * @return int
+     */
+    public function integer($key, $default = 0)
+    {
+        return intval($this->input($key, $default));
+    }
+
+    /**
+     * Retrieve input as a float value.
+     *
+     * @param  string  $key
+     * @param  float  $default
+     * @return float
+     */
+    public function float($key, $default = 0.0)
+    {
+        return floatval($this->input($key, $default));
+    }
+
+    /**
      * Retrieve input from the request as a Carbon instance.
      *
      * @param  string  $key
      * @param  string|null  $format
      * @param  string|null  $tz
      * @return \Illuminate\Support\Carbon|null
+     *
+     * @throws \Carbon\Exceptions\InvalidFormatException
      */
     public function date($key, $format = null, $tz = null)
     {
@@ -346,9 +372,11 @@ trait InteractsWithInput
     /**
      * Retrieve input from the request as an enum.
      *
+     * @template TEnum
+     *
      * @param  string  $key
-     * @param  string  $enumClass
-     * @return mixed|null
+     * @param  class-string<TEnum>  $enumClass
+     * @return TEnum|null
      */
     public function enum($key, $enumClass)
     {

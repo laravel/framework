@@ -167,11 +167,11 @@ trait HasTimestamps
      * Disable timestamps for the current class during the given callback scope.
      *
      * @param  callable  $callback
-     * @return void
+     * @return mixed
      */
     public static function withoutTimestamps(callable $callback)
     {
-        static::withoutTimestampsOn([static::class], $callback);
+        return static::withoutTimestampsOn([static::class], $callback);
     }
 
     /**

@@ -876,6 +876,41 @@ class RoutingUrlGeneratorTest extends TestCase
 
         $this->assertSame('http://www.foo.com/foo/fruits', $url->route('foo.bar', CategoryBackedEnum::Fruits));
     }
+
+    public function testSignedUrlWithKeyResolver()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com/')
+        );
+        $url->setKeyResolver(function () {
+            return 'secret';
+        });
+
+        $route = new Route(['GET'], 'foo', ['as' => 'foo', function () {
+            //
+        }]);
+        $routes->add($route);
+
+        $request = Request::create($url->signedRoute('foo'));
+
+        $this->assertTrue($url->hasValidSignature($request));
+
+        $request = Request::create($url->signedRoute('foo').'?tempered=true');
+
+        $this->assertFalse($url->hasValidSignature($request));
+
+        $url2 = $url->withKeyResolver(function () {
+            return 'other-secret';
+        });
+
+        $this->assertFalse($url2->hasValidSignature($request));
+
+        $request = Request::create($url2->signedRoute('foo'));
+
+        $this->assertTrue($url2->hasValidSignature($request));
+        $this->assertFalse($url->hasValidSignature($request));
+    }
 }
 
 class RoutableInterfaceStub implements UrlRoutable

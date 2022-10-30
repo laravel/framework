@@ -441,6 +441,41 @@ class SessionStoreTest extends TestCase
         $this->assertSame('foo', $session->getName());
     }
 
+    public function testForget()
+    {
+        $session = $this->getSession();
+        $session->put('foo', 'bar');
+        $this->assertTrue($session->has('foo'));
+        $session->forget('foo');
+        $this->assertFalse($session->has('foo'));
+
+        $session->put('foo', 'bar');
+        $session->put('bar', 'baz');
+        $session->forget(['foo', 'bar']);
+        $this->assertFalse($session->has('foo'));
+        $this->assertFalse($session->has('bar'));
+    }
+
+    public function testSetPreviousUrl()
+    {
+        $session = $this->getSession();
+        $session->setPreviousUrl('https://example.com/foo/bar');
+
+        $this->assertTrue($session->has('_previous.url'));
+        $this->assertSame('https://example.com/foo/bar', $session->get('_previous.url'));
+
+        $url = $session->previousUrl();
+        $this->assertSame('https://example.com/foo/bar', $url);
+    }
+
+    public function testPasswordConfirmed()
+    {
+        $session = $this->getSession();
+        $this->assertFalse($session->has('auth.password_confirmed_at'));
+        $session->passwordConfirmed();
+        $this->assertTrue($session->has('auth.password_confirmed_at'));
+    }
+
     public function testKeyPush()
     {
         $session = $this->getSession();

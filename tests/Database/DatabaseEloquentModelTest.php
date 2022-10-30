@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\Casts\AsStringable;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Database\Eloquent\MassAssignmentException;
+use Illuminate\Database\Eloquent\MissingAttributeException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -1295,6 +1296,32 @@ class DatabaseEloquentModelTest extends TestCase
         Model::preventSilentlyDiscardingAttributes(false);
     }
 
+    public function testUsesOverriddenHandlerWhenDiscardingAttributes()
+    {
+        EloquentModelStub::setConnectionResolver($resolver = m::mock(Resolver::class));
+        $resolver->shouldReceive('connection')->andReturn($connection = m::mock(stdClass::class));
+        $connection->shouldReceive('getSchemaBuilder->getColumnListing')->andReturn(['name', 'age', 'foo']);
+
+        Model::preventSilentlyDiscardingAttributes();
+
+        $callbackModel = null;
+        $callbackKeys = null;
+        Model::handleDiscardedAttributeViolationUsing(function ($model, $keys) use (&$callbackModel, &$callbackKeys) {
+            $callbackModel = $model;
+            $callbackKeys = $keys;
+        });
+
+        $model = new EloquentModelStub;
+        $model->guard(['name', 'age']);
+        $model->fill(['Foo' => 'bar']);
+
+        $this->assertInstanceOf(EloquentModelStub::class, $callbackModel);
+        $this->assertEquals(['Foo'], $callbackKeys);
+
+        Model::preventSilentlyDiscardingAttributes(false);
+        Model::handleDiscardedAttributeViolationUsing(null);
+    }
+
     public function testFillableOverridesGuarded()
     {
         Model::preventSilentlyDiscardingAttributes(false);
@@ -2216,10 +2243,9 @@ class DatabaseEloquentModelTest extends TestCase
     public function testStringKeyTypePreserved()
     {
         $model = $this->getMockBuilder(EloquentKeyTypeModelStub::class)->onlyMethods(['newModelQuery', 'updateTimestamps', 'refresh'])->getMock();
-        $model->id = 'string id';
 
         $query = m::mock(Builder::class);
-        $query->shouldReceive('insert')->once()->with(['id' => 'string id']);
+        $query->shouldReceive('insertGetId')->once()->with([], 'id')->andReturn('string id');
         $query->shouldReceive('getConnection')->once();
         $model->expects($this->once())->method('newModelQuery')->willReturn($query);
 
@@ -2318,6 +2344,115 @@ class DatabaseEloquentModelTest extends TestCase
         });
 
         $this->assertTrue($called);
+    }
+
+    public function testThrowsWhenAccessingMissingAttributes()
+    {
+        $originalMode = Model::preventsAccessingMissingAttributes();
+        Model::preventAccessingMissingAttributes();
+
+        try {
+            $model = new EloquentModelStub(['id' => 1]);
+            $model->exists = true;
+
+            $this->assertEquals(1, $model->id);
+            $this->expectException(MissingAttributeException::class);
+
+            $model->this_attribute_does_not_exist;
+        } finally {
+            Model::preventAccessingMissingAttributes($originalMode);
+        }
+    }
+
+    public function testUsesOverriddenHandlerWhenAccessingMissingAttributes()
+    {
+        $originalMode = Model::preventsAccessingMissingAttributes();
+        Model::preventAccessingMissingAttributes();
+
+        $callbackModel = null;
+        $callbackKey = null;
+
+        Model::handleMissingAttributeViolationUsing(function ($model, $key) use (&$callbackModel, &$callbackKey) {
+            $callbackModel = $model;
+            $callbackKey = $key;
+        });
+
+        $model = new EloquentModelStub(['id' => 1]);
+        $model->exists = true;
+
+        $this->assertEquals(1, $model->id);
+
+        $model->this_attribute_does_not_exist;
+
+        $this->assertInstanceOf(EloquentModelStub::class, $callbackModel);
+        $this->assertEquals('this_attribute_does_not_exist', $callbackKey);
+
+        Model::preventAccessingMissingAttributes($originalMode);
+        Model::handleMissingAttributeViolationUsing(null);
+    }
+
+    public function testDoesntThrowWhenAccessingMissingAttributesOnModelThatIsNotSaved()
+    {
+        $originalMode = Model::preventsAccessingMissingAttributes();
+        Model::preventAccessingMissingAttributes();
+
+        try {
+            $model = new EloquentModelStub(['id' => 1]);
+            $model->exists = false;
+
+            $this->assertEquals(1, $model->id);
+            $this->assertNull($model->this_attribute_does_not_exist);
+        } finally {
+            Model::preventAccessingMissingAttributes($originalMode);
+        }
+    }
+
+    public function testDoesntThrowWhenAccessingMissingAttributesOnModelThatWasRecentlyCreated()
+    {
+        $originalMode = Model::preventsAccessingMissingAttributes();
+        Model::preventAccessingMissingAttributes();
+
+        try {
+            $model = new EloquentModelStub(['id' => 1]);
+            $model->exists = true;
+            $model->wasRecentlyCreated = true;
+
+            $this->assertEquals(1, $model->id);
+            $this->assertNull($model->this_attribute_does_not_exist);
+        } finally {
+            Model::preventAccessingMissingAttributes($originalMode);
+        }
+    }
+
+    public function testDoesntThrowWhenAssigningMissingAttributes()
+    {
+        $originalMode = Model::preventsAccessingMissingAttributes();
+        Model::preventAccessingMissingAttributes();
+
+        try {
+            $model = new EloquentModelStub(['id' => 1]);
+            $model->exists = true;
+
+            $model->this_attribute_does_not_exist = 'now it does';
+        } finally {
+            Model::preventAccessingMissingAttributes($originalMode);
+        }
+    }
+
+    public function testDoesntThrowWhenTestingMissingAttributes()
+    {
+        $originalMode = Model::preventsAccessingMissingAttributes();
+        Model::preventAccessingMissingAttributes();
+
+        try {
+            $model = new EloquentModelStub(['id' => 1]);
+            $model->exists = true;
+
+            $this->assertTrue(isset($model->id));
+            $this->assertFalse(isset($model->this_attribute_does_not_exist));
+        } finally {
+            Model::preventAccessingMissingAttributes($originalMode);
+        }
     }
 
     protected function addMockConnection($model)

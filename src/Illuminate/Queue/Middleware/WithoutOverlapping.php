@@ -39,6 +39,13 @@ class WithoutOverlapping
     public $prefix = 'laravel-queue-overlap:';
 
     /**
+     * Share the key across different jobs.
+     *
+     * @var bool
+     */
+    public $shareKey = false;
+
+    /**
      * Create a new middleware instance.
      *
      * @param  string  $key
@@ -129,6 +136,18 @@ class WithoutOverlapping
     }
 
     /**
+     * Indicate that the lock key should be shared across job classes.
+     *
+     * @return $this
+     */
+    public function shared()
+    {
+        $this->shareKey = true;
+
+        return $this;
+    }
+
+    /**
      * Get the lock key for the given job.
      *
      * @param  mixed  $job
@@ -136,6 +155,8 @@ class WithoutOverlapping
      */
     public function getLockKey($job)
     {
-        return $this->prefix.get_class($job).':'.$this->key;
+        return $this->shareKey
+            ? $this->prefix.$this->key
+            : $this->prefix.get_class($job).':'.$this->key;
     }
 }

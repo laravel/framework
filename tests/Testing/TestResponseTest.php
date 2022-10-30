@@ -211,6 +211,29 @@ class TestResponseTest extends TestCase
         $response->assertViewMissing('foo.baz');
     }
 
+    public function testAssertContent()
+    {
+        $response = $this->makeMockResponse([
+            'render' => 'expected response data',
+        ]);
+
+        $response->assertContent('expected response data');
+
+        try {
+            $response->assertContent('expected');
+            $this->fail('xxxx');
+        } catch (AssertionFailedError $e) {
+            $this->assertSame('Failed asserting that two strings are identical.', $e->getMessage());
+        }
+
+        try {
+            $response->assertContent('expected response data with extra');
+            $this->fail('xxxx');
+        } catch (AssertionFailedError $e) {
+            $this->assertSame('Failed asserting that two strings are identical.', $e->getMessage());
+        }
+    }
+
     public function testAssertSee()
     {
         $response = $this->makeMockResponse([
@@ -557,6 +580,18 @@ class TestResponseTest extends TestCase
         $response->assertUnprocessable();
     }
 
+    public function testAssertServerError()
+    {
+        $statusCode = 500;
+
+        $baseResponse = tap(new Response, function ($response) use ($statusCode) {
+            $response->setStatusCode($statusCode);
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response->assertServerError();
+    }
+
     public function testAssertNoContentAsserts204StatusCodeByDefault()
     {
         $statusCode = 500;
@@ -861,6 +896,16 @@ class TestResponseTest extends TestCase
         $this->expectException(AssertionFailedError::class);
 
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
+
+        $response->assertJsonFragment(['id' => 1]);
+    }
+
+    public function testAssertJsonFragmentUnicodeCanFail()
+    {
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessageMatches('/Привет|Мир/');
+
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithUnicodeStub));
 
         $response->assertJsonFragment(['id' => 1]);
     }
@@ -1947,6 +1992,18 @@ class JsonSerializableSingleResourceWithIntegersStub implements JsonSerializable
             ['id' => 10, 'foo' => 'bar'],
             ['id' => 20, 'foo' => 'bar'],
             ['id' => 30, 'foo' => 'bar'],
+        ];
+    }
+}
+
+class JsonSerializableSingleResourceWithUnicodeStub implements JsonSerializable
+{
+    public function jsonSerialize(): array
+    {
+        return [
+            ['id' => 10, 'foo' => 'bar'],
+            ['id' => 20, 'foo' => 'Привет'],
+            ['id' => 30, 'foo' => 'Мир'],
         ];
     }
 }

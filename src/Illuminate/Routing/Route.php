@@ -6,7 +6,9 @@ use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Contracts\CallableDispatcher;
 use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
+use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Matching\HostValidator;
 use Illuminate\Routing\Matching\MethodValidator;
 use Illuminate\Routing\Matching\SchemeValidator;
@@ -16,7 +18,6 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Laravel\SerializableClosure\SerializableClosure;
 use LogicException;
-use ReflectionFunction;
 use Symfony\Component\Routing\Route as SymfonyRoute;
 
 class Route
@@ -233,9 +234,7 @@ class Route
             $callable = unserialize($this->action['uses'])->getClosure();
         }
 
-        return $callable(...array_values($this->resolveMethodDependencies(
-            $this->parametersWithoutNulls(), new ReflectionFunction($callable)
-        )));
+        return $this->container[CallableDispatcher::class]->dispatch($this, $callable);
     }
 
     /**
@@ -306,6 +305,16 @@ class Route
     protected function parseControllerCallback()
     {
         return Str::parseCallback($this->action['uses']);
+    }
+
+    /**
+     * Flush the cached container instance on the route.
+     *
+     * @return void
+     */
+    public function flushController()
+    {
+        $this->controller = null;
     }
 
     /**
@@ -1073,16 +1082,47 @@ class Route
             return [];
         }
 
-        return $this->controllerDispatcher()->getMiddleware(
-            $this->getController(), $this->getControllerMethod()
-        );
+        [$controllerClass, $controllerMethod] = [
+            $this->getControllerClass(),
+            $this->getControllerMethod(),
+        ];
+
+        if (is_a($controllerClass, HasMiddleware::class, true)) {
+            return $this->staticallyProvidedControllerMiddleware(
+                $controllerClass, $controllerMethod
+            );
+        }
+
+        if (method_exists($controllerClass, 'getMiddleware')) {
+            return $this->controllerDispatcher()->getMiddleware(
+                $this->getController(), $controllerMethod
+            );
+        }
+
+        return [];
+    }
+
+    /**
+     * Get the statically provided controller middleware for the given class and method.
+     *
+     * @param  string  $class
+     * @param  string  $method
+     * @return array
+     */
+    protected function staticallyProvidedControllerMiddleware(string $class, string $method)
+    {
+        return collect($class::middleware())->reject(function ($middleware) use ($method) {
+            return $this->controllerDispatcher()::methodExcludedByOptions(
+                $method, ['only' => $middleware->only, 'except' => $middleware->except]
+            );
+        })->map->middleware->values()->all();
     }
 
     /**
      * Specify middleware that should be removed from the given route.
      *
      * @param  array|string  $middleware
-     * @return $this|array
+     * @return $this
      */
     public function withoutMiddleware($middleware)
     {
@@ -1116,6 +1156,18 @@ class Route
     }
 
     /**
+     * Indicate that the route should not enforce scoping of multiple implicit Eloquent bindings.
+     *
+     * @return $this
+     */
+    public function withoutScopedBindings()
+    {
+        $this->action['scope_bindings'] = false;
+
+        return $this;
+    }
+
+    /**
      * Determine if the route should enforce scoping of multiple implicit Eloquent bindings.
      *
      * @return bool
@@ -1123,6 +1175,16 @@ class Route
     public function enforcesScopedBindings()
     {
         return (bool) ($this->action['scope_bindings'] ?? false);
+    }
+
+    /**
+     * Determine if the route should prevent scoping of multiple implicit Eloquent bindings.
+     *
+     * @return bool
+     */
+    public function preventsScopedBindings()
+    {
+        return isset($this->action['scope_bindings']) && $this->action['scope_bindings'] === false;
     }
 
     /**
