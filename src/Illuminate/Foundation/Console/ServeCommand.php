@@ -148,7 +148,8 @@ class ServeCommand extends Command
             return in_array($key, static::$passthroughVariables) ? [$key => $value] : [$key => false];
         })->all());
 
-        $process->start($this->handleProcessOutput());
+        $outputHandler = $this->option('no-output-processing') ? fn($type, $buffer) => $this->output->write($buffer) : $this->handleProcessOutput();
+        $process->start($outputHandler);
 
         return $process;
     }
@@ -333,6 +334,7 @@ class ServeCommand extends Command
             ['port', null, InputOption::VALUE_OPTIONAL, 'The port to serve the application on', Env::get('SERVER_PORT')],
             ['tries', null, InputOption::VALUE_OPTIONAL, 'The max number of ports to attempt to serve from', 10],
             ['no-reload', null, InputOption::VALUE_NONE, 'Do not reload the development server on .env file changes'],
+            ['no-output-processing', null, InputOption::VALUE_NONE, 'Do not process server output buffer (show raw output)'],
         ];
     }
 }
