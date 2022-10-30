@@ -121,7 +121,7 @@ class EloquentModelDateCastingTest extends DatabaseTestCase
             'datetime_field' => null,
         ]);
 
-        $this->assertSame(null, $user->toArray()['date_field']);
+        $this->assertSame('', $user->toArray()['date_field']);
         $this->assertSame(null, $user->toArray()['datetime_field']);
     }
 }
