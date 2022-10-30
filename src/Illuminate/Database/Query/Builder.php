@@ -7,6 +7,7 @@ use Carbon\CarbonPeriod;
 use Closure;
 use DateTimeInterface;
 use Illuminate\Contracts\Database\Query\Builder as BuilderContract;
+use Illuminate\Contracts\Database\Query\Expression as ExpressionContract;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Concerns\ExplainsQueries;
@@ -759,7 +760,8 @@ class Builder implements BuilderContract
         // If the column is making a JSON reference we'll check to see if the value
         // is a boolean. If it is, we'll add the raw boolean string as an actual
         // value to the query to ensure this is properly handled by the query.
-        if (str_contains($column, '->') && is_bool($value)) {
+        $columnstr = ($column instanceof ExpressionContract) ? $this->grammar->getValue($column) : $column;
+        if (str_contains($columnstr, '->') && is_bool($value)) {
             $value = new Expression($value ? 'true' : 'false');
 
             if (is_string($column)) {
@@ -778,7 +780,7 @@ class Builder implements BuilderContract
             'type', 'column', 'operator', 'value', 'boolean'
         );
 
-        if (! $value instanceof Expression) {
+        if (! $value instanceof ExpressionContract) {
             $this->addBinding($this->flattenValue($value), 'where');
         }
 
@@ -1187,7 +1189,7 @@ class Builder implements BuilderContract
     /**
      * Add a where between statement to the query.
      *
-     * @param  string|\Illuminate\Database\Query\Expression  $column
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  iterable  $values
      * @param  string  $boolean
      * @param  bool  $not
@@ -1414,7 +1416,7 @@ class Builder implements BuilderContract
             $value = $value->format('d');
         }
 
-        if (! $value instanceof Expression) {
+        if (! $value instanceof ExpressionContract) {
             $value = sprintf('%02d', $value);
         }
 
@@ -1459,7 +1461,7 @@ class Builder implements BuilderContract
             $value = $value->format('m');
         }
 
-        if (! $value instanceof Expression) {
+        if (! $value instanceof ExpressionContract) {
             $value = sprintf('%02d', $value);
         }
 
@@ -1538,7 +1540,7 @@ class Builder implements BuilderContract
     {
         $this->wheres[] = compact('column', 'type', 'boolean', 'operator', 'value');
 
-        if (! $value instanceof Expression) {
+        if (! $value instanceof ExpressionContract) {
             $this->addBinding($value, 'where');
         }
 
@@ -1748,7 +1750,7 @@ class Builder implements BuilderContract
 
         $this->wheres[] = compact('type', 'column', 'value', 'boolean', 'not');
 
-        if (! $value instanceof Expression) {
+        if (! $value instanceof ExpressionContract) {
             $this->addBinding($this->grammar->prepareBindingForJsonContains($value));
         }
 
@@ -1862,7 +1864,7 @@ class Builder implements BuilderContract
 
         $this->wheres[] = compact('type', 'column', 'operator', 'value', 'boolean');
 
-        if (! $value instanceof Expression) {
+        if (! $value instanceof ExpressionContract) {
             $this->addBinding((int) $this->flattenValue($value));
         }
 
@@ -2052,7 +2054,7 @@ class Builder implements BuilderContract
 
         $this->havings[] = compact('type', 'column', 'operator', 'value', 'boolean');
 
-        if (! $value instanceof Expression) {
+        if (! $value instanceof ExpressionContract) {
             $this->addBinding($this->flattenValue($value), 'having');
         }
 
@@ -2221,7 +2223,7 @@ class Builder implements BuilderContract
     /**
      * Add an "order by" clause to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Expression|string  $column
+     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Contracts\Database\Query\Expression|string  $column
      * @param  string  $direction
      * @return $this
      *
@@ -2254,7 +2256,7 @@ class Builder implements BuilderContract
     /**
      * Add a descending "order by" clause to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Expression|string  $column
+     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Contracts\Database\Query\Expression|string  $column
      * @return $this
      */
     public function orderByDesc($column)
@@ -2265,7 +2267,7 @@ class Builder implements BuilderContract
     /**
      * Add an "order by" clause for a timestamp to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Query\Expression|string  $column
+     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Contracts\Database\Query\Expression|string  $column
      * @return $this
      */
     public function latest($column = 'created_at')
@@ -2276,7 +2278,7 @@ class Builder implements BuilderContract
     /**
      * Add an "order by" clause for a timestamp to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Query\Expression|string  $column
+     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Contracts\Database\Query\Expression|string  $column
      * @return $this
      */
     public function oldest($column = 'created_at')
@@ -2422,7 +2424,7 @@ class Builder implements BuilderContract
     /**
      * Remove all existing orders and optionally add a new order.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Query\Expression|string|null  $column
+     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Contracts\Database\Query\Expression|string|null  $column
      * @param  string  $direction
      * @return $this
      */
@@ -3550,7 +3552,7 @@ class Builder implements BuilderContract
      * Create a raw database expression.
      *
      * @param  mixed  $value
-     * @return \Illuminate\Database\Query\Expression
+     * @return \Illuminate\Contracts\Database\Query\Expression
      */
     public function raw($value)
     {
@@ -3662,7 +3664,7 @@ class Builder implements BuilderContract
     {
         return collect($bindings)
                     ->reject(function ($binding) {
-                        return $binding instanceof Expression;
+                        return $binding instanceof ExpressionContract;
                     })
                     ->map([$this, 'castBinding'])
                     ->values()
@@ -3806,6 +3808,20 @@ class Builder implements BuilderContract
     public function dd()
     {
         dd($this->toSql(), $this->getBindings());
+    }
+
+    /**
+     * Get all columns in a text-only array with expressions evaluated.
+     *
+     * @return array
+     */
+    public function getColumns()
+    {
+        if ($this->columns === null) {
+            return [];
+        }
+
+        return array_map(fn ($column) => $this->grammar->getValue($column), $this->columns);
     }
 
     /**

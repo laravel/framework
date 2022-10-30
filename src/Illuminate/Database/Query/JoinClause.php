@@ -84,7 +84,7 @@ class JoinClause extends Builder
      *
      * @param  \Closure|string  $first
      * @param  string|null  $operator
-     * @param  \Illuminate\Database\Query\Expression|string|null  $second
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string|null  $second
      * @param  string  $boolean
      * @return $this
      *
@@ -104,7 +104,7 @@ class JoinClause extends Builder
      *
      * @param  \Closure|string  $first
      * @param  string|null  $operator
-     * @param  \Illuminate\Database\Query\Expression|string|null  $second
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string|null  $second
      * @return \Illuminate\Database\Query\JoinClause
      */
     public function orOn($first, $operator = null, $second = null)

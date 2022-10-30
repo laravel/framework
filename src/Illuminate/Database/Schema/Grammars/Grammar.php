@@ -4,10 +4,10 @@ namespace Illuminate\Database\Schema\Grammars;
 
 use Doctrine\DBAL\Schema\AbstractSchemaManager as SchemaManager;
 use Doctrine\DBAL\Schema\TableDiff;
+use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Database\Concerns\CompilesJsonPaths;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Grammar as BaseGrammar;
-use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Fluent;
 use LogicException;
@@ -286,7 +286,7 @@ abstract class Grammar extends BaseGrammar
     /**
      * Wrap a value in keyword identifiers.
      *
-     * @param  \Illuminate\Support\Fluent|\Illuminate\Database\Query\Expression|string  $value
+     * @param  \Illuminate\Support\Fluent|\Illuminate\Contracts\Database\Query\Expression|string  $value
      * @param  bool  $prefixAlias
      * @return string
      */
@@ -306,7 +306,7 @@ abstract class Grammar extends BaseGrammar
     protected function getDefaultValue($value)
     {
         if ($value instanceof Expression) {
-            return $value;
+            return $this->getValue($value);
         }
 
         return is_bool($value)

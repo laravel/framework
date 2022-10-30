@@ -1176,7 +1176,7 @@ class MySqlGrammar extends Grammar
     protected function modifyOnUpdate(Blueprint $blueprint, Fluent $column)
     {
         if (! is_null($column->onUpdate)) {
-            return ' on update '.$column->onUpdate;
+            return ' on update '.$this->getValue($column->onUpdate);
         }
     }
 
