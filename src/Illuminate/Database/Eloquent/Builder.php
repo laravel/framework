@@ -431,6 +431,45 @@ class Builder implements BuilderContract
 
         return $this->whereKey($id)->first($columns);
     }
+    
+    /**
+     * Find a model by its attributes.
+     *
+     * @param  array  $attributes
+     * @param  array|string  $columns
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static[]|static|null
+     */
+    public function findBy(array $attributes , $columns = ['*'])
+    {
+        if (is_array($attributes) || $attributes instanceof Arrayable ) {
+            return $this->where($attributes)->get($columns);
+        }
+    }
+
+    /**
+     * Find a model by its attributes or call callback.
+     *
+     * @param  array  $attributes
+     * @param  Closure|array|string  $columns
+     * @param  Closure | null  $callback
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static[]|static|null
+     */
+    public function findByOr(array $attributes , $columns = ['*'],  Closure $callback = null)
+    {
+        if ($columns instanceof Closure) {
+            $callback = $columns;
+
+            $columns = ['*'];
+        }
+        
+        $model = $this->findBy($attributes, $columns);
+       
+        if ($model->isNotEmpty()) {
+            return $model;
+        }
+        
+        return $callback();
+    }
 
     /**
      * Find multiple models by their primary keys.
