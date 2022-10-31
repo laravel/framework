@@ -450,7 +450,10 @@ class ResourceTest extends TestCase
 
         Route::get('/', function () {
             $post = new Post(['id' => 5]);
-            (function () { $this->exists = true; $this->wasRecentlyCreated = false; })->bindTo($post)();
+            (function () {
+                $this->exists = true;
+                $this->wasRecentlyCreated = false;
+            })->bindTo($post)();
 
             return new PostResourceWithOptionalPivotRelationship($post);
         });
