@@ -35,8 +35,8 @@ trait ResolvesDumpSource
      * @var array<string, int>
      */
     protected static $traceNames = [
-        'dump.php' => 1,
-        'EnumeratesValues.php' => 4,
+        'symfony/var-dumper/Resources/functions/dump.php' => 1,
+        'Illuminate/Collection/Traits/EnumeratesValues.php' => 4,
     ];
 
     /**
@@ -70,8 +70,11 @@ trait ResolvesDumpSource
                 continue;
             }
 
-            foreach ($this->traceNames as $name => $key) {
-                if (str_ends_with($traceFile['file'], $name)) {
+            foreach (self::$traceNames as $name => $key) {
+                if (str_ends_with(
+                    $traceFile['file'],
+                    str_replace('/', DIRECTORY_SEPARATOR, $name)
+                )) {
                     $sourceKey = $traceKey + $key;
                     break;
                 }
