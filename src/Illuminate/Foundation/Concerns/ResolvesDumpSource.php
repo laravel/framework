@@ -30,7 +30,7 @@ trait ResolvesDumpSource
     ];
 
     /**
-     * All of the trace names and its keys..
+     * All of the trace names and its keys.
      *
      * @var array<string, int>
      */
@@ -70,7 +70,7 @@ trait ResolvesDumpSource
                 continue;
             }
 
-            foreach($this->traceNames as $name => $key) {
+            foreach ($this->traceNames as $name => $key) {
                 if (str_ends_with($traceFile['file'], $name)) {
                     $sourceKey = $traceKey + $key;
                     break;
