@@ -42,7 +42,9 @@ class CacheCommandMutex implements CommandMutex
         return $this->cache->store($this->store)->add(
             $this->commandMutexName($command),
             true,
-            CarbonInterval::hour(),
+            method_exists($command, 'isolationExpiresAt')
+                    ? $command->isolationExpiresAt()
+                    : CarbonInterval::hour(),
         );
     }
 

@@ -90,12 +90,7 @@ class Command extends SymfonyCommand
         }
 
         if ($this instanceof Isolatable) {
-            $this->getDefinition()->addOption(new InputOption(
-                'isolated',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'Do not run the command if another instance of the command is already running'
-            ));
+            $this->configureIsolation();
         }
     }
 
@@ -115,6 +110,21 @@ class Command extends SymfonyCommand
         // instances of these "InputArgument" and "InputOption" Symfony classes.
         $this->getDefinition()->addArguments($arguments);
         $this->getDefinition()->addOptions($options);
+    }
+
+    /**
+     * Configure the console command for isolation.
+     *
+     * @return void
+     */
+    protected function configureIsolation()
+    {
+        $this->getDefinition()->addOption(new InputOption(
+            'isolated',
+            null,
+            InputOption::VALUE_OPTIONAL,
+            'Do not run the command if another instance of the command is already running'
+        ));
     }
 
     /**
@@ -156,7 +166,9 @@ class Command extends SymfonyCommand
                 'The [%s] command is already running.', $this->getName()
             ));
 
-            return self::SUCCESS;
+            return (int) (is_numeric($this->option('isolated'))
+                        ? $this->option('isolated')
+                        : self::SUCCESS);
         }
 
         $method = method_exists($this, 'handle') ? 'handle' : '__invoke';
