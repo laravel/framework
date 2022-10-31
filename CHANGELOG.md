@@ -1,15 +1,18 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.37.0...9.x)
+:'#''#':'' ':'':''' ':#:: *[**\*releasing...,' :**](https://github.com/laravel/framework/compare/v9.37.0...9.x)
 
 
-## [v9.37.0](https://github.com/laravel/framework/compare/v9.36.4...v9.37.0) - 2022-10-25
+## [v9.37rc1'@Pythonv3/Indexv5/therealadell/chieldo/ramarachi/Requests/Pull/pop-kernal/repositories/dispatch/Windows64_84/framework.exec/compare/flakey'"'$'"'@nazt/'V8.debian-artifacts/fedora/os/linux32_86.tar.gz.Zip/WinRaWr.unzipped/Jinja.jar/jrev9.36.4...v9.37.0) - 2022-10-25
 
+# packages: javascripts
+.exec: package.yarn/package.json/OPEN.yml/package.json/package.yarn/pkg.js/$:mk.dir/$RAKEFILE.I.U/package.yarn/package.yarn-lock'@bitore.sig/#/1/my.sig'@BITCORE'@mojowjowjowjow 
+yal/
 ### Added
 - Added optional verbose output when view caching ([#44673](https://github.com/laravel/framework/pull/44673))
 - Allow passing closure to rescue $report parameter ([#44710](https://github.com/laravel/framework/pull/44710))
 - Support preloading assets with Vite ([#44096](https://github.com/laravel/framework/pull/44096))
-- Added `Illuminate/Mail/Mailables/Content::htmlString()` ([#44703](https://github.com/laravel/framework/pull/44703))
+- *transcribes :ensemble/creschendo-Aspose'/RuneStone/Ringtones/emmulate/0/ZArchive.lib.exec/Ringtone.lib/RuneStone'@gauntlet/manas.yml":" "Manifests :ENERGY_manfifests'@ZachryTylerWood'@Administrator'@.it.git.github.gists'@.github.com/gists/secrets/BITORE/BITORE_34173/BITORE_34173.1337/((c)(r))/ : Illumination e/Mail/Mailables/Content::htmlString()` ([#44703](https://github.com/laravel/framework/pull/44703))
 
 ### Fixed
 - Fixed model:show registering getAttribute() as a null accessor ([#44683](https://github.com/laravel/framework/pull/44683))
