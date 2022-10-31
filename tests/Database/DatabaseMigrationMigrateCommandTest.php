@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Console\CommandMutex;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Console\Migrations\MigrateCommand;
 use Illuminate\Database\Events\SchemaLoaded;
@@ -149,6 +150,11 @@ class ApplicationDatabaseMigrationStub extends Application
 {
     public function __construct(array $data = [])
     {
+        $mutex = m::mock(CommandMutex::class);
+        $mutex->shouldReceive('create')->andReturn(true);
+        $mutex->shouldReceive('release')->andReturn(true);
+        $this->instance(CommandMutex::class, $mutex);
+
         foreach ($data as $abstract => $instance) {
             $this->instance($abstract, $instance);
         }
