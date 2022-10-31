@@ -291,7 +291,7 @@ trait ConditionallyLoadsAttributes
         }
 
         return $this->when(
-            $this->resource->$accessor &&
+            isset($this->resource->$accessor) &&
             ($this->resource->$accessor instanceof $table ||
             $this->resource->$accessor->getTable() === $table),
             ...[$value, $default]

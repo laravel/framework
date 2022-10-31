@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Http;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\Middleware\ValidatePostSize;
 use Illuminate\Http\Exceptions\PostTooLargeException;
 use Illuminate\Http\Request;
@@ -439,6 +440,33 @@ class ResourceTest extends TestCase
                 'subscription' => [
                     'foo' => 'bar',
                 ],
+            ],
+        ]);
+    }
+
+    public function testResourceDoesNotThrowErrorWhenUsingEloquentStrictModeAndCheckingOptionalPivotRelationship()
+    {
+        Model::shouldBeStrict(true);
+
+        Route::get('/', function () {
+            $post = new Post(['id' => 5]);
+            (function () {
+                $this->exists = true;
+                $this->wasRecentlyCreated = false;
+            })->bindTo($post)();
+
+            return new PostResourceWithOptionalPivotRelationship($post);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertExactJson([
+            'data' => [
+                'id' => 5,
             ],
         ]);
     }
