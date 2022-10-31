@@ -56,7 +56,8 @@ class NotificationSendQueuedNotificationTest extends TestCase
     public function testNotificationCanSetMaxExceptions()
     {
         $notifiable = new NotifiableUser;
-        $notification = new class {
+        $notification = new class
+        {
             public $maxExceptions = 23;
         };
 
