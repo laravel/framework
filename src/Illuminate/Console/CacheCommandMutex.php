@@ -8,18 +8,18 @@ use Illuminate\Contracts\Cache\Factory as Cache;
 class CacheCommandMutex implements CommandMutex
 {
     /**
-     * The cache store that should be used.
-     *
-     * @var string|null
-     */
-    public $store = null;
-
-    /**
      * The cache factory implementation.
      *
      * @var \Illuminate\Contracts\Cache\Factory
      */
     public $cache;
+
+    /**
+     * The cache store that should be used.
+     *
+     * @var string|null
+     */
+    public $store = null;
 
     /**
      * Create a new command mutex.
