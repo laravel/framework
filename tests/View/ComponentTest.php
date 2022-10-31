@@ -143,6 +143,25 @@ class ComponentTest extends TestCase
         $this->assertSame('foo', $component->render());
     }
 
+    public function testResolveDependenciesWithContainerViaRenderMethod()
+    {
+        $this->viewFactory->shouldReceive('exists')->once()->andReturn(true);
+
+        $component = TestRenderResolvedViewComponent::resolve([]);
+        $component->resolveView();
+
+        $this->assertNull($component->dependency);
+        $this->assertSame($this->viewFactory, $component->renderDependency);
+        $this->assertNull($component->content);
+
+        $component = TestRenderResolvedViewComponent::resolve(['content' => 'foo']);
+        $component->resolveView();
+
+        $this->assertNull($component->dependency);
+        $this->assertSame($this->viewFactory, $component->renderDependency);
+        $this->assertSame('foo', $component->content);
+    }
+
     public function testResolveComponentsUsing()
     {
         $component = new TestInlineViewComponent;
@@ -396,5 +415,29 @@ class TestHtmlableReturningViewComponent extends Component
     public function render()
     {
         return new HtmlString("<p>Hello {$this->title}</p>");
+    }
+}
+
+class TestRenderResolvedViewComponent extends Component
+{
+    static $shouldResolveConstructor = false;
+
+    public $dependency;
+
+    public $renderDependency;
+
+    public $content;
+
+    public function __construct(FactoryContract $dependency = null, $content = null)
+    {
+        $this->dependency = $dependency;
+        $this->content = $content;
+    }
+
+    public function render(FactoryContract $renderDependency)
+    {
+        $this->renderDependency = $renderDependency;
+
+        return '';
     }
 }

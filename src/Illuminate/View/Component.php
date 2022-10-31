@@ -76,11 +76,11 @@ abstract class Component
     protected static $constructorParametersCache = [];
 
     /**
-     * Get the view / view contents that represent the component.
+     * Toggle to resolve the via the constructor or the render method.
      *
-     * @return \Illuminate\Contracts\View\View|\Illuminate\Contracts\Support\Htmlable|\Closure|string
+     * @var bool
      */
-    abstract public function render();
+    protected static $shouldResolveConstructor = true;
 
     /**
      * Resolve the component instance with the given data.
@@ -98,7 +98,7 @@ abstract class Component
 
         $dataKeys = array_keys($data);
 
-        if (empty(array_diff($parameters, $dataKeys))) {
+        if (! static::$shouldResolveConstructor || empty(array_diff($parameters, $dataKeys))) {
             return new static(...array_intersect_key($data, array_flip($parameters)));
         }
 
@@ -132,7 +132,7 @@ abstract class Component
      */
     public function resolveView()
     {
-        $view = $this->render();
+        $view = ! static::$shouldResolveConstructor ? app()->call([$this, 'render']) : $this->render();
 
         if ($view instanceof ViewContract) {
             return $view;
