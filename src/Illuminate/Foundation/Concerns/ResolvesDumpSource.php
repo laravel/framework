@@ -30,6 +30,16 @@ trait ResolvesDumpSource
     ];
 
     /**
+     * All of the trace names and its keys..
+     *
+     * @var array<string, int>
+     */
+    protected static $traceNames = [
+        'dump.php' => 1,
+        'EnumeratesValues.php' => 4,
+    ];
+
+    /**
      * The source resolver.
      *
      * @var (callable(): (array{0: string, 1: string, 2: int|null}|null))|null|false
@@ -60,13 +70,14 @@ trait ResolvesDumpSource
                 continue;
             }
 
-            if (str_ends_with($traceFile['file'], 'dump.php')) {
-                $sourceKey = $traceKey + 1;
-                break;
+            foreach($this->traceNames as $name => $key) {
+                if (str_ends_with($traceFile['file'], $name)) {
+                    $sourceKey = $traceKey + $key;
+                    break;
+                }
             }
 
-            if (str_ends_with($traceFile['file'], 'EnumeratesValues.php')) {
-                $sourceKey = $traceKey + 4;
+            if (! is_null($sourceKey)) {
                 break;
             }
         }
