@@ -1002,7 +1002,7 @@ if (! function_exists('view')) {
      * @param  string|null  $view
      * @param  \Illuminate\Contracts\Support\Arrayable|array  $data
      * @param  array  $mergeData
-     * @return \Illuminate\View\View|\Illuminate\Contracts\View\Factory
+     * @return \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory
      */
     function view($view = null, $data = [], $mergeData = [])
     {
