@@ -4,7 +4,7 @@ namespace {{ namespace }};
 
 use Exception;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Http\Response;
 
 class {{ class }} extends Exception
 {
