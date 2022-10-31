@@ -56,12 +56,17 @@ trait ResolvesDumpSource
         $sourceKey = null;
 
         foreach ($trace as $traceKey => $traceFile) {
-            if (isset($traceFile['file']) && str_ends_with(
-                $traceFile['file'],
-                'dump.php'
-            )) {
-                $sourceKey = $traceKey + 1;
+            if (! isset($traceFile['file'])) {
+                continue;
+            }
 
+            if (str_ends_with($traceFile['file'], 'dump.php')) {
+                $sourceKey = $traceKey + 1;
+                break;
+            }
+
+            if (str_ends_with($traceFile['file'], 'EnumeratesValues.php')) {
+                $sourceKey = $traceKey + 4;
                 break;
             }
         }
