@@ -2,6 +2,7 @@
 
 namespace Illuminate\Contracts\Console;
 
-interface Isolated
+interface Isolatable
 {
+    //
 }

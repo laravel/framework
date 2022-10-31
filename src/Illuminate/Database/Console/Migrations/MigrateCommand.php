@@ -3,7 +3,7 @@
 namespace Illuminate\Database\Console\Migrations;
 
 use Illuminate\Console\ConfirmableTrait;
-use Illuminate\Contracts\Console\Isolated;
+use Illuminate\Contracts\Console\Isolatable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Events\SchemaLoaded;
 use Illuminate\Database\Migrations\Migrator;
@@ -12,7 +12,7 @@ use Illuminate\Database\SqlServerConnection;
 use PDOException;
 use Throwable;
 
-class MigrateCommand extends BaseCommand implements Isolated
+class MigrateCommand extends BaseCommand implements Isolatable
 {
     use ConfirmableTrait;
 

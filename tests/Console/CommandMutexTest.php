@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Console;
 use Illuminate\Console\Command;
 use Illuminate\Console\CommandMutex;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Console\Isolated;
+use Illuminate\Contracts\Console\Isolatable;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -25,7 +25,7 @@ class CommandMutexTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->command = new class extends Command implements Isolated
+        $this->command = new class extends Command implements Isolatable
         {
             public $ran = 0;
 
@@ -47,7 +47,7 @@ class CommandMutexTest extends TestCase
         $this->commandMutex->shouldReceive('create')
             ->andReturn(true)
             ->once();
-        $this->commandMutex->shouldReceive('release')
+        $this->commandMutex->shouldReceive('forget')
             ->andReturn(true)
             ->once();
 
@@ -72,7 +72,7 @@ class CommandMutexTest extends TestCase
         $this->commandMutex->shouldReceive('create')
             ->andReturn(true)
             ->twice();
-        $this->commandMutex->shouldReceive('release')
+        $this->commandMutex->shouldReceive('forget')
             ->andReturn(true)
             ->twice();
 

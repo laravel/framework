@@ -47,19 +47,6 @@ class CacheCommandMutex implements CommandMutex
     }
 
     /**
-     * Release the mutex for the given command.
-     *
-     * @param  \Illuminate\Console\Command  $command
-     * @return bool
-     */
-    public function release($command)
-    {
-        return $this->cache->store($this->store)->forget(
-            $this->commandMutexName($command)
-        );
-    }
-
-    /**
      * Determine if a command mutex exists for the given command.
      *
      * @param  \Illuminate\Console\Command  $command
@@ -68,6 +55,19 @@ class CacheCommandMutex implements CommandMutex
     public function exists($command)
     {
         return $this->cache->store($this->store)->has(
+            $this->commandMutexName($command)
+        );
+    }
+
+    /**
+     * Release the mutex for the given command.
+     *
+     * @param  \Illuminate\Console\Command  $command
+     * @return bool
+     */
+    public function forget($command)
+    {
+        return $this->cache->store($this->store)->forget(
             $this->commandMutexName($command)
         );
     }

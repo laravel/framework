@@ -3,7 +3,7 @@
 namespace Illuminate\Console;
 
 use Illuminate\Console\View\Components\Factory;
-use Illuminate\Contracts\Console\Isolated;
+use Illuminate\Contracts\Console\Isolatable;
 use Illuminate\Support\Traits\Macroable;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -89,12 +89,12 @@ class Command extends SymfonyCommand
             $this->specifyParameters();
         }
 
-        if ($this instanceof Isolated) {
+        if ($this instanceof Isolatable) {
             $this->getDefinition()->addOption(new InputOption(
                 'isolated',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Limits the command to only have one instance running at once'
+                'Do not run the command if another instance of the command is already running'
             ));
         }
     }
@@ -150,9 +150,10 @@ class Command extends SymfonyCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if ($this instanceof Isolated && $this->option('isolated') && ! $this->mutex()->create($this)) {
-            $this->info(sprintf(
-                'Skipping [%s], as command already running.', $this->getName()
+        if ($this instanceof Isolatable && $this->option('isolated') &&
+            ! $this->commandIsolationMutex()->create($this)) {
+            $this->comment(sprintf(
+                'The [%s] command is already running.', $this->getName()
             ));
 
             return self::SUCCESS;
@@ -163,13 +164,18 @@ class Command extends SymfonyCommand
         try {
             return (int) $this->laravel->call([$this, $method]);
         } finally {
-            if ($this instanceof Isolated && $this->option('isolated')) {
-                $this->mutex()->release($this);
+            if ($this instanceof Isolatable && $this->option('isolated')) {
+                $this->commandIsolationMutex()->forget($this);
             }
         }
     }
 
-    protected function mutex()
+    /**
+     * Get a command isolation mutex instance for the command.
+     *
+     * @return \Illuminate\Console\CommandMutex
+     */
+    protected function commandIsolationMutex()
     {
         return $this->laravel->bound(CommandMutex::class)
             ? $this->laravel->make(CommandMutex::class)
