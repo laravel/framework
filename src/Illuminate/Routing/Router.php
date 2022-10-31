@@ -1000,6 +1000,8 @@ class Router implements BindingRegistrar, RegistrarContract
     }
 
     /**
+     * Remove the given middleware from the specified group.
+     *
      * @param  string  $group
      * @param  string  $middleware
      * @return $this
