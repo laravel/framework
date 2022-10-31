@@ -36,7 +36,7 @@ trait ResolvesDumpSource
      */
     protected static $traceNames = [
         'symfony/var-dumper/Resources/functions/dump.php' => 1,
-        'Illuminate/Collection/Traits/EnumeratesValues.php' => 4,
+        'Illuminate/Collections/Traits/EnumeratesValues.php' => 4,
     ];
 
     /**
