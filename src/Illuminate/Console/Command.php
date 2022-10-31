@@ -123,7 +123,8 @@ class Command extends SymfonyCommand
             'isolated',
             null,
             InputOption::VALUE_OPTIONAL,
-            'Do not run the command if another instance of the command is already running'
+            'Do not run the command if another instance of the command is already running',
+            false
         ));
     }
 
@@ -160,7 +161,7 @@ class Command extends SymfonyCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if ($this instanceof Isolatable && $this->option('isolated') &&
+        if ($this instanceof Isolatable && $this->option('isolated') !== false &&
             ! $this->commandIsolationMutex()->create($this)) {
             $this->comment(sprintf(
                 'The [%s] command is already running.', $this->getName()
@@ -176,7 +177,7 @@ class Command extends SymfonyCommand
         try {
             return (int) $this->laravel->call([$this, $method]);
         } finally {
-            if ($this instanceof Isolatable && $this->option('isolated')) {
+            if ($this instanceof Isolatable && $this->option('isolated') !== false) {
                 $this->commandIsolationMutex()->forget($this);
             }
         }
