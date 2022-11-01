@@ -4,6 +4,7 @@ namespace Illuminate\Foundation;
 
 use Exception;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
@@ -439,10 +440,12 @@ class Vite implements Htmlable
             'as' => 'style',
             'href' => $url,
             'nonce' => $this->nonce ?? false,
+            ...Arr::only($this->resolveStylesheetTagAttributes($src, $url, $chunk, $manifest), 'crossorigin'),
         ] : [
             'rel' => 'modulepreload',
             'href' => $url,
             'nonce' => $this->nonce ?? false,
+            ...Arr::only($this->resolveScriptTagAttributes($src, $url, $chunk, $manifest), 'crossorigin'),
         ];
 
         $attributes = $this->integrityKey !== false

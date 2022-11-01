@@ -888,6 +888,53 @@ class FoundationViteTest extends TestCase
         $this->cleanViteManifest($buildDir);
     }
 
+    public function testCrossoriginAttributeIsIneritedByPreloadTags()
+    {
+        $buildDir = Str::random();
+        $this->makeViteManifest([
+            'resources/js/app.js' => [
+                'src' => 'resources/js/app.js',
+                'file' => 'assets/app.versioned.js',
+                'css' => [
+                    'assets/app.versioned.css',
+                ],
+            ],
+            'resources/css/app.css' => [
+                'src' => 'resources/css/app.css',
+                'file' => 'assets/app.versioned.css',
+            ],
+        ], $buildDir);
+        ViteFacade::useScriptTagAttributes([
+            'crossorigin' => 'script-crossorigin',
+        ]);
+        ViteFacade::useStyleTagAttributes([
+            'crossorigin' => 'style-crossorigin',
+        ]);
+
+        $result = app(Vite::class)(['resources/js/app.js'], $buildDir);
+
+        $this->assertSame(
+            '<link rel="preload" as="style" href="https://example.com/'.$buildDir.'/assets/app.versioned.css" crossorigin="style-crossorigin" />'
+            .'<link rel="modulepreload" href="https://example.com/'.$buildDir.'/assets/app.versioned.js" crossorigin="script-crossorigin" />'
+            .'<link rel="stylesheet" href="https://example.com/'.$buildDir.'/assets/app.versioned.css" crossorigin="style-crossorigin" />'
+            .'<script type="module" src="https://example.com/'.$buildDir.'/assets/app.versioned.js" crossorigin="script-crossorigin"></script>',
+        $result->toHtml());
+
+        $this->assertSame([
+            "https://example.com/$buildDir/assets/app.versioned.css" => [
+                'rel="preload"',
+                'as="style"',
+                'crossorigin="style-crossorigin"',
+            ],
+            "https://example.com/$buildDir/assets/app.versioned.js" => [
+                'rel="modulepreload"',
+                'crossorigin="script-crossorigin"',
+            ],
+        ], ViteFacade::preloadedAssets());
+
+        $this->cleanViteManifest($buildDir);
+    }
+
     protected function makeViteManifest($contents = null, $path = 'build')
     {
         app()->singleton('path.public', fn () => __DIR__);
