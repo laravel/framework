@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Events\RouteMatched;
 use Illuminate\Routing\Events\Routing;
+use Illuminate\Routing\Exceptions\MalformedResourceException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -319,6 +320,8 @@ class Router implements BindingRegistrar, RegistrarContract
      * @param  string  $controller
      * @param  array  $options
      * @return \Illuminate\Routing\PendingResourceRegistration
+     * 
+     * @throws \Illuminate\Routing\Exceptions\MalformedResourceException
      */
     public function resource($name, $controller, array $options = [])
     {
@@ -326,6 +329,20 @@ class Router implements BindingRegistrar, RegistrarContract
             $registrar = $this->container->make(ResourceRegistrar::class);
         } else {
             $registrar = new ResourceRegistrar($this);
+        }
+
+        $lastGroupStack = $this->getLastGroupPrefix();
+
+        if (empty($lastGroupStack) && (empty($name) || $name == "/")) {
+            throw new MalformedResourceException;
+        }
+
+        if (!empty($lastGroupStack) && str_starts_with($lastGroupStack, "/")) {
+            $name = explode("/", $lastGroupStack)[1];
+
+            return (new PendingResourceRegistration(
+                $registrar, "/", $controller, $options
+            ))->names($name)->parameters([null => Str::singular($name)]);
         }
 
         return new PendingResourceRegistration(
