@@ -76,6 +76,11 @@ abstract class Component
     protected static $constructorParametersCache = [];
 
     /**
+     * @var bool
+     */
+    protected static $shouldInjectPublic = true;
+
+    /**
      * Get the view / view contents that represent the component.
      *
      * @return \Illuminate\Contracts\View\View|\Illuminate\Contracts\Support\Htmlable|\Closure|string
@@ -209,6 +214,13 @@ abstract class Component
     public function data()
     {
         $this->attributes = $this->attributes ?: $this->newAttributeBag();
+
+        if (! static::$shouldInjectPublic) {
+            return [
+                'componentName' => $this->componentName,
+                'attributes' => $this->attributes,
+            ];
+        }
 
         return array_merge($this->extractPublicProperties(), $this->extractPublicMethods());
     }
