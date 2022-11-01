@@ -439,10 +439,12 @@ class Vite implements Htmlable
             'as' => 'style',
             'href' => $url,
             'nonce' => $this->nonce ?? false,
+            'crossorigin' => $this->resolveStylesheetTagAttributes($src, $url, $chunk, $manifest)['crossorigin'] ?? false,
         ] : [
             'rel' => 'modulepreload',
             'href' => $url,
             'nonce' => $this->nonce ?? false,
+            'crossorigin' => $this->resolveScriptTagAttributes($src, $url, $chunk, $manifest)['crossorigin'] ?? false,
         ];
 
         $attributes = $this->integrityKey !== false
