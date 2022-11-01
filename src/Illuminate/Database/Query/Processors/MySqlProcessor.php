@@ -15,7 +15,7 @@ class MySqlProcessor extends Processor
         $mapping = function ($r) {
             $r = (object) $r;
 
-            return $r->column_name;
+            return $r->COLUMN_NAME;
         };
 
         return array_map($mapping, $results);
