@@ -30,11 +30,11 @@ trait ResolvesDumpSource
     ];
 
     /**
-     * All of the trace names and its keys.
+     * Files that require special trace handling and their levels.
      *
      * @var array<string, int>
      */
-    protected static $traceNames = [
+    protected static $adjustableTraces = [
         'symfony/var-dumper/Resources/functions/dump.php' => 1,
         'Illuminate/Collections/Traits/EnumeratesValues.php' => 4,
     ];
@@ -70,7 +70,7 @@ trait ResolvesDumpSource
                 continue;
             }
 
-            foreach (self::$traceNames as $name => $key) {
+            foreach (self::$adjustableTraces as $name => $key) {
                 if (str_ends_with(
                     $traceFile['file'],
                     str_replace('/', DIRECTORY_SEPARATOR, $name)
