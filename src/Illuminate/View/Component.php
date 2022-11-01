@@ -76,14 +76,14 @@ abstract class Component
     protected static $constructorParametersCache = [];
 
     /**
-     * Indicates whether public properties should be injected on all models.
+     * Indicates whether public properties should be injected on all components.
      *
      * @var bool
      */
     protected static $componentShouldInjectPublicProperties = true;
 
     /**
-     * Indicates whether public methods should be injected on all models.
+     * Indicates whether public methods should be injected on all components.
      *
      * @var bool
      */
@@ -486,7 +486,7 @@ abstract class Component
     }
 
     /**
-     * Prevent public properties from being injected.
+     * Prevent public properties from being injected into the component view.
      *
      * @param  bool  $value
      * @return void
@@ -497,7 +497,7 @@ abstract class Component
     }
 
     /**
-     * Prevent public methods from being injected.
+     * Prevent public methods from being injected into the component view.
      *
      * @param  bool  $value
      * @return void
