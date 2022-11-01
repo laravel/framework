@@ -76,11 +76,11 @@ abstract class Component
     protected static $constructorParametersCache = [];
 
     /**
-     * Toggle to resolve the via the constructor or the render method.
+     * Indicates whether dependency injection should happen on the constructor or the render method.
      *
      * @var bool
      */
-    protected static $shouldResolveConstructor = true;
+    protected static $componentShouldResolveConstructor = true;
 
     /**
      * Resolve the component instance with the given data.
@@ -98,7 +98,7 @@ abstract class Component
 
         $dataKeys = array_keys($data);
 
-        if (! static::$shouldResolveConstructor || empty(array_diff($parameters, $dataKeys))) {
+        if (! static::$componentShouldResolveConstructor || empty(array_diff($parameters, $dataKeys))) {
             return new static(...array_intersect_key($data, array_flip($parameters)));
         }
 
@@ -132,7 +132,7 @@ abstract class Component
      */
     public function resolveView()
     {
-        $view = ! static::$shouldResolveConstructor ? app()->call([$this, 'render']) : $this->render();
+        $view = ! static::$componentShouldResolveConstructor ? app()->call([$this, 'render']) : $this->render();
 
         if ($view instanceof ViewContract) {
             return $view;
@@ -454,5 +454,16 @@ abstract class Component
     public static function resolveComponentsUsing($resolver)
     {
         static::$componentsResolver = $resolver;
+    }
+
+    /**
+     * Set whether dependencies should be resolved via the constructor or the render method.
+     *
+     * @param  bool  $value
+     * @return void
+     */
+    public static function resolveConstructorDependencies($value = true)
+    {
+        static::$componentShouldResolveConstructor = $value;
     }
 }
