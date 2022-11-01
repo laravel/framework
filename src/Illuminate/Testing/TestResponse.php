@@ -1348,13 +1348,12 @@ class TestResponse implements ArrayAccess
                 $errors = [];
 
                 $sessionErrors = $this->session()->get('errors');
+
                 if ($hasErrors && is_a($sessionErrors, ViewErrorBag::class)) {
                     foreach ($sessionErrors->getBags() as $bag => $messages) {
-                        if (! is_a($messages, MessageBag::class)) {
-                            continue;
+                        if (is_a($messages, MessageBag::class)) {
+                            $errors[$bag] = $messages->all();
                         }
-
-                        $errors[$bag] = $messages->all();
                     }
                 }
 
