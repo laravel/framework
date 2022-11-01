@@ -76,9 +76,18 @@ abstract class Component
     protected static $constructorParametersCache = [];
 
     /**
+     * Indicates whether public properties should be injected on all models.
+     *
      * @var bool
      */
-    protected static $shouldInjectPublic = true;
+    protected static $componentShouldInjectPublicProperties = true;
+
+    /**
+     * Indicates whether public methods should be injected on all models.
+     *
+     * @var bool
+     */
+    protected static $componentShouldInjectPublicMethods = true;
 
     /**
      * Get the view / view contents that represent the component.
@@ -215,14 +224,20 @@ abstract class Component
     {
         $this->attributes = $this->attributes ?: $this->newAttributeBag();
 
-        if (! static::$shouldInjectPublic) {
-            return [
-                'componentName' => $this->componentName,
-                'attributes' => $this->attributes,
-            ];
+        $data =[
+            'componentName' => $this->componentName,
+            'attributes' => $this->attributes,
+        ];
+
+        if (static::$componentShouldInjectPublicProperties) {
+            $data = array_merge($data, $this->extractPublicProperties());
         }
 
-        return array_merge($this->extractPublicProperties(), $this->extractPublicMethods());
+        if (static::$componentShouldInjectPublicMethods) {
+            $data = array_merge($data, $this->extractPublicMethods());
+        }
+
+        return $data;
     }
 
     /**
@@ -334,6 +349,8 @@ abstract class Component
     protected function ignoredMethods()
     {
         return array_merge([
+            'componentName',
+            'attributes',
             'data',
             'render',
             'resolveView',
@@ -466,5 +483,27 @@ abstract class Component
     public static function resolveComponentsUsing($resolver)
     {
         static::$componentsResolver = $resolver;
+    }
+
+    /**
+     * Prevent public properties from being injected.
+     *
+     * @param  bool  $value
+     * @return void
+     */
+    public static function preventPublicPropertyInjection($value = true)
+    {
+        static::$componentShouldInjectPublicProperties = !$value;
+    }
+
+    /**
+     * Prevent public methods from being injected.
+     *
+     * @param  bool  $value
+     * @return void
+     */
+    public static function preventPublicMethodInjection($value = true)
+    {
+        static::$componentShouldInjectPublicMethods = !$value;
     }
 }
