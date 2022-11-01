@@ -420,7 +420,7 @@ class TestHtmlableReturningViewComponent extends Component
 
 class TestRenderResolvedViewComponent extends Component
 {
-    public static $shouldResolveConstructor = false;
+    public static $componentShouldResolveConstructor = false;
 
     public $dependency;
 
