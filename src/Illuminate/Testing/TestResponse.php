@@ -4,6 +4,7 @@ namespace Illuminate\Testing;
 
 use ArrayAccess;
 use Closure;
+use Illuminate\Contracts\Support\MessageBag;
 use Illuminate\Contracts\View\View;
 use Illuminate\Cookie\CookieValuePrefix;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
@@ -15,6 +16,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\Tappable;
+use Illuminate\Support\ViewErrorBag;
 use Illuminate\Testing\Assert as PHPUnit;
 use Illuminate\Testing\Constraints\SeeInOrder;
 use Illuminate\Testing\Fluent\AssertableJson;
@@ -1339,12 +1341,24 @@ class TestResponse implements ArrayAccess
     {
         $hasErrors = $this->session()->has('errors');
 
-        $errors = $hasErrors ? $this->session()->get('errors')->all() : [];
-
         PHPUnit::assertFalse(
             $hasErrors,
             'Session has unexpected errors: '.PHP_EOL.PHP_EOL.
-            json_encode($errors, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+            json_encode((function () use ($hasErrors) {
+                $errors = [];
+
+                $sessionErrors = $this->session()->get('errors');
+
+                if ($hasErrors && is_a($sessionErrors, ViewErrorBag::class)) {
+                    foreach ($sessionErrors->getBags() as $bag => $messages) {
+                        if (is_a($messages, MessageBag::class)) {
+                            $errors[$bag] = $messages->all();
+                        }
+                    }
+                }
+
+                return $errors;
+            })(), JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
         );
 
         return $this;
