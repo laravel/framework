@@ -1344,13 +1344,13 @@ class TestResponse implements ArrayAccess
         PHPUnit::assertFalse(
             $hasErrors,
             'Session has unexpected errors: '.PHP_EOL.PHP_EOL.
-            json_encode((function () use($hasErrors) {
+            json_encode((function () use ($hasErrors) {
                 $errors = [];
 
                 $sessionErrors = $this->session()->get('errors');
                 if ($hasErrors && is_a($sessionErrors, ViewErrorBag::class)) {
                     foreach ($sessionErrors->getBags() as $bag => $messages) {
-                        if(!is_a($messages, MessageBag::class)) {
+                        if (! is_a($messages, MessageBag::class)) {
                             continue;
                         }
 
