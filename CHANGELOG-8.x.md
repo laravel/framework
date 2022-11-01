@@ -1,6 +1,12 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.83.25...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.83.26...8.x)
+
+
+## [v8.83.26 (2022-11-01)](https://github.com/laravel/framework/compare/v8.83.25...v8.83.26)
+
+### Fixed
+- Fixes controller computed middleware ([#44454](https://github.com/laravel/framework/pull/44454))
 
 
 ## [v8.83.25 (2022-09-30)](https://github.com/laravel/framework/compare/v8.83.24...v8.83.25)
