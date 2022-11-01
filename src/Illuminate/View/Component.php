@@ -224,7 +224,7 @@ abstract class Component
     {
         $this->attributes = $this->attributes ?: $this->newAttributeBag();
 
-        $data =[
+        $data = [
             'componentName' => $this->componentName,
             'attributes' => $this->attributes,
         ];
@@ -493,7 +493,7 @@ abstract class Component
      */
     public static function preventPublicPropertyInjection($value = true)
     {
-        static::$componentShouldInjectPublicProperties = !$value;
+        static::$componentShouldInjectPublicProperties = ! $value;
     }
 
     /**
@@ -504,6 +504,6 @@ abstract class Component
      */
     public static function preventPublicMethodInjection($value = true)
     {
-        static::$componentShouldInjectPublicMethods = !$value;
+        static::$componentShouldInjectPublicMethods = ! $value;
     }
 }
