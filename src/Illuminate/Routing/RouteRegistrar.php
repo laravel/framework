@@ -164,6 +164,8 @@ class RouteRegistrar
     public function group($callback)
     {
         $this->router->group($this->attributes, $callback);
+
+        return $this;
     }
 
     /**

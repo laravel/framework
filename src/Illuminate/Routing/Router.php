@@ -387,6 +387,8 @@ class Router implements BindingRegistrar, RegistrarContract
 
             array_pop($this->groupStack);
         }
+
+        return $this;
     }
 
     /**
