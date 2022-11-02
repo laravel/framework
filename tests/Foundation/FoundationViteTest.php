@@ -170,6 +170,25 @@ class FoundationViteTest extends TestCase
         );
     }
 
+    public function testReactRefreshWithNoNonce()
+    {
+        $this->makeViteHotFile();
+
+        $result = app(Vite::class)->reactRefresh();
+
+        $this->assertStringNotContainsString('nonce', $result);
+    }
+
+    public function testReactRefreshNonce()
+    {
+        $this->makeViteHotFile();
+
+        $nonce = ViteFacade::useCspNonce('expected-nonce');
+        $result = app(Vite::class)->reactRefresh();
+
+        $this->assertStringContainsString(sprintf('nonce="%s"', $nonce), $result);
+    }
+
     public function testItCanInjectIntegrityWhenPresentInManifest()
     {
         $buildDir = Str::random();
