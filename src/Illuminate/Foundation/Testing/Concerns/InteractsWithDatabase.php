@@ -69,7 +69,7 @@ trait InteractsWithDatabase
     }
 
     /**
-     * Assert table has no entries.
+     * Assert that the given table has no entries.
      *
      * @param  \Illuminate\Database\Eloquent\Model|string  $table
      * @param  string|null  $connection
