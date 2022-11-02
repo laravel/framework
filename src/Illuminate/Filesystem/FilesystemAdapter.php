@@ -329,17 +329,13 @@ class FilesystemAdapter implements CloudFilesystemContract
     /**
      * Write the contents of a file.
      *
-     * @param  \Psr\Http\Message\StreamInterface|\Illuminate\Http\File|\Illuminate\Http\UploadedFile|string|resource|string  $path
-     * @param  \Psr\Http\Message\StreamInterface|\Illuminate\Http\File|\Illuminate\Http\UploadedFile|string|resource|array|null  $contents
+     * @param  string  $path
+     * @param  \Psr\Http\Message\StreamInterface|\Illuminate\Http\File|\Illuminate\Http\UploadedFile|string|resource  $contents
      * @param  mixed  $options
      * @return string|bool
      */
-    public function put($path, $contents = null, $options = [])
+    public function put($path, $contents, $options = [])
     {
-        if (is_null($contents) || is_array($contents)) {
-            [$path, $contents, $options] = ['', $path, $contents ?? []];
-        }
-
         $options = is_string($options)
                      ? ['visibility' => $options]
                      : (array) $options;
