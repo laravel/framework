@@ -76,13 +76,6 @@ abstract class Component
     protected static $constructorParametersCache = [];
 
     /**
-     * Get the view / view contents that represent the component.
-     *
-     * @return \Illuminate\Contracts\View\View|\Illuminate\Contracts\Support\Htmlable|\Closure|string
-     */
-    abstract public function render();
-
-    /**
      * Resolve the component instance with the given data.
      *
      * @param  array  $data
@@ -94,15 +87,7 @@ abstract class Component
             return call_user_func(static::$componentsResolver, static::class, $data);
         }
 
-        $parameters = static::extractConstructorParameters();
-
-        $dataKeys = array_keys($data);
-
-        if (empty(array_diff($parameters, $dataKeys))) {
-            return new static(...array_intersect_key($data, array_flip($parameters)));
-        }
-
-        return Container::getInstance()->make(static::class, $data);
+        return new static(...array_intersect_key($data, array_flip(static::extractConstructorParameters())));
     }
 
     /**
@@ -132,7 +117,7 @@ abstract class Component
      */
     public function resolveView()
     {
-        $view = $this->render();
+        $view = app()->call([$this, 'render']);
 
         if ($view instanceof ViewContract) {
             return $view;

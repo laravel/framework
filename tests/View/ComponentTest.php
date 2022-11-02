@@ -4,7 +4,6 @@ namespace Illuminate\Tests\View;
 
 use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\View\Factory as FactoryContract;
 use Illuminate\Support\Facades\Facade;
@@ -102,12 +101,21 @@ class ComponentTest extends TestCase
         $this->assertSame('<p>Hello foo</p>', $view->toHtml());
     }
 
-    public function testResolveWithUnresolvableDependency()
+    public function testRenderMethodResolvesDependencies()
     {
-        $this->expectException(BindingResolutionException::class);
-        $this->expectExceptionMessage('Unresolvable dependency resolving');
+        $this->viewFactory->shouldReceive('exists')->once()->andReturn(true);
 
-        TestInlineViewComponentWhereRenderDependsOnProps::resolve([]);
+        $component = TestDependencyInjectionOnRenderViewComponent::resolve([]);
+        $component->resolveView();
+
+        $this->assertSame($this->viewFactory, $component->dependency);
+        $this->assertNull($component->content);
+
+        $component = TestDependencyInjectionOnRenderViewComponent::resolve(['content' => 'foo']);
+        $component->resolveView();
+
+        $this->assertSame($this->viewFactory, $component->dependency);
+        $this->assertSame('foo', $component->content);
     }
 
     public function testResolveDependenciesWithoutContainer()
@@ -131,16 +139,6 @@ class ComponentTest extends TestCase
         $component = $component::resolve(['a' => 'a', 'b' => 'b']);
         $component = $component::resolve(['b' => 'b', 'a' => 'a']);
         $this->assertSame('ab', $component->render());
-    }
-
-    public function testResolveDependenciesWithContainerIfNecessary()
-    {
-        $component = TestInlineViewComponentWithContainerDependencies::resolve([]);
-        $this->assertSame($this->viewFactory, $component->dependency);
-
-        $component = TestInlineViewComponentWithContainerDependenciesAndProps::resolve(['content' => 'foo']);
-        $this->assertSame($this->viewFactory, $component->dependency);
-        $this->assertSame('foo', $component->render());
     }
 
     public function testResolveComponentsUsing()
@@ -283,39 +281,6 @@ class TestInlineViewComponent extends Component
     }
 }
 
-class TestInlineViewComponentWithContainerDependencies extends Component
-{
-    public $dependency;
-
-    public function __construct(FactoryContract $dependency)
-    {
-        $this->dependency = $dependency;
-    }
-
-    public function render()
-    {
-        return '';
-    }
-}
-
-class TestInlineViewComponentWithContainerDependenciesAndProps extends Component
-{
-    public $content;
-
-    public $dependency;
-
-    public function __construct(FactoryContract $dependency, $content)
-    {
-        $this->content = $content;
-        $this->dependency = $dependency;
-    }
-
-    public function render()
-    {
-        return $this->content;
-    }
-}
-
 class TestInlineViewComponentWithoutDependencies extends Component
 {
     public function render()
@@ -396,5 +361,24 @@ class TestHtmlableReturningViewComponent extends Component
     public function render()
     {
         return new HtmlString("<p>Hello {$this->title}</p>");
+    }
+}
+
+class TestDependencyInjectionOnRenderViewComponent extends Component
+{
+    public $dependency;
+
+    public $content;
+
+    public function __construct($content = null)
+    {
+        $this->content = $content;
+    }
+
+    public function render(FactoryContract $dependency)
+    {
+        $this->dependency = $dependency;
+
+        return '';
     }
 }
