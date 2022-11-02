@@ -49,7 +49,7 @@ class InteractsWithContainerTest extends TestCase
     {
         $instance = $this->withoutMix();
 
-        $this->assertSame('', mix('path/to/asset.png'));
+        $this->assertSame('', (string) mix('path/to/asset.png'));
         $this->assertSame($this, $instance);
     }
 
