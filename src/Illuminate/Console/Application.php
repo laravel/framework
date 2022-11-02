@@ -95,10 +95,9 @@ class Application extends SymfonyApplication implements ApplicationContract
         );
 
         try {
-            // Use command's input definition to properly parse the arguments.
             $input->bind($this->find($commandName)->getDefinition());
         } catch (ExceptionInterface) {
-            // Ignore invalid options/arguments for now.
+            // ...
         }
 
         $this->events->dispatch(
