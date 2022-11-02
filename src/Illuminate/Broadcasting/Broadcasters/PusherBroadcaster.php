@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use Pusher\ApiErrorException;
 use Pusher\Pusher;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Illuminate\Support\Collection;
 
 class PusherBroadcaster extends Broadcaster
 {
@@ -117,32 +118,17 @@ class PusherBroadcaster extends Broadcaster
     {
         $socket = Arr::pull($payload, 'socket');
 
-        if ($this->pusherServerIsVersionFiveOrGreater()) {
-            $parameters = $socket !== null ? ['socket_id' => $socket] : [];
+        $parameters = $socket !== null ? ['socket_id' => $socket] : [];
 
-            try {
-                $this->pusher->trigger(
-                    $this->formatChannels($channels), $event, $payload, $parameters
-                );
-            } catch (ApiErrorException $e) {
-                throw new BroadcastException(
-                    sprintf('Pusher error: %s.', $e->getMessage())
-                );
-            }
-        } else {
-            $response = $this->pusher->trigger(
-                $this->formatChannels($channels), $event, $payload, $socket, true
-            );
+        $channels = Collection::make($this->formatChannels($channels));
 
-            if ((is_array($response) && $response['status'] >= 200 && $response['status'] <= 299)
-                || $response === true) {
-                return;
-            }
-
+        try {
+            $channels->chunk(100)->each(function ($channels) use ($event, $payload, $parameters) {
+                $this->pusher->trigger($channels->toArray(), $event, $payload, $parameters);
+            });
+        } catch (ApiErrorException $e) {
             throw new BroadcastException(
-                ! empty($response['body'])
-                    ? sprintf('Pusher error: %s.', $response['body'])
-                    : 'Failed to connect to Pusher.'
+                sprintf('Pusher error: %s.', $e->getMessage())
             );
         }
     }
