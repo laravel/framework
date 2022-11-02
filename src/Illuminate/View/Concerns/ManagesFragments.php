@@ -7,14 +7,14 @@ use InvalidArgumentException;
 trait ManagesFragments
 {
     /**
-     * All of the finished, captured fragments.
+     * All of the captured, rendered fragments.
      *
      * @var array
      */
     protected $fragments = [];
 
     /**
-     * The stack of in-progress fragments.
+     * The stack of in-progress fragment renders.
      *
      * @var array
      */
@@ -66,7 +66,7 @@ trait ManagesFragments
     }
 
     /**
-     * Get the entire array of fragments.
+     * Get the entire array of rendered fragments.
      *
      * @return array
      */

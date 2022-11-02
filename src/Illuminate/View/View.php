@@ -78,6 +78,19 @@ class View implements ArrayAccess, Htmlable, ViewContract
     }
 
     /**
+     * Get the evaluated contents of a given fragment.
+     *
+     * @param  string  $fragment
+     * @return string
+     */
+    public function fragment($fragment)
+    {
+        return $this->render(function () use ($fragment) {
+            return $this->factory->getFragment($fragment);
+        });
+    }
+
+    /**
      * Get the string contents of the view.
      *
      * @param  callable|null  $callback
@@ -127,19 +140,6 @@ class View implements ArrayAccess, Htmlable, ViewContract
         $this->factory->decrementRender();
 
         return $contents;
-    }
-
-    /**
-     * Get the evaluated contents of the fragment.
-     *
-     * @param  string  $fragment
-     * @return string
-     */
-    public function fragment($fragment)
-    {
-        return $this->render(function () use ($fragment) {
-            return $this->factory->getFragment($fragment);
-        });
     }
 
     /**
