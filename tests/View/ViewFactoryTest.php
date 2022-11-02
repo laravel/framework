@@ -538,6 +538,14 @@ class ViewFactoryTest extends TestCase
         $this->assertSame('<p>hi</p>&lt;p&gt;already escaped&lt;/p&gt;', $factory->yieldContent('foo', $view));
     }
 
+    public function testBasicFragmentHandling()
+    {
+        $factory = $this->getFactory();
+        $factory->startFragment('foo');
+        echo 'hi';
+        $this->assertSame('hi', $factory->stopFragment());
+    }
+
     public function testBasicSectionHandling()
     {
         $factory = $this->getFactory();
