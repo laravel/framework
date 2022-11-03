@@ -452,10 +452,12 @@ class ComponentTagCompiler
      */
     public function compileSlots(string $value)
     {
+        $prefix = $this->blade->getComponentTagPrefix();
+
         $pattern = "/
             <
                 \s*
-                x[\-\:]slot
+                {$prefix}[\-\:]slot
                 (?:\:(?<inlineName>\w+(?:-\w+)*))?
                 (?:\s+(:?)name=(?<name>(\"[^\"]+\"|\\\'[^\\\']+\\\'|[^\s>]+)))?
                 (?<attributes>
