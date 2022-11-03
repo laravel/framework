@@ -29,7 +29,8 @@ class HasAttributesWithoutConstructor
 
     public function someAttribute(): Attribute
     {
-        return new Attribute(function () {});
+        return new Attribute(function () {
+        });
     }
 }
 
