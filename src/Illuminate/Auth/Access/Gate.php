@@ -12,8 +12,10 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
+use Laravel\SerializableClosure\Support\ReflectionClosure;
 use ReflectionClass;
 use ReflectionFunction;
+use ReflectionFunctionAbstract;
 
 class Gate implements GateContract
 {
@@ -479,7 +481,22 @@ class Gate implements GateContract
         try {
             $reflection = new ReflectionClass($class);
 
-            $method = $reflection->getMethod($method);
+            if ($reflection->implementsInterface(DefinesAbilities::class)) {
+                $object = is_string($class) ? $this->container->make($class) : $class;
+                $abilities = $object->abilities();
+
+                if (isset($abilities[$method])) {
+                    $method = $abilities[$method];
+
+                    if ($method instanceof Closure) {
+                        $method = new ReflectionClosure($method);
+                    }
+                }
+            }
+
+            if (! $method instanceof ReflectionFunctionAbstract) {
+                $method = $reflection->getMethod($method);
+            }
         } catch (Exception $e) {
             return false;
         }

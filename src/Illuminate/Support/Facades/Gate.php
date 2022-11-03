@@ -3,6 +3,7 @@
 namespace Illuminate\Support\Facades;
 
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
+use Illuminate\Support\Testing\Fakes\GateFake;
 
 /**
  * @method static \Illuminate\Auth\Access\Gate guessPolicyNamesUsing(callable $callback)
@@ -23,6 +24,11 @@ use Illuminate\Contracts\Auth\Access\Gate as GateContract;
  * @method static bool has(string $ability)
  * @method static mixed getPolicyFor(object|string $class)
  * @method static mixed raw(string $ability, array|mixed $arguments = [])
+ * @method static \Illuminate\Support\Testing\Fakes\GateFake fail(string $policy, \Illuminate\Auth\Access\Response|\Illuminate\Database\Eloquent\Factories\Sequence|bool|null $value)
+ * @method static \Illuminate\Support\Testing\Fakes\GateFake except(string $policy, ?string $ability)
+ * @method static \Illuminate\Support\Testing\Fakes\GateFake checkOriginalGate()
+ * @method static void assertChecked(string $policy, ?string $ability, ?callable $callback)
+ * @method static void assertCheckedTimes(string $policy, string $ability, int $times)
  *
  * @see \Illuminate\Contracts\Auth\Access\Gate
  */
@@ -36,5 +42,15 @@ class Gate extends Facade
     protected static function getFacadeAccessor()
     {
         return GateContract::class;
+    }
+
+    /**
+     * @return \Illuminate\Support\Testing\Fakes\GateFake
+     */
+    public static function fake()
+    {
+        static::swap($fake = new GateFake(static::getFacadeRoot(), static::$app));
+
+        return $fake;
     }
 }
