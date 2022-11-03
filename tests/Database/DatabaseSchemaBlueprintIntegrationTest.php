@@ -84,6 +84,18 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
                 'INSERT INTO users (first_name, age) SELECT name, age FROM __temp__users',
                 'DROP TABLE __temp__users',
             ],
+            [
+                'CREATE TEMPORARY TABLE __temp__users AS SELECT name, age FROM users',
+                'DROP TABLE users',
+                'CREATE TABLE users (name VARCHAR(255) NOT NULL COLLATE "BINARY", age INTEGER NOT NULL)',
+                'INSERT INTO users (name, age) SELECT name, age FROM __temp__users',
+                'DROP TABLE __temp__users',
+                'CREATE TEMPORARY TABLE __temp__users AS SELECT name, age FROM users',
+                'DROP TABLE users',
+                'CREATE TABLE users (first_name VARCHAR(255) NOT NULL, age VARCHAR(255) NOT NULL COLLATE "BINARY")',
+                'INSERT INTO users (first_name, age) SELECT name, age FROM __temp__users',
+                'DROP TABLE __temp__users',
+            ],
         ];
 
         $this->assertTrue(in_array($queries, $expected));
@@ -104,26 +116,46 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
         });
 
         $queries = $blueprint->toSql($this->db->connection(), new SQLiteGrammar);
-        $queries2 = $blueprint2->toSql($this->db->connection(), new SQLiteGrammar);
 
         $expected = [
-            'CREATE TEMPORARY TABLE __temp__users AS SELECT age FROM users',
-            'DROP TABLE users',
-            'CREATE TABLE users (age INTEGER NOT NULL COLLATE RTRIM)',
-            'INSERT INTO users (age) SELECT age FROM __temp__users',
-            'DROP TABLE __temp__users',
+            [
+                'CREATE TEMPORARY TABLE __temp__users AS SELECT age FROM users',
+                'DROP TABLE users',
+                'CREATE TABLE users (age INTEGER NOT NULL COLLATE RTRIM)',
+                'INSERT INTO users (age) SELECT age FROM __temp__users',
+                'DROP TABLE __temp__users',
+            ],
+            [
+                'CREATE TEMPORARY TABLE __temp__users AS SELECT age FROM users',
+                'DROP TABLE users',
+                'CREATE TABLE users (age INTEGER NOT NULL COLLATE "RTRIM")',
+                'INSERT INTO users (age) SELECT age FROM __temp__users',
+                'DROP TABLE __temp__users',
+            ],
         ];
 
-        $expected2 = [
-            'CREATE TEMPORARY TABLE __temp__users AS SELECT age FROM users',
-            'DROP TABLE users',
-            'CREATE TABLE users (age INTEGER NOT NULL COLLATE NOCASE)',
-            'INSERT INTO users (age) SELECT age FROM __temp__users',
-            'DROP TABLE __temp__users',
+        $this->assertContains($queries, $expected);
+
+        $queries = $blueprint2->toSql($this->db->connection(), new SQLiteGrammar);
+
+        $expected = [
+            [
+                'CREATE TEMPORARY TABLE __temp__users AS SELECT age FROM users',
+                'DROP TABLE users',
+                'CREATE TABLE users (age INTEGER NOT NULL COLLATE NOCASE)',
+                'INSERT INTO users (age) SELECT age FROM __temp__users',
+                'DROP TABLE __temp__users',
+            ],
+            [
+                'CREATE TEMPORARY TABLE __temp__users AS SELECT age FROM users',
+                'DROP TABLE users',
+                'CREATE TABLE users (age INTEGER NOT NULL COLLATE "NOCASE")',
+                'INSERT INTO users (age) SELECT age FROM __temp__users',
+                'DROP TABLE __temp__users',
+            ],
         ];
 
-        $this->assertEquals($expected, $queries);
-        $this->assertEquals($expected2, $queries2);
+        $this->assertContains($queries, $expected);
     }
 
     public function testRenameIndexWorks()
@@ -188,15 +220,25 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
         $queries = $blueprintMySql->toSql($this->db->connection(), new MySqlGrammar);
 
         $expected = [
-            'CREATE TEMPORARY TABLE __temp__users AS SELECT name FROM users',
-            'DROP TABLE users',
-            'CREATE TABLE users (name VARCHAR(255) DEFAULT NULL COLLATE BINARY)',
-            'INSERT INTO users (name) SELECT name FROM __temp__users',
-            'DROP TABLE __temp__users',
-            'alter table `users` add unique `users_name_unique`(`name`)',
+            [
+                'CREATE TEMPORARY TABLE __temp__users AS SELECT name FROM users',
+                'DROP TABLE users',
+                'CREATE TABLE users (name VARCHAR(255) DEFAULT NULL COLLATE BINARY)',
+                'INSERT INTO users (name) SELECT name FROM __temp__users',
+                'DROP TABLE __temp__users',
+                'alter table `users` add unique `users_name_unique`(`name`)',
+            ],
+            [
+                'CREATE TEMPORARY TABLE __temp__users AS SELECT name FROM users',
+                'DROP TABLE users',
+                'CREATE TABLE users (name VARCHAR(255) DEFAULT NULL COLLATE "BINARY")',
+                'INSERT INTO users (name) SELECT name FROM __temp__users',
+                'DROP TABLE __temp__users',
+                'alter table `users` add unique `users_name_unique`(`name`)',
+            ],
         ];
 
-        $this->assertEquals($expected, $queries);
+        $this->assertContains($queries, $expected);
 
         $blueprintPostgres = new Blueprint('users', function ($table) {
             $table->string('name')->nullable()->unique()->change();
@@ -205,15 +247,25 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
         $queries = $blueprintPostgres->toSql($this->db->connection(), new PostgresGrammar);
 
         $expected = [
-            'CREATE TEMPORARY TABLE __temp__users AS SELECT name FROM users',
-            'DROP TABLE users',
-            'CREATE TABLE users (name VARCHAR(255) DEFAULT NULL COLLATE BINARY)',
-            'INSERT INTO users (name) SELECT name FROM __temp__users',
-            'DROP TABLE __temp__users',
-            'alter table "users" add constraint "users_name_unique" unique ("name")',
+            [
+                'CREATE TEMPORARY TABLE __temp__users AS SELECT name FROM users',
+                'DROP TABLE users',
+                'CREATE TABLE users (name VARCHAR(255) DEFAULT NULL COLLATE BINARY)',
+                'INSERT INTO users (name) SELECT name FROM __temp__users',
+                'DROP TABLE __temp__users',
+                'alter table "users" add constraint "users_name_unique" unique ("name")',
+            ],
+            [
+                'CREATE TEMPORARY TABLE __temp__users AS SELECT name FROM users',
+                'DROP TABLE users',
+                'CREATE TABLE users (name VARCHAR(255) DEFAULT NULL COLLATE "BINARY")',
+                'INSERT INTO users (name) SELECT name FROM __temp__users',
+                'DROP TABLE __temp__users',
+                'alter table "users" add constraint "users_name_unique" unique ("name")',
+            ],
         ];
 
-        $this->assertEquals($expected, $queries);
+        $this->assertContains($queries, $expected);
 
         $blueprintSQLite = new Blueprint('users', function ($table) {
             $table->string('name')->nullable()->unique()->change();
@@ -222,15 +274,25 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
         $queries = $blueprintSQLite->toSql($this->db->connection(), new SQLiteGrammar);
 
         $expected = [
-            'CREATE TEMPORARY TABLE __temp__users AS SELECT name FROM users',
-            'DROP TABLE users',
-            'CREATE TABLE users (name VARCHAR(255) DEFAULT NULL COLLATE BINARY)',
-            'INSERT INTO users (name) SELECT name FROM __temp__users',
-            'DROP TABLE __temp__users',
-            'create unique index "users_name_unique" on "users" ("name")',
+            [
+                'CREATE TEMPORARY TABLE __temp__users AS SELECT name FROM users',
+                'DROP TABLE users',
+                'CREATE TABLE users (name VARCHAR(255) DEFAULT NULL COLLATE BINARY)',
+                'INSERT INTO users (name) SELECT name FROM __temp__users',
+                'DROP TABLE __temp__users',
+                'create unique index "users_name_unique" on "users" ("name")',
+            ],
+            [
+                'CREATE TEMPORARY TABLE __temp__users AS SELECT name FROM users',
+                'DROP TABLE users',
+                'CREATE TABLE users (name VARCHAR(255) DEFAULT NULL COLLATE "BINARY")',
+                'INSERT INTO users (name) SELECT name FROM __temp__users',
+                'DROP TABLE __temp__users',
+                'create unique index "users_name_unique" on "users" ("name")',
+            ],
         ];
 
-        $this->assertEquals($expected, $queries);
+        $this->assertContains($queries, $expected);
 
         $blueprintSqlServer = new Blueprint('users', function ($table) {
             $table->string('name')->nullable()->unique()->change();
@@ -239,15 +301,25 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
         $queries = $blueprintSqlServer->toSql($this->db->connection(), new SqlServerGrammar);
 
         $expected = [
-            'CREATE TEMPORARY TABLE __temp__users AS SELECT name FROM users',
-            'DROP TABLE users',
-            'CREATE TABLE users (name VARCHAR(255) DEFAULT NULL COLLATE BINARY)',
-            'INSERT INTO users (name) SELECT name FROM __temp__users',
-            'DROP TABLE __temp__users',
-            'create unique index "users_name_unique" on "users" ("name")',
+            [
+                'CREATE TEMPORARY TABLE __temp__users AS SELECT name FROM users',
+                'DROP TABLE users',
+                'CREATE TABLE users (name VARCHAR(255) DEFAULT NULL COLLATE BINARY)',
+                'INSERT INTO users (name) SELECT name FROM __temp__users',
+                'DROP TABLE __temp__users',
+                'create unique index "users_name_unique" on "users" ("name")',
+            ],
+            [
+                'CREATE TEMPORARY TABLE __temp__users AS SELECT name FROM users',
+                'DROP TABLE users',
+                'CREATE TABLE users (name VARCHAR(255) DEFAULT NULL COLLATE "BINARY")',
+                'INSERT INTO users (name) SELECT name FROM __temp__users',
+                'DROP TABLE __temp__users',
+                'create unique index "users_name_unique" on "users" ("name")',
+            ],
         ];
 
-        $this->assertEquals($expected, $queries);
+        $this->assertContains($queries, $expected);
     }
 
     public function testAddUniqueIndexWithNameWorks()
@@ -263,15 +335,25 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
         $queries = $blueprintMySql->toSql($this->db->connection(), new MySqlGrammar);
 
         $expected = [
-            'CREATE TEMPORARY TABLE __temp__users AS SELECT name FROM users',
-            'DROP TABLE users',
-            'CREATE TABLE users (name VARCHAR(255) DEFAULT NULL COLLATE BINARY)',
-            'INSERT INTO users (name) SELECT name FROM __temp__users',
-            'DROP TABLE __temp__users',
-            'alter table `users` add unique `index1`(`name`)',
+            [
+                'CREATE TEMPORARY TABLE __temp__users AS SELECT name FROM users',
+                'DROP TABLE users',
+                'CREATE TABLE users (name VARCHAR(255) DEFAULT NULL COLLATE BINARY)',
+                'INSERT INTO users (name) SELECT name FROM __temp__users',
+                'DROP TABLE __temp__users',
+                'alter table `users` add unique `index1`(`name`)',
+            ],
+            [
+                'CREATE TEMPORARY TABLE __temp__users AS SELECT name FROM users',
+                'DROP TABLE users',
+                'CREATE TABLE users (name VARCHAR(255) DEFAULT NULL COLLATE "BINARY")',
+                'INSERT INTO users (name) SELECT name FROM __temp__users',
+                'DROP TABLE __temp__users',
+                'alter table `users` add unique `index1`(`name`)',
+            ],
         ];
 
-        $this->assertEquals($expected, $queries);
+        $this->assertContains($queries, $expected);
 
         $blueprintPostgres = new Blueprint('users', function ($table) {
             $table->unsignedInteger('name')->nullable()->unique('index1')->change();
