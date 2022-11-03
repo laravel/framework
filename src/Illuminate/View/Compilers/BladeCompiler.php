@@ -152,6 +152,13 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected $compilesComponentTags = true;
 
     /**
+     * The prefix for component tags.
+     *
+     * @var string
+     */
+    protected $componentTagPrefix = 'x';
+
+    /**
      * Compile the view at the given path.
      *
      * @param  string|null  $path
@@ -861,5 +868,26 @@ class BladeCompiler extends Compiler implements CompilerInterface
     public function withoutComponentTags()
     {
         $this->compilesComponentTags = false;
+    }
+
+    /**
+     * Get the "prefix" for component tags.
+     *
+     * @return string
+     */
+    public function getComponentTagPrefix()
+    {
+        return $this->componentTagPrefix;
+    }
+
+    /**
+     * Set the "prefix" for component tags.
+     *
+     * @param $prefix
+     * @return void
+     */
+    public function setComponentTagPrefix($prefix)
+    {
+        $this->componentTagPrefix = $prefix;
     }
 }

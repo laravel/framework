@@ -103,10 +103,12 @@ class ComponentTagCompiler
      */
     protected function compileOpeningTags(string $value)
     {
+        $prefix = $this->blade->getComponentTagPrefix();
+
         $pattern = "/
             <
                 \s*
-                x[-\:]([\w\-\:\.]*)
+                {$prefix}[-\:]([\w\-\:\.]*)
                 (?<attributes>
                     (?:
                         \s+
@@ -163,10 +165,12 @@ class ComponentTagCompiler
      */
     protected function compileSelfClosingTags(string $value)
     {
+        $prefix = $this->blade->getComponentTagPrefix();
+
         $pattern = "/
             <
                 \s*
-                x[-\:]([\w\-\:\.]*)
+                {$prefix}[-\:]([\w\-\:\.]*)
                 \s*
                 (?<attributes>
                     (?:
@@ -435,7 +439,9 @@ class ComponentTagCompiler
      */
     protected function compileClosingTags(string $value)
     {
-        return preg_replace("/<\/\s*x[-\:][\w\-\:\.]*\s*>/", ' @endComponentClass##END-COMPONENT-CLASS##', $value);
+        $prefix = $this->blade->getComponentTagPrefix();
+
+        return preg_replace("/<\/\s*{$prefix}[-\:][\w\-\:\.]*\s*>/", ' @endComponentClass##END-COMPONENT-CLASS##', $value);
     }
 
     /**
