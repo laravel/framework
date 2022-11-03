@@ -7524,6 +7524,48 @@ class ValidationValidatorTest extends TestCase
         ];
     }
 
+    /**
+     * @dataProvider dataProviderForAttributeRules
+     */
+    public function testItValidatesAgainstAssertAttribute(object $obj, array $rules, bool $expected): void
+    {
+        $sut = new Validator($this->getIlluminateArrayTranslator(), $obj, $rules,);
+
+        $this->assertSame($expected, $sut->passes());
+    }
+
+    public function dataProviderForAttributeRules(): array
+    {
+        return [
+            'object with valid properties' => [
+                'obj' => new class {
+                    #[\Illuminate\Validation\Assert(['required', 'email'])]
+                    private string $email = 'user@site.com';
+                },
+                'rules' => [],
+                'expected' => true,
+            ],
+            'object with invalid properties' => [
+                'obj' => new class {
+                    #[\Illuminate\Validation\Assert(['required', 'email'])]
+                    private string $email = 'invalidEmail';
+                },
+                'rules' => [],
+                'expected' => false,
+            ],
+            'rules array overrides Assert attribute' => [
+                'obj' => new class {
+                    #[\Illuminate\Validation\Assert(['required', 'email'])]
+                    private string $email = 'invalidEmail';
+                },
+                'rules' => [
+                    'email' => 'required',
+                ],
+                'expected' => true,
+            ],
+        ];
+    }
+
     protected function getTranslator()
     {
         return m::mock(TranslatorContract::class);

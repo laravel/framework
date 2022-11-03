@@ -16,7 +16,6 @@ use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 use Illuminate\Support\ValidatedInput;
 use InvalidArgumentException;
-use ReflectionClass;
 use ReflectionObject;
 use RuntimeException;
 use stdClass;
@@ -313,7 +312,7 @@ class Validator implements ValidatorContract
         $this->data = $this->parseData($data);
         $this->customAttributes = $customAttributes;
 
-        $this->setRules($rules);
+        $this->setRules($rules, $data);
     }
 
     /**
@@ -1099,13 +1098,22 @@ class Validator implements ValidatorContract
      * Set the validation rules.
      *
      * @param  array  $rules
+     * @param array|object|null $data
      * @return $this
      */
-    public function setRules(array $rules)
+    public function setRules(array $rules, array|object|null $data = null)
     {
         $rules = collect($rules)->mapWithKeys(function ($value, $key) {
             return [str_replace('\.', $this->dotPlaceholder, $key) => $value];
         })->toArray();
+
+        $rulesFromAttributes = [];
+
+        if(is_object($data)) {
+            $rulesFromAttributes = $this->getRulesFromAttributes($data);
+        }
+
+        $rules = array_replace_recursive($rulesFromAttributes, $rules);
 
         $this->initialRules = $rules;
 
@@ -1572,5 +1580,31 @@ class Validator implements ValidatorContract
         }
 
         return $data;
+    }
+
+    /**
+     * Gets array of rules from the given object.
+     * @param object $data
+     *
+     * @return array
+     */
+    protected function getRulesFromAttributes(object $data): array
+    {
+        $rules = [];
+
+        $reflection = new ReflectionObject($data);
+
+        foreach ($reflection->getProperties() as $property) {
+            $propertyName = $property->getName();
+            $attributes = $property->getAttributes();
+
+            foreach ($attributes as $attribute) {
+                if ($attribute->getName() === Assert::class) {
+                    $rules[$propertyName] = $attribute->getArguments()[0];
+                }
+            }
+        }
+
+        return $rules;
     }
 }
