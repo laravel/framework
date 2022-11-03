@@ -16,6 +16,8 @@ use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 use Illuminate\Support\ValidatedInput;
 use InvalidArgumentException;
+use ReflectionClass;
+use ReflectionObject;
 use RuntimeException;
 use stdClass;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -294,13 +296,13 @@ class Validator implements ValidatorContract
      * Create a new Validator instance.
      *
      * @param  \Illuminate\Contracts\Translation\Translator  $translator
-     * @param  array  $data
+     * @param  array|object  $data
      * @param  array  $rules
      * @param  array  $messages
      * @param  array  $customAttributes
      * @return void
      */
-    public function __construct(Translator $translator, array $data, array $rules,
+    public function __construct(Translator $translator, array|object $data, array $rules,
                                 array $messages = [], array $customAttributes = [])
     {
         $this->dotPlaceholder = Str::random();
@@ -317,11 +319,13 @@ class Validator implements ValidatorContract
     /**
      * Parse the data array, converting dots and asterisks.
      *
-     * @param  array  $data
+     * @param  array|object  $data
      * @return array
      */
-    public function parseData(array $data)
+    public function parseData(array|object $data)
     {
+        $data = is_array($data) ? $data : $this->objectToArray($data);
+
         $newData = [];
 
         foreach ($data as $key => $value) {
@@ -1536,5 +1540,37 @@ class Validator implements ValidatorContract
         throw new BadMethodCallException(sprintf(
             'Method %s::%s does not exist.', static::class, $method
         ));
+    }
+
+    /**
+     * Converts an object to an array.
+     * @param object $object
+     *
+     * @return array
+     */
+    protected function objectToArray(object $object): array
+    {
+        $data = [];
+        $reflection = new ReflectionObject($object);
+
+        $getterMethods = array_filter($reflection->getMethods(), static function ($method) {
+            return $method->isPublic() && str_starts_with($method->getName(), 'get');
+        });
+
+        $attributesWithGetters = array_map(static function ($method) {
+            return lcfirst(substr($method->getName(), 3));
+        }, $getterMethods);
+
+        foreach ($reflection->getProperties() as $property) {
+            $propertyName = $property->getName();
+            if (in_array($propertyName, $attributesWithGetters, true)) {
+                $getter = 'get' . ucfirst($propertyName);
+                $data[$propertyName] = $object->$getter();
+            } else {
+                $data[$propertyName] = $property->getValue($object);
+            }
+        }
+
+        return $data;
     }
 }

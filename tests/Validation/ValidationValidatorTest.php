@@ -7449,6 +7449,81 @@ class ValidationValidatorTest extends TestCase
         ], $validator->messages()->messages());
     }
 
+    /**
+     * @dataProvider dataProviderForObjectValidation
+     */
+    public function testItCanValidateAnObject(object $obj, array $rules, bool $expected): void
+    {
+        $sut = new Validator($this->getIlluminateArrayTranslator(), $obj, $rules);
+
+        $this->assertSame($expected, $sut->passes());
+    }
+
+    public function dataProviderForObjectValidation(): array
+    {
+        return [
+            'object with valid properties' => [
+                'obj' => new class {
+                    private string $foo = 'bar';
+                    private string $bar = 'qux';
+                },
+                'rules' => [
+                    'foo' => 'required',
+                    'bar' => 'required',
+                ],
+                'expected' => true,
+            ],
+            'object with invalid properties' => [
+                'obj' => new class {
+                    private string $foo = 'bar';
+                    private string $bar = 'qux';
+                },
+                'rules' => [
+                    'foo' => 'required',
+                    'bar' => 'required|integer',
+                ],
+                'expected' => false,
+            ],
+            'object with getters' => [
+                'obj' => new class {
+                    private ?string $foo = null;
+                    private ?string $bar = null;
+
+                    public function getFoo(): string
+                    {
+                        return $this->foo ?? 'bar';
+                    }
+
+                    public function getBar(): string
+                    {
+                        return $this->bar ?? 'qux';
+                    }
+                },
+                'rules' => [
+                    'foo' => 'required',
+                    'bar' => 'required',
+                ],
+                'expected' => true,
+            ],
+            'object mixing properties and getters' => [
+                'obj' => new class {
+                    private string $foo = 'bar';
+                    private ?string $myCamelCaseAttr = null;
+
+                    public function getMyCamelCaseAttr(): string
+                    {
+                        return $this->myCamelCaseAttr ?? 'my@camel.case';
+                    }
+                },
+                'rules' => [
+                    'foo' => 'required',
+                    'myCamelCaseAttr' => 'required|email',
+                ],
+                'expected' => true,
+            ],
+        ];
+    }
+
     protected function getTranslator()
     {
         return m::mock(TranslatorContract::class);

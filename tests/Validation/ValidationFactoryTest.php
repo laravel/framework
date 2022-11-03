@@ -151,4 +151,18 @@ class ValidationFactoryTest extends TestCase
 
         $this->assertSame($container, $factory->setContainer($container)->getContainer());
     }
+
+    public function testMakeMethodCreatesValidValidatorForAnObject(): void
+    {
+        $translator = m::mock(TranslatorInterface::class);
+        $factory = new Factory($translator);
+
+        $object = new class {
+            public string $foo = 'bar';
+        };
+
+        $validator = $factory->make($object, ['foo' => 'required']);
+
+        $this->assertSame(['foo' => 'bar'], $validator->getData());
+    }
 }
