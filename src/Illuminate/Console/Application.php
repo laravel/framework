@@ -94,10 +94,12 @@ class Application extends SymfonyApplication implements ApplicationContract
             $input = $input ?: new ArgvInput
         );
 
-        try {
-            $input->bind($this->find($commandName)->getDefinition());
-        } catch (ExceptionInterface) {
-            // ...
+        if (! is_null($commandName)) {
+            try {
+                $input->bind($this->find($commandName)->getDefinition());
+            } catch (ExceptionInterface) {
+                // ...
+            }
         }
 
         $this->events->dispatch(
