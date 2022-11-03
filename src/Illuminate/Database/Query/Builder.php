@@ -2273,10 +2273,10 @@ class Builder implements BuilderContract
     /**
      * Put the query's results in random order.
      *
-     * @param  string  $seed
+     * @param  int|null  $seed
      * @return $this
      */
-    public function inRandomOrder($seed = '')
+    public function inRandomOrder($seed = null)
     {
         return $this->orderByRaw($this->grammar->compileRandom($seed));
     }
