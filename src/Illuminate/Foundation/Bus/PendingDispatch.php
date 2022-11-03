@@ -25,7 +25,7 @@ class PendingDispatch
     protected $afterResponse = false;
     
     /**
-     * Indicates if the job has been already dispatched
+     * Indicates if the job has been already dispatched.
      *
      * @var bool
      */
