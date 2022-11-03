@@ -23,6 +23,13 @@ class PendingDispatch
      * @var bool
      */
     protected $afterResponse = false;
+    
+    /**
+     * Indicates if the job has been already dispatched
+     *
+     * @var bool
+     */
+    protected $dispatched = false;
 
     /**
      * Create a new pending job dispatch.
@@ -156,6 +163,10 @@ class PendingDispatch
      */
     protected function shouldDispatch()
     {
+        if ($this->dispatched) {
+            return false;
+        }
+
         if (! $this->job instanceof ShouldBeUnique) {
             return true;
         }
@@ -185,12 +196,35 @@ class PendingDispatch
      */
     public function __destruct()
     {
+        $this->dispatch();
+    }
+
+    /**
+     * Dispatch the job now
+     *
+     * @return mixed|null
+     */
+    public function now()
+    {
+        return $this->dispatch();
+    }
+
+    /**
+     * Dispatch the job
+     *
+     * @return mixed|null
+     */
+    protected function dispatch()
+    {
         if (! $this->shouldDispatch()) {
-            return;
-        } elseif ($this->afterResponse) {
-            app(Dispatcher::class)->dispatchAfterResponse($this->job);
+            return null;
+        }
+
+        $this->dispatched = true;
+        if ($this->afterResponse) {
+            return app(Dispatcher::class)->dispatchAfterResponse($this->job);
         } else {
-            app(Dispatcher::class)->dispatch($this->job);
+            return app(Dispatcher::class)->dispatch($this->job);
         }
     }
 }
