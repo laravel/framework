@@ -296,7 +296,7 @@ abstract class TestCase extends BaseTestCase
      */
     protected function onNotSuccessfulTest(Throwable $exception): void
     {
-        return parent::onNotSuccessfulTest(
+        parent::onNotSuccessfulTest(
             is_null(static::$latestResponse)
                 ? $exception
                 : static::$latestResponse->transformNotSuccessfulException($exception)
