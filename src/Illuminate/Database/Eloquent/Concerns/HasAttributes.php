@@ -460,7 +460,6 @@ trait HasAttributes
                     : $throwMissingAttributeExceptionIfApplicable($key);
     }
 
-
     /**
      * Get a plain attribute (not a relationship).
      *
