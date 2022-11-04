@@ -328,7 +328,7 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function resource($name, $controller, array $options = [])
     {
-        return $this->resources([$name=>$controller],$options);
+        return $this->resources([$name => $controller], $options);
     }
 
     /**
