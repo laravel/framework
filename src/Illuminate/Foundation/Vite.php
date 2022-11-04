@@ -576,7 +576,7 @@ class Vite implements Htmlable
         }
 
         $attributes = $this->parseAttributes([
-            'nonce' => $this->cspNonce()
+            'nonce' => $this->cspNonce(),
         ]);
 
         return new HtmlString(
