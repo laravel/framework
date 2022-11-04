@@ -430,6 +430,26 @@ class RouteRegistrarTest extends TestCase
         $this->seeResponse('hello', Request::create('bar/baz', 'GET'));
     }
 
+    public function testRouteGroupChaining()
+    {
+        $this->router
+            ->group([], function ($router) {
+                $router->get('foo', function () {
+                    return 'hello';
+                });
+            })
+            ->group([], function ($router) {
+                $router->get('bar', function () {
+                    return 'goodbye';
+                });
+            });
+
+        $routeCollection = $this->router->getRoutes();
+
+        $this->assertInstanceOf(\Illuminate\Routing\Route::class, $routeCollection->match(Request::create('foo', 'GET')));
+        $this->assertInstanceOf(\Illuminate\Routing\Route::class, $routeCollection->match(Request::create('bar', 'GET')));
+    }
+
     public function testRegisteringNonApprovedAttributesThrows()
     {
         $this->expectException(BadMethodCallException::class);

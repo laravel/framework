@@ -373,7 +373,7 @@ class Router implements BindingRegistrar, RegistrarContract
      *
      * @param  array  $attributes
      * @param  \Closure|array|string  $routes
-     * @return void
+     * @return $this
      */
     public function group(array $attributes, $routes)
     {
@@ -387,6 +387,8 @@ class Router implements BindingRegistrar, RegistrarContract
 
             array_pop($this->groupStack);
         }
+
+        return $this;
     }
 
     /**
