@@ -364,6 +364,8 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testFindOrFailMethod()
     {
+        $this->app['config']->set('app.debug', true);
+
         $this->expectException(ModelNotFoundException::class);
         $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Integration\Database\EloquentBelongsToManyTest\Tag] 10');
 
@@ -378,6 +380,8 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testFindOrFailMethodWithMany()
     {
+        $this->app['config']->set('app.debug', true);
+
         $this->expectException(ModelNotFoundException::class);
         $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Integration\Database\EloquentBelongsToManyTest\Tag] 10, 11');
 
@@ -392,8 +396,26 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testFindOrFailMethodWithManyUsingCollection()
     {
+        $this->app['config']->set('app.debug', true);
+
         $this->expectException(ModelNotFoundException::class);
         $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Integration\Database\EloquentBelongsToManyTest\Tag] 10, 11');
+
+        $post = Post::create(['title' => Str::random()]);
+
+        Tag::create(['name' => Str::random()]);
+
+        $post->tags()->attach(Tag::all());
+
+        $post->tags()->findOrFail(new Collection([10, 11]));
+    }
+
+    public function testFindOrFailMethodWithManyUsingCollectionWhenDebugIsFalse()
+    {
+        $this->app['config']->set('app.debug', false);
+
+        $this->expectException(ModelNotFoundException::class);
+        $this->expectExceptionMessage('Not Found');
 
         $post = Post::create(['title' => Str::random()]);
 
