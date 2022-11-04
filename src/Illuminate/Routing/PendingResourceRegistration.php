@@ -162,7 +162,7 @@ class PendingResourceRegistration
      * Specify middleware that should be removed from the resource routes.
      *
      * @param  array|string  $middleware
-     * @return $this|array
+     * @return \Illuminate\Routing\PendingResourceRegistration|array
      */
     public function withoutMiddleware($middleware)
     {
@@ -203,7 +203,7 @@ class PendingResourceRegistration
      * Define the callable that should be invoked on a missing model exception.
      *
      * @param  callable  $callback
-     * @return $this
+     * @return \Illuminate\Routing\PendingResourceRegistration
      */
     public function missing($callback)
     {
