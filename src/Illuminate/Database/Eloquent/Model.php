@@ -32,6 +32,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         Concerns\HasTimestamps,
         Concerns\HidesAttributes,
         Concerns\GuardsAttributes,
+        Concerns\RestrictsAttributes,
         ForwardsCalls;
 
     /**
@@ -173,34 +174,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * @var callable|null
      */
     protected static $lazyLoadingViolationCallback;
-
-    /**
-     * Indicates if an exception should be thrown instead of silently discarding non-fillable attributes.
-     *
-     * @var bool
-     */
-    protected static $modelsShouldPreventSilentlyDiscardingAttributes = false;
-
-    /**
-     * The callback that is responsible for handling discarded attribute violations.
-     *
-     * @var callable|null
-     */
-    protected static $discardedAttributeViolationCallback;
-
-    /**
-     * Indicates if an exception should be thrown when trying to access a missing attribute on a retrieved model.
-     *
-     * @var bool
-     */
-    protected static $modelsShouldPreventAccessingMissingAttributes = false;
-
-    /**
-     * The callback that is responsible for handling missing attribute violations.
-     *
-     * @var callable|null
-     */
-    protected static $missingAttributeViolationCallback;
 
     /**
      * Indicates if broadcasting is currently enabled.
@@ -431,50 +404,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public static function handleLazyLoadingViolationUsing(?callable $callback)
     {
         static::$lazyLoadingViolationCallback = $callback;
-    }
-
-    /**
-     * Prevent non-fillable attributes from being silently discarded.
-     *
-     * @param  bool  $value
-     * @return void
-     */
-    public static function preventSilentlyDiscardingAttributes($value = true)
-    {
-        static::$modelsShouldPreventSilentlyDiscardingAttributes = $value;
-    }
-
-    /**
-     * Register a callback that is responsible for handling discarded attribute violations.
-     *
-     * @param  callable|null  $callback
-     * @return void
-     */
-    public static function handleDiscardedAttributeViolationUsing(?callable $callback)
-    {
-        static::$discardedAttributeViolationCallback = $callback;
-    }
-
-    /**
-     * Prevent accessing missing attributes on retrieved models.
-     *
-     * @param  bool  $value
-     * @return void
-     */
-    public static function preventAccessingMissingAttributes($value = true)
-    {
-        static::$modelsShouldPreventAccessingMissingAttributes = $value;
-    }
-
-    /**
-     * Register a callback that is responsible for handling lazy loading violations.
-     *
-     * @param  callable|null  $callback
-     * @return void
-     */
-    public static function handleMissingAttributeViolationUsing(?callable $callback)
-    {
-        static::$missingAttributeViolationCallback = $callback;
     }
 
     /**
@@ -2165,26 +2094,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public static function preventsLazyLoading()
     {
         return static::$modelsShouldPreventLazyLoading;
-    }
-
-    /**
-     * Determine if discarding guarded attribute fills is disabled.
-     *
-     * @return bool
-     */
-    public static function preventsSilentlyDiscardingAttributes()
-    {
-        return static::$modelsShouldPreventSilentlyDiscardingAttributes;
-    }
-
-    /**
-     * Determine if accessing missing attributes is disabled.
-     *
-     * @return bool
-     */
-    public static function preventsAccessingMissingAttributes()
-    {
-        return static::$modelsShouldPreventAccessingMissingAttributes;
     }
 
     /**
