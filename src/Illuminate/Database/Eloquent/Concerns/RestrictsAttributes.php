@@ -108,7 +108,7 @@ trait RestrictsAttributes
      */
     protected function throwMissingAttributeExceptionIfApplicable($key)
     {
-        if (static::preventsAccessingMissingAttributes() &&
+        if (self::preventsAccessingMissingAttributes() &&
             $this->exists &&
             ! $this->wasRecentlyCreated) {
             if (isset(static::$missingAttributeViolationCallback)) {
