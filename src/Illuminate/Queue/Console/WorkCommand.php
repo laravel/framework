@@ -214,7 +214,9 @@ class WorkCommand extends Command
 
             $formattedStartedAt = Carbon::now()->format('Y-m-d H:i:s');
 
-            return $this->output->write("  <fg=gray>{$formattedStartedAt}</> {$job->resolveName()}");
+            $this->output->write("  <fg=gray>{$formattedStartedAt}</> {$job->resolveName()}");
+            $this->output->newLine();
+            return;
         }
 
         if ($this->latestStatus && $this->latestStatus != 'starting') {
