@@ -307,9 +307,15 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function resources(array $resources, array $options = [])
     {
-        foreach ($resources as $name => $controller) {
-            $this->resource($name, $controller, $options);
+        if ($this->container && $this->container->bound(ResourceRegistrar::class)) {
+            $registrar = $this->container->make(ResourceRegistrar::class);
+        } else {
+            $registrar = new ResourceRegistrar($this);
         }
+
+        return new PendingResourceRegistration(
+            $registrar, $resources, $options
+        );
     }
 
     /**
@@ -322,15 +328,7 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function resource($name, $controller, array $options = [])
     {
-        if ($this->container && $this->container->bound(ResourceRegistrar::class)) {
-            $registrar = $this->container->make(ResourceRegistrar::class);
-        } else {
-            $registrar = new ResourceRegistrar($this);
-        }
-
-        return new PendingResourceRegistration(
-            $registrar, $name, $controller, $options
-        );
+        $this->resources([$name=>$controller],$options);
     }
 
     /**
@@ -342,9 +340,15 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function apiResources(array $resources, array $options = [])
     {
-        foreach ($resources as $name => $controller) {
-            $this->apiResource($name, $controller, $options);
+        $only = ['index', 'show', 'store', 'update', 'destroy'];
+
+        if (isset($options['except'])) {
+            $only = array_diff($only, (array) $options['except']);
         }
+
+        return $this->resources($resources, array_merge([
+            'only' => $only,
+        ], $options));
     }
 
     /**
@@ -357,15 +361,7 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function apiResource($name, $controller, array $options = [])
     {
-        $only = ['index', 'show', 'store', 'update', 'destroy'];
-
-        if (isset($options['except'])) {
-            $only = array_diff($only, (array) $options['except']);
-        }
-
-        return $this->resource($name, $controller, array_merge([
-            'only' => $only,
-        ], $options));
+        $this->apiResources([$name => $controller],$options);
     }
 
     /**
