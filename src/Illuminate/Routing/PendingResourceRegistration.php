@@ -247,13 +247,13 @@ class PendingResourceRegistration
     {
         $this->registered = true;
 
-        if(count($this->resources) == 1){
+        if (count($this->resources) == 1) {
             $name = key($this->resources);
             $controller = $this->resources[$name];
             return $this->registrar->register(
                 $name, $controller, $this->options
             );
-        }else{
+        } else {
             foreach ($this->resources as $name => $controller) {
                 $this->registrar->register(
                     $name, $controller, $this->options
