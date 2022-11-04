@@ -214,15 +214,15 @@ class WorkCommand extends Command
 
             $formattedStartedAt = Carbon::now()->format('Y-m-d H:i:s');
 
-            $this->output->write("  <fg=gray>{$formattedStartedAt}</> {$job->resolveName()}");
-            $this->output->newLine();
+            $this->output->writeln("  <fg=gray>{$formattedStartedAt}</> {$job->resolveName()}");
+
             return;
         }
 
         if ($this->latestStatus && $this->latestStatus != 'starting') {
             $formattedStartedAt = Carbon::createFromTimestamp($this->latestStartedAt)->format('Y-m-d H:i:s');
 
-            $this->output->write("  <fg=gray>{$formattedStartedAt}</> {$job->resolveName()}");
+            $this->output->writeln("  <fg=gray>{$formattedStartedAt}</> {$job->resolveName()}");
         }
 
         $runTime = number_format((microtime(true) - $this->latestStartedAt) * 1000, 2).'ms';
