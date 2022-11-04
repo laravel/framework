@@ -35,14 +35,7 @@ class ModelNotFoundException extends RecordsNotFoundException
     {
         $this->model = $model;
         $this->ids = Arr::wrap($ids);
-
-        $this->message = "No query results for model [{$model}]";
-
-        if (count($this->ids) > 0) {
-            $this->message .= ' '.implode(', ', $this->ids);
-        } else {
-            $this->message .= '.';
-        }
+        $this->message = $this->message($model);
 
         return $this;
     }
@@ -65,5 +58,21 @@ class ModelNotFoundException extends RecordsNotFoundException
     public function getIds()
     {
         return $this->ids;
+    }
+
+    /**
+     * Get the message text.
+     *
+     * @return string
+     */
+    protected function message($model)
+    {
+        if (config('app.debug')) {
+            $ids = count($this->ids) > 0 ? ' '.implode(', ', $this->ids) : '.';
+
+            return __('No query results for model [:model]:ids', compact('model', 'ids'));
+        }
+
+        return __('Not Found');
     }
 }
