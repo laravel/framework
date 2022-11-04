@@ -303,7 +303,7 @@ class Router implements BindingRegistrar, RegistrarContract
      *
      * @param  array  $resources
      * @param  array  $options
-     * @return void
+     * @return \Illuminate\Routing\PendingResourceRegistration
      */
     public function resources(array $resources, array $options = [])
     {
@@ -328,7 +328,7 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function resource($name, $controller, array $options = [])
     {
-        $this->resources([$name=>$controller],$options);
+        return $this->resources([$name=>$controller],$options);
     }
 
     /**
@@ -336,7 +336,7 @@ class Router implements BindingRegistrar, RegistrarContract
      *
      * @param  array  $resources
      * @param  array  $options
-     * @return void
+     * @return \Illuminate\Routing\PendingResourceRegistration
      */
     public function apiResources(array $resources, array $options = [])
     {
@@ -361,7 +361,7 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function apiResource($name, $controller, array $options = [])
     {
-        $this->apiResources([$name => $controller],$options);
+        return $this->apiResources([$name => $controller],$options);
     }
 
     /**
