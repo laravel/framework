@@ -250,7 +250,7 @@ class PendingResourceRegistration
         if (count($this->resources) == 1) {
             $name = key($this->resources);
             $controller = $this->resources[$name];
-            
+
             return $this->registrar->register(
                 $name, $controller, $this->options
             );
