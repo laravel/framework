@@ -19,6 +19,10 @@ trait SerializesAndRestoresModelIdentifiers
      */
     protected function getSerializedPropertyValue($value)
     {
+        if (isset($this->connection) && $this->connection === 'sync') {
+            return $value;
+        }
+
         if ($value instanceof QueueableCollection) {
             return (new ModelIdentifier(
                 $value->getQueueableClass(),
