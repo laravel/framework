@@ -441,7 +441,7 @@ trait HasAttributes
             return $this->getAttributeValue($key);
         }
 
-        // Define wrapper so we can always call this function even though the related method does not exist.
+        // Define wrapper so we can always call this function even though the related method might not exist.
         $throwMissingAttributeExceptionIfApplicable = function ($key) {
             if (method_exists($this, 'throwMissingAttributeExceptionIfApplicable')) {
                 return $this->throwMissingAttributeExceptionIfApplicable($key);
