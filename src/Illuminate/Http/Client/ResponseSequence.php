@@ -2,7 +2,6 @@
 
 namespace Illuminate\Http\Client;
 
-use Closure;
 use Illuminate\Support\Traits\Macroable;
 use OutOfBoundsException;
 
