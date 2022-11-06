@@ -3,9 +3,8 @@
 namespace Illuminate\Http\Client;
 
 use Closure;
-use GuzzleHttp\Promise\PromiseInterface;
+use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Psr7\Response as Psr7Response;
-use GuzzleHttp\TransferStats;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
@@ -141,6 +140,20 @@ class Factory
     }
 
     /**
+     * Create a new connection exception for use during stubbing.
+     *
+     * @param  string  $message
+     * @param  array  $handlerContext
+     * @return callable(\Illuminate\Http\Client\Request): \GuzzleHttp\Exception\ConnectException
+     */
+    public static function error($message = '', array $handlerContext = [])
+    {
+        return function (Request $request) use ($message, $handlerContext) {
+            return new ConnectException($message, $request->toPsrRequest(), null, $handlerContext);
+        };
+    }
+
+    /**
      * Get an invokable object that returns a sequence of responses in order for use during stubbing.
      *
      * @param  array  $responses
@@ -177,22 +190,7 @@ class Factory
             return $this;
         }
 
-        $this->stubCallbacks = $this->stubCallbacks->merge(collect([
-            function ($request, $options) use ($callback) {
-                $response = $callback instanceof Closure
-                                ? $callback($request, $options)
-                                : $callback;
-
-                if ($response instanceof PromiseInterface) {
-                    $options['on_stats'](new TransferStats(
-                        $request->toPsrRequest(),
-                        $response->wait(),
-                    ));
-                }
-
-                return $response;
-            },
-        ]));
+        $this->stubCallbacks->add($callback);
 
         return $this;
     }
@@ -269,7 +267,7 @@ class Factory
      * Record a request response pair.
      *
      * @param  \Illuminate\Http\Client\Request  $request
-     * @param  \Illuminate\Http\Client\Response  $response
+     * @param  \Illuminate\Http\Client\Response|\Illuminate\Http\Client\ConnectionException  $response
      * @return void
      */
     public function recordRequestResponsePair($request, $response)

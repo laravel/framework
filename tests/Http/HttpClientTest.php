@@ -3,11 +3,14 @@
 namespace Illuminate\Tests\Http;
 
 use Exception;
+use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response as Psr7Response;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\Events\ConnectionFailed;
 use Illuminate\Http\Client\Events\RequestSending;
 use Illuminate\Http\Client\Events\ResponseReceived;
 use Illuminate\Http\Client\Factory;
@@ -331,7 +334,11 @@ class HttpClientTest extends TestCase
 
     public function testRequestCount()
     {
-        $this->factory->fake();
+        $this->factory->fake([
+            'http://foo.com/form' => $this->factory::response(),
+            'http://foo.com/error' => $this->factory::error(),
+        ]);
+
         $this->factory->assertSentCount(0);
 
         $this->factory->post('http://foo.com/form', [
@@ -345,6 +352,13 @@ class HttpClientTest extends TestCase
         ]);
 
         $this->factory->assertSentCount(2);
+
+        try {
+            $this->factory->post('http://foo.com/error');
+        } catch (ConnectionException $e) {
+        }
+
+        $this->factory->assertSentCount(3);
     }
 
     public function testCanSendMultipartData()
@@ -469,7 +483,8 @@ class HttpClientTest extends TestCase
                 ->push('Ok', 201)
                 ->push(['fact' => 'Cats are great!'])
                 ->pushFile(__DIR__.'/fixtures/test.txt')
-                ->pushStatus(403),
+                ->pushStatus(403)
+                ->pushError('Connection failed', ['errno' => CURLE_COULDNT_RESOLVE_HOST]),
         ]);
 
         $response = $this->factory->get('https://example.com');
@@ -488,6 +503,23 @@ class HttpClientTest extends TestCase
         $response = $this->factory->get('https://example.com');
         $this->assertSame('', $response->body());
         $this->assertSame(403, $response->status());
+
+        $exception = null;
+
+        try {
+            $response = $this->factory->get('https://example.com');
+        } catch (ConnectionException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(ConnectionException::class, $exception);
+        $this->assertEquals('Connection failed', $exception->getMessage());
+
+        $cause = $exception->getPrevious();
+        $this->assertInstanceOf(ConnectException::class, $cause);
+        $this->assertEquals('Connection failed', $cause->getMessage());
+        $this->assertEquals(['errno' => CURLE_COULDNT_RESOLVE_HOST], $cause->getHandlerContext());
 
         $this->expectException(OutOfBoundsException::class);
 
@@ -1103,6 +1135,7 @@ class HttpClientTest extends TestCase
             '200.com' => $this->factory::response('', 200),
             '400.com' => $this->factory::response('', 400),
             '500.com' => $this->factory::response('', 500),
+            'error' => $this->factory::error('Connection failed', ['errno' => CURLE_COULDNT_RESOLVE_HOST]),
         ]);
 
         $responses = $this->factory->pool(function (Pool $pool) {
@@ -1110,12 +1143,21 @@ class HttpClientTest extends TestCase
                 $pool->get('200.com'),
                 $pool->get('400.com'),
                 $pool->get('500.com'),
+                $pool->get('error'),
             ];
         });
 
         $this->assertSame(200, $responses[0]->status());
         $this->assertSame(400, $responses[1]->status());
         $this->assertSame(500, $responses[2]->status());
+
+        $this->assertInstanceOf(ConnectionException::class, $responses[3]);
+        $this->assertSame('Connection failed', $responses[3]->getMessage());
+
+        $cause = $responses[3]->getPrevious();
+        $this->assertInstanceOf(ConnectException::class, $cause);
+        $this->assertSame('Connection failed', $cause->getMessage());
+        $this->assertSame(['errno' => CURLE_COULDNT_RESOLVE_HOST], $cause->getHandlerContext());
     }
 
     public function testMultipleRequestsAreSentInThePoolWithKeys()
@@ -1124,6 +1166,7 @@ class HttpClientTest extends TestCase
             '200.com' => $this->factory::response('', 200),
             '400.com' => $this->factory::response('', 400),
             '500.com' => $this->factory::response('', 500),
+            'error' => $this->factory::error('Connection failed', ['errno' => CURLE_COULDNT_RESOLVE_HOST]),
         ]);
 
         $responses = $this->factory->pool(function (Pool $pool) {
@@ -1131,63 +1174,98 @@ class HttpClientTest extends TestCase
                 $pool->as('test200')->get('200.com'),
                 $pool->as('test400')->get('400.com'),
                 $pool->as('test500')->get('500.com'),
+                $pool->as('error')->get('error'),
             ];
         });
 
         $this->assertSame(200, $responses['test200']->status());
         $this->assertSame(400, $responses['test400']->status());
         $this->assertSame(500, $responses['test500']->status());
+
+        $this->assertInstanceOf(ConnectionException::class, $responses['error']);
+        $this->assertSame('Connection failed', $responses['error']->getMessage());
+
+        $cause = $responses['error']->getPrevious();
+        $this->assertInstanceOf(ConnectException::class, $cause);
+        $this->assertSame('Connection failed', $cause->getMessage());
+        $this->assertSame(['errno' => CURLE_COULDNT_RESOLVE_HOST], $cause->getHandlerContext());
     }
 
     public function testMiddlewareRunsInPool()
     {
-        $this->factory->fake(function (Request $request) {
-            return $this->factory->response('Fake');
-        });
+        $this->factory->fake([
+            'foo.com/fake' => $this->factory::response('Fake'),
+            'foo.com/error' => $this->factory::error('Connection failed', ['errno' => CURLE_COULDNT_RESOLVE_HOST]),
+        ]);
 
         $history = [];
 
         $middleware = Middleware::history($history);
 
         $responses = $this->factory->pool(fn (Pool $pool) => [
-            $pool->withMiddleware($middleware)->post('https://example.com', ['hyped-for' => 'laravel-movie']),
+            $pool->withMiddleware($middleware)->post('https://foo.com/fake', ['hyped-for' => 'laravel-movie']),
+            $pool->withMiddleware($middleware)->post('https://foo.com/error', ['hyped-for' => 'laracon']),
         ]);
 
         $response = $responses[0];
+        $error = $responses[1];
 
         $this->assertSame('Fake', $response->body());
+        $this->assertInstanceOf(ConnectionException::class, $error);
+        $this->assertEquals('Connection failed', $error->getMessage());
 
-        $this->assertCount(1, $history);
+        $cause = $error->getPrevious();
+        $this->assertInstanceOf(ConnectException::class, $cause);
+        $this->assertSame('Connection failed', $cause->getMessage());
+        $this->assertSame(['errno' => CURLE_COULDNT_RESOLVE_HOST], $cause->getHandlerContext());
+
+        $this->assertCount(2, $history);
 
         $this->assertSame('Fake', tap($history[0]['response']->getBody())->rewind()->getContents());
-
         $this->assertSame(['hyped-for' => 'laravel-movie'], json_decode(tap($history[0]['request']->getBody())->rewind()->getContents(), true));
+
+        $this->assertInstanceOf(ConnectException::class, $history[1]['error']);
+        $this->assertSame('Connection failed', $history[1]['error']->getMessage());
+        $this->assertSame(['hyped-for' => 'laracon'], json_decode(tap($history[1]['request']->getBody())->rewind()->getContents(), true));
     }
 
-    public function testTheRequestSendingAndResponseReceivedEventsAreFiredWhenARequestIsSent()
+    public function testTheRequestSendingAndResponseReceivedAndConnectionFailedEventsAreFiredWhenARequestIsSent()
     {
         $events = m::mock(Dispatcher::class);
-        $events->shouldReceive('dispatch')->times(5)->with(m::type(RequestSending::class));
+        $events->shouldReceive('dispatch')->times(6)->with(m::type(RequestSending::class));
         $events->shouldReceive('dispatch')->times(5)->with(m::type(ResponseReceived::class));
+        $events->shouldReceive('dispatch')->times(1)->with(m::type(ConnectionFailed::class));
 
         $factory = new Factory($events);
-        $factory->fake();
+        $factory->fake([
+            'https://example.com' => Factory::response(),
+            'https://example.com/error' => Factory::error(),
+        ]);
 
         $factory->get('https://example.com');
         $factory->head('https://example.com');
         $factory->post('https://example.com');
         $factory->patch('https://example.com');
         $factory->delete('https://example.com');
+
+        try {
+            $factory->get('https://example.com/error');
+        } catch (ConnectionException $e) {
+        }
     }
 
-    public function testTheRequestSendingAndResponseReceivedEventsAreFiredWhenARequestIsSentAsync()
+    public function testTheRequestSendingAndResponseReceivedAndConnectionFailedEventsAreFiredWhenARequestIsSentAsync()
     {
         $events = m::mock(Dispatcher::class);
-        $events->shouldReceive('dispatch')->times(5)->with(m::type(RequestSending::class));
+        $events->shouldReceive('dispatch')->times(6)->with(m::type(RequestSending::class));
         $events->shouldReceive('dispatch')->times(5)->with(m::type(ResponseReceived::class));
+        $events->shouldReceive('dispatch')->times(1)->with(m::type(ConnectionFailed::class));
 
         $factory = new Factory($events);
-        $factory->fake();
+        $factory->fake([
+            'https://example.com' => Factory::response(),
+            'https://example.com/error' => Factory::error(),
+        ]);
         $factory->pool(function (Pool $pool) {
             return [
                 $pool->get('https://example.com'),
@@ -1195,6 +1273,7 @@ class HttpClientTest extends TestCase
                 $pool->post('https://example.com'),
                 $pool->patch('https://example.com'),
                 $pool->delete('https://example.com'),
+                $pool->get('https://example.com/error'),
             ];
         });
     }
@@ -1217,6 +1296,23 @@ class HttpClientTest extends TestCase
         $factory->assertSentCount(2);
     }
 
+    public function testTheRequestSendingAndConnectionFailedEventsAreFiredForEveryRetry()
+    {
+        $events = m::mock(Dispatcher::class);
+        $events->shouldReceive('dispatch')->times(2)->with(m::type(RequestSending::class));
+        $events->shouldReceive('dispatch')->times(2)->with(m::type(ConnectionFailed::class));
+
+        $factory = new Factory($events);
+        $factory->fake(Factory::error());
+
+        try {
+            $factory->retry(2, 1000, null, false)->get('http://foo.com/get');
+        } catch (ConnectionException $e) {
+        }
+
+        $factory->assertSentCount(2);
+    }
+
     public function testTheTransferStatsAreCalledSafelyWhenFakingTheRequest()
     {
         $this->factory->fake(['https://example.com' => ['world' => 'Hello world']]);
@@ -1226,13 +1322,17 @@ class HttpClientTest extends TestCase
         $this->assertIsArray($stats);
         $this->assertEmpty($stats);
 
-        $this->assertNull($effectiveUri);
+        $this->assertSame('https://example.com', (string) $effectiveUri);
     }
 
     public function testTransferStatsArePresentWhenFakingTheRequestUsingAPromiseResponse()
     {
         $this->factory->fake(['https://example.com' => $this->factory->response()]);
+        $stats = $this->factory->get('https://example.com')->handlerStats();
         $effectiveUri = $this->factory->get('https://example.com')->effectiveUri();
+
+        $this->assertIsArray($stats);
+        $this->assertEmpty($stats);
 
         $this->assertSame('https://example.com', (string) $effectiveUri);
     }
@@ -1408,9 +1508,10 @@ class HttpClientTest extends TestCase
 
     public function testMiddlewareRunsWhenFaked()
     {
-        $this->factory->fake(function (Request $request) {
-            return $this->factory->response('Fake');
-        });
+        $this->factory->fake([
+            'example.com/fake' => $this->factory::response('Fake'),
+            'example.com/error' => $this->factory::error('Connection failed'),
+        ]);
 
         $history = [];
 
@@ -1418,15 +1519,25 @@ class HttpClientTest extends TestCase
             Middleware::history($history)
         );
 
-        $response = $pendingRequest->post('https://example.com', ['hyped-for' => 'laravel-movie']);
+        $response = $pendingRequest->post('https://example.com/fake', ['hyped-for' => 'laravel-movie']);
 
         $this->assertSame('Fake', $response->body());
 
         $this->assertCount(1, $history);
 
         $this->assertSame('Fake', tap($history[0]['response']->getBody())->rewind()->getContents());
-
         $this->assertSame(['hyped-for' => 'laravel-movie'], json_decode(tap($history[0]['request']->getBody())->rewind()->getContents(), true));
+
+        try {
+            $pendingRequest->post('https://example.com/error', ['hyped-for' => 'laravel-movie']);
+        } catch (ConnectionException $e) {
+        }
+
+        $this->assertCount(2, $history);
+
+        $this->assertInstanceOf(ConnectException::class, $history[1]['error']);
+        $this->assertSame('Connection failed', $history[1]['error']->getMessage());
+        $this->assertSame(['hyped-for' => 'laravel-movie'], json_decode(tap($history[1]['request']->getBody())->rewind()->getContents(), true));
     }
 
     public function testRequestExceptionIsNotThrownIfThePendingRequestIsSetToThrowOnFailureButTheResponseIsSuccessful()
@@ -1601,6 +1712,35 @@ class HttpClientTest extends TestCase
         $response = $this->factory->get('http://foo.com/api')->throwIf(false);
 
         $this->assertSame('{"result":{"foo":"bar"}}', $response->body());
+    }
+
+    public function testConnectionExceptionsCanBeStubbed()
+    {
+        $this->factory->fake(
+            $this->factory::error('Connection failed', ['errno' => CURLE_COULDNT_RESOLVE_HOST])
+        );
+
+        $exception = null;
+
+        try {
+            $this->factory->get('http://foo.com/api');
+        } catch (ConnectionException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(ConnectionException::class, $exception);
+        $this->assertEquals('Connection failed', $exception->getMessage());
+
+        $cause = $exception->getPrevious();
+        $this->assertInstanceOf(ConnectException::class, $cause);
+        $this->assertEquals('Connection failed', $cause->getMessage());
+        $this->assertEquals(['errno' => CURLE_COULDNT_RESOLVE_HOST], $cause->getHandlerContext());
+
+        $this->factory->assertSent(function (Request $request, $response) {
+            return $response instanceof ConnectionException
+                && $response->getMessage() === 'Connection failed';
+        });
     }
 
     public function testItCanEnforceFaking()

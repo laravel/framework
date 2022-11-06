@@ -2,6 +2,7 @@
 
 namespace Illuminate\Http\Client;
 
+use Closure;
 use Illuminate\Support\Traits\Macroable;
 use OutOfBoundsException;
 
@@ -71,7 +72,7 @@ class ResponseSequence
     }
 
     /**
-     * Push response with the contents of a file as the body to the sequence.
+     * Push a response with the contents of a file as the body to the sequence.
      *
      * @param  string  $filePath
      * @param  int  $status
@@ -84,6 +85,20 @@ class ResponseSequence
 
         return $this->pushResponse(
             Factory::response($string, $status, $headers)
+        );
+    }
+
+    /**
+     * Push a connection exception to the sequence.
+     *
+     * @param  string  $message
+     * @param  array  $handlerContext
+     * @return $this
+     */
+    public function pushError(string $message = '', array $handlerContext = [])
+    {
+        return $this->pushResponse(
+            Factory::error($message, $handlerContext)
         );
     }
 
@@ -137,20 +152,22 @@ class ResponseSequence
     /**
      * Get the next response in the sequence.
      *
+     * @param  \Illuminate\Http\Client\Request  $request
+     * @param  array  $options
      * @return mixed
      *
      * @throws \OutOfBoundsException
      */
-    public function __invoke()
+    public function __invoke(Request $request, array $options)
     {
         if ($this->failWhenEmpty && count($this->responses) === 0) {
             throw new OutOfBoundsException('A request was made, but the response sequence is empty.');
         }
 
         if (! $this->failWhenEmpty && count($this->responses) === 0) {
-            return value($this->emptyResponse ?? Factory::response());
+            return value($this->emptyResponse ?? Factory::response(), $request, $options);
         }
 
-        return array_shift($this->responses);
+        return value(array_shift($this->responses), $request, $options);
     }
 }

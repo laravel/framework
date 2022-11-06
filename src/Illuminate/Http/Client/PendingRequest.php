@@ -9,6 +9,7 @@ use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\HandlerStack;
+use GuzzleHttp\TransferStats;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Client\Events\ConnectionFailed;
 use Illuminate\Http\Client\Events\RequestSending;
@@ -87,7 +88,7 @@ class PendingRequest
     /**
      * The transfer stats for the request.
      *
-     * \GuzzleHttp\TransferStats
+     * @var \GuzzleHttp\TransferStats
      */
     protected $transferStats;
 
@@ -888,7 +889,20 @@ class PendingRequest
                 });
             })
             ->otherwise(function (TransferException $e) {
-                return $e instanceof RequestException && $e->hasResponse() ? $this->populateResponse(new Response($e->getResponse())) : $e;
+                if ($e instanceof RequestException && $e->hasResponse()) {
+                    return tap(new Response($e->getResponse()), function ($response) {
+                        $this->populateResponse($response);
+                        $this->dispatchResponseReceivedEvent($response);
+                    });
+                }
+
+                if ($e instanceof ConnectException) {
+                    return tap(new ConnectionException($e->getMessage(), 0, $e), function () {
+                        $this->dispatchConnectionFailedEvent();
+                    });
+                }
+
+                return $e;
             });
     }
 
@@ -1072,6 +1086,17 @@ class PendingRequest
                     );
 
                     return $response;
+                }, function ($reason) use ($request, $options) {
+                    if ($reason instanceof ConnectException) {
+                        $this->factory?->recordRequestResponsePair(
+                            (new Request($request))->withData($options['laravel_data']),
+                            new ConnectionException($reason->getMessage(), 0, $reason)
+                        );
+                    }
+
+                    return class_exists(\GuzzleHttp\Promise\Create::class)
+                        ? \GuzzleHttp\Promise\Create::rejectionFor($reason)
+                        : \GuzzleHttp\Promise\rejection_for($reason);
                 });
             };
         };
@@ -1086,11 +1111,11 @@ class PendingRequest
     {
         return function ($handler) {
             return function ($request, $options) use ($handler) {
-                $response = ($this->stubCallbacks ?? collect())
-                     ->map
-                     ->__invoke((new Request($request))->withData($options['laravel_data']), $options)
-                     ->filter()
-                     ->first();
+                $response = ($this->stubCallbacks ?? collect())->reduce(
+                    fn ($response, $callable) => $response ?? $callable(
+                        (new Request($request))->withData($options['laravel_data']),
+                        $options
+                    ));
 
                 if (is_null($response)) {
                     if ($this->preventStrayRequests) {
@@ -1100,7 +1125,18 @@ class PendingRequest
                     return $handler($request, $options);
                 }
 
+                if ($response instanceof ConnectException) {
+                    return class_exists(\GuzzleHttp\Promise\Create::class)
+                        ? \GuzzleHttp\Promise\Create::rejectionFor($response)
+                        : \GuzzleHttp\Promise\rejection_for($response);
+                }
+
                 $response = is_array($response) ? Factory::response($response) : $response;
+
+                $options['on_stats'](new TransferStats(
+                    $request,
+                    $response->wait(),
+                ));
 
                 $sink = $options['sink'] ?? null;
 
