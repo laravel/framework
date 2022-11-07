@@ -88,7 +88,7 @@ trait AuthorizesRequests
 
         $parameter = $parameter ?: $automaticParameterDetection;
 
-        $parameter = $parameter = is_array($parameter) ? implode(',', $parameter) : $parameter;
+        $parameter = is_array($parameter) ? implode(',', $parameter) : $parameter;
 
         $middleware = [];
 
