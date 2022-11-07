@@ -471,7 +471,7 @@ trait ValidatesAttributes
             return false;
         }
 
-        return $hasher->check($value, $guard->user()->getAuthPassword());
+        return $hasher->check($value, (string) $guard->user()->getAuthPassword());
     }
 
     /**

@@ -160,4 +160,17 @@ class AuthDatabaseUserProviderTest extends TestCase
 
         $this->assertTrue($result);
     }
+
+    public function testCredentialValidationWithNullablePassword()
+    {
+        $conn = m::mock(Connection::class);
+        $hasher = m::mock(Hasher::class);
+        $hasher->shouldReceive('check')->once()->with('plain', null)->andReturn(false);
+        $provider = new DatabaseUserProvider($conn, $hasher, 'foo');
+        $user = m::mock(Authenticatable::class);
+        $user->shouldReceive('getAuthPassword')->once()->andReturn(null);
+        $result = $provider->validateCredentials($user, ['password' => 'plain']);
+
+        $this->assertFalse($result);
+    }
 }

@@ -47,7 +47,7 @@ class GenericUser implements UserContract
     /**
      * Get the password for the user.
      *
-     * @return string
+     * @return string|null
      */
     public function getAuthPassword()
     {

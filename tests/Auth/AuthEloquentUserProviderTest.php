@@ -140,6 +140,18 @@ class AuthEloquentUserProviderTest extends TestCase
         $this->assertTrue($result);
     }
 
+    public function testCredentialValidationWithNullablePassword()
+    {
+        $hasher = m::mock(Hasher::class);
+        $hasher->shouldReceive('check')->once()->with('plain', null)->andReturn(false);
+        $provider = new EloquentUserProvider($hasher, 'foo');
+        $user = m::mock(Authenticatable::class);
+        $user->shouldReceive('getAuthPassword')->once()->andReturn(null);
+        $result = $provider->validateCredentials($user, ['password' => 'plain']);
+
+        $this->assertFalse($result);
+    }
+
     public function testModelsCanBeCreated()
     {
         $hasher = m::mock(Hasher::class);

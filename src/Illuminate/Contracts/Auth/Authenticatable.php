@@ -21,7 +21,7 @@ interface Authenticatable
     /**
      * Get the password for the user.
      *
-     * @return string
+     * @return string|null
      */
     public function getAuthPassword();
 
