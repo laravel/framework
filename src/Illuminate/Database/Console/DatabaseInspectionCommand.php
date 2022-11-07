@@ -7,6 +7,7 @@ use Illuminate\Console\Command;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\PostgresConnection;
+use Illuminate\Database\QueryException;
 use Illuminate\Database\SQLiteConnection;
 use Illuminate\Database\SqlServerConnection;
 use Illuminate\Support\Arr;
@@ -151,11 +152,15 @@ abstract class DatabaseInspectionCommand extends Command
      */
     protected function getSqliteTableSize(ConnectionInterface $connection, string $table)
     {
-        $result = $connection->selectOne('SELECT SUM(pgsize) AS size FROM dbstat WHERE name=?', [
-            $table,
-        ]);
+        try {
+            $result = $connection->selectOne('SELECT SUM(pgsize) AS size FROM dbstat WHERE name=?', [
+                $table,
+            ]);
 
-        return Arr::wrap((array) $result)['size'];
+            return Arr::wrap((array) $result)['size'];
+        } catch (QueryException $e) {
+            return null;
+        }
     }
 
     /**
