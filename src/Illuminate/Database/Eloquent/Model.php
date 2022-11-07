@@ -439,16 +439,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
         $fillable = $this->fillableFromArray($attributes);
 
-        $preventsSilentlyDiscardingAttributes = method_exists($this, 'preventsSilentlyDiscardingAttributes') &&
-            static::preventsSilentlyDiscardingAttributes();
-
         foreach ($fillable as $key => $value) {
             // The developers may choose to place some attributes in the "fillable" array
             // which means only those attributes may be set through mass assignment to
             // the model, and all others will just get ignored for security reasons.
             if ($this->isFillable($key)) {
                 $this->setAttribute($key, $value);
-            } elseif ($totallyGuarded || $preventsSilentlyDiscardingAttributes) {
+            } elseif ($totallyGuarded || static::preventsSilentlyDiscardingAttributes()) {
                 if (isset(static::$discardedAttributeViolationCallback)) {
                     call_user_func(static::$discardedAttributeViolationCallback, $this, [$key]);
                 } else {
@@ -460,7 +457,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             }
         }
 
-        if (count($attributes) !== count($fillable) && $preventsSilentlyDiscardingAttributes) {
+        if (count($attributes) !== count($fillable) &&
+            static::preventsSilentlyDiscardingAttributes()) {
             $keys = array_diff(array_keys($attributes), array_keys($fillable));
 
             if (isset(static::$discardedAttributeViolationCallback)) {
