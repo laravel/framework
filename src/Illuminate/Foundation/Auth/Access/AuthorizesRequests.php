@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Auth\Access;
 
 use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 
 trait AuthorizesRequests
