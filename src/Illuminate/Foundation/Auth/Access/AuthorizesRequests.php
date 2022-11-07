@@ -3,7 +3,6 @@
 namespace Illuminate\Foundation\Auth\Access;
 
 use Illuminate\Contracts\Auth\Access\Gate;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 
 trait AuthorizesRequests
@@ -85,7 +84,7 @@ trait AuthorizesRequests
     {
         $model = is_array($model) ? implode(',', $model) : $model;
 
-        $automaticParameterDetection = Route::getCurrentRoute()->parameterNames ?: Str::snake(class_basename($model));
+        $automaticParameterDetection = app()->has('request') ? app('request')->route()->parameterNames : Str::snake(class_basename($model));
 
         $parameter = $parameter ?: $automaticParameterDetection;
 
