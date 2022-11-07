@@ -24,13 +24,6 @@ class PendingResourceRegistration
     protected $resources;
 
     /**
-     * The resource controller.
-     *
-     * @var string
-     */
-    protected $controller;
-
-    /**
      * The resource options.
      *
      * @var array
