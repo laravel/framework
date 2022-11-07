@@ -84,9 +84,11 @@ trait AuthorizesRequests
     {
         $model = is_array($model) ? implode(',', $model) : $model;
 
-        $parameter = $parameter ?: (Route::getCurrentRoute()->parameterNames ?: Str::snake(class_basename($model)));
+        $automaticParameterDetection = Route::getCurrentRoute()->parameterNames ?: Str::snake(class_basename($model));
 
-        $parameter = $parameter = is_array($parameter) ? implode(',', $parameter) : $parameter;
+        $parameter = $parameter ?: $automaticParameterDetection;
+
+        $parameter = is_array($parameter) ? implode(',', $parameter) : $parameter;
 
         $middleware = [];
 
