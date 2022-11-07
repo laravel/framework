@@ -17,11 +17,11 @@ class PendingResourceRegistration
     protected $registrar;
 
     /**
-     * The resource name.
+     * The array of resources containing the name => controller.
      *
-     * @var string
+     * @var array
      */
-    protected $name;
+    protected $resources;
 
     /**
      * The resource controller.
@@ -48,17 +48,15 @@ class PendingResourceRegistration
      * Create a new pending resource registration instance.
      *
      * @param  \Illuminate\Routing\ResourceRegistrar  $registrar
-     * @param  string  $name
-     * @param  string  $controller
+     * @param  array  $resources
      * @param  array  $options
      * @return void
      */
-    public function __construct(ResourceRegistrar $registrar, $name, $controller, array $options)
+    public function __construct(ResourceRegistrar $registrar, array $resources, array $options)
     {
-        $this->name = $name;
+        $this->resources = $resources;
         $this->options = $options;
         $this->registrar = $registrar;
-        $this->controller = $controller;
     }
 
     /**
@@ -164,7 +162,7 @@ class PendingResourceRegistration
      * Specify middleware that should be removed from the resource routes.
      *
      * @param  array|string  $middleware
-     * @return $this|array
+     * @return \Illuminate\Routing\PendingResourceRegistration|array
      */
     public function withoutMiddleware($middleware)
     {
@@ -205,7 +203,7 @@ class PendingResourceRegistration
      * Define the callable that should be invoked on a missing model exception.
      *
      * @param  callable  $callback
-     * @return $this
+     * @return \Illuminate\Routing\PendingResourceRegistration
      */
     public function missing($callback)
     {
@@ -243,15 +241,26 @@ class PendingResourceRegistration
     /**
      * Register the resource route.
      *
-     * @return \Illuminate\Routing\RouteCollection
+     * @return \Illuminate\Routing\RouteCollection|void
      */
     public function register()
     {
         $this->registered = true;
 
-        return $this->registrar->register(
-            $this->name, $this->controller, $this->options
-        );
+        if (count($this->resources) == 1) {
+            $name = key($this->resources);
+            $controller = $this->resources[$name];
+
+            return $this->registrar->register(
+                $name, $controller, $this->options
+            );
+        } else {
+            foreach ($this->resources as $name => $controller) {
+                $this->registrar->register(
+                    $name, $controller, $this->options
+                );
+            }
+        }
     }
 
     /**
