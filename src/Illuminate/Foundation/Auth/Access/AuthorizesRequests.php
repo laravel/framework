@@ -84,7 +84,7 @@ trait AuthorizesRequests
     {
         $model = is_array($model) ? implode(',', $model) : $model;
 
-        $automaticParameterDetection = app('request')->route()->parameterNames ?? Str::snake(class_basename($model));
+        $automaticParameterDetection = app()->has('request') ? app('request')->route()->parameterNames : Str::snake(class_basename($model));
 
         $parameter = $parameter ?: $automaticParameterDetection;
 
