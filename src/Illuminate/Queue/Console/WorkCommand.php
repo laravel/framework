@@ -252,6 +252,7 @@ class WorkCommand extends Command
 
         if (! $useLineBreak) {
             $this->output->write($output);
+
             return;
         }
 
