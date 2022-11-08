@@ -238,8 +238,10 @@ class WorkCommand extends Command
     }
 
     /**
-     * @param string $output
-     * @param bool $useLine
+     * Writes the interactive output.
+     *
+     * @param  string  $output
+     * @param  bool  $useLineBreak
      * @return void
      */
     protected function writePrettyOutput($output, $useLineBreak = false)
@@ -248,7 +250,7 @@ class WorkCommand extends Command
             return;
         }
 
-        if (!$useLineBreak) {
+        if (! $useLineBreak) {
             $this->output->write($output);
             return;
         }
