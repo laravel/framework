@@ -1054,19 +1054,6 @@ trait ValidatesAttributes
     }
 
     /**
-     * Validate that an attribute is lowercase.
-     *
-     * @param  string  $attribute
-     * @param  mixed  $value
-     * @param  array<int, int|string>  $parameters
-     * @return bool
-     */
-    public function validateLowercase($attribute, $value, $parameters)
-    {
-        return Str::lower($value) === $value;
-    }
-
-    /**
      * Validate that an attribute is less than another attribute.
      *
      * @param  string  $attribute
@@ -1169,6 +1156,19 @@ trait ValidatesAttributes
         }
 
         return $this->getSize($attribute, $value) <= $this->getSize($attribute, $comparedToValue);
+    }
+
+    /**
+     * Validate that an attribute is lowercase.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateLowercase($attribute, $value, $parameters)
+    {
+        return Str::lower($value) === $value;
     }
 
     /**
