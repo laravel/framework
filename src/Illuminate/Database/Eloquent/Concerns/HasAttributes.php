@@ -181,6 +181,29 @@ trait HasAttributes
     public static $encrypter;
 
     /**
+     * Dynamically retrieve attributes on the model.
+     *
+     * @param  string  $key
+     * @return mixed
+     */
+    public function __get($key)
+    {
+        return $this->getAttribute($key);
+    }
+
+    /**
+     * Dynamically set attributes on the model.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return void
+     */
+    public function __set($key, $value)
+    {
+        $this->setAttribute($key, $value);
+    }
+
+    /**
      * Convert the model's attributes to an array.
      *
      * @return array
@@ -1422,7 +1445,7 @@ trait HasAttributes
      */
     public function getDates()
     {
-        if (! $this->usesTimestamps()) {
+        if (!method_exists($this, 'usesTimestamps') || ! $this->usesTimestamps()) {
             return $this->dates;
         }
 
