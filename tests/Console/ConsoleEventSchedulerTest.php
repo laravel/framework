@@ -147,6 +147,26 @@ class ConsoleEventSchedulerTest extends TestCase
         $events = $schedule->events();
         $this->assertSame('Asia/Tokyo', $events[0]->timezone);
     }
+
+    public function testHasCommandWithCommandAndExpression()
+    {
+        $schedule = $this->schedule;
+        $schedule->command(ConsoleCommandStub::class);
+
+        $this->assertTrue($schedule->hasCommand('foo:bar', '* * * * *'));
+        $this->assertFalse($schedule->hasCommand('foo:bar', '0 0 * * *'));
+        $this->assertFalse($schedule->hasCommand('foo:baz', '* * * * *'));
+    }
+
+    public function testHasCommandWithJobAndExpression()
+    {
+        $schedule = $this->schedule;
+        $schedule->job(ConsoleCommandStub::class);
+
+        $this->assertTrue($schedule->hasJob(ConsoleCommandStub::class, '* * * * *'));
+        $this->assertFalse($schedule->hasJob(ConsoleCommandStub::class, '0 0 * * *'));
+        $this->assertFalse($schedule->hasJob(FooClassStub::class, '* * * * *'));
+    }
 }
 
 class FooClassStub

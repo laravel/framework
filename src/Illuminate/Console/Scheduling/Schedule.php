@@ -13,7 +13,9 @@ use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\CallQueuedClosure;
+use Illuminate\Support\Arr;
 use Illuminate\Support\ProcessUtils;
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
 
@@ -363,5 +365,39 @@ class Schedule
         }
 
         return $this->dispatcher;
+    }
+
+    /**
+     * Find if artisan command with given cron expression scheduled.
+     *
+     * @param  string  $command
+     * @param  string  $expression
+     * @return bool
+     */
+    public function hasCommand(string $command, string $expression): bool
+    {
+        $event = Arr::first(
+            $this->events,
+            fn (Event $item) => Str::after($item->command, "'artisan' ") === $command && $item->getExpression() === $expression
+        );
+
+        return ! is_null($event);
+    }
+
+    /**
+     * Find if job class with given cron expression scheduled.
+     *
+     * @param  string  $job
+     * @param  string  $expression
+     * @return bool
+     */
+    public function hasJob(string $job, string $expression): bool
+    {
+        $event = Arr::first(
+            $this->events,
+            fn (Event $item) => $item->description === $job && $item->getExpression() === $expression
+        );
+
+        return ! is_null($event);
     }
 }
