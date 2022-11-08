@@ -38,7 +38,6 @@ class DatabaseEloquentModelTraitsTest extends TestCase
         $this->assertNull($model->not_existing_attribute);
 
         $this->assertEquals('Otwellian programming', $model->hobby);
-
     }
 }
 
@@ -63,4 +62,3 @@ class CustomModelWithRestrictsAttributesStub extends CustomModelWithoutRestricts
 {
     use RestrictsAttributes;
 }
-

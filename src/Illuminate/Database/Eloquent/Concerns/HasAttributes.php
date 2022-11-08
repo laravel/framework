@@ -1445,7 +1445,7 @@ trait HasAttributes
      */
     public function getDates()
     {
-        if (!method_exists($this, 'usesTimestamps') || ! $this->usesTimestamps()) {
+        if (! method_exists($this, 'usesTimestamps') || ! $this->usesTimestamps()) {
             return $this->dates;
         }
 
