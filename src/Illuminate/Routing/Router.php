@@ -373,7 +373,7 @@ class Router implements BindingRegistrar, RegistrarContract
      *
      * @param  array  $attributes
      * @param  \Closure|array|string  $routes
-     * @return void
+     * @return $this
      */
     public function group(array $attributes, $routes)
     {
@@ -387,6 +387,8 @@ class Router implements BindingRegistrar, RegistrarContract
 
             array_pop($this->groupStack);
         }
+
+        return $this;
     }
 
     /**
@@ -995,6 +997,32 @@ class Router implements BindingRegistrar, RegistrarContract
         if (! in_array($middleware, $this->middlewareGroups[$group])) {
             $this->middlewareGroups[$group][] = $middleware;
         }
+
+        return $this;
+    }
+
+    /**
+     * Remove the given middleware from the specified group.
+     *
+     * @param  string  $group
+     * @param  string  $middleware
+     * @return $this
+     */
+    public function removeMiddlewareFromGroup($group, $middleware)
+    {
+        if (! $this->hasMiddlewareGroup($group)) {
+            return $this;
+        }
+
+        $reversedMiddlewaresArray = array_flip($this->middlewareGroups[$group]);
+
+        if (! array_key_exists($middleware, $reversedMiddlewaresArray)) {
+            return $this;
+        }
+
+        $middlewareKey = $reversedMiddlewaresArray[$middleware];
+
+        unset($this->middlewareGroups[$group][$middlewareKey]);
 
         return $this;
     }

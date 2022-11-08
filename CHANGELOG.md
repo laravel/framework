@@ -1,6 +1,57 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.37.0...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.39.0...9.x)
+
+
+## [v9.39.0](https://github.com/laravel/framework/compare/v9.38.0...v9.39.0) - 2022-11-08
+
+### Added
+- Added template fragments to Blade ([#44774](https://github.com/laravel/framework/pull/44774))
+- Added source file to Collection's dd method output ([#44793](https://github.com/laravel/framework/pull/44793), [d2e0e85](https://github.com/laravel/framework/commit/d2e0e859f00579aeb2600fce2fe9fc3cca933f41))
+- Added `Illuminate/Support/Testing/Fakes/PendingBatchFake::dispatchAfterResponse()` ([#44815](https://github.com/laravel/framework/pull/44815))
+- Added `Illuminate/Foundation/Testing/Concerns/InteractsWithDatabase::assertDatabaseEmpty()` ([#44810](https://github.com/laravel/framework/pull/44810))
+
+### Fixed
+- Fixed `InteractsWithContainer::withoutMix()` ([#44822](https://github.com/laravel/framework/pull/44822))
+
+### Changed
+- Update `UpCommand::handle` that must return int ([#44807](https://github.com/laravel/framework/pull/44807))
+- Decouple database component from console component ([#44798](https://github.com/laravel/framework/pull/44798))
+- Improve input argument parsing for commands ([#44662](https://github.com/laravel/framework/pull/44662), [#44826](https://github.com/laravel/framework/pull/44826))
+- Added DatabaseBatchRepository to provides() in BusServiceProvider ([#44833](https://github.com/laravel/framework/pull/44833))
+- Move reusable onNotSuccessfulTest functionality to TestResponse ([#44827](https://github.com/laravel/framework/pull/44827))
+- Add CSP nonce to Vite reactRefresh inline script ([#44816](https://github.com/laravel/framework/pull/44816))
+- Allow route group method to be chained ([#44825](https://github.com/laravel/framework/pull/44825))
+- Remove __sleep() & __wakeup() from SerializesModels trait. ([#44847](https://github.com/laravel/framework/pull/44847))
+- Handle SQLite without ENABLE_DBSTAT_VTAB enabled in `Illuminate/Database/Console/DatabaseInspectionCommand::getSqliteTableSize()` ([#44867](https://github.com/laravel/framework/pull/44867))
+- Apply force flag when necessary in `Illuminate/Queue/Listener` ([#44862](https://github.com/laravel/framework/pull/44862))
+- De-couple Console component from framework ([#44864](https://github.com/laravel/framework/pull/44864))
+- Update Vite mock to return empty array for preloadedAssets ([#44858](https://github.com/laravel/framework/pull/44858))
+
+
+## [v9.38.0](https://github.com/laravel/framework/compare/v9.37.0...v9.38.0) - 2022-11-01
+
+### Added
+- Added `Illuminate/Routing/Route::flushController()` ([#44393](https://github.com/laravel/framework/pull/44393))
+- Added `Illuminate/Session/Store::setHandler()` ([#44736](https://github.com/laravel/framework/pull/44736))
+- Added dictionary to slug helper ([#44730](https://github.com/laravel/framework/pull/44730))
+- Added ability to set middleware based on notifiable instance and channel ([#44767](https://github.com/laravel/framework/pull/44767))
+- Added touchQuietly convenience method to Model ([#44722](https://github.com/laravel/framework/pull/44722))
+- Added `Illuminate/Routing/Router::removeMiddlewareFromGroup()` ([#44780](https://github.com/laravel/framework/pull/44780))
+- Allow queueable notifications to set maxExceptions ([#44773](https://github.com/laravel/framework/pull/44773))
+- Make migrate command isolated ([#44743](https://github.com/laravel/framework/pull/44743), [ac3252a](https://github.com/laravel/framework/commit/ac3252a4c2a4c94724cd5aeaf6268427d21f9e97))
+
+### Fixed
+- Fixed whenPivotLoaded(As) api resource methods when using Eloquent strict mode ([#44792](https://github.com/laravel/framework/pull/44792))
+- Fixed components view error when using $attributes in parent view ([#44778](https://github.com/laravel/framework/pull/44778))
+- Fixed problem with disregarding global scopes when using existOr and doesntExistOr methods on model query ([#44795](https://github.com/laravel/framework/pull/44795))
+
+### Changed
+- Recompiles views when necessary ([#44737](https://github.com/laravel/framework/pull/44737))
+- Throw meaningful exception when broadcast connection not configured ([#44745](https://github.com/laravel/framework/pull/44745))
+- Prevents booting of providers when running env:encrypt ([#44758](https://github.com/laravel/framework/pull/44758))
+- Added nonce for preloaded assets ([#44747](https://github.com/laravel/framework/pull/44747))
+- Inherit crossorigin attributes while preloading view ([#44800](https://github.com/laravel/framework/pull/44800))
 
 
 ## [v9.37.0](https://github.com/laravel/framework/compare/v9.36.4...v9.37.0) - 2022-10-25

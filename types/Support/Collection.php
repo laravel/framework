@@ -602,6 +602,7 @@ assertType('Illuminate\Support\Collection<int, string>', $collection->make(['str
 
 assertType('Illuminate\Support\Collection<string, int>', $collection->make(['string' => 'string'])->combine([2]));
 assertType('Illuminate\Support\Collection<int, int>', $collection->make([1])->combine([1]));
+assertType('Illuminate\Support\Collection<string, string>', $collection->make(['string'])->combine(['string']));
 
 assertType('Illuminate\Support\Collection<int, int>', $collection->make([1])->union([1]));
 assertType('Illuminate\Support\Collection<string, string>', $collection->make(['string' => 'string'])->union(['string' => 'string']));
