@@ -1,6 +1,32 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.38.0...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.39.0...9.x)
+
+
+## [v9.39.0](https://github.com/laravel/framework/compare/v9.38.0...v9.39.0) - 2022-11-08
+
+### Added
+- Added template fragments to Blade ([#44774](https://github.com/laravel/framework/pull/44774))
+- Added source file to Collection's dd method output ([#44793](https://github.com/laravel/framework/pull/44793), [d2e0e85](https://github.com/laravel/framework/commit/d2e0e859f00579aeb2600fce2fe9fc3cca933f41))
+- Added `Illuminate/Support/Testing/Fakes/PendingBatchFake::dispatchAfterResponse()` ([#44815](https://github.com/laravel/framework/pull/44815))
+- Added `Illuminate/Foundation/Testing/Concerns/InteractsWithDatabase::assertDatabaseEmpty()` ([#44810](https://github.com/laravel/framework/pull/44810))
+
+### Fixed
+- Fixed `InteractsWithContainer::withoutMix()` ([#44822](https://github.com/laravel/framework/pull/44822))
+
+### Changed
+- Update `UpCommand::handle` that must return int ([#44807](https://github.com/laravel/framework/pull/44807))
+- Decouple database component from console component ([#44798](https://github.com/laravel/framework/pull/44798))
+- Improve input argument parsing for commands ([#44662](https://github.com/laravel/framework/pull/44662), [#44826](https://github.com/laravel/framework/pull/44826))
+- Added DatabaseBatchRepository to provides() in BusServiceProvider ([#44833](https://github.com/laravel/framework/pull/44833))
+- Move reusable onNotSuccessfulTest functionality to TestResponse ([#44827](https://github.com/laravel/framework/pull/44827))
+- Add CSP nonce to Vite reactRefresh inline script ([#44816](https://github.com/laravel/framework/pull/44816))
+- Allow route group method to be chained ([#44825](https://github.com/laravel/framework/pull/44825))
+- Remove __sleep() & __wakeup() from SerializesModels trait. ([#44847](https://github.com/laravel/framework/pull/44847))
+- Handle SQLite without ENABLE_DBSTAT_VTAB enabled in `Illuminate/Database/Console/DatabaseInspectionCommand::getSqliteTableSize()` ([#44867](https://github.com/laravel/framework/pull/44867))
+- Apply force flag when necessary in `Illuminate/Queue/Listener` ([#44862](https://github.com/laravel/framework/pull/44862))
+- De-couple Console component from framework ([#44864](https://github.com/laravel/framework/pull/44864))
+- Update Vite mock to return empty array for preloadedAssets ([#44858](https://github.com/laravel/framework/pull/44858))
 
 
 ## [v9.38.0](https://github.com/laravel/framework/compare/v9.37.0...v9.38.0) - 2022-11-01
