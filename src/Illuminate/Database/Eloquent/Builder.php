@@ -644,6 +644,16 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Get a single primary key value from the first result of a query.
+     *
+     * @return mixed
+     */
+    public function valueKey()
+    {
+        return $this->value($this->model->getQualifiedKeyName());
+    }
+
+    /**
      * Get a single column's value from the first result of a query if it's the sole matching record.
      *
      * @param  string|\Illuminate\Database\Query\Expression  $column

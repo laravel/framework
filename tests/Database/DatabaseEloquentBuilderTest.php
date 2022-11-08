@@ -353,6 +353,26 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->whereKey('bar')->valueOrFail('column');
     }
 
+    public function testValueKeyMethodWithModelFound()
+    {
+        $builder = m::mock(Builder::class.'[value,first]', [$this->getMockQueryBuilder()]);
+        $model = $this->getMockModel();
+        $builder->setModel($model);
+        $builder->shouldReceive('value')->once()->with('foo_table.foo')->andReturn('baz');
+        $builder->shouldReceive('first')->with('foo_table.foo')->andReturn('baz');
+        $this->assertSame('baz', $builder->valueKey());
+    }
+
+    public function testValueKeyMethodWithModelNotFound()
+    {
+        $builder = m::mock(Builder::class.'[value,first]', [$this->getMockQueryBuilder()]);
+        $model = $this->getMockModel();
+        $builder->setModel($model);
+        $builder->shouldReceive('value')->once()->with('foo_table.foo')->andReturn(null);
+        $builder->shouldReceive('first')->with('foo_table.foo')->andReturn(null);
+        $this->assertNull($builder->valueKey());
+    }
+
     public function testChunkWithLastChunkComplete()
     {
         $builder = m::mock(Builder::class.'[forPage,get]', [$this->getMockQueryBuilder()]);
