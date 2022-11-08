@@ -214,28 +214,45 @@ class WorkCommand extends Command
 
             $formattedStartedAt = Carbon::now()->format('Y-m-d H:i:s');
 
-            $this->output->writeln("  <fg=gray>{$formattedStartedAt}</> {$job->resolveName()}");
-
-            return;
+            return $this->writePrettyOutput("  <fg=gray>{$formattedStartedAt}</> {$job->resolveName()}");
         }
 
         if ($this->latestStatus && $this->latestStatus != 'starting') {
             $formattedStartedAt = Carbon::createFromTimestamp($this->latestStartedAt)->format('Y-m-d H:i:s');
 
-            $this->output->writeln("  <fg=gray>{$formattedStartedAt}</> {$job->resolveName()}");
+            $this->writePrettyOutput("  <fg=gray>{$formattedStartedAt}</> {$job->resolveName()}");
         }
 
         $runTime = number_format((microtime(true) - $this->latestStartedAt) * 1000, 2).'ms';
-        $dots = max(terminal()->width() - mb_strlen($runTime) - 8, 0);
+        $dots = max(terminal()->width() - mb_strlen($job->resolveName()) - mb_strlen($runTime) - 31, 0);
 
-        $this->output->write('  '.str_repeat('<fg=gray>.</>', $dots));
-        $this->output->write(" <fg=gray>$runTime</>");
+        $this->writePrettyOutput(' '.str_repeat('<fg=gray>.</>', $dots));
+        $this->writePrettyOutput(" <fg=gray>$runTime</>");
 
-        $this->output->writeln(match ($this->latestStatus = $status) {
+        $this->writePrettyOutput(match ($this->latestStatus = $status) {
             'success' => ' <fg=green;options=bold>DONE</>',
             'released_after_exception' => ' <fg=yellow;options=bold>FAIL</>',
             default => ' <fg=red;options=bold>FAIL</>',
-        });
+        }, true);
+    }
+
+    /**
+     * @param string $output
+     * @param bool $useLine
+     * @return void
+     */
+    protected function writePrettyOutput($output, $useLineBreak = false)
+    {
+        if ($this->option('without-interactive-output')) {
+            return;
+        }
+
+        if (!$useLineBreak) {
+            $this->output->write($output);
+            return;
+        }
+
+        $this->output->writeln($output);
     }
 
     /**
