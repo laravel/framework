@@ -39,7 +39,8 @@ class WorkCommand extends Command
                             {--sleep=3 : Number of seconds to sleep when no job is available}
                             {--rest=0 : Number of seconds to rest between jobs}
                             {--timeout=60 : The number of seconds a child process can run}
-                            {--tries=1 : Number of times to attempt a job before logging it failed}';
+                            {--tries=1 : Number of times to attempt a job before logging it failed}
+                            {--without-interactive-output : Interactive output will not be printed, only logging}';
 
     /**
      * The name of the console command.
