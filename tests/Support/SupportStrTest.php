@@ -110,6 +110,8 @@ class SupportStrTest extends TestCase
         $this->assertTrue(Str::startsWith(7.123, '7'));
         $this->assertTrue(Str::startsWith(7.123, '7.12'));
         $this->assertFalse(Str::startsWith(7.123, '7.13'));
+        $this->assertFalse(Str::startsWith('jason', 'Jas'));
+        $this->assertTrue(Str::startsWith('jason', 'Jas', true));
         // Test for multibyte string support
         $this->assertTrue(Str::startsWith('Jönköping', 'Jö'));
         $this->assertTrue(Str::startsWith('Malmö', 'Malmö'));
