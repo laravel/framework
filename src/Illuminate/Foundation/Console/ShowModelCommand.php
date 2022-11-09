@@ -227,18 +227,19 @@ class ShowModelCommand extends DatabaseInspectionCommand
     /**
      * Get the Observers watching this model.
      *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return Illuminate\Support\Collection
      */
     protected function getObservers($model)
     {
         $listeners = $this->getLaravel()->make('events')->getRawListeners();
 
-        // Distill down to Eloquent observers relevant to this model.
+        // Get the Eloquent observers for this model...
         $listeners = array_filter($listeners, function ($v, $key) use ($model) {
             return Str::startsWith($key, 'eloquent.') && Str::endsWith($key, $model::class);
         }, ARRAY_FILTER_USE_BOTH);
 
-        // Format as Eloquent verb => Observer methods
+        // Format listeners Eloquent verb => Observer methods...
         $extractVerb = function ($key) {
             preg_match('/eloquent.([a-zA-Z]+)\: /', $key, $matches);
             return $matches[1] ?? '?';
