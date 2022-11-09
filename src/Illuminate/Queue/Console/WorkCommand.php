@@ -250,13 +250,13 @@ class WorkCommand extends Command
             return;
         }
 
-        if (! $useLineBreak) {
-            $this->output->write($output);
+        if ($useLineBreak) {
+            $this->output->writeln($output);
 
             return;
         }
 
-        $this->output->writeln($output);
+        $this->output->write($output);
     }
 
     /**
