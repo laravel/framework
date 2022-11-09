@@ -94,14 +94,6 @@ class Application extends SymfonyApplication implements ApplicationContract
             $input = $input ?: new ArgvInput
         );
 
-        if (! is_null($commandName)) {
-            try {
-                $input->bind($this->find($commandName)->getDefinition());
-            } catch (ExceptionInterface) {
-                // ...
-            }
-        }
-
         $this->events->dispatch(
             new CommandStarting(
                 $commandName, $input, $output = $output ?: new BufferedConsoleOutput
