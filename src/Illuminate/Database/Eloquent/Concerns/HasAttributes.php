@@ -2145,25 +2145,27 @@ trait HasAttributes
      */
     public function getMutatedAttributes()
     {
-        $class = static::class;
-
-        if (! isset(static::$mutatorCache[$class])) {
-            static::cacheMutatedAttributes($class);
+        if (! isset(static::$mutatorCache[static::class])) {
+            static::cacheMutatedAttributes($this);
         }
 
-        return static::$mutatorCache[$class];
+        return static::$mutatorCache[static::class];
     }
 
     /**
      * Extract and cache all the mutated attributes of a class.
      *
-     * @param  string  $class
+     * @param  object|string  $classOrInstance
      * @return void
      */
-    public static function cacheMutatedAttributes($class)
+    public static function cacheMutatedAttributes($classOrInstance)
     {
+        $reflection = new ReflectionClass($classOrInstance);
+
+        $class = $reflection->getName();
+
         static::$getAttributeMutatorCache[$class] =
-            collect($attributeMutatorMethods = static::getAttributeMarkedMutatorMethods($class))
+            collect($attributeMutatorMethods = static::getAttributeMarkedMutatorMethods($classOrInstance))
                     ->mapWithKeys(function ($match) {
                         return [lcfirst(static::$snakeAttributes ? Str::snake($match) : $match) => true];
                     })->all();
