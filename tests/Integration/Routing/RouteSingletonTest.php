@@ -71,6 +71,8 @@ class RouteSingletonTest extends TestCase
 
         $response = $this->put('/avatar');
         $this->assertEquals(200, $response->getStatusCode());
+        $this->assertSame('singleton update', $response->getContent());
+
         $response = $this->patch('/avatar');
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertSame('singleton update', $response->getContent());
@@ -121,18 +123,20 @@ class RouteSingletonTest extends TestCase
 
     public function testNestedSingletonParameter()
     {
-        Route::singleton('things.thumbnail', NestedSingletonTestController::class)->parameter('thing', 'video');
+        Route::singleton('v.thumbnail', NestedSingletonTestController::class)->parameter('v', 'video');
 
-        $response = $this->get('/things/123/thumbnail');
+        $response = $this->get('/v/123/thumbnail');
+
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertSame('singleton show for 123', $response->getContent());
     }
 
     public function testNestedSingletonParameters()
     {
-        Route::singleton('things.thumbnail', NestedSingletonTestController::class)->parameters(['thing' => 'video']);
+        Route::singleton('v.thumbnail', NestedSingletonTestController::class)->parameters(['v' => 'video']);
 
-        $response = $this->get('/things/123/thumbnail');
+        $response = $this->get('/v/123/thumbnail');
+
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertSame('singleton show for 123', $response->getContent());
     }
@@ -142,6 +146,7 @@ class RouteSingletonTest extends TestCase
         Route::singleton('videos.thumbnail', NestedSingletonTestController::class)->where(['video' => '[a-z]+']);
 
         $response = $this->get('/videos/123/thumbnail');
+
         $this->assertEquals(404, $response->getStatusCode());
     }
 
@@ -150,6 +155,7 @@ class RouteSingletonTest extends TestCase
         Route::singleton('/user/avatar', SingletonTestController::class);
 
         $response = $this->get('/user/avatar');
+
         $this->assertEquals(200, $response->getStatusCode());
     }
 }
