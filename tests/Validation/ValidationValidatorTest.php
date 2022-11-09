@@ -1803,6 +1803,33 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testLowercase()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [
+            'lower' => 'lowercase',
+            'mixed' => 'MixedCase',
+            'upper' => 'UPPERCASE',
+            'lower_multibyte' => 'carácter multibyte',
+            'mixed_multibyte' => 'carÁcter multibyte',
+            'upper_multibyte' => 'CARÁCTER MULTIBYTE',
+        ], [
+            'lower' => 'lowercase',
+            'mixed' => 'lowercase',
+            'upper' => 'lowercase',
+            'lower_multibyte' => 'lowercase',
+            'mixed_multibyte' => 'lowercase',
+            'upper_multibyte' => 'lowercase',
+        ]);
+
+        $this->assertSame([
+            'mixed',
+            'upper',
+            'mixed_multibyte',
+            'upper_multibyte',
+        ], $v->messages()->keys());
+    }
+
     public function testLessThan()
     {
         $trans = $this->getIlluminateArrayTranslator();
