@@ -1125,6 +1125,19 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
+     * Slice the array after the given value.
+     *
+     * @param  TValue  $value
+     * @param  int|null  $length
+     * @param  bool  $strict
+     * @return static
+     */
+    public function after($value, $length = null, $strict = true)
+    {
+        return $this->slice($this->search($value, $strict), $length);
+    }
+
+    /**
      * Split a collection into a certain number of groups.
      *
      * @param  int  $numberOfGroups

@@ -4549,6 +4549,24 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testAfter($collection)
+    {
+        $data = new $collection(['tiny', 'small', 'medium', 'large', 'huge']);
+        $this->assertEquals(['small', 'medium', 'large', 'huge'], $data->after('small')->values()->toArray());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testAfterLength($collection)
+    {
+        $data = new $collection(['tiny', 'small', 'medium', 'large', 'huge']);
+        $this->assertEquals(['small', 'medium'], $data->after('small', 2)->values()->toArray());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testSliceOffset($collection)
     {
         $data = new $collection([1, 2, 3, 4, 5, 6, 7, 8]);
