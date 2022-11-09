@@ -2155,13 +2155,14 @@ trait HasAttributes
     /**
      * Extract and cache all the mutated attributes of a class.
      *
-     * @param  mixed  $classOrInstance
+     * @param  object|string  $classOrInstance
      * @return void
      */
     public static function cacheMutatedAttributes($classOrInstance)
     {
-        $reflectionClass = new ReflectionClass($classOrInstance);
-        $class = $reflectionClass->getName();
+        $reflection = new ReflectionClass($classOrInstance);
+
+        $class = $reflection->getName();
 
         static::$getAttributeMutatorCache[$class] =
             collect($attributeMutatorMethods = static::getAttributeMarkedMutatorMethods($classOrInstance))
