@@ -242,6 +242,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
         // Format listeners Eloquent verb => Observer methods...
         $extractVerb = function ($key) {
             preg_match('/eloquent.([a-zA-Z]+)\: /', $key, $matches);
+
             return $matches[1] ?? '?';
         };
 
