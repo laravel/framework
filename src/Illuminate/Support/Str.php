@@ -271,15 +271,23 @@ class Str
      *
      * @param  string  $haystack
      * @param  string|iterable<string>  $needles
+     * @param  bool  $ignoreCase
      * @return bool
      */
-    public static function endsWith($haystack, $needles)
+    public static function endsWith($haystack, $needles, $ignoreCase = false)
     {
+        if ($ignoreCase) {
+            $haystack = mb_strtolower($haystack);
+        }
+
         if (! is_iterable($needles)) {
             $needles = (array) $needles;
         }
 
         foreach ($needles as $needle) {
+            if ($ignoreCase) {
+                $needle = mb_strtolower((string) $needle);
+            }
             if ((string) $needle !== '' && str_ends_with($haystack, $needle)) {
                 return true;
             }
