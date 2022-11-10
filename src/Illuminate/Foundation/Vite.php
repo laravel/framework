@@ -715,7 +715,7 @@ class Vite implements Htmlable
      *
      * @return bool
      */
-    protected function isRunningHot()
+    public function isRunningHot()
     {
         return is_file($this->hotFile());
     }
