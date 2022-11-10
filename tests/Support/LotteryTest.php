@@ -8,6 +8,13 @@ use RuntimeException;
 
 class LotteryTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        Lottery::determineResultNormally();
+    }
+
     public function testItCanWin()
     {
         $wins = false;
@@ -137,5 +144,41 @@ class LotteryTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectErrorMessage('Missing key in sequence.');
         Lottery::odds(1, 10000)->winner(fn () => 'winner')->loser(fn () => 'loser')->choose();
+    }
+
+    public function testItThrowsForFloatsOverOne()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectErrorMessage('Float must not be greater than 1.');
+
+        new Lottery(1.1);
+    }
+
+    public function testItCanWinWithFloat()
+    {
+        $wins = false;
+
+        Lottery::odds(1.0)
+            ->winner(function () use (&$wins) {
+                $wins = true;
+            })->choose();
+
+        $this->assertTrue($wins);
+    }
+
+    public function testItCanLoseWithFloat()
+    {
+        $wins = false;
+        $loses = false;
+
+        Lottery::odds(0.0)
+            ->winner(function () use (&$wins) {
+                $wins = true;
+            })->loser(function () use (&$loses) {
+                $loses = true;
+            })->choose();
+
+        $this->assertFalse($wins);
+        $this->assertTrue($loses);
     }
 }

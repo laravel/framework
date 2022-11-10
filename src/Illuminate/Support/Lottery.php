@@ -2,19 +2,21 @@
 
 namespace Illuminate\Support;
 
+use RuntimeException;
+
 class Lottery
 {
     /**
      * The number of expected wins.
      *
-     * @var int
+     * @var int|float
      */
     protected $chances;
 
     /**
      * The number of potential opportunities to win.
      *
-     * @var int
+     * @var int|null
      */
     protected $outOf;
 
@@ -42,11 +44,15 @@ class Lottery
     /**
      * Create a new Lottery instance.
      *
-     * @param  int  $chances
-     * @param  int  $outOf
+     * @param  int|float  $chances
+     * @param  ?int  $outOf
      */
-    public function __construct($chances, $outOf)
+    public function __construct($chances, $outOf = null)
     {
+        if ($outOf === null && is_float($chances) && $chances > 1) {
+            throw new RuntimeException('Float must not be greater than 1.');
+        }
+
         $this->chances = $chances;
 
         $this->outOf = $outOf;
@@ -55,11 +61,11 @@ class Lottery
     /**
      * Create a new Lottery instance.
      *
-     * @param  int  $chances
-     * @param  int  $outOf
+     * @param  int|float  $chances
+     * @param  ?int  $outOf
      * @return static
      */
-    public static function odds($chances, $outOf)
+    public static function odds($chances, $outOf = null)
     {
         return new static($chances, $outOf);
     }
@@ -152,7 +158,9 @@ class Lottery
      */
     protected static function resultFactory()
     {
-        return static::$resultFactory ?? fn ($chances, $outOf) => random_int(1, $outOf) <= $chances;
+        return static::$resultFactory ?? fn ($chances, $outOf) => $outOf === null
+            ? random_int(0, PHP_INT_MAX) / PHP_INT_MAX <= $chances
+            : random_int(1, $outOf) <= $chances;
     }
 
     /**
