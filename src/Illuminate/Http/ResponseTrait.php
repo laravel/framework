@@ -179,4 +179,28 @@ trait ResponseTrait
     {
         throw new HttpResponseException($this);
     }
+
+    /**
+     * Get the token for the request.
+     *
+     * @param string $inputKey Name of query or input parameter to get token from. (default: 'token')
+     * @return string|null
+     */
+    public function getToken(string $inputKey = 'token')
+    {
+        $tokens = [
+            $this->query($inputKey),
+            $this->input($inputKey),
+            $this->bearerToken(),
+            $this->getPassword(),
+        ];
+
+        foreach ($tokens as $token) {
+            if (! empty($token)) {
+                return $token;
+            }
+        }
+
+        return null;
+    }
 }
