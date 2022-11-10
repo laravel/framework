@@ -333,7 +333,7 @@ class Handler implements ExceptionHandlerContract
     /**
      * Create the context for logging by default format.
      *
-     * @param \Throwable $e
+     * @param  \Throwable $e
      * @return array
      */
     protected function buildContext(Throwable $e)
