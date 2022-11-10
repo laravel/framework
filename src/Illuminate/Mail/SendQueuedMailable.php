@@ -27,6 +27,13 @@ class SendQueuedMailable
     public $tries;
 
     /**
+     * Get the number of times to attempt a job after an exception.
+     *
+     * @return int|null
+     */
+    public $maxExceptions;
+
+    /**
      * The number of seconds the job can run before timing out.
      *
      * @var int
@@ -50,6 +57,7 @@ class SendQueuedMailable
     {
         $this->mailable = $mailable;
         $this->tries = property_exists($mailable, 'tries') ? $mailable->tries : null;
+        $this->maxExceptions = $mailable->maxExceptions ?? null;
         $this->timeout = property_exists($mailable, 'timeout') ? $mailable->timeout : null;
         $this->afterCommit = property_exists($mailable, 'afterCommit') ? $mailable->afterCommit : null;
         $this->shouldBeEncrypted = $mailable instanceof ShouldBeEncrypted;
