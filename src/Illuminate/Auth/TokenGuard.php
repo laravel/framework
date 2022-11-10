@@ -96,20 +96,7 @@ class TokenGuard implements Guard
      */
     public function getTokenForRequest()
     {
-        $stack = [
-            $this->request->query($this->inputKey),
-            $this->request->input($this->inputKey),
-            $this->request->bearerToken(),
-            $this->request->getPassword(),
-        ];
-
-        foreach ($stack as $token) {
-            if (! empty($token)) {
-                return $token;
-            }
-        }
-
-        return null;
+        return $this->request->getToken();
     }
 
     /**
