@@ -300,9 +300,9 @@ class Handler implements ExceptionHandlerContract
     }
 
     /**
-     * Create the context for logging by default format.
+     * Create the context array for logging the given exception.
      *
-     * @param  \Throwable $e
+     * @param  \Throwable  $e
      * @return array
      */
     protected function buildExceptionContext(Throwable $e)
