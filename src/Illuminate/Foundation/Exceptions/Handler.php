@@ -268,7 +268,7 @@ class Handler implements ExceptionHandlerContract
             $this->levels, fn ($level, $type) => $e instanceof $type, LogLevel::ERROR
         );
 
-        $context = $this->buildContext($e);
+        $context = $this->buildExceptionContext($e);
 
         method_exists($logger, $level)
             ? $logger->{$level}($e->getMessage(), $context)
@@ -300,6 +300,21 @@ class Handler implements ExceptionHandlerContract
     }
 
     /**
+     * Create the context for logging by default format.
+     *
+     * @param  \Throwable $e
+     * @return array
+     */
+    protected function buildExceptionContext(Throwable $e)
+    {
+        return array_merge(
+            $this->exceptionContext($e),
+            $this->context(),
+            ['exception' => $e]
+        );
+    }
+
+    /**
      * Get the default exception context variables for logging.
      *
      * @param  \Throwable  $e
@@ -328,21 +343,6 @@ class Handler implements ExceptionHandlerContract
         } catch (Throwable $e) {
             return [];
         }
-    }
-
-    /**
-     * Create the context for logging by default format.
-     *
-     * @param  \Throwable $e
-     * @return array
-     */
-    protected function buildContext(Throwable $e)
-    {
-        return array_merge(
-            $this->exceptionContext($e),
-            $this->context(),
-            ['exception' => $e]
-        );
     }
 
     /**
