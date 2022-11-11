@@ -7435,6 +7435,34 @@ class ValidationValidatorTest extends TestCase
         $this->assertEquals($expectedResult, $validator->getMessageBag()->getMessages());
     }
 
+    public function testUrlProtocol()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['url' => 'https://laravel.com'], ['url' => 'url_protocol:https,http']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['url' => 'http://laravel.com'], ['url' => 'url_protocol:https,http']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['url' => 'http://laravel.com'], ['url' => 'url_protocol:https']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['url' => 'https.laravel.com'], ['url' => 'url_protocol:https']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['url' => 'https://'], ['url' => 'url_protocol:https']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['url' => 'https://www.laravel.com'], ['url' => 'url_protocol:https']);
+        $this->assertTrue($v->passes());
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Not supported protocol provided.');
+
+        $v = new Validator($trans, ['url' => 'https://www.laravel.com'], ['url' => 'url_protocol:invalid-protocol']);
+        $v->passes();
+    }
+
     protected function getTranslator()
     {
         return m::mock(TranslatorContract::class);
