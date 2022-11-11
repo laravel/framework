@@ -1212,6 +1212,17 @@ class Str
     }
 
     /**
+     * Makes the first character of each word in a string uppercase.
+     *
+     * @param $string
+     * @return string
+     */
+    public static function ucwords($string)
+    {
+        return collect(explode(' ', $string))->map(fn ($word) => static::ucfirst($word))->join(' ');
+    }
+
+    /**
      * Get the number of words a string contains.
      *
      * @param  string  $string

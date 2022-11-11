@@ -881,6 +881,17 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Makes the first character of each word in a string uppercase.
+     *
+     * @param $string
+     * @return string
+     */
+    public static function ucwords($string)
+    {
+        return new static(Str::ucwords($string));
+    }
+
+    /**
      * Execute the given callback if the string contains a given substring.
      *
      * @param  string|iterable<string>  $needles
