@@ -1214,7 +1214,7 @@ class Str
     /**
      * Makes the first character of each word in a string uppercase.
      *
-     * @param $string
+     * @param  string  $string
      * @return string
      */
     public static function ucwords($string)
