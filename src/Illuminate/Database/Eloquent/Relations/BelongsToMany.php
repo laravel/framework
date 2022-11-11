@@ -1228,6 +1228,20 @@ class BelongsToMany extends Relation
     }
 
     /**
+     * Save an array of new models without raising any events and attach them to the parent model.
+     *
+     * @param  \Illuminate\Support\Collection|array  $models
+     * @param  array  $pivotAttributes
+     * @return array
+     */
+    public function saveManyQuietly($models, array $pivotAttributes = [])
+    {
+        return Model::withoutEvents(function () use ($models, $pivotAttributes) {
+            return $this->saveMany($models, $pivotAttributes);
+        });
+    }
+
+    /**
      * Create a new instance of the related model.
      *
      * @param  array  $attributes
