@@ -181,13 +181,14 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * Get the currently authenticated user or creates an error response.
      *
      * @return \Illuminate\Contracts\Auth\Authenticatable
+     *
      * @throws \Illuminate\Validation\UnauthorizedException
      */
     public function userOrFail()
     {
         $user = $this->user();
 
-        if (!$user) {
+        if (! $user) {
             throw new UnauthorizedException();
         }
 
