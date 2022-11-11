@@ -6,6 +6,7 @@ use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Validation\UnauthorizedException;
 
 class RequestGuard implements Guard
 {
@@ -57,6 +58,23 @@ class RequestGuard implements Guard
         return $this->user = call_user_func(
             $this->callback, $this->request, $this->getProvider()
         );
+    }
+
+    /**
+     * Get the currently authenticated user.
+     *
+     * @return \Illuminate\Contracts\Auth\Authenticatable
+     */
+    public function userOrFail()
+    {
+        $user = $this->user();
+
+        if (!$user)
+        {
+            throw new UnauthorizedException();
+        }
+
+        return $this->user();
     }
 
     /**
