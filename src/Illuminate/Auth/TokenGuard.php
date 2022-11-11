@@ -100,8 +100,7 @@ class TokenGuard implements Guard
     {
         $user = $this->user();
 
-        if (!$user)
-        {
+        if (!$user) {
             throw new UnauthorizedException();
         }
 

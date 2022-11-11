@@ -29,6 +29,7 @@ interface Guard
      * Get the currently authenticated user or creates an error response.
      *
      * @return \Illuminate\Contracts\Auth\Authenticatable
+     *
      * @throws \Illuminate\Validation\UnauthorizedException
      */
     public function userOrFail();
