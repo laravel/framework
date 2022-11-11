@@ -88,6 +88,19 @@ class PendingSingletonResourceRegistration
     }
 
     /**
+     * Indicate that the resource should have creation and storage routes.
+     *
+     * @param  bool  $creatable
+     * @return $this
+     */
+    public function creatable($creatable = true)
+    {
+        $this->options['creatable'] = $creatable;
+
+        return $this;
+    }
+
+    /**
      * Set the route names for controller actions.
      *
      * @param  array|string  $names

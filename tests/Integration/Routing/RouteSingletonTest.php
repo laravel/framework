@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Routing;
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Tests\Integration\Routing\Fixtures\CreatableSingletonTestController;
 use Illuminate\Tests\Integration\Routing\Fixtures\NestedSingletonTestController;
 use Illuminate\Tests\Integration\Routing\Fixtures\SingletonTestController;
 use Orchestra\Testbench\TestCase;
@@ -12,6 +13,9 @@ class RouteSingletonTest extends TestCase
     public function testSingletonDefaults()
     {
         Route::singleton('avatar', SingletonTestController::class);
+
+        $response = $this->get('/avatar/create');
+        $this->assertEquals(404, $response->getStatusCode());
 
         $this->assertSame('http://localhost/avatar', route('avatar.show'));
         $response = $this->get('/avatar');
@@ -36,6 +40,55 @@ class RouteSingletonTest extends TestCase
         $response = $this->delete('/avatar');
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertSame('singleton destroy', $response->getContent());
+    }
+
+    public function testCreatableSingleton()
+    {
+        Route::singleton('avatar', CreatableSingletonTestController::class)->creatable();
+
+        $this->assertSame('http://localhost/avatar/create', route('avatar.create'));
+        $response = $this->get('/avatar/create');
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertSame('singleton create', $response->getContent());
+
+        $this->assertSame('http://localhost/avatar', route('avatar.store'));
+        $response = $this->post('/avatar');
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertSame('singleton store', $response->getContent());
+    }
+
+    public function testApiSingleton()
+    {
+        Route::apiSingleton('avatar', SingletonTestController::class);
+
+        $response = $this->get('/avatar/create');
+        $this->assertEquals(404, $response->getStatusCode());
+
+        $response = $this->post('/avatar/store');
+        $this->assertEquals(404, $response->getStatusCode());
+
+        $this->assertSame('http://localhost/avatar', route('avatar.update'));
+        $response = $this->put('/avatar');
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertSame('singleton update', $response->getContent());
+    }
+
+    public function testCreatableApiSingleton()
+    {
+        Route::apiSingleton('avatar', CreatableSingletonTestController::class)->creatable();
+
+        $response = $this->get('/avatar/create');
+        $this->assertEquals(404, $response->getStatusCode());
+
+        $this->assertSame('http://localhost/avatar', route('avatar.store'));
+        $response = $this->post('/avatar');
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertSame('singleton store', $response->getContent());
+
+        $this->assertSame('http://localhost/avatar', route('avatar.update'));
+        $response = $this->put('/avatar');
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertSame('singleton update', $response->getContent());
     }
 
     public function testSingletonOnly()

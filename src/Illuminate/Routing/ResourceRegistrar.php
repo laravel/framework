@@ -2,6 +2,7 @@
 
 namespace Illuminate\Routing;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 class ResourceRegistrar
@@ -25,7 +26,7 @@ class ResourceRegistrar
      *
      * @var string[]
      */
-    protected $singletonDefaults = ['show', 'edit', 'update', 'destroy'];
+    protected $singletonResourceDefaults = ['show', 'edit', 'update', 'destroy'];
 
     /**
      * The parameters set for this resource instance.
@@ -146,7 +147,7 @@ class ResourceRegistrar
             return;
         }
 
-        $defaults = $this->singletonDefaults;
+        $defaults = $this->singletonResourceDefaults;
 
         $collection = new RouteCollection;
 
@@ -246,6 +247,16 @@ class ResourceRegistrar
 
         if (isset($options['except'])) {
             $methods = array_diff($methods, (array) $options['except']);
+        }
+
+        if (isset($options['creatable'])) {
+            $methods = isset($options['apiSingleton'])
+                            ? array_merge(['store'], $methods)
+                            : array_merge(['create', 'store'], $methods);
+
+            return $this->getResourceMethods(
+                $methods, array_values(Arr::except($options, ['creatable']))
+            );
         }
 
         return $methods;
@@ -389,6 +400,44 @@ class ResourceRegistrar
         $action = $this->getResourceAction($name, $controller, 'destroy', $options);
 
         return $this->router->delete($uri, $action);
+    }
+
+    /**
+     * Add the create method for a singleton route.
+     *
+     * @param  string  $name
+     * @param  string  $controller
+     * @param  array  $options
+     * @return \Illuminate\Routing\Route
+     */
+    protected function addSingletonCreate($name, $controller, $options)
+    {
+        $uri = $this->getResourceUri($name).'/'.static::$verbs['create'];
+
+        unset($options['missing']);
+
+        $action = $this->getResourceAction($name, $controller, 'create', $options);
+
+        return $this->router->get($uri, $action);
+    }
+
+    /**
+     * Add the store method for a singleton route.
+     *
+     * @param  string  $name
+     * @param  string  $controller
+     * @param  array  $options
+     * @return \Illuminate\Routing\Route
+     */
+    protected function addSingletonStore($name, $controller, $options)
+    {
+        $uri = $this->getResourceUri($name);
+
+        unset($options['missing']);
+
+        $action = $this->getResourceAction($name, $controller, 'store', $options);
+
+        return $this->router->post($uri, $action);
     }
 
     /**

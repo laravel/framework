@@ -413,7 +413,7 @@ class Router implements BindingRegistrar, RegistrarContract
     public function apiSingletons(array $singletons, array $options = [])
     {
         foreach ($singletons as $name => $controller) {
-            $this->apiResource($name, $controller, $options);
+            $this->apiSingleton($name, $controller, $options);
         }
     }
 
@@ -435,6 +435,7 @@ class Router implements BindingRegistrar, RegistrarContract
 
         return $this->singleton($name, $controller, array_merge([
             'only' => $only,
+            'apiSingleton' => true,
         ], $options));
     }
 
