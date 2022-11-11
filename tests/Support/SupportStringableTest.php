@@ -193,6 +193,14 @@ class SupportStringableTest extends TestCase
         $this->assertSame(['He_llo_', 'World'], $this->stringable('He_llo_World')->ucsplit()->toArray());
     }
 
+    public function testUcwordsOnStringable()
+    {
+        $this->assertSame('Laravel', $this->stringable('laravel')->ucwords()->value());
+        $this->assertSame('Laravel Framework', $this->stringable('laravel framework')->ucwords()->value());
+        $this->assertSame('Мама', $this->stringable('мама')->ucwords()->value());
+        $this->assertSame('Мама Мыла Раму', $this->stringable('мама мыла раму')->ucwords()->value());
+    }
+
     public function testWhenEndsWith()
     {
         $this->assertSame('Tony Stark', (string) $this->stringable('tony stark')->whenEndsWith('ark', function ($stringable) {

@@ -883,12 +883,11 @@ class Stringable implements JsonSerializable
     /**
      * Makes the first character of each word in a string uppercase.
      *
-     * @param $string
      * @return string
      */
-    public static function ucwords($string)
+    public function ucwords()
     {
-        return new static(Str::ucwords($string));
+        return new static(Str::ucwords($this->value));
     }
 
     /**
