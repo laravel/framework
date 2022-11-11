@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Support\Timebox;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Validation\UnauthorizedException;
 use InvalidArgumentException;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
@@ -174,6 +175,24 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         }
 
         return $this->user;
+    }
+
+    /**
+     * Get the currently authenticated user or creates an error response.
+     *
+     * @return \Illuminate\Contracts\Auth\Authenticatable
+     * @throws \Illuminate\Validation\UnauthorizedException
+     */
+    public function userOrFail()
+    {
+        $user = $this->user();
+
+        if (!$user)
+        {
+            throw new UnauthorizedException();
+        }
+
+        return $this->user();
     }
 
     /**

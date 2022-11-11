@@ -5,6 +5,7 @@ namespace Illuminate\Auth;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Http\Request;
+use Illuminate\Validation\UnauthorizedException;
 
 class TokenGuard implements Guard
 {
@@ -87,6 +88,24 @@ class TokenGuard implements Guard
         }
 
         return $this->user = $user;
+    }
+
+    /**
+     * Get the currently authenticated user or creates an error response.
+     *
+     * @return \Illuminate\Contracts\Auth\Authenticatable
+     * @throws \Illuminate\Validation\UnauthorizedException
+     */
+    public function userOrFail()
+    {
+        $user = $this->user();
+
+        if (!$user)
+        {
+            throw new UnauthorizedException();
+        }
+
+        return $this->user();
     }
 
     /**
