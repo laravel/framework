@@ -707,4 +707,18 @@ trait ReplacesAttributes
 
         return str_replace(':values', implode(', ', $parameters), $message);
     }
+
+    /**
+     * Replace all place-holders for the url_protocol rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array<int,string>  $parameters
+     * @return string
+     */
+    protected function replaceUrlProtocol($message, $attribute, $rule, $parameters)
+    {
+        return str_replace(':protocols', implode(', ', $parameters), $message);
+    }
 }
