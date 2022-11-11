@@ -106,13 +106,13 @@ class TrimStringsTest extends TestCase
         $request = new Request;
 
         $request->merge([
-            'title' => '﻿​﻿This title contains a combination of zero-width non-breakable space and zero-widh spaces characters at the begining and the end​',
+            'title' => '﻿​﻿This title contains a combination of zero-width non-breakable space and zero-width spaces characters at the begining and the end​',
         ]);
 
         $middleware = new TrimStrings;
 
         $middleware->handle($request, function ($req) {
-            $this->assertEquals('This title contains a combination of zero-width non-breakable space and zero-widh spaces characters at the begining and the end', $req->title);
+            $this->assertEquals('This title contains a combination of zero-width non-breakable space and zero-width spaces characters at the begining and the end', $req->title);
         });
     }
 }
