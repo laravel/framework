@@ -150,9 +150,7 @@ trait DatabaseRule
      */
     public function whereIn($column, $values)
     {
-        return $this->where(function ($query) use ($column, $values) {
-            $query->whereIn($column, $values);
-        });
+        return $this->where(fn ($query) => $query->whereIn($column, $values));
     }
 
     /**
@@ -164,9 +162,7 @@ trait DatabaseRule
      */
     public function whereNotIn($column, $values)
     {
-        return $this->where(function ($query) use ($column, $values) {
-            $query->whereNotIn($column, $values);
-        });
+        return $this->where(fn ($query) => $query->whereNotIn($column, $values));
     }
 
     /**
