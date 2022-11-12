@@ -463,7 +463,7 @@ class Builder implements BuilderContract
      */
     public function findOrFail($id, $columns = ['*'])
     {
-        return $this->findOr($id, $columns, function () use ($id){
+        return $this->findOr($id, $columns, function () use ($id) {
             throw (new ModelNotFoundException)->setModel(
                 get_class($this->model), $id
             );
