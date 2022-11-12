@@ -704,19 +704,9 @@ class BelongsToMany extends Relation
      */
     public function findOrFail($id, $columns = ['*'])
     {
-        $result = $this->find($id, $columns);
-
-        $id = $id instanceof Arrayable ? $id->toArray() : $id;
-
-        if (is_array($id)) {
-            if (count($result) === count(array_unique($id))) {
-                return $result;
-            }
-        } elseif (! is_null($result)) {
-            return $result;
-        }
-
-        throw (new ModelNotFoundException)->setModel(get_class($this->related), $id);
+        return $this->findOr($id, $columns, function () use ($id) {
+            throw (new ModelNotFoundException)->setModel(get_class($this->related), $id);
+        });
     }
 
     /**
@@ -787,11 +777,9 @@ class BelongsToMany extends Relation
      */
     public function firstOrFail($columns = ['*'])
     {
-        if (! is_null($model = $this->first($columns))) {
-            return $model;
-        }
-
-        throw (new ModelNotFoundException)->setModel(get_class($this->related));
+        return $this->firstOr($columns, function () {
+            throw (new ModelNotFoundException)->setModel(get_class($this->related));
+        });
     }
 
     /**
