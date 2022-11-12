@@ -463,9 +463,12 @@ class Builder implements BuilderContract
      */
     public function findOrFail($id, $columns = ['*'])
     {
-        return $this->findOr($id, $columns, function () use ($id) {
+        return $this->findOr($id, $columns, function (Collection|null $result = null) use ($id) {
+            $id = $id instanceof Arrayable ? $id->toArray() : $id;
+
             throw (new ModelNotFoundException)->setModel(
-                get_class($this->model), $id
+                get_class($this->model),
+                is_null($result) ? $id : array_diff($id, $result->modelKeys())
             );
         });
     }
@@ -502,11 +505,19 @@ class Builder implements BuilderContract
             $columns = ['*'];
         }
 
-        if (! is_null($model = $this->find($id, $columns))) {
-            return $model;
+        $result = $this->find($id, $columns);
+
+        if (is_null($result)) {
+            return $callback();
         }
 
-        return $callback();
+        $id = $id instanceof Arrayable ? $id->toArray() : $id;
+
+        if (is_array($id) && count($result ?? []) !== count(array_unique($id))) {
+            return $callback($result);
+        }
+
+        return $result;
     }
 
     /**
