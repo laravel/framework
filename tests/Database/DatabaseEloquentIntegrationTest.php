@@ -701,7 +701,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
     public function testFindOrFailWithMultipleIdsUsingCollectionThrowsModelNotFoundException()
     {
         $this->expectException(ModelNotFoundException::class);
-        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Database\EloquentTestUser] 2, 3');
+        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Database\EloquentTestUser] [2,3]');
         $this->expectExceptionObject(
             (new ModelNotFoundException())->setModel(EloquentTestUser::class, [2, 3]),
         );
