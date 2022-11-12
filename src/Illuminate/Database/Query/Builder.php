@@ -3253,7 +3253,7 @@ class Builder implements BuilderContract
      *
      * @param  array  $values
      * @param  string|null  $sequence
-     * @return int
+     * @return int|string
      */
     public function insertGetId(array $values, $sequence = null)
     {
