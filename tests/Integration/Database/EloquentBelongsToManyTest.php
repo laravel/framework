@@ -503,19 +503,6 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertInstanceOf(Tag::class, $post->tags()->firstOrNew(['id' => 666]));
     }
 
-    // public function testFirstOrNewUnrelatedExisting()
-    // {
-    //     $post = Post::create(['title' => Str::random()]);
-
-    //     $name = Str::random();
-    //     $tag = Tag::create(['name' => $name]);
-
-    //     $postTag = $post->tags()->firstOrNew(['name' => $name]);
-    //     $this->assertTrue($postTag->exists);
-    //     $this->assertTrue($postTag->is($tag));
-    //     $this->assertTrue($tag->is($post->tags()->first()));
-    // }
-
     public function testFirstOrCreateMethod()
     {
         $post = Post::create(['title' => Str::random()]);
