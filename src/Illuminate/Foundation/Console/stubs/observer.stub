@@ -18,12 +18,12 @@ class {{ class }}
     }
 
     /**
-     * Handle the {{ model }} "updated" event.
+     * Handle the {{ model }} "creating" event.
      *
      * @param  \{{ namespacedModel }}  ${{ modelVariable }}
      * @return void
      */
-    public function updated({{ model }} ${{ modelVariable }})
+    public function creating({{ model }} ${{ modelVariable }})
     {
         //
     }
@@ -40,12 +40,12 @@ class {{ class }}
     }
 
     /**
-     * Handle the {{ model }} "restored" event.
+     * Handle the {{ model }} "deleting" event.
      *
      * @param  \{{ namespacedModel }}  ${{ modelVariable }}
      * @return void
      */
-    public function restored({{ model }} ${{ modelVariable }})
+    public function deleting({{ model }} ${{ modelVariable }})
     {
         //
     }
@@ -57,6 +57,83 @@ class {{ class }}
      * @return void
      */
     public function forceDeleted({{ model }} ${{ modelVariable }})
+    {
+        //
+    }
+
+    /**
+     * Handle the {{ model }} "restored" event.
+     *
+     * @param  \{{ namespacedModel }}  ${{ modelVariable }}
+     * @return void
+     */
+    public function restored({{ model }} ${{ modelVariable }})
+    {
+        //
+    }
+
+    /**
+     * Handle the {{ model }} "restoring" event.
+     *
+     * @param  \{{ namespacedModel }}  ${{ modelVariable }}
+     * @return void
+     */
+    public function restoring({{ model }} ${{ modelVariable }})
+    {
+        //
+    }
+
+    /**
+     * Handle the {{ model }} "retrieved" event.
+     *
+     * @param  \{{ namespacedModel }}  ${{ modelVariable }}
+     * @return void
+     */
+    public function retrieved({{ model }} ${{ modelVariable }})
+    {
+        //
+    }
+
+    /**
+     * Handle the {{ model }} "saved" event.
+     *
+     * @param  \{{ namespacedModel }}  ${{ modelVariable }}
+     * @return void
+     */
+    public function saved({{ model }} ${{ modelVariable }})
+    {
+        //
+    }
+
+    /**
+     * Handle the {{ model }} "saving" event.
+     *
+     * @param  \{{ namespacedModel }}  ${{ modelVariable }}
+     * @return void
+     */
+    public function saving({{ model }} ${{ modelVariable }})
+    {
+        //
+    }
+
+    /**
+     * Handle the {{ model }} "updated" event.
+     *
+     * @param  \{{ namespacedModel }}  ${{ modelVariable }}
+     * @return void
+     */
+    public function updated({{ model }} ${{ modelVariable }})
+    {
+        //
+    }
+
+    /**
+     * Handle the {{ model }} "updating" event.
+     *
+     * @param  \{{ namespacedModel }}  ${{ modelVariable }}
+     * @return void
+     */
+    public function updating({{ model }} ${{ modelVariable }})
     {
         //
     }
