@@ -90,11 +90,9 @@ class TestMakeCommand extends GeneratorCommand
      */
     protected function getDefaultNamespace($rootNamespace)
     {
-        if ($this->option('unit')) {
-            return $rootNamespace.'\Unit';
-        } else {
-            return $rootNamespace.'\Feature';
-        }
+        return $this->option('unit')
+            ? $rootNamespace.'\Unit'
+            : $rootNamespace.'\Feature';
     }
 
     /**
