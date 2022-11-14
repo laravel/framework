@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Translation;
 
+use stdClass;
 use Illuminate\Contracts\Translation\Loader;
 use Illuminate\Support\Collection;
 use Illuminate\Translation\MessageSelector;
@@ -63,6 +64,19 @@ class TranslationTranslatorTest extends TestCase
         $this->assertEquals(['foo' => 'foo', 'baz' => 'breeze bar', 'qux' => ['tree bar', 'breeze bar', 'beep' => ['rock' => 'tree bar']]], $t->get('foo::bar', ['foo' => 'bar'], 'en'));
         $this->assertSame('breeze bar', $t->get('foo::bar.baz', ['foo' => 'bar'], 'en'));
         $this->assertSame('foo', $t->get('foo::bar.foo'));
+    }
+
+    public function testGetMethodProperlyLoadsAndRetrievesObjectItem()
+    {
+        $stdClass = new stdClass;
+        $stdClass->name = 'foo';
+        $stdClass->email = 'bar';
+        $t = new Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn(['foo :name' => 'foo :name']);
+        $this->assertSame('foo foo', $t->get('foo :name', $stdClass));
+        $t = new Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn(['foo :email' => 'foo :email']);
+        $this->assertSame('foo bar', $t->get('foo :email', $stdClass));
     }
 
     public function testGetMethodForNonExistingReturnsSameKey()

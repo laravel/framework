@@ -889,11 +889,11 @@ if (! function_exists('trans')) {
      * Translate the given message.
      *
      * @param  string|null  $key
-     * @param  array  $replace
+     * @param  mixed  $replace
      * @param  string|null  $locale
      * @return \Illuminate\Contracts\Translation\Translator|string|array|null
      */
-    function trans($key = null, $replace = [], $locale = null)
+    function trans($key = null, $replace = null, $locale = null)
     {
         if (is_null($key)) {
             return app('translator');
@@ -924,11 +924,11 @@ if (! function_exists('__')) {
      * Translate the given message.
      *
      * @param  string|null  $key
-     * @param  array  $replace
+     * @param  mixed  $replace
      * @param  string|null  $locale
      * @return string|array|null
      */
-    function __($key = null, $replace = [], $locale = null)
+    function __($key = null, $replace = null, $locale = null)
     {
         if (is_null($key)) {
             return $key;

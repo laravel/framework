@@ -99,12 +99,12 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      * Get the translation for the given key.
      *
      * @param  string  $key
-     * @param  array  $replace
+     * @param  mixed  $replace
      * @param  string|null  $locale
      * @param  bool  $fallback
      * @return string|array
      */
-    public function get($key, array $replace = [], $locale = null, $fallback = true)
+    public function get($key, mixed $replace = null, $locale = null, $fallback = true)
     {
         $locale = $locale ?: $this->locale;
 
@@ -188,10 +188,10 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      * @param  string  $group
      * @param  string  $locale
      * @param  string  $item
-     * @param  array  $replace
+     * @param  mixed  $replace
      * @return string|array|null
      */
-    protected function getLine($namespace, $group, $locale, $item, array $replace)
+    protected function getLine($namespace, $group, $locale, $item, mixed $replace)
     {
         $this->load($namespace, $group, $locale);
 
@@ -212,14 +212,16 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      * Make the place-holder replacements on a line.
      *
      * @param  string  $line
-     * @param  array  $replace
+     * @param  mixed  $replace
      * @return string
      */
-    protected function makeReplacements($line, array $replace)
+    protected function makeReplacements($line, mixed $replace)
     {
         if (empty($replace)) {
             return $line;
         }
+
+        $replace = is_object($replace) ? (array) $replace : $replace;
 
         $shouldReplace = [];
 
