@@ -1046,7 +1046,7 @@ trait HasAttributes
      *
      * @param  string  $key
      * @param  mixed  $value
-     * @return mixed
+     * @return $this
      */
     protected function setAttributeMarkedMutatedAttributeValue($key, $value)
     {
@@ -1068,6 +1068,8 @@ trait HasAttributes
         } else {
             unset($this->attributeCastCache[$key]);
         }
+
+        return $this;
     }
 
     /**
