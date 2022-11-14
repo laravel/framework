@@ -1012,9 +1012,10 @@ class Str
      * @param  string  $title
      * @param  string  $separator
      * @param  string|null  $language
+     * @param  array<string, string> $dictionary
      * @return string
      */
-    public static function slug($title, $separator = '-', $language = 'en', $dictionary = ['@' => 'at'])
+    public static function slug(string $title, string $separator = '-', ?string $language = 'en', array $dictionary = ['@' => 'at'])
     {
         $title = $language ? static::ascii($title, $language) : $title;
 
