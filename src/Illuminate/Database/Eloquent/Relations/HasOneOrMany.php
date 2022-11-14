@@ -50,8 +50,10 @@ abstract class HasOneOrMany extends Relation
      */
     public function make(array $attributes = [])
     {
-        return tap($this->related->newInstance($attributes), function ($instance) {
+        return tap($this->related->newInstance(), function ($instance) use ($attributes) {
             $this->setForeignAttributesForCreate($instance);
+
+            $instance->fill($attributes);
         });
     }
 
@@ -214,9 +216,11 @@ abstract class HasOneOrMany extends Relation
     public function firstOrNew(array $attributes = [], array $values = [])
     {
         if (is_null($instance = $this->where($attributes)->first())) {
-            $instance = $this->related->newInstance(array_merge($attributes, $values));
+            $instance = $this->related->newInstance();
 
             $this->setForeignAttributesForCreate($instance);
+
+            $instance->fill(array_merge($attributes, $values));
         }
 
         return $instance;
@@ -316,8 +320,10 @@ abstract class HasOneOrMany extends Relation
      */
     public function create(array $attributes = [])
     {
-        return tap($this->related->newInstance($attributes), function ($instance) {
+        return tap($this->related->newInstance(), function ($instance) use ($attributes) {
             $this->setForeignAttributesForCreate($instance);
+
+            $instance->fill($attributes);
 
             $instance->save();
         });
