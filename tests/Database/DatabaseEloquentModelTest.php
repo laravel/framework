@@ -14,12 +14,7 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Casts\ArrayObject;
-use Illuminate\Database\Eloquent\Casts\AsArrayObject;
-use Illuminate\Database\Eloquent\Casts\AsCollection;
-use Illuminate\Database\Eloquent\Casts\AsEncryptedArrayObject;
-use Illuminate\Database\Eloquent\Casts\AsEncryptedCollection;
-use Illuminate\Database\Eloquent\Casts\AsStringable;
+use Illuminate\Database\Eloquent\Casts;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Database\Eloquent\MassAssignmentException;
@@ -169,7 +164,7 @@ class DatabaseEloquentModelTest extends TestCase
         ]);
         $model->syncOriginal();
 
-        $this->assertInstanceOf(ArrayObject::class, $model->asarrayobjectAttribute);
+        $this->assertInstanceOf(Casts\ArrayObject::class, $model->asarrayobjectAttribute);
         $this->assertFalse($model->isDirty('asarrayobjectAttribute'));
 
         $model->asarrayobjectAttribute = ['foo' => 'bar'];
@@ -177,6 +172,22 @@ class DatabaseEloquentModelTest extends TestCase
 
         $model->asarrayobjectAttribute = ['foo' => 'baz'];
         $this->assertTrue($model->isDirty('asarrayobjectAttribute'));
+    }
+
+    public function testMustReturnObjectOnCastedAsObject()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->setAttribute('asobjectAttribute', []);
+        $model->syncOriginal();
+
+        $this->assertEquals($model->asobjectAttribute, (object) []);
+        $this->assertNotEquals($model->asobjectAttribute, []);
+
+        $this->assertEquals($model->toJson(), '{"asobjectAttribute":{}}');
+        $this->assertNotEquals($model->toJson(), '{"asobjectAttribute":[]}');
+
+        $this->assertInstanceOf(stdClass::class, $model->jsonSerialize()['asobjectAttribute']);
+        $this->assertFalse(is_array($model->jsonSerialize()['asobjectAttribute']));
     }
 
     public function testDirtyOnCastedCollection()
@@ -291,7 +302,7 @@ class DatabaseEloquentModelTest extends TestCase
         ]);
         $model->syncOriginal();
 
-        $this->assertInstanceOf(ArrayObject::class, $model->asEncryptedArrayObjectAttribute);
+        $this->assertInstanceOf(Casts\ArrayObject::class, $model->asEncryptedArrayObjectAttribute);
         $this->assertFalse($model->isDirty('asEncryptedArrayObjectAttribute'));
 
         $model->asEncryptedArrayObjectAttribute = ['foo' => 'bar'];
@@ -2966,11 +2977,12 @@ class EloquentModelCastingStub extends Model
         'dateAttribute' => 'date',
         'datetimeAttribute' => 'datetime',
         'timestampAttribute' => 'timestamp',
-        'asarrayobjectAttribute' => AsArrayObject::class,
-        'ascollectionAttribute' => AsCollection::class,
-        'asStringableAttribute' => AsStringable::class,
-        'asEncryptedCollectionAttribute' => AsEncryptedCollection::class,
-        'asEncryptedArrayObjectAttribute' => AsEncryptedArrayObject::class,
+        'asarrayobjectAttribute' => Casts\AsArrayObject::class,
+        'asobjectAttribute' => Casts\AsObject::class,
+        'ascollectionAttribute' => Casts\AsCollection::class,
+        'asStringableAttribute' => Casts\AsStringable::class,
+        'asEncryptedCollectionAttribute' => Casts\AsEncryptedCollection::class,
+        'asEncryptedArrayObjectAttribute' => Casts\AsEncryptedArrayObject::class,
     ];
 
     public function jsonAttributeValue()
