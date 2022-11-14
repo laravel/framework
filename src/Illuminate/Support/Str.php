@@ -341,11 +341,12 @@ class Str
     /**
      * Wrap the string with the given strings.
      *
+     * @param  string  $value
      * @param  string  $before
      * @param  string|null  $after
      * @return string
      */
-    public static function wrap($value, $before, $after = null)
+    public static function wrap(string $value, string $before, ?string $after = null)
     {
         return $before.$value.($after ??= $before);
     }
