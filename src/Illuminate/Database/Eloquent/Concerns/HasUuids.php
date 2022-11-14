@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Str;
 
 trait HasUuids
@@ -68,5 +69,23 @@ trait HasUuids
         }
 
         return $this->incrementing;
+    }
+
+    /**
+     * Retrieve the model for a bound value.
+     *
+     * @param  mixed  $value
+     * @param  string|null  $field
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
+    public function resolveRouteBinding($value, $field = null)
+    {
+        if (in_array($this->getRouteKeyName(), $this->uniqueIds())) {
+            if (!Str::isUuid($value)) {
+                throw (new ModelNotFoundException)->setModel(get_class($this), $value);
+            }
+        }
+
+        return parent::resolveRouteBinding($value);
     }
 }
