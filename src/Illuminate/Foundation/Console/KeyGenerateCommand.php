@@ -112,7 +112,7 @@ class KeyGenerateCommand extends Command
         );
 
         if ($replaced === $input || $replaced === null) {
-            $this->error('No APP_KEY found in your .env file. Cannot set automatically.');
+            $this->error('Unable to set application key. No APP_KEY variable was found in the .env file.');
 
             return false;
         }
