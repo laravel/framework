@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Translation;
 
-use stdClass;
 use Illuminate\Contracts\Translation\Loader;
 use Illuminate\Support\Collection;
 use Illuminate\Translation\MessageSelector;
 use Illuminate\Translation\Translator;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class TranslationTranslatorTest extends TestCase
 {
