@@ -296,7 +296,7 @@ abstract class HasOneOrMany extends Relation
     }
 
     /**
-     * Attach a collection of models to the parent instance raising any events to the parent model.
+     * Attach a collection of models to the parent instance without raising any events to the parent model.
      *
      * @param  iterable  $models
      * @return iterable
