@@ -8,7 +8,6 @@ use Illuminate\Database\Schema\Grammars\MySqlGrammar;
 use Illuminate\Database\Schema\MySqlBuilder;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 
 class DatabaseMySQLSchemaBuilderTest extends TestCase
 {
