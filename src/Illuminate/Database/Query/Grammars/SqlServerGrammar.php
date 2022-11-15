@@ -46,7 +46,7 @@ class SqlServerGrammar extends Grammar
      */
     public function compileSelect(Builder $query)
     {
-        // An ORDER BY clause is required for offset to work
+        // An order by clause is required for SQL Server offset to function...
         if ($query->offset && empty($query->orders)) {
             $query->orders[] = ['sql' => '(SELECT 0)'];
         }
@@ -320,6 +320,8 @@ class SqlServerGrammar extends Grammar
      */
     protected function compileLimit(Builder $query, $limit)
     {
+        $limit = (int) $limit;
+
         if ($limit && $query->offset > 0) {
             return "fetch next {$limit} rows only";
         }
@@ -336,6 +338,8 @@ class SqlServerGrammar extends Grammar
      */
     protected function compileOffset(Builder $query, $offset)
     {
+        $offset = (int) $offset;
+
         if ($offset) {
             return "offset {$offset} rows";
         }
