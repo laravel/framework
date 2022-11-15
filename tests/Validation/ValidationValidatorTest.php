@@ -1483,6 +1483,44 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame('The last field is required unless first is in taylor, sven.', $v->messages()->first('last'));
     }
 
+    public function testPresentIf()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['first' => 'kim'], ['last' => 'present_if:first,kim']);
+        $this->assertTrue($v->fails());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['first' => 'kim', 'last' => 'bouchouaram'], ['last' => 'present_if:first,kim']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['first' => 'taylor'], ['last' => 'present_if:first,taylor,kim']);
+        $this->assertTrue($v->fails());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['first' => 'taylor', 'last' => 'otwell'], ['last' => 'present_if:first,taylor,kim']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['first' => 'kim', 'last' => null], ['last' => 'present_if:first,kim']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => true], ['bar' => 'present_if:foo,false']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => true], ['bar' => 'present_if:foo,true']);
+        $this->assertTrue($v->fails());
+
+        // error message when passed multiple values (prohibited_if:foo,bar,baz)
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.present_if' => 'The :attribute field must be present when :other is :value.'], 'en');
+        $v = new Validator($trans, ['first' => 'kim'], ['last' => 'present_if:first,kim']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The last field must be present when first is kim.', $v->messages()->first('last'));
+    }
+
     public function testProhibited()
     {
         $trans = $this->getIlluminateArrayTranslator();

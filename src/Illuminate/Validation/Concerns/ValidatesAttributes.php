@@ -1509,6 +1509,31 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute exists even if not filled when another attribute has a given value.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  mixed  $parameters
+     * @return bool
+     */
+    public function validatePresentIf($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(2, $parameters, 'present_if');
+
+        if (! Arr::has($this->data, $parameters[0])) {
+            return false;
+        }
+
+        [$values, $other] = $this->parseDependentRuleParameters($parameters);
+
+        if (in_array($other, $values, is_bool($other) || is_null($other))) {
+            return $this->validatePresent($attribute, $value);
+        }
+
+        return true;
+    }
+
+    /**
      * Validate that an attribute passes a regular expression check.
      *
      * @param  string  $attribute

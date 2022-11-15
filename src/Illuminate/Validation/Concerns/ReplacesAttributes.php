@@ -473,6 +473,24 @@ trait ReplacesAttributes
     }
 
     /**
+     * Replace all place-holders for the present_if rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array<int,string>  $parameters
+     * @return string
+     */
+    protected function replacePresentIf($message, $attribute, $rule, $parameters)
+    {
+        $parameters[1] = $this->getDisplayableValue($parameters[0], Arr::get($this->data, $parameters[0]));
+
+        $parameters[0] = $this->getDisplayableAttribute($parameters[0]);
+
+        return str_replace([':other', ':value'], $parameters, $message);
+    }
+
+    /**
      * Replace all place-holders for the prohibited_if rule.
      *
      * @param  string  $message
