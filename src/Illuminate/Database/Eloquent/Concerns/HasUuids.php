@@ -81,7 +81,7 @@ trait HasUuids
     public function resolveRouteBinding($value, $field = null)
     {
         if (in_array($this->getRouteKeyName(), $this->uniqueIds())) {
-            if (!Str::isUuid($value)) {
+            if (! Str::isUuid($value)) {
                 throw (new ModelNotFoundException)->setModel(get_class($this), $value);
             }
         }
