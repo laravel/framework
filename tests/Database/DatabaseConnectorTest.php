@@ -336,12 +336,12 @@ class DatabaseConnectorTest extends TestCase
             $pooling = (isset($config['pooling']) && $config['pooling'] == false) ? ';ConnectionPooling=0' : '';
 
             return "sqlsrv:Server={$host}{$port};Database={$database}{$readonly}{$pooling}{$appname}";
-        } else {
-            $port = isset($config['port']) ? ':'.$port : '';
-            $appname = isset($config['appname']) ? ';appname='.$config['appname'] : '';
-            $charset = isset($config['charset']) ? ';charset='.$config['charset'] : '';
-
-            return "dblib:host={$host}{$port};dbname={$database}{$charset}{$appname}";
         }
+
+        $port = isset($config['port']) ? ':'.$port : '';
+        $appname = isset($config['appname']) ? ';appname='.$config['appname'] : '';
+        $charset = isset($config['charset']) ? ';charset='.$config['charset'] : '';
+
+        return "dblib:host={$host}{$port};dbname={$database}{$charset}{$appname}";
     }
 }
