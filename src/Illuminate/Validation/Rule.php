@@ -9,6 +9,7 @@ use Illuminate\Validation\Rules\ExcludeIf;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\In;
 use Illuminate\Validation\Rules\NotIn;
+use Illuminate\Validation\Rules\PresentIf;
 use Illuminate\Validation\Rules\ProhibitedIf;
 use Illuminate\Validation\Rules\RequiredIf;
 use Illuminate\Validation\Rules\Unique;
@@ -114,6 +115,17 @@ class Rule
     public static function excludeIf($callback)
     {
         return new ExcludeIf($callback);
+    }
+
+    /**
+     * Get a present_if constraint builder instance.
+     *
+     * @param  callable|bool  $callback
+     * @return \Illuminate\Validation\Rules\PresentIf
+     */
+    public static function presentIf($callback)
+    {
+        return new PresentIf($callback);
     }
 
     /**

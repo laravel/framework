@@ -725,7 +725,8 @@ class Validator implements ValidatorContract
             return $this->isImplicit($rule);
         }
 
-        return $this->validatePresent($attribute, $value) ||
+        return $rule === 'PresentIf' ||
+               $this->validatePresent($attribute, $value) ||
                $this->isImplicit($rule);
     }
 
