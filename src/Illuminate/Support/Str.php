@@ -353,19 +353,19 @@ class Str
     /**
      * Determine if a given string matches a given pattern.
      *
-     * @param  string|iterable<string>  $pattern
+     * @param  string|iterable<string>  $patterns
      * @param  string  $value
      * @return bool
      */
-    public static function is($pattern, $value)
+    public static function is($patterns, $value)
     {
         $value = (string) $value;
 
-        if (! is_iterable($pattern)) {
-            $pattern = [$pattern];
+        if (! is_iterable($patterns)) {
+            $patterns = [$patterns];
         }
 
-        foreach ($pattern as $pattern) {
+        foreach ($patterns as $pattern) {
             $pattern = (string) $pattern;
 
             // If the given value is an exact match we can of course return true right
