@@ -208,6 +208,18 @@ class Lottery
      * @param  callable|null  $whenMissing
      * @return void
      */
+    public static function fix($sequence, $whenMissing = null)
+    {
+        return static::forceResultWithSequence($sequence, $whenMissing);
+    }
+
+    /**
+     * Set the sequence that will be used to determine lottery results.
+     *
+     * @param  array  $sequence
+     * @param  callable|null  $whenMissing
+     * @return void
+     */
     public static function forceResultWithSequence($sequence, $whenMissing = null)
     {
         $next = 0;
