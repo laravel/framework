@@ -17,7 +17,7 @@ class PresentIf
     /**
      * Create a new present validation rule based on a condition.
      *
-     * @param Closure|bool  $condition
+     * @param  Closure|bool  $condition
      * @return void
      *
      * @throws InvalidArgumentException
