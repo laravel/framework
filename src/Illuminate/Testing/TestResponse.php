@@ -255,15 +255,13 @@ class TestResponse implements ArrayAccess
     /**
      * Assert whether the response is redirecting to a given route.
      *
-     * @param  string|null  $name
+     * @param  string  $name
      * @param  mixed  $parameters
      * @return $this
      */
-    public function assertRedirectToRoute($name = null, $parameters = [])
+    public function assertRedirectToRoute($name, $parameters = [])
     {
-        if (! is_null($name)) {
-            $uri = route($name, $parameters);
-        }
+        $uri = route($name, $parameters);
 
         PHPUnit::assertTrue(
             $this->isRedirect(),
