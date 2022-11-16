@@ -15,7 +15,7 @@ interface ExceptionHandler
      *
      * @throws \Throwable
      */
-    public function report(Throwable $e, array $context);
+    public function report(Throwable $e, array $context = []);
 
     /**
      * Determine if the exception should be reported.
