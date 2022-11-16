@@ -10,11 +10,12 @@ interface ExceptionHandler
      * Report or log an exception.
      *
      * @param  \Throwable  $e
+     * @param  array  $context
      * @return void
      *
      * @throws \Throwable
      */
-    public function report(Throwable $e);
+    public function report(Throwable $e, array $context);
 
     /**
      * Determine if the exception should be reported.

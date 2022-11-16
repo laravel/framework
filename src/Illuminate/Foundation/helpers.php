@@ -669,15 +669,16 @@ if (! function_exists('report')) {
      * Report an exception.
      *
      * @param  \Throwable|string  $exception
+     * @param  array  $context
      * @return void
      */
-    function report($exception)
+    function report($exception, array $context = [])
     {
         if (is_string($exception)) {
             $exception = new Exception($exception);
         }
 
-        app(ExceptionHandler::class)->report($exception);
+        app(ExceptionHandler::class)->report($exception, $context);
     }
 }
 

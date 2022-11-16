@@ -235,11 +235,12 @@ class Handler implements ExceptionHandlerContract
      * Report or log an exception.
      *
      * @param  \Throwable  $e
+     * @param  array  $context
      * @return void
      *
      * @throws \Throwable
      */
-    public function report(Throwable $e)
+    public function report(Throwable $e, array $context = [])
     {
         $e = $this->mapException($e);
 
@@ -268,7 +269,7 @@ class Handler implements ExceptionHandlerContract
             $this->levels, fn ($level, $type) => $e instanceof $type, LogLevel::ERROR
         );
 
-        $context = $this->buildExceptionContext($e);
+        $context = array_merge($this->buildExceptionContext($e), $context];
 
         method_exists($logger, $level)
             ? $logger->{$level}($e->getMessage(), $context)
