@@ -204,15 +204,13 @@ class WorkCommand extends Command
      */
     protected function writeOutput(Job $job, $status)
     {
-        $jobId = $this->output->isVerbose()
-             ? sprintf(' <fg=gray>%s</>', $job->getJobId())
-             : '';
-
         $this->output->write(sprintf(
             '  <fg=gray>%s</> %s%s',
             Carbon::now()->format('Y-m-d H:i:s'),
             $job->resolveName(),
-            $jobId,
+            $this->output->isVerbose()
+                ? sprintf(' <fg=gray>%s</>', $job->getJobId())
+                : ''
         ));
 
         if ($status == 'starting') {
