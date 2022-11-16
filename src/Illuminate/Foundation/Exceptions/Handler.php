@@ -269,7 +269,7 @@ class Handler implements ExceptionHandlerContract
             $this->levels, fn ($level, $type) => $e instanceof $type, LogLevel::ERROR
         );
 
-        $context = array_merge($this->buildExceptionContext($e), $context];
+        $context = array_merge($this->buildExceptionContext($e), $context);
 
         method_exists($logger, $level)
             ? $logger->{$level}($e->getMessage(), $context)
