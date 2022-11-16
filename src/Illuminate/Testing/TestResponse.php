@@ -270,7 +270,7 @@ class TestResponse implements ArrayAccess
             $this->statusMessageWithDetails('201, 301, 302, 303, 307, 308', $this->getStatusCode()),
         );
 
-        if(! is_null($name)) {
+        if (! is_null($name)) {
             $request = Request::create($this->headers->get('Location'));
 
             PHPUnit::assertEquals(

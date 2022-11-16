@@ -75,10 +75,10 @@ class AssertRedirectToRouteTest extends TestCase
         $this->router->get('test-route', function () {
             return new RedirectResponse($this->urlGenerator->route('named-route'));
         });
-    
+
         $this->get('test-route')
             ->assertRedirectToRoute();
-    }    
+    }
 
     protected function tearDown(): void
     {
