@@ -103,7 +103,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
             $model->getConnection()->getTablePrefix().$model->getTable(),
             $this->getAttributes($model),
             $this->getRelations($model),
-            $this->getObservers($model),
+            $model->getConnection()->getDatabaseName(),
         );
     }
 
@@ -267,13 +267,14 @@ class ShowModelCommand extends DatabaseInspectionCommand
      * @param  \Illuminate\Support\Collection  $attributes
      * @param  \Illuminate\Support\Collection  $relations
      * @param  \Illuminate\Support\Collection  $observers
+     * @param  string  $$databaseName
      * @return void
      */
-    protected function display($class, $database, $table, $attributes, $relations, $observers)
+    protected function display($class, $database, $table, $attributes, $relations, $observers, $databaseName)
     {
         $this->option('json')
-            ? $this->displayJson($class, $database, $table, $attributes, $relations, $observers)
-            : $this->displayCli($class, $database, $table, $attributes, $relations, $observers);
+            ? $this->displayJson($class, $database, $table, $attributes, $relations, $observers, $databaseName)
+            : $this->displayCli($class, $database, $table, $attributes, $relations, $observers, $databaseName);
     }
 
     /**
@@ -285,9 +286,10 @@ class ShowModelCommand extends DatabaseInspectionCommand
      * @param  \Illuminate\Support\Collection  $attributes
      * @param  \Illuminate\Support\Collection  $relations
      * @param  \Illuminate\Support\Collection  $observers
+     * @param  string  $databaseName
      * @return void
      */
-    protected function displayJson($class, $database, $table, $attributes, $relations, $observers)
+    protected function displayJson($class, $database, $table, $attributes, $relations, $observers, $databaseName)
     {
         $this->output->writeln(
             collect([
@@ -297,6 +299,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
                 'attributes' => $attributes,
                 'relations' => $relations,
                 'observers' => $observers,
+                'databaseName' => $databaseName,
             ])->toJson()
         );
     }
@@ -310,14 +313,16 @@ class ShowModelCommand extends DatabaseInspectionCommand
      * @param  \Illuminate\Support\Collection  $attributes
      * @param  \Illuminate\Support\Collection  $relations
      * @param  \Illuminate\Support\Collection  $observers
+     * @param  string  $databaseName
      * @return void
      */
-    protected function displayCli($class, $database, $table, $attributes, $relations, $observers)
+    protected function displayCli($class, $database, $table, $attributes, $relations, $observers, $databaseName)
     {
         $this->newLine();
 
         $this->components->twoColumnDetail('<fg=green;options=bold>'.$class.'</>');
-        $this->components->twoColumnDetail('Database', $database);
+        $this->components->twoColumnDetail('connection', $database);
+        $this->components->twoColumnDetail('database name', $databaseName);
         $this->components->twoColumnDetail('Table', $table);
 
         $this->newLine();
