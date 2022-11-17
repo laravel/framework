@@ -25,7 +25,7 @@ abstract class AbstractHasher
      */
     public function check($value, $hashedValue, array $options = [])
     {
-        if (is_null($hashedValue)) {
+        if (is_null($hashedValue) || strlen($hashedValue) === 0) {
             return false;
         }
 
