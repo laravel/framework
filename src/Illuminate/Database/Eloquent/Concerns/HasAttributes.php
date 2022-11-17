@@ -2187,7 +2187,8 @@ trait HasAttributes
             $returnType = $method->getReturnType();
 
             if ($returnType instanceof ReflectionNamedType &&
-                $returnType->getName() === Attribute::class) {
+                $returnType->getName() === Attribute::class &&
+                $method->getParameters() === []) {
                 $method->setAccessible(true);
 
                 if (is_callable($method->invoke($instance)->get)) {
