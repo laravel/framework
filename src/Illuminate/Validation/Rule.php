@@ -12,6 +12,10 @@ use Illuminate\Validation\Rules\NotIn;
 use Illuminate\Validation\Rules\ProhibitedIf;
 use Illuminate\Validation\Rules\RequiredIf;
 use Illuminate\Validation\Rules\Unique;
+use Illuminate\Validation\Rules\Password;
+use Illuminate\Validation\Rules\ImageFile;
+use Illuminate\Validation\Rules\File;
+use Illuminate\Validation\Rules\Enum;
 
 class Rule
 {
@@ -137,5 +141,46 @@ class Rule
     public static function unique($table, $column = 'NULL')
     {
         return new Unique($table, $column);
+    }
+
+    /**
+     * Get a password constraint builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\Password
+     */
+    public static function password()
+    {
+        return Password::default();
+    }
+
+    /**
+     * Get a image file constraint builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\ImageFile
+     */
+    public static function imageFile()
+    {
+        return new ImageFile;
+    }
+
+    /**
+     * Get a file constraint builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\File
+     */
+    public static function file()
+    {
+        return new File;
+    }
+
+    /**
+     * Get a enum constraint builder instance.
+     *
+     * @param  string  $type
+     * @return \Illuminate\Validation\Rules\Enum
+     */
+    public static function enum($type)
+    {
+        return new Enum($type);
     }
 }
