@@ -322,7 +322,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
 
         $this->components->twoColumnDetail('<fg=green;options=bold>'.$class.'</>');
         $this->components->twoColumnDetail('connection', $database);
-        $this->components->twoColumnDetail('database name', $databaseName);
+        $this->components->twoColumnDetail('databaseName', $databaseName);
         $this->components->twoColumnDetail('Table', $table);
 
         $this->newLine();
