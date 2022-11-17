@@ -183,7 +183,7 @@ trait DatabaseRule
     }
 
     /**
-     * Do not ignore soft deleted models during the existence check.
+     * Only include soft deleted models during the existence check.
      *
      * @param  string  $deletedAtColumn
      * @return $this
