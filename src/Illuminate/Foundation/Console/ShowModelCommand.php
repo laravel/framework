@@ -103,6 +103,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
             $model->getConnection()->getTablePrefix().$model->getTable(),
             $this->getAttributes($model),
             $this->getRelations($model),
+            $this->getObservers($model),
             $model->getConnection()->getDatabaseName(),
         );
     }
