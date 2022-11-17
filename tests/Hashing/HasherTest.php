@@ -13,21 +13,21 @@ class HasherTest extends TestCase
     public function testEmptyHashedValueReturnsFalse()
     {
         $hasher = new BcryptHasher();
-        $this->assertTrue($hasher->check('password', ''));
+        $this->assertFalse($hasher->check('password', ''));
         $hasher = new ArgonHasher();
-        $this->assertTrue($hasher->check('password', ''));
+        $this->assertFalse($hasher->check('password', ''));
         $hasher = new Argon2IdHasher();
-        $this->assertTrue($hasher->check('password', ''));
+        $this->assertFalse($hasher->check('password', ''));
     }
 
     public function testNullHashedValueReturnsFalse()
     {
         $hasher = new BcryptHasher();
-        $this->assertTrue($hasher->check('password', null));
+        $this->assertFalse($hasher->check('password', null));
         $hasher = new ArgonHasher();
-        $this->assertTrue($hasher->check('password', null));
+        $this->assertFalse($hasher->check('password', null));
         $hasher = new Argon2IdHasher();
-        $this->assertTrue($hasher->check('password', null));
+        $this->assertFalse($hasher->check('password', null));
     }
 
     public function testBasicBcryptHashing()
