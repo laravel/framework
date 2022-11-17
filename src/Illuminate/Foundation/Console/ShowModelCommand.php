@@ -267,7 +267,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
      * @param  \Illuminate\Support\Collection  $attributes
      * @param  \Illuminate\Support\Collection  $relations
      * @param  \Illuminate\Support\Collection  $observers
-     * @param  string  $$databaseName
+     * @param  string  $databaseName
      * @return void
      */
     protected function display($class, $database, $table, $attributes, $relations, $observers, $databaseName)
@@ -321,8 +321,8 @@ class ShowModelCommand extends DatabaseInspectionCommand
         $this->newLine();
 
         $this->components->twoColumnDetail('<fg=green;options=bold>'.$class.'</>');
-        $this->components->twoColumnDetail('connection', $database);
-        $this->components->twoColumnDetail('databaseName', $databaseName);
+        $this->components->twoColumnDetail('Connection', $database);
+        $this->components->twoColumnDetail('DatabaseName', $databaseName);
         $this->components->twoColumnDetail('Table', $table);
 
         $this->newLine();
