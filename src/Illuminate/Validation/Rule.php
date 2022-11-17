@@ -146,11 +146,12 @@ class Rule
     /**
      * Get a password constraint builder instance.
      *
+     * @param  int  $min
      * @return \Illuminate\Validation\Rules\Password
      */
-    public static function password()
+    public static function password($min)
     {
-        return Password::default();
+        return new Password($min);
     }
 
     /**
