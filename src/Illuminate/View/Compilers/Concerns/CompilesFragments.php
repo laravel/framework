@@ -10,7 +10,7 @@ trait CompilesFragments
      * @var string
      */
     protected $lastFragment;
-    
+
     /**
      * Compile the fragment statements into valid PHP.
      *
