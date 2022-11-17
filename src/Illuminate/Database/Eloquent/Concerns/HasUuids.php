@@ -46,11 +46,12 @@ trait HasUuids
     /**
      * Retrieve the model for a bound value.
      *
+     * @param  \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Relations\Relation  $query
      * @param  mixed  $value
      * @param  string|null  $field
-     * @return \Illuminate\Database\Eloquent\Model|null
+     * @return \Illuminate\Database\Eloquent\Relations\Relation
      */
-    public function resolveRouteBinding($value, $field = null)
+    public function resolveRouteBindingQuery($query, $value, $field = null)
     {
         if (in_array($this->getRouteKeyName(), $this->uniqueIds())) {
             if (! Str::isUuid($value)) {
@@ -58,7 +59,7 @@ trait HasUuids
             }
         }
 
-        return parent::resolveRouteBinding($value);
+        return parent::resolveRouteBindingQuery($query, $value, $field);
     }
 
     /**
