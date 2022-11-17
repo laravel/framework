@@ -131,7 +131,7 @@ class ValidationDateRuleTest extends TestCase
             resolve('translator'),
             [
                 'end_date' => now()->addWeek(),
-                'start_date' => now()
+                'start_date' => now(),
             ],
             [
                 'end_date' => Date::default()->before('start_date'),
@@ -155,14 +155,14 @@ class ValidationDateRuleTest extends TestCase
             resolve('translator'),
             [
                 'end_date' => now()->addWeek(),
-                'start_date' => now()
+                'start_date' => now(),
             ],
             [
                 'end_date' => Date::default()->beforeOrEqual('start_date'),
                 'start_date' => Date::default()->after('tomorrow'),
             ]
         );
-        
+
         $this->assertTrue($v->fails());
         $this->assertSame(
             [

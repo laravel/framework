@@ -64,8 +64,8 @@ class Date implements Rule, DataAwareRule, ValidatorAwareRule
             return static::default();
         }
 
-        if (!is_callable($callback) && !$callback instanceof static) {
-            throw new InvalidArgumentException('The given callback should be callable or an instance of ' . static::class);
+        if (! is_callable($callback) && ! $callback instanceof static) {
+            throw new InvalidArgumentException('The given callback should be callable or an instance of '.static::class);
         }
 
         static::$defaultCallback = $callback;
