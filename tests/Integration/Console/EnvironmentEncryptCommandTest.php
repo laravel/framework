@@ -70,8 +70,6 @@ class EnvironmentEncryptCommandTest extends TestCase
 
     public function testItGeneratesTheCorrectFileWhenNotUsingEnvironment()
     {
-        putenv('LARAVEL_ENV_ENCRYPTION_KEY=ponmlkjihgfedcbaponmlkjihgfedcba');
-
         $this->filesystem->shouldReceive('exists')
             ->once()
             ->andReturn(true)
@@ -88,9 +86,10 @@ class EnvironmentEncryptCommandTest extends TestCase
             ->with(base_path('.env.encrypted'), m::any());
     }
 
-    ////
     public function testItGeneratesTheCorrectFileWithKeyFromEnvironment()
     {
+        putenv('LARAVEL_ENV_ENCRYPTION_KEY=ponmlkjihgfedcbaponmlkjihgfedcba');
+
         $this->filesystem->shouldReceive('exists')
             ->once()
             ->andReturn(true)
