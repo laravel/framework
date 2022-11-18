@@ -106,7 +106,7 @@ class ForgotPasswordWithoutDefaultRoutesTest extends TestCase
         });
 
         ResetPassword::createUrlUsing(function ($notifiable, $token){
-            return  route('custom.password.reset', $token);
+            return route('custom.password.reset', $token);
         });
 
         UserFactory::new()->create();
