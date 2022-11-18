@@ -19,7 +19,7 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
     /**
      * The validator performing the validation.
      *
-     * @var \Illuminate\Contracts\Validation\Validator
+     * @var \Illuminate\Validation\Validator
      */
     protected $validator;
 
@@ -377,7 +377,7 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
     }
 
     /**
-     * Adds the given failures, and return false.
+     * Add the given failures and return false.
      *
      * @param  array|string  $messages
      * @return bool
