@@ -36,19 +36,35 @@ trait HasUlids
     /**
      * Retrieve the model for a bound value.
      *
+     * @param  \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Relations\Relation  $query
      * @param  mixed  $value
      * @param  string|null  $field
-     * @return \Illuminate\Database\Eloquent\Model|null
+     * @return \Illuminate\Database\Eloquent\Relations\Relation
      */
-    public function resolveRouteBinding($value, $field = null)
+    public function resolveRouteBindingQuery($query, $value, $field = null)
     {
-        if (in_array($this->getRouteKeyName(), $this->uniqueIds())) {
-            if (! Str::isUlid($value)) {
-                throw (new ModelNotFoundException)->setModel(get_class($this), $value);
-            }
+        if ($field && in_array($field, $this->uniqueIds())) {
+            $this->throwNotFoundUnlessUlid($value);
         }
 
-        return parent::resolveRouteBinding($value);
+        if (! $field && in_array($this->getRouteKeyName(), $this->uniqueIds())) {
+            $this->throwNotFoundUnlessUlid($value);
+        }
+
+        return parent::resolveRouteBindingQuery($query, $value, $field);
+    }
+
+    /**
+     * Throw ModelNotFoundException unless value is a ulid.
+     * 
+     * @param  mixed  $value
+     * @return void
+     */
+    protected function throwNotFoundUnlessUlid($value)
+    {
+        if (! Str::isUlid($value)) {
+            throw (new ModelNotFoundException)->setModel(get_class($this), $value);
+        }
     }
 
     /**
