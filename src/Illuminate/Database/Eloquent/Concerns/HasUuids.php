@@ -53,13 +53,26 @@ trait HasUuids
      */
     public function resolveRouteBindingQuery($query, $value, $field = null)
     {
-        if (in_array($this->getRouteKeyName(), $this->uniqueIds())) {
-            if (! Str::isUuid($value)) {
-                throw (new ModelNotFoundException)->setModel(get_class($this), $value);
-            }
+        if($field && in_array($field, $this->uniqueIds())){
+            $this->throwNotFoundUnlessUuid($value);
+        }
+
+        if(!$field && in_array($this->getRouteKeyName(), $this->uniqueIds())){
+            $this->throwNotFoundUnlessUuid($value);
         }
 
         return parent::resolveRouteBindingQuery($query, $value, $field);
+    }
+
+    /**
+     * Throw ModelNotFoundException unless value is a uuid
+     *
+     */
+    protected function throwNotFoundUnlessUuid($value)
+    {
+        if (! Str::isUuid($value)) {
+            throw (new ModelNotFoundException)->setModel(get_class($this), $value);
+        }
     }
 
     /**

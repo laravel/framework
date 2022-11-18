@@ -2,11 +2,14 @@
 
 namespace Illuminate\Tests\Integration\Routing;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 use Orchestra\Testbench\Concerns\InteractsWithPublishedFiles;
 use Orchestra\Testbench\TestCase;
 
@@ -36,6 +39,13 @@ class ImplicitModelRouteBindingTest extends TestCase
 
         Schema::create('posts', function (Blueprint $table) {
             $table->increments('id');
+            $table->integer('user_id');
+            $table->timestamps();
+        });
+
+        Schema::create('comments', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->string('slug');
             $table->integer('user_id');
             $table->timestamps();
         });
@@ -222,6 +232,36 @@ PHP);
             ],
         ]);
     }
+
+    public function testImplicitRouteBindingChildHasUuids()
+    {
+        $user = ImplicitBindingUser::create(['name' => 'Dries']);
+        $comment = ImplicitBindingComment::create([
+            'slug' => 'slug',
+            'user_id' => $user->id
+        ]);
+
+        config(['app.key' => str_repeat('a', 32)]);
+
+        $function = function (ImplicitBindingUser $user, ImplicitBindingComment $comment) {
+            return [$user, $comment];
+        };
+
+        Route::middleware(['web'])->group(function () use ($function) {
+            Route::get('/user/{user}/comment/{comment}', $function);
+            Route::get('/user/{user}/comment-id/{comment:id}', $function);
+            Route::get('/user/{user}/comment-slug/{comment:slug}', $function);
+        });
+
+        $response = $this->getJson("/user/{$user->id}/comment/{$comment->slug}");
+        $response->assertJsonFragment(['id' => $comment->id]);
+
+        $response = $this->getJson("/user/{$user->id}/comment-id/{$comment->id}");
+        $response->assertJsonFragment(['id' => $comment->id]);
+
+        $response = $this->getJson("/user/{$user->id}/comment-slug/{$comment->slug}");
+        $response->assertJsonFragment(['id' => $comment->id]);
+    }
 }
 
 class ImplicitBindingUser extends Model
@@ -236,6 +276,11 @@ class ImplicitBindingUser extends Model
     {
         return $this->hasMany(ImplicitBindingPost::class, 'user_id');
     }
+
+    public function comments()
+    {
+        return $this->hasMany(ImplicitBindingComment::class, 'user_id');
+    }
 }
 
 class ImplicitBindingPost extends Model
@@ -243,4 +288,18 @@ class ImplicitBindingPost extends Model
     public $table = 'posts';
 
     protected $fillable = ['user_id'];
+}
+
+class ImplicitBindingComment extends Model
+{
+    use HasUuids;
+
+    public $table = 'comments';
+
+    protected $fillable = ['slug', 'user_id'];
+
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
 }
