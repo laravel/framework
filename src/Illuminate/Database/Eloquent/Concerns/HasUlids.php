@@ -56,7 +56,7 @@ trait HasUlids
 
     /**
      * Throw ModelNotFoundException unless value is a ulid.
-     * 
+     *
      * @param  mixed  $value
      * @return void
      */
