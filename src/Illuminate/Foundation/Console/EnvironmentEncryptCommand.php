@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Env;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'env:encrypt')]
