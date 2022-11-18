@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation;
 
+use Error;
 use Exception;
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 use Illuminate\Filesystem\Filesystem;
@@ -141,7 +142,11 @@ class ProviderRepository
         $manifest = $this->freshManifest($providers);
 
         foreach ($providers as $provider) {
-            $instance = $this->createProvider($provider);
+            try {
+                $instance = $this->createProvider($provider);
+            } catch (Error) {
+                continue;
+            }
 
             // When recompiling the service manifest, we will spin through each of the
             // providers and check if it's a deferred provider or not. If so we'll
@@ -205,6 +210,6 @@ class ProviderRepository
      */
     public function createProvider($provider)
     {
-        return new $provider($this->app);
+        return $this->app->resolveProvider($provider);
     }
 }

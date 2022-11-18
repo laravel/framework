@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation;
 
 use Closure;
+use Error;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 use Illuminate\Contracts\Foundation\CachesConfiguration;
@@ -683,7 +684,11 @@ class Application extends Container implements ApplicationContract, CachesConfig
         // application instance automatically for the developer. This is simply
         // a more convenient way of specifying your service provider classes.
         if (is_string($provider)) {
-            $provider = $this->resolveProvider($provider);
+            try {
+                $provider = $this->resolveProvider($provider);
+            } catch (Error) {
+                return;
+            }
         }
 
         $provider->register();
