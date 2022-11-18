@@ -459,6 +459,17 @@ class Filesystem
     }
 
     /**
+     * Return the file size of a given file in a human readable format.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    public function humanReadableSize(string $path, int $precision = 2, ?string $locale = null): string
+    {
+        return bytesToHumanReadableSize($this->size($path), $precision, $locale);
+    }
+
+    /**
      * Get the file's last modification time.
      *
      * @param  string  $path
