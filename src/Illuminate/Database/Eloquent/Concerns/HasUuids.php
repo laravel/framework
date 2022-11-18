@@ -66,6 +66,7 @@ trait HasUuids
 
     /**
      * Throw ModelNotFoundException unless value is a uuid.
+     *
      * @param  mixed  $value
      * @return void
      */

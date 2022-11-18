@@ -51,6 +51,7 @@ class ImplicitModelRouteBindingTest extends TestCase
         $this->beforeApplicationDestroyed(function () {
             Schema::dropIfExists('users');
             Schema::dropIfExists('posts');
+            Schema::dropIfExists('comments');
         });
     }
 
