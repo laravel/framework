@@ -77,7 +77,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
      */
     public function missing($key)
     {
-        return !$this->has($key, $this->attributes);
+        return ! $this->has($key, $this->attributes);
     }
 
     /**
