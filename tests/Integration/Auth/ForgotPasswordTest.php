@@ -106,7 +106,7 @@ class ForgotPasswordTest extends TestCase
                 ->line(__('If you did not request a password reset, no further action is required.'));
         });
 
-        ResetPassword::createUrlUsing(function ($notifiable, $token){
+        ResetPassword::createUrlUsing(function ($notifiable, $token) {
             return route('custom.password.reset', $token);
         });
 
