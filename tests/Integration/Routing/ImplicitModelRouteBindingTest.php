@@ -4,12 +4,10 @@ namespace Illuminate\Tests\Integration\Routing;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Str;
 use Orchestra\Testbench\Concerns\InteractsWithPublishedFiles;
 use Orchestra\Testbench\TestCase;
 
@@ -238,7 +236,7 @@ PHP);
         $user = ImplicitBindingUser::create(['name' => 'Dries']);
         $comment = ImplicitBindingComment::create([
             'slug' => 'slug',
-            'user_id' => $user->id
+            'user_id' => $user->id,
         ]);
 
         config(['app.key' => str_repeat('a', 32)]);

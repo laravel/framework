@@ -53,11 +53,11 @@ trait HasUuids
      */
     public function resolveRouteBindingQuery($query, $value, $field = null)
     {
-        if($field && in_array($field, $this->uniqueIds())){
+        if ($field && in_array($field, $this->uniqueIds())) {
             $this->throwNotFoundUnlessUuid($value);
         }
 
-        if(!$field && in_array($this->getRouteKeyName(), $this->uniqueIds())){
+        if (! $field && in_array($this->getRouteKeyName(), $this->uniqueIds())) {
             $this->throwNotFoundUnlessUuid($value);
         }
 
@@ -65,8 +65,9 @@ trait HasUuids
     }
 
     /**
-     * Throw ModelNotFoundException unless value is a uuid
-     *
+     * Throw ModelNotFoundException unless value is a uuid.
+     * @param  mixed  $value
+     * @return void
      */
     protected function throwNotFoundUnlessUuid($value)
     {
