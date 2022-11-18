@@ -377,7 +377,7 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
     }
 
     /**
-     * Add the given failures and return false.
+     * Adds the given failures, and return false.
      *
      * @param  array|string  $messages
      * @return bool
