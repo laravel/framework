@@ -220,7 +220,36 @@ if (! function_exists('broadcast')) {
     }
 }
 
-if (! function_exists('cache')) {
+if (!function_exists('bytesToHumanReadableSize')) {
+    /**
+     * Format bytes number to human readable size in common units.
+     *
+     * @param  int  $bytes
+     * @param  int  $precision
+     * @param  string  $locale
+     * @return string
+     */
+    function bytesToHumanReadableSize(int $bytes, int $precision = 2, ?string $locale = null): string
+    {
+        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
+
+        $bytes = max($bytes, 0);
+        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+        $pow = min($pow, count($units) - 1);
+        $bytes /= pow(1000, $pow);
+
+        $formattedValue = round($bytes, $precision);
+
+        if ($locale) {
+            $num = NumberFormatter::create($locale, NumberFormatter::DECIMAL);
+            return $num->format($formattedValue) . " " . $units[$pow];
+        }
+
+        return $formattedValue . " " . $units[$pow];
+    }
+}
+
+if (!function_exists('cache')) {
     /**
      * Get / set the specified cache value.
      *

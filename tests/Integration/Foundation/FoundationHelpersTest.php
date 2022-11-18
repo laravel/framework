@@ -10,6 +10,154 @@ use Orchestra\Testbench\TestCase;
 
 class FoundationHelpersTest extends TestCase
 {
+    public function testBytesToHumanReadableSize()
+    {
+        $this->assertEquals(
+            '0 B',
+            bytesToHumanReadableSize(0),
+        );
+
+        $this->assertEquals(
+            '1 B',
+            bytesToHumanReadableSize(1),
+        );
+
+        $this->assertEquals(
+            '10 B',
+            bytesToHumanReadableSize(10),
+        );
+
+        $this->assertEquals(
+            '1.23 KB',
+            bytesToHumanReadableSize(1234),
+        );
+
+        $this->assertEquals(
+            '12.35 KB',
+            bytesToHumanReadableSize(12345),
+        );
+
+        $this->assertEquals(
+            '123.46 KB',
+            bytesToHumanReadableSize(123456),
+        );
+
+        $this->assertEquals(
+            '1.23 MB',
+            bytesToHumanReadableSize(1234567),
+        );
+
+        $this->assertEquals(
+            '12.35 MB',
+            bytesToHumanReadableSize(12345678),
+        );
+
+        $this->assertEquals(
+            '123.46 MB',
+            bytesToHumanReadableSize(123456789),
+        );
+
+        $this->assertEquals(
+            '1.23 GB',
+            bytesToHumanReadableSize(1234567890),
+        );
+
+        $this->assertEquals(
+            '12.35 GB',
+            bytesToHumanReadableSize(12345678901),
+        );
+
+        $this->assertEquals(
+            '123.46 GB',
+            bytesToHumanReadableSize(123456789012),
+        );
+
+        $this->assertEquals(
+            '1.23 TB',
+            bytesToHumanReadableSize(1234567890123),
+        );
+
+        $this->assertEquals(
+            '1 KB',
+            bytesToHumanReadableSize(1234, 0),
+        );
+
+        $this->assertEquals(
+            '1.2 KB',
+            bytesToHumanReadableSize(1234, 1),
+        );
+
+        $this->assertEquals(
+            '1.234 KB',
+            bytesToHumanReadableSize(1234, 3),
+        );
+
+        $this->assertEquals(
+            '1.235 GB',
+            bytesToHumanReadableSize(1234567890, 3),
+        );
+
+        $this->assertEquals(
+            '1.2346 GB',
+            bytesToHumanReadableSize(1234567890, 4),
+        );
+
+        $this->assertEquals(
+            '1.23457 GB',
+            bytesToHumanReadableSize(1234567890, 5),
+        );
+
+        $this->assertEquals(
+            '1,2 KB',
+            bytesToHumanReadableSize(1234, 1, "pt-BR"),
+        );
+
+        $this->assertEquals(
+            '1,23 KB',
+            bytesToHumanReadableSize(1234, 2, "pt-BR"),
+        );
+
+        $this->assertEquals(
+            '1,234 KB',
+            bytesToHumanReadableSize(1234, 3, "pt-BR"),
+        );
+
+        $this->assertEquals(
+            '123,457 GB',
+            bytesToHumanReadableSize(123456789012, 3, "pt-BR"),
+        );
+
+        $this->assertEquals(
+            '123,457 GB',
+            bytesToHumanReadableSize(123456789012, 4, "pt-BR"),
+        );
+
+        $this->assertEquals(
+            '123,457 GB',
+            bytesToHumanReadableSize(123456789012, 5, "pt-BR"),
+        );
+
+        $this->assertEquals(
+            '123.46 GB',
+            bytesToHumanReadableSize(123456789012, 2, "nonexistent"),
+        );
+
+        $this->assertEquals(
+            '0 B',
+            bytesToHumanReadableSize(-1),
+        );
+
+        $this->assertEquals(
+            '0 B',
+            bytesToHumanReadableSize("-1"),
+        );
+
+        $this->assertEquals(
+            "1.23 KB",
+            bytesToHumanReadableSize("1234"),
+        );
+    }
+
     public function testRescue()
     {
         $this->assertEquals(
