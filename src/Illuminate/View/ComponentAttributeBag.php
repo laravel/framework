@@ -70,7 +70,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
     }
 
     /**
-     * Determine if a given attribute does not exist in the attribute array.
+     * Determine if a given attribute is missing from the attribute array.
      *
      * @param  string  $key
      * @return bool
