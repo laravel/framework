@@ -12,7 +12,6 @@ use Illuminate\Validation\Rules\File;
 use Illuminate\Validation\Rules\ImageFile;
 use Illuminate\Validation\Rules\In;
 use Illuminate\Validation\Rules\NotIn;
-use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\Rules\ProhibitedIf;
 use Illuminate\Validation\Rules\RequiredIf;
 use Illuminate\Validation\Rules\Unique;
@@ -35,14 +34,26 @@ class Rule
     }
 
     /**
-     * Get a dimensions constraint builder instance.
+     * Create a new nested rule set.
      *
-     * @param  array  $constraints
-     * @return \Illuminate\Validation\Rules\Dimensions
+     * @param  callable  $callback
+     * @return \Illuminate\Validation\NestedRules
      */
-    public static function dimensions(array $constraints = [])
+    public static function forEach($callback)
     {
-        return new Dimensions($constraints);
+        return new NestedRules($callback);
+    }
+
+    /**
+     * Get a unique constraint builder instance.
+     *
+     * @param  string  $table
+     * @param  string  $column
+     * @return \Illuminate\Validation\Rules\Unique
+     */
+    public static function unique($table, $column = 'NULL')
+    {
+        return new Unique($table, $column);
     }
 
     /**
@@ -88,17 +99,6 @@ class Rule
     }
 
     /**
-     * Create a new nested rule set.
-     *
-     * @param  callable  $callback
-     * @return \Illuminate\Validation\NestedRules
-     */
-    public static function forEach($callback)
-    {
-        return new NestedRules($callback);
-    }
-
-    /**
      * Get a required_if constraint builder instance.
      *
      * @param  callable|bool  $callback
@@ -132,36 +132,14 @@ class Rule
     }
 
     /**
-     * Get a unique constraint builder instance.
+     * Get an enum constraint builder instance.
      *
-     * @param  string  $table
-     * @param  string  $column
-     * @return \Illuminate\Validation\Rules\Unique
+     * @param  string  $type
+     * @return \Illuminate\Validation\Rules\Enum
      */
-    public static function unique($table, $column = 'NULL')
+    public static function enum($type)
     {
-        return new Unique($table, $column);
-    }
-
-    /**
-     * Get a password constraint builder instance.
-     *
-     * @param  int  $min
-     * @return \Illuminate\Validation\Rules\Password
-     */
-    public static function password($min)
-    {
-        return new Password($min);
-    }
-
-    /**
-     * Get a image file constraint builder instance.
-     *
-     * @return \Illuminate\Validation\Rules\ImageFile
-     */
-    public static function imageFile()
-    {
-        return new ImageFile;
+        return new Enum($type);
     }
 
     /**
@@ -175,13 +153,23 @@ class Rule
     }
 
     /**
-     * Get a enum constraint builder instance.
+     * Get an image file constraint builder instance.
      *
-     * @param  string  $type
-     * @return \Illuminate\Validation\Rules\Enum
+     * @return \Illuminate\Validation\Rules\ImageFile
      */
-    public static function enum($type)
+    public static function imageFile()
     {
-        return new Enum($type);
+        return new ImageFile;
+    }
+
+    /**
+     * Get a dimensions constraint builder instance.
+     *
+     * @param  array  $constraints
+     * @return \Illuminate\Validation\Rules\Dimensions
+     */
+    public static function dimensions(array $constraints = [])
+    {
+        return new Dimensions($constraints);
     }
 }
