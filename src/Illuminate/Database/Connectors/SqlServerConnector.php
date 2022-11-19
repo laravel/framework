@@ -29,7 +29,30 @@ class SqlServerConnector extends Connector implements ConnectorInterface
     {
         $options = $this->getOptions($config);
 
-        return $this->createConnection($this->getDsn($config), $config, $options);
+        $connection = $this->createConnection($this->getDsn($config), $config, $options);
+
+        $this->configureIsolationLevel($connection, $config);
+
+        return $connection;
+    }
+
+    /**
+     * Set the connection transaction isolation level.
+     * Full details on isolation levels here: https://learn.microsoft.com/en-us/sql/t-sql/statements/set-transaction-isolation-level-transact-sql?view=sql-server-ver16
+     *
+     * @param \PDO $connection
+     * @param  array  $config
+     * @return void
+     */
+    protected function configureIsolationLevel($connection, array $config): void
+    {
+        if (! isset($config['isolation_level'])) {
+            return;
+        }
+
+        $connection->prepare(
+            "SET TRANSACTION ISOLATION LEVEL {$config['isolation_level']}"
+        )->execute();
     }
 
     /**
