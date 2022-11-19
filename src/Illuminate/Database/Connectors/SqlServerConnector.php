@@ -39,7 +39,7 @@ class SqlServerConnector extends Connector implements ConnectorInterface
     /**
      * Set the connection transaction isolation level.
      * Full details on transaction isolation levels here:
-     * https://learn.microsoft.com/en-us/sql/t-sql/statements/set-transaction-isolation-level-transact-sql?view=sql-server-ver16
+     * https://learn.microsoft.com/en-us/sql/t-sql/statements/set-transaction-isolation-level-transact-sql.
      *
      * @param  \PDO  $connection
      * @param  array  $config
