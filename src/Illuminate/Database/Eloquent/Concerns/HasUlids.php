@@ -59,6 +59,8 @@ trait HasUlids
      *
      * @param  mixed  $value
      * @return void
+     * 
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
     protected function throwNotFoundUnlessUlid($value)
     {
