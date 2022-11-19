@@ -61,7 +61,7 @@ jobs:
           REDIS_LIBS: liblz4-dev, liblzf-dev, libzstd-dev
 
       - name: Set Minimum PHP 8.0 Versions
-        uses: nick-invision/retry@v1
+        uses: nick-fields/retry@v2
         with:
           timeout_minutes: 5
           max_attempts: 5
@@ -69,7 +69,7 @@ jobs:
         if: matrix.php >= 8
 
       - name: Set Minimum PHP 8.1 Versions
-        uses: nick-invision/retry@v1
+        uses: nick-fields/retry@v2
         with:
           timeout_minutes: 5
           max_attempts: 5
@@ -77,7 +77,7 @@ jobs:
         if: matrix.php >= 8.1
 
       - name: Set Minimum PHP 8.2 Versions
-        uses: nick-invision/retry@v1
+        uses: nick-fields/retry@v2
         with:
           timeout_minutes: 5
           max_attempts: 5
@@ -85,7 +85,7 @@ jobs:
         if: matrix.php >= 8.2
 
       - name: Install dependencies
-        uses: nick-invision/retry@v1
+        uses: nick-fields/retry@v2
         with:
           timeout_minutes: 5
           max_attempts: 5
@@ -138,7 +138,7 @@ jobs:
           coverage: none
 
       - name: Set Minimum PHP 8.0 Versions
-        uses: nick-invision/retry@v1
+        uses: nick-fields/retry@v2
         with:
           timeout_minutes: 5
           max_attempts: 5
@@ -146,7 +146,7 @@ jobs:
         if: matrix.php >= 8
 
       - name: Set Minimum PHP 8.2 Versions
-        uses: nick-invision/retry@v1
+        uses: nick-fields/retry@v2
         with:
           timeout_minutes: 5
           max_attempts: 5
@@ -154,7 +154,7 @@ jobs:
         if: matrix.php >= 8.2
 
       - name: Install dependencies
-        uses: nick-invision/retry@v1
+        uses: nick-fields/retry@v2
         with:
           timeout_minutes: 5
           max_attempts: 5
