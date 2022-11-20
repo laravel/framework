@@ -53,7 +53,7 @@ class Vite implements Htmlable
      *
      * @var string
      */
-    protected $manifestFile = 'manifest.json';
+    protected $manifestFilename = 'manifest.json';
 
     /**
      * The script tag attributes resolvers.
@@ -143,6 +143,19 @@ class Vite implements Htmlable
     public function withEntryPoints($entryPoints)
     {
         $this->entryPoints = $entryPoints;
+
+        return $this;
+    }
+
+    /**
+     * Set the filename for the manifest file.
+     *
+     * @param  string  $filename
+     * @return $this
+     */
+    public function useManifestFilename($filename)
+    {
+        $this->manifestFilename = $filename;
 
         return $this;
     }
@@ -243,11 +256,10 @@ class Vite implements Htmlable
      *
      * @throws \Exception
      */
-    public function __invoke($entrypoints, $buildDirectory = null, $manifestFile = null)
+    public function __invoke($entrypoints, $buildDirectory = null)
     {
         $entrypoints = collect($entrypoints);
         $buildDirectory ??= $this->buildDirectory;
-        $manifestFile ??= $this->manifestFile;
 
         if ($this->isRunningHot()) {
             return new HtmlString(
@@ -258,7 +270,7 @@ class Vite implements Htmlable
             );
         }
 
-        $manifest = $this->manifest($buildDirectory, $manifestFile);
+        $manifest = $this->manifest($buildDirectory);
 
         $tags = collect();
         $preloads = collect();
@@ -621,16 +633,15 @@ class Vite implements Htmlable
      * @param  string|null  $buildDirectory
      * @return string
      */
-    public function asset($asset, $buildDirectory = null, $manifestFile = null)
+    public function asset($asset, $buildDirectory = null)
     {
         $buildDirectory ??= $this->buildDirectory;
-        $manifestFile ??= $this->manifestFile;
 
         if ($this->isRunningHot()) {
             return $this->hotAsset($asset);
         }
 
-        $chunk = $this->chunk($this->manifest($buildDirectory, $manifestFile), $asset);
+        $chunk = $this->chunk($this->manifest($buildDirectory), $asset);
 
         return $this->assetPath($buildDirectory.'/'.$chunk['file']);
     }
@@ -655,9 +666,9 @@ class Vite implements Htmlable
      *
      * @throws \Exception
      */
-    protected function manifest($buildDirectory, $manifestFile)
+    protected function manifest($buildDirectory)
     {
-        $path = $this->manifestPath($buildDirectory, $manifestFile);
+        $path = $this->manifestPath($buildDirectory);
 
         if (! isset(static::$manifests[$path])) {
             if (! is_file($path)) {
@@ -676,9 +687,9 @@ class Vite implements Htmlable
      * @param  string  $buildDirectory
      * @return string
      */
-    protected function manifestPath($buildDirectory, $manifestFile)
+    protected function manifestPath($buildDirectory)
     {
-        return public_path($buildDirectory.'/'.$manifestFile);
+        return public_path($buildDirectory.'/'.$this->manifestFilename);
     }
 
     /**
@@ -686,16 +697,15 @@ class Vite implements Htmlable
      *
      * @return string|null
      */
-    public function manifestHash($buildDirectory = null, $manifestFile = null)
+    public function manifestHash($buildDirectory = null)
     {
         $buildDirectory ??= $this->buildDirectory;
-        $manifestFile ??= $this->manifestFile;
 
         if ($this->isRunningHot()) {
             return null;
         }
 
-        if (! is_file($path = $this->manifestPath($buildDirectory, $manifestFile))) {
+        if (! is_file($path = $this->manifestPath($buildDirectory))) {
             return null;
         }
 
