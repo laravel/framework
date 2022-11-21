@@ -50,6 +50,8 @@ trait HasUuids
      * @param  mixed  $value
      * @param  string|null  $field
      * @return \Illuminate\Database\Eloquent\Relations\Relation
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
     public function resolveRouteBindingQuery($query, $value, $field = null)
     {
