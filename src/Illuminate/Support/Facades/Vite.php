@@ -5,6 +5,7 @@ namespace Illuminate\Support\Facades;
 /**
  * @method static string useCspNonce(?string $nonce = null)
  * @method static string|null cspNonce()
+ * @method static \Illuminate\Foundation\Vite useManifestFilename(string $filename)
  * @method static string|null manifestHash(?string $buildDirectory = null)
  * @method static string asset(string $asset, ?string $buildDirectory = null)
  * @method static string hotFile()
