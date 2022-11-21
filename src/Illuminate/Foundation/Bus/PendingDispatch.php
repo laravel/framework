@@ -150,6 +150,19 @@ class PendingDispatch
     }
 
     /**
+     * Specify the middleware the job should be dispatched through.
+     *
+     * @param  array|object  $middleware
+     * @return $this
+     */
+    public function middleware($middleware)
+    {
+        $this->job->through($middleware);
+
+        return $this;
+    }
+
+    /**
      * Determine if the job should be dispatched.
      *
      * @return bool
