@@ -2,6 +2,7 @@
 
 namespace Illuminate\Queue;
 
+use Aws\Sqs\Exception\SqsException;
 use Aws\Sqs\SqsClient;
 use Illuminate\Contracts\Queue\ClearableQueue;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
@@ -168,10 +169,18 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function pop($queue = null)
     {
-        $response = $this->sqs->receiveMessage([
-            'QueueUrl' => $queue = $this->getQueue($queue),
-            'AttributeNames' => ['ApproximateReceiveCount'],
-        ]);
+        try {
+            $response = $this->sqs->receiveMessage([
+                'QueueUrl' => $queue = $this->getQueue($queue),
+                'AttributeNames' => ['ApproximateReceiveCount'],
+            ]);
+        } catch (SqsException $ex) {
+            if ($ex->isConnectionError() && str_contains($ex->getMessage(), 'Connection reset by peer')) {
+                // ECONNRESET may be caused by reusing connection after timeout
+                return;
+            }
+            throw $ex;
+        }
 
         if (! is_null($response['Messages']) && count($response['Messages']) > 0) {
             return new SqsJob(

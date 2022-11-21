@@ -2,7 +2,9 @@
 
 namespace Illuminate\Tests\Queue;
 
+use Aws\CommandInterface;
 use Aws\Result;
+use Aws\Sqs\Exception\SqsException;
 use Aws\Sqs\SqsClient;
 use Illuminate\Container\Container;
 use Illuminate\Queue\Jobs\SqsJob;
@@ -101,6 +103,16 @@ class QueueSqsQueueTest extends TestCase
         $queue->setContainer(m::mock(Container::class));
         $queue->expects($this->once())->method('getQueue')->with($this->queueName)->willReturn($this->queueUrl);
         $this->sqs->shouldReceive('receiveMessage')->once()->with(['QueueUrl' => $this->queueUrl, 'AttributeNames' => ['ApproximateReceiveCount']])->andReturn($this->mockedReceiveEmptyMessageResponseModel);
+        $result = $queue->pop($this->queueName);
+        $this->assertNull($result);
+    }
+
+    public function testPopProperlyHandlesConnectionReset()
+    {
+        $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
+        $queue->setContainer(m::mock(Container::class));
+        $queue->expects($this->once())->method('getQueue')->with($this->queueName)->willReturn($this->queueUrl);
+        $this->sqs->shouldReceive('receiveMessage')->once()->with(['QueueUrl' => $this->queueUrl, 'AttributeNames' => ['ApproximateReceiveCount']])->andThrow(new SqsException('cURL error 35: OpenSSL SSL_connect: Connection reset by peer in connection to sqs.us-east-1.amazonaws.com:443  (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for https://sqs.us-east-1.amazonaws.com/123456/queue', $this->getMockBuilder(CommandInterface::class)->getMock(), ['connection_error' => true]));
         $result = $queue->pop($this->queueName);
         $this->assertNull($result);
     }
