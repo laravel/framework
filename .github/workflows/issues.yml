@@ -5,7 +5,7 @@ on:
     types: [labeled]
 
 permissions:
-  pull-requests: write
+  issues: write
 
 jobs:
   help-wanted:
