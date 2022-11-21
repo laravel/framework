@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Routing;
 
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -41,6 +42,13 @@ class ImplicitModelRouteBindingTest extends TestCase
             $table->timestamps();
         });
 
+        Schema::create('tags', function (Blueprint $table) {
+            $table->ulid('id')->primary();
+            $table->string('slug');
+            $table->integer('post_id');
+            $table->timestamps();
+        });
+
         Schema::create('comments', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('slug');
@@ -51,6 +59,7 @@ class ImplicitModelRouteBindingTest extends TestCase
         $this->beforeApplicationDestroyed(function () {
             Schema::dropIfExists('users');
             Schema::dropIfExists('posts');
+            Schema::dropIfExists('tags');
             Schema::dropIfExists('comments');
         });
     }
@@ -261,6 +270,37 @@ PHP);
         $response = $this->getJson("/user/{$user->id}/comment-slug/{$comment->slug}");
         $response->assertJsonFragment(['id' => $comment->id]);
     }
+
+    public function testImplicitRouteBindingChildHasUlids()
+    {
+        $user = ImplicitBindingUser::create(['name' => 'Michael Nabil']);
+        $post = ImplicitBindingPost::create(['user_id' => $user->id]);
+        $tag = ImplicitBindingTag::create([
+            'slug' => 'slug',
+            'post_id' => $post->id,
+        ]);
+
+        config(['app.key' => str_repeat('a', 32)]);
+
+        $function = function (ImplicitBindingPost $post, ImplicitBindingTag $tag) {
+            return [$post, $tag];
+        };
+
+        Route::middleware(['web'])->group(function () use ($function) {
+            Route::get('/post/{post}/tag/{tag}', $function);
+            Route::get('/post/{post}/tag-id/{tag:id}', $function);
+            Route::get('/post/{post}/tag-slug/{tag:slug}', $function);
+        });
+
+        $response = $this->getJson("/post/{$post->id}/tag/{$tag->slug}");
+        $response->assertJsonFragment(['id' => $tag->id]);
+
+        $response = $this->getJson("/post/{$post->id}/tag-id/{$tag->id}");
+        $response->assertJsonFragment(['id' => $tag->id]);
+
+        $response = $this->getJson("/post/{$post->id}/tag-slug/{$tag->slug}");
+        $response->assertJsonFragment(['id' => $tag->id]);
+    }
 }
 
 class ImplicitBindingUser extends Model
@@ -287,6 +327,25 @@ class ImplicitBindingPost extends Model
     public $table = 'posts';
 
     protected $fillable = ['user_id'];
+
+    public function tags()
+    {
+        return $this->hasMany(ImplicitBindingTag::class, 'post_id');
+    }
+}
+
+class ImplicitBindingTag extends Model
+{
+    use HasUlids;
+
+    public $table = 'tags';
+
+    protected $fillable = ['slug', 'post_id'];
+
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
 }
 
 class ImplicitBindingComment extends Model
