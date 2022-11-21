@@ -49,6 +49,13 @@ class Vite implements Htmlable
     protected $buildDirectory = 'build';
 
     /**
+     * The name of the manifest file.
+     *
+     * @var string
+     */
+    protected $manifestFilename = 'manifest.json';
+
+    /**
      * The script tag attributes resolvers.
      *
      * @var array
@@ -136,6 +143,19 @@ class Vite implements Htmlable
     public function withEntryPoints($entryPoints)
     {
         $this->entryPoints = $entryPoints;
+
+        return $this;
+    }
+
+    /**
+     * Set the filename for the manifest file.
+     *
+     * @param  string  $filename
+     * @return $this
+     */
+    public function useManifestFilename($filename)
+    {
+        $this->manifestFilename = $filename;
 
         return $this;
     }
@@ -669,7 +689,7 @@ class Vite implements Htmlable
      */
     protected function manifestPath($buildDirectory)
     {
-        return public_path($buildDirectory.'/manifest.json');
+        return public_path($buildDirectory.'/'.$this->manifestFilename);
     }
 
     /**

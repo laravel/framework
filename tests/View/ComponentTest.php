@@ -117,6 +117,8 @@ class ComponentTest extends TestCase
 
         $component = new class extends Component
         {
+            public $content;
+
             public function __construct($a = null, $b = null)
             {
                 $this->content = $a.$b;

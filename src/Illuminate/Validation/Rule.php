@@ -5,8 +5,11 @@ namespace Illuminate\Validation;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Validation\Rules\Dimensions;
+use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Rules\ExcludeIf;
 use Illuminate\Validation\Rules\Exists;
+use Illuminate\Validation\Rules\File;
+use Illuminate\Validation\Rules\ImageFile;
 use Illuminate\Validation\Rules\In;
 use Illuminate\Validation\Rules\NotIn;
 use Illuminate\Validation\Rules\ProhibitedIf;
@@ -31,14 +34,26 @@ class Rule
     }
 
     /**
-     * Get a dimensions constraint builder instance.
+     * Create a new nested rule set.
      *
-     * @param  array  $constraints
-     * @return \Illuminate\Validation\Rules\Dimensions
+     * @param  callable  $callback
+     * @return \Illuminate\Validation\NestedRules
      */
-    public static function dimensions(array $constraints = [])
+    public static function forEach($callback)
     {
-        return new Dimensions($constraints);
+        return new NestedRules($callback);
+    }
+
+    /**
+     * Get a unique constraint builder instance.
+     *
+     * @param  string  $table
+     * @param  string  $column
+     * @return \Illuminate\Validation\Rules\Unique
+     */
+    public static function unique($table, $column = 'NULL')
+    {
+        return new Unique($table, $column);
     }
 
     /**
@@ -84,17 +99,6 @@ class Rule
     }
 
     /**
-     * Create a new nested rule set.
-     *
-     * @param  callable  $callback
-     * @return \Illuminate\Validation\NestedRules
-     */
-    public static function forEach($callback)
-    {
-        return new NestedRules($callback);
-    }
-
-    /**
      * Get a required_if constraint builder instance.
      *
      * @param  callable|bool  $callback
@@ -128,14 +132,44 @@ class Rule
     }
 
     /**
-     * Get a unique constraint builder instance.
+     * Get an enum constraint builder instance.
      *
-     * @param  string  $table
-     * @param  string  $column
-     * @return \Illuminate\Validation\Rules\Unique
+     * @param  string  $type
+     * @return \Illuminate\Validation\Rules\Enum
      */
-    public static function unique($table, $column = 'NULL')
+    public static function enum($type)
     {
-        return new Unique($table, $column);
+        return new Enum($type);
+    }
+
+    /**
+     * Get a file constraint builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\File
+     */
+    public static function file()
+    {
+        return new File;
+    }
+
+    /**
+     * Get an image file constraint builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\ImageFile
+     */
+    public static function imageFile()
+    {
+        return new ImageFile;
+    }
+
+    /**
+     * Get a dimensions constraint builder instance.
+     *
+     * @param  array  $constraints
+     * @return \Illuminate\Validation\Rules\Dimensions
+     */
+    public static function dimensions(array $constraints = [])
+    {
+        return new Dimensions($constraints);
     }
 }

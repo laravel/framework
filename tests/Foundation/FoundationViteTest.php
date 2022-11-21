@@ -954,6 +954,34 @@ class FoundationViteTest extends TestCase
         $this->cleanViteManifest($buildDir);
     }
 
+    public function testItCanConfigureTheManifestFilename()
+    {
+        $buildDir = Str::random();
+        app()->singleton('path.public', fn () => __DIR__);
+        if (! file_exists(public_path($buildDir))) {
+            mkdir(public_path($buildDir));
+        }
+        $contents = json_encode([
+            'resources/js/app.js' => [
+                'src' => 'resources/js/app-from-custom-manifest.js',
+                'file' => 'assets/app-from-custom-manifest.versioned.js',
+            ],
+        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        file_put_contents(public_path("{$buildDir}/custom-manifest.json"), $contents);
+
+        ViteFacade::useManifestFilename('custom-manifest.json');
+
+        $result = app(Vite::class)(['resources/js/app.js'], $buildDir);
+
+        $this->assertSame(
+            '<link rel="modulepreload" href="https://example.com/'.$buildDir.'/assets/app-from-custom-manifest.versioned.js" />'
+            .'<script type="module" src="https://example.com/'.$buildDir.'/assets/app-from-custom-manifest.versioned.js"></script>',
+        $result->toHtml());
+
+        unlink(public_path("{$buildDir}/custom-manifest.json"));
+        rmdir(public_path($buildDir));
+    }
+
     protected function makeViteManifest($contents = null, $path = 'build')
     {
         app()->singleton('path.public', fn () => __DIR__);
