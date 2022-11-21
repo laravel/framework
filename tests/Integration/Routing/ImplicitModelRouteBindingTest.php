@@ -47,7 +47,7 @@ class ImplicitModelRouteBindingTest extends TestCase
             $table->string('slug');
             $table->integer('post_id');
         });
-        
+
         Schema::create('comments', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('slug');
