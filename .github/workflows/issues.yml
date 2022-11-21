@@ -2,8 +2,7 @@ name: issues
 
 on:
   issues:
-    types:
-      - labeled
+    types: [labeled]
 
 permissions:
   pull-requests: write
