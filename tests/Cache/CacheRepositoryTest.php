@@ -27,7 +27,7 @@ class CacheRepositoryTest extends TestCase
     {
         parent::setUp();
 
-        Carbon::setTestNow(Carbon::parse($this->getTestDate()));
+        Carbon::setTestNow(Carbon::parse(self::getTestDate()));
     }
 
     protected function tearDown(): void
