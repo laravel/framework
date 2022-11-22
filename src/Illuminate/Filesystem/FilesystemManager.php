@@ -325,7 +325,7 @@ class FilesystemManager implements FactoryContract
      */
     protected function getCustomPathNormalizer()
     {
-        $pathNormalizerClass = $this->app['config']['filesystems.path_normalizer'];
+        $pathNormalizerClass = $this->app['config']['filesystems.path_normalizer'] ?? '';
 
         if (! class_exists($pathNormalizerClass)) {
             return null;
