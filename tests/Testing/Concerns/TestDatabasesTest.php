@@ -76,7 +76,7 @@ class TestDatabasesTest extends TestCase
         tap($method)->setAccessible(true)->invoke($instance, $database);
     }
 
-    public function databaseUrls()
+    public static function databaseUrls()
     {
         return [
             [

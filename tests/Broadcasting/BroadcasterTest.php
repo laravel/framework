@@ -322,7 +322,7 @@ class BroadcasterTest extends TestCase
         $this->assertEquals($shouldMatch, $this->broadcaster->channelNameMatchesPattern($channel, $pattern));
     }
 
-    public function channelNameMatchPatternProvider()
+    public static function channelNameMatchPatternProvider()
     {
         return [
             ['something', 'something', true],

@@ -54,7 +54,7 @@ class DatabaseSqliteConnectionTest extends DatabaseTestCase
         $this->assertSame($count, DB::table('json_table')->whereJsonContainsKey($column)->count());
     }
 
-    public function jsonContainsKeyDataProvider()
+    public static function jsonContainsKeyDataProvider()
     {
         return [
             'string key' => [4, 'json_col->foo'],

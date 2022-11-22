@@ -5464,7 +5464,7 @@ class SupportCollectionTest extends TestCase
      *
      * @return array
      */
-    public function collectionClassProvider()
+    public static function collectionClassProvider()
     {
         return [
             [Collection::class],

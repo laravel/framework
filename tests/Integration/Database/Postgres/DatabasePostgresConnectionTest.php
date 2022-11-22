@@ -46,7 +46,7 @@ class DatabasePostgresConnectionTest extends PostgresTestCase
         $this->assertSame(! $expected, DB::table('json_table')->whereNotNull("json_col->$key")->exists());
     }
 
-    public function jsonWhereNullDataProvider()
+    public static function jsonWhereNullDataProvider()
     {
         return [
             'key not exists' => [true, 'invalid'],
@@ -107,7 +107,7 @@ class DatabasePostgresConnectionTest extends PostgresTestCase
         $this->assertSame($count, DB::table('json_table')->whereJsonContainsKey($column)->count());
     }
 
-    public function jsonContainsKeyDataProvider()
+    public static function jsonContainsKeyDataProvider()
     {
         return [
             'string key' => [4, 'json_col->foo'],

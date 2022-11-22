@@ -849,7 +849,7 @@ class SupportStrTest extends TestCase
         $this->assertEquals(3, Str::wordCount('МАМА МЫЛА РАМУ', 'абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'));
     }
 
-    public function validUuidList()
+    public static function validUuidList()
     {
         return [
             ['a0a2a2d2-0b87-4a18-83f2-2529882be2de'],
@@ -865,7 +865,7 @@ class SupportStrTest extends TestCase
         ];
     }
 
-    public function invalidUuidList()
+    public static function invalidUuidList()
     {
         return [
             ['not a valid uuid so we can test this'],
@@ -881,7 +881,7 @@ class SupportStrTest extends TestCase
         ];
     }
 
-    public function strContainsProvider()
+    public static function strContainsProvider()
     {
         return [
             ['Taylor', 'ylo', true, true],
@@ -900,7 +900,7 @@ class SupportStrTest extends TestCase
         ];
     }
 
-    public function strContainsAllProvider()
+    public static function strContainsAllProvider()
     {
         return [
             ['Taylor Otwell', ['taylor', 'otwell'], false, false],
@@ -938,7 +938,7 @@ class SupportStrTest extends TestCase
         $this->assertSame($expected, Str::transliterate($value));
     }
 
-    public function specialCharacterProvider(): array
+    public static function specialCharacterProvider(): array
     {
         return [
             ['ⓐⓑⓒⓓⓔⓕⓖⓗⓘⓙⓚⓛⓜⓝⓞⓟⓠⓡⓢⓣⓤⓥⓦⓧⓨⓩ', 'abcdefghijklmnopqrstuvwxyz'],

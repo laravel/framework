@@ -33,7 +33,7 @@ class DatabaseMySqlSchemaStateTest extends TestCase
         self::assertEquals($expectedVariables, $variables);
     }
 
-    public function provider(): Generator
+    public static function provider(): Generator
     {
         yield 'default' => [
             ' --user="${:LARAVEL_LOAD_USER}" --password="${:LARAVEL_LOAD_PASSWORD}" --host="${:LARAVEL_LOAD_HOST}" --port="${:LARAVEL_LOAD_PORT}"', [

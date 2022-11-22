@@ -27,7 +27,7 @@ class MailManagerTest extends TestCase
         $this->app['mail.manager']->mailer('custom_smtp');
     }
 
-    public function emptyTransportConfigDataProvider()
+    public static function emptyTransportConfigDataProvider()
     {
         return [
             [null], [''], [' '],
