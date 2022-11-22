@@ -1,6 +1,31 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.40.1...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.41.0...9.x)
+
+
+## [v9.41.0](https://github.com/laravel/framework/compare/v9.40.1...v9.41.0) - 2022-11-22
+
+### Added
+- Added `Illuminate/Validation/Rules/DatabaseRule::onlyTrashed()` ([#44989](https://github.com/laravel/framework/pull/44989))
+- Add some class rules in class Rule ([#44998](https://github.com/laravel/framework/pull/44998))
+- Added `Illuminate/View/ComponentAttributeBag::missing()` ([#45016](https://github.com/laravel/framework/pull/45016))
+- Added `Illuminate/Http/Concerns/InteractsWithInput::whenMissing()` ([#45019](https://github.com/laravel/framework/pull/45019))
+- Add isolation levels to SQL Server Connector ([#45023](https://github.com/laravel/framework/pull/45023))
+- Fix php artisan serve with PHP_CLI_SERVER_WORKERS > 1 ([#45041](https://github.com/laravel/framework/pull/45041))
+- Add ability to prune cancelled job batches ([#45034](https://github.com/laravel/framework/pull/45034))
+- Adding option for custom manifest filename on Vite Facade ([#45007](https://github.com/laravel/framework/pull/45007))
+
+### Fixed
+- Fix deprecation warning when comparing a password against a NULL database password ([#44986](https://github.com/laravel/framework/pull/44986), [206e465](https://github.com/laravel/framework/commit/206e465f9680ef4618009ddfeafa672f8015a511))
+- Outlook web dark mode email layout fix ([#45024](https://github.com/laravel/framework/pull/45024))
+
+### Changed
+- Improves queue:work command output ([#44971](https://github.com/laravel/framework/pull/44971))
+- Optimize Collection::containsStrict ([#44970](https://github.com/laravel/framework/pull/44970))
+- Make name required in `Illuminate/Testing/TestResponse::assertRedirectToRoute()` ([98a0301](https://github.com/laravel/framework/commit/98a03013ed74925f68040beee0937203b632f57d))
+- Strip key, secret and token from root config options on aws clients ([#44979](https://github.com/laravel/framework/pull/44979))
+- Allow customised implementation of the SendQueuedMailable job ([#45040](https://github.com/laravel/framework/pull/45040))
+- Validate uuid before route binding query ([#44945](https://github.com/laravel/framework/pull/44945))
 
 
 ## [v9.40.1](https://github.com/laravel/framework/compare/v9.40.0...v9.40.1) - 2022-11-15
