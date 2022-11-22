@@ -403,10 +403,6 @@ class Connection implements ConnectionInterface
     public function select($query, $bindings = [], $useReadPdo = true)
     {
         return $this->run($query, $bindings, function ($query, $bindings) use ($useReadPdo) {
-            if ($this->pretending()) {
-                return [];
-            }
-
             // For select statements, we'll simply execute the query and return an array
             // of the database result set. Each element in the array will be a single
             // row from the database table, and will either be an array or objects.
