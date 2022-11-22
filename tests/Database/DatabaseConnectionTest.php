@@ -458,7 +458,7 @@ class DatabaseConnectionTest extends TestCase
     {
         $connection = $this->getMockConnection();
         $queries = $connection->pretend(function ($connection) {
-            $connection->select('foo bar', ['baz']);
+            $connection->update('foo bar', ['baz']);
         });
         $this->assertSame('foo bar', $queries[0]['query']);
         $this->assertEquals(['baz'], $queries[0]['bindings']);
