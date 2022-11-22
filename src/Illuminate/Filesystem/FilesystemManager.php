@@ -305,13 +305,33 @@ class FilesystemManager implements FactoryContract
             $adapter = new PathPrefixedAdapter($adapter, $config['prefix']);
         }
 
-        return new Flysystem($adapter, Arr::only($config, [
-            'directory_visibility',
-            'disable_asserts',
-            'temporary_url',
-            'url',
-            'visibility',
-        ]));
+        return new Flysystem(
+            $adapter,
+            Arr::only($config, [
+                'directory_visibility',
+                'disable_asserts',
+                'temporary_url',
+                'url',
+                'visibility',
+            ]),
+            $this->getCustomPathNormalizer()
+        );
+    }
+
+    /**
+     * Get the custom path normalizer.
+     *
+     * @return \Illuminate\Contracts\Filesystem\PathNormalizer|null
+     */
+    protected function getCustomPathNormalizer()
+    {
+        $pathNormalizerClass = $this->app['config']['filesystems.path_normalizer'];
+
+        if (! class_exists($pathNormalizerClass)) {
+            return null;
+        }
+
+        return new $pathNormalizerClass();
     }
 
     /**
