@@ -571,7 +571,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertSame('http://sub.foo.com/foo/bar', $url->route('foo'));
     }
 
-    public function providerRouteParameters()
+    public static function providerRouteParameters()
     {
         return [
             [['test' => 123]],
@@ -600,7 +600,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertSame('http://www.foo.com:8080/foo?test=123', $url->route('foo', $parameters));
     }
 
-    public function provideParametersAndExpectedMeaningfulExceptionMessages()
+    public static function provideParametersAndExpectedMeaningfulExceptionMessages()
     {
         return [
             'Missing parameters "one", "two" and "three"' => [

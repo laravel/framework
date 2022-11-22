@@ -87,7 +87,7 @@ class EloquentWhereHasTest extends DatabaseTestCase
         $this->assertEquals($userOrWhereHas->first()->id, $query->first()->id);
     }
 
-    public function dataProviderWhereRelationCallback()
+    public static function dataProviderWhereRelationCallback()
     {
         $callbackArray = function ($value) {
             $callbackEloquent = function (EloquentBuilder $builder) use ($value) {

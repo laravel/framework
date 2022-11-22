@@ -892,7 +892,7 @@ class SupportHelpersTest extends TestCase
         $this->assertSame('From $_SERVER', env('foo'));
     }
 
-    public function providesPregReplaceArrayData()
+    public static function providesPregReplaceArrayData()
     {
         $pointerArray = ['Taylor', 'Otwell'];
 

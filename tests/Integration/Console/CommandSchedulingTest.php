@@ -95,7 +95,7 @@ class CommandSchedulingTest extends TestCase
         $this->assertLogged('before', 'handled', 'after');
     }
 
-    public function executionProvider()
+    public static function executionProvider()
     {
         return [
             'Foreground' => [false],

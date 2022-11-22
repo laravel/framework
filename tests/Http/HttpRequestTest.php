@@ -89,7 +89,7 @@ class HttpRequestTest extends TestCase
         $this->assertEquals($expected, $request->segment($segment, 'default'));
     }
 
-    public function segmentProvider()
+    public static function segmentProvider()
     {
         return [
             ['', 1, 'default'],
@@ -111,7 +111,7 @@ class HttpRequestTest extends TestCase
         $this->assertEquals(['foo', 'bar'], $request->segments());
     }
 
-    public function segmentsProvider()
+    public static function segmentsProvider()
     {
         return [
             ['', []],
@@ -1012,7 +1012,7 @@ class HttpRequestTest extends TestCase
         $this->assertEquals($payload, $data);
     }
 
-    public function getPrefersCases()
+    public static function getPrefersCases()
     {
         return [
             ['application/json', ['json'], 'json'],

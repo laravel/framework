@@ -70,7 +70,7 @@ class BladeEchoHandlerTest extends AbstractBladeTestCase
         eval(Str::of($this->compiler->compileString($blade))->remove(['<?php', '?>']));
     }
 
-    public function handlerLogicDataProvider()
+    public static function handlerLogicDataProvider()
     {
         return [
             ['{{$exampleObject}}'],
@@ -97,7 +97,7 @@ class BladeEchoHandlerTest extends AbstractBladeTestCase
         $this->assertSame($expectedOutput, $output);
     }
 
-    public function nonStringableDataProvider()
+    public static function nonStringableDataProvider()
     {
         return [
             ['{{"foo" . "bar"}}', 'foobar'],

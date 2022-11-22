@@ -140,7 +140,7 @@ class ViewBladeCompilerTest extends TestCase
     /**
      * @return array
      */
-    public function appendViewPathDataProvider()
+    public static function appendViewPathDataProvider()
     {
         return [
             'No PHP blocks' => [

@@ -2728,7 +2728,7 @@ class ValidationValidatorTest extends TestCase
         }
     }
 
-    public function multipleOfDataProvider()
+    public static function multipleOfDataProvider()
     {
         return [
             [0, 0, false], // zero (same)
@@ -3455,7 +3455,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
-    public function validUrls()
+    public static function validUrls()
     {
         return [
             ['aaa://fully.qualified.domain/path'],
@@ -3702,7 +3702,7 @@ class ValidationValidatorTest extends TestCase
         ];
     }
 
-    public function invalidUrls()
+    public static function invalidUrls()
     {
         return [
             ['aslsdlks'],
@@ -3739,7 +3739,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertEquals($outcome, $v->passes());
     }
 
-    public function activeUrlDataProvider()
+    public static function activeUrlDataProvider()
     {
         return [
             'Invalid Url' => [
@@ -6694,7 +6694,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
-    public function validUuidList()
+    public static function validUuidList()
     {
         return [
             ['a0a2a2d2-0b87-4a18-83f2-2529882be2de'],
@@ -6710,7 +6710,7 @@ class ValidationValidatorTest extends TestCase
         ];
     }
 
-    public function invalidUuidList()
+    public static function invalidUuidList()
     {
         return [
             ['not a valid uuid so we can test this'],
@@ -6726,7 +6726,7 @@ class ValidationValidatorTest extends TestCase
         ];
     }
 
-    public function providesPassingExcludeIfData()
+    public static function providesPassingExcludeIfData()
     {
         return [
             [
@@ -6962,7 +6962,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame($expectedValidatedData, $validator->validated());
     }
 
-    public function providesFailingExcludeIfData()
+    public static function providesFailingExcludeIfData()
     {
         return [
             [
@@ -7076,7 +7076,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame($expectedMessages, $validator->messages()->toArray());
     }
 
-    public function providesPassingExcludeData()
+    public static function providesPassingExcludeData()
     {
         return [
             [

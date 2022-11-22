@@ -86,7 +86,7 @@ class ParallelTestingTest extends TestCase
         $this->assertSame('1', (string) $parallelTesting->token());
     }
 
-    public function callbacks()
+    public static function callbacks()
     {
         return [
             ['setUpProcess'],

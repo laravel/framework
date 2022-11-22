@@ -45,7 +45,7 @@ class ConfigurationUrlParserTest extends TestCase
         ], (new ConfigurationUrlParser)->parseConfiguration('some-particular-alias://null'));
     }
 
-    public function databaseUrls()
+    public static function databaseUrls()
     {
         return [
             'simple URL' => [
