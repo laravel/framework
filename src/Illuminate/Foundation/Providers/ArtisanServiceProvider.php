@@ -17,6 +17,7 @@ use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Database\Console\DbCommand;
 use Illuminate\Database\Console\DumpCommand;
 use Illuminate\Database\Console\Factories\FactoryMakeCommand;
+use Illuminate\Database\Console\LoadCommand;
 use Illuminate\Database\Console\MonitorCommand as DatabaseMonitorCommand;
 use Illuminate\Database\Console\PruneCommand;
 use Illuminate\Database\Console\Seeds\SeedCommand;
@@ -140,6 +141,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'RouteClear' => RouteClearCommand::class,
         'RouteList' => RouteListCommand::class,
         'SchemaDump' => DumpCommand::class,
+        'SchemaLoad' => LoadCommand::class,
         'Seed' => SeedCommand::class,
         'ScheduleFinish' => ScheduleFinishCommand::class,
         'ScheduleList' => ScheduleListCommand::class,

@@ -4,11 +4,8 @@ namespace Illuminate\Database\Console\Migrations;
 
 use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Contracts\Console\Isolatable;
-use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Database\Events\SchemaLoaded;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Database\SQLiteDatabaseDoesNotExistException;
-use Illuminate\Database\SqlServerConnection;
 use PDOException;
 use Throwable;
 
@@ -46,25 +43,16 @@ class MigrateCommand extends BaseCommand implements Isolatable
     protected $migrator;
 
     /**
-     * The event dispatcher instance.
-     *
-     * @var \Illuminate\Contracts\Events\Dispatcher
-     */
-    protected $dispatcher;
-
-    /**
      * Create a new migration command instance.
      *
      * @param  \Illuminate\Database\Migrations\Migrator  $migrator
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
      * @return void
      */
-    public function __construct(Migrator $migrator, Dispatcher $dispatcher)
+    public function __construct(Migrator $migrator)
     {
         parent::__construct();
 
         $this->migrator = $migrator;
-        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -124,7 +112,15 @@ class MigrateCommand extends BaseCommand implements Isolatable
         }
 
         if (! $this->migrator->hasRunAnyMigrations() && ! $this->option('pretend')) {
-            $this->loadSchemaState();
+            $this->components->task('Loading database schema', function () {
+                return $this->callSilent('schema:load', array_filter([
+                    '--database' => $this->option('database'),
+                    '--path' => $this->option('schema-path'),
+                    '--force' => true,
+                ])) == 0;
+            });
+
+            $this->newLine();
         }
     }
 
@@ -218,64 +214,5 @@ class MigrateCommand extends BaseCommand implements Isolatable
         } finally {
             $this->laravel['config']->set("database.connections.{$connection->getName()}.database", $connection->getDatabaseName());
         }
-    }
-
-    /**
-     * Load the schema state to seed the initial database schema structure.
-     *
-     * @return void
-     */
-    protected function loadSchemaState()
-    {
-        $connection = $this->migrator->resolveConnection($this->option('database'));
-
-        // First, we will make sure that the connection supports schema loading and that
-        // the schema file exists before we proceed any further. If not, we will just
-        // continue with the standard migration operation as normal without errors.
-        if ($connection instanceof SqlServerConnection ||
-            ! is_file($path = $this->schemaPath($connection))) {
-            return;
-        }
-
-        $this->components->info('Loading stored database schemas.');
-
-        $this->components->task($path, function () use ($connection, $path) {
-            // Since the schema file will create the "migrations" table and reload it to its
-            // proper state, we need to delete it here so we don't get an error that this
-            // table already exists when the stored database schema file gets executed.
-            $this->migrator->deleteRepository();
-
-            $connection->getSchemaState()->handleOutputUsing(function ($type, $buffer) {
-                $this->output->write($buffer);
-            })->load($path);
-        });
-
-        $this->newLine();
-
-        // Finally, we will fire an event that this schema has been loaded so developers
-        // can perform any post schema load tasks that are necessary in listeners for
-        // this event, which may seed the database tables with some necessary data.
-        $this->dispatcher->dispatch(
-            new SchemaLoaded($connection, $path)
-        );
-    }
-
-    /**
-     * Get the path to the stored schema for the given connection.
-     *
-     * @param  \Illuminate\Database\Connection  $connection
-     * @return string
-     */
-    protected function schemaPath($connection)
-    {
-        if ($this->option('schema-path')) {
-            return $this->option('schema-path');
-        }
-
-        if (file_exists($path = database_path('schema/'.$connection->getName().'-schema.dump'))) {
-            return $path;
-        }
-
-        return database_path('schema/'.$connection->getName().'-schema.sql');
     }
 }
