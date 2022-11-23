@@ -70,20 +70,18 @@ class BroadcastEvent implements ShouldQueue
 
         $channels = Arr::wrap($this->event->broadcastOn());
 
-        if (empty($channels)) {
-            return;
-        }
+        if (!empty($channels)) {
+            $connections = method_exists($this->event, 'broadcastConnections')
+                                ? $this->event->broadcastConnections()
+                                : [null];
 
-        $connections = method_exists($this->event, 'broadcastConnections')
-                            ? $this->event->broadcastConnections()
-                            : [null];
+            $payload = $this->getPayloadFromEvent($this->event);
 
-        $payload = $this->getPayloadFromEvent($this->event);
-
-        foreach ($connections as $connection) {
-            $manager->connection($connection)->broadcast(
-                $channels, $name, $payload
-            );
+            foreach ($connections as $connection) {
+                $manager->connection($connection)->broadcast(
+                    $channels, $name, $payload
+                );
+            }
         }
     }
 
