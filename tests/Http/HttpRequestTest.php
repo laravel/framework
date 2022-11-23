@@ -89,7 +89,7 @@ class HttpRequestTest extends TestCase
         $this->assertEquals($expected, $request->segment($segment, 'default'));
     }
 
-    public function segmentProvider()
+    public static function segmentProvider()
     {
         return [
             ['', 1, 'default'],
@@ -111,7 +111,7 @@ class HttpRequestTest extends TestCase
         $this->assertEquals(['foo', 'bar'], $request->segments());
     }
 
-    public function segmentsProvider()
+    public static function segmentsProvider()
     {
         return [
             ['', []],
@@ -450,6 +450,41 @@ class HttpRequestTest extends TestCase
         $request = Request::create('/', 'GET', ['foo' => ['bar' => null, 'baz' => '']]);
         $this->assertFalse($request->missing('foo.bar'));
         $this->assertFalse($request->missing('foo.baz'));
+    }
+
+    public function testWhenMissingMethod()
+    {
+        $request = Request::create('/', 'GET', ['bar' => null]);
+
+        $name = $age = $city = $foo = $bar = true;
+
+        $request->whenMissing('name', function ($value) use (&$name) {
+            $name = 'Taylor';
+        });
+
+        $request->whenMissing('age', function ($value) use (&$age) {
+            $age = '';
+        });
+
+        $request->whenMissing('city', function ($value) use (&$city) {
+            $city = null;
+        });
+
+        $request->whenMissing('foo', function () use (&$foo) {
+            $foo = false;
+        });
+
+        $request->whenMissing('bar', function () use (&$bar) {
+            $bar = 'test';
+        }, function () use (&$bar) {
+            $bar = true;
+        });
+
+        $this->assertSame('Taylor', $name);
+        $this->assertSame('', $age);
+        $this->assertNull($city);
+        $this->assertFalse($foo);
+        $this->assertTrue($bar);
     }
 
     public function testHasAnyMethod()
@@ -977,7 +1012,7 @@ class HttpRequestTest extends TestCase
         $this->assertEquals($payload, $data);
     }
 
-    public function getPrefersCases()
+    public static function getPrefersCases()
     {
         return [
             ['application/json', ['json'], 'json'],

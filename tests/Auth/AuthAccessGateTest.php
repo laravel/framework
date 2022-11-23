@@ -570,7 +570,7 @@ class AuthAccessGateTest extends TestCase
     /**
      * @return array
      */
-    public function notCallableDataProvider()
+    public static function notCallableDataProvider()
     {
         return [
             [1],
@@ -1051,7 +1051,7 @@ class AuthAccessGateTest extends TestCase
         $this->assertEquals($expectedHasValue, $gate->has($abilitiesToCheck));
     }
 
-    public function hasAbilitiesTestDataProvider()
+    public static function hasAbilitiesTestDataProvider()
     {
         $abilities = ['foo' => 'foo', 'bar' => 'bar'];
         $noAbilities = [];

@@ -338,6 +338,7 @@ class Str
     /**
      * Wrap the string with the given strings.
      *
+     * @param  string  $value
      * @param  string  $before
      * @param  string|null  $after
      * @return string
@@ -1009,9 +1010,10 @@ class Str
      * @param  string  $title
      * @param  string  $separator
      * @param  string|null  $language
+     * @param  array<string, string>  $dictionary
      * @return string
      */
-    public static function slug($title, $separator = '-', $language = 'en')
+    public static function slug($title, $separator = '-', $language = 'en', $dictionary = ['@' => 'at'])
     {
         $title = $language ? static::ascii($title, $language) : $title;
 
@@ -1020,10 +1022,14 @@ class Str
 
         $title = preg_replace('!['.preg_quote($flip).']+!u', $separator, $title);
 
-        // Replace @ with the word 'at'
-        $title = str_replace('@', $separator.'at'.$separator, $title);
+        // Replace dictionary words
+        foreach ($dictionary as $key => $value) {
+            $dictionary[$key] = $separator.$value.$separator;
+        }
 
-        // Remove all characters that are not the separator, letters, numbers, or whitespace.
+        $title = str_replace(array_keys($dictionary), array_values($dictionary), $title);
+
+        // Remove all characters that are not the separator, letters, numbers, or whitespace
         $title = preg_replace('![^'.preg_quote($separator).'\pL\pN\s]+!u', '', static::lower($title));
 
         // Replace all separator characters and whitespace by a single separator
@@ -1136,9 +1142,9 @@ class Str
     {
         if (! is_null($length)) {
             return substr_count($haystack, $needle, $offset, $length);
-        } else {
-            return substr_count($haystack, $needle, $offset);
         }
+
+        return substr_count($haystack, $needle, $offset);
     }
 
     /**

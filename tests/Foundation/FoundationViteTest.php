@@ -170,6 +170,25 @@ class FoundationViteTest extends TestCase
         );
     }
 
+    public function testReactRefreshWithNoNonce()
+    {
+        $this->makeViteHotFile();
+
+        $result = app(Vite::class)->reactRefresh();
+
+        $this->assertStringNotContainsString('nonce', $result);
+    }
+
+    public function testReactRefreshNonce()
+    {
+        $this->makeViteHotFile();
+
+        $nonce = ViteFacade::useCspNonce('expected-nonce');
+        $result = app(Vite::class)->reactRefresh();
+
+        $this->assertStringContainsString(sprintf('nonce="%s"', $nonce), $result);
+    }
+
     public function testItCanInjectIntegrityWhenPresentInManifest()
     {
         $buildDir = Str::random();
@@ -844,6 +863,123 @@ class FoundationViteTest extends TestCase
         ], ViteFacade::preloadedAssets());
 
         $this->cleanViteManifest($buildDir);
+    }
+
+    public function testPreloadAssetsGetAssetNonce()
+    {
+        $buildDir = Str::random();
+        $this->makeViteManifest([
+            'resources/js/app.js' => [
+                'src' => 'resources/js/app.js',
+                'file' => 'assets/app.versioned.js',
+                'css' => [
+                    'assets/app.versioned.css',
+                ],
+            ],
+            'resources/css/app.css' => [
+                'src' => 'resources/css/app.css',
+                'file' => 'assets/app.versioned.css',
+            ],
+        ], $buildDir);
+        ViteFacade::useCspNonce('expected-nonce');
+
+        $result = app(Vite::class)(['resources/js/app.js'], $buildDir);
+
+        $this->assertSame(
+            '<link rel="preload" as="style" href="https://example.com/'.$buildDir.'/assets/app.versioned.css" nonce="expected-nonce" />'
+            .'<link rel="modulepreload" href="https://example.com/'.$buildDir.'/assets/app.versioned.js" nonce="expected-nonce" />'
+            .'<link rel="stylesheet" href="https://example.com/'.$buildDir.'/assets/app.versioned.css" nonce="expected-nonce" />'
+            .'<script type="module" src="https://example.com/'.$buildDir.'/assets/app.versioned.js" nonce="expected-nonce"></script>',
+        $result->toHtml());
+
+        $this->assertSame([
+            "https://example.com/$buildDir/assets/app.versioned.css" => [
+                'rel="preload"',
+                'as="style"',
+                'nonce="expected-nonce"',
+            ],
+            "https://example.com/$buildDir/assets/app.versioned.js" => [
+                'rel="modulepreload"',
+                'nonce="expected-nonce"',
+            ],
+        ], ViteFacade::preloadedAssets());
+
+        $this->cleanViteManifest($buildDir);
+    }
+
+    public function testCrossoriginAttributeIsIneritedByPreloadTags()
+    {
+        $buildDir = Str::random();
+        $this->makeViteManifest([
+            'resources/js/app.js' => [
+                'src' => 'resources/js/app.js',
+                'file' => 'assets/app.versioned.js',
+                'css' => [
+                    'assets/app.versioned.css',
+                ],
+            ],
+            'resources/css/app.css' => [
+                'src' => 'resources/css/app.css',
+                'file' => 'assets/app.versioned.css',
+            ],
+        ], $buildDir);
+        ViteFacade::useScriptTagAttributes([
+            'crossorigin' => 'script-crossorigin',
+        ]);
+        ViteFacade::useStyleTagAttributes([
+            'crossorigin' => 'style-crossorigin',
+        ]);
+
+        $result = app(Vite::class)(['resources/js/app.js'], $buildDir);
+
+        $this->assertSame(
+            '<link rel="preload" as="style" href="https://example.com/'.$buildDir.'/assets/app.versioned.css" crossorigin="style-crossorigin" />'
+            .'<link rel="modulepreload" href="https://example.com/'.$buildDir.'/assets/app.versioned.js" crossorigin="script-crossorigin" />'
+            .'<link rel="stylesheet" href="https://example.com/'.$buildDir.'/assets/app.versioned.css" crossorigin="style-crossorigin" />'
+            .'<script type="module" src="https://example.com/'.$buildDir.'/assets/app.versioned.js" crossorigin="script-crossorigin"></script>',
+        $result->toHtml());
+
+        $this->assertSame([
+            "https://example.com/$buildDir/assets/app.versioned.css" => [
+                'rel="preload"',
+                'as="style"',
+                'crossorigin="style-crossorigin"',
+            ],
+            "https://example.com/$buildDir/assets/app.versioned.js" => [
+                'rel="modulepreload"',
+                'crossorigin="script-crossorigin"',
+            ],
+        ], ViteFacade::preloadedAssets());
+
+        $this->cleanViteManifest($buildDir);
+    }
+
+    public function testItCanConfigureTheManifestFilename()
+    {
+        $buildDir = Str::random();
+        app()->singleton('path.public', fn () => __DIR__);
+        if (! file_exists(public_path($buildDir))) {
+            mkdir(public_path($buildDir));
+        }
+        $contents = json_encode([
+            'resources/js/app.js' => [
+                'src' => 'resources/js/app-from-custom-manifest.js',
+                'file' => 'assets/app-from-custom-manifest.versioned.js',
+            ],
+        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        file_put_contents(public_path("{$buildDir}/custom-manifest.json"), $contents);
+
+        ViteFacade::useManifestFilename('custom-manifest.json');
+
+        $result = app(Vite::class)(['resources/js/app.js'], $buildDir);
+
+        $this->assertSame(
+            '<link rel="modulepreload" href="https://example.com/'.$buildDir.'/assets/app-from-custom-manifest.versioned.js" />'
+            .'<script type="module" src="https://example.com/'.$buildDir.'/assets/app-from-custom-manifest.versioned.js"></script>',
+        $result->toHtml());
+
+        unlink(public_path("{$buildDir}/custom-manifest.json"));
+        rmdir(public_path($buildDir));
     }
 
     protected function makeViteManifest($contents = null, $path = 'build')

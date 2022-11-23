@@ -44,7 +44,7 @@ class UsePusherChannelsNamesTest extends TestCase
         );
     }
 
-    public function channelsProvider()
+    public static function channelsProvider()
     {
         $prefixesInfos = [
             ['prefix' => 'private-', 'guarded' => true],

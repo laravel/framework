@@ -54,7 +54,7 @@ class DatabasePostgresBuilderTest extends TestCase
         $grammar = m::mock(PostgresGrammar::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
         $grammar->shouldReceive('compileTableExists')->andReturn("select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'");
-        $connection->shouldReceive('select')->with("select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'", ['laravel', 'public', 'foo'])->andReturn(['countable_result']);
+        $connection->shouldReceive('selectFromWriteConnection')->with("select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'", ['laravel', 'public', 'foo'])->andReturn(['countable_result']);
         $connection->shouldReceive('getTablePrefix');
         $connection->shouldReceive('getConfig')->with('database')->andReturn('laravel');
         $builder = $this->getBuilder($connection);
@@ -69,7 +69,7 @@ class DatabasePostgresBuilderTest extends TestCase
         $grammar = m::mock(PostgresGrammar::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
         $grammar->shouldReceive('compileTableExists')->andReturn("select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'");
-        $connection->shouldReceive('select')->with("select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'", ['laravel', 'myapp', 'foo'])->andReturn(['countable_result']);
+        $connection->shouldReceive('selectFromWriteConnection')->with("select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'", ['laravel', 'myapp', 'foo'])->andReturn(['countable_result']);
         $connection->shouldReceive('getTablePrefix');
         $connection->shouldReceive('getConfig')->with('database')->andReturn('laravel');
         $builder = $this->getBuilder($connection);
@@ -85,7 +85,7 @@ class DatabasePostgresBuilderTest extends TestCase
         $grammar = m::mock(PostgresGrammar::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
         $grammar->shouldReceive('compileTableExists')->andReturn("select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'");
-        $connection->shouldReceive('select')->with("select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'", ['laravel', 'myapp', 'foo'])->andReturn(['countable_result']);
+        $connection->shouldReceive('selectFromWriteConnection')->with("select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'", ['laravel', 'myapp', 'foo'])->andReturn(['countable_result']);
         $connection->shouldReceive('getTablePrefix');
         $connection->shouldReceive('getConfig')->with('database')->andReturn('laravel');
         $builder = $this->getBuilder($connection);
@@ -101,7 +101,7 @@ class DatabasePostgresBuilderTest extends TestCase
         $grammar = m::mock(PostgresGrammar::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
         $grammar->shouldReceive('compileTableExists')->andReturn("select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'");
-        $connection->shouldReceive('select')->with("select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'", ['laravel', 'foouser', 'foo'])->andReturn(['countable_result']);
+        $connection->shouldReceive('selectFromWriteConnection')->with("select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'", ['laravel', 'foouser', 'foo'])->andReturn(['countable_result']);
         $connection->shouldReceive('getTablePrefix');
         $connection->shouldReceive('getConfig')->with('database')->andReturn('laravel');
         $builder = $this->getBuilder($connection);
@@ -116,7 +116,7 @@ class DatabasePostgresBuilderTest extends TestCase
         $grammar = m::mock(PostgresGrammar::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
         $grammar->shouldReceive('compileTableExists')->andReturn("select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'");
-        $connection->shouldReceive('select')->with("select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'", ['laravel', 'myapp', 'foo'])->andReturn(['countable_result']);
+        $connection->shouldReceive('selectFromWriteConnection')->with("select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'", ['laravel', 'myapp', 'foo'])->andReturn(['countable_result']);
         $connection->shouldReceive('getTablePrefix');
         $connection->shouldReceive('getConfig')->with('database')->andReturn('laravel');
         $builder = $this->getBuilder($connection);
@@ -131,7 +131,7 @@ class DatabasePostgresBuilderTest extends TestCase
         $grammar = m::mock(PostgresGrammar::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
         $grammar->shouldReceive('compileTableExists')->andReturn("select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'");
-        $connection->shouldReceive('select')->with("select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'", ['mydatabase', 'myapp', 'foo'])->andReturn(['countable_result']);
+        $connection->shouldReceive('selectFromWriteConnection')->with("select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'", ['mydatabase', 'myapp', 'foo'])->andReturn(['countable_result']);
         $connection->shouldReceive('getTablePrefix');
         $connection->shouldReceive('getConfig')->with('database')->andReturn('laravel');
         $builder = $this->getBuilder($connection);
@@ -147,7 +147,7 @@ class DatabasePostgresBuilderTest extends TestCase
         $grammar = m::mock(PostgresGrammar::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
         $grammar->shouldReceive('compileColumnListing')->andReturn('select column_name from information_schema.columns where table_catalog = ? and table_schema = ? and table_name = ?');
-        $connection->shouldReceive('select')->with('select column_name from information_schema.columns where table_catalog = ? and table_schema = ? and table_name = ?', ['laravel', 'public', 'foo'])->andReturn(['countable_result']);
+        $connection->shouldReceive('selectFromWriteConnection')->with('select column_name from information_schema.columns where table_catalog = ? and table_schema = ? and table_name = ?', ['laravel', 'public', 'foo'])->andReturn(['countable_result']);
         $connection->shouldReceive('getTablePrefix');
         $connection->shouldReceive('getConfig')->with('database')->andReturn('laravel');
         $processor = m::mock(PostgresProcessor::class);
@@ -165,7 +165,7 @@ class DatabasePostgresBuilderTest extends TestCase
         $grammar = m::mock(PostgresGrammar::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
         $grammar->shouldReceive('compileColumnListing')->andReturn('select column_name from information_schema.columns where table_catalog = ? and table_schema = ? and table_name = ?');
-        $connection->shouldReceive('select')->with('select column_name from information_schema.columns where table_catalog = ? and table_schema = ? and table_name = ?', ['laravel', 'myapp', 'foo'])->andReturn(['countable_result']);
+        $connection->shouldReceive('selectFromWriteConnection')->with('select column_name from information_schema.columns where table_catalog = ? and table_schema = ? and table_name = ?', ['laravel', 'myapp', 'foo'])->andReturn(['countable_result']);
         $connection->shouldReceive('getTablePrefix');
         $connection->shouldReceive('getConfig')->with('database')->andReturn('laravel');
         $processor = m::mock(PostgresProcessor::class);
@@ -184,7 +184,7 @@ class DatabasePostgresBuilderTest extends TestCase
         $grammar = m::mock(PostgresGrammar::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
         $grammar->shouldReceive('compileColumnListing')->andReturn('select column_name from information_schema.columns where table_catalog = ? and table_schema = ? and table_name = ?');
-        $connection->shouldReceive('select')->with('select column_name from information_schema.columns where table_catalog = ? and table_schema = ? and table_name = ?', ['laravel', 'foouser', 'foo'])->andReturn(['countable_result']);
+        $connection->shouldReceive('selectFromWriteConnection')->with('select column_name from information_schema.columns where table_catalog = ? and table_schema = ? and table_name = ?', ['laravel', 'foouser', 'foo'])->andReturn(['countable_result']);
         $connection->shouldReceive('getTablePrefix');
         $connection->shouldReceive('getConfig')->with('database')->andReturn('laravel');
         $processor = m::mock(PostgresProcessor::class);
@@ -202,7 +202,7 @@ class DatabasePostgresBuilderTest extends TestCase
         $grammar = m::mock(PostgresGrammar::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
         $grammar->shouldReceive('compileColumnListing')->andReturn('select column_name from information_schema.columns where table_catalog = ? and table_schema = ? and table_name = ?');
-        $connection->shouldReceive('select')->with('select column_name from information_schema.columns where table_catalog = ? and table_schema = ? and table_name = ?', ['laravel', 'myapp', 'foo'])->andReturn(['countable_result']);
+        $connection->shouldReceive('selectFromWriteConnection')->with('select column_name from information_schema.columns where table_catalog = ? and table_schema = ? and table_name = ?', ['laravel', 'myapp', 'foo'])->andReturn(['countable_result']);
         $connection->shouldReceive('getTablePrefix');
         $connection->shouldReceive('getConfig')->with('database')->andReturn('laravel');
         $processor = m::mock(PostgresProcessor::class);
@@ -220,7 +220,7 @@ class DatabasePostgresBuilderTest extends TestCase
         $grammar = m::mock(PostgresGrammar::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
         $grammar->shouldReceive('compileColumnListing')->andReturn('select column_name from information_schema.columns where table_catalog = ? and table_schema = ? and table_name = ?');
-        $connection->shouldReceive('select')->with('select column_name from information_schema.columns where table_catalog = ? and table_schema = ? and table_name = ?', ['mydatabase', 'myapp', 'foo'])->andReturn(['countable_result']);
+        $connection->shouldReceive('selectFromWriteConnection')->with('select column_name from information_schema.columns where table_catalog = ? and table_schema = ? and table_name = ?', ['mydatabase', 'myapp', 'foo'])->andReturn(['countable_result']);
         $connection->shouldReceive('getTablePrefix');
         $connection->shouldReceive('getConfig')->with('database')->andReturn('laravel');
         $processor = m::mock(PostgresProcessor::class);

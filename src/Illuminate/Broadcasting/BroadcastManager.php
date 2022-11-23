@@ -245,6 +245,10 @@ class BroadcastManager implements FactoryContract
     {
         $config = $this->getConfig($name);
 
+        if (is_null($config)) {
+            throw new InvalidArgumentException("Broadcast connection [{$name}] is not defined.");
+        }
+
         if (isset($this->customCreators[$config['driver']])) {
             return $this->callCustomCreator($config);
         }

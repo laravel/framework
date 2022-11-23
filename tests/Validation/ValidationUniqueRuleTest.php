@@ -92,6 +92,17 @@ class ValidationUniqueRuleTest extends TestCase
         $rule->withoutTrashed('softdeleted_at');
         $this->assertSame('unique:table,NULL,NULL,id,softdeleted_at,"NULL"', (string) $rule);
     }
+
+    public function testItOnlyTrashedSoftDeletes()
+    {
+        $rule = new Unique('table');
+        $rule->onlyTrashed();
+        $this->assertSame('unique:table,NULL,NULL,id,deleted_at,"NOT_NULL"', (string) $rule);
+
+        $rule = new Unique('table');
+        $rule->onlyTrashed('softdeleted_at');
+        $this->assertSame('unique:table,NULL,NULL,id,softdeleted_at,"NOT_NULL"', (string) $rule);
+    }
 }
 
 class EloquentModelStub extends Model

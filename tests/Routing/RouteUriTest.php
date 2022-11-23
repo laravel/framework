@@ -20,7 +20,7 @@ class RouteUriTest extends TestCase
     /**
      * @return array
      */
-    public function uriProvider()
+    public static function uriProvider()
     {
         return [
             [

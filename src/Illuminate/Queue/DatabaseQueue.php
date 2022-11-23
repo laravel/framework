@@ -261,7 +261,7 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
         if (Str::of($databaseVersion)->contains('MariaDB')) {
             $databaseEngine = 'mariadb';
             $databaseVersion = Str::before(Str::after($databaseVersion, '5.5.5-'), '-');
-        } elseif (Str::of($databaseVersion)->contains('vitess')) {
+        } elseif (Str::of($databaseVersion)->contains(['vitess', 'PlanetScale'])) {
             $databaseEngine = 'vitess';
             $databaseVersion = Str::before($databaseVersion, '-');
         }

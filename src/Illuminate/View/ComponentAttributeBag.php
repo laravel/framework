@@ -70,6 +70,17 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
     }
 
     /**
+     * Determine if a given attribute is missing from the attribute array.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function missing($key)
+    {
+        return ! $this->has($key, $this->attributes);
+    }
+
+    /**
      * Only include the given attribute from the attribute array.
      *
      * @param  mixed  $keys

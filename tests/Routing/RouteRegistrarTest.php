@@ -430,6 +430,26 @@ class RouteRegistrarTest extends TestCase
         $this->seeResponse('hello', Request::create('bar/baz', 'GET'));
     }
 
+    public function testRouteGroupChaining()
+    {
+        $this->router
+            ->group([], function ($router) {
+                $router->get('foo', function () {
+                    return 'hello';
+                });
+            })
+            ->group([], function ($router) {
+                $router->get('bar', function () {
+                    return 'goodbye';
+                });
+            });
+
+        $routeCollection = $this->router->getRoutes();
+
+        $this->assertInstanceOf(\Illuminate\Routing\Route::class, $routeCollection->match(Request::create('foo', 'GET')));
+        $this->assertInstanceOf(\Illuminate\Routing\Route::class, $routeCollection->match(Request::create('bar', 'GET')));
+    }
+
     public function testRegisteringNonApprovedAttributesThrows()
     {
         $this->expectException(BadMethodCallException::class);
@@ -1018,6 +1038,54 @@ class RouteRegistrarTest extends TestCase
 
         $this->seeResponse('all-users', Request::create('users', 'GET'));
         $this->assertSame('users.index', $this->getRoute()->getName());
+    }
+
+    public function testPushMiddlewareToGroup()
+    {
+        $this->router->middlewareGroup('web', []);
+        $this->router->pushMiddlewareToGroup('web', 'test-middleware');
+
+        $this->assertEquals(['test-middleware'], $this->router->getMiddlewareGroups()['web']);
+    }
+
+    public function testPushMiddlewareToGroupUnregisteredGroup()
+    {
+        $this->router->pushMiddlewareToGroup('web', 'test-middleware');
+
+        $this->assertEquals(['test-middleware'], $this->router->getMiddlewareGroups()['web']);
+    }
+
+    public function testPushMiddlewareToGroupDuplicatedMiddleware()
+    {
+        $this->router->pushMiddlewareToGroup('web', 'test-middleware');
+        $this->router->pushMiddlewareToGroup('web', 'test-middleware');
+
+        $this->assertEquals(['test-middleware'], $this->router->getMiddlewareGroups()['web']);
+    }
+
+    public function testCanRemoveMiddlewareFromGroup()
+    {
+        $this->router->pushMiddlewareToGroup('web', 'test-middleware');
+
+        $this->router->removeMiddlewareFromGroup('web', 'test-middleware');
+
+        $this->assertEquals([], $this->router->getMiddlewareGroups()['web']);
+    }
+
+    public function testCanRemoveMiddlewareFromGroupNotUnregisteredMiddleware()
+    {
+        $this->router->middlewareGroup('web', []);
+
+        $this->router->removeMiddlewareFromGroup('web', 'different-test-middleware');
+
+        $this->assertEquals([], $this->router->getMiddlewareGroups()['web']);
+    }
+
+    public function testCanRemoveMiddlewareFromGroupUnregisteredGroup()
+    {
+        $this->router->removeMiddlewareFromGroup('web', ['test-middleware']);
+
+        $this->assertEquals([], $this->router->getMiddlewareGroups());
     }
 
     /**

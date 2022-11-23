@@ -4,10 +4,12 @@ namespace Illuminate\Testing;
 
 use ArrayAccess;
 use Closure;
+use Illuminate\Contracts\Support\MessageBag;
 use Illuminate\Contracts\View\View;
 use Illuminate\Cookie\CookieValuePrefix;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
@@ -15,10 +17,13 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\Tappable;
+use Illuminate\Support\ViewErrorBag;
 use Illuminate\Testing\Assert as PHPUnit;
 use Illuminate\Testing\Constraints\SeeInOrder;
 use Illuminate\Testing\Fluent\AssertableJson;
 use LogicException;
+use PHPUnit\Framework\ExpectationFailedException;
+use ReflectionProperty;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -242,6 +247,31 @@ class TestResponse implements ArrayAccess
 
         PHPUnit::assertTrue(
             Str::contains($this->headers->get('Location'), $uri), 'Redirect location ['.$this->headers->get('Location').'] does not contain ['.$uri.'].'
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert whether the response is redirecting to a given route.
+     *
+     * @param  string  $name
+     * @param  mixed  $parameters
+     * @return $this
+     */
+    public function assertRedirectToRoute($name, $parameters = [])
+    {
+        $uri = route($name, $parameters);
+
+        PHPUnit::assertTrue(
+            $this->isRedirect(),
+            $this->statusMessageWithDetails('201, 301, 302, 303, 307, 308', $this->getStatusCode()),
+        );
+
+        $request = Request::create($this->headers->get('Location'));
+
+        PHPUnit::assertEquals(
+            app('url')->to($uri), $request->fullUrl()
         );
 
         return $this;
@@ -1339,12 +1369,24 @@ class TestResponse implements ArrayAccess
     {
         $hasErrors = $this->session()->has('errors');
 
-        $errors = $hasErrors ? $this->session()->get('errors')->all() : [];
-
         PHPUnit::assertFalse(
             $hasErrors,
             'Session has unexpected errors: '.PHP_EOL.PHP_EOL.
-            json_encode($errors, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+            json_encode((function () use ($hasErrors) {
+                $errors = [];
+
+                $sessionErrors = $this->session()->get('errors');
+
+                if ($hasErrors && is_a($sessionErrors, ViewErrorBag::class)) {
+                    foreach ($sessionErrors->getBags() as $bag => $messages) {
+                        if (is_a($messages, MessageBag::class)) {
+                            $errors[$bag] = $messages->all();
+                        }
+                    }
+                }
+
+                return $errors;
+            })(), JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
         );
 
         return $this;
@@ -1533,6 +1575,116 @@ class TestResponse implements ArrayAccess
         $this->exceptions = $exceptions;
 
         return $this;
+    }
+
+    /**
+     * This method is called when test method did not execute successfully.
+     *
+     * @param  \Throwable  $exception
+     * @return \Throwable
+     */
+    public function transformNotSuccessfulException($exception)
+    {
+        if (! $exception instanceof ExpectationFailedException) {
+            return $exception;
+        }
+
+        if ($lastException = $this->exceptions->last()) {
+            return $this->appendExceptionToException($lastException, $exception);
+        }
+
+        if ($this->baseResponse instanceof RedirectResponse) {
+            $session = $this->baseResponse->getSession();
+
+            if (! is_null($session) && $session->has('errors')) {
+                return $this->appendErrorsToException($session->get('errors')->all(), $exception);
+            }
+        }
+
+        if ($this->baseResponse->headers->get('Content-Type') === 'application/json') {
+            $testJson = new AssertableJsonString($this->getContent());
+
+            if (isset($testJson['errors'])) {
+                return $this->appendErrorsToException($testJson->json(), $exception, true);
+            }
+        }
+
+        return $exception;
+    }
+
+    /**
+     * Append an exception to the message of another exception.
+     *
+     * @param  \Throwable  $exceptionToAppend
+     * @param  \Throwable  $exception
+     * @return \Throwable
+     */
+    protected function appendExceptionToException($exceptionToAppend, $exception)
+    {
+        $exceptionMessage = $exceptionToAppend->getMessage();
+
+        $exceptionToAppend = (string) $exceptionToAppend;
+
+        $message = <<<"EOF"
+            The following exception occurred during the last request:
+
+            $exceptionToAppend
+
+            ----------------------------------------------------------------------------------
+
+            $exceptionMessage
+            EOF;
+
+        return $this->appendMessageToException($message, $exception);
+    }
+
+    /**
+     * Append errors to an exception message.
+     *
+     * @param  array  $errors
+     * @param  \Throwable  $exception
+     * @param  bool  $json
+     * @return \Throwable
+     */
+    protected function appendErrorsToException($errors, $exception, $json = false)
+    {
+        $errors = $json
+            ? json_encode($errors, JSON_PRETTY_PRINT)
+            : implode(PHP_EOL, Arr::flatten($errors));
+
+        // JSON error messages may already contain the errors, so we shouldn't duplicate them...
+        if (str_contains($exception->getMessage(), $errors)) {
+            return $exception;
+        }
+
+        $message = <<<"EOF"
+            The following errors occurred during the last request:
+
+            $errors
+            EOF;
+
+        return $this->appendMessageToException($message, $exception);
+    }
+
+    /**
+     * Append a message to an exception.
+     *
+     * @param  string  $message
+     * @param  \Throwable  $exception
+     * @return \Throwable
+     */
+    protected function appendMessageToException($message, $exception)
+    {
+        $property = new ReflectionProperty($exception, 'message');
+
+        $property->setAccessible(true);
+
+        $property->setValue(
+            $exception,
+            $exception->getMessage().PHP_EOL.PHP_EOL.$message.PHP_EOL
+        );
+
+        return $exception;
     }
 
     /**

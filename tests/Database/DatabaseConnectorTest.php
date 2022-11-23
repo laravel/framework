@@ -45,7 +45,7 @@ class DatabaseConnectorTest extends TestCase
         $this->assertSame($result, $connection);
     }
 
-    public function mySqlConnectProvider()
+    public static function mySqlConnectProvider()
     {
         return [
             ['mysql:host=foo;dbname=bar', ['host' => 'foo', 'database' => 'bar', 'collation' => 'utf8_unicode_ci', 'charset' => 'utf8']],
@@ -112,7 +112,7 @@ class DatabaseConnectorTest extends TestCase
         $this->assertSame($result, $connection);
     }
 
-    public function provideSearchPaths()
+    public static function provideSearchPaths()
     {
         return [
             'all-lowercase' => [

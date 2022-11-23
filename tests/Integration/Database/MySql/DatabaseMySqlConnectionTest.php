@@ -46,7 +46,7 @@ class DatabaseMySqlConnectionTest extends MySqlTestCase
         );
     }
 
-    public function floatComparisonsDataProvider()
+    public static function floatComparisonsDataProvider()
     {
         return [
             [0.2, '=', true],
@@ -88,7 +88,7 @@ class DatabaseMySqlConnectionTest extends MySqlTestCase
         $this->assertSame(! $expected, DB::table(self::TABLE)->whereNotNull(self::JSON_COL.'->'.$key)->exists());
     }
 
-    public function jsonWhereNullDataProvider()
+    public static function jsonWhereNullDataProvider()
     {
         return [
             'key not exists' => [true, 'invalid'],
@@ -138,7 +138,7 @@ class DatabaseMySqlConnectionTest extends MySqlTestCase
         $this->assertSame($count, DB::table(self::TABLE)->whereJsonContainsKey($column)->count());
     }
 
-    public function jsonContainsKeyDataProvider()
+    public static function jsonContainsKeyDataProvider()
     {
         return [
             'string key' => [4, 'json_col->foo'],
