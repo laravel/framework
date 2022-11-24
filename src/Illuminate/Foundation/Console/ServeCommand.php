@@ -102,9 +102,11 @@ class ServeCommand extends Command
                 clearstatcache(false, $environmentFile);
             }
 
-            if (! $this->option('no-reload') &&
+            $isEnvironmentChanged = filemtime($environmentFile) > $environmentLastModified;
+
+            if (!$this->option('no-reload') &&
                 $hasEnvironment &&
-                filemtime($environmentFile) > $environmentLastModified) {
+                $isEnvironmentChanged) {
                 $environmentLastModified = filemtime($environmentFile);
 
                 $this->newLine();
@@ -116,6 +118,16 @@ class ServeCommand extends Command
                 $this->serverRunningHasBeenDisplayed = false;
 
                 $process = $this->startProcess($hasEnvironment);
+            }
+
+            if ($this->option('exit-on-update') &&
+                $hasEnvironment &&
+                $isEnvironmentChanged) {
+                $this->newLine();
+
+                $this->components->info('Environment modified. Stopping server...');
+
+                $process->stop(5);
             }
 
             usleep(500 * 1000);
