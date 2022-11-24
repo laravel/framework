@@ -25,7 +25,8 @@ class ListenCommand extends Command
                             {--queue= : The queue to listen on}
                             {--sleep=3 : Number of seconds to sleep when no job is available}
                             {--timeout=60 : The number of seconds a child process can run}
-                            {--tries=1 : Number of times to attempt a job before logging it failed}';
+                            {--tries=1 : Number of times to attempt a job before logging it failed}
+                            {--rest=0 : Number of seconds to rest between jobs}';
 
     /**
      * The console command description.
@@ -109,7 +110,8 @@ class ListenCommand extends Command
             $this->option('timeout'),
             $this->option('sleep'),
             $this->option('tries'),
-            $this->option('force')
+            $this->option('force'),
+            $this->option('rest')
         );
     }
 
