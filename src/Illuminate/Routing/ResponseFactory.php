@@ -70,6 +70,18 @@ class ResponseFactory implements FactoryContract
     }
 
     /**
+     * Create a new "accepted" response.
+     *
+     * @param  mixed  $content
+     * @param  array  $headers
+     * @return \Illuminate\Http\Response
+     */
+    public function accepted(mixed $content = '', array $headers = [])
+    {
+        return $this->make($content, 202, $headers);
+    }
+
+    /**
      * Create a new response for a given view.
      *
      * @param  string|array  $view

@@ -24,6 +24,15 @@ interface ResponseFactory
     public function noContent($status = 204, array $headers = []);
 
     /**
+     * Create a new "accepted" response.
+     *
+     * @param  int  $status
+     * @param  array  $headers
+     * @return \Illuminate\Http\Response
+     */
+    public function accepted($status = 202, array $headers = []);
+
+    /**
      * Create a new response for a given view.
      *
      * @param  string|array  $view

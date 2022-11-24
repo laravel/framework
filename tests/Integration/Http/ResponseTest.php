@@ -9,6 +9,42 @@ use Orchestra\Testbench\TestCase;
 
 class ResponseTest extends TestCase
 {
+    public function testResponseAccepted()
+    {
+        Route::get('/response', function () {
+            return response()->accepted();
+        });
+
+        $this->get('/response')
+            ->assertStatus(202)
+            ->assertContent('');
+    }
+
+    public function testResponseAcceptedWithContent()
+    {
+        Route::get('/response', function () {
+            return response()->accepted('Hello World');
+        });
+
+        $this->get('/response')
+            ->assertStatus(202)
+            ->assertContent('Hello World');
+    }
+
+    public function testResponseAcceptedWithHeaders()
+    {
+        Route::get('/response', function () {
+            return response()->accepted('Hello World', [
+                'X-Example' => 'X-Value',
+            ]);
+        });
+
+        $this->get('/response')
+            ->assertStatus(202)
+            ->assertContent('Hello World')
+            ->assertHeader('X-Example', 'X-Value');
+    }
+
     public function testResponseWithInvalidJsonThrowsException()
     {
         $this->expectException('InvalidArgumentException');
