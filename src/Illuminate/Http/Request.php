@@ -5,6 +5,7 @@ namespace Illuminate\Http;
 use ArrayAccess;
 use Closure;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Dumpable;
 use Illuminate\Session\SymfonySessionDecorator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -20,7 +21,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
  * @method array validateWithBag(string $errorBag, array $rules, ...$params)
  * @method bool hasValidSignature(bool $absolute = true)
  */
-class Request extends SymfonyRequest implements Arrayable, ArrayAccess
+class Request extends SymfonyRequest implements Arrayable, ArrayAccess, Dumpable
 {
     use Concerns\CanBePrecognitive,
         Concerns\InteractsWithContentTypes,

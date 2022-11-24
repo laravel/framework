@@ -4,13 +4,14 @@ namespace Illuminate\Testing\Fluent;
 
 use Closure;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Dumpable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\Tappable;
 use Illuminate\Testing\AssertableJsonString;
 use PHPUnit\Framework\Assert as PHPUnit;
 
-class AssertableJson implements Arrayable
+class AssertableJson implements Arrayable, Dumpable
 {
     use Concerns\Has,
         Concerns\Matching,

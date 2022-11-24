@@ -10,6 +10,7 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\HandlerStack;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Dumpable;
 use Illuminate\Http\Client\Events\ConnectionFailed;
 use Illuminate\Http\Client\Events\RequestSending;
 use Illuminate\Http\Client\Events\ResponseReceived;
@@ -24,7 +25,7 @@ use Psr\Http\Message\RequestInterface;
 use RuntimeException;
 use Symfony\Component\VarDumper\VarDumper;
 
-class PendingRequest
+class PendingRequest implements Dumpable
 {
     use Conditionable, Macroable;
 

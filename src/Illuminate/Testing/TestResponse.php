@@ -4,6 +4,7 @@ namespace Illuminate\Testing;
 
 use ArrayAccess;
 use Closure;
+use Illuminate\Contracts\Support\Dumpable;
 use Illuminate\Contracts\Support\MessageBag;
 use Illuminate\Contracts\View\View;
 use Illuminate\Cookie\CookieValuePrefix;
@@ -30,7 +31,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 /**
  * @mixin \Illuminate\Http\Response
  */
-class TestResponse implements ArrayAccess
+class TestResponse implements ArrayAccess, Dumpable
 {
     use Tappable, Macroable {
         __call as macroCall;

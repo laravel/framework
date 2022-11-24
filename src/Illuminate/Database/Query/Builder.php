@@ -8,6 +8,7 @@ use Closure;
 use DateTimeInterface;
 use Illuminate\Contracts\Database\Query\Builder as BuilderContract;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Dumpable;
 use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Concerns\ExplainsQueries;
 use Illuminate\Database\ConnectionInterface;
@@ -26,7 +27,7 @@ use InvalidArgumentException;
 use LogicException;
 use RuntimeException;
 
-class Builder implements BuilderContract
+class Builder implements BuilderContract, Dumpable
 {
     use BuildsQueries, ExplainsQueries, ForwardsCalls, Macroable {
         __call as macroCall;

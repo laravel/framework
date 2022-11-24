@@ -1,12 +1,14 @@
 <?php
 
 use Illuminate\Contracts\Support\DeferringDisplayableValue;
+use Illuminate\Contracts\Support\Dumpable;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Env;
 use Illuminate\Support\HigherOrderTapProxy;
 use Illuminate\Support\Optional;
 use Illuminate\Support\Str;
+use Symfony\Component\VarDumper\VarDumper;
 
 if (! function_exists('append_config')) {
     /**
@@ -95,6 +97,50 @@ if (! function_exists('class_uses_recursive')) {
         }
 
         return array_unique($results);
+    }
+}
+
+if (! function_exists('dd')) {
+    /**
+     * Dump the given value(s) and end script exection.
+     *
+     * @return never
+     */
+    function dd(...$vars): void
+    {
+        foreach ($vars as $var) {
+            if ($var instanceof Dumpable) {
+                $var->dd();
+            } else {
+                VarDumper::dump($var);
+            }
+        }
+
+        exit(1);
+    }
+}
+
+if (! function_exists('dump')) {
+    /**
+     * Dump the given values and return them.
+     *
+     * @return mixed
+     */
+    function dump(...$vars): mixed
+    {
+        foreach ($vars as $var) {
+            if ($var instanceof Dumpable) {
+                $var->dump();
+            } else {
+                VarDumper::dump($var);
+            }
+        }
+
+        if (count($vars) === 1) {
+            return Arr::first($vars);
+        }
+
+        return $vars;
     }
 }
 
