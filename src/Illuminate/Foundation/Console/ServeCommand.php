@@ -104,7 +104,7 @@ class ServeCommand extends Command
 
             $isEnvironmentChanged = filemtime($environmentFile) > $environmentLastModified;
 
-            if (!$this->option('no-reload') &&
+            if (! $this->option('no-reload') &&
                 $hasEnvironment &&
                 $isEnvironmentChanged) {
                 $environmentLastModified = filemtime($environmentFile);
