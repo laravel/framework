@@ -6,6 +6,7 @@ use BadMethodCallException;
 use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Reflector;
+use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 
 /**
@@ -30,7 +31,9 @@ use InvalidArgumentException;
  */
 class RouteRegistrar
 {
-    use CreatesRegularExpressionRouteConstraints;
+    use CreatesRegularExpressionRouteConstraints, Macroable {
+        __call as macroCall;
+    }
 
     /**
      * The router instance.
@@ -240,6 +243,10 @@ class RouteRegistrar
      */
     public function __call($method, $parameters)
     {
+        if (static::hasMacro($method)) {
+            return $this->macroCall($method, $parameters);
+        }
+
         if (in_array($method, $this->passthru)) {
             return $this->registerRoute($method, ...$parameters);
         }
