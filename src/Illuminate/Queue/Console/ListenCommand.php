@@ -24,9 +24,9 @@ class ListenCommand extends Command
                             {--memory=128 : The memory limit in megabytes}
                             {--queue= : The queue to listen on}
                             {--sleep=3 : Number of seconds to sleep when no job is available}
+                            {--rest=0 : Number of seconds to rest between jobs}
                             {--timeout=60 : The number of seconds a child process can run}
-                            {--tries=1 : Number of times to attempt a job before logging it failed}
-                            {--rest=0 : Number of seconds to rest between jobs}';
+                            {--tries=1 : Number of times to attempt a job before logging it failed}';
 
     /**
      * The name of the console command.
@@ -114,15 +114,15 @@ class ListenCommand extends Command
                 : $this->option('delay');
 
         return new ListenerOptions(
-            $this->option('name'),
-            $this->option('env'),
-            $backoff,
-            $this->option('memory'),
-            $this->option('timeout'),
-            $this->option('sleep'),
-            $this->option('tries'),
-            $this->option('force'),
-            $this->option('rest')
+            name: $this->option('name'),
+            environment: $this->option('env'),
+            backoff: $backoff,
+            memory: $this->option('memory'),
+            timeout: $this->option('timeout'),
+            sleep: $this->option('sleep'),
+            rest: $this->option('rest'),
+            maxTries: $this->option('tries'),
+            force: $this->option('force')
         );
     }
 
