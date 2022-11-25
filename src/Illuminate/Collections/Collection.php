@@ -1589,7 +1589,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     {
         $values = is_null($values) ? new static($this->items) : $values;
 
-        foreach ($values as $key => $row){
+        foreach ($values as $key => $row) {
             if (is_array($row) || $row instanceof Enumerable) {
                 $values[$key] = $this->valuesRecursive(new static($row))->values()->all();
             }
