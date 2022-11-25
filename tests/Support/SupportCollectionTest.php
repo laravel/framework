@@ -1196,20 +1196,20 @@ class SupportCollectionTest extends TestCase
     public function testValuesRecursiveWithArray($collection)
     {
         $c = new $collection([
-            "a" => [
-                "x" => 1,
-                "y" => [
-                    "0"
+            'a' => [
+                'x' => 1,
+                'y' => [
+                    '0'
                 ]
             ],
-            "b" => 1
+            'b' => 1
         ]);
 
         $this->assertEquals([
             [
                 1,
                 [
-                    "0"
+                    '0'
                 ]
             ],
             1
@@ -1222,23 +1222,23 @@ class SupportCollectionTest extends TestCase
     public function testValuesRecursiveWithCollection($collection)
     {
         $c = new $collection([
-            "a" => new $collection([
-                "x" => 1,
-                "y" => new $collection([
-                    "0"
+            'a' => new $collection([
+                'x' => 1,
+                'y' => new $collection([
+                    '0'
                 ])
             ]),
-            "b" => 1
+            'b' => 1,
         ]);
 
         $this->assertEquals([
             [
                 1,
                 [
-                    "0"
+                    '0'
                 ]
             ],
-            1
+            1,
         ], $c->valuesRecursive()->all());
     }
 
@@ -1248,23 +1248,23 @@ class SupportCollectionTest extends TestCase
     public function testValuesRecursiveWithArrayAndCollection($collection)
     {
         $c = new $collection([
-            "a" => [
-                "x" => 1,
-                "y" => new $collection([
-                    "0"
+            'a' => [
+                'x' => 1,
+                'y' => new $collection([
+                    '0'
                 ])
             ],
-            "b" => 1
+            'b' => 1,
         ]);
 
         $this->assertEquals([
             [
                 1,
                 [
-                    "0"
+                    '0'
                 ]
             ],
-            1
+            1,
         ], $c->valuesRecursive()->all());
     }
 

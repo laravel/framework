@@ -1535,11 +1535,12 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
         });
     }
 
-    public function valuesRecursive($values = null){
+    public function valuesRecursive($values = null)
+    {
         return new static(function () {
             foreach ($this as $row) {
-                if(is_array($row) || $row instanceof Enumerable) {
-                    $row = $this->passthru("valuesRecursive", ["values" => collect($row)])->values()->all();
+                if (is_array($row) || $row instanceof Enumerable) {
+                    $row = $this->passthru('valuesRecursive', ['values' => collect($row)])->values()->all();
                 }
                 yield $row;
             }
