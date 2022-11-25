@@ -1189,6 +1189,86 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals([0 => 'a', 1 => 'b', 2 => 'c'], $data->values()->all());
     }
 
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testValuesRecursiveWithArray($collection)
+    {
+        $c = new $collection([
+            "a" => [
+                "x" => 1,
+                "y" => [
+                    "0"
+                ]
+            ],
+            "b" => 1
+        ]);
+
+        $this->assertEquals([
+            [
+                1,
+                [
+                    "0"
+                ]
+            ],
+            1
+        ], $c->valuesRecursive()->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testValuesRecursiveWithCollection($collection)
+    {
+        $c = new $collection([
+            "a" => new $collection([
+                "x" => 1,
+                "y" => new $collection([
+                    "0"
+                ])
+            ]),
+            "b" => 1
+        ]);
+
+        $this->assertEquals([
+            [
+                1,
+                [
+                    "0"
+                ]
+            ],
+            1
+        ], $c->valuesRecursive()->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testValuesRecursiveWithArrayAndCollection($collection)
+    {
+        $c = new $collection([
+            "a" => [
+                "x" => 1,
+                "y" => new $collection([
+                    "0"
+                ])
+            ],
+            "b" => 1
+        ]);
+
+        $this->assertEquals([
+            [
+                1,
+                [
+                    "0"
+                ]
+            ],
+            1
+        ], $c->valuesRecursive()->all());
+    }
+
+
     /**
      * @dataProvider collectionClassProvider
      */
