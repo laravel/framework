@@ -88,6 +88,7 @@ class Listener
 
         while (true) {
             $this->runProcess($process, $options->memory);
+
             if ($options->rest) {
                 sleep($options->rest);
             }
