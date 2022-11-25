@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Support;
 use ArrayAccess;
 use ArrayIterator;
 use Countable;
+use Illuminate\Contracts\Support\Dumpable;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Env;
 use Illuminate\Support\Optional;
@@ -18,6 +19,7 @@ use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use RuntimeException;
 use stdClass;
+use Symfony\Component\VarDumper\VarDumper;
 use Traversable;
 
 class SupportHelpersTest extends TestCase
@@ -921,6 +923,28 @@ class SupportHelpersTest extends TestCase
             preg_replace_array($pattern, $replacements, $subject)
         );
     }
+
+    public function testDumpDumpable()
+    {
+        VarDumper::setHandler(function ($val) {
+            echo "called VarDumper with [$val]";
+        });
+
+        $this->expectOutputString('dumped');
+
+        dump(new SupportTestDumpable());
+    }
+
+    public function testDumpRegularValue()
+    {
+        VarDumper::setHandler(function ($val) {
+            echo "called VarDumper with [$val]";
+        });
+
+        $this->expectOutputString('called VarDumper with [42]');
+
+        dump(42);
+    }
 }
 
 trait SupportTestTraitOne
@@ -1003,5 +1027,23 @@ class SupportTestCountable implements Countable
     public function count(): int
     {
         return 0;
+    }
+}
+
+class SupportTestDumpable implements Dumpable
+{
+    public function dd()
+    {
+        echo "dd'ed";
+    }
+
+    public function dump()
+    {
+        echo 'dumped';
+    }
+
+    public function __toString()
+    {
+        return "This shouldn't be getting called";
     }
 }

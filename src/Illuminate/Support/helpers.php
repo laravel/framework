@@ -102,19 +102,13 @@ if (! function_exists('class_uses_recursive')) {
 
 if (! function_exists('dd')) {
     /**
-     * Dump the given value(s) and end script exection.
+     * Dump the given values and end script execution.
      *
      * @return never
      */
     function dd(...$vars): void
     {
-        foreach ($vars as $var) {
-            if ($var instanceof Dumpable) {
-                $var->dd();
-            } else {
-                VarDumper::dump($var);
-            }
-        }
+        dump($vars);
 
         exit(1);
     }
@@ -136,6 +130,8 @@ if (! function_exists('dump')) {
             }
         }
 
+        // If only one argument was passed, return it. This matches
+        // the behavior of Symfony's `dump` function.
         if (count($vars) === 1) {
             return Arr::first($vars);
         }
