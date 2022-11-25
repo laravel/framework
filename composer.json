@@ -86,6 +86,7 @@
         "aws/aws-sdk-php": "^3.235.5",
         "doctrine/dbal": "^2.13.3|^3.1.4",
         "fakerphp/faker": "^1.9.2",
+        "funkjedi/composer-include-files": "^1.1",
         "guzzlehttp/guzzle": "^7.5",
         "league/flysystem-aws-s3-v3": "^3.0",
         "league/flysystem-ftp": "^3.0",
@@ -134,7 +135,10 @@
     "extra": {
         "branch-alias": {
             "dev-master": "9.x-dev"
-        }
+        },
+        "include_files": [
+            "src/Illuminate/Support/helpers.php"
+        ]
     },
     "suggest": {
         "ext-bcmath": "Required to use the multiple_of validation rule.",
@@ -174,7 +178,8 @@
     "config": {
         "sort-packages": true,
         "allow-plugins": {
-            "composer/package-versions-deprecated": true
+            "composer/package-versions-deprecated": true,
+            "funkjedi/composer-include-files": true
         }
     },
     "minimum-stability": "dev",
