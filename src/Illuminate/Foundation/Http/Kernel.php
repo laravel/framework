@@ -51,7 +51,7 @@ class Kernel implements KernelContract
     /**
      * The application's middleware stack.
      *
-     * @var array<int, class-string|string>
+     * @var array<int, string>
      */
     protected $middleware = [];
 
