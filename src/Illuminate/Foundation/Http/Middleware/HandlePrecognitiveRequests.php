@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Http\Middleware;
 use Illuminate\Container\Container;
 use Illuminate\Foundation\Routing\PrecognitionCallableDispatcher;
 use Illuminate\Foundation\Routing\PrecognitionControllerDispatcher;
+use Illuminate\Http\Response;
 use Illuminate\Routing\Contracts\CallableDispatcher as CallableDispatcherContract;
 use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
 
@@ -35,7 +36,7 @@ class HandlePrecognitiveRequests
      * @param  \Closure  $next
      * @return \Illuminate\Http\Response
      */
-    public function handle($request, $next)
+    public function handle($request, $next): Response
     {
         if (! $request->isAttemptingPrecognition()) {
             return $this->appendVaryHeader($request, $next($request));
