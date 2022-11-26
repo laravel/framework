@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Http\Middleware;
 use Illuminate\Container\Container;
 use Illuminate\Foundation\Routing\PrecognitionCallableDispatcher;
 use Illuminate\Foundation\Routing\PrecognitionControllerDispatcher;
+use Illuminate\Http\Response;
 use Illuminate\Routing\Contracts\CallableDispatcher as CallableDispatcherContract;
 use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
 
