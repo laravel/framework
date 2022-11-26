@@ -61,7 +61,7 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
     /**
      * The validator performing the validation.
      *
-     * @var \Illuminate\Validation\Validator
+     * @var \Illuminate\Contracts\Validation\Validator
      */
     protected $validator;
 
