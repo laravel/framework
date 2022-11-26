@@ -36,13 +36,6 @@ class ScheduleFinishCommand extends Command
     protected $description = 'Handle the completion of a scheduled command';
 
     /**
-     * Indicates whether the command should be shown in the Artisan command list.
-     *
-     * @var bool
-     */
-    protected $hidden = true;
-
-    /**
      * Execute the console command.
      *
      * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
