@@ -487,6 +487,28 @@ class HttpRequestTest extends TestCase
         $this->assertTrue($bar);
     }
 
+    public function testmissingAnyMethod()
+    {
+        $request = Request::create('/', 'GET', ['foo' => 'bar']);
+        $this->assertTrue($request->missingAny('name'));
+        $this->assertTrue($request->missingAny('age'));
+        $this->assertTrue($request->missingAny('city'));
+        $this->assertFalse($request->missingAny('foo'));
+        $this->assertTrue($request->missingAny('name', 'email'));
+        $this->assertTrue($request->missingAny(['name', 'email']));
+
+        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'email' => 'forge@laravel.com']);
+        $this->assertFalse($request->missingAny('name', 'email'));
+        $this->assertTrue($request->missingAny('username', 'password'));
+        $this->assertTrue($request->missingAny(['username', 'password']));
+
+        $request = Request::create('/', 'GET', ['foo' => ['bar' => null, 'baz' => '']]);
+        $this->assertFalse($request->missingAny('foo.bar'));
+        $this->assertFalse($request->missingAny('foo.baz'));
+        $this->assertTrue($request->missingAny('foo.bax'));
+        $this->assertFalse($request->missingAny(['foo.bax', 'foo.baz']));
+    }
+
     public function testHasAnyMethod()
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => '', 'city' => null]);
