@@ -8,6 +8,6 @@ class MorphModelMock
 {
     public static function find($id)
     {
-        return tap(new class extends Model {}, fn($model) => $model->id = $id);
+        return tap(new class extends Model {}, fn ($model) => $model->id = $id);
     }
 }
