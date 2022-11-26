@@ -321,7 +321,7 @@ class Stringable implements JsonSerializable
     }
 
     /**
-     * Determine if a given string is a valid isUlid.
+     * Determine if a given string is a valid ULID.
      *
      * @return bool
      */
