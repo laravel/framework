@@ -994,9 +994,9 @@ class SupportArrTest extends TestCase
         Arr::forget($array, 1);
         $this->assertEquals(['name' => 'hAz', 2 => 'bAz'], $array);
 
-        $array = [2 => [1 =>'products', 3 => 'users']];
+        $array = [2 => [1 => 'products', 3 => 'users']];
         Arr::forget($array, 2.3);
-        $this->assertEquals([2 => [1 =>'products']], $array);
+        $this->assertEquals([2 => [1 => 'products']], $array);
     }
 
     public function testWrap()
