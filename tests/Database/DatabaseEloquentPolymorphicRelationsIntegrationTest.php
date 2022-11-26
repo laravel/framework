@@ -155,6 +155,7 @@ class DatabaseEloquentPolymorphicRelationsIntegrationTest extends TestCase
 class EloquentManyToManyPolymorphicTestPost extends Eloquent
 {
     protected $table = 'posts';
+
     protected $guarded = [];
 
     public function tags()
@@ -166,6 +167,7 @@ class EloquentManyToManyPolymorphicTestPost extends Eloquent
 class EloquentManyToManyPolymorphicTestImage extends Eloquent
 {
     protected $table = 'images';
+
     protected $guarded = [];
 
     public function tags()
@@ -177,6 +179,7 @@ class EloquentManyToManyPolymorphicTestImage extends Eloquent
 class EloquentManyToManyPolymorphicTestTag extends Eloquent
 {
     protected $table = 'tags';
+
     protected $guarded = [];
 
     public function posts()

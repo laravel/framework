@@ -907,6 +907,7 @@ class RoutingUrlGeneratorTest extends TestCase
 class RoutableInterfaceStub implements UrlRoutable
 {
     public $key;
+
     public $slug = 'test-slug';
 
     public function getRouteKey()

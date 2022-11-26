@@ -2616,9 +2616,13 @@ class EloquentTestAnotherObserverStub
 class EloquentModelStub extends Model
 {
     public $connection;
+
     public $scopesCalled = [];
+
     protected $table = 'stub';
+
     protected $guarded = [];
+
     protected $casts = ['castedFloat' => 'float'];
 
     public function getListItemsAttribute($value)
@@ -2753,6 +2757,7 @@ class EloquentDateModelStub extends EloquentModelStub
 class EloquentModelSaveStub extends Model
 {
     protected $table = 'save_stub';
+
     protected $guarded = [];
 
     public function save(array $options = [])
@@ -2987,6 +2992,7 @@ class EloquentModelCastingStub extends Model
 class EloquentModelDynamicHiddenStub extends Model
 {
     protected $table = 'stub';
+
     protected $guarded = [];
 
     public function getHidden()
@@ -2998,6 +3004,7 @@ class EloquentModelDynamicHiddenStub extends Model
 class EloquentModelDynamicVisibleStub extends Model
 {
     protected $table = 'stub';
+
     protected $guarded = [];
 
     public function getVisible()
@@ -3009,7 +3016,9 @@ class EloquentModelDynamicVisibleStub extends Model
 class EloquentModelNonIncrementingStub extends Model
 {
     protected $table = 'stub';
+
     protected $guarded = [];
+
     public $incrementing = false;
 }
 
@@ -3038,12 +3047,14 @@ class EloquentModelEventObjectStub extends Model
 class EloquentModelWithoutTimestamps extends Model
 {
     protected $table = 'stub';
+
     public $timestamps = false;
 }
 
 class EloquentModelWithUpdatedAtNull extends Model
 {
     protected $table = 'stub';
+
     const UPDATED_AT = null;
 }
 

@@ -329,6 +329,7 @@ class EloquentModelEncryptedCastingTest extends DatabaseTestCase
 class EncryptedCast extends Model
 {
     public $timestamps = false;
+
     protected $guarded = [];
 
     public $casts = [

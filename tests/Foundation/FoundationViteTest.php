@@ -829,7 +829,8 @@ class FoundationViteTest extends TestCase
             .'<link rel="modulepreload" href="https://example.com/'.$buildDir.'/assets/import.versioned.js" general="attribute" crossorigin data-persistent-across-pages="YES" keep-me empty-string="" zero="0" />'
             .'<link rel="stylesheet" href="https://example.com/'.$buildDir.'/assets/app.versioned.css" />'
             .'<script type="module" src="https://example.com/'.$buildDir.'/assets/app.versioned.js"></script>',
-        $result->toHtml());
+            $result->toHtml(),
+        );
 
         $this->assertSame([
             "https://example.com/$buildDir/assets/app.versioned.css" => [
@@ -890,7 +891,8 @@ class FoundationViteTest extends TestCase
             .'<link rel="modulepreload" href="https://example.com/'.$buildDir.'/assets/app.versioned.js" nonce="expected-nonce" />'
             .'<link rel="stylesheet" href="https://example.com/'.$buildDir.'/assets/app.versioned.css" nonce="expected-nonce" />'
             .'<script type="module" src="https://example.com/'.$buildDir.'/assets/app.versioned.js" nonce="expected-nonce"></script>',
-        $result->toHtml());
+            $result->toHtml(),
+        );
 
         $this->assertSame([
             "https://example.com/$buildDir/assets/app.versioned.css" => [
@@ -937,7 +939,8 @@ class FoundationViteTest extends TestCase
             .'<link rel="modulepreload" href="https://example.com/'.$buildDir.'/assets/app.versioned.js" crossorigin="script-crossorigin" />'
             .'<link rel="stylesheet" href="https://example.com/'.$buildDir.'/assets/app.versioned.css" crossorigin="style-crossorigin" />'
             .'<script type="module" src="https://example.com/'.$buildDir.'/assets/app.versioned.js" crossorigin="script-crossorigin"></script>',
-        $result->toHtml());
+            $result->toHtml(),
+        );
 
         $this->assertSame([
             "https://example.com/$buildDir/assets/app.versioned.css" => [
@@ -976,7 +979,8 @@ class FoundationViteTest extends TestCase
         $this->assertSame(
             '<link rel="modulepreload" href="https://example.com/'.$buildDir.'/assets/app-from-custom-manifest.versioned.js" />'
             .'<script type="module" src="https://example.com/'.$buildDir.'/assets/app-from-custom-manifest.versioned.js"></script>',
-        $result->toHtml());
+            $result->toHtml(),
+        );
 
         unlink(public_path("{$buildDir}/custom-manifest.json"));
         rmdir(public_path($buildDir));

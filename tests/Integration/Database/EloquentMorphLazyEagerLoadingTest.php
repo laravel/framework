@@ -59,6 +59,7 @@ class Comment extends Model
 class Post extends Model
 {
     public $timestamps = false;
+
     protected $primaryKey = 'post_id';
 
     public function user()

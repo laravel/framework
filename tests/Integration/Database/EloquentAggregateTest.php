@@ -73,6 +73,8 @@ class EloquentAggregateTest extends DatabaseTestCase
 class UserAggregateTest extends Model
 {
     protected $table = 'users';
+
     protected $fillable = ['name', 'c', 'balance'];
+
     public $timestamps = false;
 }

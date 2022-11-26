@@ -124,7 +124,9 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
 class User extends Model
 {
     public $table = 'users';
+
     public $timestamps = false;
+
     protected $guarded = [];
 
     public function teamMates()
@@ -146,7 +148,9 @@ class User extends Model
 class UserWithGlobalScope extends Model
 {
     public $table = 'users';
+
     public $timestamps = false;
+
     protected $guarded = [];
 
     public static function boot()
@@ -162,7 +166,9 @@ class UserWithGlobalScope extends Model
 class Team extends Model
 {
     public $table = 'teams';
+
     public $timestamps = false;
+
     protected $guarded = [];
 }
 
@@ -171,6 +177,7 @@ class Category extends Model
     use SoftDeletes;
 
     public $timestamps = false;
+
     protected $guarded = [];
 
     public function subProducts()
@@ -182,5 +189,6 @@ class Category extends Model
 class Product extends Model
 {
     public $timestamps = false;
+
     protected $guarded = [];
 }

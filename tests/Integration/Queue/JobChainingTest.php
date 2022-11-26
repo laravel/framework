@@ -251,7 +251,9 @@ class JobChainingTestFirstJob implements ShouldQueue
     use Dispatchable, Queueable;
 
     public static $ran = false;
+
     public static $usedQueue = null;
+
     public static $usedConnection = null;
 
     public function handle()
@@ -267,7 +269,9 @@ class JobChainingTestSecondJob implements ShouldQueue
     use Dispatchable, Queueable;
 
     public static $ran = false;
+
     public static $usedQueue = null;
+
     public static $usedConnection = null;
 
     public function handle()
@@ -283,7 +287,9 @@ class JobChainingTestThirdJob implements ShouldQueue
     use Dispatchable, Queueable;
 
     public static $ran = false;
+
     public static $usedQueue = null;
+
     public static $usedConnection = null;
 
     public function handle()

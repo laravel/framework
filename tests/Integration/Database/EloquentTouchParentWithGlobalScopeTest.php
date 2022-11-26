@@ -41,7 +41,9 @@ class EloquentTouchParentWithGlobalScopeTest extends DatabaseTestCase
 class Post extends Model
 {
     public $table = 'posts';
+
     public $timestamps = true;
+
     protected $guarded = [];
 
     public function comments()
@@ -62,8 +64,11 @@ class Post extends Model
 class Comment extends Model
 {
     public $table = 'comments';
+
     public $timestamps = true;
+
     protected $guarded = [];
+
     protected $touches = ['post'];
 
     public function post()

@@ -321,6 +321,7 @@ class EloquentRelationStub extends Relation
 class EloquentNoTouchingModelStub extends Model
 {
     protected $table = 'table';
+
     protected $attributes = [
         'id' => 1,
     ];
@@ -334,6 +335,7 @@ class EloquentNoTouchingChildModelStub extends EloquentNoTouchingModelStub
 class EloquentNoTouchingAnotherModelStub extends Model
 {
     protected $table = 'another_table';
+
     protected $attributes = [
         'id' => 2,
     ];

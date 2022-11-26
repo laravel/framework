@@ -80,6 +80,7 @@ class InteractsWithAuthenticationTest extends TestCase
 class AuthenticationTestUser extends Authenticatable
 {
     public $table = 'users';
+
     public $timestamps = false;
 
     /**

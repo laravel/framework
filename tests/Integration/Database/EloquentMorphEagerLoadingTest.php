@@ -80,6 +80,7 @@ class Comment extends Model
 class Post extends Model
 {
     public $timestamps = false;
+
     protected $primaryKey = 'post_id';
 
     public function user()
@@ -96,5 +97,6 @@ class User extends Model
 class Video extends Model
 {
     public $timestamps = false;
+
     protected $primaryKey = 'video_id';
 }

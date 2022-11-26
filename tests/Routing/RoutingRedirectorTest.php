@@ -14,9 +14,13 @@ use Symfony\Component\HttpFoundation\HeaderBag;
 class RoutingRedirectorTest extends TestCase
 {
     protected $headers;
+
     protected $request;
+
     protected $url;
+
     protected $session;
+
     protected $redirect;
 
     protected function setUp(): void

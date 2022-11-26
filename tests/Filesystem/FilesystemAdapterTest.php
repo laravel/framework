@@ -23,7 +23,9 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class FilesystemAdapterTest extends TestCase
 {
     private $tempDir;
+
     private $filesystem;
+
     private $adapter;
 
     protected function setUp(): void

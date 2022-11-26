@@ -51,8 +51,11 @@ class EloquentLazyEagerLoadingTest extends DatabaseTestCase
 class Model1 extends Model
 {
     public $table = 'one';
+
     public $timestamps = false;
+
     protected $guarded = [];
+
     protected $with = ['twos'];
 
     public function twos()
@@ -69,7 +72,9 @@ class Model1 extends Model
 class Model2 extends Model
 {
     public $table = 'two';
+
     public $timestamps = false;
+
     protected $guarded = [];
 
     public function one()
@@ -81,7 +86,9 @@ class Model2 extends Model
 class Model3 extends Model
 {
     public $table = 'three';
+
     public $timestamps = false;
+
     protected $guarded = [];
 
     public function one()

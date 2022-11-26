@@ -217,6 +217,7 @@ class PrunableTestModelWithPrunableRecords extends Model
     use MassPrunable;
 
     protected $table = 'prunables';
+
     protected $connection = 'default';
 
     public function pruneAll()
@@ -238,6 +239,7 @@ class PrunableTestSoftDeletedModelWithPrunableRecords extends Model
     use MassPrunable, SoftDeletes;
 
     protected $table = 'prunables';
+
     protected $connection = 'default';
 
     public function prunable()

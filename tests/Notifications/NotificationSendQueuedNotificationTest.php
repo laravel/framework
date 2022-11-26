@@ -72,5 +72,6 @@ class NotifiableUser extends Model
     use Notifiable;
 
     public $table = 'users';
+
     public $timestamps = false;
 }

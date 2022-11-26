@@ -81,7 +81,9 @@ class EloquentModelJsonCastingTest extends DatabaseTestCase
 class JsonCast extends Model
 {
     public $table = 'json_casts';
+
     public $timestamps = false;
+
     protected $guarded = [];
 
     public $casts = [

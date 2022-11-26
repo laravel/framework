@@ -47,6 +47,7 @@ class EloquentHasOneOfManyTest extends DatabaseTestCase
 class User extends Model
 {
     protected $guarded = [];
+
     public $timestamps = false;
 
     public function latest_login()
@@ -58,5 +59,6 @@ class User extends Model
 class Login extends Model
 {
     protected $guarded = [];
+
     public $timestamps = false;
 }

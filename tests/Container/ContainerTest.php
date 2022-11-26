@@ -741,6 +741,7 @@ class ContainerNestedDependentStub
 class ContainerDefaultValueStub
 {
     public $stub;
+
     public $default;
 
     public function __construct(ContainerConcreteStub $stub, $default = 'taylor')
@@ -753,7 +754,9 @@ class ContainerDefaultValueStub
 class ContainerMixedPrimitiveStub
 {
     public $first;
+
     public $last;
+
     public $stub;
 
     public function __construct($first, ContainerConcreteStub $stub, $last)

@@ -513,7 +513,9 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
 class HasOneOfManyTestUser extends Eloquent
 {
     protected $table = 'users';
+
     protected $guarded = [];
+
     public $timestamps = false;
 
     public function logins()
@@ -634,7 +636,9 @@ class HasOneOfManyTestModel extends Eloquent
 class HasOneOfManyTestLogin extends Eloquent
 {
     protected $table = 'logins';
+
     protected $guarded = [];
+
     public $timestamps = false;
 }
 
@@ -643,23 +647,32 @@ class HasOneOfManyTestLoginWithSoftDeletes extends Eloquent
     use SoftDeletes;
 
     protected $table = 'logins';
+
     protected $guarded = [];
+
     public $timestamps = false;
 }
 
 class HasOneOfManyTestState extends Eloquent
 {
     protected $table = 'states';
+
     protected $guarded = [];
+
     public $timestamps = true;
+
     protected $fillable = ['type', 'state', 'updated_at'];
 }
 
 class HasOneOfManyTestPrice extends Eloquent
 {
     protected $table = 'prices';
+
     protected $guarded = [];
+
     public $timestamps = false;
+
     protected $fillable = ['published_at'];
+
     protected $casts = ['published_at' => 'datetime'];
 }

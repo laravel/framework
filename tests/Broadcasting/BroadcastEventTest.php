@@ -69,8 +69,11 @@ class BroadcastEventTest extends TestCase
 class TestBroadcastEvent
 {
     public $firstName = 'Taylor';
+
     public $lastName = 'Otwell';
+
     public $collection;
+
     private $title = 'Developer';
 
     public function __construct()

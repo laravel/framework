@@ -190,7 +190,9 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
 class EloquentModelEnumCastingTestModel extends Model
 {
     public $timestamps = false;
+
     protected $guarded = [];
+
     protected $table = 'enum_casts';
 
     public $casts = [

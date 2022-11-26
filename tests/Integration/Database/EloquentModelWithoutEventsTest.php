@@ -33,7 +33,9 @@ class EloquentModelWithoutEventsTest extends DatabaseTestCase
 class AutoFilledModel extends Model
 {
     public $table = 'auto_filled_models';
+
     public $timestamps = false;
+
     protected $guarded = [];
 
     public static function boot()

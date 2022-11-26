@@ -153,18 +153,23 @@ class EloquentCustomPivotCastTest extends DatabaseTestCase
 class CustomPivotCastTestUser extends Model
 {
     public $table = 'users';
+
     public $timestamps = false;
 }
 
 class CustomPivotCastTestProject extends Model
 {
     public $table = 'projects';
+
     public $timestamps = false;
 
     public function collaborators()
     {
         return $this->belongsToMany(
-            CustomPivotCastTestUser::class, 'project_users', 'project_id', 'user_id'
+            CustomPivotCastTestUser::class,
+            'project_users',
+            'project_id',
+            'user_id'
         )->using(CustomPivotCastTestCollaborator::class)->withPivot('permissions');
     }
 }

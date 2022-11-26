@@ -617,7 +617,10 @@ class DatabaseEloquentIntegrationTest extends TestCase
         EloquentTestNonIncrementingSecond::query()->eachById(
             function (EloquentTestNonIncrementingSecond $user, $i) use (&$users) {
                 $users[] = [$user->name, $i];
-            }, 2, 'name');
+            },
+            2,
+            'name'
+        );
         $this->assertSame([[' First', 0], [' Second', 1], [' Third', 2]], $users);
     }
 
@@ -1087,7 +1090,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $user = EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
 
         $user->posts()->create(['name' => 'Post 2'])
-             ->photos()->create(['name' => 'photo.jpg']);
+            ->photos()->create(['name' => 'photo.jpg']);
 
         $query = EloquentTestUser::has('postWithPhotos');
 
@@ -2132,7 +2135,9 @@ class DatabaseEloquentIntegrationTest extends TestCase
 class EloquentTestUser extends Eloquent
 {
     protected $table = 'users';
+
     protected $casts = ['birthday' => 'datetime'];
+
     protected $guarded = [];
 
     public function friends()
@@ -2179,7 +2184,7 @@ class EloquentTestUserWithCustomFriendPivot extends EloquentTestUser
     public function friends()
     {
         return $this->belongsToMany(EloquentTestUser::class, 'friends', 'user_id', 'friend_id')
-                        ->using(EloquentTestFriendPivot::class)->withPivot('user_id', 'friend_id', 'friend_level_id');
+            ->using(EloquentTestFriendPivot::class)->withPivot('user_id', 'friend_id', 'friend_level_id');
     }
 }
 
@@ -2191,8 +2196,11 @@ class EloquentTestUserWithSpaceInColumnName extends EloquentTestUser
 class EloquentTestNonIncrementing extends Eloquent
 {
     protected $table = 'non_incrementing_users';
+
     protected $guarded = [];
+
     public $incrementing = false;
+
     public $timestamps = false;
 }
 
@@ -2246,6 +2254,7 @@ class EloquentTestUserWithGlobalScopeRemovingOtherScope extends Eloquent
 class EloquentTestPost extends Eloquent
 {
     protected $table = 'posts';
+
     protected $guarded = [];
 
     public function user()
@@ -2277,18 +2286,21 @@ class EloquentTestPost extends Eloquent
 class EloquentTestTag extends Eloquent
 {
     protected $table = 'tags';
+
     protected $guarded = [];
 }
 
 class EloquentTestFriendLevel extends Eloquent
 {
     protected $table = 'friend_levels';
+
     protected $guarded = [];
 }
 
 class EloquentTestPhoto extends Eloquent
 {
     protected $table = 'photos';
+
     protected $guarded = [];
 
     public function imageable()
@@ -2315,7 +2327,9 @@ class EloquentTestUserWithCustomDateSerialization extends EloquentTestUser
 class EloquentTestOrder extends Eloquent
 {
     protected $guarded = [];
+
     protected $table = 'test_orders';
+
     protected $with = ['item'];
 
     public function item()
@@ -2327,15 +2341,20 @@ class EloquentTestOrder extends Eloquent
 class EloquentTestItem extends Eloquent
 {
     protected $guarded = [];
+
     protected $table = 'test_items';
+
     protected $connection = 'second_connection';
 }
 
 class EloquentTestWithJSON extends Eloquent
 {
     protected $guarded = [];
+
     protected $table = 'with_json';
+
     public $timestamps = false;
+
     protected $casts = [
         'json' => 'array',
     ];
@@ -2344,6 +2363,7 @@ class EloquentTestWithJSON extends Eloquent
 class EloquentTestFriendPivot extends Pivot
 {
     protected $table = 'friends';
+
     protected $guarded = [];
 
     public function user()
@@ -2365,12 +2385,14 @@ class EloquentTestFriendPivot extends Pivot
 class EloquentTouchingUser extends Eloquent
 {
     protected $table = 'users';
+
     protected $guarded = [];
 }
 
 class EloquentTouchingPost extends Eloquent
 {
     protected $table = 'posts';
+
     protected $guarded = [];
 
     protected $touches = [
@@ -2386,6 +2408,7 @@ class EloquentTouchingPost extends Eloquent
 class EloquentTouchingComment extends Eloquent
 {
     protected $table = 'comments';
+
     protected $guarded = [];
 
     protected $touches = [

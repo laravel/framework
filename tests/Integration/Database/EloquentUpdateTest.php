@@ -123,7 +123,9 @@ class EloquentUpdateTest extends DatabaseTestCase
 class TestUpdateModel1 extends Model
 {
     public $table = 'test_model1';
+
     public $timestamps = false;
+
     protected $guarded = [];
 }
 
@@ -132,6 +134,7 @@ class TestUpdateModel2 extends Model
     use SoftDeletes;
 
     public $table = 'test_model2';
+
     protected $fillable = ['name'];
 }
 
@@ -140,6 +143,8 @@ class TestUpdateModel3 extends Model
     use SoftDeletes;
 
     public $table = 'test_model3';
+
     protected $fillable = ['counter'];
+
     protected $casts = ['deleted_at' => 'datetime'];
 }

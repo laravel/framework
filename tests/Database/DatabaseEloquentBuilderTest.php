@@ -2240,6 +2240,7 @@ class EloquentBuilderTestHigherOrderWhereScopeStub extends Model
 class EloquentBuilderTestNestedStub extends Model
 {
     protected $table = 'table';
+
     use SoftDeletes;
 
     public function scopeEmpty($query)

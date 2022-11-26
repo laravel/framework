@@ -126,8 +126,11 @@ class DatabaseEloquentBelongsToManySyncTouchesParentTest extends TestCase
 class DatabaseEloquentBelongsToManySyncTouchesParentTestTestArticle extends Eloquent
 {
     protected $table = 'articles';
+
     protected $keyType = 'string';
+
     public $incrementing = false;
+
     protected $fillable = ['id', 'title'];
 
     public function users()
@@ -142,7 +145,9 @@ class DatabaseEloquentBelongsToManySyncTouchesParentTestTestArticle extends Eloq
 class DatabaseEloquentBelongsToManySyncTouchesParentTestTestArticleUser extends EloquentPivot
 {
     protected $table = 'article_user';
+
     protected $fillable = ['article_id', 'user_id'];
+
     protected $touches = ['article'];
 
     public function article()
@@ -159,8 +164,11 @@ class DatabaseEloquentBelongsToManySyncTouchesParentTestTestArticleUser extends 
 class DatabaseEloquentBelongsToManySyncTouchesParentTestTestUser extends Eloquent
 {
     protected $table = 'users';
+
     protected $keyType = 'string';
+
     public $incrementing = false;
+
     protected $fillable = ['id', 'email'];
 
     public function articles()

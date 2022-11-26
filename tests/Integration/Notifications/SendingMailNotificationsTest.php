@@ -22,6 +22,7 @@ use Orchestra\Testbench\TestCase;
 class SendingMailNotificationsTest extends TestCase
 {
     public $mailer;
+
     public $markdown;
 
     protected function tearDown(): void
@@ -338,6 +339,7 @@ class NotifiableUser extends Model
     use Notifiable;
 
     public $table = 'users';
+
     public $timestamps = false;
 }
 

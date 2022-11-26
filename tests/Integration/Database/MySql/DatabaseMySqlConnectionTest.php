@@ -13,8 +13,11 @@ use Illuminate\Support\Facades\Schema;
 class DatabaseMySqlConnectionTest extends MySqlTestCase
 {
     const TABLE = 'player';
+
     const FLOAT_COL = 'float_col';
+
     const JSON_COL = 'json_col';
+
     const FLOAT_VAL = 0.2;
 
     protected function defineDatabaseMigrationsAfterDatabaseRefreshed()

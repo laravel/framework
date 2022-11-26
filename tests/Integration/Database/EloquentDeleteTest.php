@@ -97,13 +97,16 @@ class EloquentDeleteTest extends DatabaseTestCase
 class Comment extends Model
 {
     public $table = 'comments';
+
     protected $fillable = ['post_id'];
 }
 
 class Role extends Model
 {
     use SoftDeletes;
+
     public $table = 'roles';
+
     protected $guarded = [];
 }
 

@@ -546,6 +546,7 @@ class ContainerTestContextInjectThree
 class ContainerTestContextInjectTwoInstances
 {
     public $implOne;
+
     public $implTwo;
 
     public function __construct(ContainerTestContextWithOptionalInnerDependency $implOne, ContainerTestContextInjectTwo $implTwo)
@@ -588,6 +589,7 @@ class ContainerTestContextInjectVariadic
 class ContainerTestContextInjectVariadicAfterNonVariadic
 {
     public $other;
+
     public $stubs;
 
     public function __construct(ContainerContextNonContractStub $other, IContainerContextContractStub ...$stubs)
@@ -600,7 +602,9 @@ class ContainerTestContextInjectVariadicAfterNonVariadic
 class ContainerTestContextInjectFromConfigIndividualValues
 {
     public $username;
+
     public $password;
+
     public $alias = null;
 
     public function __construct($username, $password, $alias = null)

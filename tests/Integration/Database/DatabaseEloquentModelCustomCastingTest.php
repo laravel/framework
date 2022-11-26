@@ -505,6 +505,7 @@ class ValueObjectWithCasterInstance extends ValueObject
 class Address
 {
     public $lineOne;
+
     public $lineTwo;
 
     public function __construct($lineOne, $lineTwo)
@@ -517,6 +518,7 @@ class Address
 class Settings
 {
     public ?bool $foo;
+
     public ?bool $bar;
 
     public function __construct(?bool $foo, ?bool $bar)
@@ -542,6 +544,7 @@ class Settings
 final class Decimal
 {
     private $value;
+
     private $scale;
 
     public function __construct($value)

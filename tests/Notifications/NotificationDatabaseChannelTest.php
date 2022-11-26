@@ -57,10 +57,10 @@ class NotificationDatabaseChannelTest extends TestCase
         $notifiable = m::mock();
 
         $notifiable->shouldReceive('routeNotificationFor->create')->with([
-            'id'        => 1,
-            'type'      => 'MONTHLY',
-            'data'      => ['invoice_id' => 1],
-            'read_at'   => null,
+            'id' => 1,
+            'type' => 'MONTHLY',
+            'data' => ['invoice_id' => 1],
+            'read_at' => null,
             'something' => 'else',
         ]);
 

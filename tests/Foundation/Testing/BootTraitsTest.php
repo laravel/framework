@@ -10,6 +10,7 @@ use ReflectionMethod;
 trait TestTrait
 {
     public $setUp = false;
+
     public $tearDown = false;
 
     public function setUpTestTrait()

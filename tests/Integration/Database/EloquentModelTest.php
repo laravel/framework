@@ -99,14 +99,19 @@ class EloquentModelTest extends DatabaseTestCase
 class TestModel1 extends Model
 {
     public $table = 'test_model1';
+
     public $timestamps = false;
+
     protected $guarded = [];
+
     protected $casts = ['nullable_date' => 'datetime'];
 }
 
 class TestModel2 extends Model
 {
     public $table = 'test_model2';
+
     public $timestamps = false;
+
     protected $guarded = [];
 }

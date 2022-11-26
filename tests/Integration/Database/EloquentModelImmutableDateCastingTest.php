@@ -49,7 +49,9 @@ class EloquentModelImmutableDateCastingTest extends DatabaseTestCase
 class TestModelImmutable extends Model
 {
     public $table = 'test_model_immutable';
+
     public $timestamps = false;
+
     protected $guarded = [];
 
     public $casts = [
@@ -61,7 +63,9 @@ class TestModelImmutable extends Model
 class TestModelCustomImmutable extends Model
 {
     public $table = 'test_model_immutable';
+
     public $timestamps = false;
+
     protected $guarded = [];
 
     public $casts = [

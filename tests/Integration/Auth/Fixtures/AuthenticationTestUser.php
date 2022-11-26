@@ -10,6 +10,7 @@ class AuthenticationTestUser extends Authenticatable
     use Notifiable;
 
     public $table = 'users';
+
     public $timestamps = false;
 
     /**

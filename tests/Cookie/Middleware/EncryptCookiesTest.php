@@ -30,6 +30,7 @@ class EncryptCookiesTest extends TestCase
     protected $router;
 
     protected $setCookiePath = 'cookie/set';
+
     protected $queueCookiePath = 'cookie/queue';
 
     protected function setUp(): void

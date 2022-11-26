@@ -1193,7 +1193,9 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 class User extends Model
 {
     public $table = 'users';
+
     public $timestamps = true;
+
     protected $guarded = [];
 
     protected static function boot()
@@ -1224,8 +1226,11 @@ class User extends Model
 class Post extends Model
 {
     public $table = 'posts';
+
     public $timestamps = true;
+
     protected $guarded = [];
+
     protected $touches = ['touchingTags'];
 
     protected static function boot()
@@ -1306,7 +1311,9 @@ class Post extends Model
 class Tag extends Model
 {
     public $table = 'tags';
+
     public $timestamps = true;
+
     protected $fillable = ['name', 'type'];
 
     public function posts()
@@ -1318,8 +1325,11 @@ class Tag extends Model
 class TouchingTag extends Model
 {
     public $table = 'tags';
+
     public $timestamps = true;
+
     protected $guarded = [];
+
     protected $touches = ['posts'];
 
     public function posts()
@@ -1331,7 +1341,9 @@ class TouchingTag extends Model
 class TagWithCustomPivot extends Model
 {
     public $table = 'tags';
+
     public $timestamps = true;
+
     protected $guarded = [];
 
     public function posts()
@@ -1358,7 +1370,9 @@ class PostTagPivot extends Pivot
 class TagWithGlobalScope extends Model
 {
     public $table = 'tags';
+
     public $timestamps = true;
+
     protected $guarded = [];
 
     public static function boot()

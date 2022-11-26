@@ -307,14 +307,18 @@ class ValidationExistsRuleTest extends TestCase
 class User extends Eloquent
 {
     protected $table = 'users';
+
     protected $guarded = [];
+
     public $timestamps = false;
 }
 
 class UserWithPrefixedTable extends Eloquent
 {
     protected $table = 'public.users';
+
     protected $guarded = [];
+
     public $timestamps = false;
 }
 
@@ -326,12 +330,14 @@ class UserWithConnection extends User
 class NoTableNameModel extends Eloquent
 {
     protected $guarded = [];
+
     public $timestamps = false;
 }
 
 class ClassWithRequiredConstructorParameters
 {
     private $bar;
+
     private $baz;
 
     public function __construct($bar, $baz)

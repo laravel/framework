@@ -634,6 +634,7 @@ class DatabaseEloquentCollectionTest extends TestCase
 class TestEloquentCollectionModel extends Model
 {
     protected $visible = ['visible'];
+
     protected $hidden = ['hidden'];
 
     public function getTestAttribute()
@@ -645,7 +646,9 @@ class TestEloquentCollectionModel extends Model
 class EloquentTestUserModel extends Model
 {
     protected $table = 'users';
+
     protected $guarded = [];
+
     public $timestamps = false;
 
     public function articles()
@@ -657,7 +660,9 @@ class EloquentTestUserModel extends Model
 class EloquentTestArticleModel extends Model
 {
     protected $table = 'articles';
+
     protected $guarded = [];
+
     public $timestamps = false;
 
     public function comments()
@@ -669,6 +674,8 @@ class EloquentTestArticleModel extends Model
 class EloquentTestCommentModel extends Model
 {
     protected $table = 'comments';
+
     protected $guarded = [];
+
     public $timestamps = false;
 }

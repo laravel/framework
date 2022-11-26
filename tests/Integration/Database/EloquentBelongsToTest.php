@@ -132,6 +132,7 @@ class EloquentBelongsToTest extends DatabaseTestCase
 class User extends Model
 {
     public $timestamps = false;
+
     protected $guarded = [];
 
     public function parent()

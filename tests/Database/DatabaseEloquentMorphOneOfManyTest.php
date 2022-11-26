@@ -206,7 +206,9 @@ class DatabaseEloquentMorphOneOfManyTest extends TestCase
 class MorphOneOfManyTestProduct extends Eloquent
 {
     protected $table = 'products';
+
     protected $guarded = [];
+
     public $timestamps = false;
 
     public function states()
@@ -233,7 +235,10 @@ class MorphOneOfManyTestProduct extends Eloquent
 class MorphOneOfManyTestState extends Eloquent
 {
     protected $table = 'states';
+
     protected $guarded = [];
+
     public $timestamps = false;
+
     protected $fillable = ['state', 'type'];
 }

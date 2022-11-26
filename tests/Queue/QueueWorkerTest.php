@@ -22,7 +22,9 @@ use RuntimeException;
 class QueueWorkerTest extends TestCase
 {
     public $events;
+
     public $exceptionHandler;
+
     public $maintenanceFlags;
 
     protected function setUp(): void
@@ -404,6 +406,7 @@ class QueueWorkerTest extends TestCase
 class InsomniacWorker extends Worker
 {
     public $sleptFor;
+
     public $stopOnMemoryExceeded = false;
 
     public function sleep($seconds)
@@ -475,22 +478,39 @@ class BrokenQueueConnection
 class WorkerFakeJob implements QueueJobContract
 {
     public $id = '';
+
     public $fired = false;
+
     public $callback;
+
     public $deleted = false;
+
     public $releaseAfter;
+
     public $released = false;
+
     public $maxTries;
+
     public $maxExceptions;
+
     public $shouldFailOnTimeout = false;
+
     public $uuid;
+
     public $backoff;
+
     public $retryUntil;
+
     public $attempts = 0;
+
     public $failedWith;
+
     public $failed = false;
+
     public $connectionName = '';
+
     public $queue = '';
+
     public $rawBody = '';
 
     public function __construct($callback = null)

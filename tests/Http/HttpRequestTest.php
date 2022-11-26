@@ -587,7 +587,7 @@ class HttpRequestTest extends TestCase
 
     public function testBooleanMethod()
     {
-        $request = Request::create('/', 'GET', ['with_trashed' => 'false', 'download' => true, 'checked' => 1, 'unchecked' => '0', 'with_on' => 'on', 'with_yes'=> 'yes']);
+        $request = Request::create('/', 'GET', ['with_trashed' => 'false', 'download' => true, 'checked' => 1, 'unchecked' => '0', 'with_on' => 'on', 'with_yes' => 'yes']);
         $this->assertTrue($request->boolean('checked'));
         $this->assertTrue($request->boolean('download'));
         $this->assertFalse($request->boolean('unchecked'));
@@ -605,8 +605,8 @@ class HttpRequestTest extends TestCase
             'zero_padded' => '078',
             'space_padded' => ' 901',
             'nan' => 'nan',
-            'mixed'=> '1ab',
-            'underscore_notation'=> '2_000',
+            'mixed' => '1ab',
+            'underscore_notation' => '2_000',
         ]);
         $this->assertSame(123, $request->integer('int'));
         $this->assertSame(456, $request->integer('raw_int'));
@@ -627,8 +627,8 @@ class HttpRequestTest extends TestCase
             'zero_padded' => '0.78',
             'space_padded' => ' 90.1',
             'nan' => 'nan',
-            'mixed'=> '1.ab',
-            'scientific_notation'=> '1e3',
+            'mixed' => '1.ab',
+            'scientific_notation' => '1e3',
         ]);
         $this->assertSame(1.23, $request->float('float'));
         $this->assertSame(45.6, $request->float('raw_float'));

@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 class DatabaseMigratorIntegrationTest extends TestCase
 {
     protected $db;
+
     protected $migrator;
 
     /**

@@ -144,6 +144,7 @@ class BusDispatcherTestCustomQueueCommand implements ShouldQueue
 class BusDispatcherTestSpecificQueueAndDelayCommand implements ShouldQueue
 {
     public $queue = 'foo';
+
     public $delay = 10;
 }
 

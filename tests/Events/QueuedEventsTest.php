@@ -250,6 +250,7 @@ class TestDispatcherMiddleware implements ShouldQueue
 class TestMiddleware
 {
     public $a;
+
     public $b;
 
     public function __construct($a, $b)

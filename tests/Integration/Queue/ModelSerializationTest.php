@@ -355,7 +355,9 @@ class ModelBootTestWithTraitInitialization extends Model
 class ModelSerializationTestUser extends Model
 {
     public $table = 'users';
+
     public $guarded = [];
+
     public $timestamps = false;
 }
 
@@ -379,7 +381,9 @@ class ModelSerializationTypedCustomCollectionTestClass
 class ModelSerializationTestCustomUser extends Model
 {
     public $table = 'users';
+
     public $guarded = [];
+
     public $timestamps = false;
 
     public function newCollection(array $models = [])
@@ -391,6 +395,7 @@ class ModelSerializationTestCustomUser extends Model
 class Order extends Model
 {
     public $guarded = [];
+
     public $timestamps = false;
 
     public function line()
@@ -412,6 +417,7 @@ class Order extends Model
 class Line extends Model
 {
     public $guarded = [];
+
     public $timestamps = false;
 
     public function product()
@@ -423,12 +429,14 @@ class Line extends Model
 class Product extends Model
 {
     public $guarded = [];
+
     public $timestamps = false;
 }
 
 class User extends Model
 {
     public $guarded = [];
+
     public $timestamps = false;
 
     public function roles()
@@ -441,6 +449,7 @@ class User extends Model
 class Role extends Model
 {
     public $guarded = [];
+
     public $timestamps = false;
 
     public function users()
@@ -453,6 +462,7 @@ class Role extends Model
 class RoleUser extends Pivot
 {
     public $guarded = [];
+
     public $timestamps = false;
 
     public function user()
@@ -483,7 +493,9 @@ class ModelSerializationAccessibleTestClass
     use SerializesModels;
 
     public $user;
+
     protected $user2;
+
     private $user3;
 
     public function __construct($user, $user2, $user3)

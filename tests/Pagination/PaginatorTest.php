@@ -34,7 +34,7 @@ class PaginatorTest extends TestCase
     public function testPaginatorRemovesTrailingSlashes()
     {
         $p = new Paginator($array = ['item1', 'item2', 'item3'], 2, 2,
-                                    ['path' => 'http://website.com/test/']);
+            ['path' => 'http://website.com/test/']);
 
         $this->assertSame('http://website.com/test?page=1', $p->previousPageUrl());
     }
@@ -42,7 +42,7 @@ class PaginatorTest extends TestCase
     public function testPaginatorGeneratesUrlsWithoutTrailingSlash()
     {
         $p = new Paginator($array = ['item1', 'item2', 'item3'], 2, 2,
-                                    ['path' => 'http://website.com/test']);
+            ['path' => 'http://website.com/test']);
 
         $this->assertSame('http://website.com/test?page=1', $p->previousPageUrl());
     }
@@ -58,7 +58,7 @@ class PaginatorTest extends TestCase
     public function testPaginatorReturnsPath()
     {
         $p = new Paginator($array = ['item1', 'item2', 'item3'], 2, 2,
-                                    ['path' => 'http://website.com/test']);
+            ['path' => 'http://website.com/test']);
 
         $this->assertSame($p->path(), 'http://website.com/test');
     }
@@ -66,7 +66,7 @@ class PaginatorTest extends TestCase
     public function testCanTransformPaginatorItems()
     {
         $p = new Paginator($array = ['item1', 'item2', 'item3'], 3, 1,
-                                    ['path' => 'http://website.com/test']);
+            ['path' => 'http://website.com/test']);
 
         $p->through(function ($item) {
             return substr($item, 4, 1);

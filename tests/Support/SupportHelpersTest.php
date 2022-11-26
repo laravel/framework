@@ -439,7 +439,7 @@ class SupportHelpersTest extends TestCase
             SupportTestTraitTwo::class => SupportTestTraitTwo::class,
             SupportTestTraitOne::class => SupportTestTraitOne::class,
         ],
-        class_uses_recursive(SupportTestClassTwo::class));
+            class_uses_recursive(SupportTestClassTwo::class));
     }
 
     public function testClassUsesRecursiveAcceptsObject()
@@ -448,7 +448,7 @@ class SupportHelpersTest extends TestCase
             SupportTestTraitTwo::class => SupportTestTraitTwo::class,
             SupportTestTraitOne::class => SupportTestTraitOne::class,
         ],
-        class_uses_recursive(new SupportTestClassTwo));
+            class_uses_recursive(new SupportTestClassTwo));
     }
 
     public function testClassUsesRecursiveReturnParentTraitsFirst()
@@ -458,7 +458,7 @@ class SupportHelpersTest extends TestCase
             SupportTestTraitOne::class => SupportTestTraitOne::class,
             SupportTestTraitThree::class => SupportTestTraitThree::class,
         ],
-        class_uses_recursive(SupportTestClassThree::class));
+            class_uses_recursive(SupportTestClassThree::class));
     }
 
     public function testTraitUsesRecursive()

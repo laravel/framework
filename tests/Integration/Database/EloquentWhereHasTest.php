@@ -110,7 +110,7 @@ class EloquentWhereHasTest extends DatabaseTestCase
         };
 
         return [
-            'Find user with post.public = true'  => $callbackArray(true),
+            'Find user with post.public = true' => $callbackArray(true),
             'Find user with post.public = false' => $callbackArray(false),
         ];
     }

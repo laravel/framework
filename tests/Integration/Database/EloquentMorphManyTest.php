@@ -53,8 +53,11 @@ class EloquentMorphManyTest extends DatabaseTestCase
 class Post extends Model
 {
     public $table = 'posts';
+
     public $timestamps = true;
+
     protected $guarded = [];
+
     protected $withCount = ['comments'];
 
     public function comments()
@@ -66,7 +69,9 @@ class Post extends Model
 class Comment extends Model
 {
     public $table = 'comments';
+
     public $timestamps = true;
+
     protected $guarded = [];
 
     public function commentable()

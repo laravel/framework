@@ -9,6 +9,7 @@ use Orchestra\Testbench\TestCase;
 class VerifyCsrfTokenExceptTest extends TestCase
 {
     private $stub;
+
     private $request;
 
     protected function setUp(): void

@@ -118,7 +118,9 @@ class EloquentModelDateCastingTest extends DatabaseTestCase
 class TestModel1 extends Model
 {
     public $table = 'test_model1';
+
     public $timestamps = false;
+
     protected $guarded = [];
 
     public $casts = [

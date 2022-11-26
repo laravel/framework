@@ -512,6 +512,7 @@ class TestEloquentModelWithAttributeCast extends Model
 class AttributeCastAddress
 {
     public $lineOne;
+
     public $lineTwo;
 
     public function __construct($lineOne, $lineTwo)

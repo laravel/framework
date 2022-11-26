@@ -1015,6 +1015,7 @@ class WelcomeMailableStub extends Mailable
 class MailableTestUserStub
 {
     public $name = 'Taylor Otwell';
+
     public $email = 'taylor@laravel.com';
 }
 

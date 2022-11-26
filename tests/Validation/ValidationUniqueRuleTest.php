@@ -108,26 +108,32 @@ class ValidationUniqueRuleTest extends TestCase
 class EloquentModelStub extends Model
 {
     protected $table = 'table';
+
     protected $primaryKey = 'id_column';
+
     protected $guarded = [];
 }
 
 class PrefixedTableEloquentModelStub extends Model
 {
     protected $table = 'public.table';
+
     protected $primaryKey = 'id_column';
+
     protected $guarded = [];
 }
 
 class NoTableName extends Model
 {
     protected $guarded = [];
+
     public $timestamps = false;
 }
 
 class ClassWithNonEmptyConstructor
 {
     private $bar;
+
     private $baz;
 
     public function __construct($bar, $baz)

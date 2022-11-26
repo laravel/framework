@@ -22,7 +22,9 @@ use stdClass;
 class AuthorizeMiddlewareTest extends TestCase
 {
     protected $container;
+
     protected $user;
+
     protected $router;
 
     protected function setUp(): void

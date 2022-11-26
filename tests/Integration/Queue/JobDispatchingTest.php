@@ -77,8 +77,11 @@ class Job implements ShouldQueue
     use Dispatchable, Queueable;
 
     public static $ran = false;
+
     public static $usedQueue = null;
+
     public static $usedConnection = null;
+
     public static $value = null;
 
     public function __construct($value)

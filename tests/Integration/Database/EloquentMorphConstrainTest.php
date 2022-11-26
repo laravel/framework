@@ -76,13 +76,17 @@ class Comment extends Model
 class Post extends Model
 {
     public $timestamps = false;
+
     protected $fillable = ['post_visible'];
+
     protected $casts = ['post_visible' => 'boolean'];
 }
 
 class Video extends Model
 {
     public $timestamps = false;
+
     protected $fillable = ['video_visible'];
+
     protected $casts = ['video_visible' => 'boolean'];
 }

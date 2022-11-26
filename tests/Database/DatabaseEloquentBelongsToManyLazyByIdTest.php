@@ -114,7 +114,9 @@ class DatabaseEloquentBelongsToManyLazyByIdTest extends TestCase
 class BelongsToManyLazyByIdTestTestUser extends Eloquent
 {
     protected $table = 'users';
+
     protected $fillable = ['id', 'email'];
+
     public $timestamps = false;
 
     public function articles()
@@ -126,9 +128,14 @@ class BelongsToManyLazyByIdTestTestUser extends Eloquent
 class BelongsToManyLazyByIdTestTestArticle extends Eloquent
 {
     protected $primaryKey = 'aid';
+
     protected $table = 'articles';
+
     protected $keyType = 'string';
+
     public $incrementing = false;
+
     public $timestamps = false;
+
     protected $fillable = ['aid', 'title'];
 }

@@ -7,6 +7,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 class AuthenticationTestUser extends Authenticatable
 {
     public $table = 'users';
+
     public $timestamps = false;
 
     /**
