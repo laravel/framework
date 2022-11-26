@@ -6,7 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class MorphModelMock
 {
-    public static function find($id) {
+    public static function find($id)
+    {
         return tap(new class extends Model{}, fn($model) => $model->id = $id);
     }
 }
