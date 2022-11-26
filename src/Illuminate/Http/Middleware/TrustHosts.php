@@ -28,7 +28,7 @@ abstract class TrustHosts
     /**
      * Get the host patterns that should be trusted.
      *
-     * @return array
+     * @return array<int, string|null>
      */
     abstract public function hosts();
 
