@@ -51,21 +51,21 @@ class Kernel implements KernelContract
     /**
      * The application's middleware stack.
      *
-     * @var array
+     * @var array<int, class-string|string>
      */
     protected $middleware = [];
 
     /**
      * The application's route middleware groups.
      *
-     * @var array
+     * @var array<string, array<int, class-string|string>>
      */
     protected $middlewareGroups = [];
 
     /**
      * The application's route middleware.
      *
-     * @var array
+     * @var array<string, class-string|string>
      */
     protected $routeMiddleware = [];
 
