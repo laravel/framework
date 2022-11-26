@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Http;
 
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Routing\Route;
@@ -644,6 +645,27 @@ class HttpRequestTest extends TestCase
         $this->assertEquals(TestEnum::test, $request->enum('valid_enum_value', TestEnum::class));
 
         $this->assertNull($request->enum('invalid_enum_value', TestEnum::class));
+    }
+
+    public function testMorphMethod()
+    {
+        Relation::$morphMap['ExistingMap'] = MorphModelMock::class;
+        $request = Request::create('/', 'GET', [
+            'something' => null,
+
+            'invalid_id' => 9999,
+            'invalid_type' => 'NonExistingMap',
+
+            'valid_id' => 1,
+            'valid_type' => 'ExistingMap',
+        ]);
+
+        $this->assertNull($request->morph('something'));
+        $this->assertNull($request->morph('invalid'));
+
+        $morph = $request->morph('valid');
+        $this->assertNotNull($morph);
+        $this->assertSame(1, $morph->id);
     }
 
     public function testArrayAccess()

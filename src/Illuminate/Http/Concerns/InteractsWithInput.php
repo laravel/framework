@@ -2,6 +2,8 @@
 
 namespace Illuminate\Http\Concerns;
 
+use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Date;
@@ -360,6 +362,29 @@ trait InteractsWithInput
         }
 
         return $enumClass::tryFrom($this->input($key));
+    }
+
+    /**
+     * Retrieve input from the request as a morphed eloquent model instance.
+     *
+     * @param  string  $morphable
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
+    public function morph($morphable)
+    {
+        $id = $morphable.'_id';
+        $type = $morphable.'_type';
+        if ($this->isNotFilled($id) || $this->isNotFilled($type)) {
+            return null;
+        }
+
+        /** @var class-string<\Illuminate\Database\Eloquent\Model>|null $class */
+        $class = Relation::getMorphedModel($this->input($type));
+        if (! $class) {
+            return null;
+        }
+
+        return $class::find($this->input($id));
     }
 
     /**
