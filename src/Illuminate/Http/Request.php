@@ -216,6 +216,19 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
+     * Determine if the request method matches a given pattern.
+     *
+     * @param  mixed  ...$patterns
+     * @return bool
+     */
+    public function methodIs(...$patterns)
+    {
+        $method = $this->method();
+
+        return collect($patterns)->contains(fn ($pattern) => Str::is($pattern, $method));
+    }
+
+    /**
      * Determine if the route name matches a given pattern.
      *
      * @param  mixed  ...$patterns

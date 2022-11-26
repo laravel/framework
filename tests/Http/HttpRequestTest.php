@@ -204,6 +204,31 @@ class HttpRequestTest extends TestCase
         $this->assertFalse($request->routeIs('foo.foo'));
     }
 
+    public function testMethodIsMethod()
+    {
+        $request = Request::create('/', 'GET');
+        $this->assertTrue($request->methodIs('GET'));
+        $request = Request::create('/', 'HEAD');
+        $this->assertTrue($request->methodIs('HEAD'));
+        $request = Request::create('/', 'POST');
+        $this->assertTrue($request->methodIs('POST'));
+        $request = Request::create('/', 'PUT');
+        $this->assertTrue($request->methodIs('PUT'));
+        $request = Request::create('/', 'PATCH');
+        $this->assertTrue($request->methodIs('PATCH'));
+        $request = Request::create('/', 'DELETE');
+        $this->assertTrue($request->methodIs('DELETE'));
+        $request = Request::create('/', 'OPTIONS');
+        $this->assertTrue($request->methodIs('OPTIONS'));
+        $request = Request::create('/', 'GET');
+        $this->assertTrue($request->methodIs('GET', 'POST'));
+
+        $request = Request::create('/', 'GET');
+        $this->assertFalse($request->methodIs('HEAD'));
+        $request = Request::create('/', 'GET');
+        $this->assertFalse($request->methodIs('POST', 'PUT'));
+    }
+
     public function testRouteMethod()
     {
         $request = Request::create('/foo/bar');
