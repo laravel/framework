@@ -302,7 +302,7 @@ class Router implements BindingRegistrar, RegistrarContract
                     'data' => is_array($data) ? $data : $data->toArray(),
                     'status' => is_array($status) ? 200 : $status,
                     'headers' => is_array($status) ? $status : $headers,
-                    'options' => $options
+                    'options' => $options,
                 ]);
     }
 
