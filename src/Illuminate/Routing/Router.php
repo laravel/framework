@@ -286,6 +286,27 @@ class Router implements BindingRegistrar, RegistrarContract
     }
 
     /**
+     * Register a new route that returns json.
+     *
+     * @param  string  $uri
+     * @param  array  $data
+     * @param  int|array  $status
+     * @param  array  $headers
+     * @param  int  $options
+     * @return \Illuminate\Routing\Route
+     */
+    public function json($uri, $data = [], $status = 200, array $headers = [], $options = 0)
+    {
+        return $this->match(['GET', 'HEAD'], $uri, '\Illuminate\Routing\JsonController')
+                ->setDefaults([
+                    'data' => $data,
+                    'status' => is_array($status) ? 200 : $status,
+                    'headers' => is_array($status) ? $status : $headers,
+                    'options' => $options
+                ]);
+    }
+
+    /**
      * Register a new route with the given verbs.
      *
      * @param  array|string  $methods
