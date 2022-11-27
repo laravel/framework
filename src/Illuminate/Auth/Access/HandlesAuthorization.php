@@ -36,7 +36,7 @@ trait HandlesAuthorization
      * @param  ?int  $code
      * @return \Illuminate\Auth\Access\Response
      */
-    public function denyWithStatus($status, $message = null, $code = null)
+    protected function denyWithStatus($status, $message = null, $code = null)
     {
         return Response::denyWithStatus($status, $message, $code);
     }
@@ -48,7 +48,7 @@ trait HandlesAuthorization
      * @param  ?int  $code
      * @return \Illuminate\Auth\Access\Response
      */
-    public function denyAsNotFound($message = null, $code = null)
+    protected function denyAsNotFound($message = null, $code = null)
     {
         return Response::denyWithStatus(404, $message, $code);
     }
