@@ -15,7 +15,7 @@ class DatabaseEloquentWithCastsTest extends TestCase
         $db = new DB;
 
         $db->addConnection([
-            'driver'   => 'sqlite',
+            'driver' => 'sqlite',
             'database' => ':memory:',
         ]);
 
