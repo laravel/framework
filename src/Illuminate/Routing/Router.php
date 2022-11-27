@@ -289,7 +289,7 @@ class Router implements BindingRegistrar, RegistrarContract
      * Register a new route that returns json.
      *
      * @param  string  $uri
-     * @param  array  $data
+     * @param  \Illuminate\Contracts\Support\Arrayable|array  $data
      * @param  int|array  $status
      * @param  array  $headers
      * @param  int  $options
@@ -299,7 +299,7 @@ class Router implements BindingRegistrar, RegistrarContract
     {
         return $this->match(['GET', 'HEAD'], $uri, '\Illuminate\Routing\JsonController')
                 ->setDefaults([
-                    'data' => $data,
+                    'data' => is_array($data) ? $data : $data->toArray(),
                     'status' => is_array($status) ? 200 : $status,
                     'headers' => is_array($status) ? $status : $headers,
                     'options' => $options
