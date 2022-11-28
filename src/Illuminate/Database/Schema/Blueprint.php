@@ -414,7 +414,7 @@ class Blueprint
     }
 
     /**
-     * Indicate that the given foreign key should be dropped.
+     * Indicate that the given foreign key should be dropped along with column.
      *
      * @param  \Illuminate\Database\Eloquent\Model|string  $model
      * @param  string|null  $column
@@ -425,6 +425,7 @@ class Blueprint
         if (is_string($model)) {
             $model = new $model;
         }
+
         $this->dropForeign([$column ?: $model->getForeignKey()]);
         return $this->dropColumn([$column?:$model->getForeignKey()]);;
     }
