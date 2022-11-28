@@ -369,6 +369,77 @@ class Router implements BindingRegistrar, RegistrarContract
     }
 
     /**
+     * Register an array of singleton resource controllers.
+     *
+     * @param  array  $singletons
+     * @param  array  $options
+     * @return void
+     */
+    public function singletons(array $singletons, array $options = [])
+    {
+        foreach ($singletons as $name => $controller) {
+            $this->singleton($name, $controller, $options);
+        }
+    }
+
+    /**
+     * Route a singleton resource to a controller.
+     *
+     * @param  string  $name
+     * @param  string  $controller
+     * @param  array  $options
+     * @return \Illuminate\Routing\PendingSingletonResourceRegistration
+     */
+    public function singleton($name, $controller, array $options = [])
+    {
+        if ($this->container && $this->container->bound(ResourceRegistrar::class)) {
+            $registrar = $this->container->make(ResourceRegistrar::class);
+        } else {
+            $registrar = new ResourceRegistrar($this);
+        }
+
+        return new PendingSingletonResourceRegistration(
+            $registrar, $name, $controller, $options
+        );
+    }
+
+    /**
+     * Register an array of API singleton resource controllers.
+     *
+     * @param  array  $singletons
+     * @param  array  $options
+     * @return void
+     */
+    public function apiSingletons(array $singletons, array $options = [])
+    {
+        foreach ($singletons as $name => $controller) {
+            $this->apiSingleton($name, $controller, $options);
+        }
+    }
+
+    /**
+     * Route an API singleton resource to a controller.
+     *
+     * @param  string  $name
+     * @param  string  $controller
+     * @param  array  $options
+     * @return \Illuminate\Routing\PendingSingletonResourceRegistration
+     */
+    public function apiSingleton($name, $controller, array $options = [])
+    {
+        $only = ['show', 'update', 'destroy'];
+
+        if (isset($options['except'])) {
+            $only = array_diff($only, (array) $options['except']);
+        }
+
+        return $this->singleton($name, $controller, array_merge([
+            'only' => $only,
+            'apiSingleton' => true,
+        ], $options));
+    }
+
+    /**
      * Create a route group with shared attributes.
      *
      * @param  array  $attributes
