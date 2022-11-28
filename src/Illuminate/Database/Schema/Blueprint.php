@@ -425,8 +425,8 @@ class Blueprint
         if (is_string($model)) {
             $model = new $model;
         }
-
-        return $this->dropForeign([$column ?: $model->getForeignKey()]);
+        $this->dropForeign([$column ?: $model->getForeignKey()]);
+        return $this->dropColumn([$column?:$model->getForeignKey()]);;
     }
 
     /**
