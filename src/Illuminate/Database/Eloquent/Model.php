@@ -946,14 +946,14 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * @param  float|int  $amount
      * @param  array  $extra
      * @param  string  $method
-     * @return int
+     * @return int|false
      */
     protected function incrementOrDecrement($column, $amount, $extra, $method)
     {
         $query = $this->newQueryWithoutRelationships();
 
         if (! $this->exists) {
-            return $query->{$method}($column, $amount, $extra);
+            return false;
         }
 
         $this->{$column} = $this->isClassDeviable($column)
