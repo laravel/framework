@@ -74,7 +74,6 @@ class MailMailableTest extends TestCase
         $mailable->to(collect([new MailableTestUserStub, new MailableTestUserStub]));
         $this->assertEquals([
             ['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com'],
-            ['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com'],
         ], $mailable->to);
         $this->assertTrue($mailable->hasTo(new MailableTestUserStub));
         $this->assertTrue($mailable->hasTo('taylor@laravel.com'));
@@ -151,7 +150,6 @@ class MailMailableTest extends TestCase
         $mailable = new WelcomeMailableStub;
         $mailable->cc(collect([new MailableTestUserStub, new MailableTestUserStub]));
         $this->assertEquals([
-            ['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com'],
             ['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com'],
         ], $mailable->cc);
         $this->assertTrue($mailable->hasCc(new MailableTestUserStub));
@@ -241,7 +239,6 @@ class MailMailableTest extends TestCase
         $mailable->bcc(collect([new MailableTestUserStub, new MailableTestUserStub]));
         $this->assertEquals([
             ['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com'],
-            ['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com'],
         ], $mailable->bcc);
         $this->assertTrue($mailable->hasBcc(new MailableTestUserStub));
         $this->assertTrue($mailable->hasBcc('taylor@laravel.com'));
@@ -330,7 +327,6 @@ class MailMailableTest extends TestCase
         $mailable->replyTo(collect([new MailableTestUserStub, new MailableTestUserStub]));
         $this->assertEquals([
             ['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com'],
-            ['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com'],
         ], $mailable->replyTo);
         $this->assertTrue($mailable->hasReplyTo(new MailableTestUserStub));
         $this->assertTrue($mailable->hasReplyTo('taylor@laravel.com'));
@@ -407,7 +403,6 @@ class MailMailableTest extends TestCase
         $mailable = new WelcomeMailableStub;
         $mailable->from(collect([new MailableTestUserStub, new MailableTestUserStub]));
         $this->assertEquals([
-            ['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com'],
             ['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com'],
         ], $mailable->from);
         $this->assertTrue($mailable->hasFrom(new MailableTestUserStub));
