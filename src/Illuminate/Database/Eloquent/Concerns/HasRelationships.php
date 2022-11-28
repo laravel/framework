@@ -70,7 +70,7 @@ trait HasRelationships
     }
 
     /**
-     * Return a dynamic relation resolver if defined or inherited, null otherwise
+     * Return a dynamic relation resolver if defined or inherited, null otherwise.
      *
      * @param  string  $class
      * @param  string  $key
@@ -82,7 +82,7 @@ trait HasRelationships
             return $resolver;
         }
 
-        if($parent = get_parent_class($class)) {
+        if ($parent = get_parent_class($class)) {
             return $this->relationResolver($parent, $key);
         }
 
