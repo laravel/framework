@@ -15,7 +15,7 @@ class {{ class }} extends Controller
      */
     public function store(Request $request)
     {
-        //
+        abort(404);
     }
 
     /**

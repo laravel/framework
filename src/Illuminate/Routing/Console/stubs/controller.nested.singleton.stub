@@ -17,7 +17,7 @@ class {{ class }} extends Controller
      */
     public function create({{ parentModel }} ${{ parentModelVariable }})
     {
-        //
+        abort(404);
     }
 
     /**
@@ -29,7 +29,7 @@ class {{ class }} extends Controller
      */
     public function store(Request $request, {{ parentModel }} ${{ parentModelVariable }})
     {
-        //
+        abort(404);
     }
 
     /**

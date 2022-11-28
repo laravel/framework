@@ -127,6 +127,10 @@ class ControllerMakeCommand extends GeneratorCommand
             $replace = $this->buildModelReplacements($replace);
         }
 
+        if ($this->option('creatable')) {
+            $replace['abort(404);'] = '//';
+        }
+
         $replace["use {$controllerNamespace}\Controller;\n"] = '';
 
         return str_replace(
@@ -290,6 +294,7 @@ class ControllerMakeCommand extends GeneratorCommand
             ['resource', 'r', InputOption::VALUE_NONE, 'Generate a resource controller class'],
             ['requests', 'R', InputOption::VALUE_NONE, 'Generate FormRequest classes for store and update'],
             ['singleton', 's', InputOption::VALUE_NONE, 'Generate a singleton resource controller class'],
+            ['creatable', null, InputOption::VALUE_NONE, 'Indicate that a singleton resource should be creatable'],
         ];
     }
 }
