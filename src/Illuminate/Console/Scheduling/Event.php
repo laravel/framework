@@ -157,6 +157,13 @@ class Event
     public $exitCode;
 
     /**
+     * The mutex name resolver callback.
+     *
+     * @var \Closure|null
+     */
+    public $createMutexNameCallback;
+
+    /**
      * Create a new event instance.
      *
      * @param  \Illuminate\Console\Scheduling\EventMutex  $mutex
@@ -935,7 +942,26 @@ class Event
      */
     public function mutexName()
     {
+        $createMutexNameUsing = $this->createMutexNameCallback;
+
+        if (! is_null($createMutexNameUsing) && is_callable($createMutexNameUsing)) {
+            return $createMutexNameUsing($this);
+        }
+
         return 'framework'.DIRECTORY_SEPARATOR.'schedule-'.sha1($this->expression.$this->command);
+    }
+
+    /**
+     * Set the mutex name resolver callback.
+     *
+     * @param  \Closure $callback
+     * @return $this
+     */
+    public function createMutexNameUsing(Closure $callback)
+    {
+        $this->createMutexNameCallback = $callback;
+
+        return $this;
     }
 
     /**

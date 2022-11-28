@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Console\Scheduling;
 
 use Illuminate\Console\Scheduling\Event;
 use Illuminate\Console\Scheduling\EventMutex;
+use Illuminate\Support\Str;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -93,5 +94,19 @@ class EventTest extends TestCase
         $event->dailyAt('10:15');
 
         $this->assertSame('10:15:00', $event->nextRunDate()->toTimeString());
+    }
+
+    public function testCustomMutexName()
+    {
+        $event = new Event(m::mock(EventMutex::class), 'php -i');
+        $event->description('Fancy command description');
+
+        $this->assertSame('framework/schedule-eeb46c93d45e928d62aaf684d727e213b7094822', $event->mutexName());
+
+        $event->createMutexNameUsing(function (Event $event) {
+            return Str::slug($event->description);
+        });
+
+        $this->assertSame('fancy-command-description', $event->mutexName());
     }
 }
