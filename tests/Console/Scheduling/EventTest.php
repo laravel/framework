@@ -101,7 +101,7 @@ class EventTest extends TestCase
         $event = new Event(m::mock(EventMutex::class), 'php -i');
         $event->description('Fancy command description');
 
-        $this->assertSame('framework/schedule-eeb46c93d45e928d62aaf684d727e213b7094822', $event->mutexName());
+        $this->assertSame('framework'.DIRECTORY_SEPARATOR.'schedule-eeb46c93d45e928d62aaf684d727e213b7094822', $event->mutexName());
 
         $event->createMutexNameUsing(function (Event $event) {
             return Str::slug($event->description);
