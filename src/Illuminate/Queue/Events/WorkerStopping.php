@@ -16,7 +16,7 @@ class WorkerStopping
     /**
      * The worker options.
      *
-     * @var WorkerOptions|null
+     * @var \Illuminate\Queue\WorkerOptions|null
      */
     public $workerOptions;
 
