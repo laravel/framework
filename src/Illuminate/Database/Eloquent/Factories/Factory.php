@@ -328,24 +328,14 @@ abstract class Factory
 
             $model->save();
 
-            $this->removeEmptyRelations($model);
+            foreach ($model->getRelations() as $name => $items) {
+                if ($items->isEmpty()) {
+                    $model->unsetRelation($name);
+                }
+            }
+
             $this->createChildren($model);
         });
-    }
-
-    /**
-     * Remove the empty relations to avoid issues with touch when testing.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return void
-     */
-    protected function removeEmptyRelations(Model $model)
-    {
-        foreach ($model->getRelations() as $name => $items) {
-            if ($items->isEmpty()) {
-                $model->unsetRelation($name);
-            }
-        }
     }
 
     /**
