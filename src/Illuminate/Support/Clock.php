@@ -23,6 +23,7 @@ class Clock implements ClockInterface
      *
      * @param  \DateTimeZone  $timezone
      * @return \DateTimeImmutable
+     *
      * @throws \Exception
      */
     public function withTimezone(DateTimeZone $timezone): DateTimeImmutable
