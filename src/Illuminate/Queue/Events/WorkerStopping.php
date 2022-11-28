@@ -14,7 +14,7 @@ class WorkerStopping
     public $status;
 
     /**
-     * The Worker Options
+     * The Worker Options.
      *
      * @var WorkerOptions|null
      */
@@ -24,7 +24,7 @@ class WorkerStopping
      * Create a new event instance.
      *
      * @param  int  $status
-     * @param WorkerOptions|null $workerOptions
+     * @param  WorkerOptions|null $workerOptions
      * @return void
      */
     public function __construct($status = 0, $workerOptions = null)

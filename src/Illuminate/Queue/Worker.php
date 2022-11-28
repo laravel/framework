@@ -710,7 +710,7 @@ class Worker
      * Stop listening and bail out of the script.
      *
      * @param  int  $status
-     * @param WorkerOptions|null $options
+     * @param  WorkerOptions|null $options
      * @return int
      */
     public function stop($status = 0, $options = null)
@@ -724,7 +724,7 @@ class Worker
      * Kill the process.
      *
      * @param  int  $status
-     * @param WorkerOptions|null $options
+     * @param  WorkerOptions|null $options
      * @return never
      */
     public function kill($status = 0, $options = null)
