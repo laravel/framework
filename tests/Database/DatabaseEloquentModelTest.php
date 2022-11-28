@@ -1896,6 +1896,18 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertNull($replicated->updated_at);
     }
 
+    public function testIncrementOnNonExistingItemReturnsFalse()
+    {
+        $model = m::mock(EloquentModelStub::class.'[newQueryWithoutRelationships]');
+        $model->exists = false;
+
+        $model->shouldReceive('newQueryWithoutRelationships')->andReturnNull();
+
+        $this->assertFalse($model->publicIncrement('foo', 1));
+
+        $this->assertFalse($model->publicDecrement('foo', 1));
+    }
+
     public function testIncrementOnExistingModelCallsQueryAndSetsAttribute()
     {
         $model = m::mock(EloquentModelStub::class.'[newQueryWithoutRelationships]');
@@ -2644,6 +2656,11 @@ class EloquentModelStub extends Model
     public function publicIncrement($column, $amount = 1, $extra = [])
     {
         return $this->increment($column, $amount, $extra);
+    }
+
+    public function publicDecrement($column, $amount = 1, $extra = [])
+    {
+        return $this->decrement($column, $amount, $extra);
     }
 
     public function publicIncrementQuietly($column, $amount = 1, $extra = [])
