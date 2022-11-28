@@ -11,11 +11,11 @@ breeze
 @else
 boom
 @endmaintenance';
-        $expected = "<?php if(app()->isDownForMaintenance()): ?>
+        $expected = '<?php if(app()->isDownForMaintenance()): ?>
 breeze
 <?php else: ?>
 boom
-<?php endif; ?>";
+<?php endif; ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 }

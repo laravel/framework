@@ -390,7 +390,7 @@ trait CompilesConditionals
      */
     protected function compileMaintenance()
     {
-        return "<?php if(app()->isDownForMaintenance()): ?>";
+        return '<?php if(app()->isDownForMaintenance()): ?>';
     }
 
     /**
