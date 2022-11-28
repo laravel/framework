@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Database\EloquentModelRefreshTest;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
@@ -23,8 +24,9 @@ class EloquentModelRefreshTest extends DatabaseTestCase
 
     public function testItRefreshesModelExcludedByGlobalScope()
     {
-        $post = Post::create(['title' => 'mohamed']);
+        $this->expectException(ModelNotFoundException::class);
 
+        $post = Post::create(['title' => 'mohamed']);
         $post->refresh();
     }
 
@@ -36,6 +38,7 @@ class EloquentModelRefreshTest extends DatabaseTestCase
 
         $this->assertFalse($post->trashed());
 
+        $this->expectException(ModelNotFoundException::class);
         $post->refresh();
 
         $this->assertTrue($post->trashed());
