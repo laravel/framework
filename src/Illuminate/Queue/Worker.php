@@ -677,11 +677,8 @@ class Worker
         pcntl_async_signals(true);
 
         pcntl_signal(SIGQUIT, fn () => $this->shouldQuit = true);
-
         pcntl_signal(SIGTERM, fn () => $this->shouldQuit = true);
-
         pcntl_signal(SIGUSR2, fn () => $this->paused = true);
-
         pcntl_signal(SIGCONT, fn () => $this->paused = false);
     }
 
@@ -724,7 +721,7 @@ class Worker
      * Kill the process.
      *
      * @param  int  $status
-     * @param  WorkerOptions|null  $options
+     * @param  \Illuminate\Queue\WorkerOptions|null  $options
      * @return never
      */
     public function kill($status = 0, $options = null)
