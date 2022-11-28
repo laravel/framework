@@ -356,6 +356,14 @@ class DatabaseEloquentFactoryTest extends TestCase
         unset($_SERVER['__test.role.creating-role'], $_SERVER['__test.role.creating-user']);
     }
 
+    public function test_belongs_to_many_relationship_related_models_set_on_instance_when_touching_owner()
+    {
+        $user = FactoryTestUserFactory::new()->create();
+        $role = FactoryTestRoleFactory::new()->hasAttached($user, [], 'users')->create();
+
+        $this->assertCount(1, $role->users);
+    }
+
     public function test_belongs_to_many_relationship_with_existing_model_instances()
     {
         $roles = FactoryTestRoleFactory::times(3)
@@ -912,6 +920,8 @@ class FactoryTestRoleFactory extends Factory
 class FactoryTestRole extends Eloquent
 {
     protected $table = 'roles';
+
+    protected $touches = ['users'];
 
     public function users()
     {

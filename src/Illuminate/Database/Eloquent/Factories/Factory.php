@@ -328,6 +328,12 @@ abstract class Factory
 
             $model->save();
 
+            foreach ($model->getRelations() as $name => $items) {
+                if ($items->isEmpty()) {
+                    $model->unsetRelation($name);
+                }
+            }
+
             $this->createChildren($model);
         });
     }
