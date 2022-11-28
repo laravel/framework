@@ -382,4 +382,24 @@ trait CompilesConditionals
     {
         return '<?php $__env->stopPush(); endif; ?>';
     }
+
+    /**
+     * Compile the maintenance statements into valid PHP.
+     *
+     * @return string
+     */
+    protected function compileMaintenance()
+    {
+        return "<?php if(app()->isDownForMaintenance()): ?>";
+    }
+
+    /**
+     * Compile the end-maintenance statements into valid PHP.
+     *
+     * @return string
+     */
+    protected function compileEndMaintenance()
+    {
+        return '<?php endif; ?>';
+    }
 }

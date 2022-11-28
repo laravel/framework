@@ -3,9 +3,12 @@
 namespace Illuminate\Foundation;
 
 use Illuminate\Contracts\Foundation\MaintenanceMode as MaintenanceModeContract;
+use Illuminate\Foundation\Concerns\HasPrerenderMode;
 
 class FileBasedMaintenanceMode implements MaintenanceModeContract
 {
+    use HasPrerenderMode;
+
     /**
      * Take the application down for maintenance.
      *

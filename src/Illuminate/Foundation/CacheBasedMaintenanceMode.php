@@ -5,9 +5,12 @@ namespace Illuminate\Foundation;
 use Illuminate\Contracts\Cache\Factory;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Foundation\MaintenanceMode;
+use Illuminate\Foundation\Concerns\HasPrerenderMode;
 
 class CacheBasedMaintenanceMode implements MaintenanceMode
 {
+    use HasPrerenderMode;
+
     /**
      * The cache factory.
      *

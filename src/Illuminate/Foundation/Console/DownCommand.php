@@ -130,6 +130,7 @@ class DownCommand extends Command
      */
     protected function prerenderView()
     {
+        $this->laravel->maintenanceMode()->prerenderMaintenance(true);
         (new RegisterErrorViewPaths)();
 
         return view($this->option('render'), [
