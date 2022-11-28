@@ -54,11 +54,10 @@ class QueueDatabaseQueueUnitTest extends TestCase
             return $uuid;
         });
 
-        $queue = $this->getMockBuilder(
-            DatabaseQueue::class)->onlyMethods(
-            ['currentTime'])->setConstructorArgs(
-            [$database = m::mock(Connection::class), 'table', 'default']
-        )->getMock();
+        $queue = $this->getMockBuilder(DatabaseQueue::class)
+            ->onlyMethods(['currentTime'])
+            ->setConstructorArgs([$database = m::mock(Connection::class), 'table', 'default'])
+            ->getMock();
         $queue->expects($this->any())->method('currentTime')->willReturn('time');
         $queue->setContainer($container = m::spy(Container::class));
         $database->shouldReceive('table')->with('table')->andReturn($query = m::mock(stdClass::class));
