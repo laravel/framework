@@ -954,7 +954,7 @@ class Event
     /**
      * Set the mutex name resolver callback.
      *
-     * @param  \Closure $callback
+     * @param  \Closure  $callback
      * @return $this
      */
     public function createMutexNameUsing(Closure $callback)
