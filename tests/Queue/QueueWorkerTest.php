@@ -40,9 +40,9 @@ class QueueWorkerTest extends TestCase
     {
         parent::tearDown();
 
-        Carbon::setTestNow(null);
+        Carbon::setTestNow();
 
-        Container::setInstance(null);
+        Container::setInstance();
     }
 
     public function testJobCanBeFired()
@@ -411,7 +411,7 @@ class InsomniacWorker extends Worker
         $this->sleptFor = $seconds;
     }
 
-    public function stop($status = 0)
+    public function stop($status = 0, $options = null)
     {
         return $status;
     }

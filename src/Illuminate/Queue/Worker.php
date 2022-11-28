@@ -143,7 +143,7 @@ class Worker
                 $status = $this->pauseWorker($options, $lastRestart);
 
                 if (! is_null($status)) {
-                    return $this->stop($status);
+                    return $this->stop($status, $options);
                 }
 
                 continue;
@@ -191,7 +191,7 @@ class Worker
             );
 
             if (! is_null($status)) {
-                return $this->stop($status);
+                return $this->stop($status, $options);
             }
         }
     }
@@ -223,7 +223,7 @@ class Worker
                 );
             }
 
-            $this->kill(static::EXIT_ERROR);
+            $this->kill(static::EXIT_ERROR, $options);
         });
 
         pcntl_alarm(
@@ -579,7 +579,7 @@ class Worker
      */
     protected function failJob($job, Throwable $e)
     {
-        return $job->fail($e);
+        $job->fail($e);
     }
 
     /**
@@ -676,21 +676,10 @@ class Worker
     {
         pcntl_async_signals(true);
 
-        pcntl_signal(SIGQUIT, function () {
-            $this->shouldQuit = true;
-        });
-
-        pcntl_signal(SIGTERM, function () {
-            $this->shouldQuit = true;
-        });
-
-        pcntl_signal(SIGUSR2, function () {
-            $this->paused = true;
-        });
-
-        pcntl_signal(SIGCONT, function () {
-            $this->paused = false;
-        });
+        pcntl_signal(SIGQUIT, fn () => $this->shouldQuit = true);
+        pcntl_signal(SIGTERM, fn () => $this->shouldQuit = true);
+        pcntl_signal(SIGUSR2, fn () => $this->paused = true);
+        pcntl_signal(SIGCONT, fn () => $this->paused = false);
     }
 
     /**
@@ -718,11 +707,12 @@ class Worker
      * Stop listening and bail out of the script.
      *
      * @param  int  $status
+     * @param  WorkerOptions|null  $options
      * @return int
      */
-    public function stop($status = 0)
+    public function stop($status = 0, $options = null)
     {
-        $this->events->dispatch(new WorkerStopping($status));
+        $this->events->dispatch(new WorkerStopping($status, $options));
 
         return $status;
     }
@@ -731,11 +721,12 @@ class Worker
      * Kill the process.
      *
      * @param  int  $status
+     * @param  \Illuminate\Queue\WorkerOptions|null  $options
      * @return never
      */
-    public function kill($status = 0)
+    public function kill($status = 0, $options = null)
     {
-        $this->events->dispatch(new WorkerStopping($status));
+        $this->events->dispatch(new WorkerStopping($status, $options));
 
         if (extension_loaded('posix')) {
             posix_kill(getmypid(), SIGKILL);
@@ -817,7 +808,7 @@ class Worker
     /**
      * Get the queue manager instance.
      *
-     * @return \Illuminate\Queue\QueueManager
+     * @return \Illuminate\Contracts\Queue\Factory
      */
     public function getManager()
     {
