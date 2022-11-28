@@ -39,6 +39,12 @@ class SupportStringableTest extends TestCase
         $this->assertFalse($this->stringable('2cdc7039-65a6-4ac7-8e5d-d554a98')->isUuid());
     }
 
+    public function testIsUlid()
+    {
+        $this->assertTrue($this->stringable('01GJSNW9MAF792C0XYY8RX6QFT')->isUlid());
+        $this->assertFalse($this->stringable('01GJSNW9MAF-792C0XYY8RX6ssssss-QFT')->isUlid());
+    }
+
     public function testIsJson()
     {
         $this->assertTrue($this->stringable('1')->isJson());
