@@ -334,7 +334,7 @@ abstract class Factory
     }
 
     /**
-     * Remove the empty relations to avoid issues with touch when testing
+     * Remove the empty relations to avoid issues with touch when testing.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return void
