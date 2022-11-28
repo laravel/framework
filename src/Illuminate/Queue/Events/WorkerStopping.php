@@ -2,8 +2,6 @@
 
 namespace Illuminate\Queue\Events;
 
-use Illuminate\Queue\WorkerOptions;
-
 class WorkerStopping
 {
     /**
