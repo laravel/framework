@@ -1,6 +1,26 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.41.0...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.42.0...9.x)
+
+
+## [v9.42.0](https://github.com/laravel/framework/compare/v9.41.0...v9.42.0) - 2022-11-29
+
+### Added
+- Added --rest option to queue:listen ([00a12e2](https://github.com/laravel/framework/commit/00a12e256f897d215012bddf76b6b6c0d66f7f67), [82fde9e](https://github.com/laravel/framework/commit/82fde9e0dc4f08f4c4db254b9449fd87652c40a6))
+- Added `Illuminate/Support/Stringable::isUlid()` ([#45100](https://github.com/laravel/framework/pull/45100))
+- Add news report_if and report_unless helpers functions ([#45093](https://github.com/laravel/framework/pull/45093))
+- Add callback to resolve custom mutex name of schedule events ([#45126](https://github.com/laravel/framework/pull/45126))
+- Add WorkOptions to WorkerStopping Event ([#45120](https://github.com/laravel/framework/pull/45120))
+- Added `singleton` and `creatable` options to `Illuminate/Routing/Console/ControllerMakeCommand` ([#44872](https://github.com/laravel/framework/pull/44872))
+
+### Fixed
+- Fix pure enums validation ([#45121](https://github.com/laravel/framework/pull/45121))
+- Prevent test issues with relations with the $touches property ([#45118](https://github.com/laravel/framework/pull/45118))
+- Fix factory breaking when trying to determine whether a relation is empty ([#45135](https://github.com/laravel/framework/pull/45135))
+
+### Changed
+- Allow set command description via AsCommand attribute ([#45117](https://github.com/laravel/framework/pull/45117))
+- Updated Mailable to prevent duplicated recipients ([#45119](https://github.com/laravel/framework/pull/45119))
 
 
 ## [v9.41.0](https://github.com/laravel/framework/compare/v9.40.1...v9.41.0) - 2022-11-22
