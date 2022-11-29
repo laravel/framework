@@ -15,6 +15,7 @@ use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Foundation\Bus\PendingClosureDispatch;
 use Illuminate\Foundation\Bus\PendingDispatch;
 use Illuminate\Foundation\Mix;
+use Illuminate\Http\Exceptions\HttpRedirectException;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Routing\Router;
@@ -661,6 +662,42 @@ if (! function_exists('redirect')) {
         }
 
         return app('redirect')->to($to, $status, $headers, $secure);
+    }
+}
+
+if (! function_exists('redirect_if')) {
+    /**
+     * Redirect if the given condition is true.
+     *
+     * @param  bool  $boolean
+     * @param  string  $to
+     * @param  int  $status
+     * @param  array  $headers
+     * @param  bool|null  $secure
+     * @throw \Illuminate\Http\Exceptions\HttpResponseException
+     */
+    function redirect_if($boolean, $to, $status = 302, $headers = [], $secure = null)
+    {
+        if ($boolean) {
+            throw new HttpRedirectException($to, $status, $headers, $secure);
+        }
+    }
+}
+
+if (! function_exists('redirect_unless')) {
+    /**
+     * Redirect if the given condition is false.
+     *
+     * @param  bool  $boolean
+     * @param  string  $to
+     * @param  int  $status
+     * @param  array  $headers
+     * @param  bool|null  $secure
+     * @throw \Illuminate\Http\Exceptions\HttpResponseException
+     */
+    function redirect_unless($boolean, $to, $status = 302, $headers = [], $secure = null)
+    {
+        redirect_if(! $boolean, $to, $status, $headers, $secure);
     }
 }
 

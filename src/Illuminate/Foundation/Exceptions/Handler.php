@@ -15,6 +15,7 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\MultipleRecordsFoundException;
 use Illuminate\Database\RecordsNotFoundException;
+use Illuminate\Http\Exceptions\HttpRedirectException;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -99,6 +100,7 @@ class Handler implements ExceptionHandlerContract
         AuthorizationException::class,
         BackedEnumCaseNotFoundException::class,
         HttpException::class,
+        HttpRedirectException::class,
         HttpResponseException::class,
         ModelNotFoundException::class,
         MultipleRecordsFoundException::class,
@@ -362,6 +364,10 @@ class Handler implements ExceptionHandlerContract
 
         if ($e instanceof Responsable) {
             return $e->toResponse($request);
+        }
+
+        if ($e instanceof HttpRedirectException) {
+            return redirect()->to($e->getUri(), $e->getStatusCode(), $e->getHeaders(), $e->getSecure());
         }
 
         $e = $this->prepareException($this->mapException($e));
