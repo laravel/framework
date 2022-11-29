@@ -55,22 +55,7 @@ trait HasRelationships
     protected static $relationResolvers = [];
 
     /**
-     * Define a dynamic relation resolver.
-     *
-     * @param  string  $name
-     * @param  \Closure  $callback
-     * @return void
-     */
-    public static function resolveRelationUsing($name, Closure $callback)
-    {
-        static::$relationResolvers = array_replace_recursive(
-            static::$relationResolvers,
-            [static::class => [$name => $callback]]
-        );
-    }
-
-    /**
-     * Return a dynamic relation resolver if defined or inherited, null otherwise.
+     * Get the dynamic relation resolver if defined or inherited, or return null.
      *
      * @param  string  $class
      * @param  string  $key
@@ -87,6 +72,21 @@ trait HasRelationships
         }
 
         return null;
+    }
+
+    /**
+     * Define a dynamic relation resolver.
+     *
+     * @param  string  $name
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public static function resolveRelationUsing($name, Closure $callback)
+    {
+        static::$relationResolvers = array_replace_recursive(
+            static::$relationResolvers,
+            [static::class => [$name => $callback]]
+        );
     }
 
     /**
