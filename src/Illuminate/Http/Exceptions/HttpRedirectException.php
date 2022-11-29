@@ -39,7 +39,7 @@ class HttpRedirectException extends RuntimeException
      *
      * @param  string  $uri
      * @param  int  $statusCode
-     * @param  array $headers
+     * @param  array  $headers
      * @param  bool|null  $secure
      * @return void
      */
