@@ -633,7 +633,7 @@ trait HasAttributes
      */
     public function hasDynamicAttribute($key)
     {
-        return isset($key, static::$dynamicAttributeMutatorCache[get_class($this)][$key]);
+        return isset(static::$dynamicAttributeMutatorCache[get_class($this)][$key]);
     }
 
     /**
