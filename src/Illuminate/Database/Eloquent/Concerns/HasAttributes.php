@@ -147,6 +147,27 @@ trait HasAttributes
     protected static $mutatorCache = [];
 
     /**
+     * The cache of the dynamic attributes.
+     *
+     * @var array
+     */
+    protected static $dynamicAttributeMutatorCache = [];
+
+    /**
+     * The cache of the dynamic get attributes.
+     *
+     * @var array
+     */
+    protected static $dynamicGetAttributeMutatorCache = [];
+
+    /**
+     * The cache of the dynamic set attributes.
+     *
+     * @var array
+     */
+    protected static $dynamicSetAttributeMutatorCache = [];
+
+    /**
      * The cache of the "Attribute" return type marked mutated attributes for each class.
      *
      * @var array
@@ -437,6 +458,7 @@ trait HasAttributes
         if (array_key_exists($key, $this->attributes) ||
             array_key_exists($key, $this->casts) ||
             $this->hasGetMutator($key) ||
+            $this->hasDynamicGetAttribute($key) ||
             $this->hasAttributeMutator($key) ||
             $this->isClassCastable($key)) {
             return $this->getAttributeValue($key);
@@ -604,6 +626,39 @@ trait HasAttributes
     }
 
     /**
+     * Determine if the model has a dynamic attribute.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function hasDynamicAttribute($key)
+    {
+        return array_key_exists($key, static::$dynamicAttributeMutatorCache[get_class($this)]);
+    }
+
+    /**
+     * Determine if the model has a dynamic get attribute.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function hasDynamicGetAttribute($key)
+    {
+        $class = get_class($this);
+
+        if (isset(static::$dynamicGetAttributeMutatorCache[$class][$key])) {
+            return static::$dynamicGetAttributeMutatorCache[$class][$key];
+        }
+
+        if (! $this->hasDynamicAttribute($key)) {
+            return static::$dynamicGetAttributeMutatorCache[$class][$key] = false;
+        }
+
+        return static::$dynamicGetAttributeMutatorCache[$class][$key] =
+            is_callable((static::$dynamicAttributeMutatorCache[$class][$key])->get);
+    }
+
+    /**
      * Determine if a "Attribute" return type marked mutator exists for an attribute.
      *
      * @param  string  $key
@@ -655,6 +710,37 @@ trait HasAttributes
     protected function mutateAttribute($key, $value)
     {
         return $this->{'get'.Str::studly($key).'Attribute'}($value);
+    }
+
+    /**
+     * Get the value of an attribute using its mutator.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return mixed
+     */
+    protected function mutateDynamicAttribute($key, $value)
+    {
+        if (array_key_exists($key, $this->attributeCastCache)) {
+            return $this->attributeCastCache[$key];
+        }
+
+        /** @var Attribute */
+        $attribute = static::$dynamicAttributeMutatorCache[get_class($this)][$key];
+
+        if ($attribute->get) {
+            $get = \Closure::bind($attribute->get, $this, static::class);
+
+            $value = call_user_func($get, $value, $this->attributes);
+        }
+
+        if ($attribute->withCaching || (is_object($value) && $attribute->withObjectCaching)) {
+            $this->attributeCastCache[$key] = $value;
+        } else {
+            unset($this->attributeCastCache[$key]);
+        }
+
+        return $value;
     }
 
     /**
@@ -949,6 +1035,8 @@ trait HasAttributes
         // this model, such as "json_encoding" a listing of data for storage.
         if ($this->hasSetMutator($key)) {
             return $this->setMutatedAttributeValue($key, $value);
+        } elseif ($this->hasDynamicSetAttribute($key)) {
+            return $this->setDynamicAttributeValue($key, $value);
         } elseif ($this->hasAttributeSetMutator($key)) {
             return $this->setAttributeMarkedMutatedAttributeValue($key, $value);
         }
@@ -1004,6 +1092,28 @@ trait HasAttributes
     }
 
     /**
+     * Determine if the model has a dynamic set attribute.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function hasDynamicSetAttribute($key)
+    {
+        $class = get_class($this);
+
+        if (isset(static::$dynamicSetAttributeMutatorCache[$class][$key])) {
+            return static::$dynamicSetAttributeMutatorCache[$class][$key];
+        }
+
+        if (! $this->hasDynamicAttribute($key)) {
+            return static::$dynamicSetAttributeMutatorCache[$class][$key] = false;
+        }
+
+        return static::$dynamicSetAttributeMutatorCache[$class][$key] =
+            is_callable((static::$dynamicAttributeMutatorCache[$class][$key])->set);
+    }
+
+    /**
      * Determine if an "Attribute" return type marked set mutator exists for an attribute.
      *
      * @param  string  $key
@@ -1039,6 +1149,38 @@ trait HasAttributes
     protected function setMutatedAttributeValue($key, $value)
     {
         return $this->{'set'.Str::studly($key).'Attribute'}($value);
+    }
+
+    /**
+     * Set the value of a Dynamic Attribute using its mutator.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return mixed
+     */
+    protected function setDynamicAttributeValue($key, $value)
+    {
+        $attribute = static::$dynamicAttributeMutatorCache[get_class($this)][$key];
+
+        $callback = $attribute->set ?
+            \Closure::bind($attribute->set, $this, static::class) :
+            function ($value) use ($key) {
+                $this->attributes[$key] = $value;
+            };
+
+        $this->attributes = array_merge(
+            $this->attributes,
+            $this->normalizeCastClassResponse(
+                $key,
+                $callback($value, $this->attributes)
+            )
+        );
+
+        if ($attribute->withCaching || (is_object($value) && $attribute->withObjectCaching)) {
+            $this->attributeCastCache[$key] = $value;
+        } else {
+            unset($this->attributeCastCache[$key]);
+        }
     }
 
     /**
@@ -2067,6 +2209,8 @@ trait HasAttributes
         // retrieval from the model to a form that is more useful for usage.
         if ($this->hasGetMutator($key)) {
             return $this->mutateAttribute($key, $value);
+        } elseif ($this->hasDynamicGetAttribute($key)) {
+            return $this->mutateDynamicAttribute($key, $value);
         } elseif ($this->hasAttributeGetMutator($key)) {
             return $this->mutateAttributeMarkedAttribute($key, $value);
         }
@@ -2150,6 +2294,26 @@ trait HasAttributes
         }
 
         return static::$mutatorCache[static::class];
+    }
+
+    /**
+     * Registers an dynamic attribute mutator to the model
+     *
+     * @param  string $key The attribute name
+     * @param  \Illuminate\Database\Eloquent\Casts\Attribute $func The mutator function
+     * @return void
+     *
+     * @throws \Exception If the function is called from an abstract class like \Illuminate\Database\Eloquent\Model
+     */
+    public static function registerDynamicAttribute($key, Attribute $attribute)
+    {
+        $class = static::class;
+
+        if ((new ReflectionClass($class))->isAbstract()) {
+            throw new \Exception("The class [$class] is abstract.");
+        }
+
+        static::$dynamicAttributeMutatorCache[$class][$key] = $attribute;
     }
 
     /**
