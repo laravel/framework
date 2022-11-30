@@ -2,6 +2,7 @@
 
 namespace Illuminate\Routing;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 class ResourceRegistrar
@@ -19,6 +20,13 @@ class ResourceRegistrar
      * @var string[]
      */
     protected $resourceDefaults = ['index', 'create', 'store', 'show', 'edit', 'update', 'destroy'];
+
+    /**
+     * The default actions for a singleton resource controller.
+     *
+     * @var string[]
+     */
+    protected $singletonResourceDefaults = ['show', 'edit', 'update'];
 
     /**
      * The parameters set for this resource instance.
@@ -117,6 +125,50 @@ class ResourceRegistrar
     }
 
     /**
+     * Route a singleton resource to a controller.
+     *
+     * @param  string  $name
+     * @param  string  $controller
+     * @param  array  $options
+     * @return \Illuminate\Routing\RouteCollection
+     */
+    public function singleton($name, $controller, array $options = [])
+    {
+        if (isset($options['parameters']) && ! isset($this->parameters)) {
+            $this->parameters = $options['parameters'];
+        }
+
+        // If the resource name contains a slash, we will assume the developer wishes to
+        // register these singleton routes with a prefix so we will set that up out of
+        // the box so they don't have to mess with it. Otherwise, we will continue.
+        if (str_contains($name, '/')) {
+            $this->prefixedSingleton($name, $controller, $options);
+
+            return;
+        }
+
+        $defaults = $this->singletonResourceDefaults;
+
+        $collection = new RouteCollection;
+
+        $resourceMethods = $this->getResourceMethods($defaults, $options);
+
+        foreach ($resourceMethods as $m) {
+            $route = $this->{'addSingleton'.ucfirst($m)}(
+                $name, $controller, $options
+            );
+
+            if (isset($options['bindingFields'])) {
+                $this->setResourceBindingFields($route, $options['bindingFields']);
+            }
+
+            $collection->add($route);
+        }
+
+        return $collection;
+    }
+
+    /**
      * Build a set of prefixed resource routes.
      *
      * @param  string  $name
@@ -133,6 +185,28 @@ class ResourceRegistrar
         // place-holder on the route parameters, which should be the base resources.
         $callback = function ($me) use ($name, $controller, $options) {
             $me->resource($name, $controller, $options);
+        };
+
+        return $this->router->group(compact('prefix'), $callback);
+    }
+
+    /**
+     * Build a set of prefixed singleton routes.
+     *
+     * @param  string  $name
+     * @param  string  $controller
+     * @param  array  $options
+     * @return void
+     */
+    protected function prefixedSingleton($name, $controller, array $options)
+    {
+        [$name, $prefix] = $this->getResourcePrefix($name);
+
+        // We need to extract the base resource from the resource name. Nested resources
+        // are supported in the framework, but we need to know what name to use for a
+        // place-holder on the route parameters, which should be the base resources.
+        $callback = function ($me) use ($name, $controller, $options) {
+            $me->singleton($name, $controller, $options);
         };
 
         return $this->router->group(compact('prefix'), $callback);
@@ -173,6 +247,16 @@ class ResourceRegistrar
 
         if (isset($options['except'])) {
             $methods = array_diff($methods, (array) $options['except']);
+        }
+
+        if (isset($options['creatable'])) {
+            $methods = isset($options['apiSingleton'])
+                            ? array_merge(['store', 'destroy'], $methods)
+                            : array_merge(['create', 'store', 'destroy'], $methods);
+
+            return $this->getResourceMethods(
+                $methods, array_values(Arr::except($options, ['creatable']))
+            );
         }
 
         return $methods;
@@ -312,6 +396,121 @@ class ResourceRegistrar
         $name = $this->getShallowName($name, $options);
 
         $uri = $this->getResourceUri($name).'/{'.$base.'}';
+
+        $action = $this->getResourceAction($name, $controller, 'destroy', $options);
+
+        return $this->router->delete($uri, $action);
+    }
+
+    /**
+     * Add the create method for a singleton route.
+     *
+     * @param  string  $name
+     * @param  string  $controller
+     * @param  array  $options
+     * @return \Illuminate\Routing\Route
+     */
+    protected function addSingletonCreate($name, $controller, $options)
+    {
+        $uri = $this->getResourceUri($name).'/'.static::$verbs['create'];
+
+        unset($options['missing']);
+
+        $action = $this->getResourceAction($name, $controller, 'create', $options);
+
+        return $this->router->get($uri, $action);
+    }
+
+    /**
+     * Add the store method for a singleton route.
+     *
+     * @param  string  $name
+     * @param  string  $controller
+     * @param  array  $options
+     * @return \Illuminate\Routing\Route
+     */
+    protected function addSingletonStore($name, $controller, $options)
+    {
+        $uri = $this->getResourceUri($name);
+
+        unset($options['missing']);
+
+        $action = $this->getResourceAction($name, $controller, 'store', $options);
+
+        return $this->router->post($uri, $action);
+    }
+
+    /**
+     * Add the show method for a singleton route.
+     *
+     * @param  string  $name
+     * @param  string  $controller
+     * @param  array  $options
+     * @return \Illuminate\Routing\Route
+     */
+    protected function addSingletonShow($name, $controller, $options)
+    {
+        $uri = $this->getResourceUri($name);
+
+        unset($options['missing']);
+
+        $action = $this->getResourceAction($name, $controller, 'show', $options);
+
+        return $this->router->get($uri, $action);
+    }
+
+    /**
+     * Add the edit method for a singleton route.
+     *
+     * @param  string  $name
+     * @param  string  $controller
+     * @param  array  $options
+     * @return \Illuminate\Routing\Route
+     */
+    protected function addSingletonEdit($name, $controller, $options)
+    {
+        $name = $this->getShallowName($name, $options);
+
+        $uri = $this->getResourceUri($name).'/'.static::$verbs['edit'];
+
+        $action = $this->getResourceAction($name, $controller, 'edit', $options);
+
+        return $this->router->get($uri, $action);
+    }
+
+    /**
+     * Add the update method for a singleton route.
+     *
+     * @param  string  $name
+     * @param  string  $base
+     * @param  string  $controller
+     * @param  array  $options
+     * @return \Illuminate\Routing\Route
+     */
+    protected function addSingletonUpdate($name, $controller, $options)
+    {
+        $name = $this->getShallowName($name, $options);
+
+        $uri = $this->getResourceUri($name);
+
+        $action = $this->getResourceAction($name, $controller, 'update', $options);
+
+        return $this->router->match(['PUT', 'PATCH'], $uri, $action);
+    }
+
+    /**
+     * Add the destroy method for a singleton route.
+     *
+     * @param  string  $name
+     * @param  string  $controller
+     * @param  array  $options
+     * @return \Illuminate\Routing\Route
+     */
+    protected function addSingletonDestroy($name, $controller, $options)
+    {
+        $name = $this->getShallowName($name, $options);
+
+        $uri = $this->getResourceUri($name);
 
         $action = $this->getResourceAction($name, $controller, 'destroy', $options);
 

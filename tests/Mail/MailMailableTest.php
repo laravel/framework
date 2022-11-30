@@ -71,10 +71,10 @@ class MailMailableTest extends TestCase
         $mailable->assertHasTo('taylor@laravel.com');
 
         $mailable = new WelcomeMailableStub;
-        $mailable->to(collect([new MailableTestUserStub, new MailableTestUserStub]));
+        $mailable->to(collect([new MailableTestUserStub, new MailableTestUserStub, new MailableTestUserStub2]));
         $this->assertEquals([
             ['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com'],
-            ['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com'],
+            ['name' => 'Laravel Framework', 'address' => 'contact@laravel.com'],
         ], $mailable->to);
         $this->assertTrue($mailable->hasTo(new MailableTestUserStub));
         $this->assertTrue($mailable->hasTo('taylor@laravel.com'));
@@ -149,10 +149,10 @@ class MailMailableTest extends TestCase
         $mailable->assertHasCc('taylor@laravel.com');
 
         $mailable = new WelcomeMailableStub;
-        $mailable->cc(collect([new MailableTestUserStub, new MailableTestUserStub]));
+        $mailable->cc(collect([new MailableTestUserStub, new MailableTestUserStub, new MailableTestUserStub2]));
         $this->assertEquals([
             ['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com'],
-            ['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com'],
+            ['name' => 'Laravel Framework', 'address' => 'contact@laravel.com'],
         ], $mailable->cc);
         $this->assertTrue($mailable->hasCc(new MailableTestUserStub));
         $this->assertTrue($mailable->hasCc('taylor@laravel.com'));
@@ -238,10 +238,10 @@ class MailMailableTest extends TestCase
         $mailable->assertHasBcc('taylor@laravel.com');
 
         $mailable = new WelcomeMailableStub;
-        $mailable->bcc(collect([new MailableTestUserStub, new MailableTestUserStub]));
+        $mailable->bcc(collect([new MailableTestUserStub, new MailableTestUserStub, new MailableTestUserStub2]));
         $this->assertEquals([
             ['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com'],
-            ['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com'],
+            ['name' => 'Laravel Framework', 'address' => 'contact@laravel.com'],
         ], $mailable->bcc);
         $this->assertTrue($mailable->hasBcc(new MailableTestUserStub));
         $this->assertTrue($mailable->hasBcc('taylor@laravel.com'));
@@ -327,10 +327,10 @@ class MailMailableTest extends TestCase
         $mailable->assertHasReplyTo('taylor@laravel.com');
 
         $mailable = new WelcomeMailableStub;
-        $mailable->replyTo(collect([new MailableTestUserStub, new MailableTestUserStub]));
+        $mailable->replyTo(collect([new MailableTestUserStub, new MailableTestUserStub, new MailableTestUserStub2]));
         $this->assertEquals([
             ['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com'],
-            ['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com'],
+            ['name' => 'Laravel Framework', 'address' => 'contact@laravel.com'],
         ], $mailable->replyTo);
         $this->assertTrue($mailable->hasReplyTo(new MailableTestUserStub));
         $this->assertTrue($mailable->hasReplyTo('taylor@laravel.com'));
@@ -405,10 +405,10 @@ class MailMailableTest extends TestCase
         $mailable->assertFrom('taylor@laravel.com');
 
         $mailable = new WelcomeMailableStub;
-        $mailable->from(collect([new MailableTestUserStub, new MailableTestUserStub]));
+        $mailable->from(collect([new MailableTestUserStub, new MailableTestUserStub, new MailableTestUserStub2]));
         $this->assertEquals([
             ['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com'],
-            ['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com'],
+            ['name' => 'Laravel Framework', 'address' => 'contact@laravel.com'],
         ], $mailable->from);
         $this->assertTrue($mailable->hasFrom(new MailableTestUserStub));
         $this->assertTrue($mailable->hasFrom('taylor@laravel.com'));
@@ -1016,6 +1016,12 @@ class MailableTestUserStub
 {
     public $name = 'Taylor Otwell';
     public $email = 'taylor@laravel.com';
+}
+
+class MailableTestUserStub2
+{
+    public $name = 'Laravel Framework';
+    public $email = 'contact@laravel.com';
 }
 
 class MailTestAttachable implements Attachable

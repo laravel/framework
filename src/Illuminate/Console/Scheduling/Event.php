@@ -150,6 +150,13 @@ class Event
     public $mutex;
 
     /**
+     * The mutex name resolver callback.
+     *
+     * @var \Closure|null
+     */
+    public $mutexNameResolver;
+
+    /**
      * The exit status code of the command.
      *
      * @var int|null
@@ -935,7 +942,26 @@ class Event
      */
     public function mutexName()
     {
+        $mutexNameResolver = $this->mutexNameResolver;
+
+        if (! is_null($mutexNameResolver) && is_callable($mutexNameResolver)) {
+            return $mutexNameResolver($this);
+        }
+
         return 'framework'.DIRECTORY_SEPARATOR.'schedule-'.sha1($this->expression.$this->command);
+    }
+
+    /**
+     * Set the mutex name or name resolver callback.
+     *
+     * @param  \Closure|string  $mutexName
+     * @return $this
+     */
+    public function createMutexNameUsing(Closure|string $mutexName)
+    {
+        $this->mutexNameResolver = is_string($mutexName) ? fn () => $mutexName : $mutexName;
+
+        return $this;
     }
 
     /**

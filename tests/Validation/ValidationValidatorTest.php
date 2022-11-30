@@ -4736,7 +4736,7 @@ class ValidationValidatorTest extends TestCase
     {
         // ['users'] -> if users is not empty it must be validated as array
         $trans = $this->getIlluminateArrayTranslator();
-        $v = new Validator($trans, ['users' => [['name' => 'Taylor'], ['name' => 'Abigail']]], ['users.*.name'=> 'required|string']);
+        $v = new Validator($trans, ['users' => [['name' => 'Taylor'], ['name' => 'Abigail']]], ['users.*.name' => 'required|string']);
         $v->sometimes(['users'], 'array', function ($i, $item) {
             return $item !== null;
         });
@@ -4744,7 +4744,7 @@ class ValidationValidatorTest extends TestCase
 
         // ['users'] -> if users is null no rules will be applied
         $trans = $this->getIlluminateArrayTranslator();
-        $v = new Validator($trans, ['users' => null], ['users.*.name'=> 'required|string']);
+        $v = new Validator($trans, ['users' => null], ['users.*.name' => 'required|string']);
         $v->sometimes(['users'], 'array', function ($i, $item) {
             return (bool) $item;
         });
@@ -4752,7 +4752,7 @@ class ValidationValidatorTest extends TestCase
 
         // ['company.users'] -> if users is not empty it must be validated as array
         $trans = $this->getIlluminateArrayTranslator();
-        $v = new Validator($trans, ['company' => ['users' => [['name' => 'Taylor'], ['name' => 'Abigail']]]], ['company.users.*.name'=> 'required|string']);
+        $v = new Validator($trans, ['company' => ['users' => [['name' => 'Taylor'], ['name' => 'Abigail']]]], ['company.users.*.name' => 'required|string']);
         $v->sometimes(['company.users'], 'array', function ($i, $item) {
             return $item->users !== null;
         });
@@ -4760,7 +4760,7 @@ class ValidationValidatorTest extends TestCase
 
         // ['company.users'] -> if users is null no rules will be applied
         $trans = $this->getIlluminateArrayTranslator();
-        $v = new Validator($trans, ['company' => ['users' => null]], ['company'=> 'required', 'company.users.*.name'=> 'required|string']);
+        $v = new Validator($trans, ['company' => ['users' => null]], ['company' => 'required', 'company.users.*.name' => 'required|string']);
         $v->sometimes(['company.users'], 'array', function ($i, $item) {
             return (bool) $item->users;
         });
@@ -4768,7 +4768,7 @@ class ValidationValidatorTest extends TestCase
 
         // ['company.*'] -> if users is not empty it must be validated as array
         $trans = $this->getIlluminateArrayTranslator();
-        $v = new Validator($trans, ['company' => ['users' => [['name' => 'Taylor'], ['name' => 'Abigail']]]], ['company.users.*.name'=> 'required|string']);
+        $v = new Validator($trans, ['company' => ['users' => [['name' => 'Taylor'], ['name' => 'Abigail']]]], ['company.users.*.name' => 'required|string']);
         $v->sometimes(['company.*'], 'array', function ($i, $item) {
             return $item !== null;
         });
@@ -4776,7 +4776,7 @@ class ValidationValidatorTest extends TestCase
 
         // ['company.*'] -> if users is null no rules will be applied
         $trans = $this->getIlluminateArrayTranslator();
-        $v = new Validator($trans, ['company' => ['users' => null]], ['company'=> 'required', 'company.users.*.name'=> 'required|string']);
+        $v = new Validator($trans, ['company' => ['users' => null]], ['company' => 'required', 'company.users.*.name' => 'required|string']);
         $v->sometimes(['company.*'], 'array', function ($i, $item) {
             return (bool) $item;
         });
@@ -4784,7 +4784,7 @@ class ValidationValidatorTest extends TestCase
 
         // ['users.*'] -> all nested array items in users must be validated as array
         $trans = $this->getIlluminateArrayTranslator();
-        $v = new Validator($trans, ['users' => [['name' => 'Taylor'], ['name' => 'Abigail']]], ['users.*.name'=> 'required|string']);
+        $v = new Validator($trans, ['users' => [['name' => 'Taylor'], ['name' => 'Abigail']]], ['users.*.name' => 'required|string']);
         $v->sometimes(['users.*'], 'array', function ($i, $item) {
             return (bool) $item;
         });
@@ -4792,7 +4792,7 @@ class ValidationValidatorTest extends TestCase
 
         // ['company.users.*'] -> all nested array items in users must be validated as array
         $trans = $this->getIlluminateArrayTranslator();
-        $v = new Validator($trans, ['company' => ['users' => [['name' => 'Taylor'], ['name' => 'Abigail']]]], ['company.users.*.name'=> 'required|string']);
+        $v = new Validator($trans, ['company' => ['users' => [['name' => 'Taylor'], ['name' => 'Abigail']]]], ['company.users.*.name' => 'required|string']);
         $v->sometimes(['company.users.*'], 'array', function () {
             return true;
         });
@@ -4800,7 +4800,7 @@ class ValidationValidatorTest extends TestCase
 
         // ['company.*.*'] -> all nested array items in users must be validated as array
         $trans = $this->getIlluminateArrayTranslator();
-        $v = new Validator($trans, ['company' => ['users' => [['name' => 'Taylor'], ['name' => 'Abigail']]]], ['company.users.*.name'=> 'required|string']);
+        $v = new Validator($trans, ['company' => ['users' => [['name' => 'Taylor'], ['name' => 'Abigail']]]], ['company.users.*.name' => 'required|string']);
         $v->sometimes(['company.*.*'], 'array', function ($i, $item) {
             return true;
         });
@@ -4905,7 +4905,7 @@ class ValidationValidatorTest extends TestCase
 
         // ['attendee.*'] -> if attendee name is set, all other fields will be required as well
         $trans = $this->getIlluminateArrayTranslator();
-        $v = new Validator($trans, ['attendee' => ['name' => 'Taylor', 'title' => 'Creator of Laravel', 'type' => 'Developer']], ['attendee.*'=> 'string']);
+        $v = new Validator($trans, ['attendee' => ['name' => 'Taylor', 'title' => 'Creator of Laravel', 'type' => 'Developer']], ['attendee.*' => 'string']);
         $v->sometimes(['attendee.*'], 'required', function ($i, $item) {
             return (bool) $item;
         });

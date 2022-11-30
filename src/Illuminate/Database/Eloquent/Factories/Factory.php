@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Enumerable;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\ForwardsCalls;
@@ -327,6 +328,12 @@ abstract class Factory
             }
 
             $model->save();
+
+            foreach ($model->getRelations() as $name => $items) {
+                if ($items instanceof Enumerable && $items->isEmpty()) {
+                    $model->unsetRelation($name);
+                }
+            }
 
             $this->createChildren($model);
         });

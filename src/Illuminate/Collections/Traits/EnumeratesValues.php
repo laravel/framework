@@ -780,7 +780,7 @@ trait EnumeratesValues
     /**
      * Create a collection of all elements that do not pass a given truth test.
      *
-     * @param  (callable(TValue, TKey): bool)|bool  $callback
+     * @param  (callable(TValue, TKey): bool)|bool|TValue  $callback
      * @return static
      */
     public function reject($callback = true)

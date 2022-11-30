@@ -532,7 +532,7 @@ trait HasAttributes
         }
 
         return method_exists($this, $key) ||
-            (static::$relationResolvers[get_class($this)][$key] ?? null);
+               $this->relationResolver(static::class, $key);
     }
 
     /**
