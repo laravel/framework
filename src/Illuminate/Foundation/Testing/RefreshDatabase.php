@@ -4,10 +4,13 @@ namespace Illuminate\Foundation\Testing;
 
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Testing\Traits\CanConfigureMigrationCommands;
+use Illuminate\Support\Facades\DB;
 
 trait RefreshDatabase
 {
     use CanConfigureMigrationCommands;
+
+    public static \PDO $cachedPdo;
 
     /**
      * Define hooks to migrate the database before and after each test.
@@ -16,6 +19,12 @@ trait RefreshDatabase
      */
     public function refreshDatabase()
     {
+        if (static::$cachedPdo) {
+            DB::setPdo(static::$cachedPdo);
+        } else {
+            static::$cachedPdo = DB::getPdo();
+        }
+
         $this->beforeRefreshingDatabase();
 
         $this->usingInMemoryDatabase()
