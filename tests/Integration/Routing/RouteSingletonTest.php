@@ -36,10 +36,10 @@ class RouteSingletonTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertSame('singleton update', $response->getContent());
 
-        $this->assertSame('http://localhost/avatar', route('avatar.destroy'));
-        $response = $this->delete('/avatar');
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertSame('singleton destroy', $response->getContent());
+        // $this->assertSame('http://localhost/avatar', route('avatar.destroy'));
+        // $response = $this->delete('/avatar');
+        // $this->assertEquals(404, $response->getStatusCode());
+        // $this->assertSame('singleton destroy', $response->getContent());
     }
 
     public function testCreatableSingleton()
@@ -55,6 +55,11 @@ class RouteSingletonTest extends TestCase
         $response = $this->post('/avatar');
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertSame('singleton store', $response->getContent());
+
+        $this->assertSame('http://localhost/avatar', route('avatar.destroy'));
+        $response = $this->delete('/avatar');
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertSame('singleton destroy', $response->getContent());
     }
 
     public function testApiSingleton()
