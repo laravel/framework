@@ -26,7 +26,7 @@ class ResourceRegistrar
      *
      * @var string[]
      */
-    protected $singletonResourceDefaults = ['show', 'edit', 'update', 'destroy'];
+    protected $singletonResourceDefaults = ['show', 'edit', 'update'];
 
     /**
      * The parameters set for this resource instance.
@@ -251,8 +251,8 @@ class ResourceRegistrar
 
         if (isset($options['creatable'])) {
             $methods = isset($options['apiSingleton'])
-                            ? array_merge(['store'], $methods)
-                            : array_merge(['create', 'store'], $methods);
+                            ? array_merge(['store', 'destroy'], $methods)
+                            : array_merge(['create', 'store', 'destroy'], $methods);
 
             return $this->getResourceMethods(
                 $methods, array_values(Arr::except($options, ['creatable']))

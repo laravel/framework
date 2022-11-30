@@ -52,6 +52,6 @@ class {{ class }} extends Controller
      */
     public function destroy({{ parentModel }} ${{ parentModelVariable }})
     {
-        //
+        abort(404);
     }
 }
