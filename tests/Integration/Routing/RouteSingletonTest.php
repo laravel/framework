@@ -36,10 +36,10 @@ class RouteSingletonTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertSame('singleton update', $response->getContent());
 
-        $this->assertSame('http://localhost/avatar', route('avatar.destroy'));
-        $response = $this->delete('/avatar');
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertSame('singleton destroy', $response->getContent());
+        // $this->assertSame('http://localhost/avatar', route('avatar.destroy'));
+        // $response = $this->delete('/avatar');
+        // $this->assertEquals(404, $response->getStatusCode());
+        // $this->assertSame('singleton destroy', $response->getContent());
     }
 
     public function testCreatableSingleton()
@@ -55,6 +55,11 @@ class RouteSingletonTest extends TestCase
         $response = $this->post('/avatar');
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertSame('singleton store', $response->getContent());
+
+        $this->assertSame('http://localhost/avatar', route('avatar.destroy'));
+        $response = $this->delete('/avatar');
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertSame('singleton destroy', $response->getContent());
     }
 
     public function testApiSingleton()
@@ -130,9 +135,9 @@ class RouteSingletonTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertSame('singleton update', $response->getContent());
 
-        $response = $this->delete('/avatar');
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertSame('singleton destroy', $response->getContent());
+        // $response = $this->delete('/avatar');
+        // $this->assertEquals(200, $response->getStatusCode());
+        // $this->assertSame('singleton destroy', $response->getContent());
     }
 
     public function testSingletonName()
@@ -152,6 +157,30 @@ class RouteSingletonTest extends TestCase
     public function testNestedSingleton()
     {
         Route::singleton('videos.thumbnail', NestedSingletonTestController::class);
+
+        $response = $this->get('/videos/123/thumbnail');
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertSame('singleton show for 123', $response->getContent());
+
+        $response = $this->get('/videos/123/thumbnail/edit');
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertSame('singleton edit for 123', $response->getContent());
+
+        $response = $this->put('/videos/123/thumbnail');
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertSame('singleton update for 123', $response->getContent());
+
+        $response = $this->patch('/videos/123/thumbnail');
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertSame('singleton update for 123', $response->getContent());
+
+        $response = $this->delete('/videos/123/thumbnail');
+        $this->assertEquals(405, $response->getStatusCode());
+    }
+
+    public function testCreatableNestedSingleton()
+    {
+        Route::singleton('videos.thumbnail', NestedSingletonTestController::class)->creatable();
 
         $response = $this->get('/videos/123/thumbnail');
         $this->assertEquals(200, $response->getStatusCode());
