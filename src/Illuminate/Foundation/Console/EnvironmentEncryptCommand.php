@@ -74,12 +74,6 @@ class EnvironmentEncryptCommand extends Command
 
         $keyPassed = $key !== null;
 
-        $keyPassedIsBase64 = false;
-        if ($keyPassed) {
-            $keyPassedIsBase64 = $this->isBase64Encoded($this->option('key'));
-            $key = $this->parseKey($this->option('key'));
-        }
-
         $environmentFile = $this->option('env')
                             ? base_path('.env').'.'.$this->option('env')
                             : $this->laravel->environmentFilePath();
@@ -103,7 +97,7 @@ class EnvironmentEncryptCommand extends Command
         }
 
         try {
-            $encrypter = new Encrypter($key, $cipher);
+            $encrypter = new Encrypter($this->parseKey($key), $cipher);
 
             $this->files->put(
                 $encryptedFile,
@@ -117,7 +111,7 @@ class EnvironmentEncryptCommand extends Command
 
         $this->components->info('Environment successfully encrypted.');
 
-        $this->components->twoColumnDetail('Key', ($keyPassed && ! $keyPassedIsBase64 ? $key : 'base64:'.base64_encode($key)));
+        $this->components->twoColumnDetail('Key', ($keyPassed ? $key : 'base64:'.base64_encode($key)));
         $this->components->twoColumnDetail('Cipher', $cipher);
         $this->components->twoColumnDetail('Encrypted file', $encryptedFile);
 
@@ -137,16 +131,5 @@ class EnvironmentEncryptCommand extends Command
         }
 
         return $key;
-    }
-
-    /**
-     * Checks if passed key is base64 encoded.
-     *
-     * @param  string  $key
-     * @return bool
-     */
-    protected function isBase64Encoded(string $key)
-    {
-        return Str::startsWith($key, 'base64:');
     }
 }
