@@ -197,7 +197,7 @@ class Repository implements ArrayAccess, CacheContract
     public function put($key, $value, $ttl = null)
     {
         if (is_array($key)) {
-            return $this->putMany($key, $value);
+            return $this->putMany($key, $ttl);
         }
 
         if ($ttl === null) {

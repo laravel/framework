@@ -148,8 +148,8 @@ class CacheRepositoryTest extends TestCase
     public function testPuttingMultipleItemsInCache()
     {
         $repo = $this->getRepository();
-        $repo->getStore()->shouldReceive('putMany')->once()->with(['foo' => 'bar', 'bar' => 'baz'], 1);
-        $repo->put(['foo' => 'bar', 'bar' => 'baz'], 1);
+        $repo->getStore()->shouldReceive('putMany')->once()->with(['foo' => 'bar', 'bar' => 'baz'], 10);
+        $repo->put(['foo' => 'bar', 'bar' => 'baz'], 1, 10);
     }
 
     public function testSettingMultipleItemsInCacheArray()
