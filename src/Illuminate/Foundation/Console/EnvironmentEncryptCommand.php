@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'env:encrypt')]
@@ -73,6 +74,10 @@ class EnvironmentEncryptCommand extends Command
 
         $keyPassed = $key !== null;
 
+        if ($keyPassed) {
+            $key = $this->parseKey($this->option('key'));
+        }
+
         $environmentFile = $this->option('env')
                             ? base_path('.env').'.'.$this->option('env')
                             : $this->laravel->environmentFilePath();
@@ -115,5 +120,20 @@ class EnvironmentEncryptCommand extends Command
         $this->components->twoColumnDetail('Encrypted file', $encryptedFile);
 
         $this->newLine();
+    }
+
+    /**
+     * Parse the encryption key.
+     *
+     * @param  string  $key
+     * @return string
+     */
+    protected function parseKey(string $key)
+    {
+        if (Str::startsWith($key, $prefix = 'base64:')) {
+            $key = base64_decode(Str::after($key, $prefix));
+        }
+
+        return $key;
     }
 }

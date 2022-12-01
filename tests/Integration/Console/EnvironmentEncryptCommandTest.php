@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Console;
 
+use Illuminate\Encryption\Encrypter;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\File;
 use Mockery as m;
@@ -119,5 +120,22 @@ class EnvironmentEncryptCommandTest extends TestCase
 
         $this->filesystem->shouldHaveReceived('put')
             ->with(base_path('.env.encrypted'), m::any());
+    }
+
+    public function testItEncryptsWithGivenGeneratedBase64Key()
+    {
+        $this->filesystem->shouldReceive('exists')
+            ->once()
+            ->andReturn(true)
+            ->shouldReceive('exists')
+            ->once()
+            ->andReturn(false);
+
+        $key = Encrypter::generateKey('AES-256-CBC');
+
+        $this->artisan('env:encrypt', ['--key' => 'base64:'.base64_encode($key)])
+            ->expectsOutputToContain('Environment successfully encrypted')
+            ->expectsOutputToContain('.env.encrypted')
+            ->assertExitCode(0);
     }
 }
