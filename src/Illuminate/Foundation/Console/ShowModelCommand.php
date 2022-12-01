@@ -10,6 +10,7 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Database\Console\DatabaseInspectionCommand;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use ReflectionClass;
 use ReflectionMethod;
@@ -104,6 +105,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
             $this->getAttributes($model),
             $this->getRelations($model),
             $this->getObservers($model),
+            $this->getPolicies($model),
         );
     }
 
@@ -259,6 +261,21 @@ class ShowModelCommand extends DatabaseInspectionCommand
     }
 
     /**
+     * Get the policies watching this model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return Illuminate\Support\Collection
+     */
+    protected function getPolicies($model)
+    {
+        $policies = Gate::policies();
+
+        return collect($policies)
+            ->filter(fn ($policy, $modelClass) => $modelClass === get_class($model))
+            ->values();
+    }
+
+    /**
      * Render the model information.
      *
      * @param  string  $class
@@ -269,11 +286,11 @@ class ShowModelCommand extends DatabaseInspectionCommand
      * @param  \Illuminate\Support\Collection  $observers
      * @return void
      */
-    protected function display($class, $database, $table, $attributes, $relations, $observers)
+    protected function display($class, $database, $table, $attributes, $relations, $observers, $policies)
     {
         $this->option('json')
-            ? $this->displayJson($class, $database, $table, $attributes, $relations, $observers)
-            : $this->displayCli($class, $database, $table, $attributes, $relations, $observers);
+            ? $this->displayJson($class, $database, $table, $attributes, $relations, $observers, $policies)
+            : $this->displayCli($class, $database, $table, $attributes, $relations, $observers, $policies);
     }
 
     /**
@@ -287,7 +304,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
      * @param  \Illuminate\Support\Collection  $observers
      * @return void
      */
-    protected function displayJson($class, $database, $table, $attributes, $relations, $observers)
+    protected function displayJson($class, $database, $table, $attributes, $relations, $observers, $policies)
     {
         $this->output->writeln(
             collect([
@@ -297,6 +314,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
                 'attributes' => $attributes,
                 'relations' => $relations,
                 'observers' => $observers,
+                'policies' => $policies,
             ])->toJson()
         );
     }
@@ -310,9 +328,10 @@ class ShowModelCommand extends DatabaseInspectionCommand
      * @param  \Illuminate\Support\Collection  $attributes
      * @param  \Illuminate\Support\Collection  $relations
      * @param  \Illuminate\Support\Collection  $observers
+     * @param  \Illuminate\Support\Collection  $policies
      * @return void
      */
-    protected function displayCli($class, $database, $table, $attributes, $relations, $observers)
+    protected function displayCli($class, $database, $table, $attributes, $relations, $observers, $policies)
     {
         $this->newLine();
 
@@ -370,7 +389,22 @@ class ShowModelCommand extends DatabaseInspectionCommand
         if ($observers->count()) {
             foreach ($observers as $observer) {
                 $this->components->twoColumnDetail(
-                    sprintf('%s', $observer['event']), implode(', ', $observer['observer']));
+                    sprintf('%s', $observer['event']),
+                    implode(', ', $observer['observer'])
+                );
+            }
+        }
+
+        $this->newLine();
+
+        $this->components->twoColumnDetail('<fg=green;options=bold>Policies</>');
+
+        if ($policies->count()) {
+            foreach ($policies as $policy) {
+                $this->components->twoColumnDetail(
+                    '<fg=gray>Policy</>',
+                    sprintf('%s', $policy)
+                );
             }
         }
 
