@@ -402,7 +402,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
         if ($policies->count()) {
             foreach ($policies as $policy) {
                 $this->components->twoColumnDetail(
-                    '<fg=gray>Policy</>',
+                    'Policy',
                     sprintf('%s', $policy)
                 );
             }
