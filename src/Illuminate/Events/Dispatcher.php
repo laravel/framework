@@ -94,7 +94,9 @@ class Dispatcher implements DispatcherContract
             if (str_contains($event, '*')) {
                 $this->setupWildcardListen($event, $listener);
             } else {
-                $this->listeners[$event][] = $listener;
+                if (!in_array($listener, Arr::get($this->listeners, $event, []))) {
+                    $this->listeners[$event][] = $listener;
+                }
             }
         }
     }
