@@ -89,7 +89,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
 
         try {
             $model = $this->laravel->make($class);
-            $class = ($class === get_class($model)) ? $class : get_class($model) . " (searched: {$this->argument('model')})";
+            $class = ($class === get_class($model)) ? $class : get_class($model)." (searched: {$this->argument('model')})";
         } catch (BindingResolutionException $e) {
             return $this->components->error($e->getMessage());
         }
