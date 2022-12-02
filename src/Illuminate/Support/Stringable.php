@@ -502,7 +502,7 @@ class Stringable implements JsonSerializable
      * Parse a Class@method style callback into class and method.
      *
      * @param  string|null  $default
-     * @return array
+     * @return array<int, string|null>
      */
     public function parseCallback($default = null)
     {
@@ -523,7 +523,7 @@ class Stringable implements JsonSerializable
     /**
      * Get the plural form of an English word.
      *
-     * @param  int  $count
+     * @param  int|array|\Countable  $count
      * @return static
      */
     public function plural($count = 2)
