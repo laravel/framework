@@ -1017,6 +1017,18 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Execute the given callback if the string is a valid ULID.
+     *
+     * @param  callable  $callback
+     * @param  callable|null  $default
+     * @return static
+     */
+    public function whenIsUlid($callback, $default = null)
+    {
+        return $this->when($this->isUlid(), $callback, $default);
+    }
+
+    /**
      * Execute the given callback if the string starts with a given substring.
      *
      * @param  string|iterable<string>  $needles
