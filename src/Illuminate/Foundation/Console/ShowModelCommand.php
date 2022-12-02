@@ -102,11 +102,25 @@ class ShowModelCommand extends DatabaseInspectionCommand
             $class,
             $model->getConnection()->getName(),
             $model->getConnection()->getTablePrefix().$model->getTable(),
+            $this->getPolicy($model),
             $this->getAttributes($model),
             $this->getRelations($model),
             $this->getObservers($model),
-            $this->getPolicies($model),
         );
+    }
+
+    /**
+     * Get the first policy associated with this model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return Illuminate\Support\Collection
+     */
+    protected function getPolicy($model)
+    {
+        return collect(Gate::policies())
+            ->filter(fn ($policy, $modelClass) => $modelClass === get_class($model))
+            ->values()
+            ->first();
     }
 
     /**
@@ -261,36 +275,22 @@ class ShowModelCommand extends DatabaseInspectionCommand
     }
 
     /**
-     * Get the policies watching this model.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return Illuminate\Support\Collection
-     */
-    protected function getPolicies($model)
-    {
-        $policies = Gate::policies();
-
-        return collect($policies)
-            ->filter(fn ($policy, $modelClass) => $modelClass === get_class($model))
-            ->values();
-    }
-
-    /**
      * Render the model information.
      *
      * @param  string  $class
      * @param  string  $database
      * @param  string  $table
+     * @param  string  $policy
      * @param  \Illuminate\Support\Collection  $attributes
      * @param  \Illuminate\Support\Collection  $relations
      * @param  \Illuminate\Support\Collection  $observers
      * @return void
      */
-    protected function display($class, $database, $table, $attributes, $relations, $observers, $policies)
+    protected function display($class, $database, $table, $policy, $attributes, $relations, $observers)
     {
         $this->option('json')
-            ? $this->displayJson($class, $database, $table, $attributes, $relations, $observers, $policies)
-            : $this->displayCli($class, $database, $table, $attributes, $relations, $observers, $policies);
+            ? $this->displayJson($class, $database, $table, $policy, $attributes, $relations, $observers)
+            : $this->displayCli($class, $database, $table, $policy, $attributes, $relations, $observers);
     }
 
     /**
@@ -299,22 +299,23 @@ class ShowModelCommand extends DatabaseInspectionCommand
      * @param  string  $class
      * @param  string  $database
      * @param  string  $table
+     * @param  string  $policy
      * @param  \Illuminate\Support\Collection  $attributes
      * @param  \Illuminate\Support\Collection  $relations
      * @param  \Illuminate\Support\Collection  $observers
      * @return void
      */
-    protected function displayJson($class, $database, $table, $attributes, $relations, $observers, $policies)
+    protected function displayJson($class, $database, $table, $policy, $attributes, $relations, $observers)
     {
         $this->output->writeln(
             collect([
                 'class' => $class,
                 'database' => $database,
                 'table' => $table,
+                'policy' => $policy,
                 'attributes' => $attributes,
                 'relations' => $relations,
                 'observers' => $observers,
-                'policies' => $policies,
             ])->toJson()
         );
     }
@@ -325,19 +326,23 @@ class ShowModelCommand extends DatabaseInspectionCommand
      * @param  string  $class
      * @param  string  $database
      * @param  string  $table
+     * @param  string  $policy
      * @param  \Illuminate\Support\Collection  $attributes
      * @param  \Illuminate\Support\Collection  $relations
      * @param  \Illuminate\Support\Collection  $observers
-     * @param  \Illuminate\Support\Collection  $policies
      * @return void
      */
-    protected function displayCli($class, $database, $table, $attributes, $relations, $observers, $policies)
+    protected function displayCli($class, $database, $table, $policy, $attributes, $relations, $observers)
     {
         $this->newLine();
 
         $this->components->twoColumnDetail('<fg=green;options=bold>'.$class.'</>');
         $this->components->twoColumnDetail('Database', $database);
         $this->components->twoColumnDetail('Table', $table);
+
+        if ($policy) {
+            $this->components->twoColumnDetail('Policy', $policy);
+        }
 
         $this->newLine();
 
@@ -391,19 +396,6 @@ class ShowModelCommand extends DatabaseInspectionCommand
                 $this->components->twoColumnDetail(
                     sprintf('%s', $observer['event']),
                     implode(', ', $observer['observer'])
-                );
-            }
-        }
-
-        $this->newLine();
-
-        $this->components->twoColumnDetail('<fg=green;options=bold>Policies</>');
-
-        if ($policies->count()) {
-            foreach ($policies as $policy) {
-                $this->components->twoColumnDetail(
-                    'Policy',
-                    sprintf('%s', $policy)
                 );
             }
         }
