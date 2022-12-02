@@ -1166,7 +1166,7 @@ class Validator implements ValidatorContract
      * Get the data that should be injected into the iteration of a wildcard "sometimes" callback.
      *
      * @param  string  $attribute
-     * @return \Illuminate\Support\Fluent|array|mixed
+     * @return \Illuminate\Support\Fluent|mixed
      */
     private function dataForSometimesIteration(string $attribute, $removeLastSegmentOfAttribute)
     {

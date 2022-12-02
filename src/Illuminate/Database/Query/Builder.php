@@ -241,7 +241,7 @@ class Builder implements BuilderContract
     /**
      * Set the columns to be selected.
      *
-     * @param  array|mixed  $columns
+     * @param  mixed  $columns
      * @return $this
      */
     public function select($columns = ['*'])
@@ -396,7 +396,7 @@ class Builder implements BuilderContract
     /**
      * Add a new select column to the query.
      *
-     * @param  array|mixed  $column
+     * @param  mixed  $column
      * @return $this
      */
     public function addSelect($column)

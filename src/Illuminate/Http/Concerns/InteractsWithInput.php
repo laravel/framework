@@ -271,7 +271,7 @@ trait InteractsWithInput
     /**
      * Get all of the input and files for the request.
      *
-     * @param  array|mixed  $keys
+     * @param  mixed  $keys
      * @return array
      */
     public function all($keys = null)
@@ -425,7 +425,7 @@ trait InteractsWithInput
     /**
      * Get a subset containing the provided keys with values from the input data.
      *
-     * @param  array|mixed  $keys
+     * @param  mixed  $keys
      * @return array
      */
     public function only($keys)
@@ -450,7 +450,7 @@ trait InteractsWithInput
     /**
      * Get all of the input except for a specified array of items.
      *
-     * @param  array|mixed  $keys
+     * @param  mixed  $keys
      * @return array
      */
     public function except($keys)

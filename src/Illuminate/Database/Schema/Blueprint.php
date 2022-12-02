@@ -312,7 +312,7 @@ class Blueprint
     /**
      * Indicate that the given columns should be dropped.
      *
-     * @param  array|mixed  $columns
+     * @param  mixed  $columns
      * @return \Illuminate\Support\Fluent
      */
     public function dropColumn($columns)

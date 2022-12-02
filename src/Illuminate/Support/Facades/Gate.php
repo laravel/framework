@@ -6,8 +6,8 @@ use Illuminate\Contracts\Auth\Access\Gate as GateContract;
 
 /**
  * @method static \Illuminate\Auth\Access\Gate guessPolicyNamesUsing(callable $callback)
- * @method static \Illuminate\Auth\Access\Response authorize(string $ability, array|mixed $arguments = [])
- * @method static \Illuminate\Auth\Access\Response inspect(string $ability, array|mixed $arguments = [])
+ * @method static \Illuminate\Auth\Access\Response authorize(string $ability, mixed $arguments = [])
+ * @method static \Illuminate\Auth\Access\Response inspect(string $ability, mixed $arguments = [])
  * @method static \Illuminate\Auth\Access\Response allowIf(\Closure|bool $condition, string|null $message = null, mixed $code = null)
  * @method static \Illuminate\Auth\Access\Response denyIf(\Closure|bool $condition, string|null $message = null, mixed $code = null)
  * @method static \Illuminate\Contracts\Auth\Access\Gate after(callable $callback)
@@ -16,13 +16,13 @@ use Illuminate\Contracts\Auth\Access\Gate as GateContract;
  * @method static \Illuminate\Contracts\Auth\Access\Gate forUser(\Illuminate\Contracts\Auth\Authenticatable|mixed $user)
  * @method static \Illuminate\Contracts\Auth\Access\Gate policy(string $class, string $policy)
  * @method static array abilities()
- * @method static bool allows(string $ability, array|mixed $arguments = [])
- * @method static bool any(iterable|string $abilities, array|mixed $arguments = [])
- * @method static bool check(iterable|string $abilities, array|mixed $arguments = [])
- * @method static bool denies(string $ability, array|mixed $arguments = [])
+ * @method static bool allows(string $ability, mixed $arguments = [])
+ * @method static bool any(iterable|string $abilities, mixed $arguments = [])
+ * @method static bool check(iterable|string $abilities, mixed $arguments = [])
+ * @method static bool denies(string $ability, mixed $arguments = [])
  * @method static bool has(string $ability)
  * @method static mixed getPolicyFor(object|string $class)
- * @method static mixed raw(string $ability, array|mixed $arguments = [])
+ * @method static mixed raw(string $ability, mixed $arguments = [])
  *
  * @see \Illuminate\Contracts\Auth\Access\Gate
  */

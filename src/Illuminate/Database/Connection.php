@@ -905,7 +905,7 @@ class Connection implements ConnectionInterface
     /**
      * Reconnect to the database.
      *
-     * @return mixed|false
+     * @return mixed
      *
      * @throws \Illuminate\Database\LostConnectionException
      */

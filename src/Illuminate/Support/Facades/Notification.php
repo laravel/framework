@@ -20,8 +20,8 @@ use Illuminate\Support\Testing\Fakes\NotificationFake;
  * @method static void assertSentOnDemandTimes(string $notification, int $times = 1)
  * @method static void assertSentToTimes(mixed $notifiable, string $notification, int $times = 1)
  * @method static void assertTimesSent(int $expectedCount, string $notification)
- * @method static void send(\Illuminate\Support\Collection|array|mixed $notifiables, $notification)
- * @method static void sendNow(\Illuminate\Support\Collection|array|mixed $notifiables, $notification)
+ * @method static void send(\Illuminate\Support\Collection|mixed $notifiables, $notification)
+ * @method static void sendNow(\Illuminate\Support\Collection|mixed $notifiables, $notification)
  *
  * @see \Illuminate\Notifications\ChannelManager
  */
