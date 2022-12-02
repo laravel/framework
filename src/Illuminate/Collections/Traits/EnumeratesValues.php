@@ -358,8 +358,11 @@ trait EnumeratesValues
     /**
      * Map a collection and flatten the result by a single level.
      *
-     * @param  callable(TValue, TKey): mixed  $callback
-     * @return static<int, mixed>
+     * @template TFlatMapKey of array-key
+     * @template TFlatMapValue
+     *
+     * @param  callable(TValue, TKey): (\Illuminate\Support\Collection<TFlatMapKey, TFlatMapValue>|array<TFlatMapKey, TFlatMapValue>)  $callback
+     * @return static<TFlatMapKey, TFlatMapValue>
      */
     public function flatMap(callable $callback)
     {
