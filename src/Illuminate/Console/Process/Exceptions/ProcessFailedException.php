@@ -2,7 +2,7 @@
 
 namespace Illuminate\Console\Process\Exceptions;
 
-use Illuminate\Console\Contracts\ProcessResult;
+use Illuminate\Contracts\Console\Process\ProcessResult;
 use Symfony\Component\Console\Exception\RuntimeException;
 
 class ProcessFailedException extends RuntimeException
@@ -10,14 +10,14 @@ class ProcessFailedException extends RuntimeException
     /**
      * The process result instance.
      *
-     * @var \Illuminate\Console\Contracts\ProcessResult
+     * @var \Illuminate\Contracts\Console\Process\ProcessResult
      */
     public $result;
 
     /**
      * Create a new exception instance.
      *
-     * @param  \Illuminate\Console\Contracts\ProcessResult  $result
+     * @param  \Illuminate\Contracts\Console\Process\ProcessResult  $result
      * @return void
      */
     public function __construct(ProcessResult $result)

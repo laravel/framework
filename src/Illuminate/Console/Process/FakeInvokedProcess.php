@@ -7,23 +7,39 @@ use Illuminate\Contracts\Console\Process\InvokedProcess as InvokedProcessContrac
 use Symfony\Component\Process\Exception\ProcessTimedOutException as SymfonyTimeoutException;
 use Symfony\Component\Process\Process;
 
-class InvokedProcess implements InvokedProcessContract
+class FakeInvokedProcess implements InvokedProcessContract
 {
     /**
-     * The underlying process instance.
+     * The command being faked.
      *
-     * @var \Symfony\Component\Process\Process
+     * @var string
+     */
+    protected $command;
+
+    /**
+     * The underlying process description.
+     *
+     * @var \Illuminate\Console\Process\FakeProcessDescription
      */
     protected $process;
 
     /**
+     * The signals that have been received.
+     *
+     * @var array
+     */
+    protected $receivedSignals = [];
+
+    /**
      * Create a new invoked process instance.
      *
-     * @param  \Symfony\Component\Process\Process  $process
+     * @param  string  $command
+     * @param  \Illuminate\Console\Process\FakeProcessDescription  $process
      * @return void
      */
-    public function __construct(Process $process)
+    public function __construct(string $command, FakeProcessDescription $process)
     {
+        $this->command = $command;
         $this->process = $process;
     }
 
@@ -34,7 +50,7 @@ class InvokedProcess implements InvokedProcessContract
      */
     public function id()
     {
-        return $this->process->getPid();
+        return $this->process->processId;
     }
 
     /**
@@ -45,7 +61,7 @@ class InvokedProcess implements InvokedProcessContract
      */
     public function signal(int $signal)
     {
-        $this->process->signal($signal);
+        $this->receivedSignals[] = $signal;
 
         return $this;
     }
@@ -88,13 +104,7 @@ class InvokedProcess implements InvokedProcessContract
      */
     public function wait($output = null)
     {
-        try {
-            $this->process->wait($output);
-
-            return new ProcessResult($this->process);
-        } catch (SymfonyTimeoutException $e) {
-            throw new ProcessTimedOutException($e, new ProcessResult($this->process));
-        }
+        return $this->process->toProcessResult($this->command);
     }
 
     /**
@@ -105,12 +115,15 @@ class InvokedProcess implements InvokedProcessContract
      */
     public function waitUntil($output)
     {
-        try {
-            $this->process->waitUntil($output);
-
-            return $this;
-        } catch (SymfonyTimeoutException $e) {
-            throw new ProcessTimedOutException($e, new ProcessResult($this->process));
+        foreach ($this->process->output as $processOutput) {
+            if ($output($processOutput['type'], $processOutput['buffer'])) {
+                return $this;
+            }
         }
+
+        throw new ProcessTimedOutException(
+            new SymfonyTimeoutException($this->process->toSymfonyProcess($this->command), 1),
+            $this->process->toProcessResult(),
+        );
     }
 }

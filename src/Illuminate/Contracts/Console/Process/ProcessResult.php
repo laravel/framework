@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Console\Contracts;
+namespace Illuminate\Contracts\Console\Process;
 
 interface ProcessResult
 {
@@ -17,6 +17,13 @@ interface ProcessResult
      * @return bool
      */
     public function successful();
+
+    /**
+     * Determine if the process failed.
+     *
+     * @return bool
+     */
+    public function failed();
 
     /**
      * Get the exit code of the process.

@@ -2,6 +2,9 @@
 
 namespace Illuminate\Console\Process;
 
+use Illuminate\Contracts\Console\Process\ProcessResult as ProcessResultContract;
+use Illuminate\Support\Str;
+use LogicException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException as SymfonyTimeoutException;
 use Symfony\Component\Process\Process;
 
@@ -19,21 +22,28 @@ class PendingProcess
      *
      * @var array<array-key, string>|string|null
      */
-    protected $command;
+    public $command;
 
     /**
      * The working directory of the process.
      *
      * @var string
      */
-    protected $path;
+    public $path;
 
     /**
      * The maximum number of seconds the process may run.
      *
      * @var int|null
      */
-    protected $timeout = 60;
+    public $timeout = 60;
+
+    /**
+     * The registered fake handler callbacks.
+     *
+     * @var array
+     */
+    protected $fakeHandlers = [];
 
     /**
      * Create a new pending process instance.
@@ -102,12 +112,16 @@ class PendingProcess
      *
      * @param  array<array-key, string>|string|null  $command
      * @param  callable|null  $output
-     * @return \Illuminate\Console\Contracts\ProcessResult
+     * @return \Illuminate\Contracts\Console\Process\ProcessResult
      */
     public function run($command = null, $output = null)
     {
         try {
             $process = $this->toSymfonyProcess($command);
+
+            if ($fake = $this->fakeFor($command = $process->getCommandline())) {
+                return $this->resolveSynchronousFake($command, $fake);
+            }
 
             return new ProcessResult(tap($process)->run($output));
         } catch (SymfonyTimeoutException $e) {
@@ -123,7 +137,13 @@ class PendingProcess
      */
     public function start($command = null)
     {
-        return new InvokedProcess(tap($this->toSymfonyProcess($command))->start());
+        $process = $this->toSymfonyProcess($command);
+
+        if ($fake = $this->fakeFor($command = $process->getCommandline())) {
+            return $this->resolveAsynchronousFake($command, $fake);
+        }
+
+        return new InvokedProcess(tap($process)->start());
     }
 
     /**
@@ -144,5 +164,74 @@ class PendingProcess
         $process->setTimeout($this->timeout);
 
         return $process;
+    }
+
+    /**
+     * Specify the fake process result handlers for the pending process.
+     *
+     * @param  array  $fakeHandlers
+     * @return $this
+     */
+    public function withFakeHandlers(array $fakeHandlers)
+    {
+        $this->fakeHandlers = $fakeHandlers;
+
+        return $this;
+    }
+
+    /**
+     * Get the fake handler for the given command, if applicable.
+     *
+     * @param  string  $command
+     * @return \Closure|null
+     */
+    protected function fakeFor(string $command)
+    {
+        return collect($this->fakeHandlers)
+                ->first(fn ($handler, $pattern) => Str::is($pattern, $command));
+    }
+
+    /**
+     * Resolve the given fake handler for a synchronous process.
+     *
+     * @param  string  $command
+     * @param  \Closure  $fake
+     * @return mixed
+     */
+    protected function resolveSynchronousFake(string $command, $fake)
+    {
+        $result = $fake($this);
+
+        if ($result instanceof FakeProcessResult) {
+            return $result->withCommand($command);
+        } elseif ($result instanceof ProcessResultContract) {
+            return $result;
+        } elseif ($result instanceof FakeProcessDescription) {
+            return $result->toProcessResult($command);
+        }
+
+        throw new LogicException("Unsupported synchronous process fake result provided.");
+    }
+
+    /**
+     * Resolve the given fake handler for an asynchronous process.
+     *
+     * @param  string  $command
+     * @param  \Closure  $fake
+     * @return mixed
+     */
+    protected function resolveAsynchronousFake(string $command, $fake)
+    {
+        $result = $fake($this);
+
+        // if ($result instanceof FakeProcessResult) {
+        //     return $result->withCommand($command);
+        // } elseif ($result instanceof ProcessResultContract) {
+        //     return $result;
+        // } elseif ($result instanceof FakeProcessDescription) {
+        //     return $result->toProcessResult($command);
+        // }
+
+        throw new LogicException("Unsupported synchronous process fake result provided.");
     }
 }
