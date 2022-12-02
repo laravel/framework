@@ -379,7 +379,7 @@ if (! function_exists('transform')) {
      * @param  mixed  $value
      * @param  callable  $callback
      * @param  mixed  $default
-     * @return mixed|null
+     * @return mixed
      */
     function transform($value, callable $callback, $default = null)
     {

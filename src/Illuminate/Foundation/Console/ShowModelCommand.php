@@ -469,7 +469,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
      *
      * @param  \Doctrine\DBAL\Schema\Column  $column
      * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return mixed|null
+     * @return mixed
      */
     protected function getColumnDefault($column, $model)
     {

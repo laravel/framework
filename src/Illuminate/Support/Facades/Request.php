@@ -20,7 +20,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Session\Store session()
  * @method static \Illuminate\Session\Store|null getSession()
  * @method static \Symfony\Component\HttpFoundation\ParameterBag|mixed json(string|null $key = null, mixed $default = null)
- * @method static array all(array|mixed|null $keys = null)
+ * @method static array all(array|mixed $keys = null)
  * @method static array allFiles()
  * @method static array except(array|mixed $keys)
  * @method static array ips()

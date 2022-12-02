@@ -211,7 +211,7 @@ if (! function_exists('broadcast')) {
     /**
      * Begin broadcasting an event.
      *
-     * @param  mixed|null  $event
+     * @param  mixed  $event
      * @return \Illuminate\Broadcasting\PendingBroadcast
      */
     function broadcast($event = null)
