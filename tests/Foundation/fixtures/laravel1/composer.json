@@ -1,7 +1,0 @@
-{
-    "autoload": {
-        "psr-4": {
-            "Laravel\\One\\": "app/"
-        }
-    }
-}
