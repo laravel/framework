@@ -9,11 +9,11 @@ namespace Illuminate\Support\Facades;
  * @method static string getDefaultDriver()
  * @method static void setDefaultDriver(string $name)
  * @method static mixed driver(string|null $driver = null)
- * @method static \Illuminate\Support\Manager extend(string $driver, \Closure $callback)
+ * @method static \Illuminate\Session\SessionManager extend(string $driver, \Closure $callback)
  * @method static array getDrivers()
  * @method static \Illuminate\Contracts\Container\Container getContainer()
- * @method static \Illuminate\Support\Manager setContainer(\Illuminate\Contracts\Container\Container $container)
- * @method static \Illuminate\Support\Manager forgetDrivers()
+ * @method static \Illuminate\Session\SessionManager setContainer(\Illuminate\Contracts\Container\Container $container)
+ * @method static \Illuminate\Session\SessionManager forgetDrivers()
  * @method static bool start()
  * @method static void save()
  * @method static void ageFlashData()
@@ -61,7 +61,6 @@ namespace Illuminate\Support\Facades;
  * @method static void setRequestOnHandler(\Illuminate\Http\Request $request)
  *
  * @see \Illuminate\Session\SessionManager
- * @see \Illuminate\Session\Store
  */
 class Session extends Facade
 {
