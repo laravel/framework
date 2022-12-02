@@ -21,7 +21,9 @@ class Worker
     use DetectsLostConnections;
 
     const EXIT_SUCCESS = 0;
+
     const EXIT_ERROR = 1;
+
     const EXIT_MEMORY_LIMIT = 12;
 
     /**
