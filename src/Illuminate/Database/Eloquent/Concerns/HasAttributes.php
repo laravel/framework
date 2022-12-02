@@ -1792,7 +1792,7 @@ trait HasAttributes
      *
      * @param  string|null  $key
      * @param  mixed  $default
-     * @return mixed|array
+     * @return mixed
      */
     public function getOriginal($key = null, $default = null)
     {
@@ -1806,7 +1806,7 @@ trait HasAttributes
      *
      * @param  string|null  $key
      * @param  mixed  $default
-     * @return mixed|array
+     * @return mixed
      */
     protected function getOriginalWithoutRewindingModel($key = null, $default = null)
     {
@@ -1826,7 +1826,7 @@ trait HasAttributes
      *
      * @param  string|null  $key
      * @param  mixed  $default
-     * @return mixed|array
+     * @return mixed
      */
     public function getRawOriginal($key = null, $default = null)
     {
