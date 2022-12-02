@@ -5,7 +5,7 @@ namespace Illuminate\Support\Facades;
 use Illuminate\Contracts\Routing\ResponseFactory as ResponseFactoryContract;
 
 /**
- * @method static \Illuminate\Http\Response make(array|string $content = '', int $status = 200, array $headers = [])
+ * @method static \Illuminate\Http\Response make(mixed $content = '', int $status = 200, array $headers = [])
  * @method static \Illuminate\Http\Response noContent(int $status = 204, array $headers = [])
  * @method static \Illuminate\Http\Response view(string|array $view, array $data = [], int $status = 200, array $headers = [])
  * @method static \Illuminate\Http\JsonResponse json(mixed $data = [], int $status = 200, array $headers = [], int $options = 0)
@@ -19,8 +19,12 @@ use Illuminate\Contracts\Routing\ResponseFactory as ResponseFactoryContract;
  * @method static \Illuminate\Http\RedirectResponse redirectToAction(string $action, mixed $parameters = [], int $status = 302, array $headers = [])
  * @method static \Illuminate\Http\RedirectResponse redirectGuest(string $path, int $status = 302, array $headers = [], bool|null $secure = null)
  * @method static \Illuminate\Http\RedirectResponse redirectToIntended(string $default = '/', int $status = 302, array $headers = [], bool|null $secure = null)
+ * @method static void macro(string $name, object|callable $macro)
+ * @method static void mixin(object $mixin, bool $replace = true)
+ * @method static bool hasMacro(string $name)
+ * @method static void flushMacros()
  *
- * @see \Illuminate\Contracts\Routing\ResponseFactory
+ * @see \Illuminate\Routing\ResponseFactory
  */
 class Response extends Facade
 {
