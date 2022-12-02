@@ -54,7 +54,7 @@ use PHPUnit\Framework\Assert as PHPUnit;
  * @method \Illuminate\Http\Client\Response put(string $url, array $data = [])
  * @method \Illuminate\Http\Client\Response send(string $method, string $url, array $options = [])
  *
- * @see \Illuminate\Http\Client\PendingRequest
+ * @mixin \Illuminate\Http\Client\PendingRequest
  */
 class Factory
 {
