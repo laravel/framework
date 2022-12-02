@@ -1728,7 +1728,7 @@ trait ValidatesAttributes
         $this->requireParameterCount(2, $parameters, 'exclude_if');
 
         if (! Arr::has($this->data, $parameters[0])) {
-            return true;
+            return false;
         }
 
         [$values, $other] = $this->parseDependentRuleParameters($parameters);
