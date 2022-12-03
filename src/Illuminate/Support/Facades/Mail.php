@@ -40,8 +40,22 @@ use Illuminate\Support\Testing\Fakes\MailFake;
  * @method static void mixin(object $mixin, bool $replace = true)
  * @method static bool hasMacro(string $name)
  * @method static void flushMacros()
+ * @method static void assertSent(string|\Closure $mailable, callable|int|null $callback = null)
+ * @method static void assertNotOutgoing(string|\Closure $mailable, callable|null $callback = null)
+ * @method static void assertNotSent(string|\Closure $mailable, callable|null $callback = null)
+ * @method static void assertNothingOutgoing()
+ * @method static void assertNothingSent()
+ * @method static void assertQueued(string|\Closure $mailable, callable|int|null $callback = null)
+ * @method static void assertNotQueued(string|\Closure $mailable, callable|null $callback = null)
+ * @method static void assertNothingQueued()
+ * @method static \Illuminate\Support\Collection sent(string|\Closure $mailable, callable|null $callback = null)
+ * @method static bool hasSent(string $mailable)
+ * @method static \Illuminate\Support\Collection queued(string|\Closure $mailable, callable|null $callback = null)
+ * @method static bool hasQueued(string $mailable)
+ * @method static array failures()
  *
  * @see \Illuminate\Mail\MailManager
+ * @see \Illuminate\Support\Testing\Fakes\MailFake
  */
 class Mail extends Facade
 {
