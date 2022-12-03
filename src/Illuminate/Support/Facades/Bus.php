@@ -19,8 +19,34 @@ use Illuminate\Support\Testing\Fakes\BusFake;
  * @method static void dispatchAfterResponse(mixed $command, mixed $handler = null)
  * @method static \Illuminate\Bus\Dispatcher pipeThrough(array $pipes)
  * @method static \Illuminate\Bus\Dispatcher map(array $map)
+ * @method static void except(array|string $jobsToDispatch)
+ * @method static void assertDispatched(string|\Closure $command, callable|int|null $callback = null)
+ * @method static void assertDispatchedTimes(string $command, int $times = 1)
+ * @method static void assertNotDispatched(string|\Closure $command, callable|null $callback = null)
+ * @method static void assertNothingDispatched()
+ * @method static void assertDispatchedSync(string|\Closure $command, callable|int|null $callback = null)
+ * @method static void assertDispatchedSyncTimes(string $command, int $times = 1)
+ * @method static void assertNotDispatchedSync(string|\Closure $command, callable|null $callback = null)
+ * @method static void assertDispatchedAfterResponse(string|\Closure $command, callable|int|null $callback = null)
+ * @method static void assertDispatchedAfterResponseTimes(string $command, int $times = 1)
+ * @method static void assertNotDispatchedAfterResponse(string|\Closure $command, callable|null $callback = null)
+ * @method static void assertChained(array $expectedChain)
+ * @method static void assertDispatchedWithoutChain(string|\Closure $command, callable|null $callback = null)
+ * @method static void assertBatched(callable $callback)
+ * @method static void assertBatchCount(int $count)
+ * @method static void assertNothingBatched()
+ * @method static \Illuminate\Support\Collection dispatched(string $command, callable|null $callback = null)
+ * @method static \Illuminate\Support\Collection dispatchedSync(string $command, callable|null $callback = null)
+ * @method static \Illuminate\Support\Collection dispatchedAfterResponse(string $command, callable|null $callback = null)
+ * @method static \Illuminate\Support\Collection batched(callable $callback)
+ * @method static bool hasDispatched(string $command)
+ * @method static bool hasDispatchedSync(string $command)
+ * @method static bool hasDispatchedAfterResponse(string $command)
+ * @method static \Illuminate\Bus\Batch dispatchFakeBatch(string $name = '')
+ * @method static \Illuminate\Bus\Batch recordPendingBatch(\Illuminate\Bus\PendingBatch $pendingBatch)
  *
  * @see \Illuminate\Bus\Dispatcher
+ * @see \Illuminate\Support\Testing\Fakes\BusFake
  */
 class Bus extends Facade
 {
