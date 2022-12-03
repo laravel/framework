@@ -25,8 +25,17 @@ use Illuminate\Support\Testing\Fakes\EventFake;
  * @method static void mixin(object $mixin, bool $replace = true)
  * @method static bool hasMacro(string $name)
  * @method static void flushMacros()
+ * @method static \Illuminate\Support\Testing\Fakes\EventFake except(array|string $eventsToDispatch)
+ * @method static void assertListening(string $expectedEvent, string|array $expectedListener)
+ * @method static void assertDispatched(string|\Closure $event, callable|int|null $callback = null)
+ * @method static void assertDispatchedTimes(string $event, int $times = 1)
+ * @method static void assertNotDispatched(string|\Closure $event, callable|null $callback = null)
+ * @method static void assertNothingDispatched()
+ * @method static \Illuminate\Support\Collection dispatched(string $event, callable|null $callback = null)
+ * @method static bool hasDispatched(string $event)
  *
  * @see \Illuminate\Events\Dispatcher
+ * @see \Illuminate\Support\Testing\Fakes\EventFake
  */
 class Event extends Facade
 {
