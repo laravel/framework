@@ -455,19 +455,26 @@ class HttpRequestTest extends TestCase
     public function testMissingAllMethod()
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => '', 'city' => null]);
-        $this->assertFalse($request->missingAll('city'));  
-        $this->assertFalse($request->missingAll('name', 'email'));
-        $this->assertFalse($request->missingAll(['name', 'age']));
+        $this->assertFalse($request->missingAll('name'));
+        $this->assertFalse($request->missingAll('age'));
+        $this->assertFalse($request->missingAll('city'));
+        $this->assertTrue($request->missingAll('foo'));
+        $this->assertTrue($request->missingAll('foo', 'email'));
+        $this->assertTrue($request->missingAll(['foo', 'email']));
 
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'email' => 'foo']);
-        $this->assertTrue($request->missingAll('foo'));
-        $this->assertTrue($request->missingAll('foo', 'bar'));
-        $this->assertTrue($request->missingAll(['year', 'location']));
+        $this->assertFalse($request->missingAll('name', 'email'));
+
+        $request = Request::create('/', 'GET', ['foo' => ['bar', 'bar']]);
+        $this->assertFalse($request->missingAll('foo'));
+
+        $request = Request::create('/', 'GET', ['foo' => '', 'bar' => null]);
+        $this->assertFalse($request->missingAll('foo'));
+        $this->assertFalse($request->missingAll('bar'));
 
         $request = Request::create('/', 'GET', ['foo' => ['bar' => null, 'baz' => '']]);
-        $this->assertFalse($request->missingAll(['foo.bar','foo.foo']));
-        $this->assertTrue($request->missingAll(['foo.barz','foot.barz2']));
-        $this->assertTrue($request->missingAll(['bar.foo.deep','barz.foo.deep']));
+        $this->assertFalse($request->missingAll('foo.bar'));
+        $this->assertFalse($request->missingAll('foo.baz'));
     }
 
     public function testWhenMissingMethod()
