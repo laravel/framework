@@ -7,10 +7,6 @@ use Illuminate\Http\Client\Factory;
 /**
  * @method static \GuzzleHttp\Promise\PromiseInterface response(array|string|null $body = null, int $status = 200, array $headers = [])
  * @method static \Illuminate\Http\Client\ResponseSequence sequence(array $responses = [])
- * @method static \Illuminate\Http\Client\Factory fake(callable|array|null $callback = null)
- * @method static \Illuminate\Http\Client\ResponseSequence fakeSequence(string $url = '*')
- * @method static \Illuminate\Http\Client\Factory stubUrl(string $url, \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface|callable $callback)
- * @method static \Illuminate\Http\Client\Factory preventStrayRequests(bool $prevent = true)
  * @method static \Illuminate\Http\Client\Factory allowStrayRequests()
  * @method static void recordRequestResponsePair(\Illuminate\Http\Client\Request $request, \Illuminate\Http\Client\Response $response)
  * @method static void assertSent(callable $callback)

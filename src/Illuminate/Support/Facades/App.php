@@ -84,7 +84,6 @@ namespace Illuminate\Support\Facades;
  * @method static string getNamespace()
  * @method static \Illuminate\Contracts\Container\ContextualBindingBuilder when(array|string $concrete)
  * @method static bool has(string $id)
- * @method static bool resolved(string $abstract)
  * @method static bool isShared(string $abstract)
  * @method static bool isAlias(string $name)
  * @method static void bind(string $abstract, \Closure|string|null $concrete = null, bool $shared = false)
