@@ -20,8 +20,26 @@ use Illuminate\Support\Testing\Fakes\NotificationFake;
  * @method static \Illuminate\Contracts\Container\Container getContainer()
  * @method static \Illuminate\Notifications\ChannelManager setContainer(\Illuminate\Contracts\Container\Container $container)
  * @method static \Illuminate\Notifications\ChannelManager forgetDrivers()
+ * @method static void assertSentOnDemand(string|\Closure $notification, callable|null $callback = null)
+ * @method static void assertSentTo(mixed $notifiable, string|\Closure $notification, callable|null $callback = null)
+ * @method static void assertSentOnDemandTimes(string $notification, int $times = 1)
+ * @method static void assertSentToTimes(mixed $notifiable, string $notification, int $times = 1)
+ * @method static void assertNotSentTo(mixed $notifiable, string|\Closure $notification, callable|null $callback = null)
+ * @method static void assertNothingSent()
+ * @method static void assertNothingSentTo(mixed $notifiable)
+ * @method static void assertSentTimes(string $notification, int $expectedCount)
+ * @method static void assertCount(int $expectedCount)
+ * @method static void assertTimesSent(int $expectedCount, string $notification)
+ * @method static \Illuminate\Support\Collection sent(mixed $notifiable, string $notification, callable|null $callback = null)
+ * @method static bool hasSent(mixed $notifiable, string $notification)
+ * @method static array sentNotifications()
+ * @method static void macro(string $name, object|callable $macro)
+ * @method static void mixin(object $mixin, bool $replace = true)
+ * @method static bool hasMacro(string $name)
+ * @method static void flushMacros()
  *
  * @see \Illuminate\Notifications\ChannelManager
+ * @see \Illuminate\Support\Testing\Fakes\NotificationFake
  */
 class Notification extends Facade
 {
