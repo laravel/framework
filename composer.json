@@ -34,6 +34,7 @@
         "ramsey/uuid": "^4.5",
         "symfony/console": "^6.2",
         "symfony/error-handler": "^6.2",
+        "symfony/expression-language": "^6.2",
         "symfony/finder": "^6.2",
         "symfony/http-foundation": "^6.2",
         "symfony/http-kernel": "^6.2",

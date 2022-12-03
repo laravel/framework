@@ -20,6 +20,8 @@ use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Database\Eloquent\MissingAttributeException;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\LazyLoadingViolationException;
+use Illuminate\Database\Query\CalculableExpression;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection as BaseCollection;
@@ -31,6 +33,7 @@ use LogicException;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionNamedType;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
 trait HasAttributes
 {
@@ -942,6 +945,10 @@ trait HasAttributes
             return $this->setMutatedAttributeValue($key, $value);
         } elseif ($this->hasAttributeSetMutator($key)) {
             return $this->setAttributeMarkedMutatedAttributeValue($key, $value);
+        }
+
+        if ($value instanceof CalculableExpression) {
+            $value->setExpectedResult($this->calculateResult($value));
         }
 
         // If an attribute is listed as a "date", we'll convert it from a DateTime
@@ -2013,6 +2020,8 @@ trait HasAttributes
             return true;
         } elseif (is_null($attribute)) {
             return false;
+        } elseif ($attribute instanceof Expression) {
+            return false;
         } elseif ($this->isDateAttribute($key) || $this->isDateCastableWithCustomFormat($key)) {
             return $this->fromDateTime($attribute) ===
                 $this->fromDateTime($original);
@@ -2059,7 +2068,7 @@ trait HasAttributes
         // If the attribute exists within the cast array, we will convert it to
         // an appropriate native PHP type dependent upon the associated value
         // given with the key in the pair. Dayle made this comment line up.
-        if ($this->hasCast($key)) {
+        if (!$value instanceof Expression && $this->hasCast($key)) {
             return $this->castAttribute($key, $value);
         }
 
@@ -2160,6 +2169,57 @@ trait HasAttributes
                 ->map(function ($match) {
                     return lcfirst(static::$snakeAttributes ? Str::snake($match) : $match);
                 })->all();
+    }
+
+    /**
+     * Calculate the result of a calculable expression, based on the current state of the model's attributes.
+     *
+     * @param  CalculableExpression $expression
+     *
+     * @return mixed
+     */
+    public function calculateResult(CalculableExpression $expression)
+    {
+        // Replace current model attributes into the variables:
+        return (new ExpressionLanguage())->evaluate(
+            preg_replace_callback(
+                '/`(.*?)`|([a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*)/',
+                function($matches) {
+                    return $this->getAttribute($matches[1] ?: $matches[2]);
+                },
+                $expression->getValue()
+            )
+        );
+    }
+
+    /**
+     * Apply calculated expressions to the attributes.
+     *
+     * @return void
+     */
+    public function applyCalculableAttributes()
+    {
+        foreach ($this->getCalculatedAttributes() as $key => $attribute) {
+            $this->setAttribute($key, $attribute);
+        }
+    }
+
+    /**
+     * Get a list of attributes and their expected results for which a calculable expression was defined.
+     *
+     * @return array
+     */
+    protected function getCalculatedAttributes()
+    {
+        $resolvedAttributes = [];
+
+        foreach ($this->attributes as $key => $attribute) {
+            if ($attribute instanceof CalculableExpression) {
+                $resolvedAttributes[$key] = $attribute->getExpectedResult();
+            }
+        }
+
+        return $resolvedAttributes;
     }
 
     /**

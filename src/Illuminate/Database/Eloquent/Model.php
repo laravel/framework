@@ -1207,6 +1207,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
             $this->syncChanges();
 
+            $this->applyCalculableAttributes();
+
             $this->fireModelEvent('updated', false);
         }
 

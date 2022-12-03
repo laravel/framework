@@ -19,6 +19,7 @@ use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\Grammars\Grammar as QueryGrammar;
 use Illuminate\Database\Query\Processors\Processor;
+use Illuminate\Database\Query\CalculableExpression;
 use Illuminate\Database\Schema\Builder as SchemaBuilder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\InteractsWithTime;
@@ -1005,6 +1006,17 @@ class Connection implements ConnectionInterface
     public function raw($value)
     {
         return new Expression($value);
+    }
+
+    /**
+     * Get a new calculable raw query expression.
+     *
+     * @param  mixed  $value
+     * @return \Illuminate\Database\Query\CalculableExpression
+     */
+    public function calculate($value)
+    {
+        return new CalculableExpression($value);
     }
 
     /**
