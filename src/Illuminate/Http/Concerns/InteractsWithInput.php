@@ -225,6 +225,21 @@ trait InteractsWithInput
     }
 
     /**
+     * Determine if the request is missing all given input item key.
+     *
+     * @param  string|array  $key
+     * @return bool
+     */
+    public function missingAll($keys)
+    {
+        $keys = is_array($keys) ? $keys : func_get_args();
+
+        $input = $this->all();
+
+        return ! Arr::hasAny($input, $keys);
+    }
+
+    /**
      * Apply the callback if the request is missing the given input item key.
      *
      * @param  string  $key
