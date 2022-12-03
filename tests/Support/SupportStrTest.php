@@ -1067,6 +1067,11 @@ class SupportStrTest extends TestCase
             Str::createUuidsNormally();
         }
     }
+
+    public function testItCanGetRecipientFromEmail()
+    {
+        $this->assertSame('TaylorOtwell', Str::recipientFromEmail('TaylorOtwell@laravel.com'));
+    }
 }
 
 class StringableObjectStub
