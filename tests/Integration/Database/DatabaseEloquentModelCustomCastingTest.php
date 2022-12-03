@@ -10,8 +10,11 @@ use Illuminate\Contracts\Database\Eloquent\DeviatesCastableAttributes;
 use Illuminate\Contracts\Database\Eloquent\SerializesCastableAttributes;
 use Illuminate\Database\Eloquent\InvalidCastException;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Query\CalculableExpression;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
@@ -103,6 +106,45 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
         $model = new TestEloquentModelWithCustomCast;
         $model->birthday_at = now();
         $this->assertIsString($model->toArray()['birthday_at']);
+    }
+
+    public function testCustomCastingWithRawExpression()
+    {
+        $model = new TestEloquentModelWithCustomCast;
+        $model->price = '100.05';
+        $model->save();
+
+        $this->assertInstanceof(Decimal::class, $model->price);
+
+        $model->price = DB::raw('250.5 + 5');
+        $this->assertInstanceof(Expression::class, $model->price);
+        $model->save();
+        // Raw expressions remain until the model is refreshed.
+        $this->assertInstanceof(Expression::class, $model->price);
+
+        $model->refresh();
+        $this->assertEquals((new Decimal('255.5'))->getValue(), $model->price->getValue());
+    }
+
+    public function testCustomCastingWithCalculableExpression()
+    {
+        $model = new TestEloquentModelWithCustomCast;
+        $model->price = '100.05';
+        $model->save();
+
+        $this->assertInstanceof(Decimal::class, $model->price);
+
+        $model->price = DB::calculate('`price` + 45.4');
+        $this->assertInstanceof(CalculableExpression::class, $model->price);
+        $model->save();
+
+        // Calculable expressions are changed back into whichever cast that was defined.
+        $this->assertInstanceof(Decimal::class, $model->price);
+        $this->assertEquals((new Decimal('145.45'))->getValue(), $model->price->getValue());
+
+        // Re-run comparison with fresh data.
+        $model->refresh();
+        $this->assertEquals((new Decimal('145.45'))->getValue(), $model->price->getValue());
     }
 
     public function testGetOriginalWithCastValueObjects()
@@ -548,7 +590,7 @@ final class Decimal
     {
         $parts = explode('.', (string) $value);
 
-        $this->scale = strlen($parts[1]);
+        $this->scale = strlen($parts[1] ?? '');
         $this->value = (int) str_replace('.', '', $value);
     }
 

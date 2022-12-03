@@ -947,8 +947,13 @@ trait HasAttributes
             return $this->setAttributeMarkedMutatedAttributeValue($key, $value);
         }
 
-        if ($value instanceof CalculableExpression) {
-            $value->setExpectedResult($this->calculateResult($value));
+        if ($value instanceof Expression) {
+            if ($value instanceof CalculableExpression) {
+                $value->setExpectedResult($this->calculateResult($value));
+            }
+            $this->attributes[$key] = $value;
+
+            return $this;
         }
 
         // If an attribute is listed as a "date", we'll convert it from a DateTime
@@ -1686,6 +1691,10 @@ trait HasAttributes
     protected function mergeAttributesFromClassCasts()
     {
         foreach ($this->classCastCache as $key => $value) {
+            if(($this->attributes[$key] ?? null) instanceof Expression) {
+                // Skip query expressions since no cache should be applied here.
+                continue;
+            }
             $caster = $this->resolveCasterClass($key);
 
             $this->attributes = array_merge(
@@ -2178,7 +2187,7 @@ trait HasAttributes
      *
      * @return mixed
      */
-    public function calculateResult(CalculableExpression $expression)
+    protected function calculateResult(CalculableExpression $expression)
     {
         // Replace current model attributes into the variables:
         return (new ExpressionLanguage())->evaluate(

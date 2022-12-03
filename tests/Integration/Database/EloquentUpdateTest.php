@@ -198,7 +198,7 @@ class EloquentUpdateTest extends DatabaseTestCase
         ];
     }
 
-    public function testCalculablePropertyRemainsOpenWhileUnsaved()
+    public function testCalculablePropertyRemainsAsExpressionWhileUnsaved()
     {
         /** @var Model $model */
         $model = TestUpdateModel4::create([
@@ -214,9 +214,11 @@ class EloquentUpdateTest extends DatabaseTestCase
 
         $model->save();
 
+        // During the saving/updating events, the attribute will still be an Expression instance.
         $this->assertInstanceof(CalculableExpression::class, $_SERVER['__test.saving.attributes']['counter']);
         $this->assertInstanceof(CalculableExpression::class, $_SERVER['__test.updating.attributes']['counter']);
 
+        // During saved/updated, the attribute should have been resolved to the calculable value.
         $this->assertEquals(25, $_SERVER['__test.saved.attributes']['counter']);
         $this->assertEquals(25, $_SERVER['__test.updated.attributes']['counter']);
         $this->assertEquals(25, $model->counter);
