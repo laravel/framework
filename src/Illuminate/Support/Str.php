@@ -1076,6 +1076,20 @@ class Str
         return preg_replace('~(\s|\x{3164})+~u', ' ', preg_replace('~^[\s﻿]+|[\s﻿]+$~u', '', $value));
     }
 
+
+    /**
+     * Get recipient name from the given mail address.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public static function recipientFromEmail($value)
+    {
+        return explode('@', $value)[0];
+
+    }
+
+
     /**
      * Determine if a given string starts with a given substring.
      *
