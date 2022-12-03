@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Query\CalculableExpression;
 use Illuminate\Database\Query\Expression;
+use Illuminate\Database\QueryException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -196,6 +197,36 @@ class EloquentUpdateTest extends DatabaseTestCase
             'Mixed backticks complex integers and decimals' => ['decimal_bonus', '(`counter` + (`decimal_bonus` * 1.05))', 15.5],
             'Mixed backticks complex' => ['decimal_counter', '(counter * `decimal_counter`) + (bonus % 3)', 28],
         ];
+    }
+
+    public function testInvalidCalculableExpressionOnNotExistingModel()
+    {
+        $model = new TestUpdateModel4([
+            'counter' => 4,
+            'bonus' => 3,
+        ]);
+
+        $model->counter = DB::calculate('`counter` + `bonus` * 2');
+
+        // An SQL error should be thrown indicating that there is no such column, since we cannot use
+        // equations with columns involved in insert-statements.
+        $this->expectException(QueryException::class);
+        $model->save();
+    }
+
+    public function testValidCalculableExpressionOnNotExistingModel()
+    {
+        $model = new TestUpdateModel4([
+            'counter' => 4,
+            'bonus' => 3,
+        ]);
+
+        $model->counter = DB::calculate('5 * 2');
+
+        $model->save();
+
+        $this->assertEquals(10, $model->counter);
+        $this->assertEquals(3, $model->bonus);
     }
 
     public function testCalculablePropertyRemainsAsExpressionWhileUnsaved()

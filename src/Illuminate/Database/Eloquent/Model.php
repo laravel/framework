@@ -1307,6 +1307,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
         $this->wasRecentlyCreated = true;
 
+        $this->applyCalculableAttributes();
+
         $this->fireModelEvent('created', false);
 
         return true;
