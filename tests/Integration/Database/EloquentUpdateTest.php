@@ -175,7 +175,9 @@ class EloquentUpdateTest extends DatabaseTestCase
         ]);
 
         $model->update([
-            $column => DB::calculate($expression),
+            $column => DB::calculate(
+                collect($expression)->map(fn ($item) => is_callable($item) ? $this->wrap($item()) : $item)->join('')
+            ),
         ]);
 
         $this->assertNotInstanceOf(CalculableExpression::class, $model->$column);
@@ -189,38 +191,41 @@ class EloquentUpdateTest extends DatabaseTestCase
 
     public static function calculateExpressionDataProvider()
     {
+        // This is a function wrapper that returns its own value, which we apply to SQL keywords
+        // so that we can wrap them using the correct grammar in the test.
+        $w = fn($value) => fn () => $value;
+
         return [
-            // Format: 'Explanation' => ['column', 'expression', 'expectedResult']
-            'Backticks simple integer' => ['counter', '`counter` + 25', 30],
-            'Backticks complex integers' => ['counter', '(`counter` + `bonus`) * 25', 200],
-            'Backticks even more complex integers' => ['counter', '(2 * `counter` + (`counter` + `bonus`) * 25)', 210],
-            'Backticks even more complex integers and decimals' => ['decimal_counter', '(2 * `decimal_counter` + (`decimal_counter` + `bonus`) * 25)', 226.2],
-            'Without backticks simple integer multiplication' => ['counter', 'counter * 2', 10],
-            'Without backticks simple integer addition' => ['counter', 'counter + 2', 7],
-            'Without backticks simple integer subtraction' => ['counter', 'counter - 2', 3],
-            'Without backticks simple integer division' => ['counter', 'counter / 4', 1],
-            'Without backticks simple decimal multiplication' => ['decimal_bonus', 'decimal_bonus * 2.45', 24.5],
-            'Without backticks simple decimal addition' => ['decimal_bonus', 'decimal_bonus + 2.45', 12.45],
-            'Without backticks simple decimal subtraction' => ['decimal_bonus', 'decimal_bonus - 2.45', 7.55],
-            'Without backticks simple decimal division' => ['decimal_bonus', 'decimal_bonus / 1.6', 6.25],
-            'Mixed backticks complex decimals' => ['decimal_bonus', '(`decimal_bonus` * 1.2) + (`decimal_counter` / 4)', 13.4],
-            'Mixed backticks complex integers and decimals' => ['decimal_bonus', '(`counter` + (`decimal_bonus` * 1.05))', 15.5],
-            'Mixed backticks complex' => ['decimal_counter', '(counter * `decimal_counter`) + (bonus % 3)', 28],
+            // Format: 'Explanation' => ['column', ['expressionPart', 'expressionPart', 'expressionPart'], 'expectedResult']
+            'With quotes simple integer' => ['counter', [$w('counter'), ' + 25'], 30],
+            'With quotes complex integers' => ['counter', ['(', $w('counter'), ' + ', $w('bonus'), ') * 25'], 200],
+            'With quotes even more complex integers' => ['counter', ['(2 * ', $w('counter'), ' + (', $w('counter'), ' + ', $w('bonus'), ') * 25)'], 210],
+            'With quotes even more complex integers and decimals' => ['decimal_counter', ['(2 * ', $w('decimal_counter'), ' + (', $w('decimal_counter'), ' + ', $w('bonus'), ') * 25)'], 226.2],
+            'Without quotes simple integer multiplication' => ['counter', 'counter * 2', 10],
+            'Without quotes simple integer addition' => ['counter', 'counter + 2', 7],
+            'Without quotes simple integer subtraction' => ['counter', 'counter - 2', 3],
+            'Without quotes simple integer division' => ['counter', 'counter / 4', 1],
+            'Without quotes simple decimal multiplication' => ['decimal_bonus', 'decimal_bonus * 2.45', 24.5],
+            'Without quotes simple decimal addition' => ['decimal_bonus', 'decimal_bonus + 2.45', 12.45],
+            'Without quotes simple decimal subtraction' => ['decimal_bonus', 'decimal_bonus - 2.45', 7.55],
+            'Without quotes simple decimal division' => ['decimal_bonus', 'decimal_bonus / 1.6', 6.25],
+            'Mixed quotes complex decimals' => ['decimal_bonus', ['(', $w('decimal_bonus'), ' * 1.2) + (', $w('decimal_counter'), ' / 4)'], 13.4],
+            'Mixed quotes complex integers and decimals' => ['decimal_bonus', ['(', $w('counter'), ' + (', $w('decimal_bonus'), ' * 1.05))'], 15.5],
+            'Mixed quotes complex' => ['decimal_counter', ['(counter * ', $w('decimal_counter'), ') + (bonus % 3)'], 28],
         ];
     }
 
     public function testInvalidCalculableExpressionOnNotExistingModel()
     {
+        $this->expectException(\LogicException::class);
+
         $model = new TestUpdateModel4([
             'counter' => 4,
             'bonus' => 3,
         ]);
 
-        $model->counter = DB::calculate('`counter` + `bonus` * 2');
+        $model->counter = DB::calculate($this->wrap('counter').' + '.$this->wrap('bonus').' * 2');
 
-        // An SQL error should be thrown indicating that there is no such column, since we cannot use
-        // equations with columns involved in insert-statements.
-        $this->expectException(QueryException::class);
         $model->save();
     }
 
@@ -249,7 +254,7 @@ class EloquentUpdateTest extends DatabaseTestCase
             'decimal_counter' => 5.6,
         ]);
 
-        $model->counter = DB::calculate('`counter` * (`bonus` + 2)');
+        $model->counter = DB::calculate(static::wrap('counter').' * ('.static::wrap('bonus').' + 2)');
 
         $this->assertInstanceOf(CalculableExpression::class, $model->counter);
 
@@ -263,6 +268,16 @@ class EloquentUpdateTest extends DatabaseTestCase
         $this->assertEquals(25, $_SERVER['__test.saved.attributes']['counter']);
         $this->assertEquals(25, $_SERVER['__test.updated.attributes']['counter']);
         $this->assertEquals(25, $model->counter);
+    }
+
+    /**
+     * Convenience function to wrap a query string value into an identifier.
+     * @param  mixed  $value
+     * @return string
+     */
+    protected function wrap($value)
+    {
+        return DB::connection()->getQueryGrammar()->wrap($value);
     }
 }
 

@@ -134,7 +134,7 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
 
         $this->assertInstanceof(Decimal::class, $model->price);
 
-        $model->price = DB::calculate('`price` + 45.4');
+        $model->price = DB::calculate(DB::connection()->getQueryGrammar()->wrap('price').' + 45.4');
         $this->assertInstanceof(CalculableExpression::class, $model->price);
         $model->save();
 

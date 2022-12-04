@@ -2193,6 +2193,11 @@ trait HasAttributes
             preg_replace_callback(
                 '/`(.*?)`|([a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*)/',
                 function ($matches) {
+                    if (! $this->exists) {
+                        throw new LogicException(
+                            'Calculable expressions with identifiers are only allowed for existing records.'
+                        );
+                    }
                     return $this->getAttribute($matches[1] ?: $matches[2]);
                 },
                 $expression->getValue()
