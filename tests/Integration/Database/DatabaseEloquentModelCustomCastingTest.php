@@ -591,7 +591,7 @@ final class Decimal
         $parts = explode('.', (string) $value);
         $decimals = rtrim($parts[1], '0');
         $this->scale = strlen($decimals);
-        $this->value = $parts[0] . $decimals;
+        $this->value = $parts[0].$decimals;
     }
 
     public function getValue()

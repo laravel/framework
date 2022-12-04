@@ -193,7 +193,7 @@ class EloquentUpdateTest extends DatabaseTestCase
     {
         // This is a function wrapper that returns its own value, which we apply to SQL keywords
         // so that we can wrap them using the correct grammar in the test.
-        $w = fn($value) => fn () => $value;
+        $w = fn ($value) => fn () => $value;
 
         return [
             // Format: 'Explanation' => ['column', ['expressionPart', 'expressionPart', 'expressionPart'], 'expectedResult']
@@ -272,6 +272,7 @@ class EloquentUpdateTest extends DatabaseTestCase
 
     /**
      * Convenience function to wrap a query string value into an identifier.
+     *
      * @param  mixed  $value
      * @return string
      */
