@@ -2199,7 +2199,7 @@ trait HasAttributes
                             'Calculable expressions with identifiers are only allowed for existing records.'
                         );
                     }
-                    return $this->getAttribute($matches[1] ?: $matches[2]);
+                    return $this->getAttribute($matches[1] ?: $matches[2] ?: $matches[3]);
                 },
                 $expression->getValue()
             )
