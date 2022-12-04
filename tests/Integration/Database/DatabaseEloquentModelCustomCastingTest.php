@@ -590,7 +590,7 @@ final class Decimal
     {
         $parts = explode('.', (string) $value);
 
-        $this->scale = strlen($parts[1] ?? '');
+        $this->scale = strlen($parts[1]);
         $this->value = (int) str_replace('.', '', $value);
     }
 
