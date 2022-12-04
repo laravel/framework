@@ -1691,7 +1691,7 @@ trait HasAttributes
     protected function mergeAttributesFromClassCasts()
     {
         foreach ($this->classCastCache as $key => $value) {
-            if(($this->attributes[$key] ?? null) instanceof Expression) {
+            if (($this->attributes[$key] ?? null) instanceof Expression) {
                 // Skip query expressions since no cache should be applied here.
                 continue;
             }
