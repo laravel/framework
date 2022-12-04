@@ -2077,7 +2077,7 @@ trait HasAttributes
         // If the attribute exists within the cast array, we will convert it to
         // an appropriate native PHP type dependent upon the associated value
         // given with the key in the pair. Dayle made this comment line up.
-        if (!$value instanceof Expression && $this->hasCast($key)) {
+        if (! $value instanceof Expression && $this->hasCast($key)) {
             return $this->castAttribute($key, $value);
         }
 
@@ -2183,8 +2183,7 @@ trait HasAttributes
     /**
      * Calculate the result of a calculable expression, based on the current state of the model's attributes.
      *
-     * @param  CalculableExpression $expression
-     *
+     * @param  CalculableExpression  $expression
      * @return mixed
      */
     protected function calculateResult(CalculableExpression $expression)
@@ -2193,7 +2192,7 @@ trait HasAttributes
         return (new ExpressionLanguage())->evaluate(
             preg_replace_callback(
                 '/`(.*?)`|([a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*)/',
-                function($matches) {
+                function ($matches) {
                     return $this->getAttribute($matches[1] ?: $matches[2]);
                 },
                 $expression->getValue()
