@@ -589,9 +589,9 @@ final class Decimal
     public function __construct($value)
     {
         $parts = explode('.', (string) $value);
-
-        $this->scale = strlen($parts[1]);
-        $this->value = (int) str_replace('.', '', $value);
+        $decimals = rtrim($parts[1], '0');
+        $this->scale = strlen($decimals);
+        $this->value = $parts[0] . $decimals;
     }
 
     public function getValue()
