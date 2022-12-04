@@ -2191,7 +2191,8 @@ trait HasAttributes
         // Replace current model attributes into the variables:
         return (new ExpressionLanguage())->evaluate(
             preg_replace_callback(
-                '/`(.*?)`|([a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*)/',
+                // Pattern: replace backticks, then blockquotes, then PHP-like variables.
+                '/`(.+?)`|\[(.+?)\]|([a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*)/',
                 function ($matches) {
                     if (! $this->exists) {
                         throw new LogicException(
