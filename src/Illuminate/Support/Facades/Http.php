@@ -9,6 +9,7 @@ use Illuminate\Http\Client\Factory;
  * @template TWhenReturnType
  * @template TUnlessParameter
  * @template TUnlessReturnType
+ *
  * @method static \GuzzleHttp\Promise\PromiseInterface response(array|string|null $body = null, int $status = 200, array $headers = [])
  * @method static \Illuminate\Http\Client\ResponseSequence sequence(array $responses = [])
  * @method static \Illuminate\Http\Client\Factory allowStrayRequests()

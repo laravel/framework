@@ -7,6 +7,7 @@ namespace Illuminate\Support\Facades;
  * @template TWhenReturnType
  * @template TUnlessParameter
  * @template TUnlessReturnType
+ *
  * @method static bool exists(string $path)
  * @method static bool missing(string $path)
  * @method static string get(string $path, bool $lock = false)

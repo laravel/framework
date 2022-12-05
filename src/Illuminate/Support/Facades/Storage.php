@@ -23,7 +23,7 @@ use Illuminate\Filesystem\Filesystem;
  * @method static \Illuminate\Filesystem\FilesystemManager setApplication(\Illuminate\Contracts\Foundation\Application $app)
  * @method static bool exists(string $path)
  * @method static string|null get(string $path)
- * @method static resource|null The path resource or null on failure. readStream(string $path)
+ * @method static resource|null readStream(string $path)
  * @method static bool put(string $path, string|resource $contents, mixed $options = [])
  * @method static bool writeStream(string $path, resource $resource, array $options = [])
  * @method static string getVisibility(string $path)
