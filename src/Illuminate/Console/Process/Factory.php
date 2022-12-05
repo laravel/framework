@@ -4,6 +4,7 @@ namespace Illuminate\Console\Process;
 
 use Closure;
 use Illuminate\Support\Traits\Macroable;
+use PHPUnit\Framework\Assert as PHPUnit;
 
 class Factory
 {
@@ -12,11 +13,32 @@ class Factory
     }
 
     /**
+     * Indicates if the process factory has faked process handlers.
+     *
+     * @var bool
+     */
+    protected $recording = false;
+
+    /**
+     * All of the recorded processes.
+     *
+     * @var array
+     */
+    protected $recorded = [];
+
+    /**
      * The registered fake handler callbacks.
      *
      * @var array
      */
     protected $fakeHandlers = [];
+
+    /**
+     * Indicates that an exception should be thrown if any process is not faked.
+     *
+     * @var bool
+     */
+    protected $preventStrayProcesses = false;
 
     /**
      * Create a new fake process response for testing purposes.
@@ -53,6 +75,8 @@ class Factory
      */
     public function fake(Closure|array $callback = null)
     {
+        $this->recording = true;
+
         if (is_null($callback)) {
             $this->fakeHandlers = ['*' => fn () => new FakeProcessResult];
 
@@ -70,6 +94,118 @@ class Factory
                     ? $handler
                     : fn () => $handler;
         }
+
+        return $this;
+    }
+
+    /**
+     * Indicate that an exception should be thrown if any process is not faked.
+     *
+     * @param  bool  $prevent
+     * @return $this
+     */
+    public function preventStrayProcesses($prevent = true)
+    {
+        $this->preventStrayProcesses = $prevent;
+
+        return $this;
+    }
+
+    /**
+     * Determine if stray processes are being prevented.
+     *
+     * @return bool
+     */
+    public function preventingStrayProcesses()
+    {
+        return $this->preventStrayProcesses;
+    }
+
+    /**
+     * Determine if the process factory has fake process handlers and is recording processes.
+     *
+     * @return bool
+     */
+    public function isRecording()
+    {
+        return $this->recording;
+    }
+
+    /**
+     * Record the given process if processes should be recorded.
+     *
+     * @param  \Illuminate\Console\Process\PendignProcess  $process
+     * @return $this
+     */
+    public function recordIfRecording(PendingProcess $process)
+    {
+        if ($this->isRecording()) {
+            $this->record($process);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Record the given process.
+     *
+     * @param  \Illuminate\Console\Process\PendignProcess  $process
+     * @return $this
+     */
+    public function record(PendingProcess $process)
+    {
+        $this->recorded[] = $process;
+
+        return $this;
+    }
+
+    /**
+     * Assert that a process was recorded matching a given truth test.
+     *
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function assertRan(Closure $callback)
+    {
+        PHPUnit::assertTrue(
+            collect($this->recorded)->filter(function ($pendingProcess) use ($callback) {
+                return $callback($pendingProcess);
+            })->count() > 0,
+            'An expected external process was not invoked.'
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert that a process was not recorded matching a given truth test.
+     *
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function assertNotRan(Closure $callback)
+    {
+        PHPUnit::assertTrue(
+            collect($this->recorded)->filter(function ($pendingProcess) use ($callback) {
+                return $callback($pendingProcess);
+            })->count() === 0,
+            'An unexpected external process was invoked.'
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert that no processes were recorded.
+     *
+     * @return $this
+     */
+    public function assertNothingRan()
+    {
+        PHPUnit::assertEmpty(
+            $this->recorded,
+            'An unexpected external process was invoked.'
+        );
 
         return $this;
     }

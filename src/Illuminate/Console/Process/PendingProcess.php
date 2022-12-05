@@ -4,6 +4,7 @@ namespace Illuminate\Console\Process;
 
 use Illuminate\Support\Str;
 use LogicException;
+use RuntimeException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException as SymfonyTimeoutException;
 use Symfony\Component\Process\Process;
 
@@ -115,11 +116,17 @@ class PendingProcess
      */
     public function run($command = null, $output = null)
     {
+        $this->command = $command ?: $this->command;
+
         try {
             $process = $this->toSymfonyProcess($command);
 
             if ($fake = $this->fakeFor($command = $process->getCommandline())) {
+                $this->factory->recordIfRecording($this);
+
                 return $this->resolveSynchronousFake($command, $fake);
+            } elseif ($this->factory->isRecording() && $this->factory->preventingStrayProcesses()) {
+                throw new RuntimeException('Attempted process ['.(string) $this->command.'] without a matching fake.');
             }
 
             return new ProcessResult(tap($process)->run($output));
@@ -136,10 +143,16 @@ class PendingProcess
      */
     public function start($command = null)
     {
+        $this->command = $command ?: $this->command;
+
         $process = $this->toSymfonyProcess($command);
 
         if ($fake = $this->fakeFor($command = $process->getCommandline())) {
+            $this->factory->recordIfRecording($this);
+
             return $this->resolveAsynchronousFake($command, $fake);
+        } elseif ($this->factory->isRecording() && $this->factory->preventingStrayProcesses()) {
+            throw new RuntimeException('Attempted process ['.(string) $this->command.'] without a matching fake.');
         }
 
         return new InvokedProcess(tap($process)->start());
