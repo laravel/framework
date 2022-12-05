@@ -99,29 +99,6 @@ class Factory
     }
 
     /**
-     * Indicate that an exception should be thrown if any process is not faked.
-     *
-     * @param  bool  $prevent
-     * @return $this
-     */
-    public function preventStrayProcesses($prevent = true)
-    {
-        $this->preventStrayProcesses = $prevent;
-
-        return $this;
-    }
-
-    /**
-     * Determine if stray processes are being prevented.
-     *
-     * @return bool
-     */
-    public function preventingStrayProcesses()
-    {
-        return $this->preventStrayProcesses;
-    }
-
-    /**
      * Determine if the process factory has fake process handlers and is recording processes.
      *
      * @return bool
@@ -157,6 +134,29 @@ class Factory
         $this->recorded[] = $process;
 
         return $this;
+    }
+
+    /**
+     * Indicate that an exception should be thrown if any process is not faked.
+     *
+     * @param  bool  $prevent
+     * @return $this
+     */
+    public function preventStrayProcesses($prevent = true)
+    {
+        $this->preventStrayProcesses = $prevent;
+
+        return $this;
+    }
+
+    /**
+     * Determine if stray processes are being prevented.
+     *
+     * @return bool
+     */
+    public function preventingStrayProcesses()
+    {
+        return $this->preventStrayProcesses;
     }
 
     /**
