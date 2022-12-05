@@ -24,7 +24,7 @@ class Timebox
 
         $result = $callback($this);
 
-        $remainder = intval($microseconds - ((microtime(true) - $start) * 1000000));
+        $remainder = (int) ($microseconds - ((microtime(true) - $start) * 1000000));
 
         if (! $this->earlyReturn && $remainder > 0) {
             $this->usleep($remainder);

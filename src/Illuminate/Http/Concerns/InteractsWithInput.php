@@ -352,7 +352,7 @@ trait InteractsWithInput
      */
     public function integer($key, $default = 0)
     {
-        return intval($this->input($key, $default));
+        return (int) $this->input($key, $default);
     }
 
     /**
@@ -364,7 +364,7 @@ trait InteractsWithInput
      */
     public function float($key, $default = 0.0)
     {
-        return floatval($this->input($key, $default));
+        return (float) $this->input($key, $default);
     }
 
     /**

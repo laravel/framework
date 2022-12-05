@@ -1139,7 +1139,7 @@ class Stringable implements JsonSerializable
      */
     public function toInteger()
     {
-        return intval($this->value);
+        return (int) $this->value;
     }
 
     /**
@@ -1149,7 +1149,7 @@ class Stringable implements JsonSerializable
      */
     public function toFloat()
     {
-        return floatval($this->value);
+        return (float) $this->value;
     }
 
     /**
