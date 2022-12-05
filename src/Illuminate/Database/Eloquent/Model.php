@@ -966,8 +966,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             return false;
         }
 
-        if (count($changes) !== count($this->getDirty())) {
-            $extra = array_merge($extra, array_diff_key($this->getDirty(), $changes));
+        if (count($changes) !== count($fillable = $this->getDirty())) {
+            $extra = array_merge($extra, array_diff_key($fillable, $changes));
         }
 
         $this->forceFill($extra);
