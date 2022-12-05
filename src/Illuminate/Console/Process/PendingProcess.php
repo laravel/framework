@@ -224,14 +224,10 @@ class PendingProcess
     {
         $result = $fake($this);
 
-        // if ($result instanceof FakeProcessResult) {
-        //     return $result->withCommand($command);
-        // } elseif ($result instanceof ProcessResultContract) {
-        //     return $result;
-        // } elseif ($result instanceof FakeProcessDescription) {
-        //     return $result->toProcessResult($command);
-        // }
+        if ($result instanceof FakeProcessDescription) {
+            return new FakeInvokedProcess($command, $result);
+        }
 
-        throw new LogicException("Unsupported synchronous process fake result provided.");
+        throw new LogicException("Unsupported asynchronous process fake result provided.");
     }
 }

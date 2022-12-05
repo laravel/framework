@@ -31,6 +31,27 @@ class FakeInvokedProcess implements InvokedProcessContract
     protected $receivedSignals = [];
 
     /**
+     * The number of times the process should indicate that it is "running".
+     *
+     * @var int
+     */
+    protected $runIterations;
+
+    /**
+     * The current output's index.
+     *
+     * @var int
+     */
+    protected $nextOutputIndex = 0;
+
+    /**
+     * The current error output's index.
+     *
+     * @var int
+     */
+    protected $nextErrorOutputIndex = 0;
+
+    /**
      * Create a new invoked process instance.
      *
      * @param  string  $command
@@ -67,13 +88,34 @@ class FakeInvokedProcess implements InvokedProcessContract
     }
 
     /**
+     * Determine if the process has received the given signal.
+     *
+     * @param  int  $signal
+     * @return bool
+     */
+    public function hasReceivedSignal(int $signal)
+    {
+        return in_array($signal, $this->receivedSignals);
+    }
+
+    /**
      * Determine if the process is still running.
      *
      * @return bool
      */
     public function running()
     {
-        return $this->process->isRunning();
+        $this->runIterations = is_null($this->runIterations)
+                ? $this->process->runIterations
+                : $this->runIterations;
+
+        if ($this->runIterations === 0) {
+            return false;
+        }
+
+        $this->runIterations = $this->runIterations - 1;
+
+        return true;
     }
 
     /**
@@ -83,7 +125,21 @@ class FakeInvokedProcess implements InvokedProcessContract
      */
     public function latestOutput()
     {
-        return $this->process->getIncrementalOutput();
+        $outputCount = count($this->process->output);
+
+        for ($i = $this->nextOutputIndex; $i < $outputCount; $i++) {
+            if ($this->process->output[$i]['type'] === 'out') {
+                $output = $this->process->output[$i]['buffer'];
+
+                $this->nextOutputIndex = $i + 1;
+
+                break;
+            }
+
+            $this->nextOutputIndex = $i + 1;
+        }
+
+        return $output ?? '';
     }
 
     /**
@@ -93,7 +149,21 @@ class FakeInvokedProcess implements InvokedProcessContract
      */
     public function latestErrorOutput()
     {
-        return $this->process->getIncrementalErrorOutput();
+        $outputCount = count($this->process->output);
+
+        for ($i = $this->nextErrorOutputIndex; $i < $outputCount; $i++) {
+            if ($this->process->output[$i]['type'] === 'err') {
+                $output = $this->process->output[$i]['buffer'];
+
+                $this->nextErrorOutputIndex = $i + 1;
+
+                break;
+            }
+
+            $this->nextErrorOutputIndex = $i + 1;
+        }
+
+        return $output ?? '';
     }
 
     /**
@@ -104,6 +174,24 @@ class FakeInvokedProcess implements InvokedProcessContract
      */
     public function wait($output = null)
     {
+        [$outputCount, $outputStartingPoint] = [
+            count($this->process->output),
+            min($this->nextOutputIndex, $this->nextErrorOutputIndex),
+        ];
+
+        if (! $output) {
+            return $this->process->toProcessResult($this->command);
+        }
+
+        for ($i = $outputStartingPoint; $i < $outputCount; $i++) {
+            $currentOutput = $this->process->output[$i];
+
+            if (($currentOutput['type'] === 'out' && $i >= $this->nextOutputIndex) ||
+                ($currentOutput['type'] === 'err' && $i >= $this->nextErrorOutputIndex)) {
+                $output($currentOutput['type'], $currentOutput['buffer']);
+            }
+        }
+
         return $this->process->toProcessResult($this->command);
     }
 

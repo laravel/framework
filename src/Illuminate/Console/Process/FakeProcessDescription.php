@@ -28,18 +28,11 @@ class FakeProcessDescription
     public $exitCode = 0;
 
     /**
-     * The current output's index.
+     * The number of times the process should indicate that it is "running".
      *
      * @var int
      */
-    protected $lastOutputIndex = 0;
-
-    /**
-     * The current error output's index.
-     *
-     * @var int
-     */
-    protected $lastErrorOutputIndex = 0;
+    public $runIterations = 0;
 
     /**
      * Specify the process ID that should be assigned to the process.
@@ -94,62 +87,14 @@ class FakeProcessDescription
     }
 
     /**
-     * Get the next output for the process.
+     * Specify how many times the "isRunning" method should return "true".
      *
-     * @return string
-     */
-    public function getIncrementalOutput()
-    {
-        $outputCount = count($this->output);
-
-        for ($i = $this->lastOutputIndex; $i < $outputCount; $i++) {
-            if ($this->output[$i]['type'] === 'out') {
-                $output = $this->output[$i]['buffer'];
-
-                $this->lastOutputIndex = $i;
-
-                break;
-            }
-
-            $this->lastOutputIndex = $i;
-        }
-
-        return $output ?? '';
-    }
-
-    /**
-     * Get the next error output for the process.
-     *
-     * @return string
-     */
-    public function getIncrementalErrorOutput()
-    {
-        $outputCount = count($this->output);
-
-        for ($i = $this->lastErrorOutputIndex; $i < $outputCount; $i++) {
-            if ($this->output[$i]['type'] === 'err') {
-                $output = $this->output[$i]['buffer'];
-
-                $this->lastErrorOutputIndex = $i;
-
-                break;
-            }
-
-            $this->lastErrorOutputIndex = $i;
-        }
-
-        return $output ?? '';
-    }
-
-    /**
-     * Reset the incremental output.
-     *
+     * @param  int  $iterations
      * @return $this
      */
-    public function resetIncrementalOutput()
+    public function runsFor(int $iterations)
     {
-        $this->lastOutputIndex = 0;
-        $this->lastErrorOutputIndex = 0;
+        $this->runIterations = $iterations;
 
         return $this;
     }
