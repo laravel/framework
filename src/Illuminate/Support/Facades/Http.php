@@ -5,6 +5,10 @@ namespace Illuminate\Support\Facades;
 use Illuminate\Http\Client\Factory;
 
 /**
+ * @template TWhenParameter
+ * @template TWhenReturnType
+ * @template TUnlessParameter
+ * @template TUnlessReturnType
  * @method static \GuzzleHttp\Promise\PromiseInterface response(array|string|null $body = null, int $status = 200, array $headers = [])
  * @method static \Illuminate\Http\Client\ResponseSequence sequence(array $responses = [])
  * @method static \Illuminate\Http\Client\Factory allowStrayRequests()
@@ -76,8 +80,8 @@ use Illuminate\Http\Client\Factory;
  * @method static \Illuminate\Http\Client\PendingRequest setClient(\GuzzleHttp\Client $client)
  * @method static \Illuminate\Http\Client\PendingRequest setHandler(callable $handler)
  * @method static array getOptions()
- * @method static \Illuminate\Http\Client\PendingRequest|TWhenReturnType when((\Closure($this): TWhenParameter)|TWhenParameter|null $value = null, callable|null $callback = null, callable|null $default = null)
- * @method static \Illuminate\Http\Client\PendingRequest|TUnlessReturnType unless((\Closure($this): TUnlessParameter)|TUnlessParameter|null $value = null, callable|null $callback = null, callable|null $default = null)
+ * @method static \Illuminate\Http\Client\PendingRequest|TWhenReturnType when((\Closure(\Illuminate\Http\Client\PendingRequest): TWhenParameter)|TWhenParameter|null $value = null, (callable(\Illuminate\Http\Client\PendingRequest, TWhenParameter): TWhenReturnType)|null $callback = null, (callable(\Illuminate\Http\Client\PendingRequest, TWhenParameter): TWhenReturnType)|null $default = null)
+ * @method static \Illuminate\Http\Client\PendingRequest|TUnlessReturnType unless((\Closure(\Illuminate\Http\Client\PendingRequest): TUnlessParameter)|TUnlessParameter|null $value = null, (callable(\Illuminate\Http\Client\PendingRequest, TUnlessParameter): TUnlessReturnType)|null $callback = null, (callable(\Illuminate\Http\Client\PendingRequest, TUnlessParameter): TUnlessReturnType)|null $default = null)
  *
  * @see \Illuminate\Http\Client\Factory
  */
