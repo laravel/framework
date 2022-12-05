@@ -248,7 +248,7 @@ function resolveType($type)
  *
  * @param  string  $docblock
  * @param  string  $tag
- * @return \Illuminate\Support\Collection
+ * @return \Illuminate\Support\Collection<string>
  */
 function resolveDocTags($docblock, $tag)
 {
@@ -268,7 +268,7 @@ function resolveDocTags($docblock, $tag)
  * Recursivly resolve docblock mixins.
  *
  * @param  \ReflectionClass  $class
- * @return \Illuminate\Support\Collection<ReflectionClass>
+ * @return \Illuminate\Support\Collection<\ReflectionClass>
  */
 function resolveDocMixins($class)
 {
@@ -335,7 +335,7 @@ function resolveName($method)
  * Resolve the classes methods.
  *
  * @param  \ReflectionClass  $class
- * @return Illuminate\Support\Collection<ReflectionMethodDecorator|string>
+ * @return Illuminate\Support\Collection<\ReflectionMethodDecorator|string>
  */
 function resolveMethods($class)
 {
@@ -398,7 +398,9 @@ function resolveDefaultValue($parameter)
         return '0755';
     }
 
-    return Str::of(json_encode($parameter['default']) ?: 'unknown')
+    $default = json_encode($parameter['default']);
+
+    return Str::of($default === false ? 'unknown' : $default)
         ->replace('"', "'")
         ->replace('\\/', '/')
         ->toString();

@@ -130,7 +130,7 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
-     * Get multiple items.
+     * {@inheritdoc}
      *
      * @return iterable
      */
