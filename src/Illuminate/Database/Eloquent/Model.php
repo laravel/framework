@@ -960,18 +960,26 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             ? $this->deviateClassCastableAttribute($method, $column, $amount)
             : $this->{$column} + ($method === 'increment' ? $amount : $amount * -1);
 
-        $this->forceFill($extra);
+        $changes = $this->getDirty();
 
         if ($this->fireModelEvent('updating') === false) {
             return false;
         }
 
-        return tap($this->setKeysForSaveQuery($query)->{$method}($column, $amount, $extra), function () use ($column) {
+        if (count($changes) !== count($this->getDirty())) {
+            $extra = array_merge($extra, array_diff_key($this->getDirty(), $changes));
+        }
+
+        $this->forceFill($extra);
+
+        $columns = array_keys($extra) + [$column];
+
+        return tap($this->setKeysForSaveQuery($query)->{$method}($column, $amount, $extra), function () use ($columns) {
             $this->syncChanges();
 
             $this->fireModelEvent('updated', false);
 
-            $this->syncOriginalAttribute($column);
+            $this->syncOriginalAttributes($columns);
         });
     }
 
