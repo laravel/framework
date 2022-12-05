@@ -321,6 +321,25 @@ class SupportStringableTest extends TestCase
         }));
     }
 
+    public function testWhenIsUlid()
+    {
+        $this->assertSame('Ulid: 01GJSNW9MAF792C0XYY8RX6QFT', (string) $this->stringable('01GJSNW9MAF792C0XYY8RX6QFT')->whenIsUlid(function ($stringable) {
+            return $stringable->prepend('Ulid: ');
+        }, function ($stringable) {
+            return $stringable->prepend('Not Ulid: ');
+        }));
+
+        $this->assertSame('2cdc7039-65a6-4ac7-8e5d-d554a98', (string) $this->stringable('2cdc7039-65a6-4ac7-8e5d-d554a98')->whenIsUlid(function ($stringable) {
+            return $stringable->prepend('Ulid: ');
+        }));
+
+        $this->assertSame('Not Ulid: ss-01GJSNW9MAF792C0XYY8RX6QFT', (string) $this->stringable('ss-01GJSNW9MAF792C0XYY8RX6QFT')->whenIsUlid(function ($stringable) {
+            return $stringable->prepend('Ulid: ');
+        }, function ($stringable) {
+            return $stringable->prepend('Not Ulid: ');
+        }));
+    }
+
     public function testWhenTest()
     {
         $this->assertSame('Winner: foo bar', (string) $this->stringable('foo bar')->whenTest('/bar/', function ($stringable) {
