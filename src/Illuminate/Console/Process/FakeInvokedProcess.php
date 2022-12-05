@@ -35,7 +35,7 @@ class FakeInvokedProcess implements InvokedProcessContract
      *
      * @var int
      */
-    protected $runIterations;
+    protected $remainingRunIterations;
 
     /**
      * The current output's index.
@@ -105,15 +105,15 @@ class FakeInvokedProcess implements InvokedProcessContract
      */
     public function running()
     {
-        $this->runIterations = is_null($this->runIterations)
+        $this->remainingRunIterations = is_null($this->remainingRunIterations)
                 ? $this->process->runIterations
-                : $this->runIterations;
+                : $this->remainingRunIterations;
 
-        if ($this->runIterations === 0) {
+        if ($this->remainingRunIterations === 0) {
             return false;
         }
 
-        $this->runIterations = $this->runIterations - 1;
+        $this->remainingRunIterations = $this->remainingRunIterations - 1;
 
         return true;
     }
@@ -174,14 +174,16 @@ class FakeInvokedProcess implements InvokedProcessContract
      */
     public function wait($output = null)
     {
+        if (! $output) {
+            $this->remainingRunIterations = 0;
+
+            return $this->predictProcessResult();
+        }
+
         [$outputCount, $outputStartingPoint] = [
             count($this->process->output),
             min($this->nextOutputIndex, $this->nextErrorOutputIndex),
         ];
-
-        if (! $output) {
-            return $this->process->toProcessResult($this->command);
-        }
 
         for ($i = $outputStartingPoint; $i < $outputCount; $i++) {
             $currentOutput = $this->process->output[$i];
@@ -191,6 +193,11 @@ class FakeInvokedProcess implements InvokedProcessContract
                 $output($currentOutput['type'], $currentOutput['buffer']);
             }
         }
+
+        // Ensure no longer running and no further output is returned by incremental output functions...
+        $this->remainingRunIterations = 0;
+        $this->nextOutputIndex = count($this->process->output);
+        $this->nextErrorOutputIndex = count($this->process->output);
 
         return $this->process->toProcessResult($this->command);
     }
@@ -203,15 +210,26 @@ class FakeInvokedProcess implements InvokedProcessContract
      */
     public function waitUntil($output)
     {
-        foreach ($this->process->output as $processOutput) {
+        foreach ($this->process->output as $i => $processOutput) {
             if ($output($processOutput['type'], $processOutput['buffer'])) {
                 return $this;
             }
         }
 
+        // This process would essentially be running forever; therefore, throw...
         throw new ProcessTimedOutException(
             new SymfonyTimeoutException($this->process->toSymfonyProcess($this->command), 1),
             $this->process->toProcessResult(),
         );
+    }
+
+    /**
+     * Get the ultimate process result that wil be returned by this "process".
+     *
+     * @return \Illuminate\Contracts\Console\Process\ProcessResult
+     */
+    public function predictProcessResult()
+    {
+        return $this->process->toProcessResult($this->command);
     }
 }

@@ -122,9 +122,9 @@ class PendingProcess
             $process = $this->toSymfonyProcess($command);
 
             if ($fake = $this->fakeFor($command = $process->getCommandline())) {
-                $this->factory->recordIfRecording($this);
-
-                return $this->resolveSynchronousFake($command, $fake);
+                return tap($this->resolveSynchronousFake($command, $fake), function ($result) {
+                    $this->factory->recordIfRecording($this, $result);
+                });
             } elseif ($this->factory->isRecording() && $this->factory->preventingStrayProcesses()) {
                 throw new RuntimeException('Attempted process ['.(string) $this->command.'] without a matching fake.');
             }
@@ -148,9 +148,9 @@ class PendingProcess
         $process = $this->toSymfonyProcess($command);
 
         if ($fake = $this->fakeFor($command = $process->getCommandline())) {
-            $this->factory->recordIfRecording($this);
-
-            return $this->resolveAsynchronousFake($command, $fake);
+            return tap($this->resolveAsynchronousFake($command, $fake), function (FakeInvokedProcess $process) {
+                $this->factory->recordIfRecording($this, $process->predictProcessResult());
+            });
         } elseif ($this->factory->isRecording() && $this->factory->preventingStrayProcesses()) {
             throw new RuntimeException('Attempted process ['.(string) $this->command.'] without a matching fake.');
         }
@@ -230,7 +230,7 @@ class PendingProcess
      *
      * @param  string  $command
      * @param  \Closure  $fake
-     * @return mixed
+     * @return \Illuminate\Console\Process\FakeInvokedProcess
      */
     protected function resolveAsynchronousFake(string $command, $fake)
     {

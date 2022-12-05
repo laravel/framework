@@ -3,6 +3,7 @@
 namespace Illuminate\Console\Process;
 
 use Closure;
+use Illuminate\Contracts\Console\Process\ProcessResult as ProcessResultContract;
 use Illuminate\Support\Traits\Macroable;
 use PHPUnit\Framework\Assert as PHPUnit;
 
@@ -112,12 +113,13 @@ class Factory
      * Record the given process if processes should be recorded.
      *
      * @param  \Illuminate\Console\Process\PendignProcess  $process
+     * @param  \Illuminate\Contracts\Console\Process\ProcessResult  $result
      * @return $this
      */
-    public function recordIfRecording(PendingProcess $process)
+    public function recordIfRecording(PendingProcess $process, ProcessResultContract $result)
     {
         if ($this->isRecording()) {
-            $this->record($process);
+            $this->record($process, $result);
         }
 
         return $this;
@@ -127,11 +129,12 @@ class Factory
      * Record the given process.
      *
      * @param  \Illuminate\Console\Process\PendignProcess  $process
+     * @param  \Illuminate\Contracts\Console\Process\ProcessResult  $result
      * @return $this
      */
-    public function record(PendingProcess $process)
+    public function record(PendingProcess $process, ProcessResultContract $result)
     {
-        $this->recorded[] = $process;
+        $this->recorded[] = [$process, $result];
 
         return $this;
     }
@@ -168,8 +171,8 @@ class Factory
     public function assertRan(Closure $callback)
     {
         PHPUnit::assertTrue(
-            collect($this->recorded)->filter(function ($pendingProcess) use ($callback) {
-                return $callback($pendingProcess);
+            collect($this->recorded)->filter(function ($pair) use ($callback) {
+                return $callback($pair[0], $pair[1]);
             })->count() > 0,
             'An expected external process was not invoked.'
         );
@@ -186,8 +189,8 @@ class Factory
     public function assertNotRan(Closure $callback)
     {
         PHPUnit::assertTrue(
-            collect($this->recorded)->filter(function ($pendingProcess) use ($callback) {
-                return $callback($pendingProcess);
+            collect($this->recorded)->filter(function ($pair) use ($callback) {
+                return $callback($pair[0], $pair[1]);
             })->count() === 0,
             'An unexpected external process was invoked.'
         );
