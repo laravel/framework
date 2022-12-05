@@ -223,8 +223,15 @@ class PendingProcess
     {
         $result = $fake($this);
 
-        if ($result instanceof FakeProcessDescription) {
-            return new FakeInvokedProcess($command, $result);
+        if ($result instanceof ProcessResult) {
+            return new FakeInvokedProcess(
+                $command,
+                (new FakeProcessDescription)
+                    ->output($result->output())
+                    ->errorOutput($result->errorOutput())
+                    ->runsFor(iterations: 0)
+                    ->exitCode($result->exitCode())
+            );
         } elseif ($result instanceof FakeProcessResult) {
             return new FakeInvokedProcess(
                 $command,
@@ -234,15 +241,8 @@ class PendingProcess
                     ->runsFor(iterations: 0)
                     ->exitCode($result->exitCode())
             );
-        } elseif ($result instanceof ProcessResult) {
-            return new FakeInvokedProcess(
-                $command,
-                (new FakeProcessDescription)
-                    ->output($result->output())
-                    ->errorOutput($result->errorOutput())
-                    ->runsFor(iterations: 0)
-                    ->exitCode($result->exitCode())
-            );
+        } elseif ($result instanceof FakeProcessDescription) {
+            return new FakeInvokedProcess($command, $result);
         }
 
         throw new LogicException("Unsupported asynchronous process fake result provided.");
