@@ -2556,6 +2556,7 @@ class Builder implements BuilderContract
     public function toFullSql()
     {
         $bindings = $this->getBindings();
+
         return preg_replace_callback(
             '/\?/',
             function () use (&$bindings) {
