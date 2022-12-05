@@ -157,15 +157,9 @@ function resolveDocParamType($method, $parameter)
 
     // Replace references to '$this', 'static', or 'self' with the implementations FQCN...
 
-    $types = Str::of($types)
+    return Str::of($types)
         ->replace(['$this', 'static'], '\\'.$method->sourceClass()->getName())
         ->replace('self', '\\'.$method->getDeclaringClass()->getName());
-
-    // Generics are being namespaced, so we will strip the namespace from them...
-
-    return resolveTemplateDocName($method)->reduce(function ($types, $template) use ($parameter) {
-        return Str::replace('\\'.$parameter->getDeclaringClass()->getNamespaceName().'\\'.$template, $template, $types);
-    }, $types);
 }
 
 /**
