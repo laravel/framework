@@ -2,7 +2,6 @@
 
 namespace Illuminate\Console\Process;
 
-use Illuminate\Contracts\Console\Process\ProcessResult as ProcessResultContract;
 use Illuminate\Support\Str;
 use LogicException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException as SymfonyTimeoutException;
@@ -202,10 +201,10 @@ class PendingProcess
     {
         $result = $fake($this);
 
-        if ($result instanceof FakeProcessResult) {
-            return $result->withCommand($command);
-        } elseif ($result instanceof ProcessResultContract) {
+        if ($result instanceof ProcessResult) {
             return $result;
+        } elseif ($result instanceof FakeProcessResult) {
+            return $result->withCommand($command);
         } elseif ($result instanceof FakeProcessDescription) {
             return $result->toProcessResult($command);
         }
@@ -226,6 +225,24 @@ class PendingProcess
 
         if ($result instanceof FakeProcessDescription) {
             return new FakeInvokedProcess($command, $result);
+        } elseif ($result instanceof FakeProcessResult) {
+            return new FakeInvokedProcess(
+                $command,
+                (new FakeProcessDescription)
+                    ->output($result->output())
+                    ->errorOutput($result->errorOutput())
+                    ->runsFor(iterations: 0)
+                    ->exitCode($result->exitCode())
+            );
+        } elseif ($result instanceof ProcessResult) {
+            return new FakeInvokedProcess(
+                $command,
+                (new FakeProcessDescription)
+                    ->output($result->output())
+                    ->errorOutput($result->errorOutput())
+                    ->runsFor(iterations: 0)
+                    ->exitCode($result->exitCode())
+            );
         }
 
         throw new LogicException("Unsupported asynchronous process fake result provided.");
