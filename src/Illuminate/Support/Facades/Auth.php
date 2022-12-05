@@ -36,10 +36,35 @@ use RuntimeException;
  * @method static \Illuminate\Contracts\Auth\Authenticatable|bool onceUsingId(mixed $id)
  * @method static bool viaRemember()
  * @method static void logout()
+ * @method static \Symfony\Component\HttpFoundation\Response|null basic(string $field = 'email', array $extraConditions = [])
+ * @method static \Symfony\Component\HttpFoundation\Response|null onceBasic(string $field = 'email', array $extraConditions = [])
+ * @method static bool attemptWhen(array $credentials = [], array|callable|null $callbacks = null, bool $remember = false)
+ * @method static void logoutCurrentDevice()
+ * @method static \Illuminate\Contracts\Auth\Authenticatable|null logoutOtherDevices(string $password, string $attribute = 'password')
+ * @method static void attempting(mixed $callback)
+ * @method static \Illuminate\Contracts\Auth\Authenticatable getLastAttempted()
+ * @method static string getName()
+ * @method static string getRecallerName()
+ * @method static \Illuminate\Auth\SessionGuard setRememberDuration(int $minutes)
+ * @method static \Illuminate\Contracts\Cookie\QueueingFactory getCookieJar()
+ * @method static void setCookieJar(\Illuminate\Contracts\Cookie\QueueingFactory $cookie)
+ * @method static \Illuminate\Contracts\Events\Dispatcher getDispatcher()
+ * @method static void setDispatcher(\Illuminate\Contracts\Events\Dispatcher $events)
+ * @method static \Illuminate\Contracts\Session\Session getSession()
+ * @method static \Illuminate\Contracts\Auth\Authenticatable|null getUser()
+ * @method static \Symfony\Component\HttpFoundation\Request getRequest()
+ * @method static \Illuminate\Auth\SessionGuard setRequest(\Symfony\Component\HttpFoundation\Request $request)
+ * @method static \Illuminate\Support\Timebox getTimebox()
+ * @method static \Illuminate\Contracts\Auth\Authenticatable authenticate()
+ * @method static \Illuminate\Contracts\Auth\UserProvider getProvider()
+ * @method static void setProvider(\Illuminate\Contracts\Auth\UserProvider $provider)
+ * @method static void macro(string $name, object|callable $macro)
+ * @method static void mixin(object $mixin, bool $replace = true)
+ * @method static bool hasMacro(string $name)
+ * @method static void flushMacros()
  *
  * @see \Illuminate\Auth\AuthManager
- * @see \Illuminate\Contracts\Auth\Guard
- * @see \Illuminate\Contracts\Auth\StatefulGuard
+ * @see \Illuminate\Auth\SessionGuard
  */
 class Auth extends Facade
 {

@@ -25,8 +25,12 @@ use Illuminate\Contracts\Broadcasting\Factory as BroadcastingFactoryContract;
  * @method static mixed auth(\Illuminate\Http\Request $request)
  * @method static mixed validAuthenticationResponse(\Illuminate\Http\Request $request, mixed $result)
  * @method static void broadcast(array $channels, string $event, array $payload = [])
+ * @method static array|null resolveAuthenticatedUser(\Illuminate\Http\Request $request)
+ * @method static void resolveAuthenticatedUserUsing(\Closure $callback)
+ * @method static \Illuminate\Broadcasting\Broadcasters\Broadcaster channel(\Illuminate\Contracts\Broadcasting\HasBroadcastChannel|string $channel, callable|string $callback, array $options = [])
  *
  * @see \Illuminate\Broadcasting\BroadcastManager
+ * @see \Illuminate\Broadcasting\Broadcasters\Broadcaster
  */
 class Broadcast extends Facade
 {
