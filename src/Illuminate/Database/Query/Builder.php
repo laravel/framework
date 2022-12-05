@@ -2549,6 +2549,23 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Get the full SQL representation of the query with bindings.
+     *
+     * @return string
+     */
+    public function toFullSql()
+    {
+        $bindings = $this->getBindings();
+        return preg_replace_callback(
+            '/\?/',
+            function () use (&$bindings) {
+                return json_encode(array_shift($bindings), JSON_UNESCAPED_UNICODE);
+            },
+            $this->toSql()
+        );
+    }
+
+    /**
      * Execute a query for a single record by ID.
      *
      * @param  int|string  $id
