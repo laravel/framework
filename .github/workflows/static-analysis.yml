@@ -8,7 +8,7 @@ on:
   pull_request:
 
 jobs:
-  src:
+  types:
     runs-on: ubuntu-22.04
 
     strategy:
@@ -25,7 +25,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.0
+          php-version: 8.1
           tools: composer:v2
           coverage: none
 
@@ -38,3 +38,32 @@ jobs:
 
       - name: Execute type checking
         run: vendor/bin/phpstan --configuration="phpstan.${{ matrix.directory }}.neon.dist"
+
+  facades:
+    runs-on: ubuntu-22.04
+
+    strategy:
+      fail-fast: true
+
+    name: Facade DocBlocks
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.1
+          tools: composer:v2
+          coverage: none
+
+      - name: Install dependencies
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
+
+      - name: Lint facade docblocks
+        run: php -f bin/facades.php -- --lint
