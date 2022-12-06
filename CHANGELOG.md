@@ -1,6 +1,21 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.42.2...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.43.0...9.x)
+
+
+## [v9.43.0](https://github.com/laravel/framework/compare/v9.42.2...v9.43.0) - 2022-12-06
+
+### Added
+- Add support for eager loading specific columns to withWhereHas ([#45168](https://github.com/laravel/framework/pull/45168))
+- Add Policies to Model Show Command ([#45153](https://github.com/laravel/framework/pull/45153))
+- Added `Illuminate/Support/Stringable::whenIsUlid()` ([#45183](https://github.com/laravel/framework/pull/45183))
+
+### Fixed
+- Added missing reserved names in GeneratorCommand ([#45149](https://github.com/laravel/framework/pull/45149))
+
+### Changed
+- Allow to pass base64 key to env:encrypt command ([#45157](https://github.com/laravel/framework/pull/45157))
+- Replace model:show searched value with correct FQCN ([#45160](https://github.com/laravel/framework/pull/45160))
 
 
 ## [v9.42.2](https://github.com/laravel/framework/compare/v9.42.1...v9.42.2) - 2022-11-30
