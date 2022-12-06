@@ -23,6 +23,7 @@ use RuntimeException;
  * @method static \Illuminate\Contracts\Auth\UserProvider|null createUserProvider(string|null $provider = null)
  * @method static string getDefaultUserProvider()
  * @method static bool check()
+ * @method static bool guest()
  * @method static \Illuminate\Contracts\Auth\Authenticatable|null user()
  * @method static int|string|null id()
  * @method static bool validate(array $credentials = [])

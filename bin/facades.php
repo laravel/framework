@@ -8,11 +8,23 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
 use Symfony\Component\Finder\Finder;
 
+/**
+ * Usage.
+ *
+ * Update the docblocks:
+ * $ php -f ./bin/facades.php
+ *
+ * Lint the docblocks:
+ * $ php -f ./bin/facades.php -- --lint
+ */
+
+$linting = in_array('--lint', $argv);
+
 $finder = (new Finder)
     ->in(__DIR__.'/../src/Illuminate/Support/Facades')
     ->notName('Facade.php');
 
-resolveFacades($finder)->each(function ($facade) {
+resolveFacades($finder)->each(function ($facade) use ($linting) {
     $proxies = resolveDocSees($facade);
 
     // Build a list of methods that are available on the Facade...
@@ -63,21 +75,25 @@ resolveFacades($finder)->each(function ($facade) {
      */
     PHP;
 
-    // Update the class docblock.
-
-    $contents = file_get_contents($facade->getFileName());
-
-    if ($contents === false) {
-        echo 'There was an error retrieving the class contents';
-        echo 1;
+    if (($facade->getDocComment() ?: '') === $docblock) {
+        return;
     }
 
-    $contents = Str::replace($facade->getDocComment(), $docblock, $contents);
+    if ($linting) {
+        echo "Did not find expected docblock for [{$facade->getName()}].".PHP_EOL.PHP_EOL;
+        echo $docblock;
+        exit(1);
+    }
 
+    // Update the facade docblock...
+
+    echo "Updating docblock for [{$facade->getName()}].".PHP_EOL;
+    $contents = file_get_contents($facade->getFileName());
+    $contents = Str::replace($facade->getDocComment(), $docblock, $contents);
     file_put_contents($facade->getFileName(), $contents);
 });
 
-echo 'Facade docblocks updated.';
+echo 'Done.';
 exit(0);
 
 /**
