@@ -2,8 +2,11 @@
 
 require __DIR__.'/../vendor/autoload.php';
 
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
+use Illuminate\Support\Traits\Conditionable;
 use Symfony\Component\Finder\Finder;
 
 $finder = (new Finder)
@@ -24,13 +27,6 @@ resolveFacades($finder)->each(function ($facade) {
         ->reject(fn ($method) => conflictsWithFacade($facade, $method))
         ->unique(resolveName(...))
         ->map(normaliseDetails(...));
-
-    // Prepare the @template docblocks...
-
-    $templates = $resolvedMethods->flatMap(fn ($method) => is_string($method) ? [] : $method['templates'])
-        ->map(fn ($template) => " * @template {$template}")
-        ->unique()
-        ->whenNotEmpty(fn ($templates) => $templates->push(' *'));
 
     // Prepare the @method docblocks...
 
@@ -62,7 +58,7 @@ resolveFacades($finder)->each(function ($facade) {
 
     $docblock = <<< PHP
     /**
-    {$templates->merge($methods)->join(PHP_EOL)}
+    {$methods->join(PHP_EOL)}
      *
     {$proxies->map(fn ($class) => " * @see {$class}")->join(PHP_EOL)}
      */
@@ -157,21 +153,12 @@ function resolveDocParamType($method, $parameter)
 
     // Replace references to '$this', 'static', or 'self' with the implementations FQCN...
 
-    return Str::of($types)
+    $types = Str::of($types)
         ->replace(['$this', 'static'], '\\'.$method->sourceClass()->getName())
-        ->replace('self', '\\'.$method->getDeclaringClass()->getName());
-}
+        ->replace('self', '\\'.$method->getDeclaringClass()->getName())
+        ->toString();
 
-/**
- * Resolve the templates type from the @template docblocks.
- *
- * @param  \ReflectionMethod|ReflectionMethodDecorator  $method
- * @return \Illuminate\Support\Collection<string>
- */
-function resolveTemplateDocName($method)
-{
-    return resolveDocTags($method->getDocComment() ?: '', '@template')
-        ->map(fn ($tag) => Str::before($tag, ' '));
+    return stripGenerics($method, $types);
 }
 
 /**
@@ -198,10 +185,47 @@ function resolveReturnDocType($method)
 
     // Replace references to '$this', 'static', or 'self' with the implementations FQCN...
 
-    return Str::of($types)
+    $types = Str::of($types)
         ->replace(['$this', 'static'], '\\'.$method->sourceClass()->getName())
         ->replace('self', '\\'.$method->getDeclaringClass()->getName())
         ->toString();
+
+    return stripGenerics($method, $types);
+}
+
+/**
+ * Remove generics from the type.
+ *
+ * Unfortunately the @template tag is not currently working with the @method
+ * docblocks, so we are stripping them out.
+ *
+ * @param  \ReflectionMethodDecorator  $method
+ * @param  string  $types
+ * @return string
+ */
+function stripGenerics($method, $types) {
+    if (
+        'enum' === $method->getName() &&
+        Request::class === $method->getDeclaringClass()->getName()
+    ) {
+        return Str::replace('TEnum', 'object', $types);
+    }
+
+    if (
+        'when' === $method->getName() &&
+        in_array(Conditionable::class, class_uses_recursive($method->getDeclaringClass()->getName()))
+    ) {
+        return Str::replace(['TWhenParameter', 'TWhenReturnType'], 'mixed', $types);
+    }
+
+    if (
+        'unless' === $method->getName() &&
+        in_array(Conditionable::class, class_uses_recursive($method->getDeclaringClass()->getName()))
+    ) {
+        return Str::replace(['TUnlessParameter', 'TUnlessReturnType'], 'mixed', $types);
+    }
+
+    return $types;
 }
 
 /**
@@ -373,7 +397,6 @@ function normaliseDetails($method)
                 'type' => resolveDocParamType($method, $parameter) ?? resolveType($parameter->getType()) ?? 'void',
             ]),
         'returns' => resolveReturnDocType($method) ?? resolveType($method->getReturnType()) ?? 'void',
-        'templates' => resolveDocTags($method->getDocComment(), '@template'),
     ];
 }
 

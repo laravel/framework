@@ -3,11 +3,6 @@
 namespace Illuminate\Support\Facades;
 
 /**
- * @template TWhenParameter
- * @template TWhenReturnType
- * @template TUnlessParameter
- * @template TUnlessReturnType
- *
  * @method static bool exists(string $path)
  * @method static bool missing(string $path)
  * @method static string get(string $path, bool $lock = false)
@@ -53,8 +48,8 @@ namespace Illuminate\Support\Facades;
  * @method static bool deleteDirectory(string $directory, bool $preserve = false)
  * @method static bool deleteDirectories(string $directory)
  * @method static bool cleanDirectory(string $directory)
- * @method static \Illuminate\Filesystem\Filesystem|TWhenReturnType when((\Closure(\Illuminate\Filesystem\Filesystem): TWhenParameter)|TWhenParameter|null $value = null, (callable(\Illuminate\Filesystem\Filesystem, TWhenParameter): TWhenReturnType)|null $callback = null, (callable(\Illuminate\Filesystem\Filesystem, TWhenParameter): TWhenReturnType)|null $default = null)
- * @method static \Illuminate\Filesystem\Filesystem|TUnlessReturnType unless((\Closure(\Illuminate\Filesystem\Filesystem): TUnlessParameter)|TUnlessParameter|null $value = null, (callable(\Illuminate\Filesystem\Filesystem, TUnlessParameter): TUnlessReturnType)|null $callback = null, (callable(\Illuminate\Filesystem\Filesystem, TUnlessParameter): TUnlessReturnType)|null $default = null)
+ * @method static \Illuminate\Filesystem\Filesystem|mixed when((\Closure(\Illuminate\Filesystem\Filesystem): mixed)|mixed|null $value = null, (callable(\Illuminate\Filesystem\Filesystem, mixed): mixed)|null $callback = null, (callable(\Illuminate\Filesystem\Filesystem, mixed): mixed)|null $default = null)
+ * @method static \Illuminate\Filesystem\Filesystem|mixed unless((\Closure(\Illuminate\Filesystem\Filesystem): mixed)|mixed|null $value = null, (callable(\Illuminate\Filesystem\Filesystem, mixed): mixed)|null $callback = null, (callable(\Illuminate\Filesystem\Filesystem, mixed): mixed)|null $default = null)
  * @method static void macro(string $name, object|callable $macro)
  * @method static void mixin(object $mixin, bool $replace = true)
  * @method static bool hasMacro(string $name)

@@ -3,8 +3,6 @@
 namespace Illuminate\Support\Facades;
 
 /**
- * @template TEnum
- *
  * @method static \Illuminate\Http\Request capture()
  * @method static \Illuminate\Http\Request instance()
  * @method static string method()
@@ -162,7 +160,7 @@ namespace Illuminate\Support\Facades;
  * @method static int integer(string $key, int $default = 0)
  * @method static float float(string $key, float $default = 0)
  * @method static \Illuminate\Support\Carbon|null date(string $key, string|null $format = null, string|null $tz = null)
- * @method static TEnum|null enum(string $key, class-string<TEnum> $enumClass)
+ * @method static object|null enum(string $key, class-string<object> $enumClass)
  * @method static \Illuminate\Support\Collection collect(array|string|null $key = null)
  * @method static array only(array|mixed $keys)
  * @method static array except(array|mixed $keys)
