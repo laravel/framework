@@ -25,7 +25,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.0
+          php-version: 8.1
           tools: composer:v2
           coverage: none
 
@@ -38,3 +38,7 @@ jobs:
 
       - name: Execute type checking
         run: vendor/bin/phpstan --configuration="phpstan.${{ matrix.directory }}.neon.dist"
+
+      - name: Lint facade docblocks
+        run: php -f bin/facades.php
+        if: matrix.directory == 'src'
