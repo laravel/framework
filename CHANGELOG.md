@@ -1,6 +1,16 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.42.0...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.42.1...9.x)
+
+
+## [v9.42.1](https://github.com/laravel/framework/compare/v9.42.0...v9.42.1) - 2022-11-30
+
+### Revert
+- Revert "[9.x] Create new Json ParameterBag Instance when cloning Request" ([#45147](https://github.com/laravel/framework/pull/45147))
+
+### Fixed
+- Mailable : fixes strict comparison with int value ([#45138](https://github.com/laravel/framework/pull/45138))
+- Address Dynamic Relation Resolver inconsiency issue with extended Models ([#45122](https://github.com/laravel/framework/pull/45122))
 
 
 ## [v9.42.0](https://github.com/laravel/framework/compare/v9.41.0...v9.42.0) - 2022-11-29
