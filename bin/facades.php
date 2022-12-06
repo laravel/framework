@@ -81,7 +81,8 @@ resolveFacades($finder)->each(function ($facade) use ($linting) {
 
     if ($linting) {
         echo "Did not find expected docblock for [{$facade->getName()}].".PHP_EOL.PHP_EOL;
-        echo $docblock;
+        echo $docblock.PHP_EOL.PHP_EOL;
+        echo 'Run the following command to update your docblocks locally:'.PHP_EOL.'php -f bin/facades.php';
         exit(1);
     }
 
