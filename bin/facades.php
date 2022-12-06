@@ -298,7 +298,7 @@ function resolveDocMixins($class)
 /**
  * Determine if the method is magic.
  *
- * @param  string|\ReflectionMethod  $method
+ * @param  \ReflectionMethod|string  $method
  * @return bool
  */
 function isMagic($method)
@@ -309,7 +309,7 @@ function isMagic($method)
 /**
  * Determine if the method is deprecated.
  *
- * @param  string|\ReflectionMethod  $method
+ * @param  \ReflectionMethod|string  $method
  * @return bool
  */
 function isDeprecated($method)
@@ -320,7 +320,7 @@ function isDeprecated($method)
 /**
  * Determine if the method is for a builtin contract.
  *
- * @param  string|\ReflectionMethodDecorator  $method
+ * @param  \ReflectionMethodDecorator|string  $method
  * @return bool
  */
 function fulfillsBuiltinInterface($method)
@@ -339,7 +339,7 @@ function fulfillsBuiltinInterface($method)
 /**
  * Resolve the methods name.
  *
- * @param  string|\ReflectionMethod  $method
+ * @param  \ReflectionMethod|string  $method
  * @return string
  */
 function resolveName($method)
@@ -353,7 +353,7 @@ function resolveName($method)
  * Resolve the classes methods.
  *
  * @param  \ReflectionClass  $class
- * @return Illuminate\Support\Collection<\ReflectionMethodDecorator|string>
+ * @return \Illuminate\Support\Collection<\ReflectionMethodDecorator|string>
  */
 function resolveMethods($class)
 {
@@ -379,8 +379,8 @@ function conflictsWithFacade($facade, $method)
 /**
  * Normalise the method details into a easier format to work with.
  *
- * @param  string|\ReflectionMethodDecorator  $method
- * @return string|array
+ * @param  \ReflectionMethodDecorator|string  $method
+ * @return array|string
  */
 function normaliseDetails($method)
 {
@@ -424,7 +424,7 @@ function resolveDefaultValue($parameter)
 }
 
 /**
- * @mixin ReflectionMethod
+ * @mixin \ReflectionMethod
  */
 class ReflectionMethodDecorator
 {
