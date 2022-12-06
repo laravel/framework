@@ -155,22 +155,23 @@ class ScheduleListCommand extends Command
     /**
      * Sorts the events by due date if option set.
      *
-     * @param  \Illuminate\Support\Collection $events
+     * @param  \Illuminate\Support\Collection  $events
      * @return \Illuminate\Support\Collection
      */
     private function sortEvents(\Illuminate\Support\Collection $events, DateTimeZone $timezone): \Illuminate\Support\Collection
     {
-        if (!$this->option('sort')) {
+        if (! $this->option('sort')) {
             return $events;
         }
+
         return $events->sortBy(fn ($event) => $this->getNextDueDate($event, $timezone));
     }
 
     /**
-     * Get the next due date for an event
+     * Get the next due date for an event.
      *
-     * @param Event $event
-     * @param DateTimeZone $timezone
+     * @param  Event  $event
+     * @param  DateTimeZone  $timezone
      * @return Carbon
      */
     private function getNextDueDate(\Illuminate\Console\Scheduling\Event $event, DateTimeZone $timezone): Carbon
