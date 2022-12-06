@@ -8,9 +8,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
 use Symfony\Component\Finder\Finder;
 
-/**
- * Usage.
- *
+/*
  * Update the docblocks:
  * $ php -f ./bin/facades.php
  *
