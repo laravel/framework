@@ -2,7 +2,6 @@
 
 require __DIR__.'/../vendor/autoload.php';
 
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
@@ -203,7 +202,8 @@ function resolveReturnDocType($method)
  * @param  string  $types
  * @return string
  */
-function stripGenerics($method, $types) {
+function stripGenerics($method, $types)
+{
     if (
         'enum' === $method->getName() &&
         Request::class === $method->getDeclaringClass()->getName()
