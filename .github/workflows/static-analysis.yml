@@ -45,7 +45,7 @@ jobs:
     strategy:
       fail-fast: true
 
-    name: Lint Facades
+    name: Facade DocBlocks
 
     steps:
       - name: Checkout code
