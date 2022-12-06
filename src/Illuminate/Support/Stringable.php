@@ -1177,6 +1177,14 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Check if the specified value is numeric.
+     * @return bool
+     */
+    public function isNumeric()
+    {
+        return is_numeric($this->value);
+    }
+    /**
      * Get the underlying string value as a Carbon instance.
      *
      * @param  string|null  $format

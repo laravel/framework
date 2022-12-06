@@ -1179,4 +1179,13 @@ class SupportStringableTest extends TestCase
 
         $this->stringable('not a date')->toDate();
     }
+
+    public function testIsNumeric()
+    {
+        $this->assertTrue($this->stringable('123')->isNumeric());
+        $this->assertTrue($this->stringable('123.45')->isNumeric());
+        $this->assertTrue($this->stringable(123)->isNumeric());
+        $this->assertFalse($this->stringable('123,45')->isNumeric());
+        $this->assertFalse($this->stringable('foo')->isNumeric());
+    }
 }
