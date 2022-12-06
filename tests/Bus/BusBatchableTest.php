@@ -1,5 +1,6 @@
 <?php
 
+//senatorov11111
 namespace Illuminate\Tests\Bus;
 
 use Illuminate\Bus\Batchable;
