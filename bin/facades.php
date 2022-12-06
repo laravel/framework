@@ -216,14 +216,20 @@ function stripGenerics($method, $types)
         'when' === $method->getName() &&
         in_array(Conditionable::class, class_uses_recursive($method->getDeclaringClass()->getName()))
     ) {
-        return Str::replace(['TWhenParameter', 'TWhenReturnType'], 'mixed', $types);
+        return Str::of($types)
+            ->replace(['TWhenParameter', 'TWhenReturnType'], 'mixed')
+            ->replace('mixed|null', 'mixed')
+            ->toString();
     }
 
     if (
         'unless' === $method->getName() &&
         in_array(Conditionable::class, class_uses_recursive($method->getDeclaringClass()->getName()))
     ) {
-        return Str::replace(['TUnlessParameter', 'TUnlessReturnType'], 'mixed', $types);
+        return Str::of($types)
+            ->replace(['TUnlessParameter', 'TUnlessReturnType'], 'mixed')
+            ->replace('mixed|null', 'mixed')
+            ->toString();
     }
 
     return $types;
