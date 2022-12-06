@@ -63,20 +63,21 @@ resolveFacades($finder)->each(function ($facade) {
      */
     PHP;
 
-    // Determine if the Facade docblock is up to date...
+    // Update the class docblock.
 
-    if (Str::contains(file_get_contents($facade->getFileName()) ?: '', $docblock)) {
-        return;
+    $contents = file_get_contents($facade->getFileName());
+
+    if ($contents === false) {
+        echo 'There was an error retrieving the class contents';
+        echo 1;
     }
 
-    echo "❌ Did not find expected docblock for [{$facade->getName()}].";
-    echo PHP_EOL;
-    echo PHP_EOL;
-    echo $docblock;
-    exit(1);
+    $contents = Str::replace($facade->getDocComment(), $docblock, $contents);
+
+    file_put_contents($facade->getFileName(), $contents);
 });
 
-echo '✅ Facade docblocks look good.';
+echo 'Facade docblocks updated.';
 exit(0);
 
 /**
