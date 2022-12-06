@@ -68,8 +68,8 @@ jobs:
       - name: Lint facade docblocks
         run: php -f bin/facades.php
 
-      # - name: Commit facade docblocks
-      #   uses: stefanzweifel/git-auto-commit-action@v4
-      #   with:
-      #     commit_message: Update facade docblocks
-      #     file_pattern: src/
+      - name: Commit facade docblocks
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Update facade docblocks
+          file_pattern: src/
