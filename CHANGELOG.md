@@ -1,6 +1,12 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.42.1...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.42.2...9.x)
+
+
+## [v9.42.2](https://github.com/laravel/framework/compare/v9.42.1...v9.42.2) - 2022-11-30
+
+### Changed
+- Improved stubs and `Illuminate/Routing/ResourceRegistrar::getResourceMethods()` ([6ddf3b0](https://github.com/laravel/framework/commit/6ddf3b017ccb8486c8dc5ff5a09d051a40e094ca))
 
 
 ## [v9.42.1](https://github.com/laravel/framework/compare/v9.42.0...v9.42.1) - 2022-11-30
