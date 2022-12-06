@@ -65,7 +65,7 @@ class ScheduleListCommandTest extends TestCase
         $closureLineNumber = __LINE__ - 1;
         $closureFilePath = __FILE__;
 
-        $this->artisan(ScheduleListCommand::class)
+        $this->artisan(ScheduleListCommand::class, ['-s' => true])
             ->assertSuccessful()
             ->expectsOutput('  * *     * *      *  php artisan foobar a='.ProcessUtils::escapeArgument('b').' ... Next Due: 1 minute from now')
             ->expectsOutput('  * *     * *      *  Illuminate\Tests\Integration\Console\Scheduling\FooJob  Next Due: 1 minute from now')
