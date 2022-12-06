@@ -133,7 +133,6 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
     /**
      * Throw a method not allowed HTTP exception.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  array  $others
      * @param  string  $method
      * @return void
