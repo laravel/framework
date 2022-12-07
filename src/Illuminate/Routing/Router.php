@@ -1134,7 +1134,7 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function model($key, $class, Closure $callback = null)
     {
-        $this->bind($key, RouteBinding::forModel($this->container, $class, $callback));
+        $this->bind($key, RouteBinding::forModel($this->container, $class, $callback, $key));
     }
 
     /**
