@@ -96,6 +96,16 @@ trait GuardHelpers
     }
 
     /**
+     * Forget the user.
+     *
+     * @return void
+     */
+    public function forgetUser()
+    {
+        $this->user = null;
+    }
+
+    /**
      * Get the user provider used by the guard.
      *
      * @return \Illuminate\Contracts\Auth\UserProvider
