@@ -39,6 +39,27 @@ class PendingProcess
     public $timeout = 60;
 
     /**
+     * The additional environment variables for the process.
+     *
+     * @var array
+     */
+    public $environment = [];
+
+    /**
+     * Indicates whether output should be disabled for the process.
+     *
+     * @var array
+     */
+    public $withoutOutput = false;
+
+    /**
+     * The options that will be passed to "proc_open".
+     *
+     * @var array
+     */
+    public $options = [];
+
+    /**
      * The registered fake handler callbacks.
      *
      * @var array
@@ -108,6 +129,43 @@ class PendingProcess
     }
 
     /**
+     * Set the additional environent variables for the process.
+     *
+     * @param  array  $environment
+     */
+    public function env(array $environment)
+    {
+        $this->environment = $environment;
+
+        return $this;
+    }
+
+    /**
+     * Disable output for the process.
+     *
+     * @return $this
+     */
+    public function withoutOutput()
+    {
+        $this->withoutOutput = true;
+
+        return $this;
+    }
+
+    /**
+     * Set the "proc_open" options that should be used when invoking the process.
+     *
+     * @param  array  $options
+     * @return $this
+     */
+    public function options(array $options)
+    {
+        $this->options = $options;
+
+        return $this;
+    }
+
+    /**
      * Run the process.
      *
      * @param  array<array-key, string>|string|null  $command
@@ -169,11 +227,19 @@ class PendingProcess
         $command = $command ?? $this->command;
 
         $process = is_iterable($command)
-                ? new Process($command)
-                : Process::fromShellCommandline((string) $command);
+                ? new Process($command, null, $this->environment)
+                : Process::fromShellCommandline((string) $command, null, $this->environment);
 
-        $process->setWorkingDirectory((string) $this->path ?? getcwd());
+        $process->setWorkingDirectory((string) ($this->path ?? getcwd()));
         $process->setTimeout($this->timeout);
+
+        if ($this->withoutOutput) {
+            $process->disableOutput();
+        }
+
+        if (! empty($this->options)) {
+            $process->setOptions($this->options);
+        }
 
         return $process;
     }

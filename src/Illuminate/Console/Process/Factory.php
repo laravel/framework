@@ -214,11 +214,22 @@ class Factory
     }
 
     /**
+     * Start a pool of processes and wait for them to finish executing.
+     *
+     * @param  callable  $callback
+     * @return \Illuminate\Console\Process\Pool
+     */
+    public function pool($callback)
+    {
+        return new Pool($this, $callback);
+    }
+
+    /**
      * Create a new pending process associated with this factory.
      *
      * @return \Illuminate\Console\Process\PendingProcess
      */
-    protected function newPendingProcess()
+    public function newPendingProcess()
     {
         return (new PendingProcess($this))->withFakeHandlers($this->fakeHandlers);
     }
