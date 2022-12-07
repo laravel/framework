@@ -56,6 +56,7 @@ use RuntimeException;
  * @method static \Illuminate\Auth\SessionGuard setRequest(\Symfony\Component\HttpFoundation\Request $request)
  * @method static \Illuminate\Support\Timebox getTimebox()
  * @method static \Illuminate\Contracts\Auth\Authenticatable authenticate()
+ * @method static \Illuminate\Auth\SessionGuard forgetUser()
  * @method static \Illuminate\Contracts\Auth\UserProvider getProvider()
  * @method static void setProvider(\Illuminate\Contracts\Auth\UserProvider $provider)
  * @method static void macro(string $name, object|callable $macro)
