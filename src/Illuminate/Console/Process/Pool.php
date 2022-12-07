@@ -29,6 +29,20 @@ class Pool implements ArrayAccess
     protected $pendingProcesses = [];
 
     /**
+     * The array of invoked processes.
+     *
+     * @var array
+     */
+    protected $invokedProcesses = [];
+
+    /**
+     * Indicates if the process pool has been started.
+     *
+     * @var bool
+     */
+    protected $started = false;
+
+    /**
      * Indicates if the process pool has been resolved.
      *
      * @var bool
@@ -69,36 +83,72 @@ class Pool implements ArrayAccess
     }
 
     /**
-     * Start and wait for the processes to finish.
+     * Start all of the processes in the pool.
      *
-     * @return void
+     * @return $this
      */
-    protected function resolve()
+    public function start()
     {
-        if ($this->resolved) {
+        if ($this->started) {
             return;
         }
 
         call_user_func($this->callback, $this);
 
-        $invokedProcesses = collect($this->pendingProcesses)
+        $this->invokedProcesses = collect($this->pendingProcesses)
             ->each(function ($pendingProcess) {
                 if (! $pendingProcess instanceof PendingProcess) {
                     throw new InvalidArgumentException("Process pool must only contain pending processes.");
                 }
             })->mapWithKeys(function ($pendingProcess, $key) {
                 return [$key => $pendingProcess->start()];
-            });
+            })->all();
 
-        while ($invokedProcesses->filter->running()->isNotEmpty()) {
-            usleep(50 * 1000);
+        $this->started = true;
+
+        return $this;
+    }
+
+    /**
+     * Send a signal to each running process in the pool, returning the processes that were signalled.
+     *
+     * @param  int  $signal
+     * @return \Illuminate\Support\Collection
+     */
+    public function signal(int $signal)
+    {
+        return $this->running()->each->signal($signal);
+    }
+
+    /**
+     * Get the processes in the pool that are still currently running.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function running()
+    {
+        return collect($this->invokedProcesses)->filter->running()->values();
+    }
+
+    /**
+     * Start and wait for the processes to finish.
+     *
+     * @param  callable|null  $output
+     * @return array
+     */
+    public function wait($output = null)
+    {
+        if ($this->resolved) {
+            return $this->results;
         }
 
-        $this->results = $invokedProcesses->mapWithKeys(function ($pendingProcess, $key) {
-            return [$key => $pendingProcess->wait()];
-        })->all();
+        $this->start();
 
-        $this->resolved = true;
+        return tap(collect($this->invokedProcesses)->map->wait()->all(), function ($results) {
+            $this->results = $results;
+
+            $this->resolved = true;
+        });
     }
 
     /**
@@ -109,7 +159,7 @@ class Pool implements ArrayAccess
      */
     public function offsetExists($offset): bool
     {
-        $this->resolve();
+        $this->wait();
 
         return isset($this->results[$offset]);
     }
@@ -122,7 +172,7 @@ class Pool implements ArrayAccess
      */
     public function offsetGet($offset): mixed
     {
-        $this->resolve();
+        $this->wait();
 
         return $this->results[$offset];
     }
@@ -136,7 +186,7 @@ class Pool implements ArrayAccess
      */
     public function offsetSet($offset, $value): void
     {
-        $this->resolve();
+        $this->wait();
 
         $this->results[$offset] = $value;
     }
@@ -149,7 +199,7 @@ class Pool implements ArrayAccess
      */
     public function offsetUnset($offset): void
     {
-        $this->resolve();
+        $this->wait();
 
         unset($this->results[$offset]);
     }
