@@ -66,7 +66,7 @@ class RouteBinding
             // method on the model instance. If we cannot retrieve the models we'll
             // throw a not found exception otherwise we will return the instance.
             $instance = $container->make($class);
-            
+
             $route = $container->make(Route::class);
             $field = $route->bindingFieldFor($routeParameter);
 
