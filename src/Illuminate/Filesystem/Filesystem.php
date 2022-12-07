@@ -536,7 +536,7 @@ class Filesystem
      */
     public function isFile($file)
     {
-        return is_file($file);
+        return is_string($file) && is_file($file);
     }
 
     /**
