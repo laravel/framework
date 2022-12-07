@@ -96,13 +96,15 @@ trait GuardHelpers
     }
 
     /**
-     * Forget the user.
+     * Forget the current user.
      *
-     * @return void
+     * @return $this
      */
     public function forgetUser()
     {
         $this->user = null;
+
+        return $this;
     }
 
     /**
