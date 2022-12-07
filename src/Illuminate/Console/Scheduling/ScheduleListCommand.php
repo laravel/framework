@@ -23,7 +23,7 @@ class ScheduleListCommand extends Command
      */
     protected $signature = 'schedule:list
         {--timezone= : The timezone that times should be displayed in}
-        {--s|sort : Sort by next due date}
+        {--next : Sort the listed tasks by their next due date}
     ';
 
     /**
@@ -42,7 +42,7 @@ class ScheduleListCommand extends Command
      *
      * @var string
      */
-    protected $description = 'List the scheduled commands';
+    protected $description = 'List all scheduled tasks';
 
     /**
      * The terminal width resolver callback.
@@ -103,7 +103,7 @@ class ScheduleListCommand extends Command
 
             $nextDueDateLabel = 'Next Due:';
 
-            $nextDueDate = $this->getNextDueDate($event, $timezone);
+            $nextDueDate = $this->getNextDueDateForEvent($event, $timezone);
 
             $nextDueDate = $this->output->isVerbose()
                 ? $nextDueDate->format('Y-m-d H:i:s P')
@@ -156,29 +156,29 @@ class ScheduleListCommand extends Command
      * Sorts the events by due date if option set.
      *
      * @param  \Illuminate\Support\Collection  $events
+     * @param  \DateTimeZone  $timezone
      * @return \Illuminate\Support\Collection
      */
-    private function sortEvents(\Illuminate\Support\Collection $events, DateTimeZone $timezone): \Illuminate\Support\Collection
+    private function sortEvents(\Illuminate\Support\Collection $events, DateTimeZone $timezone)
     {
-        if (! $this->option('sort')) {
-            return $events;
-        }
-
-        return $events->sortBy(fn ($event) => $this->getNextDueDate($event, $timezone));
+        return $this->option('next')
+                    ? $events->sortBy(fn ($event) => $this->getNextDueDateForEvent($event, $timezone))
+                    : $events;
     }
 
     /**
      * Get the next due date for an event.
      *
-     * @param  Event  $event
-     * @param  DateTimeZone  $timezone
-     * @return Carbon
+     * @param  \Illuminate\Console\Scheduling\Event  $event
+     * @param  \DateTimeZone  $timezone
+     * @return \Illuminate\Support\Carbon
      */
-    private function getNextDueDate(\Illuminate\Console\Scheduling\Event $event, DateTimeZone $timezone): Carbon
+    private function getNextDueDateForEvent($event, DateTimeZone $timezone)
     {
-        return Carbon::create((new CronExpression($event->expression))
-            ->getNextRunDate(Carbon::now()->setTimezone($event->timezone))
-            ->setTimezone($timezone)
+        return Carbon::create(
+            (new CronExpression($event->expression))
+                ->getNextRunDate(Carbon::now()->setTimezone($event->timezone))
+                ->setTimezone($timezone)
         );
     }
 
