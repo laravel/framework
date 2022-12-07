@@ -43,6 +43,7 @@ class Bus extends Facade
      * Replace the bound instance with a fake.
      *
      * @param  array|string  $jobsToFake
+     * @param  \Illuminate\Bus\BatchRepository|null  $batchRepository
      * @return \Illuminate\Support\Testing\Fakes\BusFake
      */
     public static function fake($jobsToFake = [], BatchRepository $batchRepository = null)
