@@ -972,7 +972,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
         $this->forceFill($extra);
 
-        $columns = array_keys($extra) + [$column];
+        $columns = array_keys(array_diff_key($extra, $changes)) + [$column];
 
         return tap($this->setKeysForSaveQuery($query)->{$method}($column, $amount, $extra), function () use ($columns) {
             $this->syncChanges();
