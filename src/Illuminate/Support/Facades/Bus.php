@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support\Facades;
 
+use Illuminate\Bus\BatchRepository;
 use Illuminate\Contracts\Bus\Dispatcher as BusDispatcherContract;
 use Illuminate\Foundation\Bus\PendingChain;
 use Illuminate\Support\Testing\Fakes\BusFake;
@@ -54,11 +55,12 @@ class Bus extends Facade
      * Replace the bound instance with a fake.
      *
      * @param  array|string  $jobsToFake
+     * @param  \Illuminate\Bus\BatchRepository|null  $batchRepository
      * @return \Illuminate\Support\Testing\Fakes\BusFake
      */
-    public static function fake($jobsToFake = [])
+    public static function fake($jobsToFake = [], BatchRepository $batchRepository = null)
     {
-        static::swap($fake = new BusFake(static::getFacadeRoot(), $jobsToFake));
+        static::swap($fake = new BusFake(static::getFacadeRoot(), $jobsToFake, $batchRepository));
 
         return $fake;
     }
