@@ -148,7 +148,11 @@ class Response implements Arrayable
     public function authorize()
     {
         if ($this->denied()) {
-            throw (new AuthorizationException($this->message(), $this->code()))
+            $message = $this->message();
+            if (!$message && request()) {
+                $message = sprintf('The action %s %s is unauthorized', request()->method(), request()->path());
+            }
+            throw (new AuthorizationException($message, $this->code()))
                 ->setResponse($this)
                 ->withStatus($this->status);
         }
