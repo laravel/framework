@@ -185,7 +185,7 @@ class Factory
             collect($this->recorded)->filter(function ($pair) use ($callback) {
                 return $callback($pair[0], $pair[1]);
             })->count() > 0,
-            'An expected external process was not invoked.'
+            'An expected process was not invoked.'
         );
 
         return $this;
@@ -222,7 +222,7 @@ class Factory
             collect($this->recorded)->filter(function ($pair) use ($callback) {
                 return $callback($pair[0], $pair[1]);
             })->count() === 0,
-            'An unexpected external process was invoked.'
+            'An unexpected process was invoked.'
         );
 
         return $this;
@@ -237,7 +237,7 @@ class Factory
     {
         PHPUnit::assertEmpty(
             $this->recorded,
-            'An unexpected external process was invoked.'
+            'An unexpected process was invoked.'
         );
 
         return $this;
