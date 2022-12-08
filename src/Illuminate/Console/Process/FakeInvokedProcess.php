@@ -123,7 +123,8 @@ class FakeInvokedProcess implements InvokedProcessContract
                 : $this->remainingRunIterations;
 
         if ($this->remainingRunIterations === 0) {
-            while ($this->invokeOutputHandlerWithNextLineOfOutput()) {}
+            while ($this->invokeOutputHandlerWithNextLineOfOutput()) {
+            }
 
             return false;
         }
@@ -181,7 +182,6 @@ class FakeInvokedProcess implements InvokedProcessContract
         for ($i = $this->nextOutputIndex; $i < $outputCount; $i++) {
             if ($this->process->output[$i]['type'] === 'out') {
                 $output = $this->process->output[$i]['buffer'];
-
                 $this->nextOutputIndex = $i + 1;
 
                 break;
@@ -190,7 +190,7 @@ class FakeInvokedProcess implements InvokedProcessContract
             $this->nextOutputIndex = $i + 1;
         }
 
-        return $output ?? '';
+        return isset($output) ? $output : '';
     }
 
     /**
@@ -205,7 +205,6 @@ class FakeInvokedProcess implements InvokedProcessContract
         for ($i = $this->nextErrorOutputIndex; $i < $outputCount; $i++) {
             if ($this->process->output[$i]['type'] === 'err') {
                 $output = $this->process->output[$i]['buffer'];
-
                 $this->nextErrorOutputIndex = $i + 1;
 
                 break;
@@ -214,7 +213,7 @@ class FakeInvokedProcess implements InvokedProcessContract
             $this->nextErrorOutputIndex = $i + 1;
         }
 
-        return $output ?? '';
+        return isset($output) ? $output : '';
     }
 
     /**
@@ -233,7 +232,9 @@ class FakeInvokedProcess implements InvokedProcessContract
             return $this->predictProcessResult();
         }
 
-        while ($this->invokeOutputHandlerWithNextLineOfOutput()) {}
+        while ($this->invokeOutputHandlerWithNextLineOfOutput()) {
+            //
+        }
 
         $this->remainingRunIterations = 0;
 
@@ -249,7 +250,7 @@ class FakeInvokedProcess implements InvokedProcessContract
     public function waitUntil(callable $until)
     {
         while ($currentOutput = $this->invokeOutputHandlerWithNextLineOfOutput()) {
-            if ($until(...$currentOutput)) {
+            if ($until($currentOutput['type'], $currentOutput['buffer'])) {
                 return $this;
             }
         }

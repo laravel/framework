@@ -50,12 +50,18 @@ class FakeProcessDescription
     /**
      * Describe a line of standard output.
      *
-     * @param  string  $output
+     * @param  array|string  $output
      * @return $this
      */
-    public function output(string $output)
+    public function output(array|string $output)
     {
-        $this->output[] = ['type' => 'out', 'buffer' => $output];
+        if (is_array($output)) {
+            collect($output)->each(fn ($line) => $this->output($line));
+
+            return $this;
+        }
+
+        $this->output[] = ['type' => 'out', 'buffer' => $output."\n"];
 
         return $this;
     }
@@ -63,12 +69,18 @@ class FakeProcessDescription
     /**
      * Describe a line of error output.
      *
-     * @param  string  $output
+     * @param  array|string  $output
      * @return $this
      */
-    public function errorOutput(string $output)
+    public function errorOutput(array|string $output)
     {
-        $this->output[] = ['type' => 'err', 'buffer' => $output];
+        if (is_array($output)) {
+            collect($output)->each(fn ($line) => $this->errorOutput($line));
+
+            return $this;
+        }
+
+        $this->output[] = ['type' => 'err', 'buffer' => $output."\n"];
 
         return $this;
     }
@@ -133,11 +145,11 @@ class FakeProcessDescription
      */
     protected function resolveOutput()
     {
-        return collect($this->output)
+        return rtrim(collect($this->output)
                 ->filter(fn ($output) => $output['type'] === 'out')
                 ->map
                 ->buffer
-                ->implode("\n");
+                ->implode(""), "\n")."\n";
     }
 
     /**
@@ -147,10 +159,10 @@ class FakeProcessDescription
      */
     protected function resolveErrorOutput()
     {
-        return collect($this->output)
+        return rtrim(collect($this->output)
                 ->filter(fn ($output) => $output['type'] === 'err')
                 ->map
                 ->buffer
-                ->implode("\n");
+                ->implode(""), "\n")."\n";
     }
 }

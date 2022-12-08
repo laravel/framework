@@ -41,16 +41,16 @@ class FakeProcessResult implements ProcessResultContract
      *
      * @param  string  $command
      * @param  int  $exitCode
-     * @param  string  $output
-     * @param  string  $errorOutput
+     * @param  array|string  $output
+     * @param  array|string  $errorOutput
      * @return void
      */
-    public function __construct(string $command = '', int $exitCode = 0, string $output = '', string $errorOutput = '')
+    public function __construct(string $command = '', int $exitCode = 0, array|string $output = '', array|string $errorOutput = '')
     {
         $this->command = $command;
         $this->exitCode = $exitCode;
-        $this->output = $output;
-        $this->errorOutput = $errorOutput;
+        $this->output = rtrim((is_array($output) ? implode("\n", $output) : $output), "\n")."\n";
+        $this->errorOutput = rtrim((is_array($errorOutput) ? implode("\n", $errorOutput) : $errorOutput), "\n")."\n";
     }
 
     /**

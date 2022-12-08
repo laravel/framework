@@ -44,12 +44,12 @@ class Factory
     /**
      * Create a new fake process response for testing purposes.
      *
-     * @param  string  $output
-     * @param  string  $errorOutput
+     * @param  array|string  $output
+     * @param  array|string  $errorOutput
      * @param  int  $exitCode
      * @return \Illuminate\Console\Process\FakeProcessResult
      */
-    public function result(string $output = '', string $errorOutput = '', int $exitCode = 0)
+    public function result(array|string $output = '', array|string $errorOutput = '', int $exitCode = 0)
     {
         return new FakeProcessResult(
             output: $output,
@@ -66,6 +66,17 @@ class Factory
     public function describe()
     {
         return new FakeProcessDescription;
+    }
+
+    /**
+     * Begin describing a fake process sequence.
+     *
+     * @param  array  $processes
+     * @return \Illuminate\Console\Process\FakeProcessSequence
+     */
+    public function sequence(array $processes = [])
+    {
+        return new FakeProcessSequence($processes);
     }
 
     /**

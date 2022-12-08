@@ -264,7 +264,7 @@ class PendingProcess
      * @param  array<array-key, string>|string|null  $command
      * @return \Symfony\Component\Process\Process
      */
-    protected function toSymfonyProcess(array|string $command)
+    protected function toSymfonyProcess(array|string|null $command)
     {
         $command = $command ?? $this->command;
 
@@ -336,6 +336,8 @@ class PendingProcess
             return $result->withCommand($command);
         } elseif ($result instanceof FakeProcessDescription) {
             return $result->toProcessResult($command);
+        } elseif ($result instanceof FakeProcessSequence) {
+            return $this->resolveSynchronousFake($command, fn () => $result());
         }
 
         throw new LogicException("Unsupported synchronous process fake result provided.");
@@ -373,6 +375,8 @@ class PendingProcess
             ))->withOutputHandler($output);
         } elseif ($result instanceof FakeProcessDescription) {
             return (new FakeInvokedProcess($command, $result))->withOutputHandler($output);
+        } elseif ($result instanceof FakeProcessSequence) {
+            return $this->resolveAsynchronousFake($command, $output, fn () => $result());
         }
 
         throw new LogicException("Unsupported asynchronous process fake result provided.");
