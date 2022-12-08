@@ -311,6 +311,7 @@ trait InteractsWithInput
      * @param  string  $key
      * @param  mixed  $default
      * @return \Illuminate\Support\Stringable
+     *
      * @deprecated use string
      */
     public function str($key, $default = null)
