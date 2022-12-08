@@ -365,8 +365,8 @@ class PendingProcess
             return (new FakeInvokedProcess(
                 $command,
                 (new FakeProcessDescription)
-                    ->output($result->output())
-                    ->errorOutput($result->errorOutput())
+                    ->replaceOutput($result->output())
+                    ->replaceErrorOutput($result->errorOutput())
                     ->runsFor(iterations: 0)
                     ->exitCode($result->exitCode())
             ))->withOutputHandler($output);
@@ -374,8 +374,8 @@ class PendingProcess
             return (new FakeInvokedProcess(
                 $command,
                 (new FakeProcessDescription)
-                    ->output($result->output())
-                    ->errorOutput($result->errorOutput())
+                    ->replaceOutput($result->output())
+                    ->replaceErrorOutput($result->errorOutput())
                     ->runsFor(iterations: 0)
                     ->exitCode($result->exitCode())
             ))->withOutputHandler($output);

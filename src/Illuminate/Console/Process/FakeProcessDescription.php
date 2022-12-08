@@ -61,9 +61,7 @@ class FakeProcessDescription
             return $this;
         }
 
-        if (strlen($output) > 0) {
-            $this->output[] = ['type' => 'out', 'buffer' => rtrim($output, "\n")."\n"];
-        }
+        $this->output[] = ['type' => 'out', 'buffer' => rtrim($output, "\n")."\n"];
 
         return $this;
     }
@@ -82,8 +80,40 @@ class FakeProcessDescription
             return $this;
         }
 
+        $this->output[] = ['type' => 'err', 'buffer' => rtrim($output, "\n")."\n"];
+
+        return $this;
+    }
+
+    /**
+     * Replace the entire output buffer with the given string.
+     *
+     * @param  string  $output
+     * @return $this
+     */
+    public function replaceOutput(string $output)
+    {
         if (strlen($output) > 0) {
-            $this->output[] = ['type' => 'err', 'buffer' => rtrim($output, "\n")."\n"];
+            $this->output = [
+                ['type' => 'out', 'buffer' => rtrim($output, "\n")."\n"],
+            ];
+        }
+
+        return $this;
+    }
+
+    /**
+     * Replace the entire error output buffer with the given string.
+     *
+     * @param  string  $output
+     * @return $this
+     */
+    public function replaceErrorOutput(string $output)
+    {
+        if (strlen($output) > 0) {
+            $this->output = [
+                ['type' => 'err', 'buffer' => rtrim($output, "\n")."\n"],
+            ];
         }
 
         return $this;
