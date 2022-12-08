@@ -39,7 +39,7 @@ class AuthenticateMiddlewareTest extends TestCase
     public function testDefaultUnauthenticatedThrows()
     {
         $this->expectException(AuthenticationException::class);
-        $this->expectExceptionMessage('Unauthenticated.');
+        $this->expectExceptionMessage('Unauthenticated route GET /path/to');
 
         $this->registerAuthDriver('default', false);
 
@@ -84,7 +84,7 @@ class AuthenticateMiddlewareTest extends TestCase
     public function testMultipleDriversUnauthenticatedThrows()
     {
         $this->expectException(AuthenticationException::class);
-        $this->expectExceptionMessage('Unauthenticated.');
+        $this->expectExceptionMessage('Unauthenticated route GET /path/to');
 
         $this->registerAuthDriver('default', false);
 
@@ -183,6 +183,8 @@ class AuthenticateMiddlewareTest extends TestCase
     protected function authenticate(...$guards)
     {
         $request = m::mock(Request::class);
+        $request->shouldReceive('method')->andReturn('GET');
+        $request->shouldReceive('path')->andReturn('/path/to');
 
         $nextParam = null;
 
