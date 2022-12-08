@@ -93,9 +93,14 @@ class FakeProcessDescription
      */
     public function replaceOutput(string $output)
     {
+        $this->output = collect($this->output)->reject(function ($output) {
+            return $output['type'] === 'out';
+        })->values()->all();
+
         if (strlen($output) > 0) {
-            $this->output = [
-                ['type' => 'out', 'buffer' => rtrim($output, "\n")."\n"],
+            $this->output[] = [
+                'type' => 'out',
+                'buffer' => rtrim($output, "\n")."\n"
             ];
         }
 
@@ -110,9 +115,14 @@ class FakeProcessDescription
      */
     public function replaceErrorOutput(string $output)
     {
+        $this->output = collect($this->output)->reject(function ($output) {
+            return $output['type'] === 'err';
+        })->values()->all();
+
         if (strlen($output) > 0) {
-            $this->output = [
-                ['type' => 'err', 'buffer' => rtrim($output, "\n")."\n"],
+            $this->output[] = [
+                'type' => 'err',
+                'buffer' => rtrim($output, "\n")."\n"
             ];
         }
 
