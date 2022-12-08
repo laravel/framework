@@ -49,7 +49,7 @@ class Factory
      * @param  int  $exitCode
      * @return \Illuminate\Console\Process\FakeProcessResult
      */
-    public function result($output = '', $errorOutput = '', $exitCode = 0)
+    public function result(string $output = '', string $errorOutput = '', int $exitCode = 0)
     {
         return new FakeProcessResult(
             output: $output,
@@ -145,7 +145,7 @@ class Factory
      * @param  bool  $prevent
      * @return $this
      */
-    public function preventStrayProcesses($prevent = true)
+    public function preventStrayProcesses(bool $prevent = true)
     {
         $this->preventStrayProcesses = $prevent;
 
@@ -178,6 +178,25 @@ class Factory
         );
 
         return $this;
+    }
+
+    /**
+     * Assert that a process was recorded a given number of times matching a given truth test.
+     *
+     * @param  \Closure  $callback
+     * @param  int  $times
+     * @return $this
+     */
+    public function assertRanTimes(Closure $callback, int $times = 1)
+    {
+        $count = collect($this->recorded)->filter(function ($pair) use ($callback) {
+            return $callback($pair[0], $pair[1]);
+        })->count();
+
+        PHPUnit::assertSame(
+            $times, $count,
+            "An expected process ran {$count} times instead of {$times} times."
+        );
     }
 
     /**
@@ -219,7 +238,7 @@ class Factory
      * @param  callable  $callback
      * @return \Illuminate\Console\Process\Pool
      */
-    public function pool($callback)
+    public function pool(callable $callback)
     {
         return new Pool($this, $callback);
     }

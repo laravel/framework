@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console\Process;
 
+use Closure;
 use Illuminate\Support\Str;
 use LogicException;
 use RuntimeException;
@@ -39,6 +40,13 @@ class PendingProcess
     public $timeout = 60;
 
     /**
+     * The maximum number of seconds the process may go without returning output.
+     *
+     * @var int
+     */
+    public $idleTimeout;
+
+    /**
      * The additional environment variables for the process.
      *
      * @var array
@@ -51,6 +59,13 @@ class PendingProcess
      * @var array
      */
     public $withoutOutput = false;
+
+    /**
+     * Indicates if TTY mode should be enabled.
+     *
+     * @var bool
+     */
+    public $tty = false;
 
     /**
      * The options that will be passed to "proc_open".
@@ -80,10 +95,10 @@ class PendingProcess
     /**
      * Specify the command that will invoke the process.
      *
-     * @param  array<array-key, string>|string|null  $command
+     * @param  array<array-key, string>|string  $command
      * @return $this
      */
-    public function command($command)
+    public function command(array|string $command)
     {
         $this->command = $command;
 
@@ -96,7 +111,7 @@ class PendingProcess
      * @param  string  $path
      * @return $this
      */
-    public function path($path)
+    public function path(string $path)
     {
         $this->path = $path;
 
@@ -109,9 +124,22 @@ class PendingProcess
      * @param  int  $timeout
      * @return $this
      */
-    public function timeout($timeout)
+    public function timeout(int $timeout)
     {
         $this->timeout = $timeout;
+
+        return $this;
+    }
+
+    /**
+     * Specify the maximum number of seconds a process may go without returning output.
+     *
+     * @param  int  $timeout
+     * @return $this
+     */
+    public function idleTimeout(int $timeout)
+    {
+        $this->idleTimeout = $timeout;
 
         return $this;
     }
@@ -153,6 +181,19 @@ class PendingProcess
     }
 
     /**
+     * Enable TTY mode for the process.
+     *
+     * @param  bool  $tty
+     * @return $this
+     */
+    public function tty(bool $tty = true)
+    {
+        $this->tty = $tty;
+
+        return $this;
+    }
+
+    /**
      * Set the "proc_open" options that should be used when invoking the process.
      *
      * @param  array  $options
@@ -172,7 +213,7 @@ class PendingProcess
      * @param  callable|null  $output
      * @return \Illuminate\Contracts\Console\Process\ProcessResult
      */
-    public function run($command = null, $output = null)
+    public function run(array|string $command = null, callable $output = null)
     {
         $this->command = $command ?: $this->command;
 
@@ -200,7 +241,7 @@ class PendingProcess
      * @param  callable  $output
      * @return \Illuminate\Console\Process\InvokedProcess
      */
-    public function start($command = null, $output = null)
+    public function start(array|string $command = null, callable $output = null)
     {
         $this->command = $command ?: $this->command;
 
@@ -223,7 +264,7 @@ class PendingProcess
      * @param  array<array-key, string>|string|null  $command
      * @return \Symfony\Component\Process\Process
      */
-    protected function toSymfonyProcess($command)
+    protected function toSymfonyProcess(array|string $command)
     {
         $command = $command ?? $this->command;
 
@@ -234,8 +275,16 @@ class PendingProcess
         $process->setWorkingDirectory((string) ($this->path ?? getcwd()));
         $process->setTimeout($this->timeout);
 
+        if ($this->idleTimeout) {
+            $process->setIdleTimeout($this->idleTimeout);
+        }
+
         if ($this->withoutOutput) {
             $process->disableOutput();
+        }
+
+        if ($this->tty) {
+            $process->setTty(true);
         }
 
         if (! empty($this->options)) {
@@ -277,7 +326,7 @@ class PendingProcess
      * @param  \Closure  $fake
      * @return mixed
      */
-    protected function resolveSynchronousFake(string $command, $fake)
+    protected function resolveSynchronousFake(string $command, Closure $fake)
     {
         $result = $fake($this);
 
@@ -300,7 +349,7 @@ class PendingProcess
      * @param  \Closure  $fake
      * @return \Illuminate\Console\Process\FakeInvokedProcess
      */
-    protected function resolveAsynchronousFake(string $command, $output, $fake)
+    protected function resolveAsynchronousFake(string $command, ?callable $output, Closure $fake)
     {
         $result = $fake($this);
 

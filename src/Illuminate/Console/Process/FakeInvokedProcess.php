@@ -223,7 +223,7 @@ class FakeInvokedProcess implements InvokedProcessContract
      * @param  callable|null  $output
      * @return \Illuminate\Console\Process\ProcessResult
      */
-    public function wait($output = null)
+    public function wait(callable $output = null)
     {
         $this->outputHandler = $output ?: $this->outputHandler;
 
@@ -246,7 +246,7 @@ class FakeInvokedProcess implements InvokedProcessContract
      * @param  callable  $until
      * @return $this
      */
-    public function waitUntil($until)
+    public function waitUntil(callable $until)
     {
         while ($currentOutput = $this->invokeOutputHandlerWithNextLineOfOutput()) {
             if ($until(...$currentOutput)) {
@@ -277,7 +277,7 @@ class FakeInvokedProcess implements InvokedProcessContract
      * @param  callable|null  $output
      * @return $this
      */
-    public function withOutputHandler($outputHandler)
+    public function withOutputHandler(?callable $outputHandler)
     {
         $this->outputHandler = $outputHandler;
 

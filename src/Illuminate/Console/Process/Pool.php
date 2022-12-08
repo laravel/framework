@@ -63,7 +63,7 @@ class Pool implements ArrayAccess
      * @param  callable  $callback
      * @return void
      */
-    public function __construct(Factory $factory, $callback)
+    public function __construct(Factory $factory, callable $callback)
     {
         $this->factory = $factory;
         $this->callback = $callback;
@@ -136,7 +136,7 @@ class Pool implements ArrayAccess
      * @param  callable|null  $output
      * @return array
      */
-    public function wait($output = null)
+    public function wait(callable $output = null)
     {
         if ($this->resolved) {
             return $this->results;

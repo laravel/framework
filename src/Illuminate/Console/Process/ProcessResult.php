@@ -92,7 +92,7 @@ class ProcessResult implements ProcessResultContract
      * @param  callable|null  $callback
      * @return $this
      */
-    public function throw($callback = null)
+    public function throw(callable $callback = null)
     {
         if ($this->successful()) {
             return $this;
@@ -114,7 +114,7 @@ class ProcessResult implements ProcessResultContract
      * @param  callable|null  $callback
      * @return $this
      */
-    public function throwIf($condition, $callback = null)
+    public function throwIf(bool $condition, callable $callback = null)
     {
         if ($condition) {
             return $this->throw($callback);

@@ -86,7 +86,7 @@ class InvokedProcess implements InvokedProcessContract
      * @param  callable|null  $output
      * @return \Illuminate\Console\Process\ProcessResult
      */
-    public function wait($output = null)
+    public function wait(callable $output = null)
     {
         try {
             $this->process->wait($output);
@@ -103,7 +103,7 @@ class InvokedProcess implements InvokedProcessContract
      * @param  callable  $output
      * @return $this
      */
-    public function waitUntil($output)
+    public function waitUntil(callable $output)
     {
         try {
             $this->process->waitUntil($output);
