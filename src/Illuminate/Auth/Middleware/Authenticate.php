@@ -80,7 +80,11 @@ class Authenticate implements AuthenticatesRequests
     protected function unauthenticated($request, array $guards)
     {
         throw new AuthenticationException(
-            'Unauthenticated.', $guards, $this->redirectTo($request)
+            sprintf(
+                'Unauthenticated route %s %s',
+                $request->method(), $request->path()
+            )
+            , $guards, $this->redirectTo($request)
         );
     }
 
