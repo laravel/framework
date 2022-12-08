@@ -494,6 +494,17 @@ class DatabaseEloquentModelTest extends TestCase
         $closure($builder);
     }
 
+    public function testWithWhereHasWithSpecificColumns()
+    {
+        $model = new EloquentModelWithWhereHasStub;
+        $instance = $model->newInstance()->newQuery()->withWhereHas('foo:diaa,fares');
+        $builder = m::mock(Builder::class);
+        $builder->shouldReceive('select')->once()->with(['diaa', 'fares']);
+        $this->assertNotNull($instance->getEagerLoads()['foo']);
+        $closure = $instance->getEagerLoads()['foo'];
+        $closure($builder);
+    }
+
     public function testWithMethodCallsQueryBuilderCorrectlyWithArray()
     {
         $result = EloquentModelWithStub::with(['foo', 'bar']);
@@ -2855,6 +2866,14 @@ class EloquentModelWithStub extends Model
         $mock->shouldReceive('with')->once()->with(['foo', 'bar'])->andReturn('foo');
 
         return $mock;
+    }
+}
+
+class EloquentModelWithWhereHasStub extends Model
+{
+    public function foo()
+    {
+        return $this->hasMany(EloquentModelStub::class);
     }
 }
 

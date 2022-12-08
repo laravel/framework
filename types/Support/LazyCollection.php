@@ -480,12 +480,12 @@ assertType('Illuminate\Support\LazyCollection<string, int>', $collection::make([
         return ['string' => 1];
     }));
 
-assertType('Illuminate\Support\LazyCollection<int, mixed>', $collection::make(['string'])
+assertType('Illuminate\Support\LazyCollection<int, string>', $collection::make(['string'])
     ->flatMap(function ($string, $int) {
         assertType('string', $string);
         assertType('int', $int);
 
-        return 1;
+        return [0 => 'string'];
     }));
 
 assertType('Illuminate\Support\LazyCollection<int, User>', $collection->mapInto(User::class));
