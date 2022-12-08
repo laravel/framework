@@ -242,27 +242,6 @@ class FakeInvokedProcess implements InvokedProcessContract
     }
 
     /**
-     * Wait for some given output from the process.
-     *
-     * @param  callable  $until
-     * @return $this
-     */
-    public function waitUntil(callable $until)
-    {
-        while ($currentOutput = $this->invokeOutputHandlerWithNextLineOfOutput()) {
-            if ($until($currentOutput['type'], $currentOutput['buffer'])) {
-                return $this;
-            }
-        }
-
-        // This process would essentially be running forever; therefore, throw...
-        throw new ProcessTimedOutException(
-            new SymfonyTimeoutException($this->process->toSymfonyProcess($this->command), 1),
-            $this->process->toProcessResult($this->command),
-        );
-    }
-
-    /**
      * Get the ultimate process result that wil be returned by this "process".
      *
      * @return \Illuminate\Contracts\Console\Process\ProcessResult
