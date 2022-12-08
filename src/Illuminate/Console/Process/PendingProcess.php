@@ -330,7 +330,9 @@ class PendingProcess
     {
         $result = $fake($this);
 
-        if ($result instanceof ProcessResult) {
+        if (is_string($result) || is_array($result)) {
+            return (new FakeProcessResult(output: $result))->withCommand($command);
+        } elseif ($result instanceof ProcessResult) {
             return $result;
         } elseif ($result instanceof FakeProcessResult) {
             return $result->withCommand($command);
@@ -354,6 +356,10 @@ class PendingProcess
     protected function resolveAsynchronousFake(string $command, ?callable $output, Closure $fake)
     {
         $result = $fake($this);
+
+        if (is_string($result) || is_array($result)) {
+            $result = new FakeProcessResult(output: $result);
+        }
 
         if ($result instanceof ProcessResult) {
             return (new FakeInvokedProcess(

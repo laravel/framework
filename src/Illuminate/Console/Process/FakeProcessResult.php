@@ -27,14 +27,14 @@ class FakeProcessResult implements ProcessResultContract
      *
      * @var string
      */
-    protected $output;
+    protected $output = '';
 
     /**
      * The process error output.
      *
      * @var string
      */
-    protected $errorOutput;
+    protected $errorOutput = '';
 
     /**
      * Create a new process result instance.
@@ -49,8 +49,27 @@ class FakeProcessResult implements ProcessResultContract
     {
         $this->command = $command;
         $this->exitCode = $exitCode;
-        $this->output = rtrim((is_array($output) ? implode("\n", $output) : $output), "\n")."\n";
-        $this->errorOutput = rtrim((is_array($errorOutput) ? implode("\n", $errorOutput) : $errorOutput), "\n")."\n";
+        $this->output = $this->normalizeOutput($output);
+        $this->errorOutput = $this->normalizeOutput($errorOutput);
+    }
+
+    /**
+     * Normalize the given output into a string with newlines.
+     *
+     * @param  array|string  $output
+     * @return string
+     */
+    protected function normalizeOutput(array|string $output)
+    {
+        if (empty($output)) {
+            return '';
+        } elseif (is_string($output)) {
+            return rtrim($output, "\n")."\n";
+        } elseif (is_array($output)) {
+            return rtrim(collect($output)
+                    ->map(fn ($line) => rtrim($line, "\n")."\n")
+                    ->implode(""), "\n");
+        }
     }
 
     /**

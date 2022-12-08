@@ -61,7 +61,7 @@ class FakeProcessDescription
             return $this;
         }
 
-        $this->output[] = ['type' => 'out', 'buffer' => $output."\n"];
+        $this->output[] = ['type' => 'out', 'buffer' => rtrim($output, "\n")."\n"];
 
         return $this;
     }
@@ -80,7 +80,9 @@ class FakeProcessDescription
             return $this;
         }
 
-        $this->output[] = ['type' => 'err', 'buffer' => $output."\n"];
+        if (strlen($output) > 0) {
+            $this->output[] = ['type' => 'err', 'buffer' => rtrim($output, "\n")."\n"];
+        }
 
         return $this;
     }
@@ -145,11 +147,12 @@ class FakeProcessDescription
      */
     protected function resolveOutput()
     {
-        return rtrim(collect($this->output)
-                ->filter(fn ($output) => $output['type'] === 'out')
-                ->map
-                ->buffer
-                ->implode(""), "\n")."\n";
+        $output = collect($this->output)
+            ->filter(fn ($output) => $output['type'] === 'out');
+
+        return $output->isNotEmpty()
+                    ? rtrim($output->map->buffer->implode(""), "\n")."\n"
+                    : '';
     }
 
     /**
@@ -159,10 +162,11 @@ class FakeProcessDescription
      */
     protected function resolveErrorOutput()
     {
-        return rtrim(collect($this->output)
-                ->filter(fn ($output) => $output['type'] === 'err')
-                ->map
-                ->buffer
-                ->implode(""), "\n")."\n";
+        $output = collect($this->output)
+            ->filter(fn ($output) => $output['type'] === 'err');
+
+        return $output->isNotEmpty()
+                    ? rtrim($output->map->buffer->implode(""), "\n")."\n"
+                    : '';
     }
 }
