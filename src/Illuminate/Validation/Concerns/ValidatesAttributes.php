@@ -2077,6 +2077,19 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate the attribute does not contains with a given substring.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateDoesntContainsWith($attribute, $value, $parameters)
+    {
+        return ! Str::contains($value, $parameters);
+    }
+
+    /**
      * Validate the attribute does not end with a given substring.
      *
      * @param  string  $attribute
