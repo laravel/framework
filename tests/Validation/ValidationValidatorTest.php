@@ -6726,6 +6726,20 @@ class ValidationValidatorTest extends TestCase
         ];
     }
 
+    public function testValidateWithValidUlid()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => '01gd6r360bp37zj17nxb55yv40'], ['foo' => 'ulid']);
+        $this->assertTrue($v->passes());
+    }
+
+    public function testValidateWithInvalidUlid()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => '01gd6r36-bp37z-17nx-55yv40'], ['foo' => 'ulid']);
+        $this->assertFalse($v->passes());
+    }
+
     public static function providesPassingExcludeIfData()
     {
         return [
