@@ -31,6 +31,7 @@ resolveFacades($finder)->each(function ($facade) use ($linting) {
         ->flatMap(fn ($class) => [$class, ...resolveDocMixins($class)])
         ->flatMap(resolveMethods(...))
         ->reject(isMagic(...))
+        ->reject(isInternal(...))
         ->reject(isDeprecated(...))
         ->reject(fulfillsBuiltinInterface(...))
         ->reject(fn ($method) => conflictsWithFacade($facade, $method))
@@ -329,6 +330,21 @@ function isMagic($method)
 }
 
 /**
+ * Determine if the method is marked as @internal.
+ *
+ * @param  \ReflectionMethod|string  $method
+ * @return bool
+ */
+function isInternal($method)
+{
+    if (is_string($method)) {
+        return false;
+    }
+
+    return resolveDocTags($method->getDocComment(), '@internal')->isNotEmpty();
+}
+
+/**
  * Determine if the method is deprecated.
  *
  * @param  \ReflectionMethod|string  $method
@@ -336,7 +352,11 @@ function isMagic($method)
  */
 function isDeprecated($method)
 {
-    return ! is_string($method) && $method->isDeprecated();
+    if (is_string($method)) {
+        return false;
+    }
+
+    return $method->isDeprecated() || resolveDocTags($method->getDocComment(), '@deprecated')->isNotEmpty();
 }
 
 /**

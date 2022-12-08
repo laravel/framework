@@ -29,7 +29,6 @@ use Illuminate\Support\Testing\Fakes\NotificationFake;
  * @method static void assertNothingSentTo(mixed $notifiable)
  * @method static void assertSentTimes(string $notification, int $expectedCount)
  * @method static void assertCount(int $expectedCount)
- * @method static void assertTimesSent(int $expectedCount, string $notification)
  * @method static \Illuminate\Support\Collection sent(mixed $notifiable, string $notification, callable|null $callback = null)
  * @method static bool hasSent(mixed $notifiable, string $notification)
  * @method static array sentNotifications()
