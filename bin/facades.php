@@ -352,7 +352,11 @@ function isInternal($method)
  */
 function isDeprecated($method)
 {
-    return ! is_string($method) && $method->isDeprecated();
+    if (is_string($method)) {
+        return false;
+    }
+
+    return $method->isDeprecated() || resolveDocTags($method->getDocComment(), '@deprecated')->isNotEmpty();
 }
 
 /**

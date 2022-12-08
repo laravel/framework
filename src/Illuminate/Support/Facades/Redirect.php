@@ -3,7 +3,6 @@
 namespace Illuminate\Support\Facades;
 
 /**
- * @method static \Illuminate\Http\RedirectResponse home(int $status = 302)
  * @method static \Illuminate\Http\RedirectResponse back(int $status = 302, array $headers = [], mixed $fallback = false)
  * @method static \Illuminate\Http\RedirectResponse refresh(int $status = 302, array $headers = [])
  * @method static \Illuminate\Http\RedirectResponse guest(string $path, int $status = 302, array $headers = [], bool|null $secure = null)

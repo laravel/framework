@@ -95,7 +95,6 @@ namespace Illuminate\Support\Facades;
  * @method static void setFormat(string|null $format, string|string[] $mimeTypes)
  * @method static string|null getRequestFormat(string|null $default = 'html')
  * @method static void setRequestFormat(string|null $format)
- * @method static string|null getContentType()
  * @method static string|null getContentTypeFormat()
  * @method static void setDefaultLocale(string $locale)
  * @method static string getDefaultLocale()
