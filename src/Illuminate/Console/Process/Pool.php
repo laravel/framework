@@ -87,7 +87,7 @@ class Pool implements ArrayAccess
      *
      * @return $this
      */
-    public function start()
+    public function start(?callable $output = null)
     {
         if ($this->started) {
             return;
@@ -100,8 +100,10 @@ class Pool implements ArrayAccess
                 if (! $pendingProcess instanceof PendingProcess) {
                     throw new InvalidArgumentException("Process pool must only contain pending processes.");
                 }
-            })->mapWithKeys(function ($pendingProcess, $key) {
-                return [$key => $pendingProcess->start()];
+            })->mapWithKeys(function ($pendingProcess, $key) use ($output) {
+                return [$key => $pendingProcess->start(output: $output ? function ($type, $buffer) use ($key, $output) {
+                    $output($type, $buffer, $key);
+                } : null)];
             })->all();
 
         $this->started = true;
@@ -133,10 +135,19 @@ class Pool implements ArrayAccess
     /**
      * Start and wait for the processes to finish.
      *
-     * @param  callable|null  $output
      * @return array
      */
-    public function wait(callable $output = null)
+    public function run()
+    {
+        return $this->wait();
+    }
+
+    /**
+     * Start and wait for the processes to finish.
+     *
+     * @return array
+     */
+    public function wait()
     {
         if ($this->resolved) {
             return $this->results;

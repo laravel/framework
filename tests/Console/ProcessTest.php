@@ -57,6 +57,27 @@ class ProcessTest extends TestCase
         $this->assertTrue(str_contains($pool[1]->output(), 'ProcessTest.php'));
     }
 
+    public function testProcessPoolCanReceiveOutputForEachProcessViaStartMethod()
+    {
+        $factory = new Factory;
+
+        $output = [];
+
+        $pool = $factory->pool(function (Pool $pool) {
+            return [
+                $pool->path(__DIR__)->command($this->ls()),
+                $pool->path(__DIR__)->command($this->ls()),
+            ];
+        })->start(function ($type, $buffer, $key) use (&$output) {
+            $output[$key][$type][] = $buffer;
+        });
+
+        $pool->wait();
+
+        $this->assertTrue(count($output[0]['out']) > 0);
+        $this->assertTrue(count($output[1]['out']) > 0);
+    }
+
     public function testProcessPoolResultsCanBeEvaluatedOnTime()
     {
         $factory = new Factory;
