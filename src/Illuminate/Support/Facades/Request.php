@@ -66,7 +66,6 @@ namespace Illuminate\Support\Facades;
  * @method static bool getHttpMethodParameterOverride()
  * @method static bool hasPreviousSession()
  * @method static void setSession(\Symfony\Component\HttpFoundation\Session\SessionInterface $session)
- * @method static void setSessionFactory(callable(): SessionInterface $factory)
  * @method static array getClientIps()
  * @method static string|null getClientIp()
  * @method static string getScriptName()

@@ -31,6 +31,7 @@ resolveFacades($finder)->each(function ($facade) use ($linting) {
         ->flatMap(fn ($class) => [$class, ...resolveDocMixins($class)])
         ->flatMap(resolveMethods(...))
         ->reject(isMagic(...))
+        ->reject(isInternal(...))
         ->reject(isDeprecated(...))
         ->reject(fulfillsBuiltinInterface(...))
         ->reject(fn ($method) => conflictsWithFacade($facade, $method))
@@ -326,6 +327,21 @@ function resolveDocMixins($class)
 function isMagic($method)
 {
     return Str::startsWith(is_string($method) ? $method : $method->getName(), '__');
+}
+
+/**
+ * Determine if the method is marked as @internal.
+ *
+ * @param  \ReflectionMethod|string  $method
+ * @return bool
+ */
+function isInternal($method)
+{
+    if (is_string($method)) {
+        return false;
+    }
+
+    return resolveDocTags($method->getDocComment(), '@internal')->isNotEmpty();
 }
 
 /**
