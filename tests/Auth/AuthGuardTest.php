@@ -593,7 +593,8 @@ class AuthGuardTest extends TestCase
     public function testForgetUserSetsUserToNull()
     {
         $user = m::mock(Authenticatable::class);
-        $guard = $this->getGuard()->setUser($user);
+        $guard = $this->getGuard();
+        $guard->setUser($user);
         $guard->forgetUser();
         $this->assertNull($guard->getUser());
     }
