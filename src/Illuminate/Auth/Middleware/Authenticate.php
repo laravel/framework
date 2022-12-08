@@ -83,8 +83,7 @@ class Authenticate implements AuthenticatesRequests
             sprintf(
                 'Unauthenticated route %s %s',
                 $request->method(), $request->path()
-            )
-            , $guards, $this->redirectTo($request)
+            ), $guards, $this->redirectTo($request)
         );
     }
 
