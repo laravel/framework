@@ -152,7 +152,6 @@ namespace Illuminate\Support\Facades;
  * @method static array keys()
  * @method static array all(array|mixed|null $keys = null)
  * @method static mixed input(string|null $key = null, mixed $default = null)
- * @method static \Illuminate\Support\Stringable str(string $key, mixed $default = null)
  * @method static \Illuminate\Support\Stringable string(string $key, mixed $default = null)
  * @method static bool boolean(string|null $key = null, bool $default = false)
  * @method static int integer(string $key, int $default = 0)
