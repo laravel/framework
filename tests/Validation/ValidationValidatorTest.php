@@ -6726,6 +6726,20 @@ class ValidationValidatorTest extends TestCase
         ];
     }
 
+    public function testValidateWithValidAscii()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'Dusseldorf'], ['foo' => 'ascii']);
+        $this->assertTrue($v->passes());
+    }
+
+    public function testValidateWithInvalidAscii()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'Düsseldorf'], ['foo' => 'ascii']);
+        $this->assertFalse($v->passes());
+    }
+
     public function testValidateWithValidUlid()
     {
         $trans = $this->getIlluminateArrayTranslator();

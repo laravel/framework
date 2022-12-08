@@ -2140,6 +2140,18 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute is 7 bit ASCII.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validateAscii($attribute, $value)
+    {
+        return Str::isAscii($value);
+    }
+
+    /**
      * Validate that an attribute is a valid ULID.
      *
      * @param  string  $attribute
