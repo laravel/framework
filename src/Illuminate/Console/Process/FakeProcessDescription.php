@@ -61,7 +61,9 @@ class FakeProcessDescription
             return $this;
         }
 
-        $this->output[] = ['type' => 'out', 'buffer' => rtrim($output, "\n")."\n"];
+        if (strlen($output) > 0) {
+            $this->output[] = ['type' => 'out', 'buffer' => rtrim($output, "\n")."\n"];
+        }
 
         return $this;
     }
