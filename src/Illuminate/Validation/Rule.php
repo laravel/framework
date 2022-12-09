@@ -4,7 +4,9 @@ namespace Illuminate\Validation;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Validation\Rules\Contains;
 use Illuminate\Validation\Rules\Dimensions;
+use Illuminate\Validation\Rules\DoesntContains;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Rules\ExcludeIf;
 use Illuminate\Validation\Rules\Exists;
@@ -96,6 +98,36 @@ class Rule
         }
 
         return new NotIn(is_array($values) ? $values : func_get_args());
+    }
+
+    /**
+     * Get an contains constraint builder instance.
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable|array|string  $values
+     * @return \Illuminate\Validation\Rules\In
+     */
+    public static function contains($values)
+    {
+        if ($values instanceof Arrayable) {
+            $values = $values->toArray();
+        }
+
+        return new Contains(is_array($values) ? $values : func_get_args());
+    }
+
+    /**
+     * Get an doesnt_contains constraint builder instance.
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable|array|string  $values
+     * @return \Illuminate\Validation\Rules\In
+     */
+    public static function doesntContains($values)
+    {
+        if ($values instanceof Arrayable) {
+            $values = $values->toArray();
+        }
+
+        return new DoesntContains(is_array($values) ? $values : func_get_args());
     }
 
     /**
