@@ -12,7 +12,6 @@ use Illuminate\Foundation\Console\CliDumper;
 use Illuminate\Foundation\Http\HtmlDumper;
 use Illuminate\Foundation\MaintenanceModeManager;
 use Illuminate\Foundation\Precognition;
-use Illuminate\Foundation\Vite;
 use Illuminate\Http\Request;
 use Illuminate\Log\Events\MessageLogged;
 use Illuminate\Support\AggregateServiceProvider;
@@ -33,15 +32,7 @@ class FoundationServiceProvider extends AggregateServiceProvider
     protected $providers = [
         FormRequestServiceProvider::class,
         ParallelTestingServiceProvider::class,
-    ];
-
-    /**
-     * The singletons to register into the container.
-     *
-     * @var array
-     */
-    public $singletons = [
-        Vite::class => Vite::class,
+        ViteServiceProvider::class,
     ];
 
     /**
