@@ -1495,6 +1495,49 @@ class HttpClientTest extends TestCase
         $this->assertSame(403, $response->status());
     }
 
+    public function testRequestExceptionIsThrownIfTheThrowIfClosureOnThePendingRequestReturnsTrue()
+    {
+        $this->factory->fake([
+            '*' => $this->factory->response(['error'], 403),
+        ]);
+
+        $exception = null;
+
+        try {
+            $this->factory
+                ->throwIf(function ($response) {
+                    $this->assertInstanceOf(Response::class, $response);
+                    $this->assertSame(403, $response->status());
+
+                    return true;
+                })
+                ->get('http://foo.com/get');
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
+    }
+
+    public function testRequestExceptionIsNotThrownIfTheThrowIfClosureOnThePendingRequestReturnsFalse()
+    {
+        $this->factory->fake([
+            '*' => $this->factory->response(['error'], 403),
+        ]);
+
+        $response = $this->factory
+            ->throwIf(function ($response) {
+                $this->assertInstanceOf(Response::class, $response);
+                $this->assertSame(403, $response->status());
+
+                return false;
+            })
+            ->get('http://foo.com/get');
+
+        $this->assertSame(403, $response->status());
+    }
+
     public function testRequestExceptionIsThrownWithCallbackIfThePendingRequestIsSetToThrowOnFailure()
     {
         $this->factory->fake([
@@ -1599,6 +1642,43 @@ class HttpClientTest extends TestCase
         ]);
 
         $response = $this->factory->get('http://foo.com/api')->throwIf(false);
+
+        $this->assertSame('{"result":{"foo":"bar"}}', $response->body());
+    }
+
+    public function testRequestExceptionIsThrowIfConditionClosureIsSatisfied()
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response('', 400),
+        ]);
+
+        $exception = null;
+
+        try {
+            $this->factory->get('http://foo.com/api')->throwIf(function ($response) {
+                $this->assertSame(400, $response->status());
+
+                return true;
+            });
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
+    }
+
+    public function testRequestExceptionIsNotThrownIfConditionClosureIsNotSatisfied()
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response(['result' => ['foo' => 'bar']], 400),
+        ]);
+
+        $response = $this->factory->get('http://foo.com/api')->throwIf(function ($response) {
+            $this->assertSame(400, $response->status());
+
+            return false;
+        });
 
         $this->assertSame('{"result":{"foo":"bar"}}', $response->body());
     }
