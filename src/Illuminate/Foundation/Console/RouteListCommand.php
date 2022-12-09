@@ -121,8 +121,8 @@ class RouteListCommand extends Command
      */
     protected function getRoutes()
     {
-        $routes = collect($this->router->getRoutes())->map(function ($route) {
-            return $this->getRouteInformation($route);
+        $routes = collect($this->router->getRoutes())->map(function ($route, $occurrence) {
+            return $this->getRouteInformation($route, $occurrence);
         })->filter()->all();
 
         if (($sort = $this->option('sort')) !== null) {
@@ -142,9 +142,10 @@ class RouteListCommand extends Command
      * Get the route information for a given route.
      *
      * @param  \Illuminate\Routing\Route  $route
+     * @param  int  $occurrence
      * @return array
      */
-    protected function getRouteInformation(Route $route)
+    protected function getRouteInformation(Route $route, int $occurrence)
     {
         return $this->filterRoute([
             'domain' => $route->domain(),
@@ -154,6 +155,7 @@ class RouteListCommand extends Command
             'action' => ltrim($route->getActionName(), '\\'),
             'middleware' => $this->getMiddleware($route),
             'vendor' => $this->isVendorRoute($route),
+            'occurrence' => $occurrence,
         ]);
     }
 
