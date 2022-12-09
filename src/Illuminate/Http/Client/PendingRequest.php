@@ -607,6 +607,7 @@ class PendingRequest
      * Throw an exception if a server or client error occurred and the given condition evaluates to true.
      *
      * @param  callable|bool  $condition
+     * @param  callable|null  $throwCallback
      * @return $this
      */
     public function throwIf($condition)
@@ -615,7 +616,7 @@ class PendingRequest
             $this->throwIfCallback = $condition;
         }
 
-        return $condition ? $this->throw() : $this;
+        return $condition ? $this->throw(func_get_args()[1] ?? null) : $this;
     }
 
     /**
@@ -808,7 +809,9 @@ class PendingRequest
                             throw $exception;
                         }
 
-                        if ($this->throwCallback && ($this->throwIfCallback === null || call_user_func($this->throwIfCallback, $response))) {
+                        if ($this->throwCallback &&
+                            ($this->throwIfCallback === null ||
+                             call_user_func($this->throwIfCallback, $response))) {
                             $response->throw($this->throwCallback);
                         }
 
