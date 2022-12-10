@@ -5,7 +5,7 @@ namespace Illuminate\Support\Facades;
 use Illuminate\Contracts\Foundation\Vite as ViteContract;
 
 /**
- * @method static void useAppFactory((callable(string, ViteContract, array, Container): ViteContract) $appResolver)
+ * @method static \Illuminate\Foundation\ViteManager useAppFactory(callable(string, ViteContract, array, Container): ViteContract $appFactory)
  * @method static ViteContract app(string|null $app = null)
  * @method static ViteContract configure(array $config)
  * @method static array preloadedAssets()

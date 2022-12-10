@@ -58,11 +58,13 @@ class ViteManager extends Manager implements ViteContract
      * Register an app factory callback.
      *
      * @param  callable(string, ViteContract, array, Container): ViteContract  $appFactory
-     * @return void
+     * @return $this
      */
     public function useAppFactory($appFactory)
     {
         $this->appFactory = $appFactory;
+
+        return $this;
     }
 
     /**
