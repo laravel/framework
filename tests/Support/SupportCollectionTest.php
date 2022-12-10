@@ -3794,6 +3794,62 @@ class SupportCollectionTest extends TestCase
         $this->assertSame('foo', $value);
     }
 
+    public function testPullWithKeyRetrievesItemFromCollection()
+    {
+        $c = new Collection(['foo', 'bar']);
+
+        $this->assertSame([0 => 'foo'], $c->pullWithKey(0)->toArray());
+        $this->assertSame([1 => 'bar'], $c->pullWithKey(1)->toArray());
+
+        $c = new Collection(['foo', 'bar']);
+
+        $this->assertSame([-1 => null], $c->pullWithKey(-1)->toArray());
+        $this->assertSame([2 => null], $c->pullWithKey(2)->toArray());
+    }
+
+    public function testPullWithKeyRemovesItemFromCollection()
+    {
+        $c = new Collection(['foo', 'bar']);
+        $c->pullWithKey(0);
+        $this->assertEquals([1 => 'bar'], $c->all());
+        $c->pullWithKey(1);
+        $this->assertEquals([], $c->all());
+    }
+
+    public function testPullWithKeyRemovesItemFromNestedCollection()
+    {
+        $nestedCollection = new Collection([
+            new Collection([
+                'value',
+                new Collection([
+                    'bar' => 'baz',
+                    'test' => 'value',
+                ]),
+            ]),
+            'bar',
+        ]);
+
+        $nestedCollection->pullWithKey('0.1.test');
+
+        $actualArray = $nestedCollection->toArray();
+        $expectedArray = [
+            [
+                'value',
+                ['bar' => 'baz'],
+            ],
+            'bar',
+        ];
+
+        $this->assertEquals($expectedArray, $actualArray);
+    }
+
+    public function testPullWithKeyReturnsDefault()
+    {
+        $c = new Collection([]);
+        $valueArray = $c->pullWithKey(0, 'foo')->toArray();
+        $this->assertSame([0 => 'foo'], $valueArray);
+    }
+
     /**
      * @dataProvider collectionClassProvider
      */

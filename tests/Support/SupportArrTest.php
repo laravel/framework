@@ -678,6 +678,32 @@ class SupportArrTest extends TestCase
         $this->assertSame('First', $first);
         $this->assertSame([1 => 'Second'], $array);
     }
+    
+    public function testPullWithKey()
+    {
+        $array = ['name' => 'Desk', 'price' => 100];
+        $nameKeyValue = Arr::pullWithKey($array, 'name');
+        $this->assertSame(['name' => 'Desk'], $nameKeyValue);
+        $this->assertSame(['price' => 100], $array);
+
+        // Only works on first level keys
+        $array = ['joe@example.com' => 'Joe', 'jane@localhost' => 'Jane'];
+        $nameKeyValue = Arr::pullWithKey($array, 'joe@example.com');
+        $this->assertSame(['joe@example.com' => 'Joe'], $nameKeyValue);
+        $this->assertSame(['jane@localhost' => 'Jane'], $array);
+
+        // Does not work for nested keys
+        $array = ['emails' => ['joe@example.com' => 'Joe', 'jane@localhost' => 'Jane']];
+        $nameKeyValue = Arr::pullWithKey($array, 'emails.joe@example.com');
+        $this->assertSame(['emails.joe@example.com' => null], $nameKeyValue);
+        $this->assertSame(['emails' => ['joe@example.com' => 'Joe', 'jane@localhost' => 'Jane']], $array);
+
+        // Works with int keys
+        $array = ['First', 'Second'];
+        $firstKeyValue = Arr::pullWithKey($array, 0);
+        $this->assertSame([0 => 'First'], $firstKeyValue);
+        $this->assertSame([1 => 'Second'], $array);
+    }
 
     public function testQuery()
     {

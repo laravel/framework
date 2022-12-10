@@ -602,6 +602,23 @@ class Arr
     }
 
     /**
+     * Get a key-value pair from the array, and remove it.
+     *
+     * @param  array  $array
+     * @param  string|int  $key
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public static function pullWithKey(&$array, $key, $default = null)
+    {
+        //as func_get_args() loses references, we can't pass
+        //spreaded func_get_args() here...
+        $value = static::pull($array, $key, $default);
+
+        return [$key => $value];
+    }
+
+    /**
      * Convert the array into a query string.
      *
      * @param  array  $array

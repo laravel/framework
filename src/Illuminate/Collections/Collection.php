@@ -978,6 +978,22 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Get and remove a key-item pair from the collection.
+     *
+     * @template TPullDefault
+     *
+     * @param  TKey  $key
+     * @param  TPullDefault|(\Closure(): TPullDefault)  $default
+     * @return TValue|TPullDefault
+     */
+    public function pullWithKey($key, $default = null)
+    {
+        //as func_get_args() loses references, we can't pass
+        //spreaded func_get_args() here...
+        return collect(Arr::pullWithKey($this->items, $key, $default));
+    }
+
+    /**
      * Put an item in the collection by key.
      *
      * @param  TKey  $key
