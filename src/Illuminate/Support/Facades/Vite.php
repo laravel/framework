@@ -2,33 +2,34 @@
 
 namespace Illuminate\Support\Facades;
 
-use Illuminate\Contracts\Foundation\Vite as ViteContract;
-
 /**
- * @method static \Illuminate\Foundation\ViteManager useAppFactory(callable(string, ViteContract, array, Container): ViteContract $appFactory)
- * @method static ViteContract app(string|null $app = null)
- * @method static ViteContract configure(array $config)
+ * @method static string getDefaultDriver()
+ * @method static \Illuminate\Foundation\ViteManager useAppFactory(callable(string, \Illuminate\Contracts\Foundation\Vite, array, \Illuminate\Contracts\Container\Container): \Illuminate\Contracts\Foundation\Vite $appFactory)
+ * @method static \Illuminate\Contracts\Foundation\Vite app(string|null $app = null)
+ * @method static \Illuminate\Contracts\Foundation\Vite configure(array $config)
  * @method static array preloadedAssets()
  * @method static string|null cspNonce()
  * @method static string useCspNonce(string|null $nonce = null)
- * @method static ViteContract useIntegrityKey(string|false $key)
- * @method static ViteContract withEntryPoints(array $entryPoints)
- * @method static ViteContract useManifestFilename(string $filename)
+ * @method static \Illuminate\Contracts\Foundation\Vite useIntegrityKey(string|false $key)
+ * @method static \Illuminate\Contracts\Foundation\Vite withEntryPoints(array $entryPoints)
+ * @method static \Illuminate\Contracts\Foundation\Vite useManifestFilename(string $filename)
  * @method static string hotFile()
- * @method static ViteContract useHotFile(string $path)
- * @method static ViteContract useBuildDirectory(string $path)
- * @method static ViteContract useScriptTagAttributes((callable(string, string, ?array, ?array): array)|array $attributes)
- * @method static ViteContract useStyleTagAttributes((callable(string, string, ?array, ?array): array)|array $attributes)
- * @method static ViteContract usePreloadTagAttributes((callable(string, string, ?array, ?array): array)|array $attributes)
+ * @method static \Illuminate\Contracts\Foundation\Vite useHotFile(string $path)
+ * @method static \Illuminate\Contracts\Foundation\Vite useBuildDirectory(string $path)
+ * @method static \Illuminate\Contracts\Foundation\Vite useScriptTagAttributes((callable(string, string, ?array, ?array): array)|array $attributes)
+ * @method static \Illuminate\Contracts\Foundation\Vite useStyleTagAttributes((callable(string, string, ?array, ?array): array)|array $attributes)
+ * @method static \Illuminate\Contracts\Foundation\Vite usePreloadTagAttributes((callable(string, string, ?array, ?array): array)|array $attributes)
  * @method static \Illuminate\Support\HtmlString|void reactRefresh()
  * @method static string asset(string $asset, string|null $buildDirectory = null)
- * @method static string|null manifestHash(string|null $buildDirectory = null)
+ * @method static string|null manifestHash(void $buildDirectory = null)
  * @method static bool isRunningHot()
  * @method static string toHtml()
- * @method static void macro(string $name, object|callable $macro)
- * @method static void mixin(object $mixin, bool $replace = true)
- * @method static bool hasMacro(string $name)
- * @method static void flushMacros()
+ * @method static mixed driver(string|null $driver = null)
+ * @method static \Illuminate\Foundation\ViteManager extend(string $driver, \Closure $callback)
+ * @method static array getDrivers()
+ * @method static \Illuminate\Contracts\Container\Container getContainer()
+ * @method static \Illuminate\Foundation\ViteManager setContainer(\Illuminate\Contracts\Container\Container $container)
+ * @method static \Illuminate\Foundation\ViteManager forgetDrivers()
  *
  * @see \Illuminate\Foundation\ViteManager
  */
