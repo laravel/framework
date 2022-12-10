@@ -3,7 +3,6 @@
 namespace Illuminate\Foundation;
 
 use Illuminate\Contracts\Foundation\Vite as ViteContract;
-use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Manager;
 use InvalidArgumentException;
 
@@ -12,7 +11,7 @@ class ViteManager extends Manager implements ViteContract
     /**
      * The registered app factory.
      *
-     * @var (callable(string, ViteContract, array, Container): ViteContract)|null
+     * @var (callable(\Illuminate\Contracts\Foundation\Vite, string, array, \Illuminate\Contracts\Container\Container): \Illuminate\Contracts\Foundation\Vite)|null
      */
     protected $appFactory = null;
 
@@ -30,7 +29,7 @@ class ViteManager extends Manager implements ViteContract
      * Create a new driver instance.
      *
      * @param  string  $driver
-     * @return ViteContract
+     * @return \Illuminate\Contracts\Foundation\Vite
      */
     protected function createDriver($driver)
     {
@@ -45,19 +44,19 @@ class ViteManager extends Manager implements ViteContract
      * Create a new app instance.
      *
      * @param  string  $app
-     * @return ViteContract
+     * @return \Illuminate\Contracts\Foundation\Vite
      */
     protected function createApp($app)
     {
-        return ($this->appFactory ?? function (string $app, ViteContract $vite, array $config) {
+        return ($this->appFactory ?? function (ViteContract $vite, string $app, array $config) {
             return $vite->configure($config);
-        })($app, new Vite, config("vite.apps.$app", []), $this->container);
+        })(new Vite, $app, config("vite.apps.$app", []), $this->container);
     }
 
     /**
      * Register an app factory callback.
      *
-     * @param  callable(string, ViteContract, array, Container): ViteContract  $appFactory
+     * @param  callable(\Illuminate\Contracts\Foundation\Vite, string, array, \Illuminate\Contracts\Container\Container): \Illuminate\Contracts\Foundation\Vite  $appFactory
      * @return $this
      */
     public function useAppFactory($appFactory)
@@ -71,7 +70,7 @@ class ViteManager extends Manager implements ViteContract
      * Get an app instance.
      *
      * @param  string|null  $app
-     * @return ViteContract
+     * @return \Illuminate\Contracts\Foundation\Vite
      *
      * @throws \InvalidArgumentException
      */
@@ -84,7 +83,7 @@ class ViteManager extends Manager implements ViteContract
      * Apply configuration to the Vite instance.
      *
      * @param  array  $config
-     * @return ViteContract
+     * @return \Illuminate\Contracts\Foundation\Vite
      */
     public function configure($config)
     {
@@ -126,7 +125,7 @@ class ViteManager extends Manager implements ViteContract
      * Use the given key to detect integrity hashes in the manifest.
      *
      * @param  string|false  $key
-     * @return ViteContract
+     * @return \Illuminate\Contracts\Foundation\Vite
      */
     public function useIntegrityKey($key)
     {
@@ -137,7 +136,7 @@ class ViteManager extends Manager implements ViteContract
      * Set the Vite entry points.
      *
      * @param  array  $entryPoints
-     * @return ViteContract
+     * @return \Illuminate\Contracts\Foundation\Vite
      */
     public function withEntryPoints($entryPoints)
     {
@@ -148,7 +147,7 @@ class ViteManager extends Manager implements ViteContract
      * Set the filename for the manifest file.
      *
      * @param  string  $filename
-     * @return ViteContract
+     * @return \Illuminate\Contracts\Foundation\Vite
      */
     public function useManifestFilename($filename)
     {
@@ -169,7 +168,7 @@ class ViteManager extends Manager implements ViteContract
      * Set the Vite "hot" file path.
      *
      * @param  string  $path
-     * @return ViteContract
+     * @return \Illuminate\Contracts\Foundation\Vite
      */
     public function useHotFile($path)
     {
@@ -180,7 +179,7 @@ class ViteManager extends Manager implements ViteContract
      * Set the Vite build directory.
      *
      * @param  string  $path
-     * @return ViteContract
+     * @return \Illuminate\Contracts\Foundation\Vite
      */
     public function useBuildDirectory($path)
     {
@@ -191,7 +190,7 @@ class ViteManager extends Manager implements ViteContract
      * Use the given callback to resolve attributes for script tags.
      *
      * @param  (callable(string, string, ?array, ?array): array)|array  $attributes
-     * @return ViteContract
+     * @return \Illuminate\Contracts\Foundation\Vite
      */
     public function useScriptTagAttributes($attributes)
     {
@@ -202,7 +201,7 @@ class ViteManager extends Manager implements ViteContract
      * Use the given callback to resolve attributes for style tags.
      *
      * @param  (callable(string, string, ?array, ?array): array)|array  $attributes
-     * @return ViteContract
+     * @return \Illuminate\Contracts\Foundation\Vite
      */
     public function useStyleTagAttributes($attributes)
     {
@@ -213,7 +212,7 @@ class ViteManager extends Manager implements ViteContract
      * Use the given callback to resolve attributes for preload tags.
      *
      * @param  (callable(string, string, ?array, ?array): array)|array  $attributes
-     * @return ViteContract
+     * @return \Illuminate\Contracts\Foundation\Vite
      */
     public function usePreloadTagAttributes($attributes)
     {
@@ -259,6 +258,7 @@ class ViteManager extends Manager implements ViteContract
     /**
      * Get a unique hash representing the current manifest, or null if there is no manifest.
      *
+     * @param  string|null  $buildDirectory
      * @return string|null
      */
     public function manifestHash($buildDirectory = null)

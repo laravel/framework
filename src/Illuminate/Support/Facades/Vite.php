@@ -4,7 +4,7 @@ namespace Illuminate\Support\Facades;
 
 /**
  * @method static string getDefaultDriver()
- * @method static \Illuminate\Foundation\ViteManager useAppFactory(callable(string, \Illuminate\Contracts\Foundation\Vite, array, \Illuminate\Contracts\Container\Container): \Illuminate\Contracts\Foundation\Vite $appFactory)
+ * @method static \Illuminate\Foundation\ViteManager useAppFactory(callable(\Illuminate\Contracts\Foundation\Vite, string, array, \Illuminate\Contracts\Container\Container): \Illuminate\Contracts\Foundation\Vite $appFactory)
  * @method static \Illuminate\Contracts\Foundation\Vite app(string|null $app = null)
  * @method static \Illuminate\Contracts\Foundation\Vite configure(array $config)
  * @method static array preloadedAssets()
@@ -21,7 +21,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Contracts\Foundation\Vite usePreloadTagAttributes((callable(string, string, ?array, ?array): array)|array $attributes)
  * @method static \Illuminate\Support\HtmlString|void reactRefresh()
  * @method static string asset(string $asset, string|null $buildDirectory = null)
- * @method static string|null manifestHash(void $buildDirectory = null)
+ * @method static string|null manifestHash(string|null $buildDirectory = null)
  * @method static bool isRunningHot()
  * @method static string toHtml()
  * @method static mixed driver(string|null $driver = null)
