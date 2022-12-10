@@ -1077,6 +1077,16 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * Indicates whether Doctrine should be used to rename column.
+     *
+     * @return bool
+     */
+    public function shouldUseDoctrineToRenameColumn()
+    {
+        return $this->isDoctrineAvailable() && config('database.dbal.rename_column', true);
+    }
+
+    /**
      * Get a Doctrine Schema Column instance.
      *
      * @param  string  $table

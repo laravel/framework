@@ -213,7 +213,7 @@ class MySqlGrammar extends Grammar
      */
     public function compileRenameColumn(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
-        return $connection->isDoctrineAvailable()
+        return $connection->shouldUseDoctrineToRenameColumn()
             ? parent::compileRenameColumn($blueprint, $command, $connection)
             : sprintf('alter table %s rename column %s to %s',
                 $this->wrapTable($blueprint),

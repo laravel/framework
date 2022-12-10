@@ -118,7 +118,7 @@ class SqlServerGrammar extends Grammar
      */
     public function compileRenameColumn(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
-        return $connection->isDoctrineAvailable()
+        return $connection->shouldUseDoctrineToRenameColumn()
             ? parent::compileRenameColumn($blueprint, $command, $connection)
             : sprintf("sp_rename '%s', %s, 'COLUMN'",
                 $this->wrap($blueprint->getTable().'.'.$command->from),
