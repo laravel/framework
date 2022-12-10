@@ -1495,6 +1495,63 @@ class HttpClientTest extends TestCase
         $this->assertSame(403, $response->status());
     }
 
+    public function testRequestExceptionIsThrownIfTheThrowIfClosureOnThePendingRequestReturnsTrue()
+    {
+        $this->factory->fake([
+            '*' => $this->factory->response(['error'], 403),
+        ]);
+
+        $exception = null;
+
+        $hitThrowCallback = false;
+
+        try {
+            $this->factory
+                ->throwIf(function ($response) {
+                    $this->assertInstanceOf(Response::class, $response);
+                    $this->assertSame(403, $response->status());
+
+                    return true;
+                }, function ($response, $e) use (&$hitThrowCallback) {
+                    $this->assertInstanceOf(Response::class, $response);
+                    $this->assertSame(403, $response->status());
+
+                    $this->assertInstanceOf(RequestException::class, $e);
+                    $hitThrowCallback = true;
+                })
+                ->get('http://foo.com/get');
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
+        $this->assertTrue($hitThrowCallback);
+    }
+
+    public function testRequestExceptionIsNotThrownIfTheThrowIfClosureOnThePendingRequestReturnsFalse()
+    {
+        $this->factory->fake([
+            '*' => $this->factory->response(['error'], 403),
+        ]);
+
+        $hitThrowCallback = false;
+
+        $response = $this->factory
+            ->throwIf(function ($response) {
+                $this->assertInstanceOf(Response::class, $response);
+                $this->assertSame(403, $response->status());
+
+                return false;
+            }, function ($response, $e) use (&$hitThrowCallback) {
+                $hitThrowCallback = true;
+            })
+            ->get('http://foo.com/get');
+
+        $this->assertSame(403, $response->status());
+        $this->assertFalse($hitThrowCallback);
+    }
+
     public function testRequestExceptionIsThrownWithCallbackIfThePendingRequestIsSetToThrowOnFailure()
     {
         $this->factory->fake([
@@ -1601,6 +1658,56 @@ class HttpClientTest extends TestCase
         $response = $this->factory->get('http://foo.com/api')->throwIf(false);
 
         $this->assertSame('{"result":{"foo":"bar"}}', $response->body());
+    }
+
+    public function testRequestExceptionIsThrowIfConditionClosureIsSatisfied()
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response('', 400),
+        ]);
+
+        $exception = null;
+
+        $hitThrowCallback = false;
+
+        try {
+            $this->factory->get('http://foo.com/api')->throwIf(function ($response) {
+                $this->assertSame(400, $response->status());
+
+                return true;
+            }, function ($response, $e) use (&$hitThrowCallback) {
+                $this->assertSame(400, $response->status());
+                $this->assertInstanceOf(RequestException::class, $e);
+
+                $hitThrowCallback = true;
+            });
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
+        $this->assertTrue($hitThrowCallback);
+    }
+
+    public function testRequestExceptionIsNotThrownIfConditionClosureIsNotSatisfied()
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response(['result' => ['foo' => 'bar']], 400),
+        ]);
+
+        $hitThrowCallback = false;
+
+        $response = $this->factory->get('http://foo.com/api')->throwIf(function ($response) {
+            $this->assertSame(400, $response->status());
+
+            return false;
+        }, function ($response, $e) use (&$hitThrowCallback) {
+            $hitThrowCallback = true;
+        });
+
+        $this->assertSame('{"result":{"foo":"bar"}}', $response->body());
+        $this->assertFalse($hitThrowCallback);
     }
 
     public function testItCanEnforceFaking()

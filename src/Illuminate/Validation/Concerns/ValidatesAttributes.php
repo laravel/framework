@@ -143,6 +143,18 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute is 7 bit ASCII.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validateAscii($attribute, $value)
+    {
+        return Str::isAscii($value);
+    }
+
+    /**
      * "Break" on first validation fail.
      *
      * Always returns true, just lets us put "bail" in rules.
@@ -2137,6 +2149,18 @@ trait ValidatesAttributes
         $~ixu';
 
         return preg_match($pattern, $value) > 0;
+    }
+
+    /**
+     * Validate that an attribute is a valid ULID.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validateUlid($attribute, $value)
+    {
+        return Str::isUlid($value);
     }
 
     /**
