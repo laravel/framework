@@ -15,6 +15,9 @@ class BladeHelpersTest extends AbstractBladeTestCase
         $this->assertSame('<?php echo app(\'vite\')(); ?>', $this->compiler->compileString('@vite()'));
         $this->assertSame('<?php echo app(\'vite\')(\'resources/js/app.js\'); ?>', $this->compiler->compileString('@vite(\'resources/js/app.js\')'));
         $this->assertSame('<?php echo app(\'vite\')([\'resources/js/app.js\']); ?>', $this->compiler->compileString('@vite([\'resources/js/app.js\'])'));
+        $this->assertSame('<?php echo app(\'vite\')->app()->toHtml(); ?>', $this->compiler->compileString('@viteApp'));
+        $this->assertSame('<?php echo app(\'vite\')->app()->toHtml(); ?>', $this->compiler->compileString('@viteApp()'));
+        $this->assertSame('<?php echo app(\'vite\')->app(\'app\')->toHtml(); ?>', $this->compiler->compileString('@viteApp(\'app\')'));
         $this->assertSame('<?php echo app(\'vite\')->reactRefresh(); ?>', $this->compiler->compileString('@viteReactRefresh'));
     }
 }
