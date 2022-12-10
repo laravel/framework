@@ -101,6 +101,41 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
         $this->assertContains($queries, $expected);
     }
 
+    public function testRenamingColumnWithoutDoctrineWorks()
+    {
+        $connection = $this->db->connection();
+        $schema = $connection->getSchemaBuilder();
+
+        $schema::useDoctrineToRenameColumns(false);
+
+        $base = new Blueprint('users', function ($table) {
+            $table->renameColumn('foo', 'bar');
+        });
+
+        $blueprint = clone $base;
+        $this->assertEquals(['alter table `users` rename column `foo` to `bar`'], $blueprint->toSql($connection, new MySqlGrammar));
+
+        $blueprint = clone $base;
+        $this->assertEquals(['alter table "users" rename column "foo" to "bar"'], $blueprint->toSql($connection, new PostgresGrammar));
+
+        $blueprint = clone $base;
+        $this->assertEquals(['alter table "users" rename column "foo" to "bar"'], $blueprint->toSql($connection, new SQLiteGrammar));
+
+        $blueprint = clone $base;
+        $this->assertEquals(['sp_rename \'"users"."foo"\', "bar", \'COLUMN\''], $blueprint->toSql($connection, new SqlServerGrammar));
+
+        $schema->create('test', function (Blueprint $table) {
+            $table->string('foo');
+        });
+
+        $schema->table('test', function (Blueprint $table) {
+            $table->renameColumn('foo', 'bar');
+        });
+
+        $this->assertFalse($schema->hasColumn('test', 'foo'));
+        $this->assertTrue($schema->hasColumn('test', 'bar'));
+    }
+
     public function testChangingColumnWithCollationWorks()
     {
         $this->db->connection()->getSchemaBuilder()->create('users', function ($table) {

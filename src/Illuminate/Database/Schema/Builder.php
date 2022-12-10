@@ -46,6 +46,13 @@ class Builder
     public static $defaultMorphKeyType = 'int';
 
     /**
+     * Indicates whether Doctrine should be used to rename columns.
+     *
+     * @var bool
+     */
+    public static $usesDoctrineToRenameColumns = true;
+
+    /**
      * Create a new database Schema manager.
      *
      * @param  \Illuminate\Database\Connection  $connection
@@ -103,6 +110,17 @@ class Builder
     public static function morphUsingUlids()
     {
         return static::defaultMorphKeyType('ulid');
+    }
+
+    /**
+     * Use Doctrine to rename columns.
+     *
+     * @param  bool  $value
+     * @return void
+     */
+    public static function useDoctrineToRenameColumns(bool $value = true)
+    {
+        static::$usesDoctrineToRenameColumns = $value;
     }
 
     /**

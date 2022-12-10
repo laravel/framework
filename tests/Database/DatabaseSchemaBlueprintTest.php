@@ -180,7 +180,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         });
 
         $connection = m::mock(Connection::class);
-        $connection->shouldReceive('shouldUseDoctrineToRenameColumn')->andReturn(false);
+        $connection->shouldReceive('usesDoctrineToRenameColumns')->andReturn(false);
 
         $blueprint = clone $base;
         $this->assertEquals(['alter table `users` rename column `foo` to `bar`'], $blueprint->toSql($connection, new MySqlGrammar));

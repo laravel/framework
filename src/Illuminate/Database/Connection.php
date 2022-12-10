@@ -1081,9 +1081,10 @@ class Connection implements ConnectionInterface
      *
      * @return bool
      */
-    public function shouldUseDoctrineToRenameColumn()
+    public function usesDoctrineToRenameColumns()
     {
-        return $this->isDoctrineAvailable() && config('database.dbal.rename_column', true);
+        return $this->isDoctrineAvailable()
+            && $this->getSchemaBuilder()::$usesDoctrineToRenameColumns;
     }
 
     /**
