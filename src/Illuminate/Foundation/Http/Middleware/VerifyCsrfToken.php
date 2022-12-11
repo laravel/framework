@@ -205,7 +205,7 @@ class VerifyCsrfToken
         return new Cookie(
             'XSRF-TOKEN',
             $request->session()->token(),
-            $this->availableAt(60 * $config['lifetime']),
+            $this->availableAt(60 * (int) $config['lifetime']),
             $config['path'],
             $config['domain'],
             $config['secure'],
