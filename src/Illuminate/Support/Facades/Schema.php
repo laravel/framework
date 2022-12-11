@@ -8,6 +8,7 @@ namespace Illuminate\Support\Facades;
  * @method static void morphUsingUuids()
  * @method static void morphUsingUlids()
  * @method static void useDoctrineToRenameColumns(bool $value = true)
+ * @method static void useDoctrineToDropColumns(bool $value = true)
  * @method static bool createDatabase(string $name)
  * @method static bool dropDatabaseIfExists(string $name)
  * @method static bool hasTable(string $table)

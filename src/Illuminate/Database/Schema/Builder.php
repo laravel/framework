@@ -53,6 +53,13 @@ class Builder
     public static $usesDoctrineToRenameColumns = true;
 
     /**
+     * Indicates whether Doctrine should be used to drop columns.
+     *
+     * @var bool
+     */
+    public static $usesDoctrineToDropColumns = true;
+
+    /**
      * Create a new database Schema manager.
      *
      * @param  \Illuminate\Database\Connection  $connection
@@ -121,6 +128,17 @@ class Builder
     public static function useDoctrineToRenameColumns(bool $value = true)
     {
         static::$usesDoctrineToRenameColumns = $value;
+    }
+
+    /**
+     * Use Doctrine to rename columns.
+     *
+     * @param  bool  $value
+     * @return void
+     */
+    public static function useDoctrineToDropColumns(bool $value = true)
+    {
+        static::$usesDoctrineToDropColumns = $value;
     }
 
     /**
