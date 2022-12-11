@@ -312,17 +312,17 @@ class SQLiteGrammar extends Grammar
 
             foreach ($command->columns as $name) {
                 $tableDiff->removedColumns[$name] = $connection->getDoctrineColumn(
-                    $this->getTablePrefix() . $blueprint->getTable(), $name
+                    $this->getTablePrefix().$blueprint->getTable(), $name
                 );
             }
 
-            return (array)$schema->getDatabasePlatform()->getAlterTableSQL($tableDiff);
+            return (array) $schema->getDatabasePlatform()->getAlterTableSQL($tableDiff);
         } else {
             $table = $this->wrapTable($blueprint);
             $columns = $this->prefixArray('drop', $this->wrapArray($command->columns));
 
             return collect($columns)->map(function ($column) use ($table) {
-                return "alter table $table $column";
+                return 'alter table '.$table.' '.$column;
             })->all();
         }
     }
