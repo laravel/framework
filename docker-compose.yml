@@ -18,10 +18,10 @@ services:
       MYSQL_DATABASE: "forge"
       MYSQL_ROOT_HOST: "%"
     ports:
-      - "3306:3306"
+      - "3307:3307"
     restart: always
   redis:
     image: redis:5.0-alpine
     ports:
-      - "6379:6379"
+      - "6380:6380"
     restart: always
