@@ -189,7 +189,7 @@ class DummyNotificationWithViaConnections extends Notification implements Should
     public function viaConnections()
     {
         return [
-            'database' => 'sync'
+            'database' => 'sync',
         ];
     }
 }
