@@ -45,7 +45,8 @@
         "symfony/var-dumper": "^6.0",
         "tijsverkoyen/css-to-inline-styles": "^2.2.5",
         "vlucas/phpdotenv": "^5.4.1",
-        "voku/portable-ascii": "^2.0"
+        "voku/portable-ascii": "^2.0",
+        "wendelladriel/laravel-validated-dto": "^1.1"
     },
     "replace": {
         "illuminate/auth": "self.version",
