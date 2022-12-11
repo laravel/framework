@@ -153,46 +153,6 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
         });
 
         $this->assertEquals(['alter table "users" drop column "name"'], $blueprint->toSql($connection, new SQLiteGrammar));
-
-        $schema->create('test', function (Blueprint $table) {
-            $table->string('foo');
-            $table->string('bar');
-            $table->string('baz');
-            $table->string('qux');
-        });
-
-        $schema->table('test', function (Blueprint $table) {
-            $table->dropColumn(['foo', 'bar']);
-            $table->dropColumn('qux');
-        });
-
-        $this->assertFalse($schema->hasColumn('test', 'foo'));
-        $this->assertFalse($schema->hasColumn('test', 'bar'));
-        $this->assertFalse($schema->hasColumn('test', 'qux'));
-        $this->assertTrue($schema->hasColumn('test', 'baz'));
-    }
-
-    public function testRenamingAndDroppingMultipleColumnsWithoutDoctrineWorks()
-    {
-        $connection = $this->db->connection();
-        $schema = $connection->getSchemaBuilder();
-
-        $schema->useDoctrineToDropColumns(false);
-        $schema->useDoctrineToRenameColumns(false);
-
-        $schema->create('test', function (Blueprint $table) {
-            $table->string('foo');
-            $table->string('bar');
-        });
-
-        $schema->table('test', function (Blueprint $table) {
-            $table->dropColumn('foo');
-            $table->renameColumn('bar', 'baz');
-        });
-
-        $this->assertFalse($schema->hasColumn('test', 'foo'));
-        $this->assertFalse($schema->hasColumn('test', 'bar'));
-        $this->assertTrue($schema->hasColumn('test', 'baz'));
     }
 
     public function testChangingColumnWithCollationWorks()
