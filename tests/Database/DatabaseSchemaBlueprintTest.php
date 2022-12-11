@@ -211,7 +211,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals(['alter table "users" drop column "foo"'], $blueprint->toSql($connection, new PostgresGrammar));
 
         $blueprint = clone $base;
-        $this->assertEquals(['alter table "users" drop "foo"'], $blueprint->toSql($connection, new SQLiteGrammar));
+        $this->assertEquals(['alter table "users" drop column "foo"'], $blueprint->toSql($connection, new SQLiteGrammar));
 
         $blueprint = clone $base;
         $this->assertEquals(['DECLARE @sql NVARCHAR(MAX) = \'\';SELECT @sql += \'ALTER TABLE [dbo].[users] DROP CONSTRAINT \' + OBJECT_NAME([default_object_id]) + \';\' FROM sys.columns WHERE [object_id] = OBJECT_ID(\'[dbo].[users]\') AND [name] in (\'foo\') AND [default_object_id] <> 0;EXEC(@sql);alter table "users" drop column "foo"'], $blueprint->toSql($connection, new SqlServerGrammar));

@@ -319,7 +319,7 @@ class SQLiteGrammar extends Grammar
             return (array) $schema->getDatabasePlatform()->getAlterTableSQL($tableDiff);
         } else {
             $table = $this->wrapTable($blueprint);
-            $columns = $this->prefixArray('drop', $this->wrapArray($command->columns));
+            $columns = $this->prefixArray('drop column', $this->wrapArray($command->columns));
 
             return collect($columns)->map(function ($column) use ($table) {
                 return 'alter table '.$table.' '.$column;

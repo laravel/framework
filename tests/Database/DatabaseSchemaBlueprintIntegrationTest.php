@@ -152,7 +152,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
             $table->dropColumn('name');
         });
 
-        $this->assertEquals(['alter table "users" drop "name"'], $blueprint->toSql($connection, new SQLiteGrammar));
+        $this->assertEquals(['alter table "users" drop column "name"'], $blueprint->toSql($connection, new SQLiteGrammar));
 
         $schema->create('test', function (Blueprint $table) {
             $table->string('foo');
