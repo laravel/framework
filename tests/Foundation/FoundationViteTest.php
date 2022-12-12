@@ -7,6 +7,7 @@ use Illuminate\Foundation\Vite;
 use Illuminate\Support\Facades\Vite as ViteFacade;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
+use ReflectionObject;
 
 class FoundationViteTest extends TestCase
 {
@@ -980,6 +981,43 @@ class FoundationViteTest extends TestCase
 
         unlink(public_path("{$buildDir}/custom-manifest.json"));
         rmdir(public_path($buildDir));
+    }
+
+    public function testItCanBeConfiguredWithArray()
+    {
+        $config = [
+            'nonce' => 'expected-nonce',
+            'integrity_key' => 'some-integrity-key',
+            'entry_points' => ['resources/js/app.js'],
+            'hot_file' => 'cold',
+            'build_directory' => 'build/packages',
+            'manifest_filename' => 'oktoberfest.json',
+            'tag_attributes' => [
+                'script' => ['type' => 'text/javascript', 'nomodule'],
+                'style' => ['type' => 'text/css'],
+                'preload' => ['rel' => 'dummy'],
+            ],
+        ];
+
+        $vite = app(Vite::class)->configure($config);
+
+        $integrityKey = (new ReflectionObject($vite))->getProperty('integrityKey')->getValue($vite);
+        $entryPoints = (new ReflectionObject($vite))->getProperty('entryPoints')->getValue($vite);
+        $buildDirectory = (new ReflectionObject($vite))->getProperty('buildDirectory')->getValue($vite);
+        $manifestFilename = (new ReflectionObject($vite))->getProperty('manifestFilename')->getValue($vite);
+        $scriptTagAttributesResolvers = (new ReflectionObject($vite))->getProperty('scriptTagAttributesResolvers')->getValue($vite);
+        $styleTagAttributesResolvers = (new ReflectionObject($vite))->getProperty('styleTagAttributesResolvers')->getValue($vite);
+        $preloadTagAttributesResolvers = (new ReflectionObject($vite))->getProperty('preloadTagAttributesResolvers')->getValue($vite);
+
+        $this->assertEquals($vite->cspNonce(), $config['nonce']);
+        $this->assertEquals($integrityKey, $config['integrity_key']);
+        $this->assertEquals($entryPoints, $config['entry_points']);
+        $this->assertEquals($vite->hotFile(), $config['hot_file']);
+        $this->assertEquals($buildDirectory, $config['build_directory']);
+        $this->assertEquals($manifestFilename, $config['manifest_filename']);
+        $this->assertEquals($scriptTagAttributesResolvers[0](), $config['tag_attributes']['script']);
+        $this->assertEquals($styleTagAttributesResolvers[0](), $config['tag_attributes']['style']);
+        $this->assertEquals($preloadTagAttributesResolvers[0](), $config['tag_attributes']['preload']);
     }
 
     protected function makeViteManifest($contents = null, $path = 'build')
