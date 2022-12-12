@@ -161,7 +161,7 @@ class DummyNotificationWithEmptyStringVia extends Notification
     }
 }
 
-class DummyNotificationWithDatabaseVia extends Notification implements ShouldQueue
+class DummyNotificationWithDatabaseVia extends Notification
 {
     use Queueable;
 
