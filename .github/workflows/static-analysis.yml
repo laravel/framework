@@ -47,7 +47,7 @@ jobs:
 
     name: Facade DocBlocks
 
-    if: ${{ github.repository_owner == 'laravel' && (github.ref_name == 'master' || github.ref_name == '9.x') }}
+    if: ${{ github.repository_owner == 'laravel' && github.event_name == 'push' }}
 
     steps:
       - name: Checkout code
