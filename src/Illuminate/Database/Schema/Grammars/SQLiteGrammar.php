@@ -310,8 +310,7 @@ class SQLiteGrammar extends Grammar
 
             $columns = $this->prefixArray('drop column', $this->wrapArray($command->columns));
 
-            return collect($columns)->map(fn ($column) =>
-                'alter table '.$table.' '.$column
+            return collect($columns)->map(fn ($column) => 'alter table '.$table.' '.$column
             )->all();
         } else {
             $tableDiff = $this->getDoctrineTableDiff(
