@@ -1077,25 +1077,14 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Indicates whether Doctrine should be used to rename columns.
+     * Indicates whether Doctrine will be prevented on schema if possible.
      *
      * @return bool
      */
-    public function usesDoctrineToRenameColumns()
+    public function preventsDoctrineOnSchemaIfPossible()
     {
-        return $this->isDoctrineAvailable()
-            && SchemaBuilder::$usesDoctrineToRenameColumns;
-    }
-
-    /**
-     * Indicates whether Doctrine should be used to drop columns.
-     *
-     * @return bool
-     */
-    public function usesDoctrineToDropColumns()
-    {
-        return $this->isDoctrineAvailable()
-            && SchemaBuilder::$usesDoctrineToDropColumns;
+        return ! $this->isDoctrineAvailable()
+            || SchemaBuilder::$preventsDoctrineUsageIfPossible;
     }
 
     /**

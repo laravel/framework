@@ -154,13 +154,13 @@ class SQLiteGrammar extends Grammar
      */
     public function compileRenameColumn(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
-        return $connection->usesDoctrineToRenameColumns()
-            ? parent::compileRenameColumn($blueprint, $command, $connection)
-            : sprintf('alter table %s rename column %s to %s',
+        return $connection->preventsDoctrineOnSchemaIfPossible()
+            ? sprintf('alter table %s rename column %s to %s',
                 $this->wrapTable($blueprint),
                 $this->wrap($command->from),
                 $this->wrap($command->to)
-            );
+            )
+            : parent::compileRenameColumn($blueprint, $command, $connection);
     }
 
     /**
@@ -305,7 +305,14 @@ class SQLiteGrammar extends Grammar
      */
     public function compileDropColumn(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
-        if ($connection->usesDoctrineToDropColumns()) {
+        if ($connection->preventsDoctrineOnSchemaIfPossible()) {
+            $table = $this->wrapTable($blueprint);
+            $columns = $this->prefixArray('drop column', $this->wrapArray($command->columns));
+
+            return collect($columns)->map(function ($column) use ($table) {
+                return 'alter table '.$table.' '.$column;
+            })->all();
+        } else {
             $tableDiff = $this->getDoctrineTableDiff(
                 $blueprint, $schema = $connection->getDoctrineSchemaManager()
             );
@@ -317,13 +324,6 @@ class SQLiteGrammar extends Grammar
             }
 
             return (array) $schema->getDatabasePlatform()->getAlterTableSQL($tableDiff);
-        } else {
-            $table = $this->wrapTable($blueprint);
-            $columns = $this->prefixArray('drop column', $this->wrapArray($command->columns));
-
-            return collect($columns)->map(function ($column) use ($table) {
-                return 'alter table '.$table.' '.$column;
-            })->all();
         }
     }
 

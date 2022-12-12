@@ -46,18 +46,11 @@ class Builder
     public static $defaultMorphKeyType = 'int';
 
     /**
-     * Indicates whether Doctrine should be used to rename columns.
+     * Indicates whether Doctrine usage will be prevented if possible.
      *
      * @var bool
      */
-    public static $usesDoctrineToRenameColumns = true;
-
-    /**
-     * Indicates whether Doctrine should be used to drop columns.
-     *
-     * @var bool
-     */
-    public static $usesDoctrineToDropColumns = true;
+    public static $preventsDoctrineUsageIfPossible = false;
 
     /**
      * Create a new database Schema manager.
@@ -120,25 +113,14 @@ class Builder
     }
 
     /**
-     * Use Doctrine to rename columns.
+     * Prevent Doctrine usage when possible.
      *
      * @param  bool  $value
      * @return void
      */
-    public static function useDoctrineToRenameColumns(bool $value = true)
+    public static function preventDoctrineUsageIfPossible(bool $value = true)
     {
-        static::$usesDoctrineToRenameColumns = $value;
-    }
-
-    /**
-     * Use Doctrine to rename columns.
-     *
-     * @param  bool  $value
-     * @return void
-     */
-    public static function useDoctrineToDropColumns(bool $value = true)
-    {
-        static::$usesDoctrineToDropColumns = $value;
+        static::$preventsDoctrineUsageIfPossible = $value;
     }
 
     /**

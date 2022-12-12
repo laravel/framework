@@ -140,13 +140,13 @@ class PostgresGrammar extends Grammar
      */
     public function compileRenameColumn(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
-        return $connection->usesDoctrineToRenameColumns()
-            ? parent::compileRenameColumn($blueprint, $command, $connection)
-            : sprintf('alter table %s rename column %s to %s',
+        return $connection->preventsDoctrineOnSchemaIfPossible()
+            ? sprintf('alter table %s rename column %s to %s',
                 $this->wrapTable($blueprint),
                 $this->wrap($command->from),
                 $this->wrap($command->to)
-            );
+            )
+            : parent::compileRenameColumn($blueprint, $command, $connection);
     }
 
     /**

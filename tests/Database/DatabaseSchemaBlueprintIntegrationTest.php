@@ -42,8 +42,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
     {
         Facade::clearResolvedInstances();
         Facade::setFacadeApplication(null);
-        $this->db->connection()->getSchemaBuilder()->useDoctrineToRenameColumns(true);
-        $this->db->connection()->getSchemaBuilder()->useDoctrineToDropColumns(true);
+        $this->db->connection()->getSchemaBuilder()->preventDoctrineUsageIfPossible(false);
     }
 
     public function testRenamingAndChangingColumnsWork()
@@ -108,7 +107,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
         $connection = $this->db->connection();
         $schema = $connection->getSchemaBuilder();
 
-        $schema->useDoctrineToRenameColumns(false);
+        $schema->preventDoctrineUsageIfPossible();
 
         $base = new Blueprint('users', function ($table) {
             $table->renameColumn('name', 'new_name');
@@ -146,7 +145,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
         $connection = $this->db->connection();
         $schema = $connection->getSchemaBuilder();
 
-        $schema->useDoctrineToDropColumns(false);
+        $schema->preventDoctrineUsageIfPossible();
 
         $blueprint = new Blueprint('users', function ($table) {
             $table->dropColumn('name');
