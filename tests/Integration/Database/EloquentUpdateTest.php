@@ -49,17 +49,17 @@ class EloquentUpdateTest extends DatabaseTestCase
     public function testUpdateMissing()
     {
         $record = TestUpdateModel1::create([
-            'name' => 'LTKort',
+            'name' => 'John',
             'title' => null,
         ]);
 
         $record->updateMissing([
-            'name' => 'Marshmallow',
+            'name' => 'Jane',
             'title' => 'Mr.',
         ]);
 
-        $this->assertSame('LTKort', $record->name);
-        $this->assertNotEmpty($record->title);
+        $this->assertSame('John', $record->name);
+        $this->assertSame('Mr.', $record->title);
     }
 
     public function testUpdateWithLimitsAndOrders()
