@@ -46,6 +46,13 @@ class Builder
     public static $defaultMorphKeyType = 'int';
 
     /**
+     * Indicates whether Doctrine DBAL usage will be prevented if possible when dropping and renaming columns.
+     *
+     * @var bool
+     */
+    public static $alwaysUsesNativeSchemaOperationsIfPossible = false;
+
+    /**
      * Create a new database Schema manager.
      *
      * @param  \Illuminate\Database\Connection  $connection
@@ -103,6 +110,17 @@ class Builder
     public static function morphUsingUlids()
     {
         return static::defaultMorphKeyType('ulid');
+    }
+
+    /**
+     * Attempt to use native schema operations for dropping and renaming columns, even if Doctrine DBAL is installed.
+     *
+     * @param  bool  $value
+     * @return void
+     */
+    public static function useNativeSchemaOperationsIfPossible(bool $value = true)
+    {
+        static::$alwaysUsesNativeSchemaOperationsIfPossible = $value;
     }
 
     /**
