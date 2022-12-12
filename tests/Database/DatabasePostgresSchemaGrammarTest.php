@@ -886,6 +886,17 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertSame('alter table "users" add primary key ("id")', $statements[1]);
     }
 
+    public function testAddingUlidAsPrimaryKey()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->ulidPrimary();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(2, $statements);
+        $this->assertSame('alter table "users" add column "id" char(26) not null', $statements[0]);
+        $this->assertSame('alter table "users" add primary key ("id")', $statements[1]);
+    }
+
     public function testAddingForeignUuid()
     {
         $blueprint = new Blueprint('users');
