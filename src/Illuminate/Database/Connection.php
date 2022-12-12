@@ -1081,7 +1081,7 @@ class Connection implements ConnectionInterface
      *
      * @return bool
      */
-    public function alwaysUsesNativeSchemaOperationsIfPossible()
+    public function usingNativeSchemaOperations()
     {
         return ! $this->isDoctrineAvailable() || SchemaBuilder::$alwaysUsesNativeSchemaOperationsIfPossible;
     }
