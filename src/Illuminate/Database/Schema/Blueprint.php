@@ -153,7 +153,7 @@ class Blueprint
     {
         if ($connection instanceof SQLiteConnection) {
             if ($this->commandsNamed(['dropColumn', 'renameColumn'])->count() > 1
-                && ! $connection->preventsDoctrineOnSchemaIfPossible()) {
+                && ! $connection->alwaysUsesNativeSchemaOperationsIfPossible()) {
                 throw new BadMethodCallException(
                     "SQLite doesn't support multiple calls to dropColumn / renameColumn in a single modification."
                 );

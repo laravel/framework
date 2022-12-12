@@ -154,7 +154,7 @@ class SQLiteGrammar extends Grammar
      */
     public function compileRenameColumn(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
-        return $connection->preventsDoctrineOnSchemaIfPossible()
+        return $connection->alwaysUsesNativeSchemaOperationsIfPossible()
             ? sprintf('alter table %s rename column %s to %s',
                 $this->wrapTable($blueprint),
                 $this->wrap($command->from),
@@ -305,13 +305,14 @@ class SQLiteGrammar extends Grammar
      */
     public function compileDropColumn(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
-        if ($connection->preventsDoctrineOnSchemaIfPossible()) {
+        if ($connection->alwaysUsesNativeSchemaOperationsIfPossible()) {
             $table = $this->wrapTable($blueprint);
+
             $columns = $this->prefixArray('drop column', $this->wrapArray($command->columns));
 
-            return collect($columns)->map(function ($column) use ($table) {
-                return 'alter table '.$table.' '.$column;
-            })->all();
+            return collect($columns)->map(fn ($column) =>
+                'alter table '.$table.' '.$column
+            )->all();
         } else {
             $tableDiff = $this->getDoctrineTableDiff(
                 $blueprint, $schema = $connection->getDoctrineSchemaManager()

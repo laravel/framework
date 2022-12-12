@@ -180,7 +180,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         });
 
         $connection = m::mock(Connection::class);
-        $connection->shouldReceive('preventsDoctrineOnSchemaIfPossible')->andReturn(true);
+        $connection->shouldReceive('alwaysUsesNativeSchemaOperationsIfPossible')->andReturn(true);
 
         $blueprint = clone $base;
         $this->assertEquals(['alter table `users` rename column `foo` to `bar`'], $blueprint->toSql($connection, new MySqlGrammar));
@@ -202,7 +202,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         });
 
         $connection = m::mock(Connection::class);
-        $connection->shouldReceive('preventsDoctrineOnSchemaIfPossible')->andReturn(true);
+        $connection->shouldReceive('alwaysUsesNativeSchemaOperationsIfPossible')->andReturn(true);
 
         $blueprint = clone $base;
         $this->assertEquals(['alter table `users` drop `foo`'], $blueprint->toSql($connection, new MySqlGrammar));

@@ -1077,14 +1077,13 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Indicates whether Doctrine will be prevented on schema if possible.
+     * Indicates whether native alter operations will be used when dropping or renaming columns, even if Doctrine DBAL is installed.
      *
      * @return bool
      */
-    public function preventsDoctrineOnSchemaIfPossible()
+    public function alwaysUsesNativeSchemaOperationsIfPossible()
     {
-        return ! $this->isDoctrineAvailable()
-            || SchemaBuilder::$preventsDoctrineUsageIfPossible;
+        return ! $this->isDoctrineAvailable() || SchemaBuilder::$alwaysUsesNativeSchemaOperationsIfPossible;
     }
 
     /**

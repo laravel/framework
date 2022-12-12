@@ -140,7 +140,7 @@ class PostgresGrammar extends Grammar
      */
     public function compileRenameColumn(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
-        return $connection->preventsDoctrineOnSchemaIfPossible()
+        return $connection->alwaysUsesNativeSchemaOperationsIfPossible()
             ? sprintf('alter table %s rename column %s to %s',
                 $this->wrapTable($blueprint),
                 $this->wrap($command->from),
