@@ -750,6 +750,17 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertSame('alter table "users" add "uuid" uniqueidentifier not null', $statements[0]);
     }
 
+    public function testAddingUuidAsPrimaryKey()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->uuidPrimary();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(2, $statements);
+        $this->assertSame('alter table "users" add "id" uniqueidentifier not null', $statements[0]);
+        $this->assertSame('alter table "users" add constraint "users_id_primary" primary key ("id")', $statements[1]);
+    }
+
     public function testAddingForeignUuid()
     {
         $blueprint = new Blueprint('users');

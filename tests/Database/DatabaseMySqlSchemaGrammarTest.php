@@ -1057,6 +1057,17 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame('alter table `users` add `uuid` char(36) not null', $statements[0]);
     }
 
+    public function testAddingUuidAsPrimaryKey()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->uuidPrimary();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(2, $statements);
+        $this->assertSame('alter table `users` add `id` char(36) not null', $statements[0]);
+        $this->assertSame('alter table `users` add primary key `users_id_primary`(`id`)', $statements[1]);
+    }
+
     public function testAddingForeignUuid()
     {
         $blueprint = new Blueprint('users');

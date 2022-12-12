@@ -711,6 +711,16 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertSame('alter table "users" add column "uuid" varchar not null', $statements[0]);
     }
 
+    public function testAddingUuidAsPrimaryKey()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->uuidPrimary();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "users" add column "id" varchar not null', $statements[0]);
+    }
+
     public function testAddingForeignUuid()
     {
         $blueprint = new Blueprint('users');

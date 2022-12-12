@@ -1514,6 +1514,17 @@ class Blueprint
     }
 
     /**
+     * Specify the primary key for the table as UUID.
+     *
+     * @param  string  $column
+     * @return void
+     */
+    public function uuidPrimary($column = 'id')
+    {
+        return $this->uuid($column)->primary();
+    }
+
+    /**
      * Add nullable columns for a polymorphic table using UUIDs.
      *
      * @param  string  $name
