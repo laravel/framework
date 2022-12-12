@@ -160,6 +160,18 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         return new static(Arr::collapse($this->items));
     }
 
+	/**
+	 * Clear all items in the collection.
+	 * 
+	 * @return $this
+	 */
+	public function clear()
+	{
+		$this->items = [];
+
+		return $this;
+	}
+
     /**
      * Determine if an item exists in the collection.
      *

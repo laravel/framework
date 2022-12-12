@@ -5460,6 +5460,16 @@ class SupportCollectionTest extends TestCase
     }
 
     /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testClear($collection)
+    {
+        $data = new $collection(['foo', 'bar', 'baz']);
+
+		$this->assertSame([], $data->clear()->toArray());
+    }
+
+    /**
      * Provides each collection class, respectively.
      *
      * @return array

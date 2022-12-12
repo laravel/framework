@@ -204,6 +204,16 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
         });
     }
 
+	/**
+	 * Clear all items in the collection.
+	 * 
+	 * @return $this
+	 */
+	public function clear()
+	{
+        return $this->passthru('clear', []);
+	}
+
     /**
      * Determine if an item exists in the enumerable.
      *
