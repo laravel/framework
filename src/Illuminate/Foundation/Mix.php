@@ -39,7 +39,7 @@ class Mix
             }
 
             if (Str::startsWith($url, ['http://', 'https://'])) {
-                return new HtmlString(Str::after($url, ':').$path);
+                return new HtmlString($url.$path);
             }
 
             return new HtmlString("//localhost:8080{$path}");
