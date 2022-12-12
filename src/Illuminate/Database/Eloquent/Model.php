@@ -1046,7 +1046,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      *
      * @param  array  $attributes
      * @param  array  $options
-     * @return bool  $quietly
      * @return bool
      */
     public function updateMissing(array $attributes = [], array $options = [])
