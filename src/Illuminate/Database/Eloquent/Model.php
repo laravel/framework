@@ -547,6 +547,22 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Fill only the missing with an array attributes of the model.
+     *
+     * @param  array  $attributes
+     * @return $this
+     */
+    public function fillMissing(array $attributes)
+    {
+        $attributes = collect($attributes)
+            ->filter(fn ($value, $key) => Arr::has($this->attributesToArray(), $key))
+            ->reject(fn ($value, $key) => filled($this->$key))
+            ->toArray();
+
+        return $this->fill($attributes);
+    }
+
+    /**
      * Fill the model with an array of attributes. Force mass assignment.
      *
      * @param  array  $attributes
@@ -1039,16 +1055,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             return false;
         }
 
-        $attributes = collect($attributes)
-            ->filter(fn ($value, $key) => Arr::has($this->attributesToArray(), $key))
-            ->reject(fn ($value, $key) => filled($this->$key))
-            ->toArray();
-
-        if (empty($attributes)) {
-            return false;
-        }
-
-        return $this->fill($attributes)->save($options);
+        return $this->fillMissing($attributes)->save($options);
     }
 
     /**
