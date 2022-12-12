@@ -1226,12 +1226,12 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame('bar', $model->age);
     }
 
-    public function testFillMissing()
+    public function testFillBlanks()
     {
         $model = new EloquentModelStub;
         $model->fillable(['name', 'age']);
         $model->fill(['name' => 'foo', 'age' => null]);
-        $model->fillMissing(['name' => 'bar', 'age' => 'baz']);
+        $model->fillBlanks(['name' => 'bar', 'age' => 'baz']);
         $this->assertSame('foo', $model->name);
         $this->assertSame('baz', $model->age);
     }

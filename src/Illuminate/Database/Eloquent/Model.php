@@ -547,12 +547,12 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
-     * Fill only the missing with an array attributes of the model.
+     * Fill only the blank (missing) with an array attributes of the model.
      *
      * @param  array  $attributes
      * @return $this
      */
-    public function fillMissing(array $attributes)
+    public function fillBlanks(array $attributes)
     {
         $attributes = collect($attributes)
             ->filter(fn ($value, $key) => Arr::has($this->attributesToArray(), $key))
@@ -1042,19 +1042,19 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
-     * Update only the missing values of the model in the database.
+     * Update only the blank (missing) values of the model in the database.
      *
      * @param  array  $attributes
      * @param  array  $options
      * @return bool
      */
-    public function updateMissing(array $attributes = [], array $options = [])
+    public function updateBlanks(array $attributes = [], array $options = [])
     {
         if (! $this->exists) {
             return false;
         }
 
-        return $this->fillMissing($attributes)->save($options);
+        return $this->fillBlanks($attributes)->save($options);
     }
 
     /**
