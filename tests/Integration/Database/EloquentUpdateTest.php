@@ -80,7 +80,7 @@ class EloquentUpdateTest extends DatabaseTestCase
 
         $record = TestUpdateModel2::find(1);
 
-        $this->assertSame('Engineer: Abdul', $record->job . ': ' . $record->name);
+        $this->assertSame('Engineer: Abdul', $record->job.': '.$record->name);
     }
 
     public function testSoftDeleteWithJoins()
