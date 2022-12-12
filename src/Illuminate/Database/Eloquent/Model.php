@@ -1038,7 +1038,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             return false;
         }
 
-        $attributes = collect($attributes)
+        $attributes = (new Collection($attributes))
             ->filter(fn ($value, $key) => Arr::has($this->attributesToArray(), $key))
             ->reject(fn ($value, $key) => filled($this->$key))
             ->toArray();
