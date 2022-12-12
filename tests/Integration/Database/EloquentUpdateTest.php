@@ -46,22 +46,6 @@ class EloquentUpdateTest extends DatabaseTestCase
         $this->assertCount(0, TestUpdateModel1::all());
     }
 
-    public function testUpdateMissing()
-    {
-        $record = TestUpdateModel1::create([
-            'name' => 'LTKort',
-            'title' => null,
-        ]);
-
-        $record->updateMissing([
-            'name' => 'Marshmallow',
-            'title' => 'Mr.',
-        ]);
-
-        $this->assertSame('LTKort', $record->name);
-        $this->assertNotEmpty($record->title);
-    }
-
     public function testUpdateWithLimitsAndOrders()
     {
         if ($this->driver === 'sqlsrv') {
@@ -96,7 +80,7 @@ class EloquentUpdateTest extends DatabaseTestCase
 
         $record = TestUpdateModel2::find(1);
 
-        $this->assertSame('Engineer: Abdul', $record->job.': '.$record->name);
+        $this->assertSame('Engineer: Abdul', $record->job . ': ' . $record->name);
     }
 
     public function testSoftDeleteWithJoins()
