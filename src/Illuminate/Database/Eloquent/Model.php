@@ -1026,6 +1026,32 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Update only the missing values of the model in the database.
+     *
+     * @param  array  $attributes
+     * @param  array  $options
+     * @return bool  $quietly
+     * @return bool
+     */
+    public function updateMissing(array $attributes = [], array $options = [])
+    {
+        if (! $this->exists) {
+            return false;
+        }
+
+        $attributes = collect($attributes)
+            ->filter(fn ($value, $key) => Arr::has($this->attributesToArray(), $key))
+            ->reject(fn ($value, $key) => filled($this->$key))
+            ->toArray();
+
+        if (empty($attributes)) {
+            return false;
+        }
+
+        return $this->fill($attributes)->save($options);
+    }
+
+    /**
      * Increment a column's value by a given amount without raising any events.
      *
      * @param  string  $column
