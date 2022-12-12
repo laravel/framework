@@ -112,8 +112,7 @@ class Vite implements ViteContract
             'usePreloadTagAttributes' => 'tag_attributes.preload',
         ];
 
-        collect($methods)->filter(fn (ReflectionMethod $method) =>
-            ! $method->isStatic()
+        collect($methods)->filter(fn (ReflectionMethod $method) => ! $method->isStatic()
             && $method->getName() !== $currentMethod
             && preg_match('/^(use|with)/', $method->getName())
         )->each(function (ReflectionMethod $method) use ($config, $methodKeyMap) {

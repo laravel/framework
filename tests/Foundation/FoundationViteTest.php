@@ -983,6 +983,13 @@ class FoundationViteTest extends TestCase
         rmdir(public_path($buildDir));
     }
 
+    public function testItCreatesInstances()
+    {
+        $this->assertSame(ViteFacade::app(), ViteFacade::app());
+        $this->assertSame(ViteFacade::app('app1'), ViteFacade::app('app1'));
+        $this->assertNotSame(ViteFacade::app('app2'), ViteFacade::app('app3'));
+    }
+
     public function testItCanBeConfiguredWithArray()
     {
         $config = [
