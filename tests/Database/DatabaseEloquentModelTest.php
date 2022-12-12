@@ -1226,6 +1226,16 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame('bar', $model->age);
     }
 
+    public function testFillMissing()
+    {
+        $model = new EloquentModelStub;
+        $model->fillable(['name', 'age']);
+        $model->fill(['name' => 'foo', 'age' => null]);
+        $model->fillMissing(['name' => 'bar', 'age' => 'baz']);
+        $this->assertSame('foo', $model->name);
+        $this->assertSame('baz', $model->age);
+    }
+
     public function testQualifyColumn()
     {
         $model = new EloquentModelStub;
