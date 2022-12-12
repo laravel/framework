@@ -46,14 +46,14 @@ class EloquentUpdateTest extends DatabaseTestCase
         $this->assertCount(0, TestUpdateModel1::all());
     }
 
-    public function testUpdateMissing()
+    public function testUpdateBlanks()
     {
         $record = TestUpdateModel1::create([
             'name' => 'John',
             'title' => null,
         ]);
 
-        $record->updateMissing([
+        $record->updateBlanks([
             'name' => 'Jane',
             'title' => 'Mr.',
         ]);

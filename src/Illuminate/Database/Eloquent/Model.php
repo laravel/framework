@@ -1026,13 +1026,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
-     * Update only the missing values of the model in the database.
+     * Update only the blank (missing) values of the model in the database.
      *
      * @param  array  $attributes
      * @param  array  $options
      * @return bool
      */
-    public function updateMissing(array $attributes = [], array $options = [])
+    public function updateBlanks(array $attributes = [], array $options = [])
     {
         if (! $this->exists) {
             return false;
