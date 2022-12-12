@@ -1001,23 +1001,23 @@ class FoundationViteTest extends TestCase
 
         $vite = app(Vite::class)->configure($config);
 
-        $integrityKey = (new ReflectionObject($vite))->getProperty('integrityKey')->getValue($vite);
-        $entryPoints = (new ReflectionObject($vite))->getProperty('entryPoints')->getValue($vite);
-        $buildDirectory = (new ReflectionObject($vite))->getProperty('buildDirectory')->getValue($vite);
-        $manifestFilename = (new ReflectionObject($vite))->getProperty('manifestFilename')->getValue($vite);
-        $scriptTagAttributesResolvers = (new ReflectionObject($vite))->getProperty('scriptTagAttributesResolvers')->getValue($vite);
-        $styleTagAttributesResolvers = (new ReflectionObject($vite))->getProperty('styleTagAttributesResolvers')->getValue($vite);
-        $preloadTagAttributesResolvers = (new ReflectionObject($vite))->getProperty('preloadTagAttributesResolvers')->getValue($vite);
-
         $this->assertEquals($vite->cspNonce(), $config['nonce']);
-        $this->assertEquals($integrityKey, $config['integrity_key']);
-        $this->assertEquals($entryPoints, $config['entry_points']);
+        $this->assertEquals($this->getViteProperty($vite, 'integrityKey'), $config['integrity_key']);
+        $this->assertEquals($this->getViteProperty($vite, 'entryPoints'), $config['entry_points']);
         $this->assertEquals($vite->hotFile(), $config['hot_file']);
-        $this->assertEquals($buildDirectory, $config['build_directory']);
-        $this->assertEquals($manifestFilename, $config['manifest_filename']);
-        $this->assertEquals($scriptTagAttributesResolvers[0](), $config['tag_attributes']['script']);
-        $this->assertEquals($styleTagAttributesResolvers[0](), $config['tag_attributes']['style']);
-        $this->assertEquals($preloadTagAttributesResolvers[0](), $config['tag_attributes']['preload']);
+        $this->assertEquals($this->getViteProperty($vite, 'buildDirectory'), $config['build_directory']);
+        $this->assertEquals($this->getViteProperty($vite, 'manifestFilename'), $config['manifest_filename']);
+        $this->assertEquals($this->getViteProperty($vite, 'scriptTagAttributesResolvers')[0](), $config['tag_attributes']['script']);
+        $this->assertEquals($this->getViteProperty($vite, 'styleTagAttributesResolvers')[0](), $config['tag_attributes']['style']);
+        $this->assertEquals($this->getViteProperty($vite, 'preloadTagAttributesResolvers')[0](), $config['tag_attributes']['preload']);
+    }
+
+    protected function getViteProperty($vite, $propertyName)
+    {
+        $property = (new ReflectionObject($vite))->getProperty($propertyName);
+        $property->setAccessible(true);
+
+        return $property->getValue($vite);
     }
 
     protected function makeViteManifest($contents = null, $path = 'build')
