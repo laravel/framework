@@ -188,6 +188,10 @@ class Blueprint
      */
     protected function addImpliedCommands(Grammar $grammar)
     {
+        if ($this->hasAutoIncrementColumn() && ! $this->creating()) {
+            array_unshift($this->commands, $this->createCommand('autoIncrementStartingValues'));
+        }
+
         if (count($this->getAddedColumns()) > 0 && ! $this->creating()) {
             array_unshift($this->commands, $this->createCommand('add'));
         }
@@ -1794,7 +1798,7 @@ class Blueprint
      */
     public function hasAutoIncrementColumn()
     {
-        return ! is_null(collect($this->getAddedColumns())->first(function ($column) {
+        return ! is_null(collect($this->columns)->first(function ($column) {
             return $column->autoIncrement === true;
         }));
     }
@@ -1810,7 +1814,7 @@ class Blueprint
             return [];
         }
 
-        return collect($this->getAddedColumns())->mapWithKeys(function ($column) {
+        return collect($this->columns)->mapWithKeys(function ($column) {
             return $column->autoIncrement === true
                         ? [$column->name => $column->get('startingValue', $column->get('from'))]
                         : [$column->name => null];

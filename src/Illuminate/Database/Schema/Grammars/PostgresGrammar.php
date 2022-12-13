@@ -111,10 +111,10 @@ class PostgresGrammar extends Grammar
      */
     public function compileAdd(Blueprint $blueprint, Fluent $command)
     {
-        return array_values(array_filter(array_merge([sprintf('alter table %s %s',
+        return sprintf('alter table %s %s',
             $this->wrapTable($blueprint),
             implode(', ', $this->prefixArray('add column', $this->getColumns($blueprint)))
-        )], $this->compileAutoIncrementStartingValues($blueprint))));
+        );
     }
 
     /**
@@ -127,7 +127,7 @@ class PostgresGrammar extends Grammar
     {
         return collect($blueprint->autoIncrementingStartingValues())->map(function ($value, $column) use ($blueprint) {
             return 'alter sequence '.$blueprint->getTable().'_'.$column.'_seq restart with '.$value;
-        })->all();
+        })->values()->all();
     }
 
     /**

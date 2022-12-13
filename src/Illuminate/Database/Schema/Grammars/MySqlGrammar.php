@@ -178,16 +178,13 @@ class MySqlGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
-     * @return array
+     * @return string
      */
     public function compileAdd(Blueprint $blueprint, Fluent $command)
     {
         $columns = $this->prefixArray('add', $this->getColumns($blueprint));
 
-        return array_values(array_merge(
-            ['alter table '.$this->wrapTable($blueprint).' '.implode(', ', $columns)],
-            $this->compileAutoIncrementStartingValues($blueprint)
-        ));
+        return 'alter table '.$this->wrapTable($blueprint).' '.implode(', ', $columns);
     }
 
     /**
@@ -200,7 +197,7 @@ class MySqlGrammar extends Grammar
     {
         return collect($blueprint->autoIncrementingStartingValues())->map(function ($value, $column) use ($blueprint) {
             return 'alter table '.$this->wrapTable($blueprint->getTable()).' auto_increment = '.$value;
-        })->all();
+        })->values()->all();
     }
 
     /**
