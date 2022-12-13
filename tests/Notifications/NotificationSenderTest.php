@@ -104,6 +104,29 @@ class NotificationSenderTest extends TestCase
 
         $sender->send($notifiable, new DummyMultiChannelNotificationWithConditionalMiddlware);
     }
+
+    public function testItCanSendQueuedWithViaConnectionsNotifications()
+    {
+        $notifiable = new AnonymousNotifiable;
+        $manager = m::mock(ChannelManager::class);
+        $bus = m::mock(BusDispatcher::class);
+        $bus->shouldReceive('dispatch')
+            ->once()
+            ->withArgs(function ($job) {
+                return $job->connection === 'sync' && $job->channels === ['database'];
+            });
+        $bus->shouldReceive('dispatch')
+            ->once()
+            ->withArgs(function ($job) {
+                return $job->connection === null && $job->channels === ['mail'];
+            });
+
+        $events = m::mock(EventDispatcher::class);
+
+        $sender = new NotificationSender($manager, $bus, $events);
+
+        $sender->send($notifiable, new DummyNotificationWithViaConnections);
+    }
 }
 
 class DummyQueuedNotificationWithStringVia extends Notification implements ShouldQueue
@@ -151,6 +174,23 @@ class DummyNotificationWithDatabaseVia extends Notification
     public function via($notifiable)
     {
         return 'database';
+    }
+}
+
+class DummyNotificationWithViaConnections extends Notification implements ShouldQueue
+{
+    use Queueable;
+
+    public function via($notifiable)
+    {
+        return ['mail', 'database'];
+    }
+
+    public function viaConnections()
+    {
+        return [
+            'database' => 'sync',
+        ];
     }
 }
 
