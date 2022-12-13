@@ -266,7 +266,7 @@ class FoundationHelpersTest extends TestCase
         // Should fallback to en_US
         $this->assertSame('Arkansas', fake()->state());
         $this->assertSame('Australian Capital Territory', fake('en_AU')->state());
-        $this->assertSame('Guadeloupe', fake('fr_FR')->region());
+        $this->assertSame('Provence-Alpes-Côte d\'Azur', fake('fr_FR')->region());
 
         app()->instance('config', new ConfigRepository(['app' => ['faker_locale' => 'en_AU']]));
         mt_srand(4, MT_RAND_PHP);
