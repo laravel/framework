@@ -66,18 +66,6 @@ class Connector
     }
 
     /**
-     * Determine if the connection is persistent.
-     *
-     * @param  array  $options
-     * @return bool
-     */
-    protected function isPersistentConnection($options)
-    {
-        return isset($options[PDO::ATTR_PERSISTENT]) &&
-               $options[PDO::ATTR_PERSISTENT];
-    }
-
-    /**
      * Handle an exception that occurred during connect execution.
      *
      * @param  \Throwable  $e
