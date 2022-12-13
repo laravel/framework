@@ -4,7 +4,6 @@ namespace Illuminate\Support\Facades;
 
 use Illuminate\Http\Client\Factory;
 
-
 /**
  * @method static \GuzzleHttp\Promise\PromiseInterface response(array|string|null $body = null, int $status = 200, array $headers = [])
  * @method static \Illuminate\Http\Client\ResponseSequence sequence(array $responses = [])
