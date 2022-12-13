@@ -107,6 +107,7 @@ trait HasAttributes
         'real',
         'string',
         'timestamp',
+        'unixtime',
     ];
 
     /**
@@ -292,6 +293,10 @@ trait HasAttributes
             // into an array without affecting how they are persisted into the storage.
             if (isset($attributes[$key]) && in_array($value, ['date', 'datetime', 'immutable_date', 'immutable_datetime'])) {
                 $attributes[$key] = $this->serializeDate($attributes[$key]);
+            }
+
+            if (isset($attributes[$key]) && $value == 'unixtime') {
+                $attributes[$key] = $this->serializeDateToInteger($attributes[$key]);
             }
 
             if (isset($attributes[$key]) && ($this->isCustomDateTimeCast($value) ||
@@ -773,6 +778,7 @@ trait HasAttributes
                 return $this->asDate($value);
             case 'datetime':
             case 'custom_datetime':
+            case 'unixtime':
                 return $this->asDateTime($value);
             case 'immutable_date':
                 return $this->asDate($value)->toImmutable();
@@ -1433,6 +1439,19 @@ trait HasAttributes
     }
 
     /**
+     * Prepare a date for integral serialization.
+     *
+     * @param  \DateTimeInterface  $date
+     * @return string
+     */
+    protected function serializeDateToInteger(DateTimeInterface $date)
+    {
+        return $date instanceof DateTimeImmutable ?
+            CarbonImmutable::instance($date)->timestamp :
+            Carbon::instance($date)->timestamp;
+    }
+
+    /**
      * Get the attributes that should be converted to dates.
      *
      * @return array
@@ -1512,7 +1531,7 @@ trait HasAttributes
      */
     protected function isDateCastable($key)
     {
-        return $this->hasCast($key, ['date', 'datetime', 'immutable_date', 'immutable_datetime']);
+        return $this->hasCast($key, ['date', 'datetime', 'immutable_date', 'immutable_datetime', 'unixtime']);
     }
 
     /**

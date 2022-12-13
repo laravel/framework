@@ -1198,6 +1198,17 @@ class Blueprint
     }
 
     /**
+     * Add a signed bigInteger for unix timestamps.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function unixtime($column)
+    {
+        return $this->bigInteger($column);
+    }
+
+    /**
      * Add a "deleted at" timestamp for the table.
      *
      * @param  string  $column
