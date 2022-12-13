@@ -234,6 +234,29 @@ class TestResponseTest extends TestCase
         }
     }
 
+    public function testAssertStreamedContent()
+    {
+        $response = TestResponse::fromBaseResponse(
+            (new StreamedResponse)->setContent('expected response data')
+        );
+
+        $this->assertStreamedContent('expected response data');
+
+        try {
+            $response->assertStreamedContent('expected');
+            $this->fail('xxxx');
+        } catch (AssertionFailedError $e) {
+            $this->assertSame('Failed asserting that two strings are identical.', $e->getMessage());
+        }
+
+        try {
+            $response->assertStreamedContent('expected response data with extra');
+            $this->fail('xxxx');
+        } catch (AssertionFailedError $e) {
+            $this->assertSame('Failed asserting that two strings are identical.', $e->getMessage());
+        }
+    }
+
     public function testAssertSee()
     {
         $response = $this->makeMockResponse([
