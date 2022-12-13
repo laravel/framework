@@ -43,8 +43,15 @@ trait InteractsWithQueue
      */
     public function fail($exception = null)
     {
-        if ($this->job) {
-            $this->job->fail($exception);
+        //Check if $exception is an instance of \Throwable or if it is null
+        if($exception instanceof \Throwable || is_null($exception)){
+            //If it is, then we can use the fail() method
+            if ($this->job) {
+                return $this->job->fail($exception);
+            }
+        } else {
+            //If it is not, then we throw an exception
+            throw new \Exception('The fail() method requires an instance of \Throwable');
         }
     }
 
