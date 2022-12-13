@@ -34,14 +34,14 @@ class ChangeColumn
         }
 
         $schema = $connection->getDoctrineSchemaManager();
-        $databasePlatform = $schema->getDatabasePlatform();
+        $databasePlatform = $connection->getDoctrineConnection()->getDatabasePlatform();
         $databasePlatform->registerDoctrineTypeMapping('enum', 'string');
 
         $tableDiff = static::getChangedDiff(
             $grammar, $blueprint, $schema
         );
 
-        if ($tableDiff !== false) {
+        if (! $tableDiff->isEmpty()) {
             return (array) $databasePlatform->getAlterTableSQL($tableDiff);
         }
 
@@ -54,13 +54,13 @@ class ChangeColumn
      * @param  \Illuminate\Database\Schema\Grammars\Grammar  $grammar
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Doctrine\DBAL\Schema\AbstractSchemaManager  $schema
-     * @return \Doctrine\DBAL\Schema\TableDiff|bool
+     * @return \Doctrine\DBAL\Schema\TableDiff
      */
     protected static function getChangedDiff($grammar, Blueprint $blueprint, SchemaManager $schema)
     {
-        $current = $schema->listTableDetails($grammar->getTablePrefix().$blueprint->getTable());
+        $current = $schema->introspectTable($grammar->getTablePrefix().$blueprint->getTable());
 
-        return (new Comparator)->diffTable(
+        return (new Comparator)->compareTables(
             $current, static::getTableWithColumnChanges($blueprint, $current)
         );
     }
@@ -89,7 +89,7 @@ class ChangeColumn
                         continue;
                     }
 
-                    $column->setCustomSchemaOption($option, static::mapFluentValueToDoctrine($option, $value));
+                    $column->setPlatformOption($option, static::mapFluentValueToDoctrine($option, $value));
                 }
             }
         }
@@ -106,7 +106,7 @@ class ChangeColumn
      */
     protected static function getDoctrineColumn(Table $table, Fluent $fluent)
     {
-        return $table->changeColumn(
+        return $table->modifyColumn(
             $fluent['name'], static::getDoctrineColumnChangeOptions($fluent)
         )->getColumn($fluent['name']);
     }

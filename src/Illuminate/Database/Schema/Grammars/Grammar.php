@@ -18,6 +18,13 @@ abstract class Grammar extends BaseGrammar
     use CompilesJsonPaths;
 
     /**
+     * The possible column modifiers.
+     *
+     * @var string[]
+     */
+    protected $modifiers = [];
+
+    /**
      * If this Grammar supports schema changes wrapped in a transaction.
      *
      * @var bool
@@ -319,7 +326,7 @@ abstract class Grammar extends BaseGrammar
         $table = $this->getTablePrefix().$blueprint->getTable();
 
         return tap(new TableDiff($table), function ($tableDiff) use ($schema, $table) {
-            $tableDiff->fromTable = $schema->listTableDetails($table);
+            $tableDiff->fromTable = $schema->introspectTable($table);
         });
     }
 
