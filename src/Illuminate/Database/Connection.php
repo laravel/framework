@@ -1077,6 +1077,16 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * Indicates whether native alter operations will be used when dropping or renaming columns, even if Doctrine DBAL is installed.
+     *
+     * @return bool
+     */
+    public function usingNativeSchemaOperations()
+    {
+        return ! $this->isDoctrineAvailable() || SchemaBuilder::$alwaysUsesNativeSchemaOperationsIfPossible;
+    }
+
+    /**
      * Get a Doctrine Schema Column instance.
      *
      * @param  string  $table

@@ -42,6 +42,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
     {
         Facade::clearResolvedInstances();
         Facade::setFacadeApplication(null);
+        $this->db->connection()->getSchemaBuilder()->useNativeSchemaOperationsIfPossible(false);
     }
 
     public function testRenamingAndChangingColumnsWork()
@@ -75,6 +76,58 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
         ];
 
         $this->assertContains($queries, $expected);
+    }
+
+    public function testRenamingColumnsWithoutDoctrineWorks()
+    {
+        $connection = $this->db->connection();
+        $schema = $connection->getSchemaBuilder();
+
+        $schema->useNativeSchemaOperationsIfPossible();
+
+        $base = new Blueprint('users', function ($table) {
+            $table->renameColumn('name', 'new_name');
+        });
+
+        $blueprint = clone $base;
+        $this->assertEquals(['alter table `users` rename column `name` to `new_name`'], $blueprint->toSql($connection, new MySqlGrammar));
+
+        $blueprint = clone $base;
+        $this->assertEquals(['alter table "users" rename column "name" to "new_name"'], $blueprint->toSql($connection, new PostgresGrammar));
+
+        $blueprint = clone $base;
+        $this->assertEquals(['alter table "users" rename column "name" to "new_name"'], $blueprint->toSql($connection, new SQLiteGrammar));
+
+        $blueprint = clone $base;
+        $this->assertEquals(['sp_rename \'"users"."name"\', "new_name", \'COLUMN\''], $blueprint->toSql($connection, new SqlServerGrammar));
+
+        $schema->create('test', function (Blueprint $table) {
+            $table->string('foo');
+            $table->string('baz');
+        });
+
+        $schema->table('test', function (Blueprint $table) {
+            $table->renameColumn('foo', 'bar');
+            $table->renameColumn('baz', 'qux');
+        });
+
+        $this->assertFalse($schema->hasColumn('test', 'foo'));
+        $this->assertFalse($schema->hasColumn('test', 'baz'));
+        $this->assertTrue($schema->hasColumns('test', ['bar', 'qux']));
+    }
+
+    public function testDroppingColumnsWithoutDoctrineWorks()
+    {
+        $connection = $this->db->connection();
+        $schema = $connection->getSchemaBuilder();
+
+        $schema->useNativeSchemaOperationsIfPossible();
+
+        $blueprint = new Blueprint('users', function ($table) {
+            $table->dropColumn('name');
+        });
+
+        $this->assertEquals(['alter table "users" drop column "name"'], $blueprint->toSql($connection, new SQLiteGrammar));
     }
 
     public function testChangingColumnWithCollationWorks()

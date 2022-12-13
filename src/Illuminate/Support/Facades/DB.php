@@ -58,6 +58,7 @@ namespace Illuminate\Support\Facades;
  * @method static void forgetRecordModificationState()
  * @method static \Illuminate\Database\Connection useWriteConnectionWhenReading(bool $value = true)
  * @method static bool isDoctrineAvailable()
+ * @method static bool usingNativeSchemaOperations()
  * @method static \Doctrine\DBAL\Schema\Column getDoctrineColumn(string $table, string $column)
  * @method static \Doctrine\DBAL\Schema\AbstractSchemaManager getDoctrineSchemaManager()
  * @method static \Doctrine\DBAL\Connection getDoctrineConnection()
