@@ -4,6 +4,7 @@ namespace Illuminate\Support\Facades;
 
 use Illuminate\Http\Client\Factory;
 
+
 /**
  * @method static \GuzzleHttp\Promise\PromiseInterface response(array|string|null $body = null, int $status = 200, array $headers = [])
  * @method static \Illuminate\Http\Client\ResponseSequence sequence(array $responses = [])
@@ -49,7 +50,7 @@ use Illuminate\Http\Client\Factory;
  * @method static \Illuminate\Http\Client\PendingRequest withMiddleware(callable $middleware)
  * @method static \Illuminate\Http\Client\PendingRequest beforeSending(callable $callback)
  * @method static \Illuminate\Http\Client\PendingRequest throw(callable|null $callback = null)
- * @method static \Illuminate\Http\Client\PendingRequest throwIf(callable|bool $condition, callable|null $throwCallback = null)
+ * @method static \Illuminate\Http\Client\PendingRequest throwIf(callable|bool $condition)
  * @method static \Illuminate\Http\Client\PendingRequest throwUnless(bool $condition)
  * @method static \Illuminate\Http\Client\PendingRequest dump()
  * @method static \Illuminate\Http\Client\PendingRequest dd()
