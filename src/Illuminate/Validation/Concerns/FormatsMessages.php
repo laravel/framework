@@ -449,11 +449,11 @@ trait FormatsMessages
         }
 
         if (is_bool($value)) {
-            return $value ? 'true' : 'false';
+            return $value ? __('validation.true') : __('validation.false');
         }
 
         if (is_null($value)) {
-            return 'empty';
+            return __('validation.empty');
         }
 
         return (string) $value;
