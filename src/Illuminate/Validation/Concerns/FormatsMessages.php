@@ -449,11 +449,11 @@ trait FormatsMessages
         }
 
         if (is_bool($value)) {
-            return $value ? __('validation.true') : __('validation.false');
+            return $value ? $this->translator->get('validation.true') : $this->translator->get('validation.false');
         }
 
         if (is_null($value)) {
-            return __('validation.empty');
+            return $this->translator->get('validation.empty');
         }
 
         return (string) $value;
