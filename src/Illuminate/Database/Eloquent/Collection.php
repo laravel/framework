@@ -91,10 +91,10 @@ class Collection extends BaseCollection implements QueueableCollection
             ->get()
             ->keyBy($this->first()->getKeyName());
 
-        $attributes = Arr::except(
-            array_keys($models->first()->getAttributes()),
+        $attributes = array_keys(Arr::except(
+            $models->first()->getAttributes(),
             $models->first()->getKeyName()
-        );
+        ));
 
         $this->each(function ($model) use ($models, $attributes) {
             $extraAttributes = Arr::only($models->get($model->getKey())->getAttributes(), $attributes);
