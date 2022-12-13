@@ -236,7 +236,7 @@ class MySqlGrammar extends Grammar
     {
         return $connection->usingNativeSchemaOperations()
             ? 'alter table '.$this->wrapTable($blueprint).' '
-                .implode(', ', $this->prefixArray('modify', $this->getColumns($blueprint)))
+                .implode(', ', $this->prefixArray('modify', $this->getChangedColumns($blueprint)))
             : parent::compileChange($blueprint, $command, $connection);
     }
 

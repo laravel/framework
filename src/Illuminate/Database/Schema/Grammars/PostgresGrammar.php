@@ -150,6 +150,26 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Compile a change column command into a series of SQL statements.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @param  \Illuminate\Database\Connection  $connection
+     * @return array|string
+     *
+     * @throws \RuntimeException
+     */
+    public function compileChange(Blueprint $blueprint, Fluent $command, Connection $connection)
+    {
+        return $connection->usingNativeSchemaOperations()
+            ? sprintf('alter table %s %s',
+                $this->wrapTable($blueprint),
+                implode(', ', $this->prefixArray('alter column', $this->getChangedColumns($blueprint)))
+            )
+            : parent::compileChange($blueprint, $command, $connection);
+    }
+
+    /**
      * Compile a primary key command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
@@ -1137,5 +1157,27 @@ class PostgresGrammar extends Grammar
         if ($column->storedAs !== null) {
             return " generated always as ({$column->storedAs}) stored";
         }
+    }
+
+    /**
+     * Compile the blueprint's changed column definitions.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @return array
+     */
+    protected function getChangedColumns(Blueprint $blueprint)
+    {
+        $columns = [];
+
+        foreach ($blueprint->getChangedColumns() as $column) {
+            // Each of the column types has their own compiler functions, which are tasked
+            // with turning the column definition into its SQL format for this platform
+            // used by the connection. The column's modifiers are compiled and added.
+            $sql = $this->wrap($column).' type '.$this->getType($column);
+
+            $columns[] = $this->addModifiers($sql, $blueprint, $column);
+        }
+
+        return $columns;
     }
 }
