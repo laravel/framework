@@ -233,14 +233,12 @@ class Encrypter implements EncrypterContract, StringEncrypter
             return false;
         }
 
-        // Required values, must be strings
         foreach (['iv', 'value', 'mac'] as $item) {
             if (! isset($payload[$item]) || ! is_string($payload[$item])) {
                 return false;
             }
         }
 
-        // Optional, but has to be string if present
         if (isset($payload['tag']) && ! is_string($payload['tag'])) {
             return false;
         }
