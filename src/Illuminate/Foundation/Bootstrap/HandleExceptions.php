@@ -126,7 +126,7 @@ class HandleExceptions
             }
         });
     }
-    
+
     /**
      * Determine if deprecation error should be ignored.
      *
