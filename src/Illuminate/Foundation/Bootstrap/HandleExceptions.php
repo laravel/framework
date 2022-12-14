@@ -102,10 +102,7 @@ class HandleExceptions
      */
     public function handleDeprecationError($message, $file, $line, $level = E_DEPRECATED)
     {
-        if (! class_exists(LogManager::class)
-            || ! static::$app->hasBeenBootstrapped()
-            || static::$app->runningUnitTests()
-        ) {
+        if ($this->shouldIgnoresDeprecationError()) {
             return;
         }
 
@@ -128,6 +125,18 @@ class HandleExceptions
                 ));
             }
         });
+    }
+    
+    /**
+     * Determine if deprecation error should be ignored.
+     *
+     * @return bool
+     */
+    protected function shouldIgnoresDeprecationError()
+    {
+        return ! class_exists(LogManager::class)
+            || ! static::$app->hasBeenBootstrapped()
+            || static::$app->runningUnitTests();
     }
 
     /**
