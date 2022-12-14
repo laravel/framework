@@ -104,7 +104,7 @@ trait SerializesAndRestoresModelIdentifiers
      */
     public function restoreModel($value)
     {
-        if (!$value->id) {
+        if (! $value->id) {
             return Container::getInstance()->make($value->class);
         }
 
