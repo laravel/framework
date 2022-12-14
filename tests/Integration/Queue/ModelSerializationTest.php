@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
+use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
@@ -328,6 +329,14 @@ class ModelSerializationTest extends TestCase
         unserialize($serialized);
 
         $this->assertTrue(true);
+    }
+
+    public function testItCanUnserializeModelRepository()
+    {
+        $userRepository = Container::getInstance()->make(ModelSerializationTestUser::class);
+
+        $serialized = serialize(new ModelSerializationTestClass($userRepository));
+        unserialize($serialized);
     }
 }
 

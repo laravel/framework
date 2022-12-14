@@ -2,6 +2,7 @@
 
 namespace Illuminate\Queue;
 
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Database\ModelIdentifier;
 use Illuminate\Contracts\Queue\QueueableCollection;
 use Illuminate\Contracts\Queue\QueueableEntity;
@@ -103,6 +104,10 @@ trait SerializesAndRestoresModelIdentifiers
      */
     public function restoreModel($value)
     {
+        if (!$value->id) {
+            return Container::getInstance()->make($value->class);
+        }
+
         return $this->getQueryForModelRestoration(
             (new $value->class)->setConnection($value->connection), $value->id
         )->useWritePdo()->firstOrFail()->load($value->relations ?? []);
