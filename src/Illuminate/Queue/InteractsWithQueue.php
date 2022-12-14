@@ -3,6 +3,8 @@
 namespace Illuminate\Queue;
 
 use Illuminate\Contracts\Queue\Job as JobContract;
+use InvalidArgumentException;
+use Throwable;
 
 trait InteractsWithQueue
 {
@@ -43,8 +45,12 @@ trait InteractsWithQueue
      */
     public function fail($exception = null)
     {
-        if ($this->job) {
-            $this->job->fail($exception);
+        if ($exception instanceof Throwable || is_null($exception)) {
+            if ($this->job) {
+                return $this->job->fail($exception);
+            }
+        } else {
+            throw new InvalidArgumentException('The fail method requires an instance of Throwable.');
         }
     }
 
