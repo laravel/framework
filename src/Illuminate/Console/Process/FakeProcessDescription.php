@@ -148,6 +148,17 @@ class FakeProcessDescription
      * @param  int  $iterations
      * @return $this
      */
+    public function iterations(int $iterations)
+    {
+        return $this->runsFor(iterations: $iterations);
+    }
+
+    /**
+     * Specify how many times the "isRunning" method should return "true".
+     *
+     * @param  int  $iterations
+     * @return $this
+     */
     public function runsFor(int $iterations)
     {
         $this->runIterations = $iterations;
