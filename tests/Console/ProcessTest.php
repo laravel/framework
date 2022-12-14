@@ -287,7 +287,7 @@ class ProcessTest extends TestCase
         $this->assertEquals("ls command 2\n", $result->output());
 
         $result = $factory->run('ls -la');
-        $this->assertEquals("", $result->output());
+        $this->assertEquals('', $result->output());
     }
 
     public function testProcessFakeSequencesCanThrowWhenSequenceIsEmpty()
@@ -299,7 +299,7 @@ class ProcessTest extends TestCase
         $factory->fake([
             'ls *' => $factory->sequence()
                         ->push('ls command 1')
-                        ->push('ls command 2')
+                        ->push('ls command 2'),
         ]);
 
         $result = $factory->run('ls -la');
@@ -385,7 +385,7 @@ class ProcessTest extends TestCase
         $result = $factory->path(__DIR__)->run('echo "Hello World" >&2; exit 1;');
 
         $this->assertFalse($result->successful());
-        $this->assertEquals("", $result->output());
+        $this->assertEquals('', $result->output());
         $this->assertEquals("Hello World\n", $result->errorOutput());
     }
 
@@ -459,7 +459,7 @@ class ProcessTest extends TestCase
         $this->assertEquals("THREE\n", $latestOutput[1]);
         $this->assertEquals("ONE\nTWO\nTHREE\n", $output[1]);
 
-        $this->assertEquals("", $latestOutput[2]);
+        $this->assertEquals('', $latestOutput[2]);
         $this->assertEquals("ONE\nTWO\nTHREE\n", $output[2]);
     }
 

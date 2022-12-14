@@ -100,7 +100,7 @@ class FakeProcessDescription
         if (strlen($output) > 0) {
             $this->output[] = [
                 'type' => 'out',
-                'buffer' => rtrim($output, "\n")."\n"
+                'buffer' => rtrim($output, "\n")."\n",
             ];
         }
 
@@ -122,7 +122,7 @@ class FakeProcessDescription
         if (strlen($output) > 0) {
             $this->output[] = [
                 'type' => 'err',
-                'buffer' => rtrim($output, "\n")."\n"
+                'buffer' => rtrim($output, "\n")."\n",
             ];
         }
 
@@ -193,7 +193,7 @@ class FakeProcessDescription
             ->filter(fn ($output) => $output['type'] === 'out');
 
         return $output->isNotEmpty()
-                    ? rtrim($output->map->buffer->implode(""), "\n")."\n"
+                    ? rtrim($output->map->buffer->implode(''), "\n")."\n"
                     : '';
     }
 
@@ -208,7 +208,7 @@ class FakeProcessDescription
             ->filter(fn ($output) => $output['type'] === 'err');
 
         return $output->isNotEmpty()
-                    ? rtrim($output->map->buffer->implode(""), "\n")."\n"
+                    ? rtrim($output->map->buffer->implode(''), "\n")."\n"
                     : '';
     }
 }

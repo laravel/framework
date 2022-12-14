@@ -2,9 +2,7 @@
 
 namespace Illuminate\Console\Process;
 
-use Illuminate\Console\Process\Exceptions\ProcessTimedOutException;
 use Illuminate\Contracts\Console\Process\InvokedProcess as InvokedProcessContract;
-use Symfony\Component\Process\Exception\ProcessTimedOutException as SymfonyTimeoutException;
 use Symfony\Component\Process\Process;
 
 class FakeInvokedProcess implements InvokedProcessContract

@@ -69,7 +69,7 @@ class FakeProcessResult implements ProcessResultContract
             return rtrim(
                 collect($output)
                     ->map(fn ($line) => rtrim($line, "\n")."\n")
-                    ->implode(""),
+                    ->implode(''),
                 "\n"
             );
         }

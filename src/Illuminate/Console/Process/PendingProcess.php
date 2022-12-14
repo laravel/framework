@@ -342,7 +342,7 @@ class PendingProcess
             return $this->resolveSynchronousFake($command, fn () => $result());
         }
 
-        throw new LogicException("Unsupported synchronous process fake result provided.");
+        throw new LogicException('Unsupported synchronous process fake result provided.');
     }
 
     /**
@@ -385,6 +385,6 @@ class PendingProcess
             return $this->resolveAsynchronousFake($command, $output, fn () => $result());
         }
 
-        throw new LogicException("Unsupported asynchronous process fake result provided.");
+        throw new LogicException('Unsupported asynchronous process fake result provided.');
     }
 }

@@ -67,7 +67,7 @@ class Pool
             collect($this->pendingProcesses)
                 ->each(function ($pendingProcess) {
                     if (! $pendingProcess instanceof PendingProcess) {
-                        throw new InvalidArgumentException("Process pool must only contain pending processes.");
+                        throw new InvalidArgumentException('Process pool must only contain pending processes.');
                     }
                 })->mapWithKeys(function ($pendingProcess, $key) use ($output) {
                     return [$key => $pendingProcess->start(output: $output ? function ($type, $buffer) use ($key, $output) {

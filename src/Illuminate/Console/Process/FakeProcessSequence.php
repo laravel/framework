@@ -24,7 +24,7 @@ class FakeProcessSequence
     /**
      * The response that should be returned when the sequence is empty.
      *
-     * @var \Illuminate\Contracts\Console\Process\ProcessResult|\Illuminate\Console\Process\FakeProcessDescription  $process
+     * @var \Illuminate\Contracts\Console\Process\ProcessResult|\Illuminate\Console\Process\FakeProcessDescription
      */
     protected $emptyProcess;
 
