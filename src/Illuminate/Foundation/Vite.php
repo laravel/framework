@@ -476,7 +476,7 @@ class Vite implements Htmlable
             : $attributes;
 
         foreach ($this->preloadTagAttributesResolvers as $resolver) {
-            if (false === $resolvedAttributes = $resolver($src, $url, $chunk, $manifest)) {
+            if (false === ($resolvedAttributes = $resolver($src, $url, $chunk, $manifest))) {
                 return false;
             }
 
