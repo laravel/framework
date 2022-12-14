@@ -547,7 +547,7 @@ class PostgresGrammar extends Grammar
     {
         return sprintf('comment on table %s is %s',
             $this->wrapTable($blueprint),
-            is_null($command->value) ? 'NULL' : "'".str_replace("'", "''", $command->comment)."'"
+            is_null($command->comment) ? 'NULL' : "'".str_replace("'", "''", $command->comment)."'"
         );
     }
 
