@@ -249,7 +249,7 @@ class Blueprint
             foreach ($grammar->getFluentCommands() as $commandName) {
                 $attributeName = lcfirst($commandName);
 
-                if (! isset($column->{$attributeName})) {
+                if (! array_key_exists($attributeName, $column->getAttributes())) {
                     continue;
                 }
 
