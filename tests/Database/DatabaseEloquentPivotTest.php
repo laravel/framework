@@ -29,9 +29,9 @@ class DatabaseEloquentPivotTest extends TestCase
         $connection->shouldReceive('getPostProcessor')->andReturn($processor = m::mock(Processor::class));
         $parent->getConnection()->getQueryGrammar()->shouldReceive('getDateFormat')->andReturn('Y-m-d H:i:s');
         $parent->setDateFormat('Y-m-d H:i:s');
-        $pivot = Pivot::fromAttributes($parent, ['foo' => 'bar', 'created_at' => '2015-09-12'], 'table', true);
+        $pivot = Pivot::fromAttributes($parent, ['foo' => 'bar', 'created_at' => '2015-09-12', 'updated_at' => '2015-09-12'], 'table', true);
 
-        $this->assertEquals(['foo' => 'bar', 'created_at' => '2015-09-12 00:00:00'], $pivot->getAttributes());
+        $this->assertEquals(['foo' => 'bar', 'created_at' => '2015-09-12 00:00:00', 'updated_at' => '2015-09-12 00:00:00'], $pivot->getAttributes());
         $this->assertSame('connection', $pivot->getConnectionName());
         $this->assertSame('table', $pivot->getTable());
         $this->assertTrue($pivot->exists);
@@ -91,19 +91,25 @@ class DatabaseEloquentPivotTest extends TestCase
         $parent = m::mock(Model::class.'[getConnectionName,getDates]');
         $parent->shouldReceive('getConnectionName')->andReturn('connection');
         $parent->shouldReceive('getDates')->andReturn([]);
-        $pivot = DatabaseEloquentPivotTestDateStub::fromAttributes($parent, ['foo' => 'bar', 'created_at' => 'foo'], 'table');
+        $pivot = DatabaseEloquentPivotTestDateStub::fromAttributes($parent, ['foo' => 'bar', 'created_at' => 'foo', 'updated_at' => 'bar'], 'table');
         $this->assertTrue($pivot->timestamps);
+
+        $pivot = DatabaseEloquentPivotTestDateStub::fromAttributes($parent, ['foo' => 'bar', 'created_at' => 'foo'], 'table');
+        $this->assertFalse($pivot->timestamps);
 
         $pivot = DatabaseEloquentPivotTestDateStub::fromAttributes($parent, ['foo' => 'bar'], 'table');
         $this->assertFalse($pivot->timestamps);
     }
 
-    public function testTimestampPropertyIsTrueWhenCreatingFromRawAttributes()
+    public function testTimestampPropertyIsSetWhenCreatingFromRawAttributes()
     {
         $parent = m::mock(Model::class.'[getConnectionName,getDates]');
         $parent->shouldReceive('getConnectionName')->andReturn('connection');
-        $pivot = Pivot::fromRawAttributes($parent, ['foo' => 'bar', 'created_at' => 'foo'], 'table');
+        $pivot = Pivot::fromRawAttributes($parent, ['foo' => 'bar', 'created_at' => 'foo', 'updated_at' => 'bar'], 'table');
         $this->assertTrue($pivot->timestamps);
+
+        $pivot = Pivot::fromRawAttributes($parent, ['foo' => 'bar', 'created_at' => 'foo'], 'table');
+        $this->assertFalse($pivot->timestamps);
     }
 
     public function testKeysCanBeSetProperly()

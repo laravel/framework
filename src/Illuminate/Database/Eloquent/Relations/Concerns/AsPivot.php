@@ -222,7 +222,10 @@ trait AsPivot
      */
     public function hasTimestampAttributes($attributes = null)
     {
-        return array_key_exists($this->getCreatedAtColumn(), $attributes ?? $this->attributes);
+        $attributes ??= $this->attributes;
+
+        return array_key_exists($this->getCreatedAtColumn(), $attributes) &&
+            array_key_exists($this->getUpdatedAtColumn(), $attributes);
     }
 
     /**
