@@ -244,7 +244,7 @@ class Factory
     }
 
     /**
-     * Start a pool of processes and wait for them to finish executing.
+     * Start defining a pool of processes.
      *
      * @param  callable  $callback
      * @return \Illuminate\Console\Process\Pool
@@ -252,6 +252,18 @@ class Factory
     public function pool(callable $callback)
     {
         return new Pool($this, $callback);
+    }
+
+    /**
+     * Run a pool of processes and wait for them to finish executing.
+     *
+     * @param  callable  $callback
+     * @param  callable|null  $output
+     * @return \Illuminate\Console\Process\ProcessPoolResults
+     */
+    public function concurrently(callable $callback, ?callable $output)
+    {
+        return (new Pool($this, $callback))->start($output)->wait();
     }
 
     /**

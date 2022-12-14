@@ -2,10 +2,9 @@
 
 namespace Illuminate\Console\Process;
 
-use ArrayAccess;
 use InvalidArgumentException;
 
-class Pool implements ArrayAccess
+class Pool
 {
     /**
      * The process factory instance.
@@ -27,34 +26,6 @@ class Pool implements ArrayAccess
      * @var array
      */
     protected $pendingProcesses = [];
-
-    /**
-     * The array of invoked processes.
-     *
-     * @var array
-     */
-    protected $invokedProcesses = [];
-
-    /**
-     * Indicates if the process pool has been started.
-     *
-     * @var bool
-     */
-    protected $started = false;
-
-    /**
-     * Indicates if the process pool has been resolved.
-     *
-     * @var bool
-     */
-    protected $resolved = false;
-
-    /**
-     * The results of the processes.
-     *
-     * @var array
-     */
-    protected $results = [];
 
     /**
      * Create a new process pool.
@@ -85,57 +56,32 @@ class Pool implements ArrayAccess
     /**
      * Start all of the processes in the pool.
      *
-     * @return $this
+     * @param  callable|null  $output
+     * @return \Illuminate\Console\Process\InvokedProcessPool
      */
     public function start(?callable $output = null)
     {
-        if ($this->started) {
-            return;
-        }
-
         call_user_func($this->callback, $this);
 
-        $this->invokedProcesses = collect($this->pendingProcesses)
-            ->each(function ($pendingProcess) {
-                if (! $pendingProcess instanceof PendingProcess) {
-                    throw new InvalidArgumentException("Process pool must only contain pending processes.");
-                }
-            })->mapWithKeys(function ($pendingProcess, $key) use ($output) {
-                return [$key => $pendingProcess->start(output: $output ? function ($type, $buffer) use ($key, $output) {
-                    $output($type, $buffer, $key);
-                } : null)];
-            })->all();
-
-        $this->started = true;
-
-        return $this;
-    }
-
-    /**
-     * Send a signal to each running process in the pool, returning the processes that were signalled.
-     *
-     * @param  int  $signal
-     * @return \Illuminate\Support\Collection
-     */
-    public function signal(int $signal)
-    {
-        return $this->running()->each->signal($signal);
-    }
-
-    /**
-     * Get the processes in the pool that are still currently running.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    public function running()
-    {
-        return collect($this->invokedProcesses)->filter->running()->values();
+        return new InvokedProcessPool(
+            collect($this->pendingProcesses)
+                ->each(function ($pendingProcess) {
+                    if (! $pendingProcess instanceof PendingProcess) {
+                        throw new InvalidArgumentException("Process pool must only contain pending processes.");
+                    }
+                })->mapWithKeys(function ($pendingProcess, $key) use ($output) {
+                    return [$key => $pendingProcess->start(output: $output ? function ($type, $buffer) use ($key, $output) {
+                        $output($type, $buffer, $key);
+                    } : null)];
+                })
+            ->all()
+        );
     }
 
     /**
      * Start and wait for the processes to finish.
      *
-     * @return array
+     * @return \Illuminate\Console\Process\ProcessPoolResults
      */
     public function run()
     {
@@ -145,74 +91,11 @@ class Pool implements ArrayAccess
     /**
      * Start and wait for the processes to finish.
      *
-     * @return array
+     * @return \Illuminate\Console\Process\ProcessPoolResults
      */
     public function wait()
     {
-        if ($this->resolved) {
-            return $this->results;
-        }
-
-        $this->start();
-
-        return tap(collect($this->invokedProcesses)->map->wait()->all(), function ($results) {
-            $this->results = $results;
-
-            $this->resolved = true;
-        });
-    }
-
-    /**
-     * Determine if the given array offset exists.
-     *
-     * @param  int  $offset
-     * @return bool
-     */
-    public function offsetExists($offset): bool
-    {
-        $this->wait();
-
-        return isset($this->results[$offset]);
-    }
-
-    /**
-     * Get the result at the given offset.
-     *
-     * @param  int  $offset
-     * @return mixed
-     */
-    public function offsetGet($offset): mixed
-    {
-        $this->wait();
-
-        return $this->results[$offset];
-    }
-
-    /**
-     * Set the result at the given offset.
-     *
-     * @param  int  $offset
-     * @param  mixed  $value
-     * @return void
-     */
-    public function offsetSet($offset, $value): void
-    {
-        $this->wait();
-
-        $this->results[$offset] = $value;
-    }
-
-    /**
-     * Unset the result at the given offset.
-     *
-     * @param  int  $offset
-     * @return void
-     */
-    public function offsetUnset($offset): void
-    {
-        $this->wait();
-
-        unset($this->results[$offset]);
+        return $this->start()->wait();
     }
 
     /**

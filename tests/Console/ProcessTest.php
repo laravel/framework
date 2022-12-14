@@ -38,23 +38,20 @@ class ProcessTest extends TestCase
     {
         $factory = new Factory;
 
-        $pool = $factory->pool(function (Pool $pool) {
+        $pool = $factory->pool(function ($pool) {
             return [
                 $pool->path(__DIR__)->command($this->ls()),
                 $pool->path(__DIR__)->command($this->ls()),
             ];
         });
 
-        $this->assertTrue(count($pool->running()) === 0);
+        $results = $pool->start()->wait();
 
-        $pool->start();
-        $pool->wait();
+        $this->assertTrue($results[0]->successful());
+        $this->assertTrue($results[1]->successful());
 
-        $this->assertTrue($pool[0]->successful());
-        $this->assertTrue($pool[1]->successful());
-
-        $this->assertTrue(str_contains($pool[0]->output(), 'ProcessTest.php'));
-        $this->assertTrue(str_contains($pool[1]->output(), 'ProcessTest.php'));
+        $this->assertTrue(str_contains($results[0]->output(), 'ProcessTest.php'));
+        $this->assertTrue(str_contains($results[1]->output(), 'ProcessTest.php'));
     }
 
     public function testProcessPoolCanReceiveOutputForEachProcessViaStartMethod()
@@ -63,7 +60,7 @@ class ProcessTest extends TestCase
 
         $output = [];
 
-        $pool = $factory->pool(function (Pool $pool) {
+        $pool = $factory->pool(function ($pool) {
             return [
                 $pool->path(__DIR__)->command($this->ls()),
                 $pool->path(__DIR__)->command($this->ls()),
@@ -72,40 +69,26 @@ class ProcessTest extends TestCase
             $output[$key][$type][] = $buffer;
         });
 
-        $pool->wait();
+        $poolResults = $pool->wait();
 
         $this->assertTrue(count($output[0]['out']) > 0);
         $this->assertTrue(count($output[1]['out']) > 0);
-    }
-
-    public function testProcessPoolResultsCanBeEvaluatedOnTime()
-    {
-        $factory = new Factory;
-
-        $pool = $factory->pool(function (Pool $pool) {
-            return [
-                $pool->path(__DIR__)->command($this->ls()),
-                $pool->path(__DIR__)->command($this->ls()),
-            ];
-        });
-
-        $this->assertTrue($pool[0]->successful());
-        $this->assertTrue($pool[1]->successful());
-
-        $this->assertTrue(str_contains($pool[0]->output(), 'ProcessTest.php'));
-        $this->assertTrue(str_contains($pool[1]->output(), 'ProcessTest.php'));
+        $this->assertInstanceOf(ProcessResult::class, $poolResults[0]);
+        $this->assertInstanceOf(ProcessResult::class, $poolResults[1]);
+        $this->assertTrue(str_contains($poolResults[0]->output(), 'ProcessTest.php'));
+        $this->assertTrue(str_contains($poolResults[1]->output(), 'ProcessTest.php'));
     }
 
     public function testProcessPoolResultsCanBeEvaluatedByName()
     {
         $factory = new Factory;
 
-        $pool = $factory->pool(function (Pool $pool) {
+        $pool = $factory->pool(function ($pool) {
             return [
                 $pool->as('first')->path(__DIR__)->command($this->ls()),
                 $pool->as('second')->path(__DIR__)->command($this->ls()),
             ];
-        });
+        })->wait();
 
         $this->assertTrue($pool['first']->successful());
         $this->assertTrue($pool['second']->successful());
