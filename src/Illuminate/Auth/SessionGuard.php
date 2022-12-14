@@ -631,8 +631,9 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         $this->getCookieJar()->unqueue($this->getRecallerName());
 
         if (! is_null($this->recaller())) {
-            $this->getCookieJar()->queue($this->getCookieJar()
-                    ->forget($this->getRecallerName()));
+            $this->getCookieJar()->queue(
+                $this->getCookieJar()->forget($this->getRecallerName())
+            );
         }
     }
 
