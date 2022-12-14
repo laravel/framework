@@ -204,4 +204,27 @@ class EncrypterTest extends TestCase
         $this->assertTrue(Encrypter::supported($key, 'aes-128-CBC'));
         $this->assertTrue(Encrypter::supported($key, 'aes-128-cbc'));
     }
+
+    public function provideTamperedData()
+    {
+        return [
+            [['iv' => ['value_in_array'], 'value' => '', 'mac' => '']],
+            [['iv' => '', 'value' => '', 'mac' => '']],
+            [['iv' => '', 'value' => ['value_in_array'], 'mac' => '']],
+            [['iv' => '', 'value' => '', 'mac' => ['value_in_array']]],
+            [['iv' => '', 'value' => '', 'mac' => ['value_in_array'], 'tag' => ['value_in_array']]],
+        ];
+    }
+
+    /**
+     * @dataProvider provideTamperedData
+     */
+    public function testTamperedPayloadWillGetRejected($payload)
+    {
+        $this->expectException(DecryptException::class);
+        $this->expectExceptionMessage('The payload is invalid.');
+
+        $enc = new Encrypter(str_repeat('x', 16));
+        $enc->decrypt(base64_encode(json_encode($payload)));
+    }
 }

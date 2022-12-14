@@ -229,10 +229,24 @@ class Encrypter implements EncrypterContract, StringEncrypter
      */
     protected function validPayload($payload)
     {
-        return is_array($payload) && isset($payload['iv'], $payload['value'], $payload['mac']) &&
-            strlen(base64_decode($payload['iv'], true)) === openssl_cipher_iv_length(strtolower($this->cipher));
-    }
+        if (!is_array($payload)) {
+            return false;
+        }
 
+        // Required values, must be strings
+        foreach (['iv', 'value', 'mac'] as $item) {
+            if (!isset($payload[$item]) || !is_string($payload[$item])) {
+                return false;
+            }
+        }
+
+        // Optional, but has to be string if present
+        if (isset($payload['tag']) && !is_string($payload['tag'])) {
+            return false;
+        }
+
+        return strlen(base64_decode($payload['iv'], true)) === openssl_cipher_iv_length(strtolower($this->cipher));
+    }
     /**
      * Determine if the MAC for the given payload is valid.
      *
