@@ -61,6 +61,26 @@ class InvokedProcess implements InvokedProcessContract
     }
 
     /**
+     * Get the standard output for the process.
+     *
+     * @return string
+     */
+    public function output()
+    {
+        return $this->process->getOutput();
+    }
+
+    /**
+     * Get the error output for the process.
+     *
+     * @return string
+     */
+    public function errorOutput()
+    {
+        return $this->process->getErrorOutput();
+    }
+
+    /**
      * Get the latest standard output for the process.
      *
      * @return string

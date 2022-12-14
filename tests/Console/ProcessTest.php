@@ -4,7 +4,6 @@ namespace Illuminate\Tests;
 
 use Illuminate\Console\Process\Exceptions\ProcessFailedException;
 use Illuminate\Console\Process\Factory;
-use Illuminate\Console\Process\Pool;
 use Illuminate\Contracts\Console\Process\ProcessResult;
 use Mockery as m;
 use OutOfBoundsException;
@@ -430,6 +429,38 @@ class ProcessTest extends TestCase
         $result->throwIf(false);
 
         $this->assertTrue(true);
+    }
+
+    public function testFakeInvokedProcessOutputWithLatestOutput()
+    {
+        $factory = new Factory;
+
+        $factory->fake(function () use ($factory) {
+            return $factory->describe()
+                    ->output('ONE')
+                    ->output('TWO')
+                    ->output('THREE')
+                    ->runsFor(iterations: 3);
+        });
+
+        $process = $factory->start('echo "ONE"; sleep 1; echo "TWO"; sleep 1; echo "THREE"; sleep 1;');
+
+        $latestOutput = [];
+        $output = [];
+
+        while ($process->running()) {
+            $latestOutput[] = $process->latestOutput();
+            $output[] = $process->output();
+        }
+
+        $this->assertEquals("ONE\n", $latestOutput[0]);
+        $this->assertEquals("ONE\nTWO\n", $output[0]);
+
+        $this->assertEquals("THREE\n", $latestOutput[1]);
+        $this->assertEquals("ONE\nTWO\nTHREE\n", $output[1]);
+
+        $this->assertEquals("", $latestOutput[2]);
+        $this->assertEquals("ONE\nTWO\nTHREE\n", $output[2]);
     }
 
     protected function ls()

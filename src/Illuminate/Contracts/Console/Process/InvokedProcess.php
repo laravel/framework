@@ -27,6 +27,20 @@ interface InvokedProcess
     public function running();
 
     /**
+     * Get the standard output for the process.
+     *
+     * @return string
+     */
+    public function output();
+
+    /**
+     * Get the error output for the process.
+     *
+     * @return string
+     */
+    public function errorOutput();
+
+    /**
      * Get the latest standard output for the process.
      *
      * @return string

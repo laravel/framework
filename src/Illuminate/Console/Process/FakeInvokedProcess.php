@@ -171,6 +171,46 @@ class FakeInvokedProcess implements InvokedProcessContract
     }
 
     /**
+     * Get the standard output for the process.
+     *
+     * @return string
+     */
+    public function output()
+    {
+        $this->latestOutput();
+
+        $output = [];
+
+        for ($i = 0; $i < $this->nextOutputIndex; $i++) {
+            if ($this->process->output[$i]['type'] === 'out') {
+                $output[] = $this->process->output[$i]['buffer'];
+            }
+        }
+
+        return rtrim(implode('', $output), "\n")."\n";
+    }
+
+    /**
+     * Get the error output for the process.
+     *
+     * @return string
+     */
+    public function errorOutput()
+    {
+        $this->latestErrorOutput();
+
+        $output = [];
+
+        for ($i = 0; $i < $this->nextErrorOutputIndex; $i++) {
+            if ($this->process->output[$i]['type'] === 'err') {
+                $output[] = $this->process->output[$i]['buffer'];
+            }
+        }
+
+        return rtrim(implode('', $output), "\n")."\n";
+    }
+
+    /**
      * Get the latest standard output for the process.
      *
      * @return string
