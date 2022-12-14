@@ -238,10 +238,15 @@ class TestResponseTest extends TestCase
     public function testAssertStreamedContent()
     {
         $response = TestResponse::fromBaseResponse(
-            (new StreamedResponse)->setContent('expected response data')
+            new StreamedResponse(function () {
+                $stream = fopen('php://memory', 'r+');
+                fwrite($stream, 'expected response data');
+                rewind($stream);
+                fpassthru($stream);
+            })
         );
 
-        $this->assertStreamedContent('expected response data');
+        $response->assertStreamedContent('expected response data');
 
         try {
             $response->assertStreamedContent('expected');
