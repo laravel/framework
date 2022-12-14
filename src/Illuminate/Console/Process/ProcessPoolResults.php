@@ -3,6 +3,7 @@
 namespace Illuminate\Console\Process;
 
 use ArrayAccess;
+use Illuminate\Support\Collection;
 
 class ProcessPoolResults implements ArrayAccess
 {
@@ -22,6 +23,16 @@ class ProcessPoolResults implements ArrayAccess
     public function __construct(array $results)
     {
         $this->results = $results;
+    }
+
+    /**
+     * Get the results as a collection.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function collect()
+    {
+        return new Collection($this->results);
     }
 
     /**

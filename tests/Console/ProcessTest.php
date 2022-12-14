@@ -463,6 +463,36 @@ class ProcessTest extends TestCase
         $this->assertEquals("ONE\nTWO\nTHREE\n", $output[2]);
     }
 
+    public function testBasicFakeAssertions()
+    {
+        $factory = new Factory;
+
+        $factory->fake();
+
+        $result = $factory->run('ls -la');
+
+        $factory->assertRan(function ($process, $result) {
+            return $process->command == 'ls -la';
+        });
+
+        $factory->assertRanTimes(function ($process, $result) {
+            return $process->command == 'ls -la';
+        }, 1);
+
+        $factory->assertNotRan(function ($process, $result) {
+            return $process->command == 'cat foo';
+        });
+    }
+
+    public function testAsssertingThatNothingRan()
+    {
+        $factory = new Factory;
+
+        $factory->fake();
+
+        $factory->assertNothingRan();
+    }
+
     protected function ls()
     {
         return windows_os() ? 'dir' : 'ls';
