@@ -207,12 +207,17 @@ class EncrypterTest extends TestCase
 
     public function provideTamperedData()
     {
+        $validIv = base64_encode(str_repeat('.', 16));
+
         return [
             [['iv' => ['value_in_array'], 'value' => '', 'mac' => '']],
-            [['iv' => '', 'value' => '', 'mac' => '']],
-            [['iv' => '', 'value' => ['value_in_array'], 'mac' => '']],
-            [['iv' => '', 'value' => '', 'mac' => ['value_in_array']]],
-            [['iv' => '', 'value' => '', 'mac' => ['value_in_array'], 'tag' => ['value_in_array']]],
+            [['iv' => new class() {}, 'value' => '', 'mac' => '']],
+            [['iv' => $validIv, 'value' => ['value_in_array'], 'mac' => '']],
+            [['iv' => $validIv, 'value' => new class() {}, 'mac' => '']],
+            [['iv' => $validIv, 'value' => '', 'mac' => ['value_in_array']]],
+            [['iv' => $validIv, 'value' => '', 'mac' => null]],
+            [['iv' => $validIv, 'value' => '', 'mac' => '', 'tag' => ['value_in_array']]],
+            [['iv' => $validIv, 'value' => '', 'mac' => '', 'tag' => -1]],
         ];
     }
 
