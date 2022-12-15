@@ -20,7 +20,7 @@ class PostgresGrammar extends Grammar
      *
      * @var string[]
      */
-    protected $modifiers = ['Collate', 'Increment', 'Nullable', 'Default', 'VirtualAs', 'StoredAs'];
+    protected $modifiers = ['GeneratedAs', 'Collate', 'Increment', 'Nullable', 'Default', 'VirtualAs', 'StoredAs'];
 
     /**
      * The columns available as serials.
@@ -716,18 +716,7 @@ class PostgresGrammar extends Grammar
             ])[$type];
         }
 
-        $options = '';
-
-        if (! is_bool($column->generatedAs) && ! empty($column->generatedAs)) {
-            $options = sprintf(' (%s)', $column->generatedAs);
-        }
-
-        return sprintf(
-            '%s generated %s as identity%s',
-            $type,
-            $column->always ? 'always' : 'by default',
-            $options
-        );
+        return $type;
     }
 
     /**
@@ -1156,6 +1145,30 @@ class PostgresGrammar extends Grammar
     {
         if ($column->storedAs !== null) {
             return " generated always as ({$column->storedAs}) stored";
+        }
+    }
+
+    /**
+     * Get the SQL for a generated column modifier.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string|null
+     */
+    protected function modifyGeneratedAs(Blueprint $blueprint, Fluent $column)
+    {
+        if ($column->generatedAs !== null) {
+            $options = '';
+
+            if (! is_bool($column->generatedAs) && ! empty($column->generatedAs)) {
+                $options = sprintf(' (%s)', $column->generatedAs);
+            }
+
+            return sprintf(
+                ' generated %s as identity%s',
+                $column->always ? 'always' : 'by default',
+                $options
+            );
         }
     }
 
