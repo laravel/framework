@@ -100,19 +100,6 @@ jobs:
           DYNAMODB_ENDPOINT: "http://localhost:8888"
           AWS_ACCESS_KEY_ID: random_key
           AWS_SECRET_ACCESS_KEY: random_secret
-        if: matrix.stability != 'prefer-lowest'
-
-      - name: Execute tests (without deprecations)
-        run: vendor/bin/phpunit --verbose
-        env:
-          DB_PORT: ${{ job.services.mysql.ports[3306] }}
-          DB_USERNAME: root
-          DYNAMODB_CACHE_TABLE: laravel_dynamodb_test
-          DYNAMODB_ENDPOINT: "http://localhost:8888"
-          AWS_ACCESS_KEY_ID: random_key
-          AWS_SECRET_ACCESS_KEY: random_secret
-          TESTBENCH_CONVERT_DEPRECATIONS_TO_EXCEPTIONS: false
-        if: matrix.stability == 'prefer-lowest'
 
       - name: Store artifacts
         uses: actions/upload-artifact@v2
@@ -178,7 +165,6 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: random_key
           AWS_SECRET_ACCESS_KEY: random_secret
-          TESTBENCH_CONVERT_DEPRECATIONS_TO_EXCEPTIONS: false
 
       - name: Store artifacts
         uses: actions/upload-artifact@v2
