@@ -14,7 +14,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Foundation\Vite useBuildDirectory(string $path)
  * @method static \Illuminate\Foundation\Vite useScriptTagAttributes((callable(string, string, ?array, ?array): array)|array $attributes)
  * @method static \Illuminate\Foundation\Vite useStyleTagAttributes((callable(string, string, ?array, ?array): array)|array $attributes)
- * @method static \Illuminate\Foundation\Vite usePreloadTagAttributes((callable(string, string, ?array, ?array): array)|array $attributes)
+ * @method static \Illuminate\Foundation\Vite usePreloadTagAttributes((callable(string, string, ?array, ?array): array|false)|array|false $attributes)
  * @method static \Illuminate\Support\HtmlString|void reactRefresh()
  * @method static string asset(string $asset, string|null $buildDirectory = null)
  * @method static string|null manifestHash(string|null $buildDirectory = null)
