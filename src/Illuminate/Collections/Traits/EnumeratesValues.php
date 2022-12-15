@@ -530,7 +530,7 @@ trait EnumeratesValues
     /**
      * Filter items by the given key value pair.
      *
-     * @param  callable|string  $key
+     * @param  callable|string|null  $key
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return static
@@ -565,7 +565,7 @@ trait EnumeratesValues
     /**
      * Filter items by the given key value pair using strict comparison.
      *
-     * @param  string  $key
+     * @param  string|null  $key
      * @param  mixed  $value
      * @return static
      */
@@ -577,7 +577,7 @@ trait EnumeratesValues
     /**
      * Filter items by the given key value pair.
      *
-     * @param  string  $key
+     * @param  string|null  $key
      * @param  \Illuminate\Contracts\Support\Arrayable|iterable  $values
      * @param  bool  $strict
      * @return static
@@ -592,7 +592,7 @@ trait EnumeratesValues
     /**
      * Filter items by the given key value pair using strict comparison.
      *
-     * @param  string  $key
+     * @param  string|null  $key
      * @param  \Illuminate\Contracts\Support\Arrayable|iterable  $values
      * @return static
      */
@@ -604,7 +604,7 @@ trait EnumeratesValues
     /**
      * Filter items such that the value of the given key is between the given values.
      *
-     * @param  string  $key
+     * @param  string|null  $key
      * @param  \Illuminate\Contracts\Support\Arrayable|iterable  $values
      * @return static
      */
@@ -616,7 +616,7 @@ trait EnumeratesValues
     /**
      * Filter items such that the value of the given key is not between the given values.
      *
-     * @param  string  $key
+     * @param  string|null  $key
      * @param  \Illuminate\Contracts\Support\Arrayable|iterable  $values
      * @return static
      */
@@ -630,7 +630,7 @@ trait EnumeratesValues
     /**
      * Filter items by the given key value pair.
      *
-     * @param  string  $key
+     * @param  string|null  $key
      * @param  \Illuminate\Contracts\Support\Arrayable|iterable  $values
      * @param  bool  $strict
      * @return static
@@ -645,7 +645,7 @@ trait EnumeratesValues
     /**
      * Filter items by the given key value pair using strict comparison.
      *
-     * @param  string  $key
+     * @param  string|null  $key
      * @param  \Illuminate\Contracts\Support\Arrayable|iterable  $values
      * @return static
      */
