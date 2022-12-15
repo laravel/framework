@@ -28,6 +28,7 @@ use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Cookie;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class TestResponseTest extends TestCase
 {
@@ -228,6 +229,34 @@ class TestResponseTest extends TestCase
 
         try {
             $response->assertContent('expected response data with extra');
+            $this->fail('xxxx');
+        } catch (AssertionFailedError $e) {
+            $this->assertSame('Failed asserting that two strings are identical.', $e->getMessage());
+        }
+    }
+
+    public function testAssertStreamedContent()
+    {
+        $response = TestResponse::fromBaseResponse(
+            new StreamedResponse(function () {
+                $stream = fopen('php://memory', 'r+');
+                fwrite($stream, 'expected response data');
+                rewind($stream);
+                fpassthru($stream);
+            })
+        );
+
+        $response->assertStreamedContent('expected response data');
+
+        try {
+            $response->assertStreamedContent('expected');
+            $this->fail('xxxx');
+        } catch (AssertionFailedError $e) {
+            $this->assertSame('Failed asserting that two strings are identical.', $e->getMessage());
+        }
+
+        try {
+            $response->assertStreamedContent('expected response data with extra');
             $this->fail('xxxx');
         } catch (AssertionFailedError $e) {
             $this->assertSame('Failed asserting that two strings are identical.', $e->getMessage());
