@@ -590,17 +590,12 @@ class TestResponse implements ArrayAccess
      *
      * @param  string|array  $value
      * @param  bool  $escape
+     * @param  bool  $debug
      * @return $this
      */
-    public function assertSee($value, $escape = true)
+    public function assertSee($value, $escape = true, $debug = false)
     {
-        $value = Arr::wrap($value);
-
-        $values = $escape ? array_map('e', ($value)) : $value;
-
-        foreach ($values as $value) {
-            PHPUnit::assertStringContainsString((string) $value, $this->getContent());
-        }
+        $this->responseContains($this->getContent(), $value, $escape, $debug, true);
 
         return $this;
     }
@@ -626,19 +621,12 @@ class TestResponse implements ArrayAccess
      *
      * @param  string|array  $value
      * @param  bool  $escape
+     * @param  bool  $debug
      * @return $this
      */
-    public function assertSeeText($value, $escape = true)
+    public function assertSeeText($value, $escape = true, $debug = false)
     {
-        $value = Arr::wrap($value);
-
-        $values = $escape ? array_map('e', ($value)) : $value;
-
-        $content = strip_tags($this->getContent());
-
-        foreach ($values as $value) {
-            PHPUnit::assertStringContainsString((string) $value, $content);
-        }
+        $this->responseContains(strip_tags($this->getContent()), $value, $escape, $debug, true);
 
         return $this;
     }
@@ -664,17 +652,12 @@ class TestResponse implements ArrayAccess
      *
      * @param  string|array  $value
      * @param  bool  $escape
+     * @param  bool  $debug
      * @return $this
      */
-    public function assertDontSee($value, $escape = true)
+    public function assertDontSee($value, $escape = true, $debug = false)
     {
-        $value = Arr::wrap($value);
-
-        $values = $escape ? array_map('e', ($value)) : $value;
-
-        foreach ($values as $value) {
-            PHPUnit::assertStringNotContainsString((string) $value, $this->getContent());
-        }
+        $this->responseContains($this->getContent(), $value, $escape, $debug, false);
 
         return $this;
     }
@@ -684,21 +667,46 @@ class TestResponse implements ArrayAccess
      *
      * @param  string|array  $value
      * @param  bool  $escape
+     * @param  bool  $debug
      * @return $this
      */
-    public function assertDontSeeText($value, $escape = true)
+    public function assertDontSeeText($value, $escape = true, $debug = false)
+    {
+        $this->responseContains(strip_tags($this->getContent()), $value, $escape, $debug, false);
+
+        return $this;
+    }
+
+    /**
+     * Assert that the response body contains or does not contain values.
+     *
+     * @param  string  $content
+     * @param  string|array  $value
+     * @param  bool  $escape
+     * @param  bool  $debug
+     * @param  bool  $shouldSee
+     * @return void
+     */
+    protected function responseContains($content, $value, $escape, $debug, $shouldSee)
     {
         $value = Arr::wrap($value);
 
         $values = $escape ? array_map('e', ($value)) : $value;
 
-        $content = strip_tags($this->getContent());
+        $parameters = [
+            $debug ? "'".$content."'\n" : '',
+            $shouldSee ? 'Did not see expected value' : 'Saw unexpected value',
+        ];
 
         foreach ($values as $value) {
-            PHPUnit::assertStringNotContainsString((string) $value, $content);
-        }
+            array_push($parameters, $value);
 
-        return $this;
+            $message = sprintf('%s%s [%s] within response body.', ...$parameters);
+
+            $contains = str_contains($content, $value);
+
+            PHPUnit::assertTrue($shouldSee ? $contains : ! $contains, $message);
+        }
     }
 
     /**
