@@ -93,8 +93,8 @@ class ScheduleListCommand extends Command
                 ], $event->command);
             }
 
-            if ($event instanceof CallbackEvent && is_string($event->description)) {
-                if (class_exists($event->description)) {
+            if ($event instanceof CallbackEvent) {
+                if (is_string($event->description) && class_exists($event->description)) {
                     $command = $event->description;
                     $description = '';
                 } else {
@@ -112,7 +112,7 @@ class ScheduleListCommand extends Command
                 ? $nextDueDate->format('Y-m-d H:i:s P')
                 : $nextDueDate->diffForHumans();
 
-            $hasMutex = $event->mutex->exists($event) ? 'Has Mutex › ' : '';
+            $hasMutex = is_string($event->description) && $event->mutex->exists($event) ? 'Has Mutex › ' : '';
 
             $dots = str_repeat('.', max(
                 $terminalWidth - mb_strlen($expression.$command.$nextDueDateLabel.$nextDueDate.$hasMutex) - 8, 0
