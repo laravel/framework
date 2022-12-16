@@ -202,7 +202,7 @@ class Str
     }
 
     /**
-     * Convert a value to camel case.
+     * Convert a string to camel case.
      *
      * @param  string  $value
      * @return string
@@ -264,6 +264,19 @@ class Str
         }
 
         return true;
+    }
+
+    /**
+     * Convert a string to "dot" notation.
+     *
+     * @param string $value
+     * @return string
+     */
+    public static function dot($value)
+    {
+       return static::snake(static::replace(
+           ['-', '_'], ' ', implode(static::ucsplit($value))
+       ), '.');
     }
 
     /**
@@ -1099,7 +1112,7 @@ class Str
     }
 
     /**
-     * Convert a value to studly caps case.
+     * Convert a string to studly caps case.
      *
      * @param  string  $value
      * @return string

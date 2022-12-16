@@ -155,7 +155,7 @@ class Stringable implements JsonSerializable
     }
 
     /**
-     * Convert a value to camel case.
+     * Convert a string to camel case.
      *
      * @return static
      */
@@ -197,6 +197,16 @@ class Stringable implements JsonSerializable
     public function dirname($levels = 1)
     {
         return new static(dirname($this->value, $levels));
+    }
+
+    /**
+     * Convert a string to "dot" notation.
+     *
+     * @return $this
+     */
+    public function dot()
+    {
+        return new static(Str::dot($this->value));
     }
 
     /**
@@ -770,7 +780,7 @@ class Stringable implements JsonSerializable
     }
 
     /**
-     * Convert a value to studly caps case.
+     * Convert a string to studly caps case.
      *
      * @return static
      */
