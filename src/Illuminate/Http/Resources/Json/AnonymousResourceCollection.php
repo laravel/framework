@@ -2,7 +2,6 @@
 
 namespace Illuminate\Http\Resources\Json;
 
-#[\AllowDynamicProperties]
 class AnonymousResourceCollection extends ResourceCollection
 {
     /**
@@ -11,6 +10,13 @@ class AnonymousResourceCollection extends ResourceCollection
      * @var string
      */
     public $collects;
+
+    /**
+     * Indicates if the collection keys should be preserved.
+     *
+     * @var bool
+     */
+    public $preserveKeys = false;
 
     /**
      * Create a new anonymous resource collection.
