@@ -19,7 +19,9 @@ class EventListCommandTest extends TestCase
         $this->dispatcher = new Dispatcher();
         EventListCommand::resolveEventsUsing(fn () => $this->dispatcher);
 
-        $this->beforeApplicationDestroyed(fn () => unset($this->dispatcher));
+        $this->beforeApplicationDestroyed(function () {
+            unset($this->dispatcher)
+        });
     }
 
     public function testDisplayEmptyList()
