@@ -314,15 +314,22 @@ class ComponentTagCompiler
      */
     protected function guessAnonymousComponentUsingPaths(Factory $viewFactory, string $component)
     {
-        if (str_contains($component, ViewFinderInterface::HINT_PATH_DELIMITER)) {
-            return;
-        }
+        $delimiter = ViewFinderInterface::HINT_PATH_DELIMITER;
 
         foreach ($this->blade->getAnonymousComponentPaths() as $path) {
             try {
+                if (str_contains($component, $delimiter) &&
+                    ! str_starts_with($component, $path['prefix'].$delimiter)) {
+                    continue;
+                }
+
+                $formattedComponent = str_starts_with($component, $path['prefix'].$delimiter)
+                        ? Str::after($component, $delimiter)
+                        : $component;
+
                 if (! is_null($guess = match (true) {
-                    $viewFactory->exists($guess = md5($path).ViewFinderInterface::HINT_PATH_DELIMITER.$component) => $guess,
-                    $viewFactory->exists($guess = md5($path).ViewFinderInterface::HINT_PATH_DELIMITER.$component.'.index') => $guess,
+                    $viewFactory->exists($guess = $path['prefixHash'].$delimiter.$formattedComponent) => $guess,
+                    $viewFactory->exists($guess = $path['prefixHash'].$delimiter.$formattedComponent.'.index') => $guess,
                     default => null,
                 })) {
                     return $guess;

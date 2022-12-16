@@ -693,15 +693,22 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * Register a new anonymous component path.
      *
      * @param  string  $path
+     * @param  string|null  $prefix
      * @return void
      */
-    public function anonymousComponentPath(string $path)
+    public function anonymousComponentPath(string $path, string $prefix = null)
     {
-        $this->anonymousComponentPaths[] = $path;
+        $prefixHash = md5($prefix ?: $path);
+
+        $this->anonymousComponentPaths[] = [
+            'path' => $path,
+            'prefix' => $prefix,
+            'prefixHash' => $prefixHash,
+        ];
 
         Container::getInstance()
                 ->make(ViewFactory::class)
-                ->addNamespace(md5($path), $path);
+                ->addNamespace($prefixHash, $path);
     }
 
     /**

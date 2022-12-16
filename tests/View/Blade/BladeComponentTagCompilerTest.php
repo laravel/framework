@@ -585,14 +585,14 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $blade = m::mock(BladeCompiler::class)->makePartial();
 
         $blade->shouldReceive('getAnonymousComponentPaths')->once()->andReturn([
-            'test-directory',
+            ['path' => 'test-directory', 'prefix' => null, 'prefixHash' => md5('test-directory')],
         ]);
 
         $compiler = $this->compiler([], [], $blade);
 
         $result = $compiler->compileTags('<x-panel />');
 
-        $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\View\AnonymousComponent', 'panel', ['view' => '8ee975052836fdc7da2267cf8a580b80::panel.index','data' => []])
+        $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\View\AnonymousComponent', 'panel', ['view' => '".md5('test-directory')."::panel.index','data' => []])
 <?php if (isset(\$attributes) && \$attributes instanceof Illuminate\View\ComponentAttributeBag && \$constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
@@ -618,14 +618,14 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $blade = m::mock(BladeCompiler::class)->makePartial();
 
         $blade->shouldReceive('getAnonymousComponentPaths')->once()->andReturn([
-            'test-directory',
+            ['path' => 'test-directory', 'prefix' => null, 'prefixHash' => md5('test-directory')],
         ]);
 
         $compiler = $this->compiler([], [], $blade);
 
         $result = $compiler->compileTags('<x-panel />');
 
-        $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\View\AnonymousComponent', 'panel', ['view' => '8ee975052836fdc7da2267cf8a580b80::panel','data' => []])
+        $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\View\AnonymousComponent', 'panel', ['view' => '".md5('test-directory')."::panel','data' => []])
 <?php if (isset(\$attributes) && \$attributes instanceof Illuminate\View\ComponentAttributeBag && \$constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
