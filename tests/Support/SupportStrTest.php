@@ -715,6 +715,19 @@ class SupportStrTest extends TestCase
         $this->assertSame('fooBarBaz', Str::camel('foo-bar_baz'));
     }
 
+    public function testDot()
+    {
+        $this->assertSame('laravel.p.h.p.framework', Str::dot('Laravel_p_h_p_framework'));
+        $this->assertSame('laravel.php.framework', Str::dot('Laravel_php_framework'));
+        $this->assertSame('laravel.ph.p.framework', Str::dot('Laravel-phP-framework'));
+        $this->assertSame('laravel.php.framework', Str::dot('Laravel  -_-  php   -_-   framework   '));
+
+        $this->assertSame('foo.bar', Str::dot('FooBar'));
+        $this->assertSame('foo.bar', Str::dot('foo_bar'));
+        $this->assertSame('foo.bar.baz', Str::dot('Foo-barBaz'));
+        $this->assertSame('foo.bar.baz', Str::dot('foo-bar_baz'));
+    }
+
     public function testSubstr()
     {
         $this->assertSame('Ё', Str::substr('БГДЖИЛЁ', -1));
