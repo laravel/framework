@@ -102,7 +102,7 @@ class ScheduleListCommand extends Command
                 }
             }
 
-            $command = mb_strlen($command) > 1 ? "{$command} " : '';
+            $command = is_string($command) && mb_strlen($command) > 1 ? "{$command} " : '';
 
             $nextDueDateLabel = 'Next Due:';
 
