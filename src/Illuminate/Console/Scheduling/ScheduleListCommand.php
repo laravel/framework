@@ -110,9 +110,7 @@ class ScheduleListCommand extends Command
                 ? $nextDueDate->format('Y-m-d H:i:s P')
                 : $nextDueDate->diffForHumans();
 
-            $hasMutex = $event instanceof CallbackEvent
-                ? (isset($event->description) && $event->mutex->exists($event) ? 'Has Mutex › ' : '')
-                : ($event->mutex->exists($event) ? 'Has Mutex › ' : '');
+            $hasMutex = $event->mutex->exists($event) ? 'Has Mutex › ' : '';
 
             $dots = str_repeat('.', max(
                 $terminalWidth - mb_strlen($expression.$command.$nextDueDateLabel.$nextDueDate.$hasMutex) - 8, 0
