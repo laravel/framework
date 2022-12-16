@@ -73,7 +73,7 @@ jobs:
         with:
           timeout_minutes: 5
           max_attempts: 5
-          command: composer require ramsey/collection:^1.2 brick/math:^0.9.3 --no-interaction --no-update
+          command: composer require ramsey/collection:^1.2 brick/math:^0.9.3 symfony/css-selector:^6.0 --no-interaction --no-update
         if: matrix.php >= 8.1
 
       - name: Set Minimum PHP 8.2 Versions
@@ -145,12 +145,20 @@ jobs:
           command: composer require guzzlehttp/guzzle:~7.2 --no-interaction --no-update
         if: matrix.php >= 8
 
+      - name: Set Minimum PHP 8.1 Versions
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer require ramsey/collection:~1.2 brick/math:~0.9.3 symfony/css-selector:~6.0 --no-interaction --no-update
+        if: matrix.php >= 8.1
+
       - name: Set Minimum PHP 8.2 Versions
         uses: nick-fields/retry@v2
         with:
           timeout_minutes: 5
           max_attempts: 5
-          command: composer require guzzlehttp/guzzle:~7.5 guzzlehttp/psr7:~2.4 predis/predis:^2.0.2 --no-interaction --no-update
+          command: composer require guzzlehttp/guzzle:~7.5 guzzlehttp/psr7:~2.4 predis/predis:~2.0.2 --no-interaction --no-update
         if: matrix.php >= 8.2
 
       - name: Install dependencies
