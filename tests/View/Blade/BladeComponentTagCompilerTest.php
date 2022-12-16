@@ -577,7 +577,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $app->shouldReceive('getNamespace')->once()->andReturn('App\\');
 
         $factory->shouldReceive('exists')->andReturnUsing(function ($arg) {
-            return $arg === 'ddd41f081fefd4c3fd2c5ab82a8f0f70::panel';
+            return $arg === md5('test-directory').'::panel';
         });
 
         Container::setInstance($container);
@@ -585,14 +585,14 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $blade = m::mock(BladeCompiler::class)->makePartial();
 
         $blade->shouldReceive('getAnonymousComponentPaths')->once()->andReturn([
-            __DIR__,
+            'test-directory',
         ]);
 
         $compiler = $this->compiler([], [], $blade);
 
         $result = $compiler->compileTags('<x-panel />');
 
-        $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\View\AnonymousComponent', 'panel', ['view' => 'ddd41f081fefd4c3fd2c5ab82a8f0f70::panel','data' => []])
+        $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\View\AnonymousComponent', 'panel', ['view' => '8ee975052836fdc7da2267cf8a580b80::panel','data' => []])
 <?php if (isset(\$attributes) && \$attributes instanceof Illuminate\View\ComponentAttributeBag && \$constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
