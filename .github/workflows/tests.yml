@@ -37,7 +37,7 @@ jobs:
           - 8888:8000
 
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         php: [8.2]
         stability: [prefer-lowest, prefer-stable]
