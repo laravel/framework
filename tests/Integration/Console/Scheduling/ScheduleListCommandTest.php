@@ -11,6 +11,8 @@ use Orchestra\Testbench\TestCase;
 
 class ScheduleListCommandTest extends TestCase
 {
+    protected $schedule;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -19,6 +21,10 @@ class ScheduleListCommandTest extends TestCase
         ScheduleListCommand::resolveTerminalWidthUsing(fn () => 80);
 
         $this->schedule = $this->app->make(Schedule::class);
+
+        $this->beforeApplicationDestroyed(function () {
+            unset($this->schedule);
+        });
     }
 
     public function testDisplayEmptySchedule()
