@@ -80,29 +80,27 @@ class ScheduleListCommand extends Command
         $events = $events->map(function ($event) use ($terminalWidth, $expressionSpacing, $timezone) {
             $expression = $this->formatCronExpression($event->expression, $expressionSpacing);
 
-            /** @var string|null $command */
-            $command = $event->command;
+            $command = $event->command ?? '';
 
-            /** @var string|null $description */
-            $description = $event->description;
+            $description = $event->description ?? '';
 
-            if (! $this->output->isVerbose() && is_string($event->command)) {
+            if (! $this->output->isVerbose()) {
                 $command = str_replace([Application::phpBinary(), Application::artisanBinary()], [
                     'php',
                     preg_replace("#['\"]#", '', Application::artisanBinary()),
-                ], $event->command);
+                ], $command);
             }
 
             if ($event instanceof CallbackEvent) {
-                if (is_string($event->description) && class_exists($event->description)) {
-                    $command = $event->description;
+                if (class_exists($description)) {
+                    $command = $description;
                     $description = '';
                 } else {
                     $command = 'Closure at: '.$this->getClosureLocation($event);
                 }
             }
 
-            $command = is_string($command) && mb_strlen($command) > 1 ? "{$command} " : '';
+            $command = mb_strlen($command) > 1 ? "{$command} " : '';
 
             $nextDueDateLabel = 'Next Due:';
 
@@ -113,7 +111,7 @@ class ScheduleListCommand extends Command
                 : $nextDueDate->diffForHumans();
 
             $hasMutex = $event instanceof CallbackEvent
-                ? (is_string($event->description) && $event->mutex->exists($event) ? 'Has Mutex › ' : '')
+                ? (isset($event->description) && $event->mutex->exists($event) ? 'Has Mutex › ' : '')
                 : ($event->mutex->exists($event) ? 'Has Mutex › ' : '');
 
             $dots = str_repeat('.', max(
@@ -154,7 +152,7 @@ class ScheduleListCommand extends Command
     {
         $rows = $events->map(fn ($event) => array_map('mb_strlen', preg_split("/\s+/", $event->expression)));
 
-        return collect($rows[0] ?? [])->keys()->map(fn ($key) => $rows->max($key));
+        return collect($rows[0] ?? [])->keys()->map(fn ($key) => $rows->max($key))->all();
     }
 
     /**
