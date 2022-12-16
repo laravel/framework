@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Support;
 
 use BadMethodCallException;
+use Illuminate\Support\MacroMixin;
 use Illuminate\Support\Traits\Macroable;
 use PHPUnit\Framework\TestCase;
 
@@ -65,14 +66,14 @@ class SupportMacroableTest extends TestCase
         $this->assertSame('static', $result);
     }
 
-    public function testClassBasedMacros()
+    public function testInstanceBasedMacros()
     {
         TestMacroable::mixin(new TestMixin);
         $instance = new TestMacroable;
         $this->assertSame('instance-Adam', $instance->methodOne('Adam'));
     }
 
-    public function testClassBasedMacrosNoReplace()
+    public function testInstanceBasedMacrosNoReplace()
     {
         TestMacroable::macro('methodThree', function () {
             return 'bar';
@@ -82,6 +83,26 @@ class SupportMacroableTest extends TestCase
         $this->assertSame('bar', $instance->methodThree());
 
         TestMacroable::mixin(new TestMixin);
+        $this->assertSame('foo', $instance->methodThree());
+    }
+
+    public function testClassBasedMacros()
+    {
+        TestMacroable::mixin(TestMixinClass::class);
+        $instance = new TestMacroable;
+        $this->assertSame('instance-Adam', $instance->methodOne('Adam'));
+    }
+
+    public function testClassBasedMacrosNoReplace()
+    {
+        TestMacroable::macro('methodThree', function () {
+            return 'bar';
+        });
+        TestMacroable::mixin(TestMixinClass::class, false);
+        $instance = new TestMacroable;
+        $this->assertSame('bar', $instance->methodThree());
+
+        TestMacroable::mixin(TestMixinClass::class);
         $this->assertSame('foo', $instance->methodThree());
     }
 
@@ -158,5 +179,23 @@ class TestMixin
         return function () {
             return 'foo';
         };
+    }
+}
+
+class TestMixinClass extends MacroMixin
+{
+    public function methodOne($value)
+    {
+        return $this->methodTwo($value);
+    }
+
+    protected function methodTwo($value)
+    {
+        return $this->protectedVariable.'-'.$value;
+    }
+
+    protected function methodThree()
+    {
+        return 'foo';
     }
 }

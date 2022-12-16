@@ -6,6 +6,7 @@ use BadMethodCallException;
 use Closure;
 use ReflectionClass;
 use ReflectionMethod;
+use WeakMap;
 
 trait Macroable
 {
@@ -15,6 +16,13 @@ trait Macroable
      * @var array
      */
     protected static $macros = [];
+
+    /**
+     * Mixin macro instances.
+     *
+     * @var WeakMap
+     */
+    protected static $mixins;
 
     /**
      * Register a custom macro.
@@ -31,7 +39,7 @@ trait Macroable
     /**
      * Mix another object into the class.
      *
-     * @param  object  $mixin
+     * @param  object|string  $mixin
      * @param  bool  $replace
      * @return void
      *
@@ -39,6 +47,12 @@ trait Macroable
      */
     public static function mixin($mixin, $replace = true)
     {
+        if (is_string($mixin)) {
+            static::mixinClass($mixin, $replace);
+
+            return;
+        }
+
         $methods = (new ReflectionClass($mixin))->getMethods(
             ReflectionMethod::IS_PUBLIC | ReflectionMethod::IS_PROTECTED
         );
@@ -48,6 +62,36 @@ trait Macroable
                 $method->setAccessible(true);
                 static::macro($method->name, $method->invoke($mixin));
             }
+        }
+    }
+
+    /**
+     * Mix another class's methods into the class.
+     *
+     * @param  string  $mixinClass
+     * @param  bool  $replace
+     * @return void
+     *
+     * @throws \ReflectionException
+     */
+    public static function mixinClass($mixinClass, $replace = true)
+    {
+        $instances = static::$mixins ??= new WeakMap();
+        $methods = (new ReflectionClass($mixinClass))->getMethods(
+            ReflectionMethod::IS_PUBLIC | ReflectionMethod::IS_PROTECTED
+        );
+
+        foreach ($methods as $method) {
+            if ($method->name === '__constructor' || (! $replace && static::hasMacro($method->name))) {
+                continue;
+            }
+
+            static::macro($method->name, function (...$args) use ($instances, $mixinClass, $method) {
+                // @phpstan-ignore-next-line
+                $instance = $instances[$this] ??= new $mixinClass($this);
+
+                return $method->invoke($instance, ...$args);
+            });
         }
     }
 
