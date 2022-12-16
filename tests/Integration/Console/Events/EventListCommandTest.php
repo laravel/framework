@@ -20,7 +20,7 @@ class EventListCommandTest extends TestCase
         EventListCommand::resolveEventsUsing(fn () => $this->dispatcher);
 
         $this->beforeApplicationDestroyed(function () {
-            unset($this->dispatcher)
+            unset($this->dispatcher);
         });
     }
 
