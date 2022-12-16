@@ -124,6 +124,13 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected $rawBlocks = [];
 
     /**
+     * The array of anonymous component paths to search for components in.
+     *
+     * @var array
+     */
+    protected $anonymousComponentPaths = [];
+
+    /**
      * The array of anonymous component namespaces to autoload from.
      *
      * @var array
@@ -683,6 +690,21 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
+     * Register a new anonymous component path.
+     *
+     * @param  string  $path
+     * @return void
+     */
+    public function anonymousComponentPath(string $path)
+    {
+        $this->anonymousComponentPaths[] = $path;
+
+        Container::getInstance()
+                ->make(ViewFactory::class)
+                ->addNamespace(md5($path), $path);
+    }
+
+    /**
      * Register an anonymous component namespace.
      *
      * @param  string  $directory
@@ -709,6 +731,16 @@ class BladeCompiler extends Compiler implements CompilerInterface
     public function componentNamespace($namespace, $prefix)
     {
         $this->classComponentNamespaces[$prefix] = $namespace;
+    }
+
+    /**
+     * Get the registered anonymous component paths.
+     *
+     * @return array
+     */
+    public function getAnonymousComponentPaths()
+    {
+        return $this->anonymousComponentPaths;
     }
 
     /**
