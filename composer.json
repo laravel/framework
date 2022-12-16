@@ -85,7 +85,7 @@
         "ably/ably-php": "^1.0",
         "aws/aws-sdk-php": "^3.235.5",
         "doctrine/dbal": "^2.13.3|^3.1.4",
-        "fakerphp/faker": "^1.9.2",
+        "fakerphp/faker": "^1.21",
         "guzzlehttp/guzzle": "^7.5",
         "league/flysystem-aws-s3-v3": "^3.0",
         "league/flysystem-ftp": "^3.0",
