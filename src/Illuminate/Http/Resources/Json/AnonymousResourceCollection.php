@@ -2,6 +2,7 @@
 
 namespace Illuminate\Http\Resources\Json;
 
+#[\AllowDynamicProperties]
 class AnonymousResourceCollection extends ResourceCollection
 {
     /**
