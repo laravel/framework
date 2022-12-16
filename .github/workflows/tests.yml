@@ -81,7 +81,7 @@ jobs:
         with:
           timeout_minutes: 5
           max_attempts: 5
-          command: composer require guzzlehttp/guzzle:^7.5 guzzlehttp/psr7:^2.4 predis/predis:^2.0.2 fakerphp/faker:^1.21 --no-interaction --no-update
+          command: composer require guzzlehttp/guzzle:^7.5 guzzlehttp/psr7:^2.4 symfony/css-selector:^6.0 predis/predis:^2.0.2 fakerphp/faker:^1.21 --no-interaction --no-update
         if: matrix.php >= 8.2
 
       - name: Install dependencies
