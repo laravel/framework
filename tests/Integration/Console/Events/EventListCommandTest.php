@@ -10,7 +10,7 @@ use Orchestra\Testbench\TestCase;
 
 class EventListCommandTest extends TestCase
 {
-    protected $dispatcher;
+    public $dispatcher;
 
     protected function setUp(): void
     {
@@ -18,10 +18,6 @@ class EventListCommandTest extends TestCase
 
         $this->dispatcher = new Dispatcher();
         EventListCommand::resolveEventsUsing(fn () => $this->dispatcher);
-
-        $this->beforeApplicationDestroyed(function () {
-            unset($this->dispatcher);
-        });
     }
 
     public function testDisplayEmptyList()
