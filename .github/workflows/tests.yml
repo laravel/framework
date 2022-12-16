@@ -37,9 +37,9 @@ jobs:
           - 8888:8000
 
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
-        php: [8.1, 8.2]
+        php: ['8.0', 8.1, 8.2]
         stability: [prefer-lowest, prefer-stable]
 
     name: PHP ${{ matrix.php }} - ${{ matrix.stability }}
