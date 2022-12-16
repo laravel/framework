@@ -6,6 +6,7 @@ use BadMethodCallException;
 use Closure;
 use ReflectionClass;
 use ReflectionMethod;
+use WeakMap;
 
 trait Macroable
 {
@@ -15,6 +16,13 @@ trait Macroable
      * @var array
      */
     protected static $macros = [];
+
+    /**
+     * Trait macro instances.
+     *
+     * @var WeakMap
+     */
+    protected static $traits;
 
     /**
      * Register a custom macro.
@@ -48,6 +56,35 @@ trait Macroable
                 $method->setAccessible(true);
                 static::macro($method->name, $method->invoke($mixin));
             }
+        }
+    }
+
+    /**
+     * Apply a trait into the class.
+     *
+     * @param  string  $trait
+     * @param  bool  $replace
+     * @return void
+     *
+     * @throws \ReflectionException
+     */
+    public static function trait($trait, $replace = true)
+    {
+        $instances = static::$traits ??= new WeakMap();
+        $methods = (new ReflectionClass($trait))->getMethods(
+            ReflectionMethod::IS_PUBLIC | ReflectionMethod::IS_PROTECTED
+        );
+
+        foreach ($methods as $method) {
+            if ($method->name === '__constructor' || (! $replace && static::hasMacro($method->name))) {
+                continue;
+            }
+
+            static::macro($method->name, function (...$args) use ($instances, $trait, $method) {
+                $instance = $instances[$this] ??= new $trait($this);
+
+                return $method->invoke($instance, ...$args);
+            });
         }
     }
 

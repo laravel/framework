@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Support;
 
 use BadMethodCallException;
+use Illuminate\Support\MacroTrait;
 use Illuminate\Support\Traits\Macroable;
 use PHPUnit\Framework\TestCase;
 
@@ -85,6 +86,26 @@ class SupportMacroableTest extends TestCase
         $this->assertSame('foo', $instance->methodThree());
     }
 
+    public function testMacroTraits()
+    {
+        TestMacroable::trait(TestTrait::class);
+        $instance = new TestMacroable;
+        $this->assertSame('instance-Adam', $instance->methodOne('Adam'));
+    }
+
+    public function testMacroTraitsNoReplace()
+    {
+        TestMacroable::macro('methodThree', function () {
+            return 'bar';
+        });
+        TestMacroable::trait(TestTrait::class, false);
+        $instance = new TestMacroable;
+        $this->assertSame('bar', $instance->methodThree());
+
+        TestMacroable::trait(TestTrait::class);
+        $this->assertSame('foo', $instance->methodThree());
+    }
+
     public function testFlushMacros()
     {
         TestMacroable::macro('flushMethod', function () {
@@ -158,5 +179,23 @@ class TestMixin
         return function () {
             return 'foo';
         };
+    }
+}
+
+class TestTrait extends MacroTrait
+{
+    public function methodOne($value)
+    {
+        return $this->methodTwo($value);
+    }
+
+    protected function methodTwo($value)
+    {
+        return $this->protectedVariable.'-'.$value;
+    }
+
+    protected function methodThree()
+    {
+        return 'foo';
     }
 }
