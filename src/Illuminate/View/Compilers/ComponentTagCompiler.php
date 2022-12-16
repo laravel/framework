@@ -314,6 +314,10 @@ class ComponentTagCompiler
      */
     protected function guessAnonymousComponentUsingPaths(Factory $viewFactory, string $component)
     {
+        if (str_contains($component, ViewFinderInterface::HINT_PATH_DELIMITER)) {
+            return;
+        }
+
         foreach ($this->blade->getAnonymousComponentPaths() as $path) {
             try {
                 if (! is_null($guess = match (true) {
