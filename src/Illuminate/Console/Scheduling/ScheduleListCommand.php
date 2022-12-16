@@ -175,7 +175,7 @@ class ScheduleListCommand extends Command
      */
     private function getNextDueDateForEvent($event, DateTimeZone $timezone)
     {
-        return Carbon::create(
+        return Carbon::instance(
             (new CronExpression($event->expression))
                 ->getNextRunDate(Carbon::now()->setTimezone($event->timezone))
                 ->setTimezone($timezone)
