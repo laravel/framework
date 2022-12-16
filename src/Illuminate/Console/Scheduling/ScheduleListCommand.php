@@ -80,17 +80,20 @@ class ScheduleListCommand extends Command
         $events = $events->map(function ($event) use ($terminalWidth, $expressionSpacing, $timezone) {
             $expression = $this->formatCronExpression($event->expression, $expressionSpacing);
 
+            /** @var string|null $command */
             $command = $event->command;
+
+            /** @var string|null $description */
             $description = $event->description;
 
-            if (! $this->output->isVerbose()) {
+            if (! $this->output->isVerbose() && is_string($event->command)) {
                 $command = str_replace([Application::phpBinary(), Application::artisanBinary()], [
                     'php',
                     preg_replace("#['\"]#", '', Application::artisanBinary()),
                 ], $event->command);
             }
 
-            if ($event instanceof CallbackEvent) {
+            if ($event instanceof CallbackEvent && is_string($event->description)) {
                 if (class_exists($event->description)) {
                     $command = $event->description;
                     $description = '';
