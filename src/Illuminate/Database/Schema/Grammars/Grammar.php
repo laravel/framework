@@ -177,28 +177,6 @@ abstract class Grammar extends BaseGrammar
     }
 
     /**
-     * Compile the blueprint's changed column definitions.
-     *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @return array
-     */
-    protected function getChangedColumns(Blueprint $blueprint)
-    {
-        $columns = [];
-
-        foreach ($blueprint->getChangedColumns() as $column) {
-            // Each of the column types has their own compiler functions, which are tasked
-            // with turning the column definition into its SQL format for this platform
-            // used by the connection. The column's modifiers are compiled and added.
-            $sql = $this->wrap($column).' '.$this->getType($column);
-
-            $columns[] = $this->addModifiers($sql, $blueprint, $column);
-        }
-
-        return $columns;
-    }
-
-    /**
      * Get the SQL for the column data type.
      *
      * @param  \Illuminate\Support\Fluent  $column
