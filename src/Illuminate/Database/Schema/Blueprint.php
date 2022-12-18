@@ -129,6 +129,15 @@ class Blueprint
         $this->ensureCommandsAreValid($connection);
 
         foreach ($this->commands as $command) {
+            if ($command->isFluent
+                && (! $command->column->change && ! isset($command->column->{lcfirst($command->name)})
+                    || ($command->column->change && ! $connection->usingNativeSchemaOperations()))) {
+                // Doctrine DBAL handles fluent commands on change. Also, there is no need to
+                // compile them when creating or adding a column when its value is not set,
+                // but we should always compile them when using native column modifying.
+                continue;
+            }
+
             $method = 'compile'.ucfirst($command->name);
 
             if (method_exists($grammar, $method) || $grammar::hasMacro($method)) {
@@ -247,16 +256,12 @@ class Blueprint
     {
         foreach ($this->columns as $column) {
             foreach ($grammar->getFluentCommands() as $commandName) {
-                $attributeName = lcfirst($commandName);
+                $value = $column->{lcfirst($commandName)};
 
-                if ($column->change || ! isset($column->{$attributeName})) {
-                    continue;
-                }
-
-                $value = $column->{$attributeName};
+                $isFluent = true;
 
                 $this->addCommand(
-                    $commandName, compact('value', 'column')
+                    $commandName, compact('value', 'column', 'isFluent')
                 );
             }
         }
