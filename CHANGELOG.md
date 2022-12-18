@@ -1,6 +1,37 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.43.0...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.44.0...9.x)
+
+
+## [v9.44.0](https://github.com/laravel/framework/compare/v9.43.0...v9.44.0) - 2022-12-15
+
+### Added
+- Added `Illuminate/Auth/GuardHelpers::forgetUser()` ([#45208](https://github.com/laravel/framework/pull/45208))
+- Added sort option for schedule:list ([#45198](https://github.com/laravel/framework/pull/45198))
+- Added `ascii` and `ulid` validation rules ([#45218](https://github.com/laravel/framework/pull/45218))
+- Http client - allow to provide closure as "throwif" condition ([#45251](https://github.com/laravel/framework/pull/45251))
+- Support '/' as a possible column name in database ([#45268](https://github.com/laravel/framework/pull/45268))
+- Added Granular notifications queue connections ([#45264](https://github.com/laravel/framework/pull/45264))
+- Add support for native rename/drop column commands ([#45258](https://github.com/laravel/framework/pull/45258))
+- Add $encoding parameter to substr method ([#45300](https://github.com/laravel/framework/pull/45300))
+- Use Macroable in Session facade ([#45310](https://github.com/laravel/framework/pull/45310))
+
+### Fixed
+- Fixed aliasing with cursor pagination ([#45188](https://github.com/laravel/framework/pull/45188))
+- Fixed email verification request ([#45227](https://github.com/laravel/framework/pull/45227))
+- Return 500 http error, instead of 200, when dotenv fails to load ([#45235](https://github.com/laravel/framework/pull/45235))
+- Fixed bug on Job Batchs Table ([#45263](https://github.com/laravel/framework/pull/45263))
+- Fixed schedule:list crash when call() is given class-string ([#45306](https://github.com/laravel/framework/pull/45306))
+- Fixed Lack of Memory when failing a job with wrong variable passed on the method fail() ([#45291](https://github.com/laravel/framework/pull/45291))
+- Fixed errors occurring when encrypted cookies has been tampered with ([#45313](https://github.com/laravel/framework/pull/45313))
+- bug fix, change array_merge to array_replace to prevent reindex ([#45309](https://github.com/laravel/framework/pull/45309))
+
+### Changed
+- Allow BusFake to use custom BusRepository ([#45202](https://github.com/laravel/framework/pull/45202))
+- Improved error logging for unmatched routes and route not found ([#45206](https://github.com/laravel/framework/pull/45206))
+- Improve assertSeeText and assertDontSeeText test methods ([#45274](https://github.com/laravel/framework/pull/45274))
+- Improved `Illuminate/Auth/SessionGuard::clearUserDataFromStorage()` ([#45305](https://github.com/laravel/framework/pull/45305))
+- Allows shouldIgnoresDeprecationError() to be overriden ([#45299](https://github.com/laravel/framework/pull/45299))
 
 
 ## [v9.43.0](https://github.com/laravel/framework/compare/v9.42.2...v9.43.0) - 2022-12-06
