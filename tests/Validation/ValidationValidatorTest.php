@@ -1857,6 +1857,42 @@ class ValidationValidatorTest extends TestCase
         ], $v->messages()->keys());
     }
 
+    public function testSnakecase()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [
+            'lower' => 'lowercase',
+            'mixed' => 'MixedCase',
+            'upper' => 'UPPERCASE',
+            'lower_multibyte' => 'carácter_multibyte',
+            'mixed_multibyte' => 'carÁcter_multibyte',
+            'upper_multibyte' => 'CARÁCTER_MULTIBYTE',
+            'lower_multibyte_space' => 'carácter multibyte',
+            'mixed_multibyte_space' => 'carÁcter multibyte',
+            'upper_multibyte_space' => 'CARÁCTER MULTIBYTE',
+        ], [
+            'lower' => 'snakecase',
+            'mixed' => 'snakecase',
+            'upper' => 'snakecase',
+            'lower_multibyte' => 'snakecase',
+            'mixed_multibyte' => 'snakecase',
+            'upper_multibyte' => 'snakecase',
+            'lower_multibyte_space' => 'snakecase',
+            'mixed_multibyte_space' => 'snakecase',
+            'upper_multibyte_space' => 'snakecase',
+        ]);
+
+        $this->assertSame([
+            'mixed',
+            'upper',
+            'mixed_multibyte',
+            'upper_multibyte',
+            'lower_multibyte_space',
+            'mixed_multibyte_space',
+            'upper_multibyte_space',
+        ], $v->messages()->keys());
+    }
+
     public function testLessThan()
     {
         $trans = $this->getIlluminateArrayTranslator();

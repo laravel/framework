@@ -1197,6 +1197,19 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute is snakecase.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateSnakecase($attribute, $value, $parameters)
+    {
+        return Str::snake($value) === $value;
+    }
+
+    /**
      * Validate the MIME type of a file is an image MIME type.
      *
      * @param  string  $attribute
