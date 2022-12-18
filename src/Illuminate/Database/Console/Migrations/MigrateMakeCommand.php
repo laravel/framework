@@ -19,7 +19,8 @@ class MigrateMakeCommand extends BaseCommand
         {--path= : The location where the migration file should be created}
         {--realpath : Indicate any provided migration file paths are pre-resolved absolute paths}
         {--fullpath : Output the full path of the migration}
-        {--uuid : Set UUID as default primary key of the table}';
+        {--uuid : Set UUID as default primary key of the table}
+        {--ulid : Set ULID as default primary key of the table}';
 
     /**
      * The console command description.
@@ -73,7 +74,7 @@ class MigrateMakeCommand extends BaseCommand
 
         $create = $this->input->getOption('create') ?: false;
 
-        $uuid = $this->input->getOption('uuid') ?: false;
+        $primary = $this->getPrimaryKey();
 
         // If no table was given as an option but a create option is given then we
         // will use the "create" option as the table name. This allows the devs
@@ -94,7 +95,7 @@ class MigrateMakeCommand extends BaseCommand
         // Now we are ready to write the migration out to disk. Once we've written
         // the migration out, we will dump-autoload for the entire framework to
         // make sure that the migrations are registered by the class loaders.
-        $this->writeMigration($name, $table, $create, $uuid);
+        $this->writeMigration($name, $table, $create, $primary);
 
         $this->composer->dumpAutoloads();
     }
@@ -108,10 +109,10 @@ class MigrateMakeCommand extends BaseCommand
      * @param  bool  $uuid
      * @return string
      */
-    protected function writeMigration($name, $table, $create, $uuid = false)
+    protected function writeMigration($name, $table, $create, $primary)
     {
         $file = $this->creator->create(
-            $name, $this->getMigrationPath(), $table, $create, $uuid
+            $name, $this->getMigrationPath(), $table, $create, $primary
         );
 
         if (! $this->option('fullpath')) {
@@ -135,5 +136,23 @@ class MigrateMakeCommand extends BaseCommand
         }
 
         return parent::getMigrationPath();
+    }
+
+    /**
+     * Get the primary key to use. If null, migration will resolve to default 'id()'
+     *
+     * @return string|null
+     */
+    protected function getPrimaryKey()
+    {
+        if ($this->input->getOption('uuid')) {
+            return 'uuid(\'id\')';
+        }
+
+        if ($this->input->getOption('ulid')) {
+            return 'ulid(\'id\')';
+        }
+
+        return null;
     }
 }

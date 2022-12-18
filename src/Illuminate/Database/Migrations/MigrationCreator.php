@@ -55,7 +55,7 @@ class MigrationCreator
      *
      * @throws \Exception
      */
-    public function create($name, $path, $table = null, $create = false, $uuid = false)
+    public function create($name, $path, $table = null, $create = false, $primary = null)
     {
         $this->ensureMigrationDoesntAlreadyExist($name, $path);
 
@@ -68,7 +68,8 @@ class MigrationCreator
 
         $this->files->ensureDirectoryExists(dirname($path));
 
-        $primary = $uuid ? "uuid('id')" : "id()";
+        $primary = $primary ?: 'id()';
+
         $this->files->put(
             $path, $this->populateStub($stub, $table, $primary)
         );
