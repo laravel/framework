@@ -50,11 +50,12 @@ class MigrationCreator
      * @param  string  $path
      * @param  string|null  $table
      * @param  bool  $create
+     * @param  bool  $uuid
      * @return string
      *
      * @throws \Exception
      */
-    public function create($name, $path, $table = null, $create = false)
+    public function create($name, $path, $table = null, $create = false, $uuid = false)
     {
         $this->ensureMigrationDoesntAlreadyExist($name, $path);
 
@@ -67,8 +68,9 @@ class MigrationCreator
 
         $this->files->ensureDirectoryExists(dirname($path));
 
+        $primary = $uuid ? "uuid('id')" : "id()";
         $this->files->put(
-            $path, $this->populateStub($stub, $table)
+            $path, $this->populateStub($stub, $table, $primary)
         );
 
         // Next, we will fire any hooks that are supposed to fire after a migration is
@@ -134,17 +136,19 @@ class MigrationCreator
      *
      * @param  string  $stub
      * @param  string|null  $table
+     * @param  bool  $primary
      * @return string
      */
-    protected function populateStub($stub, $table)
+    protected function populateStub($stub, $table, $primary)
     {
         // Here we will replace the table place-holders with the table specified by
         // the developer, which is useful for quickly creating a tables creation
         // or update migration from the console instead of typing it manually.
         if (! is_null($table)) {
             $stub = str_replace(
-                ['DummyTable', '{{ table }}', '{{table}}'],
-                $table, $stub
+                ['DummyTable', '{{ table }}', '{{table}}', '{{ primary }}'],
+                [$table, $table, $table, $primary],
+                $stub,
             );
         }
 

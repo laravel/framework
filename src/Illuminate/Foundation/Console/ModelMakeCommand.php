@@ -118,6 +118,7 @@ class ModelMakeCommand extends GeneratorCommand
             'name' => "create_{$table}_table",
             '--create' => $table,
             '--fullpath' => true,
+            '--uuid' => $this->option('uuid'),
         ]);
     }
 
@@ -184,6 +185,10 @@ class ModelMakeCommand extends GeneratorCommand
             return $this->resolveStubPath('/stubs/model.morph-pivot.stub');
         }
 
+        if ($this->option('uuid')) {
+            return $this->resolveStubPath('/stubs/model-uuid.stub');
+        }
+
         return $this->resolveStubPath('/stubs/model.stub');
     }
 
@@ -231,6 +236,7 @@ class ModelMakeCommand extends GeneratorCommand
             ['resource', 'r', InputOption::VALUE_NONE, 'Indicates if the generated controller should be a resource controller'],
             ['api', null, InputOption::VALUE_NONE, 'Indicates if the generated controller should be an API resource controller'],
             ['requests', 'R', InputOption::VALUE_NONE, 'Create new form request classes and use them in the resource controller'],
+            ['uuid', 'u', InputOption::VALUE_NONE, 'Set UUID as the default primary key for the model'],
         ];
     }
 }
