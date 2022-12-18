@@ -139,7 +139,10 @@ class MigrateMakeCommand extends BaseCommand
     }
 
     /**
-     * Get the primary key to use. If null, migration will resolve to default 'id()'
+     * Get the primary key to use.
+     *
+     * If null, migration will resolve to default 'id()'.
+     * If both '--uuid' and '--ulid' are present, '--uuid' will take precedence
      *
      * @return string|null
      */
