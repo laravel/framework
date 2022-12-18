@@ -34,6 +34,7 @@ use Illuminate\Foundation\Console\ConfigClearCommand;
 use Illuminate\Foundation\Console\ConsoleMakeCommand;
 use Illuminate\Foundation\Console\DocsCommand;
 use Illuminate\Foundation\Console\DownCommand;
+use Illuminate\Foundation\Console\EnumMakeCommand;
 use Illuminate\Foundation\Console\EnvironmentCommand;
 use Illuminate\Foundation\Console\EnvironmentDecryptCommand;
 use Illuminate\Foundation\Console\EnvironmentEncryptCommand;
@@ -167,6 +168,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'ConsoleMake' => ConsoleMakeCommand::class,
         'ControllerMake' => ControllerMakeCommand::class,
         'Docs' => DocsCommand::class,
+        'EnumMake' => EnumMakeCommand::class,
         'EventGenerate' => EventGenerateCommand::class,
         'EventMake' => EventMakeCommand::class,
         'ExceptionMake' => ExceptionMakeCommand::class,
@@ -365,6 +367,18 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     {
         $this->app->singleton(ControllerMakeCommand::class, function ($app) {
             return new ControllerMakeCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerEnumMakeCommand()
+    {
+        $this->app->singleton(EnumMakeCommand::class, function ($app) {
+            return new EnumMakeCommand($app['files']);
         });
     }
 
