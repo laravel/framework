@@ -1137,11 +1137,13 @@ class PostgresGrammar extends Grammar
     protected function modifyVirtualAs(Blueprint $blueprint, Fluent $column)
     {
         if ($column->change) {
-            if (array_key_exists('virtualAs', $column->getAttributes()) && is_null($column->virtualAs)) {
-                return 'drop expression if exists';
+            if (array_key_exists('virtualAs', $column->getAttributes())) {
+                return is_null($column->virtualAs)
+                    ? 'drop expression if exists'
+                    : throw new LogicException('This database driver does not support modifying generated columns.');
             }
 
-            throw new LogicException('This database driver does not support modifying generated columns.');
+            return null;
         }
 
         if (! is_null($column->virtualAs)) {
@@ -1159,11 +1161,13 @@ class PostgresGrammar extends Grammar
     protected function modifyStoredAs(Blueprint $blueprint, Fluent $column)
     {
         if ($column->change) {
-            if (array_key_exists('storedAs', $column->getAttributes()) && is_null($column->storedAs)) {
-                return 'drop expression if exists';
+            if (array_key_exists('storedAs', $column->getAttributes())) {
+                return is_null($column->storedAs)
+                    ? 'drop expression if exists'
+                    : throw new LogicException('This database driver does not support modifying generated columns.');
             }
 
-            throw new LogicException('This database driver does not support modifying generated columns.');
+            return null;
         }
 
         if (! is_null($column->storedAs)) {
