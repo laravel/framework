@@ -7,7 +7,7 @@ enum {{ class }}: int
   /**
    * Default case
    */
-  case Default = 'default';
+  case Default = 0;
 
   public static function names(): array
   {
