@@ -460,7 +460,8 @@ function normaliseDetails($method)
  * @param  \ReflectionMethodDecorator  $method
  * @return \Illuminate\Support\Collection<int, \ReflectionParameter|\DynamicParameter>
  */
-function resolveParameters($method) {
+function resolveParameters($method)
+{
     $dynamicParameters = resolveDocParameters($method)
         ->skip($method->getNumberOfParameters())
         ->mapInto(DynamicParameter::class);
