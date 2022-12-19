@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Migrations;
 
 use Closure;
+use Illuminate\Database\Schema\Builder;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -55,7 +56,7 @@ class MigrationCreator
      *
      * @throws \Exception
      */
-    public function create($name, $path, $table = null, $create = false, $primary = 'default')
+    public function create($name, $path, $table = null, $create = false)
     {
         $this->ensureMigrationDoesntAlreadyExist($name, $path);
 
@@ -68,10 +69,8 @@ class MigrationCreator
 
         $this->files->ensureDirectoryExists(dirname($path));
 
-        $primary = $this->getPrimaryKeyField($primary);
-
         $this->files->put(
-            $path, $this->populateStub($stub, $table, $primary)
+            $path, $this->populateStub($stub, $table)
         );
 
         // Next, we will fire any hooks that are supposed to fire after a migration is
@@ -140,7 +139,7 @@ class MigrationCreator
      * @param  bool  $primary
      * @return string
      */
-    protected function populateStub($stub, $table, $primary)
+    protected function populateStub($stub, $table)
     {
         // Here we will replace the table place-holders with the table specified by
         // the developer, which is useful for quickly creating a tables creation
@@ -148,7 +147,7 @@ class MigrationCreator
         if (! is_null($table)) {
             $stub = str_replace(
                 ['DummyTable', '{{ table }}', '{{table}}', '{{ primary }}'],
-                [$table, $table, $table, $primary],
+                [$table, $table, $table, $this->getPrimaryKeyField()],
                 $stub,
             );
         }
@@ -215,14 +214,15 @@ class MigrationCreator
     }
 
     /**
-     * Get the equivalent primary key method.
+     * Get the equivalent primary key method to use.
      *
      * @return string
      */
-    protected function getPrimaryKeyField($primaryType)
+    protected function getPrimaryKeyField()
     {
-        if (in_array($primaryType, ['uuid', 'ulid'])) {
-            return "{$primaryType}('id')";
+        $keyType = Builder::$defaultMorphKeyType;
+        if (in_array($keyType, ['uuid', 'ulid'])) {
+            return "{$keyType}('id')";
         }
 
         return 'id()';

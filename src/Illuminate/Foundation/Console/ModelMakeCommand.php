@@ -5,7 +5,7 @@ namespace Illuminate\Foundation\Console;
 use Illuminate\Console\Command;
 use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
-use Illuminate\Database\Concerns\SetsPrimaryType;
+use Illuminate\Database\Schema\Builder;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
@@ -13,7 +13,7 @@ use Symfony\Component\Console\Input\InputOption;
 #[AsCommand(name: 'make:model')]
 class ModelMakeCommand extends GeneratorCommand
 {
-    use CreatesMatchingTest, SetsPrimaryType;
+    use CreatesMatchingTest;
 
     /**
      * The console command name.
@@ -116,11 +116,12 @@ class ModelMakeCommand extends GeneratorCommand
             $table = Str::singular($table);
         }
 
+        Builder::defaultMorphKeyType($this->option('primary') ?: 'int');
         $this->call('make:migration', [
             'name' => "create_{$table}_table",
             '--create' => $table,
             '--fullpath' => true,
-            '--primary' => $this->option('primary') ?: 'default',
+            '--primary' => Builder::$defaultMorphKeyType,
         ]);
     }
 
@@ -187,10 +188,8 @@ class ModelMakeCommand extends GeneratorCommand
             return $this->resolveStubPath('/stubs/model.morph-pivot.stub');
         }
 
-        if ($this->option('primary')) {
-            $primaryType = $this->evaluatePrimaryType($this->option('primary'));
-
-            return $this->resolveStubPath("/stubs/model-$primaryType.stub");
+        if ($this->option('primary') && in_array($this->option('primary'), ['uuid', 'ulid'])) {
+            return $this->resolveStubPath("/stubs/model-{$this->option('primary')}.stub");
         }
 
         return $this->resolveStubPath('/stubs/model.stub');
@@ -240,7 +239,7 @@ class ModelMakeCommand extends GeneratorCommand
             ['resource', 'r', InputOption::VALUE_NONE, 'Indicates if the generated controller should be a resource controller'],
             ['api', null, InputOption::VALUE_NONE, 'Indicates if the generated controller should be an API resource controller'],
             ['requests', 'R', InputOption::VALUE_NONE, 'Create new form request classes and use them in the resource controller'],
-            ['primary', 'P', InputOption::VALUE_OPTIONAL, 'Set default primary key type for the model <info>[default, uuid, ulid]</info>', 'default'],
+            ['primary', 'P', InputOption::VALUE_OPTIONAL, 'Set default primary key type for the model <info>[int, uuid, ulid]</info>', 'int'],
         ];
     }
 }
