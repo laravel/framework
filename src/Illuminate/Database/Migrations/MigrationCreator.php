@@ -55,7 +55,7 @@ class MigrationCreator
      *
      * @throws \Exception
      */
-    public function create($name, $path, $table = null, $create = false, $primary = null)
+    public function create($name, $path, $table = null, $create = false, $primary = 'default')
     {
         $this->ensureMigrationDoesntAlreadyExist($name, $path);
 
@@ -68,7 +68,7 @@ class MigrationCreator
 
         $this->files->ensureDirectoryExists(dirname($path));
 
-        $primary = $primary ?: 'id()';
+        $primary = $this->getPrimaryKeyField($primary);
 
         $this->files->put(
             $path, $this->populateStub($stub, $table, $primary)
@@ -212,6 +212,23 @@ class MigrationCreator
     protected function getDatePrefix()
     {
         return date('Y_m_d_His');
+    }
+
+    /**
+     * Get the equivalent primary key method.
+     *
+     * @return string
+     */
+    protected function getPrimaryKeyField($primary)
+    {
+        if ($primary === 'UUID') {
+            return 'uuid(\'id\')';
+        }
+        if ($primary === 'ULID') {
+            return 'ulid(\'id\')';
+        }
+
+        return 'id()';
     }
 
     /**

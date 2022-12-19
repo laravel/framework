@@ -19,8 +19,7 @@ class MigrateMakeCommand extends BaseCommand
         {--path= : The location where the migration file should be created}
         {--realpath : Indicate any provided migration file paths are pre-resolved absolute paths}
         {--fullpath : Output the full path of the migration}
-        {--uuid : Set UUID as default primary key of the table}
-        {--ulid : Set ULID as default primary key of the table}';
+        {--p|primary : Set default primary key for the table}';
 
     /**
      * The console command description.
@@ -74,7 +73,7 @@ class MigrateMakeCommand extends BaseCommand
 
         $create = $this->input->getOption('create') ?: false;
 
-        $primary = $this->getPrimaryKey();
+        $primary = $this->getPrimaryKey($table);
 
         // If no table was given as an option but a create option is given then we
         // will use the "create" option as the table name. This allows the devs
@@ -141,21 +140,14 @@ class MigrateMakeCommand extends BaseCommand
     /**
      * Get the primary key to use.
      *
-     * If null, migration will resolve to default 'id()'.
-     * If both '--uuid' and '--ulid' are present, '--uuid' will take precedence
-     *
-     * @return string|null
+     * @return string
      */
-    protected function getPrimaryKey()
+    protected function getPrimaryKey($table)
     {
-        if ($this->input->getOption('uuid')) {
-            return 'uuid(\'id\')';
-        }
-
-        if ($this->input->getOption('ulid')) {
-            return 'ulid(\'id\')';
-        }
-
-        return null;
+        return $this->choice(
+            'What primary key do you want for the ' . $table . '?',
+            ['default', 'UUID', 'ULID'],
+            0
+        );
     }
 }
