@@ -1029,7 +1029,7 @@ class Builder implements BuilderContract
         $this->wheres[] = compact('type', 'column', 'values', 'boolean');
 
         if (count($values) !== count(Arr::flatten($values, 1))) {
-            throw new InvalidArgumentException("Nested arrays may not be passed to whereIn method.");
+            throw new InvalidArgumentException('Nested arrays may not be passed to whereIn method.');
         }
 
         // Finally, we'll add a binding for each value unless that value is an expression
