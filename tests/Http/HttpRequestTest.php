@@ -5,10 +5,11 @@ namespace Illuminate\Tests\Http;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Routing\Route;
+use Illuminate\Routing\UrlGenerator;
+use Illuminate\Routing\RouteCollection;
 use Illuminate\Session\Store;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\URL;
 use Illuminate\Tests\Database\Fixtures\Models\Money\Price;
 use InvalidArgumentException;
 use Mockery as m;
@@ -18,6 +19,7 @@ use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Illuminate\Container\Container;
 
 if (PHP_VERSION_ID >= 80100) {
     include 'Enums.php';
@@ -130,9 +132,10 @@ class HttpRequestTest extends TestCase
         $request = Request::create('http://foo.com/foo/bar/?');
         $this->assertSame('http://foo.com/foo/bar', $request->url());
 
-        URL::forceScheme('foo-bar');
         $request = Request::create('foo-bar://foo.com/foo/bar');
-        $this->assertSame('foo-bar://foo.com/foo/bar', $request->url());
+        $urlGenerator = $this->getUrlGenerator($request);
+        $urlGenerator->forceScheme('foo-bar');
+        $this->assertSame('foo-bar://foo.com:80/foo/bar', $request->url());
     }
 
     public function testFullUrlMethod()
@@ -334,8 +337,9 @@ class HttpRequestTest extends TestCase
         $request = Request::create('https://example.com:8080');
         $this->assertSame('https://example.com:8080', $request->schemeAndHttpHost());
 
-        URL::forceScheme('foo-bar');
         $request = Request::create('foo-bar://example.com:8080');
+        $urlGenerator = $this->getUrlGenerator($request);
+        $urlGenerator->forceScheme('foo-bar');
         $this->assertSame('foo-bar://example.com:8080', $request->schemeAndHttpHost());
     }
 
@@ -1054,7 +1058,8 @@ class HttpRequestTest extends TestCase
     public function testPrefersMethod($accept, $prefers, $expected)
     {
         $this->assertSame(
-            $expected, Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => $accept])->prefers($prefers)
+            $expected,
+            Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => $accept])->prefers($prefers)
         );
     }
 
@@ -1534,5 +1539,14 @@ class HttpRequestTest extends TestCase
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'email' => 'foo']);
         $request->setLaravelSession($session);
         $request->flashExcept(['email']);
+    }
+
+    public function getUrlGenerator($request)
+    {
+        $container = new Container;
+        $urlGenerator = new UrlGenerator(new RouteCollection, $request);
+        $container->singleton(UrlGenerator::class, fn () =>  $urlGenerator);
+
+        return $urlGenerator;
     }
 }
