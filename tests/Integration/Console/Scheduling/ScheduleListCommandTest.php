@@ -11,6 +11,8 @@ use Orchestra\Testbench\TestCase;
 
 class ScheduleListCommandTest extends TestCase
 {
+    public $schedule;
+
     protected function setUp(): void
     {
         parent::setUp();

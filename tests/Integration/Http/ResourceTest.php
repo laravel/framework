@@ -1445,7 +1445,7 @@ class ResourceTest extends TestCase
                     'Mohamed',
                     $this->mergeWhen(false, ['Adam', 'Matt']),
                     'Jeffrey',
-                    $this->mergeWhen(false, (['Abigail', 'Lydia'])),
+                    $this->mergeWhen(false, ['Abigail', 'Lydia']),
                 ]);
             }
         };

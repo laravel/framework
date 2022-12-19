@@ -129,11 +129,12 @@ class WorkCommand extends Command
      */
     protected function runWorker($connection, $queue)
     {
-        return $this->worker->setName($this->option('name'))
-                     ->setCache($this->cache)
-                     ->{$this->option('once') ? 'runNextJob' : 'daemon'}(
-            $connection, $queue, $this->gatherWorkerOptions()
-        );
+        return $this->worker
+            ->setName($this->option('name'))
+            ->setCache($this->cache)
+            ->{$this->option('once') ? 'runNextJob' : 'daemon'}(
+                $connection, $queue, $this->gatherWorkerOptions()
+            );
     }
 
     /**

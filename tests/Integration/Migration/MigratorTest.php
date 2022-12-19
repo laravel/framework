@@ -14,6 +14,8 @@ class MigratorTest extends TestCase
      */
     private $output;
 
+    public $subject;
+
     protected function setUp(): void
     {
         parent::setUp();
