@@ -368,7 +368,7 @@ class PendingCommand
     protected function mockConsoleOutput()
     {
         $mock = Mockery::mock(OutputStyle::class.'[askQuestion]', [
-            (new ArrayInput($this->parameters)), $this->createABufferedOutputMock(),
+            new ArrayInput($this->parameters), $this->createABufferedOutputMock(),
         ]);
 
         foreach ($this->test->expectedQuestions as $i => $question) {
