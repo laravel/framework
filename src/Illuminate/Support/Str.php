@@ -269,14 +269,14 @@ class Str
     /**
      * Convert a string to "dot" notation.
      *
-     * @param string $value
+     * @param  string  $value
      * @return string
      */
     public static function dot($value)
     {
-       return static::snake(static::replace(
+        return static::snake(static::replace(
            ['-', '_'], ' ', implode(static::ucsplit($value))
-       ), '.');
+        ), '.');
     }
 
     /**
