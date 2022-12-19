@@ -327,30 +327,36 @@ class SupportHelpersTest extends TestCase
 
     public function testClassUsesRecursiveShouldReturnTraitsOnParentClasses()
     {
-        $this->assertSame([
-            SupportTestTraitTwo::class => SupportTestTraitTwo::class,
-            SupportTestTraitOne::class => SupportTestTraitOne::class,
-        ],
-        class_uses_recursive(SupportTestClassTwo::class));
+        $this->assertSame(
+            [
+                SupportTestTraitTwo::class => SupportTestTraitTwo::class,
+                SupportTestTraitOne::class => SupportTestTraitOne::class,
+            ],
+            class_uses_recursive(SupportTestClassTwo::class)
+        );
     }
 
     public function testClassUsesRecursiveAcceptsObject()
     {
-        $this->assertSame([
-            SupportTestTraitTwo::class => SupportTestTraitTwo::class,
-            SupportTestTraitOne::class => SupportTestTraitOne::class,
-        ],
-        class_uses_recursive(new SupportTestClassTwo));
+        $this->assertSame(
+            [
+                SupportTestTraitTwo::class => SupportTestTraitTwo::class,
+                SupportTestTraitOne::class => SupportTestTraitOne::class,
+            ],
+            class_uses_recursive(new SupportTestClassTwo)
+        );
     }
 
     public function testClassUsesRecursiveReturnParentTraitsFirst()
     {
-        $this->assertSame([
-            SupportTestTraitTwo::class => SupportTestTraitTwo::class,
-            SupportTestTraitOne::class => SupportTestTraitOne::class,
-            SupportTestTraitThree::class => SupportTestTraitThree::class,
-        ],
-        class_uses_recursive(SupportTestClassThree::class));
+        $this->assertSame(
+            [
+                SupportTestTraitTwo::class => SupportTestTraitTwo::class,
+                SupportTestTraitOne::class => SupportTestTraitOne::class,
+                SupportTestTraitThree::class => SupportTestTraitThree::class,
+            ],
+            class_uses_recursive(SupportTestClassThree::class)
+        );
     }
 
     public function testTap()

@@ -272,7 +272,7 @@ trait ValidatesAttributes
             $secondDate = $this->getDateTimeWithOptionalFormat($format, $second);
         }
 
-        return ($firstDate && $secondDate) && ($this->compare($firstDate, $secondDate, $operator));
+        return ($firstDate && $secondDate) && $this->compare($firstDate, $secondDate, $operator);
     }
 
     /**

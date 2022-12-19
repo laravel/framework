@@ -150,7 +150,7 @@ class PhpRedisConnector implements Connector
             }
         }
 
-        $client->{($persistent ? 'pconnect' : 'connect')}(...$parameters);
+        $client->{$persistent ? 'pconnect' : 'connect'}(...$parameters);
     }
 
     /**

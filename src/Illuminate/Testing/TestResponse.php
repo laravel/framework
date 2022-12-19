@@ -575,7 +575,7 @@ EOF;
     {
         $value = Arr::wrap($value);
 
-        $values = $escape ? array_map('e', ($value)) : $value;
+        $values = $escape ? array_map('e', $value) : $value;
 
         foreach ($values as $value) {
             PHPUnit::assertStringContainsString((string) $value, $this->getContent());
@@ -593,7 +593,7 @@ EOF;
      */
     public function assertSeeInOrder(array $values, $escape = true)
     {
-        $values = $escape ? array_map('e', ($values)) : $values;
+        $values = $escape ? array_map('e', $values) : $values;
 
         PHPUnit::assertThat($values, new SeeInOrder($this->getContent()));
 
@@ -611,7 +611,7 @@ EOF;
     {
         $value = Arr::wrap($value);
 
-        $values = $escape ? array_map('e', ($value)) : $value;
+        $values = $escape ? array_map('e', $value) : $value;
 
         tap(strip_tags($this->getContent()), function ($content) use ($values) {
             foreach ($values as $value) {
@@ -631,7 +631,7 @@ EOF;
      */
     public function assertSeeTextInOrder(array $values, $escape = true)
     {
-        $values = $escape ? array_map('e', ($values)) : $values;
+        $values = $escape ? array_map('e', $values) : $values;
 
         PHPUnit::assertThat($values, new SeeInOrder(strip_tags($this->getContent())));
 
@@ -649,7 +649,7 @@ EOF;
     {
         $value = Arr::wrap($value);
 
-        $values = $escape ? array_map('e', ($value)) : $value;
+        $values = $escape ? array_map('e', $value) : $value;
 
         foreach ($values as $value) {
             PHPUnit::assertStringNotContainsString((string) $value, $this->getContent());
@@ -669,7 +669,7 @@ EOF;
     {
         $value = Arr::wrap($value);
 
-        $values = $escape ? array_map('e', ($value)) : $value;
+        $values = $escape ? array_map('e', $value) : $value;
 
         tap(strip_tags($this->getContent()), function ($content) use ($values) {
             foreach ($values as $value) {

@@ -77,6 +77,7 @@ class RedisQueueIntegrationTest extends TestCase
 
     /**
      * @dataProvider redisDriverProvider
+     *
      * @requires extension pcntl
      *
      * @param  mixed  $driver
