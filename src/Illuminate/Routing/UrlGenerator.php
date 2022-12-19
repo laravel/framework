@@ -675,6 +675,7 @@ class UrlGenerator implements UrlGeneratorContract
         $this->cachedScheme = null;
 
         $this->forceScheme = $scheme ? $scheme.'://' : null;
+        $this->request->setForceScheme($this->forceScheme);
     }
 
     /**

@@ -57,6 +57,13 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     protected $routeResolver;
 
     /**
+     * The force scheme.
+     *
+     * @var string|null
+     */
+    protected $forceScheme;
+
+    /**
      * Create a new Illuminate HTTP request from server variables.
      *
      * @return static
@@ -414,6 +421,14 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getScheme(): string
+    {
+        return Str::remove('://', $this->forceScheme) ?? parent::getScheme();
+    }
+
+    /**
      * Get the input source for the request.
      *
      * @return \Symfony\Component\HttpFoundation\ParameterBag
@@ -702,6 +717,19 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     public function setRouteResolver(Closure $callback)
     {
         $this->routeResolver = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Set force scheme.
+     *
+     * @param  string|null  $forceScheme
+     * @return $this
+     */
+    public function setForceScheme($forceScheme)
+    {
+        $this->forceScheme = $forceScheme;
 
         return $this;
     }
