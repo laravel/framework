@@ -555,7 +555,7 @@ trait ValidatesAttributes
     }
 
     /**
-     * Validate that an attribute has decimal figures between a set of values.
+     * Validate that an attribute has a given number of decimal places.
      *
      * @param  string  $attribute
      * @param  mixed  $value
@@ -571,15 +571,13 @@ trait ValidatesAttributes
         $this->requireParameterCount(1, $parameters, 'decimal');
 
         $matches = [];
+
         preg_match('/^\d*.(\d*)$/', $value, $matches);
 
         $decimals = strlen(end($matches));
 
-        if ($decimals < $parameters[0]) {
-            return false;
-        }
-
-        return !isset($parameters[1]) || $decimals <= $parameters[1];
+        return $decimals >= $parameters[0] &&
+               (! isset($parameters[1]) || $decimals <= $parameters[1]);
     }
 
     /**
