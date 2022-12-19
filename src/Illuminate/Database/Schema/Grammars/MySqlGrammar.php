@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Schema\Grammars;
 
 use Illuminate\Database\Connection;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Fluent;
 use RuntimeException;
@@ -16,7 +17,7 @@ class MySqlGrammar extends Grammar
      */
     protected $modifiers = [
         'Unsigned', 'Charset', 'Collate', 'VirtualAs', 'StoredAs', 'Nullable', 'Invisible',
-        'Srid', 'Default', 'Increment', 'Comment', 'After', 'First',
+        'Srid', 'Default', 'OnUpdate', 'Increment', 'Comment', 'After', 'First',
     ];
 
     /**
@@ -235,9 +236,6 @@ class MySqlGrammar extends Grammar
             $columns = [];
 
             foreach ($blueprint->getChangedColumns() as $column) {
-                // Each of the column types has their own compiler functions, which are tasked
-                // with turning the column definition into its SQL format for this platform
-                // used by the connection. The column's modifiers are compiled and added.
                 $sql = $this->wrap($column).' '.$this->getType($column);
 
                 $columns[] = $this->addModifiers($sql, $blueprint, $column);
@@ -786,13 +784,17 @@ class MySqlGrammar extends Grammar
      */
     protected function typeDateTime(Fluent $column)
     {
-        $columnType = $column->precision ? "datetime($column->precision)" : 'datetime';
-
         $current = $column->precision ? "CURRENT_TIMESTAMP($column->precision)" : 'CURRENT_TIMESTAMP';
 
-        $columnType = $column->useCurrent ? "$columnType default $current" : $columnType;
+        if ($column->useCurrent) {
+            $column->default(new Expression($current));
+        }
 
-        return $column->useCurrentOnUpdate ? "$columnType on update $current" : $columnType;
+        if ($column->useCurrentOnUpdate) {
+            $column->onUpdate(new Expression($current));
+        }
+
+        return $column->precision ? "datetime($column->precision)" : 'datetime';
     }
 
     /**
@@ -836,13 +838,17 @@ class MySqlGrammar extends Grammar
      */
     protected function typeTimestamp(Fluent $column)
     {
-        $columnType = $column->precision ? "timestamp($column->precision)" : 'timestamp';
-
         $current = $column->precision ? "CURRENT_TIMESTAMP($column->precision)" : 'CURRENT_TIMESTAMP';
 
-        $columnType = $column->useCurrent ? "$columnType default $current" : $columnType;
+        if ($column->useCurrent) {
+            $column->default(new Expression($current));
+        }
 
-        return $column->useCurrentOnUpdate ? "$columnType on update $current" : $columnType;
+        if ($column->useCurrentOnUpdate) {
+            $column->onUpdate(new Expression($current));
+        }
+
+        return $column->precision ? "timestamp($column->precision)" : 'timestamp';
     }
 
     /**
@@ -1200,6 +1206,20 @@ class MySqlGrammar extends Grammar
     {
         if (! is_null($column->comment)) {
             return " comment '".addslashes($column->comment)."'";
+        }
+    }
+
+    /**
+     * Get the SQL for an "on update" column modifier.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string|null
+     */
+    protected function modifyOnUpdate(Blueprint $blueprint, Fluent $column)
+    {
+        if (! is_null($column->onUpdate)) {
+            return ' on update '.$column->onUpdate;
         }
     }
 
