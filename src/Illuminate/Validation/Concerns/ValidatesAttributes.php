@@ -564,7 +564,7 @@ trait ValidatesAttributes
      */
     public function validateDecimal($attribute, $value, $parameters)
     {
-        if (!$this->validateNumeric($attribute, $value)) {
+        if (! $this->validateNumeric($attribute, $value)) {
             return false;
         }
 
