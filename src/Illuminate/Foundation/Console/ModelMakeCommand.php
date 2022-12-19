@@ -2,8 +2,10 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Illuminate\Console\Command;
 use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
+use Illuminate\Database\Concerns\SetsPrimaryType;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
@@ -11,7 +13,7 @@ use Symfony\Component\Console\Input\InputOption;
 #[AsCommand(name: 'make:model')]
 class ModelMakeCommand extends GeneratorCommand
 {
-    use CreatesMatchingTest;
+    use CreatesMatchingTest, SetsPrimaryType;
 
     /**
      * The console command name.
@@ -118,8 +120,7 @@ class ModelMakeCommand extends GeneratorCommand
             'name' => "create_{$table}_table",
             '--create' => $table,
             '--fullpath' => true,
-            '--uuid' => $this->option('uuid') ?: false,
-            '--ulid' => $this->option('ulid') ?: false,
+            '--primary' => $this->option('primary') ?: 'default',
         ]);
     }
 
@@ -186,12 +187,10 @@ class ModelMakeCommand extends GeneratorCommand
             return $this->resolveStubPath('/stubs/model.morph-pivot.stub');
         }
 
-        if ($this->option('uuid')) {
-            return $this->resolveStubPath('/stubs/model-uuid.stub');
-        }
+        if ($this->option('primary')) {
+            $primaryType = $this->evaluatePrimaryType($this->option('primary'));
 
-        if ($this->option('ulid')) {
-            return $this->resolveStubPath('/stubs/model-ulid.stub');
+            return $this->resolveStubPath("/stubs/model-$primaryType.stub");
         }
 
         return $this->resolveStubPath('/stubs/model.stub');
@@ -241,8 +240,7 @@ class ModelMakeCommand extends GeneratorCommand
             ['resource', 'r', InputOption::VALUE_NONE, 'Indicates if the generated controller should be a resource controller'],
             ['api', null, InputOption::VALUE_NONE, 'Indicates if the generated controller should be an API resource controller'],
             ['requests', 'R', InputOption::VALUE_NONE, 'Create new form request classes and use them in the resource controller'],
-            ['uuid', null, InputOption::VALUE_NONE, 'Use UUID as the default primary key for the model'],
-            ['ulid', null, InputOption::VALUE_NONE, 'Use ULID as the default primary key for the model'],
+            ['primary', 'P', InputOption::VALUE_OPTIONAL, 'Set default primary key type for the model <info>[default, uuid, ulid]</info>', 'default'],
         ];
     }
 }

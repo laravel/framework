@@ -219,13 +219,10 @@ class MigrationCreator
      *
      * @return string
      */
-    protected function getPrimaryKeyField($primary)
+    protected function getPrimaryKeyField($primaryType)
     {
-        if ($primary === 'UUID') {
-            return 'uuid(\'id\')';
-        }
-        if ($primary === 'ULID') {
-            return 'ulid(\'id\')';
+        if (in_array($primaryType, ['uuid', 'ulid'])) {
+            return "{$primaryType}('id')";
         }
 
         return 'id()';

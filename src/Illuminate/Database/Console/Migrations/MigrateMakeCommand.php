@@ -2,12 +2,15 @@
 
 namespace Illuminate\Database\Console\Migrations;
 
+use Illuminate\Database\Concerns\SetsPrimaryType;
 use Illuminate\Database\Migrations\MigrationCreator;
 use Illuminate\Support\Composer;
 use Illuminate\Support\Str;
 
 class MigrateMakeCommand extends BaseCommand
 {
+    use SetsPrimaryType;
+
     /**
      * The console command signature.
      *
@@ -19,7 +22,7 @@ class MigrateMakeCommand extends BaseCommand
         {--path= : The location where the migration file should be created}
         {--realpath : Indicate any provided migration file paths are pre-resolved absolute paths}
         {--fullpath : Output the full path of the migration}
-        {--p|primary : Set default primary key for the table}';
+        {--P|primary=default : Set default primary key type for the table <info>[default, uuid, ulid]</info>}';
 
     /**
      * The console command description.
@@ -73,7 +76,7 @@ class MigrateMakeCommand extends BaseCommand
 
         $create = $this->input->getOption('create') ?: false;
 
-        $primary = $this->getPrimaryKey($table);
+        $primaryType = $this->evaluatePrimaryType($this->input->getOption('primary'));
 
         // If no table was given as an option but a create option is given then we
         // will use the "create" option as the table name. This allows the devs
@@ -94,7 +97,7 @@ class MigrateMakeCommand extends BaseCommand
         // Now we are ready to write the migration out to disk. Once we've written
         // the migration out, we will dump-autoload for the entire framework to
         // make sure that the migrations are registered by the class loaders.
-        $this->writeMigration($name, $table, $create, $primary);
+        $this->writeMigration($name, $table, $create, $primaryType);
 
         $this->composer->dumpAutoloads();
     }
@@ -135,19 +138,5 @@ class MigrateMakeCommand extends BaseCommand
         }
 
         return parent::getMigrationPath();
-    }
-
-    /**
-     * Get the primary key to use.
-     *
-     * @return string
-     */
-    protected function getPrimaryKey($table)
-    {
-        return $this->choice(
-            'What primary key do you want for the ' . $table . '?',
-            ['default', 'UUID', 'ULID'],
-            0
-        );
     }
 }

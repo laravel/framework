@@ -28,8 +28,8 @@ class DatabaseMigrationMakeCommandTest extends TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $creator->shouldReceive('create')->once()
-                ->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', 'foo', true, null)
-                ->andReturn(__DIR__.'/migrations/2021_04_23_110457_create_foo.php');
+            ->with('create_foo', __DIR__ . DIRECTORY_SEPARATOR . 'migrations', 'foo', true, 'default')
+            ->andReturn(__DIR__ . '/migrations/2021_04_23_110457_create_foo.php');
         $composer->shouldReceive('dumpAutoloads')->once();
 
         $this->runCommand($command, ['name' => 'create_foo']);
@@ -45,8 +45,8 @@ class DatabaseMigrationMakeCommandTest extends TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $creator->shouldReceive('create')->once()
-                ->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', 'foo', true, null)
-                ->andReturn(__DIR__.'/migrations/2021_04_23_110457_create_foo.php');
+            ->with('create_foo', __DIR__ . DIRECTORY_SEPARATOR . 'migrations', 'foo', true, 'default')
+            ->andReturn(__DIR__ . '/migrations/2021_04_23_110457_create_foo.php');
 
         $this->runCommand($command, ['name' => 'create_foo']);
     }
@@ -61,8 +61,8 @@ class DatabaseMigrationMakeCommandTest extends TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $creator->shouldReceive('create')->once()
-                ->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', 'foo', true, null)
-                ->andReturn(__DIR__.'/migrations/2021_04_23_110457_create_foo.php');
+            ->with('create_foo', __DIR__ . DIRECTORY_SEPARATOR . 'migrations', 'foo', true, 'default')
+            ->andReturn(__DIR__ . '/migrations/2021_04_23_110457_create_foo.php');
 
         $this->runCommand($command, ['name' => 'CreateFoo']);
     }
@@ -77,8 +77,8 @@ class DatabaseMigrationMakeCommandTest extends TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $creator->shouldReceive('create')->once()
-                ->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', 'users', true, null)
-                ->andReturn(__DIR__.'/migrations/2021_04_23_110457_create_foo.php');
+            ->with('create_foo', __DIR__ . DIRECTORY_SEPARATOR . 'migrations', 'users', true, 'default')
+            ->andReturn(__DIR__ . '/migrations/2021_04_23_110457_create_foo.php');
 
         $this->runCommand($command, ['name' => 'create_foo', '--create' => 'users']);
     }
@@ -93,8 +93,8 @@ class DatabaseMigrationMakeCommandTest extends TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $creator->shouldReceive('create')->once()
-                ->with('create_users_table', __DIR__.DIRECTORY_SEPARATOR.'migrations', 'users', true, null)
-                ->andReturn(__DIR__.'/migrations/2021_04_23_110457_create_users_table.php');
+            ->with('create_users_table', __DIR__ . DIRECTORY_SEPARATOR . 'migrations', 'users', true, 'default')
+            ->andReturn(__DIR__ . '/migrations/2021_04_23_110457_create_users_table.php');
 
         $this->runCommand($command, ['name' => 'create_users_table']);
     }
@@ -109,12 +109,13 @@ class DatabaseMigrationMakeCommandTest extends TestCase
         $command->setLaravel($app);
         $app->setBasePath('/home/laravel');
         $creator->shouldReceive('create')->once()
-                ->with('create_foo', '/home/laravel/vendor/laravel-package/migrations', 'users', true, null)
-                ->andReturn('/home/laravel/vendor/laravel-package/migrations/2021_04_23_110457_create_foo.php');
-        $this->runCommand($command, ['name' => 'create_foo', '--path' => 'vendor/laravel-package/migrations', '--create' => 'users']);
+            ->with('create_foo', '/home/laravel/vendor/laravel-package/migrations', 'users', true, 'default')
+            ->andReturn('/home/laravel/vendor/laravel-package/migrations/2021_04_23_110457_create_foo.php');
+        $this->runCommand($command,
+            ['name' => 'create_foo', '--path' => 'vendor/laravel-package/migrations', '--create' => 'users']);
     }
 
-    public function testCanSpecifyUuidToCreateMigrations()
+    public function testCanSpecifyEmptyPrimaryOptionToCreateMigrations()
     {
         $command = new MigrateMakeCommand(
             $creator = m::mock(MigrationCreator::class),
@@ -124,13 +125,13 @@ class DatabaseMigrationMakeCommandTest extends TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $creator->shouldReceive('create')->once()
-            ->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', 'foo', true, 'uuid(\'id\')')
-            ->andReturn(__DIR__.'/migrations/2021_04_23_110457_create_foo.php');
+            ->with('create_foo', __DIR__ . DIRECTORY_SEPARATOR . 'migrations', 'foo', true, 'default')
+            ->andReturn(__DIR__ . '/migrations/2021_04_23_110457_create_foo.php');
 
-        $this->runCommand($command, ['name' => 'create_foo', '--uuid' => true]);
+        $this->runCommand($command, ['name' => 'create_foo', '--primary' => null]);
     }
 
-    public function testCanSpecifyUlidToCreateMigrations()
+    public function testCanSpecifyDefaultPrimaryOptionToCreateMigrations()
     {
         $command = new MigrateMakeCommand(
             $creator = m::mock(MigrationCreator::class),
@@ -140,10 +141,42 @@ class DatabaseMigrationMakeCommandTest extends TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $creator->shouldReceive('create')->once()
-            ->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', 'foo', true, 'ulid(\'id\')')
-            ->andReturn(__DIR__.'/migrations/2021_04_23_110457_create_foo.php');
+            ->with('create_foo', __DIR__ . DIRECTORY_SEPARATOR . 'migrations', 'foo', true, 'default')
+            ->andReturn(__DIR__ . '/migrations/2021_04_23_110457_create_foo.php');
 
-        $this->runCommand($command, ['name' => 'create_foo', '--ulid' => true]);
+        $this->runCommand($command, ['name' => 'create_foo', '--primary' => 'default']);
+    }
+
+    public function testCanSpecifyUuidPrimaryOptionToCreateMigrations()
+    {
+        $command = new MigrateMakeCommand(
+            $creator = m::mock(MigrationCreator::class),
+            m::mock(Composer::class)->shouldIgnoreMissing()
+        );
+        $app = new Application;
+        $app->useDatabasePath(__DIR__);
+        $command->setLaravel($app);
+        $creator->shouldReceive('create')->once()
+            ->with('create_foo', __DIR__ . DIRECTORY_SEPARATOR . 'migrations', 'foo', true, 'uuid')
+            ->andReturn(__DIR__ . '/migrations/2021_04_23_110457_create_foo.php');
+
+        $this->runCommand($command, ['name' => 'create_foo', '--primary' => 'uuid']);
+    }
+
+    public function testCanSpecifyUlidPrimaryOptionToCreateMigrations()
+    {
+        $command = new MigrateMakeCommand(
+            $creator = m::mock(MigrationCreator::class),
+            m::mock(Composer::class)->shouldIgnoreMissing()
+        );
+        $app = new Application;
+        $app->useDatabasePath(__DIR__);
+        $command->setLaravel($app);
+        $creator->shouldReceive('create')->once()
+            ->with('create_foo', __DIR__ . DIRECTORY_SEPARATOR . 'migrations', 'foo', true, 'ulid')
+            ->andReturn(__DIR__ . '/migrations/2021_04_23_110457_create_foo.php');
+
+        $this->runCommand($command, ['name' => 'create_foo', '--primary' => 'ulid']);
     }
 
     protected function runCommand($command, $input = [])
