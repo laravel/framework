@@ -174,7 +174,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
             .'modify `amount` double(6, 2) null invisible after `name`, '
             .'modify `added_at` timestamp(4) not null default CURRENT_TIMESTAMP(4) on update CURRENT_TIMESTAMP(4), '
             ."modify `difficulty` enum('easy', 'hard') character set utf8mb4 collate 'unicode' not null default 'easy', "
-            ."modify `positions` multipolygon as (expression) stored srid 1234, "
+            .'modify `positions` multipolygon as (expression) stored srid 1234, '
             ."modify `id` bigint unsigned not null auto_increment primary key comment 'my comment' first",
             'alter table `users` auto_increment = 10',
         ], $blueprint->toSql($connection, new MySqlGrammar));
