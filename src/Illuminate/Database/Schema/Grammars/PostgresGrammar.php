@@ -163,12 +163,10 @@ class PostgresGrammar extends Grammar
     public function compileChange(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
         if ($connection->usingNativeSchemaOperations()) {
-            $changes = [];
+            $columns = [];
 
             foreach ($blueprint->getChangedColumns() as $column) {
-                $sql = 'alter table '.$this->wrapTable($blueprint).' alter column '.$this->wrap($column);
-
-                $changes[] = $sql.' type '.$this->getType($column).$this->modifyCollate($blueprint, $column);
+                $changes = ['type '.$this->getType($column).$this->modifyCollate($blueprint, $column)];
 
                 foreach ($this->modifiers as $modifier) {
                     if (in_array($modifier, ['Collate', 'Increment'])) {
@@ -180,13 +178,15 @@ class PostgresGrammar extends Grammar
                         $constraints = (array) $this->{$method}($blueprint, $column);
 
                         foreach ($constraints as $constraint) {
-                            $changes[] = $sql.' '.$constraint;
+                            $changes[] = $constraint;
                         }
                     }
                 }
+
+                $columns[] = implode(', ', $this->prefixArray('alter column '.$this->wrap($column), $changes));
             }
 
-            return $changes;
+            return 'alter table '.$this->wrapTable($blueprint).' '.implode(', ', $columns);
         }
 
         return parent::compileChange($blueprint, $command, $connection);
