@@ -30,6 +30,13 @@ class SqlServerGrammar extends Grammar
     protected $serials = ['tinyInteger', 'smallInteger', 'mediumInteger', 'integer', 'bigInteger'];
 
     /**
+     * The commands to be executed outside of create or alter command.
+     *
+     * @var string[]
+     */
+    protected $fluentCommands = ['Default'];
+
+    /**
      * Compile a create database command.
      *
      * @param  string  $name
@@ -127,6 +134,43 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile a change column command into a series of SQL statements.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @param  \Illuminate\Database\Connection  $connection
+     * @return array|string
+     *
+     * @throws \RuntimeException
+     */
+    public function compileChange(Blueprint $blueprint, Fluent $command, Connection $connection)
+    {
+        if ($connection->usingNativeSchemaOperations()) {
+            $changes = [];
+
+            foreach ($blueprint->getChangedColumns() as $column) {
+                $sql = 'alter table '.$this->wrapTable($blueprint).' alter column '.$this->wrap($column);
+
+                foreach ($this->modifiers as $modifier) {
+                    if (in_array($modifier, ['Increment', 'Default'])) {
+                        continue;
+                    }
+
+                    if (method_exists($this, $method = "modify{$modifier}")) {
+                        $sql .= $this->{$method}($blueprint, $column);
+                    }
+                }
+
+                $changes[] = $sql;
+            }
+
+            return $changes;
+        }
+
+        return parent::compileChange($blueprint, $command, $connection);
+    }
+
+    /**
      * Compile a primary key command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
@@ -191,6 +235,28 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile a default command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string|null
+     */
+    public function compileDefault(Blueprint $blueprint, Fluent $command)
+    {
+        if ($command->column->change) {
+            $dropDefaultConstraintSql = $this->compileDropDefaultConstraint($blueprint, $command);
+
+            return is_null($command->value)
+                ? $dropDefaultConstraintSql
+                : $dropDefaultConstraintSql.sprintf('alter table %s add default %s for %s',
+                    $this->wrapTable($blueprint),
+                    $this->getDefaultValue($command->default),
+                    $this->wrap($command->column)
+                );
+        }
+    }
+
+    /**
      * Compile a drop table command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
@@ -238,7 +304,7 @@ class SqlServerGrammar extends Grammar
     {
         $columns = $this->wrapArray($command->columns);
 
-        $dropExistingConstraintsSql = $this->compileDropDefaultConstraint($blueprint, $command).';';
+        $dropExistingConstraintsSql = $this->compileDropDefaultConstraint($blueprint, $command);
 
         return $dropExistingConstraintsSql.'alter table '.$this->wrapTable($blueprint).' drop column '.implode(', ', $columns);
     }
@@ -252,7 +318,7 @@ class SqlServerGrammar extends Grammar
      */
     public function compileDropDefaultConstraint(Blueprint $blueprint, Fluent $command)
     {
-        $columns = "'".implode("','", $command->columns)."'";
+        $columns = "'".implode("','", $command->columns ?? [$command->column->name])."'";
 
         $tableName = $this->getTablePrefix().$blueprint->getTable();
 
@@ -260,7 +326,7 @@ class SqlServerGrammar extends Grammar
         $sql .= "SELECT @sql += 'ALTER TABLE [dbo].[{$tableName}] DROP CONSTRAINT ' + OBJECT_NAME([default_object_id]) + ';' ";
         $sql .= 'FROM sys.columns ';
         $sql .= "WHERE [object_id] = OBJECT_ID('[dbo].[{$tableName}]') AND [name] in ({$columns}) AND [default_object_id] <> 0;";
-        $sql .= 'EXEC(@sql)';
+        $sql .= 'EXEC(@sql);';
 
         return $sql;
     }
@@ -936,6 +1002,14 @@ class SqlServerGrammar extends Grammar
      */
     protected function modifyPersisted(Blueprint $blueprint, Fluent $column)
     {
+        if ($column->change) {
+            if ($column->type === 'computed') {
+                return $column->persisted ? ' add persisted' : ' drop persisted';
+            }
+
+            return null;
+        }
+
         if ($column->persisted) {
             return ' persisted';
         }
