@@ -106,7 +106,6 @@ class MigrateMakeCommand extends BaseCommand
      * @param  string  $name
      * @param  string  $table
      * @param  bool  $create
-     * @param  bool  $uuid
      * @return string
      */
     protected function writeMigration($name, $table, $create)

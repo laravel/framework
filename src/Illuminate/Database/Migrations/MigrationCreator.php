@@ -220,7 +220,7 @@ class MigrationCreator
     {
         $keyType = Builder::$defaultMorphKeyType;
         if (in_array($keyType, ['uuid', 'ulid'])) {
-            return "{$keyType}('id')";
+            return "$keyType('id')";
         }
 
         return 'id()';
