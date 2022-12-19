@@ -8,6 +8,7 @@ use Illuminate\Routing\Route;
 use Illuminate\Session\Store;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Tests\Database\Fixtures\Models\Money\Price;
 use InvalidArgumentException;
 use Mockery as m;
@@ -128,6 +129,10 @@ class HttpRequestTest extends TestCase
 
         $request = Request::create('http://foo.com/foo/bar/?');
         $this->assertSame('http://foo.com/foo/bar', $request->url());
+
+        URL::forceScheme('foo-bar');
+        $request = Request::create('foo-bar://foo.com/foo/bar');
+        $this->assertSame('foo-bar://foo.com/foo/bar', $request->url());
     }
 
     public function testFullUrlMethod()
@@ -328,6 +333,10 @@ class HttpRequestTest extends TestCase
 
         $request = Request::create('https://example.com:8080');
         $this->assertSame('https://example.com:8080', $request->schemeAndHttpHost());
+
+        URL::forceScheme('foo-bar');
+        $request = Request::create('foo-bar://example.com:8080');
+        $this->assertSame('foo-bar://example.com:8080', $request->schemeAndHttpHost());
     }
 
     public function testHasMethod()
