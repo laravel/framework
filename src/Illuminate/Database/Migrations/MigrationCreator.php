@@ -51,7 +51,6 @@ class MigrationCreator
      * @param  string  $path
      * @param  string|null  $table
      * @param  bool  $create
-     * @param  bool  $uuid
      * @return string
      *
      * @throws \Exception
@@ -136,7 +135,6 @@ class MigrationCreator
      *
      * @param  string  $stub
      * @param  string|null  $table
-     * @param  bool  $primary
      * @return string
      */
     protected function populateStub($stub, $table)
