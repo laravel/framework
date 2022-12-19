@@ -425,7 +425,9 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function getScheme(): string
     {
-        return Str::remove('://', $this->forceScheme) ?? parent::getScheme();
+        return $this->forceScheme
+            ? Str::remove('://', $this->forceScheme)
+            : parent::getScheme();
     }
 
     /**
