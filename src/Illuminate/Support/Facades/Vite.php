@@ -21,7 +21,8 @@ namespace Illuminate\Support\Facades;
  * @method static bool isRunningHot()
  * @method static string toHtml()
  * @method static void macro(string $name, object|callable $macro)
- * @method static void mixin(object $mixin, bool $replace = true)
+ * @method static void mixin(object|string $mixin, bool $replace = true)
+ * @method static void mixinClass(string $mixinClass, bool $replace = true)
  * @method static bool hasMacro(string $name)
  * @method static void flushMacros()
  *

@@ -20,7 +20,8 @@ use Illuminate\Contracts\Routing\ResponseFactory as ResponseFactoryContract;
  * @method static \Illuminate\Http\RedirectResponse redirectGuest(string $path, int $status = 302, array $headers = [], bool|null $secure = null)
  * @method static \Illuminate\Http\RedirectResponse redirectToIntended(string $default = '/', int $status = 302, array $headers = [], bool|null $secure = null)
  * @method static void macro(string $name, object|callable $macro)
- * @method static void mixin(object $mixin, bool $replace = true)
+ * @method static void mixin(object|string $mixin, bool $replace = true)
+ * @method static void mixinClass(string $mixinClass, bool $replace = true)
  * @method static bool hasMacro(string $name)
  * @method static void flushMacros()
  *

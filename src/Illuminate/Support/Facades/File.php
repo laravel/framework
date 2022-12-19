@@ -51,7 +51,8 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Filesystem\Filesystem|mixed when((\Closure(\Illuminate\Filesystem\Filesystem): mixed)|mixed $value = null, (callable(\Illuminate\Filesystem\Filesystem, mixed): mixed)|null $callback = null, (callable(\Illuminate\Filesystem\Filesystem, mixed): mixed)|null $default = null)
  * @method static \Illuminate\Filesystem\Filesystem|mixed unless((\Closure(\Illuminate\Filesystem\Filesystem): mixed)|mixed $value = null, (callable(\Illuminate\Filesystem\Filesystem, mixed): mixed)|null $callback = null, (callable(\Illuminate\Filesystem\Filesystem, mixed): mixed)|null $default = null)
  * @method static void macro(string $name, object|callable $macro)
- * @method static void mixin(object $mixin, bool $replace = true)
+ * @method static void mixin(object|string $mixin, bool $replace = true)
+ * @method static void mixinClass(string $mixinClass, bool $replace = true)
  * @method static bool hasMacro(string $name)
  * @method static void flushMacros()
  *
