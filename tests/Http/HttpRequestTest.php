@@ -2,11 +2,12 @@
 
 namespace Illuminate\Tests\Http;
 
+use Illuminate\Container\Container;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Routing\Route;
-use Illuminate\Routing\UrlGenerator;
 use Illuminate\Routing\RouteCollection;
+use Illuminate\Routing\UrlGenerator;
 use Illuminate\Session\Store;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -19,7 +20,6 @@ use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Illuminate\Container\Container;
 
 if (PHP_VERSION_ID >= 80100) {
     include 'Enums.php';
