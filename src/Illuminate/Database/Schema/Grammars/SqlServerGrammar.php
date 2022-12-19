@@ -147,10 +147,14 @@ class SqlServerGrammar extends Grammar
     public function compileChange(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
         if ($connection->usingNativeSchemaOperations()) {
-            $changes = [];
+            $columns = [];
 
             foreach ($blueprint->getChangedColumns() as $column) {
-                $sql = 'alter table '.$this->wrapTable($blueprint).' alter column '.$this->wrap($column);
+                $sql = sprintf('alter table %s alter column %s %s',
+                    $this->wrapTable($blueprint),
+                    $this->wrap($column),
+                    $this->getType($column)
+                );
 
                 foreach ($this->modifiers as $modifier) {
                     if (in_array($modifier, ['Increment', 'Default'])) {
@@ -162,10 +166,10 @@ class SqlServerGrammar extends Grammar
                     }
                 }
 
-                $changes[] = $sql;
+                $columns[] = $sql;
             }
 
-            return $changes;
+            return $columns;
         }
 
         return parent::compileChange($blueprint, $command, $connection);
@@ -247,11 +251,11 @@ class SqlServerGrammar extends Grammar
         if ($command->column->change) {
             $dropDefaultConstraintSql = $this->compileDropDefaultConstraint($blueprint, $command);
 
-            return is_null($command->value)
+            return is_null($command->column->default)
                 ? $dropDefaultConstraintSql
                 : $dropDefaultConstraintSql.sprintf('alter table %s add default %s for %s',
                     $this->wrapTable($blueprint),
-                    $this->getDefaultValue($command->default),
+                    $this->getDefaultValue($command->column->default),
                     $this->wrap($command->column)
                 );
         }
