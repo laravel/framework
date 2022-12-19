@@ -576,8 +576,12 @@ trait ValidatesAttributes
 
         $decimals = strlen(end($matches));
 
+        if (! isset($parameters[1])) {
+            return $decimals == $parameters[0];
+        }
+
         return $decimals >= $parameters[0] &&
-               (! isset($parameters[1]) || $decimals <= $parameters[1]);
+               $decimals <= $parameters[1];
     }
 
     /**
