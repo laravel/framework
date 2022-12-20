@@ -555,6 +555,36 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute has a given number of decimal places.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateDecimal($attribute, $value, $parameters)
+    {
+        if (! $this->validateNumeric($attribute, $value)) {
+            return false;
+        }
+
+        $this->requireParameterCount(1, $parameters, 'decimal');
+
+        $matches = [];
+
+        preg_match('/^\d*.(\d*)$/', $value, $matches);
+
+        $decimals = strlen(end($matches));
+
+        if (! isset($parameters[1])) {
+            return $decimals == $parameters[0];
+        }
+
+        return $decimals >= $parameters[0] &&
+               $decimals <= $parameters[1];
+    }
+
+    /**
      * Validate that an attribute is different from another attribute.
      *
      * @param  string  $attribute

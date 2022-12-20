@@ -2448,6 +2448,43 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testValidateDecimal()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'asdad'], ['foo' => 'Decimal:2,3']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1.2345'], ['foo' => 'Decimal:2,3']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1.234'], ['foo' => 'Decimal:2,3']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1.23'], ['foo' => 'Decimal:2,3']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1.2'], ['foo' => 'Decimal:2,3']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1.23'], ['foo' => 'Decimal:2']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1.233'], ['foo' => 'Decimal:2']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1.2'], ['foo' => 'Decimal:2']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1'], ['foo' => 'Decimal:0,1']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1.2'], ['foo' => 'Decimal:0,1']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1.23'], ['foo' => 'Decimal:0,1']);
+        $this->assertFalse($v->passes());
+    }
+
     public function testValidateInt()
     {
         $trans = $this->getIlluminateArrayTranslator();
