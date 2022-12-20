@@ -16,7 +16,7 @@ class BladeComponentsTest extends AbstractBladeTestCase
 
     public function testClassComponentsAreCompiled()
     {
-        $this->assertSame('<?php if (isset($component)) { $__componentOriginal32877a641c21ac6579f6376333c8770674a6058f = $component; } ?>
+        $this->assertSame('<?php if (isset($component)) { $__componentOriginal2dda3d2f2f9b76bd400bf03f0b84e87f = $component; } ?>
 <?php $component = Illuminate\Tests\View\Blade\ComponentStub::class::resolve(["foo" => "bar"] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName(\'test\'); ?>
 <?php if ($component->shouldRender()): ?>
@@ -36,9 +36,9 @@ class BladeComponentsTest extends AbstractBladeTestCase
 
         $this->assertSame('<?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginal0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33)): ?>
-<?php $component = $__componentOriginal0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33; ?>
-<?php unset($__componentOriginal0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33); ?>
+<?php if (isset($__componentOriginal79aef92e83454121ab6e5f64077e7d8a)): ?>
+<?php $component = $__componentOriginal79aef92e83454121ab6e5f64077e7d8a; ?>
+<?php unset($__componentOriginal79aef92e83454121ab6e5f64077e7d8a); ?>
 <?php endif; ?>', $this->compiler->compileString('@endcomponentClass'));
     }
 
