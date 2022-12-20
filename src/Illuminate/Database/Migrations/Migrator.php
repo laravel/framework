@@ -703,7 +703,7 @@ class Migrator
      */
     public function deleteRepository()
     {
-        return $this->repository->deleteRepository();
+        $this->repository->deleteRepository();
     }
 
     /**

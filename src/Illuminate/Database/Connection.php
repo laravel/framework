@@ -273,7 +273,7 @@ class Connection implements ConnectionInterface
     /**
      * Get the default schema grammar instance.
      *
-     * @return \Illuminate\Database\Schema\Grammars\Grammar
+     * @return \Illuminate\Database\Schema\Grammars\Grammar|null
      */
     protected function getDefaultSchemaGrammar()
     {
@@ -1097,7 +1097,7 @@ class Connection implements ConnectionInterface
     {
         $schema = $this->getDoctrineSchemaManager();
 
-        return $schema->listTableDetails($table)->getColumn($column);
+        return $schema->introspectTable($table)->getColumn($column);
     }
 
     /**
@@ -1109,11 +1109,7 @@ class Connection implements ConnectionInterface
     {
         $connection = $this->getDoctrineConnection();
 
-        // Doctrine v2 expects one parameter while v3 expects two. 2nd will be ignored on v2...
-        return $this->getDoctrineDriver()->getSchemaManager(
-            $connection,
-            $connection->getDatabasePlatform()
-        );
+        return $connection->createSchemaManager();
     }
 
     /**
@@ -1151,7 +1147,7 @@ class Connection implements ConnectionInterface
      * @param  string  $type
      * @return void
      *
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      * @throws \RuntimeException
      */
     public function registerDoctrineType(Type|string $class, string $name, string $type): void

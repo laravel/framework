@@ -245,7 +245,7 @@ class DatabaseManager implements ConnectionResolverInterface
      * @param  string  $type
      * @return void
      *
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      * @throws \RuntimeException
      */
     public function registerDoctrineType(string $class, string $name, string $type): void
