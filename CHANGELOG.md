@@ -1,6 +1,25 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.44.0...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.45.0...9.x)
+
+
+## [v9.45.0](https://github.com/laravel/framework/compare/v9.44.0...v9.45.0) - 2022-12-20
+
+### Added
+- Allows the registration of custom, root-level anonymous component search paths. ([#45338](https://github.com/laravel/framework/pull/45338), [1ff0379](https://github.com/laravel/framework/commit/1ff0379d203ac836c3eeae567cc07b99c352b1e7))
+- Added decimal validation rule ([#45356](https://github.com/laravel/framework/pull/45356), [e89b2b0](https://github.com/laravel/framework/commit/e89b2b0bd0e43b8aecd72a55c546288576bb0370))
+- Added align property to button mail component ([#45362](https://github.com/laravel/framework/pull/45362))
+- Added whereUlid(param) support for routing ([#45372](https://github.com/laravel/framework/pull/45372))
+
+### Fixed
+- Fixed single line @php statements to not be parsed as php blocks in BladeCompiler ([#45333](https://github.com/laravel/framework/pull/45333))
+- Added missing code to set locale from model preferred locale in Maillable ([#45308](https://github.com/laravel/framework/pull/45308))
+
+### Changed
+- Vite: ability to prevent preload tag generation from attribute resolver callback ([#45283](https://github.com/laravel/framework/pull/45283))
+- Deprecation Test Improvements ([#45317](https://github.com/laravel/framework/pull/45317))
+- Do not allow nested arrays in whereIn method ([140c3a8](https://github.com/laravel/framework/commit/140c3a81d261669d0785aebe2599aed99991e890))
+- Bump ramsey/uuid ([#45367](https://github.com/laravel/framework/pull/45367))
 
 
 ## [v9.44.0](https://github.com/laravel/framework/compare/v9.43.0...v9.44.0) - 2022-12-15
