@@ -73,7 +73,7 @@ jobs:
         with:
           timeout_minutes: 5
           max_attempts: 5
-          command: composer require ramsey/collection:^1.2 brick/math:^0.9.3 symfony/css-selector:^6.0 --no-interaction --no-update
+          command: composer require brick/math:^0.9.3 symfony/css-selector:^6.0 --no-interaction --no-update
         if: matrix.php >= 8.1
 
       - name: Set Minimum PHP 8.2 Versions
@@ -150,7 +150,7 @@ jobs:
         with:
           timeout_minutes: 5
           max_attempts: 5
-          command: composer require ramsey/collection:~1.2 brick/math:~0.9.3 symfony/css-selector:~6.0 --no-interaction --no-update
+          command: composer require brick/math:~0.9.3 symfony/css-selector:~6.0 --no-interaction --no-update
         if: matrix.php >= 8.1
 
       - name: Set Minimum PHP 8.2 Versions
