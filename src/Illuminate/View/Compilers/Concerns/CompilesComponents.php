@@ -46,7 +46,7 @@ trait CompilesComponents
      */
     public static function newComponentHash(string $component)
     {
-        static::$componentHashStack[] = $hash = sha1($component);
+        static::$componentHashStack[] = $hash = hash('xxh128', $component);
 
         return $hash;
     }

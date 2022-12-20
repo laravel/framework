@@ -178,7 +178,7 @@ trait ManagesLayouts
         if (! isset(static::$parentPlaceholder[$section])) {
             $salt = static::parentPlaceholderSalt();
 
-            static::$parentPlaceholder[$section] = '##parent-placeholder-'.sha1($salt.$section).'##';
+            static::$parentPlaceholder[$section] = '##parent-placeholder-'.hash('xxh128', $salt.$section).'##';
         }
 
         return static::$parentPlaceholder[$section];
