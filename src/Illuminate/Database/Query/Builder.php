@@ -1617,19 +1617,23 @@ class Builder implements BuilderContract
     /**
      * Add an exists clause to the query.
      *
-     * @param  \Closure  $callback
+     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $callback
      * @param  string  $boolean
      * @param  bool  $not
      * @return $this
      */
-    public function whereExists(Closure $callback, $boolean = 'and', $not = false)
+    public function whereExists($callback, $boolean = 'and', $not = false)
     {
-        $query = $this->forSubQuery();
+        if ($callback instanceof Closure) {
+            $query = $this->forSubQuery();
 
-        // Similar to the sub-select clause, we will create a new query instance so
-        // the developer may cleanly specify the entire exists query and we will
-        // compile the whole thing in the grammar and insert it into the SQL.
-        $callback($query);
+            // Similar to the sub-select clause, we will create a new query instance so
+            // the developer may cleanly specify the entire exists query and we will
+            // compile the whole thing in the grammar and insert it into the SQL.
+            $callback($query);
+        } else {
+            $query = $callback;
+        }
 
         return $this->addWhereExistsQuery($query, $boolean, $not);
     }
@@ -1637,11 +1641,11 @@ class Builder implements BuilderContract
     /**
      * Add an or exists clause to the query.
      *
-     * @param  \Closure  $callback
+     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $callback
      * @param  bool  $not
      * @return $this
      */
-    public function orWhereExists(Closure $callback, $not = false)
+    public function orWhereExists($callback, $not = false)
     {
         return $this->whereExists($callback, 'or', $not);
     }
@@ -1649,11 +1653,11 @@ class Builder implements BuilderContract
     /**
      * Add a where not exists clause to the query.
      *
-     * @param  \Closure  $callback
+     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $callback
      * @param  string  $boolean
      * @return $this
      */
-    public function whereNotExists(Closure $callback, $boolean = 'and')
+    public function whereNotExists($callback, $boolean = 'and')
     {
         return $this->whereExists($callback, $boolean, true);
     }
@@ -1661,10 +1665,10 @@ class Builder implements BuilderContract
     /**
      * Add a where not exists clause to the query.
      *
-     * @param  \Closure  $callback
+     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $callback
      * @return $this
      */
-    public function orWhereNotExists(Closure $callback)
+    public function orWhereNotExists($callback)
     {
         return $this->orWhereExists($callback, true);
     }
