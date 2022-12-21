@@ -26,13 +26,14 @@ class DatabaseSqliteSchemaStateTest extends TestCase
         $connection->shouldReceive('getDatabaseName')->andReturn($config['database']);
 
         $process = m::spy(Process::class);
-        $processFactory = m::mock(new ProcessFactory($process));
+        $processFactory = m::spy(function () use ($process) {
+            return $process;
+        });
 
         $schemaState = new SqliteSchemaState($connection, null, $processFactory);
         $schemaState->load('database/schema/sqlite-schema.dump');
 
-        $processFactory->shouldHaveReceived('__invoke')
-            ->with('sqlite3 "${:LARAVEL_LOAD_DATABASE}" < "${:LARAVEL_LOAD_PATH}"');
+        $processFactory->shouldHaveBeenCalled()->with('sqlite3 "${:LARAVEL_LOAD_DATABASE}" < "${:LARAVEL_LOAD_PATH}"');
 
         $process->shouldHaveReceived('mustRun')->with(null, [
             'LARAVEL_LOAD_DATABASE' => 'database/database.sqlite',
@@ -55,20 +56,5 @@ class DatabaseSqliteSchemaStateTest extends TestCase
         $schemaState->load('database/schema/sqlite-schema.dump');
 
         $pdo->shouldHaveReceived('exec')->with('CREATE TABLE IF NOT EXISTS "migrations" ("id" integer not null primary key autoincrement, "migration" varchar not null, "batch" integer not null);');
-    }
-}
-
-class ProcessFactory
-{
-    private $process;
-
-    public function __construct($process)
-    {
-        $this->process = $process;
-    }
-
-    public function __invoke()
-    {
-        return $this->process;
     }
 }
