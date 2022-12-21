@@ -69,15 +69,26 @@ class Str
     }
 
     /**
-     * Return the remainder of a string after the first occurrence of a given value.
+     * Return the remainder of a string after the first (or last) occurrence of a given value.
      *
      * @param  string  $subject
      * @param  string  $search
+     * @param  bool    $last
      * @return string
      */
-    public static function after($subject, $search)
+    public static function after($subject, $search, $last = false)
     {
-        return $search === '' ? $subject : array_reverse(explode($search, $subject, 2))[0];
+        if ($search === '') {
+            return $subject;
+        }
+
+        $position = $last ? mb_strrpos($subject, (string) $search) : mb_strpos($subject, (string) $search);
+
+        if ($position === false) {
+            return $subject;
+        }
+
+        return static::substr($subject, $position + static::length($search));
     }
 
     /**
@@ -89,17 +100,7 @@ class Str
      */
     public static function afterLast($subject, $search)
     {
-        if ($search === '') {
-            return $subject;
-        }
-
-        $position = strrpos($subject, (string) $search);
-
-        if ($position === false) {
-            return $subject;
-        }
-
-        return substr($subject, $position + strlen($search));
+        return static::after($subject, $search, true);
     }
 
     /**
