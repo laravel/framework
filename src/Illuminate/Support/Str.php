@@ -73,7 +73,7 @@ class Str
      *
      * @param  string  $subject
      * @param  string  $search
-     * @param  bool    $last
+     * @param  bool  $last
      * @return string
      */
     public static function after($subject, $search, $last = false)
