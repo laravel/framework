@@ -256,7 +256,7 @@ trait ConditionallyLoadsAttributes
      */
     public function whenHas($attribute, $value = null, $default = null)
     {
-        if (func_num_args() < 3) {
+        if (is_null($default)) {
             $default = new MissingValue();
         }
 
@@ -264,12 +264,12 @@ trait ConditionallyLoadsAttributes
             return value($default);
         }
 
-        if (func_num_args() === 1) {
-            return $this->resource->{$attribute};
-        }
-
         if ($this->resource->{$attribute} === null) {
             return;
+        }
+
+        if (is_null($value)) {
+            return $this->resource->{$attribute};
         }
 
         return value($value, $this->resource->{$attribute});
