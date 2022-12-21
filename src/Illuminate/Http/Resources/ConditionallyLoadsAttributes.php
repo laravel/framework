@@ -241,25 +241,9 @@ trait ConditionallyLoadsAttributes
      */
     public function whenCounted($relationship, $value = null, $default = null)
     {
-        if (func_num_args() < 3) {
-            $default = new MissingValue();
-        }
-
         $attribute = (string) Str::of($relationship)->snake()->finish('_count');
 
-        if (! isset($this->resource->getAttributes()[$attribute])) {
-            return value($default);
-        }
-
-        if (func_num_args() === 1) {
-            return $this->resource->{$attribute};
-        }
-
-        if ($this->resource->{$attribute} === null) {
-            return;
-        }
-
-        return value($value, $this->resource->{$attribute});
+        return $this->whenHas($attribute, $value, $default);
     }
 
     /**
@@ -276,7 +260,7 @@ trait ConditionallyLoadsAttributes
             $default = new MissingValue();
         }
 
-        if (!isset($this->resource->getAttributes()[$attribute])) {
+        if (! isset($this->resource->getAttributes()[$attribute])) {
             return value($default);
         }
 
