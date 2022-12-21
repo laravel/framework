@@ -263,6 +263,35 @@ trait ConditionallyLoadsAttributes
     }
 
     /**
+     * Retrieve a when has attribute if it exists.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  mixed  $default
+     * @return \Illuminate\Http\Resources\MissingValue|mixed
+     */
+    public function whenHas($attribute, $value = null, $default = null)
+    {
+        if (func_num_args() < 3) {
+            $default = new MissingValue();
+        }
+
+        if (!isset($this->resource->getAttributes()[$attribute])) {
+            return value($default);
+        }
+
+        if (func_num_args() === 1) {
+            return $this->resource->{$attribute};
+        }
+
+        if ($this->resource->{$attribute} === null) {
+            return;
+        }
+
+        return value($value, $this->resource->{$attribute});
+    }
+
+    /**
      * Execute a callback if the given pivot table has been loaded.
      *
      * @param  string  $table
