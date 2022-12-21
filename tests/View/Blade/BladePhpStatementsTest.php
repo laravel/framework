@@ -91,4 +91,19 @@ class BladePhpStatementsTest extends AbstractBladeTestCase
         $expected = '<?php ($set = true); ?> <?php ($hello = \'hi\'); ?> <?php echo "Hello world" ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
+
+    public function testCompilationOfMixedUsageStatements()
+    {
+        $string = '@php (
+            $classes = [
+                \'admin-font-mono\', // Font weight
+            ])
+        @endphp';
+        $expected = '<?php (
+            $classes = [
+                \'admin-font-mono\', // Font weight
+            ])
+        ?>';
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
 }
