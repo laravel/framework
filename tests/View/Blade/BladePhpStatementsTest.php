@@ -84,11 +84,4 @@ class BladePhpStatementsTest extends AbstractBladeTestCase
 
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
-
-    public function testCompilationOfMixedPhpStatements()
-    {
-        $string = '@php($set = true) @php ($hello = \'hi\') @php echo "Hello world" @endphp';
-        $expected = '<?php ($set = true); ?> <?php ($hello = \'hi\'); ?> <?php echo "Hello world" ?>';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
-    }
 }
