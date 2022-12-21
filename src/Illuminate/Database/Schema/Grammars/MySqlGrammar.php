@@ -236,13 +236,12 @@ class MySqlGrammar extends Grammar
             $columns = [];
 
             foreach ($blueprint->getChangedColumns() as $column) {
-                $sql = $this->wrap($column).' '.$this->getType($column);
+                $sql = 'modify '.$this->wrap($column).' '.$this->getType($column);
 
                 $columns[] = $this->addModifiers($sql, $blueprint, $column);
             }
 
-            return 'alter table '.$this->wrapTable($blueprint).' '
-                .implode(', ', $this->prefixArray('modify', $columns));
+            return 'alter table '.$this->wrapTable($blueprint).' '.implode(', ', $columns);
         }
 
         return parent::compileChange($blueprint, $command, $connection);
