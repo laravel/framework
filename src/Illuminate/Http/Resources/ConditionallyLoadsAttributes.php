@@ -260,7 +260,7 @@ trait ConditionallyLoadsAttributes
             $default = new MissingValue();
         }
 
-        if (! isset($this->resource->getAttributes()[$attribute])) {
+        if (! Arr::has($this->resource->getAttributes(), $attribute)) {
             return value($default);
         }
 
