@@ -47,6 +47,8 @@ jobs:
 
     name: Facade DocBlocks
 
+    if: ${{ github.repository_owner == 'laravel' && github.event_name == 'push' }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -65,5 +67,11 @@ jobs:
           max_attempts: 5
           command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
 
-      - name: Lint facade docblocks
-        run: php -f bin/facades.php -- --lint
+      - name: Update facade docblocks
+        run: php -f bin/facades.php
+
+      - name: Commit facade docblocks
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Update facade docblocks
+          file_pattern: src/
