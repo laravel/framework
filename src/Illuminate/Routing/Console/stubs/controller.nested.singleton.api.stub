@@ -13,7 +13,7 @@ class {{ class }} extends Controller
     /**
      * Store the newly created resource in storage.
      */
-    public function store(Request $request, {{ parentModel }} ${{ parentModelVariable }}): Response
+    public function store(Request $request, {{ parentModel }} ${{ parentModelVariable }}): never
     {
         abort(404);
     }
