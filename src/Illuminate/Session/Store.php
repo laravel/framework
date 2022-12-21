@@ -7,12 +7,15 @@ use Illuminate\Contracts\Session\Session;
 use Illuminate\Support\Arr;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
+use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\ViewErrorBag;
 use SessionHandlerInterface;
 use stdClass;
 
 class Store implements Session
 {
+    use Macroable;
+
     /**
      * The session ID.
      *

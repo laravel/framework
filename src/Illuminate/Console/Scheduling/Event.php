@@ -26,7 +26,7 @@ class Event
     /**
      * The command string.
      *
-     * @var string
+     * @var string|null
      */
     public $command;
 
@@ -47,7 +47,7 @@ class Event
     /**
      * The user the command should run as.
      *
-     * @var string
+     * @var string|null
      */
     public $user;
 
@@ -138,7 +138,7 @@ class Event
     /**
      * The human readable description of the event.
      *
-     * @var string
+     * @var string|null
      */
     public $description;
 

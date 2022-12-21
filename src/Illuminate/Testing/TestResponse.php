@@ -573,6 +573,19 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Assert that the given string matches the streamed response content.
+     *
+     * @param  $value
+     * @return $this
+     */
+    public function assertStreamedContent($value)
+    {
+        PHPUnit::assertSame($value, $this->streamedContent());
+
+        return $this;
+    }
+
+    /**
      * Assert that the given string or array of strings are contained within the response.
      *
      * @param  string|array  $value
@@ -583,7 +596,7 @@ class TestResponse implements ArrayAccess
     {
         $value = Arr::wrap($value);
 
-        $values = $escape ? array_map('e', ($value)) : $value;
+        $values = $escape ? array_map('e', $value) : $value;
 
         foreach ($values as $value) {
             PHPUnit::assertStringContainsString((string) $value, $this->getContent());
@@ -601,7 +614,7 @@ class TestResponse implements ArrayAccess
      */
     public function assertSeeInOrder(array $values, $escape = true)
     {
-        $values = $escape ? array_map('e', ($values)) : $values;
+        $values = $escape ? array_map('e', $values) : $values;
 
         PHPUnit::assertThat($values, new SeeInOrder($this->getContent()));
 
@@ -619,13 +632,13 @@ class TestResponse implements ArrayAccess
     {
         $value = Arr::wrap($value);
 
-        $values = $escape ? array_map('e', ($value)) : $value;
+        $values = $escape ? array_map('e', $value) : $value;
 
-        tap(strip_tags($this->getContent()), function ($content) use ($values) {
-            foreach ($values as $value) {
-                PHPUnit::assertStringContainsString((string) $value, $content);
-            }
-        });
+        $content = strip_tags($this->getContent());
+
+        foreach ($values as $value) {
+            PHPUnit::assertStringContainsString((string) $value, $content);
+        }
 
         return $this;
     }
@@ -639,7 +652,7 @@ class TestResponse implements ArrayAccess
      */
     public function assertSeeTextInOrder(array $values, $escape = true)
     {
-        $values = $escape ? array_map('e', ($values)) : $values;
+        $values = $escape ? array_map('e', $values) : $values;
 
         PHPUnit::assertThat($values, new SeeInOrder(strip_tags($this->getContent())));
 
@@ -657,7 +670,7 @@ class TestResponse implements ArrayAccess
     {
         $value = Arr::wrap($value);
 
-        $values = $escape ? array_map('e', ($value)) : $value;
+        $values = $escape ? array_map('e', $value) : $value;
 
         foreach ($values as $value) {
             PHPUnit::assertStringNotContainsString((string) $value, $this->getContent());
@@ -677,13 +690,13 @@ class TestResponse implements ArrayAccess
     {
         $value = Arr::wrap($value);
 
-        $values = $escape ? array_map('e', ($value)) : $value;
+        $values = $escape ? array_map('e', $value) : $value;
 
-        tap(strip_tags($this->getContent()), function ($content) use ($values) {
-            foreach ($values as $value) {
-                PHPUnit::assertStringNotContainsString((string) $value, $content);
-            }
-        });
+        $content = strip_tags($this->getContent());
+
+        foreach ($values as $value) {
+            PHPUnit::assertStringNotContainsString((string) $value, $content);
+        }
 
         return $this;
     }

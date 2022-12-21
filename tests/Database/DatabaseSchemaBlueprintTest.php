@@ -173,6 +173,50 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals(['alter table `users` add `foo` varchar(255) not null'], $blueprint->toSql($connection, new MySqlGrammar));
     }
 
+    public function testRenameColumnWithoutDoctrine()
+    {
+        $base = new Blueprint('users', function ($table) {
+            $table->renameColumn('foo', 'bar');
+        });
+
+        $connection = m::mock(Connection::class);
+        $connection->shouldReceive('usingNativeSchemaOperations')->andReturn(true);
+
+        $blueprint = clone $base;
+        $this->assertEquals(['alter table `users` rename column `foo` to `bar`'], $blueprint->toSql($connection, new MySqlGrammar));
+
+        $blueprint = clone $base;
+        $this->assertEquals(['alter table "users" rename column "foo" to "bar"'], $blueprint->toSql($connection, new PostgresGrammar));
+
+        $blueprint = clone $base;
+        $this->assertEquals(['alter table "users" rename column "foo" to "bar"'], $blueprint->toSql($connection, new SQLiteGrammar));
+
+        $blueprint = clone $base;
+        $this->assertEquals(['sp_rename \'"users"."foo"\', "bar", \'COLUMN\''], $blueprint->toSql($connection, new SqlServerGrammar));
+    }
+
+    public function testDropColumnWithoutDoctrine()
+    {
+        $base = new Blueprint('users', function ($table) {
+            $table->dropColumn('foo');
+        });
+
+        $connection = m::mock(Connection::class);
+        $connection->shouldReceive('usingNativeSchemaOperations')->andReturn(true);
+
+        $blueprint = clone $base;
+        $this->assertEquals(['alter table `users` drop `foo`'], $blueprint->toSql($connection, new MySqlGrammar));
+
+        $blueprint = clone $base;
+        $this->assertEquals(['alter table "users" drop column "foo"'], $blueprint->toSql($connection, new PostgresGrammar));
+
+        $blueprint = clone $base;
+        $this->assertEquals(['alter table "users" drop column "foo"'], $blueprint->toSql($connection, new SQLiteGrammar));
+
+        $blueprint = clone $base;
+        $this->assertStringContainsString('alter table "users" drop column "foo"', $blueprint->toSql($connection, new SqlServerGrammar)[0]);
+    }
+
     public function testMacroable()
     {
         Blueprint::macro('foo', function () {

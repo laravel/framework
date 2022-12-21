@@ -865,6 +865,157 @@ class FoundationViteTest extends TestCase
         $this->cleanViteManifest($buildDir);
     }
 
+    public function testItCanSuppressPreloadTagGeneration()
+    {
+        $buildDir = Str::random();
+        $this->makeViteManifest([
+            'resources/js/app.js' => [
+                'src' => 'resources/js/app.js',
+                'file' => 'assets/app.versioned.js',
+                'imports' => [
+                    'import.js',
+                    'import-nopreload.js',
+                ],
+                'css' => [
+                    'assets/app.versioned.css',
+                    'assets/app-nopreload.versioned.css',
+                ],
+            ],
+            'resources/js/app-nopreload.js' => [
+                'src' => 'resources/js/app-nopreload.js',
+                'file' => 'assets/app-nopreload.versioned.js',
+            ],
+            'import.js' => [
+                'file' => 'assets/import.versioned.js',
+            ],
+            'import-nopreload.js' => [
+                'file' => 'assets/import-nopreload.versioned.js',
+            ],
+            'resources/css/app.css' => [
+                'src' => 'resources/css/app.css',
+                'file' => 'assets/app.versioned.css',
+            ],
+            'resources/css/app-nopreload.css' => [
+                'src' => 'resources/css/app-nopreload.css',
+                'file' => 'assets/app-nopreload.versioned.css',
+            ],
+        ], $buildDir);
+        ViteFacade::usePreloadTagAttributes(function ($src, $url, $chunk, $manifest) use ($buildDir) {
+            $this->assertSame([
+                'resources/js/app.js' => [
+                    'src' => 'resources/js/app.js',
+                    'file' => 'assets/app.versioned.js',
+                    'imports' => [
+                        'import.js',
+                        'import-nopreload.js',
+                    ],
+                    'css' => [
+                        'assets/app.versioned.css',
+                        'assets/app-nopreload.versioned.css',
+                    ],
+                ],
+                'resources/js/app-nopreload.js' => [
+                    'src' => 'resources/js/app-nopreload.js',
+                    'file' => 'assets/app-nopreload.versioned.js',
+                ],
+                'import.js' => [
+                    'file' => 'assets/import.versioned.js',
+                ],
+                'import-nopreload.js' => [
+                    'file' => 'assets/import-nopreload.versioned.js',
+                ],
+                'resources/css/app.css' => [
+                    'src' => 'resources/css/app.css',
+                    'file' => 'assets/app.versioned.css',
+                ],
+                'resources/css/app-nopreload.css' => [
+                    'src' => 'resources/css/app-nopreload.css',
+                    'file' => 'assets/app-nopreload.versioned.css',
+                ],
+            ], $manifest);
+
+            (match ($src) {
+                'resources/js/app.js' => function () use ($url, $chunk, $buildDir) {
+                    $this->assertSame("https://example.com/{$buildDir}/assets/app.versioned.js", $url);
+                    $this->assertSame([
+                        'src' => 'resources/js/app.js',
+                        'file' => 'assets/app.versioned.js',
+                        'imports' => [
+                            'import.js',
+                            'import-nopreload.js',
+                        ],
+                        'css' => [
+                            'assets/app.versioned.css',
+                            'assets/app-nopreload.versioned.css',
+                        ],
+                    ], $chunk);
+                },
+                'resources/js/app-nopreload.js' => function () use ($url, $chunk, $buildDir) {
+                    $this->assertSame("https://example.com/{$buildDir}/assets/app-nopreload.versioned.js", $url);
+                    $this->assertSame([
+                        'src' => 'resources/js/app-nopreload.js',
+                        'file' => 'assets/app-nopreload.versioned.js',
+                    ], $chunk);
+                },
+                'import.js' => function () use ($url, $chunk, $buildDir) {
+                    $this->assertSame("https://example.com/{$buildDir}/assets/import.versioned.js", $url);
+                    $this->assertSame([
+                        'file' => 'assets/import.versioned.js',
+                    ], $chunk);
+                },
+                'import-nopreload.js' => function () use ($url, $chunk, $buildDir) {
+                    $this->assertSame("https://example.com/{$buildDir}/assets/import-nopreload.versioned.js", $url);
+                    $this->assertSame([
+                        'file' => 'assets/import-nopreload.versioned.js',
+                    ], $chunk);
+                },
+                'resources/css/app.css' => function () use ($url, $chunk, $buildDir) {
+                    $this->assertSame("https://example.com/{$buildDir}/assets/app.versioned.css", $url);
+                    $this->assertSame([
+                        'src' => 'resources/css/app.css',
+                        'file' => 'assets/app.versioned.css',
+                    ], $chunk);
+                },
+                'resources/css/app-nopreload.css' => function () use ($url, $chunk, $buildDir) {
+                    $this->assertSame("https://example.com/{$buildDir}/assets/app-nopreload.versioned.css", $url);
+                    $this->assertSame([
+                        'src' => 'resources/css/app-nopreload.css',
+                        'file' => 'assets/app-nopreload.versioned.css',
+                    ], $chunk);
+                },
+            })();
+
+            return Str::contains($src, '-nopreload') ? false : [];
+        });
+
+        $result = app(Vite::class)(['resources/js/app.js', 'resources/js/app-nopreload.js'], $buildDir);
+
+        $this->assertSame(
+            '<link rel="preload" as="style" href="https://example.com/'.$buildDir.'/assets/app.versioned.css" />'
+            .'<link rel="modulepreload" href="https://example.com/'.$buildDir.'/assets/app.versioned.js" />'
+            .'<link rel="modulepreload" href="https://example.com/'.$buildDir.'/assets/import.versioned.js" />'
+            .'<link rel="stylesheet" href="https://example.com/'.$buildDir.'/assets/app.versioned.css" />'
+            .'<link rel="stylesheet" href="https://example.com/'.$buildDir.'/assets/app-nopreload.versioned.css" />'
+            .'<script type="module" src="https://example.com/'.$buildDir.'/assets/app.versioned.js"></script>'
+            .'<script type="module" src="https://example.com/'.$buildDir.'/assets/app-nopreload.versioned.js"></script>',
+            $result->toHtml());
+
+        $this->assertSame([
+            "https://example.com/$buildDir/assets/app.versioned.css" => [
+                'rel="preload"',
+                'as="style"',
+            ],
+            "https://example.com/$buildDir/assets/app.versioned.js" => [
+                'rel="modulepreload"',
+            ],
+            "https://example.com/$buildDir/assets/import.versioned.js" => [
+                'rel="modulepreload"',
+            ],
+        ], ViteFacade::preloadedAssets());
+
+        $this->cleanViteManifest($buildDir);
+    }
+
     public function testPreloadAssetsGetAssetNonce()
     {
         $buildDir = Str::random();

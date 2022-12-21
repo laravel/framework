@@ -319,6 +319,18 @@ function resolveDocMixins($class)
 }
 
 /**
+ * Resolve the classes referenced methods in the @methods docblocks.
+ *
+ * @param  \ReflectionMethodDecorator  $method
+ * @return \Illuminate\Support\Collection<int, string>
+ */
+function resolveDocParameters($method)
+{
+    return resolveDocTags($method->getDocComment() ?: '', '@param')
+        ->map(fn ($tag) => Str::squish($tag));
+}
+
+/**
  * Determine if the method is magic.
  *
  * @param  \ReflectionMethod|string  $method
@@ -428,7 +440,7 @@ function normaliseDetails($method)
 {
     return is_string($method) ? $method : [
         'name' => $method->getName(),
-        'parameters' => collect($method->getParameters())
+        'parameters' => resolveParameters($method)
             ->map(fn ($parameter) => [
                 'name' => '$'.$parameter->getName(),
                 'optional' => $parameter->isOptional() && ! $parameter->isVariadic(),
@@ -440,6 +452,21 @@ function normaliseDetails($method)
             ]),
         'returns' => resolveReturnDocType($method) ?? resolveType($method->getReturnType()) ?? 'void',
     ];
+}
+
+/**
+ * Resolve the parameters for the method.
+ *
+ * @param  \ReflectionMethodDecorator  $method
+ * @return \Illuminate\Support\Collection<int, \ReflectionParameter|\DynamicParameter>
+ */
+function resolveParameters($method)
+{
+    $dynamicParameters = resolveDocParameters($method)
+        ->skip($method->getNumberOfParameters())
+        ->mapInto(DynamicParameter::class);
+
+    return collect($method->getParameters())->merge($dynamicParameters);
 }
 
 /**
@@ -503,5 +530,59 @@ class ReflectionMethodDecorator
     public function sourceClass()
     {
         return new ReflectionClass($this->sourceClass);
+    }
+}
+
+class DynamicParameter
+{
+    /**
+     * @param  string  $definition
+     */
+    public function __construct(private $definition)
+    {
+        //
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return Str::of($this->definition)
+            ->after('$')
+            ->before(' ')
+            ->toString();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isOptional()
+    {
+        return true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isVariadic()
+    {
+        return Str::contains($this->definition, " ...\${$this->getName()}");
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDefaultValueAvailable()
+    {
+        return true;
+    }
+
+    /**
+     * @return null
+     */
+    public function getDefaultValue()
+    {
+        return null;
     }
 }

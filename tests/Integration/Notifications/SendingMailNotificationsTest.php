@@ -21,6 +21,7 @@ use Orchestra\Testbench\TestCase;
 
 class SendingMailNotificationsTest extends TestCase
 {
+    public $mailFactory;
     public $mailer;
     public $markdown;
 

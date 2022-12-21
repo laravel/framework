@@ -80,19 +80,20 @@ class ScheduleListCommand extends Command
         $events = $events->map(function ($event) use ($terminalWidth, $expressionSpacing, $timezone) {
             $expression = $this->formatCronExpression($event->expression, $expressionSpacing);
 
-            $command = $event->command;
-            $description = $event->description;
+            $command = $event->command ?? '';
+
+            $description = $event->description ?? '';
 
             if (! $this->output->isVerbose()) {
                 $command = str_replace([Application::phpBinary(), Application::artisanBinary()], [
                     'php',
                     preg_replace("#['\"]#", '', Application::artisanBinary()),
-                ], $event->command);
+                ], $command);
             }
 
             if ($event instanceof CallbackEvent) {
-                if (class_exists($event->description)) {
-                    $command = $event->description;
+                if (class_exists($description)) {
+                    $command = $description;
                     $description = '';
                 } else {
                     $command = 'Closure at: '.$this->getClosureLocation($event);
@@ -149,7 +150,7 @@ class ScheduleListCommand extends Command
     {
         $rows = $events->map(fn ($event) => array_map('mb_strlen', preg_split("/\s+/", $event->expression)));
 
-        return collect($rows[0] ?? [])->keys()->map(fn ($key) => $rows->max($key));
+        return collect($rows[0] ?? [])->keys()->map(fn ($key) => $rows->max($key))->all();
     }
 
     /**
@@ -175,7 +176,7 @@ class ScheduleListCommand extends Command
      */
     private function getNextDueDateForEvent($event, DateTimeZone $timezone)
     {
-        return Carbon::create(
+        return Carbon::instance(
             (new CronExpression($event->expression))
                 ->getNextRunDate(Carbon::now()->setTimezone($event->timezone))
                 ->setTimezone($timezone)
@@ -220,8 +221,14 @@ class ScheduleListCommand extends Command
             );
         }
 
+        if (is_string($callback)) {
+            return $callback;
+        }
+
         if (is_array($callback)) {
-            return sprintf('%s::%s', $callback[0]::class, $callback[1]);
+            $className = is_string($callback[0]) ? $callback[0] : $callback[0]::class;
+
+            return sprintf('%s::%s', $className, $callback[1]);
         }
 
         return sprintf('%s::__invoke', $callback::class);
