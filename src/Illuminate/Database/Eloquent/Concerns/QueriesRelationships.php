@@ -588,14 +588,15 @@ trait QueriesRelationships
     }
 
     /**
-     * Add subselect queries to include an aggregate value for a relationship.
+     * Add a subquery aggregation on a relationship.
      *
      * @param  mixed  $relations
      * @param  string  $column
      * @param  string  $function
+     * @param  \Closure  $callback
      * @return $this
      */
-    public function withAggregate($relations, $column, $function = null)
+    public function relationAggregate($relations, $column, $function, $callback)
     {
         if (empty($relations)) {
             return $this;
@@ -662,17 +663,7 @@ trait QueriesRelationships
                 preg_replace('/[^[:alnum:][:space:]_]/u', '', "$name $function $column")
             );
 
-            if ($function === 'exists') {
-                $this->selectRaw(
-                    sprintf('exists(%s) as %s', $query->toSql(), $this->getQuery()->grammar->wrap($alias)),
-                    $query->getBindings()
-                )->withCasts([$alias => 'bool']);
-            } else {
-                $this->selectSub(
-                    $function ? $query : $query->limit(1),
-                    $alias
-                );
-            }
+            $callback($query, $alias);
         }
 
         return $this;
@@ -694,6 +685,36 @@ trait QueriesRelationships
         return $this->getQuery()->from === $relation->getQuery()->getQuery()->from
             ? "{$relation->getRelationCountHash(false)}.$column"
             : $column;
+    }
+
+    /**
+     * Add subselect queries to include an aggregate value for a relationship.
+     *
+     * @param  mixed  $relations
+     * @param  string  $column
+     * @param  string  $function
+     * @return $this
+     */
+    public function withAggregate($relations, $column, $function = null)
+    {
+        return $this->relationAggregate(
+            $relations,
+            $column,
+            $function,
+            function ($query, $alias) use ($function) {
+                if ($function === 'exists') {
+                    $this->selectRaw(
+                        sprintf('exists(%s) as %s', $query->toSql(), $this->getQuery()->grammar->wrap($alias)),
+                        $query->getBindings()
+                    )->withCasts([$alias => 'bool']);
+                } else {
+                    $this->selectSub(
+                        $function ? $query : $query->limit(1),
+                        $alias
+                    );
+                }
+            }
+        );
     }
 
     /**
@@ -764,6 +785,184 @@ trait QueriesRelationships
     public function withExists($relation)
     {
         return $this->withAggregate($relation, '*', 'exists');
+    }
+
+    /**
+     * Add the where clause to the query over relation aggregation.
+     *
+     * @param  mixed  $relation
+     * @param  string  $column
+     * @param  string  $function
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function WhereHasAggregate($relation, $column, $function, $operator = null, $value = null, $boolean = 'and')
+    {
+        return $this->relationAggregate(
+            $relation,
+            $column,
+            $function,
+            fn ($query) => $this->where($query, $operator, $value, $boolean)
+        );
+    }
+
+    /**
+     * Add the where clause to the query over relation count.
+     *
+     * @param  mixed  $relation
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereHasCount($relation, $operator = null, $value = null, $boolean = 'and')
+    {
+        return $this->WhereHasAggregate($relation, '*', 'count', $operator, $value, $boolean);
+    }
+
+    /**
+     * Add the where clause to the query over relation max.
+     *
+     * @param  mixed  $relation
+     * @param  string  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereHasMax($relation, $column, $operator = null, $value = null, $boolean = 'and')
+    {
+        return $this->WhereHasAggregate($relation, $column, 'max', $operator, $value, $boolean);
+    }
+
+    /**
+     * Add the where clause to the query over relation min.
+     *
+     * @param  mixed  $relation
+     * @param  string  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereHasMin($relation, $column, $operator = null, $value = null, $boolean = 'and')
+    {
+        return $this->WhereHasAggregate($relation, $column, 'min', $operator, $value, $boolean);
+    }
+
+    /**
+     * Add the where clause to the query over relation sum.
+     *
+     * @param  mixed  $relation
+     * @param  string  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereHasSum($relation, $column, $operator = null, $value = null, $boolean = 'and')
+    {
+        return $this->WhereHasAggregate($relation, $column, 'sum', $operator, $value, $boolean);
+    }
+
+    /**
+     * Add the where clause to the query over relation avg.
+     *
+     * @param  mixed  $relation
+     * @param  string  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereHasAvg($relation, $column, $operator = null, $value = null, $boolean = 'and')
+    {
+        return $this->WhereHasAggregate($relation, $column, 'avg', $operator, $value, $boolean);
+    }
+
+    /**
+     * Add the order by clause to the query over relation aggregation.
+     *
+     * @param  mixed  $relation
+     * @param  string  $column
+     * @param  string  $function
+     * @param  string  $direction
+     * @return $this
+     */
+    public function orderByAggregate($relation, $column, $function, $direction = 'asc')
+    {
+        return $this->relationAggregate(
+            $relation,
+            $column,
+            $function,
+            fn ($query) => $this->orderBy($query, $direction)
+        );
+    }
+
+    /**
+     * Add the order by clause to the query over relation count.
+     *
+     * @param  mixed  $relation
+     * @param  string  $direction
+     * @return $this
+     */
+    public function orderByCount($relation, $direction = 'asc')
+    {
+        return $this->orderByAggregate($relation, '*', 'count', $direction);
+    }
+
+    /**
+     * Add the order by clause to the query over relation max.
+     *
+     * @param  mixed  $relation
+     * @param  string  $column
+     * @param  string  $direction
+     * @return $this
+     */
+    public function orderByMax($relation, $column, $direction = 'asc')
+    {
+        return $this->orderByAggregate($relation, $column, 'max', $direction);
+    }
+
+    /**
+     * Add the order by clause to the query over relation count.
+     *
+     * @param  mixed  $relation
+     * @param  string  $column
+     * @param  string  $direction
+     * @return $this
+     */
+    public function orderByMin($relation, $column, $direction = 'asc')
+    {
+        return $this->orderByAggregate($relation, $column, 'min', $direction);
+    }
+
+    /**
+     * Add the order by clause to the query over relation count.
+     *
+     * @param  mixed  $relation
+     * @param  string  $column
+     * @param  string  $direction
+     * @return $this
+     */
+    public function orderBySum($relation, $column, $direction = 'asc')
+    {
+        return $this->orderByAggregate($relation, $column, 'sum', $direction);
+    }
+
+    /**
+     * Add the order by clause to the query over relation count.
+     *
+     * @param  mixed  $relation
+     * @param  string  $column
+     * @param  string  $direction
+     * @return $this
+     */
+    public function orderByAvg($relation, $column, $direction = 'asc')
+    {
+        return $this->orderByAggregate($relation, $column, 'avg', $direction);
     }
 
     /**
