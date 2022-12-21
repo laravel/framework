@@ -24,6 +24,7 @@ use Illuminate\Testing\Fluent\AssertableJson;
 use LogicException;
 use PHPUnit\Framework\ExpectationFailedException;
 use ReflectionProperty;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -56,6 +57,13 @@ class TestResponse implements ArrayAccess
      * @var string
      */
     protected $streamedContent;
+
+    /**
+     * The binary file content of the response.
+     *
+     * @var string
+     */
+    protected $binaryFileContent;
 
     /**
      * Create a new test response instance.
@@ -581,6 +589,19 @@ class TestResponse implements ArrayAccess
     public function assertStreamedContent($value)
     {
         PHPUnit::assertSame($value, $this->streamedContent());
+
+        return $this;
+    }
+
+    /**
+     * Assert that the given string matches the binary file response content.
+     *
+     * @param  $value
+     * @return $this
+     */
+    public function assertBinaryFileContent($value)
+    {
+        PHPUnit::assertSame($value, $this->binaryFileContent());
 
         return $this;
     }
@@ -1564,8 +1585,33 @@ class TestResponse implements ArrayAccess
             PHPUnit::fail('The response is not a streamed response.');
         }
 
-        ob_start(function (string $buffer): string {
-            $this->streamedContent .= $buffer;
+        return $this->streamedContent = $this->captureContent();
+    }
+
+    /**
+     * Get the binary file content from the response.
+     *
+     * @return string
+     */
+    public function binaryFileContent()
+    {
+        if (! is_null($this->binaryFileContent)) {
+            return $this->binaryFileContent;
+        }
+
+        if (! $this->baseResponse instanceof BinaryFileResponse) {
+            PHPUnit::fail('The response is not a binary file response.');
+        }
+
+        return $this->binaryFileContent = $this->captureContent();
+    }
+
+    protected function captureContent()
+    {
+        $content = '';
+
+        ob_start(function (string $buffer) use (&$content): string {
+            $content .= $buffer;
 
             return '';
         });
@@ -1574,7 +1620,7 @@ class TestResponse implements ArrayAccess
 
         ob_end_clean();
 
-        return $this->streamedContent;
+        return $content;
     }
 
     /**

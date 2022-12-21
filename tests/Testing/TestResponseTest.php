@@ -263,6 +263,34 @@ class TestResponseTest extends TestCase
         }
     }
 
+    public function testAssertBinaryFileContent()
+    {
+        $files = new Filesystem;
+        $tempDir = __DIR__.'/tmp';
+        $files->makeDirectory($tempDir, 0755, false, true);
+        $files->put($tempDir.'/file.txt', 'expected response data');
+
+        $response = TestResponse::fromBaseResponse(new BinaryFileResponse($tempDir.'/file.txt'));
+
+        $response->assertBinaryFileContent('expected response data');
+
+        try {
+            $response->assertBinaryFileContent('expected');
+            $this->fail('xxxx');
+        } catch (AssertionFailedError $e) {
+            $this->assertSame('Failed asserting that two strings are identical.', $e->getMessage());
+        }
+
+        try {
+            $response->assertBinaryFileContent('expected response data with extra');
+            $this->fail('xxxx');
+        } catch (AssertionFailedError $e) {
+            $this->assertSame('Failed asserting that two strings are identical.', $e->getMessage());
+        }
+
+        $files->deleteDirectory($tempDir);
+    }
+
     public function testAssertSee()
     {
         $response = $this->makeMockResponse([
