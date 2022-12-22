@@ -1585,7 +1585,7 @@ class TestResponse implements ArrayAccess
             PHPUnit::fail('The response is not a streamed response.');
         }
 
-        return $this->streamedContent = $this->captureContent();
+        return $this->streamedContent = $this->bufferContent();
     }
 
     /**
@@ -1603,10 +1603,10 @@ class TestResponse implements ArrayAccess
             PHPUnit::fail('The response is not a binary file response.');
         }
 
-        return $this->binaryFileContent = $this->captureContent();
+        return $this->binaryFileContent = $this->bufferContent();
     }
 
-    protected function captureContent()
+    protected function bufferContent()
     {
         $content = '';
 
