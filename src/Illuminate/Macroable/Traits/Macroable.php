@@ -25,10 +25,6 @@ trait Macroable
      */
     public static function macro($name, $macro)
     {
-        if (empty(static::$macros[static::class])) {
-            static::$macros[static::class] = [];
-        }
-
         static::$macros[static::class][$name] = $macro;
     }
 
