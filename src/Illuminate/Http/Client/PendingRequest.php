@@ -679,6 +679,30 @@ class PendingRequest
     }
 
     /**
+     * Issue a sync GET request to the given URL.
+     *
+     * @param  string  $url
+     * @param  array|string|null  $query
+     * @return \Illuminate\Http\Client\Response
+     */
+    public function getSync(string $url, $query = null)
+    {
+        return $this->async(false)->get($url, $query);
+    }
+
+    /**
+     * Issue an async GET request to the given URL.
+     *
+     * @param  string  $url
+     * @param  array|string|null  $query
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function getAsync(string $url, $query = null)
+    {
+        return $this->async()->get($url, $query);
+    }
+
+    /**
      * Issue a HEAD request to the given URL.
      *
      * @param  string  $url
@@ -693,17 +717,65 @@ class PendingRequest
     }
 
     /**
+     * Issue a sync HEAD request to the given URL.
+     *
+     * @param  string  $url
+     * @param  array|string|null  $query
+     * @return \Illuminate\Http\Client\Response
+     */
+    public function headSync(string $url, $query = null)
+    {
+        return $this->async(false)->head($url, $query);
+    }
+
+    /**
+     * Issue an async HEAD request to the given URL.
+     *
+     * @param  string  $url
+     * @param  array|string|null  $query
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function headAsync(string $url, $query = null)
+    {
+        return $this->async()->head($url, $query);
+    }
+
+    /**
      * Issue a POST request to the given URL.
      *
      * @param  string  $url
      * @param  array  $data
-     * @return \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface
+     * @return \Illuminate\Http\Client\Response
      */
     public function post(string $url, $data = [])
     {
         return $this->send('POST', $url, [
             $this->bodyFormat => $data,
         ]);
+    }
+
+    /**
+     * Issue a sync POST request to the given URL.
+     *
+     * @param  string  $url
+     * @param  array  $data
+     * @return \Illuminate\Http\Client\Response
+     */
+    public function postSync(string $url, $data = [])
+    {
+        return $this->async(false)->post($url, $data);
+    }
+
+    /**
+     * Issue an async POST request to the given URL.
+     *
+     * @param  string  $url
+     * @param  array  $data
+     * @return \Illuminate\Http\Client\Response
+     */
+    public function postAsync(string $url, $data = [])
+    {
+        return $this->async()->post($url, $data);
     }
 
     /**
@@ -721,6 +793,30 @@ class PendingRequest
     }
 
     /**
+     * Issue a sync PATCH request to the given URL.
+     *
+     * @param  string  $url
+     * @param  array  $data
+     * @return \Illuminate\Http\Client\Response
+     */
+    public function patchSync($url, $data = [])
+    {
+        return $this->async(false)->patch($url, $data);
+    }
+
+    /**
+     * Issue an async PATCH request to the given URL.
+     *
+     * @param  string  $url
+     * @param  array  $data
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function patchAsync($url, $data = [])
+    {
+        return $this->async()->patch($url, $data);
+    }
+
+    /**
      * Issue a PUT request to the given URL.
      *
      * @param  string  $url
@@ -735,6 +831,30 @@ class PendingRequest
     }
 
     /**
+     * Issue a sync PUT request to the given URL.
+     *
+     * @param  string  $url
+     * @param  array  $data
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function putSync($url, $data = [])
+    {
+        return $this->async(false)->put($url, $data);
+    }
+
+    /**
+     * Issue an async PUT request to the given URL.
+     *
+     * @param  string  $url
+     * @param  array  $data
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function putAsync($url, $data = [])
+    {
+        return $this->async()->put($url, $data);
+    }
+
+    /**
      * Issue a DELETE request to the given URL.
      *
      * @param  string  $url
@@ -742,6 +862,34 @@ class PendingRequest
      * @return \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface
      */
     public function delete($url, $data = [])
+    {
+        return $this->send('DELETE', $url, empty($data) ? [] : [
+            $this->bodyFormat => $data,
+        ]);
+    }
+
+    /**
+     * Issue a sync DELETE request to the given URL.
+     *
+     * @param  string  $url
+     * @param  array  $data
+     * @return \Illuminate\Http\Client\Response
+     */
+    public function deleteSync($url, $data = [])
+    {
+        return $this->send('DELETE', $url, empty($data) ? [] : [
+            $this->bodyFormat => $data,
+        ]);
+    }
+
+    /**
+     * Issue an async DELETE request to the given URL.
+     *
+     * @param  string  $url
+     * @param  array  $data
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function deleteAsync($url, $data = [])
     {
         return $this->send('DELETE', $url, empty($data) ? [] : [
             $this->bodyFormat => $data,
@@ -836,6 +984,36 @@ class PendingRequest
 
             return $result;
         });
+    }
+
+    /**
+     * Send the request to the given URL.
+     *
+     * @param  string  $method
+     * @param  string  $url
+     * @param  array  $options
+     * @return \Illuminate\Http\Client\Response
+     *
+     * @throws \Exception
+     */
+    public function sendSync(string $method, string $url, array $options = [])
+    {
+        return $this->async(false)->send($method, $url, $options);
+    }
+
+    /**
+     * Send the request to the given URL.
+     *
+     * @param  string  $method
+     * @param  string  $url
+     * @param  array  $options
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     *
+     * @throws \Exception
+     */
+    public function sendAsync(string $method, string $url, array $options = [])
+    {
+        return $this->async()->send($method, $url, $options);
     }
 
     /**
