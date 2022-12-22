@@ -5,18 +5,28 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Container\Container;
 use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Events\MigrationEnded;
+use Illuminate\Database\Events\MigrationEvent;
+use Illuminate\Database\Events\MigrationsEnded;
+use Illuminate\Database\Events\MigrationsStarted;
+use Illuminate\Database\Events\MigrationStarted;
+use Illuminate\Database\Events\NoPendingMigrations;
 use Illuminate\Database\Migrations\DatabaseMigrationRepository;
 use Illuminate\Database\Migrations\Migrator;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Str;
-use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 
 class DatabaseMigratorIntegrationTest extends TestCase
 {
     protected $db;
     protected $migrator;
+
+    protected $container;
 
     /**
      * Bootstrap Eloquent.
@@ -50,20 +60,29 @@ class DatabaseMigratorIntegrationTest extends TestCase
             return $app['db']->connection()->getSchemaBuilder();
         });
 
+        $container->singleton(Dispatcher::class, function ($app) {
+            return new Dispatcher($app);
+        });
+
+        $container->alias(DispatcherContract::class, 'events');
+        $container->bind(DispatcherContract::class, Dispatcher::class);
+
+        $container->instance('cache', new class() {
+            function refreshEventDispatcher() {}
+        });
+
+        $this->container = $container;
+
         Facade::setFacadeApplication($container);
+
+        Event::fake();
 
         $this->migrator = new Migrator(
             $repository = new DatabaseMigrationRepository($db->getDatabaseManager(), 'migrations'),
             $db->getDatabaseManager(),
-            new Filesystem
+            new Filesystem,
+            $container->make('events')
         );
-
-        $output = m::mock(OutputStyle::class);
-        $output->shouldReceive('write');
-        $output->shouldReceive('writeln');
-        $output->shouldReceive('newLineWritten');
-
-        $this->migrator->setOutput($output);
 
         if (! $repository->repositoryExists()) {
             $repository->createRepository();
@@ -81,6 +100,7 @@ class DatabaseMigratorIntegrationTest extends TestCase
     {
         Facade::clearResolvedInstances();
         Facade::setFacadeApplication(null);
+        $this->container = null;
     }
 
     public function testBasicMigrationOfSingleFolder()
@@ -281,5 +301,38 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $this->migrator->run([__DIR__.'/migrations/one'], ['database' => 'sqlite2']);
         $this->migrator->reset([__DIR__.'/migrations/one'], ['database' => 'sqlite2']);
         $this->assertSame('default', $this->migrator->getConnection());
+    }
+
+    public function testBasicMigrationOfSingleFolderRaisesEvents()
+    {
+        $ran = $this->migrator->run([__DIR__.'/migrations/one']);
+
+        $this->assertTrue($this->db->schema()->hasTable('users'));
+        $this->assertTrue($this->db->schema()->hasTable('password_resets'));
+
+        $this->assertTrue(str_contains($ran[0], 'users'));
+        $this->assertTrue(str_contains($ran[1], 'password_resets'));
+
+        Event::assertDispatchedTimes(MigrationEnded::class, 2);
+        Event::assertDispatchedTimes(MigrationStarted::class, 2);
+
+        Event::assertDispatchedTimes(MigrationsEnded::class, 1);
+        Event::assertDispatchedTimes(MigrationsStarted::class, 1);
+
+        Event::assertNotDispatched(NoPendingMigrations::class);
+
+        Event::assertDispatched(MigrationEnded::class, function (MigrationEnded $event) {
+            $this->assertIsString($event->migrationName);
+            $this->assertNotEmpty($event->migrationName);
+            $this->assertSame('up', $event->method);
+            return true;
+        });
+
+        Event::assertDispatched(MigrationStarted::class, function (MigrationStarted $event) {
+            $this->assertIsString($event->migrationName);
+            $this->assertNotEmpty($event->migrationName);
+            $this->assertSame('up', $event->method);
+            return true;
+        });
     }
 }
