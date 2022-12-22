@@ -272,17 +272,17 @@ class TestResponseTest extends TestCase
 
         $response = TestResponse::fromBaseResponse(new BinaryFileResponse($tempDir.'/file.txt'));
 
-        $response->assertBinaryFileContent('expected response data');
+        $response->assertFileContent('expected response data');
 
         try {
-            $response->assertBinaryFileContent('expected');
+            $response->assertFileContent('expected');
             $this->fail('xxxx');
         } catch (AssertionFailedError $e) {
             $this->assertSame('Failed asserting that two strings are identical.', $e->getMessage());
         }
 
         try {
-            $response->assertBinaryFileContent('expected response data with extra');
+            $response->assertFileContent('expected response data with extra');
             $this->fail('xxxx');
         } catch (AssertionFailedError $e) {
             $this->assertSame('Failed asserting that two strings are identical.', $e->getMessage());

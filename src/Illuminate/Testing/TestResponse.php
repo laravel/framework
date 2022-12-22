@@ -63,7 +63,7 @@ class TestResponse implements ArrayAccess
      *
      * @var string
      */
-    protected $binaryFileContent;
+    protected $fileContent;
 
     /**
      * Create a new test response instance.
@@ -599,9 +599,9 @@ class TestResponse implements ArrayAccess
      * @param  $value
      * @return $this
      */
-    public function assertBinaryFileContent($value)
+    public function assertFileContent($value)
     {
-        PHPUnit::assertSame($value, $this->binaryFileContent());
+        PHPUnit::assertSame($value, $this->fileContent());
 
         return $this;
     }
@@ -1593,17 +1593,17 @@ class TestResponse implements ArrayAccess
      *
      * @return string
      */
-    public function binaryFileContent()
+    public function fileContent()
     {
-        if (! is_null($this->binaryFileContent)) {
-            return $this->binaryFileContent;
+        if (! is_null($this->fileContent)) {
+            return $this->fileContent;
         }
 
         if (! $this->baseResponse instanceof BinaryFileResponse) {
             PHPUnit::fail('The response is not a binary file response.');
         }
 
-        return $this->binaryFileContent = $this->bufferContent();
+        return $this->fileContent = $this->bufferContent();
     }
 
     protected function bufferContent()
