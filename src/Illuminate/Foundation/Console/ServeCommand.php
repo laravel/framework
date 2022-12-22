@@ -74,6 +74,7 @@ class ServeCommand extends Command
         'XDEBUG_CONFIG',
         'XDEBUG_MODE',
         'XDEBUG_SESSION',
+        'PATH',
     ];
 
     /**
