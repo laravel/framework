@@ -184,7 +184,7 @@ class RouteRegistrar
     /**
      * Create a route group with shared attributes.
      *
-     * @param  \Closure|array|tstring  $callback
+     * @param  \Closure|array|string  $callback
      * @return $this
      */
     public function group($callback)
