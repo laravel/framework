@@ -25,7 +25,11 @@ trait Macroable
      */
     public static function macro($name, $macro)
     {
-        static::$macros[$name] = $macro;
+        if (empty(static::$macros[static::class])) {
+            static::$macros[static::class] = [];
+        }
+
+        static::$macros[static::class][$name] = $macro;
     }
 
     /**
@@ -59,7 +63,7 @@ trait Macroable
      */
     public static function hasMacro($name)
     {
-        return isset(static::$macros[$name]);
+        return (bool) static::getMacro($name);
     }
 
     /**
@@ -83,13 +87,13 @@ trait Macroable
      */
     public static function __callStatic($method, $parameters)
     {
-        if (! static::hasMacro($method)) {
+        $macro = static::getMacro($method);
+
+        if (! $macro) {
             throw new BadMethodCallException(sprintf(
                 'Method %s::%s does not exist.', static::class, $method
             ));
         }
-
-        $macro = static::$macros[$method];
 
         if ($macro instanceof Closure) {
             $macro = $macro->bindTo(null, static::class);
@@ -109,18 +113,39 @@ trait Macroable
      */
     public function __call($method, $parameters)
     {
-        if (! static::hasMacro($method)) {
+        $macro = static::getMacro($method);
+
+        if (! $macro) {
             throw new BadMethodCallException(sprintf(
                 'Method %s::%s does not exist.', static::class, $method
             ));
         }
-
-        $macro = static::$macros[$method];
 
         if ($macro instanceof Closure) {
             $macro = $macro->bindTo($this, static::class);
         }
 
         return $macro(...$parameters);
+    }
+
+    /**
+     * Get the registered macro for the given name.
+     *
+     * @param  string  $name
+     * @return object|callable|null
+     */
+    protected static function getMacro($name)
+    {
+        $class = static::class;
+
+        while ($class) {
+            if (isset(static::$macros[$class][$name])) {
+                return static::$macros[$class][$name];
+            }
+
+            $class = get_parent_class($class);
+        }
+
+        return null;
     }
 }
