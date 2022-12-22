@@ -986,24 +986,24 @@ class FoundationViteTest extends TestCase
     {
         $buildDir = Str::random();
         $this->makeViteManifest([
-            "resources/js/app.css" =>  [
-                "file" =>  "assets/app-versioned.css",
-                "src" =>  "resources/js/app.css"
+            'resources/js/app.css' =>  [
+                'file' =>  'assets/app-versioned.css',
+                'src' =>  'resources/js/app.css',
             ],
-            "resources/js/Pages/Welcome.vue" =>  [
-                "file" =>  "assets/Welcome-versioned.js",
-                "src" =>  "resources/js/Pages/Welcome.vue",
-                "imports" =>  [
-                    "resources/js/app.js"
-                ]
+            'resources/js/Pages/Welcome.vue' =>  [
+                'file' =>  'assets/Welcome-versioned.js',
+                'src' =>  'resources/js/Pages/Welcome.vue',
+                'imports' =>  [
+                    'resources/js/app.js',
+                ],
             ],
-            "resources/js/app.js" =>  [
-                "file" =>  "assets/app-versioned.js",
-                "src" =>  "resources/js/app.js",
-                "css" =>  [
-                    "assets/app-versioned.css"
-                ]
-            ]
+            'resources/js/app.js' =>  [
+                'file' =>  'assets/app-versioned.js',
+                'src' =>  'resources/js/app.js',
+                'css' =>  [
+                    'assets/app-versioned.css',
+                ],
+            ],
         ], $buildDir);
 
         $result = app(Vite::class)(['resources/js/app.js', 'resources/js/Pages/Welcome.vue'], $buildDir);
