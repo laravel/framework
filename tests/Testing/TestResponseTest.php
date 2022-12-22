@@ -263,7 +263,7 @@ class TestResponseTest extends TestCase
         }
     }
 
-    public function testAssertBinaryFileContent()
+    public function testAssertFileContent()
     {
         $files = new Filesystem;
         $tempDir = __DIR__.'/tmp';
