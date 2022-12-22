@@ -39,6 +39,31 @@ class SupportMacroableTest extends TestCase
         $this->assertFalse($macroable::hasMacro('bar'));
     }
 
+    public function testRegisterMacroInChildClass()
+    {
+        $macroable = $this->macroable;
+        $childMacroable = new ChildMacroable;
+
+        $macroable::macro('originalMethod', function () {
+            return 'parent - originalMethod';
+        });
+
+        $childMacroable::macro('originalMethod', function () {
+            return 'child - originalMethod';
+        });
+
+        $childMacroable::macro('newMethod', function () {
+            return 'child - newMethod';
+        });
+
+        $this->assertSame('parent - originalMethod', $macroable->originalMethod());
+        $this->assertSame('child - originalMethod', $childMacroable->originalMethod());
+        $this->assertSame('child - newMethod', $childMacroable->newMethod());
+
+        $this->expectException(BadMethodCallException::class);
+        $macroable->newMethod();
+    }
+
     public function testRegisterMacroAndCallWithoutStatic()
     {
         $macroable = $this->macroable;
@@ -123,6 +148,10 @@ class SupportMacroableTest extends TestCase
 class EmptyMacroable
 {
     use Macroable;
+}
+
+class ChildMacroable extends EmptyMacroable
+{
 }
 
 class TestMacroable
