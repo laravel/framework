@@ -504,6 +504,27 @@ class PrecognitionTest extends TestCase
         $response->assertHeader('Precognition', 'true');
     }
 
+    public function testItStopsExecutionAfterFailedValidationWithNestedValidationFilteringAndFormRequest()
+    {
+        Route::post('test-route', function (NestedPrecognitionTestRequest $request, ClassThatBindsOnInstantiation $foo) {
+            fail();
+        })->middleware(PrecognitionInvokingController::class);
+        $this->app->instance('ClassWasInstantiated', false);
+
+        $response = $this->postJson('test-route', [
+            'nested' => [
+                ['namsse' => 'sdsd']
+            ]
+        ], [
+            'Precognition' => 'true',
+            'Precognition-Validate-Only' => 'nested , nested.0.name',
+        ]);
+
+        $this->assertFalse($this->app['ClassWasInstantiated']);
+        $response->assertJsonValidationErrors('nested.0.name');
+        $response->assertHeader('Precognition', 'true');
+    }
+
     public function testItContinuesExecutionAfterSuccessfulValidationWithoutValidationFilteringAndFormRequest()
     {
         Route::post('test-route', function (PrecognitionTestRequest $request, ClassThatBindsOnInstantiation $foo) {
@@ -915,6 +936,17 @@ class PrecognitionTestRequest extends FormRequest
         }
 
         return $rules;
+    }
+}
+
+class NestedPrecognitionTestRequest extends FormRequest
+{
+    public function rules()
+    {
+        return [
+            'nested' => ['required', 'array', 'min:1'],
+            'nested.*.name' => ['required', 'string']
+        ];
     }
 }
 
