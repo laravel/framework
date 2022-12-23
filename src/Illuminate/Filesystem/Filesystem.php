@@ -284,14 +284,16 @@ class Filesystem
         $success = true;
 
         foreach ($paths as $path) {
-            try {
-                if (@unlink($path)) {
-                    clearstatcache(false, $path);
-                } else {
+            if (file_exists($path)) {
+                try {
+                    if (@unlink($path)) {
+                        clearstatcache(false, $path);
+                    } else {
+                        $success = false;
+                    }
+                } catch (ErrorException $e) {
                     $success = false;
                 }
-            } catch (ErrorException $e) {
-                $success = false;
             }
         }
 
