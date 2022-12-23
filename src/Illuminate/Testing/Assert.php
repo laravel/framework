@@ -5,10 +5,6 @@ namespace Illuminate\Testing;
 use ArrayAccess;
 use Illuminate\Testing\Constraints\ArraySubset;
 use PHPUnit\Framework\Assert as PHPUnit;
-use PHPUnit\Framework\Constraint\DirectoryExists;
-use PHPUnit\Framework\Constraint\FileExists;
-use PHPUnit\Framework\Constraint\LogicalNot;
-use PHPUnit\Framework\Constraint\RegularExpression;
 use PHPUnit\Framework\InvalidArgumentException;
 
 /**
