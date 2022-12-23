@@ -1133,6 +1133,57 @@ class FoundationViteTest extends TestCase
         rmdir(public_path($buildDir));
     }
 
+    public function testItOnlyOutputsUniquePreloadTags()
+    {
+        $buildDir = Str::random();
+        $this->makeViteManifest([
+            'resources/js/app.css' =>  [
+                'file' =>  'assets/app-versioned.css',
+                'src' =>  'resources/js/app.css',
+            ],
+            'resources/js/Pages/Welcome.vue' =>  [
+                'file' =>  'assets/Welcome-versioned.js',
+                'src' =>  'resources/js/Pages/Welcome.vue',
+                'imports' =>  [
+                    'resources/js/app.js',
+                ],
+            ],
+            'resources/js/app.js' =>  [
+                'file' =>  'assets/app-versioned.js',
+                'src' =>  'resources/js/app.js',
+                'css' =>  [
+                    'assets/app-versioned.css',
+                ],
+            ],
+        ], $buildDir);
+
+        $result = app(Vite::class)(['resources/js/app.js', 'resources/js/Pages/Welcome.vue'], $buildDir);
+
+        $this->assertSame(
+            '<link rel="preload" as="style" href="https://example.com/'.$buildDir.'/assets/app-versioned.css" />'
+            .'<link rel="modulepreload" href="https://example.com/'.$buildDir.'/assets/app-versioned.js" />'
+            .'<link rel="modulepreload" href="https://example.com/'.$buildDir.'/assets/Welcome-versioned.js" />'
+            .'<link rel="stylesheet" href="https://example.com/'.$buildDir.'/assets/app-versioned.css" />'
+            .'<script type="module" src="https://example.com/'.$buildDir.'/assets/app-versioned.js"></script>'
+            .'<script type="module" src="https://example.com/'.$buildDir.'/assets/Welcome-versioned.js"></script>',
+        $result->toHtml());
+
+        $this->assertSame([
+            "https://example.com/$buildDir/assets/app-versioned.css" => [
+                'rel="preload"',
+                'as="style"',
+            ],
+            "https://example.com/$buildDir/assets/app-versioned.js" => [
+                'rel="modulepreload"',
+            ],
+            "https://example.com/$buildDir/assets/Welcome-versioned.js" => [
+                'rel="modulepreload"',
+            ],
+        ], ViteFacade::preloadedAssets());
+
+        $this->cleanViteManifest($buildDir);
+    }
+
     protected function makeViteManifest($contents = null, $path = 'build')
     {
         app()->singleton('path.public', fn () => __DIR__);
