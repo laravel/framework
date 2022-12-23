@@ -263,7 +263,7 @@ trait ConditionallyLoadsAttributes
     }
 
     /**
-     * Retrieve a an attribute if it exists on the resource.
+     * Retrieve an attribute if it exists on the resource.
      *
      * @param  string  $attribute
      * @param  mixed  $value
