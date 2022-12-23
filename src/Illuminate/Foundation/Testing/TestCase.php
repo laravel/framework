@@ -27,6 +27,7 @@ abstract class TestCase extends BaseTestCase
         Concerns\InteractsWithDatabase,
         Concerns\InteractsWithDeprecationHandling,
         Concerns\InteractsWithExceptionHandling,
+        Concerns\InteractsWithNotSuccessfulTests,
         Concerns\InteractsWithSession,
         Concerns\InteractsWithTime,
         Concerns\InteractsWithViews;
@@ -289,20 +290,5 @@ abstract class TestCase extends BaseTestCase
                 }
             }
         }
-    }
-
-    /**
-     * This method is called when a test method did not execute successfully.
-     *
-     * @param  \Throwable  $exception
-     * @return void
-     */
-    protected function onNotSuccessfulTest(Throwable $exception): void
-    {
-        parent::onNotSuccessfulTest(
-            is_null(static::$latestResponse)
-                ? $exception
-                : static::$latestResponse->transformNotSuccessfulException($exception)
-        );
     }
 }

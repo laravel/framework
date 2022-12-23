@@ -23,7 +23,9 @@ class TestCaseTest extends BaseTestCase
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessageMatches('/Assertion message.*Unexpected exception/s');
 
-        $testCase->onNotSuccessfulTest(new ExpectationFailedException('Assertion message.'));
+        (fn () => $this->onNotSuccessfulTest(
+            new ExpectationFailedException('Assertion message.'))
+        )->call($testCase);
     }
 
     public function test_it_includes_validation_errors_on_test_failures()
@@ -39,7 +41,10 @@ class TestCaseTest extends BaseTestCase
 
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessageMatches('/Assertion message.*The first name field is required/s');
-        $testCase->onNotSuccessfulTest(new ExpectationFailedException('Assertion message.'));
+
+        (fn () => $testCase->onNotSuccessfulTest(
+            new ExpectationFailedException('Assertion message.'))
+        )->call($testCase);
     }
 
     public function test_it_includes_json_validation_errors_on_test_failures()
@@ -51,7 +56,9 @@ class TestCaseTest extends BaseTestCase
 
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessageMatches('/Assertion message.*The first name field is required/s');
-        $testCase->onNotSuccessfulTest(new ExpectationFailedException('Assertion message.'));
+        (fn () => $testCase->onNotSuccessfulTest(
+            new ExpectationFailedException('Assertion message.'))
+        )->call($testCase);
     }
 
     public function test_it_doesnt_fail_with_false_json()
@@ -63,7 +70,10 @@ class TestCaseTest extends BaseTestCase
 
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessageMatches('/Assertion message/s');
-        $testCase->onNotSuccessfulTest(new ExpectationFailedException('Assertion message.'));
+
+        (fn () => $testCase->onNotSuccessfulTest(
+            new ExpectationFailedException('Assertion message.'))
+        )->call($testCase);
     }
 
     public function test_it_doesnt_fail_with_encoded_json()
@@ -79,7 +89,10 @@ class TestCaseTest extends BaseTestCase
 
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessageMatches('/Assertion message/s');
-        $testCase->onNotSuccessfulTest(new ExpectationFailedException('Assertion message.'));
+
+        (fn () => $testCase->onNotSuccessfulTest(
+            new ExpectationFailedException('Assertion message.'))
+        )->call($testCase);
     }
 
     public function tearDown(): void
