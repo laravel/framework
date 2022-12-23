@@ -280,11 +280,9 @@ trait ConditionallyLoadsAttributes
             return value($default);
         }
 
-        if (func_num_args() === 1) {
-            return $this->resource->{$attribute};
-        }
-
-        return value($value, $this->resource->{$attribute});
+        return func_num_args() === 1
+                ? $this->resource->{$attribute}
+                : value($value, $this->resource->{$attribute});
     }
 
     /**
