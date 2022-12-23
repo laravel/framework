@@ -1478,6 +1478,92 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertSame([], $builder->getBindings());
     }
 
+    public function testWhereHasCount()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+
+        $builder = $model->whereHasCount('foo', '>', 1);
+
+        $this->assertSame('select "eloquent_builder_test_model_parent_stubs".* from "eloquent_builder_test_model_parent_stubs" where (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") > ?', $builder->toSql());
+        $this->assertSame([1], $builder->getBindings());
+    }
+
+    public function testWhereHasCountWithConstraintsAndHavingInSubquery()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+
+        $builder = $model->where('bar', 'baz')
+            ->whereHasCount(['foo' => fn ($q) => $q->having('bam', '>', 'qux')], '>', 1)
+            ->where('quux', 'quuux');
+
+        $this->assertSame('select "eloquent_builder_test_model_parent_stubs".* from "eloquent_builder_test_model_parent_stubs" where "bar" = ? and (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" having "bam" > ?) > ? and "quux" = ?', $builder->toSql());
+        $this->assertEquals(['baz', 'qux', 1, 'quuux'], $builder->getBindings());
+    }
+
+    public function testWhereHasCountThrowExceptionWhenOperatorisClosure()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The aggregation operator can not be a closure.');
+
+        $model = new EloquentBuilderTestModelParentStub;
+
+        $model->whereHasCount('foo', fn ($q) => $q->having('bam', '>', 'qux'), '>', 1);
+    }
+
+    public function testWhereHasMin()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+
+        $builder = $model->whereHasMin('foo', 'bam', '<=', 3);
+
+        $this->assertSame('select "eloquent_builder_test_model_parent_stubs".* from "eloquent_builder_test_model_parent_stubs" where (select min("eloquent_builder_test_model_close_related_stubs"."bam") from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") <= ?', $builder->toSql());
+        $this->assertSame([3], $builder->getBindings());
+    }
+
+    public function testWhereHasMinOnBelongsToMany()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+
+        $builder = $model->whereHasMin('roles', 'id', '>', 1);
+
+        $this->assertSame('select "eloquent_builder_test_model_parent_stubs".* from "eloquent_builder_test_model_parent_stubs" where (select min("eloquent_builder_test_model_far_related_stubs"."id") from "eloquent_builder_test_model_far_related_stubs" inner join "user_role" on "eloquent_builder_test_model_far_related_stubs"."id" = "user_role"."related_id" where "eloquent_builder_test_model_parent_stubs"."id" = "user_role"."self_id") > ?', $builder->toSql());
+        $this->assertSame([1], $builder->getBindings());
+    }
+
+    public function testWhereHasMinOnSelfRelated()
+    {
+        Carbon::setTestNow($now = '2017-10-10 10:10:10');
+
+        $model = new EloquentBuilderTestModelSelfRelatedStub;
+
+        $builder = $model->whereHasMin('childFoos', 'created_at', '>=', $now);
+
+        // alias has a dynamic hash, so replace with a static string for comparison
+        $alias = 'self_alias_hash';
+        $aliasRegex = '/\b(laravel_reserved_\d)(\b|$)/i';
+
+        $sql = preg_replace($aliasRegex, $alias, $builder->toSql());
+
+        $this->assertSame('select "self_related_stubs".* from "self_related_stubs" where (select min("self_alias_hash"."created_at") from "self_related_stubs" as "self_alias_hash" where "self_related_stubs"."id" = "self_alias_hash"."parent_id") >= ?', $sql);
+        $this->assertSame([$now], $builder->getBindings());
+    }
+
+    public function testWhereHasAggregateAndSelfRelationConstrain()
+    {
+        EloquentBuilderTestStub::resolveRelationUsing('children', function ($model) {
+            return $model->hasMany(EloquentBuilderTestStub::class, 'parent_id', 'id')->where('enum_value', 'foo');
+        });
+
+        $model = new EloquentBuilderTestStub;
+        $this->mockConnectionForModel($model, '');
+        $relationHash = $model->children()->getRelationCountHash(false);
+
+        $builder = $model->whereHasCount('children', '>', 2);
+
+        $this->assertSame(vsprintf('select "table".* from "table" where (select count(*) from "table" as "%s" where "table"."id" = "%s"."parent_id" and "enum_value" = ?) > ?', [$relationHash, $relationHash]), $builder->toSql());
+        $this->assertSame(['foo', 2], $builder->getBindings());
+    }
+
     public function testHasNestedWithConstraints()
     {
         $model = new EloquentBuilderTestModelParentStub;
