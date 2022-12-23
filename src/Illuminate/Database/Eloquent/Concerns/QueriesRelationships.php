@@ -800,6 +800,10 @@ trait QueriesRelationships
      */
     public function WhereHasAggregate($relation, $column, $function, $operator = null, $value = null, $boolean = 'and')
     {
+        if ($operator instanceof Closure) {
+            throw new InvalidArgumentException('The aggregation operator can not be a closure.');
+        }
+
         return $this->relationAggregate(
             $relation,
             $column,
