@@ -3454,6 +3454,29 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testKeyByWhenClosureReturningArrayOfKeys($collection)
+    {
+        $data = new $collection([
+            $entry1 = ['id' => 1, 'keys' => ['a', 'b']],
+            $entry2 = ['id' => 2, 'keys' => ['b']],
+            $entry3 = ['id' => 3, 'keys' => ['c']],
+            ['id' => 4, 'keys' => []],
+        ]);
+
+        $result = $data->keyBy(function ($item) {
+            return $item['keys'];
+        });
+
+        $this->assertEquals([
+            'a' => $entry1,
+            'b' => $entry2,
+            'c' => $entry3,
+        ], $result->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testKeyByObject($collection)
     {
         $data = new $collection([
