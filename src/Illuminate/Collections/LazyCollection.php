@@ -566,7 +566,6 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
                 }
 
                 foreach ($resolvedKeys as $resolvedKey) {
-
                     if (is_object($resolvedKey)) {
                         $resolvedKey = (string) $resolvedKey;
                     }
