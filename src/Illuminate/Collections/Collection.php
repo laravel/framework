@@ -542,13 +542,13 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         foreach ($this->items as $key => $item) {
             $resolvedKeys = $keyBy($item, $key);
 
-            if (!is_array($resolvedKeys)) {
+            if (! is_array($resolvedKeys)) {
                 $resolvedKeys = [$resolvedKeys];
             }
 
             foreach ($resolvedKeys as $resolvedKey) {
                 if (is_object($resolvedKey)) {
-                    $resolvedKey = (string)$resolvedKey;
+                    $resolvedKey = (string) $resolvedKey;
                 }
 
                 $results[$resolvedKey] = $item;

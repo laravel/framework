@@ -561,14 +561,14 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
             foreach ($this as $key => $item) {
                 $resolvedKeys = $keyBy($item, $key);
 
-                if (!is_array($resolvedKeys)) {
+                if (! is_array($resolvedKeys)) {
                     $resolvedKeys = [$resolvedKeys];
                 }
 
                 foreach ($resolvedKeys as $resolvedKey) {
 
                     if (is_object($resolvedKey)) {
-                        $resolvedKey = (string)$resolvedKey;
+                        $resolvedKey = (string) $resolvedKey;
                     }
 
                     yield $resolvedKey => $item;
