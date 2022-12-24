@@ -93,7 +93,7 @@ trait ConditionallyLoadsAttributes
     }
 
     /**
-     * Retrieve a value if the given "condition" is (or resolves to) truthy.
+     * Retrieve a value if the given "condition" is truthy.
      *
      * @param  bool  $condition
      * @param  mixed  $value
@@ -110,7 +110,7 @@ trait ConditionallyLoadsAttributes
     }
 
     /**
-     * Retrieve a value if the given "condition" is (or resolves to) falsy.
+     * Retrieve a value if the given "condition" is falsy.
      *
      * @param  bool  $condition
      * @param  mixed  $value
