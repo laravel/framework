@@ -76,6 +76,13 @@ class FilesystemTest extends TestCase
         );
     }
 
+    public function testLinesNotIsFile()
+    {
+        $filesystem = new Filesystem;
+        $this->expectException(FileNotFoundException::class);
+        $filesystem->requireOnce('foo.txt');
+    }
+
     public function testReplaceCreatesFile()
     {
         $tempFile = self::$tempDir.'/file.txt';
@@ -517,7 +524,7 @@ class FilesystemTest extends TestCase
      * @requires extension pcntl
      * @requires OS Linux|Darwin
      */
-    public function testSharedGet()
+    public function testGet()
     {
         $content = str_repeat('123456', 1000000);
         $result = 1;
@@ -554,6 +561,13 @@ class FilesystemTest extends TestCase
         $filesystem->requireOnce(self::$tempDir.'/scripts/foo.php');
         $this->assertTrue(function_exists('random_function_xyz'));
         $this->assertFalse(function_exists('random_function_xyz_changed'));
+    }
+
+    public function testRequireOnceNotIsFile()
+    {
+        $filesystem = new Filesystem;
+        $this->expectException(FileNotFoundException::class);
+        $filesystem->requireOnce('foo.txt');
     }
 
     public function testCopyCopiesFileProperly()
@@ -623,6 +637,17 @@ class FilesystemTest extends TestCase
         $filesystem = new Filesystem;
         $this->assertSame('0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33', $filesystem->hash(self::$tempDir.'/foo.txt', 'sha1'));
         $this->assertSame('76d3bc41c9f588f7fcd0d5bf4718f8f84b1c41b20882703100b9eb9413807c01', $filesystem->hash(self::$tempDir.'/foo.txt', 'sha3-256'));
+    }
+
+    public function testSharedGet()
+    {
+        $path = self::$tempDir.'/foo.txt';
+        file_put_contents($path, 'foo');
+
+        $files = new Filesystem;
+        $result = $files->sharedGet($path);
+
+        $this->assertEquals('foo', $result);
     }
 
     /**
