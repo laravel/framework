@@ -372,7 +372,6 @@ class Builder implements BuilderContract
      * @param  string  $boolean
      * @return mixed
      */
-
     public function forceDeleteWhere($column, $operator = null, $value = null, $boolean = 'and')
     {
         return $this->where($column, $operator, $value, $boolean)->forceDelete();
