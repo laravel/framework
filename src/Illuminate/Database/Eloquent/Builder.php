@@ -350,7 +350,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Combine where and Delete to one method
+     * Combine where and Delete to one method.
      *
      * @param  \Closure|array|string|\Illuminate\Database\Query\Expression  $column
      * @param  mixed  $operator
@@ -358,14 +358,13 @@ class Builder implements BuilderContract
      * @param  string  $boolean
      * @return mixed
      */
-
     public function deleteWhere($column, $operator = null, $value = null, $boolean = 'and')
     {
         return $this->where($column, $operator, $value, $boolean)->delete();
     }
 
     /**
-     * Combine where and Delete to one method
+     * Combine where and Delete to one method.
      *
      * @param  \Closure|array|string|\Illuminate\Database\Query\Expression  $column
      * @param  mixed  $operator
@@ -373,7 +372,7 @@ class Builder implements BuilderContract
      * @param  string  $boolean
      * @return mixed
      */
-    
+
     public function forceDeleteWhere($column, $operator = null, $value = null, $boolean = 'and')
     {
         return $this->where($column, $operator, $value, $boolean)->forceDelete();
