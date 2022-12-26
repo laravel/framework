@@ -179,7 +179,7 @@ class Builder implements BuilderContract
      */
     public function withoutGlobalScope($scope)
     {
-        if (! is_string($scope)) {
+        if (!is_string($scope)) {
             $scope = get_class($scope);
         }
 
@@ -198,7 +198,7 @@ class Builder implements BuilderContract
      */
     public function withoutGlobalScopes(array $scopes = null)
     {
-        if (! is_array($scopes)) {
+        if (!is_array($scopes)) {
             $scopes = array_keys($this->scopes);
         }
 
@@ -316,7 +316,9 @@ class Builder implements BuilderContract
     public function orWhere($column, $operator = null, $value = null)
     {
         [$value, $operator] = $this->query->prepareValueAndOperator(
-            $value, $operator, func_num_args() === 2
+            $value,
+            $operator,
+            func_num_args() === 2
         );
 
         return $this->where($column, $operator, $value, 'or');
@@ -333,7 +335,7 @@ class Builder implements BuilderContract
      */
     public function whereNot($column, $operator = null, $value = null, $boolean = 'and')
     {
-        return $this->where($column, $operator, $value, $boolean.' not');
+        return $this->where($column, $operator, $value, $boolean . ' not');
     }
 
     /**
@@ -347,6 +349,34 @@ class Builder implements BuilderContract
     public function orWhereNot($column, $operator = null, $value = null)
     {
         return $this->whereNot($column, $operator, $value, 'or');
+    }
+
+    /**
+     * Combine where and Delete to one method
+     *
+     * @param  \Closure|array|string|\Illuminate\Database\Query\Expression  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @param  string  $boolean
+     * @return mixed
+     */
+    public function deleteWhere($column, $operator = null, $value = null, $boolean = 'and')
+    {
+        return $this->where($column, $operator, $value, $boolean)->delete();
+    }
+
+    /**
+     * Combine where and Delete to one method
+     *
+     * @param  \Closure|array|string|\Illuminate\Database\Query\Expression  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @param  string  $boolean
+     * @return mixed
+     */
+    public function forceDeleteWhere($column, $operator = null, $value = null, $boolean = 'and')
+    {
+        return $this->where($column, $operator, $value, $boolean)->forceDelete();
     }
 
     /**
@@ -470,7 +500,8 @@ class Builder implements BuilderContract
         if (is_array($id)) {
             if (count($result) !== count(array_unique($id))) {
                 throw (new ModelNotFoundException)->setModel(
-                    get_class($this->model), array_diff($id, $result->modelKeys())
+                    get_class($this->model),
+                    array_diff($id, $result->modelKeys())
                 );
             }
 
@@ -479,7 +510,8 @@ class Builder implements BuilderContract
 
         if (is_null($result)) {
             throw (new ModelNotFoundException)->setModel(
-                get_class($this->model), $id
+                get_class($this->model),
+                $id
             );
         }
 
@@ -495,7 +527,7 @@ class Builder implements BuilderContract
      */
     public function findOrNew($id, $columns = ['*'])
     {
-        if (! is_null($model = $this->find($id, $columns))) {
+        if (!is_null($model = $this->find($id, $columns))) {
             return $model;
         }
 
@@ -518,7 +550,7 @@ class Builder implements BuilderContract
             $columns = ['*'];
         }
 
-        if (! is_null($model = $this->find($id, $columns))) {
+        if (!is_null($model = $this->find($id, $columns))) {
             return $model;
         }
 
@@ -534,7 +566,7 @@ class Builder implements BuilderContract
      */
     public function firstOrNew(array $attributes = [], array $values = [])
     {
-        if (! is_null($instance = $this->where($attributes)->first())) {
+        if (!is_null($instance = $this->where($attributes)->first())) {
             return $instance;
         }
 
@@ -550,7 +582,7 @@ class Builder implements BuilderContract
      */
     public function firstOrCreate(array $attributes = [], array $values = [])
     {
-        if (! is_null($instance = $this->where($attributes)->first())) {
+        if (!is_null($instance = $this->where($attributes)->first())) {
             return $instance;
         }
 
@@ -583,7 +615,7 @@ class Builder implements BuilderContract
      */
     public function firstOrFail($columns = ['*'])
     {
-        if (! is_null($model = $this->first($columns))) {
+        if (!is_null($model = $this->first($columns))) {
             return $model;
         }
 
@@ -605,7 +637,7 @@ class Builder implements BuilderContract
             $columns = ['*'];
         }
 
-        if (! is_null($model = $this->first($columns))) {
+        if (!is_null($model = $this->first($columns))) {
             return $model;
         }
 
@@ -715,7 +747,7 @@ class Builder implements BuilderContract
             // For nested eager loads we'll skip loading them here and they will be set as an
             // eager load on the query to retrieve the relation so that they will be eager
             // loaded on that query, because that is where they get hydrated as models.
-            if (! str_contains($name, '.')) {
+            if (!str_contains($name, '.')) {
                 $models = $this->eagerLoadRelation($models, $name, $constraints);
             }
         }
@@ -747,7 +779,8 @@ class Builder implements BuilderContract
         // of models which have been eagerly hydrated and are readied for return.
         return $relation->match(
             $relation->initRelation($models, $name),
-            $relation->getEager(), $name
+            $relation->getEager(),
+            $name
         );
     }
 
@@ -797,7 +830,7 @@ class Builder implements BuilderContract
         // that start with the given top relations and adds them to our arrays.
         foreach ($this->eagerLoad as $name => $constraints) {
             if ($this->isNestedUnder($relation, $name)) {
-                $nested[substr($name, strlen($relation.'.'))] = $constraints;
+                $nested[substr($name, strlen($relation . '.'))] = $constraints;
             }
         }
 
@@ -813,7 +846,7 @@ class Builder implements BuilderContract
      */
     protected function isNestedUnder($relation, $name)
     {
-        return str_contains($name, '.') && str_starts_with($name, $relation.'.');
+        return str_contains($name, '.') && str_starts_with($name, $relation . '.');
     }
 
     /**
@@ -854,9 +887,11 @@ class Builder implements BuilderContract
         // If the model has a mutator for the requested column, we will spin through
         // the results and mutate the values so that the mutated version of these
         // columns are returned as you would expect from these Eloquent models.
-        if (! $this->model->hasGetMutator($column) &&
-            ! $this->model->hasCast($column) &&
-            ! in_array($column, $this->model->getDates())) {
+        if (
+            !$this->model->hasGetMutator($column) &&
+            !$this->model->hasCast($column) &&
+            !in_array($column, $this->model->getDates())
+        ) {
             return $results;
         }
 
@@ -1017,7 +1052,7 @@ class Builder implements BuilderContract
             return 0;
         }
 
-        if (! is_array(reset($values))) {
+        if (!is_array(reset($values))) {
             $values = [$values];
         }
 
@@ -1048,7 +1083,7 @@ class Builder implements BuilderContract
 
         $column = $this->model->getUpdatedAtColumn();
 
-        if (! $this->model->usesTimestamps() || is_null($column)) {
+        if (!$this->model->usesTimestamps() || is_null($column)) {
             return false;
         }
 
@@ -1066,7 +1101,9 @@ class Builder implements BuilderContract
     public function increment($column, $amount = 1, array $extra = [])
     {
         return $this->toBase()->increment(
-            $column, $amount, $this->addUpdatedAtColumn($extra)
+            $column,
+            $amount,
+            $this->addUpdatedAtColumn($extra)
         );
     }
 
@@ -1081,7 +1118,9 @@ class Builder implements BuilderContract
     public function decrement($column, $amount = 1, array $extra = [])
     {
         return $this->toBase()->decrement(
-            $column, $amount, $this->addUpdatedAtColumn($extra)
+            $column,
+            $amount,
+            $this->addUpdatedAtColumn($extra)
         );
     }
 
@@ -1093,8 +1132,10 @@ class Builder implements BuilderContract
      */
     protected function addUpdatedAtColumn(array $values)
     {
-        if (! $this->model->usesTimestamps() ||
-            is_null($this->model->getUpdatedAtColumn())) {
+        if (
+            !$this->model->usesTimestamps() ||
+            is_null($this->model->getUpdatedAtColumn())
+        ) {
             return $values;
         }
 
@@ -1107,7 +1148,7 @@ class Builder implements BuilderContract
 
         $segments = preg_split('/\s+as\s+/i', $this->query->from);
 
-        $qualifiedColumn = end($segments).'.'.$column;
+        $qualifiedColumn = end($segments) . '.' . $column;
 
         $values[$qualifiedColumn] = Arr::get($values, $qualifiedColumn, $values[$column]);
 
@@ -1124,7 +1165,7 @@ class Builder implements BuilderContract
      */
     protected function addTimestampsToUpsertValues(array $values)
     {
-        if (! $this->model->usesTimestamps()) {
+        if (!$this->model->usesTimestamps()) {
             return $values;
         }
 
@@ -1152,15 +1193,17 @@ class Builder implements BuilderContract
      */
     protected function addUpdatedAtToUpsertColumns(array $update)
     {
-        if (! $this->model->usesTimestamps()) {
+        if (!$this->model->usesTimestamps()) {
             return $update;
         }
 
         $column = $this->model->getUpdatedAtColumn();
 
-        if (! is_null($column) &&
-            ! array_key_exists($column, $update) &&
-            ! in_array($column, $update)) {
+        if (
+            !is_null($column) &&
+            !array_key_exists($column, $update) &&
+            !in_array($column, $update)
+        ) {
             $update[] = $column;
         }
 
@@ -1237,7 +1280,8 @@ class Builder implements BuilderContract
             // care of grouping the "wheres" properly so the logical order doesn't get
             // messed up when adding scopes. Then we'll return back out the builder.
             $builder = $builder->callNamedScope(
-                $scope, Arr::wrap($parameters)
+                $scope,
+                Arr::wrap($parameters)
             );
         }
 
@@ -1251,14 +1295,14 @@ class Builder implements BuilderContract
      */
     public function applyScopes()
     {
-        if (! $this->scopes) {
+        if (!$this->scopes) {
             return $this;
         }
 
         $builder = clone $this;
 
         foreach ($this->scopes as $identifier => $scope) {
-            if (! isset($builder->scopes[$identifier])) {
+            if (!isset($builder->scopes[$identifier])) {
                 continue;
             }
 
@@ -1299,7 +1343,7 @@ class Builder implements BuilderContract
         // scope so that we can properly group the added scope constraints in the
         // query as their own isolated nested where statement and avoid issues.
         $originalWhereCount = is_null($query->wheres)
-                    ? 0 : count($query->wheres);
+            ? 0 : count($query->wheres);
 
         $result = $scope(...$parameters) ?? $this;
 
@@ -1341,11 +1385,13 @@ class Builder implements BuilderContract
         $query->wheres = [];
 
         $this->groupWhereSliceForScope(
-            $query, array_slice($allWheres, 0, $originalWhereCount)
+            $query,
+            array_slice($allWheres, 0, $originalWhereCount)
         );
 
         $this->groupWhereSliceForScope(
-            $query, array_slice($allWheres, $originalWhereCount)
+            $query,
+            array_slice($allWheres, $originalWhereCount)
         );
     }
 
@@ -1365,7 +1411,8 @@ class Builder implements BuilderContract
         // we don't add any unnecessary nesting thus keeping the query clean.
         if ($whereBooleans->contains('or')) {
             $query->wheres[] = $this->createNestedWhere(
-                $whereSlice, $whereBooleans->first()
+                $whereSlice,
+                $whereBooleans->first()
             );
         } else {
             $query->wheres = array_merge($query->wheres, $whereSlice);
@@ -1494,7 +1541,7 @@ class Builder implements BuilderContract
         // syntax, we shall loop over the nested relations and prepend each key of
         // this array while flattening into the traditional dot notation format.
         foreach ($relations as $key => $value) {
-            if (! is_string($key) || ! is_array($value)) {
+            if (!is_string($key) || !is_array($value)) {
                 continue;
             }
 
@@ -1517,9 +1564,9 @@ class Builder implements BuilderContract
                 [$key, $value] = $this->parseNameAndAttributeSelectionConstraint($value);
             }
 
-            $preparedRelationships[$prefix.$key] = $this->combineConstraints([
+            $preparedRelationships[$prefix . $key] = $this->combineConstraints([
                 $value,
-                $preparedRelationships[$prefix.$key] ?? static function () {
+                $preparedRelationships[$prefix . $key] ?? static function () {
                     //
                 },
             ]);
@@ -1575,8 +1622,8 @@ class Builder implements BuilderContract
                 }
 
                 return $query instanceof BelongsToMany
-                        ? $query->getRelated()->getTable().'.'.$column
-                        : $column;
+                    ? $query->getRelated()->getTable() . '.' . $column
+                    : $column;
             }, explode(',', explode(':', $name)[1])));
         }];
     }
@@ -1598,7 +1645,7 @@ class Builder implements BuilderContract
         foreach (explode('.', $name) as $segment) {
             $progress[] = $segment;
 
-            if (! isset($results[$last = implode('.', $progress)])) {
+            if (!isset($results[$last = implode('.', $progress)])) {
                 $results[$last] = static function () {
                     //
                 };
@@ -1887,7 +1934,7 @@ class Builder implements BuilderContract
             return static::registerMixin($parameters[0], $parameters[1] ?? true);
         }
 
-        if (! static::hasGlobalMacro($method)) {
+        if (!static::hasGlobalMacro($method)) {
             static::throwBadMethodCallException($method);
         }
 
@@ -1914,7 +1961,7 @@ class Builder implements BuilderContract
         );
 
         foreach ($methods as $method) {
-            if ($replace || ! static::hasGlobalMacro($method->name)) {
+            if ($replace || !static::hasGlobalMacro($method->name)) {
                 $method->setAccessible(true);
 
                 static::macro($method->name, $method->invoke($mixin));
