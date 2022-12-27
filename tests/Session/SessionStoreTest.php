@@ -634,7 +634,7 @@ class SessionStoreTest extends TestCase
         ]], $errors->getBags()['default']->getMessages());
     }
 
-    public function testsItIsMacroable()
+    public function testItIsMacroable()
     {
         $this->getSession()->macro('foo', function () {
             return 'macroable';
