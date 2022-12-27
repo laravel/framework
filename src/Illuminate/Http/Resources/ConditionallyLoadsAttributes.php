@@ -158,6 +158,29 @@ trait ConditionallyLoadsAttributes
     }
 
     /**
+     * Retrieve an attribute if it exists on the resource.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  mixed  $default
+     * @return \Illuminate\Http\Resources\MissingValue|mixed
+     */
+    public function whenHas($attribute, $value = null, $default = null)
+    {
+        if (func_num_args() < 3) {
+            $default = new MissingValue;
+        }
+
+        if (! array_key_exists($attribute, $this->resource->getAttributes())) {
+            return value($default);
+        }
+
+        return func_num_args() === 1
+                ? $this->resource->{$attribute}
+                : value($value, $this->resource->{$attribute});
+    }
+
+    /**
      * Retrieve a model attribute if it is null.
      *
      * @param  mixed  $value
@@ -242,7 +265,7 @@ trait ConditionallyLoadsAttributes
     public function whenCounted($relationship, $value = null, $default = null)
     {
         if (func_num_args() < 3) {
-            $default = new MissingValue();
+            $default = new MissingValue;
         }
 
         $attribute = (string) Str::of($relationship)->snake()->finish('_count');

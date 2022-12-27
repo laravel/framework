@@ -615,7 +615,7 @@ class Arr
      *
      * @param  array  $array
      * @param  int|null  $number
-     * @param  bool|false  $preserveKeys
+     * @param  bool  $preserveKeys
      * @return mixed
      *
      * @throws \InvalidArgumentException
