@@ -23,7 +23,6 @@ class TestCaseTest extends BaseTestCase
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessageMatches('/Assertion message.*Unexpected exception/s');
 
-
         $testCase::$latestResponse->transformNotSuccessfulException(
             $exception = new ExpectationFailedException('Assertion message.'),
         );
