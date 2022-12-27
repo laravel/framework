@@ -460,6 +460,26 @@ trait FormatsMessages
     }
 
     /**
+     * Get the displayable list of the values.
+     *
+     * @param  string  $attribute
+     * @param  array  $values
+     * @return string
+     */
+    public function getDisplayableValues($attribute, $values)
+    {
+        $list = [];
+
+        foreach ($values as $value) {
+            $displayable = $this->getDisplayableValue($attribute, $value);
+
+            $list[] = str_contains($displayable, ',') ? '"'.$displayable.'"' : $displayable;
+        }
+
+        return implode(', ', $list);
+    }
+
+    /**
      * Transform an array of attributes to their displayable form.
      *
      * @param  array  $values
