@@ -48,8 +48,7 @@ interface Guard
      * @return bool
      */
     public function hasUser();
-
-
+    
     /**
      * Compares the authenticated user with a given user.
      *
