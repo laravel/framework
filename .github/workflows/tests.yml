@@ -40,9 +40,10 @@ jobs:
       fail-fast: true
       matrix:
         php: [8.1, 8.2]
+        phpunit: ['9.0', '10.0']
         stability: [prefer-lowest, prefer-stable]
 
-    name: PHP ${{ matrix.php }} - ${{ matrix.stability }}
+    name: PHP ${{ matrix.php }} - ${{ matrix.phpunit }} - ${{ matrix.stability }}
 
     steps:
       - name: Checkout code
@@ -65,7 +66,7 @@ jobs:
         with:
           timeout_minutes: 5
           max_attempts: 5
-          command: composer require symfony/css-selector:^6.0 --no-interaction --no-update
+          command: composer require phpunit/phpunit:^${{ matrix.phpunit }} symfony/css-selector:^6.0 --no-interaction --no-update
 
       - name: Set Minimum PHP 8.2 Versions
         uses: nick-fields/retry@v2
