@@ -4,6 +4,8 @@ namespace Illuminate\Tests\Cache;
 
 use Illuminate\Cache\ApcStore;
 use Illuminate\Cache\ApcWrapper;
+use Mockery;
+use Mockery\Mock;
 use PHPUnit\Framework\TestCase;
 
 class CacheApcStoreTest extends TestCase
@@ -53,14 +55,23 @@ class CacheApcStoreTest extends TestCase
 
     public function testSetMultipleMethodProperlyCallsAPC()
     {
-        $apc = $this->getMockBuilder(ApcWrapper::class)->onlyMethods(['put'])->getMock();
-        $apc->expects($this->exactly(3))->method('put')->withConsecutive([
-            $this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo(60),
-        ], [
-            $this->equalTo('baz'), $this->equalTo('qux'), $this->equalTo(60),
-        ], [
-            $this->equalTo('bar'), $this->equalTo('norf'), $this->equalTo(60),
-        ])->willReturn(true);
+        $apc = Mockery::mock(ApcWrapper::class);
+
+        $apc->shouldReceive('put')
+            ->once()
+            ->with('foo', 'bar', 60)
+            ->andReturn(true);
+
+        $apc->shouldReceive('put')
+            ->once()
+            ->with('baz', 'qux', 60)
+            ->andReturn(true);
+
+        $apc->shouldReceive('put')
+            ->once()
+            ->with('bar', 'norf', 60)
+            ->andReturn(true);
+
         $store = new ApcStore($apc);
         $result = $store->putMany([
             'foo' => 'bar',

@@ -151,11 +151,19 @@ jobs:
           max_attempts: 5
           command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
 
-      - name: Execute tests
-        run: vendor/bin/phpunit --verbose
+      - name: Execute tests against PHPUnit ^9
+        run: vendor/bin/phpunit --verbose --configuration phpunit9.xml.dist
         env:
           AWS_ACCESS_KEY_ID: random_key
           AWS_SECRET_ACCESS_KEY: random_secret
+        if: matrix.phpunit == '9.0'
+
+      - name: Execute tests against PHPUnit ^10
+        run: vendor/bin/phpunit
+        env:
+          AWS_ACCESS_KEY_ID: random_key
+          AWS_SECRET_ACCESS_KEY: random_secret
+        if : matrix.phpunit != '9.0'
 
       - name: Store artifacts
         uses: actions/upload-artifact@v3

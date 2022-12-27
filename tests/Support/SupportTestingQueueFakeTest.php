@@ -8,7 +8,6 @@ use Illuminate\Foundation\Application;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Support\Testing\Fakes\QueueFake;
 use Mockery as m;
-use PHPUnit\Framework\Constraint\ExceptionMessage;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 
@@ -44,7 +43,7 @@ class SupportTestingQueueFakeTest extends TestCase
             $this->fake->assertPushed(JobStub::class);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\JobStub] job was not pushed.'));
+            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\JobStub] job was not pushed.', $e->getMessage());
         }
 
         $this->fake->push($this->job);
@@ -110,7 +109,7 @@ class SupportTestingQueueFakeTest extends TestCase
             $this->fake->assertNotPushed(JobStub::class);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('The unexpected [Illuminate\Tests\Support\JobStub] job was pushed.'));
+            $this->assertStringContainsString('The unexpected [Illuminate\Tests\Support\JobStub] job was pushed.', $e->getMessage());
         }
     }
 
@@ -126,7 +125,7 @@ class SupportTestingQueueFakeTest extends TestCase
             });
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('The unexpected [Illuminate\Tests\Support\JobStub] job was pushed.'));
+            $this->assertStringContainsString('The unexpected [Illuminate\Tests\Support\JobStub] job was pushed.', $e->getMessage());
         }
     }
 
@@ -138,7 +137,7 @@ class SupportTestingQueueFakeTest extends TestCase
             $this->fake->assertPushedOn('bar', JobStub::class);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\JobStub] job was not pushed.'));
+            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\JobStub] job was not pushed.', $e->getMessage());
         }
 
         $this->fake->assertPushedOn('foo', JobStub::class);
@@ -154,7 +153,7 @@ class SupportTestingQueueFakeTest extends TestCase
             });
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\JobStub] job was not pushed.'));
+            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\JobStub] job was not pushed.', $e->getMessage());
         }
 
         $this->fake->assertPushedOn('foo', function (JobStub $job) {
@@ -171,7 +170,7 @@ class SupportTestingQueueFakeTest extends TestCase
             $this->fake->assertPushed(JobStub::class, 1);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\JobStub] job was pushed 2 times instead of 1 times.'));
+            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\JobStub] job was pushed 2 times instead of 1 times.', $e->getMessage());
         }
 
         $this->fake->assertPushed(JobStub::class, 2);
@@ -187,7 +186,7 @@ class SupportTestingQueueFakeTest extends TestCase
             $this->fake->assertNothingPushed();
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('Jobs were pushed unexpectedly.'));
+            $this->assertStringContainsString('Jobs were pushed unexpectedly.', $e->getMessage());
         }
     }
 
@@ -273,7 +272,7 @@ class SupportTestingQueueFakeTest extends TestCase
             });
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('The expected chain was not pushed'));
+            $this->assertStringContainsString('The expected chain was not pushed.', $e->getMessage());
         }
     }
 
@@ -283,7 +282,7 @@ class SupportTestingQueueFakeTest extends TestCase
             $this->fake->assertPushedWithChain(JobWithChainStub::class, []);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\JobWithChainStub] job was not pushed'));
+            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\JobWithChainStub] job was not pushed.', $e->getMessage());
         }
 
         $this->fake->push(new JobWithChainStub([
@@ -294,7 +293,7 @@ class SupportTestingQueueFakeTest extends TestCase
             $this->fake->assertPushedWithChain(JobWithChainStub::class, []);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('The expected chain can not be empty'));
+            $this->assertStringContainsString('The expected chain can not be empty.', $e->getMessage());
         }
 
         try {
@@ -304,7 +303,7 @@ class SupportTestingQueueFakeTest extends TestCase
             ]);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('The expected chain was not pushed'));
+            $this->assertStringContainsString('The expected chain was not pushed.', $e->getMessage());
         }
 
         try {
@@ -314,7 +313,7 @@ class SupportTestingQueueFakeTest extends TestCase
             ]);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('The expected chain was not pushed'));
+            $this->assertStringContainsString('The expected chain was not pushed.', $e->getMessage());
         }
     }
 
@@ -323,9 +322,9 @@ class SupportTestingQueueFakeTest extends TestCase
         try {
             $this->fake->undefinedMethod();
         } catch (BadMethodCallException $e) {
-            $this->assertThat($e, new ExceptionMessage(sprintf(
+            $this->assertSame(sprintf(
                 'Call to undefined method %s::%s()', get_class($this->fake), 'undefinedMethod'
-            )));
+            ), $e->getMessage());
         }
     }
 
