@@ -83,6 +83,16 @@ trait GuardHelpers
     }
 
     /**
+     * Compares the authenticated user with a given user
+     *
+     * @return bool
+     */
+    public function userIs(AuthenticatableContract $user)
+    {
+        return $this->user->getAuthIdentifier() === $user->getAuthIdentifier();
+    }
+
+    /**
      * Set the current user.
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user

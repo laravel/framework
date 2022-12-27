@@ -2,6 +2,8 @@
 
 namespace Illuminate\Contracts\Auth;
 
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
+
 interface Guard
 {
     /**
@@ -46,6 +48,14 @@ interface Guard
      * @return bool
      */
     public function hasUser();
+
+
+    /**
+     * Compares the authenticated user with a given user
+     *
+     * @return bool
+     */
+    public function userIs(AuthenticatableContract $user);
 
     /**
      * Set the current user.
