@@ -6,8 +6,6 @@ on:
       - master
       - '*.x'
 
-if: ${{ github.repository_owner == 'laravel' }}
-
 jobs:
   update:
     runs-on: ubuntu-22.04
