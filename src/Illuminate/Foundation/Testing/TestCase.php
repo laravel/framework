@@ -27,7 +27,6 @@ abstract class TestCase extends BaseTestCase
         Concerns\InteractsWithDatabase,
         Concerns\InteractsWithDeprecationHandling,
         Concerns\InteractsWithExceptionHandling,
-        Concerns\InteractsWithNotSuccessfulTests,
         Concerns\InteractsWithSession,
         Concerns\InteractsWithTime,
         Concerns\InteractsWithViews;
@@ -112,6 +111,26 @@ abstract class TestCase extends BaseTestCase
     protected function refreshApplication()
     {
         $this->app = $this->createApplication();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function runTest(): mixed
+    {
+        $result = null;
+
+        try {
+            $result = parent::runTest();
+        } catch (Throwable $e) {
+            if (! is_null(static::$latestResponse)) {
+                static::$latestResponse->transformNotSuccessfulException($e);
+            }
+
+            throw $e;
+        }
+
+        return $result;
     }
 
     /**
