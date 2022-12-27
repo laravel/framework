@@ -1,22 +1,21 @@
-name: static analysis
+name: facades
 
 on:
   push:
     branches:
       - master
       - '*.x'
-  pull_request:
+
+if: ${{ github.repository_owner == 'laravel' }}
 
 jobs:
-  types:
+  update:
     runs-on: ubuntu-22.04
 
     strategy:
       fail-fast: true
-      matrix:
-        directory: [src, types]
 
-    name: ${{ matrix.directory == 'src' && 'Source Code' || 'Types' }}
+    name: Facade DocBlocks
 
     steps:
       - name: Checkout code
@@ -36,5 +35,11 @@ jobs:
           max_attempts: 5
           command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
 
-      - name: Execute type checking
-        run: vendor/bin/phpstan --configuration="phpstan.${{ matrix.directory }}.neon.dist"
+      - name: Update facade docblocks
+        run: php -f bin/facades.php
+
+      - name: Commit facade docblocks
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Update facade docblocks
+          file_pattern: src/
