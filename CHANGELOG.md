@@ -1,6 +1,15 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.45.0...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.45.1...9.x)
+
+
+## [v9.45.1](https://github.com/laravel/framework/compare/v9.45.0...v9.45.1) - 2022-12-21
+
+### Revert
+- Revert "fix single line @php statements to not be parsed as php blocks" ([#45389](https://github.com/laravel/framework/pull/45389))
+
+### Changed
+- Load schema to in memory database ([#45375](https://github.com/laravel/framework/pull/45375))
 
 
 ## [v9.45.0](https://github.com/laravel/framework/compare/v9.44.0...v9.45.0) - 2022-12-20
