@@ -51,7 +51,7 @@ interface Guard
 
 
     /**
-     * Compares the authenticated user with a given user
+     * Compares the authenticated user with a given user.
      *
      * @return bool
      */
