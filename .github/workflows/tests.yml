@@ -43,7 +43,7 @@ jobs:
         phpunit: ['9.0', '10.0']
         stability: [prefer-lowest, prefer-stable]
 
-    name: PHP ${{ matrix.php }} - ${{ matrix.phpunit }} - ${{ matrix.stability }}
+    name: PHP ${{ matrix.php }} - PHPUnit ${{ matrix.phpunit }} - ${{ matrix.stability }}
 
     steps:
       - name: Checkout code
