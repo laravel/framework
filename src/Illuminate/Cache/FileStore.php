@@ -270,7 +270,7 @@ class FileStore implements Store, LockProvider
         $e = null;
 
         try {
-            $data = @unserialize(substr($contents, 10));
+            $data = unserialize(substr($contents, 10));
         } catch (Exception $e) {
             // ...
         }
