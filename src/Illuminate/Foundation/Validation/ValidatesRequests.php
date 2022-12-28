@@ -28,7 +28,7 @@ trait ValidatesRequests
 
         return tap($validator, function ($validator) use ($request) {
             if ($request->isPrecognitive()) {
-                $rules = $request->filterPrecognitiveRules($validator->getRules());
+                $rules = $request->filterPrecognitiveRules($validator->getRulesWithoutPlaceholders());
 
                 $validator->setRules($rules)->after(Precognition::afterValidationHook($request));
             }
@@ -55,7 +55,7 @@ trait ValidatesRequests
 
         return tap($validator, function ($validator) use ($request) {
             if ($request->isPrecognitive()) {
-                $rules = $request->filterPrecognitiveRules($validator->getRules());
+                $rules = $request->filterPrecognitiveRules($validator->getRulesWithoutPlaceholders());
 
                 $validator->setRules($rules)->after(Precognition::afterValidationHook($request));
             }

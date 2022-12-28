@@ -3,7 +3,6 @@
 namespace Illuminate\Http\Concerns;
 
 use Illuminate\Support\Collection;
-use Illuminate\Validation\ValidationRuleParser;
 
 trait CanBePrecognitive
 {

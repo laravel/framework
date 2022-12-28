@@ -1092,6 +1092,18 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Get the validation rules with key placeholders removed.
+     *
+     * @return array
+     */
+    public function getRulesWithoutPlaceholders()
+    {
+        return collect($this->rules)->mapWithKeys(fn ($value, $key) => [
+            $this->replacePlaceholderInString($key) => $value,
+        ])->all();
+    }
+
+    /**
      * Set the validation rules.
      *
      * @param  array  $rules
