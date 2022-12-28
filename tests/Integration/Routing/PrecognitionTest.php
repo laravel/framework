@@ -520,6 +520,7 @@ class PrecognitionTest extends TestCase
             'Precognition-Validate-Only' => 'nested,nested.0.name',
         ]);
 
+        $response->assertStatus(422);
         $this->assertFalse($this->app['ClassWasInstantiated']);
         $response->assertJsonValidationErrors('nested.0.name');
         $response->assertHeader('Precognition', 'true');
