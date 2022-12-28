@@ -25,18 +25,6 @@ trait CanBePrecognitive
     }
 
     /**
-     * Parse the human-friendly rules into a full rules array.
-     *
-     * @param  array  $rules
-     * @param  array  $data
-     * @return \stdClass
-     */
-    public function explodePrecognitiveRules($rules, $data)
-    {
-        return (new ValidationRuleParser($data))->explode($rules);
-    }
-
-    /**
      * Determine if the request is attempting to be precognitive.
      *
      * @return bool

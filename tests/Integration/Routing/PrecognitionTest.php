@@ -504,12 +504,11 @@ class PrecognitionTest extends TestCase
         $response->assertHeader('Precognition', 'true');
     }
 
-    public function testItStopsExecutionAfterFailedValidationWithNestedValidationFilteringAndFormRequest()
+    public function testItStopsExecutionAfterFailedValidationWithNestedValidationFilteringUsingFormRequest()
     {
-        Route::post('test-route', function (NestedPrecognitionTestRequest $request, ClassThatBindsOnInstantiation $foo) {
+        Route::post('test-route', function (NestedPrecognitionTestRequest $request) {
             fail();
         })->middleware(PrecognitionInvokingController::class);
-        $this->app->instance('ClassWasInstantiated', false);
 
         $response = $this->postJson('test-route', [
             'nested' => [
@@ -521,8 +520,113 @@ class PrecognitionTest extends TestCase
         ]);
 
         $response->assertStatus(422);
-        $this->assertFalse($this->app['ClassWasInstantiated']);
-        $response->assertJsonValidationErrors('nested.0.name');
+        $response->assertExactJson([
+            'message' => 'The nested.0.name field is required.',
+            'errors' => [
+                'nested' => [
+                    [
+                        'name' => [
+                            'The nested.0.name field is required.',
+                        ]
+                    ],
+                ],
+            ],
+        ]);
+        $response->assertHeader('Precognition', 'true');
+    }
+
+    public function testItStopsExecutionAfterFailedValidationWithNestedValidationFilteringUsingRequestValidate()
+    {
+        Route::post('test-route', function (Request $request) {
+            $request->validate([
+                'nested' => ['required', 'array', 'min:1'],
+                'nested.*.name' => ['required', 'string']
+            ]);
+            fail();
+        })->middleware(PrecognitionInvokingController::class);
+
+        $response = $this->postJson('test-route', [
+            'nested' => [
+                ['namsse' => 'sdsd']
+            ]
+        ], [
+            'Precognition' => 'true',
+            'Precognition-Validate-Only' => 'nested,nested.0.name',
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertExactJson([
+            'message' => 'The nested.0.name field is required.',
+            'errors' => [
+                'nested' => [
+                    [
+                        'name' => [
+                            'The nested.0.name field is required.',
+                        ]
+                    ],
+                ],
+            ],
+        ]);
+        $response->assertHeader('Precognition', 'true');
+    }
+
+    public function testItStopsExecutionAfterFailedValidationWithNestedValidationFilteringUsingControllerValidate()
+    {
+        Route::post('test-route', [PrecognitionTestController::class, 'methodWhereNestedRulesAreValidatedViaControllerValidate'])
+            ->middleware(PrecognitionInvokingController::class);
+
+        $response = $this->postJson('test-route', [
+            'nested' => [
+                ['namsse' => 'sdsd']
+            ]
+        ], [
+            'Precognition' => 'true',
+            'Precognition-Validate-Only' => 'nested,nested.0.name',
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertExactJson([
+            'message' => 'The nested.0.name field is required.',
+            'errors' => [
+                'nested' => [
+                    [
+                        'name' => [
+                            'The nested.0.name field is required.',
+                        ]
+                    ],
+                ],
+            ],
+        ]);
+        $response->assertHeader('Precognition', 'true');
+    }
+
+    public function testItStopsExecutionAfterFailedValidationWithNestedValidationFilteringUsingControllerValidateWith()
+    {
+        Route::post('test-route', [PrecognitionTestController::class, 'methodWhereNestedRulesAreValidatedViaControllerValidateWith'])
+            ->middleware(PrecognitionInvokingController::class);
+
+        $response = $this->postJson('test-route', [
+            'nested' => [
+                ['namsse' => 'sdsd']
+            ]
+        ], [
+            'Precognition' => 'true',
+            'Precognition-Validate-Only' => 'nested,nested.0.name',
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertExactJson([
+            'message' => 'The nested.0.name field is required.',
+            'errors' => [
+                'nested' => [
+                    [
+                        'name' => [
+                            'The nested.0.name field is required.',
+                        ]
+                    ],
+                ],
+            ],
+        ]);
         $response->assertHeader('Precognition', 'true');
     }
 
@@ -798,6 +902,34 @@ class PrecognitionTest extends TestCase
 class PrecognitionTestController
 {
     use ValidatesRequests;
+
+    public function methodWhereNestedRulesAreValidatedViaControllerValidate(Request $request)
+    {
+        precognitive(function () use ($request) {
+            $this->validate($request, [
+                'nested' => ['required', 'array', 'min:1'],
+                'nested.*.name' => ['required', 'string']
+            ]);
+
+            fail();
+        });
+
+        fail();
+    }
+
+    public function methodWhereNestedRulesAreValidatedViaControllerValidateWith(Request $request)
+    {
+        precognitive(function () {
+            $this->validateWith([
+                'nested' => ['required', 'array', 'min:1'],
+                'nested.*.name' => ['required', 'string']
+            ]);
+
+            fail();
+        });
+
+        fail();
+    }
 
     public function methodWherePredicitionValidatesViaControllerValidate(Request $request)
     {

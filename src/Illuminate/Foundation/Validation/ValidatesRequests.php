@@ -23,20 +23,14 @@ trait ValidatesRequests
         $request = $request ?: request();
 
         if (is_array($validator)) {
-            $rules = $request->isPrecognitive()
-                ? $request->filterPrecognitiveRules($validator)
-                : $validator;
-
-            $validator = $this->getValidationFactory()->make($request->all(), $rules);
-        } elseif ($request->isPrecognitive()) {
-            $validator->setRules(
-                $request->filterPrecognitiveRules($validator->getRules())
-            );
+            $validator = $this->getValidationFactory()->make($request->all(), $validator);
         }
 
         return tap($validator, function ($validator) use ($request) {
             if ($request->isPrecognitive()) {
-                $validator->after(Precognition::afterValidationHook($request));
+                $rules = $request->filterPrecognitiveRules($validator->getRules());
+
+                $validator->setRules($rules)->after(Precognition::afterValidationHook($request));
             }
         })->validate();
     }
@@ -55,17 +49,15 @@ trait ValidatesRequests
     public function validate(Request $request, array $rules,
                              array $messages = [], array $customAttributes = [])
     {
-        $rules = $request->isPrecognitive()
-            ? $request->filterPrecognitiveRules($rules)
-            : $rules;
-
         $validator = $this->getValidationFactory()->make(
             $request->all(), $rules, $messages, $customAttributes
         );
 
         return tap($validator, function ($validator) use ($request) {
             if ($request->isPrecognitive()) {
-                $validator->after(Precognition::afterValidationHook($request));
+                $rules = $request->filterPrecognitiveRules($validator->getRules());
+
+                $validator->setRules($rules)->after(Precognition::afterValidationHook($request));
             }
         })->validate();
     }
