@@ -12,9 +12,10 @@ class RouteGroup
      * @param  array  $new
      * @param  array  $old
      * @param  bool  $prependExistingPrefix
+     * @param  bool  $appendExistingSuffix
      * @return array
      */
-    public static function merge($new, $old, $prependExistingPrefix = true)
+    public static function merge($new, $old, $prependExistingPrefix = true, $appendExistingSuffix = true)
     {
         if (isset($new['domain'])) {
             unset($old['domain']);
@@ -27,11 +28,12 @@ class RouteGroup
         $new = array_merge(static::formatAs($new, $old), [
             'namespace' => static::formatNamespace($new, $old),
             'prefix' => static::formatPrefix($new, $old, $prependExistingPrefix),
+            'suffix' => static::formatSuffix($new, $old, $appendExistingSuffix),
             'where' => static::formatWhere($new, $old),
         ]);
 
         return array_merge_recursive(Arr::except(
-            $old, ['namespace', 'prefix', 'where', 'as']
+            $old, ['namespace', 'prefix', 'suffix', 'where', 'as']
         ), $new);
     }
 
@@ -69,6 +71,25 @@ class RouteGroup
             return isset($new['prefix']) ? trim($old, '/').'/'.trim($new['prefix'], '/') : $old;
         } else {
             return isset($new['prefix']) ? trim($new['prefix'], '/').'/'.trim($old, '/') : $old;
+        }
+    }
+
+    /**
+     * Format the suffix for the new group attributes.
+     *
+     * @param  array  $new
+     * @param  array  $old
+     * @param  bool  $appendExistingSuffix
+     * @return string|null
+     */
+    protected static function formatSuffix($new, $old, $appendExistingSuffix = true)
+    {
+        $old = $old['suffix'] ?? '';
+
+        if ($appendExistingSuffix) {
+            return isset($new['suffix']) ? trim($new['suffix'], '/').'/'.trim($old, '/') : $old;
+        } else {
+            return isset($new['suffix']) ? trim($old, '/').'/'.trim($new['suffix'], '/'): $old;
         }
     }
 

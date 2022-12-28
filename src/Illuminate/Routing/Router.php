@@ -482,11 +482,12 @@ class Router implements BindingRegistrar, RegistrarContract
      *
      * @param  array  $new
      * @param  bool  $prependExistingPrefix
+     * @param  bool  $appendExisitingSuffix
      * @return array
      */
-    public function mergeWithLastGroup($new, $prependExistingPrefix = true)
+    public function mergeWithLastGroup($new, $prependExistingPrefix = true, $appendExisitingSuffix = true)
     {
-        return RouteGroup::merge($new, end($this->groupStack), $prependExistingPrefix);
+        return RouteGroup::merge($new, end($this->groupStack), $prependExistingPrefix, $appendExisitingSuffix);
     }
 
     /**
@@ -515,6 +516,22 @@ class Router implements BindingRegistrar, RegistrarContract
             $last = end($this->groupStack);
 
             return $last['prefix'] ?? '';
+        }
+
+        return '';
+    }
+
+    /**
+     * Get the suffix from the last group on the stack.
+     *
+     * @return string
+     */
+    public function getLastGroupSuffix()
+    {
+        if ($this->hasGroupStack()) {
+            $last = end($this->groupStack);
+
+            return $last['suffix'] ?? '';
         }
 
         return '';
@@ -551,7 +568,7 @@ class Router implements BindingRegistrar, RegistrarContract
         }
 
         $route = $this->newRoute(
-            $methods, $this->prefix($uri), $action
+            $methods, $this->suffix($this->prefix($uri)), $action
         );
 
         // If we have groups that need to be merged, we will merge them now after this
@@ -675,6 +692,17 @@ class Router implements BindingRegistrar, RegistrarContract
     }
 
     /**
+     * Suffix the given URI with the last suffix.
+     *
+     * @param  string  $uri
+     * @return string
+     */
+    protected function suffix($uri)
+    {
+        return trim(trim($uri, '/').'/'.trim($this->getLastGroupSuffix(), '/'), '/') ?: '/';
+    }
+
+    /**
      * Add the necessary where clauses to the route based on its initial registration.
      *
      * @param  \Illuminate\Routing\Route  $route
@@ -699,7 +727,8 @@ class Router implements BindingRegistrar, RegistrarContract
     {
         $route->setAction($this->mergeWithLastGroup(
             $route->getAction(),
-            $prependExistingPrefix = false
+            $prependExistingPrefix = false,
+            $appendExistingSuffix = false
         ));
     }
 

@@ -169,13 +169,14 @@ class Route
     {
         $this->uri = $uri;
         $this->methods = (array) $methods;
-        $this->action = Arr::except($this->parseAction($action), ['prefix']);
+        $this->action = Arr::except($this->parseAction($action), ['prefix', 'suffix']);
 
         if (in_array('GET', $this->methods) && ! in_array('HEAD', $this->methods)) {
             $this->methods[] = 'HEAD';
         }
 
         $this->prefix(is_array($action) ? Arr::get($action, 'prefix') : '');
+        $this->suffix(is_array($action) ? Arr::get($action, 'suffix') : '');
     }
 
     /**
@@ -789,6 +790,16 @@ class Route
     }
 
     /**
+     * Get the prefix of the route instance.
+     *
+     * @return string|null
+     */
+    public function getSuffix()
+    {
+        return $this->action['suffix'] ?? null;
+    }
+
+    /**
      * Add a prefix to the route URI.
      *
      * @param  string  $prefix
@@ -806,6 +817,23 @@ class Route
     }
 
     /**
+     * Add a suffix to the route URI.
+     *
+     * @param  string  $suffix
+     * @return $this
+     */
+    public function suffix($suffix)
+    {
+        $suffix ??= '';
+
+        $this->updateSuffixOnAction($suffix);
+
+        $uri = rtrim($this->uri, '/').'/'.ltrim($suffix, '/');
+
+        return $this->setUri($uri !== '/' ? trim($uri, '/') : $uri);
+    }
+
+    /**
      * Update the "prefix" attribute on the action array.
      *
      * @param  string  $prefix
@@ -815,6 +843,19 @@ class Route
     {
         if (! empty($newPrefix = trim(rtrim($prefix, '/').'/'.ltrim($this->action['prefix'] ?? '', '/'), '/'))) {
             $this->action['prefix'] = $newPrefix;
+        }
+    }
+
+    /**
+     * Update the "suffix" attribute on the action array.
+     *
+     * @param  string  $suffix
+     * @return void
+     */
+    protected function updateSuffixOnAction($suffix)
+    {
+        if (! empty($newSuffix = trim(rtrim($suffix, '/').'/'.ltrim($this->action['suffix'] ?? '', '/'), '/'))) {
+            $this->action['suffix'] = $newSuffix;
         }
     }
 

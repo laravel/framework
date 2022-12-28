@@ -23,6 +23,7 @@ use InvalidArgumentException;
  * @method \Illuminate\Routing\RouteRegistrar name(string $value)
  * @method \Illuminate\Routing\RouteRegistrar namespace(string|null $value)
  * @method \Illuminate\Routing\RouteRegistrar prefix(string $prefix)
+ * @method \Illuminate\Routing\RouteRegistrar suffix(string $suffix)
  * @method \Illuminate\Routing\RouteRegistrar scopeBindings()
  * @method \Illuminate\Routing\RouteRegistrar where(array $where)
  * @method \Illuminate\Routing\RouteRegistrar withoutMiddleware(array|string $middleware)
@@ -68,6 +69,7 @@ class RouteRegistrar
         'name',
         'namespace',
         'prefix',
+        'suffix',
         'scopeBindings',
         'where',
         'withoutMiddleware',

@@ -280,10 +280,10 @@ class CompiledRouteCollection extends AbstractRouteCollection
      */
     protected function newRoute(array $attributes)
     {
-        if (empty($attributes['action']['prefix'] ?? '')) {
+        if (empty($attributes['action']['prefix'] ?? '') && empty($attributes['action']['suffix'] ?? '')) {
             $baseUri = $attributes['uri'];
-        } else {
-            $prefix = trim($attributes['action']['prefix'], '/');
+        } else if ($prefix = $attributes['action']['prefix']) {
+            $prefix = trim($prefix, '/');
 
             $baseUri = trim(implode(
                 '/', array_slice(
@@ -291,6 +291,10 @@ class CompiledRouteCollection extends AbstractRouteCollection
                     count($prefix !== '' ? explode('/', $prefix) : [])
                 )
             ), '/');
+        } else {
+            $suffix = trim($attributes['action']['suffix'], '/');
+
+            $baseUri = trim($attributes['uri'], '/').'/'.$suffix;
         }
 
         return $this->router->newRoute($attributes['methods'], $baseUri === '' ? '/' : $baseUri, $attributes['action'])

@@ -42,11 +42,12 @@ class ThrottleRequests
      * @param  int|string  $maxAttempts
      * @param  float|int  $decayMinutes
      * @param  string  $prefix
+     * @param  string  $suffix
      * @return \Symfony\Component\HttpFoundation\Response
      *
      * @throws \Illuminate\Http\Exceptions\ThrottleRequestsException
      */
-    public function handle($request, Closure $next, $maxAttempts = 60, $decayMinutes = 1, $prefix = '')
+    public function handle($request, Closure $next, $maxAttempts = 60, $decayMinutes = 1, $prefix = '', $suffix = '')
     {
         if (is_string($maxAttempts)
             && func_num_args() === 3
@@ -59,7 +60,7 @@ class ThrottleRequests
             $next,
             [
                 (object) [
-                    'key' => $prefix.$this->resolveRequestSignature($request),
+                    'key' => $prefix.$this->resolveRequestSignature($request).$suffix,
                     'maxAttempts' => $this->resolveMaxAttempts($request, $maxAttempts),
                     'decayMinutes' => $decayMinutes,
                     'responseCallback' => null,
