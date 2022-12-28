@@ -517,7 +517,7 @@ class PrecognitionTest extends TestCase
             ]
         ], [
             'Precognition' => 'true',
-            'Precognition-Validate-Only' => 'nested , nested.0.name',
+            'Precognition-Validate-Only' => 'nested,nested.0.name',
         ]);
 
         $this->assertFalse($this->app['ClassWasInstantiated']);
