@@ -790,7 +790,7 @@ class Route
     }
 
     /**
-     * Get the prefix of the route instance.
+     * Get the suffix of the route instance.
      *
      * @return string|null
      */
