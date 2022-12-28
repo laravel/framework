@@ -1612,9 +1612,16 @@ trait HasAttributes
      */
     protected function isClassDeviable($key)
     {
-        return $this->isClassCastable($key) &&
-            method_exists($castType = $this->parseCasterClass($this->getCasts()[$key]), 'increment') &&
-            method_exists($castType, 'decrement');
+        if (! $this->isClassCastable($key)) {
+            return false;
+        }
+
+        $castType = $this->parseCasterClass($this->getCasts()[$key]);
+        if (method_exists($castType, 'castUsing')) {
+            $castType = $castType::castUsing([]);
+        }
+
+        return method_exists($castType, 'increment') && method_exists($castType, 'decrement');
     }
 
     /**
