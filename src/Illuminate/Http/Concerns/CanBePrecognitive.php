@@ -3,6 +3,7 @@
 namespace Illuminate\Http\Concerns;
 
 use Illuminate\Support\Collection;
+use Illuminate\Validation\ValidationRuleParser;
 
 trait CanBePrecognitive
 {
@@ -21,6 +22,18 @@ trait CanBePrecognitive
         return Collection::make($rules)
             ->only(explode(',', $this->header('Precognition-Validate-Only')))
             ->all();
+    }
+
+    /**
+     * Parse the human-friendly rules into a full rules array.
+     *
+     * @param  array  $rules
+     * @param  array  $data
+     * @return \stdClass
+     */
+    public function explodePrecognitiveRules($rules, $data)
+    {
+        return (new ValidationRuleParser($data))->explode($rules);
     }
 
     /**
