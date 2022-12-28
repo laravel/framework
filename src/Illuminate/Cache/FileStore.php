@@ -268,6 +268,7 @@ class FileStore implements Store, LockProvider
         }
 
         $e = null;
+        $data = false;
 
         try {
             $data = unserialize(substr($contents, 10));
