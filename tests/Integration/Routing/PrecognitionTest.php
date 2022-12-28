@@ -512,8 +512,8 @@ class PrecognitionTest extends TestCase
 
         $response = $this->postJson('test-route', [
             'nested' => [
-                ['namsse' => 'sdsd']
-            ]
+                ['namsse' => 'sdsd'],
+            ],
         ], [
             'Precognition' => 'true',
             'Precognition-Validate-Only' => 'nested,nested.0.name',
@@ -527,7 +527,7 @@ class PrecognitionTest extends TestCase
                     [
                         'name' => [
                             'The nested.0.name field is required.',
-                        ]
+                        ],
                     ],
                 ],
             ],
@@ -540,15 +540,15 @@ class PrecognitionTest extends TestCase
         Route::post('test-route', function (Request $request) {
             $request->validate([
                 'nested' => ['required', 'array', 'min:1'],
-                'nested.*.name' => ['required', 'string']
+                'nested.*.name' => ['required', 'string'],
             ]);
             fail();
         })->middleware(PrecognitionInvokingController::class);
 
         $response = $this->postJson('test-route', [
             'nested' => [
-                ['namsse' => 'sdsd']
-            ]
+                ['namsse' => 'sdsd'],
+            ],
         ], [
             'Precognition' => 'true',
             'Precognition-Validate-Only' => 'nested,nested.0.name',
@@ -562,7 +562,7 @@ class PrecognitionTest extends TestCase
                     [
                         'name' => [
                             'The nested.0.name field is required.',
-                        ]
+                        ],
                     ],
                 ],
             ],
@@ -577,8 +577,8 @@ class PrecognitionTest extends TestCase
 
         $response = $this->postJson('test-route', [
             'nested' => [
-                ['namsse' => 'sdsd']
-            ]
+                ['namsse' => 'sdsd'],
+            ],
         ], [
             'Precognition' => 'true',
             'Precognition-Validate-Only' => 'nested,nested.0.name',
@@ -592,7 +592,7 @@ class PrecognitionTest extends TestCase
                     [
                         'name' => [
                             'The nested.0.name field is required.',
-                        ]
+                        ],
                     ],
                 ],
             ],
@@ -607,8 +607,8 @@ class PrecognitionTest extends TestCase
 
         $response = $this->postJson('test-route', [
             'nested' => [
-                ['namsse' => 'sdsd']
-            ]
+                ['namsse' => 'sdsd'],
+            ],
         ], [
             'Precognition' => 'true',
             'Precognition-Validate-Only' => 'nested,nested.0.name',
@@ -622,7 +622,7 @@ class PrecognitionTest extends TestCase
                     [
                         'name' => [
                             'The nested.0.name field is required.',
-                        ]
+                        ],
                     ],
                 ],
             ],
@@ -1036,7 +1036,7 @@ class PrecognitionTestController
         precognitive(function () use ($request) {
             $this->validate($request, [
                 'nested' => ['required', 'array', 'min:1'],
-                'nested.*.name' => ['required', 'string']
+                'nested.*.name' => ['required', 'string'],
             ]);
 
             fail();
@@ -1050,7 +1050,7 @@ class PrecognitionTestController
         precognitive(function () {
             $this->validateWith([
                 'nested' => ['required', 'array', 'min:1'],
-                'nested.*.name' => ['required', 'string']
+                'nested.*.name' => ['required', 'string'],
             ]);
 
             fail();
@@ -1206,7 +1206,7 @@ class NestedPrecognitionTestRequest extends FormRequest
     {
         return [
             'nested' => ['required', 'array', 'min:1'],
-            'nested.*.name' => ['required', 'string']
+            'nested.*.name' => ['required', 'string'],
         ];
     }
 }
