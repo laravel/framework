@@ -26,13 +26,13 @@ trait ValidatesRequests
             $validator = $this->getValidationFactory()->make($request->all(), $validator);
         }
 
-        return tap($validator, function ($validator) use ($request) {
-            if ($request->isPrecognitive()) {
-                $rules = $request->filterPrecognitiveRules($validator->getRulesWithoutPlaceholders());
+        if ($request->isPrecognitive()) {
+            $rules = $request->filterPrecognitiveRules($validator->getRulesWithoutPlaceholders());
 
-                $validator->setRules($rules)->after(Precognition::afterValidationHook($request));
-            }
-        })->validate();
+            $validator->setRules($rules)->after(Precognition::afterValidationHook($request));
+        }
+
+        $validator->validate();
     }
 
     /**
@@ -53,13 +53,13 @@ trait ValidatesRequests
             $request->all(), $rules, $messages, $customAttributes
         );
 
-        return tap($validator, function ($validator) use ($request) {
-            if ($request->isPrecognitive()) {
-                $rules = $request->filterPrecognitiveRules($validator->getRulesWithoutPlaceholders());
+        if ($request->isPrecognitive()) {
+            $rules = $request->filterPrecognitiveRules($validator->getRulesWithoutPlaceholders());
 
-                $validator->setRules($rules)->after(Precognition::afterValidationHook($request));
-            }
-        })->validate();
+            $validator->setRules($rules)->after(Precognition::afterValidationHook($request));
+        }
+
+        return $validator->validate();
     }
 
     /**
