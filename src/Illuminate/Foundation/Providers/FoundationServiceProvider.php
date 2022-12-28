@@ -114,9 +114,10 @@ class FoundationServiceProvider extends AggregateServiceProvider
         Request::macro('validate', function (array $rules, ...$params) {
             return tap(validator($this->all(), $rules, ...$params), function ($validator) {
                 if ($this->isPrecognitive()) {
-                    $rules = $this->filterPrecognitiveRules($validator->getRulesWithoutPlaceholders());
-
-                    $validator->setRules($rules)->after(Precognition::afterValidationHook($this));
+                    $validator->after(Precognition::afterValidationHook($this))
+                        ->setRules(
+                            $this->filterPrecognitiveRules($validator->getRulesWithoutPlaceholders())
+                        );
                 }
             })->validate();
         });

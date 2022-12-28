@@ -27,12 +27,13 @@ trait ValidatesRequests
         }
 
         if ($request->isPrecognitive()) {
-            $rules = $request->filterPrecognitiveRules($validator->getRulesWithoutPlaceholders());
-
-            $validator->setRules($rules)->after(Precognition::afterValidationHook($request));
+            $validator->after(Precognition::afterValidationHook($request))
+                ->setRules(
+                    $request->filterPrecognitiveRules($validator->getRulesWithoutPlaceholders())
+                );
         }
 
-        $validator->validate();
+        return $validator->validate();
     }
 
     /**
@@ -54,9 +55,10 @@ trait ValidatesRequests
         );
 
         if ($request->isPrecognitive()) {
-            $rules = $request->filterPrecognitiveRules($validator->getRulesWithoutPlaceholders());
-
-            $validator->setRules($rules)->after(Precognition::afterValidationHook($request));
+            $validator->after(Precognition::afterValidationHook($request))
+                ->setRules(
+                    $request->filterPrecognitiveRules($validator->getRulesWithoutPlaceholders())
+                );
         }
 
         return $validator->validate();

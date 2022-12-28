@@ -117,9 +117,9 @@ class FormRequest extends Request implements ValidatesWhenResolved
         )->stopOnFirstFailure($this->stopOnFirstFailure);
 
         if ($this->isPrecognitive()) {
-            $rules = $this->filterPrecognitiveRules($validator->getRulesWithoutPlaceholders());
-
-            $validator->setRules($rules);
+            $validator->setRules(
+                $this->filterPrecognitiveRules($validator->getRulesWithoutPlaceholders())
+            );
         }
 
         return $validator;
