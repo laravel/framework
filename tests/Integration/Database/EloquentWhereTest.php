@@ -90,6 +90,83 @@ class EloquentWhereTest extends DatabaseTestCase
         })->first()));
     }
 
+    public function testWhereIn()
+    {
+        /** @var \Illuminate\Tests\Integration\Database\UserWhereTest $user1 */
+        $user1 = UserWhereTest::create([
+            'name' => 'test-name1',
+            'email' => 'test-email1',
+            'address' => 'test-address1',
+        ]);
+
+        /** @var \Illuminate\Tests\Integration\Database\UserWhereTest $user2 */
+        $user2 = UserWhereTest::create([
+            'name' => 'test-name2',
+            'email' => 'test-email2',
+            'address' => 'test-address2',
+        ]);
+
+        /** @var \Illuminate\Tests\Integration\Database\UserWhereTest $user3 */
+        $user3 = UserWhereTest::create([
+            'name' => 'test-name2',
+            'email' => 'test-email3',
+            'address' => 'test-address3',
+        ]);
+
+        $this->assertTrue($user2->is(UserWhereTest::whereIn('id', [2])->first()));
+
+        $users = UserWhereTest::query()->whereIn('id', [1, 2, 22])->get();
+
+        $this->assertTrue($user1->is($users[0]));
+        $this->assertTrue($user2->is($users[1]));
+        $this->assertCount(2, $users);
+
+        $users = UserWhereTest::query()->whereIn('email', ['test-email1', 'test-email2'])->get();
+
+        $this->assertTrue($user1->is($users[0]));
+        $this->assertTrue($user2->is($users[1]));
+        $this->assertCount(2, $users);
+    }
+
+    public function testWhereIntegerInRaw()
+    {
+        /** @var \Illuminate\Tests\Integration\Database\UserWhereTest $user1 */
+        $user1 = UserWhereTest::create([
+            'name' => 'test-name1',
+            'email' => 'test-email1',
+            'address' => 'test-address1',
+        ]);
+
+        /** @var \Illuminate\Tests\Integration\Database\UserWhereTest $user2 */
+        $user2 = UserWhereTest::create([
+            'name' => 'test-name2',
+            'email' => 'test-email2',
+            'address' => 'test-address2',
+        ]);
+
+        /** @var \Illuminate\Tests\Integration\Database\UserWhereTest $user3 */
+        $user3 = UserWhereTest::create([
+            'name' => 'test-name2',
+            'email' => 'test-email3',
+            'address' => 'test-address3',
+        ]);
+
+        $users = UserWhereTest::query()->whereIntegerInRaw('id', [1, 2, 5])->get();
+        $this->assertTrue($user1->is($users[0]));
+        $this->assertTrue($user2->is($users[1]));
+        $this->assertCount(2, $users);
+
+        $users = UserWhereTest::query()->whereIntegerNotInRaw('id', [2])->get();
+        $this->assertTrue($user1->is($users[0]));
+        $this->assertTrue($user3->is($users[1]));
+        $this->assertCount(2, $users);
+
+        $users = UserWhereTest::query()->whereIntegerInRaw('id', ['1', '2'])->get();
+        $this->assertTrue($user1->is($users[0]));
+        $this->assertTrue($user2->is($users[1]));
+        $this->assertCount(2, $users);
+    }
+
     public function testFirstWhere()
     {
         /** @var \Illuminate\Tests\Integration\Database\UserWhereTest $firstUser */
