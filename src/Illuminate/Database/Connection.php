@@ -211,6 +211,13 @@ class Connection implements ConnectionInterface
     protected static $resolvers = [];
 
     /**
+     * Indicate that queries should be prevented.
+     *
+     * @var bool
+     */
+    protected $preventQueries = false;
+
+    /**
      * Create a new database connection instance.
      *
      * @param  \PDO|\Closure  $pdo
@@ -705,6 +712,10 @@ class Connection implements ConnectionInterface
      */
     protected function run($query, $bindings, Closure $callback)
     {
+        if ($this->preventQueries) {
+            throw new RuntimeException("Queries are being prevented. Attempting to run query [{$query}].");
+        }
+
         foreach ($this->beforeExecutingCallbacks as $beforeExecutingCallback) {
             $beforeExecutingCallback($query, $bindings, $this);
         }
@@ -791,6 +802,56 @@ class Connection implements ConnectionInterface
     protected function getElapsedTime($start)
     {
         return round((microtime(true) - $start) * 1000, 2);
+    }
+
+    /**
+     * Indicate that an exception should be thrown when a query is to be run.
+     *
+     * @param  \Closure|null  $callback
+     * @return mixed
+     */
+    public function preventQueries($callback = null)
+    {
+        if ($callback === null) {
+            $this->preventQueries = true;
+
+            return;
+        }
+
+        $preventQueriesCache = $this->preventQueries;
+
+        $this->preventQueries = true;
+
+        try {
+            return $callback();
+        } finally {
+            $this->preventQueries = $preventQueriesCache;
+        }
+    }
+
+    /**
+     * Restore normal behaviour; do not throw exceptions when a query is to be run.
+     *
+     * @param  \Closure|null  $callback
+     * @return mixed
+     */
+    public function allowQueries($callback = null)
+    {
+        if ($callback === null) {
+            $this->preventQueries = false;
+
+            return;
+        }
+
+        $preventQueriesCache = $this->preventQueries;
+
+        $this->preventQueries = false;
+
+        try {
+            return $callback();
+        } finally {
+            $this->preventQueries = $preventQueriesCache;
+        }
     }
 
     /**
@@ -1492,6 +1553,16 @@ class Connection implements ConnectionInterface
     public function logging()
     {
         return $this->loggingQueries;
+    }
+
+    /**
+     * Determine if the connection is preventing queries.
+     *
+     * @return bool
+     */
+    public function preventingQueries()
+    {
+        return $this->preventQueries;
     }
 
     /**

@@ -24,6 +24,7 @@ use PDOException;
 use PDOStatement;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use RuntimeException;
 use stdClass;
 
 class DatabaseConnectionTest extends TestCase
@@ -470,6 +471,62 @@ class DatabaseConnectionTest extends TestCase
         $schema = $connection->getSchemaBuilder();
         $this->assertInstanceOf(Builder::class, $schema);
         $this->assertSame($connection, $schema->getConnection());
+    }
+
+    public function testItCanPreventQueries()
+    {
+        $connection = new Connection(new DatabaseConnectionTestMockPDO);
+
+        $this->assertFalse($connection->preventingQueries());
+        $connection->preventQueries();
+        $this->assertTrue($connection->preventingQueries());
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Queries are being prevented. Attempting to run query [select * from users].');
+
+        $connection->statement('select * from users', []);
+    }
+
+    public function testItAcceptsClosure()
+    {
+        $connection = new Connection(new DatabaseConnectionTestMockPDO);
+
+        $result = $connection->preventQueries(function () use ($connection) {
+            $this->assertTrue($connection->preventingQueries());
+
+            try {
+                $connection->statement('select * from users', []);
+            } catch (RuntimeException $exception) {
+                return $exception->getMessage();
+            }
+        });
+
+        $this->assertFalse($connection->preventingQueries());
+        $this->assertSame('Queries are being prevented. Attempting to run query [select * from users].', $result);
+    }
+
+    public function testItCanBeNested()
+    {
+        $connection = new Connection(new DatabaseConnectionTestMockPDO);
+        $isActive = fn () => $connection->preventingQueries() ? 'prevent:' : 'allow:';
+
+        $result = $connection->preventQueries(function () use ($connection, $isActive) {
+            return $isActive().$connection->allowQueries(function () use ($connection, $isActive) {
+                return $isActive().$connection->preventQueries(function () use ($connection, $isActive) {
+                    return $isActive().$connection->allowQueries(function () use ($connection, $isActive) {
+                        return $isActive().$connection->preventQueries(function () use ($connection, $isActive) {
+                            return $isActive().$connection->preventQueries(function () use ($connection, $isActive) {
+                                return $isActive().$connection->allowQueries(function () use ($isActive) {
+                                    return $isActive();
+                                }).$isActive();
+                            }).$isActive();
+                        }).$isActive();
+                    }).$isActive();
+                }).$isActive();
+            }).$isActive();
+        });
+
+        $this->assertSame('prevent:allow:prevent:allow:prevent:prevent:allow:prevent:prevent:allow:prevent:allow:prevent:', $result);
     }
 
     protected function getMockConnection($methods = [], $pdo = null)

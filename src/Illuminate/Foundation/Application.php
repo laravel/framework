@@ -15,6 +15,8 @@ use Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables;
 use Illuminate\Foundation\Events\LocaleUpdated;
 use Illuminate\Http\Request;
 use Illuminate\Log\LogServiceProvider;
+use Illuminate\Routing\Events\PreparingResponse;
+use Illuminate\Routing\Events\ResponsePrepared;
 use Illuminate\Routing\RoutingServiceProvider;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -1427,5 +1429,33 @@ class Application extends Container implements ApplicationContract, CachesConfig
         }
 
         throw new RuntimeException('Unable to detect application namespace.');
+    }
+
+    /**
+     * Prevent database queries while preparing the request response.
+     *
+     * @param  string|null  $connection
+     * @return $this
+     */
+    public function preventQueriesWhilePreparingResponse($connection = null)
+    {
+        $this['events']->listen(PreparingResponse::class, fn () => $this['db']->connection($connection)->preventQueries());
+
+        $this['events']->listen(ResponsePrepared::class, fn () => $this['db']->connection($connection)->allowQueries());
+
+        return $this;
+    }
+
+    /**
+     * Restores ability for database to query while preparing the request response.
+     *
+     * @param  string|null  $connection
+     * @return $this
+     */
+    public function allowQueriesWhilePreparingResponse($connection = null)
+    {
+        $this['events']->listen(PreparingResponse::class, fn () => $this['db']->connection($connection)->allowQueries());
+
+        return $this;
     }
 }
