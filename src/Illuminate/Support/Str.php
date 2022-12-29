@@ -492,7 +492,7 @@ class Str
     {
         if (mb_strwidth($value, $encoding) <= $limit) {
             return $value;
-        } else if ($limit < 0 && mb_strwidth($value, $encoding) <= abs($limit)) {
+        } elseif ($limit < 0 && mb_strwidth($value, $encoding) <= abs($limit)) {
             return $end;
         }
 
