@@ -790,12 +790,12 @@ class SupportStringableTest extends TestCase
 
         $string = 'The PHP framework for web artisans.';
         $this->assertSame('The PHP...', (string) $this->stringable($string)->limit(7));
-        $this->assertSame('The PHP', (string) $this->stringable($string)->limit(7, 'UTF-8', ''));
+        $this->assertSame('The PHP', (string) $this->stringable($string)->limit(7, '', 'UTF-8'));
         $this->assertSame('The PHP framework for web artisans.', (string) $this->stringable($string)->limit(100));
 
         $nonAsciiString = '这是一段中文';
         $this->assertSame('这是一...', (string) $this->stringable($nonAsciiString)->limit(6));
-        $this->assertSame('这是一', (string) $this->stringable($nonAsciiString)->limit(6, 'UTF-8', ''));
+        $this->assertSame('这是一', (string) $this->stringable($nonAsciiString)->limit(6, '', 'UTF-8'));
     }
 
     public function testLength()
