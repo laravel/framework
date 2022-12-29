@@ -488,13 +488,15 @@ class Str
      * @param  string  $end
      * @return string
      */
-    public static function limit($value, $limit = 100, $end = '...')
+    public static function limit($value, $limit = 100, $encoding = 'UTF-8', $end = '...')
     {
-        if (mb_strwidth($value, 'UTF-8') <= $limit) {
+        if (mb_strwidth($value, $encoding) <= $limit) {
             return $value;
+        } else if ($limit < 0 && mb_strwidth($value, $encoding) <= abs($limit)) {
+            return $end;
         }
 
-        return rtrim(mb_strimwidth($value, 0, $limit, '', 'UTF-8')).$end;
+        return rtrim(mb_strimwidth($value, 0, $limit, '', $encoding)).$end;
     }
 
     /**
