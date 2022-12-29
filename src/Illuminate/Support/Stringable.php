@@ -378,9 +378,9 @@ class Stringable implements JsonSerializable
      * @param  string  $end
      * @return static
      */
-    public function limit($limit = 100, $end = '...')
+    public function limit($limit = 100, $encoding = 'UTF-8', $end = '...')
     {
-        return new static(Str::limit($this->value, $limit, $end));
+        return new static(Str::limit($this->value, $limit, $encoding, $end));
     }
 
     /**
