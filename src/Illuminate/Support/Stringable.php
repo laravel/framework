@@ -376,6 +376,7 @@ class Stringable implements JsonSerializable
      *
      * @param  int  $limit
      * @param  string  $end
+     * @param  string  $encoding
      * @return static
      */
     public function limit($limit = 100, $end = '...', $encoding = 'UTF-8')
