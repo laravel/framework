@@ -488,7 +488,7 @@ class Str
      * @param  string  $end
      * @return string
      */
-    public static function limit($value, $limit = 100, $encoding = 'UTF-8', $end = '...')
+    public static function limit($value, $limit = 100, $end = '...', $encoding = 'UTF-8')
     {
         if (mb_strwidth($value, $encoding) <= $limit) {
             return $value;
