@@ -117,9 +117,15 @@ trait InteractsWithContentTypes
     {
         $acceptable = $this->getAcceptableContentTypes();
 
-        return count($acceptable) === 0 || (
-            isset($acceptable[0]) && ($acceptable[0] === '*/*' || $acceptable[0] === '*')
-        );
+        if (count($acceptable) === 0) {
+            return true;
+        }
+
+        foreach ($acceptable as $key => $accept) {
+            if ($accept === '*/*' || $accept === '*') {
+                return true;
+            }
+        }
     }
 
     /**
