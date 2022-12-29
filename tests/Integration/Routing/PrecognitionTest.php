@@ -630,6 +630,23 @@ class PrecognitionTest extends TestCase
         $response->assertHeader('Precognition', 'true');
     }
 
+    public function testItCanPassValidationForEscapedDotsAfterFilteringWithPrecognition()
+    {
+        Route::post('test-route', function (PrecognitionRequestWithEscapedDots $request) {
+            fail();
+        })->middleware(PrecognitionInvokingController::class);
+
+        $response = $this->postJson('test-route', [
+            'escaped.dot' => 'value',
+        ], [
+            'Precognition' => 'true',
+            'Precognition-Validate-Only' => 'escaped.dot',
+        ]);
+
+        $response->assertNoContent();
+        $response->assertHeader('Precognition', 'true');
+    }
+
     public function testItCanFilterRulesWithEscapedDotsUsingFormRequest()
     {
         Route::post('test-route', function (PrecognitionRequestWithEscapedDots $request) {
@@ -640,7 +657,7 @@ class PrecognitionTest extends TestCase
             //
         ], [
             'Precognition' => 'true',
-            'Precognition-Validate-Only' => 'escaped.dot',
+            'Precognition-Validate-Only' => 'escaped\\.dot',
         ]);
 
         $response->assertStatus(422);
@@ -659,7 +676,7 @@ class PrecognitionTest extends TestCase
     {
         Route::post('test-route', function (Request $request) {
             $request->validate([
-                'escaped\.dot' => 'required',
+                'escaped\\.dot' => 'required',
             ]);
 
             fail();
@@ -669,7 +686,7 @@ class PrecognitionTest extends TestCase
             //
         ], [
             'Precognition' => 'true',
-            'Precognition-Validate-Only' => 'escaped.dot',
+            'Precognition-Validate-Only' => 'escaped\\.dot',
         ]);
 
         $response->assertStatus(422);
@@ -693,7 +710,7 @@ class PrecognitionTest extends TestCase
             //
         ], [
             'Precognition' => 'true',
-            'Precognition-Validate-Only' => 'escaped.dot',
+            'Precognition-Validate-Only' => 'escaped\\.dot',
         ]);
 
         $response->assertStatus(422);
@@ -717,7 +734,7 @@ class PrecognitionTest extends TestCase
             //
         ], [
             'Precognition' => 'true',
-            'Precognition-Validate-Only' => 'escaped.dot',
+            'Precognition-Validate-Only' => 'escaped\\.dot',
         ]);
 
         $response->assertStatus(422);
@@ -1009,7 +1026,7 @@ class PrecognitionTestController
     {
         precognitive(function () use ($request) {
             $this->validate($request, [
-                'escaped\.dot' => 'required',
+                'escaped\\.dot' => 'required',
             ]);
 
             fail();
@@ -1022,7 +1039,7 @@ class PrecognitionTestController
     {
         precognitive(function () {
             $this->validateWith([
-                'escaped\.dot' => 'required',
+                'escaped\\.dot' => 'required',
             ]);
 
             fail();
@@ -1216,7 +1233,7 @@ class PrecognitionRequestWithEscapedDots extends FormRequest
     public function rules()
     {
         return [
-            'escaped\.dot' => ['required'],
+            'escaped\\.dot' => ['required'],
         ];
     }
 }
