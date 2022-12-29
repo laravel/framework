@@ -23,6 +23,40 @@ use Illuminate\Support\Traits\ForwardsCalls;
 use JsonSerializable;
 use LogicException;
 
+/**
+ * @method static \Illuminate\Database\Eloquent\Model|static make(array $attributes = [])
+ * @method static \Illuminate\Database\Eloquent\Builder withGlobalScope(string $identifier, \Illuminate\Database\Eloquent\Scope|\Closure $scope)
+ * @method static \Illuminate\Database\Eloquent\Builder withoutGlobalScope(\Illuminate\Database\Eloquent\Scope|string $scope)
+ * @method static \Illuminate\Database\Eloquent\Builder withoutGlobalScopes(array|null $scopes = null)
+ * @method static \Illuminate\Database\Eloquent\Builder whereKey(mixed $id)
+ * @method static \Illuminate\Database\Eloquent\Builder whereKeyNot(mixed $id)
+ * @method static \Illuminate\Database\Eloquent\Builder where(\Closure|string|array|\Illuminate\Database\Query\Expression $column, mixed $operator = null, mixed $value = null, string $boolean = 'and')
+ * @method static \Illuminate\Database\Eloquent\Model|static|null firstWhere(\Closure|string|array|\Illuminate\Database\Query\Expression $column, mixed $operator = null, mixed $value = null, string $boolean = 'and')
+ * @method static \Illuminate\Database\Eloquent\Builder orWhere(\Closure|array|string|\Illuminate\Database\Query\Expression $column, mixed $operator = null, mixed $value = null)
+ * @method static \Illuminate\Database\Eloquent\Builder whereNot(\Closure|string|array|\Illuminate\Database\Query\Expression $column, mixed $operator = null, mixed $value = null, string $boolean = 'and')
+ * @method static \Illuminate\Database\Eloquent\Builder orWhereNot(\Closure|array|string|\Illuminate\Database\Query\Expression $column, mixed $operator = null, mixed $value = null)
+ * @method static \Illuminate\Database\Eloquent\Builder latest(string|\Illuminate\Database\Query\Expression|null $column = null)
+ * @method static \Illuminate\Database\Eloquent\Builder oldest(string|\Illuminate\Database\Query\Expression|null $column = null)
+ * @method static \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static[]|static|null find(mixed $id, array|string $columns = ['*'])
+ * @method static \Illuminate\Database\Eloquent\Collection findMany(\Illuminate\Contracts\Support\Arrayable|array $ids, array|string $columns = ['*'])
+ * @method static \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static|static[] findOrFail(mixed $id, array|string $columns = ['*'])
+ * @method static \Illuminate\Database\Eloquent\Model|static findOrNew(mixed $id, array|string $columns = ['*'])
+ * @method static \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static[]|static|mixed findOr(mixed $id, \Closure|array|string $columns = ['*'], \Closure|null $callback = null)
+ * @method static \Illuminate\Database\Eloquent\Model|static firstOrNew(array $attributes = [], array $values = [])
+ * @method static \Illuminate\Database\Eloquent\Model|static firstOrCreate(array $attributes = [], array $values = [])
+ * @method static \Illuminate\Database\Eloquent\Model|static updateOrCreate(array $attributes, array $values = [])
+ * @method static \Illuminate\Database\Eloquent\Model|static firstOrFail(array|string $columns = ['*'])
+ * @method static \Illuminate\Database\Eloquent\Model|static|mixed firstOr(\Closure|array|string $columns = ['*'], \Closure|null $callback = null)
+ * @method static \Illuminate\Database\Eloquent\Collection|static[] get(array|string $columns = ['*'])
+ * @method static \Illuminate\Contracts\Pagination\LengthAwarePaginator paginate(int|null|\Closure $perPage = null, array|string $columns = ['*'], string $pageName = 'page', int|null $page = null)
+ * @method static \Illuminate\Contracts\Pagination\Paginator simplePaginate(int|null $perPage = null, array|string $columns = ['*'], string $pageName = 'page', int|null $page = null)
+ * @method static \Illuminate\Contracts\Pagination\CursorPaginator cursorPaginate(int|null $perPage = null, array|string $columns = ['*'], string $cursorName = 'cursor', \Illuminate\Pagination\Cursor|string|null $cursor = null)
+ * @method static \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Builder create(array $attributes = [])
+ * @method static \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Builder forceCreate(array $attributes)
+ * @method static int upsert(array $values, array|string $uniqueBy, array|null $update = null)
+ *
+ * @see \Illuminate\Database\Eloquent\Builder
+ */
 abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToString, HasBroadcastChannel, Jsonable, JsonSerializable, QueueableEntity, UrlRoutable
 {
     use Concerns\HasAttributes,
