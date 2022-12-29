@@ -486,6 +486,7 @@ class Str
      * @param  string  $value
      * @param  int  $limit
      * @param  string  $end
+     * @param  string  $encoding
      * @return string
      */
     public static function limit($value, $limit = 100, $end = '...', $encoding = 'UTF-8')
