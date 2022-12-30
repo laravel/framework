@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
+use TypeError;
 
 class EloquentModelDecimalCastingTest extends DatabaseTestCase
 {
@@ -16,6 +17,67 @@ class EloquentModelDecimalCastingTest extends DatabaseTestCase
             $table->decimal('decimal_field_2', 8, 2)->nullable();
             $table->decimal('decimal_field_4', 8, 4)->nullable();
         });
+    }
+
+    public function testItThrowsOnNonNumericValues()
+    {
+        $model = new class extends Model {
+            public $timestamps = false;
+
+            protected $casts = [
+                'amount' => 'decimal:20',
+            ];
+        };
+        $model->amount = 'foo';
+
+        $this->expectException(TypeError::class);
+
+        $model->amount;
+    }
+
+    public function testItHandlesLargeNumbers()
+    {
+        $model = new class extends Model {
+            public $timestamps = false;
+
+            protected $casts = [
+                'amount' => 'decimal:20',
+            ];
+        };
+
+        $model->amount = '0.89898989898989898989';
+        $this->assertSame('0.89898989898989898989', $model->amount);
+
+        $model->amount = '89898989898989898989';
+        $this->assertSame('89898989898989898989.00000000000000000000', $model->amount);
+    }
+
+    public function testItTrimsLongValues()
+    {
+        $model = new class extends Model {
+            public $timestamps = false;
+
+            protected $casts = [
+                'amount' => 'decimal:20',
+            ];
+        };
+
+        $model->amount = '0.89898989898989898989898989898989898989898989';
+        $this->assertSame('0.89898989898989898989', $model->amount);
+    }
+
+    public function testItDoesntRoundNumbers()
+    {
+        $model = new class extends Model {
+            public $timestamps = false;
+
+            protected $casts = [
+                'amount' => 'decimal:1',
+            ];
+        };
+
+        $model->amount = '0.99';
+        $this->assertSame('0.9', $model->amount);
     }
 
     public function testDecimalsAreCastable()
