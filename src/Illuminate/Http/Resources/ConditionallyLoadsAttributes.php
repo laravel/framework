@@ -93,7 +93,7 @@ trait ConditionallyLoadsAttributes
     }
 
     /**
-     * Retrieve a value based on a given condition.
+     * Retrieve a value if the given "condition" is truthy.
      *
      * @param  bool  $condition
      * @param  mixed  $value
@@ -107,6 +107,21 @@ trait ConditionallyLoadsAttributes
         }
 
         return func_num_args() === 3 ? value($default) : new MissingValue;
+    }
+
+    /**
+     * Retrieve a value if the given "condition" is falsy.
+     *
+     * @param  bool  $condition
+     * @param  mixed  $value
+     * @param  mixed  $default
+     * @return \Illuminate\Http\Resources\MissingValue|mixed
+     */
+    public function unless($condition, $value, $default = null)
+    {
+        $arguments = func_num_args() === 2 ? [$value] : [$value, $default];
+
+        return $this->when(! $condition, ...$arguments);
     }
 
     /**
