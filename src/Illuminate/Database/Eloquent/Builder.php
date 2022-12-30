@@ -916,9 +916,9 @@ class Builder implements BuilderContract
      */
     public function simplePaginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
     {
-        $page = $page ?: Paginator::resolveCurrentPage($pageName);
+        $page ??= Paginator::resolveCurrentPage($pageName);
 
-        $perPage = $perPage ?: $this->model->getPerPage();
+        $perPage ??= $this->model->getPerPage();
 
         // Next we will set the limit and offset for this query so that when we get the
         // results we get the proper section of results. Then, we'll create the full
@@ -942,7 +942,7 @@ class Builder implements BuilderContract
      */
     public function cursorPaginate($perPage = null, $columns = ['*'], $cursorName = 'cursor', $cursor = null)
     {
-        $perPage = $perPage ?: $this->model->getPerPage();
+        $perPage ??= $this->model->getPerPage();
 
         return $this->paginateUsingCursor($perPage, $columns, $cursorName, $cursor);
     }

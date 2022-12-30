@@ -97,7 +97,7 @@ trait FormatsMessages
      */
     protected function getFromLocalArray($attribute, $lowerRule, $source = null)
     {
-        $source = $source ?: $this->customMessages;
+        $source ??= $this->customMessages;
 
         $keys = ["{$attribute}.{$lowerRule}", $lowerRule, $attribute];
 

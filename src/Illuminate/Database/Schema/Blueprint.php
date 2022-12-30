@@ -1599,7 +1599,7 @@ class Blueprint
         // If no name was specified for this index, we will create one using a basic
         // convention of the table name, followed by the columns, followed by an
         // index type, such as primary or index, which makes the index unique.
-        $index = $index ?: $this->createIndexName($type, $columns);
+        $index ??= $this->createIndexName($type, $columns);
 
         return $this->addCommand(
             $type, compact('index', 'columns', 'algorithm')

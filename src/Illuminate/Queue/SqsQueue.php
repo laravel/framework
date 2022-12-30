@@ -204,7 +204,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function getQueue($queue)
     {
-        $queue = $queue ?: $this->default;
+        $queue ??= $this->default;
 
         return filter_var($queue, FILTER_VALIDATE_URL) === false
             ? $this->suffixQueue($queue, $this->suffix)

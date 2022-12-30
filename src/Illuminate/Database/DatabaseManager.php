@@ -90,7 +90,7 @@ class DatabaseManager implements ConnectionResolverInterface
     {
         [$database, $type] = $this->parseConnectionName($name);
 
-        $name = $name ?: $database;
+        $name ??= $database;
 
         // If we haven't created this connection, we'll create it based on the config
         // provided in the application. Once we've created the connections we will
@@ -112,7 +112,7 @@ class DatabaseManager implements ConnectionResolverInterface
      */
     protected function parseConnectionName($name)
     {
-        $name = $name ?: $this->getDefaultConnection();
+        $name ??= $this->getDefaultConnection();
 
         return Str::endsWith($name, ['::read', '::write'])
                             ? explode('::', $name, 2) : [$name, null];
@@ -155,7 +155,7 @@ class DatabaseManager implements ConnectionResolverInterface
      */
     protected function configuration($name)
     {
-        $name = $name ?: $this->getDefaultConnection();
+        $name ??= $this->getDefaultConnection();
 
         // To get the database connection configuration, we will just pull each of the
         // connection configurations and get the configurations for the given name.
@@ -271,7 +271,7 @@ class DatabaseManager implements ConnectionResolverInterface
      */
     public function purge($name = null)
     {
-        $name = $name ?: $this->getDefaultConnection();
+        $name ??= $this->getDefaultConnection();
 
         $this->disconnect($name);
 
@@ -286,7 +286,7 @@ class DatabaseManager implements ConnectionResolverInterface
      */
     public function disconnect($name = null)
     {
-        if (isset($this->connections[$name = $name ?: $this->getDefaultConnection()])) {
+        if (isset($this->connections[$name ??= $this->getDefaultConnection()])) {
             $this->connections[$name]->disconnect();
         }
     }
@@ -299,7 +299,7 @@ class DatabaseManager implements ConnectionResolverInterface
      */
     public function reconnect($name = null)
     {
-        $this->disconnect($name = $name ?: $this->getDefaultConnection());
+        $this->disconnect($name ??= $this->getDefaultConnection());
 
         if (! isset($this->connections[$name])) {
             return $this->connection($name);

@@ -281,7 +281,7 @@ class StartSession
      */
     protected function sessionIsPersistent(array $config = null)
     {
-        $config = $config ?: $this->manager->getSessionConfig();
+        $config ??= $this->manager->getSessionConfig();
 
         return ! is_null($config['driver'] ?? null);
     }

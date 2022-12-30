@@ -43,7 +43,7 @@ class PasswordBrokerManager implements FactoryContract
      */
     public function broker($name = null)
     {
-        $name = $name ?: $this->getDefaultDriver();
+        $name ??= $this->getDefaultDriver();
 
         return $this->brokers[$name] ?? ($this->brokers[$name] = $this->resolve($name));
     }

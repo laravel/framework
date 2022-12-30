@@ -2088,7 +2088,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     {
         $relationship = $this->{$this->childRouteBindingRelationshipName($childType)}();
 
-        $field = $field ?: $relationship->getRelated()->getRouteKeyName();
+        $field ??= $relationship->getRelated()->getRouteKeyName();
 
         if ($relationship instanceof HasManyThrough ||
             $relationship instanceof BelongsToMany) {

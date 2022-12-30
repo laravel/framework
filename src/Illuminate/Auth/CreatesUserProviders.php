@@ -50,7 +50,7 @@ trait CreatesUserProviders
      */
     protected function getProviderConfiguration($provider)
     {
-        if ($provider = $provider ?: $this->getDefaultUserProvider()) {
+        if ($provider ??= $this->getDefaultUserProvider()) {
             return $this->app['config']['auth.providers.'.$provider];
         }
     }

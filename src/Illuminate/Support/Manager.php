@@ -65,7 +65,7 @@ abstract class Manager
      */
     public function driver($driver = null)
     {
-        $driver = $driver ?: $this->getDefaultDriver();
+        $driver ??= $this->getDefaultDriver();
 
         if (is_null($driver)) {
             throw new InvalidArgumentException(sprintf(

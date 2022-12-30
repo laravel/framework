@@ -203,7 +203,7 @@ class BelongsToMany extends Relation
      */
     protected function performJoin($query = null)
     {
-        $query = $query ?: $this->query;
+        $query ??= $this->query;
 
         // We need to join to the intermediate table on the related model's primary
         // key column with the intermediate table's foreign key for the related

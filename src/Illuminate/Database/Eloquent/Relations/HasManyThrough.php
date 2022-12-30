@@ -105,7 +105,7 @@ class HasManyThrough extends Relation
      */
     protected function performJoin(Builder $query = null)
     {
-        $query = $query ?: $this->query;
+        $query ??= $this->query;
 
         $farKey = $this->getQualifiedFarKeyName();
 

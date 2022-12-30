@@ -212,7 +212,7 @@ trait InteractsWithDatabase
     {
         $database = $this->app->make('db');
 
-        $connection = $connection ?: $this->getTableConnection($table) ?: $database->getDefaultConnection();
+        $connection ??= $this->getTableConnection($table) ?: $database->getDefaultConnection();
 
         return $database->connection($connection);
     }

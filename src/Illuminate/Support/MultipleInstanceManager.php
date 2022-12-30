@@ -71,7 +71,7 @@ abstract class MultipleInstanceManager
      */
     public function instance($name = null)
     {
-        $name = $name ?: $this->getDefaultInstance();
+        $name ??= $this->getDefaultInstance();
 
         return $this->instances[$name] = $this->get($name);
     }

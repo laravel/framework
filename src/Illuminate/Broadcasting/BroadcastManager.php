@@ -127,7 +127,7 @@ class BroadcastManager implements FactoryContract
             return;
         }
 
-        $request = $request ?: $this->app['request'];
+        $request ??= $this->app['request'];
 
         return $request->header('X-Socket-ID');
     }
@@ -217,7 +217,7 @@ class BroadcastManager implements FactoryContract
      */
     public function driver($name = null)
     {
-        $name = $name ?: $this->getDefaultDriver();
+        $name ??= $this->getDefaultDriver();
 
         return $this->drivers[$name] = $this->get($name);
     }

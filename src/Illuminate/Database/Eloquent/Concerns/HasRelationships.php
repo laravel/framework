@@ -101,9 +101,9 @@ trait HasRelationships
     {
         $instance = $this->newRelatedInstance($related);
 
-        $foreignKey = $foreignKey ?: $this->getForeignKey();
+        $foreignKey ??= $this->getForeignKey();
 
-        $localKey = $localKey ?: $this->getKeyName();
+        $localKey ??= $this->getKeyName();
 
         return $this->newHasOne($instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey, $localKey);
     }
@@ -137,9 +137,9 @@ trait HasRelationships
     {
         $through = $this->newRelatedThroughInstance($through);
 
-        $firstKey = $firstKey ?: $this->getForeignKey();
+        $firstKey ??= $this->getForeignKey();
 
-        $secondKey = $secondKey ?: $through->getForeignKey();
+        $secondKey ??= $through->getForeignKey();
 
         return $this->newHasOneThrough(
             $this->newRelatedInstance($related)->newQuery(), $this, $through,
@@ -183,7 +183,7 @@ trait HasRelationships
 
         $table = $instance->getTable();
 
-        $localKey = $localKey ?: $this->getKeyName();
+        $localKey ??= $this->getKeyName();
 
         return $this->newMorphOne($instance->newQuery(), $this, $table.'.'.$type, $table.'.'.$id, $localKey);
     }
@@ -233,7 +233,7 @@ trait HasRelationships
         // Once we have the foreign key names we'll just create a new Eloquent query
         // for the related models and return the relationship instance which will
         // actually be responsible for retrieving and hydrating every relation.
-        $ownerKey = $ownerKey ?: $instance->getKeyName();
+        $ownerKey ??= $instance->getKeyName();
 
         return $this->newBelongsTo(
             $instance->newQuery(), $this, $foreignKey, $ownerKey, $relation
@@ -269,7 +269,7 @@ trait HasRelationships
         // If no name is provided, we will use the backtrace to get the function name
         // since that is most likely the name of the polymorphic interface. We can
         // use that to get both the class and foreign key that will be utilized.
-        $name = $name ?: $this->guessBelongsToRelation();
+        $name ??= $this->guessBelongsToRelation();
 
         [$type, $id] = $this->getMorphs(
             Str::snake($name), $type, $id
@@ -371,9 +371,9 @@ trait HasRelationships
     {
         $instance = $this->newRelatedInstance($related);
 
-        $foreignKey = $foreignKey ?: $this->getForeignKey();
+        $foreignKey ??= $this->getForeignKey();
 
-        $localKey = $localKey ?: $this->getKeyName();
+        $localKey ??= $this->getKeyName();
 
         return $this->newHasMany(
             $instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey, $localKey
@@ -409,9 +409,9 @@ trait HasRelationships
     {
         $through = $this->newRelatedThroughInstance($through);
 
-        $firstKey = $firstKey ?: $this->getForeignKey();
+        $firstKey ??= $this->getForeignKey();
 
-        $secondKey = $secondKey ?: $through->getForeignKey();
+        $secondKey ??= $through->getForeignKey();
 
         return $this->newHasManyThrough(
             $this->newRelatedInstance($related)->newQuery(),
@@ -462,7 +462,7 @@ trait HasRelationships
 
         $table = $instance->getTable();
 
-        $localKey = $localKey ?: $this->getKeyName();
+        $localKey ??= $this->getKeyName();
 
         return $this->newMorphMany($instance->newQuery(), $this, $table.'.'.$type, $table.'.'.$id, $localKey);
     }
@@ -509,9 +509,9 @@ trait HasRelationships
         // instances as well as the relationship instances we need for this.
         $instance = $this->newRelatedInstance($related);
 
-        $foreignPivotKey = $foreignPivotKey ?: $this->getForeignKey();
+        $foreignPivotKey ??= $this->getForeignKey();
 
-        $relatedPivotKey = $relatedPivotKey ?: $instance->getForeignKey();
+        $relatedPivotKey ??= $instance->getForeignKey();
 
         // If no table name was provided, we can guess it by concatenating the two
         // models using underscores in alphabetical order. The two model names
@@ -570,9 +570,9 @@ trait HasRelationships
         // instances, as well as the relationship instances we need for these.
         $instance = $this->newRelatedInstance($related);
 
-        $foreignPivotKey = $foreignPivotKey ?: $name.'_id';
+        $foreignPivotKey ??= $name.'_id';
 
-        $relatedPivotKey = $relatedPivotKey ?: $instance->getForeignKey();
+        $relatedPivotKey ??= $instance->getForeignKey();
 
         // Now we're ready to create a new query builder for the related model and
         // the relationship instances for this relation. This relation will set
@@ -630,12 +630,12 @@ trait HasRelationships
     public function morphedByMany($related, $name, $table = null, $foreignPivotKey = null,
                                   $relatedPivotKey = null, $parentKey = null, $relatedKey = null)
     {
-        $foreignPivotKey = $foreignPivotKey ?: $this->getForeignKey();
+        $foreignPivotKey ??= $this->getForeignKey();
 
         // For the inverse of the polymorphic many-to-many relations, we will change
         // the way we determine the foreign and other keys, as it is the opposite
         // of the morph-to-many method since we're figuring out these inverses.
-        $relatedPivotKey = $relatedPivotKey ?: $name.'_id';
+        $relatedPivotKey ??= $name.'_id';
 
         return $this->morphToMany(
             $related, $name, $table, $foreignPivotKey,
