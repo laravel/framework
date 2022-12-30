@@ -335,9 +335,9 @@ class Response implements ArrayAccess
      *
      * @throws \Illuminate\Http\Client\RequestException
      */
-    public function throwIf($condition)
+    public function throwIf($condition, $throwCallback = null)
     {
-        return value($condition, $this) ? $this->throw(func_get_args()[1] ?? null) : $this;
+        return value($condition, $this) ? $this->throw($throwCallback) : $this;
     }
 
     /**
@@ -349,9 +349,9 @@ class Response implements ArrayAccess
      *
      * @throws \Illuminate\Http\Client\RequestException
      */
-    public function throwUnless($condition)
+    public function throwUnless($condition, $throwCallback = null)
     {
-        return ! value($condition, $this) ? $this->throw(func_get_args()[1] ?? null) : $this;
+        return $this->throwIf(! value($condition, $this), $throwCallback);
     }
 
     /**
