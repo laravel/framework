@@ -31,6 +31,7 @@ use LogicException;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionNamedType;
+use TypeError;
 
 trait HasAttributes
 {
@@ -1318,7 +1319,15 @@ trait HasAttributes
      */
     protected function asDecimal($value, $decimals)
     {
-        return number_format($value, $decimals, '.', '');
+        $value = (string) $value;
+
+        if (! is_numeric($value)) {
+            throw new TypeError('$value must be numeric.');
+        }
+
+        [$int, $fraction] = explode('.', $value) + [1 => ''];
+
+        return $int.'.'.Str::of($fraction)->limit($decimals, '')->padLeft($decimals, '0');
     }
 
     /**
