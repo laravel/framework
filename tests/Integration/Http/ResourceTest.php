@@ -168,7 +168,7 @@ class ResourceTest extends TestCase
         ]);
     }
 
-    public function testResourcesMayDosntHaveOptionalValues()
+    public function testResourcesMayHaveOptionalValues()
     {
         Route::get('/', function () {
             return new PostResourceWithUnlessOptionalData(new Post([
