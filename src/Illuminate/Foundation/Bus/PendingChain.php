@@ -145,12 +145,12 @@ class PendingChain
 
         if ($this->connection) {
             $firstJob->chainConnection = $this->connection;
-            $firstJob->connection = $firstJob->connection ?: $this->connection;
+            $firstJob->connection ??= $this->connection;
         }
 
         if ($this->queue) {
             $firstJob->chainQueue = $this->queue;
-            $firstJob->queue = $firstJob->queue ?: $this->queue;
+            $firstJob->queue ??= $this->queue;
         }
 
         if ($this->delay) {
