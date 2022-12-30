@@ -351,7 +351,7 @@ class Response implements ArrayAccess
      */
     public function throwUnless($condition)
     {
-        return $this->throwIf(! $condition);
+        return ! value($condition, $this) ? $this->throw(func_get_args()[1] ?? null) : $this;
     }
 
     /**
