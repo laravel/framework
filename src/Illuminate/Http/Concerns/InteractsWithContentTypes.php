@@ -126,6 +126,8 @@ trait InteractsWithContentTypes
                 return true;
             }
         }
+
+        return false;
     }
 
     /**
