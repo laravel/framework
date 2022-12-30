@@ -1616,12 +1616,9 @@ trait HasAttributes
             return false;
         }
 
-        $castType = $this->parseCasterClass($this->getCasts()[$key]);
-        if (method_exists($castType, 'castUsing')) {
-            $castType = $castType::castUsing([]);
-        }
+        $castType = $this->resolveCasterClass($key);
 
-        return method_exists($castType, 'increment') && method_exists($castType, 'decrement');
+        return method_exists($castType::class, 'increment') && method_exists($castType::class, 'decrement');
     }
 
     /**
