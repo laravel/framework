@@ -62,7 +62,7 @@ class Repository implements ArrayAccess, CacheContract
     /**
      * Determine if an item exists in the cache.
      *
-     * @param  string  $key
+     * @param  array|string  $key
      * @return bool
      */
     public function has($key): bool
@@ -88,7 +88,7 @@ class Repository implements ArrayAccess, CacheContract
      *
      * @param  array|string  $key
      * @param  TCacheValue|(\Closure(): TCacheValue)  $default
-     * @return TCacheValue
+     * @return (TCacheValue is null ? mixed : TCacheValue)
      */
     public function get($key, $default = null): mixed
     {
@@ -179,9 +179,9 @@ class Repository implements ArrayAccess, CacheContract
      *
      * @template TCacheValue
      *
-     * @param  string  $key
+     * @param  array|string  $key
      * @param  TCacheValue|(\Closure(): TCacheValue)  $default
-     * @return TCacheValue
+     * @return (TCacheValue is null ? mixed : TCacheValue)
      */
     public function pull($key, $default = null)
     {

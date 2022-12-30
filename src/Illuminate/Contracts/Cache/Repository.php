@@ -12,9 +12,9 @@ interface Repository extends CacheInterface
      *
      * @template TCacheValue
      *
-     * @param  string  $key
+     * @param  array|string  $key
      * @param  TCacheValue|(\Closure(): TCacheValue)  $default
-     * @return TCacheValue
+     * @return (TCacheValue is null ? mixed : TCacheValue)
      */
     public function pull($key, $default = null);
 
