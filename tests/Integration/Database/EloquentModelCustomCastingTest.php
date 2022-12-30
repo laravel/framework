@@ -373,31 +373,37 @@ class Euro implements Castable
 {
     public string $value;
 
-    public function __construct(string $value) {
+    public function __construct(string $value)
+    {
         $this->value = $value;
     }
 
-    public static function castUsing(array $arguments) {
+    public static function castUsing(array $arguments)
+    {
         return EuroCaster::class;
     }
 }
 
 class EuroCaster implements CastsAttributes
 {
-    public function get($model, $key, $value, $attributes) {
+    public function get($model, $key, $value, $attributes)
+    {
         return new Euro($value);
     }
 
-    public function set($model, $key, $value, $attributes) {
+    public function set($model, $key, $value, $attributes)
+    {
         return $value->value;
     }
 
-    public function increment($model, $key, string $value, $attributes) {
+    public function increment($model, $key, string $value, $attributes)
+    {
         $model->$key = new Euro(bcadd($model->$key->value, $value, 2));
         return $model->$key;
     }
 
-    public function decrement($model, $key, string $value, $attributes) {
+    public function decrement($model, $key, string $value, $attributes)
+    {
         $model->$key = new Euro(bcsub($model->$key->value, $value, 2));
         return $model->$key;
     }
@@ -410,7 +416,8 @@ class Member extends Model
         'amount' => Euro::class,
     ];
 
-    public function incrementAmount(Euro $amount) {
+    public function incrementAmount(Euro $amount)
+    {
         $this->increment('amount', $amount->value);
     }
 }
