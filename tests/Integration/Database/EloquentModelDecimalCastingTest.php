@@ -21,7 +21,8 @@ class EloquentModelDecimalCastingTest extends DatabaseTestCase
 
     public function testItThrowsOnNonNumericValues()
     {
-        $model = new class extends Model {
+        $model = new class extends Model
+        {
             public $timestamps = false;
 
             protected $casts = [
@@ -37,7 +38,8 @@ class EloquentModelDecimalCastingTest extends DatabaseTestCase
 
     public function testItHandlesLargeNumbers()
     {
-        $model = new class extends Model {
+        $model = new class extends Model
+        {
             public $timestamps = false;
 
             protected $casts = [
@@ -54,7 +56,8 @@ class EloquentModelDecimalCastingTest extends DatabaseTestCase
 
     public function testItTrimsLongValues()
     {
-        $model = new class extends Model {
+        $model = new class extends Model
+        {
             public $timestamps = false;
 
             protected $casts = [
@@ -68,7 +71,8 @@ class EloquentModelDecimalCastingTest extends DatabaseTestCase
 
     public function testItDoesntRoundNumbers()
     {
-        $model = new class extends Model {
+        $model = new class extends Model
+        {
             public $timestamps = false;
 
             protected $casts = [
