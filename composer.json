@@ -138,7 +138,7 @@
         }
     },
     "suggest": {
-        "ext-bcmath": "Required to use the multiple_of validation rule.",
+        "ext-bcmath": "Required to use the multiple_of validation rule and the Eloquent model decimal attribute cast.",
         "ext-ftp": "Required to use the Flysystem FTP driver.",
         "ext-gd": "Required to use Illuminate\\Http\\Testing\\FileFactory::image().",
         "ext-memcached": "Required to use the memcache cache driver.",
