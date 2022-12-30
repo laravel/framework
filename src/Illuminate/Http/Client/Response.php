@@ -353,7 +353,7 @@ class Response implements ArrayAccess
     {
         return $this->throwIf(! $condition);
     }
-    
+
     /**
      * Determine if the given offset exists.
      *
