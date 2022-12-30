@@ -220,7 +220,7 @@ trait ConditionallyLoadsAttributes
     {
         $arguments = func_num_args() == 1 ? [$value] : [$value, $default];
 
-        return $this->when(! is_null($value), ...$arguments);
+        return $this->unless(is_null($value), ...$arguments);
     }
 
     /**
