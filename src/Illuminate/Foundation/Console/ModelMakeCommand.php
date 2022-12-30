@@ -61,6 +61,7 @@ class ModelMakeCommand extends GeneratorCommand
             $this->input->setOption('seed', true);
             $this->input->setOption('migration', true);
             $this->input->setOption('controller', true);
+            $this->input->setOption('observer', true);
             $this->input->setOption('policy', true);
             $this->input->setOption('resource', true);
         }
@@ -79,6 +80,10 @@ class ModelMakeCommand extends GeneratorCommand
 
         if ($this->option('controller') || $this->option('resource') || $this->option('api')) {
             $this->createController();
+        }
+
+        if ($this->option('observer')) {
+            $this->createObserver();
         }
 
         if ($this->option('policy')) {
@@ -155,6 +160,23 @@ class ModelMakeCommand extends GeneratorCommand
     }
 
     /**
+     * Create an observer for the model.
+     *
+     * @return void
+     */
+    protected function createObserver()
+    {
+        $observer = Str::studly(class_basename($this->argument('name')));
+
+        $modelName = $this->qualifyClass($this->getNameInput());
+
+        $this->call('make:observer', array_filter([
+            'name' => "{$observer}Observer",
+            '--model' => $modelName ?? null,
+        ]));
+    }
+
+    /**
      * Create a policy file for the model.
      *
      * @return void
@@ -221,6 +243,7 @@ class ModelMakeCommand extends GeneratorCommand
         return [
             ['all', 'a', InputOption::VALUE_NONE, 'Generate a migration, seeder, factory, policy, resource controller, and form request classes for the model'],
             ['controller', 'c', InputOption::VALUE_NONE, 'Create a new controller for the model'],
+            ['observer', 'o', InputOption::VALUE_NONE, 'Create a new observer for the model'],
             ['factory', 'f', InputOption::VALUE_NONE, 'Create a new factory for the model'],
             ['force', null, InputOption::VALUE_NONE, 'Create the class even if the model already exists'],
             ['migration', 'm', InputOption::VALUE_NONE, 'Create a new migration file for the model'],
