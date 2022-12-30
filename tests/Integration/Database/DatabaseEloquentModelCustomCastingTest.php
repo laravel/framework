@@ -22,6 +22,7 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
             $table->increments('id');
             $table->timestamps();
             $table->decimal('price');
+            $table->decimal('price_with_caster_instance');
         });
     }
 
@@ -149,15 +150,20 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
     {
         $model = new TestEloquentModelWithCustomCast;
         $model->price = '123.456';
+        $model->price_with_caster_instance = '123.456';
         $model->save();
 
         $model->increment('price', '530.865');
+        $model->increment('price_with_caster_instance', '530.865');
 
         $this->assertSame((new Decimal('654.321'))->getValue(), $model->price->getValue());
+        $this->assertSame((new Decimal('654.321'))->getValue(), $model->price_with_caster_instance->getValue());
 
         $model->decrement('price', '333.333');
+        $model->decrement('price_with_caster_instance', '333.333');
 
         $this->assertSame((new Decimal('320.988'))->getValue(), $model->price->getValue());
+        $this->assertSame((new Decimal('320.988'))->getValue(), $model->price_with_caster_instance->getValue());
     }
 
     public function testSerializableCasts()
@@ -289,6 +295,7 @@ class TestEloquentModelWithCustomCast extends Model
     protected $casts = [
         'address' => AddressCaster::class,
         'price' => DecimalCaster::class,
+        'price_with_caster_instance' => Decimal::class,
         'password' => HashCaster::class,
         'other_password' => HashCaster::class.':md5',
         'uppercase' => UppercaseCaster::class,
@@ -541,7 +548,7 @@ class Settings
     }
 }
 
-final class Decimal
+final class Decimal implements Castable
 {
     private $value;
     private $scale;
@@ -557,6 +564,11 @@ final class Decimal
     public function getValue()
     {
         return $this->value;
+    }
+
+    public static function castUsing(array $arguments)
+    {
+        return DecimalCaster::class;
     }
 
     public function __toString()

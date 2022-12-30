@@ -1613,7 +1613,7 @@ trait HasAttributes
     protected function isClassDeviable($key)
     {
         return $this->isClassCastable($key) &&
-            method_exists($castType = $this->parseCasterClass($this->getCasts()[$key]), 'increment') &&
+            method_exists($castType = $this->resolveCasterClass($key), 'increment') &&
             method_exists($castType, 'decrement');
     }
 
