@@ -1580,10 +1580,6 @@ class HttpClientTest extends TestCase
 
                     return false;
                 }, function ($response, $e) use (&$hitThrowCallback) {
-                    $this->assertInstanceOf(Response::class, $response);
-                    $this->assertSame(403, $response->status());
-
-                    $this->assertInstanceOf(RequestException::class, $e);
                     $hitThrowCallback = true;
                 })
                 ->get('http://foo.com/get');
@@ -1634,6 +1630,10 @@ class HttpClientTest extends TestCase
 
                 return true;
             }, function ($response, $e) use (&$hitThrowCallback) {
+                $this->assertInstanceOf(Response::class, $response);
+                $this->assertSame(403, $response->status());
+
+                $this->assertInstanceOf(RequestException::class, $e);
                 $hitThrowCallback = true;
             })
             ->get('http://foo.com/get');
