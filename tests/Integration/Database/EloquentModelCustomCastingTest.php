@@ -399,12 +399,14 @@ class EuroCaster implements CastsAttributes
     public function increment($model, $key, string $value, $attributes)
     {
         $model->$key = new Euro(bcadd($model->$key->value, $value, 2));
+
         return $model->$key;
     }
 
     public function decrement($model, $key, string $value, $attributes)
     {
         $model->$key = new Euro(bcsub($model->$key->value, $value, 2));
+
         return $model->$key;
     }
 }
