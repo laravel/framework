@@ -66,6 +66,19 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame('alter table `users` auto_increment = 1000', $statements[1]);
     }
 
+    public function testAddColumnsWithMultipleAutoIncrementStartingValue()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->id()->from(100);
+        $blueprint->string('name')->from(200);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals([
+            'alter table `users` add `id` bigint unsigned not null auto_increment primary key, add `name` varchar(255) not null',
+            'alter table `users` auto_increment = 100',
+        ], $statements);
+    }
+
     public function testEngineCreateTable()
     {
         $blueprint = new Blueprint('users');

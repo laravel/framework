@@ -34,7 +34,7 @@ class PostgresGrammar extends Grammar
      *
      * @var string[]
      */
-    protected $fluentCommands = ['Comment'];
+    protected $fluentCommands = ['Comment', 'AutoIncrementStartingValues'];
 
     /**
      * Compile a create database command.
@@ -91,15 +91,15 @@ class PostgresGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
-     * @return array
+     * @return string
      */
     public function compileCreate(Blueprint $blueprint, Fluent $command)
     {
-        return array_values(array_filter(array_merge([sprintf('%s table %s (%s)',
+        return sprintf('%s table %s (%s)',
             $blueprint->temporary ? 'create temporary' : 'create',
             $this->wrapTable($blueprint),
             implode(', ', $this->getColumns($blueprint))
-        )], $this->compileAutoIncrementStartingValues($blueprint))));
+        );
     }
 
     /**
@@ -111,23 +111,25 @@ class PostgresGrammar extends Grammar
      */
     public function compileAdd(Blueprint $blueprint, Fluent $command)
     {
-        return array_values(array_filter(array_merge([sprintf('alter table %s %s',
+        return sprintf('alter table %s %s',
             $this->wrapTable($blueprint),
             implode(', ', $this->prefixArray('add column', $this->getColumns($blueprint)))
-        )], $this->compileAutoIncrementStartingValues($blueprint))));
+        );
     }
 
     /**
      * Compile the auto-incrementing column starting values.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @return array
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
      */
-    public function compileAutoIncrementStartingValues(Blueprint $blueprint)
+    public function compileAutoIncrementStartingValues(Blueprint $blueprint, Fluent $command)
     {
-        return collect($blueprint->autoIncrementingStartingValues())->map(function ($value, $column) use ($blueprint) {
-            return 'alter sequence '.$blueprint->getTable().'_'.$column.'_seq restart with '.$value;
-        })->all();
+        if ($command->column->autoIncrement
+            && $value = $command->column->get('startingValue', $command->column->get('from'))) {
+            return 'alter sequence '.$blueprint->getTable().'_'.$command->column->name.'_seq restart with '.$value;
+        }
     }
 
     /**
@@ -509,11 +511,13 @@ class PostgresGrammar extends Grammar
      */
     public function compileComment(Blueprint $blueprint, Fluent $command)
     {
-        return sprintf('comment on column %s.%s is %s',
-            $this->wrapTable($blueprint),
-            $this->wrap($command->column->name),
-            "'".str_replace("'", "''", $command->value)."'"
-        );
+        if (! is_null($command->column->comment)) {
+            return sprintf('comment on column %s.%s is %s',
+                $this->wrapTable($blueprint),
+                $this->wrap($command->column->name),
+                "'".str_replace("'", "''", $command->column->comment)."'"
+            );
+        }
     }
 
     /**

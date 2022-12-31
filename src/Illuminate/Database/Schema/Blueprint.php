@@ -243,17 +243,7 @@ class Blueprint
     {
         foreach ($this->columns as $column) {
             foreach ($grammar->getFluentCommands() as $commandName) {
-                $attributeName = lcfirst($commandName);
-
-                if (! isset($column->{$attributeName})) {
-                    continue;
-                }
-
-                $value = $column->{$attributeName};
-
-                $this->addCommand(
-                    $commandName, compact('value', 'column')
-                );
+                $this->addCommand($commandName, compact('column'));
             }
         }
     }
@@ -1785,35 +1775,5 @@ class Blueprint
         return array_filter($this->columns, function ($column) {
             return (bool) $column->change;
         });
-    }
-
-    /**
-     * Determine if the blueprint has auto-increment columns.
-     *
-     * @return bool
-     */
-    public function hasAutoIncrementColumn()
-    {
-        return ! is_null(collect($this->getAddedColumns())->first(function ($column) {
-            return $column->autoIncrement === true;
-        }));
-    }
-
-    /**
-     * Get the auto-increment column starting values.
-     *
-     * @return array
-     */
-    public function autoIncrementingStartingValues()
-    {
-        if (! $this->hasAutoIncrementColumn()) {
-            return [];
-        }
-
-        return collect($this->getAddedColumns())->mapWithKeys(function ($column) {
-            return $column->autoIncrement === true
-                        ? [$column->name => $column->get('startingValue', $column->get('from'))]
-                        : [$column->name => null];
-        })->filter()->all();
     }
 }

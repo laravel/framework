@@ -52,6 +52,21 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertSame('alter sequence users_id_seq restart with 1000', $statements[1]);
     }
 
+    public function testAddColumnsWithMultipleAutoIncrementStartingValue()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->id()->from(100);
+        $blueprint->increments('code')->from(200);
+        $blueprint->string('name')->from(300);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals([
+            'alter table "users" add column "id" bigserial primary key not null, add column "code" serial primary key not null, add column "name" varchar(255) not null',
+            'alter sequence users_id_seq restart with 100',
+            'alter sequence users_code_seq restart with 200',
+        ], $statements);
+    }
+
     public function testCreateTableAndCommentColumn()
     {
         $blueprint = new Blueprint('users');
