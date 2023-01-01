@@ -34,9 +34,9 @@ class ForeignIdColumnDefinition extends ColumnDefinition
      * @param  string  $column
      * @return \Illuminate\Database\Schema\ForeignKeyDefinition
      */
-    public function constrained($table = null, $column = 'id')
+    public function constrained($table = null, $column = 'id', $constraintName = null)
     {
-        return $this->references($column)->on($table ?? Str::plural(Str::beforeLast($this->name, '_'.$column)));
+        return $this->references($column, $constraintName)->on($table ?? Str::plural(Str::beforeLast($this->name, '_'.$column)));
     }
 
     /**
@@ -45,8 +45,8 @@ class ForeignIdColumnDefinition extends ColumnDefinition
      * @param  string  $column
      * @return \Illuminate\Database\Schema\ForeignKeyDefinition
      */
-    public function references($column)
+    public function references($column, $constraintName = null)
     {
-        return $this->blueprint->foreign($this->name)->references($column);
+        return $this->blueprint->foreign($this->name, $constraintName)->references($column);
     }
 }

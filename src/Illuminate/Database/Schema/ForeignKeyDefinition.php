@@ -15,6 +15,16 @@ use Illuminate\Support\Fluent;
 class ForeignKeyDefinition extends Fluent
 {
     /**
+     * Sets the name of the constraint.
+     *
+     * @return $this
+     */
+    public function name(string $name)
+    {
+        return $this->name($name);
+    }
+
+    /**
      * Indicate that updates should cascade.
      *
      * @return $this
