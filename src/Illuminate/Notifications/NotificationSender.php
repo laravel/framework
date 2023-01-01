@@ -191,10 +191,18 @@ class NotificationSender
             foreach ((array) $original->via($notifiable) as $channel) {
                 $notification = clone $original;
 
-                $notification->id = $notificationId;
+                if (! $notification->id) {
+                    $notification->id = $notificationId;
+                }
 
                 if (! is_null($this->locale)) {
                     $notification->locale = $this->locale;
+                }
+
+                $connection = $notification->connection;
+
+                if (method_exists($notification, 'viaConnections')) {
+                    $connection = $notification->viaConnections()[$channel] ?? null;
                 }
 
                 $queue = $notification->queue;
@@ -203,20 +211,27 @@ class NotificationSender
                     $queue = $notification->viaQueues()[$channel] ?? null;
                 }
 
+                $delay = $notification->delay;
+
+                if (method_exists($notification, 'withDelay')) {
+                    $delay = $notification->withDelay($notifiable, $channel) ?? null;
+                }
+
+                $middleware = $notification->middleware ?? [];
+
+                if (method_exists($notification, 'middleware')) {
+                    $middleware = array_merge(
+                        $notification->middleware($notifiable, $channel),
+                        $middleware
+                    );
+                }
+
                 $this->bus->dispatch(
                     (new SendQueuedNotifications($notifiable, $notification, [$channel]))
-                            ->onConnection($notification->connection)
+                            ->onConnection($connection)
                             ->onQueue($queue)
-                            ->delay(is_array($notification->delay) ?
-                                    ($notification->delay[$channel] ?? null)
-                                    : $notification->delay
-                            )
-                            ->through(
-                                array_merge(
-                                    method_exists($notification, 'middleware') ? $notification->middleware() : [],
-                                    $notification->middleware ?? []
-                                )
-                            )
+                            ->delay(is_array($delay) ? ($delay[$channel] ?? null) : $delay)
+                            ->through($middleware)
                 );
             }
         }

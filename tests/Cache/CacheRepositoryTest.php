@@ -23,6 +23,13 @@ use PHPUnit\Framework\TestCase;
 
 class CacheRepositoryTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Carbon::setTestNow(Carbon::parse(self::getTestDate()));
+    }
+
     protected function tearDown(): void
     {
         m::close();
@@ -254,14 +261,12 @@ class CacheRepositoryTest extends TestCase
         $this->assertFalse($result);
     }
 
-    public function dataProviderTestGetSeconds()
+    public static function dataProviderTestGetSeconds()
     {
-        Carbon::setTestNow(Carbon::parse($this->getTestDate()));
-
         return [
-            [Carbon::now()->addMinutes(5)],
-            [(new DateTime($this->getTestDate()))->modify('+5 minutes')],
-            [(new DateTimeImmutable($this->getTestDate()))->modify('+5 minutes')],
+            [Carbon::parse(self::getTestDate())->addMinutes(5)],
+            [(new DateTime(self::getTestDate()))->modify('+5 minutes')],
+            [(new DateTimeImmutable(self::getTestDate()))->modify('+5 minutes')],
             [new DateInterval('PT5M')],
             [300],
         ];
@@ -274,8 +279,6 @@ class CacheRepositoryTest extends TestCase
      */
     public function testGetSeconds($duration)
     {
-        Carbon::setTestNow(Carbon::parse($this->getTestDate()));
-
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('put')->once()->with($key = 'foo', $value = 'bar', 300);
         $repo->put($key, $value, $duration);
@@ -435,7 +438,7 @@ class CacheRepositoryTest extends TestCase
         return $repository;
     }
 
-    protected function getTestDate()
+    protected static function getTestDate()
     {
         return '2030-07-25 12:13:14 UTC';
     }

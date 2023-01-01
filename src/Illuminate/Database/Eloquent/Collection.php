@@ -295,7 +295,7 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Determine if a key exists in the collection.
      *
-     * @param  (callable(TModel, TKey): bool)|TModel|string  $key
+     * @param  (callable(TModel, TKey): bool)|TModel|string|int  $key
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return bool
@@ -665,15 +665,28 @@ class Collection extends BaseCollection implements QueueableCollection
             return;
         }
 
-        $class = get_class($this->first());
+        $class = $this->getQueueableModelClass($this->first());
 
         $this->each(function ($model) use ($class) {
-            if (get_class($model) !== $class) {
+            if ($this->getQueueableModelClass($model) !== $class) {
                 throw new LogicException('Queueing collections with multiple model types is not supported.');
             }
         });
 
         return $class;
+    }
+
+    /**
+     * Get the queueable class name for the given model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return string
+     */
+    protected function getQueueableModelClass($model)
+    {
+        return method_exists($model, 'getQueueableClassName')
+                ? $model->getQueueableClassName()
+                : get_class($model);
     }
 
     /**

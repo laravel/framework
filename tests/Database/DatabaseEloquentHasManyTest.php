@@ -55,6 +55,15 @@ class DatabaseEloquentHasManyTest extends TestCase
         $this->assertEquals($created, $relation->create(['name' => 'taylor']));
     }
 
+    public function testForceCreateMethodProperlyCreatesNewModel()
+    {
+        $relation = $this->getRelation();
+        $created = $this->expectForceCreatedModel($relation, ['name' => 'taylor']);
+
+        $this->assertEquals($created, $relation->forceCreate(['name' => 'taylor']));
+        $this->assertEquals(1, $created->getAttribute('foreign_key'));
+    }
+
     public function testFindOrNewMethodFindsModel()
     {
         $relation = $this->getRelation();
@@ -301,6 +310,18 @@ class DatabaseEloquentHasManyTest extends TestCase
     {
         $model = $this->expectNewModel($relation, $attributes);
         $model->expects($this->once())->method('save');
+
+        return $model;
+    }
+
+    protected function expectForceCreatedModel($relation, $attributes)
+    {
+        $attributes[$relation->getForeignKeyName()] = $relation->getParentKey();
+
+        $model = m::mock(Model::class);
+        $model->shouldReceive('getAttribute')->with($relation->getForeignKeyName())->andReturn($relation->getParentKey());
+
+        $relation->getRelated()->shouldReceive('forceCreate')->once()->with($attributes)->andReturn($model);
 
         return $model;
     }

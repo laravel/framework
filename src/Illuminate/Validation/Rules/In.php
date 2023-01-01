@@ -6,6 +6,8 @@ class In
 {
     /**
      * The name of the rule.
+     *
+     * @var string
      */
     protected $rule = 'in';
 

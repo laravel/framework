@@ -225,6 +225,27 @@ trait InteractsWithInput
     }
 
     /**
+     * Apply the callback if the request is missing the given input item key.
+     *
+     * @param  string  $key
+     * @param  callable  $callback
+     * @param  callable|null  $default
+     * @return $this|mixed
+     */
+    public function whenMissing($key, callable $callback, callable $default = null)
+    {
+        if ($this->missing($key)) {
+            return $callback(data_get($this->all(), $key)) ?: $this;
+        }
+
+        if ($default) {
+            return $default();
+        }
+
+        return $this;
+    }
+
+    /**
      * Determine if the given input key is an empty string for "has".
      *
      * @param  string  $key
@@ -285,6 +306,30 @@ trait InteractsWithInput
     }
 
     /**
+     * Retrieve input from the request as a Stringable instance.
+     *
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return \Illuminate\Support\Stringable
+     */
+    public function str($key, $default = null)
+    {
+        return $this->string($key, $default);
+    }
+
+    /**
+     * Retrieve input from the request as a Stringable instance.
+     *
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return \Illuminate\Support\Stringable
+     */
+    public function string($key, $default = null)
+    {
+        return str($this->input($key, $default));
+    }
+
+    /**
      * Retrieve input as a boolean value.
      *
      * Returns true when value is "1", "true", "on", and "yes". Otherwise, returns false.
@@ -299,12 +344,38 @@ trait InteractsWithInput
     }
 
     /**
+     * Retrieve input as an integer value.
+     *
+     * @param  string  $key
+     * @param  int  $default
+     * @return int
+     */
+    public function integer($key, $default = 0)
+    {
+        return intval($this->input($key, $default));
+    }
+
+    /**
+     * Retrieve input as a float value.
+     *
+     * @param  string  $key
+     * @param  float  $default
+     * @return float
+     */
+    public function float($key, $default = 0.0)
+    {
+        return floatval($this->input($key, $default));
+    }
+
+    /**
      * Retrieve input from the request as a Carbon instance.
      *
      * @param  string  $key
      * @param  string|null  $format
      * @param  string|null  $tz
      * @return \Illuminate\Support\Carbon|null
+     *
+     * @throws \Carbon\Exceptions\InvalidFormatException
      */
     public function date($key, $format = null, $tz = null)
     {
@@ -317,6 +388,27 @@ trait InteractsWithInput
         }
 
         return Date::createFromFormat($format, $this->input($key), $tz);
+    }
+
+    /**
+     * Retrieve input from the request as an enum.
+     *
+     * @template TEnum
+     *
+     * @param  string  $key
+     * @param  class-string<TEnum>  $enumClass
+     * @return TEnum|null
+     */
+    public function enum($key, $enumClass)
+    {
+        if ($this->isNotFilled($key) ||
+            ! function_exists('enum_exists') ||
+            ! enum_exists($enumClass) ||
+            ! method_exists($enumClass, 'tryFrom')) {
+            return null;
+        }
+
+        return $enumClass::tryFrom($this->input($key));
     }
 
     /**
@@ -519,7 +611,7 @@ trait InteractsWithInput
      * Dump the request items and end the script.
      *
      * @param  mixed  $keys
-     * @return void
+     * @return never
      */
     public function dd(...$keys)
     {

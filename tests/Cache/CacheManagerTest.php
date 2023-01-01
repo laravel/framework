@@ -92,6 +92,104 @@ class CacheManagerTest extends TestCase
         $this->assertNotNull($repo->getEventDispatcher());
     }
 
+    public function testItRefreshesDispatcherOnAllStores()
+    {
+        $userConfig = [
+            'cache' => [
+                'stores' => [
+                    'store_1' => [
+                        'driver' => 'array',
+                    ],
+                    'store_2' => [
+                        'driver' => 'array',
+                    ],
+                ],
+            ],
+        ];
+
+        $app = $this->getApp($userConfig);
+        $cacheManager = new CacheManager($app);
+        $repo1 = $cacheManager->store('store_1');
+        $repo2 = $cacheManager->store('store_2');
+
+        $this->assertNull($repo1->getEventDispatcher());
+        $this->assertNull($repo2->getEventDispatcher());
+
+        $dispatcher = new Event;
+        $app->bind(Dispatcher::class, fn () => $dispatcher);
+
+        $cacheManager->refreshEventDispatcher();
+
+        $this->assertNotSame($repo1, $repo2);
+        $this->assertSame($dispatcher, $repo1->getEventDispatcher());
+        $this->assertSame($dispatcher, $repo2->getEventDispatcher());
+    }
+
+    public function testItSetsDefaultDriverChangesGlobalConfig()
+    {
+        $userConfig = [
+            'cache' => [
+                'default' => 'store_1',
+                'stores' => [
+                    'store_1' => [
+                        'driver' => 'array',
+                    ],
+                    'store_2' => [
+                        'driver' => 'array',
+                    ],
+                ],
+            ],
+        ];
+
+        $app = $this->getApp($userConfig);
+        $cacheManager = new CacheManager($app);
+
+        $cacheManager->setDefaultDriver('><((((@>');
+
+        $this->assertEquals('><((((@>', $app->get('config')->get('cache.default'));
+    }
+
+    public function testItPurgesMemoizedStoreObjects()
+    {
+        $userConfig = [
+            'cache' => [
+                'stores' => [
+                    'store_1' => [
+                        'driver' => 'array',
+                    ],
+                    'store_2' => [
+                        'driver' => 'null',
+                    ],
+                ],
+            ],
+        ];
+
+        $app = $this->getApp($userConfig);
+        $cacheManager = new CacheManager($app);
+
+        $repo1 = $cacheManager->store('store_1');
+        $repo2 = $cacheManager->store('store_1');
+
+        $repo3 = $cacheManager->store('store_2');
+        $repo4 = $cacheManager->store('store_2');
+        $repo5 = $cacheManager->store('store_2');
+
+        $this->assertSame($repo1, $repo2);
+        $this->assertSame($repo3, $repo4);
+        $this->assertSame($repo3, $repo5);
+        $this->assertNotSame($repo1, $repo5);
+
+        $cacheManager->purge('store_1');
+
+        // Make sure a now object is built this time.
+        $repo6 = $cacheManager->store('store_1');
+        $this->assertNotSame($repo1, $repo6);
+
+        // Make sure Purge does not delete all objects.
+        $repo7 = $cacheManager->store('store_2');
+        $this->assertSame($repo3, $repo7);
+    }
+
     public function testForgetDriver()
     {
         $cacheManager = m::mock(CacheManager::class)
@@ -181,8 +279,8 @@ class CacheManagerTest extends TestCase
 
     protected function getApp(array $userConfig)
     {
-        $app = Container::getInstance();
-        $app->bind('config', fn () => new Repository($userConfig));
+        $app = new Container;
+        $app->singleton('config', fn () => new Repository($userConfig));
 
         return $app;
     }

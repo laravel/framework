@@ -30,4 +30,18 @@ class ValidatedInputTest extends TestCase
         $this->assertEquals(['name' => 'Taylor'], $input->except(['votes']));
         $this->assertEquals(['name' => 'Taylor', 'votes' => 100], $input->all());
     }
+
+    public function test_input_existence()
+    {
+        $inputA = new ValidatedInput(['name' => 'Taylor']);
+
+        $this->assertEquals(true, $inputA->has('name'));
+        $this->assertEquals(true, $inputA->missing('votes'));
+        $this->assertEquals(true, $inputA->missing(['votes']));
+        $this->assertEquals(false, $inputA->missing('name'));
+
+        $inputB = new ValidatedInput(['name' => 'Taylor', 'votes' => 100]);
+
+        $this->assertEquals(true, $inputB->has(['name', 'votes']));
+    }
 }

@@ -21,6 +21,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
         Concerns\CompilesConditionals,
         Concerns\CompilesEchos,
         Concerns\CompilesErrors,
+        Concerns\CompilesFragments,
         Concerns\CompilesHelpers,
         Concerns\CompilesIncludes,
         Concerns\CompilesInjections,
@@ -121,6 +122,20 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * @var array
      */
     protected $rawBlocks = [];
+
+    /**
+     * The array of anonymous component paths to search for components in.
+     *
+     * @var array
+     */
+    protected $anonymousComponentPaths = [];
+
+    /**
+     * The array of anonymous component namespaces to autoload from.
+     *
+     * @var array
+     */
+    protected $anonymousComponentNamespaces = [];
 
     /**
      * The array of class component aliases and their class names.
@@ -510,6 +525,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
             $match[0] = $this->callCustomDirective($match[1], Arr::get($match, 3));
         } elseif (method_exists($this, $method = 'compile'.ucfirst($match[1]))) {
             $match[0] = $this->$method(Arr::get($match, 3));
+        } else {
+            return $match[0];
         }
 
         return isset($match[3]) ? $match[0] : $match[0].$match[2];
@@ -673,6 +690,45 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
+     * Register a new anonymous component path.
+     *
+     * @param  string  $path
+     * @param  string|null  $prefix
+     * @return void
+     */
+    public function anonymousComponentPath(string $path, string $prefix = null)
+    {
+        $prefixHash = md5($prefix ?: $path);
+
+        $this->anonymousComponentPaths[] = [
+            'path' => $path,
+            'prefix' => $prefix,
+            'prefixHash' => $prefixHash,
+        ];
+
+        Container::getInstance()
+                ->make(ViewFactory::class)
+                ->addNamespace($prefixHash, $path);
+    }
+
+    /**
+     * Register an anonymous component namespace.
+     *
+     * @param  string  $directory
+     * @param  string|null  $prefix
+     * @return void
+     */
+    public function anonymousComponentNamespace(string $directory, string $prefix = null)
+    {
+        $prefix ??= $directory;
+
+        $this->anonymousComponentNamespaces[$prefix] = Str::of($directory)
+                ->replace('/', '.')
+                ->trim('. ')
+                ->toString();
+    }
+
+    /**
      * Register a class-based component namespace.
      *
      * @param  string  $namespace
@@ -682,6 +738,26 @@ class BladeCompiler extends Compiler implements CompilerInterface
     public function componentNamespace($namespace, $prefix)
     {
         $this->classComponentNamespaces[$prefix] = $namespace;
+    }
+
+    /**
+     * Get the registered anonymous component paths.
+     *
+     * @return array
+     */
+    public function getAnonymousComponentPaths()
+    {
+        return $this->anonymousComponentPaths;
+    }
+
+    /**
+     * Get the registered anonymous component namespaces.
+     *
+     * @return array
+     */
+    public function getAnonymousComponentNamespaces()
+    {
+        return $this->anonymousComponentNamespaces;
     }
 
     /**

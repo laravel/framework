@@ -158,6 +158,17 @@ class EloquentWhereTest extends DatabaseTestCase
         $this->assertSame(UserWhereTest::class, $exception->getModel());
     }
 
+    public function testSoleValue()
+    {
+        $expected = UserWhereTest::create([
+            'name' => 'test-name',
+            'email' => 'test-email',
+            'address' => 'test-address',
+        ]);
+
+        $this->assertEquals('test-name', UserWhereTest::where('name', 'test-name')->soleValue('name'));
+    }
+
     public function testChunkMap()
     {
         UserWhereTest::create([

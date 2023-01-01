@@ -118,7 +118,7 @@ class EncryptCookies
         $validated = [];
 
         foreach ($value as $index => $subValue) {
-            $validated[$index] = $this->validateValue("${key}[${index}]", $subValue);
+            $validated[$index] = $this->validateValue("{$key}[{$index}]", $subValue);
         }
 
         return $validated;

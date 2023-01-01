@@ -134,6 +134,14 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertDatabaseCount(new ProductStub, 1);
     }
 
+    public function testAssertDatabaseEmpty()
+    {
+        $this->mockCountBuilder(0);
+
+        $this->assertDatabaseEmpty(ProductStub::class);
+        $this->assertDatabaseEmpty(new ProductStub);
+    }
+
     public function testAssertTableEntriesCountWrong()
     {
         $this->expectException(ExpectationFailedException::class);
@@ -320,6 +328,8 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $value = $this->data[$key];
 
         $builder->shouldReceive('where')->with($key, $value)->andReturnSelf();
+
+        $builder->shouldReceive('select')->with(array_keys($this->data))->andReturnSelf();
 
         $builder->shouldReceive('limit')->andReturnSelf();
 

@@ -5,7 +5,9 @@ namespace Illuminate\Tests\Support;
 use BadMethodCallException;
 use Illuminate\Bus\Queueable;
 use Illuminate\Foundation\Application;
+use Illuminate\Queue\QueueManager;
 use Illuminate\Support\Testing\Fakes\QueueFake;
+use Mockery as m;
 use PHPUnit\Framework\Constraint\ExceptionMessage;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
@@ -29,6 +31,13 @@ class SupportTestingQueueFakeTest extends TestCase
         $this->job = new JobStub;
     }
 
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        m::close();
+    }
+
     public function testAssertPushed()
     {
         try {
@@ -41,6 +50,38 @@ class SupportTestingQueueFakeTest extends TestCase
         $this->fake->push($this->job);
 
         $this->fake->assertPushed(JobStub::class);
+    }
+
+    public function testItCanAssertAgainstDataWithPush()
+    {
+        $data = null;
+        $this->fake->push(JobStub::class, ['foo' => 'bar'], 'redis');
+
+        $this->fake->assertPushed(JobStub::class, function ($job, $queue, $jobData) use (&$data) {
+            $data = $jobData;
+
+            return true;
+        });
+
+        $this->assertSame(['foo' => 'bar'], $data);
+    }
+
+    public function testAssertPushedWithIgnore()
+    {
+        $job = new JobStub;
+
+        $manager = m::mock(QueueManager::class);
+        $manager->shouldReceive('push')->once()->withArgs(function ($passedJob) use ($job) {
+            return $passedJob === $job;
+        });
+
+        $fake = new QueueFake(new Application, JobToFakeStub::class, $manager);
+
+        $fake->push($job);
+        $fake->push(new JobToFakeStub());
+
+        $fake->assertNotPushed(JobStub::class);
+        $fake->assertPushed(JobToFakeStub::class);
     }
 
     public function testAssertPushedWithClosure()
@@ -287,9 +328,64 @@ class SupportTestingQueueFakeTest extends TestCase
             )));
         }
     }
+
+    public function testAssertClosurePushed()
+    {
+        $this->fake->push(function () {
+            // Do nothing
+        });
+
+        $this->fake->assertClosurePushed();
+    }
+
+    public function testAssertClosurePushedWithTimes()
+    {
+        $this->fake->push(function () {
+            // Do nothing
+        });
+
+        $this->fake->push(function () {
+            // Do nothing
+        });
+
+        $this->fake->assertClosurePushed(2);
+    }
+
+    public function testAssertClosureNotPushed()
+    {
+        $this->fake->push($this->job);
+
+        $this->fake->assertClosureNotPushed();
+    }
+
+    public function testItDoesntFakeJobsPassedViaExcept()
+    {
+        $job = new JobStub;
+
+        $manager = m::mock(QueueManager::class);
+        $manager->shouldReceive('push')->once()->withArgs(function ($passedJob) use ($job) {
+            return $passedJob === $job;
+        });
+
+        $fake = (new QueueFake(new Application, [], $manager))->except(JobStub::class);
+
+        $fake->push($job);
+        $fake->push(new JobToFakeStub());
+
+        $fake->assertNotPushed(JobStub::class);
+        $fake->assertPushed(JobToFakeStub::class);
+    }
 }
 
 class JobStub
+{
+    public function handle()
+    {
+        //
+    }
+}
+
+class JobToFakeStub
 {
     public function handle()
     {

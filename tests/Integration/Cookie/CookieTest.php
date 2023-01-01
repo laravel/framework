@@ -14,6 +14,13 @@ use Orchestra\Testbench\TestCase;
 
 class CookieTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        Carbon::setTestNow(null);
+    }
+
     public function test_cookie_is_sent_back_with_proper_expire_time_when_should_expire_on_close()
     {
         $this->app['config']->set('session.expire_on_close', true);
@@ -24,7 +31,7 @@ class CookieTest extends TestCase
 
         $response = $this->get('/');
         $this->assertCount(2, $response->headers->getCookies());
-        $this->assertEquals(0, ($response->headers->getCookies()[1])->getExpiresTime());
+        $this->assertEquals(0, $response->headers->getCookies()[1]->getExpiresTime());
     }
 
     public function test_cookie_is_sent_back_with_proper_expire_time_with_respect_to_lifetime()
@@ -36,9 +43,10 @@ class CookieTest extends TestCase
             return 'hello world';
         })->middleware('web');
 
+        Carbon::setTestNow(Carbon::now());
         $response = $this->get('/');
         $this->assertCount(2, $response->headers->getCookies());
-        $this->assertEquals(Carbon::now()->getTimestamp() + 60, ($response->headers->getCookies()[1])->getExpiresTime());
+        $this->assertEquals(Carbon::now()->getTimestamp() + 60, $response->headers->getCookies()[1]->getExpiresTime());
     }
 
     protected function getEnvironmentSetUp($app)

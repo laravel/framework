@@ -54,6 +54,15 @@ interface Container extends ContainerInterface
     public function bind($abstract, $concrete = null, $shared = false);
 
     /**
+     * Bind a callback to resolve with Container::call.
+     *
+     * @param  array|string  $method
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public function bindMethod($method, $callback);
+
+    /**
      * Register a binding if it hasn't already been registered.
      *
      * @param  string  $abstract

@@ -61,7 +61,7 @@ class DatabaseFailedJobProviderTest extends TestCase
 
         $uuid = Str::uuid();
 
-        $exception = new Exception(utf8_decode('ÐÑÙ0E\xE2\x�98\xA0World��7B¹!þÿ'));
+        $exception = new Exception(mb_convert_encoding('ÐÑÙ0E\xE2\x�98\xA0World��7B¹!þÿ', 'ISO-8859-1', 'UTF-8'));
         $provider = new DatabaseFailedJobProvider($db->getDatabaseManager(), 'default', 'failed_jobs');
 
         $provider->log('database', 'default', json_encode(['uuid' => (string) $uuid]), $exception);

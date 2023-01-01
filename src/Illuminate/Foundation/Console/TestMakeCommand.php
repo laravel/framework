@@ -4,8 +4,10 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Str;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
 
+#[AsCommand(name: 'make:test')]
 class TestMakeCommand extends GeneratorCommand
 {
     /**
@@ -14,15 +16,6 @@ class TestMakeCommand extends GeneratorCommand
      * @var string
      */
     protected $name = 'make:test';
-
-    /**
-     * The name of the console command.
-     *
-     * This name is used to identify the command during lazy loading.
-     *
-     * @var string|null
-     */
-    protected static $defaultName = 'make:test';
 
     /**
      * The console command description.
@@ -111,8 +104,9 @@ class TestMakeCommand extends GeneratorCommand
     protected function getOptions()
     {
         return [
-            ['unit', 'u', InputOption::VALUE_NONE, 'Create a unit test.'],
-            ['pest', 'p', InputOption::VALUE_NONE, 'Create a Pest test.'],
+            ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the test already exists'],
+            ['unit', 'u', InputOption::VALUE_NONE, 'Create a unit test'],
+            ['pest', 'p', InputOption::VALUE_NONE, 'Create a Pest test'],
         ];
     }
 }

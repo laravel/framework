@@ -152,7 +152,8 @@ class Blueprint
     protected function ensureCommandsAreValid(Connection $connection)
     {
         if ($connection instanceof SQLiteConnection) {
-            if ($this->commandsNamed(['dropColumn', 'renameColumn'])->count() > 1) {
+            if ($this->commandsNamed(['dropColumn', 'renameColumn'])->count() > 1
+                && ! $connection->usingNativeSchemaOperations()) {
                 throw new BadMethodCallException(
                     "SQLite doesn't support multiple calls to dropColumn / renameColumn in a single modification."
                 );
@@ -540,7 +541,7 @@ class Blueprint
      * @param  string|array  $columns
      * @param  string|null  $name
      * @param  string|null  $algorithm
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\IndexDefinition
      */
     public function primary($columns, $name = null, $algorithm = null)
     {
@@ -553,7 +554,7 @@ class Blueprint
      * @param  string|array  $columns
      * @param  string|null  $name
      * @param  string|null  $algorithm
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\IndexDefinition
      */
     public function unique($columns, $name = null, $algorithm = null)
     {
@@ -566,7 +567,7 @@ class Blueprint
      * @param  string|array  $columns
      * @param  string|null  $name
      * @param  string|null  $algorithm
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\IndexDefinition
      */
     public function index($columns, $name = null, $algorithm = null)
     {
@@ -579,7 +580,7 @@ class Blueprint
      * @param  string|array  $columns
      * @param  string|null  $name
      * @param  string|null  $algorithm
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\IndexDefinition
      */
     public function fullText($columns, $name = null, $algorithm = null)
     {
@@ -591,7 +592,7 @@ class Blueprint
      *
      * @param  string|array  $columns
      * @param  string|null  $name
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\IndexDefinition
      */
     public function spatialIndex($columns, $name = null)
     {
@@ -603,7 +604,7 @@ class Blueprint
      *
      * @param  string  $expression
      * @param  string  $name
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\IndexDefinition
      */
     public function rawIndex($expression, $name)
     {
@@ -1089,7 +1090,7 @@ class Blueprint
      * Create a new date-time column on the table.
      *
      * @param  string  $column
-     * @param  int  $precision
+     * @param  int|null  $precision
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function dateTime($column, $precision = 0)
@@ -1101,7 +1102,7 @@ class Blueprint
      * Create a new date-time column (with time zone) on the table.
      *
      * @param  string  $column
-     * @param  int  $precision
+     * @param  int|null  $precision
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function dateTimeTz($column, $precision = 0)
@@ -1113,7 +1114,7 @@ class Blueprint
      * Create a new time column on the table.
      *
      * @param  string  $column
-     * @param  int  $precision
+     * @param  int|null  $precision
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function time($column, $precision = 0)
@@ -1125,7 +1126,7 @@ class Blueprint
      * Create a new time column (with time zone) on the table.
      *
      * @param  string  $column
-     * @param  int  $precision
+     * @param  int|null  $precision
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function timeTz($column, $precision = 0)
@@ -1137,7 +1138,7 @@ class Blueprint
      * Create a new timestamp column on the table.
      *
      * @param  string  $column
-     * @param  int  $precision
+     * @param  int|null  $precision
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function timestamp($column, $precision = 0)
@@ -1149,7 +1150,7 @@ class Blueprint
      * Create a new timestamp (with time zone) column on the table.
      *
      * @param  string  $column
-     * @param  int  $precision
+     * @param  int|null  $precision
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function timestampTz($column, $precision = 0)
@@ -1160,7 +1161,7 @@ class Blueprint
     /**
      * Add nullable creation and update timestamps to the table.
      *
-     * @param  int  $precision
+     * @param  int|null  $precision
      * @return void
      */
     public function timestamps($precision = 0)
@@ -1175,7 +1176,7 @@ class Blueprint
      *
      * Alias for self::timestamps().
      *
-     * @param  int  $precision
+     * @param  int|null  $precision
      * @return void
      */
     public function nullableTimestamps($precision = 0)
@@ -1186,7 +1187,7 @@ class Blueprint
     /**
      * Add creation and update timestampTz columns to the table.
      *
-     * @param  int  $precision
+     * @param  int|null  $precision
      * @return void
      */
     public function timestampsTz($precision = 0)
@@ -1200,7 +1201,7 @@ class Blueprint
      * Add a "deleted at" timestamp for the table.
      *
      * @param  string  $column
-     * @param  int  $precision
+     * @param  int|null  $precision
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function softDeletes($column = 'deleted_at', $precision = 0)
@@ -1212,7 +1213,7 @@ class Blueprint
      * Add a "deleted at" timestampTz for the table.
      *
      * @param  string  $column
-     * @param  int  $precision
+     * @param  int|null  $precision
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function softDeletesTz($column = 'deleted_at', $precision = 0)
@@ -1243,7 +1244,7 @@ class Blueprint
     }
 
     /**
-     * Create a new uuid column on the table.
+     * Create a new UUID column on the table.
      *
      * @param  string  $column
      * @return \Illuminate\Database\Schema\ColumnDefinition
@@ -1264,6 +1265,34 @@ class Blueprint
         return $this->addColumnDefinition(new ForeignIdColumnDefinition($this, [
             'type' => 'uuid',
             'name' => $column,
+        ]));
+    }
+
+    /**
+     * Create a new ULID column on the table.
+     *
+     * @param  string  $column
+     * @param  int|null  $length
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function ulid($column = 'uuid', $length = 26)
+    {
+        return $this->char($column, $length);
+    }
+
+    /**
+     * Create a new ULID column on the table with a foreign key constraint.
+     *
+     * @param  string  $column
+     * @param  int|null  $length
+     * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
+     */
+    public function foreignUlid($column, $length = 26)
+    {
+        return $this->addColumnDefinition(new ForeignIdColumnDefinition($this, [
+            'type' => 'char',
+            'name' => $column,
+            'length' => $length,
         ]));
     }
 
@@ -1412,6 +1441,8 @@ class Blueprint
     {
         if (Builder::$defaultMorphKeyType === 'uuid') {
             $this->uuidMorphs($name, $indexName);
+        } elseif (Builder::$defaultMorphKeyType === 'ulid') {
+            $this->ulidMorphs($name, $indexName);
         } else {
             $this->numericMorphs($name, $indexName);
         }
@@ -1428,6 +1459,8 @@ class Blueprint
     {
         if (Builder::$defaultMorphKeyType === 'uuid') {
             $this->nullableUuidMorphs($name, $indexName);
+        } elseif (Builder::$defaultMorphKeyType === 'ulid') {
+            $this->nullableUlidMorphs($name, $indexName);
         } else {
             $this->nullableNumericMorphs($name, $indexName);
         }
@@ -1498,6 +1531,38 @@ class Blueprint
     }
 
     /**
+     * Add the proper columns for a polymorphic table using ULIDs.
+     *
+     * @param  string  $name
+     * @param  string|null  $indexName
+     * @return void
+     */
+    public function ulidMorphs($name, $indexName = null)
+    {
+        $this->string("{$name}_type");
+
+        $this->ulid("{$name}_id");
+
+        $this->index(["{$name}_type", "{$name}_id"], $indexName);
+    }
+
+    /**
+     * Add nullable columns for a polymorphic table using ULIDs.
+     *
+     * @param  string  $name
+     * @param  string|null  $indexName
+     * @return void
+     */
+    public function nullableUlidMorphs($name, $indexName = null)
+    {
+        $this->string("{$name}_type")->nullable();
+
+        $this->ulid("{$name}_id")->nullable();
+
+        $this->index(["{$name}_type", "{$name}_id"], $indexName);
+    }
+
+    /**
      * Adds the `remember_token` column to the table.
      *
      * @return \Illuminate\Database\Schema\ColumnDefinition
@@ -1505,6 +1570,17 @@ class Blueprint
     public function rememberToken()
     {
         return $this->string('remember_token', 100)->nullable();
+    }
+
+    /**
+     * Add a comment to the table.
+     *
+     * @param  string  $comment
+     * @return \Illuminate\Support\Fluent
+     */
+    public function comment($comment)
+    {
+        return $this->addCommand('tableComment', compact('comment'));
     }
 
     /**

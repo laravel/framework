@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Console\CommandMutex;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Console\Migrations\MigrateCommand;
 use Illuminate\Database\Events\SchemaLoaded;
@@ -68,7 +69,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
     public function testMigrationRepositoryCreatedWhenNecessary()
     {
         $params = [$migrator = m::mock(Migrator::class), $dispatcher = m::mock(Dispatcher::class)];
-        $command = $this->getMockBuilder(MigrateCommand::class)->onlyMethods(['call'])->setConstructorArgs($params)->getMock();
+        $command = $this->getMockBuilder(MigrateCommand::class)->onlyMethods(['callSilent'])->setConstructorArgs($params)->getMock();
         $app = new ApplicationDatabaseMigrationStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
@@ -80,7 +81,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
         $migrator->shouldReceive('setOutput')->once()->andReturn($migrator);
         $migrator->shouldReceive('run')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], ['pretend' => false, 'step' => false]);
         $migrator->shouldReceive('repositoryExists')->once()->andReturn(false);
-        $command->expects($this->once())->method('call')->with($this->equalTo('migrate:install'), $this->equalTo([]));
+        $command->expects($this->once())->method('callSilent')->with($this->equalTo('migrate:install'), $this->equalTo([]));
 
         $this->runCommand($command);
     }
@@ -149,6 +150,11 @@ class ApplicationDatabaseMigrationStub extends Application
 {
     public function __construct(array $data = [])
     {
+        $mutex = m::mock(CommandMutex::class);
+        $mutex->shouldReceive('create')->andReturn(true);
+        $mutex->shouldReceive('release')->andReturn(true);
+        $this->instance(CommandMutex::class, $mutex);
+
         foreach ($data as $abstract => $instance) {
             $this->instance($abstract, $instance);
         }

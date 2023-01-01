@@ -45,6 +45,7 @@ trait DetectsLostConnections
             'The connection is broken and recovery is not possible. The connection is marked by the client driver as unrecoverable. No attempt was made to restore the connection.',
             'SQLSTATE[HY000] [2002] php_network_getaddresses: getaddrinfo failed: Try again',
             'SQLSTATE[HY000] [2002] php_network_getaddresses: getaddrinfo failed: Name or service not known',
+            'SQLSTATE[HY000] [2002] php_network_getaddresses: getaddrinfo for',
             'SQLSTATE[HY000]: General error: 7 SSL SYSCALL error: EOF detected',
             'SQLSTATE[HY000] [2002] Connection timed out',
             'SSL: Connection timed out',
@@ -57,6 +58,9 @@ trait DetectsLostConnections
             'The client was disconnected by the server because of inactivity. See wait_timeout and interactive_timeout for configuring this behavior.',
             'SQLSTATE[08006] [7] could not translate host name',
             'TCP Provider: Error code 0x274C',
+            'SQLSTATE[HY000] [2002] No such file or directory',
+            'SSL: Operation timed out',
+            'Reason: Server is in script upgrade mode. Only administrator can connect at this time.',
         ]);
     }
 }

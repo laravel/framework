@@ -145,6 +145,25 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
+     * Compile a rename column command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @param  \Illuminate\Database\Connection  $connection
+     * @return array|string
+     */
+    public function compileRenameColumn(Blueprint $blueprint, Fluent $command, Connection $connection)
+    {
+        return $connection->usingNativeSchemaOperations()
+            ? sprintf('alter table %s rename column %s to %s',
+                $this->wrapTable($blueprint),
+                $this->wrap($command->from),
+                $this->wrap($command->to)
+            )
+            : parent::compileRenameColumn($blueprint, $command, $connection);
+    }
+
+    /**
      * Compile a unique key command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
@@ -195,7 +214,7 @@ class SQLiteGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
-     * @return string
+     * @return string|null
      */
     public function compileForeign(Blueprint $blueprint, Fluent $command)
     {
@@ -247,6 +266,26 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
+     * Compile the SQL needed to retrieve all table names.
+     *
+     * @return string
+     */
+    public function compileGetAllTables()
+    {
+        return 'select type, name from sqlite_master where type = \'table\' and name not like \'sqlite_%\'';
+    }
+
+    /**
+     * Compile the SQL needed to retrieve all view names.
+     *
+     * @return string
+     */
+    public function compileGetAllViews()
+    {
+        return 'select type, name from sqlite_master where type = \'view\'';
+    }
+
+    /**
      * Compile the SQL needed to rebuild the database.
      *
      * @return string
@@ -266,17 +305,26 @@ class SQLiteGrammar extends Grammar
      */
     public function compileDropColumn(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
-        $tableDiff = $this->getDoctrineTableDiff(
-            $blueprint, $schema = $connection->getDoctrineSchemaManager()
-        );
+        if ($connection->usingNativeSchemaOperations()) {
+            $table = $this->wrapTable($blueprint);
 
-        foreach ($command->columns as $name) {
-            $tableDiff->removedColumns[$name] = $connection->getDoctrineColumn(
-                $this->getTablePrefix().$blueprint->getTable(), $name
+            $columns = $this->prefixArray('drop column', $this->wrapArray($command->columns));
+
+            return collect($columns)->map(fn ($column) => 'alter table '.$table.' '.$column
+            )->all();
+        } else {
+            $tableDiff = $this->getDoctrineTableDiff(
+                $blueprint, $schema = $connection->getDoctrineSchemaManager()
             );
-        }
 
-        return (array) $schema->getDatabasePlatform()->getAlterTableSQL($tableDiff);
+            foreach ($command->columns as $name) {
+                $tableDiff->removedColumns[$name] = $connection->getDoctrineColumn(
+                    $this->getTablePrefix().$blueprint->getTable(), $name
+                );
+            }
+
+            return (array) $schema->getDatabasePlatform()->getAlterTableSQL($tableDiff);
+        }
     }
 
     /**
@@ -362,7 +410,7 @@ class SQLiteGrammar extends Grammar
             $index->isPrimary(), $index->getFlags(), $index->getOptions()
         );
 
-        $platform = $schemaManager->getDatabasePlatform();
+        $platform = $connection->getDoctrineConnection()->getDatabasePlatform();
 
         return [
             $platform->getDropIndexSQL($command->from, $this->getTablePrefix().$blueprint->getTable()),

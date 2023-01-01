@@ -9,26 +9,29 @@ use Illuminate\Support\Reflector;
 use InvalidArgumentException;
 
 /**
+ * @method \Illuminate\Routing\Route any(string $uri, \Closure|array|string|null $action = null)
+ * @method \Illuminate\Routing\Route delete(string $uri, \Closure|array|string|null $action = null)
  * @method \Illuminate\Routing\Route get(string $uri, \Closure|array|string|null $action = null)
+ * @method \Illuminate\Routing\Route options(string $uri, \Closure|array|string|null $action = null)
+ * @method \Illuminate\Routing\Route patch(string $uri, \Closure|array|string|null $action = null)
  * @method \Illuminate\Routing\Route post(string $uri, \Closure|array|string|null $action = null)
  * @method \Illuminate\Routing\Route put(string $uri, \Closure|array|string|null $action = null)
- * @method \Illuminate\Routing\Route delete(string $uri, \Closure|array|string|null $action = null)
- * @method \Illuminate\Routing\Route patch(string $uri, \Closure|array|string|null $action = null)
- * @method \Illuminate\Routing\Route options(string $uri, \Closure|array|string|null $action = null)
- * @method \Illuminate\Routing\Route any(string $uri, \Closure|array|string|null $action = null)
  * @method \Illuminate\Routing\RouteRegistrar as(string $value)
  * @method \Illuminate\Routing\RouteRegistrar controller(string $controller)
  * @method \Illuminate\Routing\RouteRegistrar domain(string $value)
  * @method \Illuminate\Routing\RouteRegistrar middleware(array|string|null $middleware)
  * @method \Illuminate\Routing\RouteRegistrar name(string $value)
  * @method \Illuminate\Routing\RouteRegistrar namespace(string|null $value)
- * @method \Illuminate\Routing\RouteRegistrar prefix(string  $prefix)
+ * @method \Illuminate\Routing\RouteRegistrar prefix(string $prefix)
  * @method \Illuminate\Routing\RouteRegistrar scopeBindings()
- * @method \Illuminate\Routing\RouteRegistrar where(array  $where)
- * @method \Illuminate\Routing\RouteRegistrar withoutMiddleware(array|string  $middleware)
+ * @method \Illuminate\Routing\RouteRegistrar where(array $where)
+ * @method \Illuminate\Routing\RouteRegistrar withoutMiddleware(array|string $middleware)
+ * @method \Illuminate\Routing\RouteRegistrar withoutScopedBindings()
  */
 class RouteRegistrar
 {
+    use CreatesRegularExpressionRouteConstraints;
+
     /**
      * The router instance.
      *
@@ -153,14 +156,42 @@ class RouteRegistrar
     }
 
     /**
+     * Route a singleton resource to a controller.
+     *
+     * @param  string  $name
+     * @param  string  $controller
+     * @param  array  $options
+     * @return \Illuminate\Routing\PendingSingletonResourceRegistration
+     */
+    public function singleton($name, $controller, array $options = [])
+    {
+        return $this->router->singleton($name, $controller, $this->attributes + $options);
+    }
+
+    /**
+     * Route an API singleton resource to a controller.
+     *
+     * @param  string  $name
+     * @param  string  $controller
+     * @param  array  $options
+     * @return \Illuminate\Routing\PendingSingletonResourceRegistration
+     */
+    public function apiSingleton($name, $controller, array $options = [])
+    {
+        return $this->router->apiSingleton($name, $controller, $this->attributes + $options);
+    }
+
+    /**
      * Create a route group with shared attributes.
      *
-     * @param  \Closure|string  $callback
-     * @return void
+     * @param  \Closure|array|string  $callback
+     * @return $this
      */
     public function group($callback)
     {
         $this->router->group($this->attributes, $callback);
+
+        return $this;
     }
 
     /**
@@ -210,7 +241,7 @@ class RouteRegistrar
         }
 
         if (is_array($action) &&
-            ! Arr::isAssoc($action) &&
+            array_is_list($action) &&
             Reflector::isCallable($action)) {
             if (strncmp($action[0], '\\', 1)) {
                 $action[0] = '\\'.$action[0];

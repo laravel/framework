@@ -86,11 +86,21 @@ trait GuardHelpers
      * Set the current user.
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @return $this
+     * @return void
      */
     public function setUser(AuthenticatableContract $user)
     {
         $this->user = $user;
+    }
+
+    /**
+     * Forget the current user.
+     *
+     * @return $this
+     */
+    public function forgetUser()
+    {
+        $this->user = null;
 
         return $this;
     }

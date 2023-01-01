@@ -175,6 +175,16 @@ trait ManagesFrequencies
     }
 
     /**
+     * Schedule the event to run every odd hour.
+     *
+     * @return $this
+     */
+    public function everyOddHour()
+    {
+        return $this->spliceIntoPosition(1, 0)->spliceIntoPosition(2, '1-23/2');
+    }
+
+    /**
      * Schedule the event to run every two hours.
      *
      * @return $this
@@ -468,6 +478,21 @@ trait ManagesFrequencies
     }
 
     /**
+     * Schedule the event to run quarterly on a given day and time.
+     *
+     * @param  int  $dayOfQuarter
+     * @param  int  $time
+     * @return $this
+     */
+    public function quarterlyOn($dayOfQuarter = 1, $time = '0:0')
+    {
+        $this->dailyAt($time);
+
+        return $this->spliceIntoPosition(3, $dayOfQuarter)
+                    ->spliceIntoPosition(4, '1-12/3');
+    }
+
+    /**
      * Schedule the event to run yearly.
      *
      * @return $this
@@ -531,7 +556,7 @@ trait ManagesFrequencies
      */
     protected function spliceIntoPosition($position, $value)
     {
-        $segments = explode(' ', $this->expression);
+        $segments = preg_split("/\s+/", $this->expression);
 
         $segments[$position - 1] = $value;
 

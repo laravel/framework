@@ -10,6 +10,26 @@ use RuntimeException;
 
 class HasherTest extends TestCase
 {
+    public function testEmptyHashedValueReturnsFalse()
+    {
+        $hasher = new BcryptHasher();
+        $this->assertFalse($hasher->check('password', ''));
+        $hasher = new ArgonHasher();
+        $this->assertFalse($hasher->check('password', ''));
+        $hasher = new Argon2IdHasher();
+        $this->assertFalse($hasher->check('password', ''));
+    }
+
+    public function testNullHashedValueReturnsFalse()
+    {
+        $hasher = new BcryptHasher();
+        $this->assertFalse($hasher->check('password', null));
+        $hasher = new ArgonHasher();
+        $this->assertFalse($hasher->check('password', null));
+        $hasher = new Argon2IdHasher();
+        $this->assertFalse($hasher->check('password', null));
+    }
+
     public function testBasicBcryptHashing()
     {
         $hasher = new BcryptHasher;

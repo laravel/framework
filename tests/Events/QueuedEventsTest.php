@@ -7,6 +7,7 @@ use Illuminate\Contracts\Queue\Queue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Events\CallQueuedListener;
 use Illuminate\Events\Dispatcher;
+use Illuminate\Queue\QueueManager;
 use Illuminate\Support\Testing\Fakes\QueueFake;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -82,6 +83,48 @@ class QueuedEventsTest extends TestCase
 
         $d->listen('some.event', TestDispatcherGetConnection::class.'@handle');
         $d->dispatch('some.event', ['foo', 'bar']);
+    }
+
+    public function testQueueIsSetByGetQueueDynamically()
+    {
+        $d = new Dispatcher;
+
+        $fakeQueue = new QueueFake(new Container);
+
+        $d->setQueueResolver(function () use ($fakeQueue) {
+            return $fakeQueue;
+        });
+
+        $d->listen('some.event', TestDispatcherGetQueueDynamically::class.'@handle');
+        $d->dispatch('some.event', [['useHighPriorityQueue' => true], 'bar']);
+
+        $fakeQueue->assertPushedOn('p0', CallQueuedListener::class);
+    }
+
+    public function testQueueIsSetByGetConnectionDynamically()
+    {
+        $d = new Dispatcher;
+        $queueManager = $this->createMock(QueueManager::class);
+        $queue = $this->createMock(Queue::class);
+
+        $queueManager->expects($this->once())
+            ->method('connection')
+            ->with('redis')
+            ->willReturn($queue);
+
+        $queue->expects($this->once())
+            ->method('pushOn')
+            ->with(null, $this->isInstanceOf(CallQueuedListener::class));
+
+        $d->setQueueResolver(function () use ($queueManager) {
+            return $queueManager;
+        });
+
+        $d->listen('some.event', TestDispatcherGetConnectionDynamically::class.'@handle');
+        $d->dispatch('some.event', [
+            ['shouldUseRedisConnection' => true],
+            'bar',
+        ]);
     }
 
     public function testQueuePropagateRetryUntilAndMaxExceptions()
@@ -218,5 +261,41 @@ class TestMiddleware
     public function handle($job, $next)
     {
         $next($job);
+    }
+}
+
+class TestDispatcherGetConnectionDynamically implements ShouldQueue
+{
+    public function handle()
+    {
+        //
+    }
+
+    public function viaConnection($event)
+    {
+        if ($event['shouldUseRedisConnection']) {
+            return 'redis';
+        }
+
+        return 'sqs';
+    }
+}
+
+class TestDispatcherGetQueueDynamically implements ShouldQueue
+{
+    public $queue = 'my_queue';
+
+    public function handle()
+    {
+        //
+    }
+
+    public function viaQueue($event)
+    {
+        if ($event['useHighPriorityQueue']) {
+            return 'p0';
+        }
+
+        return 'p99';
     }
 }

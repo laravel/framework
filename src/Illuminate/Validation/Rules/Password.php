@@ -66,14 +66,14 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
     protected $symbols = false;
 
     /**
-     * If the password should has not been compromised in data leaks.
+     * If the password should not have been compromised in data leaks.
      *
      * @var bool
      */
     protected $uncompromised = false;
 
     /**
-     * The number of times a password can appear in data leaks before being consider compromised.
+     * The number of times a password can appear in data leaks before being considered compromised.
      *
      * @var int
      */
@@ -300,22 +300,32 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
                 return;
             }
 
-            $value = (string) $value;
-
             if ($this->mixedCase && ! preg_match('/(\p{Ll}+.*\p{Lu})|(\p{Lu}+.*\p{Ll})/u', $value)) {
-                $validator->errors()->add($attribute, 'The :attribute must contain at least one uppercase and one lowercase letter.');
+                $validator->errors()->add(
+                    $attribute,
+                    $this->getErrorMessage('validation.password.mixed')
+                );
             }
 
             if ($this->letters && ! preg_match('/\pL/u', $value)) {
-                $validator->errors()->add($attribute, 'The :attribute must contain at least one letter.');
+                $validator->errors()->add(
+                    $attribute,
+                    $this->getErrorMessage('validation.password.letters')
+                );
             }
 
             if ($this->symbols && ! preg_match('/\p{Z}|\p{S}|\p{P}/u', $value)) {
-                $validator->errors()->add($attribute, 'The :attribute must contain at least one symbol.');
+                $validator->errors()->add(
+                    $attribute,
+                    $this->getErrorMessage('validation.password.symbols')
+                );
             }
 
             if ($this->numbers && ! preg_match('/\pN/u', $value)) {
-                $validator->errors()->add($attribute, 'The :attribute must contain at least one number.');
+                $validator->errors()->add(
+                    $attribute,
+                    $this->getErrorMessage('validation.password.numbers')
+                );
             }
         });
 
@@ -327,9 +337,7 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
             'value' => $value,
             'threshold' => $this->compromisedThreshold,
         ])) {
-            return $this->fail(
-                'The given :attribute has appeared in a data leak. Please choose a different :attribute.'
-            );
+            return $this->fail($this->getErrorMessage('validation.password.uncompromised'));
         }
 
         return true;
@@ -343,6 +351,29 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
     public function message()
     {
         return $this->messages;
+    }
+
+    /**
+     * Get the translated password error message.
+     *
+     * @param  string  $key
+     * @return string
+     */
+    protected function getErrorMessage($key)
+    {
+        if (($message = $this->validator->getTranslator()->get($key)) !== $key) {
+            return $message;
+        }
+
+        $messages = [
+            'validation.password.mixed' => 'The :attribute must contain at least one uppercase and one lowercase letter.',
+            'validation.password.letters' => 'The :attribute must contain at least one letter.',
+            'validation.password.symbols' => 'The :attribute must contain at least one symbol.',
+            'validation.password.numbers' => 'The :attribute must contain at least one number.',
+            'validation.password.uncompromised' => 'The given :attribute has appeared in a data leak. Please choose a different :attribute.',
+        ];
+
+        return $messages[$key];
     }
 
     /**

@@ -1,10 +1,15 @@
 name: databases
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
+      - '*.x'
+  pull_request:
 
 jobs:
   mysql_57:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     services:
       mysql:
@@ -23,7 +28,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -34,7 +39,7 @@ jobs:
           coverage: none
 
       - name: Install dependencies
-        uses: nick-invision/retry@v1
+        uses: nick-fields/retry@v2
         with:
           timeout_minutes: 5
           max_attempts: 5
@@ -47,7 +52,7 @@ jobs:
           DB_USERNAME: root
 
   mysql_8:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     services:
       mysql:
@@ -66,7 +71,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -77,7 +82,7 @@ jobs:
           coverage: none
 
       - name: Install dependencies
-        uses: nick-invision/retry@v1
+        uses: nick-fields/retry@v2
         with:
           timeout_minutes: 5
           max_attempts: 5
@@ -90,7 +95,7 @@ jobs:
           DB_USERNAME: root
 
   mariadb:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     services:
       mysql:
@@ -109,7 +114,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -120,7 +125,7 @@ jobs:
           coverage: none
 
       - name: Install dependencies
-        uses: nick-invision/retry@v1
+        uses: nick-fields/retry@v2
         with:
           timeout_minutes: 5
           max_attempts: 5
@@ -133,7 +138,7 @@ jobs:
           DB_USERNAME: root
 
   pgsql:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     services:
       postgresql:
@@ -153,7 +158,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -164,7 +169,7 @@ jobs:
           coverage: none
 
       - name: Install dependencies
-        uses: nick-invision/retry@v1
+        uses: nick-fields/retry@v2
         with:
           timeout_minutes: 5
           max_attempts: 5
@@ -195,25 +200,25 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.1
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, sqlsrv, pdo, pdo_sqlsrv
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, sqlsrv, pdo, pdo_sqlsrv, odbc, pdo_odbc
           tools: composer:v2
           coverage: none
 
       - name: Install dependencies
-        uses: nick-invision/retry@v1
+        uses: nick-fields/retry@v2
         with:
           timeout_minutes: 5
           max_attempts: 5
           command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
 
       - name: Execute tests
-        run: vendor/bin/phpunit tests/Integration/Database --verbose --exclude-group SkipMSSQL
+        run: vendor/bin/phpunit tests/Integration/Database --verbose
         env:
           DB_CONNECTION: sqlsrv
           DB_DATABASE: master

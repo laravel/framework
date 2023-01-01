@@ -168,6 +168,19 @@ class PendingCommand
     }
 
     /**
+     * Specify that the given string shouldn't be contained in the command output.
+     *
+     * @param  string  $string
+     * @return $this
+     */
+    public function doesntExpectOutputToContain($string)
+    {
+        $this->test->unexpectedOutputSubstrings[$string] = false;
+
+        return $this;
+    }
+
+    /**
      * Specify a table that should be printed when the command runs.
      *
      * @param  array  $headers
@@ -234,6 +247,16 @@ class PendingCommand
     public function assertSuccessful()
     {
         return $this->assertExitCode(Command::SUCCESS);
+    }
+
+    /**
+     * Assert that the command has the success exit code.
+     *
+     * @return $this
+     */
+    public function assertOk()
+    {
+        return $this->assertSuccessful();
     }
 
     /**
@@ -331,6 +354,10 @@ class PendingCommand
         if ($output = array_search(true, $this->test->unexpectedOutput)) {
             $this->test->fail('Output "'.$output.'" was printed.');
         }
+
+        if ($output = array_search(true, $this->test->unexpectedOutputSubstrings)) {
+            $this->test->fail('Output "'.$output.'" was printed.');
+        }
     }
 
     /**
@@ -341,7 +368,7 @@ class PendingCommand
     protected function mockConsoleOutput()
     {
         $mock = Mockery::mock(OutputStyle::class.'[askQuestion]', [
-            (new ArrayInput($this->parameters)), $this->createABufferedOutputMock(),
+            new ArrayInput($this->parameters), $this->createABufferedOutputMock(),
         ]);
 
         foreach ($this->test->expectedQuestions as $i => $question) {
@@ -392,6 +419,8 @@ class PendingCommand
 
         foreach ($this->test->expectedOutputSubstrings as $i => $text) {
             $mock->shouldReceive('doWrite')
+                ->atLeast()
+                ->times(0)
                 ->withArgs(fn ($output) => str_contains($output, $text))
                 ->andReturnUsing(function () use ($i) {
                     unset($this->test->expectedOutputSubstrings[$i]);
@@ -400,11 +429,23 @@ class PendingCommand
 
         foreach ($this->test->unexpectedOutput as $output => $displayed) {
             $mock->shouldReceive('doWrite')
+                ->atLeast()
+                ->times(0)
                 ->ordered()
                 ->with($output, Mockery::any())
                 ->andReturnUsing(function () use ($output) {
                     $this->test->unexpectedOutput[$output] = true;
                 });
+        }
+
+        foreach ($this->test->unexpectedOutputSubstrings as $text => $displayed) {
+            $mock->shouldReceive('doWrite')
+                 ->atLeast()
+                 ->times(0)
+                 ->withArgs(fn ($output) => str_contains($output, $text))
+                 ->andReturnUsing(function () use ($text) {
+                     $this->test->unexpectedOutputSubstrings[$text] = true;
+                 });
         }
 
         return $mock;
@@ -420,6 +461,7 @@ class PendingCommand
         $this->test->expectedOutput = [];
         $this->test->expectedOutputSubstrings = [];
         $this->test->unexpectedOutput = [];
+        $this->test->unexpectedOutputSubstrings = [];
         $this->test->expectedTables = [];
         $this->test->expectedQuestions = [];
         $this->test->expectedChoices = [];

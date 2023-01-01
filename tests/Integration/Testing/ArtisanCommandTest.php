@@ -33,12 +33,27 @@ class ArtisanCommandTest extends TestCase
             $this->line($this->ask('Huh?'));
         });
 
+        Artisan::command('exit {code}', fn () => (int) $this->argument('code'));
+
         Artisan::command('contains', function () {
             $this->line('My name is Taylor Otwell');
         });
     }
 
     public function test_console_command_that_passes()
+    {
+        $this->artisan('exit', ['code' => 0])->assertOk();
+    }
+
+    public function test_console_command_that_fails()
+    {
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Expected status code 0 but received 1.');
+
+        $this->artisan('exit', ['code' => 1])->assertOk();
+    }
+
+    public function test_console_command_that_passes_with_output()
     {
         $this->artisan('survey')
              ->expectsQuestion('What is your name?', 'Taylor Otwell')
@@ -70,6 +85,16 @@ class ArtisanCommandTest extends TestCase
              ->expectsQuestion('What is your name?', 'Taylor Otwell')
              ->expectsQuestion('Which language do you prefer?', 'PHP')
              ->doesntExpectOutput('Your name is Taylor Otwell and you prefer PHP.')
+             ->assertExitCode(0);
+    }
+
+    public function test_console_command_that_fails_from_unexpected_output_substring()
+    {
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Output "Taylor Otwell" was printed.');
+
+        $this->artisan('contains')
+             ->doesntExpectOutputToContain('Taylor Otwell')
              ->assertExitCode(0);
     }
 

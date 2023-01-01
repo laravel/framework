@@ -18,7 +18,7 @@ class CustomPayloadTest extends TestCase
         return [QueueServiceProvider::class];
     }
 
-    public function websites()
+    public static function websites()
     {
         yield ['laravel.com'];
 

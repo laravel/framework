@@ -12,6 +12,13 @@ use PHPUnit\Framework\TestCase;
 
 class CacheFileStoreTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        Carbon::setTestNow(null);
+    }
+
     public function testNullIsReturnedIfFileDoesntExist()
     {
         $files = $this->mockFilesystem();
@@ -189,6 +196,8 @@ class CacheFileStoreTest extends TestCase
 
     public function testIncrementExpiredKeys()
     {
+        Carbon::setTestNow(Carbon::now());
+
         $filePath = $this->getCachePath('foo');
         $files = $this->mockFilesystem();
         $now = Carbon::now()->getTimestamp();
@@ -265,6 +274,8 @@ class CacheFileStoreTest extends TestCase
 
     public function testIncrementDoesNotExtendCacheLife()
     {
+        Carbon::setTestNow(Carbon::now());
+
         $files = $this->mockFilesystem();
         $expiration = Carbon::now()->addSeconds(50)->getTimestamp();
         $initialValue = $expiration.serialize(1);

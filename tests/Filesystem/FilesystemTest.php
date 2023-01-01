@@ -450,6 +450,29 @@ class FilesystemTest extends TestCase
         $this->assertFalse($files->isReadable(self::$tempDir.'/doesnotexist.txt'));
     }
 
+    public function testIsDirEmpty()
+    {
+        mkdir(self::$tempDir.'/foo-dir');
+        file_put_contents(self::$tempDir.'/foo-dir/.hidden', 'foo');
+        mkdir(self::$tempDir.'/bar-dir');
+        file_put_contents(self::$tempDir.'/bar-dir/foo.txt', 'foo');
+        mkdir(self::$tempDir.'/baz-dir');
+        mkdir(self::$tempDir.'/baz-dir/.hidden');
+        mkdir(self::$tempDir.'/quz-dir');
+        mkdir(self::$tempDir.'/quz-dir/not-hidden');
+
+        $files = new Filesystem;
+
+        $this->assertTrue($files->isEmptyDirectory(self::$tempDir.'/foo-dir', true));
+        $this->assertFalse($files->isEmptyDirectory(self::$tempDir.'/foo-dir'));
+        $this->assertFalse($files->isEmptyDirectory(self::$tempDir.'/bar-dir', true));
+        $this->assertFalse($files->isEmptyDirectory(self::$tempDir.'/bar-dir'));
+        $this->assertTrue($files->isEmptyDirectory(self::$tempDir.'/baz-dir', true));
+        $this->assertFalse($files->isEmptyDirectory(self::$tempDir.'/baz-dir'));
+        $this->assertFalse($files->isEmptyDirectory(self::$tempDir.'/quz-dir', true));
+        $this->assertFalse($files->isEmptyDirectory(self::$tempDir.'/quz-dir'));
+    }
+
     public function testGlobFindsFiles()
     {
         file_put_contents(self::$tempDir.'/foo.txt', 'foo');
@@ -544,6 +567,21 @@ class FilesystemTest extends TestCase
         $this->assertEquals($data, file_get_contents(self::$tempDir.'/text/foo2.txt'));
     }
 
+    public function testHasSameHashChecksFileHashes()
+    {
+        $filesystem = new Filesystem;
+
+        mkdir(self::$tempDir.'/text');
+        file_put_contents(self::$tempDir.'/text/foo.txt', 'contents');
+        file_put_contents(self::$tempDir.'/text/foo2.txt', 'contents');
+        file_put_contents(self::$tempDir.'/text/foo3.txt', 'invalid');
+
+        $this->assertTrue($filesystem->hasSameHash(self::$tempDir.'/text/foo.txt', self::$tempDir.'/text/foo2.txt'));
+        $this->assertFalse($filesystem->hasSameHash(self::$tempDir.'/text/foo.txt', self::$tempDir.'/text/foo3.txt'));
+        $this->assertFalse($filesystem->hasSameHash(self::$tempDir.'/text/foo4.txt', self::$tempDir.'/text/foo.txt'));
+        $this->assertFalse($filesystem->hasSameHash(self::$tempDir.'/text/foo.txt', self::$tempDir.'/text/foo4.txt'));
+    }
+
     public function testIsFileChecksFilesProperly()
     {
         $filesystem = new Filesystem;
@@ -572,11 +610,19 @@ class FilesystemTest extends TestCase
         $this->assertContainsOnlyInstancesOf(SplFileInfo::class, $files->allFiles(self::$tempDir));
     }
 
-    public function testHash()
+    public function testHashWithDefaultValue()
     {
         file_put_contents(self::$tempDir.'/foo.txt', 'foo');
         $filesystem = new Filesystem;
         $this->assertSame('acbd18db4cc2f85cedef654fccc4a4d8', $filesystem->hash(self::$tempDir.'/foo.txt'));
+    }
+
+    public function testHash()
+    {
+        file_put_contents(self::$tempDir.'/foo.txt', 'foo');
+        $filesystem = new Filesystem;
+        $this->assertSame('0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33', $filesystem->hash(self::$tempDir.'/foo.txt', 'sha1'));
+        $this->assertSame('76d3bc41c9f588f7fcd0d5bf4718f8f84b1c41b20882703100b9eb9413807c01', $filesystem->hash(self::$tempDir.'/foo.txt', 'sha3-256'));
     }
 
     /**

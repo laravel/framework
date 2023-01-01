@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Console\OutputStyle;
+use Illuminate\Console\View\Components\Factory;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\ConnectionResolverInterface;
@@ -23,6 +24,7 @@ class SeedCommandTest extends TestCase
     {
         $input = new ArrayInput(['--force' => true, '--database' => 'sqlite']);
         $output = new NullOutput;
+        $outputStyle = new OutputStyle($input, $output);
 
         $seeder = m::mock(Seeder::class);
         $seeder->shouldReceive('setContainer')->once()->andReturnSelf();
@@ -38,7 +40,10 @@ class SeedCommandTest extends TestCase
         $container->shouldReceive('environment')->once()->andReturn('testing');
         $container->shouldReceive('make')->with('DatabaseSeeder')->andReturn($seeder);
         $container->shouldReceive('make')->with(OutputStyle::class, m::any())->andReturn(
-            new OutputStyle($input, $output)
+            $outputStyle
+        );
+        $container->shouldReceive('make')->with(Factory::class, m::any())->andReturn(
+            new Factory($outputStyle)
         );
 
         $command = new SeedCommand($resolver);
@@ -59,6 +64,7 @@ class SeedCommandTest extends TestCase
             '--class' => UserWithoutModelEventsSeeder::class,
         ]);
         $output = new NullOutput;
+        $outputStyle = new OutputStyle($input, $output);
 
         $instance = new UserWithoutModelEventsSeeder();
 
@@ -75,7 +81,10 @@ class SeedCommandTest extends TestCase
         $container->shouldReceive('environment')->once()->andReturn('testing');
         $container->shouldReceive('make')->with(UserWithoutModelEventsSeeder::class)->andReturn($seeder);
         $container->shouldReceive('make')->with(OutputStyle::class, m::any())->andReturn(
-            new OutputStyle($input, $output)
+            $outputStyle
+        );
+        $container->shouldReceive('make')->with(Factory::class, m::any())->andReturn(
+            new Factory($outputStyle)
         );
 
         $command = new SeedCommand($resolver);

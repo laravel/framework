@@ -253,7 +253,7 @@ class MailManager implements FactoryContract
             $config['credentials'] = Arr::only($config, ['key', 'secret', 'token']);
         }
 
-        return $config;
+        return Arr::except($config, ['token']);
     }
 
     /**
@@ -281,7 +281,7 @@ class MailManager implements FactoryContract
         }
 
         return $factory->create(new Dsn(
-            'mailgun+api',
+            'mailgun+'.($config['scheme'] ?? 'https'),
             $config['endpoint'] ?? 'default',
             $config['secret'],
             $config['domain']

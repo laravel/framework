@@ -17,7 +17,7 @@ class RefreshDatabaseTest extends TestCase
     {
         RefreshDatabaseState::$migrated = false;
 
-        $this->traitObject = $this->getMockForTrait(RefreshDatabase::class, [], '', true, true, true, [
+        $this->traitObject = $this->getMockForAbstractClass(RefreshDatabaseTestMockClass::class, [], '', true, true, true, [
             'artisan',
             'beginDatabaseTransaction',
         ]);
@@ -94,4 +94,15 @@ class RefreshDatabaseTest extends TestCase
 
         $refreshTestDatabaseReflection->invoke($this->traitObject);
     }
+}
+
+class RefreshDatabaseTestMockClass
+{
+    use RefreshDatabase;
+
+    public $app;
+
+    public $dropViews = false;
+
+    public $dropTypes = false;
 }

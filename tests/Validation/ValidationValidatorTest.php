@@ -27,6 +27,7 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 use InvalidArgumentException;
 use Mockery as m;
+use Mockery\MockInterface;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use stdClass;
@@ -39,6 +40,7 @@ class ValidationValidatorTest extends TestCase
     {
         parent::tearDown();
 
+        Carbon::setTestNow(null);
         m::close();
     }
 
@@ -62,6 +64,36 @@ class ValidationValidatorTest extends TestCase
         ], [
             'users.*.name.required' => 'user name is required',
             'users.*.posts.*.name.required' => 'post name is required',
+        ]);
+
+        $this->assertFalse($v->passes());
+        $this->assertSame('post name is required', $v->errors()->all()[0]);
+    }
+
+    public function testNestedArrayErrorMessagesAreRetrievedFromLocalArray()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [
+            'users' => [
+                [
+                    'name' => 'Taylor Otwell',
+                    'posts' => [
+                        [
+                            'name' => '',
+                        ],
+                    ],
+                ],
+            ],
+        ], [
+            'users.*.name' => ['required'],
+            'users.*.posts.*.name' => ['required'],
+        ], [
+            'users.*.name' => [
+                'required' => 'user name is required',
+            ],
+            'users.*.posts.*.name' => [
+                'required' => 'post name is required',
+            ],
         ]);
 
         $this->assertFalse($v->passes());
@@ -169,6 +201,37 @@ class ValidationValidatorTest extends TestCase
         $trans->shouldReceive('get')->never();
         $v = new Validator($trans, ['foo' => 'taylor'], ['name' => 'Confirmed']);
         $this->assertTrue($v->passes());
+    }
+
+    public function testValidateUsingNestedValidationRulesPasses()
+    {
+        $rules = [
+            'items' => ['array'],
+            'items.*' => ['array', ['required_array_keys', '|name']],
+            'items.*.|name' => [['in', '|ABC123']],
+        ];
+
+        $data = [
+            'items' => [
+                ['|name' => '|ABC123'],
+            ],
+        ];
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, $data, $rules);
+
+        $this->assertTrue($v->passes());
+
+        $data = [
+            'items' => [
+                ['|name' => '|1234'],
+            ],
+        ];
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, $data, $rules);
+
+        $this->assertSame('validation.in', $v->messages()->get('items.0.|name')[0]);
     }
 
     public function testValidateEmptyStringsAlwaysPasses()
@@ -1740,6 +1803,60 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testLowercase()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [
+            'lower' => 'lowercase',
+            'mixed' => 'MixedCase',
+            'upper' => 'UPPERCASE',
+            'lower_multibyte' => 'carácter multibyte',
+            'mixed_multibyte' => 'carÁcter multibyte',
+            'upper_multibyte' => 'CARÁCTER MULTIBYTE',
+        ], [
+            'lower' => 'lowercase',
+            'mixed' => 'lowercase',
+            'upper' => 'lowercase',
+            'lower_multibyte' => 'lowercase',
+            'mixed_multibyte' => 'lowercase',
+            'upper_multibyte' => 'lowercase',
+        ]);
+
+        $this->assertSame([
+            'mixed',
+            'upper',
+            'mixed_multibyte',
+            'upper_multibyte',
+        ], $v->messages()->keys());
+    }
+
+    public function testUppercase()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [
+            'lower' => 'lowercase',
+            'mixed' => 'MixedCase',
+            'upper' => 'UPPERCASE',
+            'lower_multibyte' => 'carácter multibyte',
+            'mixed_multibyte' => 'carÁcter multibyte',
+            'upper_multibyte' => 'CARÁCTER MULTIBYTE',
+        ], [
+            'lower' => 'uppercase',
+            'mixed' => 'uppercase',
+            'upper' => 'uppercase',
+            'lower_multibyte' => 'uppercase',
+            'mixed_multibyte' => 'uppercase',
+            'upper_multibyte' => 'uppercase',
+        ]);
+
+        $this->assertSame([
+            'lower',
+            'mixed',
+            'lower_multibyte',
+            'mixed_multibyte',
+        ], $v->messages()->keys());
+    }
+
     public function testLessThan()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -1907,6 +2024,22 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['foo' => 'true'], ['foo' => 'Accepted']);
         $this->assertTrue($v->passes());
+    }
+
+    public function testValidateRequiredAcceptedIf()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'no', 'bar' => 'baz'], ['bar' => 'required_if_accepted:foo']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'yes', 'bar' => 'baz'], ['bar' => 'required_if_accepted:foo']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'no', 'bar' => ''], ['bar' => 'required_if_accepted:foo']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'yes', 'bar' => ''], ['bar' => 'required_if_accepted:foo']);
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateAcceptedIf()
@@ -2130,6 +2263,17 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame('The url must end with one of the following values http, https', $v->messages()->first('url'));
     }
 
+    public function testValidateDoesntEndWith()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => 'hello world'], ['x' => 'doesnt_end_with:hello']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => 'hello world'], ['x' => 'doesnt_end_with:world']);
+        $this->assertFalse($v->passes());
+    }
+
     public function testValidateStartsWith()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -2155,6 +2299,17 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['url' => 'laravel.com'], ['url' => 'starts_with:http,https']);
         $this->assertFalse($v->passes());
         $this->assertSame('The url must start with one of the following values http, https', $v->messages()->first('url'));
+    }
+
+    public function testValidateDoesntStartWith()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => 'world hello'], ['x' => 'doesnt_start_with:hello']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => 'hello world'], ['x' => 'doesnt_start_with:hello']);
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateString()
@@ -2293,6 +2448,55 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testValidateDecimal()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'asdad'], ['foo' => 'Decimal:2,3']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1.2345'], ['foo' => 'Decimal:2,3']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1.234'], ['foo' => 'Decimal:2,3']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '-1.234'], ['foo' => 'Decimal:2,3']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1.23'], ['foo' => 'Decimal:2,3']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '+1.23'], ['foo' => 'Decimal:2,3']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1.2'], ['foo' => 'Decimal:2,3']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1.23'], ['foo' => 'Decimal:2']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '-1.23'], ['foo' => 'Decimal:2']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1.233'], ['foo' => 'Decimal:2']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1.2'], ['foo' => 'Decimal:2']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1'], ['foo' => 'Decimal:0,1']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1.2'], ['foo' => 'Decimal:0,1']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '-1.2'], ['foo' => 'Decimal:0,1']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1.23'], ['foo' => 'Decimal:0,1']);
+        $this->assertFalse($v->passes());
+    }
+
     public function testValidateInt()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -2337,11 +2541,31 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => '+12.3'], ['foo' => 'digits_between:1,6']);
         $this->assertFalse($v->passes());
 
-        $v = new Validator($trans, ['foo' => '1.2'], ['foo' => 'digits_between:1,10']);
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => '12345'], ['foo' => 'min_digits:1']);
         $this->assertTrue($v->passes());
 
-        $v = new Validator($trans, ['foo' => '0.9876'], ['foo' => 'digits_between:1,5']);
-        $this->assertTrue($v->fails());
+        $v = new Validator($trans, ['foo' => 'bar'], ['foo' => 'min_digits:1']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '123'], ['foo' => 'min_digits:4']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '+12.3'], ['foo' => 'min_digits:1']);
+        $this->assertFalse($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => '12345'], ['foo' => 'max_digits:6']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'bar'], ['foo' => 'max_digits:10']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '123'], ['foo' => 'max_digits:2']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '+12.3'], ['foo' => 'max_digits:6']);
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateSize()
@@ -2394,6 +2618,24 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => '123'], ['foo' => 'Numeric|Between:50,100']);
         $this->assertFalse($v->passes());
 
+        // inclusive on min
+        $v = new Validator($trans, ['foo' => '123'], ['foo' => 'Numeric|Between:123,200']);
+        $this->assertTrue($v->passes());
+
+        // inclusive on max
+        $v = new Validator($trans, ['foo' => '123'], ['foo' => 'Numeric|Between:0,123']);
+        $this->assertTrue($v->passes());
+
+        // can work with float
+        $v = new Validator($trans, ['foo' => '0.02'], ['foo' => 'Numeric|Between:0.01,0.02']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '0.02'], ['foo' => 'Numeric|Between:0.01,0.03']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '0.001'], ['foo' => 'Numeric|Between:0.01,0.03']);
+        $this->assertFalse($v->passes());
+
         $v = new Validator($trans, ['foo' => '3'], ['foo' => 'Numeric|Between:1,5']);
         $this->assertTrue($v->passes());
 
@@ -2420,10 +2662,26 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => '3'], ['foo' => 'Min:3']);
         $this->assertFalse($v->passes());
 
+        // an equal value qualifies.
+        $v = new Validator($trans, ['foo' => '3'], ['foo' => 'Numeric|Min:3']);
+        $this->assertTrue($v->passes());
+
         $v = new Validator($trans, ['foo' => 'anc'], ['foo' => 'Min:3']);
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['foo' => '2'], ['foo' => 'Numeric|Min:3']);
+        $this->assertFalse($v->passes());
+
+        // '2.001' is considered as a float when the "Numeric" rule exists.
+        $v = new Validator($trans, ['foo' => '2.001'], ['foo' => 'Numeric|Min:3']);
+        $this->assertFalse($v->passes());
+
+        // '2.001' is a string of length 5 in absence of the "Numeric" rule.
+        $v = new Validator($trans, ['foo' => '2.001'], ['foo' => 'Min:3']);
+        $this->assertTrue($v->passes());
+
+        // '20' is a string of length 2 in absence of the "Numeric" rule.
+        $v = new Validator($trans, ['foo' => '20'], ['foo' => 'Min:3']);
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['foo' => '5'], ['foo' => 'Numeric|Min:3']);
@@ -2456,6 +2714,18 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['foo' => '211'], ['foo' => 'Numeric|Max:100']);
+        $this->assertFalse($v->passes());
+
+        // an equal value qualifies.
+        $v = new Validator($trans, ['foo' => '3'], ['foo' => 'Numeric|Max:3']);
+        $this->assertTrue($v->passes());
+
+        // '2.001' is considered as a float when the "Numeric" rule exists.
+        $v = new Validator($trans, ['foo' => '2.001'], ['foo' => 'Numeric|Max:3']);
+        $this->assertTrue($v->passes());
+
+        // '2.001' is a string of length 5 in absence of the "Numeric" rule.
+        $v = new Validator($trans, ['foo' => '2.001'], ['foo' => 'Max:3']);
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['foo' => '22'], ['foo' => 'Numeric|Max:33']);
@@ -2492,7 +2762,7 @@ class ValidationValidatorTest extends TestCase
      *
      * @dataProvider multipleOfDataProvider
      */
-    public function testValidateMutlpleOf($input, $allowed, $passes)
+    public function testValidateMultipleOf($input, $allowed, $passes)
     {
         $trans = $this->getIlluminateArrayTranslator();
         $trans->addLines(['validation.multiple_of' => 'The :attribute must be a multiple of :value'], 'en');
@@ -2507,7 +2777,7 @@ class ValidationValidatorTest extends TestCase
         }
     }
 
-    public function multipleOfDataProvider()
+    public static function multipleOfDataProvider()
     {
         return [
             [0, 0, false], // zero (same)
@@ -3234,7 +3504,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
-    public function validUrls()
+    public static function validUrls()
     {
         return [
             ['aaa://fully.qualified.domain/path'],
@@ -3481,7 +3751,7 @@ class ValidationValidatorTest extends TestCase
         ];
     }
 
-    public function invalidUrls()
+    public static function invalidUrls()
     {
         return [
             ['aslsdlks'],
@@ -3498,23 +3768,50 @@ class ValidationValidatorTest extends TestCase
         ];
     }
 
-    public function testValidateActiveUrl()
+    /**
+     * @dataProvider activeUrlDataProvider
+     */
+    public function testValidateActiveUrl($data, $outcome)
     {
         $trans = $this->getIlluminateArrayTranslator();
-        $v = new Validator($trans, ['x' => 'aslsdlks'], ['x' => 'active_url']);
-        $this->assertFalse($v->passes());
+        $v = m::mock(
+            new Validator($trans, $data, ['x' => 'active_url']),
+            function (MockInterface $mock) {
+                $mock
+                    ->shouldAllowMockingProtectedMethods()
+                    ->shouldReceive('getDnsRecords')
+                    ->withAnyArgs()
+                    ->zeroOrMoreTimes()
+                    ->andReturn(['hit']);
+            }
+        );
+        $this->assertEquals($outcome, $v->passes());
+    }
 
-        $v = new Validator($trans, ['x' => ['fdsfs', 'fdsfds']], ['x' => 'active_url']);
-        $this->assertFalse($v->passes());
-
-        $v = new Validator($trans, ['x' => 'http://google.com'], ['x' => 'active_url']);
-        $this->assertTrue($v->passes());
-
-        $v = new Validator($trans, ['x' => 'http://www.google.com'], ['x' => 'active_url']);
-        $this->assertTrue($v->passes());
-
-        $v = new Validator($trans, ['x' => 'http://www.google.com/about'], ['x' => 'active_url']);
-        $this->assertTrue($v->passes());
+    public static function activeUrlDataProvider()
+    {
+        return [
+            'Invalid Url' => [
+                ['x' => 'aslsdlks'],
+                false,
+            ],
+            'Invalid Urls' => [
+                ['x' => 'fdsfs', 'fdsfds'],
+                false,
+            ],
+            'Google Without Subdomain' => [
+                ['x' => 'http://google.com'],
+                true,
+            ],
+            'Google With Subdomain' => [
+                ['x' => 'http://www.google.com'],
+                true,
+            ],
+            'Google With Subdomain About Page' => [
+                ['x' => 'http://www.google.com/about'],
+                true,
+            ],
+        ];
     }
 
     public function testValidateImage()
@@ -4143,8 +4440,6 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['x' => new Carbon('2018-01-01')], ['x' => 'date_equals:tomorrow']);
         $this->assertTrue($v->fails());
-
-        Carbon::setTestNow(null);
     }
 
     public function testBeforeAndAfter()
@@ -4490,7 +4785,7 @@ class ValidationValidatorTest extends TestCase
     {
         // ['users'] -> if users is not empty it must be validated as array
         $trans = $this->getIlluminateArrayTranslator();
-        $v = new Validator($trans, ['users' => [['name' => 'Taylor'], ['name' => 'Abigail']]], ['users.*.name'=> 'required|string']);
+        $v = new Validator($trans, ['users' => [['name' => 'Taylor'], ['name' => 'Abigail']]], ['users.*.name' => 'required|string']);
         $v->sometimes(['users'], 'array', function ($i, $item) {
             return $item !== null;
         });
@@ -4498,7 +4793,7 @@ class ValidationValidatorTest extends TestCase
 
         // ['users'] -> if users is null no rules will be applied
         $trans = $this->getIlluminateArrayTranslator();
-        $v = new Validator($trans, ['users' => null], ['users.*.name'=> 'required|string']);
+        $v = new Validator($trans, ['users' => null], ['users.*.name' => 'required|string']);
         $v->sometimes(['users'], 'array', function ($i, $item) {
             return (bool) $item;
         });
@@ -4506,7 +4801,7 @@ class ValidationValidatorTest extends TestCase
 
         // ['company.users'] -> if users is not empty it must be validated as array
         $trans = $this->getIlluminateArrayTranslator();
-        $v = new Validator($trans, ['company' => ['users' => [['name' => 'Taylor'], ['name' => 'Abigail']]]], ['company.users.*.name'=> 'required|string']);
+        $v = new Validator($trans, ['company' => ['users' => [['name' => 'Taylor'], ['name' => 'Abigail']]]], ['company.users.*.name' => 'required|string']);
         $v->sometimes(['company.users'], 'array', function ($i, $item) {
             return $item->users !== null;
         });
@@ -4514,7 +4809,7 @@ class ValidationValidatorTest extends TestCase
 
         // ['company.users'] -> if users is null no rules will be applied
         $trans = $this->getIlluminateArrayTranslator();
-        $v = new Validator($trans, ['company' => ['users' => null]], ['company'=> 'required', 'company.users.*.name'=> 'required|string']);
+        $v = new Validator($trans, ['company' => ['users' => null]], ['company' => 'required', 'company.users.*.name' => 'required|string']);
         $v->sometimes(['company.users'], 'array', function ($i, $item) {
             return (bool) $item->users;
         });
@@ -4522,7 +4817,7 @@ class ValidationValidatorTest extends TestCase
 
         // ['company.*'] -> if users is not empty it must be validated as array
         $trans = $this->getIlluminateArrayTranslator();
-        $v = new Validator($trans, ['company' => ['users' => [['name' => 'Taylor'], ['name' => 'Abigail']]]], ['company.users.*.name'=> 'required|string']);
+        $v = new Validator($trans, ['company' => ['users' => [['name' => 'Taylor'], ['name' => 'Abigail']]]], ['company.users.*.name' => 'required|string']);
         $v->sometimes(['company.*'], 'array', function ($i, $item) {
             return $item !== null;
         });
@@ -4530,7 +4825,7 @@ class ValidationValidatorTest extends TestCase
 
         // ['company.*'] -> if users is null no rules will be applied
         $trans = $this->getIlluminateArrayTranslator();
-        $v = new Validator($trans, ['company' => ['users' => null]], ['company'=> 'required', 'company.users.*.name'=> 'required|string']);
+        $v = new Validator($trans, ['company' => ['users' => null]], ['company' => 'required', 'company.users.*.name' => 'required|string']);
         $v->sometimes(['company.*'], 'array', function ($i, $item) {
             return (bool) $item;
         });
@@ -4538,7 +4833,7 @@ class ValidationValidatorTest extends TestCase
 
         // ['users.*'] -> all nested array items in users must be validated as array
         $trans = $this->getIlluminateArrayTranslator();
-        $v = new Validator($trans, ['users' => [['name' => 'Taylor'], ['name' => 'Abigail']]], ['users.*.name'=> 'required|string']);
+        $v = new Validator($trans, ['users' => [['name' => 'Taylor'], ['name' => 'Abigail']]], ['users.*.name' => 'required|string']);
         $v->sometimes(['users.*'], 'array', function ($i, $item) {
             return (bool) $item;
         });
@@ -4546,7 +4841,7 @@ class ValidationValidatorTest extends TestCase
 
         // ['company.users.*'] -> all nested array items in users must be validated as array
         $trans = $this->getIlluminateArrayTranslator();
-        $v = new Validator($trans, ['company' => ['users' => [['name' => 'Taylor'], ['name' => 'Abigail']]]], ['company.users.*.name'=> 'required|string']);
+        $v = new Validator($trans, ['company' => ['users' => [['name' => 'Taylor'], ['name' => 'Abigail']]]], ['company.users.*.name' => 'required|string']);
         $v->sometimes(['company.users.*'], 'array', function () {
             return true;
         });
@@ -4554,7 +4849,7 @@ class ValidationValidatorTest extends TestCase
 
         // ['company.*.*'] -> all nested array items in users must be validated as array
         $trans = $this->getIlluminateArrayTranslator();
-        $v = new Validator($trans, ['company' => ['users' => [['name' => 'Taylor'], ['name' => 'Abigail']]]], ['company.users.*.name'=> 'required|string']);
+        $v = new Validator($trans, ['company' => ['users' => [['name' => 'Taylor'], ['name' => 'Abigail']]]], ['company.users.*.name' => 'required|string']);
         $v->sometimes(['company.*.*'], 'array', function ($i, $item) {
             return true;
         });
@@ -4659,7 +4954,7 @@ class ValidationValidatorTest extends TestCase
 
         // ['attendee.*'] -> if attendee name is set, all other fields will be required as well
         $trans = $this->getIlluminateArrayTranslator();
-        $v = new Validator($trans, ['attendee' => ['name' => 'Taylor', 'title' => 'Creator of Laravel', 'type' => 'Developer']], ['attendee.*'=> 'string']);
+        $v = new Validator($trans, ['attendee' => ['name' => 'Taylor', 'title' => 'Creator of Laravel', 'type' => 'Developer']], ['attendee.*' => 'string']);
         $v->sometimes(['attendee.*'], 'required', function ($i, $item) {
             return (bool) $item;
         });
@@ -6448,7 +6743,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
-    public function validUuidList()
+    public static function validUuidList()
     {
         return [
             ['a0a2a2d2-0b87-4a18-83f2-2529882be2de'],
@@ -6464,7 +6759,7 @@ class ValidationValidatorTest extends TestCase
         ];
     }
 
-    public function invalidUuidList()
+    public static function invalidUuidList()
     {
         return [
             ['not a valid uuid so we can test this'],
@@ -6480,7 +6775,35 @@ class ValidationValidatorTest extends TestCase
         ];
     }
 
-    public function providesPassingExcludeIfData()
+    public function testValidateWithValidAscii()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'Dusseldorf'], ['foo' => 'ascii']);
+        $this->assertTrue($v->passes());
+    }
+
+    public function testValidateWithInvalidAscii()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'Düsseldorf'], ['foo' => 'ascii']);
+        $this->assertFalse($v->passes());
+    }
+
+    public function testValidateWithValidUlid()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => '01gd6r360bp37zj17nxb55yv40'], ['foo' => 'ulid']);
+        $this->assertTrue($v->passes());
+    }
+
+    public function testValidateWithInvalidUlid()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => '01gd6r36-bp37z-17nx-55yv40'], ['foo' => 'ulid']);
+        $this->assertFalse($v->passes());
+    }
+
+    public static function providesPassingExcludeIfData()
     {
         return [
             [
@@ -6716,7 +7039,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame($expectedValidatedData, $validator->validated());
     }
 
-    public function providesFailingExcludeIfData()
+    public static function providesFailingExcludeIfData()
     {
         return [
             [
@@ -6830,7 +7153,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame($expectedMessages, $validator->messages()->toArray());
     }
 
-    public function providesPassingExcludeData()
+    public static function providesPassingExcludeData()
     {
         return [
             [
@@ -7029,6 +7352,26 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame(['mouse' => null], $validator->invalid());
     }
 
+    public function testExcludeWithValuesAreReallyRemoved()
+    {
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            [
+                'cat' => 'Tom',
+                'mouse' => 'Jerry',
+            ],
+            [
+                'cat' => 'string',
+                'mouse' => 'string|exclude_with:cat',
+            ]
+        );
+
+        $this->assertTrue($validator->passes());
+        $this->assertSame(['cat' => 'Tom'], $validator->validated());
+        $this->assertSame(['cat' => 'Tom'], $validator->valid());
+        $this->assertSame([], $validator->invalid());
+    }
+
     public function testValidateFailsWithAsterisksAsDataKeys()
     {
         $post = ['data' => [0 => ['date' => '2019-01-24'], 1 => ['date' => 'blah'], '*' => ['date' => 'blah']]];
@@ -7172,6 +7515,69 @@ class ValidationValidatorTest extends TestCase
             'The baz field must contain entries for foo, fee, boo, bar',
             $validator->messages()->first('baz')
         );
+    }
+
+    public function testArrayKeysWithDotIntegerMin()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $data = [
+            'foo.bar' => -1,
+        ];
+
+        $rules = [
+            'foo\.bar' => 'integer|min:1',
+        ];
+
+        $expectedResult = [
+            'foo.bar' => [
+                'validation.min.numeric',
+            ],
+        ];
+
+        $validator = new Validator($trans, $data, $rules, [], []);
+        $this->assertEquals($expectedResult, $validator->getMessageBag()->getMessages());
+    }
+
+    public function testItCanTranslateMessagesForClosureBasedRules()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.translated-error' => 'Translated error message.'], 'en');
+        $rule = function ($attribute, $value, $fail) {
+            $fail('validation.translated-error')->translate();
+            $fail('validation.not-translated-message')->translate();
+        };
+
+        $validator = new Validator($trans, ['foo' => 'bar'], ['foo' => $rule]);
+
+        $this->assertTrue($validator->fails());
+        $this->assertSame([
+            'foo' => [
+                'Translated error message.',
+                'validation.not-translated-message',
+            ],
+        ], $validator->messages()->messages());
+    }
+
+    public function testItCanSpecifyTheValidationErrorKeyForTheErrorMessageForClosureBasedRules()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $rule = function ($attribute, $value, $fail) {
+            $fail('bar.baz', 'Another attribute error.');
+            $fail('This attribute error.');
+        };
+
+        $validator = new Validator($trans, ['foo' => 'xxxx'], ['foo' => $rule]);
+
+        $this->assertFalse($validator->passes());
+        $this->assertSame([
+            'bar.baz' => [
+                'Another attribute error.',
+            ],
+            'foo' => [
+                'This attribute error.',
+            ],
+        ], $validator->messages()->messages());
     }
 
     protected function getTranslator()

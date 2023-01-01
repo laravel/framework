@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\MultipleRecordsFoundException;
 use Illuminate\Database\Query\Expression;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
 
@@ -40,6 +39,13 @@ abstract class Relation implements BuilderContract
      * @var \Illuminate\Database\Eloquent\Model
      */
     protected $related;
+
+    /**
+     * Indicates whether the eagerly loaded relation should implicitly return an empty collection.
+     *
+     * @var bool
+     */
+    protected $eagerKeysWereEmpty = false;
 
     /**
      * Indicates if the relation is adding constraints.
@@ -155,7 +161,9 @@ abstract class Relation implements BuilderContract
      */
     public function getEager()
     {
-        return $this->get();
+        return $this->eagerKeysWereEmpty
+                    ? $this->query->getModel()->newCollection()
+                    : $this->get();
     }
 
     /**
@@ -299,13 +307,23 @@ abstract class Relation implements BuilderContract
     }
 
     /**
+     * Get the base query builder driving the Eloquent builder.
+     *
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public function getBaseQuery()
+    {
+        return $this->query->getQuery();
+    }
+
+    /**
      * Get a base query builder instance.
      *
      * @return \Illuminate\Database\Query\Builder
      */
     public function toBase()
     {
-        return $this->query->getQuery();
+        return $this->query->toBase();
     }
 
     /**
@@ -366,6 +384,24 @@ abstract class Relation implements BuilderContract
     public function relatedUpdatedAt()
     {
         return $this->related->getUpdatedAtColumn();
+    }
+
+    /**
+     * Add a whereIn eager constraint for the given set of model keys to be loaded.
+     *
+     * @param  string  $whereIn
+     * @param  string  $key
+     * @param  array  $modelKeys
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return void
+     */
+    protected function whereInEager(string $whereIn, string $key, array $modelKeys, $query = null)
+    {
+        ($query ?? $this->query)->{$whereIn}($key, $modelKeys);
+
+        if ($modelKeys === []) {
+            $this->eagerKeysWereEmpty = true;
+        }
     }
 
     /**
@@ -445,7 +481,7 @@ abstract class Relation implements BuilderContract
      */
     protected static function buildMorphMapFromModels(array $models = null)
     {
-        if (is_null($models) || Arr::isAssoc($models)) {
+        if (is_null($models) || ! array_is_list($models)) {
             return $models;
         }
 

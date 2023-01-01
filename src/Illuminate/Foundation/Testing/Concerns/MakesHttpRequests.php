@@ -64,6 +64,13 @@ trait MakesHttpRequests
     protected $withCredentials = false;
 
     /**
+     * The latest test response (if any).
+     *
+     * @var \Illuminate\Testing\TestResponse|null
+     */
+    public static $latestResponse;
+
+    /**
      * Define additional headers to be sent with the request.
      *
      * @param  array  $headers
@@ -100,6 +107,18 @@ trait MakesHttpRequests
     public function withToken(string $token, string $type = 'Bearer')
     {
         return $this->withHeader('Authorization', $type.' '.$token);
+    }
+
+    /**
+     * Remove the authorization token from the request.
+     *
+     * @return $this
+     */
+    public function withoutToken()
+    {
+        unset($this->defaultHeaders['Authorization']);
+
+        return $this;
     }
 
     /**
@@ -298,11 +317,12 @@ trait MakesHttpRequests
      *
      * @param  string  $uri
      * @param  array  $headers
+     * @param  int  $options
      * @return \Illuminate\Testing\TestResponse
      */
-    public function getJson($uri, array $headers = [])
+    public function getJson($uri, array $headers = [], $options = 0)
     {
-        return $this->json('GET', $uri, [], $headers);
+        return $this->json('GET', $uri, [], $headers, $options);
     }
 
     /**
@@ -327,11 +347,12 @@ trait MakesHttpRequests
      * @param  string  $uri
      * @param  array  $data
      * @param  array  $headers
+     * @param  int  $options
      * @return \Illuminate\Testing\TestResponse
      */
-    public function postJson($uri, array $data = [], array $headers = [])
+    public function postJson($uri, array $data = [], array $headers = [], $options = 0)
     {
-        return $this->json('POST', $uri, $data, $headers);
+        return $this->json('POST', $uri, $data, $headers, $options);
     }
 
     /**
@@ -356,11 +377,12 @@ trait MakesHttpRequests
      * @param  string  $uri
      * @param  array  $data
      * @param  array  $headers
+     * @param  int  $options
      * @return \Illuminate\Testing\TestResponse
      */
-    public function putJson($uri, array $data = [], array $headers = [])
+    public function putJson($uri, array $data = [], array $headers = [], $options = 0)
     {
-        return $this->json('PUT', $uri, $data, $headers);
+        return $this->json('PUT', $uri, $data, $headers, $options);
     }
 
     /**
@@ -385,11 +407,12 @@ trait MakesHttpRequests
      * @param  string  $uri
      * @param  array  $data
      * @param  array  $headers
+     * @param  int  $options
      * @return \Illuminate\Testing\TestResponse
      */
-    public function patchJson($uri, array $data = [], array $headers = [])
+    public function patchJson($uri, array $data = [], array $headers = [], $options = 0)
     {
-        return $this->json('PATCH', $uri, $data, $headers);
+        return $this->json('PATCH', $uri, $data, $headers, $options);
     }
 
     /**
@@ -414,11 +437,12 @@ trait MakesHttpRequests
      * @param  string  $uri
      * @param  array  $data
      * @param  array  $headers
+     * @param  int  $options
      * @return \Illuminate\Testing\TestResponse
      */
-    public function deleteJson($uri, array $data = [], array $headers = [])
+    public function deleteJson($uri, array $data = [], array $headers = [], $options = 0)
     {
-        return $this->json('DELETE', $uri, $data, $headers);
+        return $this->json('DELETE', $uri, $data, $headers, $options);
     }
 
     /**
@@ -432,6 +456,7 @@ trait MakesHttpRequests
     public function options($uri, array $data = [], array $headers = [])
     {
         $server = $this->transformHeadersToServerVars($headers);
+
         $cookies = $this->prepareCookiesForRequest();
 
         return $this->call('OPTIONS', $uri, $data, $cookies, [], $server);
@@ -443,11 +468,28 @@ trait MakesHttpRequests
      * @param  string  $uri
      * @param  array  $data
      * @param  array  $headers
+     * @param  int  $options
      * @return \Illuminate\Testing\TestResponse
      */
-    public function optionsJson($uri, array $data = [], array $headers = [])
+    public function optionsJson($uri, array $data = [], array $headers = [], $options = 0)
     {
-        return $this->json('OPTIONS', $uri, $data, $headers);
+        return $this->json('OPTIONS', $uri, $data, $headers, $options);
+    }
+
+    /**
+     * Visit the given URI with a HEAD request.
+     *
+     * @param  string  $uri
+     * @param  array  $headers
+     * @return \Illuminate\Testing\TestResponse
+     */
+    public function head($uri, array $headers = [])
+    {
+        $server = $this->transformHeadersToServerVars($headers);
+
+        $cookies = $this->prepareCookiesForRequest();
+
+        return $this->call('HEAD', $uri, [], $cookies, [], $server);
     }
 
     /**
@@ -457,13 +499,14 @@ trait MakesHttpRequests
      * @param  string  $uri
      * @param  array  $data
      * @param  array  $headers
+     * @param  int  $options
      * @return \Illuminate\Testing\TestResponse
      */
-    public function json($method, $uri, array $data = [], array $headers = [])
+    public function json($method, $uri, array $data = [], array $headers = [], $options = 0)
     {
         $files = $this->extractFilesFromDataArray($data);
 
-        $content = json_encode($data);
+        $content = json_encode($data, $options);
 
         $headers = array_merge([
             'CONTENT_LENGTH' => mb_strlen($content, '8bit'),
@@ -515,7 +558,7 @@ trait MakesHttpRequests
             $response = $this->followRedirects($response);
         }
 
-        return $this->createTestResponse($response);
+        return static::$latestResponse = $this->createTestResponse($response);
     }
 
     /**

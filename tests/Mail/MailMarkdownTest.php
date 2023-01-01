@@ -27,7 +27,7 @@ class MailMarkdownTest extends TestCase
 
         $result = $markdown->render('view', []);
 
-        $this->assertNotFalse(strpos($result, '<html></html>'));
+        $this->assertStringContainsString('<html></html>', $result);
     }
 
     public function testRenderFunctionReturnsHtmlWithCustomTheme()
@@ -44,7 +44,7 @@ class MailMarkdownTest extends TestCase
 
         $result = $markdown->render('view', []);
 
-        $this->assertNotFalse(strpos($result, '<html></html>'));
+        $this->assertStringContainsString('<html></html>', $result);
     }
 
     public function testRenderFunctionReturnsHtmlWithCustomThemeWithMailPrefix()
@@ -61,7 +61,7 @@ class MailMarkdownTest extends TestCase
 
         $result = $markdown->render('view', []);
 
-        $this->assertNotFalse(strpos($result, '<html></html>'));
+        $this->assertStringContainsString('<html></html>', $result);
     }
 
     public function testRenderTextReturnsText()

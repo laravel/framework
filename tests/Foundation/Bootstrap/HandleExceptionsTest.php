@@ -14,6 +14,10 @@ use ReflectionClass;
 
 class HandleExceptionsTest extends TestCase
 {
+    protected $app;
+    protected $config;
+    protected $handleExceptions;
+
     protected function setUp(): void
     {
         $this->app = m::mock(Application::setInstance(new Application));
@@ -64,6 +68,70 @@ class HandleExceptionsTest extends TestCase
         );
     }
 
+    public function testPhpDeprecationsWithStackTraces()
+    {
+        $logger = m::mock(LogManager::class);
+        $this->app->instance(LogManager::class, $logger);
+
+        $this->config->set('logging.deprecations', [
+            'channel' => 'null',
+            'trace' => true,
+        ]);
+
+        $logger->shouldReceive('channel')->with('deprecations')->andReturnSelf();
+        $logger->shouldReceive('warning')->with(
+            m::on(fn (string $message) => (bool) preg_match(
+                <<<REGEXP
+                #ErrorException: str_contains\(\): Passing null to parameter \#2 \(\\\$needle\) of type string is deprecated in /home/user/laravel/routes/web\.php:17
+                Stack trace:
+                \#0 .*helpers.php\(.*\): Illuminate\\\\Foundation\\\\Bootstrap\\\\HandleExceptions.*
+                \#1 .*HandleExceptions\.php\(.*\): with.*
+                \#2 .*HandleExceptions\.php\(.*\): Illuminate\\\\Foundation\\\\Bootstrap\\\\HandleExceptions->handleDeprecation.*
+                \#3 .*HandleExceptionsTest\.php\(.*\): Illuminate\\\\Foundation\\\\Bootstrap\\\\HandleExceptions->handleError.*
+                [\s\S]*#i
+                REGEXP,
+                $message
+            ))
+        );
+
+        $this->handleExceptions->handleError(
+            E_DEPRECATED,
+            'str_contains(): Passing null to parameter #2 ($needle) of type string is deprecated',
+            '/home/user/laravel/routes/web.php',
+            17
+        );
+    }
+
+    public function testNullValueAsChannelUsesNullDriver()
+    {
+        $logger = m::mock(LogManager::class);
+        $this->app->instance(LogManager::class, $logger);
+
+        $this->config->set('logging.deprecations', [
+            'channel' => null,
+            'trace' => false,
+        ]);
+
+        $logger->shouldReceive('channel')->with('deprecations')->andReturnSelf();
+        $logger->shouldReceive('warning')->with(sprintf('%s in %s on line %s',
+            'str_contains(): Passing null to parameter #2 ($needle) of type string is deprecated',
+            '/home/user/laravel/routes/web.php',
+            17
+        ));
+
+        $this->handleExceptions->handleError(
+            E_DEPRECATED,
+            'str_contains(): Passing null to parameter #2 ($needle) of type string is deprecated',
+            '/home/user/laravel/routes/web.php',
+            17
+        );
+
+        $this->assertEquals([
+            'driver' => 'monolog',
+            'handler' => NullHandler::class,
+        ], $this->config->get('logging.channels.deprecations'));
+    }
+
     public function testUserDeprecations()
     {
         $logger = m::mock(LogManager::class);
@@ -75,6 +143,40 @@ class HandleExceptionsTest extends TestCase
             '/home/user/laravel/routes/web.php',
             17
         ));
+
+        $this->handleExceptions->handleError(
+            E_USER_DEPRECATED,
+            'str_contains(): Passing null to parameter #2 ($needle) of type string is deprecated',
+            '/home/user/laravel/routes/web.php',
+            17
+        );
+    }
+
+    public function testUserDeprecationsWithStackTraces()
+    {
+        $logger = m::mock(LogManager::class);
+        $this->app->instance(LogManager::class, $logger);
+
+        $this->config->set('logging.deprecations', [
+            'channel' => 'null',
+            'trace' => true,
+        ]);
+
+        $logger->shouldReceive('channel')->with('deprecations')->andReturnSelf();
+        $logger->shouldReceive('warning')->with(
+            m::on(fn (string $message) => (bool) preg_match(
+                <<<REGEXP
+                #ErrorException: str_contains\(\): Passing null to parameter \#2 \(\\\$needle\) of type string is deprecated in /home/user/laravel/routes/web\.php:17
+                Stack trace:
+                \#0 .*helpers.php\(.*\): Illuminate\\\\Foundation\\\\Bootstrap\\\\HandleExceptions.*
+                \#1 .*HandleExceptions\.php\(.*\): with.*
+                \#2 .*HandleExceptions\.php\(.*\): Illuminate\\\\Foundation\\\\Bootstrap\\\\HandleExceptions->handleDeprecation.*
+                \#3 .*HandleExceptionsTest\.php\(.*\): Illuminate\\\\Foundation\\\\Bootstrap\\\\HandleExceptions->handleError.*
+                [\s\S]*#i
+                REGEXP,
+                $message
+            ))
+        );
 
         $this->handleExceptions->handleError(
             E_USER_DEPRECATED,

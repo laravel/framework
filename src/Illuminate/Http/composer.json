@@ -21,9 +21,9 @@
         "illuminate/macroable": "^10.0",
         "illuminate/session": "^10.0",
         "illuminate/support": "^10.0",
-        "symfony/http-foundation": "^6.1",
-        "symfony/http-kernel": "^6.1",
-        "symfony/mime": "^6.1"
+        "symfony/http-foundation": "^6.2",
+        "symfony/http-kernel": "^6.2",
+        "symfony/mime": "^6.2"
     },
     "autoload": {
         "psr-4": {
@@ -32,7 +32,7 @@
     },
     "suggest": {
         "ext-gd": "Required to use Illuminate\\Http\\Testing\\FileFactory::image().",
-        "guzzlehttp/guzzle": "Required to use the HTTP Client (^7.2)."
+        "guzzlehttp/guzzle": "Required to use the HTTP Client (^7.5)."
     },
     "extra": {
         "branch-alias": {

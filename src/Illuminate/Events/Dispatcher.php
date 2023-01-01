@@ -147,7 +147,7 @@ class Dispatcher implements DispatcherContract
      * Register an event and payload to be fired later.
      *
      * @param  string  $event
-     * @param  array  $payload
+     * @param  object|array  $payload
      * @return void
      */
     public function push($event, $payload = [])
@@ -579,11 +579,11 @@ class Dispatcher implements DispatcherContract
         [$listener, $job] = $this->createListenerAndJob($class, $method, $arguments);
 
         $connection = $this->resolveQueue()->connection(method_exists($listener, 'viaConnection')
-                    ? $listener->viaConnection()
+                    ? (isset($arguments[0]) ? $listener->viaConnection($arguments[0]) : $listener->viaConnection())
                     : $listener->connection ?? null);
 
         $queue = method_exists($listener, 'viaQueue')
-                    ? $listener->viaQueue()
+                    ? (isset($arguments[0]) ? $listener->viaQueue($arguments[0]) : $listener->viaQueue())
                     : $listener->queue ?? null;
 
         isset($listener->delay)

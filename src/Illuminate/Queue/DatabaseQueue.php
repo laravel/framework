@@ -145,11 +145,15 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
     {
         $queue = $this->getQueue($queue);
 
-        $availableAt = $this->availableAt();
+        $now = $this->availableAt();
 
         return $this->database->table($this->table)->insert(collect((array) $jobs)->map(
-            function ($job) use ($queue, $data, $availableAt) {
-                return $this->buildDatabaseRecord($queue, $this->createPayload($job, $this->getQueue($queue), $data), $availableAt);
+            function ($job) use ($queue, $data, $now) {
+                return $this->buildDatabaseRecord(
+                    $queue,
+                    $this->createPayload($job, $this->getQueue($queue), $data),
+                    isset($job->delay) ? $this->availableAt($job->delay) : $now,
+                );
             }
         )->all());
     }
@@ -257,12 +261,19 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
         if (Str::of($databaseVersion)->contains('MariaDB')) {
             $databaseEngine = 'mariadb';
             $databaseVersion = Str::before(Str::after($databaseVersion, '5.5.5-'), '-');
+        } elseif (Str::of($databaseVersion)->contains(['vitess', 'PlanetScale'])) {
+            $databaseEngine = 'vitess';
+            $databaseVersion = Str::before($databaseVersion, '-');
         }
 
         if (($databaseEngine === 'mysql' && version_compare($databaseVersion, '8.0.1', '>=')) ||
             ($databaseEngine === 'mariadb' && version_compare($databaseVersion, '10.6.0', '>=')) ||
             ($databaseEngine === 'pgsql' && version_compare($databaseVersion, '9.5', '>='))) {
             return 'FOR UPDATE SKIP LOCKED';
+        }
+
+        if ($databaseEngine === 'sqlsrv') {
+            return 'with(rowlock,updlock,readpast)';
         }
 
         return true;

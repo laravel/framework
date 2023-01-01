@@ -6,26 +6,36 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Testing\Fakes\EventFake;
 
 /**
- * @method static \Closure createClassListener(string $listener, bool $wildcard = false)
- * @method static \Closure makeListener(\Closure|string $listener, bool $wildcard = false)
- * @method static \Illuminate\Events\Dispatcher setQueueResolver(callable $resolver)
- * @method static array getListeners(string $eventName)
- * @method static array|null dispatch(string|object $event, mixed $payload = [], bool $halt = false)
- * @method static array|null until(string|object $event, mixed $payload = [])
+ * @method static void listen(\Closure|string|array $events, \Closure|string|array|null $listener = null)
  * @method static bool hasListeners(string $eventName)
- * @method static void assertDispatched(string|\Closure $event, callable|int $callback = null)
- * @method static void assertDispatchedTimes(string $event, int $times = 1)
- * @method static void assertNotDispatched(string|\Closure $event, callable|int $callback = null)
- * @method static void assertNothingDispatched()
- * @method static void assertListening(string $expectedEvent, string $expectedListener)
+ * @method static bool hasWildcardListeners(string $eventName)
+ * @method static void push(string $event, object|array $payload = [])
  * @method static void flush(string $event)
+ * @method static void subscribe(object|string $subscriber)
+ * @method static array|null until(string|object $event, mixed $payload = [])
+ * @method static array|null dispatch(string|object $event, mixed $payload = [], bool $halt = false)
+ * @method static array getListeners(string $eventName)
+ * @method static \Closure makeListener(\Closure|string|array $listener, bool $wildcard = false)
+ * @method static \Closure createClassListener(string $listener, bool $wildcard = false)
  * @method static void forget(string $event)
  * @method static void forgetPushed()
- * @method static void listen(\Closure|string|array $events, \Closure|string|array $listener = null)
- * @method static void push(string $event, array $payload = [])
- * @method static void subscribe(object|string $subscriber)
+ * @method static \Illuminate\Events\Dispatcher setQueueResolver(callable $resolver)
+ * @method static array getRawListeners()
+ * @method static void macro(string $name, object|callable $macro)
+ * @method static void mixin(object $mixin, bool $replace = true)
+ * @method static bool hasMacro(string $name)
+ * @method static void flushMacros()
+ * @method static \Illuminate\Support\Testing\Fakes\EventFake except(array|string $eventsToDispatch)
+ * @method static void assertListening(string $expectedEvent, string|array $expectedListener)
+ * @method static void assertDispatched(string|\Closure $event, callable|int|null $callback = null)
+ * @method static void assertDispatchedTimes(string $event, int $times = 1)
+ * @method static void assertNotDispatched(string|\Closure $event, callable|null $callback = null)
+ * @method static void assertNothingDispatched()
+ * @method static \Illuminate\Support\Collection dispatched(string $event, callable|null $callback = null)
+ * @method static bool hasDispatched(string $event)
  *
  * @see \Illuminate\Events\Dispatcher
+ * @see \Illuminate\Support\Testing\Fakes\EventFake
  */
 class Event extends Facade
 {

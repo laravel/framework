@@ -34,6 +34,17 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertEquals($expected, (array) DB::table('posts')->where('title', 'Foo Post')->select('id', 'title')->sole());
     }
 
+    public function testSoleWithParameters()
+    {
+        $expected = ['id' => '1'];
+
+        $this->assertEquals($expected, (array) DB::table('posts')->where('title', 'Foo Post')->sole('id'));
+        $this->assertEquals($expected, (array) DB::table('posts')->where('title', 'Foo Post')->sole(['id']));
+
+        $expected = ['id' => '1', 'title' => 'Foo Post'];
+        $this->assertEquals($expected, (array) DB::table('posts')->where('title', 'Foo Post')->sole(['id', 'title']));
+    }
+
     public function testSoleFailsForMultipleRecords()
     {
         DB::table('posts')->insert([
@@ -58,6 +69,8 @@ class QueryBuilderTest extends DatabaseTestCase
 
         $this->assertEquals($expected, (array) DB::table('posts')->select('id', 'title')->first());
         $this->assertEquals($expected, (array) DB::table('posts')->select(['id', 'title'])->first());
+
+        $this->assertCount(4, (array) DB::table('posts')->select()->first());
     }
 
     public function testSelectReplacesExistingSelects()
@@ -85,6 +98,9 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertEquals($expected, (array) DB::table('posts')->select('id')->addSelect('title', 'content')->first());
         $this->assertEquals($expected, (array) DB::table('posts')->select('id')->addSelect(['title', 'content'])->first());
         $this->assertEquals($expected, (array) DB::table('posts')->addSelect(['id', 'title', 'content'])->first());
+
+        $this->assertCount(4, (array) DB::table('posts')->addSelect([])->first());
+        $this->assertEquals(['id' => '1'], (array) DB::table('posts')->select('id')->addSelect([])->first());
     }
 
     public function testAddSelectWithSubQuery()
@@ -140,6 +156,21 @@ class QueryBuilderTest extends DatabaseTestCase
 
         $this->assertCount(1, $results);
         $this->assertSame('Bar Post', $results[0]->title);
+    }
+
+    public function testWhereNotInputStringParameter()
+    {
+        $results = DB::table('posts')->whereNot('title', 'Foo Post')->get();
+
+        $this->assertCount(1, $results);
+        $this->assertSame('Bar Post', $results[0]->title);
+
+        DB::table('posts')->insert([
+            ['title' => 'Baz Post', 'content' => 'Lorem Ipsum.', 'created_at' => new Carbon('2017-11-12 13:14:15')],
+        ]);
+
+        $results = DB::table('posts')->whereNot('title', 'Foo Post')->whereNot('title', 'Bar Post')->get();
+        $this->assertSame('Baz Post', $results[0]->title);
     }
 
     public function testOrWhereNot()
@@ -215,6 +246,15 @@ class QueryBuilderTest extends DatabaseTestCase
     {
         $this->assertSame(2, DB::table('posts')->where('id', 1)->orWhereTime('created_at', '03:04:05')->count());
         $this->assertSame(2, DB::table('posts')->where('id', 1)->orWhereTime('created_at', new Carbon('2018-01-02 03:04:05'))->count());
+    }
+
+    public function testWhereNested()
+    {
+        $results = DB::table('posts')->where('content', 'Lorem Ipsum.')->whereNested(function ($query) {
+            $query->where('title', 'Foo Post')
+                ->orWhere('title', 'Bar Post');
+        })->count();
+        $this->assertSame(2, $results);
     }
 
     public function testPaginateWithSpecificColumns()

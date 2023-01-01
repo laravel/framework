@@ -430,6 +430,26 @@ class RouteRegistrarTest extends TestCase
         $this->seeResponse('hello', Request::create('bar/baz', 'GET'));
     }
 
+    public function testRouteGroupChaining()
+    {
+        $this->router
+            ->group([], function ($router) {
+                $router->get('foo', function () {
+                    return 'hello';
+                });
+            })
+            ->group([], function ($router) {
+                $router->get('bar', function () {
+                    return 'goodbye';
+                });
+            });
+
+        $routeCollection = $this->router->getRoutes();
+
+        $this->assertInstanceOf(\Illuminate\Routing\Route::class, $routeCollection->match(Request::create('foo', 'GET')));
+        $this->assertInstanceOf(\Illuminate\Routing\Route::class, $routeCollection->match(Request::create('bar', 'GET')));
+    }
+
     public function testRegisteringNonApprovedAttributesThrows()
     {
         $this->expectException(BadMethodCallException::class);
@@ -851,6 +871,155 @@ class RouteRegistrarTest extends TestCase
         }
     }
 
+    public function testWhereInRegistration()
+    {
+        $wheres = ['foo' => 'one|two', 'bar' => 'one|two'];
+
+        $this->router->get('/{foo}/{bar}')->whereIn(['foo', 'bar'], ['one', 'two']);
+        $this->router->get('/api/{bar}/{foo}')->whereIn(['bar', 'foo'], ['one', 'two']);
+
+        /** @var \Illuminate\Routing\Route $route */
+        foreach ($this->router->getRoutes() as $route) {
+            $this->assertEquals($wheres, $route->wheres);
+        }
+    }
+
+    public function testGroupWhereNumberRegistrationOnRouteRegistrar()
+    {
+        $wheres = ['foo' => '[0-9]+', 'bar' => '[0-9]+'];
+
+        $this->router->prefix('/{foo}/{bar}')->whereNumber(['foo', 'bar'])->group(function ($router) {
+            $router->get('/');
+        });
+
+        $this->router->prefix('/api/{bar}/{foo}')->whereNumber(['bar', 'foo'])->group(function ($router) {
+            $router->get('/');
+        });
+
+        /** @var \Illuminate\Routing\Route $route */
+        foreach ($this->router->getRoutes() as $route) {
+            $this->assertEquals($wheres, $route->wheres);
+        }
+    }
+
+    public function testGroupWhereAlphaRegistrationOnRouteRegistrar()
+    {
+        $wheres = ['foo' => '[a-zA-Z]+', 'bar' => '[a-zA-Z]+'];
+
+        $this->router->prefix('/{foo}/{bar}')->whereAlpha(['foo', 'bar'])->group(function ($router) {
+            $router->get('/');
+        });
+
+        $this->router->prefix('/api/{bar}/{foo}')->whereAlpha(['bar', 'foo'])->group(function ($router) {
+            $router->get('/');
+        });
+
+        /** @var \Illuminate\Routing\Route $route */
+        foreach ($this->router->getRoutes() as $route) {
+            $this->assertEquals($wheres, $route->wheres);
+        }
+    }
+
+    public function testGroupWhereAlphaNumericRegistrationOnRouteRegistrar()
+    {
+        $wheres = ['1a2b3c' => '[a-zA-Z0-9]+'];
+
+        $this->router->prefix('/{foo}')->whereAlphaNumeric(['1a2b3c'])->group(function ($router) {
+            $router->get('/');
+        });
+
+        /** @var \Illuminate\Routing\Route $route */
+        foreach ($this->router->getRoutes() as $route) {
+            $this->assertEquals($wheres, $route->wheres);
+        }
+    }
+
+    public function testGroupWhereInRegistrationOnRouteRegistrar()
+    {
+        $wheres = ['foo' => 'one|two', 'bar' => 'one|two'];
+
+        $this->router->prefix('/{foo}/{bar}')->whereIn(['foo', 'bar'], ['one', 'two'])->group(function ($router) {
+            $router->get('/');
+        });
+
+        $this->router->prefix('/api/{bar}/{foo}')->whereIn(['bar', 'foo'], ['one', 'two'])->group(function ($router) {
+            $router->get('/');
+        });
+
+        /** @var \Illuminate\Routing\Route $route */
+        foreach ($this->router->getRoutes() as $route) {
+            $this->assertEquals($wheres, $route->wheres);
+        }
+    }
+
+    public function testGroupWhereNumberRegistrationOnRouter()
+    {
+        $wheres = ['foo' => '[0-9]+', 'bar' => '[0-9]+'];
+
+        $this->router->whereNumber(['foo', 'bar'])->prefix('/{foo}/{bar}')->group(function ($router) {
+            $router->get('/');
+        });
+
+        $this->router->whereNumber(['bar', 'foo'])->prefix('/api/{bar}/{foo}')->group(function ($router) {
+            $router->get('/');
+        });
+
+        /** @var \Illuminate\Routing\Route $route */
+        foreach ($this->router->getRoutes() as $route) {
+            $this->assertEquals($wheres, $route->wheres);
+        }
+    }
+
+    public function testGroupWhereAlphaRegistrationOnRouter()
+    {
+        $wheres = ['foo' => '[a-zA-Z]+', 'bar' => '[a-zA-Z]+'];
+
+        $this->router->whereAlpha(['foo', 'bar'])->prefix('/{foo}/{bar}')->group(function ($router) {
+            $router->get('/');
+        });
+
+        $this->router->whereAlpha(['bar', 'foo'])->prefix('/api/{bar}/{foo}')->group(function ($router) {
+            $router->get('/');
+        });
+
+        /** @var \Illuminate\Routing\Route $route */
+        foreach ($this->router->getRoutes() as $route) {
+            $this->assertEquals($wheres, $route->wheres);
+        }
+    }
+
+    public function testGroupWhereAlphaNumericRegistrationOnRouter()
+    {
+        $wheres = ['1a2b3c' => '[a-zA-Z0-9]+'];
+
+        $this->router->whereAlphaNumeric(['1a2b3c'])->prefix('/{foo}')->group(function ($router) {
+            $router->get('/');
+        });
+
+        /** @var \Illuminate\Routing\Route $route */
+        foreach ($this->router->getRoutes() as $route) {
+            $this->assertEquals($wheres, $route->wheres);
+        }
+    }
+
+    public function testGroupWhereInRegistrationOnRouter()
+    {
+        $wheres = ['foo' => 'one|two', 'bar' => 'one|two'];
+
+        $this->router->whereIn(['foo', 'bar'], ['one', 'two'])->prefix('/{foo}/{bar}')->group(function ($router) {
+            $router->get('/');
+        });
+
+        $this->router->whereIn(['bar', 'foo'], ['one', 'two'])->prefix('/api/{bar}/{foo}')->group(function ($router) {
+            $router->get('/');
+        });
+
+        /** @var \Illuminate\Routing\Route $route */
+        foreach ($this->router->getRoutes() as $route) {
+            $this->assertEquals($wheres, $route->wheres);
+        }
+    }
+
     public function testCanSetRouteName()
     {
         $this->router->as('users.index')->get('users', function () {
@@ -869,6 +1038,54 @@ class RouteRegistrarTest extends TestCase
 
         $this->seeResponse('all-users', Request::create('users', 'GET'));
         $this->assertSame('users.index', $this->getRoute()->getName());
+    }
+
+    public function testPushMiddlewareToGroup()
+    {
+        $this->router->middlewareGroup('web', []);
+        $this->router->pushMiddlewareToGroup('web', 'test-middleware');
+
+        $this->assertEquals(['test-middleware'], $this->router->getMiddlewareGroups()['web']);
+    }
+
+    public function testPushMiddlewareToGroupUnregisteredGroup()
+    {
+        $this->router->pushMiddlewareToGroup('web', 'test-middleware');
+
+        $this->assertEquals(['test-middleware'], $this->router->getMiddlewareGroups()['web']);
+    }
+
+    public function testPushMiddlewareToGroupDuplicatedMiddleware()
+    {
+        $this->router->pushMiddlewareToGroup('web', 'test-middleware');
+        $this->router->pushMiddlewareToGroup('web', 'test-middleware');
+
+        $this->assertEquals(['test-middleware'], $this->router->getMiddlewareGroups()['web']);
+    }
+
+    public function testCanRemoveMiddlewareFromGroup()
+    {
+        $this->router->pushMiddlewareToGroup('web', 'test-middleware');
+
+        $this->router->removeMiddlewareFromGroup('web', 'test-middleware');
+
+        $this->assertEquals([], $this->router->getMiddlewareGroups()['web']);
+    }
+
+    public function testCanRemoveMiddlewareFromGroupNotUnregisteredMiddleware()
+    {
+        $this->router->middlewareGroup('web', []);
+
+        $this->router->removeMiddlewareFromGroup('web', 'different-test-middleware');
+
+        $this->assertEquals([], $this->router->getMiddlewareGroups()['web']);
+    }
+
+    public function testCanRemoveMiddlewareFromGroupUnregisteredGroup()
+    {
+        $this->router->removeMiddlewareFromGroup('web', ['test-middleware']);
+
+        $this->assertEquals([], $this->router->getMiddlewareGroups());
     }
 
     /**

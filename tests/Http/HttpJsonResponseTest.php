@@ -23,7 +23,7 @@ class HttpJsonResponseTest extends TestCase
         $this->assertSame('bar', $response->getData()->foo);
     }
 
-    public function setAndRetrieveDataProvider()
+    public static function setAndRetrieveDataProvider()
     {
         return [
             'Jsonable data' => [new JsonResponseTestJsonableObject],
@@ -85,7 +85,7 @@ class HttpJsonResponseTest extends TestCase
         new JsonResponse(['data' => $data], 200, [], JSON_PARTIAL_OUTPUT_ON_ERROR);
     }
 
-    public function jsonErrorDataProvider()
+    public static function jsonErrorDataProvider()
     {
         // Resources can't be encoded
         $resource = tmpfile();

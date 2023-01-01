@@ -5,8 +5,10 @@ namespace Illuminate\Foundation\Console;
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Str;
 use LogicException;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
 
+#[AsCommand(name: 'make:policy')]
 class PolicyMakeCommand extends GeneratorCommand
 {
     /**
@@ -15,15 +17,6 @@ class PolicyMakeCommand extends GeneratorCommand
      * @var string
      */
     protected $name = 'make:policy';
-
-    /**
-     * The name of the console command.
-     *
-     * This name is used to identify the command during lazy loading.
-     *
-     * @var string|null
-     */
-    protected static $defaultName = 'make:policy';
 
     /**
      * The console command description.
@@ -200,6 +193,7 @@ class PolicyMakeCommand extends GeneratorCommand
     protected function getOptions()
     {
         return [
+            ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the policy already exists'],
             ['model', 'm', InputOption::VALUE_OPTIONAL, 'The model that the policy applies to'],
             ['guard', 'g', InputOption::VALUE_OPTIONAL, 'The guard that the policy relies on'],
         ];

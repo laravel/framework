@@ -38,7 +38,10 @@ class ThrottlesExceptionsWithRedisTest extends TestCase
     {
         $this->assertJobWasReleasedImmediately(CircuitBreakerWithRedisTestJob::class, $key = Str::random());
         $this->assertJobWasReleasedImmediately(CircuitBreakerWithRedisTestJob::class, $key);
-        $this->assertJobWasReleasedWithDelay(CircuitBreakerWithRedisTestJob::class, $key);
+
+        retry(2, function () use ($key) {
+            $this->assertJobWasReleasedWithDelay(CircuitBreakerWithRedisTestJob::class, $key);
+        });
     }
 
     public function testCircuitStaysClosedForSuccessfulJobs()
@@ -54,7 +57,10 @@ class ThrottlesExceptionsWithRedisTest extends TestCase
         $this->assertJobRanSuccessfully(CircuitBreakerWithRedisSuccessfulJob::class, $key);
         $this->assertJobWasReleasedImmediately(CircuitBreakerWithRedisTestJob::class, $key);
         $this->assertJobWasReleasedImmediately(CircuitBreakerWithRedisTestJob::class, $key);
-        $this->assertJobWasReleasedWithDelay(CircuitBreakerWithRedisTestJob::class, $key);
+
+        retry(2, function () use ($key) {
+            $this->assertJobWasReleasedWithDelay(CircuitBreakerWithRedisTestJob::class, $key);
+        });
     }
 
     protected function assertJobWasReleasedImmediately($class, $key)
@@ -123,6 +129,8 @@ class CircuitBreakerWithRedisTestJob
 
     public static $handled = false;
 
+    public $key;
+
     public function __construct($key)
     {
         $this->key = $key;
@@ -146,6 +154,8 @@ class CircuitBreakerWithRedisSuccessfulJob
     use InteractsWithQueue, Queueable;
 
     public static $handled = false;
+
+    public $key;
 
     public function __construct($key)
     {

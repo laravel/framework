@@ -34,7 +34,7 @@ class Builder
     /**
      * The default string length for migrations.
      *
-     * @var int
+     * @var int|null
      */
     public static $defaultStringLength = 255;
 
@@ -44,6 +44,13 @@ class Builder
      * @var string
      */
     public static $defaultMorphKeyType = 'int';
+
+    /**
+     * Indicates whether Doctrine DBAL usage will be prevented if possible when dropping and renaming columns.
+     *
+     * @var bool
+     */
+    public static $alwaysUsesNativeSchemaOperationsIfPossible = false;
 
     /**
      * Create a new database Schema manager.
@@ -78,8 +85,8 @@ class Builder
      */
     public static function defaultMorphKeyType(string $type)
     {
-        if (! in_array($type, ['int', 'uuid'])) {
-            throw new InvalidArgumentException("Morph key type must be 'int' or 'uuid'.");
+        if (! in_array($type, ['int', 'uuid', 'ulid'])) {
+            throw new InvalidArgumentException("Morph key type must be 'int', 'uuid', or 'ulid'.");
         }
 
         static::$defaultMorphKeyType = $type;
@@ -93,6 +100,27 @@ class Builder
     public static function morphUsingUuids()
     {
         return static::defaultMorphKeyType('uuid');
+    }
+
+    /**
+     * Set the default morph key type for migrations to ULIDs.
+     *
+     * @return void
+     */
+    public static function morphUsingUlids()
+    {
+        return static::defaultMorphKeyType('ulid');
+    }
+
+    /**
+     * Attempt to use native schema operations for dropping and renaming columns, even if Doctrine DBAL is installed.
+     *
+     * @param  bool  $value
+     * @return void
+     */
+    public static function useNativeSchemaOperationsIfPossible(bool $value = true)
+    {
+        static::$alwaysUsesNativeSchemaOperationsIfPossible = $value;
     }
 
     /**
@@ -168,6 +196,36 @@ class Builder
         }
 
         return true;
+    }
+
+    /**
+     * Execute a table builder callback if the given table has a given column.
+     *
+     * @param  string  $table
+     * @param  string  $column
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public function whenTableHasColumn(string $table, string $column, Closure $callback)
+    {
+        if ($this->hasColumn($table, $column)) {
+            $this->table($table, fn (Blueprint $table) => $callback($table));
+        }
+    }
+
+    /**
+     * Execute a table builder callback if the given table doesn't have a given column.
+     *
+     * @param  string  $table
+     * @param  string  $column
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public function whenTableDoesntHaveColumn(string $table, string $column, Closure $callback)
+    {
+        if (! $this->hasColumn($table, $column)) {
+            $this->table($table, fn (Blueprint $table) => $callback($table));
+        }
     }
 
     /**

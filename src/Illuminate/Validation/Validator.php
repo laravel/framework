@@ -210,6 +210,7 @@ class Validator implements ValidatorContract
         'Present',
         'Required',
         'RequiredIf',
+        'RequiredIfAccepted',
         'RequiredUnless',
         'RequiredWith',
         'RequiredWithAll',
@@ -231,6 +232,7 @@ class Validator implements ValidatorContract
         'Different',
         'ExcludeIf',
         'ExcludeUnless',
+        'ExcludeWith',
         'ExcludeWithout',
         'Gt',
         'Gte',
@@ -239,6 +241,7 @@ class Validator implements ValidatorContract
         'AcceptedIf',
         'DeclinedIf',
         'RequiredIf',
+        'RequiredIfAccepted',
         'RequiredUnless',
         'RequiredWith',
         'RequiredWithAll',
@@ -257,7 +260,7 @@ class Validator implements ValidatorContract
      *
      * @var string[]
      */
-    protected $excludeRules = ['Exclude', 'ExcludeIf', 'ExcludeUnless', 'ExcludeWithout'];
+    protected $excludeRules = ['Exclude', 'ExcludeIf', 'ExcludeUnless', 'ExcludeWith', 'ExcludeWithout'];
 
     /**
      * The size related validation rules.
@@ -380,9 +383,7 @@ class Validator implements ValidatorContract
      */
     public function after($callback)
     {
-        $this->after[] = function () use ($callback) {
-            return $callback($this);
-        };
+        $this->after[] = fn () => $callback($this);
 
         return $this;
     }
@@ -811,15 +812,21 @@ class Validator implements ValidatorContract
         }
 
         if (! $rule->passes($attribute, $value)) {
-            $this->failedRules[$attribute][get_class($rule)] = [];
+            $ruleClass = $rule instanceof InvokableValidationRule ?
+                get_class($rule->invokable()) :
+                get_class($rule);
 
-            $messages = $this->getFromLocalArray($attribute, get_class($rule)) ?? $rule->message();
+            $this->failedRules[$attribute][$ruleClass] = [];
 
-            $messages = $messages ? (array) $messages : [get_class($rule)];
+            $messages = $this->getFromLocalArray($attribute, $ruleClass) ?? $rule->message();
 
-            foreach ($messages as $message) {
-                $this->messages->add($attribute, $this->makeReplacements(
-                    $message, $attribute, get_class($rule), []
+            $messages = $messages ? (array) $messages : [$ruleClass];
+
+            foreach ($messages as $key => $message) {
+                $key = is_string($key) ? $key : $attribute;
+
+                $this->messages->add($key, $this->makeReplacements(
+                    $message, $key, $ruleClass, []
                 ));
             }
         }
@@ -866,18 +873,16 @@ class Validator implements ValidatorContract
             $this->passes();
         }
 
-        $attribute = str_replace(
-            [$this->dotPlaceholder, '__asterisk__'],
-            ['.', '*'],
-            $attribute
-        );
+        $attributeWithPlaceholders = $attribute;
+
+        $attribute = $this->replacePlaceholderInString($attribute);
 
         if (in_array($rule, $this->excludeRules)) {
             return $this->excludeAttribute($attribute);
         }
 
         $this->messages->add($attribute, $this->makeReplacements(
-            $this->getMessage($attribute, $rule), $attribute, $rule, $parameters
+            $this->getMessage($attributeWithPlaceholders, $rule), $attribute, $rule, $parameters
         ));
 
         $this->failedRules[$attribute][$rule] = $parameters;

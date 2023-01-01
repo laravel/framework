@@ -4,8 +4,10 @@ namespace Illuminate\Database\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
 
+#[AsCommand(name: 'db:wipe')]
 class WipeCommand extends Command
 {
     use ConfirmableTrait;
@@ -16,15 +18,6 @@ class WipeCommand extends Command
      * @var string
      */
     protected $name = 'db:wipe';
-
-    /**
-     * The name of the console command.
-     *
-     * This name is used to identify the command during lazy loading.
-     *
-     * @var string|null
-     */
-    protected static $defaultName = 'db:wipe';
 
     /**
      * The console command description.
@@ -49,17 +42,17 @@ class WipeCommand extends Command
         if ($this->option('drop-views')) {
             $this->dropAllViews($database);
 
-            $this->info('Dropped all views successfully.');
+            $this->components->info('Dropped all views successfully.');
         }
 
         $this->dropAllTables($database);
 
-        $this->info('Dropped all tables successfully.');
+        $this->components->info('Dropped all tables successfully.');
 
         if ($this->option('drop-types')) {
             $this->dropAllTypes($database);
 
-            $this->info('Dropped all types successfully.');
+            $this->components->info('Dropped all types successfully.');
         }
 
         return 0;

@@ -160,6 +160,18 @@ class EncrypterTest extends TestCase
         $e->decrypt($payload);
     }
 
+    public function testDecryptionExceptionIsThrownWhenUnexpectedTagIsAdded()
+    {
+        $this->expectException(DecryptException::class);
+        $this->expectExceptionMessage('Unable to use tag because the cipher algorithm does not support AEAD.');
+
+        $e = new Encrypter(str_repeat('a', 16));
+        $payload = $e->encrypt('foo');
+        $decodedPayload = json_decode(base64_decode($payload));
+        $decodedPayload->tag = 'set-manually';
+        $e->decrypt(base64_encode(json_encode($decodedPayload)));
+    }
+
     public function testExceptionThrownWithDifferentKey()
     {
         $this->expectException(DecryptException::class);
@@ -191,5 +203,33 @@ class EncrypterTest extends TestCase
         $this->assertTrue(Encrypter::supported($key, 'AES-128-GCM'));
         $this->assertTrue(Encrypter::supported($key, 'aes-128-CBC'));
         $this->assertTrue(Encrypter::supported($key, 'aes-128-cbc'));
+    }
+
+    public function provideTamperedData()
+    {
+        $validIv = base64_encode(str_repeat('.', 16));
+
+        return [
+            [['iv' => ['value_in_array'], 'value' => '', 'mac' => '']],
+            [['iv' => new class() {}, 'value' => '', 'mac' => '']],
+            [['iv' => $validIv, 'value' => ['value_in_array'], 'mac' => '']],
+            [['iv' => $validIv, 'value' => new class() {}, 'mac' => '']],
+            [['iv' => $validIv, 'value' => '', 'mac' => ['value_in_array']]],
+            [['iv' => $validIv, 'value' => '', 'mac' => null]],
+            [['iv' => $validIv, 'value' => '', 'mac' => '', 'tag' => ['value_in_array']]],
+            [['iv' => $validIv, 'value' => '', 'mac' => '', 'tag' => -1]],
+        ];
+    }
+
+    /**
+     * @dataProvider provideTamperedData
+     */
+    public function testTamperedPayloadWillGetRejected($payload)
+    {
+        $this->expectException(DecryptException::class);
+        $this->expectExceptionMessage('The payload is invalid.');
+
+        $enc = new Encrypter(str_repeat('x', 16));
+        $enc->decrypt(base64_encode(json_encode($payload)));
     }
 }

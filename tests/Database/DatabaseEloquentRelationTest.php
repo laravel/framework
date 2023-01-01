@@ -269,20 +269,6 @@ class DatabaseEloquentRelationTest extends TestCase
         $this->assertSame('foo', $result);
     }
 
-    public function testRelationResolvers()
-    {
-        $model = new EloquentRelationResetModelStub;
-        $builder = m::mock(Builder::class);
-        $builder->shouldReceive('getModel')->andReturn($model);
-
-        EloquentRelationResetModelStub::resolveRelationUsing('customer', function ($model) use ($builder) {
-            return new EloquentResolverRelationStub($builder, $model);
-        });
-
-        $this->assertInstanceOf(EloquentResolverRelationStub::class, $model->customer());
-        $this->assertSame(['key' => 'value'], $model->customer);
-    }
-
     public function testIsRelationIgnoresAttribute()
     {
         $model = new EloquentRelationAndAtrributeModelStub;
@@ -351,14 +337,6 @@ class EloquentNoTouchingAnotherModelStub extends Model
     protected $attributes = [
         'id' => 2,
     ];
-}
-
-class EloquentResolverRelationStub extends EloquentRelationStub
-{
-    public function getResults()
-    {
-        return ['key' => 'value'];
-    }
 }
 
 class EloquentRelationAndAtrributeModelStub extends Model

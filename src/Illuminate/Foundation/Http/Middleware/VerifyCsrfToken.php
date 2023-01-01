@@ -146,7 +146,7 @@ class VerifyCsrfToken
      * Get the CSRF token from the request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return string
+     * @return string|null
      */
     protected function getTokenFromRequest($request)
     {
@@ -188,14 +188,31 @@ class VerifyCsrfToken
             $response = $response->toResponse($request);
         }
 
-        $response->headers->setCookie(
-            new Cookie(
-                'XSRF-TOKEN', $request->session()->token(), $this->availableAt(60 * $config['lifetime']),
-                $config['path'], $config['domain'], $config['secure'], false, false, $config['same_site'] ?? null
-            )
-        );
+        $response->headers->setCookie($this->newCookie($request, $config));
 
         return $response;
+    }
+
+    /**
+     * Create a new "XSRF-TOKEN" cookie that contains the CSRF token.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  array  $config
+     * @return \Symfony\Component\HttpFoundation\Cookie
+     */
+    protected function newCookie($request, $config)
+    {
+        return new Cookie(
+            'XSRF-TOKEN',
+            $request->session()->token(),
+            $this->availableAt(60 * $config['lifetime']),
+            $config['path'],
+            $config['domain'],
+            $config['secure'],
+            false,
+            false,
+            $config['same_site'] ?? null
+        );
     }
 
     /**

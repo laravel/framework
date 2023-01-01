@@ -17,7 +17,7 @@ class TranslationMessageSelectorTest extends TestCase
         $this->assertEquals($expected, $selector->choose($id, $number, 'en'));
     }
 
-    public function chooseTestData()
+    public static function chooseTestData()
     {
         return [
             ['first', 'first', 1],

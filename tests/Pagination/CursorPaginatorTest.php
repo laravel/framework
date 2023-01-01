@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Pagination;
 
 use Illuminate\Pagination\Cursor;
 use Illuminate\Pagination\CursorPaginator;
+use Illuminate\Support\Collection;
 use PHPUnit\Framework\TestCase;
 
 class CursorPaginatorTest extends TestCase
@@ -76,6 +77,47 @@ class CursorPaginatorTest extends TestCase
 
         $this->assertInstanceOf(CursorPaginator::class, $p);
         $this->assertSame([['id' => 6], ['id' => 7]], $p->items());
+    }
+
+    public function testLengthAwarePaginatorisOnFirstAndLastPage()
+    {
+        $paginator = new CursorPaginator([['id' => 1], ['id' => 2], ['id' => 3], ['id' => 4]], 2, null, [
+            'parameters' => ['id'],
+        ]);
+
+        $this->assertTrue($paginator->onFirstPage());
+        $this->assertFalse($paginator->onLastPage());
+
+        $cursor = new Cursor(['id' => 3]);
+        $paginator = new CursorPaginator([['id' => 3], ['id' => 4]], 2, $cursor, [
+            'parameters' => ['id'],
+        ]);
+
+        $this->assertFalse($paginator->onFirstPage());
+        $this->assertTrue($paginator->onLastPage());
+    }
+
+    public function testReturnEmptyCursorWhenItemsAreEmpty()
+    {
+        $cursor = new Cursor(['id' => 25], true);
+
+        $p = new CursorPaginator(Collection::make(), 25, $cursor, [
+            'path' => 'http://website.com/test',
+            'cursorName' => 'cursor',
+            'parameters' => ['id'],
+        ]);
+
+        $this->assertInstanceOf(CursorPaginator::class, $p);
+
+        $this->assertSame([
+            'data' => [],
+            'path' => 'http://website.com/test',
+            'per_page' => 25,
+            'next_cursor' => null,
+            'next_page_url' => null,
+            'prev_cursor' => null,
+            'prev_page_url' => null,
+        ], $p->toArray());
     }
 
     protected function getCursor($params, $isNext = true)
