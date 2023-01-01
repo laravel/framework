@@ -10,6 +10,7 @@ use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\View\Strategies\{AppendStrategy, OverrideStrategy};
 use IteratorAggregate;
 use Traversable;
 
@@ -25,6 +26,14 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
     protected $attributes = [];
 
     /**
+     * An array of default merge strategies.
+     *
+     * @var array
+     */
+
+    protected $strategies = [];
+
+    /**
      * Create a new component attribute bag instance.
      *
      * @param  array  $attributes
@@ -33,6 +42,10 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
     public function __construct(array $attributes = [])
     {
         $this->attributes = $attributes;
+
+        $this->strategies = config('view.strategies', [
+            "class" => AppendStrategy::class,
+        ]);
     }
 
     /**
@@ -215,9 +228,10 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
      *
      * @param  array  $attributeDefaults
      * @param  bool  $escape
+     * @param  array  $strategyOverrides
      * @return static
      */
-    public function merge(array $attributeDefaults = [], $escape = true)
+    public function merge(array $attributeDefaults = [], array $strategyOverrides = [], $escape = true)
     {
         $attributeDefaults = array_map(function ($value) use ($escape) {
             return $this->shouldEscapeAttributeValue($escape, $value)
@@ -225,20 +239,15 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
                         : $value;
         }, $attributeDefaults);
 
-        [$appendableAttributes, $nonAppendableAttributes] = collect($this->attributes)
-                    ->partition(function ($value, $key) use ($attributeDefaults) {
-                        return $key === 'class' ||
-                               (isset($attributeDefaults[$key]) &&
-                                $attributeDefaults[$key] instanceof AppendableAttributeValue);
-                    });
+        // TODO: Decomission AppendableAttributeValue since it is no longer necessary.
 
-        $attributes = $appendableAttributes->mapWithKeys(function ($value, $key) use ($attributeDefaults, $escape) {
+        $attributes = collect($this->attributes)->mapWithKeys(function ($value, $key) use ($attributeDefaults, $strategyOverrides, $escape) {
             $defaultsValue = isset($attributeDefaults[$key]) && $attributeDefaults[$key] instanceof AppendableAttributeValue
                         ? $this->resolveAppendableAttributeDefault($attributeDefaults, $key, $escape)
                         : ($attributeDefaults[$key] ?? '');
 
-            return [$key => implode(' ', array_unique(array_filter([$defaultsValue, $value])))];
-        })->merge($nonAppendableAttributes)->all();
+            return [$key => $this->resolveAttributeMergeStrategy($strategyOverrides, $key)($defaultsValue, $value)];
+        })->all();
 
         return new static(array_merge($attributeDefaults, $attributes));
     }
@@ -287,6 +296,20 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
         }
 
         return $value;
+    }
+
+    /**
+     * Resolve an attribute's merge strategy.
+     *
+     * @param array $strategyOverrides
+     * @param string $key
+     * @return string
+     */
+    protected function resolveAttributeMergeStrategy($strategyOverrides, $key)
+    {
+        $strategies = array_merge($this->strategies, $strategyOverrides);
+
+        return isset($strategies[$key]) ? new $strategies[$key] : new OverrideStrategy;
     }
 
     /**
