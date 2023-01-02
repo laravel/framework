@@ -12,12 +12,12 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Cache\CacheManager forgetDriver(array|string|null $name = null)
  * @method static void purge(string|null $name = null)
  * @method static \Illuminate\Cache\CacheManager extend(string $driver, \Closure $callback)
- * @method static bool has(array|string $key)
+ * @method static bool has(string $key)
  * @method static bool missing(string $key)
- * @method static (TCacheValue get(array|string $key, TCacheValue|(\Closure(): TCacheValue) $default = null)
+ * @method static mixed get(array|string $key, mixed $default = null)
  * @method static array many(array $keys)
- * @method static iterable getMultiple(iterable<string> $keys, mixed $default = null)
- * @method static (TCacheValue pull(array|string $key, TCacheValue|(\Closure(): TCacheValue) $default = null)
+ * @method static iterable getMultiple(iterable $keys, mixed $default = null)
+ * @method static mixed pull(string $key, mixed $default = null)
  * @method static bool put(array|string $key, mixed $value, \DateTimeInterface|\DateInterval|int|null $ttl = null)
  * @method static bool set(string $key, mixed $value, null|int|\DateInterval $ttl = null)
  * @method static bool putMany(array $values, \DateTimeInterface|\DateInterval|int|null $ttl = null)
@@ -26,12 +26,12 @@ namespace Illuminate\Support\Facades;
  * @method static int|bool increment(string $key, mixed $value = 1)
  * @method static int|bool decrement(string $key, mixed $value = 1)
  * @method static bool forever(string $key, mixed $value)
- * @method static TCacheValue remember(string $key, \Closure|\DateTimeInterface|\DateInterval|int|null $ttl, \Closure(): TCacheValue $callback)
- * @method static TCacheValue sear(string $key, \Closure(): TCacheValue $callback)
- * @method static TCacheValue rememberForever(string $key, \Closure(): TCacheValue $callback)
+ * @method static mixed remember(string $key, \Closure|\DateTimeInterface|\DateInterval|int|null $ttl, \Closure $callback)
+ * @method static mixed sear(string $key, \Closure $callback)
+ * @method static mixed rememberForever(string $key, \Closure $callback)
  * @method static bool forget(string $key)
  * @method static bool delete(string $key)
- * @method static bool deleteMultiple(iterable<string> $keys)
+ * @method static bool deleteMultiple(iterable $keys)
  * @method static bool clear()
  * @method static \Illuminate\Cache\TaggedCache tags(array|mixed $names)
  * @method static bool supportsTags()
@@ -51,6 +51,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Contracts\Cache\Lock restoreLock(string $name, string $owner)
  *
  * @see \Illuminate\Cache\CacheManager
+ * @mixin \Illuminate\Cache\Repository
  */
 class Cache extends Facade
 {
