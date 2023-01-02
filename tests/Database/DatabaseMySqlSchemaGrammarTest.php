@@ -850,7 +850,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->dateTime('foo')->useCurrent();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table `users` add `foo` datetime default CURRENT_TIMESTAMP not null', $statements[0]);
+        $this->assertSame('alter table `users` add `foo` datetime not null default CURRENT_TIMESTAMP', $statements[0]);
     }
 
     public function testAddingDateTimeWithOnUpdateCurrent()
@@ -859,7 +859,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->dateTime('foo')->useCurrentOnUpdate();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table `users` add `foo` datetime on update CURRENT_TIMESTAMP not null', $statements[0]);
+        $this->assertSame('alter table `users` add `foo` datetime not null on update CURRENT_TIMESTAMP', $statements[0]);
     }
 
     public function testAddingDateTimeWithDefaultCurrentAndOnUpdateCurrent()
@@ -868,7 +868,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->dateTime('foo')->useCurrent()->useCurrentOnUpdate();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table `users` add `foo` datetime default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP not null', $statements[0]);
+        $this->assertSame('alter table `users` add `foo` datetime not null default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP', $statements[0]);
     }
 
     public function testAddingDateTimeWithDefaultCurrentOnUpdateCurrentAndPrecision()
@@ -877,7 +877,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->dateTime('foo', 3)->useCurrent()->useCurrentOnUpdate();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table `users` add `foo` datetime(3) default CURRENT_TIMESTAMP(3) on update CURRENT_TIMESTAMP(3) not null', $statements[0]);
+        $this->assertSame('alter table `users` add `foo` datetime(3) not null default CURRENT_TIMESTAMP(3) on update CURRENT_TIMESTAMP(3)', $statements[0]);
     }
 
     public function testAddingDateTimeTz()
@@ -964,7 +964,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->timestamp('created_at', 1)->useCurrent();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table `users` add `created_at` timestamp(1) default CURRENT_TIMESTAMP(1) not null', $statements[0]);
+        $this->assertSame('alter table `users` add `created_at` timestamp(1) not null default CURRENT_TIMESTAMP(1)', $statements[0]);
     }
 
     public function testAddingTimestampWithOnUpdateCurrentSpecifyingPrecision()
@@ -973,7 +973,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->timestamp('created_at', 1)->useCurrentOnUpdate();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table `users` add `created_at` timestamp(1) on update CURRENT_TIMESTAMP(1) not null', $statements[0]);
+        $this->assertSame('alter table `users` add `created_at` timestamp(1) not null on update CURRENT_TIMESTAMP(1)', $statements[0]);
     }
 
     public function testAddingTimestampWithDefaultCurrentAndOnUpdateCurrentSpecifyingPrecision()
@@ -982,7 +982,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->timestamp('created_at', 1)->useCurrent()->useCurrentOnUpdate();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table `users` add `created_at` timestamp(1) default CURRENT_TIMESTAMP(1) on update CURRENT_TIMESTAMP(1) not null', $statements[0]);
+        $this->assertSame('alter table `users` add `created_at` timestamp(1) not null default CURRENT_TIMESTAMP(1) on update CURRENT_TIMESTAMP(1)', $statements[0]);
     }
 
     public function testAddingTimestampTz()
