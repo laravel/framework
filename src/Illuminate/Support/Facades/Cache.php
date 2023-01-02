@@ -12,7 +12,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Cache\CacheManager forgetDriver(array|string|null $name = null)
  * @method static void purge(string|null $name = null)
  * @method static \Illuminate\Cache\CacheManager extend(string $driver, \Closure $callback)
- * @method static bool has(string $key)
+ * @method static bool has(array|string $key)
  * @method static bool missing(string $key)
  * @method static mixed get(array|string $key, mixed $default = null)
  * @method static array many(array $keys)
