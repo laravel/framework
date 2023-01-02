@@ -1472,8 +1472,8 @@ class HttpClientTest extends TestCase
 
         try {
             $this->factory
-                ->get('http://foo.com/get')
-                ->throwIf(true);
+                ->throwIf(true)
+                ->get('http://foo.com/get');
         } catch (RequestException $e) {
             $exception = $e;
         }
@@ -1507,7 +1507,6 @@ class HttpClientTest extends TestCase
 
         try {
             $this->factory
-                ->get('http://foo.com/get')
                 ->throwIf(function ($response) {
                     $this->assertInstanceOf(Response::class, $response);
                     $this->assertSame(403, $response->status());
@@ -1519,7 +1518,8 @@ class HttpClientTest extends TestCase
 
                     $this->assertInstanceOf(RequestException::class, $e);
                     $hitThrowCallback = true;
-                });
+                })
+                ->get('http://foo.com/get');
         } catch (RequestException $e) {
             $exception = $e;
         }
@@ -1538,7 +1538,6 @@ class HttpClientTest extends TestCase
         $hitThrowCallback = false;
 
         $response = $this->factory
-            ->get('http://foo.com/get')
             ->throwIf(function ($response) {
                 $this->assertInstanceOf(Response::class, $response);
                 $this->assertSame(403, $response->status());
@@ -1546,7 +1545,8 @@ class HttpClientTest extends TestCase
                 return false;
             }, function ($response, $e) use (&$hitThrowCallback) {
                 $hitThrowCallback = true;
-            });
+            })
+            ->get('http://foo.com/get');
 
         $this->assertSame(403, $response->status());
         $this->assertFalse($hitThrowCallback);
