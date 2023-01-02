@@ -84,7 +84,7 @@ abstract class Grammar extends BaseGrammar
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
      * @param  \Illuminate\Database\Connection  $connection
-     * @return array
+     * @return array|string
      *
      * @throws \RuntimeException
      */
@@ -162,7 +162,7 @@ abstract class Grammar extends BaseGrammar
     }
 
     /**
-     * Compile the blueprint's column definitions.
+     * Compile the blueprint's added column definitions.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @return array
@@ -286,7 +286,7 @@ abstract class Grammar extends BaseGrammar
     /**
      * Wrap a value in keyword identifiers.
      *
-     * @param  \Illuminate\Database\Query\Expression|string  $value
+     * @param  \Illuminate\Support\Fluent|\Illuminate\Database\Query\Expression|string  $value
      * @param  bool  $prefixAlias
      * @return string
      */

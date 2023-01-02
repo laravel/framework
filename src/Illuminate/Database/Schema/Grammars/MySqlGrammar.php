@@ -228,6 +228,38 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Compile a change column command into a series of SQL statements.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @param  \Illuminate\Database\Connection  $connection
+     * @return array|string
+     *
+     * @throws \RuntimeException
+     */
+    public function compileChange(Blueprint $blueprint, Fluent $command, Connection $connection)
+    {
+        if ($connection->usingNativeSchemaOperations()) {
+            $columns = [];
+
+            foreach ($blueprint->getChangedColumns() as $column) {
+                $sql = sprintf('%s %s%s %s',
+                    is_null($column->renameTo) ? 'modify' : 'change',
+                    $this->wrap($column),
+                    is_null($column->renameTo) ? '' : ' '.$this->wrap($column->renameTo),
+                    $this->getType($column)
+                );
+
+                $columns[] = $this->addModifiers($sql, $blueprint, $column);
+            }
+
+            return 'alter table '.$this->wrapTable($blueprint).' '.implode(', ', $columns);
+        }
+
+        return parent::compileChange($blueprint, $command, $connection);
+    }
+
+    /**
      * Compile a primary key command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint

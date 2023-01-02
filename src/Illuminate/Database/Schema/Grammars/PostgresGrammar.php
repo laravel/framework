@@ -6,6 +6,7 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Fluent;
+use LogicException;
 
 class PostgresGrammar extends Grammar
 {
@@ -35,7 +36,7 @@ class PostgresGrammar extends Grammar
      *
      * @var string[]
      */
-    protected $fluentCommands = ['Comment', 'AutoIncrementStartingValues'];
+    protected $fluentCommands = ['AutoIncrementStartingValues', 'Comment'];
 
     /**
      * Compile a create database command.
@@ -150,6 +151,47 @@ class PostgresGrammar extends Grammar
                 $this->wrap($command->to)
             )
             : parent::compileRenameColumn($blueprint, $command, $connection);
+    }
+
+    /**
+     * Compile a change column command into a series of SQL statements.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @param  \Illuminate\Database\Connection  $connection
+     * @return array|string
+     *
+     * @throws \RuntimeException
+     */
+    public function compileChange(Blueprint $blueprint, Fluent $command, Connection $connection)
+    {
+        if ($connection->usingNativeSchemaOperations()) {
+            $columns = [];
+
+            foreach ($blueprint->getChangedColumns() as $column) {
+                $changes = ['type '.$this->getType($column).$this->modifyCollate($blueprint, $column)];
+
+                foreach ($this->modifiers as $modifier) {
+                    if ($modifier === 'Collate') {
+                        continue;
+                    }
+
+                    if (method_exists($this, $method = "modify{$modifier}")) {
+                        $constraints = (array) $this->{$method}($blueprint, $column);
+
+                        foreach ($constraints as $constraint) {
+                            $changes[] = $constraint;
+                        }
+                    }
+                }
+
+                $columns[] = implode(', ', $this->prefixArray('alter column '.$this->wrap($column), $changes));
+            }
+
+            return 'alter table '.$this->wrapTable($blueprint).' '.implode(', ', $columns);
+        }
+
+        return parent::compileChange($blueprint, $command, $connection);
     }
 
     /**
@@ -512,11 +554,11 @@ class PostgresGrammar extends Grammar
      */
     public function compileComment(Blueprint $blueprint, Fluent $command)
     {
-        if (! is_null($command->column->comment)) {
+        if (! is_null($comment = $command->column->comment) || $command->column->change) {
             return sprintf('comment on column %s.%s is %s',
                 $this->wrapTable($blueprint),
                 $this->wrap($command->column->name),
-                "'".str_replace("'", "''", $command->column->comment)."'"
+                is_null($comment) ? 'NULL' : "'".str_replace("'", "''", $comment)."'"
             );
         }
     }
@@ -1054,6 +1096,10 @@ class PostgresGrammar extends Grammar
      */
     protected function modifyNullable(Blueprint $blueprint, Fluent $column)
     {
+        if ($column->change) {
+            return $column->nullable ? 'drop not null' : 'set not null';
+        }
+
         return $column->nullable ? ' null' : ' not null';
     }
 
@@ -1066,6 +1112,10 @@ class PostgresGrammar extends Grammar
      */
     protected function modifyDefault(Blueprint $blueprint, Fluent $column)
     {
+        if ($column->change) {
+            return is_null($column->default) ? 'drop default' : 'set default '.$this->getDefaultValue($column->default);
+        }
+
         if (! is_null($column->default)) {
             return ' default '.$this->getDefaultValue($column->default);
         }
@@ -1080,7 +1130,9 @@ class PostgresGrammar extends Grammar
      */
     protected function modifyIncrement(Blueprint $blueprint, Fluent $column)
     {
-        if ((in_array($column->type, $this->serials) || ($column->generatedAs !== null)) && $column->autoIncrement) {
+        if (! $column->change
+            && (in_array($column->type, $this->serials) || ($column->generatedAs !== null))
+            && $column->autoIncrement) {
             return ' primary key';
         }
     }
@@ -1094,6 +1146,16 @@ class PostgresGrammar extends Grammar
      */
     protected function modifyVirtualAs(Blueprint $blueprint, Fluent $column)
     {
+        if ($column->change) {
+            if (array_key_exists('virtualAs', $column->getAttributes())) {
+                return is_null($column->virtualAs)
+                    ? 'drop expression if exists'
+                    : throw new LogicException('This database driver does not support modifying generated columns.');
+            }
+
+            return null;
+        }
+
         if (! is_null($column->virtualAs)) {
             return " generated always as ({$column->virtualAs})";
         }
@@ -1108,6 +1170,16 @@ class PostgresGrammar extends Grammar
      */
     protected function modifyStoredAs(Blueprint $blueprint, Fluent $column)
     {
+        if ($column->change) {
+            if (array_key_exists('storedAs', $column->getAttributes())) {
+                return is_null($column->storedAs)
+                    ? 'drop expression if exists'
+                    : throw new LogicException('This database driver does not support modifying generated columns.');
+            }
+
+            return null;
+        }
+
         if (! is_null($column->storedAs)) {
             return " generated always as ({$column->storedAs}) stored";
         }
@@ -1118,16 +1190,30 @@ class PostgresGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $column
-     * @return string|null
+     * @return string|array|null
      */
     protected function modifyGeneratedAs(Blueprint $blueprint, Fluent $column)
     {
+        $sql = null;
+
         if (! is_null($column->generatedAs)) {
-            return sprintf(
+            $sql = sprintf(
                 ' generated %s as identity%s',
                 $column->always ? 'always' : 'by default',
                 ! is_bool($column->generatedAs) && ! empty($column->generatedAs) ? " ({$column->generatedAs})" : ''
             );
         }
+
+        if ($column->change) {
+            $changes = ['drop identity if exists'];
+
+            if (! is_null($sql)) {
+                $changes[] = 'add '.$sql;
+            }
+
+            return $changes;
+        }
+
+        return $sql;
     }
 }
