@@ -1471,6 +1471,7 @@ class Container implements ArrayAccess, ContainerContract
     {
         if (! in_array($concrete, $this->buildStack, true)) {
             $this->buildStack[] = $concrete;
+
             return true;
         }
 
