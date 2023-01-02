@@ -118,13 +118,27 @@ class BoundMethod
      */
     protected static function getMethodDependencies($container, $callback, array $parameters = [])
     {
+        $shouldPopFromBuildStack = false;
+        if ( // Allows contextual binding of method parameters when buildStack is empty
+            is_array($callback) &&
+            ! empty($contextual = $container->contextual) &&
+            array_key_exists($className = get_class($callback[0]), $contextual)) {
+            $container->pushToBuildStack($className);
+            $shouldPopFromBuildStack = true;
+        }
+
         $dependencies = [];
 
         foreach (static::getCallReflector($callback)->getParameters() as $parameter) {
             static::addDependencyForCallParameter($container, $parameter, $parameters, $dependencies);
         }
+        $dependencies = array_merge($dependencies, array_values($parameters));
+        
+        if ($shouldPopFromBuildStack) {
+            $container->popFromBuildStack();
+        }
 
-        return array_merge($dependencies, array_values($parameters));
+        return $dependencies;
     }
 
     /**
