@@ -81,7 +81,7 @@ class MigratorTest extends TestCase
 
         $this->expectTwoColumnDetail('CreatePeopleTable');
         $this->expectBulletList([
-            'create table "people" ("id" integer not null primary key autoincrement, "name" varchar not null, "email" varchar not null, "password" varchar not null, "remember_token" varchar, "created_at" datetime, "updated_at" datetime)',
+            'create table "people" ("id" integer primary key autoincrement not null, "name" varchar not null, "email" varchar not null, "password" varchar not null, "remember_token" varchar, "created_at" datetime, "updated_at" datetime)',
             'create unique index "people_email_unique" on "people" ("email")',
         ]);
 
