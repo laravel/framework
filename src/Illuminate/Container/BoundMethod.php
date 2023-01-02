@@ -119,7 +119,7 @@ class BoundMethod
     protected static function getMethodDependencies($container, $callback, array $parameters = [])
     {
         $shouldPopFromBuildStack = false;
-        if ( // Allows contextual binding of method parameters when buildStack is empty
+        if ( // Allows contextual binding of method parameters when buildStack is missing the callback class
             is_array($callback) &&
             ! empty($contextual = $container->contextual) &&
             array_key_exists($className = get_class($callback[0]), $contextual)) {
@@ -133,7 +133,7 @@ class BoundMethod
             static::addDependencyForCallParameter($container, $parameter, $parameters, $dependencies);
         }
         $dependencies = array_merge($dependencies, array_values($parameters));
-        
+
         if ($shouldPopFromBuildStack) {
             $container->popFromBuildStack();
         }
