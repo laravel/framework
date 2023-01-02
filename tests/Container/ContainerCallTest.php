@@ -234,19 +234,22 @@ class ContainerCallTest extends TestCase
     {
         $sut = new Container();
 
-        $sut->pushToBuildStack('foo');
+        $pushed = $sut->pushToBuildStack('foo');
 
         $this->assertSame(['foo'], $sut->getBuildStack());
+        $this->assertTrue($pushed);
     }
 
     public function testPushToBuildStackWithAlreadyExistingEntry(): void
     {
         $sut = new Container();
 
-        $sut->pushToBuildStack('foo');
-        $sut->pushToBuildStack('foo');
+        $firstPush = $sut->pushToBuildStack('foo');
+        $secondPush = $sut->pushToBuildStack('foo');
 
         $this->assertSame(['foo'], $sut->getBuildStack());
+        $this->assertTrue($firstPush);
+        $this->assertFalse($secondPush);
     }
 
     public function testPopFromBuildStack(): void

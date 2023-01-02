@@ -123,8 +123,7 @@ class BoundMethod
             is_array($callback) &&
             ! empty($contextual = $container->contextual) &&
             array_key_exists($className = get_class($callback[0]), $contextual)) {
-            $container->pushToBuildStack($className);
-            $shouldPopFromBuildStack = true;
+            $shouldPopFromBuildStack = $container->pushToBuildStack($className);
         }
 
         $dependencies = [];

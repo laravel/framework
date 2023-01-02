@@ -1467,11 +1467,14 @@ class Container implements ArrayAccess, ContainerContract
         $this[$key] = $value;
     }
 
-    public function pushToBuildStack(string $concrete): void
+    public function pushToBuildStack(string $concrete): bool
     {
         if (! in_array($concrete, $this->buildStack, true)) {
             $this->buildStack[] = $concrete;
+            return true;
         }
+
+        return false;
     }
 
     public function getBuildStack(): array
