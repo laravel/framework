@@ -229,6 +229,38 @@ class ContainerCallTest extends TestCase
             return $foo;
         });
     }
+
+    public function testPushToBuildStack(): void
+    {
+        $sut = new Container();
+
+        $sut->pushToBuildStack('foo');
+
+        $this->assertSame(['foo'], $sut->getBuildStack());
+    }
+
+    public function testPushToBuildStackWithAlreadyExistingEntry(): void
+    {
+        $sut = new Container();
+
+        $sut->pushToBuildStack('foo');
+        $sut->pushToBuildStack('foo');
+
+        $this->assertSame(['foo'], $sut->getBuildStack());
+    }
+
+    public function testPopFromBuildStack(): void
+    {
+        $sut = new Container();
+
+        $sut->pushToBuildStack('foo');
+        $sut->pushToBuildStack('bar');
+
+        $this->assertSame('bar', $sut->popFromBuildStack());
+        $this->assertSame('foo', $sut->popFromBuildStack());
+        $this->assertNull($sut->popFromBuildStack());
+        $this->assertEmpty($sut->getBuildStack());
+    }
 }
 
 class ContainerTestCallStub

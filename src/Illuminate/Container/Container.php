@@ -89,7 +89,7 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * The stack of concretions currently being built.
      *
-     * @var array[]
+     * @var string[]
      */
     protected $buildStack = [];
 
@@ -1465,5 +1465,22 @@ class Container implements ArrayAccess, ContainerContract
     public function __set($key, $value)
     {
         $this[$key] = $value;
+    }
+
+    public function pushToBuildStack(string $concrete): void
+    {
+        if (! in_array($concrete, $this->buildStack, true)) {
+            $this->buildStack[] = $concrete;
+        }
+    }
+
+    public function getBuildStack(): array
+    {
+        return $this->buildStack;
+    }
+
+    public function popFromBuildStack(): ?string
+    {
+        return array_pop($this->buildStack);
     }
 }
