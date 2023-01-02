@@ -329,7 +329,7 @@ trait ValidatesAttributes
         try {
             return @Date::parse($value) ?: null;
         } catch (Exception $e) {
-            //
+            return null;
         }
     }
 
