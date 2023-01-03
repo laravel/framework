@@ -44,15 +44,26 @@ class BladePhpStatementsTest extends AbstractBladeTestCase
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
-    public function testStringWithParenthesisCannotBeCompiled()
+    public function testStringWithParenthesisCanBeCompiled()
     {
-        $string = "@php(\$data = ['test' => ')'])";
+        $string = "@php(\$data = ['single' => ')'])";
+        $expected = "<?php (\$data = ['single' => ')']); ?>";
 
-        $expected = "<?php (\$data = ['test' => ')']); ?>";
+        $this->assertEquals($expected, $this->compiler->compileString($string));
 
-        $actual = "<?php (\$data = ['test' => '); ?>'])";
+        $string = "@php(\$data = ['(multiple)-))' => '((-))'])";
+        $expected = "<?php (\$data = ['(multiple)-))' => '((-))']); ?>";
 
-        $this->assertEquals($actual, $this->compiler->compileString($string));
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+
+        $string = "@php(\$data = [(int)'(multiple)-))' => (bool)'((casty))'])";
+        $expected = "<?php (\$data = [(int)'(multiple)-))' => (bool)'((casty))']); ?>";
+
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+
+        $this->assertSame('<?php echo $__env->renderEach(\'foo\', \'b)a)r\'); ?>', $this->compiler->compileString('@each(\'foo\', \'b)a)r\')'));
+        $this->assertSame('<?php echo $__env->make(\'test_for\', [\'issue))\' => \'(issue#45424))\'], \Illuminate\Support\Arr::except(get_defined_vars(), [\'__data\', \'__path\']))->render(); ?>', $this->compiler->compileString('@include(\'test_for\', [\'issue))\' => \'(issue#45424))\'])'));
+        $this->assertSame('( <?php echo $__env->make(\'test_for\', [\'not_too_much))\' => \'(issue#45424))\'], \Illuminate\Support\Arr::except(get_defined_vars(), [\'__data\', \'__path\']))->render(); ?>))', $this->compiler->compileString('( @include(\'test_for\', [\'not_too_much))\' => \'(issue#45424))\'])))'));
     }
 
     public function testStringWithEmptyStringDataValue()
