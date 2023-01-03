@@ -38,3 +38,6 @@ assertType('mixed', with(new User(), function ($user) {
 assertType('mixed', with(new User(), function ($user): mixed {
     return $user;
 }));
+assertType('User', with(new User(), function ($user): User {
+    return $user;
+}));
