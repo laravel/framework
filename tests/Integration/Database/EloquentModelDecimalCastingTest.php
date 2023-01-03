@@ -7,6 +7,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 use TypeError;
+use ValueError;
 
 class EloquentModelDecimalCastingTest extends DatabaseTestCase
 {
@@ -17,6 +18,58 @@ class EloquentModelDecimalCastingTest extends DatabaseTestCase
             $table->decimal('decimal_field_2', 8, 2)->nullable();
             $table->decimal('decimal_field_4', 8, 4)->nullable();
         });
+    }
+
+    public function testItHandlesExponent()
+    {
+        $model = new class extends Model
+        {
+            public $timestamps = false;
+
+            protected $casts = [
+                'amount' => 'decimal:20',
+            ];
+        };
+
+        $model->amount = 0.123456789e3;
+        $this->assertSame('123.45678900000000000000', $model->amount);
+    }
+
+    public function testItThrowsWhenPassingExponentAsString()
+    {
+        $model = new class extends Model
+        {
+            public $timestamps = false;
+
+            protected $casts = [
+                'amount' => 'decimal:20',
+            ];
+        };
+        $model->amount = '0.1e3';
+
+        if (extension_loaded('bcmath')) {
+            $this->expectException(ValueError::class);
+        } else {
+            $this->expectException(RuntimeException::class);
+            $this->expectExceptionMessage('The "decimal" model cast is unable to handle string based floats with exponents.'); // when bcmath is not available
+        }
+
+        $model->amount;
+    }
+
+    public function testItHandlesIntegersWithUnderscores()
+    {
+        $model = new class extends Model
+        {
+            public $timestamps = false;
+
+            protected $casts = [
+                'amount' => 'decimal:2',
+            ];
+        };
+
+        $model->amount = 1_234.5;
+        $this->assertSame('1234.50', $model->amount);
     }
 
     public function testItThrowsOnNonNumericValues()
@@ -31,9 +84,31 @@ class EloquentModelDecimalCastingTest extends DatabaseTestCase
         };
         $model->amount = 'foo';
 
-        $this->expectException(TypeError::class);
+        if (extension_loaded('bcmath')) {
+            $this->expectException(ValueError::class);
+        } else {
+            $this->expectException(TypeError::class);
+        }
 
         $model->amount;
+    }
+
+    public function testItHandlesMissingIntegers()
+    {
+        $model = new class extends Model
+        {
+            public $timestamps = false;
+
+            protected $casts = [
+                'amount' => 'decimal:2',
+            ];
+        };
+
+        $model->amount = .8;
+        $this->assertSame('0.80', $model->amount);
+
+        $model->amount = '.8';
+        $this->assertSame('0.80', $model->amount);
     }
 
     public function testItHandlesLargeNumbers()
