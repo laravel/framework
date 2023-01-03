@@ -14,7 +14,6 @@ jobs:
       fail-fast: true
 
     name: Facade DocBlocks
-    if: ${{ false }}  # Disable until this supports generic annotations...
 
     steps:
       - name: Checkout code
