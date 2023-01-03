@@ -1319,15 +1319,11 @@ trait HasAttributes
      */
     protected function asDecimal($value, $decimals)
     {
-        $value = (string) $value;
-
-        if (! is_numeric($value)) {
-            throw new TypeError('$value must be numeric.');
+        if (extension_loaded('bcmath')) {
+            return bcadd($value, '0', $decimals);
+        } else {
+            return number_format($value, $decimals, '.', '');
         }
-
-        [$int, $fraction] = explode('.', $value) + [1 => ''];
-
-        return $int.'.'.Str::of($fraction)->limit($decimals, '')->padLeft($decimals, '0');
     }
 
     /**

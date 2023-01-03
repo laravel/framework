@@ -7,6 +7,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 use TypeError;
+use ValueError;
 
 class EloquentModelDecimalCastingTest extends DatabaseTestCase
 {
@@ -31,7 +32,11 @@ class EloquentModelDecimalCastingTest extends DatabaseTestCase
         };
         $model->amount = 'foo';
 
-        $this->expectException(TypeError::class);
+        if (extension_loaded('bcmath')) {
+            $this->expectException(ValueError::class);
+        } else {
+            $this->expectException(TypeError::class);
+        }
 
         $model->amount;
     }
