@@ -68,6 +68,7 @@ class ServeCommand extends Command
     public static $passthroughVariables = [
         'APP_ENV',
         'LARAVEL_SAIL',
+        'PATH',
         'PHP_CLI_SERVER_WORKERS',
         'PHP_IDE_CONFIG',
         'SYSTEMROOT',

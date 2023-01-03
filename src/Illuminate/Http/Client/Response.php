@@ -37,7 +37,7 @@ class Response implements ArrayAccess
     /**
      * The transfer stats for the request.
      *
-     * \GuzzleHttp\TransferStats|null
+     * @var \GuzzleHttp\TransferStats|null
      */
     public $transferStats;
 
@@ -329,14 +329,15 @@ class Response implements ArrayAccess
     /**
      * Throw an exception if a server or client error occurred and the given condition evaluates to true.
      *
-     * @param  bool  $condition
+     * @param  \Closure|bool  $condition
+     * @param  \Closure|null  $throwCallback
      * @return $this
      *
      * @throws \Illuminate\Http\Client\RequestException
      */
     public function throwIf($condition)
     {
-        return $condition ? $this->throw() : $this;
+        return value($condition, $this) ? $this->throw(func_get_args()[1] ?? null) : $this;
     }
 
     /**

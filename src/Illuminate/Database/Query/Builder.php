@@ -1028,6 +1028,10 @@ class Builder implements BuilderContract
 
         $this->wheres[] = compact('type', 'column', 'values', 'boolean');
 
+        if (count($values) !== count(Arr::flatten($values, 1))) {
+            throw new InvalidArgumentException('Nested arrays may not be passed to whereIn method.');
+        }
+
         // Finally, we'll add a binding for each value unless that value is an expression
         // in which case we will just skip over it since it will be the query as a raw
         // string and not as a parameterized place-holder to be replaced by the PDO.
@@ -2273,7 +2277,7 @@ class Builder implements BuilderContract
     /**
      * Put the query's results in random order.
      *
-     * @param  string  $seed
+     * @param  string|int  $seed
      * @return $this
      */
     public function inRandomOrder($seed = '')

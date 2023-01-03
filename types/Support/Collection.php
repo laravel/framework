@@ -286,7 +286,7 @@ assertType(
         }
     )
 );
-assertType('Illuminate\Support\Collection<int, User>|void', $collection->when(fn () =>'Taylor', function ($collection, $name) {
+assertType('Illuminate\Support\Collection<int, User>|void', $collection->when(fn () => 'Taylor', function ($collection, $name) {
     assertType('Illuminate\Support\Collection<int, User>', $collection);
     assertType('string', $name);
 }));
@@ -584,12 +584,12 @@ assertType('Illuminate\Support\Collection<string, int>', $collection::make(['str
         return ['string' => 1];
     }));
 
-assertType('Illuminate\Support\Collection<int, mixed>', $collection::make(['string'])
+assertType('Illuminate\Support\Collection<int, string>', $collection::make(['string'])
     ->flatMap(function ($string, $int) {
         assertType('string', $string);
         assertType('int', $int);
 
-        return 1;
+        return [0 => 'string'];
     }));
 
 assertType('Illuminate\Support\Collection<int, User>', $collection->mapInto(User::class));
@@ -855,6 +855,7 @@ assertType('Illuminate\Support\Collection<int, mixed>', $collection->make(['stri
 assertType('Illuminate\Support\Collection<int, mixed>', $collection->make(['string' => 'string'])->pluck('string', 'string'));
 
 assertType('Illuminate\Support\Collection<int, User>', $collection->reject());
+assertType('Illuminate\Support\Collection<int, User>', $collection->reject(new User));
 assertType('Illuminate\Support\Collection<int, User>', $collection->reject(function ($user) {
     assertType('User', $user);
 

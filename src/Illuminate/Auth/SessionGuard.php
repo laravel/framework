@@ -401,7 +401,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * Attempt to authenticate a user with credentials and additional callbacks.
      *
      * @param  array  $credentials
-     * @param  array|callable  $callbacks
+     * @param  array|callable|null  $callbacks
      * @param  bool  $remember
      * @return bool
      */
@@ -628,9 +628,12 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     {
         $this->session->remove($this->getName());
 
+        $this->getCookieJar()->unqueue($this->getRecallerName());
+
         if (! is_null($this->recaller())) {
-            $this->getCookieJar()->queue($this->getCookieJar()
-                    ->forget($this->getRecallerName()));
+            $this->getCookieJar()->queue(
+                $this->getCookieJar()->forget($this->getRecallerName())
+            );
         }
     }
 

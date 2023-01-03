@@ -567,6 +567,72 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
             '@endComponentClass##END-COMPONENT-CLASS##', trim($result));
     }
 
+    public function testClasslessComponentsWithAnonymousComponentPath()
+    {
+        $container = new Container;
+
+        $container->instance(Application::class, $app = m::mock(Application::class));
+        $container->instance(Factory::class, $factory = m::mock(Factory::class));
+
+        $app->shouldReceive('getNamespace')->once()->andReturn('App\\');
+
+        $factory->shouldReceive('exists')->andReturnUsing(function ($arg) {
+            return $arg === md5('test-directory').'::panel.index';
+        });
+
+        Container::setInstance($container);
+
+        $blade = m::mock(BladeCompiler::class)->makePartial();
+
+        $blade->shouldReceive('getAnonymousComponentPaths')->once()->andReturn([
+            ['path' => 'test-directory', 'prefix' => null, 'prefixHash' => md5('test-directory')],
+        ]);
+
+        $compiler = $this->compiler([], [], $blade);
+
+        $result = $compiler->compileTags('<x-panel />');
+
+        $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\View\AnonymousComponent', 'panel', ['view' => '".md5('test-directory')."::panel.index','data' => []])
+<?php if (isset(\$attributes) && \$attributes instanceof Illuminate\View\ComponentAttributeBag && \$constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php \$component->withAttributes([]); ?>\n".
+            '@endComponentClass##END-COMPONENT-CLASS##', trim($result));
+    }
+
+    public function testClasslessIndexComponentsWithAnonymousComponentPath()
+    {
+        $container = new Container;
+
+        $container->instance(Application::class, $app = m::mock(Application::class));
+        $container->instance(Factory::class, $factory = m::mock(Factory::class));
+
+        $app->shouldReceive('getNamespace')->once()->andReturn('App\\');
+
+        $factory->shouldReceive('exists')->andReturnUsing(function ($arg) {
+            return $arg === md5('test-directory').'::panel';
+        });
+
+        Container::setInstance($container);
+
+        $blade = m::mock(BladeCompiler::class)->makePartial();
+
+        $blade->shouldReceive('getAnonymousComponentPaths')->once()->andReturn([
+            ['path' => 'test-directory', 'prefix' => null, 'prefixHash' => md5('test-directory')],
+        ]);
+
+        $compiler = $this->compiler([], [], $blade);
+
+        $result = $compiler->compileTags('<x-panel />');
+
+        $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\View\AnonymousComponent', 'panel', ['view' => '".md5('test-directory')."::panel','data' => []])
+<?php if (isset(\$attributes) && \$attributes instanceof Illuminate\View\ComponentAttributeBag && \$constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php \$component->withAttributes([]); ?>\n".
+            '@endComponentClass##END-COMPONENT-CLASS##', trim($result));
+    }
+
     public function testAttributeSanitization()
     {
         $this->mockViewFactory();

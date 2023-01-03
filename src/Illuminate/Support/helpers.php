@@ -412,10 +412,11 @@ if (! function_exists('with')) {
      * Return the given value, optionally passed through the given callback.
      *
      * @template TValue
+     * @template TReturn
      *
      * @param  TValue  $value
-     * @param  (callable(TValue): TValue)|null  $callback
-     * @return TValue
+     * @param  (callable(TValue): (TReturn))|null  $callback
+     * @return ($callback is null ? TValue : TReturn)
      */
     function with($value, callable $callback = null)
     {

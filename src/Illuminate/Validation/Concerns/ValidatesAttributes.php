@@ -143,6 +143,18 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute is 7 bit ASCII.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validateAscii($attribute, $value)
+    {
+        return Str::isAscii($value);
+    }
+
+    /**
      * "Break" on first validation fail.
      *
      * Always returns true, just lets us put "bail" in rules.
@@ -287,7 +299,7 @@ trait ValidatesAttributes
             $secondDate = $this->getDateTimeWithOptionalFormat($format, $second);
         }
 
-        return ($firstDate && $secondDate) && ($this->compare($firstDate, $secondDate, $operator));
+        return ($firstDate && $secondDate) && $this->compare($firstDate, $secondDate, $operator);
     }
 
     /**
@@ -540,6 +552,36 @@ trait ValidatesAttributes
         $this->requireParameterCount(1, $parameters, 'date_equals');
 
         return $this->compareDates($attribute, $value, $parameters, '=');
+    }
+
+    /**
+     * Validate that an attribute has a given number of decimal places.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateDecimal($attribute, $value, $parameters)
+    {
+        if (! $this->validateNumeric($attribute, $value)) {
+            return false;
+        }
+
+        $this->requireParameterCount(1, $parameters, 'decimal');
+
+        $matches = [];
+
+        preg_match('/^[+-]?\d*.(\d*)$/', $value, $matches);
+
+        $decimals = strlen(end($matches));
+
+        if (! isset($parameters[1])) {
+            return $decimals == $parameters[0];
+        }
+
+        return $decimals >= $parameters[0] &&
+               $decimals <= $parameters[1];
     }
 
     /**
@@ -2137,6 +2179,18 @@ trait ValidatesAttributes
         $~ixu';
 
         return preg_match($pattern, $value) > 0;
+    }
+
+    /**
+     * Validate that an attribute is a valid ULID.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validateUlid($attribute, $value)
+    {
+        return Str::isUlid($value);
     }
 
     /**

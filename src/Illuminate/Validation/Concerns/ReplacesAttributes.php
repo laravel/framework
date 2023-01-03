@@ -71,6 +71,26 @@ trait ReplacesAttributes
     }
 
     /**
+     * Replace all place-holders for the decimal rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array<int,int>  $parameters
+     * @return string
+     */
+    protected function replaceDecimal($message, $attribute, $rule, $parameters)
+    {
+        return str_replace(
+            ':decimal',
+            isset($parameters[1])
+                ? $parameters[0].'-'.$parameters[1]
+                : $parameters[0],
+            $message
+        );
+    }
+
+    /**
      * Replace all place-holders for the different rule.
      *
      * @param  string  $message

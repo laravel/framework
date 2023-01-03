@@ -304,6 +304,8 @@ class TestEloquentModelWithCustomCast extends Model
 
 class HashCaster implements CastsInboundAttributes
 {
+    protected $algorithm;
+
     public function __construct($algorithm = 'sha256')
     {
         $this->algorithm = $algorithm;
