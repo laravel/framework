@@ -31,6 +31,7 @@ use LogicException;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionNamedType;
+use RuntimeException;
 use TypeError;
 
 trait HasAttributes
@@ -1313,21 +1314,27 @@ trait HasAttributes
     /**
      * Return a decimal as string.
      *
-     * @param  float  $value
+     * @param  float|string  $value
      * @param  int  $decimals
      * @return string
      */
     protected function asDecimal($value, $decimals)
     {
-        $value = (string) $value;
+        if (extension_loaded('bcmath')) {
+            return bcadd($value, 0, $decimals);
+        }
 
         if (! is_numeric($value)) {
             throw new TypeError('$value must be numeric.');
         }
 
+        if (is_string($value) && Str::contains($value, 'e', true)) {
+            throw new RuntimeException('The "decimal" model cast is unable to handle string based floats with exponents.');
+        }
+
         [$int, $fraction] = explode('.', $value) + [1 => ''];
 
-        return $int.'.'.Str::of($fraction)->limit($decimals, '')->padLeft($decimals, '0');
+        return Str::of($int)->padLeft('1', '0').'.'.Str::of($fraction)->limit($decimals, '')->padRight($decimals, '0');
     }
 
     /**
