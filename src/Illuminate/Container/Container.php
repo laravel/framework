@@ -648,7 +648,20 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function call($callback, array $parameters = [], $defaultMethod = null)
     {
-        return BoundMethod::call($this, $callback, $parameters, $defaultMethod);
+        $pushedToBuildStack = false;
+
+        if(is_array($callback) &&  ! in_array($className = get_class($callback[0]), $this->buildStack, true)) {
+            $this->buildStack[] = $className;
+            $pushedToBuildStack = true;
+        }
+
+        $result = BoundMethod::call($this, $callback, $parameters, $defaultMethod);
+
+        if($pushedToBuildStack){
+            array_pop($this->buildStack);
+        }
+
+        return $result;
     }
 
     /**
