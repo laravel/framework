@@ -35,9 +35,6 @@ assertType('int', with(new User(), function ($user): int {
 assertType('mixed', with(new User(), function ($user) {
     return $user;
 }));
-assertType('mixed', with(new User(), function ($user): mixed {
-    return $user;
-}));
 assertType('User', with(new User(), function ($user): User {
     return $user;
 }));
