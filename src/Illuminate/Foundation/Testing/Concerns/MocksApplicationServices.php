@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Testing\Concerns;
 
+use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Bus\Dispatcher as BusDispatcherContract;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcherContract;
 use Illuminate\Contracts\Notifications\Dispatcher as NotificationDispatcher;
@@ -283,6 +284,22 @@ trait MocksApplicationServices
 
             $this->fail('The following expected notification were not dispatched: ['.$notification.']');
         });
+
+        return $this;
+    }
+
+    /**
+     * Specify a policy that is expected to be called.
+     *
+     * @param  string  $ability
+     * @param  array|mixed  $arguments
+     * @return $this
+     */
+    protected function expectsAuthorization($ability, $arguments)
+    {
+        $mock = Mockery::mock(Gate::class)->makePartial();
+
+        $mock->shouldReceive('authorize')->with($ability, $arguments);
 
         return $this;
     }
