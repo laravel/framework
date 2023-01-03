@@ -1,6 +1,28 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.45.1...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.46.0...9.x)
+
+
+## [v9.46.0](https://github.com/laravel/framework/compare/v9.45.1...v9.46.0) - 2023-01-03
+
+### Added
+- Added Passthrough PATH variable to serve command ([#45402](https://github.com/laravel/framework/pull/45402))
+- Added whenHas to JsonResource ([#45376](https://github.com/laravel/framework/pull/45376))
+- Added ./fleet directory to .gitignore ([#45432](https://github.com/laravel/framework/pull/45432))
+- Added unless to JsonResource ([#45419](https://github.com/laravel/framework/pull/45419))
+
+### Fixed
+- Fixed credentials check ([#45437](https://github.com/laravel/framework/pull/45437))
+- Fixed decimal cast precision issue ([#45456](https://github.com/laravel/framework/pull/45456), [#45492](https://github.com/laravel/framework/pull/45492))
+- Precognitive validation with nested arrays doesn't throw validation error ([#45405](https://github.com/laravel/framework/pull/45405))
+- Fixed issue on which class to check increment and decrement methods for custom cast ([#45444](https://github.com/laravel/framework/pull/45444))
+
+### Changed
+- Update decimal validation rule to allow validation of signed numbers ([24a48b2](https://github.com/laravel/framework/commit/24a48b2fa6154b2ba2e669999e73a060f9e82080))
+- Output only unique asset / preload tags in Vite ([#45404](https://github.com/laravel/framework/pull/45404))
+- Optimize whereKey method in Query Builder ([#45453](https://github.com/laravel/framework/pull/45453))
+- Remove extra code in Model.php to optimize performance ([#45476](https://github.com/laravel/framework/pull/45476))
+- Exception Handler prepareResponse add previous Exception ([#45499](https://github.com/laravel/framework/pull/45499))
 
 
 ## [v9.45.1](https://github.com/laravel/framework/compare/v9.45.0...v9.45.1) - 2022-12-21
