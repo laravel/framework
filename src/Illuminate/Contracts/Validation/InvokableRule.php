@@ -2,6 +2,8 @@
 
 namespace Illuminate\Contracts\Validation;
 
+use Closure;
+
 interface InvokableRule
 {
     /**
@@ -12,5 +14,5 @@ interface InvokableRule
      * @param  \Closure(string): \Illuminate\Translation\PotentiallyTranslatedString  $fail
      * @return void
      */
-    public function __invoke($attribute, $value, $fail);
+    public function __invoke(string $attribute, mixed $value, Closure $fail);
 }

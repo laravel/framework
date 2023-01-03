@@ -3,68 +3,56 @@
 namespace {{ namespace }};
 
 use {{ rootNamespace }}Http\Controllers\Controller;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class {{ class }} extends Controller
 {
     /**
      * Show the form for creating the resource.
-     *
-     * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(): never
     {
         abort(404);
     }
 
     /**
      * Store the newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request): never
     {
         abort(404);
     }
 
     /**
      * Display the resource.
-     *
-     * @return \Illuminate\Http\Response
      */
-    public function show()
+    public function show(): Response
     {
         //
     }
 
     /**
      * Show the form for editing the resource.
-     *
-     * @return \Illuminate\Http\Response
      */
-    public function edit()
+    public function edit(): Response
     {
         //
     }
 
     /**
      * Update the resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
      */
-    public function update(Request $request)
+    public function update(Request $request): RedirectResponse
     {
         //
     }
 
     /**
      * Remove the resource from storage.
-     *
-     * @return \Illuminate\Http\Response
      */
-    public function destroy()
+    public function destroy(): never
     {
         abort(404);
     }
