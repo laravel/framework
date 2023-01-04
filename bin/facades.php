@@ -243,7 +243,7 @@ function resolveDocblockTypes($method, $typeNode)
     }
 
     if ($typeNode instanceof ArrayTypeNode) {
-        return 'array';
+        return resolveDocblockTypes($method, $typeNode->type).'[]';
     }
 
     if ($typeNode instanceof IdentifierTypeNode) {

@@ -12,7 +12,7 @@ namespace Illuminate\Support\Facades;
  * @method static void expire(string $name, string|null $path = null, string|null $domain = null)
  * @method static void unqueue(string $name, string|null $path = null)
  * @method static \Illuminate\Cookie\CookieJar setDefaultPathAndDomain(string $path, string $domain, bool $secure = false, string|null $sameSite = null)
- * @method static array getQueuedCookies()
+ * @method static \Symfony\Component\HttpFoundation\Cookie[] getQueuedCookies()
  * @method static \Illuminate\Cookie\CookieJar flushQueuedCookies()
  * @method static void macro(string $name, object|callable $macro)
  * @method static void mixin(object $mixin, bool $replace = true)

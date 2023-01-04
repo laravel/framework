@@ -4,7 +4,7 @@ namespace Illuminate\Support\Facades;
 
 /**
  * @method static string version()
- * @method static void bootstrapWith(array $bootstrappers)
+ * @method static void bootstrapWith(string[] $bootstrappers)
  * @method static void afterLoadingEnvironment(\Closure $callback)
  * @method static void beforeBootstrapping(string $bootstrapper, \Closure $callback)
  * @method static void afterBootstrapping(string $bootstrapper, \Closure $callback)
