@@ -505,6 +505,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected function compileStatements($template)
     {
         preg_match_all('/\B@(@?\w+(?:::\w+)?)([ \t]*)(\( ( [\S\s]*? ) \))?/x', $template, $matches);
+
         for ($i = 0; isset($matches[0][$i]); $i++) {
             $match = [
                 $matches[0][$i],
@@ -516,9 +517,12 @@ class BladeCompiler extends Compiler implements CompilerInterface
 
             // Here we check to see if we have properly found the closing parenthesis by
             // regex pattern or not, and will recursively continue on to the next ")"
-            // then check again until the tokenizer confirms we found the right one
-            while (isset($match[4]) && Str::endsWith($match[0], ')') && ! $this->isProperMatch($match[0])) {
+            // then check again until the tokenizer confirms we find the right one.
+            while (isset($match[4]) &&
+                   Str::endsWith($match[0], ')') &&
+                   ! $this->hasEvenNumberOfParentheses($match[0])) {
                 $rest = Str::before(Str::after($template, $match[0]), ')');
+
                 $match[0] = $match[0].$rest.')';
                 $match[3] = $match[3].$rest.')';
                 $match[4] = $match[4].$rest;
@@ -528,6 +532,34 @@ class BladeCompiler extends Compiler implements CompilerInterface
         }
 
         return $template;
+    }
+
+    /**
+     * Determine if the given expression has the same number of opening and closing parentheses.
+     *
+     * @param  string  $expression
+     * @return bool
+     */
+    protected function hasEvenNumberOfParentheses(string $expression)
+    {
+        $tokens = token_get_all('<?php '.$expression);
+
+        if (Arr::last($tokens) !== ')') {
+            return false;
+        }
+
+        $opening = 0;
+        $closing = 0;
+
+        foreach ($tokens as $token) {
+            if ($token == ')') {
+                $closing++;
+            } elseif ($token == '(') {
+                $opening++;
+            }
+        }
+
+        return $opening === $closing;
     }
 
     /**
@@ -919,26 +951,5 @@ class BladeCompiler extends Compiler implements CompilerInterface
     public function withoutComponentTags()
     {
         $this->compilesComponentTags = false;
-    }
-
-    protected function isProperMatch($match)
-    {
-        $tokens = token_get_all('<?php '.$match);
-
-        if (Arr::last($tokens) !== ')') {
-            return false;
-        }
-
-        $openings = 0;
-        $closings = 0;
-        foreach ($tokens as $token) {
-            if ($token == ')') {
-                $closings++;
-            } elseif ($token == '(') {
-                $openings++;
-            }
-        }
-
-        return $openings === $closings;
     }
 }
