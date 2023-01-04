@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Http;
 
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\Middleware\ValidatePostSize;
 use Illuminate\Http\Exceptions\PostTooLargeException;
@@ -15,6 +16,7 @@ use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\HtmlString;
 use Illuminate\Tests\Integration\Http\Fixtures\Author;
 use Illuminate\Tests\Integration\Http\Fixtures\AuthorResourceWithOptionalRelationship;
 use Illuminate\Tests\Integration\Http\Fixtures\EmptyPostCollectionResource;
@@ -69,6 +71,75 @@ class ResourceTest extends TestCase
                 'id' => 5,
                 'title' => 'Test Title',
             ],
+        ]);
+    }
+
+    public function testResourcesWithPropertyImplementsArrayable()
+    {
+        Route::get('/', function () {
+            return JsonResource::make([
+                'arrayable' => new class implements Arrayable
+                {
+                    public function toArray(): array
+                    {
+                        return ['Laravel', 'PHP'];
+                    }
+                },
+            ]);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertExactJson([
+            'data' => ['arrayable' => ['Laravel', 'PHP']],
+        ]);
+    }
+
+    public function testResourcesWithPropertyImplementsHtmlString()
+    {
+        Route::get('/', function () {
+            return JsonResource::make([
+                'html' => new HtmlString('<h1>Laravel</h1>'),
+            ]);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertExactJson([
+            'data' => ['html' => '<h1>Laravel</h1>'],
+        ]);
+    }
+
+    public function testResourcesWithPropertyImplementsStringable()
+    {
+        Route::get('/', function () {
+            return JsonResource::make([
+                'stringable' => new class
+                {
+                    public function __toString(): string
+                    {
+                        return 'Laravel';
+                    }
+                },
+            ]);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertExactJson([
+            'data' => ['stringable' => 'Laravel'],
         ]);
     }
 

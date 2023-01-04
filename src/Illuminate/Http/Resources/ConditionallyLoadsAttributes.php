@@ -2,8 +2,10 @@
 
 namespace Illuminate\Http\Resources;
 
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Stringable;
 
 trait ConditionallyLoadsAttributes
 {
@@ -33,12 +35,33 @@ trait ConditionallyLoadsAttributes
                 );
             }
 
-            if ($value instanceof self && is_null($value->resource)) {
-                $data[$key] = null;
-            }
+            $data[$key] = $this->prepareValue($value);
         }
 
         return $this->removeMissingValues($data);
+    }
+
+    /**
+     * Prepares the given value.
+     *
+     * @param  mixed  $value
+     * @return mixed
+     */
+    protected function prepareValue($value)
+    {
+        if ($value instanceof self && is_null($value->resource)) {
+            return null;
+        }
+
+        if ($value instanceof Arrayable) {
+            return $value->toArray();
+        }
+
+        if ($value instanceof Stringable) {
+            return $value->__toString();
+        }
+
+        return $value;
     }
 
     /**
