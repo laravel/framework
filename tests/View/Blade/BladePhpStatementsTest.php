@@ -11,6 +11,14 @@ class BladePhpStatementsTest extends AbstractBladeTestCase
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
+    public function testStringWithParenthesisWithEndPHP()
+    {
+        $string = "@php(\$data = ['related_to' => 'issue#45388'];) {{ \$data }} @endphp";
+        $expected = "<?php(\$data = ['related_to' => 'issue#45388'];) {{ \$data }} ?>";
+
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
     public function testPhpStatementsWithoutExpressionAreIgnored()
     {
         $string = '@php';
@@ -52,14 +60,6 @@ class BladePhpStatementsTest extends AbstractBladeTestCase
 
         $string = "@php(\$data = ['single' => (string)':(('])";
         $expected = "<?php (\$data = ['single' => (string)':((']); ?>";
-        $this->assertEquals($expected, $this->compiler->compileString($string));
-
-        $string = "@php(\$data = ['single' => (string)':(('])
-foo
-@php(\$data = ['single' => (string)':(('])";
-        $expected = "<?php (\$data = ['single' => (string)':((']); ?>
-foo
-<?php (\$data = ['single' => (string)':((']); ?>";
         $this->assertEquals($expected, $this->compiler->compileString($string));
 
         $string = "@php(\$data = ['single' => '(()(('])";
@@ -115,6 +115,29 @@ foo
         $string = "@php(\$data = ['test' => \"\\\"escaped\\\"\"])";
 
         $expected = "<?php (\$data = ['test' => \"\\\"escaped\\\"\"]); ?>";
+
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
+    public function testUnclosedParenthesisForBladeTags()
+    {
+        $string = "<span @class(['(']></span>";
+        $expected = "<span class=\"<?php echo \Illuminate\Support\Arr::toCssClasses([]) ?>\"(['(']></span>";
+
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+
+        $string = "<span @class(['']></span>";
+        $expected = "<span class=\"<?php echo \Illuminate\Support\Arr::toCssClasses([]) ?>\"(['']></span>";
+
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+
+        $string = "<span @class([')']></span>";
+        $expected = "<span @class([')']></span>";
+
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+
+        $string = "<span @class(['))']></span>";
+        $expected = "<span @class(['))']></span>";
 
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
