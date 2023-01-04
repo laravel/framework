@@ -123,8 +123,8 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
             $others,
             sprintf(
                 'The %s method is not supported for route %s. Supported methods: %s.',
-                $request->path(),
                 $method,
+                $request->path(),
                 implode(', ', $others)
             )
         );
