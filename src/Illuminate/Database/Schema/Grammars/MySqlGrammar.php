@@ -239,24 +239,24 @@ class MySqlGrammar extends Grammar
      */
     public function compileChange(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
-        if ($connection->usingNativeSchemaOperations()) {
-            $columns = [];
-
-            foreach ($blueprint->getChangedColumns() as $column) {
-                $sql = sprintf('%s %s%s %s',
-                    is_null($column->renameTo) ? 'modify' : 'change',
-                    $this->wrap($column),
-                    is_null($column->renameTo) ? '' : ' '.$this->wrap($column->renameTo),
-                    $this->getType($column)
-                );
-
-                $columns[] = $this->addModifiers($sql, $blueprint, $column);
-            }
-
-            return 'alter table '.$this->wrapTable($blueprint).' '.implode(', ', $columns);
+        if (! $connection->usingNativeSchemaOperations()) {
+            return parent::compileChange($blueprint, $command, $connection);
         }
 
-        return parent::compileChange($blueprint, $command, $connection);
+        $columns = [];
+
+        foreach ($blueprint->getChangedColumns() as $column) {
+            $sql = sprintf('%s %s%s %s',
+                is_null($column->renameTo) ? 'modify' : 'change',
+                $this->wrap($column),
+                is_null($column->renameTo) ? '' : ' '.$this->wrap($column->renameTo),
+                $this->getType($column)
+            );
+
+            $columns[] = $this->addModifiers($sql, $blueprint, $column);
+        }
+
+        return 'alter table '.$this->wrapTable($blueprint).' '.implode(', ', $columns);
     }
 
     /**

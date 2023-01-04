@@ -165,33 +165,33 @@ class PostgresGrammar extends Grammar
      */
     public function compileChange(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
-        if ($connection->usingNativeSchemaOperations()) {
-            $columns = [];
-
-            foreach ($blueprint->getChangedColumns() as $column) {
-                $changes = ['type '.$this->getType($column).$this->modifyCollate($blueprint, $column)];
-
-                foreach ($this->modifiers as $modifier) {
-                    if ($modifier === 'Collate') {
-                        continue;
-                    }
-
-                    if (method_exists($this, $method = "modify{$modifier}")) {
-                        $constraints = (array) $this->{$method}($blueprint, $column);
-
-                        foreach ($constraints as $constraint) {
-                            $changes[] = $constraint;
-                        }
-                    }
-                }
-
-                $columns[] = implode(', ', $this->prefixArray('alter column '.$this->wrap($column), $changes));
-            }
-
-            return 'alter table '.$this->wrapTable($blueprint).' '.implode(', ', $columns);
+        if (! $connection->usingNativeSchemaOperations()) {
+            return parent::compileChange($blueprint, $command, $connection);
         }
 
-        return parent::compileChange($blueprint, $command, $connection);
+        $columns = [];
+
+        foreach ($blueprint->getChangedColumns() as $column) {
+            $changes = ['type '.$this->getType($column).$this->modifyCollate($blueprint, $column)];
+
+            foreach ($this->modifiers as $modifier) {
+                if ($modifier === 'Collate') {
+                    continue;
+                }
+
+                if (method_exists($this, $method = "modify{$modifier}")) {
+                    $constraints = (array) $this->{$method}($blueprint, $column);
+
+                    foreach ($constraints as $constraint) {
+                        $changes[] = $constraint;
+                    }
+                }
+            }
+
+            $columns[] = implode(', ', $this->prefixArray('alter column '.$this->wrap($column), $changes));
+        }
+
+        return 'alter table '.$this->wrapTable($blueprint).' '.implode(', ', $columns);
     }
 
     /**

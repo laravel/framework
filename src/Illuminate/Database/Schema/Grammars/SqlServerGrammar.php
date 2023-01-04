@@ -146,29 +146,29 @@ class SqlServerGrammar extends Grammar
      */
     public function compileChange(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
-        if ($connection->usingNativeSchemaOperations()) {
-            $changes = [$this->compileDropDefaultConstraint($blueprint, $command)];
-
-            foreach ($blueprint->getChangedColumns() as $column) {
-                $sql = sprintf('alter table %s alter column %s %s',
-                    $this->wrapTable($blueprint),
-                    $this->wrap($column),
-                    $this->getType($column)
-                );
-
-                foreach ($this->modifiers as $modifier) {
-                    if (method_exists($this, $method = "modify{$modifier}")) {
-                        $sql .= $this->{$method}($blueprint, $column);
-                    }
-                }
-
-                $changes[] = $sql;
-            }
-
-            return $changes;
+        if (! $connection->usingNativeSchemaOperations()) {
+            return parent::compileChange($blueprint, $command, $connection);
         }
 
-        return parent::compileChange($blueprint, $command, $connection);
+        $changes = [$this->compileDropDefaultConstraint($blueprint, $command)];
+
+        foreach ($blueprint->getChangedColumns() as $column) {
+            $sql = sprintf('alter table %s alter column %s %s',
+                $this->wrapTable($blueprint),
+                $this->wrap($column),
+                $this->getType($column)
+            );
+
+            foreach ($this->modifiers as $modifier) {
+                if (method_exists($this, $method = "modify{$modifier}")) {
+                    $sql .= $this->{$method}($blueprint, $column);
+                }
+            }
+
+            $changes[] = $sql;
+        }
+
+        return $changes;
     }
 
     /**
