@@ -119,7 +119,7 @@ class Blueprint
      */
     public function toSql(Connection $connection, Grammar $grammar)
     {
-        $this->addImpliedCommands($grammar);
+        $this->addImpliedCommands($connection, $grammar);
 
         $statements = [];
 
@@ -183,10 +183,11 @@ class Blueprint
     /**
      * Add the commands that are implied by the blueprint's state.
      *
+     * @param  \Illuminate\Database\Connection  $connection
      * @param  \Illuminate\Database\Schema\Grammars\Grammar  $grammar
      * @return void
      */
-    protected function addImpliedCommands(Grammar $grammar)
+    protected function addImpliedCommands(Connection $connection, Grammar $grammar)
     {
         if (count($this->getAddedColumns()) > 0 && ! $this->creating()) {
             array_unshift($this->commands, $this->createCommand('add'));
@@ -198,7 +199,7 @@ class Blueprint
 
         $this->addFluentIndexes();
 
-        $this->addFluentCommands($grammar);
+        $this->addFluentCommands($connection, $grammar);
     }
 
     /**
@@ -236,24 +237,19 @@ class Blueprint
     /**
      * Add the fluent commands specified on any columns.
      *
+     * @param  \Illuminate\Database\Connection  $connection
      * @param  \Illuminate\Database\Schema\Grammars\Grammar  $grammar
      * @return void
      */
-    public function addFluentCommands(Grammar $grammar)
+    public function addFluentCommands(Connection $connection, Grammar $grammar)
     {
         foreach ($this->columns as $column) {
+            if ($column->change && ! $connection->usingNativeSchemaOperations()) {
+                continue;
+            }
+
             foreach ($grammar->getFluentCommands() as $commandName) {
-                $attributeName = lcfirst($commandName);
-
-                if (! isset($column->{$attributeName})) {
-                    continue;
-                }
-
-                $value = $column->{$attributeName};
-
-                $this->addCommand(
-                    $commandName, compact('value', 'column')
-                );
+                $this->addCommand($commandName, compact('column'));
             }
         }
     }
@@ -1785,35 +1781,5 @@ class Blueprint
         return array_filter($this->columns, function ($column) {
             return (bool) $column->change;
         });
-    }
-
-    /**
-     * Determine if the blueprint has auto-increment columns.
-     *
-     * @return bool
-     */
-    public function hasAutoIncrementColumn()
-    {
-        return ! is_null(collect($this->getAddedColumns())->first(function ($column) {
-            return $column->autoIncrement === true;
-        }));
-    }
-
-    /**
-     * Get the auto-increment column starting values.
-     *
-     * @return array
-     */
-    public function autoIncrementingStartingValues()
-    {
-        if (! $this->hasAutoIncrementColumn()) {
-            return [];
-        }
-
-        return collect($this->getAddedColumns())->mapWithKeys(function ($column) {
-            return $column->autoIncrement === true
-                        ? [$column->name => $column->get('startingValue', $column->get('from'))]
-                        : [$column->name => null];
-        })->filter()->all();
     }
 }

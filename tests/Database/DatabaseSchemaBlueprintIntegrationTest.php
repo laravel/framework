@@ -130,6 +130,147 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
         $this->assertEquals(['alter table "users" drop column "name"'], $blueprint->toSql($connection, new SQLiteGrammar));
     }
 
+    public function testNativeColumnModifyingOnMySql()
+    {
+        $connection = $this->db->connection();
+        $schema = $connection->getSchemaBuilder();
+
+        $schema->useNativeSchemaOperationsIfPossible();
+
+        $blueprint = new Blueprint('users', function ($table) {
+            $table->double('amount', 6, 2)->nullable()->invisible()->after('name')->change();
+            $table->timestamp('added_at', 4)->nullable(false)->useCurrent()->useCurrentOnUpdate()->change();
+            $table->enum('difficulty', ['easy', 'hard'])->default('easy')->charset('utf8mb4')->collation('unicode')->change();
+            $table->multiPolygon('positions')->srid(1234)->storedAs('expression')->change();
+            $table->string('old_name', 50)->renameTo('new_name')->change();
+            $table->bigIncrements('id')->first()->from(10)->comment('my comment')->change();
+        });
+
+        $this->assertEquals([
+            'alter table `users` '
+            .'modify `amount` double(6, 2) null invisible after `name`, '
+            .'modify `added_at` timestamp(4) not null default CURRENT_TIMESTAMP(4) on update CURRENT_TIMESTAMP(4), '
+            ."modify `difficulty` enum('easy', 'hard') character set utf8mb4 collate 'unicode' not null default 'easy', "
+            .'modify `positions` multipolygon as (expression) stored srid 1234, '
+            .'change `old_name` `new_name` varchar(50) not null, '
+            ."modify `id` bigint unsigned not null auto_increment primary key comment 'my comment' first",
+            'alter table `users` auto_increment = 10',
+        ], $blueprint->toSql($connection, new MySqlGrammar));
+    }
+
+    public function testNativeColumnModifyingOnPostgreSql()
+    {
+        $connection = $this->db->connection();
+        $schema = $connection->getSchemaBuilder();
+
+        $schema->useNativeSchemaOperationsIfPossible();
+
+        $blueprint = new Blueprint('users', function ($table) {
+            $table->integer('code')->autoIncrement()->from(10)->comment('my comment')->change();
+        });
+
+        $this->assertEquals([
+            'alter table "users" '
+            .'alter column "code" type serial, '
+            .'alter column "code" set not null, '
+            .'alter column "code" drop default, '
+            .'alter column "code" drop identity if exists',
+            'alter sequence users_code_seq restart with 10',
+            'comment on column "users"."code" is \'my comment\'',
+        ], $blueprint->toSql($connection, new PostgresGrammar));
+
+        $blueprint = new Blueprint('users', function ($table) {
+            $table->char('name', 40)->nullable()->default('easy')->collation('unicode')->change();
+        });
+
+        $this->assertEquals([
+            'alter table "users" '
+            .'alter column "name" type char(40) collate "unicode", '
+            .'alter column "name" drop not null, '
+            .'alter column "name" set default \'easy\', '
+            .'alter column "name" drop identity if exists',
+            'comment on column "users"."name" is NULL',
+        ], $blueprint->toSql($connection, new PostgresGrammar));
+
+        $blueprint = new Blueprint('users', function ($table) {
+            $table->integer('foo')->generatedAs('expression')->always()->change();
+        });
+
+        $this->assertEquals([
+            'alter table "users" '
+            .'alter column "foo" type integer, '
+            .'alter column "foo" set not null, '
+            .'alter column "foo" drop default, '
+            .'alter column "foo" drop identity if exists, '
+            .'alter column "foo" add  generated always as identity (expression)',
+            'comment on column "users"."foo" is NULL',
+        ], $blueprint->toSql($connection, new PostgresGrammar));
+
+        $blueprint = new Blueprint('users', function ($table) {
+            $table->point('foo')->isGeometry()->projection(1234)->change();
+        });
+
+        $this->assertEquals([
+            'alter table "users" '
+            .'alter column "foo" type geometry(point, 1234), '
+            .'alter column "foo" set not null, '
+            .'alter column "foo" drop default, '
+            .'alter column "foo" drop identity if exists',
+            'comment on column "users"."foo" is NULL',
+        ], $blueprint->toSql($connection, new PostgresGrammar));
+
+        $blueprint = new Blueprint('users', function ($table) {
+            $table->timestamp('added_at', 2)->useCurrent()->storedAs(null)->change();
+        });
+
+        $this->assertEquals([
+            'alter table "users" '
+            .'alter column "added_at" type timestamp(2) without time zone, '
+            .'alter column "added_at" set not null, '
+            .'alter column "added_at" set default CURRENT_TIMESTAMP, '
+            .'alter column "added_at" drop expression if exists, '
+            .'alter column "added_at" drop identity if exists',
+            'comment on column "users"."added_at" is NULL',
+        ], $blueprint->toSql($connection, new PostgresGrammar));
+    }
+
+    public function testNativeColumnModifyingOnSqlServer()
+    {
+        $connection = $this->db->connection();
+        $schema = $connection->getSchemaBuilder();
+
+        $schema->useNativeSchemaOperationsIfPossible();
+
+        $blueprint = new Blueprint('users', function ($table) {
+            $table->timestamp('added_at', 4)->nullable(false)->useCurrent()->change();
+        });
+
+        $this->assertEquals([
+            "DECLARE @sql NVARCHAR(MAX) = '';SELECT @sql += 'ALTER TABLE [dbo].[users] DROP CONSTRAINT ' + OBJECT_NAME([default_object_id]) + ';' FROM sys.columns WHERE [object_id] = OBJECT_ID('[dbo].[users]') AND [name] in ('added_at') AND [default_object_id] <> 0;EXEC(@sql)",
+            'alter table "users" alter column "added_at" datetime2(4) not null',
+            'alter table "users" add default CURRENT_TIMESTAMP for "added_at"',
+        ], $blueprint->toSql($connection, new SqlServerGrammar));
+
+        $blueprint = new Blueprint('users', function ($table) {
+            $table->char('name', 40)->nullable()->default('easy')->collation('unicode')->change();
+        });
+
+        $this->assertEquals([
+            "DECLARE @sql NVARCHAR(MAX) = '';SELECT @sql += 'ALTER TABLE [dbo].[users] DROP CONSTRAINT ' + OBJECT_NAME([default_object_id]) + ';' FROM sys.columns WHERE [object_id] = OBJECT_ID('[dbo].[users]') AND [name] in ('name') AND [default_object_id] <> 0;EXEC(@sql)",
+            'alter table "users" alter column "name" nchar(40) collate unicode null',
+            'alter table "users" add default \'easy\' for "name"',
+        ], $blueprint->toSql($connection, new SqlServerGrammar));
+
+        $blueprint = new Blueprint('users', function ($table) {
+            $table->integer('foo')->change();
+        });
+
+        $this->assertEquals([
+            "DECLARE @sql NVARCHAR(MAX) = '';SELECT @sql += 'ALTER TABLE [dbo].[users] DROP CONSTRAINT ' + OBJECT_NAME([default_object_id]) + ';' FROM sys.columns WHERE [object_id] = OBJECT_ID('[dbo].[users]') AND [name] in ('foo') AND [default_object_id] <> 0;EXEC(@sql)",
+            'alter table "users" alter column "foo" int not null',
+        ], $blueprint->toSql($connection, new SqlServerGrammar));
+    }
+
     public function testChangingColumnWithCollationWorks()
     {
         $this->db->connection()->getSchemaBuilder()->create('users', function ($table) {
