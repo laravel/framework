@@ -44,6 +44,21 @@ class BladePhpStatementsTest extends AbstractBladeTestCase
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
+    public function testStringWithOpeningParenthesisCanBeCompiled()
+    {
+        $string = "@php(\$data = ['single' => ':(('])";
+        $expected = "<?php (\$data = ['single' => ':((']); ?>";
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+
+        $string = "@php(\$data = ['single' => (string)':(('])";
+        $expected = "<?php (\$data = ['single' => (string)':((']); ?>";
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+
+        $string = "@php(\$data = ['single' => '(()(('])";
+        $expected = "<?php (\$data = ['single' => '(()((']); ?>";
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
     public function testStringWithParenthesisCanBeCompiled()
     {
         $string = "@php(\$data = ['single' => ')'])";
