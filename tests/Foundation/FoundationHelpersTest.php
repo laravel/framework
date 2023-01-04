@@ -274,4 +274,21 @@ class FoundationHelpersTest extends TestCase
         // Should fallback to en_US
         $this->assertSame('Australian Capital Territory', fake()->state());
     }
+
+
+    public function testYear()
+    {
+        $year = year();
+
+        $this->assertIsInt($year);
+        $this->assertEquals(date('Y'), $year);
+    }
+
+    public function testCurrentYear()
+    {
+        $year = current_year();
+
+        $this->assertIsInt($year);
+        $this->assertEquals(date('Y'), $year);
+    }
 }
