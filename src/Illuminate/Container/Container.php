@@ -650,8 +650,13 @@ class Container implements ArrayAccess, ContainerContract
     {
         $pushedToBuildStack = false;
 
-        if (is_array($callback) && ! in_array($className = get_class($callback[0]), $this->buildStack, true)) {
+        if (is_array($callback) && ! in_array(
+            $className = (is_string($callback[0]) ? $callback[0] : get_class($callback[0])),
+            $this->buildStack,
+            true
+        )) {
             $this->buildStack[] = $className;
+
             $pushedToBuildStack = true;
         }
 
