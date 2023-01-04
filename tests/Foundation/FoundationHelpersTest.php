@@ -7,6 +7,7 @@ use Illuminate\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Mix;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -281,7 +282,7 @@ class FoundationHelpersTest extends TestCase
         $year = year();
 
         $this->assertIsInt($year);
-        $this->assertEquals(date('Y'), $year);
+        $this->assertEquals(Date::now()->year, $year);
     }
 
     public function testCurrentYear()
@@ -289,6 +290,6 @@ class FoundationHelpersTest extends TestCase
         $year = current_year();
 
         $this->assertIsInt($year);
-        $this->assertEquals(date('Y'), $year);
+        $this->assertEquals(Date::now()->year, $year);
     }
 }
