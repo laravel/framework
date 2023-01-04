@@ -573,6 +573,32 @@ if (! function_exists('now')) {
     }
 }
 
+if (! function_exists('year')) {
+    /**
+     * Gets the current year.
+     *
+     * @param  \DateTimeZone|string|null  $tz
+     * @return int
+     */
+    function year($tz = null): int
+    {
+        return Date::now($tz)->year;
+    }
+}
+
+if (! function_exists('current_year')) {
+    /**
+     * Gets the current year.
+     *
+     * @param  \DateTimeZone|string|null  $tz
+     * @return int
+     */
+    function current_year($tz = null): int
+    {
+        return Date::now($tz)->year;
+    }
+}
+
 if (! function_exists('old')) {
     /**
      * Retrieve an old input item.
