@@ -404,7 +404,8 @@ if (! function_exists('unless')) {
      * @param  mixed  $default
      * @return mixed
      */
-    function unless($value, callable $callback, $default = null) {
+    function unless($value, callable $callback, $default = null)
+    {
         if (! $value) {
             return $callback($value);
         }
@@ -426,13 +427,14 @@ if (! function_exists('when')) {
      * @param  mixed  $default
      * @return mixed
      */
-    function when($value, callable $callback, $default = null) {
+    function when($value, callable $callback, $default = null)
+    {
         if ($value) {
             return $callback($value);
         }
 
         if (is_callable($default)) {
-            return $default();
+            return $default($value);
         }
 
         return $default;
