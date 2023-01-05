@@ -2,10 +2,25 @@
 
 require __DIR__.'/../vendor/autoload.php';
 
+use Illuminate\Cache\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
+use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\CallableTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\ConditionalTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\IntersectionTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\NullableTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\ThisTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
+use PHPStan\PhpDocParser\Lexer\Lexer;
+use PHPStan\PhpDocParser\Parser\ConstExprParser;
+use PHPStan\PhpDocParser\Parser\PhpDocParser;
+use PHPStan\PhpDocParser\Parser\TokenIterator;
+use PHPStan\PhpDocParser\Parser\TypeParser;
 use Symfony\Component\Finder\Finder;
 
 /*
@@ -64,13 +79,17 @@ resolveFacades($finder)->each(function ($facade) use ($linting) {
                 ->prepend(' * @see https://carbon.nesbot.com/docs/');
     }
 
+    // To support generics, we want to preserve any mixins on the class...
+
+    $directMixins = resolveDocTags($facade->getDocComment() ?: '', '@mixin');
+
     // Generate the docblock...
 
     $docblock = <<< PHP
     /**
     {$methods->join(PHP_EOL)}
      *
-    {$proxies->map(fn ($class) => " * @see {$class}")->join(PHP_EOL)}
+    {$proxies->map(fn ($class) => " * @see {$class}")->merge($directMixins->map(fn ($class) => " * @mixin {$class}"))->join(PHP_EOL)}
      */
     PHP;
 
@@ -144,12 +163,12 @@ function resolveDocMethods($class)
  */
 function resolveDocParamType($method, $parameter)
 {
-    $tag = resolveDocTags($method->getDocComment() ?: '', '@param')
-        ->first(fn ($tag) => preg_match('/\$'.$parameter->getName().'\b/', $tag) === 1);
+    $paramTypeNode = collect(parseDocblock($method->getDocComment())->getParamTagValues())
+        ->firstWhere('parameterName', '$'.$parameter->getName());
 
     // As we didn't find a param type, we will now recursivly check if the prototype has a value specified...
 
-    if ($tag === null) {
+    if ($paramTypeNode === null) {
         try {
             $prototype = new ReflectionMethodDecorator($method->getPrototype(), $method->sourceClass()->getName());
 
@@ -159,22 +178,7 @@ function resolveDocParamType($method, $parameter)
         }
     }
 
-    // Strip the rest operator, variable name, and desription from the tag...
-
-    $types = Str::of($tag)
-        ->beforeLast("...\${$parameter->getName()}")
-        ->beforeLast("\${$parameter->getName()}")
-        ->trim()
-        ->toString();
-
-    // Replace references to '$this', 'static', or 'self' with the implementations FQCN...
-
-    $types = Str::of($types)
-        ->replace(['$this', 'static'], '\\'.$method->sourceClass()->getName())
-        ->replace('self', '\\'.$method->getDeclaringClass()->getName())
-        ->toString();
-
-    return stripGenerics($method, $types);
+    return trim(resolveDocblockTypes($method, $paramTypeNode->type), '()');
 }
 
 /**
@@ -185,70 +189,221 @@ function resolveDocParamType($method, $parameter)
  */
 function resolveReturnDocType($method)
 {
-    $types = resolveDocTags($method->getDocComment() ?: '', '@return')->first();
+    $returnTypeNode = array_values(parseDocblock($method->getDocComment())->getReturnTagValues())[0] ?? null;
 
-    if ($types === null) {
+    if ($returnTypeNode === null) {
         return null;
     }
 
-    // Strip the return description, but don't strip array generics...
-
-    if (Str::containsAll($types, ['<', '>'])) {
-        $types = Str::beforeLast($types, '>').'>';
-    } elseif (Str::contains($types, ' ')) {
-        $types = Str::before($types, ' ');
-    }
-
-    // Replace references to '$this', 'static', or 'self' with the implementations FQCN...
-
-    $types = Str::of($types)
-        ->replace(['$this', 'static'], '\\'.$method->sourceClass()->getName())
-        ->replace('self', '\\'.$method->getDeclaringClass()->getName())
-        ->toString();
-
-    return stripGenerics($method, $types);
+    return trim(resolveDocblockTypes($method, $returnTypeNode->type), '()');
 }
 
 /**
- * Remove generics from the type.
+ * Parse the given docblock.
  *
- * Unfortunately the @template tag is not currently working with the @method
- * docblocks, so we are stripping them out.
+ * @param  string  $docblock
+ * @return \PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocNode
+ */
+function parseDocblock($docblock)
+{
+    return (new PhpDocParser(new TypeParser(new ConstExprParser), new ConstExprParser))->parse(
+        new TokenIterator((new Lexer)->tokenize($docblock ?: '/** */'))
+    );
+}
+
+/**
+ * Resolve the types from the docblock.
  *
  * @param  \ReflectionMethodDecorator  $method
- * @param  string  $types
+ * @param  \PHPStan\PhpDocParser\Ast\Type\TypeNode  $typeNode
  * @return string
  */
-function stripGenerics($method, $types)
+function resolveDocblockTypes($method, $typeNode)
+{
+    if ($typeNode instanceof UnionTypeNode) {
+        return '('.collect($typeNode->types)
+            ->map(fn ($node) => resolveDocblockTypes($method, $node))
+            ->unique()
+            ->implode('|').')';
+    }
+
+    if ($typeNode instanceof IntersectionTypeNode) {
+        return '('.collect($typeNode->types)
+            ->map(fn ($node) => resolveDocblockTypes($method, $node))
+            ->unique()
+            ->implode('&').')';
+    }
+
+    if ($typeNode instanceof GenericTypeNode) {
+        return resolveDocblockTypes($method, $typeNode->type);
+    }
+
+    if ($typeNode instanceof ThisTypeNode) {
+        return '\\'.$method->sourceClass()->getName();
+    }
+
+    if ($typeNode instanceof ArrayTypeNode) {
+        return resolveDocblockTypes($method, $typeNode->type).'[]';
+    }
+
+    if ($typeNode instanceof IdentifierTypeNode) {
+        if ($typeNode->name === 'static') {
+            return '\\'.$method->sourceClass()->getName();
+        }
+
+        if ($typeNode->name === 'self') {
+            return '\\'.$method->getDeclaringClass()->getName();
+        }
+
+        if (isBuiltIn($typeNode->name)) {
+            return (string) $typeNode;
+        }
+
+        if (class_exists($typeNode->name)) {
+            return (string) $typeNode;
+        }
+
+        if (interface_exists($typeNode->name)) {
+            return (string) $typeNode;
+        }
+
+        if (enum_exists($typeNode->name)) {
+            return (string) $typeNode;
+        }
+
+        if (isKnownOptionalDependency($typeNode->name)) {
+            return (string) $typeNode;
+        }
+
+        if ($typeNode->name === 'class-string') {
+            return 'string';
+        }
+
+        return handleUnknownIdentifierType($method, $typeNode);
+    }
+
+    if ($typeNode instanceof ConditionalTypeNode) {
+        return handleConditionalType($method, $typeNode);
+    }
+
+    if ($typeNode instanceof NullableTypeNode) {
+        return '?'.resolveDocblockTypes($method, $typeNode->type);
+    }
+
+    if ($typeNode instanceof CallableTypeNode) {
+        return resolveDocblockTypes($method, $typeNode->identifier);
+    }
+
+    echo 'Unhandled type: '.$typeNode::class;
+    echo PHP_EOL;
+    echo 'You will need to update the `resolveDocblockTypes` to handle this type.';
+    exit(1);
+}
+
+/**
+ * Handle conditional types.
+ *
+ * @param  \ReflectionMethodDecorator  $method
+ * @param  \PHPStan\PhpDocParser\Ast\Type\ConditionalTypeNode  $typeNode
+ * @return string
+ */
+function handleConditionalType($method, $typeNode)
 {
     if (
-        'enum' === $method->getName() &&
-        Request::class === $method->getDeclaringClass()->getName()
+        in_array($method->getname(), ['pull', 'get']) &&
+        $method->getDeclaringClass()->getName() === Repository::class
     ) {
-        return Str::replace('TEnum', 'object', $types);
+        return 'mixed';
+    }
+
+    echo 'Found unknown conditional type. You will need to update the `handleConditionalType` to handle this new conditional type.';
+    exit(1);
+}
+
+/**
+ * Handle unknown identifier types.
+ *
+ * @param  \ReflectionMethodDecorator  $method
+ * @param  \PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode  $typeNode
+ * @return string
+ */
+function handleUnknownIdentifierType($method, $typeNode)
+{
+    if (
+        $typeNode->name === 'TCacheValue' &&
+        $method->getDeclaringClass()->getName() === Repository::class
+    ) {
+        return 'mixed';
     }
 
     if (
-        'when' === $method->getName() &&
+        $typeNode->name === 'TWhenParameter' &&
         in_array(Conditionable::class, class_uses_recursive($method->getDeclaringClass()->getName()))
     ) {
-        return Str::of($types)
-            ->replace(['TWhenParameter', 'TWhenReturnType'], 'mixed')
-            ->replace('mixed|null', 'mixed')
-            ->toString();
+        return 'mixed';
     }
 
     if (
-        'unless' === $method->getName() &&
+        $typeNode->name === 'TWhenReturnType' &&
         in_array(Conditionable::class, class_uses_recursive($method->getDeclaringClass()->getName()))
     ) {
-        return Str::of($types)
-            ->replace(['TUnlessParameter', 'TUnlessReturnType'], 'mixed')
-            ->replace('mixed|null', 'mixed')
-            ->toString();
+        return 'mixed';
     }
 
-    return $types;
+    if (
+        $typeNode->name === 'TUnlessParameter' &&
+        in_array(Conditionable::class, class_uses_recursive($method->getDeclaringClass()->getName()))
+    ) {
+        return 'mixed';
+    }
+
+    if (
+        $typeNode->name === 'TUnlessReturnType' &&
+        in_array(Conditionable::class, class_uses_recursive($method->getDeclaringClass()->getName()))
+    ) {
+        return 'mixed';
+    }
+
+    if (
+        $typeNode->name === 'TEnum' &&
+        $method->getDeclaringClass()->getName() === Request::class
+    ) {
+        return 'object';
+    }
+
+    echo 'Found unknown type: '.$typeNode->name;
+    echo PHP_EOL;
+    echo 'You will need to update the `handleUnknownIdentifierType` to handle this new type / generic.';
+    exit(1);
+}
+
+/**
+ * Determine if the type is a built-in.
+ *
+ * @param  string  $type
+ * @return bool
+ */
+function isBuiltIn($type)
+{
+    return in_array($type, [
+        'null', 'bool', 'int', 'float', 'string', 'array', 'object',
+        'resource', 'never', 'void', 'mixed', 'iterable', 'self', 'static',
+        'parent', 'true', 'false', 'callable',
+    ]);
+}
+
+/**
+ * Determine if the type is known optional dependency.
+ *
+ * @param  string  $type
+ * @return bool
+ */
+function isKnownOptionalDependency($type)
+{
+    return in_array($type, [
+        '\Pusher\Pusher',
+        '\GuzzleHttp\Psr7\RequestInterface',
+    ]);
 }
 
 /**

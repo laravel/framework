@@ -233,7 +233,7 @@ class Vite implements Htmlable
     /**
      * Use the given callback to resolve attributes for preload tags.
      *
-     * @param  (callable(string, string, ?array, ?array): array|false)|array|false  $attributes
+     * @param  (callable(string, string, ?array, ?array): (array|false))|array|false  $attributes
      * @return $this
      */
     public function usePreloadTagAttributes($attributes)
