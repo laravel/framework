@@ -548,6 +548,22 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function hasAny($key);
 
     /**
+     * Determine if an item is missing from the collection by key.
+     *
+     * @param  TKey|array<array-key, TKey>  $key
+     * @return bool
+     */
+    public function missing($key);
+
+    /**
+     * Determine if any of the keys are missing from the collection.
+     *
+     * @param  TKey|array<array-key, TKey>  $key
+     * @return bool
+     */
+    public function missingAny($key);
+
+    /**
      * Concatenate values of a given key as a string.
      *
      * @param  string  $value

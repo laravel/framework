@@ -2299,6 +2299,38 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testMissing($collection)
+    {
+        $data = new $collection(['id' => 1, 'first' => 'Hello', 'second' => 'World']);
+
+        $this->assertFalse($data->missing('first'));
+        $this->assertTrue($data->missing('third'));
+        $this->assertFalse($data->missing(['first', 'second']));
+        $this->assertFalse($data->missing(['third', 'first']));
+        $this->assertTrue($data->missing(['third', 'fourth']));
+        $this->assertFalse($data->missing('first', 'second'));
+        $this->assertTrue($data->missing([]));
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testMissingAny($collection)
+    {
+        $data = new $collection(['id' => 1, 'first' => 'Hello', 'second' => 'World']);
+
+        $this->assertFalse($data->missingAny('first'));
+        $this->assertTrue($data->missingAny('third'));
+        $this->assertTrue($data->missingAny(['first', 'fourth']));
+        $this->assertFalse($data->missingAny(['first', 'second']));
+        $this->assertTrue($data->missingAny(['third', 'fourth']));
+        $this->assertTrue($data->missingAny('third', 'fourth'));
+        $this->assertFalse($data->missingAny([]));
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testImplode($collection)
     {
         $data = new $collection([['name' => 'taylor', 'email' => 'foo'], ['name' => 'dayle', 'email' => 'bar']]);

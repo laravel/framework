@@ -610,6 +610,44 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
+     * Determine if an item is missing from the collection by key.
+     *
+     * @param  TKey|array<array-key, TKey>  $key
+     * @return bool
+     */
+    public function missing($key)
+    {
+        $keys = array_flip(is_array($key) ? $key : func_get_args());
+
+        foreach ($this as $key => $value) {
+            if (array_key_exists($key, $keys)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Determine if any of the keys are missing from the collection.
+     *
+     * @param  TKey|array<array-key, TKey>  $key
+     * @return bool
+     */
+    public function missingAny($key)
+    {
+        $keys = array_flip(is_array($key) ? $key : func_get_args());
+
+        foreach ($keys as $key => $value) {
+            if ($this->missing($key)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Concatenate values of a given key as a string.
      *
      * @param  callable|string  $value

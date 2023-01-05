@@ -595,6 +595,48 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Determine if an item is missing from the collection by key.
+     *
+     * @param  TKey|array<array-key, TKey>  $key
+     * @return bool
+     */
+    public function missing($key)
+    {
+        $keys = is_array($key) ? $key : func_get_args();
+
+        foreach ($keys as $value) {
+            if (array_key_exists($value, $this->items)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Determine if any of the keys are missing from the collection.
+     *
+     * @param  TKey|array<array-key, TKey>  $key
+     * @return bool
+     */
+    public function missingAny($key)
+    {
+        if ($this->isEmpty()) {
+            return true;
+        }
+
+        $keys = is_array($key) ? $key : func_get_args();
+
+        foreach ($keys as $value) {
+            if ($this->missing($value)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Concatenate values of a given key as a string.
      *
      * @param  callable|string  $value
