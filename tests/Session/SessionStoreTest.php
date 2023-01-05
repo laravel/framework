@@ -634,6 +634,15 @@ class SessionStoreTest extends TestCase
         ]], $errors->getBags()['default']->getMessages());
     }
 
+    public function testItIsMacroable()
+    {
+        $this->getSession()->macro('foo', function () {
+            return 'macroable';
+        });
+
+        $this->assertSame('macroable', $this->getSession()->foo());
+    }
+
     public function getSession($serialization = 'php')
     {
         $reflection = new ReflectionClass(Store::class);

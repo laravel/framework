@@ -50,8 +50,10 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         // ids are not empty
         $builder = m::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
-        $builder->setModel($this->getMockModel());
-        $builder->getQuery()->shouldReceive('whereIn')->once()->with('foo_table.foo', ['one', 'two']);
+        $model = $this->getMockModel();
+        $model->shouldReceive('getKeyType')->andReturn('int');
+        $builder->setModel($model);
+        $builder->getQuery()->shouldReceive('whereIntegerInRaw')->once()->with('foo_table.foo', ['one', 'two']);
         $builder->shouldReceive('get')->with(['column'])->andReturn(['baz']);
 
         $result = $builder->findMany(['one', 'two'], ['column']);
@@ -61,8 +63,9 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder = m::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
         $model = $this->getMockModel();
         $model->shouldReceive('newCollection')->once()->withNoArgs()->andReturn('emptycollection');
+        $model->shouldReceive('getKeyType')->andReturn('int');
         $builder->setModel($model);
-        $builder->getQuery()->shouldNotReceive('whereIn');
+        $builder->getQuery()->shouldNotReceive('whereIntegerInRaw');
         $builder->shouldNotReceive('get');
 
         $result = $builder->findMany([], ['column']);
@@ -132,10 +135,11 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $model = $this->getMockModel();
         $model->shouldReceive('getKey')->andReturn(1);
+        $model->shouldReceive('getKeyType')->andReturn('int');
 
         $builder = m::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
         $builder->setModel($model);
-        $builder->getQuery()->shouldReceive('whereIn')->once()->with('foo_table.foo', [1, 2]);
+        $builder->getQuery()->shouldReceive('whereIntegerInRaw')->once()->with('foo_table.foo', [1, 2]);
         $builder->shouldReceive('get')->with(['column'])->andReturn(new Collection([$model]));
         $builder->findOrFail([1, 2], ['column']);
     }
@@ -146,10 +150,11 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $model = $this->getMockModel();
         $model->shouldReceive('getKey')->andReturn(1);
+        $model->shouldReceive('getKeyType')->andReturn('int');
 
         $builder = m::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
         $builder->setModel($model);
-        $builder->getQuery()->shouldReceive('whereIn')->once()->with('foo_table.foo', [1, 2]);
+        $builder->getQuery()->shouldReceive('whereIntegerInRaw')->once()->with('foo_table.foo', [1, 2]);
         $builder->shouldReceive('get')->with(['column'])->andReturn(new Collection([$model]));
         $builder->findOrFail(new Collection([1, 2]), ['column']);
     }
@@ -176,9 +181,11 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder = m::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
         $model1 = $this->getMockModel();
         $model2 = $this->getMockModel();
+        $model1->shouldReceive('getKeyType')->andReturn('int');
+        $model2->shouldReceive('getKeyType')->andReturn('int');
         $builder->setModel($model1);
-        $builder->getQuery()->shouldReceive('whereIn')->with('foo_table.foo', [1, 2])->twice();
-        $builder->getQuery()->shouldReceive('whereIn')->with('foo_table.foo', [1, 2, 3])->once();
+        $builder->getQuery()->shouldReceive('whereIntegerInRaw')->with('foo_table.foo', [1, 2])->twice();
+        $builder->getQuery()->shouldReceive('whereIntegerInRaw')->with('foo_table.foo', [1, 2, 3])->once();
         $builder->shouldReceive('get')->andReturn(new Collection([$model1, $model2]))->once();
         $builder->shouldReceive('get')->with(['column'])->andReturn(new Collection([$model1, $model2]))->once();
         $builder->shouldReceive('get')->andReturn(null)->once();
@@ -202,9 +209,11 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder = m::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
         $model1 = $this->getMockModel();
         $model2 = $this->getMockModel();
+        $model1->shouldReceive('getKeyType')->andReturn('int');
+        $model2->shouldReceive('getKeyType')->andReturn('int');
         $builder->setModel($model1);
-        $builder->getQuery()->shouldReceive('whereIn')->with('foo_table.foo', [1, 2])->twice();
-        $builder->getQuery()->shouldReceive('whereIn')->with('foo_table.foo', [1, 2, 3])->once();
+        $builder->getQuery()->shouldReceive('whereIntegerInRaw')->with('foo_table.foo', [1, 2])->twice();
+        $builder->getQuery()->shouldReceive('whereIntegerInRaw')->with('foo_table.foo', [1, 2, 3])->once();
         $builder->shouldReceive('get')->andReturn(new Collection([$model1, $model2]))->once();
         $builder->shouldReceive('get')->with(['column'])->andReturn(new Collection([$model1, $model2]))->once();
         $builder->shouldReceive('get')->andReturn(null)->once();
@@ -236,8 +245,10 @@ class DatabaseEloquentBuilderTest extends TestCase
     public function testFindWithMany()
     {
         $builder = m::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
-        $builder->getQuery()->shouldReceive('whereIn')->once()->with('foo_table.foo', [1, 2]);
-        $builder->setModel($this->getMockModel());
+        $model = $this->getMockModel();
+        $model->shouldReceive('getKeyType')->andReturn('int');
+        $builder->getQuery()->shouldReceive('whereIntegerInRaw')->once()->with('foo_table.foo', [1, 2]);
+        $builder->setModel($model);
         $builder->shouldReceive('get')->with(['column'])->andReturn('baz');
 
         $result = $builder->find([1, 2], ['column']);
@@ -248,8 +259,10 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $ids = collect([1, 2]);
         $builder = m::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
-        $builder->getQuery()->shouldReceive('whereIn')->once()->with('foo_table.foo', [1, 2]);
-        $builder->setModel($this->getMockModel());
+        $model = $this->getMockModel();
+        $model->shouldReceive('getKeyType')->andReturn('int');
+        $builder->getQuery()->shouldReceive('whereIntegerInRaw')->once()->with('foo_table.foo', [1, 2]);
+        $builder->setModel($model);
         $builder->shouldReceive('get')->with(['column'])->andReturn('baz');
 
         $result = $builder->find($ids, ['column']);
@@ -1793,12 +1806,13 @@ class DatabaseEloquentBuilderTest extends TestCase
     public function testWhereKeyMethodWithArray()
     {
         $model = $this->getMockModel();
+        $model->shouldReceive('getKeyType')->andReturn('int');
         $builder = $this->getBuilder()->setModel($model);
         $keyName = $model->getQualifiedKeyName();
 
         $array = [1, 2, 3];
 
-        $builder->getQuery()->shouldReceive('whereIn')->once()->with($keyName, $array);
+        $builder->getQuery()->shouldReceive('whereIntegerInRaw')->once()->with($keyName, $array);
 
         $builder->whereKey($array);
     }
@@ -1806,12 +1820,13 @@ class DatabaseEloquentBuilderTest extends TestCase
     public function testWhereKeyMethodWithCollection()
     {
         $model = $this->getMockModel();
+        $model->shouldReceive('getKeyType')->andReturn('int');
         $builder = $this->getBuilder()->setModel($model);
         $keyName = $model->getQualifiedKeyName();
 
         $collection = new Collection([1, 2, 3]);
 
-        $builder->getQuery()->shouldReceive('whereIn')->once()->with($keyName, $collection);
+        $builder->getQuery()->shouldReceive('whereIntegerInRaw')->once()->with($keyName, $collection);
 
         $builder->whereKey($collection);
     }
@@ -1875,12 +1890,13 @@ class DatabaseEloquentBuilderTest extends TestCase
     public function testWhereKeyNotMethodWithArray()
     {
         $model = $this->getMockModel();
+        $model->shouldReceive('getKeyType')->andReturn('int');
         $builder = $this->getBuilder()->setModel($model);
         $keyName = $model->getQualifiedKeyName();
 
         $array = [1, 2, 3];
 
-        $builder->getQuery()->shouldReceive('whereNotIn')->once()->with($keyName, $array);
+        $builder->getQuery()->shouldReceive('whereIntegerNotInRaw')->once()->with($keyName, $array);
 
         $builder->whereKeyNot($array);
     }
@@ -1888,12 +1904,13 @@ class DatabaseEloquentBuilderTest extends TestCase
     public function testWhereKeyNotMethodWithCollection()
     {
         $model = $this->getMockModel();
+        $model->shouldReceive('getKeyType')->andReturn('int');
         $builder = $this->getBuilder()->setModel($model);
         $keyName = $model->getQualifiedKeyName();
 
         $collection = new Collection([1, 2, 3]);
 
-        $builder->getQuery()->shouldReceive('whereNotIn')->once()->with($keyName, $collection);
+        $builder->getQuery()->shouldReceive('whereIntegerNotInRaw')->once()->with($keyName, $collection);
 
         $builder->whereKeyNot($collection);
     }

@@ -3,9 +3,11 @@
 namespace Illuminate\Tests\Integration\Database;
 
 use GMP;
+use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Contracts\Database\Eloquent\SerializesCastableAttributes;
 use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Schema\Blueprint;
 use InvalidArgumentException;
@@ -46,6 +48,11 @@ class EloquentModelCustomCastingTest extends TestCase
             $table->string('string_field');
             $table->timestamps();
         });
+
+        $this->schema()->create('members', function (Blueprint $table) {
+            $table->increments('id');
+            $table->decimal('amount', 4, 2);
+        });
     }
 
     /**
@@ -56,6 +63,7 @@ class EloquentModelCustomCastingTest extends TestCase
     protected function tearDown(): void
     {
         $this->schema()->drop('casting_table');
+        $this->schema()->drop('members');
     }
 
     /**
@@ -161,6 +169,19 @@ class EloquentModelCustomCastingTest extends TestCase
             'created_at' => $model->created_at->toJSON(),
             'id' => 1,
         ], $model->toArray());
+    }
+
+    public function testModelWithCustomCastsWorkWithCustomIncrementDecrement()
+    {
+        $model = new Member();
+        $model->amount = new Euro('2');
+        $model->save();
+
+        $this->assertInstanceOf(Euro::class, $model->amount);
+        $this->assertEquals('2', $model->amount->value);
+
+        $model->incrementAmount(new Euro('1'));
+        $this->assertEquals('3.00', $model->amount->value);
     }
 
     /**
@@ -345,5 +366,60 @@ class AddressModel
     {
         $this->lineOne = $address_line_one;
         $this->lineTwo = $address_line_two;
+    }
+}
+
+class Euro implements Castable
+{
+    public string $value;
+
+    public function __construct(string $value)
+    {
+        $this->value = $value;
+    }
+
+    public static function castUsing(array $arguments)
+    {
+        return EuroCaster::class;
+    }
+}
+
+class EuroCaster implements CastsAttributes
+{
+    public function get($model, $key, $value, $attributes)
+    {
+        return new Euro($value);
+    }
+
+    public function set($model, $key, $value, $attributes)
+    {
+        return $value->value;
+    }
+
+    public function increment($model, $key, string $value, $attributes)
+    {
+        $model->$key = new Euro(bcadd($model->$key->value, $value, 2));
+
+        return $model->$key;
+    }
+
+    public function decrement($model, $key, string $value, $attributes)
+    {
+        $model->$key = new Euro(bcsub($model->$key->value, $value, 2));
+
+        return $model->$key;
+    }
+}
+
+class Member extends Model
+{
+    public $timestamps = false;
+    protected $casts = [
+        'amount' => Euro::class,
+    ];
+
+    public function incrementAmount(Euro $amount)
+    {
+        $this->increment('amount', $amount->value);
     }
 }

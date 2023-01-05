@@ -31,6 +31,8 @@ use LogicException;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionNamedType;
+use RuntimeException;
+use TypeError;
 
 trait HasAttributes
 {
@@ -1303,13 +1305,27 @@ trait HasAttributes
     /**
      * Return a decimal as string.
      *
-     * @param  float  $value
+     * @param  float|string  $value
      * @param  int  $decimals
      * @return string
      */
     protected function asDecimal($value, $decimals)
     {
-        return number_format($value, $decimals, '.', '');
+        if (extension_loaded('bcmath')) {
+            return bcadd($value, 0, $decimals);
+        }
+
+        if (! is_numeric($value)) {
+            throw new TypeError('$value must be numeric.');
+        }
+
+        if (is_string($value) && Str::contains($value, 'e', true)) {
+            throw new RuntimeException('The "decimal" model cast is unable to handle string based floats with exponents.');
+        }
+
+        [$int, $fraction] = explode('.', $value) + [1 => ''];
+
+        return Str::of($int)->padLeft('1', '0').'.'.Str::of($fraction)->limit($decimals, '')->padRight($decimals, '0');
     }
 
     /**
@@ -1597,9 +1613,13 @@ trait HasAttributes
      */
     protected function isClassDeviable($key)
     {
-        return $this->isClassCastable($key) &&
-            method_exists($castType = $this->parseCasterClass($this->getCasts()[$key]), 'increment') &&
-            method_exists($castType, 'decrement');
+        if (! $this->isClassCastable($key)) {
+            return false;
+        }
+
+        $castType = $this->resolveCasterClass($key);
+
+        return method_exists($castType::class, 'increment') && method_exists($castType::class, 'decrement');
     }
 
     /**

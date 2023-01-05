@@ -11,6 +11,14 @@ class BladePhpStatementsTest extends AbstractBladeTestCase
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
+    public function testStringWithParenthesisWithEndPHP()
+    {
+        $string = "@php(\$data = ['related_to' => 'issue#45388'];) {{ \$data }} @endphp";
+        $expected = "<?php(\$data = ['related_to' => 'issue#45388'];) {{ \$data }} ?>";
+
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
     public function testPhpStatementsWithoutExpressionAreIgnored()
     {
         $string = '@php';

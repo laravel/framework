@@ -37,6 +37,7 @@ use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalPivotRela
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationship;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationshipCounts;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithoutWrap;
+use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithUnlessOptionalData;
 use Illuminate\Tests\Integration\Http\Fixtures\ReallyEmptyPostResource;
 use Illuminate\Tests\Integration\Http\Fixtures\ResourceWithPreservedKeys;
 use Illuminate\Tests\Integration\Http\Fixtures\SerializablePostResource;
@@ -163,6 +164,31 @@ class ResourceTest extends TestCase
                 'third' => 'value',
                 'fourth' => 'default',
                 'fifth' => 'default',
+            ],
+        ]);
+    }
+
+    public function testResourcesMayHaveOptionalValuesUsingUnless()
+    {
+        Route::get('/', function () {
+            return new PostResourceWithUnlessOptionalData(new Post([
+                'id' => 5,
+            ]));
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/',
+            ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertJson([
+            'data' => [
+                'id' => 5,
+                'first' => 'value',
+                'fourth' => 'value',
+                'fifth' => 'value',
             ],
         ]);
     }
