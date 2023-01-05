@@ -39,7 +39,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: [8.1, 8.2]
+        php: [8.2]
         stability: [prefer-lowest, prefer-stable]
 
     name: PHP ${{ matrix.php }} - ${{ matrix.stability }}
@@ -60,20 +60,12 @@ jobs:
           REDIS_CONFIGURE_OPTS: --enable-redis --enable-redis-igbinary --enable-redis-msgpack --enable-redis-lzf --with-liblzf --enable-redis-zstd --with-libzstd --enable-redis-lz4 --with-liblz4
           REDIS_LIBS: liblz4-dev, liblzf-dev, libzstd-dev
 
-      - name: Set Minimum PHP 8.1 Versions
-        uses: nick-fields/retry@v2
-        with:
-          timeout_minutes: 5
-          max_attempts: 5
-          command: composer require brick/math:^0.9.3 symfony/css-selector:^6.0 --no-interaction --no-update
-        if: matrix.php >= 8.1
-
       - name: Set Minimum PHP 8.2 Versions
         uses: nick-fields/retry@v2
         with:
           timeout_minutes: 5
           max_attempts: 5
-          command: composer require guzzlehttp/guzzle:^7.5 guzzlehttp/psr7:^2.4 predis/predis:^2.0.2 --no-interaction --no-update
+          command: composer require brick/math:^0.9.3 symfony/css-selector:^6.0 guzzlehttp/guzzle:^7.5 guzzlehttp/psr7:^2.4 predis/predis:^2.0.2 --no-interaction --no-update
         if: matrix.php >= 8.2
 
       - name: Install dependencies
@@ -107,7 +99,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: [8.1, 8.2]
+        php: [8.2]
         stability: [prefer-lowest, prefer-stable]
 
     name: PHP ${{ matrix.php }} - ${{ matrix.stability }} - Windows
@@ -129,28 +121,12 @@ jobs:
           tools: composer:v2
           coverage: none
 
-      - name: Set Minimum PHP 8.1 Versions
-        uses: nick-fields/retry@v2
-        with:
-          timeout_minutes: 5
-          max_attempts: 5
-          command: composer require ramsey/collection:^1.2 brick/math:^0.9.3 --no-interaction --no-update
-        if: matrix.php >= 8.1
-
-      - name: Set Minimum PHP 8.1 Versions
-        uses: nick-fields/retry@v2
-        with:
-          timeout_minutes: 5
-          max_attempts: 5
-          command: composer require brick/math:~0.9.3 symfony/css-selector:~6.0 --no-interaction --no-update
-        if: matrix.php >= 8.1
-
       - name: Set Minimum PHP 8.2 Versions
         uses: nick-fields/retry@v2
         with:
           timeout_minutes: 5
           max_attempts: 5
-          command: composer require guzzlehttp/guzzle:~7.5 guzzlehttp/psr7:~2.4 predis/predis:~2.0.2 --no-interaction --no-update
+          command: composer require brick/math:~0.9.3 symfony/css-selector:~6.0 guzzlehttp/guzzle:~7.5 guzzlehttp/psr7:~2.4 predis/predis:~2.0.2 --no-interaction --no-update
         if: matrix.php >= 8.2
 
       - name: Install dependencies

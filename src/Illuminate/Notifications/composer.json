@@ -14,7 +14,7 @@
         }
     ],
     "require": {
-        "php": "^8.1",
+        "php": "^8.2",
         "illuminate/broadcasting": "^11.0",
         "illuminate/bus": "^11.0",
         "illuminate/collections": "^11.0",

@@ -719,9 +719,6 @@ class HttpRequestTest extends TestCase
         $request->date('date', 'invalid_format');
     }
 
-    /**
-     * @requires PHP >= 8.1
-     */
     public function testEnumMethod()
     {
         $request = Request::create('/', 'GET', [

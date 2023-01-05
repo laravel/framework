@@ -37,9 +37,6 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals($str, e($html));
     }
 
-    /**
-     * @requires PHP >= 8.1
-     */
     public function testEWithEnums()
     {
         $enumValue = StringBackedEnum::ADMIN_LABEL;
