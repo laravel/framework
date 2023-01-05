@@ -452,6 +452,17 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Surround the string with the given values.
+     *
+     * @param  array  $values
+     * @return static
+     */
+    public function surround(...$values)
+    {
+        return $this->append(...$values)->prepend(...$values);
+    }
+
+    /**
      * Determine if the string matches the given pattern.
      *
      * @param  string  $pattern

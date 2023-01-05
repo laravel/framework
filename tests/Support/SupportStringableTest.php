@@ -1179,4 +1179,10 @@ class SupportStringableTest extends TestCase
 
         $this->stringable('not a date')->toDate();
     }
+
+    public function testSurround()
+    {
+        $this->assertSame('FooBarFoo', (string) $this->stringable('Bar')->surround('Foo'));
+        $this->assertSame('FooBatBarFooBat', (string) $this->stringable('Bar')->surround('Foo', 'Bat'));
+    }
 }
