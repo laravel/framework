@@ -16,14 +16,14 @@
     "require": {
         "php": "^8.1",
         "ext-json": "*",
-        "illuminate/collections": "^10.0",
-        "illuminate/container": "^10.0",
-        "illuminate/contracts": "^10.0",
-        "illuminate/http": "^10.0",
-        "illuminate/macroable": "^10.0",
-        "illuminate/pipeline": "^10.0",
-        "illuminate/session": "^10.0",
-        "illuminate/support": "^10.0",
+        "illuminate/collections": "^11.0",
+        "illuminate/container": "^11.0",
+        "illuminate/contracts": "^11.0",
+        "illuminate/http": "^11.0",
+        "illuminate/macroable": "^11.0",
+        "illuminate/pipeline": "^11.0",
+        "illuminate/session": "^11.0",
+        "illuminate/support": "^11.0",
         "symfony/http-foundation": "^6.2",
         "symfony/http-kernel": "^6.2",
         "symfony/routing": "^6.2"
@@ -39,7 +39,7 @@
         }
     },
     "suggest": {
-        "illuminate/console": "Required to use the make commands (^10.0).",
+        "illuminate/console": "Required to use the make commands (^11.0).",
         "nyholm/psr7": "Required to use PSR-7 bridging features (^1.2).",
         "symfony/psr-http-message-bridge": "Required to use PSR-7 bridging features (^2.0)."
     },
