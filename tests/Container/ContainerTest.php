@@ -803,7 +803,6 @@ class ContainerContextualBindingCallTarget
 {
     public function __construct()
     {
-
     }
 
     public function work(IContainerContractStub $stub)
