@@ -1310,8 +1310,9 @@ class Mailable implements MailableContract, Renderable
     {
         [$html, $text] = $this->renderForAssertions();
 
-        PHPUnit::assertTrue(
-            str_contains($html, $string),
+        PHPUnit::assertStringContainsString(
+            $string,
+            $html,
             "Did not see expected text [{$string}] within email body."
         );
 
@@ -1328,8 +1329,9 @@ class Mailable implements MailableContract, Renderable
     {
         [$html, $text] = $this->renderForAssertions();
 
-        PHPUnit::assertFalse(
-            str_contains($html, $string),
+        PHPUnit::assertStringNotContainsString(
+            $string,
+            $html,
             "Saw unexpected text [{$string}] within email body."
         );
 
@@ -1361,8 +1363,9 @@ class Mailable implements MailableContract, Renderable
     {
         [$html, $text] = $this->renderForAssertions();
 
-        PHPUnit::assertTrue(
-            str_contains($text, $string),
+        PHPUnit::assertStringContainsString(
+            $string,
+            $text,
             "Did not see expected text [{$string}] within text email body."
         );
 
@@ -1379,8 +1382,9 @@ class Mailable implements MailableContract, Renderable
     {
         [$html, $text] = $this->renderForAssertions();
 
-        PHPUnit::assertFalse(
-            str_contains($text, $string),
+        PHPUnit::assertStringNotContainsString(
+            $string,
+            $text,
             "Saw unexpected text [{$string}] within text email body."
         );
 
