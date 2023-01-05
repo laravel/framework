@@ -861,9 +861,6 @@ class RoutingUrlGeneratorTest extends TestCase
         Request::create($url->signedRoute('foo', ['expires' => 253402300799]));
     }
 
-    /**
-     * @requires PHP >= 8.1
-     */
     public function testRouteGenerationWithBackedEnums()
     {
         $url = new UrlGenerator(

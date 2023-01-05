@@ -14,7 +14,7 @@
         }
     ],
     "require": {
-        "php": "^8.1",
+        "php": "^8.2",
         "ext-json": "*",
         "psr/log": "^1.0|^2.0|^3.0",
         "illuminate/bus": "^11.0",
