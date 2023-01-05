@@ -395,6 +395,50 @@ if (! function_exists('transform')) {
     }
 }
 
+if (! function_exists('unless')) {
+    /**
+     * Apply the callback if the given "value" is (or resolves to) falsy and return it.
+     *
+     * @param  mixed  $value
+     * @param  callable  $callback
+     * @param  mixed  $default
+     * @return mixed
+     */
+    function unless($value, callable $callback, $default = null) {
+        if (! $value) {
+            return $callback($value);
+        }
+
+        if (is_callable($default)) {
+            return $default($value);
+        }
+
+        return $default;
+    }
+}
+
+if (! function_exists('when')) {
+    /**
+     * Apply the callback if the given "value" is (or resolves to) truthy and return it.
+     *
+     * @param  mixed  $value
+     * @param  callable  $callback
+     * @param  mixed  $default
+     * @return mixed
+     */
+    function when($value, callable $callback, $default = null) {
+        if ($value) {
+            return $callback($value);
+        }
+
+        if (is_callable($default)) {
+            return $default();
+        }
+
+        return $default;
+    }
+}
+
 if (! function_exists('windows_os')) {
     /**
      * Determine whether the current environment is Windows based.

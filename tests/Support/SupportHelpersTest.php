@@ -927,6 +927,48 @@ class SupportHelpersTest extends TestCase
             preg_replace_array($pattern, $replacements, $subject)
         );
     }
+
+    public function testWhen()
+    {
+        $this->assertSame('foobar', when('foo', function($value) {
+            return $value.'bar';
+        }));
+
+        $this->assertSame('baz', when(false, function($value) {
+            return $value.'bar';
+        }, 'baz'));
+
+        $this->assertSame('baz', when(0, function($value) {
+            return $value.'bar';
+        }, 'baz'));
+
+        $this->assertSame('baz', when(false, function($value) {
+            return $value.'bar';
+        }, function() {
+            return 'baz';
+        }));
+    }
+
+    public function testUnless()
+    {
+        $this->assertSame('bar', unless(false, function($value) {
+            return $value.'bar';
+        }));
+
+        $this->assertSame('0bar', unless(0, function($value) {
+            return $value.'bar';
+        }));
+
+        $this->assertSame('baz', unless('foo', function($value) {
+            return $value.'bar';
+        }, 'baz'));
+
+        $this->assertSame('baz', unless('foo', function($value) {
+            return $value.'bar';
+        }, function() {
+            return 'baz';
+        }));
+    }
 }
 
 trait SupportTestTraitOne
