@@ -930,42 +930,42 @@ class SupportHelpersTest extends TestCase
 
     public function testWhen()
     {
-        $this->assertSame('foobar', when('foo', function($value) {
+        $this->assertSame('foobar', when('foo', function ($value) {
             return $value.'bar';
         }));
 
-        $this->assertSame('baz', when(false, function($value) {
+        $this->assertSame('baz', when(false, function ($value) {
             return $value.'bar';
         }, 'baz'));
 
-        $this->assertSame('baz', when(0, function($value) {
+        $this->assertSame('baz', when(0, function ($value) {
             return $value.'bar';
         }, 'baz'));
 
-        $this->assertSame('baz', when(false, function($value) {
+        $this->assertSame('baz', when(false, function ($value) {
             return $value.'bar';
-        }, function() {
+        }, function () {
             return 'baz';
         }));
     }
 
     public function testUnless()
     {
-        $this->assertSame('bar', unless(false, function($value) {
+        $this->assertSame('bar', unless(false, function ($value) {
             return $value.'bar';
         }));
 
-        $this->assertSame('0bar', unless(0, function($value) {
+        $this->assertSame('0bar', unless(0, function ($value) {
             return $value.'bar';
         }));
 
-        $this->assertSame('baz', unless('foo', function($value) {
+        $this->assertSame('baz', unless('foo', function ($value) {
             return $value.'bar';
         }, 'baz'));
 
-        $this->assertSame('baz', unless('foo', function($value) {
+        $this->assertSame('baz', unless('foo', function ($value) {
             return $value.'bar';
-        }, function() {
+        }, function () {
             return 'baz';
         }));
     }
