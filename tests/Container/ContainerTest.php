@@ -669,6 +669,8 @@ class ContainerTest extends TestCase
     {
         $container = new Container;
 
+        $container->bind(IContainerContractStub::class, ContainerImplementationStubTwo::class);
+
         $container->when(ContainerContextualBindingCallTarget::class)
                 ->needs(IContainerContractStub::class)
                 ->give(ContainerImplementationStub::class);
