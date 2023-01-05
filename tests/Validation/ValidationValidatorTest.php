@@ -2583,6 +2583,18 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => '3'], ['foo' => 'Numeric|Size:3']);
         $this->assertTrue($v->passes());
 
+        $v = new Validator($trans, ['foo' => '123'], ['foo' => 'Decimal:0|Size:3']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '3'], ['foo' => 'Decimal:0|Size:3']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '123'], ['foo' => 'Integer|Size:3']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '3'], ['foo' => 'Integer|Size:3']);
+        $this->assertTrue($v->passes());
+
         $v = new Validator($trans, ['foo' => [1, 2, 3]], ['foo' => 'Array|Size:3']);
         $this->assertTrue($v->passes());
 
@@ -2684,6 +2696,17 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => '20'], ['foo' => 'Min:3']);
         $this->assertFalse($v->passes());
 
+        // an equal value qualifies.
+        $v = new Validator($trans, ['foo' => '3'], ['foo' => 'Decimal:0|Min:3']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '2'], ['foo' => 'Decimal:0|Min:3']);
+        $this->assertFalse($v->passes());
+
+        // '2.001' is considered as a float when the "Numeric" rule exists.
+        $v = new Validator($trans, ['foo' => '2.001'], ['foo' => 'Decimal:0,3|Min:3']);
+        $this->assertFalse($v->passes());
+
         $v = new Validator($trans, ['foo' => '5'], ['foo' => 'Numeric|Min:3']);
         $this->assertTrue($v->passes());
 
@@ -2727,6 +2750,17 @@ class ValidationValidatorTest extends TestCase
         // '2.001' is a string of length 5 in absence of the "Numeric" rule.
         $v = new Validator($trans, ['foo' => '2.001'], ['foo' => 'Max:3']);
         $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '211'], ['foo' => 'Decimal:0|Max:100']);
+        $this->assertFalse($v->passes());
+
+        // an equal value qualifies.
+        $v = new Validator($trans, ['foo' => '3'], ['foo' => 'Decimal:0|Max:3']);
+        $this->assertTrue($v->passes());
+
+        // '2.001' is considered as a float when the "Numeric" rule exists.
+        $v = new Validator($trans, ['foo' => '2.001'], ['foo' => 'Decimal:0,3|Max:3']);
+        $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['foo' => '22'], ['foo' => 'Numeric|Max:33']);
         $this->assertTrue($v->passes());
