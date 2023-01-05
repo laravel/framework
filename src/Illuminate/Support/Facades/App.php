@@ -104,7 +104,7 @@ namespace Illuminate\Support\Facades;
  * @method static mixed rebinding(string $abstract, \Closure $callback)
  * @method static mixed refresh(string $abstract, mixed $target, string $method)
  * @method static \Closure wrap(\Closure $callback, array $parameters = [])
- * @method static mixed call(callable|string $callback, array<string, mixed> $parameters = [], string|null $defaultMethod = null)
+ * @method static mixed call(callable|string $callback, array $parameters = [], string|null $defaultMethod = null)
  * @method static \Closure factory(string $abstract)
  * @method static mixed makeWith(string|callable $abstract, array $parameters = [])
  * @method static mixed get(string $id)
