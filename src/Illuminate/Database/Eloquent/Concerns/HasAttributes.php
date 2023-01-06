@@ -1070,6 +1070,8 @@ trait HasAttributes
         } else {
             unset($this->attributeCastCache[$key]);
         }
+
+        return $this;
     }
 
     /**
