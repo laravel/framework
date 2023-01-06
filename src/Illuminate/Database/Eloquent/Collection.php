@@ -564,7 +564,7 @@ class Collection extends BaseCollection implements QueueableCollection
      *
      * @param  string|array<array-key, string>  $value
      * @param  string|null  $key
-     * @return \Illuminate\Support\Collection<int, mixed>
+     * @return \Illuminate\Support\Collection<array-key, mixed>
      */
     public function pluck($value, $key = null)
     {
