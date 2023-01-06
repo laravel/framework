@@ -33,14 +33,15 @@ trait CompilesJson
     /**
      * Wraps the given value in a json_encode function call.
      *
-     * @param  string     $value
-     * @param  int        $options
-     * @param  int|string $depth
+     * @param  string  $value
+     * @param  int  $options
+     * @param  int|string  $depth
      * @return string
      */
     protected function wrapJsonHandler($value, $options, $depth)
     {
         $value = "json_encode($value, $options, $depth)";
+
         return sprintf($this->echoFormat, $value);
     }
 }
