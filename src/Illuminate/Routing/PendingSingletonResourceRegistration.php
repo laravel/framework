@@ -101,6 +101,19 @@ class PendingSingletonResourceRegistration
     }
 
     /**
+     * Indicate that the resource should have a deletion route.
+     *
+     * @param  bool  $destroyable
+     * @return $this
+     */
+    public function destroyable($destroyable = true)
+    {
+        $this->options['destroyable'] = $destroyable;
+
+        return $this;
+    }
+
+    /**
      * Set the route names for controller actions.
      *
      * @param  array|string  $names

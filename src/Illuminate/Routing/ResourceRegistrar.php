@@ -259,6 +259,14 @@ class ResourceRegistrar
             );
         }
 
+        if (isset($options['destroyable'])) {
+            $methods = array_merge(['destroy'], $methods);
+
+            return $this->getResourceMethods(
+                $methods, array_values(Arr::except($options, ['destroyable']))
+            );
+        }
+
         return $methods;
     }
 
