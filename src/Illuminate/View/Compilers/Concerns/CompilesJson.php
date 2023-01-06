@@ -25,6 +25,22 @@ trait CompilesJson
 
         $depth = isset($parts[2]) ? trim($parts[2]) : 512;
 
-        return "<?php echo json_encode($parts[0], $options, $depth) ?>";
+        $wrapped = $this->wrapJsonHandler($parts[0], $options, $depth);
+
+        return "<?php echo $wrapped ?>";
+    }
+
+    /**
+     * Wraps the given value in a json_encode function call.
+     *
+     * @param  string     $value
+     * @param  int        $options
+     * @param  int|string $depth
+     * @return string
+     */
+    protected function wrapJsonHandler($value, $options, $depth)
+    {
+        $value = "json_encode($value, $options, $depth)";
+        return sprintf($this->echoFormat, $value);
     }
 }
