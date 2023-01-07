@@ -2100,6 +2100,19 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testChunkWithoutPreservingKeys($collection)
+    {
+        $data = new $collection([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+        $data = $data->chunk(3, false);
+
+        $this->assertEquals([1, 2, 3], $data->first()->toArray());
+        $this->assertEquals([4, 5, 6], $data->get(1)->toArray());
+        $this->assertEquals([10], $data->last()->toArray());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testSplitIn($collection)
     {
         $data = new $collection([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);

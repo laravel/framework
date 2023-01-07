@@ -946,9 +946,10 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * Chunk the collection into chunks of the given size.
      *
      * @param  int  $size
+     * @param  bool  $preserveKeys
      * @return static<int, static>
      */
-    public function chunk($size);
+    public function chunk($size, $preserveKeys = true);
 
     /**
      * Chunk the collection into chunks with a callback.
