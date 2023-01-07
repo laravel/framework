@@ -154,7 +154,7 @@ class StartSession
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Contracts\Session\Session
      */
-    public function getSession(Request $request)
+    protected function getSession(Request $request)
     {
         return tap($this->manager->driver(), function ($session) use ($request) {
             $session->setId($request->cookies->get($session->getName()));
