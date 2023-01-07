@@ -96,7 +96,7 @@ class ValidationRuleParserTest extends TestCase
         ], $rules);
     }
 
-    public function testExplodeProperlyParsesSingleRegexRule()
+    public function testExplodeFailsParsingSingleRegexRuleContainingPipe()
     {
         $data = ['items' => [['type' => 'foo']]];
 
@@ -104,7 +104,8 @@ class ValidationRuleParserTest extends TestCase
             ['items.*.type' => 'regex:/^(foo|bar)$/i']
         );
 
-        $this->assertSame('regex:/^(foo|bar)$/i', $exploded->rules['items.0.type'][0]);
+        $this->assertSame('regex:/^(foo', $exploded->rules['items.0.type'][0]);
+        $this->assertSame('bar)$/i', $exploded->rules['items.0.type'][1]);
     }
 
     public function testExplodeProperlyParsesRegexWithArrayOfRules()
