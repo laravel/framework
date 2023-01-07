@@ -108,6 +108,18 @@ class ValidationRuleParserTest extends TestCase
         $this->assertSame('bar)$/i', $exploded->rules['items.0.type'][1]);
     }
 
+    public function testExplodeProperlyParsesSingleRegexRuleNotContainingPipe()
+    {
+        $data = ['items' => [['type' => 'foo']]];
+
+        $exploded = (new ValidationRuleParser($data))->explode(
+            ['items.*.type' => 'regex:/^[\d\-]*$/|max:20']
+        );
+
+        $this->assertSame('regex:/^[\d\-]*$/', $exploded->rules['items.0.type'][0]);
+        $this->assertSame('max:20', $exploded->rules['items.0.type'][1]);
+    }
+
     public function testExplodeProperlyParsesRegexWithArrayOfRules()
     {
         $data = ['items' => [['type' => 'foo']]];
