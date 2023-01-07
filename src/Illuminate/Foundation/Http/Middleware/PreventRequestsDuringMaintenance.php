@@ -75,15 +75,25 @@ class PreventRequestsDuringMaintenance
                 );
             }
 
-            throw new HttpException(
-                $data['status'] ?? 503,
-                'Service Unavailable',
-                null,
-                $this->getHeaders($data)
-            );
+            $this->abort($data);
         }
 
         return $next($request);
+    }
+
+    /**
+     * @param array $data
+     *
+     * @throws HttpException
+     */
+    public function abort(array $data): void
+    {
+        throw new HttpException(
+            $data['status'] ?? 503,
+            'Service Unavailable',
+            null,
+            $this->getHeaders($data)
+        );
     }
 
     /**
