@@ -59,8 +59,8 @@ class PreventRequestsDuringMaintenance
 
             if (isset($data['redirect'])) {
                 $path = $data['redirect'] === '/'
-                            ? $data['redirect']
-                            : trim($data['redirect'], '/');
+                    ? $data['redirect']
+                    : trim($data['redirect'], '/');
 
                 if ($request->path() !== $path) {
                     return redirect($path);
@@ -82,7 +82,7 @@ class PreventRequestsDuringMaintenance
     }
 
     /**
-     * @param array $data
+     * @param  array  $data
      *
      * @throws HttpException
      */
@@ -106,11 +106,11 @@ class PreventRequestsDuringMaintenance
     protected function hasValidBypassCookie($request, array $data)
     {
         return isset($data['secret']) &&
-                $request->cookie('laravel_maintenance') &&
-                MaintenanceModeBypassCookie::isValid(
-                    $request->cookie('laravel_maintenance'),
-                    $data['secret']
-                );
+            $request->cookie('laravel_maintenance') &&
+            MaintenanceModeBypassCookie::isValid(
+                $request->cookie('laravel_maintenance'),
+                $data['secret']
+            );
     }
 
     /**
