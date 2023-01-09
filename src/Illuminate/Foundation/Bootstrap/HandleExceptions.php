@@ -60,12 +60,11 @@ class HandleExceptions
      * @param  string  $message
      * @param  string  $file
      * @param  int  $line
-     * @param  array  $context
      * @return void
      *
      * @throws \ErrorException
      */
-    public function handleError($level, $message, $file = '', $line = 0, $context = [])
+    public function handleError($level, $message, $file = '', $line = 0)
     {
         if ($this->isDeprecation($level)) {
             $this->handleDeprecationError($message, $file, $line, $level);
