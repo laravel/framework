@@ -528,7 +528,7 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Set the visible attributes across the entire collection.
      *
-     * @param  array<string>  $visible
+     * @param  array<int, string>  $visible
      * @return $this
      */
     public function setVisible($visible)
