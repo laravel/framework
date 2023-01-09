@@ -460,6 +460,92 @@ class EventsDispatcherTest extends TestCase
         $listeners = $d->getListeners(ExampleEvent::class);
         $this->assertCount(3, $listeners);
     }
+
+    public function testListenersObjectsCreationOrder()
+    {
+        $_SERVER['__event.test'] = [];
+        $d = new Dispatcher;
+        $d->listen(TestEvent::class, TestListener1::class);
+        $d->listen(TestEvent::class, TestListener2::class);
+        $d->listen(TestEvent::class, TestListener3::class);
+
+        // Attaching events does not make any objects.
+        $this->assertEquals([], $_SERVER['__event.test']);
+
+        $d->dispatch(TestEvent::class);
+
+        // Dispatching event does not make an object of the event class.
+        $this->assertEquals([
+            'cons-1',
+            'handle-1',
+            'cons-2',
+            'handle-2',
+            'cons-3',
+            'handle-3',
+        ], $_SERVER['__event.test']);
+
+        $d->dispatch(TestEvent::class);
+
+        // Event Objects are re-resolved on each dispatch. (No memoization)
+        $this->assertEquals([
+            'cons-1',
+            'handle-1',
+            'cons-2',
+            'handle-2',
+            'cons-3',
+            'handle-3',
+            'cons-1',
+            'handle-1',
+            'cons-2',
+            'handle-2',
+            'cons-3',
+            'handle-3',
+        ], $_SERVER['__event.test']);
+
+        unset($_SERVER['__event.test']);
+    }
+
+    public function test_Listener_object_creation_is_lazy()
+    {
+        $d = new Dispatcher;
+        $d->listen(TestEvent::class, TestListener1::class);
+        $d->listen(TestEvent::class, TestListener2Falser::class);
+        $d->listen(TestEvent::class, TestListener3::class);
+        $d->listen(ExampleEvent::class, TestListener2::class);
+
+        $_SERVER['__event.test'] = [];
+        $d->dispatch(ExampleEvent::class);
+
+        // It only resolves relevant listeners not all.
+        $this->assertEquals(['cons-2', 'handle-2'], $_SERVER['__event.test']);
+
+        $_SERVER['__event.test'] = [];
+        $d->dispatch(TestEvent::class);
+
+        $this->assertEquals([
+            'cons-1',
+            'handle-1',
+            'cons-2-falser',
+            'handle-2-falser',
+        ], $_SERVER['__event.test']);
+
+        unset($_SERVER['__event.test']);
+
+        $d = new Dispatcher;
+        $d->listen(TestEvent::class, TestListener1::class);
+        $d->listen(TestEvent::class, TestListener2Falser::class);
+        $d->listen(TestEvent::class, TestListener3::class);
+
+        $_SERVER['__event.test'] = [];
+        $d->dispatch(TestEvent::class, halt: true);
+
+        $this->assertEquals([
+            'cons-1',
+            'handle-1',
+        ], $_SERVER['__event.test']);
+
+        unset($_SERVER['__event.test']);
+    }
 }
 
 class ExampleEvent
@@ -497,5 +583,71 @@ class TestListener
     public function handle()
     {
         self::$counter++;
+    }
+}
+
+class TestEvent
+{
+    public function __construct()
+    {
+        $_SERVER['__event.test'][] = 'cons-event-1';
+    }
+}
+
+class TestListener1
+{
+    public function __construct()
+    {
+        $_SERVER['__event.test'][] = 'cons-1';
+    }
+
+    public function handle()
+    {
+        $_SERVER['__event.test'][] = 'handle-1';
+
+        return 'resp-1';
+    }
+}
+
+class TestListener2
+{
+    public function __construct()
+    {
+        $_SERVER['__event.test'][] = 'cons-2';
+    }
+
+    public function handle()
+    {
+        $_SERVER['__event.test'][] = 'handle-2';
+
+        return 'resp-2';
+    }
+}
+
+class TestListener2Falser
+{
+    public function __construct()
+    {
+        $_SERVER['__event.test'][] = 'cons-2-falser';
+    }
+
+    public function handle()
+    {
+        $_SERVER['__event.test'][] = 'handle-2-falser';
+
+        return false;
+    }
+}
+
+class TestListener3
+{
+    public function __construct()
+    {
+        $_SERVER['__event.test'][] = 'cons-3';
+    }
+
+    public function handle()
+    {
+        $_SERVER['__event.test'][] = 'handle-3';
     }
 }
