@@ -20,7 +20,7 @@
         "ext-openssl": "*",
         "doctrine/inflector": "^2.0.6",
         "dragonmantank/cron-expression": "^3.3.2",
-        "egulias/email-validator": "^3.2.5",
+        "egulias/email-validator": "^4.0",
         "fruitcake/php-cors": "^1.2",
         "laravel/serializable-closure": "^1.2.2",
         "league/commonmark": "^2.3.8",
