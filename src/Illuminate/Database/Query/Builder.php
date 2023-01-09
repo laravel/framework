@@ -3393,6 +3393,32 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Atomically increments columns values by the given amounts.
+     *
+     * @param  array<string, float|int|numeric-string>  $columns
+     * @param  array<string, mixed>  $extra
+     * @return int
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function incrementColumns(array $columns, array $extra = [])
+    {
+        foreach ($columns as $column => $amount) {
+            if (! is_numeric($amount)) {
+                throw new InvalidArgumentException("Non-numeric value passed as increment amount for column: '$column'.");
+            }
+
+            if (! is_string($column)) {
+                throw new InvalidArgumentException('Non-associative array passed to incrementMany method.');
+            }
+
+            $columns[$column] = $this->raw("{$this->grammar->wrap($column)} + $amount");
+        }
+
+        return $this->update(array_merge($columns, $extra));
+    }
+
+    /**
      * Increment a column's value by a given amount.
      *
      * @param  string  $column
@@ -3408,11 +3434,7 @@ class Builder implements BuilderContract
             throw new InvalidArgumentException('Non-numeric value passed to increment method.');
         }
 
-        $wrapped = $this->grammar->wrap($column);
-
-        $columns = array_merge([$column => $this->raw("$wrapped + $amount")], $extra);
-
-        return $this->update($columns);
+        return $this->incrementColumns([$column => $amount], $extra);
     }
 
     /**

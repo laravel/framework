@@ -1978,6 +1978,22 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 'bar', 1 => 'foo'], $builder->getBindings());
     }
 
+    public function testIncrementManyArgumentValidation1()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectErrorMessage('Non-numeric value passed as increment amount for column: \'col\'.');
+        $builder = $this->getBuilder();
+        $builder->from('users')->incrementColumns(['col' => 'a']);
+    }
+
+    public function testIncrementManyArgumentValidation2()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectErrorMessage('Non-associative array passed to incrementMany method.');
+        $builder = $this->getBuilder();
+        $builder->from('users')->incrementColumns([11 => 11]);
+    }
+
     public function testWhereNotWithArrayConditions()
     {
         $builder = $this->getBuilder();
