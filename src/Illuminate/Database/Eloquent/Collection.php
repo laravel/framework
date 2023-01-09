@@ -539,7 +539,7 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Set the hidden attributes across the entire collection.
      *
-     * @param  array<string>  $hidden
+     * @param  array<int, string>  $hidden
      * @return $this
      */
     public function setHidden($hidden)
