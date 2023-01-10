@@ -36,7 +36,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      *
      * @var string
      */
-    private $suffix;
+    protected $suffix;
 
     /**
      * Create a new Amazon SQS queue instance.

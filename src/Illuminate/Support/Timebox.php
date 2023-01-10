@@ -14,9 +14,11 @@ class Timebox
     /**
      * Invoke the given callback within the specified timebox minimum.
      *
-     * @param  callable  $callback
+     * @template TCallReturnType
+     *
+     * @param  (callable($this): TCallReturnType)  $callback
      * @param  int  $microseconds
-     * @return mixed
+     * @return TCallReturnType
      */
     public function call(callable $callback, int $microseconds)
     {

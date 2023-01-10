@@ -332,7 +332,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table `users` add primary key `bar`(`foo`)', $statements[0]);
+        $this->assertSame('alter table `users` add primary key (`foo`)', $statements[0]);
     }
 
     public function testAddingPrimaryKeyWithAlgorithm()
@@ -342,7 +342,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table `users` add primary key `bar` using hash(`foo`)', $statements[0]);
+        $this->assertSame('alter table `users` add primary key using hash(`foo`)', $statements[0]);
     }
 
     public function testAddingUniqueKey()

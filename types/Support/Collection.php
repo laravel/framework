@@ -874,8 +874,8 @@ assertType('int', $collection->make([1])->pipe(function ($collection) {
 
 assertType('mixed', $collection->pipeInto(User::class));
 
-assertType('Illuminate\Support\Collection<int, mixed>', $collection->make(['string' => 'string'])->pluck('string'));
-assertType('Illuminate\Support\Collection<int, mixed>', $collection->make(['string' => 'string'])->pluck('string', 'string'));
+assertType('Illuminate\Support\Collection<(int|string), mixed>', $collection->make(['string' => 'string'])->pluck('string'));
+assertType('Illuminate\Support\Collection<(int|string), mixed>', $collection->make(['string' => 'string'])->pluck('string', 'string'));
 
 assertType('Illuminate\Support\Collection<int, User>', $collection->reject());
 assertType('Illuminate\Support\Collection<int, User>', $collection->reject(new User));
