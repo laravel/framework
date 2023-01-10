@@ -421,7 +421,9 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
             }
 
             if ($value === true) {
-                $value = $key;
+                // We make an exception for Alpine's x-data attribute. This allows us to initialize
+                // an Alpine component with empty state, e.g.: <x-button x-data @click="..."/>
+                $value = $key === 'x-data' ? '' : $key;
             }
 
             $string .= ' '.$key.'="'.str_replace('"', '\\"', trim($value)).'"';
