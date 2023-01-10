@@ -595,6 +595,48 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Determine if an item exists in the collection by value.
+     *
+     * @param mixed $value
+     * @return bool
+     */
+    public function hasValue($value)
+    {
+        $values = is_array($value) ? $value : func_get_args();
+
+        foreach ($values as $value) {
+            if (! in_array($value, $this->items)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Determine if any of the values exists in the collection.
+     *
+     * @param mixed $value
+     * @return bool
+     */
+    public function hasAnyValue($value)
+    {
+        if ($this->isEmpty()) {
+            return false;
+        }
+
+        $values = is_array($value) ? $value : func_get_args();
+
+        foreach ($values as $value) {
+            if ($this->hasValue($value)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Concatenate values of a given key as a string.
      *
      * @param  callable|string  $value
