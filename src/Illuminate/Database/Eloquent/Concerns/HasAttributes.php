@@ -3,6 +3,8 @@
 namespace Illuminate\Database\Eloquent\Concerns;
 
 use BackedEnum;
+use Brick\Math\BigDecimal;
+use Brick\Math\RoundingMode;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use DateTimeImmutable;
@@ -1322,21 +1324,7 @@ trait HasAttributes
      */
     protected function asDecimal($value, $decimals)
     {
-        if (extension_loaded('bcmath')) {
-            return bcadd($value, 0, $decimals);
-        }
-
-        if (! is_numeric($value)) {
-            throw new TypeError('$value must be numeric.');
-        }
-
-        if (is_string($value) && Str::contains($value, 'e', true)) {
-            throw new RuntimeException('The "decimal" model cast is unable to handle string based floats with exponents.');
-        }
-
-        [$int, $fraction] = explode('.', $value) + [1 => ''];
-
-        return Str::of($int)->padLeft('1', '0').'.'.Str::of($fraction)->limit($decimals, '')->padRight($decimals, '0');
+        return (string) BigDecimal::of($value)->toScale($decimals, RoundingMode::HALF_UP);
     }
 
     /**
