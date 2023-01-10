@@ -233,17 +233,39 @@ class Builder
     }
 
     /**
+     * Get the columns for a given table.
+     *
+     * @param  string  $table
+     * @return array
+     */
+    public function getColumns($table)
+    {
+        $table = $this->connection->getTablePrefix().$table;
+
+        $results = $this->connection->selectFromWriteConnection($this->grammar->compileColumns($table));
+
+        return $this->connection->getPostProcessor()->processColumns($results);
+    }
+
+    /**
      * Get the data type for the given column name.
      *
      * @param  string  $table
      * @param  string  $column
+     * @param  bool  $fullDefinition
      * @return string
      */
-    public function getColumnType($table, $column)
+    public function getColumnType($table, $column, $fullDefinition = false)
     {
-        $table = $this->connection->getTablePrefix().$table;
+        $columns = $this->getColumns($table);
 
-        return $this->connection->getDoctrineColumn($table, $column)->getType()->getName();
+        foreach ($columns as $value) {
+            if (strtolower($value['name']) === $column) {
+                return $fullDefinition ? $value['type'] : $value['type_name'];
+            }
+        }
+
+        throw new InvalidArgumentException("There is no column with name '$column' on table '$table'.");
     }
 
     /**
@@ -254,11 +276,7 @@ class Builder
      */
     public function getColumnListing($table)
     {
-        $results = $this->connection->selectFromWriteConnection($this->grammar->compileColumnListing(
-            $this->connection->getTablePrefix().$table
-        ));
-
-        return $this->connection->getPostProcessor()->processColumnListing($results);
+        return array_map(fn($result) => $result['name'], $this->getColumns($table));
     }
 
     /**

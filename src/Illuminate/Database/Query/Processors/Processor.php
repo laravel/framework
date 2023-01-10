@@ -42,8 +42,16 @@ class Processor
      * @param  array  $results
      * @return array
      */
-    public function processColumnListing($results)
+    public function processColumns($results)
     {
-        return $results;
+        return array_map(function ($result) {
+            $result = (object) $result;
+
+            return [
+                'name' => $result->name,
+                'type_name' => $result->type_name,
+                'type' => $result->type,
+            ];
+        }, $results);
     }
 }

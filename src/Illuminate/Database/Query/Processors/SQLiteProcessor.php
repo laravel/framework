@@ -10,10 +10,16 @@ class SQLiteProcessor extends Processor
      * @param  array  $results
      * @return array
      */
-    public function processColumnListing($results)
+    public function processColumns($results)
     {
         return array_map(function ($result) {
-            return ((object) $result)->name;
+            $result = (object) $result;
+
+            return [
+                'name' => $result->name,
+                'type_name' => strtok($result->type, '('),
+                'type' => $result->type,
+            ];
         }, $results);
     }
 }

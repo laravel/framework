@@ -36,10 +36,31 @@ class PostgresProcessor extends Processor
      * @param  array  $results
      * @return array
      */
-    public function processColumnListing($results)
+    public function processColumns($results)
     {
         return array_map(function ($result) {
-            return ((object) $result)->column_name;
+            $result = (object) $result;
+
+            $type = match ($typeName = $result->type_name) {
+                'bit', 'bit varying', 'character', 'character varying'
+                    => is_null($result->length) ? $typeName : $typeName."($result->length)",
+                'numeric' => is_null($result->total) ? $typeName : $typeName."($result->total, $result->places)",
+                'time without time zone'
+                    => is_null($result->precision) ? $typeName : "time($result->precision) without time zone",
+                'time with time zone'
+                    => is_null($result->precision) ? $typeName : "time($result->precision) with time zone",
+                'timestamp without time zone'
+                    => is_null($result->precision) ? $typeName : "timestamp($result->precision) without time zone",
+                'timestamp with time zone'
+                    => is_null($result->precision) ? $typeName : "timestamp($result->precision) with time zone",
+                default => $typeName,
+            };
+
+            return [
+                'name' => $result->name,
+                'type_name' => $result->type_name,
+                'type' => $type,
+            ];
         }, $results);
     }
 }

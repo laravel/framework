@@ -1175,11 +1175,11 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertSame("select * from information_schema.tables where table_catalog = 'db' and table_schema = 'public' and table_name = 'table' and table_type = 'BASE TABLE'", $statement);
     }
 
-    public function testCompileColumnListing()
+    public function testCompileColumns()
     {
-        $statement = $this->getGrammar()->compileColumnListing();
+        $statement = $this->getGrammar()->compileColumns('db', 'public', 'table');
 
-        $this->assertSame('select column_name from information_schema.columns where table_catalog = ? and table_schema = ? and table_name = ?', $statement);
+        $this->assertSame("select column_name as \"name\", data_type as \"type_name\", character_maximum_length as \"length\", numeric_precision as \"total\", numeric_scale as \"places\", datetime_precision as \"precision\" from information_schema.columns where table_catalog = 'db' and table_schema = 'public' and table_name = 'table'", $statement);
     }
 
     protected function getConnection()

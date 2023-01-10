@@ -86,9 +86,15 @@ class SqlServerGrammar extends Grammar
      * @param  string  $table
      * @return string
      */
-    public function compileColumnListing($table)
+    public function compileColumns($table)
     {
-        return "select name from sys.columns where object_id = object_id('$table')";
+        return sprintf(
+            'select col.name as name, type.name as type_name, '
+                .'col.max_length as length, col.precision as precision, col.scale as places '
+                .'from sys.columns as col join sys.types as type on col.user_type_id = type.user_type_id '
+                .'where object_id = object_id(%s)',
+            $this->quoteString($table)
+        );
     }
 
     /**

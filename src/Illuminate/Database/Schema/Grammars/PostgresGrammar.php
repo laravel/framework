@@ -89,11 +89,21 @@ class PostgresGrammar extends Grammar
     /**
      * Compile the query to determine the list of columns.
      *
+     * @param  string  $database
+     * @param  string  $schema
+     * @param  string  $table
      * @return string
      */
-    public function compileColumnListing()
+    public function compileColumns($database, $schema, $table)
     {
-        return 'select column_name from information_schema.columns where table_catalog = ? and table_schema = ? and table_name = ?';
+        return sprintf(
+            'select column_name as "name", data_type as "type_name", '
+                .'character_maximum_length as "length", numeric_precision as "total", numeric_scale as "places", datetime_precision as "precision" '
+                .'from information_schema.columns where table_catalog = %s and table_schema = %s and table_name = %s',
+            $this->quoteString($database),
+            $this->quoteString($schema),
+            $this->quoteString($table)
+        );
     }
 
     /**

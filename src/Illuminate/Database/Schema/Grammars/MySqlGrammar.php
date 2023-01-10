@@ -84,11 +84,18 @@ class MySqlGrammar extends Grammar
     /**
      * Compile the query to determine the list of columns.
      *
+     * @param  string  $database
+     * @param  string  $table
      * @return string
      */
-    public function compileColumnListing()
+    public function compileColumns($database, $table)
     {
-        return 'select column_name as `column_name` from information_schema.columns where table_schema = ? and table_name = ?';
+        return sprintf(
+            'select column_name as `name`, column_type as `type`, data_type as `type_name` '
+                .'from information_schema.columns where table_schema = %s and table_name = %s',
+            $this->quoteString($database),
+            $this->quoteString($table)
+        );
     }
 
     /**
