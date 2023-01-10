@@ -15,7 +15,7 @@ class DatabaseSQLiteProcessorTest extends TestCase
         $expected = [
             ['name' => 'id', 'type_name' => 'integer', 'type' => 'integer'],
             ['name' => 'name', 'type_name' => 'varchar', 'type' => 'varchar'],
-            ['name' => 'is_active', 'type_name' => 'tinyint', 'type' => 'tinyint(1)']
+            ['name' => 'is_active', 'type_name' => 'tinyint', 'type' => 'tinyint(1)'],
         ];
 
         $this->assertEquals($expected, $processor->processColumns($listing));

@@ -20,7 +20,7 @@ class DatabasePostgresProcessorTest extends TestCase
         $expected = [
             ['name' => 'id', 'type_name' => 'bigserial', 'type' => 'bigserial'],
             ['name' => 'name', 'type_name' => 'character varying', 'type' => 'character varying(100)'],
-            ['name' => 'balance', 'type_name' => 'numeric', 'type' => 'numeric(8, 0)'],
+            ['name' => 'balance', 'type_name' => 'numeric', 'type' => 'numeric(8,0)'],
             ['name' => 'birth_date', 'type_name' => 'timestamp without time zone', 'type' => 'timestamp(6) without time zone'],
         ];
 
