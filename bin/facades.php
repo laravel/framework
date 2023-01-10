@@ -178,7 +178,9 @@ function resolveDocParamType($method, $parameter)
         }
     }
 
-    return trim(resolveDocblockTypes($method, $paramTypeNode->type), '()');
+    $type = resolveDocblockTypes($method, $paramTypeNode->type);
+
+    return is_string($type) ? trim($type, '()') : null;
 }
 
 /**
@@ -195,7 +197,9 @@ function resolveReturnDocType($method)
         return null;
     }
 
-    return trim(resolveDocblockTypes($method, $returnTypeNode->type), '()');
+    $type = resolveDocblockTypes($method, $returnTypeNode->type);
+
+    return is_string($type) ? trim($type, '()') : null;
 }
 
 /**
@@ -296,8 +300,8 @@ function resolveDocblockTypes($method, $typeNode)
 
     echo 'Unhandled type: '.$typeNode::class;
     echo PHP_EOL;
-    echo 'You will need to update the `resolveDocblockTypes` to handle this type.';
-    exit(1);
+    echo 'You may need to update the `resolveDocblockTypes` to handle this type.';
+    echo PHP_EOL;
 }
 
 /**
@@ -317,7 +321,7 @@ function handleConditionalType($method, $typeNode)
     }
 
     echo 'Found unknown conditional type. You will need to update the `handleConditionalType` to handle this new conditional type.';
-    exit(1);
+    echo PHP_EOL;
 }
 
 /**
@@ -373,8 +377,8 @@ function handleUnknownIdentifierType($method, $typeNode)
 
     echo 'Found unknown type: '.$typeNode->name;
     echo PHP_EOL;
-    echo 'You will need to update the `handleUnknownIdentifierType` to handle this new type / generic.';
-    exit(1);
+    echo 'You may need to update the `handleUnknownIdentifierType` to handle this new type / generic.';
+    echo PHP_EOL;
 }
 
 /**

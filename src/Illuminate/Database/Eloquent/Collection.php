@@ -526,6 +526,28 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Set the visible attributes across the entire collection.
+     *
+     * @param  array<int, string>  $visible
+     * @return $this
+     */
+    public function setVisible($visible)
+    {
+        return $this->each->setVisible($visible);
+    }
+
+    /**
+     * Set the hidden attributes across the entire collection.
+     *
+     * @param  array<int, string>  $hidden
+     * @return $this
+     */
+    public function setHidden($hidden)
+    {
+        return $this->each->setHidden($hidden);
+    }
+
+    /**
      * Append an attribute across the entire collection.
      *
      * @param  array<array-key, string>|string  $attributes
@@ -564,7 +586,7 @@ class Collection extends BaseCollection implements QueueableCollection
      *
      * @param  string|array<array-key, string>  $value
      * @param  string|null  $key
-     * @return \Illuminate\Support\Collection<int, mixed>
+     * @return \Illuminate\Support\Collection<array-key, mixed>
      */
     public function pluck($value, $key = null)
     {
