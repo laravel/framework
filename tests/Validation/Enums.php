@@ -19,3 +19,20 @@ enum PureEnum
     case one;
     case two;
 }
+
+enum MethodStatus: int
+{
+    case Pending = 1;
+    case Done = 2;
+
+    public static function tryFromName($value)
+    {
+        foreach (self::cases() as $enum) {
+            if ($enum->name === $value) {
+                return $enum;
+            }
+        }
+
+        return null;
+    }
+}

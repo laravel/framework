@@ -20,24 +20,26 @@ if (PHP_VERSION_ID >= 80100) {
  */
 class ValidationEnumRuleTest extends TestCase
 {
-    public function testvalidationPassesWhenPassingCorrectEnum()
+    public function testValidationPassesWhenPassingCorrectEnum()
     {
         $v = new Validator(
             resolve('translator'),
             [
                 'status' => 'pending',
                 'int_status' => 1,
+                'method_status' => 'Pending',
             ],
             [
                 'status' => new Enum(StringStatus::class),
                 'int_status' => new Enum(IntegerStatus::class),
+                'method_status' => new Enum(MethodStatus::class, 'tryFromName'),
             ]
         );
 
         $this->assertFalse($v->fails());
     }
 
-    public function testvalidationPassesWhenPassingInstanceOfEnum()
+    public function testValidationPassesWhenPassingInstanceOfEnum()
     {
         $v = new Validator(
             resolve('translator'),
@@ -52,7 +54,7 @@ class ValidationEnumRuleTest extends TestCase
         $this->assertFalse($v->fails());
     }
 
-    public function testvalidationPassesWhenPassingInstanceOfPureEnum()
+    public function testValidationPassesWhenPassingInstanceOfPureEnum()
     {
         $v = new Validator(
             resolve('translator'),
@@ -169,6 +171,37 @@ class ValidationEnumRuleTest extends TestCase
             ],
             [
                 'status' => new Enum(IntegerStatus::class),
+            ]
+        );
+
+        $this->assertTrue($v->fails());
+        $this->assertEquals(['The selected status is invalid.'], $v->messages()->get('status'));
+    }
+
+    public function testValidationPassesWhenPassingMethodToEnum()
+    {
+        $v = new Validator(
+            resolve('translator'),
+            [
+                'status' => 'Done',
+            ],
+            [
+                'status' => new Enum(MethodStatus::class, 'tryFromName'),
+            ]
+        );
+
+        $this->assertFalse($v->fails());
+    }
+
+    public function testValidationFailsWhenMethodDoesNotExist()
+    {
+        $v = new Validator(
+            resolve('translator'),
+            [
+                'status' => 'Done',
+            ],
+            [
+                'status' => new Enum(MethodStatus::class, 'doesnotexist'),
             ]
         );
 

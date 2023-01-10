@@ -15,14 +15,28 @@ class Enum implements Rule
     protected $type;
 
     /**
+     * The method used to translate a value into the enum.
+     *
+     * @var string
+     */
+    protected $method;
+
+    /**
      * Create a new rule instance.
      *
      * @param  string  $type
+     * @param  string  $method
      * @return void
      */
-    public function __construct($type)
+    public function __construct($type, $method = 'tryFrom')
     {
         $this->type = $type;
+        $this->method = $method;
+    }
+
+    public function method($method)
+    {
+        $this->method = $method;
     }
 
     /**
@@ -38,12 +52,12 @@ class Enum implements Rule
             return true;
         }
 
-        if (is_null($value) || ! function_exists('enum_exists') || ! enum_exists($this->type) || ! method_exists($this->type, 'tryFrom')) {
+        if (is_null($value) || ! function_exists('enum_exists') || ! enum_exists($this->type) || ! method_exists($this->type, $this->method)) {
             return false;
         }
 
         try {
-            return ! is_null($this->type::tryFrom($value));
+            return ! is_null($this->type::{$this->method}($value));
         } catch (TypeError $e) {
             return false;
         }
