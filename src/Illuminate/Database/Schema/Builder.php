@@ -414,6 +414,7 @@ class Builder
     /**
      * Disable foreign key constraints in a callback.
      *
+     * @param  \Closure  $callback
      * @return void
      */
     public function withoutForeignKeyConstraints(Closure $callback)
