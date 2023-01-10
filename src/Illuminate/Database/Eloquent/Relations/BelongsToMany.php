@@ -334,6 +334,23 @@ class BelongsToMany extends Relation
     {
         $this->using = $class;
 
+        return $this->loadKeyColumnIfAvailable($class);
+    }
+
+    /**
+     * If the custom pivot model is incrementing, load the key column as pivot column.
+     * 
+     * @param string $class 
+     * @return $this 
+     */
+    protected function loadKeyColumnIfAvailable(string $class)
+    {
+        $instance = new $class;
+
+        if ($instance instanceof Model && $instance->incrementing) {
+            return $this->withPivot($instance->getKeyName());
+        }
+
         return $this;
     }
 
