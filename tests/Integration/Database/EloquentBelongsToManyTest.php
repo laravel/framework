@@ -1104,6 +1104,21 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertEquals(0, $user->postsWithCustomPivot()->first()->pivot->is_draft);
     }
 
+    public function testIncrementingPivotLoadsPrimaryKey()
+    {
+        $user = User::create(['name' => Str::random()]);
+        $post1 = Post::create(['title' => Str::random()]);
+
+        $user->postsWithIncrementingPivot()->sync([$post1->uuid]);
+
+        $lazyLoading = Model::preventsLazyLoading();
+        Model::preventLazyLoading();
+
+        $this->assertIsNumeric($user->postsWithIncrementingPivot->first()->pivot->id);
+
+        Model::preventLazyLoading($lazyLoading);
+    }
+
     public function testOrderByPivotMethod()
     {
         $tag1 = Tag::create(['name' => Str::random()]);
@@ -1218,6 +1233,12 @@ class User extends Model
             ->using(UserPostPivot::class)
             ->withPivot('is_draft')
             ->withTimestamps();
+    }
+
+    public function postsWithIncrementingPivot()
+    {
+        return $this->belongsToMany(Post::class, 'users_posts', 'user_uuid', 'post_uuid', 'uuid', 'uuid')
+            ->using(IncrementingPivot::class);
     }
 }
 
@@ -1343,6 +1364,12 @@ class TagWithCustomPivot extends Model
 class UserPostPivot extends Pivot
 {
     protected $table = 'users_posts';
+}
+
+class IncrementingPivot extends Pivot
+{
+    protected $table = '';
+    public $incrementing = true;
 }
 
 class PostTagPivot extends Pivot
