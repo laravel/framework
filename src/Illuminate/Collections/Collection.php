@@ -597,7 +597,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Determine if an item exists in the collection by value.
      *
-     * @param mixed $value
+     * @param  mixed  $value
      * @return bool
      */
     public function hasValue($value)
@@ -616,7 +616,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Determine if any of the values exists in the collection.
      *
-     * @param mixed $value
+     * @param  mixed  $value
      * @return bool
      */
     public function hasAnyValue($value)
