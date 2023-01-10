@@ -15,10 +15,12 @@ class SQLiteProcessor extends Processor
         return array_map(function ($result) {
             $result = (object) $result;
 
+            $type = strtolower($result->type);
+
             return [
                 'name' => $result->name,
-                'type_name' => strtok($result->type, '('),
-                'type' => $result->type,
+                'type_name' => strtok($type, '('),
+                'type' => $type,
             ];
         }, $results);
     }

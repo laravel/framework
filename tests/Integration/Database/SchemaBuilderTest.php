@@ -63,7 +63,7 @@ class SchemaBuilderTest extends DatabaseTestCase
         $blueprint->build($this->getConnection(), new SQLiteGrammar);
 
         $this->assertArrayHasKey(TinyInteger::NAME, Type::getTypesMap());
-        $this->assertSame('tinyinteger', Schema::getColumnType('test', 'test_column'));
+        $this->assertSame('tinyint', Schema::getColumnType('test', 'test_column'));
     }
 
     public function testRegisterCustomDoctrineTypeASecondTime()
@@ -85,7 +85,7 @@ class SchemaBuilderTest extends DatabaseTestCase
         $blueprint->build($this->getConnection(), new SQLiteGrammar);
 
         $this->assertArrayHasKey(TinyInteger::NAME, Type::getTypesMap());
-        $this->assertSame('tinyinteger', Schema::getColumnType('test', 'test_column'));
+        $this->assertSame('tinyint', Schema::getColumnType('test', 'test_column'));
     }
 
     public function testChangeToTextColumn()

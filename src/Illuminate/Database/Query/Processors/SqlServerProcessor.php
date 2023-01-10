@@ -67,9 +67,8 @@ class SqlServerProcessor extends Processor
             $result = (object) $result;
 
             $type = match ($typeName = $result->type_name) {
-                'binary', 'varbinary', 'char', 'varchar', 'nchar', 'nvarchar'
-                    => $result->length == -1 ? $typeName."(max)" : $typeName."($result->length)",
-                'decimal', 'numeric' => $typeName."($result->precision, $result->places)",
+                'binary', 'varbinary', 'char', 'varchar', 'nchar', 'nvarchar' => $result->length == -1 ? $typeName."(max)" : $typeName."($result->length)",
+                'decimal', 'numeric' => $typeName."($result->precision,$result->places)",
                 'float', 'datetime2', 'datetimeoffset', 'time' => $typeName."($result->precision)",
                 default => $typeName,
             };

@@ -5,7 +5,6 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Database\Schema\Builder;
-use LogicException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use stdClass;

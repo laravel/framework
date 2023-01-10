@@ -276,7 +276,7 @@ class Builder
      */
     public function getColumnListing($table)
     {
-        return array_map(fn($result) => $result['name'], $this->getColumns($table));
+        return array_map(fn ($result) => $result['name'], $this->getColumns($table));
     }
 
     /**
