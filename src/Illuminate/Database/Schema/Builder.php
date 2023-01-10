@@ -412,6 +412,20 @@ class Builder
     }
 
     /**
+     * Disable foreign key constraints in a callback.
+     *
+     * @return void
+     */
+    public function withoutForeignKeyConstraints(Closure $callback)
+    {
+        $this->disableForeignKeyConstraints();
+
+        $callback();
+
+        $this->enableForeignKeyConstraints();
+    }
+
+    /**
      * Execute the blueprint to build / modify the table.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
