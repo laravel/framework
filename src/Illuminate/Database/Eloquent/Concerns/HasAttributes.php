@@ -1323,7 +1323,11 @@ trait HasAttributes
     protected function asDecimal($value, $decimals)
     {
         if (extension_loaded('bcmath')) {
-            return bcadd($value, 0, $decimals);
+            if (((string) $value)[0] != '-') {
+                return bcadd($value, '0.' . str_repeat('0', $decimals) . '5', $decimals);
+            }
+
+            return bcsub($value, '0.' . str_repeat('0', $decimals) . '5', $decimals);
         }
 
         if (! is_numeric($value)) {
@@ -1334,9 +1338,11 @@ trait HasAttributes
             throw new RuntimeException('The "decimal" model cast is unable to handle string based floats with exponents.');
         }
 
-        [$int, $fraction] = explode('.', $value) + [1 => ''];
+        if ($decimals >= ini_get('precision')) {
+            throw new RuntimeException('$decimals precision is higher then floating point precision, please use ext-bcmath.');
+        }
 
-        return Str::of($int)->padLeft('1', '0').'.'.Str::of($fraction)->limit($decimals, '')->padRight($decimals, '0');
+        return number_format($value, $decimals, '.', '');
     }
 
     /**

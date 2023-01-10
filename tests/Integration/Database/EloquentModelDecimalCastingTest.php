@@ -141,10 +141,10 @@ class EloquentModelDecimalCastingTest extends DatabaseTestCase
         };
 
         $model->amount = '0.89898989898989898989898989898989898989898989';
-        $this->assertSame('0.89898989898989898989', $model->amount);
+        $this->assertSame('0.89898989898989898990', $model->amount);
     }
 
-    public function testItDoesntRoundNumbers()
+    public function testItRoundsNumbers()
     {
         $model = new class extends Model
         {
@@ -156,7 +156,22 @@ class EloquentModelDecimalCastingTest extends DatabaseTestCase
         };
 
         $model->amount = '0.99';
-        $this->assertSame('0.9', $model->amount);
+        $this->assertSame('1.0', $model->amount);
+    }
+
+    public function testItWorksOnNegativeNumbers()
+    {
+        $model = new class extends Model
+        {
+            public $timestamps = false;
+
+            protected $casts = [
+                'amount' => 'decimal:1',
+            ];
+        };
+
+        $model->amount = '-0.50';
+        $this->assertSame('-0.5', $model->amount);
     }
 
     public function testDecimalsAreCastable()
