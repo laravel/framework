@@ -71,11 +71,19 @@ class PostgresGrammar extends Grammar
     /**
      * Compile the query to determine if a table exists.
      *
+     * @param  string  $database
+     * @param  string  $schema
+     * @param  string  $table
      * @return string
      */
-    public function compileTableExists()
+    public function compileTableExists($database, $schema, $table)
     {
-        return "select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'";
+        return sprintf(
+            "select * from information_schema.tables where table_catalog = %s and table_schema = %s and table_name = %s and table_type = 'BASE TABLE'",
+            $this->quoteString($database),
+            $this->quoteString($schema),
+            $this->quoteString($table)
+        );
     }
 
     /**

@@ -26,9 +26,9 @@ class DatabasePostgresSchemaBuilderTest extends TestCase
         $connection->shouldReceive('getConfig')->with('schema')->andReturn('schema');
         $connection->shouldReceive('getConfig')->with('search_path')->andReturn('public');
         $builder = new PostgresBuilder($connection);
-        $grammar->shouldReceive('compileTableExists')->once()->andReturn('sql');
+        $grammar->shouldReceive('compileTableExists')->with('db', 'public', 'prefix_table')->once()->andReturn('sql');
         $connection->shouldReceive('getTablePrefix')->once()->andReturn('prefix_');
-        $connection->shouldReceive('selectFromWriteConnection')->once()->with('sql', ['db', 'public', 'prefix_table'])->andReturn(['prefix_table']);
+        $connection->shouldReceive('selectFromWriteConnection')->once()->with('sql')->andReturn(['prefix_table']);
 
         $this->assertTrue($builder->hasTable('table'));
     }

@@ -23,8 +23,8 @@ class DatabaseSchemaBuilderTest extends TestCase
         $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
         $builder = new Builder($connection);
 
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('This database driver does not support creating databases.');
+        $connection->shouldReceive('statement')->with($sql = 'sql');
+        $grammar->shouldReceive('compileCreateDatabase')->with('foo', $connection)->once()->andReturn($sql);
 
         $builder->createDatabase('foo');
     }
@@ -36,8 +36,8 @@ class DatabaseSchemaBuilderTest extends TestCase
         $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
         $builder = new Builder($connection);
 
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('This database driver does not support dropping databases.');
+        $connection->shouldReceive('statement')->with($sql = 'sql');
+        $grammar->shouldReceive('compileDropDatabaseIfExists')->with('foo')->once()->andReturn($sql);
 
         $builder->dropDatabaseIfExists('foo');
     }
@@ -48,9 +48,9 @@ class DatabaseSchemaBuilderTest extends TestCase
         $grammar = m::mock(stdClass::class);
         $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
         $builder = new Builder($connection);
-        $grammar->shouldReceive('compileTableExists')->once()->andReturn('sql');
+        $grammar->shouldReceive('compileTableExists')->with('prefix_table')->once()->andReturn('sql');
         $connection->shouldReceive('getTablePrefix')->once()->andReturn('prefix_');
-        $connection->shouldReceive('selectFromWriteConnection')->once()->with('sql', ['prefix_table'])->andReturn(['prefix_table']);
+        $connection->shouldReceive('selectFromWriteConnection')->once()->with('sql')->andReturn(['prefix_table']);
 
         $this->assertTrue($builder->hasTable('table'));
     }

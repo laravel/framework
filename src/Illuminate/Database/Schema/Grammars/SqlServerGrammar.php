@@ -69,11 +69,15 @@ class SqlServerGrammar extends Grammar
     /**
      * Compile the query to determine if a table exists.
      *
+     * @param  string  $table
      * @return string
      */
-    public function compileTableExists()
+    public function compileTableExists($table)
     {
-        return "select * from sys.sysobjects where id = object_id(?) and xtype in ('U', 'V')";
+        return sprintf(
+            "select * from sys.sysobjects where id = object_id(%s) and xtype in ('U', 'V')",
+            $this->quoteString($table)
+        );
     }
 
     /**

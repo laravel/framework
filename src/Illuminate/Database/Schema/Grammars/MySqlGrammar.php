@@ -68,11 +68,17 @@ class MySqlGrammar extends Grammar
     /**
      * Compile the query to determine the list of tables.
      *
+     * @param  string  $database
+     * @param  string  $table
      * @return string
      */
-    public function compileTableExists()
+    public function compileTableExists($database, $table)
     {
-        return "select * from information_schema.tables where table_schema = ? and table_name = ? and table_type = 'BASE TABLE'";
+        return sprintf(
+            "select * from information_schema.tables where table_schema = %s and table_name = %s and table_type = 'BASE TABLE'",
+            $this->quoteString($database),
+            $this->quoteString($table)
+        );
     }
 
     /**

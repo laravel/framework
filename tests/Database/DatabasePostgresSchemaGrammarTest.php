@@ -1170,9 +1170,9 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
     public function testCompileTableExists()
     {
-        $statement = $this->getGrammar()->compileTableExists();
+        $statement = $this->getGrammar()->compileTableExists('db', 'public', 'table');
 
-        $this->assertSame('select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = \'BASE TABLE\'', $statement);
+        $this->assertSame("select * from information_schema.tables where table_catalog = 'db' and table_schema = 'public' and table_name = 'table' and table_type = 'BASE TABLE'", $statement);
     }
 
     public function testCompileColumnListing()

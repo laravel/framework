@@ -29,11 +29,12 @@ class SQLiteGrammar extends Grammar
     /**
      * Compile the query to determine if a table exists.
      *
+     * @param  string  $table
      * @return string
      */
-    public function compileTableExists()
+    public function compileTableExists($table)
     {
-        return "select * from sqlite_master where type = 'table' and name = ?";
+        return "select * from sqlite_master where type = 'table' and name = ".$this->quoteString($table);
     }
 
     /**

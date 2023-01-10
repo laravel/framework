@@ -23,9 +23,9 @@ class DatabaseMySQLSchemaBuilderTest extends TestCase
         $connection->shouldReceive('getDatabaseName')->andReturn('db');
         $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
         $builder = new MySqlBuilder($connection);
-        $grammar->shouldReceive('compileTableExists')->once()->andReturn('sql');
+        $grammar->shouldReceive('compileTableExists')->once()->with('db', 'prefix_table')->andReturn('sql');
         $connection->shouldReceive('getTablePrefix')->once()->andReturn('prefix_');
-        $connection->shouldReceive('selectFromWriteConnection')->once()->with('sql', ['db', 'prefix_table'])->andReturn(['prefix_table']);
+        $connection->shouldReceive('selectFromWriteConnection')->once()->with('sql')->andReturn(['prefix_table']);
 
         $this->assertTrue($builder->hasTable('table'));
     }

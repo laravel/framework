@@ -133,7 +133,9 @@ class Builder
      */
     public function createDatabase($name)
     {
-        throw new LogicException('This database driver does not support creating databases.');
+        return $this->connection->statement(
+            $this->grammar->compileCreateDatabase($name, $this->connection)
+        );
     }
 
     /**
@@ -146,7 +148,9 @@ class Builder
      */
     public function dropDatabaseIfExists($name)
     {
-        throw new LogicException('This database driver does not support dropping databases.');
+        return $this->connection->statement(
+            $this->grammar->compileDropDatabaseIfExists($name)
+        );
     }
 
     /**
@@ -160,7 +164,7 @@ class Builder
         $table = $this->connection->getTablePrefix().$table;
 
         return count($this->connection->selectFromWriteConnection(
-            $this->grammar->compileTableExists(), [$table]
+            $this->grammar->compileTableExists($table)
         )) > 0;
     }
 
@@ -364,13 +368,25 @@ class Builder
     /**
      * Get all of the table names for the database.
      *
-     * @return void
-     *
-     * @throws \LogicException
+     * @return array
      */
     public function getAllTables()
     {
-        throw new LogicException('This database driver does not support getting all tables.');
+        return $this->connection->select(
+            $this->grammar->compileGetAllTables()
+        );
+    }
+
+    /**
+     * Get all of the view names for the database.
+     *
+     * @return array
+     */
+    public function getAllViews()
+    {
+        return $this->connection->select(
+            $this->grammar->compileGetAllViews()
+        );
     }
 
     /**
