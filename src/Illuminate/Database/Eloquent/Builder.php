@@ -232,11 +232,7 @@ class Builder implements BuilderContract
         }
 
         if (is_array($id) || $id instanceof Arrayable) {
-            if (in_array($this->model->getKeyType(), ['int', 'integer'])) {
-                $this->query->whereIntegerInRaw($this->model->getQualifiedKeyName(), $id);
-            } else {
-                $this->query->whereIn($this->model->getQualifiedKeyName(), $id);
-            }
+            $this->query->whereIn($this->model->getQualifiedKeyName(), $id);
 
             return $this;
         }
@@ -261,11 +257,7 @@ class Builder implements BuilderContract
         }
 
         if (is_array($id) || $id instanceof Arrayable) {
-            if (in_array($this->model->getKeyType(), ['int', 'integer'])) {
-                $this->query->whereIntegerNotInRaw($this->model->getQualifiedKeyName(), $id);
-            } else {
-                $this->query->whereNotIn($this->model->getQualifiedKeyName(), $id);
-            }
+            $this->query->whereNotIn($this->model->getQualifiedKeyName(), $id);
 
             return $this;
         }
