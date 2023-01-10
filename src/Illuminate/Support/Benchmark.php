@@ -47,4 +47,29 @@ class Benchmark
 
         dd($result);
     }
+    
+    
+    /**
+     * Measure elapsed time of a callback, then dump and die.
+     *
+     * @param  \Closure $callback
+     * @param  int  $iterations
+     * @return never
+     */
+    public static function elapsed(Closure $callback, int $iterations = 1): void
+    {
+        $start = hrtime(true);
+
+        for ($i = 0; $i < $iterations; ++$i) {
+            $callback();
+        }
+        
+        $end = hrtime(true);
+
+        $eta = $end - $start;
+
+        $eta /= 1e+6;
+
+        dd($eta);
+    }
 }
