@@ -1094,7 +1094,6 @@ class Builder implements BuilderContract
             $values = $values->toArray();
         }
 
-        // To better mimic the "whereIn" method, we flatten the values
         $values = Arr::flatten($values);
 
         foreach ($values as &$value) {
