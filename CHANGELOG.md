@@ -1,6 +1,26 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.46.0...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.47.0...9.x)
+
+
+## [v9.47.0](https://github.com/laravel/framework/compare/v9.46.0...v9.47.0) - 2023-01-10
+
+### Added
+- Added Support Lazy Collections in `BatchFake::add()` ([#45507](https://github.com/laravel/framework/pull/45507))
+- Added Decimal to list of Numeric rules ([#45533](https://github.com/laravel/framework/pull/45533))
+- Added `Illuminate/Routing/PendingSingletonResourceRegistration::destroyable()` ([#45549](https://github.com/laravel/framework/pull/45549))
+- Added setVisible and setHidden to Eloquent Collection ([#45558](https://github.com/laravel/framework/pull/45558))
+
+### Fixed
+- Fix bound method contextual binding ([#45500](https://github.com/laravel/framework/pull/45500))
+- Fixed Method explodeExplicitRule with regex rule ([#45555](https://github.com/laravel/framework/pull/45555))
+- Fixed `Illuminate/Database/Query/Builder::whereIntegerInRaw()` ([#45584](https://github.com/laravel/framework/pull/45584))
+- Fixes blade tags ([#45490](https://github.com/laravel/framework/pull/45490))
+
+### Changed
+- Return model when casting attribute ([#45539](https://github.com/laravel/framework/pull/45539))
+- always show full path to migration in `Illuminate/Database/Console/Migrations/MigrateMakeCommand.php` ([9f6ff48](https://github.com/laravel/framework/commit/9f6ff487e6964dc407c267d1a40352fa71b2fc44))
+- Remove index name when adding primary key on MySQL ([#45515](https://github.com/laravel/framework/pull/45515))
 
 
 ## [v9.46.0](https://github.com/laravel/framework/compare/v9.45.1...v9.46.0) - 2023-01-03
