@@ -166,6 +166,13 @@ class Validator implements ValidatorContract
     public $excludeUnvalidatedArrayKeys = false;
 
     /**
+     * Indicates that the validation should always stop on the first rule failure.
+     *
+     * @var bool
+     */
+    public $alwaysBail = false;
+
+    /**
      * All of the custom validator extensions.
      *
      * @var array
@@ -842,7 +849,7 @@ class Validator implements ValidatorContract
     {
         $cleanedAttribute = $this->replacePlaceholderInString($attribute);
 
-        if ($this->hasRule($attribute, ['Bail'])) {
+        if ($this->hasRule($attribute, ['Bail']) || $this->alwaysBail) {
             return $this->messages->has($cleanedAttribute);
         }
 

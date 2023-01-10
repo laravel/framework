@@ -74,6 +74,13 @@ class Factory implements FactoryContract
     protected $excludeUnvalidatedArrayKeys = true;
 
     /**
+     * Indicates that the validation should always stop on the first rule failure.
+     *
+     * @var bool
+     */
+    protected $alwaysBail = false;
+
+    /**
      * The Validator resolver instance.
      *
      * @var \Closure
@@ -123,6 +130,8 @@ class Factory implements FactoryContract
         }
 
         $validator->excludeUnvalidatedArrayKeys = $this->excludeUnvalidatedArrayKeys;
+
+        $validator->alwaysBail = $this->alwaysBail;
 
         $this->addExtensions($validator);
 
@@ -266,6 +275,16 @@ class Factory implements FactoryContract
     public function excludeUnvalidatedArrayKeys()
     {
         $this->excludeUnvalidatedArrayKeys = true;
+    }
+
+    /**
+     * Indicates that the validation should always stop on the first rule failure.
+     *
+     * @return void
+     */
+    public function alwaysBail($alwaysBail = true)
+    {
+        $this->alwaysBail = $alwaysBail;
     }
 
     /**
