@@ -216,7 +216,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
     /**
      * Get the validated data from the request.
      *
-     * @param  string|null  $key
+     * @param  string|array|int|null  $key
      * @param  mixed  $default
      * @return mixed
      */
