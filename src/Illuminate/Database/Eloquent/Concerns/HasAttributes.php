@@ -1324,10 +1324,10 @@ trait HasAttributes
     {
         if (extension_loaded('bcmath')) {
             if (((string) $value)[0] != '-') {
-                return bcadd($value, '0.' . str_repeat('0', $decimals) . '5', $decimals);
+                return bcadd($value, '0.'.str_repeat('0', $decimals).'5', $decimals);
             }
 
-            return bcsub($value, '0.' . str_repeat('0', $decimals) . '5', $decimals);
+            return bcsub($value, '0.'.str_repeat('0', $decimals).'5', $decimals);
         }
 
         if (! is_numeric($value)) {
@@ -1336,10 +1336,6 @@ trait HasAttributes
 
         if (is_string($value) && Str::contains($value, 'e', true)) {
             throw new RuntimeException('The "decimal" model cast is unable to handle string based floats with exponents.');
-        }
-
-        if ($decimals >= ini_get('precision')) {
-            throw new RuntimeException('$decimals precision is higher then floating point precision, please use ext-bcmath.');
         }
 
         return number_format($value, $decimals, '.', '');
