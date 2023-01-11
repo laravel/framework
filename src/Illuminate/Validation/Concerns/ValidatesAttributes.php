@@ -378,6 +378,22 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute contains only one-byte alpha-numeric characters.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validateAlphaNumAscii($attribute, $value)
+    {
+        if (preg_match('/.*[^\x01-\x7E].*/u', $value) === 1) {
+            return false;
+        }
+
+        return $this->validateAlphaNum($attribute, $value);
+    }
+
+    /**
      * Validate that an attribute is an array.
      *
      * @param  string  $attribute
