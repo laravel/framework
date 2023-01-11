@@ -4209,6 +4209,28 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testValidateAlphaNumAscii()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => 'asls13dlks'], ['x' => 'AlphaNumAscii']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 'http://g232oogle.com'], ['x' => 'AlphaNumAscii']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => '१२३'], ['x' => 'AlphaNumAscii']); // numbers in Hindi
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => '٧٨٩'], ['x' => 'AlphaNumAscii']); // eastern arabic numerals
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => 'नमस्कार'], ['x' => 'AlphaNumAscii']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => 'ＡＢＣ１２３'], ['x' => 'AlphaNumAscii']); // full-width alphanumeric
+        $this->assertTrue($v->fails());
+    }
+
     public function testValidateAlphaDash()
     {
         $trans = $this->getIlluminateArrayTranslator();
