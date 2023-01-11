@@ -29,6 +29,19 @@ trait CompilesIncludes
     }
 
     /**
+     * Compile the includeWithOnly statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileIncludeWithOnly($expression)
+    {
+        $expression = $this->stripParentheses($expression);
+
+        return "<?php echo \$__env->make({$expression}, [])->render(); ?>";
+    }
+
+    /**
      * Compile the include-if statements into valid PHP.
      *
      * @param  string  $expression

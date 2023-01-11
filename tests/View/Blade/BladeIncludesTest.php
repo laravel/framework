@@ -19,6 +19,14 @@ class BladeIncludesTest extends AbstractBladeTestCase
         $this->assertSame('<?php echo $__env->make(name(foo), \Illuminate\Support\Arr::except(get_defined_vars(), [\'__data\', \'__path\']))->render(); ?>', $this->compiler->compileString('@include(name(foo))'));
     }
 
+    public function testIncludesWithOnlyAreCompiled()
+    {
+        $this->assertSame('<?php echo $__env->make(\'foo\', [])->render(); ?>', $this->compiler->compileString("@includeWithOnly('foo')"));
+        $this->assertSame('<?php echo $__env->make(\'foo\', [\'((\'], [])->render(); ?>', $this->compiler->compileString("@includeWithOnly('foo', ['(('])"));
+        $this->assertSame('<?php echo $__env->make(\'foo\', [\'((a)\' => \'((a)\'], [])->render(); ?>', $this->compiler->compileString("@includeWithOnly('foo', ['((a)' => '((a)'])"));
+        $this->assertSame('<?php echo $__env->make(name(foo), [])->render(); ?>', $this->compiler->compileString('@includeWithOnly(name(foo))'));
+    }
+
     public function testIncludeIfsAreCompiled()
     {
         $this->assertSame('<?php if ($__env->exists(\'foo\')) echo $__env->make(\'foo\', \Illuminate\Support\Arr::except(get_defined_vars(), [\'__data\', \'__path\']))->render(); ?>', $this->compiler->compileString('@includeIf(\'foo\')'));
