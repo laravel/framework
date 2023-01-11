@@ -24,11 +24,13 @@ class SessionStoreTest extends TestCase
     public function testSessionIsLoadedFromHandler()
     {
         $session = $this->getSession();
-        $session->getHandler()->shouldReceive('read')->once()->with($this->getSessionId())->andReturn(serialize(['foo' => 'bar', 'bagged' => ['name' => 'taylor']]));
+        $session->getHandler()->shouldReceive('read')->once()->with($this->getSessionId())->andReturn(serialize([9988 => 'value', 'foo' => 'bar', 'bagged' => ['name' => 'taylor']]));
         $session->start();
 
         $this->assertSame('bar', $session->get('foo'));
         $this->assertSame('baz', $session->get('bar', 'baz'));
+        $this->assertSame('value', $session->get('9988'));
+        $this->assertTrue($session->has('9988'));
         $this->assertTrue($session->has('foo'));
         $this->assertFalse($session->has('bar'));
         $this->assertTrue($session->isStarted());

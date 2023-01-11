@@ -98,7 +98,18 @@ class Store implements Session
      */
     protected function loadSession()
     {
-        $this->attributes = array_merge($this->attributes, $this->readFromHandler());
+        $attributes = [];
+        foreach ($this->readFromHandler() as $key => $value) {
+            if (array_key_exists($key, $this->attributes)) {
+                $attributes[$key] = $value;
+
+                continue;
+            }
+
+            $attributes[$key] = $value;
+        }
+
+        $this->attributes = $attributes;
 
         $this->marshalErrorBag();
     }
