@@ -22,7 +22,7 @@ use Throwable;
 /**
  * @mixin \Illuminate\Log\Logger
  */
-class LogManager
+class LogManager implements LoggerInterface
 {
     use ParsesLogConfiguration;
 
@@ -595,10 +595,13 @@ class LogManager
      * System is unusable.
      *
      * @param  string  $message
+     * @param  array  $context
      * @return void
      */
-    public function emergency($message, ...$context): void
+    public function emergency($message, $context = []): void
     {
+        $context = array_slice(func_get_args(), 1);
+
         $this->driver()->emergency($message, $this->mergeContexts($context));
     }
 
@@ -609,10 +612,13 @@ class LogManager
      * trigger the SMS alerts and wake you up.
      *
      * @param  string  $message
+     * @param  array  $context
      * @return void
      */
-    public function alert($message, ...$context): void
+    public function alert($message, $context = []): void
     {
+        $context = array_slice(func_get_args(), 1);
+
         $this->driver()->alert($message, $this->mergeContexts($context));
     }
 
@@ -622,10 +628,13 @@ class LogManager
      * Example: Application component unavailable, unexpected exception.
      *
      * @param  string  $message
+     * @param  array  $context
      * @return void
      */
-    public function critical($message, ...$context): void
+    public function critical($message, $context = []): void
     {
+        $context = array_slice(func_get_args(), 1);
+
         $this->driver()->critical($message, $this->mergeContexts($context));
     }
 
@@ -634,10 +643,13 @@ class LogManager
      * be logged and monitored.
      *
      * @param  string  $message
+     * @param  array  $context
      * @return void
      */
-    public function error($message, ...$context): void
+    public function error($message, $context = []): void
     {
+        $context = array_slice(func_get_args(), 1);
+
         $this->driver()->error($message, $this->mergeContexts($context));
     }
 
@@ -648,10 +660,13 @@ class LogManager
      * that are not necessarily wrong.
      *
      * @param  string  $message
+     * @param  array  $context
      * @return void
      */
-    public function warning($message, ...$context): void
+    public function warning($message, $context = []): void
     {
+        $context = array_slice(func_get_args(), 1);
+
         $this->driver()->warning($message, $this->mergeContexts($context));
     }
 
@@ -659,10 +674,13 @@ class LogManager
      * Normal but significant events.
      *
      * @param  string  $message
+     * @param  array  $context
      * @return void
      */
-    public function notice($message, ...$context): void
+    public function notice($message, $context = []): void
     {
+        $context = array_slice(func_get_args(), 1);
+
         $this->driver()->notice($message, $this->mergeContexts($context));
     }
 
@@ -672,10 +690,13 @@ class LogManager
      * Example: User logs in, SQL logs.
      *
      * @param  string  $message
+     * @param  array  $context
      * @return void
      */
-    public function info($message, ...$context): void
+    public function info($message, $context = []): void
     {
+        $context = array_slice(func_get_args(), 1);
+
         $this->driver()->info($message, $this->mergeContexts($context));
     }
 
@@ -683,10 +704,13 @@ class LogManager
      * Detailed debug information.
      *
      * @param  string  $message
+     * @param  array  $context
      * @return void
      */
-    public function debug($message, ...$context): void
+    public function debug($message, $context = []): void
     {
+        $context = array_slice(func_get_args(), 1);
+
         $this->driver()->debug($message, $this->mergeContexts($context));
     }
 
@@ -695,10 +719,13 @@ class LogManager
      *
      * @param  mixed  $level
      * @param  string  $message
+     * @param  array  $context
      * @return void
      */
-    public function log($level, $message, ...$context): void
+    public function log($level, $message, $context = []): void
     {
+        $context = array_slice(func_get_args(), 2);
+
         $this->driver()->log($level, $message, $this->mergeContexts($context));
     }
 
@@ -715,7 +742,7 @@ class LogManager
     }
 
     /**
-     * @param $userPassedContext
+     * @param  $userPassedContext
      * @return array
      */
     protected function mergeContexts($userPassedContext)
