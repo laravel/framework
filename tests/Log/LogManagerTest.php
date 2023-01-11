@@ -670,17 +670,17 @@ class LogManagerTest extends TestCase
             $context = $message->context;
         });
 
-        $object = (object)[];
+        $object = (object) [];
 
         $manager->error('foo', 'text', 15, [
-            'key' => 'value'
+            'key' => 'value',
         ], $object);
 
         $this->assertSame([
             'text',
             15,
             'key' => 'value',
-            $object
+            $object,
         ], $context);
     }
 

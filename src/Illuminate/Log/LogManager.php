@@ -720,7 +720,7 @@ class LogManager
      */
     protected function mergeContexts($userPassedContext)
     {
-        return array_reduce($userPassedContext, function($carry, $argument) {
+        return array_reduce($userPassedContext, function ($carry, $argument) {
             if (is_array($argument)) {
                 $carry = array_merge($carry, $argument);
             } else {
