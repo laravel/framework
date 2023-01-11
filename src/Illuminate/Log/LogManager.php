@@ -22,7 +22,7 @@ use Throwable;
 /**
  * @mixin \Illuminate\Log\Logger
  */
-class LogManager implements LoggerInterface
+class LogManager
 {
     use ParsesLogConfiguration;
 
@@ -595,12 +595,11 @@ class LogManager implements LoggerInterface
      * System is unusable.
      *
      * @param  string  $message
-     * @param  array  $context
      * @return void
      */
-    public function emergency($message, array $context = []): void
+    public function emergency($message, ...$context): void
     {
-        $this->driver()->emergency($message, $context);
+        $this->driver()->emergency($message, $this->mergeContexts($context));
     }
 
     /**
@@ -610,12 +609,11 @@ class LogManager implements LoggerInterface
      * trigger the SMS alerts and wake you up.
      *
      * @param  string  $message
-     * @param  array  $context
      * @return void
      */
-    public function alert($message, array $context = []): void
+    public function alert($message, ...$context): void
     {
-        $this->driver()->alert($message, $context);
+        $this->driver()->alert($message, $this->mergeContexts($context));
     }
 
     /**
@@ -624,12 +622,11 @@ class LogManager implements LoggerInterface
      * Example: Application component unavailable, unexpected exception.
      *
      * @param  string  $message
-     * @param  array  $context
      * @return void
      */
-    public function critical($message, array $context = []): void
+    public function critical($message, ...$context): void
     {
-        $this->driver()->critical($message, $context);
+        $this->driver()->critical($message, $this->mergeContexts($context));
     }
 
     /**
@@ -637,12 +634,11 @@ class LogManager implements LoggerInterface
      * be logged and monitored.
      *
      * @param  string  $message
-     * @param  array  $context
      * @return void
      */
-    public function error($message, array $context = []): void
+    public function error($message, ...$context): void
     {
-        $this->driver()->error($message, $context);
+        $this->driver()->error($message, $this->mergeContexts($context));
     }
 
     /**
@@ -652,24 +648,22 @@ class LogManager implements LoggerInterface
      * that are not necessarily wrong.
      *
      * @param  string  $message
-     * @param  array  $context
      * @return void
      */
-    public function warning($message, array $context = []): void
+    public function warning($message, ...$context): void
     {
-        $this->driver()->warning($message, $context);
+        $this->driver()->warning($message, $this->mergeContexts($context));
     }
 
     /**
      * Normal but significant events.
      *
      * @param  string  $message
-     * @param  array  $context
      * @return void
      */
-    public function notice($message, array $context = []): void
+    public function notice($message, ...$context): void
     {
-        $this->driver()->notice($message, $context);
+        $this->driver()->notice($message, $this->mergeContexts($context));
     }
 
     /**
@@ -678,24 +672,22 @@ class LogManager implements LoggerInterface
      * Example: User logs in, SQL logs.
      *
      * @param  string  $message
-     * @param  array  $context
      * @return void
      */
-    public function info($message, array $context = []): void
+    public function info($message, ...$context): void
     {
-        $this->driver()->info($message, $context);
+        $this->driver()->info($message, $this->mergeContexts($context));
     }
 
     /**
      * Detailed debug information.
      *
      * @param  string  $message
-     * @param  array  $context
      * @return void
      */
-    public function debug($message, array $context = []): void
+    public function debug($message, ...$context): void
     {
-        $this->driver()->debug($message, $context);
+        $this->driver()->debug($message, $this->mergeContexts($context));
     }
 
     /**
@@ -703,12 +695,11 @@ class LogManager implements LoggerInterface
      *
      * @param  mixed  $level
      * @param  string  $message
-     * @param  array  $context
      * @return void
      */
-    public function log($level, $message, array $context = []): void
+    public function log($level, $message, ...$context): void
     {
-        $this->driver()->log($level, $message, $context);
+        $this->driver()->log($level, $message, $this->mergeContexts($context));
     }
 
     /**
@@ -721,5 +712,22 @@ class LogManager implements LoggerInterface
     public function __call($method, $parameters)
     {
         return $this->driver()->$method(...$parameters);
+    }
+
+    /**
+     * @param $userPassedContext
+     * @return array
+     */
+    protected function mergeContexts($userPassedContext)
+    {
+        return array_reduce($userPassedContext, function($carry, $argument) {
+            if (is_array($argument)) {
+                $carry = array_merge($carry, $argument);
+            } else {
+                $carry[] = $argument;
+            }
+
+            return $carry;
+        }, []);
     }
 }
