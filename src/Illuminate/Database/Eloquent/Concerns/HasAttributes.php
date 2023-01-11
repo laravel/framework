@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent\Concerns;
 
 use BackedEnum;
 use Brick\Math\BigDecimal;
+use Brick\Math\Exception\MathException as BrickMathException;
 use Brick\Math\RoundingMode;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
@@ -25,6 +26,7 @@ use Illuminate\Database\LazyLoadingViolationException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection as BaseCollection;
+use Illuminate\Support\Exceptions\MathException;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
@@ -1322,7 +1324,11 @@ trait HasAttributes
      */
     protected function asDecimal($value, $decimals)
     {
-        return (string) BigDecimal::of($value)->toScale($decimals, RoundingMode::HALF_UP);
+        try {
+            return (string) BigDecimal::of($value)->toScale($decimals, RoundingMode::HALF_UP);
+        } catch (BrickMathException $e) {
+            throw new MathException('Unable to cast value to a decimal.', previous: $e);
+        }
     }
 
     /**

@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Database\EloquentModelDecimalCastingTest;
 use Brick\Math\Exception\NumberFormatException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Exceptions\MathException;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
@@ -52,7 +53,7 @@ class EloquentModelDecimalCastingTest extends DatabaseTestCase
         $this->assertSame('1234.50', $model->amount);
     }
 
-    public function testItThrowsOnNonNumericValues()
+    public function testItWrapsThrownExceptions()
     {
         $model = new class extends Model
         {
@@ -64,10 +65,14 @@ class EloquentModelDecimalCastingTest extends DatabaseTestCase
         };
         $model->amount = 'foo';
 
-        $this->expectException(NumberFormatException::class);
-        $this->expectExceptionMessage('The given value "foo" does not represent a valid number.');
-
-        $model->amount;
+        try {
+            $model->amount;
+            $this->fail();
+        } catch (MathException $e) {
+            $this->assertSame('Unable to cast value to a decimal.', $e->getMessage());
+            $this->assertInstanceOf(NumberFormatException::class, $e->getPrevious());
+            $this->assertSame('The given value "foo" does not represent a valid number.', $e->getPrevious()->getMessage());
+        }
     }
 
     public function testItHandlesMissingIntegers()
