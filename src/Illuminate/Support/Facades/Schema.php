@@ -29,6 +29,7 @@ namespace Illuminate\Support\Facades;
  * @method static void rename(string $from, string $to)
  * @method static bool enableForeignKeyConstraints()
  * @method static bool disableForeignKeyConstraints()
+ * @method static mixed withoutForeignKeyConstraints(\Closure $callback)
  * @method static \Illuminate\Database\Connection getConnection()
  * @method static \Illuminate\Database\Schema\Builder setConnection(\Illuminate\Database\Connection $connection)
  * @method static void blueprintResolver(\Closure $resolver)
