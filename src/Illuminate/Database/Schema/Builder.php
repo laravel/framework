@@ -412,18 +412,20 @@ class Builder
     }
 
     /**
-     * Disable foreign key constraints in a callback.
+     * Disable foreign key constraints during the execution of a callback.
      *
      * @param  \Closure  $callback
-     * @return void
+     * @return mixed
      */
     public function withoutForeignKeyConstraints(Closure $callback)
     {
         $this->disableForeignKeyConstraints();
 
-        $callback();
+        $result = $callback();
 
         $this->enableForeignKeyConstraints();
+
+        return $result;
     }
 
     /**
