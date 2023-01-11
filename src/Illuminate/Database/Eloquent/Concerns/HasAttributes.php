@@ -33,8 +33,6 @@ use LogicException;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionNamedType;
-use RuntimeException;
-use TypeError;
 
 trait HasAttributes
 {

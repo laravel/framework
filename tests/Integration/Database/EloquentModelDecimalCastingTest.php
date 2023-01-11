@@ -7,8 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
-use TypeError;
-use ValueError;
 
 class EloquentModelDecimalCastingTest extends DatabaseTestCase
 {
@@ -119,7 +117,6 @@ class EloquentModelDecimalCastingTest extends DatabaseTestCase
             ];
         };
 
-
         $model->amount = '0.8989898989';
         $this->assertSame('0.90', $model->amount);
     }
@@ -215,7 +212,6 @@ class EloquentModelDecimalCastingTest extends DatabaseTestCase
         $model->amount = '-0.8989898989';
         $this->assertSame('-0.90', $model->amount);
     }
-
 }
 
 class TestModel1 extends Model
