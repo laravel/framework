@@ -47,14 +47,15 @@ class MailLogTransportTest extends TestCase
 
             All the best,
 
-            Burt & Irving = Magic
+            Burt & Irving
             BODY)
             ->text('A text part');
 
         $actualLoggedValue = $this->getLoggedEmailMessage($message);
 
         $this->assertStringNotContainsString("=\r\n", $actualLoggedValue);
-        $this->assertStringContainsString('Burt & Irving = Magic', $actualLoggedValue);
+        $this->assertStringContainsString('href=', $actualLoggedValue);
+        $this->assertStringContainsString('Burt & Irving', $actualLoggedValue);
         $this->assertStringContainsString('https://example.com/reset-password=5e113c71a4c210aff04b3fa66f1b1299', $actualLoggedValue);
     }
 
