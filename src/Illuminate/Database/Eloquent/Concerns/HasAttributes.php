@@ -1180,15 +1180,15 @@ trait HasAttributes
      */
     protected function setEnumCastableAttribute($key, $value)
     {
-	    $enumClass = $this->getCasts()[$key];
-	
-	    if ( !isset($value) ) {
-		    $this->attributes[$key] = null;
-	    } elseif ( is_object($value) ) {
-		    $this->attributes[$key] = $this->getStorableEnumValue($value);
-	    } else {
-		    $this->attributes[$key] = $this->getStorableEnumValue($this->getEnumCaseFromValue($enumClass, $value));
-	    }
+        $enumClass = $this->getCasts()[$key];
+
+        if (! isset($value)) {
+            $this->attributes[$key] = null;
+        } elseif (is_object($value)) {
+            $this->attributes[$key] = $this->getStorableEnumValue($value);
+        } else {
+            $this->attributes[$key] = $this->getStorableEnumValue($this->getEnumCaseFromValue($enumClass, $value));
+        }
     }
 
     /**
@@ -1235,9 +1235,9 @@ trait HasAttributes
      */
     protected function getStorableEnumValue($value)
     {
-	    return $value instanceof BackedEnum ? $value->value : $value->name;
+        return $value instanceof BackedEnum ? $value->value : $value->name;
     }
-	
+
     /**
      * Get the storable value from the given enum.
      *
@@ -1740,9 +1740,9 @@ trait HasAttributes
     protected function isClassSerializable($key)
     {
         return ! $this->isEnumCastable($key)
-	        && ! $this->isEnumArrayCastable($key)
-	        && $this->isClassCastable($key)
-	        && method_exists($this->resolveCasterClass($key), 'serialize');
+            && ! $this->isEnumArrayCastable($key)
+            && $this->isClassCastable($key)
+            && method_exists($this->resolveCasterClass($key), 'serialize');
     }
 
     /**
