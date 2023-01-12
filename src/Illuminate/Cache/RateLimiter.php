@@ -74,7 +74,7 @@ class RateLimiter
         if ($this->tooManyAttempts($key, $maxAttempts)) {
             return false;
         }
-    
+
         if (is_null($result = $callback())) {
             $result = true;
         }
