@@ -74,8 +74,12 @@ class RateLimiter
         if ($this->tooManyAttempts($key, $maxAttempts)) {
             return false;
         }
+    
+        if (is_null($result = $callback())) {
+            $result = true;
+        }
 
-        return tap($callback() ?: true, function () use ($key, $decaySeconds) {
+        return tap($result, function () use ($key, $decaySeconds) {
             $this->hit($key, $decaySeconds);
         });
     }
