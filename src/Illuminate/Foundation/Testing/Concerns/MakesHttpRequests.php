@@ -110,7 +110,7 @@ trait MakesHttpRequests
     }
 
     /**
-     * Add basic auth header for the request.
+     * Add a basic authentication header to the request with the given credentials.
      *
      * @param  string  $username
      * @param  string  $password
