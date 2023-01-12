@@ -40,7 +40,7 @@ class MailLogTransportTest extends TestCase
         $message = (new Message(new Email))
             ->from('noreply@example.com', 'no-reply')
             ->to('taylor@example.com', 'Taylor')
-            ->html(<<<BODY
+            ->html(<<<'BODY'
             Hi,
 
             <a href="https://example.com/reset-password=5e113c71a4c210aff04b3fa66f1b1299">Click here to reset your password</a>.
@@ -72,7 +72,8 @@ class MailLogTransportTest extends TestCase
 
     private function getLoggedEmailMessage(Message $message): string
     {
-        $logger = new class extends NullLogger {
+        $logger = new class extends NullLogger
+        {
             public string $loggedValue = '';
 
             public function log($level, string|\Stringable $message, array $context = []): void
