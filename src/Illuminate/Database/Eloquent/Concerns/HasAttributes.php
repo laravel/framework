@@ -1187,7 +1187,9 @@ trait HasAttributes
         } elseif (is_object($value)) {
             $this->attributes[$key] = $this->getStorableEnumValue($value);
         } else {
-            $this->attributes[$key] = $this->getStorableEnumValue($this->getEnumCaseFromValue($enumClass, $value));
+            $this->attributes[$key] = $this->getStorableEnumValue(
+				$this->getEnumCaseFromValue($enumClass, $value)
+            );
         }
     }
 
