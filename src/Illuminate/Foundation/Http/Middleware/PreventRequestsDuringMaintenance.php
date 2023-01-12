@@ -84,7 +84,7 @@ class PreventRequestsDuringMaintenance
     /**
      * @param  array  $data
      *
-     * @throws HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      */
     public function abort(array $data): void
     {
