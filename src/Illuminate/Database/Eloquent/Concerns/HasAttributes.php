@@ -1180,21 +1180,22 @@ trait HasAttributes
      */
     protected function setEnumCastableAttribute($key, $value)
     {
-        $enumClass = $this->getCasts()[$key];
-
-        if (! isset($value)) {
-            $this->attributes[$key] = null;
-        } elseif (is_object($value)) {
-            $this->attributes[$key] = $this->getStorableEnumValue($value);
-        } else {
-            $this->attributes[$key] = $this->getStorableEnumValue(
-                $this->getEnumCaseFromValue($enumClass, $value)
+	    $enumClass = $this->getCasts()[$key];
+	
+	    if ( !isset($value) ) {
+		    $this->attributes[$key] = null;
+	    } elseif ( is_object($value) ) {
+		    $this->attributes[$key] = $this->getStorableEnumValue($value);
+	    } else {
+		    $this->attributes[$key] = $this->getStorableEnumValue($this->getEnumCaseFromValue($enumClass, $value));
+	    }
+    }
 
     /**
      * Set the value of an enum array castable attribute.
      *
      * @param  string  $key
-     * @param  \UnitEnum|string|int  $value
+     * @param  array|string  $value
      * @return void
      */
     protected function setEnumArrayCastableAttribute($key, $value)
@@ -1234,9 +1235,9 @@ trait HasAttributes
      */
     protected function getStorableEnumValue($value)
     {
-        return $value instanceof BackedEnum
-                ? $value->value
-                : $value->name;
+	    return $value instanceof BackedEnum ? $value->value : $value->name;
+    }
+	
     /**
      * Get the storable value from the given enum.
      *
