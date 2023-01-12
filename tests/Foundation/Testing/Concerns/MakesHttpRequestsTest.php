@@ -32,17 +32,16 @@ class MakesHttpRequestsTest extends TestCase
             return base64_encode("$username:$password");
         };
 
-        $username = "foo";
-        $password = "bar";
+        $username = 'foo';
+        $password = 'bar';
 
         $this->withBasicAuth($username, $password);
-        $this->assertSame("Basic " . $callback($username, $password), $this->defaultHeaders['Authorization']);
+        $this->assertSame('Basic '.$callback($username, $password), $this->defaultHeaders['Authorization']);
 
-        $password = "buzz";
+        $password = 'buzz';
 
         $this->withBasicAuth($username, $password);
-        $this->assertSame("Basic " . $callback($username, $password), $this->defaultHeaders['Authorization']);
-
+        $this->assertSame('Basic '.$callback($username, $password), $this->defaultHeaders['Authorization']);
     }
 
     public function testWithoutTokenRemovesAuthorizationHeader()
