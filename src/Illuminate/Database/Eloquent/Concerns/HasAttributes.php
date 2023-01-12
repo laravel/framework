@@ -1237,7 +1237,9 @@ trait HasAttributes
      */
     protected function getStorableEnumValue($value)
     {
-        return $value instanceof BackedEnum ? $value->value : $value->name;
+        return $value instanceof BackedEnum
+	        ? $value->value
+	        : $value->name;
     }
 
     /**
@@ -1248,7 +1250,9 @@ trait HasAttributes
      */
     protected function getStorableEnumArrayValue($value)
     {
-        return json_encode(array_map(fn ($value) => $this->getStorableEnumValue($value), $value));
+        return json_encode(
+			array_map(fn ($value) => $this->getStorableEnumValue($value), $value)
+        );
     }
 
     /**
