@@ -43,7 +43,7 @@ class Redirector
      * @param  mixed  $fallback
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function back($status = 302, $headers = [], $fallback = false)
+    public function back($status = 303, $headers = [], $fallback = false)
     {
         return $this->createRedirect($this->generator->previous($fallback), $status, $headers);
     }
@@ -55,7 +55,7 @@ class Redirector
      * @param  array  $headers
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function refresh($status = 302, $headers = [])
+    public function refresh($status = 303, $headers = [])
     {
         return $this->to($this->generator->getRequest()->path(), $status, $headers);
     }
@@ -69,7 +69,7 @@ class Redirector
      * @param  bool|null  $secure
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function guest($path, $status = 302, $headers = [], $secure = null)
+    public function guest($path, $status = 303, $headers = [], $secure = null)
     {
         $request = $this->generator->getRequest();
 
@@ -93,7 +93,7 @@ class Redirector
      * @param  bool|null  $secure
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function intended($default = '/', $status = 302, $headers = [], $secure = null)
+    public function intended($default = '/', $status = 303, $headers = [], $secure = null)
     {
         $path = $this->session->pull('url.intended', $default);
 
@@ -109,7 +109,7 @@ class Redirector
      * @param  bool|null  $secure
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function to($path, $status = 302, $headers = [], $secure = null)
+    public function to($path, $status = 303, $headers = [], $secure = null)
     {
         return $this->createRedirect($this->generator->to($path, [], $secure), $status, $headers);
     }
@@ -122,7 +122,7 @@ class Redirector
      * @param  array  $headers
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function away($path, $status = 302, $headers = [])
+    public function away($path, $status = 303, $headers = [])
     {
         return $this->createRedirect($path, $status, $headers);
     }
@@ -135,7 +135,7 @@ class Redirector
      * @param  array  $headers
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function secure($path, $status = 302, $headers = [])
+    public function secure($path, $status = 303, $headers = [])
     {
         return $this->to($path, $status, $headers, true);
     }
@@ -149,7 +149,7 @@ class Redirector
      * @param  array  $headers
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function route($route, $parameters = [], $status = 302, $headers = [])
+    public function route($route, $parameters = [], $status = 303, $headers = [])
     {
         return $this->to($this->generator->route($route, $parameters), $status, $headers);
     }
@@ -164,7 +164,7 @@ class Redirector
      * @param  array  $headers
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function signedRoute($route, $parameters = [], $expiration = null, $status = 302, $headers = [])
+    public function signedRoute($route, $parameters = [], $expiration = null, $status = 303, $headers = [])
     {
         return $this->to($this->generator->signedRoute($route, $parameters, $expiration), $status, $headers);
     }
@@ -179,7 +179,7 @@ class Redirector
      * @param  array  $headers
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function temporarySignedRoute($route, $expiration, $parameters = [], $status = 302, $headers = [])
+    public function temporarySignedRoute($route, $expiration, $parameters = [], $status = 303, $headers = [])
     {
         return $this->to($this->generator->temporarySignedRoute($route, $expiration, $parameters), $status, $headers);
     }
@@ -193,7 +193,7 @@ class Redirector
      * @param  array  $headers
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function action($action, $parameters = [], $status = 302, $headers = [])
+    public function action($action, $parameters = [], $status = 303, $headers = [])
     {
         return $this->to($this->generator->action($action, $parameters), $status, $headers);
     }

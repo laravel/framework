@@ -57,7 +57,7 @@ class RoutingRedirectorTest extends TestCase
 
         $this->assertInstanceOf(RedirectResponse::class, $response);
         $this->assertSame('http://foo.com/bar', $response->getTargetUrl());
-        $this->assertEquals(302, $response->getStatusCode());
+        $this->assertEquals(303, $response->getStatusCode());
         $this->assertEquals($this->session, $response->getSession());
     }
 
