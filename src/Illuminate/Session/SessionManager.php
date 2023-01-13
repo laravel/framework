@@ -89,8 +89,10 @@ class SessionManager extends Manager
 
         $lifetime = $this->config->get('session.lifetime');
 
+        $includeMeta = $this->config->get('session.include_meta_data');
+
         return $this->buildSession(new DatabaseSessionHandler(
-            $this->getDatabaseConnection(), $table, $lifetime, $this->container
+            $this->getDatabaseConnection(), $table, $lifetime, $includeMeta ? $this->container : null
         ));
     }
 
