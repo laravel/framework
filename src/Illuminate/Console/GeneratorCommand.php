@@ -9,6 +9,8 @@ use Symfony\Component\Console\Input\InputArgument;
 
 abstract class GeneratorCommand extends Command
 {
+    use Concerns\PromptsForMissingInput;
+
     /**
      * The filesystem instance.
      *
