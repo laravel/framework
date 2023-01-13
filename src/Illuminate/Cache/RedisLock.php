@@ -72,6 +72,16 @@ class RedisLock extends Lock
     }
 
     /**
+     * Determine if the current lock exists.
+     *
+     * @return bool
+     */
+    public function exists()
+    {
+        return $this->redis->get($this->name) !== null;
+    }
+
+    /**
      * Get the name of the Redis connection being used to manage the lock.
      *
      * @return string

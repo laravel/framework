@@ -55,7 +55,7 @@ class ArrayLock extends Lock
      *
      * @return bool
      */
-    protected function exists()
+    public function exists()
     {
         return isset($this->store->locks[$this->name]);
     }

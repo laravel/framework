@@ -213,6 +213,17 @@ class RedisStore extends TaggableStore implements LockProvider
     }
 
     /**
+     * Determine if a lock with the given name is locked
+     *
+     * @param string $name
+     * @return bool
+     */
+    public function isLocked($name)
+    {
+        return $this->lock($name)->exists();
+    }
+
+    /**
      * Remove an item from the cache.
      *
      * @param  string  $key

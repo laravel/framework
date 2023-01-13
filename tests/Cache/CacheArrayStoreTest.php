@@ -273,4 +273,19 @@ class CacheArrayStoreTest extends TestCase
 
         $this->assertFalse($wannabeOwner->release());
     }
+
+    public function testCanCheckIfLockExists()
+    {
+        $store = new ArrayStore;
+        $this->assertFalse($store->isLocked('foo'));
+
+        $lock = $store->lock('foo', 10);
+        $lock->acquire();
+
+        $this->assertTrue($store->isLocked('foo'));
+
+        $lock->release();
+
+        $this->assertFalse($store->isLocked('foo'));
+    }
 }

@@ -4,6 +4,8 @@ namespace Illuminate\Tests\Integration\Queue;
 
 use Exception;
 use Illuminate\Bus\Queueable;
+use Illuminate\Cache\Repository;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
@@ -11,6 +13,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\UniqueAware;
 use Illuminate\Support\Facades\Bus;
 use Orchestra\Testbench\TestCase;
 
@@ -148,6 +151,22 @@ class UniqueJobTest extends TestCase
         $this->assertTrue($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
     }
 
+    public function testLockStatusCanBeChecked()
+    {
+        UniqueTestJob::$handled = false;
+
+        Bus::fake();
+
+        $job = new UniqueTestJob();
+
+        $this->assertFalse($job->isLocked());
+
+        dispatch($job);
+        Bus::assertDispatched(UniqueTestJob::class);
+
+        $this->assertTrue($job->isLocked());
+    }
+
     protected function getLockKey($job)
     {
         return 'laravel_unique_job:'.(is_string($job) ? $job : get_class($job));
@@ -156,7 +175,7 @@ class UniqueJobTest extends TestCase
 
 class UniqueTestJob implements ShouldQueue, ShouldBeUnique
 {
-    use InteractsWithQueue, Queueable, Dispatchable;
+    use InteractsWithQueue, Queueable, Dispatchable, UniqueAware;
 
     public static $handled = false;
 

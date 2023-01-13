@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Cache;
 
+use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\RedisStore;
 use Illuminate\Contracts\Redis\Factory;
 use Mockery as m;
@@ -146,6 +147,28 @@ class CacheRedisStoreTest extends TestCase
         $this->assertSame('foo:', $redis->getPrefix());
         $redis->setPrefix(null);
         $this->assertEmpty($redis->getPrefix());
+    }
+
+    public function testCanCheckIfLockExists()
+    {
+        $redis = $this->getRedis();
+        $redis->getRedis()->shouldReceive('connection')->times(4)->with('default')->andReturn($redis->getRedis());
+
+        $redis->getRedis()->shouldReceive('get')->once()->with('prefix:foo')->andReturn(null);
+        $this->assertFalse($redis->isLocked('foo'));
+
+        $redis->getRedis()->shouldReceive('set')->once()->with('prefix:foo', 'owner', 'EX', 10, 'NX')->andReturn(true);
+        $lock = $redis->lock('foo', 10, 'owner');
+        $lock->acquire();
+
+        $redis->getRedis()->shouldReceive('get')->once()->with('prefix:foo')->andReturn('owner');
+        $this->assertTrue($redis->isLocked('foo'));
+
+        $redis->getRedis()->shouldReceive('eval')->once()->andReturn(true);
+        $lock->release();
+
+        $redis->getRedis()->shouldReceive('get')->once()->with('prefix:foo')->andReturn(null);
+        $this->assertFalse($redis->isLocked('foo'));
     }
 
     protected function getRedis()

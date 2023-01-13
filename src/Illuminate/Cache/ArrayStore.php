@@ -215,4 +215,25 @@ class ArrayStore extends TaggableStore implements LockProvider
     {
         return $this->lock($name, 0, $owner);
     }
+
+    /**
+     * Determine if a lock with the given name is locked
+     *
+     * @param string $name
+     * @return bool
+     */
+    public function isLocked($name)
+    {
+        $lock = $this->lock($name);
+
+        if (!$lock->exists()) {
+            return false;
+        }
+
+        if($this->locks[$name]['expiresAt'] == null) {
+            return true;
+        }
+
+        return $this->locks[$name]['expiresAt']->isFuture();
+    }
 }
