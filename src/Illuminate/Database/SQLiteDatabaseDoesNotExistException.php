@@ -21,7 +21,7 @@ class SQLiteDatabaseDoesNotExistException extends InvalidArgumentException
      */
     public function __construct($path)
     {
-        parent::__construct("Database ({$path}) does not exist.");
+        parent::__construct("Database file at path [{$path}] does not exist. Ensure this is an absolute path to the database.");
 
         $this->path = $path;
     }
