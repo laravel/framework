@@ -179,6 +179,6 @@
             "composer/package-versions-deprecated": true
         }
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "prefer-stable": true
 }
