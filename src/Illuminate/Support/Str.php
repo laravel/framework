@@ -14,6 +14,7 @@ use Ramsey\Uuid\Codec\TimestampFirstCombCodec;
 use Ramsey\Uuid\Generator\CombGenerator;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidFactory;
+use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\Uid\Ulid;
 use Traversable;
 use voku\helper\ASCII;
@@ -426,11 +427,15 @@ class Str
     /**
      * Determine if a given string is a valid UUID.
      *
-     * @param  string  $value
+     * @param  string|\Ramsey\Uuid\UuidInterface  $value
      * @return bool
      */
     public static function isUuid($value)
     {
+        if ($value instanceof UuidInterface) {
+            return true;
+        }
+
         if (! is_string($value)) {
             return false;
         }

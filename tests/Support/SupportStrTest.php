@@ -422,6 +422,13 @@ class SupportStrTest extends TestCase
         $this->assertFalse(Str::isUuid($uuid));
     }
 
+    public function testIsUuidWithANewlyGeneratedUuid()
+    {
+        $uuid = Str::uuid();
+
+        $this->assertTrue(Str::isUuid($uuid));
+    }
+
     public function testIsJson()
     {
         $this->assertTrue(Str::isJson('1'));
