@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Cache;
 
-use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\RedisStore;
 use Illuminate\Contracts\Redis\Factory;
 use Mockery as m;

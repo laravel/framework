@@ -4,8 +4,6 @@ namespace Illuminate\Tests\Integration\Queue;
 
 use Exception;
 use Illuminate\Bus\Queueable;
-use Illuminate\Cache\Repository;
-use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;

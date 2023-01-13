@@ -9,9 +9,9 @@ use Illuminate\Container\Container;
 trait UniqueAware
 {
     /**
-     * Check if the current job can be dispatched based on its uniqueness
+     * Check if the current job can be dispatched based on its uniqueness.
      *
-     * @return boolean
+     * @return bool
      */
     public function isLocked()
     {
@@ -19,7 +19,7 @@ trait UniqueAware
     }
 
     /**
-     * Return the lock cache key for the current job
+     * Return the lock cache key for the current job.
      *
      * @return string
      */
