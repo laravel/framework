@@ -769,21 +769,21 @@ abstract class Factory
      */
     public function modelName()
     {
-        $resolver = static::$modelNameResolver ?? function (self $factory) {
-            $namespacedFactoryBasename = Str::replaceLast(
-                'Factory', '', Str::replaceFirst(static::$namespace, '', get_class($factory))
-            );
-
-            $factoryBasename = Str::replaceLast('Factory', '', class_basename($factory));
-
-            $appNamespace = static::appNamespace();
-
-            return class_exists($appNamespace.'Models\\'.$namespacedFactoryBasename)
-                        ? $appNamespace.'Models\\'.$namespacedFactoryBasename
-                        : $appNamespace.$factoryBasename;
-        };
-
-        return $this->model ?? $resolver($this);
+	    $resolver = static::$modelNameResolver ?? function (self $factory) {
+		    $namespacedFactoryBasename = Str::replaceLast(
+			    'Factory', '', Str::replaceFirst(static::$namespace, 'Models\\', get_class($factory))
+		    );
+		
+		    $factoryBasename = Str::replaceLast('Factory', '', class_basename($factory));
+		
+		    $appNamespace = static::appNamespace();
+		
+		    return class_exists($namespacedFactoryBasename)
+			    ? $namespacedFactoryBasename
+			    : $appNamespace.$factoryBasename;
+	    };
+	
+	    return $this->model ?? $resolver($this);
     }
 
     /**
