@@ -1681,7 +1681,7 @@ trait ValidatesAttributes
     }
 
     /**
-     * Validate that an attribute does not exist.
+     * Validate that an attribute does not exist, or must be empty
      *
      * @param  string  $attribute
      * @param  mixed  $value
@@ -1689,7 +1689,7 @@ trait ValidatesAttributes
      */
     public function validateProhibited($attribute, $value)
     {
-        return false;
+        return empty($value);
     }
 
     /**
