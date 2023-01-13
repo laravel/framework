@@ -3,7 +3,6 @@
 namespace Illuminate\Queue;
 
 use Illuminate\Contracts\Queue\Job as JobContract;
-use Illuminate\Queue\ManuallyFailedException;
 use InvalidArgumentException;
 use Throwable;
 
