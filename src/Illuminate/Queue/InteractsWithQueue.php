@@ -2,7 +2,6 @@
 
 namespace Illuminate\Queue;
 
-use Exception;
 use Illuminate\Contracts\Queue\Job as JobContract;
 use Illuminate\Queue\ManuallyFailedException;
 use InvalidArgumentException;
