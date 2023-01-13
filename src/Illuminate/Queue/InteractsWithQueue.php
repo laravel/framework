@@ -3,7 +3,6 @@
 namespace Illuminate\Queue;
 
 use Illuminate\Contracts\Queue\Job as JobContract;
-use InvalidArgumentException;
 use Throwable;
 
 trait InteractsWithQueue
@@ -20,7 +19,7 @@ trait InteractsWithQueue
      *
      * @return int
      */
-    public function attempts()
+    public function attempts(): int
     {
         return $this->job ? $this->job->attempts() : 1;
     }
@@ -30,10 +29,10 @@ trait InteractsWithQueue
      *
      * @return void
      */
-    public function delete()
+    public function delete(): void
     {
         if ($this->job) {
-            return $this->job->delete();
+            $this->job->delete();
         }
     }
 
@@ -43,18 +42,14 @@ trait InteractsWithQueue
      * @param  \Throwable|string|null  $exception
      * @return void
      */
-    public function fail($exception = null)
+    public function fail(Throwable|string $exception = null): void
     {
         if (is_string($exception)) {
             $exception = new ManuallyFailedException($exception);
         }
 
-        if ($exception instanceof Throwable || is_null($exception)) {
-            if ($this->job) {
-                return $this->job->fail($exception);
-            }
-        } else {
-            throw new InvalidArgumentException('The fail method requires a string or an instance of Throwable.');
+        if ($this->job) {
+            $this->job->fail($exception);
         }
     }
 
@@ -64,10 +59,10 @@ trait InteractsWithQueue
      * @param  int  $delay
      * @return void
      */
-    public function release($delay = 0)
+    public function release(int $delay = 0): void
     {
         if ($this->job) {
-            return $this->job->release($delay);
+            $this->job->release($delay);
         }
     }
 
@@ -77,7 +72,7 @@ trait InteractsWithQueue
      * @param  \Illuminate\Contracts\Queue\Job  $job
      * @return $this
      */
-    public function setJob(JobContract $job)
+    public function setJob(JobContract $job): self
     {
         $this->job = $job;
 
