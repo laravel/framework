@@ -11,7 +11,7 @@ namespace Illuminate\Support\Facades;
  * @method static void queue(array ...$parameters)
  * @method static void expire(string $name, string|null $path = null, string|null $domain = null)
  * @method static void unqueue(string $name, string|null $path = null)
- * @method static \Illuminate\Cookie\CookieJar setDefaultPathAndDomain(string $path, string $domain, bool $secure = false, string|null $sameSite = null)
+ * @method static \Illuminate\Cookie\CookieJar setDefaultPathAndDomain(string $path, string|null $domain, bool|null $secure = false, string|null $sameSite = null)
  * @method static \Symfony\Component\HttpFoundation\Cookie[] getQueuedCookies()
  * @method static \Illuminate\Cookie\CookieJar flushQueuedCookies()
  * @method static void macro(string $name, object|callable $macro)

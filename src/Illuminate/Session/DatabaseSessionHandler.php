@@ -39,7 +39,7 @@ class DatabaseSessionHandler implements ExistenceAwareInterface, SessionHandlerI
     /**
      * The container instance.
      *
-     * @var \Illuminate\Contracts\Container\Container
+     * @var \Illuminate\Contracts\Container\Container|null
      */
     protected $container;
 

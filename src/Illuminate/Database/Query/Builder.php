@@ -1094,6 +1094,8 @@ class Builder implements BuilderContract
             $values = $values->toArray();
         }
 
+        $values = Arr::flatten($values);
+
         foreach ($values as &$value) {
             $value = (int) $value;
         }

@@ -575,7 +575,7 @@ class TestResponse implements ArrayAccess
     /**
      * Assert that the given string matches the streamed response content.
      *
-     * @param  $value
+     * @param  string  $value
      * @return $this
      */
     public function assertStreamedContent($value)
