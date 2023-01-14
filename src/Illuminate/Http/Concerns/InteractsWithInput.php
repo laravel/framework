@@ -385,7 +385,7 @@ trait InteractsWithInput
         }
 
         if (is_string($this->input($key)) && str($this->input($key))->contains(',')) {
-            return explode(',',$this->input($key));
+            return explode(',', $this->input($key));
         }
 
         return [$this->input($key)];

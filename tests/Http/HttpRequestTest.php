@@ -645,7 +645,7 @@ class HttpRequestTest extends TestCase
     {
         $request = Request::create('/?bar[]=foo1&bar[]=foo2');
 
-        $this->assertSame(['foo1','foo2'], $request->array('bar'));
+        $this->assertSame(['foo1', 'foo2'], $request->array('bar'));
 
         $request = Request::create('/', 'GET', [
             'bar' => [
@@ -661,13 +661,13 @@ class HttpRequestTest extends TestCase
             'comma_seperated' => 'hello,hi,hola',
         ]);
 
-        $this->assertSame(['foo1','foo2'], $request->array('bar'));
+        $this->assertSame(['foo1', 'foo2'], $request->array('bar'));
         $this->assertSame(['in1' => 'foo1', 'in2' => 'foo2'], $request->array('indexed_bar'));
         $this->assertSame([1], $request->array('int'));
         $this->assertSame(['hello'], $request->array('string'));
         $this->assertSame([], $request->array('unknown'));
-        $this->assertSame([1,2,3], $request->array('unknown_with_default',[1,2,3]));
-        $this->assertSame(['hello','hi','hola'], $request->array('comma_seperated'));
+        $this->assertSame([1, 2, 3], $request->array('unknown_with_default',[1,2,3]));
+        $this->assertSame(['hello', 'hi', 'hola'], $request->array('comma_seperated'));
     }
 
     public function testCollectMethod()
