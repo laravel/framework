@@ -100,8 +100,8 @@ interface QueueableInterface
     /**
      * Invoke all of the chain's failed job callbacks.
      *
-     * @param  \Throwable  $e
+     * @param  ?\Throwable  $e
      * @return void
      */
-    public function invokeChainCatchCallbacks(\Throwable $e);
+    public function invokeChainCatchCallbacks(?\Throwable $e);
 }

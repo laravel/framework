@@ -11,6 +11,7 @@ use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\InteractsWithQueueInterface;
 use Illuminate\Queue\Middleware\RateLimited;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
@@ -191,7 +192,7 @@ class RateLimitedTest extends TestCase
     }
 }
 
-class RateLimitedTestJob implements QueueableInterface
+class RateLimitedTestJob implements QueueableInterface, InteractsWithQueueInterface
 {
     use InteractsWithQueue, Queueable;
 

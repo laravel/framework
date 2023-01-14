@@ -8,6 +8,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Queue\QueueableEntity;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\InteractsWithQueueInterface;
 use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Queue\SyncQueue;
 use LogicException;
@@ -118,7 +119,7 @@ class FailingSyncQueueTestHandler
     }
 }
 
-class SyncQueueJob implements ShouldQueue
+class SyncQueueJob implements ShouldQueue, InteractsWithQueueInterface
 {
     use InteractsWithQueue;
 
