@@ -368,6 +368,30 @@ trait InteractsWithInput
     }
 
     /**
+     * Retrieve input as an array.
+     *
+     * @param  string  $key
+     * @param  array  $default
+     * @return array
+     */
+    public function array($key, $default = [])
+    {
+        if ($this->isNotFilled($key)) {
+            return $default;
+        }
+
+        if (is_array($this->input($key))) {
+            return $this->input($key);
+        }
+
+        if (is_string($this->input($key)) && str($this->input($key))->contains(',')) {
+            return explode(',',$this->input($key));
+        }
+
+        return [$this->input($key)];
+    }
+
+    /**
      * Retrieve input from the request as a Carbon instance.
      *
      * @param  string  $key
