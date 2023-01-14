@@ -10,7 +10,6 @@ use Illuminate\Database\Schema\Grammars\Grammar;
 use Illuminate\Database\SQLiteConnection;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Traits\Macroable;
-use function PHPUnit\Framework\isInstanceOf;
 
 class Blueprint
 {
