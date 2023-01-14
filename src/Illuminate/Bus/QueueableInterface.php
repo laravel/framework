@@ -103,5 +103,5 @@ interface QueueableInterface
      * @param  ?\Throwable  $e
      * @return void
      */
-    public function invokeChainCatchCallbacks(?\Throwable $e);
+    public function invokeChainCatchCallbacks(?\Throwable $e): void;
 }

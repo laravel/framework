@@ -78,7 +78,7 @@ trait Queueable
      * @param  string|null  $connection
      * @return $this
      */
-    public function onConnection(?string $connection): self
+    public function onConnection(?string $connection): QueueableInterface
     {
         $this->connection = $connection;
 
@@ -91,7 +91,7 @@ trait Queueable
      * @param  string|null  $queue
      * @return $this
      */
-    public function onQueue(?string $queue): self
+    public function onQueue(?string $queue): QueueableInterface
     {
         $this->queue = $queue;
 
@@ -104,7 +104,7 @@ trait Queueable
      * @param  string|null  $connection
      * @return $this
      */
-    public function allOnConnection(?string $connection): self
+    public function allOnConnection(?string $connection): QueueableInterface
     {
         $this->chainConnection = $connection;
         $this->connection = $connection;
@@ -118,7 +118,7 @@ trait Queueable
      * @param  string|null  $queue
      * @return $this
      */
-    public function allOnQueue(?string $queue): self
+    public function allOnQueue(?string $queue): QueueableInterface
     {
         $this->chainQueue = $queue;
         $this->queue = $queue;
@@ -132,7 +132,7 @@ trait Queueable
      * @param  \DateTimeInterface|\DateInterval|array|int|null  $delay
      * @return $this
      */
-    public function delay($delay): self
+    public function delay($delay): QueueableInterface
     {
         $this->delay = $delay;
 
@@ -144,7 +144,7 @@ trait Queueable
      *
      * @return $this
      */
-    public function afterCommit(): self
+    public function afterCommit(): QueueableInterface
     {
         $this->afterCommit = true;
 
@@ -156,7 +156,7 @@ trait Queueable
      *
      * @return $this
      */
-    public function beforeCommit(): self
+    public function beforeCommit(): QueueableInterface
     {
         $this->afterCommit = false;
 
@@ -169,7 +169,7 @@ trait Queueable
      * @param  array|object  $middleware
      * @return $this
      */
-    public function through($middleware): self
+    public function through($middleware): QueueableInterface
     {
         $this->middleware = Arr::wrap($middleware);
 
@@ -182,7 +182,7 @@ trait Queueable
      * @param  array  $chain
      * @return $this
      */
-    public function chain($chain): self
+    public function chain($chain): QueueableInterface
     {
         $this->chained = collect($chain)->map(function ($job) {
             return $this->serializeJob($job);
@@ -197,7 +197,7 @@ trait Queueable
      * @param  mixed  $job
      * @return $this
      */
-    public function prependToChain($job): self
+    public function prependToChain($job): QueueableInterface
     {
         $this->chained = Arr::prepend($this->chained, $this->serializeJob($job));
 
@@ -210,7 +210,7 @@ trait Queueable
      * @param  mixed  $job
      * @return $this
      */
-    public function appendToChain($job): self
+    public function appendToChain($job): QueueableInterface
     {
         $this->chained = array_merge($this->chained, [$this->serializeJob($job)]);
 
@@ -267,7 +267,7 @@ trait Queueable
      * @param  ?\Throwable  $e
      * @return void
      */
-    public function invokeChainCatchCallbacks(?\Throwable $e)
+    public function invokeChainCatchCallbacks(?\Throwable $e): void
     {
         collect($this->chainCatchCallbacks)->each(function ($callback) use ($e) {
             $callback($e);
