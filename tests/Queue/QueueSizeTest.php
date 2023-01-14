@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Queue;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Bus\QueueableInterface;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Queue;
 use Orchestra\Testbench\TestCase;
@@ -27,12 +28,12 @@ class QueueSizeTest extends TestCase
     }
 }
 
-class TestJob1 implements ShouldQueue
+class TestJob1 implements ShouldQueue, QueueableInterface
 {
     use Queueable;
 }
 
-class TestJob2 implements ShouldQueue
+class TestJob2 implements ShouldQueue, QueueableInterface
 {
     use Queueable;
 }

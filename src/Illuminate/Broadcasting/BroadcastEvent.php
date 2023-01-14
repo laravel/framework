@@ -3,6 +3,7 @@
 namespace Illuminate\Broadcasting;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Bus\QueueableInterface;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastingFactory;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Support\Arrayable;
@@ -10,7 +11,7 @@ use Illuminate\Support\Arr;
 use ReflectionClass;
 use ReflectionProperty;
 
-class BroadcastEvent implements ShouldQueue
+class BroadcastEvent implements ShouldQueue, QueueableInterface
 {
     use Queueable;
 

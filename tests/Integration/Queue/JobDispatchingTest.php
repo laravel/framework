@@ -3,8 +3,10 @@
 namespace Illuminate\Tests\Integration\Queue;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Bus\QueueableInterface;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Foundation\Bus\DispatchableInterface;
 use Orchestra\Testbench\TestCase;
 
 class JobDispatchingTest extends TestCase
@@ -72,7 +74,7 @@ class JobDispatchingTest extends TestCase
     }
 }
 
-class Job implements ShouldQueue
+class Job implements ShouldQueue, DispatchableInterface, QueueableInterface
 {
     use Dispatchable, Queueable;
 

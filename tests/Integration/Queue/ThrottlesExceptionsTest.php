@@ -5,9 +5,11 @@ namespace Illuminate\Tests\Integration\Queue;
 use Exception;
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Bus\Queueable;
+use Illuminate\Bus\QueueableInterface;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\InteractsWithQueueInterface;
 use Illuminate\Queue\Middleware\ThrottlesExceptions;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
@@ -107,7 +109,7 @@ class ThrottlesExceptionsTest extends TestCase
     }
 }
 
-class CircuitBreakerTestJob
+class CircuitBreakerTestJob implements InteractsWithQueueInterface, QueueableInterface
 {
     use InteractsWithQueue, Queueable;
 
@@ -126,7 +128,7 @@ class CircuitBreakerTestJob
     }
 }
 
-class CircuitBreakerSuccessfulJob
+class CircuitBreakerSuccessfulJob implements InteractsWithQueueInterface, QueueableInterface
 {
     use InteractsWithQueue, Queueable;
 

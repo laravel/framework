@@ -3,15 +3,17 @@
 namespace Illuminate\Notifications;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Bus\QueueableInterface;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\InteractsWithQueueInterface;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
 
-class SendQueuedNotifications implements ShouldQueue
+class SendQueuedNotifications implements ShouldQueue, InteractsWithQueueInterface, QueueableInterface
 {
     use InteractsWithQueue, Queueable, SerializesModels;
 

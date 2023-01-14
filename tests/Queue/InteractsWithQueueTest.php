@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Queue;
 use Exception;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\InteractsWithQueueInterface;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -20,7 +21,7 @@ class InteractsWithQueueTest extends TestCase
             return true;
         });
 
-        $job = new class
+        $job = new class implements InteractsWithQueueInterface
         {
             use InteractsWithQueue;
 

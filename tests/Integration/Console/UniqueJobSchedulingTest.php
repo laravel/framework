@@ -3,11 +3,14 @@
 namespace Illuminate\Tests\Integration\Console;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Bus\QueueableInterface;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Foundation\Bus\DispatchableInterface;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\InteractsWithQueueInterface;
 use Illuminate\Support\Facades\Queue;
 use Orchestra\Testbench\TestCase;
 
@@ -53,7 +56,7 @@ class UniqueJobSchedulingTest extends TestCase
     }
 }
 
-class TestJob implements ShouldQueue
+class TestJob implements ShouldQueue, InteractsWithQueueInterface, QueueableInterface, DispatchableInterface
 {
     use InteractsWithQueue, Queueable, Dispatchable;
 }

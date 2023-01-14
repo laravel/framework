@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Notifications;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Bus\QueueableInterface;
 use Illuminate\Contracts\Bus\Dispatcher as BusDispatcher;
 use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -102,7 +103,7 @@ class NotificationSenderTest extends TestCase
 
         $sender = new NotificationSender($manager, $bus, $events);
 
-        $sender->send($notifiable, new DummyMultiChannelNotificationWithConditionalMiddlware);
+        $sender->send($notifiable, new DummyMultiChannelNotificationWithConditionalMiddleware);
     }
 
     public function testItCanSendQueuedWithViaConnectionsNotifications()
@@ -161,7 +162,7 @@ class DummyNotificationWithEmptyStringVia extends Notification
     }
 }
 
-class DummyNotificationWithDatabaseVia extends Notification
+class DummyNotificationWithDatabaseVia extends Notification implements QueueableInterface
 {
     use Queueable;
 
@@ -177,7 +178,7 @@ class DummyNotificationWithDatabaseVia extends Notification
     }
 }
 
-class DummyNotificationWithViaConnections extends Notification implements ShouldQueue
+class DummyNotificationWithViaConnections extends Notification implements ShouldQueue, QueueableInterface
 {
     use Queueable;
 
@@ -194,7 +195,7 @@ class DummyNotificationWithViaConnections extends Notification implements Should
     }
 }
 
-class DummyNotificationWithMiddleware extends Notification implements ShouldQueue
+class DummyNotificationWithMiddleware extends Notification implements ShouldQueue, QueueableInterface
 {
     use Queueable;
 
@@ -211,7 +212,7 @@ class DummyNotificationWithMiddleware extends Notification implements ShouldQueu
     }
 }
 
-class DummyMultiChannelNotificationWithConditionalMiddlware extends Notification implements ShouldQueue
+class DummyMultiChannelNotificationWithConditionalMiddleware extends Notification implements ShouldQueue, QueueableInterface
 {
     use Queueable;
 

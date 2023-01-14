@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Mail;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Bus\QueueableInterface;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\View\Factory;
@@ -95,7 +96,7 @@ class MailableQueuedTest extends TestCase
     }
 }
 
-class MailableQueueableStub extends Mailable implements ShouldQueue
+class MailableQueueableStub extends Mailable implements ShouldQueue, QueueableInterface
 {
     use Queueable;
 

@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Support;
 
 use Illuminate\Bus\Batch;
 use Illuminate\Bus\Queueable;
+use Illuminate\Bus\QueueableInterface;
 use Illuminate\Contracts\Bus\QueueingDispatcher;
 use Illuminate\Support\Testing\Fakes\BatchRepositoryFake;
 use Illuminate\Support\Testing\Fakes\BusFake;
@@ -594,7 +595,7 @@ class BusJobStub
     //
 }
 
-class ChainedJobStub
+class ChainedJobStub implements QueueableInterface
 {
     use Queueable;
 }

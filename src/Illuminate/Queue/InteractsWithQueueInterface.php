@@ -45,5 +45,5 @@ interface InteractsWithQueueInterface
      * @param  \Illuminate\Contracts\Queue\Job  $job
      * @return $this
      */
-    public function setJob(JobContract $job): void;
+    public function setJob(JobContract $job): InteractsWithQueueInterface;
 }

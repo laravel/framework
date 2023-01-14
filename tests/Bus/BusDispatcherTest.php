@@ -4,11 +4,13 @@ namespace Illuminate\Tests\Bus;
 
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Bus\Queueable;
+use Illuminate\Bus\QueueableInterface;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\Queue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\InteractsWithQueueInterface;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -160,7 +162,7 @@ class StandAloneHandler
     }
 }
 
-class ShouldNotBeDispatched implements ShouldQueue
+class ShouldNotBeDispatched implements ShouldQueue, QueueableInterface, InteractsWithQueueInterface
 {
     use InteractsWithQueue, Queueable;
 

@@ -3,8 +3,9 @@
 namespace Illuminate\Notifications\Messages;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Bus\QueueableInterface;
 
-class BroadcastMessage
+class BroadcastMessage implements QueueableInterface
 {
     use Queueable;
 

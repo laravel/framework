@@ -3,9 +3,11 @@
 namespace Illuminate\Tests\Integration\Queue;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Bus\QueueableInterface;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Foundation\Bus\DispatchableInterface;
 use Orchestra\Testbench\TestCase;
 use Queue;
 
@@ -126,7 +128,7 @@ class WorkCommandTest extends TestCase
     }
 }
 
-class FirstJob implements ShouldQueue
+class FirstJob implements ShouldQueue, DispatchableInterface, QueueableInterface
 {
     use Dispatchable, Queueable;
 
@@ -138,7 +140,7 @@ class FirstJob implements ShouldQueue
     }
 }
 
-class SecondJob implements ShouldQueue
+class SecondJob implements ShouldQueue, DispatchableInterface, QueueableInterface
 {
     use Dispatchable, Queueable;
 
@@ -150,7 +152,7 @@ class SecondJob implements ShouldQueue
     }
 }
 
-class ThirdJob implements ShouldQueue
+class ThirdJob implements ShouldQueue, DispatchableInterface, QueueableInterface
 {
     use Dispatchable, Queueable;
 

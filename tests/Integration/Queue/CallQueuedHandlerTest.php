@@ -4,11 +4,13 @@ namespace Illuminate\Tests\Integration\Queue;
 
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Bus\Queueable;
+use Illuminate\Bus\QueueableInterface;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\InteractsWithQueueInterface;
 use Illuminate\Support\Facades\Event;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
@@ -126,7 +128,7 @@ class CallQueuedHandlerTest extends TestCase
     }
 }
 
-class CallQueuedHandlerTestJob
+class CallQueuedHandlerTestJob implements InteractsWithQueueInterface
 {
     use InteractsWithQueue;
 
@@ -159,7 +161,9 @@ abstract class AbstractCallQueuedHandlerTestJobWithMiddleware
     }
 }
 
-class CallQueuedHandlerTestJobWithMiddleware extends AbstractCallQueuedHandlerTestJobWithMiddleware
+class CallQueuedHandlerTestJobWithMiddleware extends AbstractCallQueuedHandlerTestJobWithMiddleware implements
+    InteractsWithQueueInterface,
+    QueueableInterface
 {
     use InteractsWithQueue, Queueable;
 

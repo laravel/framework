@@ -13,7 +13,7 @@ trait Dispatchable
      *
      * @return \Illuminate\Foundation\Bus\PendingDispatch
      */
-    public static function dispatch(...$arguments)
+    public static function dispatch(...$arguments): PendingDispatch
     {
         return new PendingDispatch(new static(...$arguments));
     }
@@ -25,7 +25,7 @@ trait Dispatchable
      * @param  mixed  ...$arguments
      * @return \Illuminate\Foundation\Bus\PendingDispatch|\Illuminate\Support\Fluent
      */
-    public static function dispatchIf($boolean, ...$arguments)
+    public static function dispatchIf($boolean, ...$arguments): PendingDispatch|Fluent
     {
         if ($boolean instanceof Closure) {
             $dispatchable = new static(...$arguments);
@@ -47,7 +47,7 @@ trait Dispatchable
      * @param  mixed  ...$arguments
      * @return \Illuminate\Foundation\Bus\PendingDispatch|\Illuminate\Support\Fluent
      */
-    public static function dispatchUnless($boolean, ...$arguments)
+    public static function dispatchUnless($boolean, ...$arguments): PendingDispatch|Fluent
     {
         if ($boolean instanceof Closure) {
             $dispatchable = new static(...$arguments);
@@ -69,7 +69,7 @@ trait Dispatchable
      *
      * @return mixed
      */
-    public static function dispatchSync(...$arguments)
+    public static function dispatchSync(...$arguments): mixed
     {
         return app(Dispatcher::class)->dispatchSync(new static(...$arguments));
     }
@@ -81,7 +81,7 @@ trait Dispatchable
      *
      * @deprecated Will be removed in a future Laravel version.
      */
-    public static function dispatchNow(...$arguments)
+    public static function dispatchNow(...$arguments): mixed
     {
         return app(Dispatcher::class)->dispatchNow(new static(...$arguments));
     }
@@ -91,7 +91,7 @@ trait Dispatchable
      *
      * @return mixed
      */
-    public static function dispatchAfterResponse(...$arguments)
+    public static function dispatchAfterResponse(...$arguments): mixed
     {
         return app(Dispatcher::class)->dispatchAfterResponse(new static(...$arguments));
     }
@@ -102,7 +102,7 @@ trait Dispatchable
      * @param  array  $chain
      * @return \Illuminate\Foundation\Bus\PendingChain
      */
-    public static function withChain($chain)
+    public static function withChain($chain): PendingChain
     {
         return new PendingChain(static::class, $chain);
     }

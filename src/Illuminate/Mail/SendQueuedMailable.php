@@ -3,12 +3,14 @@
 namespace Illuminate\Mail;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Bus\QueueableInterface;
 use Illuminate\Contracts\Mail\Factory as MailFactory;
 use Illuminate\Contracts\Mail\Mailable as MailableContract;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\InteractsWithQueueInterface;
 
-class SendQueuedMailable
+class SendQueuedMailable implements InteractsWithQueueInterface, QueueableInterface
 {
     use Queueable, InteractsWithQueue;
 

@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Queue;
 
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Bus\Queueable;
+use Illuminate\Bus\QueueableInterface;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Contracts\Cache\Repository as Cache;
@@ -190,7 +191,7 @@ class RateLimitedTest extends TestCase
     }
 }
 
-class RateLimitedTestJob
+class RateLimitedTestJob implements QueueableInterface
 {
     use InteractsWithQueue, Queueable;
 

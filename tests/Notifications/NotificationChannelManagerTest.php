@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Notifications;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Bus\QueueableInterface;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher as Bus;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -170,7 +171,7 @@ class NotificationChannelManagerTestNotCancelledNotification extends Notificatio
     }
 }
 
-class NotificationChannelManagerTestQueuedNotification extends Notification implements ShouldQueue
+class NotificationChannelManagerTestQueuedNotification extends Notification implements ShouldQueue, QueueableInterface
 {
     use Queueable;
 

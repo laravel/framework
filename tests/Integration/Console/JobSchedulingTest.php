@@ -3,9 +3,11 @@
 namespace Illuminate\Tests\Integration\Console;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Bus\QueueableInterface;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\InteractsWithQueueInterface;
 use Illuminate\Support\Facades\Queue;
 use Orchestra\Testbench\TestCase;
 
@@ -82,7 +84,7 @@ class JobSchedulingTest extends TestCase
     }
 }
 
-class JobWithDefaultQueue implements ShouldQueue
+class JobWithDefaultQueue implements ShouldQueue, QueueableInterface, InteractsWithQueueInterface
 {
     use Queueable, InteractsWithQueue;
 
@@ -92,7 +94,7 @@ class JobWithDefaultQueue implements ShouldQueue
     }
 }
 
-class JobWithDefaultQueueTwo implements ShouldQueue
+class JobWithDefaultQueueTwo implements ShouldQueue, QueueableInterface, InteractsWithQueueInterface
 {
     use Queueable, InteractsWithQueue;
 
@@ -102,12 +104,12 @@ class JobWithDefaultQueueTwo implements ShouldQueue
     }
 }
 
-class JobWithoutDefaultQueue implements ShouldQueue
+class JobWithoutDefaultQueue implements ShouldQueue, QueueableInterface, InteractsWithQueueInterface
 {
     use Queueable, InteractsWithQueue;
 }
 
-class JobWithDefaultConnection implements ShouldQueue
+class JobWithDefaultConnection implements ShouldQueue, QueueableInterface, InteractsWithQueueInterface
 {
     use Queueable, InteractsWithQueue;
 
@@ -117,7 +119,7 @@ class JobWithDefaultConnection implements ShouldQueue
     }
 }
 
-class JobWithoutDefaultConnection implements ShouldQueue
+class JobWithoutDefaultConnection implements ShouldQueue, QueueableInterface, InteractsWithQueueInterface
 {
     use Queueable, InteractsWithQueue;
 }

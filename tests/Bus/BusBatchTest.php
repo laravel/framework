@@ -9,6 +9,7 @@ use Illuminate\Bus\BatchFactory;
 use Illuminate\Bus\DatabaseBatchRepository;
 use Illuminate\Bus\PendingBatch;
 use Illuminate\Bus\Queueable;
+use Illuminate\Bus\QueueableInterface;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\Factory;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -17,6 +18,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Foundation\Bus\DispatchableInterface;
 use Illuminate\Queue\CallQueuedClosure;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -504,17 +506,17 @@ class BusBatchTest extends TestCase
     }
 }
 
-class ChainHeadJob implements ShouldQueue
+class ChainHeadJob implements ShouldQueue, DispatchableInterface, QueueableInterface
 {
     use Dispatchable, Queueable, Batchable;
 }
 
-class SecondTestJob implements ShouldQueue
+class SecondTestJob implements ShouldQueue, DispatchableInterface, QueueableInterface
 {
     use Dispatchable, Queueable, Batchable;
 }
 
-class ThirdTestJob implements ShouldQueue
+class ThirdTestJob implements ShouldQueue, DispatchableInterface, QueueableInterface
 {
     use Dispatchable, Queueable, Batchable;
 }

@@ -3,11 +3,13 @@
 namespace Illuminate\Tests\Integration\Queue;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Bus\QueueableInterface;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Foundation\Bus\DispatchableInterface;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
@@ -90,7 +92,7 @@ class JobEncryptionTest extends DatabaseTestCase
     }
 }
 
-class JobEncryptionTestEncryptedJob implements ShouldQueue, ShouldBeEncrypted
+class JobEncryptionTestEncryptedJob implements ShouldQueue, ShouldBeEncrypted, DispatchableInterface, QueueableInterface
 {
     use Dispatchable, Queueable;
 
@@ -102,7 +104,7 @@ class JobEncryptionTestEncryptedJob implements ShouldQueue, ShouldBeEncrypted
     }
 }
 
-class JobEncryptionTestNonEncryptedJob implements ShouldQueue
+class JobEncryptionTestNonEncryptedJob implements ShouldQueue, DispatchableInterface, QueueableInterface
 {
     use Dispatchable, Queueable;
 

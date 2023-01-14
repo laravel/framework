@@ -72,7 +72,7 @@ trait InteractsWithQueue
      * @param  \Illuminate\Contracts\Queue\Job  $job
      * @return $this
      */
-    public function setJob(JobContract $job): self
+    public function setJob(JobContract $job): InteractsWithQueueInterface
     {
         $this->job = $job;
 

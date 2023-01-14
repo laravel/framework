@@ -4,13 +4,16 @@ namespace Illuminate\Tests\Integration\Queue;
 
 use Exception;
 use Illuminate\Bus\Queueable;
+use Illuminate\Bus\QueueableInterface;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Foundation\Bus\DispatchableInterface;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\InteractsWithQueueInterface;
 use Illuminate\Support\Facades\Bus;
 use Orchestra\Testbench\TestCase;
 
@@ -154,7 +157,12 @@ class UniqueJobTest extends TestCase
     }
 }
 
-class UniqueTestJob implements ShouldQueue, ShouldBeUnique
+class UniqueTestJob implements
+    ShouldQueue,
+    ShouldBeUnique,
+    InteractsWithQueueInterface,
+    QueueableInterface,
+    DispatchableInterface
 {
     use InteractsWithQueue, Queueable, Dispatchable;
 
@@ -166,7 +174,12 @@ class UniqueTestJob implements ShouldQueue, ShouldBeUnique
     }
 }
 
-class UniqueTestFailJob implements ShouldQueue, ShouldBeUnique
+class UniqueTestFailJob implements
+    ShouldQueue,
+    ShouldBeUnique,
+    InteractsWithQueueInterface,
+    QueueableInterface,
+    DispatchableInterface
 {
     use InteractsWithQueue, Queueable, Dispatchable;
 

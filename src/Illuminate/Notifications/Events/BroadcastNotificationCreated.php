@@ -4,12 +4,13 @@ namespace Illuminate\Notifications\Events;
 
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Bus\Queueable;
+use Illuminate\Bus\QueueableInterface;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Arr;
 
-class BroadcastNotificationCreated implements ShouldBroadcast
+class BroadcastNotificationCreated implements ShouldBroadcast, QueueableInterface
 {
     use Queueable, SerializesModels;
 

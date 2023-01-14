@@ -3,11 +3,13 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Bus\QueueableInterface;
 use Illuminate\Contracts\Console\Kernel as KernelContract;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Foundation\Bus\DispatchableInterface;
 
-class QueuedCommand implements ShouldQueue
+class QueuedCommand implements ShouldQueue, DispatchableInterface, QueueableInterface
 {
     use Dispatchable, Queueable;
 

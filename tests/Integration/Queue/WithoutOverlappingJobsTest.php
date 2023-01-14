@@ -5,10 +5,12 @@ namespace Illuminate\Tests\Integration\Queue;
 use Exception;
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Bus\Queueable;
+use Illuminate\Bus\QueueableInterface;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\InteractsWithQueueInterface;
 use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
@@ -161,7 +163,7 @@ class WithoutOverlappingJobsTest extends TestCase
     }
 }
 
-class OverlappingTestJob
+class OverlappingTestJob implements InteractsWithQueueInterface, QueueableInterface
 {
     use InteractsWithQueue, Queueable;
 
@@ -196,7 +198,7 @@ class FailedOverlappingTestJob extends OverlappingTestJob
     }
 }
 
-class OverlappingTestJobWithSharedKeyOne
+class OverlappingTestJobWithSharedKeyOne implements InteractsWithQueueInterface, QueueableInterface
 {
     use InteractsWithQueue, Queueable;
 
@@ -213,7 +215,7 @@ class OverlappingTestJobWithSharedKeyOne
     }
 }
 
-class OverlappingTestJobWithSharedKeyTwo
+class OverlappingTestJobWithSharedKeyTwo implements InteractsWithQueueInterface, QueueableInterface
 {
     use InteractsWithQueue, Queueable;
 

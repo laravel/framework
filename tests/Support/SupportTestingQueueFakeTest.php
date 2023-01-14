@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Support;
 
 use BadMethodCallException;
 use Illuminate\Bus\Queueable;
+use Illuminate\Bus\QueueableInterface;
 use Illuminate\Foundation\Application;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Support\Testing\Fakes\QueueFake;
@@ -364,7 +365,7 @@ class JobToFakeStub
     }
 }
 
-class JobWithChainStub
+class JobWithChainStub implements QueueableInterface
 {
     use Queueable;
 
@@ -379,7 +380,7 @@ class JobWithChainStub
     }
 }
 
-class JobWithChainAndParameterStub
+class JobWithChainAndParameterStub implements QueueableInterface
 {
     use Queueable;
 

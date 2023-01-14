@@ -3,9 +3,12 @@
 namespace Illuminate\Tests\Integration\Queue;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Bus\QueueableInterface;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Foundation\Bus\DispatchableInterface;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\InteractsWithQueueInterface;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Queue;
@@ -246,7 +249,7 @@ class JobChainingTest extends TestCase
     }
 }
 
-class JobChainingTestFirstJob implements ShouldQueue
+class JobChainingTestFirstJob implements ShouldQueue, DispatchableInterface, QueueableInterface
 {
     use Dispatchable, Queueable;
 
@@ -262,7 +265,7 @@ class JobChainingTestFirstJob implements ShouldQueue
     }
 }
 
-class JobChainingTestSecondJob implements ShouldQueue
+class JobChainingTestSecondJob implements ShouldQueue, DispatchableInterface, QueueableInterface
 {
     use Dispatchable, Queueable;
 
@@ -278,7 +281,7 @@ class JobChainingTestSecondJob implements ShouldQueue
     }
 }
 
-class JobChainingTestThirdJob implements ShouldQueue
+class JobChainingTestThirdJob implements ShouldQueue, DispatchableInterface, QueueableInterface
 {
     use Dispatchable, Queueable;
 
@@ -294,7 +297,7 @@ class JobChainingTestThirdJob implements ShouldQueue
     }
 }
 
-class JobChainingTestDeletingJob implements ShouldQueue
+class JobChainingTestDeletingJob implements ShouldQueue, DispatchableInterface, InteractsWithQueueInterface, QueueableInterface
 {
     use Dispatchable, InteractsWithQueue, Queueable;
 
@@ -307,7 +310,7 @@ class JobChainingTestDeletingJob implements ShouldQueue
     }
 }
 
-class JobChainingTestReleasingJob implements ShouldQueue
+class JobChainingTestReleasingJob implements ShouldQueue, DispatchableInterface, InteractsWithQueueInterface, QueueableInterface
 {
     use Dispatchable, InteractsWithQueue, Queueable;
 
@@ -317,7 +320,7 @@ class JobChainingTestReleasingJob implements ShouldQueue
     }
 }
 
-class JobChainingTestFailingJob implements ShouldQueue
+class JobChainingTestFailingJob implements ShouldQueue, DispatchableInterface, InteractsWithQueueInterface, QueueableInterface
 {
     use Dispatchable, InteractsWithQueue, Queueable;
 
@@ -327,7 +330,7 @@ class JobChainingTestFailingJob implements ShouldQueue
     }
 }
 
-class JobChainAddingPrependingJob implements ShouldQueue
+class JobChainAddingPrependingJob implements ShouldQueue, DispatchableInterface, InteractsWithQueueInterface, QueueableInterface
 {
     use Dispatchable, InteractsWithQueue, Queueable;
 
@@ -337,7 +340,7 @@ class JobChainAddingPrependingJob implements ShouldQueue
     }
 }
 
-class JobChainAddingAppendingJob implements ShouldQueue
+class JobChainAddingAppendingJob implements ShouldQueue, DispatchableInterface, InteractsWithQueueInterface, QueueableInterface
 {
     use Dispatchable, InteractsWithQueue, Queueable;
 
@@ -347,7 +350,7 @@ class JobChainAddingAppendingJob implements ShouldQueue
     }
 }
 
-class JobChainAddingExistingJob implements ShouldQueue
+class JobChainAddingExistingJob implements ShouldQueue, DispatchableInterface, InteractsWithQueueInterface, QueueableInterface
 {
     use Dispatchable, InteractsWithQueue, Queueable;
 
@@ -360,7 +363,7 @@ class JobChainAddingExistingJob implements ShouldQueue
     }
 }
 
-class JobChainAddingAddedJob implements ShouldQueue
+class JobChainAddingAddedJob implements ShouldQueue, DispatchableInterface, InteractsWithQueueInterface, QueueableInterface
 {
     use Dispatchable, InteractsWithQueue, Queueable;
 
@@ -373,7 +376,7 @@ class JobChainAddingAddedJob implements ShouldQueue
     }
 }
 
-class JobChainingTestThrowJob implements ShouldQueue
+class JobChainingTestThrowJob implements ShouldQueue, DispatchableInterface, InteractsWithQueueInterface, QueueableInterface
 {
     use Dispatchable, InteractsWithQueue, Queueable;
 

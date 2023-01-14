@@ -3,12 +3,14 @@
 namespace Illuminate\Events;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Bus\QueueableInterface;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\InteractsWithQueueInterface;
 
-class CallQueuedListener implements ShouldQueue
+class CallQueuedListener implements ShouldQueue, QueueableInterface, InteractsWithQueueInterface
 {
     use InteractsWithQueue, Queueable;
 

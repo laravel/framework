@@ -3,9 +3,10 @@
 namespace Illuminate\Notifications\Events;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Bus\QueueableInterface;
 use Illuminate\Queue\SerializesModels;
 
-class NotificationSent
+class NotificationSent implements QueueableInterface
 {
     use Queueable, SerializesModels;
 

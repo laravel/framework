@@ -5,10 +5,12 @@ namespace Illuminate\Tests\Integration\Queue;
 use Exception;
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Bus\Queueable;
+use Illuminate\Bus\QueueableInterface;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\InteractsWithQueueInterface;
 use Illuminate\Queue\Middleware\ThrottlesExceptionsWithRedis;
 use Illuminate\Support\Str;
 use Mockery as m;
@@ -123,7 +125,7 @@ class ThrottlesExceptionsWithRedisTest extends TestCase
     }
 }
 
-class CircuitBreakerWithRedisTestJob
+class CircuitBreakerWithRedisTestJob implements InteractsWithQueueInterface, QueueableInterface
 {
     use InteractsWithQueue, Queueable;
 
@@ -149,7 +151,7 @@ class CircuitBreakerWithRedisTestJob
     }
 }
 
-class CircuitBreakerWithRedisSuccessfulJob
+class CircuitBreakerWithRedisSuccessfulJob implements InteractsWithQueueInterface, QueueableInterface
 {
     use InteractsWithQueue, Queueable;
 

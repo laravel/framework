@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Queue;
 
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Bus\Queueable;
+use Illuminate\Bus\QueueableInterface;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Contracts\Queue\Job;
@@ -11,6 +12,7 @@ use Illuminate\Contracts\Redis\Factory as Redis;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\InteractsWithQueueInterface;
 use Illuminate\Queue\Middleware\RateLimitedWithRedis;
 use Illuminate\Support\Str;
 use Mockery as m;
@@ -184,7 +186,7 @@ class RateLimitedWithRedisTest extends TestCase
     }
 }
 
-class RedisRateLimitedTestJob
+class RedisRateLimitedTestJob implements QueueableInterface, InteractsWithQueueInterface
 {
     use InteractsWithQueue, Queueable;
 

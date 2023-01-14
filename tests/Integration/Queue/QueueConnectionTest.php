@@ -3,9 +3,11 @@
 namespace Illuminate\Tests\Integration\Queue;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Bus\QueueableInterface;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\DatabaseTransactionsManager;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Foundation\Bus\DispatchableInterface;
 use Illuminate\Support\Facades\Bus;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
@@ -73,7 +75,7 @@ class QueueConnectionTest extends TestCase
     }
 }
 
-class QueueConnectionTestJob implements ShouldQueue
+class QueueConnectionTestJob implements ShouldQueue, DispatchableInterface, QueueableInterface
 {
     use Dispatchable, Queueable;
 
