@@ -19,7 +19,7 @@ class Store implements Session
     /**
      * The session ID.
      *
-     * @var string
+     * @var string|null
      */
     protected $id;
 
