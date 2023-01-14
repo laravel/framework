@@ -666,7 +666,7 @@ class HttpRequestTest extends TestCase
         $this->assertSame([1], $request->array('int'));
         $this->assertSame(['hello'], $request->array('string'));
         $this->assertSame([], $request->array('unknown'));
-        $this->assertSame([1, 2, 3], $request->array('unknown_with_default',[1,2,3]));
+        $this->assertSame([1, 2, 3], $request->array('unknown_with_default',[1, 2, 3]));
         $this->assertSame(['hello', 'hi', 'hola'], $request->array('comma_seperated'));
     }
 
