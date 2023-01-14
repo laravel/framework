@@ -10,6 +10,7 @@ use Illuminate\Database\Schema\Grammars\Grammar;
 use Illuminate\Database\SQLiteConnection;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Traits\Macroable;
+use function PHPUnit\Framework\isInstanceOf;
 
 class Blueprint
 {
@@ -1033,11 +1034,15 @@ class Blueprint
      * Create a new enum column on the table.
      *
      * @param  string  $column
-     * @param  array  $allowed
+     * @param  array|Enum  $allowed
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function enum($column, array $allowed)
+    public function enum($column, array|Enum $allowed)
     {
+        if ($allowed instanceof Enum) {
+            $allowed = $allowed->getAcceptedValues();
+        }
+
         return $this->addColumn('enum', $column, compact('allowed'));
     }
 
