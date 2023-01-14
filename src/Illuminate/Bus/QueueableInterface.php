@@ -10,7 +10,7 @@ interface QueueableInterface
      * @param  string|null  $connection
      * @return $this
      */
-    public function onConnection(?string $connection): self;
+    public function onConnection(?string $connection): QueueableInterface;
 
     /**
      * Set the desired queue for the job.
@@ -18,7 +18,7 @@ interface QueueableInterface
      * @param  string|null  $queue
      * @return $this
      */
-    public function onQueue(?string $queue): self;
+    public function onQueue(?string $queue): QueueableInterface;
 
     /**
      * Set the desired connection for the chain.
@@ -26,7 +26,7 @@ interface QueueableInterface
      * @param  string|null  $connection
      * @return $this
      */
-    public function allOnConnection(?string $connection): self;
+    public function allOnConnection(?string $connection): QueueableInterface;
 
     /**
      * Set the desired queue for the chain.
@@ -34,7 +34,7 @@ interface QueueableInterface
      * @param  string|null  $queue
      * @return $this
      */
-    public function allOnQueue(?string $queue): self;
+    public function allOnQueue(?string $queue): QueueableInterface;
 
     /**
      * Set the desired delay in seconds for the job.
@@ -42,21 +42,21 @@ interface QueueableInterface
      * @param  \DateTimeInterface|\DateInterval|array|int|null  $delay
      * @return $this
      */
-    public function delay(\DateInterval|\DateTimeInterface|int|array|null $delay): self;
+    public function delay(\DateInterval|\DateTimeInterface|int|array|null $delay): QueueableInterface;
 
     /**
      * Indicate that the job should be dispatched after all database transactions have committed.
      *
      * @return $this
      */
-    public function afterCommit(): self;
+    public function afterCommit(): QueueableInterface;
 
     /**
      * Indicate that the job should not wait until database transactions have been committed before dispatching.
      *
      * @return $this
      */
-    public function beforeCommit(): self;
+    public function beforeCommit(): QueueableInterface;
 
     /**
      * Specify the middleware the job should be dispatched through.
@@ -64,7 +64,7 @@ interface QueueableInterface
      * @param  array|object  $middleware
      * @return $this
      */
-    public function through($middleware): self;
+    public function through($middleware): QueueableInterface;
 
     /**
      * Set the jobs that should run if this job is successful.
@@ -72,7 +72,7 @@ interface QueueableInterface
      * @param  array  $chain
      * @return $this
      */
-    public function chain(array $chain): self;
+    public function chain(array $chain): QueueableInterface;
 
     /**
      * Prepend a job to the current chain so that it is run after the currently running job.
@@ -80,7 +80,7 @@ interface QueueableInterface
      * @param  mixed  $job
      * @return $this
      */
-    public function prependToChain($job): self;
+    public function prependToChain($job): QueueableInterface;
 
     /**
      * Append a job to the end of the current chain.
@@ -88,7 +88,7 @@ interface QueueableInterface
      * @param  mixed  $job
      * @return $this
      */
-    public function appendToChain($job): self;
+    public function appendToChain($job): QueueableInterface;
 
     /**
      * Dispatch the next job on the chain.
