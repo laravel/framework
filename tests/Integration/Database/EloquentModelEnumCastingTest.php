@@ -21,7 +21,7 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
         Schema::create('enum_casts', function (Blueprint $table) {
             $table->increments('id');
             $table->string('string_status', 100)->nullable();
-            $table->json('string_status_array', 100)->nullable();
+            $table->json('string_status_array')->nullable();
             $table->integer('integer_status')->nullable();
             $table->json('integer_status_array')->nullable();
             $table->string('arrayable_status')->nullable();
