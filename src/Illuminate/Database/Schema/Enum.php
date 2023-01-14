@@ -12,8 +12,7 @@ class Enum
 
     public function getAcceptedValues(): array
     {
-        $enumClass = new $this->type;
-        $cases = $enumClass->cases();
+        $cases = $this->type::cases();
 
         $arrayOfCasesValues = [];
         foreach ($cases as $case) {
