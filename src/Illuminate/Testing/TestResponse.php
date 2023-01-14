@@ -131,6 +131,16 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Assert that the response has a 'bad request' status code.
+     *
+     * @return $this
+     */
+    public function assertBadRequest()
+    {
+        return $this->assertStatus(400);
+    }
+
+    /**
      * Assert that the response has a not found status code.
      *
      * @return $this
@@ -183,6 +193,16 @@ class TestResponse implements ArrayAccess
         );
 
         return $this;
+    }
+
+    /**
+     * Assert that the response has a 'not implemented' status code.
+     *
+     * @return $this
+     */
+    public function assertNotImplemented()
+    {
+        return $this->assertStatus(501);
     }
 
     /**
