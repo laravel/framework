@@ -580,6 +580,30 @@ class EventsDispatcherTest extends TestCase
 
         unset($_SERVER['__event.test']);
     }
+
+    public function testDispatchWrapped()
+    {
+        $d = new Dispatcher;
+        $d->listen('e', fn ($payload) => throw new Exception('1- '.$payload));
+        $d->listen('e', fn ($payload) => throw new Exception('2- '.$payload));
+        $d->listen('e', fn ($payload) => '3- Hello Commander');
+
+        $wrapper = function ($listener) {
+            try {
+                return $listener();
+            } catch (Exception $e) {
+                return $e->getMessage();
+            }
+        };
+
+        $responses = $d->dispatchWith('e', 'payload', false, $wrapper);
+
+        $this->assertEquals([
+            '1- payload',
+            '2- payload',
+            '3- Hello Commander',
+        ], $responses);
+    }
 }
 
 class TestListenerLean

@@ -223,14 +223,15 @@ class Dispatcher implements DispatcherContract
     }
 
     /**
-     * Fire an event and call the listeners.
+     * Fire an event and call the listeners within the given wrapper.
      *
      * @param  string|object  $event
      * @param  mixed  $payload
      * @param  bool  $halt
+     * @param  \Closure|null  $wrapper
      * @return array|null
      */
-    public function dispatch($event, $payload = [], $halt = false)
+    public function dispatchWith($event, $payload = [], $halt = false, $wrapper = null)
     {
         // When the given "event" is actually an object we will assume it is an event
         // object and use the class as the event name and this event itself as the
@@ -246,7 +247,7 @@ class Dispatcher implements DispatcherContract
         $responses = [];
 
         foreach ($this->getListeners($event) as $listener) {
-            $response = $listener($event, $payload);
+            $response = $wrapper ? $wrapper(fn () => $listener($event, $payload)) : $listener($event, $payload);
 
             // If a response is returned from the listener and event halting is enabled
             // we will just return this response, and not call the rest of the event
@@ -266,6 +267,19 @@ class Dispatcher implements DispatcherContract
         }
 
         return $halt ? null : $responses;
+    }
+
+    /**
+     * Fire an event and call the listeners.
+     *
+     * @param  string|object  $event
+     * @param  mixed  $payload
+     * @param  bool  $halt
+     * @return array|null
+     */
+    public function dispatch($event, $payload = [], $halt = false, $wrapper = null)
+    {
+        return $this->dispatchWith($event, $payload, $halt);
     }
 
     /**
