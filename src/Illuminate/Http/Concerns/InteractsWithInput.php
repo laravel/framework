@@ -374,7 +374,7 @@ trait InteractsWithInput
      * @param  array  $default
      * @return array
      */
-    public function array($key, $default = [])
+    public function asArray($key, $default = [])
     {
         if ($this->isNotFilled($key)) {
             return $default;
