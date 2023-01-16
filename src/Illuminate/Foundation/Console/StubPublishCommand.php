@@ -4,7 +4,7 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Foundation\Events\CollectStubsForPublishing;
+use Illuminate\Foundation\Events\PublishingStubs;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'stub:publish')]
@@ -48,7 +48,7 @@ class StubPublishCommand extends Command
             (new Filesystem)->makeDirectory($stubsPath);
         }
 
-        $files = [
+        $stubs = [
             __DIR__.'/stubs/cast.inbound.stub' => 'cast.inbound.stub',
             __DIR__.'/stubs/cast.stub' => 'cast.stub',
             __DIR__.'/stubs/console.stub' => 'console.stub',
@@ -94,11 +94,9 @@ class StubPublishCommand extends Command
             realpath(__DIR__.'/../../Routing/Console/stubs/middleware.stub') => 'middleware.stub',
         ];
 
-        $event = new CollectStubsForPublishing($files);
+        $this->laravel['events']->dispatch($event = new PublishingStubs($stubs));
 
-        app('events')->dispatch($event);
-
-        foreach ($event->getStubs() as $from => $to) {
+        foreach ($event->stubs as $from => $to) {
             $to = $stubsPath.DIRECTORY_SEPARATOR.ltrim($to, DIRECTORY_SEPARATOR);
 
             if ((! $this->option('existing') && (! file_exists($to) || $this->option('force')))
