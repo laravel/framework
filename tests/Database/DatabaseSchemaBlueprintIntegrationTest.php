@@ -515,6 +515,51 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
         $this->assertEquals($expected, $queries);
     }
 
+    public function testDropIndexOnColumnChangeWorks()
+    {
+        $connection = $this->db->connection();
+
+        $connection->getSchemaBuilder()->create('users', function ($table) {
+            $table->string('name')->nullable();
+        });
+
+        $blueprint = new Blueprint('users', function ($table) {
+            $table->string('name')->nullable()->unique(false)->change();
+        });
+
+        $this->assertContains(
+            'alter table `users` drop index `users_name_unique`',
+            $blueprint->toSql($connection, new MySqlGrammar)
+        );
+
+        $blueprint = new Blueprint('users', function ($table) {
+            $table->string('name')->nullable()->unique(false)->change();
+        });
+
+        $this->assertContains(
+            'alter table "users" drop constraint "users_name_unique"',
+            $blueprint->toSql($connection, new PostgresGrammar)
+        );
+
+        $blueprint = new Blueprint('users', function ($table) {
+            $table->string('name')->nullable()->unique(false)->change();
+        });
+
+        $this->assertContains(
+            'drop index "users_name_unique"',
+            $blueprint->toSql($connection, new SQLiteGrammar)
+        );
+
+        $blueprint = new Blueprint('users', function ($table) {
+            $table->string('name')->nullable()->unique(false)->change();
+        });
+
+        $this->assertContains(
+            'drop index "users_name_unique" on "users"',
+            $blueprint->toSql($connection, new SqlServerGrammar)
+        );
+    }
+
     public function testItEnsuresDroppingMultipleColumnsIsAvailable()
     {
         $this->expectException(BadMethodCallException::class);
