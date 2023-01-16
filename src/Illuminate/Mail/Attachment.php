@@ -14,14 +14,14 @@ class Attachment
     /**
      * The attached file's filename.
      *
-     * @var string|null
+     * @var ?string
      */
     public $as;
 
     /**
      * The attached file's mime type.
      *
-     * @var string|null
+     * @var ?string
      */
     public $mime;
 
@@ -82,7 +82,7 @@ class Attachment
     /**
      * Create a mail attachment from a file in the specified storage disk.
      *
-     * @param  string|null  $disk
+     * @param  ?string  $disk
      * @param  string  $path
      * @return static
      */

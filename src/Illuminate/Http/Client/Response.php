@@ -65,7 +65,7 @@ class Response implements ArrayAccess
     /**
      * Get the JSON decoded body of the response as an array or scalar value.
      *
-     * @param  string|null  $key
+     * @param  ?string  $key
      * @param  mixed  $default
      * @return mixed
      */
@@ -95,7 +95,7 @@ class Response implements ArrayAccess
     /**
      * Get the JSON decoded body of the response as a collection.
      *
-     * @param  string|null  $key
+     * @param  ?string  $key
      * @return \Illuminate\Support\Collection
      */
     public function collect($key = null)

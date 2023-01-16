@@ -11,7 +11,7 @@ interface PresenceVerifierInterface
      * @param  string  $column
      * @param  string  $value
      * @param  int|null  $excludeId
-     * @param  string|null  $idColumn
+     * @param  ?string  $idColumn
      * @param  array  $extra
      * @return int
      */

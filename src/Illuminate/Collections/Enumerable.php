@@ -379,7 +379,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Filter items where the value for the given key is null.
      *
-     * @param  string|null  $key
+     * @param  ?string  $key
      * @return static
      */
     public function whereNull($key = null);
@@ -387,7 +387,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Filter items where the value for the given key is not null.
      *
-     * @param  string|null  $key
+     * @param  ?string  $key
      * @return static
      */
     public function whereNotNull($key = null);
@@ -551,7 +551,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * Concatenate values of a given key as a string.
      *
      * @param  string  $value
-     * @param  string|null  $glue
+     * @param  ?string  $glue
      * @return string
      */
     public function implode($value, $glue = null);
@@ -1096,7 +1096,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * Get the values of a given key.
      *
      * @param  string|array<array-key, string>  $value
-     * @param  string|null  $key
+     * @param  ?string  $key
      * @return static<int, mixed>
      */
     public function pluck($value, $key = null);

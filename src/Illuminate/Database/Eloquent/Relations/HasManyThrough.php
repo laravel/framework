@@ -491,7 +491,7 @@ class HasManyThrough extends Relation
      * @param  int|null  $perPage
      * @param  array  $columns
      * @param  string  $cursorName
-     * @param  string|null  $cursor
+     * @param  ?string  $cursor
      * @return \Illuminate\Contracts\Pagination\CursorPaginator
      */
     public function cursorPaginate($perPage = null, $columns = ['*'], $cursorName = 'cursor', $cursor = null)
@@ -533,8 +533,8 @@ class HasManyThrough extends Relation
      *
      * @param  int  $count
      * @param  callable  $callback
-     * @param  string|null  $column
-     * @param  string|null  $alias
+     * @param  ?string  $column
+     * @param  ?string  $alias
      * @return bool
      */
     public function chunkById($count, callable $callback, $column = null, $alias = null)
@@ -589,8 +589,8 @@ class HasManyThrough extends Relation
      * Query lazily, by chunking the results of a query by comparing IDs.
      *
      * @param  int  $chunkSize
-     * @param  string|null  $column
-     * @param  string|null  $alias
+     * @param  ?string  $column
+     * @param  ?string  $alias
      * @return \Illuminate\Support\LazyCollection
      */
     public function lazyById($chunkSize = 1000, $column = null, $alias = null)

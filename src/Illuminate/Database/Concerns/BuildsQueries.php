@@ -107,8 +107,8 @@ trait BuildsQueries
      *
      * @param  int  $count
      * @param  callable  $callback
-     * @param  string|null  $column
-     * @param  string|null  $alias
+     * @param  ?string  $column
+     * @param  ?string  $alias
      * @return bool
      */
     public function chunkById($count, callable $callback, $column = null, $alias = null)
@@ -161,8 +161,8 @@ trait BuildsQueries
      *
      * @param  callable  $callback
      * @param  int  $count
-     * @param  string|null  $column
-     * @param  string|null  $alias
+     * @param  ?string  $column
+     * @param  ?string  $alias
      * @return bool
      */
     public function eachById(callable $callback, $count = 1000, $column = null, $alias = null)
@@ -213,8 +213,8 @@ trait BuildsQueries
      * Query lazily, by chunking the results of a query by comparing IDs.
      *
      * @param  int  $chunkSize
-     * @param  string|null  $column
-     * @param  string|null  $alias
+     * @param  ?string  $column
+     * @param  ?string  $alias
      * @return \Illuminate\Support\LazyCollection
      *
      * @throws \InvalidArgumentException
@@ -228,8 +228,8 @@ trait BuildsQueries
      * Query lazily, by chunking the results of a query by comparing IDs in descending order.
      *
      * @param  int  $chunkSize
-     * @param  string|null  $column
-     * @param  string|null  $alias
+     * @param  ?string  $column
+     * @param  ?string  $alias
      * @return \Illuminate\Support\LazyCollection
      *
      * @throws \InvalidArgumentException
@@ -243,8 +243,8 @@ trait BuildsQueries
      * Query lazily, by chunking the results of a query by comparing IDs in a given order.
      *
      * @param  int  $chunkSize
-     * @param  string|null  $column
-     * @param  string|null  $alias
+     * @param  ?string  $column
+     * @param  ?string  $alias
      * @param  bool  $descending
      * @return \Illuminate\Support\LazyCollection
      *

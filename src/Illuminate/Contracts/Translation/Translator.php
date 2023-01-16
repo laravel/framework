@@ -9,7 +9,7 @@ interface Translator
      *
      * @param  string  $key
      * @param  array  $replace
-     * @param  string|null  $locale
+     * @param  ?string  $locale
      * @return mixed
      */
     public function get($key, array $replace = [], $locale = null);
@@ -20,7 +20,7 @@ interface Translator
      * @param  string  $key
      * @param  \Countable|int|array  $number
      * @param  array  $replace
-     * @param  string|null  $locale
+     * @param  ?string  $locale
      * @return string
      */
     public function choice($key, $number, array $replace = [], $locale = null);

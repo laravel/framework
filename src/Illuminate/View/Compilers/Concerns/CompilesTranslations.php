@@ -7,7 +7,7 @@ trait CompilesTranslations
     /**
      * Compile the lang statements into valid PHP.
      *
-     * @param  string|null  $expression
+     * @param  ?string  $expression
      * @return string
      */
     protected function compileLang($expression)

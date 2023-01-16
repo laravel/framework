@@ -16,7 +16,7 @@ trait CompilesConditionals
     /**
      * Compile the if-auth statements into valid PHP.
      *
-     * @param  string|null  $guard
+     * @param  ?string  $guard
      * @return string
      */
     protected function compileAuth($guard = null)
@@ -29,7 +29,7 @@ trait CompilesConditionals
     /**
      * Compile the else-auth statements into valid PHP.
      *
-     * @param  string|null  $guard
+     * @param  ?string  $guard
      * @return string
      */
     protected function compileElseAuth($guard = null)
@@ -93,7 +93,7 @@ trait CompilesConditionals
     /**
      * Compile the if-guest statements into valid PHP.
      *
-     * @param  string|null  $guard
+     * @param  ?string  $guard
      * @return string
      */
     protected function compileGuest($guard = null)
@@ -106,7 +106,7 @@ trait CompilesConditionals
     /**
      * Compile the else-guest statements into valid PHP.
      *
-     * @param  string|null  $guard
+     * @param  ?string  $guard
      * @return string
      */
     protected function compileElseGuest($guard = null)
@@ -285,7 +285,7 @@ trait CompilesConditionals
     /**
      * Compile a once block into valid PHP.
      *
-     * @param  string|null  $id
+     * @param  ?string  $id
      * @return string
      */
     protected function compileOnce($id = null)

@@ -71,9 +71,9 @@ interface ResponseFactory
      * Create a new streamed response instance as a file download.
      *
      * @param  callable  $callback
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @param  array  $headers
-     * @param  string|null  $disposition
+     * @param  ?string  $disposition
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
     public function streamDownload($callback, $name = null, array $headers = [], $disposition = 'attachment');
@@ -82,9 +82,9 @@ interface ResponseFactory
      * Create a new file download response.
      *
      * @param  \SplFileInfo|string  $file
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @param  array  $headers
-     * @param  string|null  $disposition
+     * @param  ?string  $disposition
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
     public function download($file, $name = null, array $headers = [], $disposition = 'attachment');

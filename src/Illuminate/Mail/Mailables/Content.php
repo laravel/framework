@@ -11,7 +11,7 @@ class Content
     /**
      * The Blade view that should be rendered for the mailable.
      *
-     * @var string|null
+     * @var ?string
      */
     public $view;
 
@@ -20,28 +20,28 @@ class Content
      *
      * Alternative syntax for "view".
      *
-     * @var string|null
+     * @var ?string
      */
     public $html;
 
     /**
      * The Blade view that represents the text version of the message.
      *
-     * @var string|null
+     * @var ?string
      */
     public $text;
 
     /**
      * The Blade view that represents the Markdown version of the message.
      *
-     * @var string|null
+     * @var ?string
      */
     public $markdown;
 
     /**
      * The pre-rendered HTML of the message.
      *
-     * @var string|null
+     * @var ?string
      */
     public $htmlString;
 
@@ -55,12 +55,12 @@ class Content
     /**
      * Create a new content definition.
      *
-     * @param  string|null  $view
-     * @param  string|null  $html
-     * @param  string|null  $text
-     * @param  string|null  $markdown
+     * @param  ?string  $view
+     * @param  ?string  $html
+     * @param  ?string  $text
+     * @param  ?string  $markdown
      * @param  array  $with
-     * @param  string|null  $htmlString
+     * @param  ?string  $htmlString
      *
      * @named-arguments-supported
      */

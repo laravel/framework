@@ -3,15 +3,15 @@
 namespace Illuminate\Support\Facades;
 
 /**
- * @method static \Symfony\Component\HttpFoundation\Cookie make(string $name, string $value, int $minutes = 0, string|null $path = null, string|null $domain = null, bool|null $secure = null, bool $httpOnly = true, bool $raw = false, string|null $sameSite = null)
- * @method static \Symfony\Component\HttpFoundation\Cookie forever(string $name, string $value, string|null $path = null, string|null $domain = null, bool|null $secure = null, bool $httpOnly = true, bool $raw = false, string|null $sameSite = null)
- * @method static \Symfony\Component\HttpFoundation\Cookie forget(string $name, string|null $path = null, string|null $domain = null)
- * @method static bool hasQueued(string $key, string|null $path = null)
- * @method static \Symfony\Component\HttpFoundation\Cookie|null queued(string $key, mixed $default = null, string|null $path = null)
+ * @method static \Symfony\Component\HttpFoundation\Cookie make(string $name, string $value, int $minutes = 0, ?string $path = null, ?string $domain = null, bool|null $secure = null, bool $httpOnly = true, bool $raw = false, ?string $sameSite = null)
+ * @method static \Symfony\Component\HttpFoundation\Cookie forever(string $name, string $value, ?string $path = null, ?string $domain = null, bool|null $secure = null, bool $httpOnly = true, bool $raw = false, ?string $sameSite = null)
+ * @method static \Symfony\Component\HttpFoundation\Cookie forget(string $name, ?string $path = null, ?string $domain = null)
+ * @method static bool hasQueued(string $key, ?string $path = null)
+ * @method static \Symfony\Component\HttpFoundation\Cookie|null queued(string $key, mixed $default = null, ?string $path = null)
  * @method static void queue(mixed ...$parameters)
- * @method static void expire(string $name, string|null $path = null, string|null $domain = null)
- * @method static void unqueue(string $name, string|null $path = null)
- * @method static \Illuminate\Cookie\CookieJar setDefaultPathAndDomain(string $path, string|null $domain, bool|null $secure = false, string|null $sameSite = null)
+ * @method static void expire(string $name, ?string $path = null, ?string $domain = null)
+ * @method static void unqueue(string $name, ?string $path = null)
+ * @method static \Illuminate\Cookie\CookieJar setDefaultPathAndDomain(string $path, ?string $domain, bool|null $secure = false, ?string $sameSite = null)
  * @method static \Symfony\Component\HttpFoundation\Cookie[] getQueuedCookies()
  * @method static \Illuminate\Cookie\CookieJar flushQueuedCookies()
  * @method static void macro(string $name, object|callable $macro)
@@ -37,7 +37,7 @@ class Cookie extends Facade
     /**
      * Retrieve a cookie from the request.
      *
-     * @param  string|null  $key
+     * @param  ?string  $key
      * @param  mixed  $default
      * @return string|array|null
      */

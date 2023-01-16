@@ -54,7 +54,7 @@ class SqlServerGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $columns
-     * @return string|null
+     * @return ?string
      */
     protected function compileColumns(Builder $query, $columns)
     {

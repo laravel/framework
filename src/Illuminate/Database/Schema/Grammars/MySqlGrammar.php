@@ -991,7 +991,7 @@ class MySqlGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $column
-     * @return string|null
+     * @return ?string
      */
     protected function modifyVirtualAs(Blueprint $blueprint, Fluent $column)
     {
@@ -1013,7 +1013,7 @@ class MySqlGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $column
-     * @return string|null
+     * @return ?string
      */
     protected function modifyStoredAs(Blueprint $blueprint, Fluent $column)
     {
@@ -1035,7 +1035,7 @@ class MySqlGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $column
-     * @return string|null
+     * @return ?string
      */
     protected function modifyUnsigned(Blueprint $blueprint, Fluent $column)
     {
@@ -1049,7 +1049,7 @@ class MySqlGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $column
-     * @return string|null
+     * @return ?string
      */
     protected function modifyCharset(Blueprint $blueprint, Fluent $column)
     {
@@ -1063,7 +1063,7 @@ class MySqlGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $column
-     * @return string|null
+     * @return ?string
      */
     protected function modifyCollate(Blueprint $blueprint, Fluent $column)
     {
@@ -1077,7 +1077,7 @@ class MySqlGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $column
-     * @return string|null
+     * @return ?string
      */
     protected function modifyNullable(Blueprint $blueprint, Fluent $column)
     {
@@ -1098,7 +1098,7 @@ class MySqlGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $column
-     * @return string|null
+     * @return ?string
      */
     protected function modifyInvisible(Blueprint $blueprint, Fluent $column)
     {
@@ -1112,7 +1112,7 @@ class MySqlGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $column
-     * @return string|null
+     * @return ?string
      */
     protected function modifyDefault(Blueprint $blueprint, Fluent $column)
     {
@@ -1126,7 +1126,7 @@ class MySqlGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $column
-     * @return string|null
+     * @return ?string
      */
     protected function modifyIncrement(Blueprint $blueprint, Fluent $column)
     {
@@ -1140,7 +1140,7 @@ class MySqlGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $column
-     * @return string|null
+     * @return ?string
      */
     protected function modifyFirst(Blueprint $blueprint, Fluent $column)
     {
@@ -1154,7 +1154,7 @@ class MySqlGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $column
-     * @return string|null
+     * @return ?string
      */
     protected function modifyAfter(Blueprint $blueprint, Fluent $column)
     {
@@ -1168,7 +1168,7 @@ class MySqlGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $column
-     * @return string|null
+     * @return ?string
      */
     protected function modifyComment(Blueprint $blueprint, Fluent $column)
     {
@@ -1182,7 +1182,7 @@ class MySqlGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $column
-     * @return string|null
+     * @return ?string
      */
     protected function modifySrid(Blueprint $blueprint, Fluent $column)
     {

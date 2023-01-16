@@ -215,7 +215,7 @@ class TestResponse implements ArrayAccess
     /**
      * Assert whether the response is redirecting to a given URI.
      *
-     * @param  string|null  $uri
+     * @param  ?string  $uri
      * @return $this
      */
     public function assertRedirect($uri = null)
@@ -280,7 +280,7 @@ class TestResponse implements ArrayAccess
     /**
      * Assert whether the response is redirecting to a given signed route.
      *
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @param  mixed  $parameters
      * @return $this
      */
@@ -373,7 +373,7 @@ class TestResponse implements ArrayAccess
     /**
      * Assert that the response offers a file download.
      *
-     * @param  string|null  $filename
+     * @param  ?string  $filename
      * @return $this
      */
     public function assertDownload($filename = null)
@@ -838,7 +838,7 @@ class TestResponse implements ArrayAccess
      * Assert that the response JSON has the expected count of items at the given key.
      *
      * @param  int  $count
-     * @param  string|null  $key
+     * @param  ?string  $key
      * @return $this
      */
     public function assertJsonCount(int $count, $key = null)
@@ -993,7 +993,7 @@ class TestResponse implements ArrayAccess
     /**
      * Validate and return the decoded response JSON.
      *
-     * @param  string|null  $key
+     * @param  ?string  $key
      * @return mixed
      */
     public function json($key = null)
@@ -1004,7 +1004,7 @@ class TestResponse implements ArrayAccess
     /**
      * Get the JSON decoded body of the response as a collection.
      *
-     * @param  string|null  $key
+     * @param  ?string  $key
      * @return \Illuminate\Support\Collection
      */
     public function collect($key = null)
@@ -1342,7 +1342,7 @@ class TestResponse implements ArrayAccess
      * Assert that the session is missing the given errors.
      *
      * @param  string|array  $keys
-     * @param  string|null  $format
+     * @param  ?string  $format
      * @param  string  $errorBag
      * @return $this
      */
@@ -1496,7 +1496,7 @@ class TestResponse implements ArrayAccess
     /**
      * Dump the content from the response.
      *
-     * @param  string|null  $key
+     * @param  ?string  $key
      * @return $this
      */
     public function dump($key = null)

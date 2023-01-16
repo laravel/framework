@@ -89,7 +89,7 @@ class LogManager implements LoggerInterface
      * Create a new, on-demand aggregate logger instance.
      *
      * @param  array  $channels
-     * @param  string|null  $channel
+     * @param  ?string  $channel
      * @return \Psr\Log\LoggerInterface
      */
     public function stack(array $channels, $channel = null)
@@ -103,7 +103,7 @@ class LogManager implements LoggerInterface
     /**
      * Get a log channel instance.
      *
-     * @param  string|null  $channel
+     * @param  ?string  $channel
      * @return \Psr\Log\LoggerInterface
      */
     public function channel($channel = null)
@@ -114,7 +114,7 @@ class LogManager implements LoggerInterface
     /**
      * Get a log driver instance.
      *
-     * @param  string|null  $driver
+     * @param  ?string  $driver
      * @return \Psr\Log\LoggerInterface
      */
     public function driver($driver = null)
@@ -517,7 +517,7 @@ class LogManager implements LoggerInterface
     /**
      * Get the default log driver name.
      *
-     * @return string|null
+     * @return ?string
      */
     public function getDefaultDriver()
     {
@@ -552,7 +552,7 @@ class LogManager implements LoggerInterface
     /**
      * Unset the given channel instance.
      *
-     * @param  string|null  $driver
+     * @param  ?string  $driver
      * @return $this
      */
     public function forgetChannel($driver = null)
@@ -567,8 +567,8 @@ class LogManager implements LoggerInterface
     /**
      * Parse the driver name.
      *
-     * @param  string|null  $driver
-     * @return string|null
+     * @param  ?string  $driver
+     * @return ?string
      */
     protected function parseDriver($driver)
     {

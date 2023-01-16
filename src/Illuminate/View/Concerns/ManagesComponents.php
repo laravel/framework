@@ -163,7 +163,7 @@ trait ManagesComponents
      * Start the slot rendering process.
      *
      * @param  string  $name
-     * @param  string|null  $content
+     * @param  ?string  $content
      * @param  array  $attributes
      * @return void
      */

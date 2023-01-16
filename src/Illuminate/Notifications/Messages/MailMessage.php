@@ -31,14 +31,14 @@ class MailMessage extends SimpleMessage implements Renderable
     /**
      * The Markdown template to render (if applicable).
      *
-     * @var string|null
+     * @var ?string
      */
     public $markdown = 'notifications::email';
 
     /**
      * The current theme being used when generating emails.
      *
-     * @var string|null
+     * @var ?string
      */
     public $theme;
 
@@ -176,7 +176,7 @@ class MailMessage extends SimpleMessage implements Renderable
      * Set the from address for the mail message.
      *
      * @param  string  $address
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return $this
      */
     public function from($address, $name = null)
@@ -190,7 +190,7 @@ class MailMessage extends SimpleMessage implements Renderable
      * Set the "reply to" address of the message.
      *
      * @param  array|string  $address
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return $this
      */
     public function replyTo($address, $name = null)
@@ -208,7 +208,7 @@ class MailMessage extends SimpleMessage implements Renderable
      * Set the cc address for the mail message.
      *
      * @param  array|string  $address
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return $this
      */
     public function cc($address, $name = null)
@@ -226,7 +226,7 @@ class MailMessage extends SimpleMessage implements Renderable
      * Set the bcc address for the mail message.
      *
      * @param  array|string  $address
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return $this
      */
     public function bcc($address, $name = null)

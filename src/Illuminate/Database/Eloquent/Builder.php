@@ -852,7 +852,7 @@ class Builder implements BuilderContract
      * Get an array with the values of a given column.
      *
      * @param  string|\Illuminate\Database\Query\Expression  $column
-     * @param  string|null  $key
+     * @param  ?string  $key
      * @return \Illuminate\Support\Collection
      */
     public function pluck($column, $key = null)
@@ -1043,7 +1043,7 @@ class Builder implements BuilderContract
     /**
      * Update the column's update timestamp.
      *
-     * @param  string|null  $column
+     * @param  ?string  $column
      * @return int|false
      */
     public function touch($column = null)

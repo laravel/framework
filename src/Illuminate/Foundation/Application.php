@@ -169,7 +169,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Create a new Illuminate application instance.
      *
-     * @param  string|null  $basePath
+     * @param  ?string  $basePath
      * @return void
      */
     public function __construct($basePath = null)
@@ -810,7 +810,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      * Register a deferred provider and service.
      *
      * @param  string  $provider
-     * @param  string|null  $service
+     * @param  ?string  $service
      * @return void
      */
     public function registerDeferredProvider($provider, $service = null)

@@ -42,7 +42,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     /**
      * The "data" wrapper that should be applied.
      *
-     * @var string|null
+     * @var ?string
      */
     public static $wrap = 'data';
 

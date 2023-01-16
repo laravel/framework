@@ -35,7 +35,7 @@ interface Mailable
      * Set the recipients of the message.
      *
      * @param  object|array|string  $address
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return self
      */
     public function cc($address, $name = null);
@@ -44,7 +44,7 @@ interface Mailable
      * Set the recipients of the message.
      *
      * @param  object|array|string  $address
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return $this
      */
     public function bcc($address, $name = null);
@@ -53,7 +53,7 @@ interface Mailable
      * Set the recipients of the message.
      *
      * @param  object|array|string  $address
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return $this
      */
     public function to($address, $name = null);

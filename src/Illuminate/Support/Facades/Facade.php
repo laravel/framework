@@ -159,7 +159,7 @@ abstract class Facade
     /**
      * Get the mockable class for the bound instance.
      *
-     * @return string|null
+     * @return ?string
      */
     protected static function getMockableClass()
     {

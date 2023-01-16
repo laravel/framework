@@ -30,14 +30,14 @@ class ModelIdentifier
     /**
      * The connection name of the model.
      *
-     * @var string|null
+     * @var ?string
      */
     public $connection;
 
     /**
      * The class name of the model collection.
      *
-     * @var string|null
+     * @var ?string
      */
     public $collectionClass;
 
@@ -61,7 +61,7 @@ class ModelIdentifier
     /**
      * Specify the collection class that should be used when serializing / restoring collections.
      *
-     * @param  string|null  $collectionClass
+     * @param  ?string  $collectionClass
      * @return $this
      */
     public function useCollectionClass(?string $collectionClass)

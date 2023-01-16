@@ -17,7 +17,7 @@ class CacheLock extends Lock
      * @param  \Illuminate\Contracts\Cache\Store  $store
      * @param  string  $name
      * @param  int  $seconds
-     * @param  string|null  $owner
+     * @param  ?string  $owner
      * @return void
      */
     public function __construct($store, $name, $seconds, $owner = null)

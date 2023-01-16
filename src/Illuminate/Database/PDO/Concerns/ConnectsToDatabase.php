@@ -12,8 +12,8 @@ trait ConnectsToDatabase
      * Create a new database connection.
      *
      * @param  mixed[]  $params
-     * @param  string|null  $username
-     * @param  string|null  $password
+     * @param  ?string  $username
+     * @param  ?string  $password
      * @param  mixed[]  $driverOptions
      * @return \Illuminate\Database\PDO\Connection
      *

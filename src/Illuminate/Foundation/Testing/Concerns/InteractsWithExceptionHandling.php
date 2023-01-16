@@ -155,7 +155,7 @@ trait InteractsWithExceptionHandling
      *
      * @param  \Closure  $test
      * @param  class-string<\Throwable>  $expectedClass
-     * @param  string|null  $expectedMessage
+     * @param  ?string  $expectedMessage
      * @return $this
      */
     protected function assertThrows(Closure $test, string $expectedClass = Throwable::class, ?string $expectedMessage = null)

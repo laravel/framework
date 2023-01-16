@@ -28,7 +28,7 @@ class NotificationFake implements NotificationDispatcher, NotificationFactory
     /**
      * Locale used when sending notifications.
      *
-     * @var string|null
+     * @var ?string
      */
     public $locale;
 
@@ -342,7 +342,7 @@ class NotificationFake implements NotificationDispatcher, NotificationFactory
     /**
      * Get a channel instance by name.
      *
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return mixed
      */
     public function channel($name = null)

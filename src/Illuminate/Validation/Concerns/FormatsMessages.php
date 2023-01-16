@@ -76,7 +76,7 @@ trait FormatsMessages
      *
      * @param  string  $attribute
      * @param  string  $rule
-     * @return string|null
+     * @return ?string
      */
     protected function getInlineMessage($attribute, $rule)
     {
@@ -93,7 +93,7 @@ trait FormatsMessages
      * @param  string  $attribute
      * @param  string  $lowerRule
      * @param  array|null  $source
-     * @return string|null
+     * @return ?string
      */
     protected function getFromLocalArray($attribute, $lowerRule, $source = null)
     {
@@ -487,7 +487,7 @@ trait FormatsMessages
      * @param  string  $rule
      * @param  array  $parameters
      * @param  \Illuminate\Validation\Validator  $validator
-     * @return string|null
+     * @return ?string
      */
     protected function callReplacer($message, $attribute, $rule, $parameters, $validator)
     {

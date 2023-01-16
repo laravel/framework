@@ -9,7 +9,7 @@ trait InteractsWithSockets
     /**
      * The socket ID for the user that raised the event.
      *
-     * @var string|null
+     * @var ?string
      */
     public $socket;
 

@@ -3,14 +3,14 @@
 namespace Illuminate\Support\Facades;
 
 /**
- * @method static \Illuminate\Contracts\Cache\Repository store(string|null $name = null)
- * @method static \Illuminate\Contracts\Cache\Repository driver(string|null $driver = null)
+ * @method static \Illuminate\Contracts\Cache\Repository store(?string $name = null)
+ * @method static \Illuminate\Contracts\Cache\Repository driver(?string $driver = null)
  * @method static \Illuminate\Cache\Repository repository(\Illuminate\Contracts\Cache\Store $store)
  * @method static void refreshEventDispatcher()
  * @method static string getDefaultDriver()
  * @method static void setDefaultDriver(string $name)
  * @method static \Illuminate\Cache\CacheManager forgetDriver(array|string|null $name = null)
- * @method static void purge(string|null $name = null)
+ * @method static void purge(?string $name = null)
  * @method static \Illuminate\Cache\CacheManager extend(string $driver, \Closure $callback)
  * @method static bool has(array|string $key)
  * @method static bool missing(string $key)
@@ -47,7 +47,7 @@ namespace Illuminate\Support\Facades;
  * @method static mixed macroCall(string $method, array $parameters)
  * @method static bool flush()
  * @method static string getPrefix()
- * @method static \Illuminate\Contracts\Cache\Lock lock(string $name, int $seconds = 0, string|null $owner = null)
+ * @method static \Illuminate\Contracts\Cache\Lock lock(string $name, int $seconds = 0, ?string $owner = null)
  * @method static \Illuminate\Contracts\Cache\Lock restoreLock(string $name, string $owner)
  *
  * @see \Illuminate\Cache\CacheManager

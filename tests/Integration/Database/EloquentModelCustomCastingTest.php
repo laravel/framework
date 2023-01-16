@@ -258,7 +258,7 @@ class GMPCast implements CastsAttributes, SerializesCastableAttributes
      * @param  string  $key
      * @param  string  $value
      * @param  array  $attributes
-     * @return string|null
+     * @return ?string
      */
     public function get($model, $key, $value, $attributes)
     {
@@ -270,7 +270,7 @@ class GMPCast implements CastsAttributes, SerializesCastableAttributes
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @param  string  $key
-     * @param  string|null  $value
+     * @param  ?string  $value
      * @param  array  $attributes
      * @return string
      */
@@ -303,7 +303,7 @@ class NonNullableString implements CastsAttributes
      * @param  string  $key
      * @param  string  $value
      * @param  array  $attributes
-     * @return string|null
+     * @return ?string
      */
     public function get($model, $key, $value, $attributes)
     {
@@ -315,7 +315,7 @@ class NonNullableString implements CastsAttributes
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @param  string  $key
-     * @param  string|null  $value
+     * @param  ?string  $value
      * @param  array  $attributes
      * @return string
      */

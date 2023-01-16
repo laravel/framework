@@ -63,7 +63,7 @@ class Store implements Session
      *
      * @param  string  $name
      * @param  \SessionHandlerInterface  $handler
-     * @param  string|null  $id
+     * @param  ?string  $id
      * @param  string  $serialization
      * @return void
      */
@@ -311,7 +311,7 @@ class Store implements Session
     /**
      * Determine if the session contains old input.
      *
-     * @param  string|null  $key
+     * @param  ?string  $key
      * @return bool
      */
     public function hasOldInput($key = null)
@@ -324,7 +324,7 @@ class Store implements Session
     /**
      * Get the requested item from the flashed input array.
      *
-     * @param  string|null  $key
+     * @param  ?string  $key
      * @param  mixed  $default
      * @return mixed
      */
@@ -697,7 +697,7 @@ class Store implements Session
     /**
      * Get the previous URL from the session.
      *
-     * @return string|null
+     * @return ?string
      */
     public function previousUrl()
     {

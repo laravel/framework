@@ -21,7 +21,7 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     /**
      * The locale used when sending notifications.
      *
-     * @var string|null
+     * @var ?string
      */
     protected $locale;
 
@@ -57,7 +57,7 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     /**
      * Get a channel instance.
      *
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return mixed
      */
     public function channel($name = null)

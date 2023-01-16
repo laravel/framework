@@ -391,7 +391,7 @@ abstract class GeneratorCommand extends Command
     /**
      * Get the model for the default guard's user provider.
      *
-     * @return string|null
+     * @return ?string
      */
     protected function userProviderModel()
     {

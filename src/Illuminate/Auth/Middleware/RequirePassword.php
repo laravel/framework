@@ -49,7 +49,7 @@ class RequirePassword
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
-     * @param  string|null  $redirectToRoute
+     * @param  ?string  $redirectToRoute
      * @param  int|null  $passwordTimeoutSeconds
      * @return mixed
      */

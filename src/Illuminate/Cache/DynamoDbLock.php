@@ -17,7 +17,7 @@ class DynamoDbLock extends Lock
      * @param  \Illuminate\Cache\DynamoDbStore  $dynamo
      * @param  string  $name
      * @param  int  $seconds
-     * @param  string|null  $owner
+     * @param  ?string  $owner
      * @return void
      */
     public function __construct(DynamoDbStore $dynamo, $name, $seconds, $owner = null)

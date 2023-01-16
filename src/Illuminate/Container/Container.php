@@ -641,7 +641,7 @@ class Container implements ArrayAccess, ContainerContract
      *
      * @param  callable|string  $callback
      * @param  array<string, mixed>  $parameters
-     * @param  string|null  $defaultMethod
+     * @param  ?string  $defaultMethod
      * @return mixed
      *
      * @throws \InvalidArgumentException

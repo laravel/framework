@@ -55,7 +55,7 @@ abstract class AbstractPaginator implements Htmlable
     /**
      * The URL fragment to add to all URLs.
      *
-     * @var string|null
+     * @var ?string
      */
     protected $fragment;
 
@@ -136,7 +136,7 @@ abstract class AbstractPaginator implements Htmlable
     /**
      * Get the URL for the previous page.
      *
-     * @return string|null
+     * @return ?string
      */
     public function previousPageUrl()
     {
@@ -189,7 +189,7 @@ abstract class AbstractPaginator implements Htmlable
     /**
      * Get / set the URL fragment to be appended to URLs.
      *
-     * @param  string|null  $fragment
+     * @param  ?string  $fragment
      * @return $this|string|null
      */
     public function fragment($fragment = null)
@@ -207,7 +207,7 @@ abstract class AbstractPaginator implements Htmlable
      * Add a set of query string values to the paginator.
      *
      * @param  array|string|null  $key
-     * @param  string|null  $value
+     * @param  ?string  $value
      * @return $this
      */
     public function appends($key, $value = null)
@@ -462,7 +462,7 @@ abstract class AbstractPaginator implements Htmlable
     /**
      * Get the base path for paginator generated URLs.
      *
-     * @return string|null
+     * @return ?string
      */
     public function path()
     {

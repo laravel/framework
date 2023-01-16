@@ -16,7 +16,7 @@ class Vite implements Htmlable
     /**
      * The Content Security Policy nonce to apply to all generated tags.
      *
-     * @var string|null
+     * @var ?string
      */
     protected $nonce;
 
@@ -37,7 +37,7 @@ class Vite implements Htmlable
     /**
      * The path to the "hot" file.
      *
-     * @var string|null
+     * @var ?string
      */
     protected $hotFile;
 
@@ -103,7 +103,7 @@ class Vite implements Htmlable
     /**
      * Get the Content Security Policy nonce applied to all generated tags.
      *
-     * @return string|null
+     * @return ?string
      */
     public function cspNonce()
     {
@@ -251,7 +251,7 @@ class Vite implements Htmlable
      * Generate Vite tags for an entrypoint.
      *
      * @param  string|string[]  $entrypoints
-     * @param  string|null  $buildDirectory
+     * @param  ?string  $buildDirectory
      * @return \Illuminate\Support\HtmlString
      *
      * @throws \Exception
@@ -639,7 +639,7 @@ class Vite implements Htmlable
      * Get the URL for an asset.
      *
      * @param  string  $asset
-     * @param  string|null  $buildDirectory
+     * @param  ?string  $buildDirectory
      * @return string
      */
     public function asset($asset, $buildDirectory = null)
@@ -704,8 +704,8 @@ class Vite implements Htmlable
     /**
      * Get a unique hash representing the current manifest, or null if there is no manifest.
      *
-     * @param  string|null  $buildDirectory
-     * @return string|null
+     * @param  ?string  $buildDirectory
+     * @return ?string
      */
     public function manifestHash($buildDirectory = null)
     {

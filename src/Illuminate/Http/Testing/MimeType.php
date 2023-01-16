@@ -56,7 +56,7 @@ class MimeType
      * Search for the extension of a given MIME type.
      *
      * @param  string  $mimeType
-     * @return string|null
+     * @return ?string
      */
     public static function search($mimeType)
     {

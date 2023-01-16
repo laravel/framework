@@ -159,7 +159,7 @@ function resolveDocMethods($class)
  *
  * @param  \ReflectionMethodDecorator  $method
  * @param  \ReflectionParameter  $parameter
- * @return string|null
+ * @return ?string
  */
 function resolveDocParamType($method, $parameter)
 {
@@ -187,7 +187,7 @@ function resolveDocParamType($method, $parameter)
  * Resolve the return type from the @return docblock.
  *
  * @param  \ReflectionMethodDecorator  $method
- * @return string|null
+ * @return ?string
  */
 function resolveReturnDocType($method)
 {
@@ -414,7 +414,7 @@ function isKnownOptionalDependency($type)
  * Resolve the declared type.
  *
  * @param  \ReflectionType|null  $type
- * @return string|null
+ * @return ?string
  */
 function resolveType($type)
 {

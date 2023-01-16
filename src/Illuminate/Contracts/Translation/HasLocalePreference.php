@@ -7,7 +7,7 @@ interface HasLocalePreference
     /**
      * Get the preferred locale of the entity.
      *
-     * @return string|null
+     * @return ?string
      */
     public function preferredLocale();
 }

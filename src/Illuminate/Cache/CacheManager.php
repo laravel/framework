@@ -51,7 +51,7 @@ class CacheManager implements FactoryContract
     /**
      * Get a cache store instance by name, wrapped in a repository.
      *
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return \Illuminate\Contracts\Cache\Repository
      */
     public function store($name = null)
@@ -64,7 +64,7 @@ class CacheManager implements FactoryContract
     /**
      * Get a cache driver instance.
      *
-     * @param  string|null  $driver
+     * @param  ?string  $driver
      * @return \Illuminate\Contracts\Cache\Repository
      */
     public function driver($driver = null)
@@ -383,7 +383,7 @@ class CacheManager implements FactoryContract
     /**
      * Disconnect the given driver and remove from local cache.
      *
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return void
      */
     public function purge($name = null)

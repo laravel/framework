@@ -16,7 +16,7 @@ interface QueueingFactory extends Factory
      * Remove a cookie from the queue.
      *
      * @param  string  $name
-     * @param  string|null  $path
+     * @param  ?string  $path
      * @return void
      */
     public function unqueue($name, $path = null);

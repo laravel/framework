@@ -6,7 +6,7 @@ use Laravel\Ui\UiServiceProvider;
 use RuntimeException;
 
 /**
- * @method static \Illuminate\Contracts\Auth\Guard|\Illuminate\Contracts\Auth\StatefulGuard guard(string|null $name = null)
+ * @method static \Illuminate\Contracts\Auth\Guard|\Illuminate\Contracts\Auth\StatefulGuard guard(?string $name = null)
  * @method static \Illuminate\Auth\SessionGuard createSessionDriver(string $name, array $config)
  * @method static \Illuminate\Auth\TokenGuard createTokenDriver(string $name, array $config)
  * @method static string getDefaultDriver()
@@ -20,7 +20,7 @@ use RuntimeException;
  * @method static bool hasResolvedGuards()
  * @method static \Illuminate\Auth\AuthManager forgetGuards()
  * @method static \Illuminate\Auth\AuthManager setApplication(\Illuminate\Contracts\Foundation\Application $app)
- * @method static \Illuminate\Contracts\Auth\UserProvider|null createUserProvider(string|null $provider = null)
+ * @method static \Illuminate\Contracts\Auth\UserProvider|null createUserProvider(?string $provider = null)
  * @method static string getDefaultUserProvider()
  * @method static bool check()
  * @method static bool guest()

@@ -24,7 +24,7 @@ class Processor
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  string  $sql
      * @param  array  $values
-     * @param  string|null  $sequence
+     * @param  ?string  $sequence
      * @return int
      */
     public function processInsertGetId(Builder $query, $sql, $values, $sequence = null)

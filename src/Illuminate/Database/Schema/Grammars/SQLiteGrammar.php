@@ -68,7 +68,7 @@ class SQLiteGrammar extends Grammar
      * Get the foreign key syntax for a table creation statement.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @return string|null
+     * @return ?string
      */
     protected function addForeignKeys(Blueprint $blueprint)
     {
@@ -117,7 +117,7 @@ class SQLiteGrammar extends Grammar
      * Get the primary key syntax for a table creation statement.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @return string|null
+     * @return ?string
      */
     protected function addPrimaryKeys(Blueprint $blueprint)
     {
@@ -902,7 +902,7 @@ class SQLiteGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $column
-     * @return string|null
+     * @return ?string
      */
     protected function modifyVirtualAs(Blueprint $blueprint, Fluent $column)
     {
@@ -924,7 +924,7 @@ class SQLiteGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $column
-     * @return string|null
+     * @return ?string
      */
     protected function modifyStoredAs(Blueprint $blueprint, Fluent $column)
     {
@@ -946,7 +946,7 @@ class SQLiteGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $column
-     * @return string|null
+     * @return ?string
      */
     protected function modifyNullable(Blueprint $blueprint, Fluent $column)
     {
@@ -967,7 +967,7 @@ class SQLiteGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $column
-     * @return string|null
+     * @return ?string
      */
     protected function modifyDefault(Blueprint $blueprint, Fluent $column)
     {
@@ -981,7 +981,7 @@ class SQLiteGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $column
-     * @return string|null
+     * @return ?string
      */
     protected function modifyIncrement(Blueprint $blueprint, Fluent $column)
     {

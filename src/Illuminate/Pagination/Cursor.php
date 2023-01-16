@@ -37,7 +37,7 @@ class Cursor implements Arrayable
      * Get the given parameter from the cursor.
      *
      * @param  string  $parameterName
-     * @return string|null
+     * @return ?string
      *
      * @throws \UnexpectedValueException
      */
@@ -108,7 +108,7 @@ class Cursor implements Arrayable
     /**
      * Get a cursor instance from the encoded string representation.
      *
-     * @param  string|null  $encodedString
+     * @param  ?string  $encodedString
      * @return static|null
      */
     public static function fromEncoded($encodedString)

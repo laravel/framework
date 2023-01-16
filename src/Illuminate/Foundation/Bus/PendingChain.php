@@ -26,14 +26,14 @@ class PendingChain
     /**
      * The name of the connection the chain should be sent to.
      *
-     * @var string|null
+     * @var ?string
      */
     public $connection;
 
     /**
      * The name of the queue the chain should be sent to.
      *
-     * @var string|null
+     * @var ?string
      */
     public $queue;
 
@@ -67,7 +67,7 @@ class PendingChain
     /**
      * Set the desired connection for the job.
      *
-     * @param  string|null  $connection
+     * @param  ?string  $connection
      * @return $this
      */
     public function onConnection($connection)
@@ -80,7 +80,7 @@ class PendingChain
     /**
      * Set the desired queue for the job.
      *
-     * @param  string|null  $queue
+     * @param  ?string  $queue
      * @return $this
      */
     public function onQueue($queue)

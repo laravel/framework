@@ -57,7 +57,7 @@ trait ManagesFragments
      * Get the contents of a fragment.
      *
      * @param  string  $name
-     * @param  string|null  $default
+     * @param  ?string  $default
      * @return mixed
      */
     public function getFragment($name, $default = null)

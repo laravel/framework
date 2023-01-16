@@ -310,7 +310,7 @@ class ComponentTagCompiler
      *
      * @param  \Illuminate\Contracts\View\Factory  $viewFactory
      * @param  string  $component
-     * @return string|null
+     * @return ?string
      */
     protected function guessAnonymousComponentUsingPaths(Factory $viewFactory, string $component)
     {
@@ -345,7 +345,7 @@ class ComponentTagCompiler
      *
      * @param  \Illuminate\Contracts\View\Factory  $viewFactory
      * @param  string  $component
-     * @return string|null
+     * @return ?string
      */
     protected function guessAnonymousComponentUsingNamespaces(Factory $viewFactory, string $component)
     {
@@ -375,7 +375,7 @@ class ComponentTagCompiler
      * Find the class for the given component using the registered namespaces.
      *
      * @param  string  $component
-     * @return string|null
+     * @return ?string
      */
     public function findClassByComponent(string $component)
     {

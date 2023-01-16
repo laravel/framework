@@ -10,12 +10,12 @@ interface Factory
      * @param  string  $name
      * @param  string  $value
      * @param  int  $minutes
-     * @param  string|null  $path
-     * @param  string|null  $domain
+     * @param  ?string  $path
+     * @param  ?string  $domain
      * @param  bool|null  $secure
      * @param  bool  $httpOnly
      * @param  bool  $raw
-     * @param  string|null  $sameSite
+     * @param  ?string  $sameSite
      * @return \Symfony\Component\HttpFoundation\Cookie
      */
     public function make($name, $value, $minutes = 0, $path = null, $domain = null, $secure = null, $httpOnly = true, $raw = false, $sameSite = null);
@@ -25,12 +25,12 @@ interface Factory
      *
      * @param  string  $name
      * @param  string  $value
-     * @param  string|null  $path
-     * @param  string|null  $domain
+     * @param  ?string  $path
+     * @param  ?string  $domain
      * @param  bool|null  $secure
      * @param  bool  $httpOnly
      * @param  bool  $raw
-     * @param  string|null  $sameSite
+     * @param  ?string  $sameSite
      * @return \Symfony\Component\HttpFoundation\Cookie
      */
     public function forever($name, $value, $path = null, $domain = null, $secure = null, $httpOnly = true, $raw = false, $sameSite = null);
@@ -39,8 +39,8 @@ interface Factory
      * Expire the given cookie.
      *
      * @param  string  $name
-     * @param  string|null  $path
-     * @param  string|null  $domain
+     * @param  ?string  $path
+     * @param  ?string  $domain
      * @return \Symfony\Component\HttpFoundation\Cookie
      */
     public function forget($name, $path = null, $domain = null);

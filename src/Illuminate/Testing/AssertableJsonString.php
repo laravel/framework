@@ -51,7 +51,7 @@ class AssertableJsonString implements ArrayAccess, Countable
     /**
      * Validate and return the decoded response JSON.
      *
-     * @param  string|null  $key
+     * @param  ?string  $key
      * @return mixed
      */
     public function json($key = null)
@@ -63,7 +63,7 @@ class AssertableJsonString implements ArrayAccess, Countable
      * Assert that the response JSON has the expected count of items at the given key.
      *
      * @param  int  $count
-     * @param  string|null  $key
+     * @param  ?string  $key
      * @return $this
      */
     public function assertCount(int $count, $key = null)

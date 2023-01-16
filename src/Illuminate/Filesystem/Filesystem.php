@@ -410,7 +410,7 @@ class Filesystem
      * Guess the file extension from the mime-type of a given file.
      *
      * @param  string  $path
-     * @return string|null
+     * @return ?string
      *
      * @throws \RuntimeException
      */

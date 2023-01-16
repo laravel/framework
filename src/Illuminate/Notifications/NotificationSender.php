@@ -40,7 +40,7 @@ class NotificationSender
     /**
      * The locale to be used when sending notifications.
      *
-     * @var string|null
+     * @var ?string
      */
     protected $locale;
 
@@ -50,7 +50,7 @@ class NotificationSender
      * @param  \Illuminate\Notifications\ChannelManager  $manager
      * @param  \Illuminate\Contracts\Bus\Dispatcher  $bus
      * @param  \Illuminate\Contracts\Events\Dispatcher  $events
-     * @param  string|null  $locale
+     * @param  ?string  $locale
      * @return void
      */
     public function __construct($manager, $bus, $events, $locale = null)
@@ -115,7 +115,7 @@ class NotificationSender
      *
      * @param  mixed  $notifiable
      * @param  mixed  $notification
-     * @return string|null
+     * @return ?string
      */
     protected function preferredLocale($notifiable, $notification)
     {

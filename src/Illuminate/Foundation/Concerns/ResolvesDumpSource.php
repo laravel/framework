@@ -143,7 +143,7 @@ trait ResolvesDumpSource
      *
      * @param  string  $file
      * @param  int|null  $line
-     * @return string|null
+     * @return ?string
      */
     protected function resolveSourceHref($file, $line)
     {

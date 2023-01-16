@@ -20,7 +20,7 @@ trait InteractsWithDatabase
      *
      * @param  \Illuminate\Database\Eloquent\Model|string  $table
      * @param  array  $data
-     * @param  string|null  $connection
+     * @param  ?string  $connection
      * @return $this
      */
     protected function assertDatabaseHas($table, array $data, $connection = null)
@@ -37,7 +37,7 @@ trait InteractsWithDatabase
      *
      * @param  \Illuminate\Database\Eloquent\Model|string  $table
      * @param  array  $data
-     * @param  string|null  $connection
+     * @param  ?string  $connection
      * @return $this
      */
     protected function assertDatabaseMissing($table, array $data, $connection = null)
@@ -56,7 +56,7 @@ trait InteractsWithDatabase
      *
      * @param  \Illuminate\Database\Eloquent\Model|string  $table
      * @param  int  $count
-     * @param  string|null  $connection
+     * @param  ?string  $connection
      * @return $this
      */
     protected function assertDatabaseCount($table, int $count, $connection = null)
@@ -72,7 +72,7 @@ trait InteractsWithDatabase
      * Assert that the given table has no entries.
      *
      * @param  \Illuminate\Database\Eloquent\Model|string  $table
-     * @param  string|null  $connection
+     * @param  ?string  $connection
      * @return $this
      */
     protected function assertDatabaseEmpty($table, $connection = null)
@@ -89,8 +89,8 @@ trait InteractsWithDatabase
      *
      * @param  \Illuminate\Database\Eloquent\Model|string  $table
      * @param  array  $data
-     * @param  string|null  $connection
-     * @param  string|null  $deletedAtColumn
+     * @param  ?string  $connection
+     * @param  ?string  $deletedAtColumn
      * @return $this
      */
     protected function assertSoftDeleted($table, array $data = [], $connection = null, $deletedAtColumn = 'deleted_at')
@@ -116,8 +116,8 @@ trait InteractsWithDatabase
      *
      * @param  \Illuminate\Database\Eloquent\Model|string  $table
      * @param  array  $data
-     * @param  string|null  $connection
-     * @param  string|null  $deletedAtColumn
+     * @param  ?string  $connection
+     * @param  ?string  $deletedAtColumn
      * @return $this
      */
     protected function assertNotSoftDeleted($table, array $data = [], $connection = null, $deletedAtColumn = 'deleted_at')
@@ -204,8 +204,8 @@ trait InteractsWithDatabase
     /**
      * Get the database connection.
      *
-     * @param  string|null  $connection
-     * @param  string|null  $table
+     * @param  ?string  $connection
+     * @param  ?string  $table
      * @return \Illuminate\Database\Connection
      */
     protected function getConnection($connection = null, $table = null)
@@ -232,7 +232,7 @@ trait InteractsWithDatabase
      * Get the table connection specified in the given model.
      *
      * @param  \Illuminate\Database\Eloquent\Model|string  $table
-     * @return string|null
+     * @return ?string
      */
     protected function getTableConnection($table)
     {

@@ -37,7 +37,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * The connection name for the model.
      *
-     * @var string|null
+     * @var ?string
      */
     protected $connection;
 
@@ -212,14 +212,14 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * The name of the "created at" column.
      *
-     * @var string|null
+     * @var ?string
      */
     const CREATED_AT = 'created_at';
 
     /**
      * The name of the "updated at" column.
      *
-     * @var string|null
+     * @var ?string
      */
     const UPDATED_AT = 'updated_at';
 
@@ -378,7 +378,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Determine if the given model is ignoring touches.
      *
-     * @param  string|null  $class
+     * @param  ?string  $class
      * @return bool
      */
     public static function isIgnoringTouch($class = null)
@@ -618,7 +618,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * Create a new model instance that is existing.
      *
      * @param  array  $attributes
-     * @param  string|null  $connection
+     * @param  ?string  $connection
      * @return static
      */
     public function newFromBuilder($attributes = [], $connection = null)
@@ -637,7 +637,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Begin querying the model on a given connection.
      *
-     * @param  string|null  $connection
+     * @param  ?string  $connection
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public static function on($connection = null)
@@ -1581,7 +1581,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * @param  array  $attributes
      * @param  string  $table
      * @param  bool  $exists
-     * @param  string|null  $using
+     * @param  ?string  $using
      * @return \Illuminate\Database\Eloquent\Relations\Pivot
      */
     public function newPivot(self $parent, array $attributes, $table, $exists, $using = null)
@@ -1774,7 +1774,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Get the current connection name for the model.
      *
-     * @return string|null
+     * @return ?string
      */
     public function getConnectionName()
     {
@@ -1784,7 +1784,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Set the connection associated with the model.
      *
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return $this
      */
     public function setConnection($name)
@@ -1797,7 +1797,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Resolve a connection instance.
      *
-     * @param  string|null  $connection
+     * @param  ?string  $connection
      * @return \Illuminate\Database\Connection
      */
     public static function resolveConnection($connection = null)
@@ -1993,7 +1993,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Get the queueable connection for the entity.
      *
-     * @return string|null
+     * @return ?string
      */
     public function getQueueableConnection()
     {
@@ -2024,7 +2024,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * Retrieve the model for a bound value.
      *
      * @param  mixed  $value
-     * @param  string|null  $field
+     * @param  ?string  $field
      * @return \Illuminate\Database\Eloquent\Model|null
      */
     public function resolveRouteBinding($value, $field = null)
@@ -2036,7 +2036,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * Retrieve the model for a bound value.
      *
      * @param  mixed  $value
-     * @param  string|null  $field
+     * @param  ?string  $field
      * @return \Illuminate\Database\Eloquent\Model|null
      */
     public function resolveSoftDeletableRouteBinding($value, $field = null)
@@ -2049,7 +2049,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      *
      * @param  string  $childType
      * @param  mixed  $value
-     * @param  string|null  $field
+     * @param  ?string  $field
      * @return \Illuminate\Database\Eloquent\Model|null
      */
     public function resolveChildRouteBinding($childType, $value, $field)
@@ -2062,7 +2062,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      *
      * @param  string  $childType
      * @param  mixed  $value
-     * @param  string|null  $field
+     * @param  ?string  $field
      * @return \Illuminate\Database\Eloquent\Model|null
      */
     public function resolveSoftDeletableChildRouteBinding($childType, $value, $field)
@@ -2075,7 +2075,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      *
      * @param  string  $childType
      * @param  mixed  $value
-     * @param  string|null  $field
+     * @param  ?string  $field
      * @return \Illuminate\Database\Eloquent\Relations\Relation
      */
     protected function resolveChildRouteBindingQuery($childType, $value, $field)
@@ -2110,7 +2110,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      *
      * @param  \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Relations\Relation  $query
      * @param  mixed  $value
-     * @param  string|null  $field
+     * @param  ?string  $field
      * @return \Illuminate\Database\Eloquent\Relations\Relation
      */
     public function resolveRouteBindingQuery($query, $value, $field = null)

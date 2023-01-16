@@ -3,10 +3,10 @@
 namespace Illuminate\Support\Facades;
 
 /**
- * @method static bool hasForLocale(string $key, string|null $locale = null)
- * @method static bool has(string $key, string|null $locale = null, bool $fallback = true)
- * @method static string|array get(string $key, array $replace = [], string|null $locale = null, bool $fallback = true)
- * @method static string choice(string $key, \Countable|int|array $number, array $replace = [], string|null $locale = null)
+ * @method static bool hasForLocale(string $key, ?string $locale = null)
+ * @method static bool has(string $key, ?string $locale = null, bool $fallback = true)
+ * @method static string|array get(string $key, array $replace = [], ?string $locale = null, bool $fallback = true)
+ * @method static string choice(string $key, \Countable|int|array $number, array $replace = [], ?string $locale = null)
  * @method static void addLines(array $lines, string $locale, string $namespace = '*')
  * @method static void load(string $namespace, string $group, string $locale)
  * @method static void addNamespace(string $namespace, string $hint)

@@ -88,7 +88,7 @@ abstract class Factory
     /**
      * The name of the database connection that will be used to create the models.
      *
-     * @var string|null
+     * @var ?string
      */
     protected $connection;
 
@@ -129,7 +129,7 @@ abstract class Factory
      * @param  \Illuminate\Support\Collection|null  $for
      * @param  \Illuminate\Support\Collection|null  $afterMaking
      * @param  \Illuminate\Support\Collection|null  $afterCreating
-     * @param  string|null  $connection
+     * @param  ?string  $connection
      * @param  \Illuminate\Support\Collection|null  $recycle
      * @return void
      */
@@ -559,7 +559,7 @@ abstract class Factory
      * Define a child relationship for the model.
      *
      * @param  \Illuminate\Database\Eloquent\Factories\Factory  $factory
-     * @param  string|null  $relationship
+     * @param  ?string  $relationship
      * @return static
      */
     public function has(self $factory, $relationship = null)
@@ -589,7 +589,7 @@ abstract class Factory
      *
      * @param  \Illuminate\Database\Eloquent\Factories\Factory|\Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model|array  $factory
      * @param  (callable(): array<string, mixed>)|array<string, mixed>  $pivot
-     * @param  string|null  $relationship
+     * @param  ?string  $relationship
      * @return static
      */
     public function hasAttached($factory, $pivot = [], $relationship = null)
@@ -611,7 +611,7 @@ abstract class Factory
      * Define a parent relationship for the model.
      *
      * @param  \Illuminate\Database\Eloquent\Factories\Factory|\Illuminate\Database\Eloquent\Model  $factory
-     * @param  string|null  $relationship
+     * @param  ?string  $relationship
      * @return static
      */
     public function for($factory, $relationship = null)

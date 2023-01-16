@@ -46,7 +46,7 @@ class Message
      * Add a "from" address to the message.
      *
      * @param  string|array  $address
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return $this
      */
     public function from($address, $name = null)
@@ -62,7 +62,7 @@ class Message
      * Set the "sender" of the message.
      *
      * @param  string|array  $address
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return $this
      */
     public function sender($address, $name = null)
@@ -91,7 +91,7 @@ class Message
      * Add a recipient to the message.
      *
      * @param  string|array  $address
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @param  bool  $override
      * @return $this
      */
@@ -128,7 +128,7 @@ class Message
      * Add a carbon copy to the message.
      *
      * @param  string|array  $address
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @param  bool  $override
      * @return $this
      */
@@ -165,7 +165,7 @@ class Message
      * Add a blind carbon copy to the message.
      *
      * @param  string|array  $address
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @param  bool  $override
      * @return $this
      */
@@ -202,7 +202,7 @@ class Message
      * Add a "reply to" address to the message.
      *
      * @param  string|array  $address
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return $this
      */
     public function replyTo($address, $name = null)
@@ -368,7 +368,7 @@ class Message
      *
      * @param  string  $data
      * @param  string  $name
-     * @param  string|null  $contentType
+     * @param  ?string  $contentType
      * @return string
      */
     public function embedData($data, $name, $contentType = null)

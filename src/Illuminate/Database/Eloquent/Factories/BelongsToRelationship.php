@@ -62,7 +62,7 @@ class BelongsToRelationship
     /**
      * Get the deferred resolver for this relationship's parent ID.
      *
-     * @param  string|null  $key
+     * @param  ?string  $key
      * @return \Closure
      */
     protected function resolver($key)

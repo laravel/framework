@@ -16,7 +16,7 @@ class Response implements Arrayable
     /**
      * The response message.
      *
-     * @var string|null
+     * @var ?string
      */
     protected $message;
 
@@ -52,7 +52,7 @@ class Response implements Arrayable
     /**
      * Create a new "allow" Response.
      *
-     * @param  string|null  $message
+     * @param  ?string  $message
      * @param  mixed  $code
      * @return \Illuminate\Auth\Access\Response
      */
@@ -64,7 +64,7 @@ class Response implements Arrayable
     /**
      * Create a new "deny" Response.
      *
-     * @param  string|null  $message
+     * @param  ?string  $message
      * @param  mixed  $code
      * @return \Illuminate\Auth\Access\Response
      */
@@ -77,7 +77,7 @@ class Response implements Arrayable
      * Create a new "deny" Response with a HTTP status code.
      *
      * @param  int  $status
-     * @param  string|null  $message
+     * @param  ?string  $message
      * @param  mixed  $code
      * @return \Illuminate\Auth\Access\Response
      */
@@ -89,7 +89,7 @@ class Response implements Arrayable
     /**
      * Create a new "deny" Response with a 404 HTTP status code.
      *
-     * @param  string|null  $message
+     * @param  ?string  $message
      * @param  mixed  $code
      * @return \Illuminate\Auth\Access\Response
      */
@@ -121,7 +121,7 @@ class Response implements Arrayable
     /**
      * Get the response message.
      *
-     * @return string|null
+     * @return ?string
      */
     public function message()
     {

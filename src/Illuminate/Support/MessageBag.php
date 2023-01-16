@@ -162,8 +162,8 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
     /**
      * Get the first message from the message bag for a given key.
      *
-     * @param  string|null  $key
-     * @param  string|null  $format
+     * @param  ?string  $key
+     * @param  ?string  $format
      * @return string
      */
     public function first($key = null, $format = null)
@@ -179,7 +179,7 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
      * Get all of the messages from the message bag for a given key.
      *
      * @param  string  $key
-     * @param  string|null  $format
+     * @param  ?string  $format
      * @return array
      */
     public function get($key, $format = null)
@@ -204,7 +204,7 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
      * Get the messages for a wildcard key.
      *
      * @param  string  $key
-     * @param  string|null  $format
+     * @param  ?string  $format
      * @return array
      */
     protected function getMessagesForWildcardKey($key, $format)
@@ -223,7 +223,7 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
     /**
      * Get all of the messages for every key in the message bag.
      *
-     * @param  string|null  $format
+     * @param  ?string  $format
      * @return array
      */
     public function all($format = null)
@@ -242,7 +242,7 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
     /**
      * Get all of the unique messages for every key in the message bag.
      *
-     * @param  string|null  $format
+     * @param  ?string  $format
      * @return array
      */
     public function unique($format = null)

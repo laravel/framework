@@ -168,7 +168,7 @@ interface Container extends ContainerInterface
      *
      * @param  callable|string  $callback
      * @param  array  $parameters
-     * @param  string|null  $defaultMethod
+     * @param  ?string  $defaultMethod
      * @return mixed
      */
     public function call($callback, array $parameters = [], $defaultMethod = null);

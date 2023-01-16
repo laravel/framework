@@ -77,7 +77,7 @@ class Manager
     /**
      * Get a connection instance from the global manager.
      *
-     * @param  string|null  $connection
+     * @param  ?string  $connection
      * @return \Illuminate\Contracts\Queue\Queue
      */
     public static function connection($connection = null)
@@ -90,8 +90,8 @@ class Manager
      *
      * @param  string  $job
      * @param  mixed  $data
-     * @param  string|null  $queue
-     * @param  string|null  $connection
+     * @param  ?string  $queue
+     * @param  ?string  $connection
      * @return mixed
      */
     public static function push($job, $data = '', $queue = null, $connection = null)
@@ -104,8 +104,8 @@ class Manager
      *
      * @param  array  $jobs
      * @param  mixed  $data
-     * @param  string|null  $queue
-     * @param  string|null  $connection
+     * @param  ?string  $queue
+     * @param  ?string  $connection
      * @return mixed
      */
     public static function bulk($jobs, $data = '', $queue = null, $connection = null)
@@ -119,8 +119,8 @@ class Manager
      * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  string  $job
      * @param  mixed  $data
-     * @param  string|null  $queue
-     * @param  string|null  $connection
+     * @param  ?string  $queue
+     * @param  ?string  $connection
      * @return mixed
      */
     public static function later($delay, $job, $data = '', $queue = null, $connection = null)
@@ -131,7 +131,7 @@ class Manager
     /**
      * Get a registered connection instance.
      *
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return \Illuminate\Contracts\Queue\Queue
      */
     public function getConnection($name = null)

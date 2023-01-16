@@ -32,7 +32,7 @@ class PackageManifest
     /**
      * The manifest path.
      *
-     * @var string|null
+     * @var ?string
      */
     public $manifestPath;
 

@@ -21,7 +21,7 @@ class RuleMakeCommand extends GeneratorCommand
      *
      * This name is used to identify the command during lazy loading.
      *
-     * @var string|null
+     * @var ?string
      *
      * @deprecated
      */

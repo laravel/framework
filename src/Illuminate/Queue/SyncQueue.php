@@ -15,7 +15,7 @@ class SyncQueue extends Queue implements QueueContract
     /**
      * Get the size of the queue.
      *
-     * @param  string|null  $queue
+     * @param  ?string  $queue
      * @return int
      */
     public function size($queue = null)
@@ -28,7 +28,7 @@ class SyncQueue extends Queue implements QueueContract
      *
      * @param  string  $job
      * @param  mixed  $data
-     * @param  string|null  $queue
+     * @param  ?string  $queue
      * @return mixed
      *
      * @throws \Throwable
@@ -124,7 +124,7 @@ class SyncQueue extends Queue implements QueueContract
      * Push a raw payload onto the queue.
      *
      * @param  string  $payload
-     * @param  string|null  $queue
+     * @param  ?string  $queue
      * @param  array  $options
      * @return mixed
      */
@@ -139,7 +139,7 @@ class SyncQueue extends Queue implements QueueContract
      * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  string  $job
      * @param  mixed  $data
-     * @param  string|null  $queue
+     * @param  ?string  $queue
      * @return mixed
      */
     public function later($delay, $job, $data = '', $queue = null)
@@ -150,7 +150,7 @@ class SyncQueue extends Queue implements QueueContract
     /**
      * Pop the next job off of the queue.
      *
-     * @param  string|null  $queue
+     * @param  ?string  $queue
      * @return \Illuminate\Contracts\Queue\Job|null
      */
     public function pop($queue = null)

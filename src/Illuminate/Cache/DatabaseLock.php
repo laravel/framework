@@ -36,7 +36,7 @@ class DatabaseLock extends Lock
      * @param  string  $table
      * @param  string  $name
      * @param  int  $seconds
-     * @param  string|null  $owner
+     * @param  ?string  $owner
      * @param  array  $lottery
      * @return void
      */

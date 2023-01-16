@@ -1062,7 +1062,7 @@ class PostgresGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $column
-     * @return string|null
+     * @return ?string
      */
     protected function modifyCollate(Blueprint $blueprint, Fluent $column)
     {
@@ -1076,7 +1076,7 @@ class PostgresGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $column
-     * @return string|null
+     * @return ?string
      */
     protected function modifyNullable(Blueprint $blueprint, Fluent $column)
     {
@@ -1088,7 +1088,7 @@ class PostgresGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $column
-     * @return string|null
+     * @return ?string
      */
     protected function modifyDefault(Blueprint $blueprint, Fluent $column)
     {
@@ -1102,7 +1102,7 @@ class PostgresGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $column
-     * @return string|null
+     * @return ?string
      */
     protected function modifyIncrement(Blueprint $blueprint, Fluent $column)
     {
@@ -1116,7 +1116,7 @@ class PostgresGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $column
-     * @return string|null
+     * @return ?string
      */
     protected function modifyVirtualAs(Blueprint $blueprint, Fluent $column)
     {
@@ -1130,7 +1130,7 @@ class PostgresGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $column
-     * @return string|null
+     * @return ?string
      */
     protected function modifyStoredAs(Blueprint $blueprint, Fluent $column)
     {

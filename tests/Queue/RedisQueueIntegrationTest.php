@@ -517,7 +517,7 @@ class RedisQueueIntegrationTest extends TestCase
     /**
      * @param  string  $driver
      * @param  string  $default
-     * @param  string|null  $connection
+     * @param  ?string  $connection
      * @param  int  $retryAfter
      * @param  int|null  $blockFor
      */

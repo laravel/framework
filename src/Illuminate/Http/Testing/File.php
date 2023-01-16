@@ -30,7 +30,7 @@ class File extends UploadedFile
     /**
      * The MIME type to report.
      *
-     * @var string|null
+     * @var ?string
      */
     public $mimeTypeToReport;
 

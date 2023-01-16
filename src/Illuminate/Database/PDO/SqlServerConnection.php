@@ -67,7 +67,7 @@ class SqlServerConnection implements ServerInfoAwareConnection
     /**
      * Get the last insert ID.
      *
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return mixed
      */
     public function lastInsertId($name = null)

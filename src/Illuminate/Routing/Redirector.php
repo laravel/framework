@@ -254,7 +254,7 @@ class Redirector
     /**
      * Get the "intended" URL from the session.
      *
-     * @return string|null
+     * @return ?string
      */
     public function getIntendedUrl()
     {

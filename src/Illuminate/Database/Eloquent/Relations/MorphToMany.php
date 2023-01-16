@@ -42,7 +42,7 @@ class MorphToMany extends BelongsToMany
      * @param  string  $relatedPivotKey
      * @param  string  $parentKey
      * @param  string  $relatedKey
-     * @param  string|null  $relationName
+     * @param  ?string  $relationName
      * @param  bool  $inverse
      * @return void
      */

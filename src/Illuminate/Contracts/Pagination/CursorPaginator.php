@@ -16,7 +16,7 @@ interface CursorPaginator
      * Add a set of query string values to the paginator.
      *
      * @param  array|string|null  $key
-     * @param  string|null  $value
+     * @param  ?string  $value
      * @return $this
      */
     public function appends($key, $value = null);
@@ -24,7 +24,7 @@ interface CursorPaginator
     /**
      * Get / set the URL fragment to be appended to URLs.
      *
-     * @param  string|null  $fragment
+     * @param  ?string  $fragment
      * @return $this|string|null
      */
     public function fragment($fragment = null);
@@ -32,14 +32,14 @@ interface CursorPaginator
     /**
      * Get the URL for the previous page, or null.
      *
-     * @return string|null
+     * @return ?string
      */
     public function previousPageUrl();
 
     /**
      * The URL for the next page, or null.
      *
-     * @return string|null
+     * @return ?string
      */
     public function nextPageUrl();
 
@@ -88,7 +88,7 @@ interface CursorPaginator
     /**
      * Get the base path for paginator generated URLs.
      *
-     * @return string|null
+     * @return ?string
      */
     public function path();
 
@@ -109,7 +109,7 @@ interface CursorPaginator
     /**
      * Render the paginator using a given view.
      *
-     * @param  string|null  $view
+     * @param  ?string  $view
      * @param  array  $data
      * @return string
      */

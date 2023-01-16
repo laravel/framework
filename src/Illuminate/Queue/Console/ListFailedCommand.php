@@ -21,7 +21,7 @@ class ListFailedCommand extends Command
      *
      * This name is used to identify the command during lazy loading.
      *
-     * @var string|null
+     * @var ?string
      *
      * @deprecated
      */
@@ -90,7 +90,7 @@ class ListFailedCommand extends Command
      * Extract the failed job name from payload.
      *
      * @param  string  $payload
-     * @return string|null
+     * @return ?string
      */
     private function extractJobName($payload)
     {
@@ -107,7 +107,7 @@ class ListFailedCommand extends Command
      * Match the job name from the payload.
      *
      * @param  array  $payload
-     * @return string|null
+     * @return ?string
      */
     protected function matchJobName($payload)
     {

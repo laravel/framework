@@ -42,7 +42,7 @@ class Command extends SymfonyCommand
     /**
      * The console command description.
      *
-     * @var string|null
+     * @var ?string
      */
     protected $description;
 

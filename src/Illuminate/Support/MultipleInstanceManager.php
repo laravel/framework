@@ -66,7 +66,7 @@ abstract class MultipleInstanceManager
     /**
      * Get an instance instance by name.
      *
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return mixed
      */
     public function instance($name = null)
@@ -153,7 +153,7 @@ abstract class MultipleInstanceManager
     /**
      * Disconnect the given instance and remove from local cache.
      *
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return void
      */
     public function purge($name = null)

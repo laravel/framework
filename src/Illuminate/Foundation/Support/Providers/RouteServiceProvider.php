@@ -18,7 +18,7 @@ class RouteServiceProvider extends ServiceProvider
     /**
      * The controller namespace for the application.
      *
-     * @var string|null
+     * @var ?string
      */
     protected $namespace;
 

@@ -48,7 +48,7 @@ class MigrationCreator
      *
      * @param  string  $name
      * @param  string  $path
-     * @param  string|null  $table
+     * @param  ?string  $table
      * @param  bool  $create
      * @return string
      *
@@ -106,7 +106,7 @@ class MigrationCreator
     /**
      * Get the migration stub file.
      *
-     * @param  string|null  $table
+     * @param  ?string  $table
      * @param  bool  $create
      * @return string
      */
@@ -133,7 +133,7 @@ class MigrationCreator
      * Populate the place-holders in the migration stub.
      *
      * @param  string  $stub
-     * @param  string|null  $table
+     * @param  ?string  $table
      * @return string
      */
     protected function populateStub($stub, $table)
@@ -177,7 +177,7 @@ class MigrationCreator
     /**
      * Fire the registered post create hooks.
      *
-     * @param  string|null  $table
+     * @param  ?string  $table
      * @param  string  $path
      * @return void
      */

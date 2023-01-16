@@ -16,7 +16,7 @@ class BoundMethod
      * @param  \Illuminate\Container\Container  $container
      * @param  callable|string  $callback
      * @param  array  $parameters
-     * @param  string|null  $defaultMethod
+     * @param  ?string  $defaultMethod
      * @return mixed
      *
      * @throws \ReflectionException
@@ -43,7 +43,7 @@ class BoundMethod
      * @param  \Illuminate\Container\Container  $container
      * @param  string  $target
      * @param  array  $parameters
-     * @param  string|null  $defaultMethod
+     * @param  ?string  $defaultMethod
      * @return mixed
      *
      * @throws \InvalidArgumentException

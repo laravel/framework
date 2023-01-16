@@ -40,7 +40,7 @@ class RouteGroup
      *
      * @param  array  $new
      * @param  array  $old
-     * @return string|null
+     * @return ?string
      */
     protected static function formatNamespace($new, $old)
     {
@@ -59,7 +59,7 @@ class RouteGroup
      * @param  array  $new
      * @param  array  $old
      * @param  bool  $prependExistingPrefix
-     * @return string|null
+     * @return ?string
      */
     protected static function formatPrefix($new, $old, $prependExistingPrefix = true)
     {

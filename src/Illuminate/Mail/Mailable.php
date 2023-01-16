@@ -161,7 +161,7 @@ class Mailable implements MailableContract, Renderable
     /**
      * The name of the theme that should be used when formatting the message.
      *
-     * @var string|null
+     * @var ?string
      */
     public $theme;
 
@@ -549,7 +549,7 @@ class Mailable implements MailableContract, Renderable
      * Set the sender of the message.
      *
      * @param  object|array|string  $address
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return $this
      */
     public function from($address, $name = null)
@@ -561,7 +561,7 @@ class Mailable implements MailableContract, Renderable
      * Determine if the given recipient is set on the mailable.
      *
      * @param  object|array|string  $address
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return bool
      */
     public function hasFrom($address, $name = null)
@@ -573,7 +573,7 @@ class Mailable implements MailableContract, Renderable
      * Set the recipients of the message.
      *
      * @param  object|array|string  $address
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return $this
      */
     public function to($address, $name = null)
@@ -589,7 +589,7 @@ class Mailable implements MailableContract, Renderable
      * Determine if the given recipient is set on the mailable.
      *
      * @param  object|array|string  $address
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return bool
      */
     public function hasTo($address, $name = null)
@@ -601,7 +601,7 @@ class Mailable implements MailableContract, Renderable
      * Set the recipients of the message.
      *
      * @param  object|array|string  $address
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return $this
      */
     public function cc($address, $name = null)
@@ -613,7 +613,7 @@ class Mailable implements MailableContract, Renderable
      * Determine if the given recipient is set on the mailable.
      *
      * @param  object|array|string  $address
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return bool
      */
     public function hasCc($address, $name = null)
@@ -625,7 +625,7 @@ class Mailable implements MailableContract, Renderable
      * Set the recipients of the message.
      *
      * @param  object|array|string  $address
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return $this
      */
     public function bcc($address, $name = null)
@@ -637,7 +637,7 @@ class Mailable implements MailableContract, Renderable
      * Determine if the given recipient is set on the mailable.
      *
      * @param  object|array|string  $address
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return bool
      */
     public function hasBcc($address, $name = null)
@@ -649,7 +649,7 @@ class Mailable implements MailableContract, Renderable
      * Set the "reply to" address of the message.
      *
      * @param  object|array|string  $address
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return $this
      */
     public function replyTo($address, $name = null)
@@ -661,7 +661,7 @@ class Mailable implements MailableContract, Renderable
      * Determine if the given replyTo is set on the mailable.
      *
      * @param  object|array|string  $address
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return bool
      */
     public function hasReplyTo($address, $name = null)
@@ -675,7 +675,7 @@ class Mailable implements MailableContract, Renderable
      * All recipients are stored internally as [['name' => ?, 'address' => ?]]
      *
      * @param  object|array|string  $address
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @param  string  $property
      * @return $this
      */
@@ -706,7 +706,7 @@ class Mailable implements MailableContract, Renderable
      * Convert the given recipient arguments to an array.
      *
      * @param  object|array|string  $address
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return array
      */
     protected function addressesToArray($address, $name)
@@ -749,7 +749,7 @@ class Mailable implements MailableContract, Renderable
      * Determine if the given recipient is set on the mailable.
      *
      * @param  object|array|string  $address
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @param  string  $property
      * @return bool
      */
@@ -785,7 +785,7 @@ class Mailable implements MailableContract, Renderable
      * Determine if the mailable "envelope" method defines a recipient.
      *
      * @param  string  $address
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @param  string  $property
      * @return bool
      */
@@ -1005,7 +1005,7 @@ class Mailable implements MailableContract, Renderable
      * Attach a file to the message from storage.
      *
      * @param  string  $path
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @param  array  $options
      * @return $this
      */
@@ -1019,7 +1019,7 @@ class Mailable implements MailableContract, Renderable
      *
      * @param  string  $disk
      * @param  string  $path
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @param  array  $options
      * @return $this
      */
@@ -1041,7 +1041,7 @@ class Mailable implements MailableContract, Renderable
      * Determine if the mailable has the given attachment from storage.
      *
      * @param  string  $path
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @param  array  $options
      * @return bool
      */
@@ -1055,7 +1055,7 @@ class Mailable implements MailableContract, Renderable
      *
      * @param  string  $disk
      * @param  string  $path
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @param  array  $options
      * @return bool
      */
@@ -1161,7 +1161,7 @@ class Mailable implements MailableContract, Renderable
      * Assert that the mailable is from the given address.
      *
      * @param  object|array|string  $address
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return $this
      */
     public function assertFrom($address, $name = null)
@@ -1180,7 +1180,7 @@ class Mailable implements MailableContract, Renderable
      * Assert that the mailable has the given recipient.
      *
      * @param  object|array|string  $address
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return $this
      */
     public function assertTo($address, $name = null)
@@ -1199,7 +1199,7 @@ class Mailable implements MailableContract, Renderable
      * Assert that the mailable has the given recipient.
      *
      * @param  object|array|string  $address
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return $this
      */
     public function assertHasTo($address, $name = null)
@@ -1211,7 +1211,7 @@ class Mailable implements MailableContract, Renderable
      * Assert that the mailable has the given recipient.
      *
      * @param  object|array|string  $address
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return $this
      */
     public function assertHasCc($address, $name = null)
@@ -1230,7 +1230,7 @@ class Mailable implements MailableContract, Renderable
      * Assert that the mailable has the given recipient.
      *
      * @param  object|array|string  $address
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return $this
      */
     public function assertHasBcc($address, $name = null)
@@ -1249,7 +1249,7 @@ class Mailable implements MailableContract, Renderable
      * Assert that the mailable has the given "reply to" address.
      *
      * @param  object|array|string  $address
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return $this
      */
     public function assertHasReplyTo($address, $name = null)
@@ -1268,7 +1268,7 @@ class Mailable implements MailableContract, Renderable
      * Format the mailable recipeint for display in an assertion message.
      *
      * @param  object|array|string  $address
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return string
      */
     private function formatAssertionRecipient($address, $name = null)
@@ -1449,7 +1449,7 @@ class Mailable implements MailableContract, Renderable
      * Assert the mailable has the given attachment from storage.
      *
      * @param  string  $path
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @param  array  $options
      * @return $this
      */
@@ -1470,7 +1470,7 @@ class Mailable implements MailableContract, Renderable
      *
      * @param  string  $disk
      * @param  string  $path
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @param  array  $options
      * @return $this
      */

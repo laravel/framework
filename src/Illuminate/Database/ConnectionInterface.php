@@ -10,7 +10,7 @@ interface ConnectionInterface
      * Begin a fluent query against a database table.
      *
      * @param  \Closure|\Illuminate\Database\Query\Builder|string  $table
-     * @param  string|null  $as
+     * @param  ?string  $as
      * @return \Illuminate\Database\Query\Builder
      */
     public function table($table, $as = null);

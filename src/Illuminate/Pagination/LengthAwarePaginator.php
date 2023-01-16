@@ -70,7 +70,7 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
     /**
      * Render the paginator using the given view.
      *
-     * @param  string|null  $view
+     * @param  ?string  $view
      * @param  array  $data
      * @return \Illuminate\Contracts\Support\Htmlable
      */
@@ -82,7 +82,7 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
     /**
      * Render the paginator using the given view.
      *
-     * @param  string|null  $view
+     * @param  ?string  $view
      * @param  array  $data
      * @return \Illuminate\Contracts\Support\Htmlable
      */
@@ -165,7 +165,7 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
     /**
      * Get the URL for the next page.
      *
-     * @return string|null
+     * @return ?string
      */
     public function nextPageUrl()
     {

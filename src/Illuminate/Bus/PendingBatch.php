@@ -198,7 +198,7 @@ class PendingBatch
     /**
      * Get the connection used by the pending batch.
      *
-     * @return string|null
+     * @return ?string
      */
     public function connection()
     {
@@ -221,7 +221,7 @@ class PendingBatch
     /**
      * Get the queue used by the pending batch.
      *
-     * @return string|null
+     * @return ?string
      */
     public function queue()
     {

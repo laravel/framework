@@ -123,8 +123,8 @@ class Gate implements GateContract
      * Perform an on-demand authorization check. Throw an authorization exception if the condition or callback is false.
      *
      * @param  \Illuminate\Auth\Access\Response|\Closure|bool  $condition
-     * @param  string|null  $message
-     * @param  string|null  $code
+     * @param  ?string  $message
+     * @param  ?string  $code
      * @return \Illuminate\Auth\Access\Response
      *
      * @throws \Illuminate\Auth\Access\AuthorizationException
@@ -138,8 +138,8 @@ class Gate implements GateContract
      * Perform an on-demand authorization check. Throw an authorization exception if the condition or callback is true.
      *
      * @param  \Illuminate\Auth\Access\Response|\Closure|bool  $condition
-     * @param  string|null  $message
-     * @param  string|null  $code
+     * @param  ?string  $message
+     * @param  ?string  $code
      * @return \Illuminate\Auth\Access\Response
      *
      * @throws \Illuminate\Auth\Access\AuthorizationException
@@ -153,8 +153,8 @@ class Gate implements GateContract
      * Authorize a given condition or callback.
      *
      * @param  \Illuminate\Auth\Access\Response|\Closure|bool  $condition
-     * @param  string|null  $message
-     * @param  string|null  $code
+     * @param  ?string  $message
+     * @param  ?string  $code
      * @param  bool  $allowWhenResponseIs
      * @return \Illuminate\Auth\Access\Response
      *
@@ -445,7 +445,7 @@ class Gate implements GateContract
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
      * @param  \Closure|string|array  $class
-     * @param  string|null  $method
+     * @param  ?string  $method
      * @return bool
      */
     protected function canBeCalledWithUser($user, $class, $method = null)

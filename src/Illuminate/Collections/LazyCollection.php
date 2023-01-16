@@ -613,7 +613,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      * Concatenate values of a given key as a string.
      *
      * @param  callable|string  $value
-     * @param  string|null  $glue
+     * @param  ?string  $glue
      * @return string
      */
     public function implode($value, $glue = null)
@@ -715,7 +715,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      * Get the values of a given key.
      *
      * @param  string|array<array-key, string>  $value
-     * @param  string|null  $key
+     * @param  ?string  $key
      * @return static<int, mixed>
      */
     public function pluck($value, $key = null)

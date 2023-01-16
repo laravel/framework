@@ -864,7 +864,7 @@ class SqlServerGrammar extends Grammar
      * Create the column definition for a generated, computed column type.
      *
      * @param  \Illuminate\Support\Fluent  $column
-     * @return string|null
+     * @return ?string
      */
     protected function typeComputed(Fluent $column)
     {
@@ -876,7 +876,7 @@ class SqlServerGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $column
-     * @return string|null
+     * @return ?string
      */
     protected function modifyCollate(Blueprint $blueprint, Fluent $column)
     {
@@ -890,7 +890,7 @@ class SqlServerGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $column
-     * @return string|null
+     * @return ?string
      */
     protected function modifyNullable(Blueprint $blueprint, Fluent $column)
     {
@@ -904,7 +904,7 @@ class SqlServerGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $column
-     * @return string|null
+     * @return ?string
      */
     protected function modifyDefault(Blueprint $blueprint, Fluent $column)
     {
@@ -918,7 +918,7 @@ class SqlServerGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $column
-     * @return string|null
+     * @return ?string
      */
     protected function modifyIncrement(Blueprint $blueprint, Fluent $column)
     {
@@ -932,7 +932,7 @@ class SqlServerGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $column
-     * @return string|null
+     * @return ?string
      */
     protected function modifyPersisted(Blueprint $blueprint, Fluent $column)
     {

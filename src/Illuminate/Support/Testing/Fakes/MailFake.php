@@ -291,7 +291,7 @@ class MailFake implements Factory, Mailer, MailQueue
     /**
      * Get a mailer instance by name.
      *
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return \Illuminate\Contracts\Mail\Mailer
      */
     public function mailer($name = null)
@@ -375,7 +375,7 @@ class MailFake implements Factory, Mailer, MailQueue
      * Queue a new e-mail message for sending.
      *
      * @param  \Illuminate\Contracts\Mail\Mailable|string|array  $view
-     * @param  string|null  $queue
+     * @param  ?string  $queue
      * @return mixed
      */
     public function queue($view, $queue = null)
@@ -396,7 +396,7 @@ class MailFake implements Factory, Mailer, MailQueue
      *
      * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  \Illuminate\Contracts\Mail\Mailable|string|array  $view
-     * @param  string|null  $queue
+     * @param  ?string  $queue
      * @return mixed
      */
     public function later($delay, $view, $queue = null)

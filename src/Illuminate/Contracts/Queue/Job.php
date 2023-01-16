@@ -7,7 +7,7 @@ interface Job
     /**
      * Get the UUID of the job.
      *
-     * @return string|null
+     * @return ?string
      */
     public function uuid();
 

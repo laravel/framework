@@ -106,7 +106,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      * Assert that the given file or directory exists.
      *
      * @param  string|array  $path
-     * @param  string|null  $content
+     * @param  ?string  $content
      * @return $this
      */
     public function assertExists($path, $content = null)
@@ -251,7 +251,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      * Get the contents of a file.
      *
      * @param  string  $path
-     * @return string|null
+     * @return ?string
      */
     public function get($path)
     {
@@ -266,9 +266,9 @@ class FilesystemAdapter implements CloudFilesystemContract
      * Create a streamed response for a given file.
      *
      * @param  string  $path
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @param  array  $headers
-     * @param  string|null  $disposition
+     * @param  ?string  $disposition
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
     public function response($path, $name = null, array $headers = [], $disposition = 'inline')
@@ -308,7 +308,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      * Create a streamed download response for a given file.
      *
      * @param  string  $path
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
     public function download($path, $name = null, array $headers = [])
@@ -765,7 +765,7 @@ class FilesystemAdapter implements CloudFilesystemContract
     /**
      * Get an array of all files in a directory.
      *
-     * @param  string|null  $directory
+     * @param  ?string  $directory
      * @param  bool  $recursive
      * @return array
      */
@@ -785,7 +785,7 @@ class FilesystemAdapter implements CloudFilesystemContract
     /**
      * Get all of the files from the given directory (recursive).
      *
-     * @param  string|null  $directory
+     * @param  ?string  $directory
      * @return array
      */
     public function allFiles($directory = null)
@@ -796,7 +796,7 @@ class FilesystemAdapter implements CloudFilesystemContract
     /**
      * Get all of the directories within a given directory.
      *
-     * @param  string|null  $directory
+     * @param  ?string  $directory
      * @param  bool  $recursive
      * @return array
      */
@@ -815,7 +815,7 @@ class FilesystemAdapter implements CloudFilesystemContract
     /**
      * Get all the directories within a given directory (recursive).
      *
-     * @param  string|null  $directory
+     * @param  ?string  $directory
      * @return array
      */
     public function allDirectories($directory = null)
@@ -894,8 +894,8 @@ class FilesystemAdapter implements CloudFilesystemContract
     /**
      * Parse the given visibility value.
      *
-     * @param  string|null  $visibility
-     * @return string|null
+     * @param  ?string  $visibility
+     * @return ?string
      *
      * @throws \InvalidArgumentException
      */

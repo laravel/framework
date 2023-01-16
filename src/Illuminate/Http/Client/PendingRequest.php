@@ -286,7 +286,7 @@ class PendingRequest
      *
      * @param  string|array  $name
      * @param  string|resource  $contents
-     * @param  string|null  $filename
+     * @param  ?string  $filename
      * @param  array  $headers
      * @return $this
      */

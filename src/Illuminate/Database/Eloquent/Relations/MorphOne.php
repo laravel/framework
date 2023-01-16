@@ -79,8 +79,8 @@ class MorphOne extends MorphOneOrMany implements SupportsPartialRelations
      * Add constraints for inner join subselect for one of many relationships.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  string|null  $column
-     * @param  string|null  $aggregate
+     * @param  ?string  $column
+     * @param  ?string  $aggregate
      * @return void
      */
     public function addOneOfManySubQueryConstraints(Builder $query, $column = null, $aggregate = null)

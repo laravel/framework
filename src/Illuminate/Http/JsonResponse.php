@@ -45,7 +45,7 @@ class JsonResponse extends BaseJsonResponse
     /**
      * Sets the JSONP callback.
      *
-     * @param  string|null  $callback
+     * @param  ?string  $callback
      * @return $this
      */
     public function withCallback($callback = null)

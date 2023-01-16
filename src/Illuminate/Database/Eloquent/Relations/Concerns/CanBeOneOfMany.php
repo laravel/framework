@@ -35,8 +35,8 @@ trait CanBeOneOfMany
      * Add constraints for inner join subselect for one of many relationships.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  string|null  $column
-     * @param  string|null  $aggregate
+     * @param  ?string  $column
+     * @param  ?string  $aggregate
      * @return void
      */
     abstract public function addOneOfManySubQueryConstraints(Builder $query, $column = null, $aggregate = null);
@@ -61,7 +61,7 @@ trait CanBeOneOfMany
      *
      * @param  string|array|null  $column
      * @param  string|\Closure|null  $aggregate
-     * @param  string|null  $relation
+     * @param  ?string  $relation
      * @return $this
      *
      * @throws \InvalidArgumentException
@@ -136,7 +136,7 @@ trait CanBeOneOfMany
      * Indicate that the relation is the latest single result of a larger one-to-many relationship.
      *
      * @param  string|array|null  $column
-     * @param  string|null  $relation
+     * @param  ?string  $relation
      * @return $this
      */
     public function latestOfMany($column = 'id', $relation = null)
@@ -150,7 +150,7 @@ trait CanBeOneOfMany
      * Indicate that the relation is the oldest single result of a larger one-to-many relationship.
      *
      * @param  string|array|null  $column
-     * @param  string|null  $relation
+     * @param  ?string  $relation
      * @return $this
      */
     public function oldestOfMany($column = 'id', $relation = null)
@@ -177,8 +177,8 @@ trait CanBeOneOfMany
      * Get a new query for the related model, grouping the query by the given column, often the foreign key of the relationship.
      *
      * @param  string|array  $groupBy
-     * @param  string|null  $column
-     * @param  string|null  $aggregate
+     * @param  ?string  $column
+     * @param  ?string  $aggregate
      * @return \Illuminate\Database\Eloquent\Builder
      */
     protected function newOneOfManySubQuery($groupBy, $column = null, $aggregate = null)

@@ -12,7 +12,7 @@ class Headers
     /**
      * The message's message ID.
      *
-     * @var string|null
+     * @var ?string
      */
     public $messageId;
 
@@ -33,7 +33,7 @@ class Headers
     /**
      * Create a new instance of headers for a message.
      *
-     * @param  string|null  $messageId
+     * @param  ?string  $messageId
      * @param  array  $references
      * @param  array  $text
      * @return void

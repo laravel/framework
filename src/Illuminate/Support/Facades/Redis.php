@@ -3,13 +3,13 @@
 namespace Illuminate\Support\Facades;
 
 /**
- * @method static \Illuminate\Redis\Connections\Connection connection(string|null $name = null)
- * @method static \Illuminate\Redis\Connections\Connection resolve(string|null $name = null)
+ * @method static \Illuminate\Redis\Connections\Connection connection(?string $name = null)
+ * @method static \Illuminate\Redis\Connections\Connection resolve(?string $name = null)
  * @method static array connections()
  * @method static void enableEvents()
  * @method static void disableEvents()
  * @method static void setDriver(string $driver)
- * @method static void purge(string|null $name = null)
+ * @method static void purge(?string $name = null)
  * @method static \Illuminate\Redis\RedisManager extend(string $driver, \Closure $callback)
  * @method static void createSubscription(array|string $channels, \Closure $callback, string $method = 'subscribe')
  * @method static \Illuminate\Redis\Limiters\ConcurrencyLimiterBuilder funnel(string $name)
@@ -19,7 +19,7 @@ namespace Illuminate\Support\Facades;
  * @method static void psubscribe(array|string $channels, \Closure $callback)
  * @method static mixed command(string $method, array $parameters = [])
  * @method static void listen(\Closure $callback)
- * @method static string|null getName()
+ * @method static ?string getName()
  * @method static \Illuminate\Redis\Connections\Connection setName(string $name)
  * @method static \Illuminate\Contracts\Events\Dispatcher getEventDispatcher()
  * @method static void setEventDispatcher(\Illuminate\Contracts\Events\Dispatcher $events)

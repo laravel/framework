@@ -29,7 +29,7 @@ class AssertableJson implements Arrayable
     /**
      * The "dot" path to the current scope.
      *
-     * @var string|null
+     * @var ?string
      */
     private $path;
 
@@ -37,7 +37,7 @@ class AssertableJson implements Arrayable
      * Create a new fluent, assertable JSON data instance.
      *
      * @param  array  $props
-     * @param  string|null  $path
+     * @param  ?string  $path
      * @return void
      */
     protected function __construct(array $props, string $path = null)
@@ -64,7 +64,7 @@ class AssertableJson implements Arrayable
     /**
      * Retrieve a prop within the current scope using "dot" notation.
      *
-     * @param  string|null  $key
+     * @param  ?string  $key
      * @return mixed
      */
     protected function prop(string $key = null)

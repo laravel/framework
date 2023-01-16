@@ -59,7 +59,7 @@ class Connection implements ConnectionInterface
     /**
      * The type of the connection.
      *
-     * @var string|null
+     * @var ?string
      */
     protected $readWriteType;
 
@@ -318,7 +318,7 @@ class Connection implements ConnectionInterface
      * Begin a fluent query against a database table.
      *
      * @param  \Closure|\Illuminate\Database\Query\Builder|string  $table
-     * @param  string|null  $as
+     * @param  ?string  $as
      * @return \Illuminate\Database\Query\Builder
      */
     public function table($table, $as = null)
@@ -1271,7 +1271,7 @@ class Connection implements ConnectionInterface
     /**
      * Get the database connection name.
      *
-     * @return string|null
+     * @return ?string
      */
     public function getName()
     {
@@ -1281,7 +1281,7 @@ class Connection implements ConnectionInterface
     /**
      * Get the database connection full name.
      *
-     * @return string|null
+     * @return ?string
      */
     public function getNameWithReadWriteType()
     {
@@ -1291,7 +1291,7 @@ class Connection implements ConnectionInterface
     /**
      * Get an option from the configuration options.
      *
-     * @param  string|null  $option
+     * @param  ?string  $option
      * @return mixed
      */
     public function getConfig($option = null)
@@ -1520,7 +1520,7 @@ class Connection implements ConnectionInterface
     /**
      * Set the read / write type of the connection.
      *
-     * @param  string|null  $readWriteType
+     * @param  ?string  $readWriteType
      * @return $this
      */
     public function setReadWriteType($readWriteType)

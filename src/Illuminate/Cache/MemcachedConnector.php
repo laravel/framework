@@ -10,7 +10,7 @@ class MemcachedConnector
      * Create a new Memcached connection.
      *
      * @param  array  $servers
-     * @param  string|null  $connectionId
+     * @param  ?string  $connectionId
      * @param  array  $options
      * @param  array  $credentials
      * @return \Memcached
@@ -38,7 +38,7 @@ class MemcachedConnector
     /**
      * Get a new Memcached instance.
      *
-     * @param  string|null  $connectionId
+     * @param  ?string  $connectionId
      * @param  array  $credentials
      * @param  array  $options
      * @return \Memcached
@@ -61,7 +61,7 @@ class MemcachedConnector
     /**
      * Create the Memcached instance.
      *
-     * @param  string|null  $connectionId
+     * @param  ?string  $connectionId
      * @return \Memcached
      */
     protected function createMemcachedInstance($connectionId)

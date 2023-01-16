@@ -168,7 +168,7 @@ trait BroadcastsEvents
     /**
      * Get the queue connection that should be used to broadcast model events.
      *
-     * @return string|null
+     * @return ?string
      */
     public function broadcastConnection()
     {
@@ -178,7 +178,7 @@ trait BroadcastsEvents
     /**
      * Get the queue that should be used to broadcast model events.
      *
-     * @return string|null
+     * @return ?string
      */
     public function broadcastQueue()
     {

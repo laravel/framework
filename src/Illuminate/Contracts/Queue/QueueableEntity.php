@@ -21,7 +21,7 @@ interface QueueableEntity
     /**
      * Get the connection of the entity.
      *
-     * @return string|null
+     * @return ?string
      */
     public function getQueueableConnection();
 }

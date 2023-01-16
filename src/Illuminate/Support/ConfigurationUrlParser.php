@@ -74,7 +74,7 @@ class ConfigurationUrlParser
      * Get the database driver from the URL.
      *
      * @param  array  $url
-     * @return string|null
+     * @return ?string
      */
     protected function getDriver($url)
     {
@@ -91,7 +91,7 @@ class ConfigurationUrlParser
      * Get the database name from the URL.
      *
      * @param  array  $url
-     * @return string|null
+     * @return ?string
      */
     protected function getDatabase($url)
     {

@@ -15,7 +15,7 @@ class ListenerOptions extends WorkerOptions
      * Create a new listener options instance.
      *
      * @param  string  $name
-     * @param  string|null  $environment
+     * @param  ?string  $environment
      * @param  int|int[]  $backoff
      * @param  int  $memory
      * @param  int  $timeout

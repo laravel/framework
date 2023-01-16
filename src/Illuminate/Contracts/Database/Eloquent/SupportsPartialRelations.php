@@ -7,7 +7,7 @@ interface SupportsPartialRelations
     /**
      * Indicate that the relation is a single result of a larger one-to-many relationship.
      *
-     * @param  string|null  $column
+     * @param  ?string  $column
      * @param  string|\Closure|null  $aggregate
      * @param  string  $relation
      * @return $this

@@ -59,7 +59,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      *
      * @param  \Illuminate\Contracts\Redis\Factory  $redis
      * @param  string  $default
-     * @param  string|null  $connection
+     * @param  ?string  $connection
      * @param  int  $retryAfter
      * @param  int|null  $blockFor
      * @param  bool  $dispatchAfterCommit
@@ -86,7 +86,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     /**
      * Get the size of the queue.
      *
-     * @param  string|null  $queue
+     * @param  ?string  $queue
      * @return int
      */
     public function size($queue = null)
@@ -103,7 +103,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      *
      * @param  array  $jobs
      * @param  mixed  $data
-     * @param  string|null  $queue
+     * @param  ?string  $queue
      * @return void
      */
     public function bulk($jobs, $data = '', $queue = null)
@@ -126,7 +126,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      *
      * @param  object|string  $job
      * @param  mixed  $data
-     * @param  string|null  $queue
+     * @param  ?string  $queue
      * @return mixed
      */
     public function push($job, $data = '', $queue = null)
@@ -146,7 +146,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      * Push a raw payload onto the queue.
      *
      * @param  string  $payload
-     * @param  string|null  $queue
+     * @param  ?string  $queue
      * @param  array  $options
      * @return mixed
      */
@@ -166,7 +166,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  object|string  $job
      * @param  mixed  $data
-     * @param  string|null  $queue
+     * @param  ?string  $queue
      * @return mixed
      */
     public function later($delay, $job, $data = '', $queue = null)
@@ -187,7 +187,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      *
      * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  string  $payload
-     * @param  string|null  $queue
+     * @param  ?string  $queue
      * @return mixed
      */
     protected function laterRaw($delay, $payload, $queue = null)
@@ -218,7 +218,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     /**
      * Pop the next job off of the queue.
      *
-     * @param  string|null  $queue
+     * @param  ?string  $queue
      * @return \Illuminate\Contracts\Queue\Job|null
      */
     public function pop($queue = null)
@@ -352,7 +352,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     /**
      * Get the queue or return the default.
      *
-     * @param  string|null  $queue
+     * @param  ?string  $queue
      * @return string
      */
     public function getQueue($queue)

@@ -43,7 +43,7 @@ trait CollectsResources
     /**
      * Get the resource that this resource collects.
      *
-     * @return string|null
+     * @return ?string
      */
     protected function collects()
     {

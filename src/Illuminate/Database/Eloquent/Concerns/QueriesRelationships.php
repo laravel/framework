@@ -530,7 +530,7 @@ trait QueriesRelationships
      * Add a "belongs to" relationship where clause to the query.
      *
      * @param  \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>  $related
-     * @param  string|null  $relationshipName
+     * @param  ?string  $relationshipName
      * @param  string  $boolean
      * @return $this
      *
@@ -577,7 +577,7 @@ trait QueriesRelationships
      * Add an "BelongsTo" relationship with an "or where" clause to the query.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $related
-     * @param  string|null  $relationshipName
+     * @param  ?string  $relationshipName
      * @return $this
      *
      * @throws \RuntimeException

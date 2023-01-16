@@ -26,7 +26,7 @@ use Illuminate\Http\Client\Factory;
  * @method static \Illuminate\Http\Client\PendingRequest withBody(string $content, string $contentType)
  * @method static \Illuminate\Http\Client\PendingRequest asJson()
  * @method static \Illuminate\Http\Client\PendingRequest asForm()
- * @method static \Illuminate\Http\Client\PendingRequest attach(string|array $name, string|resource $contents = '', string|null $filename = null, array $headers = [])
+ * @method static \Illuminate\Http\Client\PendingRequest attach(string|array $name, string|resource $contents = '', ?string $filename = null, array $headers = [])
  * @method static \Illuminate\Http\Client\PendingRequest asMultipart()
  * @method static \Illuminate\Http\Client\PendingRequest bodyFormat(string $format)
  * @method static \Illuminate\Http\Client\PendingRequest contentType(string $contentType)

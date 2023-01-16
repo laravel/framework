@@ -76,7 +76,7 @@ class RedisManager implements Factory
     /**
      * Get a Redis connection by name.
      *
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return \Illuminate\Redis\Connections\Connection
      */
     public function connection($name = null)
@@ -95,7 +95,7 @@ class RedisManager implements Factory
     /**
      * Resolve the given connection by name.
      *
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return \Illuminate\Redis\Connections\Connection
      *
      * @throws \InvalidArgumentException
@@ -240,7 +240,7 @@ class RedisManager implements Factory
     /**
      * Disconnect the given connection and remove from local cache.
      *
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return void
      */
     public function purge($name = null)

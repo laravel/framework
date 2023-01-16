@@ -7,7 +7,7 @@ interface Factory
     /**
      * Get a channel instance by name.
      *
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return mixed
      */
     public function channel($name = null);

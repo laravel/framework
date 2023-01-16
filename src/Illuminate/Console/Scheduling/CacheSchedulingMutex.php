@@ -17,7 +17,7 @@ class CacheSchedulingMutex implements SchedulingMutex, CacheAware
     /**
      * The cache store that should be used.
      *
-     * @var string|null
+     * @var ?string
      */
     public $store;
 

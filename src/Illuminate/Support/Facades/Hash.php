@@ -11,7 +11,7 @@ namespace Illuminate\Support\Facades;
  * @method static bool check(string $value, string $hashedValue, array $options = [])
  * @method static bool needsRehash(string $hashedValue, array $options = [])
  * @method static string getDefaultDriver()
- * @method static mixed driver(string|null $driver = null)
+ * @method static mixed driver(?string $driver = null)
  * @method static \Illuminate\Hashing\HashManager extend(string $driver, \Closure $callback)
  * @method static array getDrivers()
  * @method static \Illuminate\Contracts\Container\Container getContainer()

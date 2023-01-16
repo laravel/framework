@@ -62,7 +62,7 @@ abstract class TrustHosts
     /**
      * Get a regular expression matching the application URL and all of its subdomains.
      *
-     * @return string|null
+     * @return ?string
      */
     protected function allSubdomainsOfApplicationUrl()
     {

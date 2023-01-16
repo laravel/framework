@@ -140,7 +140,7 @@ class BelongsToMany extends Relation
      * @param  string  $relatedPivotKey
      * @param  string  $parentKey
      * @param  string  $relatedKey
-     * @param  string|null  $relationName
+     * @param  ?string  $relationName
      * @return void
      */
     public function __construct(Builder $query, Model $parent, $table, $foreignPivotKey,
@@ -932,7 +932,7 @@ class BelongsToMany extends Relation
      * @param  int|null  $perPage
      * @param  array  $columns
      * @param  string  $cursorName
-     * @param  string|null  $cursor
+     * @param  ?string  $cursor
      * @return \Illuminate\Contracts\Pagination\CursorPaginator
      */
     public function cursorPaginate($perPage = null, $columns = ['*'], $cursorName = 'cursor', $cursor = null)
@@ -965,8 +965,8 @@ class BelongsToMany extends Relation
      *
      * @param  int  $count
      * @param  callable  $callback
-     * @param  string|null  $column
-     * @param  string|null  $alias
+     * @param  ?string  $column
+     * @param  ?string  $alias
      * @return bool
      */
     public function chunkById($count, callable $callback, $column = null, $alias = null)
@@ -1023,8 +1023,8 @@ class BelongsToMany extends Relation
      * Query lazily, by chunking the results of a query by comparing IDs.
      *
      * @param  int  $chunkSize
-     * @param  string|null  $column
-     * @param  string|null  $alias
+     * @param  ?string  $column
+     * @param  ?string  $alias
      * @return \Illuminate\Support\LazyCollection
      */
     public function lazyById($chunkSize = 1000, $column = null, $alias = null)

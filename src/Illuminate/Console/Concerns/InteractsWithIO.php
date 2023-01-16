@@ -72,7 +72,7 @@ trait InteractsWithIO
     /**
      * Get the value of a command argument.
      *
-     * @param  string|null  $key
+     * @param  ?string  $key
      * @return array|string|bool|null
      */
     public function argument($key = null)
@@ -108,7 +108,7 @@ trait InteractsWithIO
     /**
      * Get the value of a command option.
      *
-     * @param  string|null  $key
+     * @param  ?string  $key
      * @return string|array|bool|null
      */
     public function option($key = null)
@@ -146,7 +146,7 @@ trait InteractsWithIO
      * Prompt the user for input.
      *
      * @param  string  $question
-     * @param  string|null  $default
+     * @param  ?string  $default
      * @return mixed
      */
     public function ask($question, $default = null)
@@ -159,7 +159,7 @@ trait InteractsWithIO
      *
      * @param  string  $question
      * @param  array|callable  $choices
-     * @param  string|null  $default
+     * @param  ?string  $default
      * @return mixed
      */
     public function anticipate($question, $choices, $default = null)
@@ -172,7 +172,7 @@ trait InteractsWithIO
      *
      * @param  string  $question
      * @param  array|callable  $choices
-     * @param  string|null  $default
+     * @param  ?string  $default
      * @return mixed
      */
     public function askWithCompletion($question, $choices, $default = null)
@@ -295,7 +295,7 @@ trait InteractsWithIO
      * Write a string as standard output.
      *
      * @param  string  $string
-     * @param  string|null  $style
+     * @param  ?string  $style
      * @param  int|string|null  $verbosity
      * @return void
      */

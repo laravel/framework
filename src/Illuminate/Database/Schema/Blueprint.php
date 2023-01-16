@@ -428,7 +428,7 @@ class Blueprint
      * Indicate that the given foreign key should be dropped.
      *
      * @param  \Illuminate\Database\Eloquent\Model|string  $model
-     * @param  string|null  $column
+     * @param  ?string  $column
      * @return \Illuminate\Support\Fluent
      */
     public function dropForeignIdFor($model, $column = null)
@@ -444,7 +444,7 @@ class Blueprint
      * Indicate that the given foreign key should be dropped.
      *
      * @param  \Illuminate\Database\Eloquent\Model|string  $model
-     * @param  string|null  $column
+     * @param  ?string  $column
      * @return \Illuminate\Support\Fluent
      */
     public function dropConstrainedForeignIdFor($model, $column = null)
@@ -524,7 +524,7 @@ class Blueprint
      * Indicate that the polymorphic columns should be dropped.
      *
      * @param  string  $name
-     * @param  string|null  $indexName
+     * @param  ?string  $indexName
      * @return void
      */
     public function dropMorphs($name, $indexName = null)
@@ -549,8 +549,8 @@ class Blueprint
      * Specify the primary key(s) for the table.
      *
      * @param  string|array  $columns
-     * @param  string|null  $name
-     * @param  string|null  $algorithm
+     * @param  ?string  $name
+     * @param  ?string  $algorithm
      * @return \Illuminate\Database\Schema\IndexDefinition
      */
     public function primary($columns, $name = null, $algorithm = null)
@@ -562,8 +562,8 @@ class Blueprint
      * Specify a unique index for the table.
      *
      * @param  string|array  $columns
-     * @param  string|null  $name
-     * @param  string|null  $algorithm
+     * @param  ?string  $name
+     * @param  ?string  $algorithm
      * @return \Illuminate\Database\Schema\IndexDefinition
      */
     public function unique($columns, $name = null, $algorithm = null)
@@ -575,8 +575,8 @@ class Blueprint
      * Specify an index for the table.
      *
      * @param  string|array  $columns
-     * @param  string|null  $name
-     * @param  string|null  $algorithm
+     * @param  ?string  $name
+     * @param  ?string  $algorithm
      * @return \Illuminate\Database\Schema\IndexDefinition
      */
     public function index($columns, $name = null, $algorithm = null)
@@ -588,8 +588,8 @@ class Blueprint
      * Specify an fulltext for the table.
      *
      * @param  string|array  $columns
-     * @param  string|null  $name
-     * @param  string|null  $algorithm
+     * @param  ?string  $name
+     * @param  ?string  $algorithm
      * @return \Illuminate\Database\Schema\IndexDefinition
      */
     public function fullText($columns, $name = null, $algorithm = null)
@@ -601,7 +601,7 @@ class Blueprint
      * Specify a spatial index for the table.
      *
      * @param  string|array  $columns
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return \Illuminate\Database\Schema\IndexDefinition
      */
     public function spatialIndex($columns, $name = null)
@@ -625,7 +625,7 @@ class Blueprint
      * Specify a foreign key for the table.
      *
      * @param  string|array  $columns
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return \Illuminate\Database\Schema\ForeignKeyDefinition
      */
     public function foreign($columns, $name = null)
@@ -933,7 +933,7 @@ class Blueprint
      * Create a foreign ID column for the given model.
      *
      * @param  \Illuminate\Database\Eloquent\Model|string  $model
-     * @param  string|null  $column
+     * @param  ?string  $column
      * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
      */
     public function foreignIdFor($model, $column = null)
@@ -1444,7 +1444,7 @@ class Blueprint
      * Add the proper columns for a polymorphic table.
      *
      * @param  string  $name
-     * @param  string|null  $indexName
+     * @param  ?string  $indexName
      * @return void
      */
     public function morphs($name, $indexName = null)
@@ -1462,7 +1462,7 @@ class Blueprint
      * Add nullable columns for a polymorphic table.
      *
      * @param  string  $name
-     * @param  string|null  $indexName
+     * @param  ?string  $indexName
      * @return void
      */
     public function nullableMorphs($name, $indexName = null)
@@ -1480,7 +1480,7 @@ class Blueprint
      * Add the proper columns for a polymorphic table using numeric IDs (incremental).
      *
      * @param  string  $name
-     * @param  string|null  $indexName
+     * @param  ?string  $indexName
      * @return void
      */
     public function numericMorphs($name, $indexName = null)
@@ -1496,7 +1496,7 @@ class Blueprint
      * Add nullable columns for a polymorphic table using numeric IDs (incremental).
      *
      * @param  string  $name
-     * @param  string|null  $indexName
+     * @param  ?string  $indexName
      * @return void
      */
     public function nullableNumericMorphs($name, $indexName = null)
@@ -1512,7 +1512,7 @@ class Blueprint
      * Add the proper columns for a polymorphic table using UUIDs.
      *
      * @param  string  $name
-     * @param  string|null  $indexName
+     * @param  ?string  $indexName
      * @return void
      */
     public function uuidMorphs($name, $indexName = null)
@@ -1528,7 +1528,7 @@ class Blueprint
      * Add nullable columns for a polymorphic table using UUIDs.
      *
      * @param  string  $name
-     * @param  string|null  $indexName
+     * @param  ?string  $indexName
      * @return void
      */
     public function nullableUuidMorphs($name, $indexName = null)
@@ -1544,7 +1544,7 @@ class Blueprint
      * Add the proper columns for a polymorphic table using ULIDs.
      *
      * @param  string  $name
-     * @param  string|null  $indexName
+     * @param  ?string  $indexName
      * @return void
      */
     public function ulidMorphs($name, $indexName = null)
@@ -1560,7 +1560,7 @@ class Blueprint
      * Add nullable columns for a polymorphic table using ULIDs.
      *
      * @param  string  $name
-     * @param  string|null  $indexName
+     * @param  ?string  $indexName
      * @return void
      */
     public function nullableUlidMorphs($name, $indexName = null)
@@ -1599,7 +1599,7 @@ class Blueprint
      * @param  string  $type
      * @param  string|array  $columns
      * @param  string  $index
-     * @param  string|null  $algorithm
+     * @param  ?string  $algorithm
      * @return \Illuminate\Support\Fluent
      */
     protected function indexCommand($type, $columns, $index, $algorithm = null)

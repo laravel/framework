@@ -543,7 +543,7 @@ trait EnumeratesValues
     /**
      * Filter items where the value for the given key is null.
      *
-     * @param  string|null  $key
+     * @param  ?string  $key
      * @return static
      */
     public function whereNull($key = null)
@@ -554,7 +554,7 @@ trait EnumeratesValues
     /**
      * Filter items where the value for the given key is not null.
      *
-     * @param  string|null  $key
+     * @param  ?string  $key
      * @return static
      */
     public function whereNotNull($key = null)
@@ -974,7 +974,7 @@ trait EnumeratesValues
      * Get an operator checker callback.
      *
      * @param  callable|string  $key
-     * @param  string|null  $operator
+     * @param  ?string  $operator
      * @param  mixed  $value
      * @return \Closure
      */

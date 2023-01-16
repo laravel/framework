@@ -9,7 +9,7 @@ class FileFactory
      *
      * @param  string  $name
      * @param  string|int  $kilobytes
-     * @param  string|null  $mimeType
+     * @param  ?string  $mimeType
      * @return \Illuminate\Http\Testing\File
      */
     public function create($name, $kilobytes = 0, $mimeType = null)

@@ -14,7 +14,7 @@ class Address
     /**
      * The recipient's name.
      *
-     * @var string|null
+     * @var ?string
      */
     public $name;
 
@@ -22,7 +22,7 @@ class Address
      * Create a new address instance.
      *
      * @param  string  $address
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return void
      */
     public function __construct(string $address, string $name = null)

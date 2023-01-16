@@ -60,7 +60,7 @@ class AuthManager implements FactoryContract
     /**
      * Attempt to get the guard from the local cache.
      *
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return \Illuminate\Contracts\Auth\Guard|\Illuminate\Contracts\Auth\StatefulGuard
      */
     public function guard($name = null)

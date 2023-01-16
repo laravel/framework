@@ -75,7 +75,7 @@ class Collection extends BaseCollection implements QueueableCollection
      *
      * @param  array<array-key, (callable(\Illuminate\Database\Eloquent\Builder): mixed)|string>|string  $relations
      * @param  string  $column
-     * @param  string|null  $function
+     * @param  ?string  $function
      * @return $this
      */
     public function loadAggregate($relations, $column, $function = null)
@@ -651,7 +651,7 @@ class Collection extends BaseCollection implements QueueableCollection
      * Get an array with the values of a given key.
      *
      * @param  string|array<array-key, string>  $value
-     * @param  string|null  $key
+     * @param  ?string  $key
      * @return \Illuminate\Support\Collection<array-key, mixed>
      */
     public function pluck($value, $key = null)
@@ -688,7 +688,7 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Get the type of the entities being queued.
      *
-     * @return string|null
+     * @return ?string
      *
      * @throws \LogicException
      */
@@ -763,7 +763,7 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Get the connection of the entities being queued.
      *
-     * @return string|null
+     * @return ?string
      *
      * @throws \LogicException
      */

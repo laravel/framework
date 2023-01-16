@@ -66,7 +66,7 @@ class CursorPaginator extends AbstractCursorPaginator implements Arrayable, Arra
     /**
      * Render the paginator using the given view.
      *
-     * @param  string|null  $view
+     * @param  ?string  $view
      * @param  array  $data
      * @return \Illuminate\Contracts\Support\Htmlable
      */
@@ -78,7 +78,7 @@ class CursorPaginator extends AbstractCursorPaginator implements Arrayable, Arra
     /**
      * Render the paginator using the given view.
      *
-     * @param  string|null  $view
+     * @param  ?string  $view
      * @param  array  $data
      * @return \Illuminate\Contracts\Support\Htmlable
      */

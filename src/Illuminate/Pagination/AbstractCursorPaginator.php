@@ -54,7 +54,7 @@ abstract class AbstractCursorPaginator implements Htmlable
     /**
      * The URL fragment to add to all URLs.
      *
-     * @var string|null
+     * @var ?string
      */
     protected $fragment;
 
@@ -119,7 +119,7 @@ abstract class AbstractCursorPaginator implements Htmlable
     /**
      * Get the URL for the previous page.
      *
-     * @return string|null
+     * @return ?string
      */
     public function previousPageUrl()
     {
@@ -133,7 +133,7 @@ abstract class AbstractCursorPaginator implements Htmlable
     /**
      * The URL for the next page, or null.
      *
-     * @return string|null
+     * @return ?string
      */
     public function nextPageUrl()
     {
@@ -233,7 +233,7 @@ abstract class AbstractCursorPaginator implements Htmlable
      *
      * @param  \ArrayAccess|\stdClass  $item
      * @param  string  $parameterName
-     * @return string|null
+     * @return ?string
      */
     protected function getPivotParameterForItem($item, $parameterName)
     {
@@ -266,7 +266,7 @@ abstract class AbstractCursorPaginator implements Htmlable
     /**
      * Get / set the URL fragment to be appended to URLs.
      *
-     * @param  string|null  $fragment
+     * @param  ?string  $fragment
      * @return $this|string|null
      */
     public function fragment($fragment = null)
@@ -284,7 +284,7 @@ abstract class AbstractCursorPaginator implements Htmlable
      * Add a set of query string values to the paginator.
      *
      * @param  array|string|null  $key
-     * @param  string|null  $value
+     * @param  ?string  $value
      * @return $this
      */
     public function appends($key, $value = null)
@@ -476,7 +476,7 @@ abstract class AbstractCursorPaginator implements Htmlable
     /**
      * Get the base path for paginator generated URLs.
      *
-     * @return string|null
+     * @return ?string
      */
     public function path()
     {

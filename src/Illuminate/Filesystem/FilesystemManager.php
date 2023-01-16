@@ -62,7 +62,7 @@ class FilesystemManager implements FactoryContract
     /**
      * Get a filesystem instance.
      *
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return \Illuminate\Contracts\Filesystem\Filesystem
      */
     public function drive($name = null)
@@ -73,7 +73,7 @@ class FilesystemManager implements FactoryContract
     /**
      * Get a filesystem instance.
      *
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return \Illuminate\Contracts\Filesystem\Filesystem
      */
     public function disk($name = null)
@@ -378,7 +378,7 @@ class FilesystemManager implements FactoryContract
     /**
      * Disconnect the given disk and remove from local cache.
      *
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return void
      */
     public function purge($name = null)

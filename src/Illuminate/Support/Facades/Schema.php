@@ -48,7 +48,7 @@ class Schema extends Facade
     /**
      * Get a schema builder instance for a connection.
      *
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return \Illuminate\Database\Schema\Builder
      */
     public static function connection($name)

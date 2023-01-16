@@ -161,7 +161,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Compile the view at the given path.
      *
-     * @param  string|null  $path
+     * @param  ?string  $path
      * @return void
      */
     public function compile($path = null)
@@ -587,7 +587,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * Call the given directive with the given value.
      *
      * @param  string  $name
-     * @param  string|null  $value
+     * @param  ?string  $value
      * @return string
      */
     protected function callCustomDirective($name, $value)
@@ -687,7 +687,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * Register a class-based component alias directive.
      *
      * @param  string  $class
-     * @param  string|null  $alias
+     * @param  ?string  $alias
      * @param  string  $prefix
      * @return void
      */
@@ -744,7 +744,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * Register a new anonymous component path.
      *
      * @param  string  $path
-     * @param  string|null  $prefix
+     * @param  ?string  $prefix
      * @return void
      */
     public function anonymousComponentPath(string $path, string $prefix = null)
@@ -766,7 +766,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * Register an anonymous component namespace.
      *
      * @param  string  $directory
-     * @param  string|null  $prefix
+     * @param  ?string  $prefix
      * @return void
      */
     public function anonymousComponentNamespace(string $directory, string $prefix = null)
@@ -825,7 +825,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * Register a component alias directive.
      *
      * @param  string  $path
-     * @param  string|null  $alias
+     * @param  ?string  $alias
      * @return void
      */
     public function aliasComponent($path, $alias = null)
@@ -847,7 +847,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * Register an include alias directive.
      *
      * @param  string  $path
-     * @param  string|null  $alias
+     * @param  ?string  $alias
      * @return void
      */
     public function include($path, $alias = null)
@@ -859,7 +859,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * Register an include alias directive.
      *
      * @param  string  $path
-     * @param  string|null  $alias
+     * @param  ?string  $alias
      * @return void
      */
     public function aliasInclude($path, $alias = null)

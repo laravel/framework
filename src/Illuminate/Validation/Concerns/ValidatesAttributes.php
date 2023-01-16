@@ -256,7 +256,7 @@ trait ValidatesAttributes
      * Get the date format for an attribute if it has one.
      *
      * @param  string  $attribute
-     * @return string|null
+     * @return ?string
      */
     protected function getDateFormat($attribute)
     {
@@ -909,7 +909,7 @@ trait ValidatesAttributes
     /**
      * Get the excluded ID column and value for the unique rule.
      *
-     * @param  string|null  $idColumn
+     * @param  ?string  $idColumn
      * @param  array<int, int|string>  $parameters
      * @return array
      */

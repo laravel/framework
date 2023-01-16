@@ -16,7 +16,7 @@ class CacheEventMutex implements EventMutex, CacheAware
     /**
      * The cache store that should be used.
      *
-     * @var string|null
+     * @var ?string
      */
     public $store;
 

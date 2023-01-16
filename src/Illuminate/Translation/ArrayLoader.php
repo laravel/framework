@@ -18,7 +18,7 @@ class ArrayLoader implements Loader
      *
      * @param  string  $locale
      * @param  string  $group
-     * @param  string|null  $namespace
+     * @param  ?string  $namespace
      * @return array
      */
     public function load($locale, $group, $namespace = null)
@@ -57,7 +57,7 @@ class ArrayLoader implements Loader
      * @param  string  $locale
      * @param  string  $group
      * @param  array  $messages
-     * @param  string|null  $namespace
+     * @param  ?string  $namespace
      * @return $this
      */
     public function addMessages($locale, $group, array $messages, $namespace = null)

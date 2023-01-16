@@ -16,7 +16,7 @@ class PotentiallyTranslatedString implements Stringable
     /**
      * The translated string.
      *
-     * @var string|null
+     * @var ?string
      */
     protected $translation;
 
@@ -44,7 +44,7 @@ class PotentiallyTranslatedString implements Stringable
      * Translate the string.
      *
      * @param  array  $replace
-     * @param  string|null  $locale
+     * @param  ?string  $locale
      * @return $this
      */
     public function translate($replace = [], $locale = null)
@@ -59,7 +59,7 @@ class PotentiallyTranslatedString implements Stringable
      *
      * @param  \Countable|int|array  $number
      * @param  array  $replace
-     * @param  string|null  $locale
+     * @param  ?string  $locale
      * @return $this
      */
     public function translateChoice($number, array $replace = [], $locale = null)

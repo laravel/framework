@@ -17,7 +17,7 @@ class MemcachedLock extends Lock
      * @param  \Memcached  $memcached
      * @param  string  $name
      * @param  int  $seconds
-     * @param  string|null  $owner
+     * @param  ?string  $owner
      * @return void
      */
     public function __construct($memcached, $name, $seconds, $owner = null)

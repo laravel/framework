@@ -36,7 +36,7 @@ class PendingBroadcast
     /**
      * Broadcast the event using a specific broadcaster.
      *
-     * @param  string|null  $connection
+     * @param  ?string  $connection
      * @return $this
      */
     public function via($connection = null)

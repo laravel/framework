@@ -31,7 +31,7 @@ class DocsCommand extends Command
      *
      * This name is used to identify the command during lazy loading.
      *
-     * @var string|null
+     * @var ?string
      *
      * @deprecated
      */
@@ -75,7 +75,7 @@ class DocsCommand extends Command
     /**
      * The custom documentation version to open.
      *
-     * @var string|null
+     * @var ?string
      */
     protected $version;
 

@@ -48,7 +48,7 @@ trait HasUuids
      *
      * @param  \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Relations\Relation  $query
      * @param  mixed  $value
-     * @param  string|null  $field
+     * @param  ?string  $field
      * @return \Illuminate\Database\Eloquent\Relations\Relation
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException

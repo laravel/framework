@@ -57,14 +57,14 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * A cached copy of the URL root for the current request.
      *
-     * @var string|null
+     * @var ?string
      */
     protected $cachedRoot;
 
     /**
      * A cached copy of the URL scheme for the current request.
      *
-     * @var string|null
+     * @var ?string
      */
     protected $cachedScheme;
 
@@ -115,7 +115,7 @@ class UrlGenerator implements UrlGeneratorContract
      *
      * @param  \Illuminate\Routing\RouteCollectionInterface  $routes
      * @param  \Illuminate\Http\Request  $request
-     * @param  string|null  $assetRoot
+     * @param  ?string  $assetRoot
      * @return void
      */
     public function __construct(RouteCollectionInterface $routes, Request $request, $assetRoot = null)
@@ -183,7 +183,7 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Get the previous URL from the session if possible.
      *
-     * @return string|null
+     * @return ?string
      */
     protected function getPreviousUrlFromSession()
     {
@@ -573,7 +573,7 @@ class UrlGenerator implements UrlGeneratorContract
      * Get the base URL for the request.
      *
      * @param  string  $scheme
-     * @param  string|null  $root
+     * @param  ?string  $root
      * @return string
      */
     public function formatRoot($scheme, $root = null)
@@ -667,7 +667,7 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Force the scheme for URLs.
      *
-     * @param  string|null  $scheme
+     * @param  ?string  $scheme
      * @return void
      */
     public function forceScheme($scheme)
@@ -680,7 +680,7 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Set the forced root URL.
      *
-     * @param  string|null  $root
+     * @param  ?string  $root
      * @return void
      */
     public function forceRootUrl($root)

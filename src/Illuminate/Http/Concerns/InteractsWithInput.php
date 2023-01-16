@@ -15,7 +15,7 @@ trait InteractsWithInput
     /**
      * Retrieve a server variable from the request.
      *
-     * @param  string|null  $key
+     * @param  ?string  $key
      * @param  string|array|null  $default
      * @return string|array|null
      */
@@ -38,7 +38,7 @@ trait InteractsWithInput
     /**
      * Retrieve a header from the request.
      *
-     * @param  string|null  $key
+     * @param  ?string  $key
      * @param  string|array|null  $default
      * @return string|array|null
      */
@@ -50,7 +50,7 @@ trait InteractsWithInput
     /**
      * Get the bearer token from the request headers.
      *
-     * @return string|null
+     * @return ?string
      */
     public function bearerToken()
     {
@@ -294,7 +294,7 @@ trait InteractsWithInput
     /**
      * Retrieve an input item from the request.
      *
-     * @param  string|null  $key
+     * @param  ?string  $key
      * @param  mixed  $default
      * @return mixed
      */
@@ -334,7 +334,7 @@ trait InteractsWithInput
      *
      * Returns true when value is "1", "true", "on", and "yes". Otherwise, returns false.
      *
-     * @param  string|null  $key
+     * @param  ?string  $key
      * @param  bool  $default
      * @return bool
      */
@@ -371,8 +371,8 @@ trait InteractsWithInput
      * Retrieve input from the request as a Carbon instance.
      *
      * @param  string  $key
-     * @param  string|null  $format
-     * @param  string|null  $tz
+     * @param  ?string  $format
+     * @param  ?string  $tz
      * @return \Illuminate\Support\Carbon|null
      *
      * @throws \Carbon\Exceptions\InvalidFormatException
@@ -467,7 +467,7 @@ trait InteractsWithInput
     /**
      * Retrieve a query string item from the request.
      *
-     * @param  string|null  $key
+     * @param  ?string  $key
      * @param  string|array|null  $default
      * @return string|array|null
      */
@@ -479,7 +479,7 @@ trait InteractsWithInput
     /**
      * Retrieve a request payload item from the request.
      *
-     * @param  string|null  $key
+     * @param  ?string  $key
      * @param  string|array|null  $default
      * @return string|array|null
      */
@@ -502,7 +502,7 @@ trait InteractsWithInput
     /**
      * Retrieve a cookie from the request.
      *
-     * @param  string|null  $key
+     * @param  ?string  $key
      * @param  string|array|null  $default
      * @return string|array|null
      */
@@ -577,7 +577,7 @@ trait InteractsWithInput
     /**
      * Retrieve a file from the request.
      *
-     * @param  string|null  $key
+     * @param  ?string  $key
      * @param  mixed  $default
      * @return \Illuminate\Http\UploadedFile|\Illuminate\Http\UploadedFile[]|array|null
      */

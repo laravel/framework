@@ -646,7 +646,7 @@ class Handler implements ExceptionHandlerContract
      * Get the view used to render HTTP exceptions.
      *
      * @param  \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface  $e
-     * @return string|null
+     * @return ?string
      */
     protected function getHttpExceptionView(HttpExceptionInterface $e)
     {

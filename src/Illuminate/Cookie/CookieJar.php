@@ -22,7 +22,7 @@ class CookieJar implements JarContract
     /**
      * The default domain (if specified).
      *
-     * @var string|null
+     * @var ?string
      */
     protected $domain;
 
@@ -53,12 +53,12 @@ class CookieJar implements JarContract
      * @param  string  $name
      * @param  string  $value
      * @param  int  $minutes
-     * @param  string|null  $path
-     * @param  string|null  $domain
+     * @param  ?string  $path
+     * @param  ?string  $domain
      * @param  bool|null  $secure
      * @param  bool  $httpOnly
      * @param  bool  $raw
-     * @param  string|null  $sameSite
+     * @param  ?string  $sameSite
      * @return \Symfony\Component\HttpFoundation\Cookie
      */
     public function make($name, $value, $minutes = 0, $path = null, $domain = null, $secure = null, $httpOnly = true, $raw = false, $sameSite = null)
@@ -75,12 +75,12 @@ class CookieJar implements JarContract
      *
      * @param  string  $name
      * @param  string  $value
-     * @param  string|null  $path
-     * @param  string|null  $domain
+     * @param  ?string  $path
+     * @param  ?string  $domain
      * @param  bool|null  $secure
      * @param  bool  $httpOnly
      * @param  bool  $raw
-     * @param  string|null  $sameSite
+     * @param  ?string  $sameSite
      * @return \Symfony\Component\HttpFoundation\Cookie
      */
     public function forever($name, $value, $path = null, $domain = null, $secure = null, $httpOnly = true, $raw = false, $sameSite = null)
@@ -92,8 +92,8 @@ class CookieJar implements JarContract
      * Expire the given cookie.
      *
      * @param  string  $name
-     * @param  string|null  $path
-     * @param  string|null  $domain
+     * @param  ?string  $path
+     * @param  ?string  $domain
      * @return \Symfony\Component\HttpFoundation\Cookie
      */
     public function forget($name, $path = null, $domain = null)
@@ -105,7 +105,7 @@ class CookieJar implements JarContract
      * Determine if a cookie has been queued.
      *
      * @param  string  $key
-     * @param  string|null  $path
+     * @param  ?string  $path
      * @return bool
      */
     public function hasQueued($key, $path = null)
@@ -118,7 +118,7 @@ class CookieJar implements JarContract
      *
      * @param  string  $key
      * @param  mixed  $default
-     * @param  string|null  $path
+     * @param  ?string  $path
      * @return \Symfony\Component\HttpFoundation\Cookie|null
      */
     public function queued($key, $default = null, $path = null)
@@ -157,8 +157,8 @@ class CookieJar implements JarContract
      * Queue a cookie to expire with the next response.
      *
      * @param  string  $name
-     * @param  string|null  $path
-     * @param  string|null  $domain
+     * @param  ?string  $path
+     * @param  ?string  $domain
      * @return void
      */
     public function expire($name, $path = null, $domain = null)
@@ -170,7 +170,7 @@ class CookieJar implements JarContract
      * Remove a cookie from the queue.
      *
      * @param  string  $name
-     * @param  string|null  $path
+     * @param  ?string  $path
      * @return void
      */
     public function unqueue($name, $path = null)
@@ -192,9 +192,9 @@ class CookieJar implements JarContract
      * Get the path and domain, or the default values.
      *
      * @param  string  $path
-     * @param  string|null  $domain
+     * @param  ?string  $domain
      * @param  bool|null  $secure
-     * @param  string|null  $sameSite
+     * @param  ?string  $sameSite
      * @return array
      */
     protected function getPathAndDomain($path, $domain, $secure = null, $sameSite = null)
@@ -206,9 +206,9 @@ class CookieJar implements JarContract
      * Set the default path and domain for the jar.
      *
      * @param  string  $path
-     * @param  string|null  $domain
+     * @param  ?string  $domain
      * @param  bool|null  $secure
-     * @param  string|null  $sameSite
+     * @param  ?string  $sameSite
      * @return $this
      */
     public function setDefaultPathAndDomain($path, $domain, $secure = false, $sameSite = null)

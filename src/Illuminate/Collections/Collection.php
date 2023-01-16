@@ -598,7 +598,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      * Concatenate values of a given key as a string.
      *
      * @param  callable|string  $value
-     * @param  string|null  $glue
+     * @param  ?string  $glue
      * @return string
      */
     public function implode($value, $glue = null)
@@ -718,7 +718,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      * Get the values of a given key.
      *
      * @param  string|int|array<array-key, string>  $value
-     * @param  string|null  $key
+     * @param  ?string  $key
      * @return static<array-key, mixed>
      */
     public function pluck($value, $key = null)

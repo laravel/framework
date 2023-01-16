@@ -34,7 +34,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
      *
      * This name is used to identify the command during lazy loading.
      *
-     * @var string|null
+     * @var ?string
      *
      * @deprecated
      */
@@ -410,7 +410,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
      *
      * @param  string  $column
      * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return string|null
+     * @return ?string
      */
     protected function getCastType($column, $model)
     {

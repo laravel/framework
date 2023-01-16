@@ -165,7 +165,7 @@ class RouteCollection extends AbstractRouteCollection
     /**
      * Get routes from the collection by method.
      *
-     * @param  string|null  $method
+     * @param  ?string  $method
      * @return \Illuminate\Routing\Route[]
      */
     public function get($method = null)

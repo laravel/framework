@@ -5,8 +5,8 @@ namespace Illuminate\Support\Facades;
 use Illuminate\Filesystem\Filesystem;
 
 /**
- * @method static \Illuminate\Contracts\Filesystem\Filesystem drive(string|null $name = null)
- * @method static \Illuminate\Contracts\Filesystem\Filesystem disk(string|null $name = null)
+ * @method static \Illuminate\Contracts\Filesystem\Filesystem drive(?string $name = null)
+ * @method static \Illuminate\Contracts\Filesystem\Filesystem disk(?string $name = null)
  * @method static \Illuminate\Contracts\Filesystem\Filesystem cloud()
  * @method static \Illuminate\Contracts\Filesystem\Filesystem build(string|array $config)
  * @method static \Illuminate\Contracts\Filesystem\Filesystem createLocalDriver(array $config)
@@ -18,11 +18,11 @@ use Illuminate\Filesystem\Filesystem;
  * @method static string getDefaultDriver()
  * @method static string getDefaultCloudDriver()
  * @method static \Illuminate\Filesystem\FilesystemManager forgetDisk(array|string $disk)
- * @method static void purge(string|null $name = null)
+ * @method static void purge(?string $name = null)
  * @method static \Illuminate\Filesystem\FilesystemManager extend(string $driver, \Closure $callback)
  * @method static \Illuminate\Filesystem\FilesystemManager setApplication(\Illuminate\Contracts\Foundation\Application $app)
  * @method static bool exists(string $path)
- * @method static string|null get(string $path)
+ * @method static ?string get(string $path)
  * @method static resource|null readStream(string $path)
  * @method static bool put(string $path, string|resource $contents, mixed $options = [])
  * @method static bool writeStream(string $path, resource $resource, array $options = [])
@@ -35,13 +35,13 @@ use Illuminate\Filesystem\Filesystem;
  * @method static bool move(string $from, string $to)
  * @method static int size(string $path)
  * @method static int lastModified(string $path)
- * @method static array files(string|null $directory = null, bool $recursive = false)
- * @method static array allFiles(string|null $directory = null)
- * @method static array directories(string|null $directory = null, bool $recursive = false)
- * @method static array allDirectories(string|null $directory = null)
+ * @method static array files(?string $directory = null, bool $recursive = false)
+ * @method static array allFiles(?string $directory = null)
+ * @method static array directories(?string $directory = null, bool $recursive = false)
+ * @method static array allDirectories(?string $directory = null)
  * @method static bool makeDirectory(string $path)
  * @method static bool deleteDirectory(string $directory)
- * @method static \Illuminate\Filesystem\FilesystemAdapter assertExists(string|array $path, string|null $content = null)
+ * @method static \Illuminate\Filesystem\FilesystemAdapter assertExists(string|array $path, ?string $content = null)
  * @method static \Illuminate\Filesystem\FilesystemAdapter assertMissing(string|array $path)
  * @method static \Illuminate\Filesystem\FilesystemAdapter assertDirectoryEmpty(string $path)
  * @method static bool missing(string $path)
@@ -50,8 +50,8 @@ use Illuminate\Filesystem\Filesystem;
  * @method static bool directoryExists(string $path)
  * @method static bool directoryMissing(string $path)
  * @method static string path(string $path)
- * @method static \Symfony\Component\HttpFoundation\StreamedResponse response(string $path, string|null $name = null, array $headers = [], string|null $disposition = 'inline')
- * @method static \Symfony\Component\HttpFoundation\StreamedResponse download(string $path, string|null $name = null, array $headers = [])
+ * @method static \Symfony\Component\HttpFoundation\StreamedResponse response(string $path, ?string $name = null, array $headers = [], ?string $disposition = 'inline')
+ * @method static \Symfony\Component\HttpFoundation\StreamedResponse download(string $path, ?string $name = null, array $headers = [])
  * @method static string|false putFile(string $path, \Illuminate\Http\File|\Illuminate\Http\UploadedFile|string $file, mixed $options = [])
  * @method static string|false putFileAs(string $path, \Illuminate\Http\File|\Illuminate\Http\UploadedFile|string $file, string $name, mixed $options = [])
  * @method static string|false checksum(string $path, array $options = [])
@@ -85,7 +85,7 @@ class Storage extends Facade
     /**
      * Replace the given disk with a local testing disk.
      *
-     * @param  string|null  $disk
+     * @param  ?string  $disk
      * @param  array  $config
      * @return \Illuminate\Contracts\Filesystem\Filesystem
      */
@@ -113,7 +113,7 @@ class Storage extends Facade
     /**
      * Replace the given disk with a persistent local testing disk.
      *
-     * @param  string|null  $disk
+     * @param  ?string  $disk
      * @param  array  $config
      * @return \Illuminate\Contracts\Filesystem\Filesystem
      */

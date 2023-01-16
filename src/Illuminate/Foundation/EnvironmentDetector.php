@@ -56,7 +56,7 @@ class EnvironmentDetector
      * Get the environment argument from the console.
      *
      * @param  array  $args
-     * @return string|null
+     * @return ?string
      */
     protected function getEnvironmentArgument(array $args)
     {

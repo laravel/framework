@@ -16,7 +16,7 @@ trait CreatesUserProviders
     /**
      * Create the user provider implementation for the driver.
      *
-     * @param  string|null  $provider
+     * @param  ?string  $provider
      * @return \Illuminate\Contracts\Auth\UserProvider|null
      *
      * @throws \InvalidArgumentException
@@ -45,7 +45,7 @@ trait CreatesUserProviders
     /**
      * Get the user provider configuration.
      *
-     * @param  string|null  $provider
+     * @param  ?string  $provider
      * @return array|null
      */
     protected function getProviderConfiguration($provider)

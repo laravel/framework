@@ -48,7 +48,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      * Returns the value of the given key.
      *
      * @param  string  $key
-     * @return string|null
+     * @return ?string
      */
     public function get($key)
     {
@@ -75,9 +75,9 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      *
      * @param  string  $key
      * @param  mixed  $value
-     * @param  string|null  $expireResolution
+     * @param  ?string  $expireResolution
      * @param  int|null  $expireTTL
-     * @param  string|null  $flag
+     * @param  ?string  $flag
      * @return bool
      */
     public function set($key, $value, $expireResolution = null, $expireTTL = null, $flag = null)

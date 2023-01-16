@@ -27,7 +27,7 @@ class CommandSchedulingTest extends TestCase
     /**
      * Just in case Testbench starts to ship an `artisan` script, we'll check and save a backup.
      *
-     * @var string|null
+     * @var ?string
      */
     protected $originalArtisan;
 

@@ -539,7 +539,7 @@ trait MakesHttpRequests
      * @param  array  $cookies
      * @param  array  $files
      * @param  array  $server
-     * @param  string|null  $content
+     * @param  ?string  $content
      * @return \Illuminate\Testing\TestResponse
      */
     public function call($method, $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null)

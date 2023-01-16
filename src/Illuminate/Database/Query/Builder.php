@@ -440,7 +440,7 @@ class Builder implements BuilderContract
      * Set the table which the query is targeting.
      *
      * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|string  $table
-     * @param  string|null  $as
+     * @param  ?string  $as
      * @return $this
      */
     public function from($table, $as = null)
@@ -459,8 +459,8 @@ class Builder implements BuilderContract
      *
      * @param  string  $table
      * @param  \Closure|string  $first
-     * @param  string|null  $operator
-     * @param  string|null  $second
+     * @param  ?string  $operator
+     * @param  ?string  $second
      * @param  string  $type
      * @param  bool  $where
      * @return $this
@@ -515,8 +515,8 @@ class Builder implements BuilderContract
      * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|string  $query
      * @param  string  $as
      * @param  \Closure|string  $first
-     * @param  string|null  $operator
-     * @param  string|null  $second
+     * @param  ?string  $operator
+     * @param  ?string  $second
      * @param  string  $type
      * @param  bool  $where
      * @return $this
@@ -539,8 +539,8 @@ class Builder implements BuilderContract
      *
      * @param  string  $table
      * @param  \Closure|string  $first
-     * @param  string|null  $operator
-     * @param  string|null  $second
+     * @param  ?string  $operator
+     * @param  ?string  $second
      * @return $this
      */
     public function leftJoin($table, $first, $operator = null, $second = null)
@@ -568,8 +568,8 @@ class Builder implements BuilderContract
      * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|string  $query
      * @param  string  $as
      * @param  \Closure|string  $first
-     * @param  string|null  $operator
-     * @param  string|null  $second
+     * @param  ?string  $operator
+     * @param  ?string  $second
      * @return $this
      */
     public function leftJoinSub($query, $as, $first, $operator = null, $second = null)
@@ -582,8 +582,8 @@ class Builder implements BuilderContract
      *
      * @param  string  $table
      * @param  \Closure|string  $first
-     * @param  string|null  $operator
-     * @param  string|null  $second
+     * @param  ?string  $operator
+     * @param  ?string  $second
      * @return $this
      */
     public function rightJoin($table, $first, $operator = null, $second = null)
@@ -611,8 +611,8 @@ class Builder implements BuilderContract
      * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|string  $query
      * @param  string  $as
      * @param  \Closure|string  $first
-     * @param  string|null  $operator
-     * @param  string|null  $second
+     * @param  ?string  $operator
+     * @param  ?string  $second
      * @return $this
      */
     public function rightJoinSub($query, $as, $first, $operator = null, $second = null)
@@ -625,8 +625,8 @@ class Builder implements BuilderContract
      *
      * @param  string  $table
      * @param  \Closure|string|null  $first
-     * @param  string|null  $operator
-     * @param  string|null  $second
+     * @param  ?string  $operator
+     * @param  ?string  $second
      * @return $this
      */
     public function crossJoin($table, $first = null, $operator = null, $second = null)
@@ -920,9 +920,9 @@ class Builder implements BuilderContract
      * Add a "where" clause comparing two columns to the query.
      *
      * @param  string|array  $first
-     * @param  string|null  $operator
-     * @param  string|null  $second
-     * @param  string|null  $boolean
+     * @param  ?string  $operator
+     * @param  ?string  $second
+     * @param  ?string  $boolean
      * @return $this
      */
     public function whereColumn($first, $operator = null, $second = null, $boolean = 'and')
@@ -957,8 +957,8 @@ class Builder implements BuilderContract
      * Add an "or where" clause comparing two columns to the query.
      *
      * @param  string|array  $first
-     * @param  string|null  $operator
-     * @param  string|null  $second
+     * @param  ?string  $operator
+     * @param  ?string  $second
      * @return $this
      */
     public function orWhereColumn($first, $operator = null, $second = null)
@@ -2855,7 +2855,7 @@ class Builder implements BuilderContract
      * Get a collection instance containing the values of a given column.
      *
      * @param  string  $column
-     * @param  string|null  $key
+     * @param  ?string  $key
      * @return \Illuminate\Support\Collection
      */
     public function pluck($column, $key = null)
@@ -2892,7 +2892,7 @@ class Builder implements BuilderContract
      * Strip off the table name or alias from a column identifier.
      *
      * @param  string  $column
-     * @return string|null
+     * @return ?string
      */
     protected function stripTableForPluck($column)
     {
@@ -3258,7 +3258,7 @@ class Builder implements BuilderContract
      * Insert a new record and get the value of the primary key.
      *
      * @param  array  $values
-     * @param  string|null  $sequence
+     * @param  ?string  $sequence
      * @return int
      */
     public function insertGetId(array $values, $sequence = null)

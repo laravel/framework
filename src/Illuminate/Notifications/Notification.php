@@ -18,7 +18,7 @@ class Notification
     /**
      * The locale to be used when sending the notification.
      *
-     * @var string|null
+     * @var ?string
      */
     public $locale;
 

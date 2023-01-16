@@ -23,7 +23,7 @@ class PolicyMakeCommand extends GeneratorCommand
      *
      * This name is used to identify the command during lazy loading.
      *
-     * @var string|null
+     * @var ?string
      *
      * @deprecated
      */
@@ -84,7 +84,7 @@ class PolicyMakeCommand extends GeneratorCommand
     /**
      * Get the model for the guard's user provider.
      *
-     * @return string|null
+     * @return ?string
      *
      * @throws \LogicException
      */

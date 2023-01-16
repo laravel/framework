@@ -17,14 +17,14 @@ class QueuedClosure
     /**
      * The name of the connection the job should be sent to.
      *
-     * @var string|null
+     * @var ?string
      */
     public $connection;
 
     /**
      * The name of the queue the job should be sent to.
      *
-     * @var string|null
+     * @var ?string
      */
     public $queue;
 
@@ -56,7 +56,7 @@ class QueuedClosure
     /**
      * Set the desired connection for the job.
      *
-     * @param  string|null  $connection
+     * @param  ?string  $connection
      * @return $this
      */
     public function onConnection($connection)
@@ -69,7 +69,7 @@ class QueuedClosure
     /**
      * Set the desired queue for the job.
      *
-     * @param  string|null  $queue
+     * @param  ?string  $queue
      * @return $this
      */
     public function onQueue($queue)

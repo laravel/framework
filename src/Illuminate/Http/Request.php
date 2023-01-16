@@ -180,8 +180,8 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      * Get a segment from the URI (1 based index).
      *
      * @param  int  $index
-     * @param  string|null  $default
-     * @return string|null
+     * @param  ?string  $default
+     * @return ?string
      */
     public function segment($index, $default = null)
     {
@@ -313,7 +313,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     /**
      * Get the client IP address.
      *
-     * @return string|null
+     * @return ?string
      */
     public function ip()
     {
@@ -333,7 +333,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     /**
      * Get the client user agent.
      *
-     * @return string|null
+     * @return ?string
      */
     public function userAgent()
     {
@@ -396,7 +396,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     /**
      * Get the JSON payload for the request.
      *
-     * @param  string|null  $key
+     * @param  ?string  $key
      * @param  mixed  $default
      * @return \Symfony\Component\HttpFoundation\ParameterBag|mixed
      */
@@ -598,7 +598,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     /**
      * Get the user making the request.
      *
-     * @param  string|null  $guard
+     * @param  ?string  $guard
      * @return mixed
      */
     public function user($guard = null)
@@ -609,7 +609,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     /**
      * Get the route handling the request.
      *
-     * @param  string|null  $param
+     * @param  ?string  $param
      * @param  mixed  $default
      * @return \Illuminate\Routing\Route|object|string|null
      */

@@ -30,7 +30,7 @@ interface Filesystem
      * Get the contents of a file.
      *
      * @param  string  $path
-     * @return string|null
+     * @return ?string
      */
     public function get($path);
 
@@ -142,7 +142,7 @@ interface Filesystem
     /**
      * Get an array of all files in a directory.
      *
-     * @param  string|null  $directory
+     * @param  ?string  $directory
      * @param  bool  $recursive
      * @return array
      */
@@ -151,7 +151,7 @@ interface Filesystem
     /**
      * Get all of the files from the given directory (recursive).
      *
-     * @param  string|null  $directory
+     * @param  ?string  $directory
      * @return array
      */
     public function allFiles($directory = null);
@@ -159,7 +159,7 @@ interface Filesystem
     /**
      * Get all of the directories within a given directory.
      *
-     * @param  string|null  $directory
+     * @param  ?string  $directory
      * @param  bool  $recursive
      * @return array
      */
@@ -168,7 +168,7 @@ interface Filesystem
     /**
      * Get all (recursive) of the directories within a given directory.
      *
-     * @param  string|null  $directory
+     * @param  ?string  $directory
      * @return array
      */
     public function allDirectories($directory = null);

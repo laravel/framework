@@ -230,7 +230,7 @@ class Stringable implements JsonSerializable
      *
      * @param  string  $phrase
      * @param  array  $options
-     * @return string|null
+     * @return ?string
      */
     public function excerpt($phrase = '', $options = [])
     {
@@ -363,7 +363,7 @@ class Stringable implements JsonSerializable
     /**
      * Return the length of the given string.
      *
-     * @param  string|null  $encoding
+     * @param  ?string  $encoding
      * @return int
      */
     public function length($encoding = null)
@@ -501,8 +501,8 @@ class Stringable implements JsonSerializable
     /**
      * Parse a Class@method style callback into class and method.
      *
-     * @param  string|null  $default
-     * @return array<int, string|null>
+     * @param  ?string  $default
+     * @return array<int, ?string>
      */
     public function parseCallback($default = null)
     {
@@ -738,7 +738,7 @@ class Stringable implements JsonSerializable
      * Generate a URL friendly "slug" from a given string.
      *
      * @param  string  $separator
-     * @param  string|null  $language
+     * @param  ?string  $language
      * @param  array<string, string>  $dictionary
      * @return static
      */
@@ -1071,7 +1071,7 @@ class Stringable implements JsonSerializable
     /**
      * Get the number of words a string contains.
      *
-     * @param  string|null  $characters
+     * @param  ?string  $characters
      * @return int
      */
     public function wordCount($characters = null)
@@ -1083,7 +1083,7 @@ class Stringable implements JsonSerializable
      * Wrap the string with the given strings.
      *
      * @param  string  $before
-     * @param  string|null  $after
+     * @param  ?string  $after
      * @return static
      */
     public function wrap($before, $after = null)
@@ -1180,8 +1180,8 @@ class Stringable implements JsonSerializable
     /**
      * Get the underlying string value as a Carbon instance.
      *
-     * @param  string|null  $format
-     * @param  string|null  $tz
+     * @param  ?string  $format
+     * @param  ?string  $tz
      * @return \Illuminate\Support\Carbon
      *
      * @throws \Carbon\Exceptions\InvalidFormatException

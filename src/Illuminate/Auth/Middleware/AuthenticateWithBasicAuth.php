@@ -30,8 +30,8 @@ class AuthenticateWithBasicAuth
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
-     * @param  string|null  $guard
-     * @param  string|null  $field
+     * @param  ?string  $guard
+     * @param  ?string  $field
      * @return mixed
      *
      * @throws \Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException

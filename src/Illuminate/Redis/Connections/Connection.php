@@ -25,7 +25,7 @@ abstract class Connection
     /**
      * The Redis connection name.
      *
-     * @var string|null
+     * @var ?string
      */
     protected $name;
 
@@ -149,7 +149,7 @@ abstract class Connection
     /**
      * Get the connection name.
      *
-     * @return string|null
+     * @return ?string
      */
     public function getName()
     {

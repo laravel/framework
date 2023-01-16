@@ -118,7 +118,7 @@ class Str
      * Transliterate a string to its closest ASCII representation.
      *
      * @param  string  $string
-     * @param  string|null  $unknown
+     * @param  ?string  $unknown
      * @param  bool|null  $strict
      * @return string
      */
@@ -294,7 +294,7 @@ class Str
      * @param  string  $text
      * @param  string  $phrase
      * @param  array  $options
-     * @return string|null
+     * @return ?string
      */
     public static function excerpt($text, $phrase = '', $options = [])
     {
@@ -343,7 +343,7 @@ class Str
      *
      * @param  string  $value
      * @param  string  $before
-     * @param  string|null  $after
+     * @param  ?string  $after
      * @return string
      */
     public static function wrap($value, $before, $after = null)
@@ -468,7 +468,7 @@ class Str
      * Return the length of the given string.
      *
      * @param  string  $value
-     * @param  string|null  $encoding
+     * @param  ?string  $encoding
      * @return int
      */
     public static function length($value, $encoding = null)
@@ -685,8 +685,8 @@ class Str
      * Parse a Class[@]method style callback into class and method.
      *
      * @param  string  $callback
-     * @param  string|null  $default
-     * @return array<int, string|null>
+     * @param  ?string  $default
+     * @return array<int, ?string>
      */
     public static function parseCallback($callback, $default = null)
     {
@@ -1012,7 +1012,7 @@ class Str
      *
      * @param  string  $title
      * @param  string  $separator
-     * @param  string|null  $language
+     * @param  ?string  $language
      * @param  array<string, string>  $dictionary
      * @return string
      */
@@ -1218,7 +1218,7 @@ class Str
      * Get the number of words a string contains.
      *
      * @param  string  $string
-     * @param  string|null  $characters
+     * @param  ?string  $characters
      * @return int
      */
     public static function wordCount($string, $characters = null)

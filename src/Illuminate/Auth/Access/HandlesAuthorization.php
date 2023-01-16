@@ -7,7 +7,7 @@ trait HandlesAuthorization
     /**
      * Create a new access response.
      *
-     * @param  string|null  $message
+     * @param  ?string  $message
      * @param  mixed  $code
      * @return \Illuminate\Auth\Access\Response
      */
@@ -19,7 +19,7 @@ trait HandlesAuthorization
     /**
      * Throws an unauthorized exception.
      *
-     * @param  string|null  $message
+     * @param  ?string  $message
      * @param  mixed|null  $code
      * @return \Illuminate\Auth\Access\Response
      */

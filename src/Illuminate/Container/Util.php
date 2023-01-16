@@ -47,7 +47,7 @@ class Util
      * From Reflector::getParameterClassName() in Illuminate\Support.
      *
      * @param  \ReflectionParameter  $parameter
-     * @return string|null
+     * @return ?string
      */
     public static function getParameterClassName($parameter)
     {

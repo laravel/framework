@@ -60,7 +60,7 @@ class Reflector
      * Get the class name of the given parameter's type, if possible.
      *
      * @param  \ReflectionParameter  $parameter
-     * @return string|null
+     * @return ?string
      */
     public static function getParameterClassName($parameter)
     {

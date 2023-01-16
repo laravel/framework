@@ -1209,7 +1209,7 @@ class Router implements BindingRegistrar, RegistrarContract
      * Get a route parameter for the current route.
      *
      * @param  string  $key
-     * @param  string|null  $default
+     * @param  ?string  $default
      * @return mixed
      */
     public function input($key, $default = null)
@@ -1269,7 +1269,7 @@ class Router implements BindingRegistrar, RegistrarContract
     /**
      * Get the current route name.
      *
-     * @return string|null
+     * @return ?string
      */
     public function currentRouteName()
     {
@@ -1301,7 +1301,7 @@ class Router implements BindingRegistrar, RegistrarContract
     /**
      * Get the current route action.
      *
-     * @return string|null
+     * @return ?string
      */
     public function currentRouteAction()
     {

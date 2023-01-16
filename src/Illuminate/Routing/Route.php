@@ -415,8 +415,8 @@ class Route
      * Get original value of a given parameter from the route.
      *
      * @param  string  $name
-     * @param  string|null  $default
-     * @return string|null
+     * @param  ?string  $default
+     * @return ?string
      */
     public function originalParameter($name, $default = null)
     {
@@ -537,7 +537,7 @@ class Route
      * Get the binding field for the given parameter.
      *
      * @param  string|int  $parameter
-     * @return string|null
+     * @return ?string
      */
     public function bindingFieldFor($parameter)
     {
@@ -640,7 +640,7 @@ class Route
      * Set a regular expression requirement on the route.
      *
      * @param  array|string  $name
-     * @param  string|null  $expression
+     * @param  ?string  $expression
      * @return $this
      */
     public function where($name, $expression = null)
@@ -747,7 +747,7 @@ class Route
     /**
      * Get or set the domain for the route.
      *
-     * @param  string|null  $domain
+     * @param  ?string  $domain
      * @return $this|string|null
      */
     public function domain($domain = null)
@@ -770,7 +770,7 @@ class Route
     /**
      * Get the domain defined for the route.
      *
-     * @return string|null
+     * @return ?string
      */
     public function getDomain()
     {
@@ -781,7 +781,7 @@ class Route
     /**
      * Get the prefix of the route instance.
      *
-     * @return string|null
+     * @return ?string
      */
     public function getPrefix()
     {
@@ -859,7 +859,7 @@ class Route
     /**
      * Get the name of the route instance.
      *
-     * @return string|null
+     * @return ?string
      */
     public function getName()
     {
@@ -960,7 +960,7 @@ class Route
     /**
      * Get the action array or one of its properties for the route.
      *
-     * @param  string|null  $key
+     * @param  ?string  $key
      * @return mixed
      */
     public function getAction($key = null)

@@ -10,7 +10,7 @@ class TwoColumnDetail extends Component
      * Renders the component using the given arguments.
      *
      * @param  string  $first
-     * @param  string|null  $second
+     * @param  ?string  $second
      * @param  int  $verbosity
      * @return void
      */

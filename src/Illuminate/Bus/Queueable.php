@@ -12,28 +12,28 @@ trait Queueable
     /**
      * The name of the connection the job should be sent to.
      *
-     * @var string|null
+     * @var ?string
      */
     public $connection;
 
     /**
      * The name of the queue the job should be sent to.
      *
-     * @var string|null
+     * @var ?string
      */
     public $queue;
 
     /**
      * The name of the connection the chain should be sent to.
      *
-     * @var string|null
+     * @var ?string
      */
     public $chainConnection;
 
     /**
      * The name of the queue the chain should be sent to.
      *
-     * @var string|null
+     * @var ?string
      */
     public $chainQueue;
 
@@ -75,7 +75,7 @@ trait Queueable
     /**
      * Set the desired connection for the job.
      *
-     * @param  string|null  $connection
+     * @param  ?string  $connection
      * @return $this
      */
     public function onConnection($connection)
@@ -88,7 +88,7 @@ trait Queueable
     /**
      * Set the desired queue for the job.
      *
-     * @param  string|null  $queue
+     * @param  ?string  $queue
      * @return $this
      */
     public function onQueue($queue)
@@ -101,7 +101,7 @@ trait Queueable
     /**
      * Set the desired connection for the chain.
      *
-     * @param  string|null  $connection
+     * @param  ?string  $connection
      * @return $this
      */
     public function allOnConnection($connection)
@@ -115,7 +115,7 @@ trait Queueable
     /**
      * Set the desired queue for the chain.
      *
-     * @param  string|null  $queue
+     * @param  ?string  $queue
      * @return $this
      */
     public function allOnQueue($queue)

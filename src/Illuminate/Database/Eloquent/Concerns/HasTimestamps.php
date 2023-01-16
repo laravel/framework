@@ -23,7 +23,7 @@ trait HasTimestamps
     /**
      * Update the model's update timestamp.
      *
-     * @param  string|null  $attribute
+     * @param  ?string  $attribute
      * @return bool
      */
     public function touch($attribute = null)
@@ -46,7 +46,7 @@ trait HasTimestamps
     /**
      * Update the model's update timestamp without raising any events.
      *
-     * @param  string|null  $attribute
+     * @param  ?string  $attribute
      * @return bool
      */
     public function touchQuietly($attribute = null)
@@ -137,7 +137,7 @@ trait HasTimestamps
     /**
      * Get the name of the "created at" column.
      *
-     * @return string|null
+     * @return ?string
      */
     public function getCreatedAtColumn()
     {
@@ -147,7 +147,7 @@ trait HasTimestamps
     /**
      * Get the name of the "updated at" column.
      *
-     * @return string|null
+     * @return ?string
      */
     public function getUpdatedAtColumn()
     {
@@ -157,7 +157,7 @@ trait HasTimestamps
     /**
      * Get the fully qualified "created at" column.
      *
-     * @return string|null
+     * @return ?string
      */
     public function getQualifiedCreatedAtColumn()
     {
@@ -167,7 +167,7 @@ trait HasTimestamps
     /**
      * Get the fully qualified "updated at" column.
      *
-     * @return string|null
+     * @return ?string
      */
     public function getQualifiedUpdatedAtColumn()
     {
@@ -206,7 +206,7 @@ trait HasTimestamps
     /**
      * Determine if the given model is ignoring timestamps / touches.
      *
-     * @param  string|null  $class
+     * @param  ?string  $class
      * @return bool
      */
     public static function isIgnoringTimestamps($class = null)

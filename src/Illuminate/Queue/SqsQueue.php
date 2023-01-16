@@ -64,7 +64,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     /**
      * Get the size of the queue.
      *
-     * @param  string|null  $queue
+     * @param  ?string  $queue
      * @return int
      */
     public function size($queue = null)
@@ -84,7 +84,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      *
      * @param  string  $job
      * @param  mixed  $data
-     * @param  string|null  $queue
+     * @param  ?string  $queue
      * @return mixed
      */
     public function push($job, $data = '', $queue = null)
@@ -104,7 +104,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      * Push a raw payload onto the queue.
      *
      * @param  string  $payload
-     * @param  string|null  $queue
+     * @param  ?string  $queue
      * @param  array  $options
      * @return mixed
      */
@@ -121,7 +121,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  string  $job
      * @param  mixed  $data
-     * @param  string|null  $queue
+     * @param  ?string  $queue
      * @return mixed
      */
     public function later($delay, $job, $data = '', $queue = null)
@@ -146,7 +146,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      *
      * @param  array  $jobs
      * @param  mixed  $data
-     * @param  string|null  $queue
+     * @param  ?string  $queue
      * @return void
      */
     public function bulk($jobs, $data = '', $queue = null)
@@ -163,7 +163,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     /**
      * Pop the next job off of the queue.
      *
-     * @param  string|null  $queue
+     * @param  ?string  $queue
      * @return \Illuminate\Contracts\Queue\Job|null
      */
     public function pop($queue = null)
@@ -199,7 +199,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     /**
      * Get the queue or return the default.
      *
-     * @param  string|null  $queue
+     * @param  ?string  $queue
      * @return string
      */
     public function getQueue($queue)

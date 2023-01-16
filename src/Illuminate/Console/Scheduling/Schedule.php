@@ -141,8 +141,8 @@ class Schedule
      * Add a new job callback event to the schedule.
      *
      * @param  object|string  $job
-     * @param  string|null  $queue
-     * @param  string|null  $connection
+     * @param  ?string  $queue
+     * @param  ?string  $connection
      * @return \Illuminate\Console\Scheduling\CallbackEvent
      */
     public function job($job, $queue = null, $connection = null)
@@ -162,8 +162,8 @@ class Schedule
      * Dispatch the given job to the queue.
      *
      * @param  object  $job
-     * @param  string|null  $queue
-     * @param  string|null  $connection
+     * @param  ?string  $queue
+     * @param  ?string  $connection
      * @return void
      *
      * @throws \RuntimeException
@@ -193,8 +193,8 @@ class Schedule
      * Dispatch the given unique job to the queue.
      *
      * @param  object  $job
-     * @param  string|null  $queue
-     * @param  string|null  $connection
+     * @param  ?string  $queue
+     * @param  ?string  $connection
      * @return void
      *
      * @throws \RuntimeException

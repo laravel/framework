@@ -83,7 +83,7 @@ class JoinClause extends Builder
      * on `contacts`.`user_id` = `users`.`id` and `contacts`.`info_id` = `info`.`id`
      *
      * @param  \Closure|string  $first
-     * @param  string|null  $operator
+     * @param  ?string  $operator
      * @param  \Illuminate\Database\Query\Expression|string|null  $second
      * @param  string  $boolean
      * @return $this
@@ -103,7 +103,7 @@ class JoinClause extends Builder
      * Add an "or on" clause to the join.
      *
      * @param  \Closure|string  $first
-     * @param  string|null  $operator
+     * @param  ?string  $operator
      * @param  \Illuminate\Database\Query\Expression|string|null  $second
      * @return \Illuminate\Database\Query\JoinClause
      */

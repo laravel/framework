@@ -36,7 +36,7 @@ trait DelegatesToResource
      * Retrieve the model for a bound value.
      *
      * @param  mixed  $value
-     * @param  string|null  $field
+     * @param  ?string  $field
      * @return void
      *
      * @throws \Exception
@@ -51,7 +51,7 @@ trait DelegatesToResource
      *
      * @param  string  $childType
      * @param  mixed  $value
-     * @param  string|null  $field
+     * @param  ?string  $field
      * @return void
      *
      * @throws \Exception

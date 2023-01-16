@@ -268,7 +268,7 @@ abstract class Relation implements BuilderContract
      * Get all of the primary keys for an array of models.
      *
      * @param  array  $models
-     * @param  string|null  $key
+     * @param  ?string  $key
      * @return array
      */
     protected function getKeys(array $models, $key = null)
@@ -468,7 +468,7 @@ abstract class Relation implements BuilderContract
      * Get the model associated with a custom polymorphic type.
      *
      * @param  string  $alias
-     * @return string|null
+     * @return ?string
      */
     public static function getMorphedModel($alias)
     {

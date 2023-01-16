@@ -17,7 +17,7 @@ class HandleExceptions
     /**
      * Reserved memory so that errors can be displayed properly on memory exhaustion.
      *
-     * @var string|null
+     * @var ?string
      */
     public static $reservedMemory;
 

@@ -119,7 +119,7 @@ class BroadcastManager implements FactoryContract
      * Get the socket ID for the given request.
      *
      * @param  \Illuminate\Http\Request|null  $request
-     * @return string|null
+     * @return ?string
      */
     public function socket($request = null)
     {
@@ -201,7 +201,7 @@ class BroadcastManager implements FactoryContract
     /**
      * Get a driver instance.
      *
-     * @param  string|null  $driver
+     * @param  ?string  $driver
      * @return mixed
      */
     public function connection($driver = null)
@@ -212,7 +212,7 @@ class BroadcastManager implements FactoryContract
     /**
      * Get a driver instance.
      *
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return mixed
      */
     public function driver($name = null)
@@ -408,7 +408,7 @@ class BroadcastManager implements FactoryContract
     /**
      * Disconnect the given disk and remove from local cache.
      *
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return void
      */
     public function purge($name = null)

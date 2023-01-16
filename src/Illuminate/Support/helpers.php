@@ -156,7 +156,7 @@ if (! function_exists('object_get')) {
      * Get an item from an object using "dot" notation.
      *
      * @param  object  $object
-     * @param  string|null  $key
+     * @param  ?string  $key
      * @param  mixed  $default
      * @return mixed
      */
@@ -265,7 +265,7 @@ if (! function_exists('str')) {
     /**
      * Get a new stringable object from the given string.
      *
-     * @param  string|null  $string
+     * @param  ?string  $string
      * @return \Illuminate\Support\Stringable|mixed
      */
     function str($string = null)

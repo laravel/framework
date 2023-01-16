@@ -18,7 +18,7 @@ class Composer
     /**
      * The working path to regenerate from.
      *
-     * @var string|null
+     * @var ?string
      */
     protected $workingPath;
 
@@ -26,7 +26,7 @@ class Composer
      * Create a new Composer manager instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
-     * @param  string|null  $workingPath
+     * @param  ?string  $workingPath
      * @return void
      */
     public function __construct(Filesystem $files, $workingPath = null)
@@ -111,7 +111,7 @@ class Composer
     /**
      * Get the version of Composer.
      *
-     * @return string|null
+     * @return ?string
      */
     public function getVersion()
     {

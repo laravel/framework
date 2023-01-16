@@ -62,7 +62,7 @@ class MailManager implements FactoryContract
     /**
      * Get a mailer instance by name.
      *
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return \Illuminate\Contracts\Mail\Mailer
      */
     public function mailer($name = null)
@@ -75,7 +75,7 @@ class MailManager implements FactoryContract
     /**
      * Get a mailer driver instance.
      *
-     * @param  string|null  $driver
+     * @param  ?string  $driver
      * @return \Illuminate\Mail\Mailer
      */
     public function driver($driver = null)
@@ -434,7 +434,7 @@ class MailManager implements FactoryContract
     /**
      * Disconnect the given mailer and remove from local cache.
      *
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return void
      */
     public function purge($name = null)

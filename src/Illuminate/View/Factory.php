@@ -314,7 +314,7 @@ class Factory implements FactoryContract
      * Get the extension used by the view file.
      *
      * @param  string  $path
-     * @return string|null
+     * @return ?string
      */
     protected function getExtension($path)
     {

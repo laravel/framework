@@ -21,7 +21,7 @@ class ValidateSignature
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
-     * @param  string|null  $relative
+     * @param  ?string  $relative
      * @return \Illuminate\Http\Response
      *
      * @throws \Illuminate\Routing\Exceptions\InvalidSignatureException

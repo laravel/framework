@@ -60,7 +60,7 @@ trait Interaction
     /**
      * Retrieve a prop within the current scope using "dot" notation.
      *
-     * @param  string|null  $key
+     * @param  ?string  $key
      * @return mixed
      */
     abstract protected function prop(string $key = null);

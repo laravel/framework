@@ -21,7 +21,7 @@ class EncryptedStore extends Store
      * @param  string  $name
      * @param  \SessionHandlerInterface  $handler
      * @param  \Illuminate\Contracts\Encryption\Encrypter  $encrypter
-     * @param  string|null  $id
+     * @param  ?string  $id
      * @param  string  $serialization
      * @return void
      */

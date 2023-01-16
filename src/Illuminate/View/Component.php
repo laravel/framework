@@ -384,7 +384,7 @@ abstract class Component
     /**
      * Get the evaluated view contents for the given view.
      *
-     * @param  string|null  $view
+     * @param  ?string  $view
      * @param  \Illuminate\Contracts\Support\Arrayable|array  $data
      * @param  array  $mergeData
      * @return \Illuminate\Contracts\View\View

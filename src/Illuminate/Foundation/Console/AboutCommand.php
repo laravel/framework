@@ -23,7 +23,7 @@ class AboutCommand extends Command
      *
      * This name is used to identify the command during lazy loading.
      *
-     * @var string|null
+     * @var ?string
      *
      * @deprecated
      */
@@ -225,7 +225,7 @@ class AboutCommand extends Command
      *
      * @param  string  $section
      * @param  callable|string|array  $data
-     * @param  string|null  $value
+     * @param  ?string  $value
      * @return void
      */
     public static function add(string $section, $data, string $value = null)
@@ -238,7 +238,7 @@ class AboutCommand extends Command
      *
      * @param  string  $section
      * @param  callable|string|array  $data
-     * @param  string|null  $value
+     * @param  ?string  $value
      * @return void
      */
     protected static function addToSection(string $section, $data, string $value = null)

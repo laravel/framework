@@ -168,7 +168,7 @@ interface Session
     /**
      * Get the previous URL from the session.
      *
-     * @return string|null
+     * @return ?string
      */
     public function previousUrl();
 

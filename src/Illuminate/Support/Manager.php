@@ -58,7 +58,7 @@ abstract class Manager
     /**
      * Get a driver instance.
      *
-     * @param  string|null  $driver
+     * @param  ?string  $driver
      * @return mixed
      *
      * @throws \InvalidArgumentException

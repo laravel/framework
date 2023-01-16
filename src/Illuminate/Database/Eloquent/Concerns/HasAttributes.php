@@ -1409,7 +1409,7 @@ trait HasAttributes
      * Convert a DateTime to a storable string.
      *
      * @param  mixed  $value
-     * @return string|null
+     * @return ?string
      */
     public function fromDateTime($value)
     {
@@ -1804,7 +1804,7 @@ trait HasAttributes
     /**
      * Get the model's original attribute values.
      *
-     * @param  string|null  $key
+     * @param  ?string  $key
      * @param  mixed  $default
      * @return mixed|array
      */
@@ -1818,7 +1818,7 @@ trait HasAttributes
     /**
      * Get the model's original attribute values.
      *
-     * @param  string|null  $key
+     * @param  ?string  $key
      * @param  mixed  $default
      * @return mixed|array
      */
@@ -1838,7 +1838,7 @@ trait HasAttributes
     /**
      * Get the model's raw original attribute values.
      *
-     * @param  string|null  $key
+     * @param  ?string  $key
      * @param  mixed  $default
      * @return mixed|array
      */

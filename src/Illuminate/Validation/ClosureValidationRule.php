@@ -23,7 +23,7 @@ class ClosureValidationRule implements RuleContract
     /**
      * The validation error message.
      *
-     * @var string|null
+     * @var ?string
      */
     public $message;
 

@@ -74,7 +74,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      * Determine if a translation exists for a given locale.
      *
      * @param  string  $key
-     * @param  string|null  $locale
+     * @param  ?string  $locale
      * @return bool
      */
     public function hasForLocale($key, $locale = null)
@@ -86,7 +86,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      * Determine if a translation exists.
      *
      * @param  string  $key
-     * @param  string|null  $locale
+     * @param  ?string  $locale
      * @param  bool  $fallback
      * @return bool
      */
@@ -100,7 +100,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      *
      * @param  string  $key
      * @param  array  $replace
-     * @param  string|null  $locale
+     * @param  ?string  $locale
      * @param  bool  $fallback
      * @return string|array
      */
@@ -147,7 +147,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      * @param  string  $key
      * @param  \Countable|int|array  $number
      * @param  array  $replace
-     * @param  string|null  $locale
+     * @param  ?string  $locale
      * @return string
      */
     public function choice($key, $number, array $replace = [], $locale = null)
@@ -173,7 +173,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     /**
      * Get the proper locale for a choice operation.
      *
-     * @param  string|null  $locale
+     * @param  ?string  $locale
      * @return string
      */
     protected function localeForChoice($locale)
@@ -327,7 +327,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     /**
      * Get the array of locales to be checked.
      *
-     * @param  string|null  $locale
+     * @param  ?string  $locale
      * @return array
      */
     protected function localeArray($locale)

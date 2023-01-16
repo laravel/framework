@@ -107,7 +107,7 @@ class Mailer implements MailerContract, MailQueueContract
      * Set the global from address and name.
      *
      * @param  string  $address
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return void
      */
     public function alwaysFrom($address, $name = null)
@@ -119,7 +119,7 @@ class Mailer implements MailerContract, MailQueueContract
      * Set the global reply-to address and name.
      *
      * @param  string  $address
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return void
      */
     public function alwaysReplyTo($address, $name = null)
@@ -142,7 +142,7 @@ class Mailer implements MailerContract, MailQueueContract
      * Set the global to address and name.
      *
      * @param  string  $address
-     * @param  string|null  $name
+     * @param  ?string  $name
      * @return void
      */
     public function alwaysTo($address, $name = null)
@@ -401,7 +401,7 @@ class Mailer implements MailerContract, MailQueueContract
      * Queue a new e-mail message for sending.
      *
      * @param  \Illuminate\Contracts\Mail\Mailable|string|array  $view
-     * @param  string|null  $queue
+     * @param  ?string  $queue
      * @return mixed
      *
      * @throws \InvalidArgumentException
@@ -450,7 +450,7 @@ class Mailer implements MailerContract, MailQueueContract
      *
      * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  \Illuminate\Contracts\Mail\Mailable  $view
-     * @param  string|null  $queue
+     * @param  ?string  $queue
      * @return mixed
      *
      * @throws \InvalidArgumentException

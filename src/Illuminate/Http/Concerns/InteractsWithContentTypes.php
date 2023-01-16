@@ -77,7 +77,7 @@ trait InteractsWithContentTypes
      * Return the most suitable content type from the given array based on content negotiation.
      *
      * @param  string|array  $contentTypes
-     * @return string|null
+     * @return ?string
      */
     public function prefers($contentTypes)
     {

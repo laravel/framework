@@ -17,7 +17,7 @@ class CacheCommandMutex implements CommandMutex
     /**
      * The cache store that should be used.
      *
-     * @var string|null
+     * @var ?string
      */
     public $store = null;
 
@@ -86,7 +86,7 @@ class CacheCommandMutex implements CommandMutex
     /**
      * Specify the cache store that should be used.
      *
-     * @param  string|null  $store
+     * @param  ?string  $store
      * @return $this
      */
     public function useStore($store)
