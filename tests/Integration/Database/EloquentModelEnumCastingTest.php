@@ -32,9 +32,9 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
     {
         DB::table('enum_casts')->insert([
             'string_status' => 'pending',
-            'string_status_array' => json_encode(['pending','done']),
+            'string_status_array' => json_encode(['pending', 'done']),
             'integer_status' => 1,
-            'integer_status_array' => json_encode([1,2]),
+            'integer_status_array' => json_encode([1, 2]),
             'arrayable_status' => 'pending',
         ]);
 
