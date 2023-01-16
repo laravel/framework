@@ -617,6 +617,17 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Count the number of items in the collection by a field or using a callback.
+     *
+     * @param  (callable(TValue, TKey): mixed)|string|null  $countBy
+     * @return \Illuminate\Support\Collection<array-key, int>
+     */
+    public function countBy($countBy = null)
+    {
+        return $this->toBase()->countBy($countBy);
+    }
+
+    /**
      * Collapse the collection of items into a single array.
      *
      * @return \Illuminate\Support\Collection<int, mixed>
