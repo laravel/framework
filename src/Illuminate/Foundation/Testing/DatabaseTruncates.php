@@ -32,7 +32,17 @@ trait DatabaseTruncates
         }
 
         // Seed the database on subsequent runs.
-        $this->artisan('db:seed', ['--class' => $this->seeder()]);
+        if ($seeder = $this->seeder()) {
+            // Use a specific seeder class.
+            $this->artisan('db:seed', ['--class' => $seeder]);
+
+            return;
+        }
+
+        if ($this->shouldSeed()) {
+            // Use the default seeder class.
+            $this->artisan('db:seed');
+        }
     }
 
     protected function excludeTables()
