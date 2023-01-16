@@ -582,41 +582,6 @@ class Collection extends BaseCollection implements QueueableCollection
      */
 
     /**
-     * Get an array with the values of a given key.
-     *
-     * @param  string|array<array-key, string>  $value
-     * @param  string|null  $key
-     * @return \Illuminate\Support\Collection<array-key, mixed>
-     */
-    public function pluck($value, $key = null)
-    {
-        return $this->toBase()->pluck($value, $key);
-    }
-
-    /**
-     * Get the keys of the collection items.
-     *
-     * @return \Illuminate\Support\Collection<int, TKey>
-     */
-    public function keys()
-    {
-        return $this->toBase()->keys();
-    }
-
-    /**
-     * Zip the collection together with one or more arrays.
-     *
-     * @template TZipValue
-     *
-     * @param  \Illuminate\Contracts\Support\Arrayable<array-key, TZipValue>|iterable<array-key, TZipValue>  ...$items
-     * @return \Illuminate\Support\Collection<int, \Illuminate\Support\Collection<int, TModel|TZipValue>>
-     */
-    public function zip($items)
-    {
-        return $this->toBase()->zip(...func_get_args());
-    }
-
-    /**
      * Count the number of items in the collection by a field or using a callback.
      *
      * @param  (callable(TValue, TKey): mixed)|string|null  $countBy
@@ -659,6 +624,16 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Get the keys of the collection items.
+     *
+     * @return \Illuminate\Support\Collection<int, TKey>
+     */
+    public function keys()
+    {
+        return $this->toBase()->keys();
+    }
+
+    /**
      * Pad collection to the specified length with a value.
      *
      * @template TPadValue
@@ -670,6 +645,31 @@ class Collection extends BaseCollection implements QueueableCollection
     public function pad($size, $value)
     {
         return $this->toBase()->pad($size, $value);
+    }
+
+    /**
+     * Get an array with the values of a given key.
+     *
+     * @param  string|array<array-key, string>  $value
+     * @param  string|null  $key
+     * @return \Illuminate\Support\Collection<array-key, mixed>
+     */
+    public function pluck($value, $key = null)
+    {
+        return $this->toBase()->pluck($value, $key);
+    }
+
+    /**
+     * Zip the collection together with one or more arrays.
+     *
+     * @template TZipValue
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable<array-key, TZipValue>|iterable<array-key, TZipValue>  ...$items
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Support\Collection<int, TModel|TZipValue>>
+     */
+    public function zip($items)
+    {
+        return $this->toBase()->zip(...func_get_args());
     }
 
     /**
