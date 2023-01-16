@@ -99,7 +99,7 @@ class StubPublishCommand extends Command
         app('events')->dispatch($event);
 
         foreach ($event->getStubs() as $from => $to) {
-            $to = $stubsPath . DIRECTORY_SEPARATOR . ltrim($to, DIRECTORY_SEPARATOR);
+            $to = $stubsPath.DIRECTORY_SEPARATOR.ltrim($to, DIRECTORY_SEPARATOR);
 
             if ((! $this->option('existing') && (! file_exists($to) || $this->option('force')))
                 || ($this->option('existing') && file_exists($to))) {

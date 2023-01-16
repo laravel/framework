@@ -16,7 +16,7 @@ class CollectStubsForPublishing
     /**
      * Create a new event instance.
      *
-     * @param array $stubs
+     * @param  array  $stubs
      */
     public function __construct($stubs)
     {
@@ -26,8 +26,8 @@ class CollectStubsForPublishing
     /**
      * Add a new stub for publishing.
      *
-     * @param string $filpath
-     * @param string $name
+     * @param  string  $filpath
+     * @param  string  $name
      *
      * @return $this
      */
