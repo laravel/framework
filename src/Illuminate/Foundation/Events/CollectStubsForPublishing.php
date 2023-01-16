@@ -28,7 +28,6 @@ class CollectStubsForPublishing
      *
      * @param  string  $filpath
      * @param  string  $name
-     *
      * @return $this
      */
     public function addStub($filpath, $name)
