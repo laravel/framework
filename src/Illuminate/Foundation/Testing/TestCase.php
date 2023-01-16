@@ -223,6 +223,7 @@ abstract class TestCase extends BaseTestCase
         Component::forgetFactory();
         Queue::createPayloadUsing(null);
         HandleExceptions::forgetApp();
+        Str::createUuidsNormally();
 
         if ($this->callbackException) {
             throw $this->callbackException;
