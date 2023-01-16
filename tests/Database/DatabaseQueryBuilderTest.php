@@ -1983,15 +1983,15 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectErrorMessage('Non-numeric value passed as increment amount for column: \'col\'.');
         $builder = $this->getBuilder();
-        $builder->from('users')->incrementColumns(['col' => 'a']);
+        $builder->from('users')->incrementEach(['col' => 'a']);
     }
 
     public function testIncrementManyArgumentValidation2()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectErrorMessage('Non-associative array passed to incrementMany method.');
+        $this->expectErrorMessage('Non-associative array passed to incrementEach method.');
         $builder = $this->getBuilder();
-        $builder->from('users')->incrementColumns([11 => 11]);
+        $builder->from('users')->incrementEach([11 => 11]);
     }
 
     public function testWhereNotWithArrayConditions()

@@ -54,7 +54,7 @@ class QueryBuilderTest extends DatabaseTestCase
         $connection = DB::table('accounting')->getConnection();
         $connection->enableQueryLog();
 
-        DB::table('accounting')->where('user_id', 2)->incrementColumns([
+        DB::table('accounting')->where('user_id', 2)->incrementEach([
             'wallet_1' => 10,
             'wallet_2' => -20,
         ], ['name' => 'foo']);
@@ -83,7 +83,7 @@ class QueryBuilderTest extends DatabaseTestCase
         ], (array) $rows[1]);
 
         // without the second argument.
-        $affectedRowsCount = DB::table('accounting')->where('user_id', 2)->incrementColumns([
+        $affectedRowsCount = DB::table('accounting')->where('user_id', 2)->incrementEach([
             'wallet_1' => 20,
             'wallet_2' => 20,
         ]);
@@ -101,7 +101,7 @@ class QueryBuilderTest extends DatabaseTestCase
         ], (array) $rows[1]);
 
         // Test Can affect multiple rows at once.
-        $affectedRowsCount = DB::table('accounting')->incrementColumns([
+        $affectedRowsCount = DB::table('accounting')->incrementEach([
             'wallet_1' => 31.5,
             'wallet_2' => '-32.5',
         ]);
@@ -126,7 +126,7 @@ class QueryBuilderTest extends DatabaseTestCase
         ], (array) $rows[1]);
 
         // In case of a conflict, the second argument wins and sets a fixed value:
-        $affectedRowsCount = DB::table('accounting')->incrementColumns([
+        $affectedRowsCount = DB::table('accounting')->incrementEach([
             'wallet_1' => 3000,
         ], ['wallet_1' => 1.5]);
 
