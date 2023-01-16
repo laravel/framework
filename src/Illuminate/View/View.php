@@ -10,6 +10,8 @@ use Illuminate\Contracts\Support\MessageProvider;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Contracts\View\Engine;
 use Illuminate\Contracts\View\View as ViewContract;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Enumerable;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
@@ -91,6 +93,22 @@ class View implements ArrayAccess, Htmlable, ViewContract
     }
 
     /**
+     * Get the evaluated contents for a given array of fragments.
+     *
+     * @param  mixed  $fragments
+     * @return string
+     */
+    public function fragments($fragments)
+    {
+        return collect(is_array($fragments)
+            ? $fragments
+            : func_get_args()
+        )->map(function ($fragment) {
+            return $this->fragment($fragment);
+        })->implode('');
+    }
+
+    /**
      * Get the evaluated contents of a given fragment if the given condition is true.
      *
      * @param  bool  $boolean
@@ -101,6 +119,22 @@ class View implements ArrayAccess, Htmlable, ViewContract
     {
         if (value($boolean)) {
             return $this->fragment($fragment);
+        }
+
+        return $this->render();
+    }
+
+    /**
+     * Get the evaluated contents for a given array of fragments if the given condition is true.
+     *
+     * @param  bool  $boolean
+     * @param  string[]  ...$fragments
+     * @return string
+     */
+    public function fragmentsIf($boolean, ...$fragments)
+    {
+        if (value($boolean)) {
+            return $this->fragments(...$fragments);
         }
 
         return $this->render();
