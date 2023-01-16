@@ -99,7 +99,7 @@ class View implements ArrayAccess, Htmlable, ViewContract
      */
     public function fragmentIf($boolean, $fragment)
     {
-        if ($boolean) {
+        if (value($boolean)) {
             return $this->fragment($fragment);
         }
 
