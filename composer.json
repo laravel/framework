@@ -21,7 +21,7 @@
         "brick/math": "^0.10.2",
         "doctrine/inflector": "^2.0",
         "dragonmantank/cron-expression": "^3.3.2",
-        "egulias/email-validator": "^3.2.1",
+        "egulias/email-validator": "^3.2.1|^4.0",
         "fruitcake/php-cors": "^1.2",
         "laravel/serializable-closure": "^1.2.2",
         "league/commonmark": "^2.2.1",
