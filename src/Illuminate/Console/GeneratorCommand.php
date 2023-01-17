@@ -7,6 +7,7 @@ use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Finder\Finder;
 
 abstract class GeneratorCommand extends Command implements PromptsForMissingInput
 {
@@ -232,6 +233,40 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
         return is_dir(app_path('Models'))
                     ? $rootNamespace.'Models\\'.$model
                     : $rootNamespace.$model;
+    }
+
+    /**
+     * Get a list of possible model names.
+     *
+     * @return array<int, string>
+     */
+    protected function possibleModels()
+    {
+        $modelPath = is_dir(app_path('Models')) ? app_path('Models') : app_path();
+
+        return collect((new Finder)->files()->depth(0)->in($modelPath))
+            ->map(fn ($file) => $file->getBasename('.php'))
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Get a list of possible event names.
+     *
+     * @return array<int, string>
+     */
+    protected function possibleEvents()
+    {
+        $eventPath = app_path('Events');
+
+        if (! is_dir($eventPath)) {
+            return [];
+        }
+
+        return collect((new Finder)->files()->depth(0)->in($eventPath))
+            ->map(fn ($file) => $file->getBasename('.php'))
+            ->values()
+            ->all();
     }
 
     /**
