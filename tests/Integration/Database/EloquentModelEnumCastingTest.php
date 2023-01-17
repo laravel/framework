@@ -121,15 +121,15 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
 
         $model->save();
 
-        $this->assertEquals((object) [
+        $this->assertEquals([
             'id' => $model->id,
             'string_status' => 'pending',
             'string_status_array' => json_encode(['pending', 'done']),
             'integer_status' => 1,
             'integer_status_array' => json_encode([1, 2]),
             'arrayable_status' => 'pending',
-        ], (object) collect(DB::table('enum_casts')->where('id', $model->id)->first())->map(function ($value) {
-            return str_replace(',', ', ', str_replace(', ', ',', $value));
+        ], collect(DB::table('enum_casts')->where('id', $model->id)->first())->map(function ($value) {
+            return str_replace(', ', ',', $value);
         })->all());
     }
 
@@ -145,15 +145,15 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
 
         $model->save();
 
-        $this->assertEquals((object) [
+        $this->assertEquals([
             'id' => $model->id,
             'string_status' => 'pending',
             'string_status_array' => json_encode(['pending', 'done']),
             'integer_status' => 1,
             'integer_status_array' => json_encode([1, 2]),
             'arrayable_status' => 'pending',
-        ], (object) collect(DB::table('enum_casts')->where('id', $model->id)->first())->map(function ($value) {
-            return str_replace(',', ', ', str_replace(', ', ',', $value));
+        ], collect(DB::table('enum_casts')->where('id', $model->id)->first())->map(function ($value) {
+            return str_replace(', ', ',', $value);
         })->all());
     }
 
