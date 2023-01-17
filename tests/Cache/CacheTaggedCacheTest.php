@@ -5,12 +5,8 @@ namespace Illuminate\Tests\Cache;
 use DateInterval;
 use DateTime;
 use Illuminate\Cache\ArrayStore;
-use Illuminate\Cache\RedisTaggedCache;
-use Illuminate\Cache\TagSet;
-use Illuminate\Contracts\Cache\Store;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 
 class CacheTaggedCacheTest extends TestCase
 {
