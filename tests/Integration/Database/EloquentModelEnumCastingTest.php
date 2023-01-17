@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 if (PHP_VERSION_ID >= 80100) {
     include 'Enums.php';
@@ -127,7 +128,9 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
             'integer_status' => 1,
             'integer_status_array' => json_encode([1, 2]),
             'arrayable_status' => 'pending',
-        ], DB::table('enum_casts')->where('id', $model->id)->first());
+        ], collect(DB::table('enum_casts')->where('id', $model->id)->first())->map(function ($value) {
+            return str_replace(',', ', ', str_replace(', ', ',', $value));
+        })->all());
     }
 
     public function testEnumsAreNotConvertedOnSaveWhenAlreadyCorrect()
@@ -149,7 +152,9 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
             'integer_status' => 1,
             'integer_status_array' => json_encode([1, 2]),
             'arrayable_status' => 'pending',
-        ], DB::table('enum_casts')->where('id', $model->id)->first());
+        ], collect(DB::table('enum_casts')->where('id', $model->id)->first())->map(function ($value) {
+            return str_replace(',', ', ', str_replace(', ', ',', $value));
+        })->all());
     }
 
     public function testEnumsAcceptNullOnSave()
