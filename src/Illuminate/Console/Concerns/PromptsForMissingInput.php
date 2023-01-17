@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console\Concerns;
 
+use Illuminate\Contracts\Console\PromptsForMissingInput as PromptsForMissingInputContract;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -18,7 +19,9 @@ trait PromptsForMissingInput
     {
         parent::interact($input, $output);
 
-        $this->promptForMissingArguments($input, $output);
+        if ($this instanceof PromptsForMissingInputContract) {
+            $this->promptForMissingArguments($input, $output);
+        }
     }
 
     /**

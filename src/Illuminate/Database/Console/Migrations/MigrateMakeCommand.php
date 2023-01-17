@@ -2,15 +2,13 @@
 
 namespace Illuminate\Database\Console\Migrations;
 
-use Illuminate\Console\Concerns\PromptsForMissingInput;
+use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Illuminate\Database\Migrations\MigrationCreator;
 use Illuminate\Support\Composer;
 use Illuminate\Support\Str;
 
-class MigrateMakeCommand extends BaseCommand
+class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
 {
-    use PromptsForMissingInput;
-
     /**
      * The console command signature.
      *

@@ -3,14 +3,13 @@
 namespace Illuminate\Console;
 
 use Illuminate\Console\Concerns\CreatesMatchingTest;
+use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputArgument;
 
-abstract class GeneratorCommand extends Command
+abstract class GeneratorCommand extends Command implements PromptsForMissingInput
 {
-    use Concerns\PromptsForMissingInput;
-
     /**
      * The filesystem instance.
      *
