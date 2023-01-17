@@ -1,6 +1,29 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.47.0...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.48.0...9.x)
+
+
+## [v9.48.0](https://github.com/laravel/framework/compare/v9.47.0...v9.48.0) - 2023-01-17
+
+### Added
+- Added `Illuminate/Database/Schema/Builder::withoutForeignKeyConstraints()` ([#45601](https://github.com/laravel/framework/pull/45601))
+- Added `fragments()` \ `fragmentIf()` \ `fragmentsIf()` methods to `Illuminate/View/View.php` class ([#45656](https://github.com/laravel/framework/pull/45656), [#45669](https://github.com/laravel/framework/pull/45669))
+- Added `incrementEach()` and `decrementEach()` to `Illuminate/Database/Query/Builder` ([#45577](https://github.com/laravel/framework/pull/45577))
+- Added ability to drop an index when modifying a column ([#45513](https://github.com/laravel/framework/pull/45513))
+- Allow to set HTTP client for mailers ([#45684](https://github.com/laravel/framework/pull/45684))
+- Added 402 exception view ([#45682](https://github.com/laravel/framework/pull/45682))
+- Added `notFound()` helper to Http Client response ([#45681](https://github.com/laravel/framework/pull/45681))
+
+### Fixed
+- Fixed decimal cast ([#45602](https://github.com/laravel/framework/pull/45602))
+
+### Changed
+- Ignore whitespaces/newlines when finding relations in model:show command ([#45608](https://github.com/laravel/framework/pull/45608))
+- Fail queued job with a string messag ([#45625](https://github.com/laravel/framework/pull/45625))
+- Allow fake() helper in unit tests ([#45624](https://github.com/laravel/framework/pull/45624))
+- allow egulias/email-validator v4 ([#45649](https://github.com/laravel/framework/pull/45649))
+- Force countBy method in EloquentCollection to return base collection ([#45663](https://github.com/laravel/framework/pull/45663))
+- Allow for the collection of stubs to be published ([#45653](https://github.com/laravel/framework/pull/45653))
 
 
 ## [v9.47.0](https://github.com/laravel/framework/compare/v9.46.0...v9.47.0) - 2023-01-10
