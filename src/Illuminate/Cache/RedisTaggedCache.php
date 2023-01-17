@@ -5,6 +5,24 @@ namespace Illuminate\Cache;
 class RedisTaggedCache extends TaggedCache
 {
     /**
+     * Store an item in the cache if the key does not exist.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
+     * @return bool
+     */
+    public function add($key, $value, $ttl = null)
+    {
+        $this->tags->addEntry(
+            $this->itemKey($key),
+            ! is_null($ttl) ? $this->getSeconds($ttl) : 0
+        );
+
+        return parent::add($key, $value, $ttl);
+    }
+
+    /**
      * Store an item in the cache.
      *
      * @param  string  $key
@@ -35,7 +53,7 @@ class RedisTaggedCache extends TaggedCache
      */
     public function increment($key, $value = 1)
     {
-        $this->tags->addEntry($this->itemKey($key));
+        $this->tags->addEntry($this->itemKey($key), updateWhen: 'GT');
 
         return parent::increment($key, $value);
     }
@@ -49,7 +67,7 @@ class RedisTaggedCache extends TaggedCache
      */
     public function decrement($key, $value = 1)
     {
-        $this->tags->addEntry($this->itemKey($key));
+        $this->tags->addEntry($this->itemKey($key), updateWhen: 'GT');
 
         return parent::decrement($key, $value);
     }

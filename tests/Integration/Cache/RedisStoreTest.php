@@ -94,6 +94,25 @@ class RedisStoreTest extends TestCase
         $this->assertEquals(0, Cache::store('redis')->tags(['votes'])->get('person-1'));
     }
 
+    public function testIncrementedTagEntriesProperlyTurnStale()
+    {
+        Cache::store('redis')->clear();
+
+        Cache::store('redis')->tags(['votes'])->add('person-1', 0, $seconds = 1);
+        Cache::store('redis')->tags(['votes'])->increment('person-1');
+        Cache::store('redis')->tags(['votes'])->increment('person-1');
+
+        sleep(2);
+
+        Cache::store('redis')->tags(['votes'])->flushStale();
+
+        $keyCount = Cache::store('redis')->connection()->keys('*');
+        // var_dump($keyCount);
+        // var_dump(Cache::store('redis')->tags(['votes'])->getTags()->entries()->all());
+        // var_dump(Cache::store('redis')->tags(['votes'])->getTags()->entries()->all());
+        $this->assertEquals(0, count($keyCount));
+    }
+
     public function testTagsCanBeFlushedBySingleKey()
     {
         Cache::store('redis')->clear();
@@ -120,7 +139,7 @@ class RedisStoreTest extends TestCase
         sleep(2);
 
         // Add a non-stale entry to people...
-        Cache::store('redis')->tags(['people', 'author'])->put('person-3', 'Jennifer', 1);
+        Cache::store('redis')->tags(['people', 'author'])->put('person-3', 'Jennifer', 5);
 
         Cache::store('redis')->tags(['people'])->flushStale();
 

@@ -11,14 +11,19 @@ class RedisTagSet extends TagSet
      *
      * @param  string  $key
      * @param  int  $ttl
+     * @param  string  $updateWhen
      * @return void
      */
-    public function addEntry(string $key, int $ttl = 0)
+    public function addEntry(string $key, int $ttl = 0, $updateWhen = null)
     {
         $ttl = $ttl > 0 ? now()->addSeconds($ttl)->getTimestamp() : -1;
 
         foreach ($this->tagIds() as $tagKey) {
-            $this->store->connection()->zadd($this->store->getPrefix().$tagKey, $ttl, $key);
+            if ($updateWhen) {
+                $this->store->connection()->zadd($this->store->getPrefix().$tagKey, $updateWhen, $ttl, $key);
+            } else {
+                $this->store->connection()->zadd($this->store->getPrefix().$tagKey, $ttl, $key);
+            }
         }
     }
 
