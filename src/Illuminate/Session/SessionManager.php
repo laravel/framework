@@ -13,7 +13,7 @@ class SessionManager extends Manager
      * Call a custom driver creator.
      *
      * @param  string  $driver
-     * @return mixed
+     * @return \Illuminate\Session\Store
      */
     protected function callCustomCreator($driver)
     {
