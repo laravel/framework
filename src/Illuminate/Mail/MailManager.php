@@ -169,7 +169,7 @@ class MailManager implements FactoryContract
      */
     protected function createSmtpTransport(array $config)
     {
-        $factory = new EsmtpTransportFactory();
+        $factory = new EsmtpTransportFactory;
 
         $transport = $factory->create(new Dsn(
             ! empty($config['encryption']) && $config['encryption'] === 'tls' ? (($config['port'] == 465) ? 'smtps' : 'smtp') : '',
