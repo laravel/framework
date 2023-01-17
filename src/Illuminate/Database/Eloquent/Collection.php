@@ -584,7 +584,7 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Count the number of items in the collection by a field or using a callback.
      *
-     * @param  (callable(TValue, TKey): array-key)|string|null  $countBy
+     * @param  (callable(TModel, TKey): array-key)|string|null  $countBy
      * @return \Illuminate\Support\Collection<array-key, int>
      */
     public function countBy($countBy = null)
@@ -676,7 +676,7 @@ class Collection extends BaseCollection implements QueueableCollection
      * Get the comparison function to detect duplicates.
      *
      * @param  bool  $strict
-     * @return callable(TValue, TValue): bool
+     * @return callable(TModel, TModel): bool
      */
     protected function duplicateComparator($strict)
     {
