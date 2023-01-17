@@ -13,6 +13,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunTransportFactory;
 use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkTransportFactory;
 use Symfony\Component\Mailer\Transport\Dsn;
@@ -223,7 +224,7 @@ class MailManager implements FactoryContract
      * Create an instance of the Symfony Amazon SES Transport driver.
      *
      * @param  array  $config
-     * @return \Symfony\Component\Mailer\Bridge\Amazon\Transport\SesApiAsyncAwsTransport
+     * @return \Illuminate\Mail\Transport\SesTransport
      */
     protected function createSesTransport(array $config)
     {
@@ -274,7 +275,7 @@ class MailManager implements FactoryContract
      */
     protected function createMailgunTransport(array $config)
     {
-        $factory = new MailgunTransportFactory();
+        $factory = new MailgunTransportFactory(null, $this->getHttpClient($config));
 
         if (! isset($config['secret'])) {
             $config = $this->app['config']->get('services.mailgun', []);
@@ -296,7 +297,7 @@ class MailManager implements FactoryContract
      */
     protected function createPostmarkTransport(array $config)
     {
-        $factory = new PostmarkTransportFactory();
+        $factory = new PostmarkTransportFactory(null, $this->getHttpClient($config));
 
         $options = isset($config['message_stream_id'])
                     ? ['message_stream' => $config['message_stream_id']]
@@ -367,6 +368,21 @@ class MailManager implements FactoryContract
     protected function createArrayTransport()
     {
         return new ArrayTransport;
+    }
+
+    /**
+     * Get a configured Symfony HTTP client instance.
+     *
+     * @return \Symfony\Contracts\HttpClient\HttpClientInterface|null
+     */
+    protected function getHttpClient(array $config)
+    {
+        if ($options = ($config['client'] ?? false)) {
+            $maxHostConnections = Arr::pull($options, 'max_host_connections', 6);
+            $maxPendingPushes = Arr::pull($options, 'max_pending_pushes', 50);
+
+            return HttpClient::create($options, $maxHostConnections, $maxPendingPushes);
+        }
     }
 
     /**

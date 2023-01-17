@@ -28,8 +28,8 @@ use Illuminate\Contracts\Auth\Access\Gate as GateContract;
  * @method static array abilities()
  * @method static array policies()
  * @method static \Illuminate\Auth\Access\Gate setContainer(\Illuminate\Contracts\Container\Container $container)
- * @method static \Illuminate\Auth\Access\Response denyWithStatus(int $status, ?string $message = null, ?int $code = null)
- * @method static \Illuminate\Auth\Access\Response denyAsNotFound(?string $message = null, ?int $code = null)
+ * @method static \Illuminate\Auth\Access\Response denyWithStatus(int $status, string|null $message = null, int|null $code = null)
+ * @method static \Illuminate\Auth\Access\Response denyAsNotFound(string|null $message = null, int|null $code = null)
  *
  * @see \Illuminate\Auth\Access\Gate
  */

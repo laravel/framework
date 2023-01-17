@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Validation;
 
+use Countable;
 use DateTime;
 use DateTimeImmutable;
 use Egulias\EmailValidator\Validation\NoRFCWarningsValidation;
@@ -1635,6 +1636,77 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
         $this->assertTrue($v->messages()->has('foo.0.email'));
         $this->assertFalse($v->messages()->has('foo.1.email'));
+    }
+
+    /** @dataProvider prohibitedRulesData */
+    public function testProhibitedRulesAreConsistent($rules, $data, $result)
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $this->assertSame($result, (new Validator($trans, $data, $rules))->passes());
+    }
+
+    public function prohibitedRulesData()
+    {
+        $emptyCountable = new class implements Countable
+        {
+            public function count()
+            {
+                return 0;
+            }
+        };
+
+        return [
+            // prohibited...
+            // correct as per the docs. potentially incorrect behaviour.
+            [['p' => 'prohibited'], [], true],
+            [['p' => 'prohibited'], ['p' => ''], true],
+            [['p' => 'prohibited'], ['p' => ' '], true],
+            [['p' => 'prohibited'], ['p' => null], false],
+            [['p' => 'prohibited'], ['p' => []], false],
+            [['p' => 'prohibited'], ['p' => $emptyCountable], false],
+            [['p' => 'prohibited'], ['p' => 'foo'], false],
+
+            // prohibited_if...
+            // incorrect as per the docs. incorrect behaviour.
+            [['p' => 'prohibited_if:bar,1'], ['bar' => 1], true],
+            [['p' => 'prohibited_if:bar,1'], ['bar' => 1, 'p' => ''], true],
+            [['p' => 'prohibited_if:bar,1'], ['bar' => 1, 'p' => ' '], true],
+            [['p' => 'prohibited_if:bar,1'], ['bar' => 1, 'p' => null], true],
+            [['p' => 'prohibited_if:bar,1'], ['bar' => 1, 'p' => []], true],
+            [['p' => 'prohibited_if:bar,1'], ['bar' => 1, 'p' => $emptyCountable], true],
+            [['p' => 'prohibited_if:bar,1'], ['bar' => 1, 'p' => 'foo'], false],
+
+            // prohibited_unless...
+            // incorrect as per the docs.
+            [['p' => 'prohibited_unless:bar,1'], ['bar' => 2], true],
+            [['p' => 'prohibited_unless:bar,1'], ['bar' => 2, 'p' => ''], true],
+            [['p' => 'prohibited_unless:bar,1'], ['bar' => 2, 'p' => ' '], true],
+            [['p' => 'prohibited_unless:bar,1'], ['bar' => 2, 'p' => null], true],
+            [['p' => 'prohibited_unless:bar,1'], ['bar' => 2, 'p' => []], true],
+            [['p' => 'prohibited_unless:bar,1'], ['bar' => 2, 'p' => $emptyCountable], true],
+            [['p' => 'prohibited_unless:bar,1'], ['bar' => 2, 'p' => 'foo'], false],
+
+            // prohibites, with "p" values...
+            // matches the first one, but is incorrect as per the docs.
+            [['p' => 'prohibits:bar'], [], true],
+            [['p' => 'prohibits:bar'], ['bar' => 2, 'p' => ''], true],
+            [['p' => 'prohibits:bar'], ['bar' => 2, 'p' => ' '], true],
+            [['p' => 'prohibits:bar'], ['bar' => 2, 'p' => null], false],
+            [['p' => 'prohibits:bar'], ['bar' => 2, 'p' => []], false],
+            [['p' => 'prohibits:bar'], ['bar' => 2, 'p' => $emptyCountable], false],
+            [['p' => 'prohibits:bar'], ['bar' => 2, 'p' => 'foo'], false],
+
+            // prohibites, with "bar" values...
+            // correct, and correct per the docs.
+            [['p' => 'prohibits:bar'], ['p' => 'foo'], true],
+            [['p' => 'prohibits:bar'], ['bar' => '', 'p' => 'foo'], false],
+            [['p' => 'prohibits:bar'], ['bar' => ' ', 'p' => 'foo'], false],
+            [['p' => 'prohibits:bar'], ['bar' => null, 'p' => 'foo'], false],
+            [['p' => 'prohibits:bar'], ['bar' => [], 'p' => 'foo'], false],
+            [['p' => 'prohibits:bar'], ['bar' => $emptyCountable, 'p' => 'foo'], false],
+            [['p' => 'prohibits:bar'], ['bar' => 'foo', 'p' => 'foo'], false],
+        ];
     }
 
     public function testFailedFileUploads()

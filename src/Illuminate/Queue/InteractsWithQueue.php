@@ -40,17 +40,21 @@ trait InteractsWithQueue
     /**
      * Fail the job from the queue.
      *
-     * @param  \Throwable|null  $exception
+     * @param  \Throwable|string|null  $exception
      * @return void
      */
     public function fail($exception = null)
     {
+        if (is_string($exception)) {
+            $exception = new ManuallyFailedException($exception);
+        }
+
         if ($exception instanceof Throwable || is_null($exception)) {
             if ($this->job) {
                 return $this->job->fail($exception);
             }
         } else {
-            throw new InvalidArgumentException('The fail method requires an instance of Throwable.');
+            throw new InvalidArgumentException('The fail method requires a string or an instance of Throwable.');
         }
     }
 

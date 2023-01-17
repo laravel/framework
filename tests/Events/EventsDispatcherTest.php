@@ -546,6 +546,78 @@ class EventsDispatcherTest extends TestCase
 
         unset($_SERVER['__event.test']);
     }
+
+    public function testInvokeIsCalled()
+    {
+        // Only "handle" is called when both "handle" and "__invoke" exist on listener.
+        $_SERVER['__event.test'] = [];
+        $d = new Dispatcher;
+        $d->listen('myEvent', TestListenerInvokeyHandler::class);
+        $d->dispatch('myEvent');
+        $this->assertEquals(['__construct', 'handle'], $_SERVER['__event.test']);
+
+        // "__invoke" is called when there is no handle.
+        $_SERVER['__event.test'] = [];
+        $d = new Dispatcher;
+        $d->listen('myEvent', TestListenerInvokey::class);
+        $d->listen('myEvent', TestListenerInvokeyHandler::class);
+        $d->dispatch('myEvent', 'somePayload');
+        $this->assertEquals(['__construct', '__invoke_somePayload'], $_SERVER['__event.test']);
+
+        // It falls back to __invoke if the referenced method is not found.
+        $_SERVER['__event.test'] = [];
+        $d = new Dispatcher;
+        $d->listen('myEvent', [TestListenerInvokey::class, 'someAbsentMethod']);
+        $d->dispatch('myEvent', 'somePayload');
+        $this->assertEquals(['__construct', '__invoke_somePayload'], $_SERVER['__event.test']);
+
+        // It throws an "Error" when there is no method to be called.
+        $d = new Dispatcher;
+        $d->listen('myEvent', TestListenerLean::class);
+        $this->expectError();
+        $this->expectErrorMessage('Call to undefined method '.TestListenerLean::class.'::__invoke()');
+        $d->dispatch('myEvent', 'somePayload');
+
+        unset($_SERVER['__event.test']);
+    }
+}
+
+class TestListenerLean
+{
+    //
+}
+
+class TestListenerInvokeyHandler
+{
+    public function __construct()
+    {
+        $_SERVER['__event.test'][] = '__construct';
+    }
+
+    public function __invoke()
+    {
+        $_SERVER['__event.test'][] = '__invoke';
+    }
+
+    public function handle()
+    {
+        $_SERVER['__event.test'][] = 'handle';
+    }
+}
+
+class TestListenerInvokey
+{
+    public function __construct()
+    {
+        $_SERVER['__event.test'][] = '__construct';
+    }
+
+    public function __invoke($payload)
+    {
+        $_SERVER['__event.test'][] = '__invoke_'.$payload;
+
+        return false;
+    }
 }
 
 class ExampleEvent

@@ -91,6 +91,49 @@ class View implements ArrayAccess, Htmlable, ViewContract
     }
 
     /**
+     * Get the evaluated contents for a given array of fragments.
+     *
+     * @param  array  $fragments
+     * @return string
+     */
+    public function fragments(array $fragments)
+    {
+        return collect($fragments)->map(fn ($f) => $this->fragment($f))->implode('');
+    }
+
+    /**
+     * Get the evaluated contents of a given fragment if the given condition is true.
+     *
+     * @param  bool  $boolean
+     * @param  string  $fragment
+     * @return string
+     */
+    public function fragmentIf($boolean, $fragment)
+    {
+        if (value($boolean)) {
+            return $this->fragment($fragment);
+        }
+
+        return $this->render();
+    }
+
+    /**
+     * Get the evaluated contents for a given array of fragments if the given condition is true.
+     *
+     * @param  bool  $boolean
+     * @param  array  $fragments
+     * @return string
+     */
+    public function fragmentsIf($boolean, array $fragments)
+    {
+        if (value($boolean)) {
+            return $this->fragments($fragments);
+        }
+
+        return $this->render();
+    }
+
+    /**
      * Get the string contents of the view.
      *
      * @param  callable|null  $callback
