@@ -78,6 +78,17 @@ class HttpClientTest extends TestCase
         $this->assertTrue($response->forbidden());
     }
 
+    public function testNotFoundResponse()
+    {
+        $this->factory->fake([
+            'laravel.com' => $this->factory::response('', 404),
+        ]);
+
+        $response = $this->factory->post('http://laravel.com');
+
+        $this->assertTrue($response->notFound());
+    }
+
     public function testResponseBodyCasting()
     {
         $this->factory->fake([
