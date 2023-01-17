@@ -107,9 +107,6 @@ class RedisStoreTest extends TestCase
         Cache::store('redis')->tags(['votes'])->flushStale();
 
         $keyCount = Cache::store('redis')->connection()->keys('*');
-        // var_dump($keyCount);
-        // var_dump(Cache::store('redis')->tags(['votes'])->getTags()->entries()->all());
-        // var_dump(Cache::store('redis')->tags(['votes'])->getTags()->entries()->all());
         $this->assertEquals(0, count($keyCount));
     }
 
