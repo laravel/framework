@@ -40,6 +40,12 @@ class CacheTableCommandTest extends TestCase
         $this->runCommand($command);
     }
 
+    public function testCanGetHelpWithoutInstantiatingDependencies()
+    {
+        $help = (new CacheTableCommand())->getHelp();
+        $this->stringContains('php artisan cache:table', $help);
+    }
+
     protected function runCommand($command, $input = [])
     {
         return $command->run(new ArrayInput($input), new NullOutput);

@@ -48,27 +48,17 @@ class CacheTableCommand extends Command
     protected $composer;
 
     /**
-     * Create a new cache table command instance.
+     * Execute the console command.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
      * @param  \Illuminate\Support\Composer  $composer
      * @return void
      */
-    public function __construct(Filesystem $files, Composer $composer)
+    public function handle(Filesystem $files, Composer $composer)
     {
-        parent::__construct();
-
         $this->files = $files;
         $this->composer = $composer;
-    }
 
-    /**
-     * Execute the console command.
-     *
-     * @return void
-     */
-    public function handle()
-    {
         $fullPath = $this->createBaseMigration();
 
         $this->files->put($fullPath, $this->files->get(__DIR__.'/stubs/cache.stub'));
