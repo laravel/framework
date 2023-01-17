@@ -323,6 +323,12 @@ Working directory: expected-working-directory');
         $this->assertSame($this->openedUrl, 'https://laravel.com/docs/8.x');
     }
 
+    public function testCanGetHelpWithoutInstantiatingDependencies()
+    {
+        $help = (new DocsCommand())->getHelp();
+        $this->stringContains('php artisan docs', $help);
+    }
+
     protected function command()
     {
         $this->app->forgetInstance(DocsCommand::class);
