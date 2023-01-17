@@ -205,6 +205,16 @@ class Response implements ArrayAccess
     }
 
     /**
+     * Determine if the response was a 404 "Not Found" response.
+     *
+     * @return bool
+     */
+    public function notFound()
+    {
+        return $this->status() === 404;
+    }
+
+    /**
      * Determine if the response indicates a client or server error occurred.
      *
      * @return bool
