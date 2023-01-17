@@ -31,7 +31,7 @@ trait PromptsForMissingInput
      * @param  \Symfony\Component\Console\Output\OutputInterface  $output
      * @return void
      */
-    protected function promptforMissingArguments(InputInterface $input, OutputInterface $output)
+    protected function promptForMissingArguments(InputInterface $input, OutputInterface $output)
     {
         $prompted = collect($this->getDefinition()->getArguments())
             ->filter(fn ($argument) => $argument->isRequired() && is_null($input->getArgument($argument->getName())))
