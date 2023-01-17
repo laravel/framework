@@ -128,7 +128,7 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
             'integer_status' => 1,
             'integer_status_array' => json_encode([1, 2]),
             'arrayable_status' => 'pending',
-        ], collect(DB::table('enum_casts')->where('id', $model->id)->first())->map(function ($value) {
+        ], (object) collect(DB::table('enum_casts')->where('id', $model->id)->first())->map(function ($value) {
             return str_replace(',', ', ', str_replace(', ', ',', $value));
         })->all());
     }
@@ -152,7 +152,7 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
             'integer_status' => 1,
             'integer_status_array' => json_encode([1, 2]),
             'arrayable_status' => 'pending',
-        ], collect(DB::table('enum_casts')->where('id', $model->id)->first())->map(function ($value) {
+        ], (object) collect(DB::table('enum_casts')->where('id', $model->id)->first())->map(function ($value) {
             return str_replace(',', ', ', str_replace(', ', ',', $value));
         })->all());
     }
