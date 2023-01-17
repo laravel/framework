@@ -321,13 +321,9 @@ class ControllerMakeCommand extends GeneratorCommand
             'singleton',
         ], default: 0);
 
-        match ($type) {
-            'empty' => null,
-            'api' => $input->setOption('api', true),
-            'invokable' => $input->setOption('invokable', true),
-            'resource' => $input->setOption('resource', true),
-            'singleton' => $input->setOption('singleton', true),
-        };
+        if ($type !== 'empty') {
+            $input->setOption($type, true);
+        }
 
         if (in_array($type, ['api', 'resource', 'singleton'])) {
             $model = $this->components->askWithCompletion(

@@ -136,14 +136,14 @@ class TestMakeCommand extends GeneratorCommand
             return;
         }
 
-        $option = $this->components->choice('Which type of test would you like', [
+        $type = $this->components->choice('Which type of test would you like', [
             'feature',
             'unit',
             'pest feature',
             'pest unit',
         ], default: 0);
 
-        match ($option) {
+        match ($type) {
             'feature' => null,
             'unit' => $input->setOption('unit', true),
             'pest feature' => $input->setOption('pest', true),
