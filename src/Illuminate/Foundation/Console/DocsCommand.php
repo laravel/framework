@@ -86,7 +86,6 @@ class DocsCommand extends Command
      */
     protected $systemOsFamily = PHP_OS_FAMILY;
 
-
     /**
      * Configure the current command.
      *

@@ -1648,7 +1648,8 @@ class ValidationValidatorTest extends TestCase
 
     public function prohibitedRulesData()
     {
-        $emptyCountable = new class implements Countable {
+        $emptyCountable = new class implements Countable
+        {
             public function count()
             {
                 return 0;
