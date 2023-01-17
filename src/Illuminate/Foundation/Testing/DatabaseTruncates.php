@@ -48,7 +48,7 @@ trait DatabaseTruncates
     protected function excludeTables()
     {
         return [
-            'migrations',
+            $this->app['config']->get('database.migrations'),
         ];
     }
 }
