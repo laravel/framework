@@ -739,7 +739,7 @@ class Store implements Session
      * Set the underlying session handler implementation.
      *
      * @param  \SessionHandlerInterface  $handler
-     * @return SessionHandlerInterface
+     * @return \SessionHandlerInterface
      */
     public function setHandler(SessionHandlerInterface $handler)
     {
