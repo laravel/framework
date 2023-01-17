@@ -113,7 +113,7 @@ class Vite implements Htmlable
     /**
      * Generate or set a Content Security Policy nonce to apply to all generated tags.
      *
-     * @param  ?string  $nonce
+     * @param  string|null  $nonce
      * @return string
      */
     public function useCspNonce($nonce = null)

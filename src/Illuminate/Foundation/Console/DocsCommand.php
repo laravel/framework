@@ -190,7 +190,7 @@ class DocsCommand extends Command
     /**
      * Determine the page to open.
      *
-     * @return ?string
+     * @return string|null
      */
     protected function resolvePage()
     {
@@ -216,7 +216,7 @@ class DocsCommand extends Command
     /**
      * Ask the user which page they would like to open.
      *
-     * @return ?string
+     * @return string|null
      */
     protected function askForPage()
     {
@@ -226,7 +226,7 @@ class DocsCommand extends Command
     /**
      * Ask the user which page they would like to open via a custom strategy.
      *
-     * @return ?string
+     * @return string|null
      */
     protected function askForPageViaCustomStrategy()
     {
@@ -246,7 +246,7 @@ class DocsCommand extends Command
     /**
      * Ask the user which page they would like to open using autocomplete.
      *
-     * @return ?string
+     * @return string|null
      */
     protected function askForPageViaAutocomplete()
     {
@@ -267,7 +267,7 @@ class DocsCommand extends Command
     /**
      * Guess the page the user is attempting to open.
      *
-     * @return ?string
+     * @return string|null
      */
     protected function guessPage()
     {
@@ -293,7 +293,7 @@ class DocsCommand extends Command
      * The section the user specifically asked to open.
      *
      * @param  string  $page
-     * @return ?string
+     * @return string|null
      */
     protected function section($page)
     {
@@ -316,7 +316,7 @@ class DocsCommand extends Command
      * Guess the section the user is attempting to open.
      *
      * @param  string  $page
-     * @return ?string
+     * @return string|null
      */
     protected function guessSection($page)
     {

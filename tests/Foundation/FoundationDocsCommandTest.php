@@ -14,7 +14,7 @@ class FoundationDocsCommandTest extends TestCase
     /**
      * The URL opened by the command.
      *
-     * @var ?string
+     * @var string|null
      */
     protected $openedUrl;
 

@@ -456,7 +456,7 @@ if (! function_exists('fake') && class_exists(\Faker\Factory::class)) {
     /**
      * Get a faker instance.
      *
-     * @param  ?string  $locale
+     * @param  string|null  $locale
      * @return \Faker\Generator
      */
     function fake($locale = null)
