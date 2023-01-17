@@ -86,20 +86,6 @@ class DocsCommand extends Command
      */
     protected $systemOsFamily = PHP_OS_FAMILY;
 
-    /**
-     * Create a new command instance.
-     *
-     * @param  \Illuminate\Http\Client\Factory  $http
-     * @param  \Illuminate\Contracts\Cache\Repository  $cache
-     * @return void
-     */
-    public function __construct(Http $http, Cache $cache)
-    {
-        parent::__construct();
-
-        $this->http = $http;
-        $this->cache = $cache;
-    }
 
     /**
      * Configure the current command.
@@ -118,10 +104,15 @@ class DocsCommand extends Command
     /**
      * Execute the console command.
      *
+     * @param  \Illuminate\Http\Client\Factory  $http
+     * @param  \Illuminate\Contracts\Cache\Repository  $cache
      * @return int
      */
-    public function handle()
+    public function handle(Http $http, Cache $cache)
     {
+        $this->http = $http;
+        $this->cache = $cache;
+
         try {
             $this->openUrl();
         } catch (ProcessFailedException $e) {
