@@ -325,8 +325,8 @@ class ControllerMakeCommand extends GeneratorCommand
             'empty' => null,
             'api' => $input->setOption('api', true),
             'invokable' => $input->setOption('invokable', true),
-            'resource' => tap($input)->setOption('resource', true),
-            'singleton' => tap($input)->setOption('singleton', true),
+            'resource' => $input->setOption('resource', true),
+            'singleton' => $input->setOption('singleton', true),
         };
 
         if (in_array($type, ['api', 'resource', 'singleton'])) {
