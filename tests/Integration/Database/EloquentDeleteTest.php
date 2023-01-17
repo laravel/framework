@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\Fixtures\Post;
+use Illuminate\Tests\Integration\Database\Fixtures\PostStringyKey;
 
 class EloquentDeleteTest extends DatabaseTestCase
 {
@@ -91,6 +92,49 @@ class EloquentDeleteTest extends DatabaseTestCase
         $this->assertEquals('\(^_^)/', $_SERVER['(-_-)']);
 
         unset($_SERVER['(-_-)']);
+    }
+
+    public function testDestroy()
+    {
+        Schema::create('my_posts', function (Blueprint $table) {
+            $table->increments('my_id');
+            $table->timestamps();
+        });
+
+        PostStringyKey::unguard();
+        PostStringyKey::query()->create([]);
+        PostStringyKey::query()->create([]);
+
+        PostStringyKey::query()->getConnection()->enableQueryLog();
+        PostStringyKey::retrieved(fn ($model) => $_SERVER['destroy']['retrieved'][] = $model->my_id);
+        PostStringyKey::deleting(fn ($model) => $_SERVER['destroy']['deleting'][] = $model->my_id);
+        PostStringyKey::deleted(fn ($model) => $_SERVER['destroy']['deleted'][] = $model->my_id);
+
+        $_SERVER['destroy'] = [];
+        PostStringyKey::destroy(1, 2, 3, 4);
+
+        $this->assertEquals([1, 2], $_SERVER['destroy']['retrieved']);
+        $this->assertEquals([1, 2], $_SERVER['destroy']['deleting']);
+        $this->assertEquals([1, 2], $_SERVER['destroy']['deleted']);
+
+        $logs = PostStringyKey::query()->getConnection()->getQueryLog();
+
+        $this->assertEquals(0, PostStringyKey::query()->count());
+
+        $this->assertStringStartsWith('select * from "my_posts" where "my_id" in (', str_replace(['`', '[', ']'], '"', $logs[0]['query']));
+
+        $this->assertStringStartsWith('delete from "my_posts" where "my_id" = ', str_replace(['`', '[', ']'], '"', $logs[1]['query']));
+        $this->assertEquals([1], $logs[1]['bindings']);
+
+        $this->assertStringStartsWith('delete from "my_posts" where "my_id" = ', str_replace(['`', '[', ']'], '"', $logs[2]['query']));
+        $this->assertEquals([2], $logs[2]['bindings']);
+
+        // Total of 3 queries.
+        $this->assertCount(3, $logs);
+
+        PostStringyKey::reguard();
+        unset($_SERVER['destroy']);
+        Schema::drop('my_posts');
     }
 }
 
