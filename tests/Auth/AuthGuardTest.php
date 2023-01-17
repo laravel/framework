@@ -241,8 +241,7 @@ class AuthGuardTest extends TestCase
     public function testAuthenticateReturnsUserWhenUserIsNotNull()
     {
         $user = m::mock(Authenticatable::class);
-        $guard = $this->getGuard();
-        $guard->setUser($user);
+        $guard = $this->getGuard()->setUser($user);
 
         $this->assertEquals($user, $guard->authenticate());
     }
@@ -270,8 +269,7 @@ class AuthGuardTest extends TestCase
     public function testHasUserReturnsTrueWhenUserIsNotNull()
     {
         $user = m::mock(Authenticatable::class);
-        $guard = $this->getGuard();
-        $guard->setUser($user);
+        $guard = $this->getGuard()->setUser($user);
 
         $this->assertTrue($guard->hasUser());
     }
