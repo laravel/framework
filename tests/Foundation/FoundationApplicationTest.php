@@ -315,6 +315,26 @@ class FoundationApplicationTest extends TestCase
         $this->assertArrayHasKey(0, $app['events']->getListeners('bootstrapped: Illuminate\Foundation\Bootstrap\RegisterFacades'));
     }
 
+    public function testPreBootstrappingAddsClosure()
+    {
+        $app = new Application;
+        $closure = function () {
+            //
+        };
+        $app->preBootstrapping($closure);
+        $this->assertArrayHasKey(0, $app['events']->getListeners('bootstrapping'));
+    }
+
+    public function testPostBootstrappingAddsClosure()
+    {
+        $app = new Application;
+        $closure = function () {
+            //
+        };
+        $app->postBootstrapping($closure);
+        $this->assertArrayHasKey(0, $app['events']->getListeners('bootstrapped'));
+    }
+
     public function testTerminationCallbacksCanAcceptAtNotation()
     {
         $app = new Application;

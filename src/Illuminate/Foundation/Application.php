@@ -236,6 +236,8 @@ class Application extends Container implements ApplicationContract, CachesConfig
     {
         $this->hasBeenBootstrapped = true;
 
+        $this['events']->dispatch('bootstrapping', [$this]);
+
         foreach ($bootstrappers as $bootstrapper) {
             $this['events']->dispatch('bootstrapping: '.$bootstrapper, [$this]);
 
@@ -243,6 +245,8 @@ class Application extends Container implements ApplicationContract, CachesConfig
 
             $this['events']->dispatch('bootstrapped: '.$bootstrapper, [$this]);
         }
+
+        $this['events']->dispatch('bootstrapped', [$this]);
     }
 
     /**
@@ -271,6 +275,17 @@ class Application extends Container implements ApplicationContract, CachesConfig
     }
 
     /**
+     * Register a callback to run before any bootstrapping.
+     *
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public function preBootstrapping(Closure $callback)
+    {
+        $this['events']->listen('bootstrapping', $callback);
+    }
+
+    /**
      * Register a callback to run after a bootstrapper.
      *
      * @param  string  $bootstrapper
@@ -280,6 +295,17 @@ class Application extends Container implements ApplicationContract, CachesConfig
     public function afterBootstrapping($bootstrapper, Closure $callback)
     {
         $this['events']->listen('bootstrapped: '.$bootstrapper, $callback);
+    }
+
+    /**
+     * Register a callback to run after all bootstrapping.
+     *
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public function postBootstrapping(Closure $callback)
+    {
+        $this['events']->listen('bootstrapped', $callback);
     }
 
     /**
