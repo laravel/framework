@@ -213,7 +213,7 @@ class Response implements ArrayAccess
     {
         return $this->status() === 422;
     }
-    
+
     /**
      * Determine if the response was a 404 "Not Found" response.
      *
