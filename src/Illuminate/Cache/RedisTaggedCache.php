@@ -53,7 +53,7 @@ class RedisTaggedCache extends TaggedCache
      */
     public function increment($key, $value = 1)
     {
-        $this->tags->addEntry($this->itemKey($key), updateWhen: 'GT');
+        $this->tags->addEntry($this->itemKey($key), updateWhen: 'NX');
 
         return parent::increment($key, $value);
     }
@@ -67,7 +67,7 @@ class RedisTaggedCache extends TaggedCache
      */
     public function decrement($key, $value = 1)
     {
-        $this->tags->addEntry($this->itemKey($key), updateWhen: 'GT');
+        $this->tags->addEntry($this->itemKey($key), updateWhen: 'NX');
 
         return parent::decrement($key, $value);
     }
