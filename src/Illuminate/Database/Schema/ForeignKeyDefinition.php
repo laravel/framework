@@ -65,7 +65,7 @@ class ForeignKeyDefinition extends Fluent
     }
 
     /**
-     * Indicate that deletes should set no action.
+     * Indicate that deletes should have "no action".
      *
      * @return $this
      */
