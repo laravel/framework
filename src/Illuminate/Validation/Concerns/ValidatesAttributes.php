@@ -11,6 +11,7 @@ use Egulias\EmailValidator\Validation\MultipleValidationWithAnd;
 use Egulias\EmailValidator\Validation\NoRFCWarningsValidation;
 use Egulias\EmailValidator\Validation\RFCValidation;
 use Exception;
+use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Date;
@@ -2325,6 +2326,22 @@ trait ValidatesAttributes
     {
         if (is_numeric($this->getValue($attribute))) {
             $this->numericRules[] = $rule;
+        }
+    }
+
+    /**
+     * Validate that an attribute was is encrypted.
+     *
+     * @param string $attribute
+     * @param string $value
+     * @return bool
+     */
+    public function validateEncrypted(string $attribute, string $value): bool
+    {
+        try {
+            return ! is_null(decrypt($value));
+        } catch (DecryptException $e) {
+            return false;
         }
     }
 }
