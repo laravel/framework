@@ -4,6 +4,7 @@ namespace Illuminate\Validation\Concerns;
 
 use Brick\Math\BigDecimal;
 use Brick\Math\Exception\MathException as BrickMathException;
+use Brick\Math\BigNumber;
 use DateTime;
 use DateTimeInterface;
 use Egulias\EmailValidator\EmailValidator;
@@ -436,13 +437,10 @@ trait ValidatesAttributes
     {
         $this->requireParameterCount(2, $parameters, 'between');
 
-        $size = $this->getSize($attribute, $value);
-
-        if (is_string($size)) {
-            return with(BigDecimal::of($size), fn ($size) => $size->isGreaterThanOrEqualTo($parameters[0]) && $size->isLessThanOrEqualTo($parameters[1]));
-        } else {
-            return $size >= $parameters[0] && $size <= $parameters[1];
-        }
+        return with(
+            BigNumber::of($this->getSize($attribute, $value)),
+            fn ($size) => $size->isGreaterThanOrEqualTo($parameters[0]) && $size->isLessThanOrEqualTo($parameters[1])
+        );
     }
 
     /**
@@ -1083,16 +1081,8 @@ trait ValidatesAttributes
 
         $this->shouldBeNumeric($attribute, 'Gt');
 
-        $compare = function ($left, $right) {
-            if (is_string($left)) {
-                return BigDecimal::of($left)->isGreaterThan($right);
-            } else {
-                return $left > $right;
-            }
-        };
-
         if (is_null($comparedToValue) && (is_numeric($value) && is_numeric($parameters[0]))) {
-            return $compare($this->getSize($attribute, $value), $parameters[0]);
+            return BigNumber::of($this->getSize($attribute, $value))->isGreaterThan($parameters[0]);
         }
 
         if (is_numeric($parameters[0])) {
@@ -1100,7 +1090,7 @@ trait ValidatesAttributes
         }
 
         if ($this->hasRule($attribute, $this->numericRules) && is_numeric($value) && is_numeric($comparedToValue)) {
-            return $compare($value, $comparedToValue);
+            return BigNumber::of($value)->isGreaterThan($comparedToValue);
         }
 
         if (! $this->isSameType($value, $comparedToValue)) {
@@ -1127,16 +1117,8 @@ trait ValidatesAttributes
 
         $this->shouldBeNumeric($attribute, 'Lt');
 
-        $compare = function ($left, $right) {
-            if (is_string($left)) {
-                return BigDecimal::of($left)->isLessThan($right);
-            } else {
-                return $left < $right;
-            }
-        };
-
         if (is_null($comparedToValue) && (is_numeric($value) && is_numeric($parameters[0]))) {
-            return $compare($this->getSize($attribute, $value), $parameters[0]);
+            return BigNumber::of($this->getSize($attribute, $value))->isLessThan($parameters[0]);
         }
 
         if (is_numeric($parameters[0])) {
@@ -1144,7 +1126,7 @@ trait ValidatesAttributes
         }
 
         if ($this->hasRule($attribute, $this->numericRules) && is_numeric($value) && is_numeric($comparedToValue)) {
-            return $compare($value, $comparedToValue);
+            return BigNumber::of($value)->isLessThan($comparedToValue);
         }
 
         if (! $this->isSameType($value, $comparedToValue)) {
@@ -1171,16 +1153,8 @@ trait ValidatesAttributes
 
         $this->shouldBeNumeric($attribute, 'Gte');
 
-        $compare = function ($left, $right) {
-            if (is_string($left)) {
-                return BigDecimal::of($left)->isGreaterThanOrEqualTo($right);
-            } else {
-                return $left >= $right;
-            }
-        };
-
         if (is_null($comparedToValue) && (is_numeric($value) && is_numeric($parameters[0]))) {
-            return $compare($this->getSize($attribute, $value), $parameters[0]);
+            return BigNumber::of($this->getSize($attribute, $value))->isGreaterThanOrEqualTo($parameters[0]);
         }
 
         if (is_numeric($parameters[0])) {
@@ -1188,7 +1162,7 @@ trait ValidatesAttributes
         }
 
         if ($this->hasRule($attribute, $this->numericRules) && is_numeric($value) && is_numeric($comparedToValue)) {
-            return $compare($value, $comparedToValue);
+            return BigNumber::of($value)->isGreaterThanOrEqualTo($comparedToValue);
         }
 
         if (! $this->isSameType($value, $comparedToValue)) {
@@ -1215,16 +1189,8 @@ trait ValidatesAttributes
 
         $this->shouldBeNumeric($attribute, 'Lte');
 
-        $compare = function ($left, $right) {
-            if (is_string($left)) {
-                return BigDecimal::of($left)->isLessThanOrEqualTo($right);
-            } else {
-                return $left <= $right;
-            }
-        };
-
         if (is_null($comparedToValue) && (is_numeric($value) && is_numeric($parameters[0]))) {
-            return $compare($this->getSize($attribute, $value), $parameters[0]);
+            return BigNumber::of($this->getSize($attribute, $value))->isLessThanOrEqualTo($parameters[0]);
         }
 
         if (is_numeric($parameters[0])) {
@@ -1232,7 +1198,7 @@ trait ValidatesAttributes
         }
 
         if ($this->hasRule($attribute, $this->numericRules) && is_numeric($value) && is_numeric($comparedToValue)) {
-            return $compare($value, $comparedToValue);
+            return BigNumber::of($value)->isLessThanOrEqualTo($comparedToValue);
         }
 
         if (! $this->isSameType($value, $comparedToValue)) {
@@ -1425,13 +1391,7 @@ trait ValidatesAttributes
             return false;
         }
 
-        $size = $this->getSize($attribute, $value);
-
-        if (is_string($size)) {
-            return BigDecimal::of($size)->isLessThanOrEqualTo($parameters[0]);
-        } else {
-            return $size <= $parameters[0];
-        }
+        return BigNumber::of($this->getSize($attribute, $value))->isLessThanOrEqualTo($parameters[0]);
     }
 
     /**
@@ -1533,13 +1493,7 @@ trait ValidatesAttributes
     {
         $this->requireParameterCount(1, $parameters, 'min');
 
-        $size = $this->getSize($attribute, $value);
-
-        if (is_string($size)) {
-            return BigDecimal::of($size)->isGreaterThanOrEqualTo($parameters[0]);
-        } else {
-            return $size >= $parameters[0];
-        }
+        return BigNumber::of($this->getSize($attribute, $value))->isGreaterThanOrEqualTo($parameters[0]);
     }
 
     /**
@@ -2214,13 +2168,7 @@ trait ValidatesAttributes
     {
         $this->requireParameterCount(1, $parameters, 'size');
 
-        $size = $this->getSize($attribute, $value);
-
-        if (is_string($size)) {
-            return BigDecimal::of($size)->isEqualTo($parameters[0]);
-        } else {
-            return $size == $parameters[0];
-        }
+        return BigNumber::of($this->getSize($attribute, $value))->isEqualTo($parameters[0]);
     }
 
     /**
