@@ -155,7 +155,7 @@ class Mailer implements MailerContract, MailQueueContract
      * Begin the process of mailing a mailable class instance.
      *
      * @param  mixed  $users
-     * @param  string  $name
+     * @param  string|null  $name
      * @return \Illuminate\Mail\PendingMail
      */
     public function to($users, $name = null)
@@ -171,10 +171,15 @@ class Mailer implements MailerContract, MailQueueContract
      * Begin the process of mailing a mailable class instance.
      *
      * @param  mixed  $users
+     * @param  string|null  $name
      * @return \Illuminate\Mail\PendingMail
      */
-    public function cc($users)
+    public function cc($users, $name = null)
     {
+        if (! is_null($name) && is_string($users)) {
+            $users = new Address($users, $name);
+        }
+
         return (new PendingMail($this))->cc($users);
     }
 
@@ -182,10 +187,15 @@ class Mailer implements MailerContract, MailQueueContract
      * Begin the process of mailing a mailable class instance.
      *
      * @param  mixed  $users
+     * @param  string|null  $name
      * @return \Illuminate\Mail\PendingMail
      */
-    public function bcc($users)
+    public function bcc($users, $name = null)
     {
+        if (! is_null($name) && is_string($users)) {
+            $users = new Address($users, $name);
+        }
+
         return (new PendingMail($this))->bcc($users);
     }
 
