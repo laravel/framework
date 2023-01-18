@@ -1097,7 +1097,6 @@ trait ValidatesAttributes
             return false;
         }
 
-        // TODO?
         return $this->getSize($attribute, $value) > $this->getSize($attribute, $comparedToValue);
     }
 
@@ -1133,7 +1132,6 @@ trait ValidatesAttributes
             return false;
         }
 
-        // TODO?
         return $this->getSize($attribute, $value) < $this->getSize($attribute, $comparedToValue);
     }
 
@@ -1169,7 +1167,6 @@ trait ValidatesAttributes
             return false;
         }
 
-        // TODO?
         return $this->getSize($attribute, $value) >= $this->getSize($attribute, $comparedToValue);
     }
 
@@ -1205,7 +1202,6 @@ trait ValidatesAttributes
             return false;
         }
 
-        // TODO?
         return $this->getSize($attribute, $value) <= $this->getSize($attribute, $comparedToValue);
     }
 
