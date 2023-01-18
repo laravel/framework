@@ -351,6 +351,28 @@ class Response implements ArrayAccess
     }
 
     /**
+     * @param  int  $statusCode
+     * @return $this
+     *
+     * @throws \Illuminate\Http\Client\RequestException
+     */
+    public function throwIfStatus($statusCode)
+    {
+        return $this->status() === $statusCode ? $this->throw() : $this;
+    }
+
+    /**
+     * @param  int  $statusCode
+     * @return $this
+     *
+     * @throws \Illuminate\Http\Client\RequestException
+     */
+    public function throwUnlessStatus($statusCode)
+    {
+        return $this->status() === $statusCode ? $this : $this->throw();
+    }
+
+    /**
      * Determine if the given offset exists.
      *
      * @param  string  $offset

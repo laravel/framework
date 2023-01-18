@@ -113,13 +113,6 @@ class PendingRequest
     protected $throwIfCallback;
 
     /**
-     * A status code to check if an exception should be thrown based on the status code of the response.
-     *
-     * @var int
-     */
-    protected $throwIfStatusCode = null;
-
-    /**
      * The number of times to try the request.
      *
      * @var int
@@ -638,17 +631,6 @@ class PendingRequest
     }
 
     /**
-     * Throw an exception if the status code matches the given status code.
-     *
-     * @param  int  $statusCode
-     * @return void
-     */
-    public function throwIfStatus($statusCode)
-    {
-        $this->throwIfStatusCode = $statusCode;
-    }
-
-    /**
      * Dump the request before sending.
      *
      * @return $this
@@ -819,10 +801,6 @@ class PendingRequest
                     $this->dispatchResponseReceivedEvent($response);
 
                     if (! $response->successful()) {
-                        if (! is_null($this->throwIfStatusCode) && $response->status() !== $this->throwIfStatusCode) {
-                            return;
-                        }
-
                         try {
                             $shouldRetry = $this->retryWhenCallback ? call_user_func($this->retryWhenCallback, $response->toException(), $this) : true;
                         } catch (Exception $exception) {

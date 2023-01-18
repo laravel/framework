@@ -1721,6 +1721,29 @@ class HttpClientTest extends TestCase
         $this->assertFalse($hitThrowCallback);
     }
 
+    public function testRequestExceptionIsThrownIfStatusCodeIsSatisfied()
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response('', 400),
+        ]);
+
+        $this->expectException(RequestException::class);
+        $response = $this->factory->get('http://foo.com/api')->throwIfStatus(400);
+
+        $this->assertSame(400, $response->status());
+    }
+
+    public function testRequestExceptionIsNotThrownIfStatusCodeIsNotSatisfied()
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response('', 400),
+        ]);
+
+        $response = $this->factory->get('http://foo.com/api')->throwIfStatus(500);
+
+        $this->assertSame(400, $response->status());
+    }
+
     public function testItCanEnforceFaking()
     {
         $this->factory->preventStrayRequests();
