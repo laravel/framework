@@ -10,6 +10,7 @@ use Illuminate\Contracts\Mail\Mailable as MailableContract;
 use Illuminate\Contracts\Queue\Factory as Queue;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
@@ -577,6 +578,10 @@ class Mailable implements MailableContract, Renderable
      */
     public function to($address, $name = null)
     {
+        if (! $this->locale && $address instanceof HasLocalePreference) {
+            $this->locale($address->preferredLocale());
+        }
+
         return $this->setAddress($address, $name, 'to');
     }
 
@@ -1305,8 +1310,9 @@ class Mailable implements MailableContract, Renderable
     {
         [$html, $text] = $this->renderForAssertions();
 
-        PHPUnit::assertTrue(
-            str_contains($html, $string),
+        PHPUnit::assertStringContainsString(
+            $string,
+            $html,
             "Did not see expected text [{$string}] within email body."
         );
 
@@ -1323,8 +1329,9 @@ class Mailable implements MailableContract, Renderable
     {
         [$html, $text] = $this->renderForAssertions();
 
-        PHPUnit::assertFalse(
-            str_contains($html, $string),
+        PHPUnit::assertStringNotContainsString(
+            $string,
+            $html,
             "Saw unexpected text [{$string}] within email body."
         );
 
@@ -1356,8 +1363,9 @@ class Mailable implements MailableContract, Renderable
     {
         [$html, $text] = $this->renderForAssertions();
 
-        PHPUnit::assertTrue(
-            str_contains($text, $string),
+        PHPUnit::assertStringContainsString(
+            $string,
+            $text,
             "Did not see expected text [{$string}] within text email body."
         );
 
@@ -1374,8 +1382,9 @@ class Mailable implements MailableContract, Renderable
     {
         [$html, $text] = $this->renderForAssertions();
 
-        PHPUnit::assertFalse(
-            str_contains($text, $string),
+        PHPUnit::assertStringNotContainsString(
+            $string,
+            $text,
             "Saw unexpected text [{$string}] within text email body."
         );
 

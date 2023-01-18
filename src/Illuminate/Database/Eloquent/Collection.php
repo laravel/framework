@@ -526,6 +526,28 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Set the visible attributes across the entire collection.
+     *
+     * @param  array<int, string>  $visible
+     * @return $this
+     */
+    public function setVisible($visible)
+    {
+        return $this->each->setVisible($visible);
+    }
+
+    /**
+     * Set the hidden attributes across the entire collection.
+     *
+     * @param  array<int, string>  $hidden
+     * @return $this
+     */
+    public function setHidden($hidden)
+    {
+        return $this->each->setHidden($hidden);
+    }
+
+    /**
      * Append an attribute across the entire collection.
      *
      * @param  array<array-key, string>|string  $attributes
@@ -560,38 +582,14 @@ class Collection extends BaseCollection implements QueueableCollection
      */
 
     /**
-     * Get an array with the values of a given key.
+     * Count the number of items in the collection by a field or using a callback.
      *
-     * @param  string|array<array-key, string>  $value
-     * @param  string|null  $key
-     * @return \Illuminate\Support\Collection<int, mixed>
+     * @param  (callable(TModel, TKey): array-key)|string|null  $countBy
+     * @return \Illuminate\Support\Collection<array-key, int>
      */
-    public function pluck($value, $key = null)
+    public function countBy($countBy = null)
     {
-        return $this->toBase()->pluck($value, $key);
-    }
-
-    /**
-     * Get the keys of the collection items.
-     *
-     * @return \Illuminate\Support\Collection<int, TKey>
-     */
-    public function keys()
-    {
-        return $this->toBase()->keys();
-    }
-
-    /**
-     * Zip the collection together with one or more arrays.
-     *
-     * @template TZipValue
-     *
-     * @param  \Illuminate\Contracts\Support\Arrayable<array-key, TZipValue>|iterable<array-key, TZipValue>  ...$items
-     * @return \Illuminate\Support\Collection<int, \Illuminate\Support\Collection<int, TModel|TZipValue>>
-     */
-    public function zip($items)
-    {
-        return $this->toBase()->zip(...func_get_args());
+        return $this->toBase()->countBy($countBy);
     }
 
     /**
@@ -626,6 +624,16 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Get the keys of the collection items.
+     *
+     * @return \Illuminate\Support\Collection<int, TKey>
+     */
+    public function keys()
+    {
+        return $this->toBase()->keys();
+    }
+
+    /**
      * Pad collection to the specified length with a value.
      *
      * @template TPadValue
@@ -640,10 +648,35 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Get an array with the values of a given key.
+     *
+     * @param  string|array<array-key, string>  $value
+     * @param  string|null  $key
+     * @return \Illuminate\Support\Collection<array-key, mixed>
+     */
+    public function pluck($value, $key = null)
+    {
+        return $this->toBase()->pluck($value, $key);
+    }
+
+    /**
+     * Zip the collection together with one or more arrays.
+     *
+     * @template TZipValue
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable<array-key, TZipValue>|iterable<array-key, TZipValue>  ...$items
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Support\Collection<int, TModel|TZipValue>>
+     */
+    public function zip($items)
+    {
+        return $this->toBase()->zip(...func_get_args());
+    }
+
+    /**
      * Get the comparison function to detect duplicates.
      *
      * @param  bool  $strict
-     * @return callable(TValue, TValue): bool
+     * @return callable(TModel, TModel): bool
      */
     protected function duplicateComparator($strict)
     {

@@ -20,7 +20,7 @@ class DatabaseEloquentDynamicRelationsTest extends TestCase
         $this->assertEquals(['many' => 'related'], $model->getRelationValue('dynamicRel_2'));
     }
 
-    public function testDynamicRelationsOverride()
+    public function testBasicDynamicRelationsOverride()
     {
         // Dynamic Relations can override each other.
         DynamicRelationModel::resolveRelationUsing('dynamicRelConflict', fn ($m) => $m->hasOne(Related::class));
@@ -31,6 +31,32 @@ class DatabaseEloquentDynamicRelationsTest extends TestCase
         $this->assertEquals(['many' => 'related'], $model->dynamicRelConflict);
         $this->assertEquals(['many' => 'related'], $model->getRelationValue('dynamicRelConflict'));
         $this->assertTrue($model->isRelation('dynamicRelConflict'));
+    }
+
+    public function testInharitedDynamicRelations()
+    {
+        DynamicRelationModel::resolveRelationUsing('inheritedDynamicRel', fn () => new FakeHasManyRel);
+        $model = new DynamicRelationModel;
+        $model2 = new DynamicRelationModel2;
+        $model4 = new DynamicRelationModel4;
+        $this->assertTrue($model->isRelation('inheritedDynamicRel'));
+        $this->assertTrue($model4->isRelation('inheritedDynamicRel'));
+        $this->assertFalse($model2->isRelation('inheritedDynamicRel'));
+        $this->assertEquals($model->inheritedDynamicRel(), $model4->inheritedDynamicRel());
+        $this->assertEquals($model->inheritedDynamicRel, $model4->inheritedDynamicRel);
+    }
+
+    public function testInheritedDynamicRelationsOverride()
+    {
+        // Inherited Dynamic Relations can be overriden
+        DynamicRelationModel::resolveRelationUsing('dynamicRelConflict', fn ($m) => $m->hasOne(Related::class));
+        $model = new DynamicRelationModel;
+        $model4 = new DynamicRelationModel4;
+        $this->assertInstanceOf(HasOne::class, $model->dynamicRelConflict());
+        $this->assertInstanceOf(HasOne::class, $model4->dynamicRelConflict());
+        DynamicRelationModel4::resolveRelationUsing('dynamicRelConflict', fn ($m) => $m->hasMany(Related::class));
+        $this->assertInstanceOf(HasOne::class, $model->dynamicRelConflict());
+        $this->assertInstanceOf(HasMany::class, $model4->dynamicRelConflict());
     }
 
     public function testDynamicRelationsCanNotHaveTheSameNameAsNormalRelations()
@@ -90,6 +116,11 @@ class DynamicRelationModel2 extends Model
 }
 
 class DynamicRelationModel3 extends Model
+{
+    //
+}
+
+class DynamicRelationModel4 extends DynamicRelationModel
 {
     //
 }

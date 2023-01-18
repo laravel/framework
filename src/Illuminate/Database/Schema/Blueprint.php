@@ -152,7 +152,8 @@ class Blueprint
     protected function ensureCommandsAreValid(Connection $connection)
     {
         if ($connection instanceof SQLiteConnection) {
-            if ($this->commandsNamed(['dropColumn', 'renameColumn'])->count() > 1) {
+            if ($this->commandsNamed(['dropColumn', 'renameColumn'])->count() > 1
+                && ! $connection->usingNativeSchemaOperations()) {
                 throw new BadMethodCallException(
                     "SQLite doesn't support multiple calls to dropColumn / renameColumn in a single modification."
                 );
@@ -214,7 +215,17 @@ class Blueprint
                 // index method can be called without a name and it will generate one.
                 if ($column->{$index} === true) {
                     $this->{$index}($column->name);
-                    $column->{$index} = false;
+                    $column->{$index} = null;
+
+                    continue 2;
+                }
+
+                // If the index has been specified on the given column, but it equals false
+                // and the column is supposed to be changed, we will call the drop index
+                // method with an array of column to drop it by its conventional name.
+                elseif ($column->{$index} === false && $column->change) {
+                    $this->{'drop'.ucfirst($index)}([$column->name]);
+                    $column->{$index} = null;
 
                     continue 2;
                 }
@@ -224,7 +235,7 @@ class Blueprint
                 // the index since the developer specified the explicit name for this.
                 elseif (isset($column->{$index})) {
                     $this->{$index}($column->name, $column->{$index});
-                    $column->{$index} = false;
+                    $column->{$index} = null;
 
                     continue 2;
                 }

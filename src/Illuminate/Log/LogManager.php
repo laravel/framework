@@ -19,6 +19,9 @@ use Monolog\Logger as Monolog;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
+/**
+ * @mixin \Illuminate\Log\Logger
+ */
 class LogManager implements LoggerInterface
 {
     use ParsesLogConfiguration;

@@ -4,13 +4,16 @@ namespace Illuminate\Session;
 
 use Illuminate\Support\Manager;
 
+/**
+ * @mixin \Illuminate\Session\Store
+ */
 class SessionManager extends Manager
 {
     /**
      * Call a custom driver creator.
      *
      * @param  string  $driver
-     * @return mixed
+     * @return \Illuminate\Session\Store
      */
     protected function callCustomCreator($driver)
     {

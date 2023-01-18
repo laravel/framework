@@ -45,7 +45,8 @@ class Lottery
      * Create a new Lottery instance.
      *
      * @param  int|float  $chances
-     * @param  ?int  $outOf
+     * @param  int|null  $outOf
+     * @return void
      */
     public function __construct($chances, $outOf = null)
     {
@@ -62,7 +63,7 @@ class Lottery
      * Create a new Lottery instance.
      *
      * @param  int|float  $chances
-     * @param  ?int  $outOf
+     * @param  int|null  $outOf
      * @return static
      */
     public static function odds($chances, $outOf = null)

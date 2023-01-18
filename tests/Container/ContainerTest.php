@@ -665,6 +665,21 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(ContainerConcreteStub::class, $class);
     }
 
+    public function testMethodLevelContextualBinding()
+    {
+        $container = new Container;
+
+        $container->bind(IContainerContractStub::class, ContainerImplementationStubTwo::class);
+
+        $container->when(ContainerContextualBindingCallTarget::class)
+                ->needs(IContainerContractStub::class)
+                ->give(ContainerImplementationStub::class);
+
+        $result = $container->call([new ContainerContextualBindingCallTarget, 'work']);
+
+        $this->assertInstanceOf(ContainerImplementationStub::class, $result);
+    }
+
     // public function testContainerCanCatchCircularDependency()
     // {
     //     $this->expectException(\Illuminate\Contracts\Container\CircularDependencyException::class);
@@ -781,5 +796,17 @@ class ContainerInjectVariableStubWithInterfaceImplementation implements IContain
     public function __construct(ContainerConcreteStub $concrete, $something)
     {
         $this->something = $something;
+    }
+}
+
+class ContainerContextualBindingCallTarget
+{
+    public function __construct()
+    {
+    }
+
+    public function work(IContainerContractStub $stub)
+    {
+        return $stub;
     }
 }

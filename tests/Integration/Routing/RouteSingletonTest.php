@@ -36,10 +36,10 @@ class RouteSingletonTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertSame('singleton update', $response->getContent());
 
-        $this->assertSame('http://localhost/avatar', route('avatar.destroy'));
-        $response = $this->delete('/avatar');
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertSame('singleton destroy', $response->getContent());
+        // $this->assertSame('http://localhost/avatar', route('avatar.destroy'));
+        // $response = $this->delete('/avatar');
+        // $this->assertEquals(404, $response->getStatusCode());
+        // $this->assertSame('singleton destroy', $response->getContent());
     }
 
     public function testCreatableSingleton()
@@ -55,6 +55,36 @@ class RouteSingletonTest extends TestCase
         $response = $this->post('/avatar');
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertSame('singleton store', $response->getContent());
+
+        $this->assertSame('http://localhost/avatar', route('avatar.destroy'));
+        $response = $this->delete('/avatar');
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertSame('singleton destroy', $response->getContent());
+    }
+
+    public function testDestroyableSingleton()
+    {
+        Route::singleton('avatar', CreatableSingletonTestController::class)->destroyable();
+
+        $this->assertSame('http://localhost/avatar', route('avatar.show'));
+        $response = $this->get('/avatar');
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertSame('singleton show', $response->getContent());
+
+        $this->assertSame('http://localhost/avatar/edit', route('avatar.edit'));
+        $response = $this->get('/avatar/edit');
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertSame('singleton edit', $response->getContent());
+
+        $this->assertSame('http://localhost/avatar', route('avatar.update'));
+        $response = $this->put('/avatar');
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertSame('singleton update', $response->getContent());
+
+        $this->assertSame('http://localhost/avatar', route('avatar.destroy'));
+        $response = $this->delete('/avatar');
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertSame('singleton destroy', $response->getContent());
     }
 
     public function testApiSingleton()
@@ -89,6 +119,26 @@ class RouteSingletonTest extends TestCase
         $response = $this->put('/avatar');
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertSame('singleton update', $response->getContent());
+    }
+
+    public function testDestroyableApiSingleton()
+    {
+        Route::apiSingleton('avatar', CreatableSingletonTestController::class)->destroyable();
+
+        $this->assertSame('http://localhost/avatar', route('avatar.show'));
+        $response = $this->get('/avatar');
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertSame('singleton show', $response->getContent());
+
+        $this->assertSame('http://localhost/avatar', route('avatar.update'));
+        $response = $this->put('/avatar');
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertSame('singleton update', $response->getContent());
+
+        $this->assertSame('http://localhost/avatar', route('avatar.destroy'));
+        $response = $this->delete('/avatar');
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertSame('singleton destroy', $response->getContent());
     }
 
     public function testSingletonOnly()
@@ -130,9 +180,9 @@ class RouteSingletonTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertSame('singleton update', $response->getContent());
 
-        $response = $this->delete('/avatar');
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertSame('singleton destroy', $response->getContent());
+        // $response = $this->delete('/avatar');
+        // $this->assertEquals(200, $response->getStatusCode());
+        // $this->assertSame('singleton destroy', $response->getContent());
     }
 
     public function testSingletonName()
@@ -152,6 +202,55 @@ class RouteSingletonTest extends TestCase
     public function testNestedSingleton()
     {
         Route::singleton('videos.thumbnail', NestedSingletonTestController::class);
+
+        $response = $this->get('/videos/123/thumbnail');
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertSame('singleton show for 123', $response->getContent());
+
+        $response = $this->get('/videos/123/thumbnail/edit');
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertSame('singleton edit for 123', $response->getContent());
+
+        $response = $this->put('/videos/123/thumbnail');
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertSame('singleton update for 123', $response->getContent());
+
+        $response = $this->patch('/videos/123/thumbnail');
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertSame('singleton update for 123', $response->getContent());
+
+        $response = $this->delete('/videos/123/thumbnail');
+        $this->assertEquals(405, $response->getStatusCode());
+    }
+
+    public function testCreatableNestedSingleton()
+    {
+        Route::singleton('videos.thumbnail', NestedSingletonTestController::class)->creatable();
+
+        $response = $this->get('/videos/123/thumbnail');
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertSame('singleton show for 123', $response->getContent());
+
+        $response = $this->get('/videos/123/thumbnail/edit');
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertSame('singleton edit for 123', $response->getContent());
+
+        $response = $this->put('/videos/123/thumbnail');
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertSame('singleton update for 123', $response->getContent());
+
+        $response = $this->patch('/videos/123/thumbnail');
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertSame('singleton update for 123', $response->getContent());
+
+        $response = $this->delete('/videos/123/thumbnail');
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertSame('singleton destroy for 123', $response->getContent());
+    }
+
+    public function testDestroyableNestedSingleton()
+    {
+        Route::singleton('videos.thumbnail', NestedSingletonTestController::class)->destroyable();
 
         $response = $this->get('/videos/123/thumbnail');
         $this->assertEquals(200, $response->getStatusCode());

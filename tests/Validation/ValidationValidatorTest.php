@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Validation;
 
+use Countable;
 use DateTime;
 use DateTimeImmutable;
 use Egulias\EmailValidator\Validation\NoRFCWarningsValidation;
@@ -1637,6 +1638,77 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->messages()->has('foo.1.email'));
     }
 
+    /** @dataProvider prohibitedRulesData */
+    public function testProhibitedRulesAreConsistent($rules, $data, $result)
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $this->assertSame($result, (new Validator($trans, $data, $rules))->passes());
+    }
+
+    public function prohibitedRulesData()
+    {
+        $emptyCountable = new class implements Countable
+        {
+            public function count()
+            {
+                return 0;
+            }
+        };
+
+        return [
+            // prohibited...
+            // correct as per the docs. potentially incorrect behaviour.
+            [['p' => 'prohibited'], [], true],
+            [['p' => 'prohibited'], ['p' => ''], true],
+            [['p' => 'prohibited'], ['p' => ' '], true],
+            [['p' => 'prohibited'], ['p' => null], false],
+            [['p' => 'prohibited'], ['p' => []], false],
+            [['p' => 'prohibited'], ['p' => $emptyCountable], false],
+            [['p' => 'prohibited'], ['p' => 'foo'], false],
+
+            // prohibited_if...
+            // incorrect as per the docs. incorrect behaviour.
+            [['p' => 'prohibited_if:bar,1'], ['bar' => 1], true],
+            [['p' => 'prohibited_if:bar,1'], ['bar' => 1, 'p' => ''], true],
+            [['p' => 'prohibited_if:bar,1'], ['bar' => 1, 'p' => ' '], true],
+            [['p' => 'prohibited_if:bar,1'], ['bar' => 1, 'p' => null], true],
+            [['p' => 'prohibited_if:bar,1'], ['bar' => 1, 'p' => []], true],
+            [['p' => 'prohibited_if:bar,1'], ['bar' => 1, 'p' => $emptyCountable], true],
+            [['p' => 'prohibited_if:bar,1'], ['bar' => 1, 'p' => 'foo'], false],
+
+            // prohibited_unless...
+            // incorrect as per the docs.
+            [['p' => 'prohibited_unless:bar,1'], ['bar' => 2], true],
+            [['p' => 'prohibited_unless:bar,1'], ['bar' => 2, 'p' => ''], true],
+            [['p' => 'prohibited_unless:bar,1'], ['bar' => 2, 'p' => ' '], true],
+            [['p' => 'prohibited_unless:bar,1'], ['bar' => 2, 'p' => null], true],
+            [['p' => 'prohibited_unless:bar,1'], ['bar' => 2, 'p' => []], true],
+            [['p' => 'prohibited_unless:bar,1'], ['bar' => 2, 'p' => $emptyCountable], true],
+            [['p' => 'prohibited_unless:bar,1'], ['bar' => 2, 'p' => 'foo'], false],
+
+            // prohibites, with "p" values...
+            // matches the first one, but is incorrect as per the docs.
+            [['p' => 'prohibits:bar'], [], true],
+            [['p' => 'prohibits:bar'], ['bar' => 2, 'p' => ''], true],
+            [['p' => 'prohibits:bar'], ['bar' => 2, 'p' => ' '], true],
+            [['p' => 'prohibits:bar'], ['bar' => 2, 'p' => null], false],
+            [['p' => 'prohibits:bar'], ['bar' => 2, 'p' => []], false],
+            [['p' => 'prohibits:bar'], ['bar' => 2, 'p' => $emptyCountable], false],
+            [['p' => 'prohibits:bar'], ['bar' => 2, 'p' => 'foo'], false],
+
+            // prohibites, with "bar" values...
+            // correct, and correct per the docs.
+            [['p' => 'prohibits:bar'], ['p' => 'foo'], true],
+            [['p' => 'prohibits:bar'], ['bar' => '', 'p' => 'foo'], false],
+            [['p' => 'prohibits:bar'], ['bar' => ' ', 'p' => 'foo'], false],
+            [['p' => 'prohibits:bar'], ['bar' => null, 'p' => 'foo'], false],
+            [['p' => 'prohibits:bar'], ['bar' => [], 'p' => 'foo'], false],
+            [['p' => 'prohibits:bar'], ['bar' => $emptyCountable, 'p' => 'foo'], false],
+            [['p' => 'prohibits:bar'], ['bar' => 'foo', 'p' => 'foo'], false],
+        ];
+    }
+
     public function testFailedFileUploads()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -2448,6 +2520,55 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testValidateDecimal()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'asdad'], ['foo' => 'Decimal:2,3']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1.2345'], ['foo' => 'Decimal:2,3']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1.234'], ['foo' => 'Decimal:2,3']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '-1.234'], ['foo' => 'Decimal:2,3']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1.23'], ['foo' => 'Decimal:2,3']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '+1.23'], ['foo' => 'Decimal:2,3']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1.2'], ['foo' => 'Decimal:2,3']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1.23'], ['foo' => 'Decimal:2']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '-1.23'], ['foo' => 'Decimal:2']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1.233'], ['foo' => 'Decimal:2']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1.2'], ['foo' => 'Decimal:2']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1'], ['foo' => 'Decimal:0,1']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1.2'], ['foo' => 'Decimal:0,1']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '-1.2'], ['foo' => 'Decimal:0,1']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1.23'], ['foo' => 'Decimal:0,1']);
+        $this->assertFalse($v->passes());
+    }
+
     public function testValidateInt()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -2532,6 +2653,18 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['foo' => '3'], ['foo' => 'Numeric|Size:3']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '123'], ['foo' => 'Decimal:0|Size:3']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '3'], ['foo' => 'Decimal:0|Size:3']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '123'], ['foo' => 'Integer|Size:3']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '3'], ['foo' => 'Integer|Size:3']);
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['foo' => [1, 2, 3]], ['foo' => 'Array|Size:3']);
@@ -2635,6 +2768,17 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => '20'], ['foo' => 'Min:3']);
         $this->assertFalse($v->passes());
 
+        // an equal value qualifies.
+        $v = new Validator($trans, ['foo' => '3'], ['foo' => 'Decimal:0|Min:3']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '2'], ['foo' => 'Decimal:0|Min:3']);
+        $this->assertFalse($v->passes());
+
+        // '2.001' is considered as a float when the "Numeric" rule exists.
+        $v = new Validator($trans, ['foo' => '2.001'], ['foo' => 'Decimal:0,3|Min:3']);
+        $this->assertFalse($v->passes());
+
         $v = new Validator($trans, ['foo' => '5'], ['foo' => 'Numeric|Min:3']);
         $this->assertTrue($v->passes());
 
@@ -2678,6 +2822,17 @@ class ValidationValidatorTest extends TestCase
         // '2.001' is a string of length 5 in absence of the "Numeric" rule.
         $v = new Validator($trans, ['foo' => '2.001'], ['foo' => 'Max:3']);
         $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '211'], ['foo' => 'Decimal:0|Max:100']);
+        $this->assertFalse($v->passes());
+
+        // an equal value qualifies.
+        $v = new Validator($trans, ['foo' => '3'], ['foo' => 'Decimal:0|Max:3']);
+        $this->assertTrue($v->passes());
+
+        // '2.001' is considered as a float when the "Numeric" rule exists.
+        $v = new Validator($trans, ['foo' => '2.001'], ['foo' => 'Decimal:0,3|Max:3']);
+        $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['foo' => '22'], ['foo' => 'Numeric|Max:33']);
         $this->assertTrue($v->passes());
@@ -6724,6 +6879,34 @@ class ValidationValidatorTest extends TestCase
             ['af6f8cb0c57d11e19b210800200c9a66'],
             ['ff6f8cb0-c57da-51e1-9b21-0800200c9a66'],
         ];
+    }
+
+    public function testValidateWithValidAscii()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'Dusseldorf'], ['foo' => 'ascii']);
+        $this->assertTrue($v->passes());
+    }
+
+    public function testValidateWithInvalidAscii()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'Düsseldorf'], ['foo' => 'ascii']);
+        $this->assertFalse($v->passes());
+    }
+
+    public function testValidateWithValidUlid()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => '01gd6r360bp37zj17nxb55yv40'], ['foo' => 'ulid']);
+        $this->assertTrue($v->passes());
+    }
+
+    public function testValidateWithInvalidUlid()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => '01gd6r36-bp37z-17nx-55yv40'], ['foo' => 'ulid']);
+        $this->assertFalse($v->passes());
     }
 
     public static function providesPassingExcludeIfData()

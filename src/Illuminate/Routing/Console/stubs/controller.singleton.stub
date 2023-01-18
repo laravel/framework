@@ -66,6 +66,6 @@ class {{ class }} extends Controller
      */
     public function destroy()
     {
-        //
+        abort(404);
     }
 }

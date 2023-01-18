@@ -199,6 +199,12 @@ class NotificationSender
                     $notification->locale = $this->locale;
                 }
 
+                $connection = $notification->connection;
+
+                if (method_exists($notification, 'viaConnections')) {
+                    $connection = $notification->viaConnections()[$channel] ?? null;
+                }
+
                 $queue = $notification->queue;
 
                 if (method_exists($notification, 'viaQueues')) {
@@ -222,7 +228,7 @@ class NotificationSender
 
                 $this->bus->dispatch(
                     (new SendQueuedNotifications($notifiable, $notification, [$channel]))
-                            ->onConnection($notification->connection)
+                            ->onConnection($connection)
                             ->onQueue($queue)
                             ->delay(is_array($delay) ? ($delay[$channel] ?? null) : $delay)
                             ->through($middleware)

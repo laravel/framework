@@ -1,0 +1,43 @@
+name: facades
+
+on:
+  push:
+    branches:
+      - master
+      - '*.x'
+
+jobs:
+  update:
+    runs-on: ubuntu-22.04
+
+    strategy:
+      fail-fast: true
+
+    name: Facade DocBlocks
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.1
+          tools: composer:v2
+          coverage: none
+
+      - name: Install dependencies
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
+
+      - name: Update facade docblocks
+        run: php -f bin/facades.php
+
+      - name: Commit facade docblocks
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Update facade docblocks
+          file_pattern: src/

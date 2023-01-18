@@ -40,6 +40,17 @@ trait CreatesRegularExpressionRouteConstraints
     }
 
     /**
+     * Specify that the given route parameters must be ULIDs.
+     *
+     * @param  array|string  $parameters
+     * @return $this
+     */
+    public function whereUlid($parameters)
+    {
+        return $this->assignExpressionToParameters($parameters, '[0-7][0-9a-hjkmnp-tv-zA-HJKMNP-TV-Z]{25}');
+    }
+
+    /**
      * Specify that the given route parameters must be UUIDs.
      *
      * @param  array|string  $parameters

@@ -286,6 +286,7 @@ class UrlSigningTest extends TestCase
 class RoutableInterfaceStub implements UrlRoutable
 {
     public $key;
+    public $routable;
     public $slug = 'routable-slug';
 
     public function getRouteKey()
