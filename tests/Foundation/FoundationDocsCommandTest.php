@@ -287,7 +287,7 @@ Working directory: expected-working-directory');
         $_SERVER['argv'] = $argCache;
     }
 
-    public function testUnknownSystemNotifiedToOpenManualy()
+    public function testUnknownSystemNotifiedToOpenManually()
     {
         $this->app[Kernel::class]->registerCommand($this->command()->setUrlOpener(null)->setSystemOsFamily('Laravel OS'));
 

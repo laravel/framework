@@ -1058,7 +1058,7 @@ class FoundationViteTest extends TestCase
         $this->cleanViteManifest($buildDir);
     }
 
-    public function testCrossoriginAttributeIsIneritedByPreloadTags()
+    public function testCrossoriginAttributeIsInheritedByPreloadTags()
     {
         $buildDir = Str::random();
         $this->makeViteManifest([
