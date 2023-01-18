@@ -63,4 +63,24 @@ class ForeignKeyDefinition extends Fluent
     {
         return $this->onDelete('set null');
     }
+
+    /**
+     * Indicate that deletes should set no action.
+     *
+     * @return $this
+     */
+    public function noActionOnDelete()
+    {
+        return $this->onDelete('no action');
+    }
+
+    /**
+     * Indicate that updates should set no action.
+     *
+     * @return $this
+     */
+    public function noActionOnUpdate()
+    {
+        return $this->onUpdate('no action');
+    }
 }
