@@ -74,7 +74,7 @@ class Migrator
     protected $output;
 
     /**
-     * Indicates whether migrator should prevent rollback. 
+     * Indicates whether migrator should prevent rollback.
      */
     protected static $shouldPreventRollback = false;
 
@@ -765,7 +765,7 @@ class Migrator
 
     /**
      * Indicates that migrator should prevent rollback.
-     * 
+     *
      * @param  bool  $shouldBeStrict
      * @return void
      */
@@ -776,7 +776,7 @@ class Migrator
 
     /**
      * Prevent migrator from rollback.
-     * 
+     *
      * @param  bool  $value
      * @return void
      */
@@ -787,7 +787,7 @@ class Migrator
 
     /**
      * Indicates if rollback is disabled.
-     * 
+     *
      * @return bool
      */
     public function preventsRollback()

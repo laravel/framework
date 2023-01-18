@@ -53,6 +53,7 @@ class RollbackCommand extends BaseCommand
     {
         if ($this->migrator->preventsRollback()) {
             $this->components->warn('Rollback was prevented.');
+
             return 1;
         }
 
