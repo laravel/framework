@@ -136,6 +136,8 @@ class Http extends Facade
      * Indicate that an exception should be thrown if any request is not faked.
      *
      * @return \Illuminate\Http\Client\Factory
+     *
+     * @deprecated
      */
     public static function preventStrayRequests()
     {
