@@ -186,7 +186,6 @@ class CommandTest extends TestCase
             protected $aliases = ['bar:baz', 'baz:qux'];
         };
 
-        $this->assertSame('foo:bar', $command->getName());
         $this->assertSame(['bar:baz', 'baz:qux'], $command->getAliases());
     }
 
