@@ -177,6 +177,19 @@ class CommandTest extends TestCase
         $this->assertFalse($command->parentIsHidden());
     }
 
+    public function testAliasesProperty()
+    {
+        $command = new class extends Command
+        {
+            protected $name = 'foo:bar';
+
+            protected $aliases = ['bar:baz', 'baz:qux'];
+        };
+
+        $this->assertSame('foo:bar', $command->getName());
+        $this->assertSame(['bar:baz', 'baz:qux'], $command->getAliases());
+    }
+
     public function testChoiceIsSingleSelectByDefault()
     {
         $output = m::mock(OutputStyle::class);
