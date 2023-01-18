@@ -3800,14 +3800,14 @@ class Builder implements BuilderContract
         dd($this->toSql(), $this->getBindings());
     }
     
-     /**
+    /**
      * Die and dump the final SQL query with replaced bindings.
      *
      * @return never
      */
     public function ddFinalQuery()
     {
-        dd(vsprintf(str_replace(array('?'), array('\'%s\''), $this->toSql()), $this->getBindings()));
+        dd(vsprintf(str_replace(['?'], ['\'%s\''], $this->toSql()), $this->getBindings()));
     }
 
     /**
