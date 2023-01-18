@@ -73,14 +73,4 @@ class ForeignKeyDefinition extends Fluent
     {
         return $this->onDelete('no action');
     }
-
-    /**
-     * Indicate that updates should set no action.
-     *
-     * @return $this
-     */
-    public function noActionOnUpdate()
-    {
-        return $this->onUpdate('no action');
-    }
 }
