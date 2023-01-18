@@ -55,4 +55,11 @@ class SupportFacadesHttpTest extends TestCase
 
         $this->assertSame($client, $this->app->make(Factory::class));
     }
+
+    public function testFacadeRootIsSharedWhenAllowingStrayRequests(): void
+    {
+        $client = Http::allowStrayRequests();
+
+        $this->assertSame($client, $this->app->make(Factory::class));
+    }
 }

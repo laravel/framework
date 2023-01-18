@@ -7,7 +7,6 @@ use Illuminate\Http\Client\Factory;
 /**
  * @method static \GuzzleHttp\Promise\PromiseInterface response(array|string|null $body = null, int $status = 200, array $headers = [])
  * @method static \Illuminate\Http\Client\ResponseSequence sequence(array $responses = [])
- * @method static \Illuminate\Http\Client\Factory allowStrayRequests()
  * @method static void recordRequestResponsePair(\Illuminate\Http\Client\Request $request, \Illuminate\Http\Client\Response $response)
  * @method static void assertSent(callable $callback)
  * @method static void assertSentInOrder(array $callbacks)
@@ -119,6 +118,18 @@ class Http extends Facade
         });
 
         return $fake->fakeSequence($urlPattern);
+    }
+
+    /**
+     * Indicate that an exception should not be thrown if a request is not faked.
+     *
+     * @return \Illuminate\Http\Client\Factory
+     */
+    public static function allowStrayRequests()
+    {
+        return tap(static::getFacadeRoot(), function ($fake) {
+            static::swap($fake->allowStrayRequests());
+        });
     }
 
     /**
