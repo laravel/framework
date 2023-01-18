@@ -1744,6 +1744,26 @@ class HttpClientTest extends TestCase
         $this->assertSame(400, $response->status());
     }
 
+    public function testRequestExceptionIsThrownUnlessStatusCodeIsSatisfied()
+    {
+        $this->factory->fake([
+            'http://foo.com/api/400' => $this->factory::response('', 400),
+            'http://foo.com/api/408' => $this->factory::response('', 408),
+            'http://foo.com/api/500' => $this->factory::response('', 500),
+        ]);
+
+        $this->expectException(RequestException::class);
+        $response = $this->factory->get('http://foo.com/api/400')->throwUnlessStatus(500);
+        $this->assertSame(400, $response->status());
+
+        $this->expectException(RequestException::class);
+        $response = $this->factory->get('http://foo.com/api/408')->throwIfStatus(500);
+        $this->assertSame(408, $response->status());
+
+        $response = $this->factory->get('http://foo.com/api/500')->throwUnlessStatus(500);
+        $this->assertSame(500, $response->status());
+    }
+
     public function testItCanEnforceFaking()
     {
         $this->factory->preventStrayRequests();
