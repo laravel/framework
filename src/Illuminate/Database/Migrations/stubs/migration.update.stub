@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('{{ table }}', function (Blueprint $table) {
+        Schema::table('{{ table }}', static function (Blueprint $table) {
             //
         });
     }
