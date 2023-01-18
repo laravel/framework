@@ -809,7 +809,7 @@ class Arr
     }
 
     /**
-     * Filter the array then reorder the filtered array key
+     * Filter the array then reorder the filtered array key.
      *
      * @param  array  $array
      * @param  callable  $callback
