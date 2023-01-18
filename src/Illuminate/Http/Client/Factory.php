@@ -60,7 +60,7 @@ class Factory
      *
      * @var bool
      */
-    protected $preventStrayRequests = true;
+    protected $preventStrayRequests = false;
 
     /**
      * Create a new factory instance.

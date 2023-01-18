@@ -101,7 +101,7 @@ class Http extends Facade
     public static function fake($callback = null)
     {
         return tap(static::getFacadeRoot(), function ($fake) use ($callback) {
-            static::swap($fake->fake($callback));
+            static::swap($fake->preventStrayRequests()->fake($callback));
         });
     }
 
@@ -114,7 +114,7 @@ class Http extends Facade
     public static function fakeSequence(string $urlPattern = '*')
     {
         $fake = tap(static::getFacadeRoot(), function ($fake) {
-            static::swap($fake);
+            static::swap($fake->preventStrayRequests());
         });
 
         return $fake->fakeSequence($urlPattern);
