@@ -18,8 +18,8 @@ class PredisClusterConnection extends PredisConnection
             ? ServerFlushDatabase::class
             : FLUSHDB::class;
 
-        $this->client->executeCommandOnNodes(
-            tap($command)->setArguments(func_get_args())
-        );
+        foreach ($this->client as $node) {
+            $node->executeCommand(tap(new $command)->setArguments(func_get_args()));
+        }
     }
 }
