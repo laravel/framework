@@ -205,6 +205,16 @@ class Response implements ArrayAccess
     }
 
     /**
+     * Determine if the response was a 422 "Unprocessable Entity" response.
+     *
+     * @return bool
+     */
+    public function unprocessable()
+    {
+        return $this->status() === 422;
+    }
+    
+    /**
      * Determine if the response was a 404 "Not Found" response.
      *
      * @return bool
