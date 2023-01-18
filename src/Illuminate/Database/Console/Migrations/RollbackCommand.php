@@ -51,6 +51,11 @@ class RollbackCommand extends BaseCommand
      */
     public function handle()
     {
+        if ($this->migrator->preventsRollback()) {
+            $this->components->warn('Rollback was prevented.');
+            return 1;
+        }
+
         if (! $this->confirmToProceed()) {
             return 1;
         }

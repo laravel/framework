@@ -74,6 +74,11 @@ class Migrator
     protected $output;
 
     /**
+     * Indicates whether migrator should prevent rollback. 
+     */
+    protected static $shouldPreventRollback = false;
+
+    /**
      * Create a new migrator instance.
      *
      * @param  \Illuminate\Database\Migrations\MigrationRepositoryInterface  $repository
@@ -756,5 +761,37 @@ class Migrator
         if ($this->events) {
             $this->events->dispatch($event);
         }
+    }
+
+    /**
+     * Indicates that migrator should prevent rollback.
+     * 
+     * @param  bool  $shouldBeStrict
+     * @return void
+     */
+    public static function shouldBeStrict(bool $shouldBeStrict = true)
+    {
+        static::preventRollback($shouldBeStrict);
+    }
+
+    /**
+     * Prevent migrator from rollback.
+     * 
+     * @param  bool  $value
+     * @return void
+     */
+    public static function preventRollback(bool $value = true)
+    {
+        static::$shouldPreventRollback = $value;
+    }
+
+    /**
+     * Indicates if rollback is disabled.
+     * 
+     * @return bool
+     */
+    public function preventsRollback()
+    {
+        return static::$shouldPreventRollback;
     }
 }

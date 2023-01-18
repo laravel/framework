@@ -282,4 +282,26 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $this->migrator->reset([__DIR__.'/migrations/one'], ['database' => 'sqlite2']);
         $this->assertSame('default', $this->migrator->getConnection());
     }
+
+    public function testStrictMode()
+    {
+        $this->assertSame(false, $this->migrator->preventsRollback());
+
+        $this->migrator->shouldBeStrict(true);
+        $this->assertSame(true, $this->migrator->preventsRollback());
+
+        $this->migrator->shouldBeStrict(false);
+        $this->assertSame(false, $this->migrator->preventsRollback());
+    }
+
+    public function testPreventsRollback()
+    {
+        $this->assertSame(false, $this->migrator->preventsRollback());
+
+        $this->migrator->shouldBeStrict(true);
+        $this->assertSame(true, $this->migrator->preventsRollback());
+
+        $this->migrator->shouldBeStrict(false);
+        $this->assertSame(false, $this->migrator->preventsRollback());
+    }
 }
