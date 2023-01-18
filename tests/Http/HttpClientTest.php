@@ -1878,7 +1878,6 @@ class HttpClientTest extends TestCase
         $this->assertFalse($hitThrowCallback);
     }
 
-
     public function testRequestExceptionIsThrownIfStatusCodeIsSatisfied()
     {
         $this->factory->fake([
@@ -2096,8 +2095,9 @@ class HttpClientTest extends TestCase
         $this->assertInstanceOf(RequestException::class, $exception);
     }
 
-    public function testItEnforcesFakingByDefault()
+    public function testItEnforcesFaking()
     {
+        $this->factory->preventStrayRequests();
         $this->factory->fake(['https://vapor.laravel.com' => Factory::response('ok', 200)]);
         $this->factory->fake(['https://forge.laravel.com' => Factory::response('ok', 200)]);
 
