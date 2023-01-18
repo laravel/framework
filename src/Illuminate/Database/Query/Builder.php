@@ -3799,7 +3799,7 @@ class Builder implements BuilderContract
     {
         dd($this->toSql(), $this->getBindings());
     }
-    
+
     /**
      * Die and dump the final SQL query with replaced bindings.
      *
