@@ -39,7 +39,7 @@ class HttpClientTest extends TestCase
     {
         parent::setUp();
 
-        $this->factory = new Factory();
+        $this->factory = new Factory;
     }
 
     protected function tearDown(): void
@@ -267,7 +267,8 @@ class HttpClientTest extends TestCase
     {
         $this->factory->fake();
 
-        $this->factory->asJson()->post('http://foo.com/form', new class () implements JsonSerializable {
+        $this->factory->asJson()->post('http://foo.com/form', new class implements JsonSerializable
+        {
             public function jsonSerialize(): mixed
             {
                 return [
@@ -288,7 +289,8 @@ class HttpClientTest extends TestCase
     {
         $this->factory->fake();
 
-        $this->factory->asJson()->post('http://foo.com/form', new class () implements JsonSerializable, Arrayable {
+        $this->factory->asJson()->post('http://foo.com/form', new class implements JsonSerializable, Arrayable
+        {
             public function jsonSerialize(): mixed
             {
                 return [
@@ -559,8 +561,7 @@ class HttpClientTest extends TestCase
         $this->factory->fakeSequence()->pushStatus(200);
 
         $response = $this->factory->withCookies(
-            ['foo' => 'bar'],
-            'https://laravel.com'
+            ['foo' => 'bar'], 'https://laravel.com'
         )->get('https://laravel.com');
 
         $this->assertCount(1, $response->cookies()->toArray());
