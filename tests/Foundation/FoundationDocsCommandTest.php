@@ -29,7 +29,7 @@ class FoundationDocsCommandTest extends TestCase
     {
         parent::setUp();
 
-        Http::preventStrayRequests()->fake([
+        Http::fake([
             'https://laravel.com/docs/8.x/index.json' => Http::response(file_get_contents(__DIR__.'/fixtures/docs.json')),
         ]);
 

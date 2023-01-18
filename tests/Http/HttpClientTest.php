@@ -1878,6 +1878,7 @@ class HttpClientTest extends TestCase
         $this->assertFalse($hitThrowCallback);
     }
 
+
     public function testRequestExceptionIsThrownIfStatusCodeIsSatisfied()
     {
         $this->factory->fake([
@@ -2095,9 +2096,8 @@ class HttpClientTest extends TestCase
         $this->assertInstanceOf(RequestException::class, $exception);
     }
 
-    public function testItCanEnforceFaking()
+    public function testItEnforcesFakingByDefault()
     {
-        $this->factory->preventStrayRequests();
         $this->factory->fake(['https://vapor.laravel.com' => Factory::response('ok', 200)]);
         $this->factory->fake(['https://forge.laravel.com' => Factory::response('ok', 200)]);
 
@@ -2108,6 +2108,20 @@ class HttpClientTest extends TestCase
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Attempted request to [https://laravel.com] without a matching fake.');
+
+        $this->factory->get('https://laravel.com');
+    }
+
+    public function testAllowsSendingStrayRequests()
+    {
+        $this->factory->allowStrayRequests();
+        $this->factory->fake(['https://vapor.laravel.com' => Factory::response('ok', 200)]);
+        $this->factory->fake(['https://forge.laravel.com' => Factory::response('ok', 200)]);
+
+        $responses = [];
+        $responses[] = $this->factory->get('https://vapor.laravel.com')->body();
+        $responses[] = $this->factory->get('https://forge.laravel.com')->body();
+        $this->assertSame(['ok', 'ok'], $responses);
 
         $this->factory->get('https://laravel.com');
     }
