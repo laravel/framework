@@ -1092,6 +1092,22 @@ class SupportArrTest extends TestCase
         ], Arr::keyBy($array, 'id'));
     }
 
+    public function testFilterWithReorder()
+    {
+        $languages = [
+            'java',
+            'javascript',
+            'python',
+            'php',
+        ];
+
+        $p = Arr::filterWithReorder($languages, fn ($arr) => str_starts_with($arr, 'p'));
+        $this->assertArrayHasKey(0, $p);
+        $this->assertArrayHasKey(1, $p);
+        $this->assertArrayNotHasKey(3, $p);
+        $this->assertArrayNotHasKey(2, $p);
+    }
+
     public function testPrependKeysWith()
     {
         $array = [

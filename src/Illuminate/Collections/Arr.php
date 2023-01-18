@@ -809,6 +809,18 @@ class Arr
     }
 
     /**
+     * Filter the array then reorder the filtered array key
+     *
+     * @param  array  $array
+     * @param  callable  $callback
+     * @return array
+     */
+    public static function filterWithReorder($array, callable $callback)
+    {
+        return array_values(static::where($array, $callback));
+    }
+
+    /**
      * If the given value is not an array and not null, wrap it in one.
      *
      * @param  mixed  $value
