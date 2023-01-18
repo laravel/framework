@@ -155,12 +155,12 @@ class Mailer implements MailerContract, MailQueueContract
      * Begin the process of mailing a mailable class instance.
      *
      * @param  mixed  $users
-     * @param  string $name
+     * @param  string  $name
      * @return \Illuminate\Mail\PendingMail
      */
     public function to($users, $name = null)
     {
-        if (!is_null($name) && is_string($users)) {
+        if (! is_null($name) && is_string($users)) {
             $users = new Address($users, $name);
         }
 
