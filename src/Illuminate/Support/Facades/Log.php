@@ -13,7 +13,7 @@ namespace Illuminate\Support\Facades;
  * @method static string|null getDefaultDriver()
  * @method static void setDefaultDriver(string $name)
  * @method static \Illuminate\Log\LogManager extend(string $driver, \Closure $callback)
- * @method static \Illuminate\Log\LogManager forgetChannel(string|null $driver = null)
+ * @method static void forgetChannel(string|null $driver = null)
  * @method static array getChannels()
  * @method static void emergency(string $message, array $context = [])
  * @method static void alert(string $message, array $context = [])
