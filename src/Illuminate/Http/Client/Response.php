@@ -373,6 +373,26 @@ class Response implements ArrayAccess
     }
 
     /**
+     * @return $this
+     *
+     * @throws \Illuminate\Http\Client\RequestException
+     */
+    public function throwIfClientError()
+    {
+        return $this->clientError() ? $this->throw() : $this;
+    }
+
+    /**
+     * @return $this
+     *
+     * @throws \Illuminate\Http\Client\RequestException
+     */
+    public function throwIfServerError()
+    {
+        return $this->serverError() ? $this->throw() : $this;
+    }
+
+    /**
      * Determine if the given offset exists.
      *
      * @param  string  $offset

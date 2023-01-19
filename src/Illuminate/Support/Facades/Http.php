@@ -61,6 +61,8 @@ use Illuminate\Http\Client\Factory;
  * @method static \Illuminate\Http\Client\Response delete(string $url, array $data = [])
  * @method static \Illuminate\Http\Client\Response throwIfStatus(int $statusCode)
  * @method static \Illuminate\Http\Client\Response throwUnlessStatus(int $statusCode)
+ * @method static \Illuminate\Http\Client\Response throwIfClientError()
+ * @method static \Illuminate\Http\Client\Response throwIfServerError()
  * @method static array pool(callable $callback)
  * @method static \Illuminate\Http\Client\Response send(string $method, string $url, array $options = [])
  * @method static \GuzzleHttp\Client buildClient()
