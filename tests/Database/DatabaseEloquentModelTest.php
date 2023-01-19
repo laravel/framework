@@ -44,6 +44,10 @@ use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use stdClass;
 
+if (PHP_VERSION_ID >= 80100) {
+	include 'Enums.php';
+}
+
 class DatabaseEloquentModelTest extends TestCase
 {
     use InteractsWithTime;
@@ -301,7 +305,10 @@ class DatabaseEloquentModelTest extends TestCase
         $model->asEncryptedArrayObjectAttribute = ['foo' => 'baz'];
         $this->assertTrue($model->isDirty('asEncryptedArrayObjectAttribute'));
     }
-
+	
+	/**
+	 * @requires PHP >= 8.1
+	 */
     public function testDirtyOnEnumCollectionObject()
     {
         $model = new EloquentModelCastingStub;
@@ -3009,7 +3016,7 @@ class EloquentModelCastingStub extends Model
         'asStringableAttribute' => AsStringable::class,
         'asEncryptedCollectionAttribute' => AsEncryptedCollection::class,
         'asEncryptedArrayObjectAttribute' => AsEncryptedArrayObject::class,
-        'asEnumCollectionAttribute' => AsEnumCollection::class.':'.'StringStatus',
+        'asEnumCollectionAttribute' => AsEnumCollection::class.':'.StringStatus::class,
     ];
 
     public function jsonAttributeValue()
@@ -3096,14 +3103,5 @@ class Uppercase implements CastsInboundAttributes
     public function set($model, string $key, $value, array $attributes)
     {
         return is_string($value) ? strtoupper($value) : $value;
-    }
-}
-
-if (PHP_VERSION_ID >= 80100) {
-    enum StringStatus : string
-    {
-        case draft = 'draft';
-        case pending = 'pending';
-        case done = 'done';
     }
 }
