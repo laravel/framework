@@ -45,7 +45,7 @@ use ReflectionClass;
 use stdClass;
 
 if (PHP_VERSION_ID >= 80100) {
-	include 'Enums.php';
+    include 'Enums.php';
 }
 
 class DatabaseEloquentModelTest extends TestCase
@@ -305,10 +305,10 @@ class DatabaseEloquentModelTest extends TestCase
         $model->asEncryptedArrayObjectAttribute = ['foo' => 'baz'];
         $this->assertTrue($model->isDirty('asEncryptedArrayObjectAttribute'));
     }
-	
-	/**
-	 * @requires PHP >= 8.1
-	 */
+
+    /**
+     * @requires PHP >= 8.1
+     */
     public function testDirtyOnEnumCollectionObject()
     {
         $model = new EloquentModelCastingStub;
