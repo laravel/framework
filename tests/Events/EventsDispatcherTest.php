@@ -448,6 +448,25 @@ class EventsDispatcherTest extends TestCase
         TestListener::$counter = 0;
     }
 
+    public function testWrapperEvent()
+    {
+        $d = new Dispatcher;
+        $d->listen(TestWrapperEvent::class, fn () => throw new Exception('Hi 1'));
+        $d->listen(TestWrapperEvent::class, fn () => throw new Exception('Hi 2'));
+        $d->listen(TestWrapperEvent::class, fn () => throw new Exception('Hi 3'));
+
+        $_SERVER['__event.test'] = [];
+        $responses = $d->dispatch(TestWrapperEvent::class);
+        $this->assertEquals(['Hi 1', 'Hi 2', 'Hi 3'], $responses);
+        $this->assertEquals(['__construct'], $_SERVER['__event.test']);
+
+        $event = new TestWrapperEvent;
+        $_SERVER['__event.test'] = [];
+        $responses = $d->dispatch($event);
+        $this->assertEquals([], $_SERVER['__event.test']);
+        $this->assertEquals(['Hi 1', 'Hi 2', 'Hi 3'], $responses);
+    }
+
     public function testGetListeners()
     {
         $d = new Dispatcher;
@@ -721,5 +740,22 @@ class TestListener3
     public function handle()
     {
         $_SERVER['__event.test'][] = 'handle-3';
+    }
+}
+
+class TestWrapperEvent
+{
+    public function __construct()
+    {
+        $_SERVER['__event.test'][] = '__construct';
+    }
+
+    public function wrapListener($listener)
+    {
+        try {
+            return $listener();
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
     }
 }

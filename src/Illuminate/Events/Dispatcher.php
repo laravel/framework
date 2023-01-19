@@ -232,6 +232,16 @@ class Dispatcher implements DispatcherContract
      */
     public function dispatch($event, $payload = [], $halt = false)
     {
+        if (method_exists($event, 'wrapListener')) {
+            if (is_string($event)) {
+                $event = $this->container->make($event);
+            }
+
+            $wrapper = fn ($listener) => $event->wrapListener($listener);
+        } else {
+            $wrapper = fn ($listener) => $listener();
+        }
+
         // When the given "event" is actually an object we will assume it is an event
         // object and use the class as the event name and this event itself as the
         // payload to the handler, which makes object based events quite simple.
@@ -246,7 +256,7 @@ class Dispatcher implements DispatcherContract
         $responses = [];
 
         foreach ($this->getListeners($event) as $listener) {
-            $response = $listener($event, $payload);
+            $response = $wrapper(fn () => $listener($event, $payload));
 
             // If a response is returned from the listener and event halting is enabled
             // we will just return this response, and not call the rest of the event
