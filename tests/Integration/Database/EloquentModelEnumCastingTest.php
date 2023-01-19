@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Illuminate\Database\Eloquent\Casts\AsCollection;
 use Illuminate\Database\Eloquent\Casts\AsEnumCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
@@ -249,9 +248,9 @@ class EloquentModelEnumCastingTestModel extends Model
 
     public $casts = [
         'string_status' => StringStatus::class,
-        'string_status_collection' => AsEnumCollection::class . ':' . StringStatus::class,
+        'string_status_collection' => AsEnumCollection::class.':'.StringStatus::class,
         'integer_status' => IntegerStatus::class,
-        'integer_status_collection' => AsEnumCollection::class . ':' . IntegerStatus::class,
+        'integer_status_collection' => AsEnumCollection::class.':'.IntegerStatus::class,
         'arrayable_status' => ArrayableStatus::class,
     ];
 }

@@ -301,25 +301,24 @@ class DatabaseEloquentModelTest extends TestCase
         $model->asEncryptedArrayObjectAttribute = ['foo' => 'baz'];
         $this->assertTrue($model->isDirty('asEncryptedArrayObjectAttribute'));
     }
-	
-	
-	public function testDirtyOnEnumCollectionObject()
-	{
-		$model = new EloquentModelCastingStub;
-		$model->setRawAttributes([
-			'asEnumCollectionAttribute' => json_encode(['draft', 'pending']),
-		]);
-		$model->syncOriginal();
-		
-		$this->assertInstanceOf(BaseCollection::class, $model->asEnumCollectionAttribute);
-		$this->assertFalse($model->isDirty('asEnumCollectionAttribute'));
-		
-		$model->asEnumCollectionAttribute = ['draft', 'pending'];
-		$this->assertFalse($model->isDirty('asEnumCollectionAttribute'));
-		
-		$model->asEnumCollectionAttribute = ['draft', 'done'];
-		$this->assertTrue($model->isDirty('asEnumCollectionAttribute'));
-	}
+
+    public function testDirtyOnEnumCollectionObject()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->setRawAttributes([
+            'asEnumCollectionAttribute' => json_encode(['draft', 'pending']),
+        ]);
+        $model->syncOriginal();
+
+        $this->assertInstanceOf(BaseCollection::class, $model->asEnumCollectionAttribute);
+        $this->assertFalse($model->isDirty('asEnumCollectionAttribute'));
+
+        $model->asEnumCollectionAttribute = ['draft', 'pending'];
+        $this->assertFalse($model->isDirty('asEnumCollectionAttribute'));
+
+        $model->asEnumCollectionAttribute = ['draft', 'done'];
+        $this->assertTrue($model->isDirty('asEnumCollectionAttribute'));
+    }
 
     public function testCleanAttributes()
     {
@@ -3010,7 +3009,7 @@ class EloquentModelCastingStub extends Model
         'asStringableAttribute' => AsStringable::class,
         'asEncryptedCollectionAttribute' => AsEncryptedCollection::class,
         'asEncryptedArrayObjectAttribute' => AsEncryptedArrayObject::class,
-        'asEnumCollectionAttribute' => AsEnumCollection::class . ':' . StringStatus::class,
+        'asEnumCollectionAttribute' => AsEnumCollection::class.':'.StringStatus::class,
     ];
 
     public function jsonAttributeValue()
@@ -3101,10 +3100,10 @@ class Uppercase implements CastsInboundAttributes
 }
 
 if (PHP_VERSION_ID >= 80100) {
-	enum StringStatus: string
-	{
-		case draft = 'draft';
-		case pending = 'pending';
-		case done = 'done';
-	}
+    enum StringStatus : string
+    {
+        case draft = 'draft';
+        case pending = 'pending';
+        case done = 'done';
+    }
 }
