@@ -158,6 +158,22 @@ class HttpRequestTest extends TestCase
 
         $request = Request::create('https://foo.com');
         $this->assertSame('https://foo.com/?key=value%20with%20spaces', $request->fullUrlWithQuery(['key' => 'value with spaces']));
+
+        $request = Request::create('https://foo.com');
+        $this->assertSame('https://foo.com', $request->fullUrlOnlyWithQuery(['page']));
+
+        $request = Request::create('https://foo.com?page=1');
+        $this->assertSame('https://foo.com?page=1', $request->fullUrlOnlyWithQuery(['page']));
+
+        $request = Request::create('https://foo.com?name=taylor&page=1');
+        $this->assertSame('https://foo.com?page=1', $request->fullUrlOnlyWithQuery(['page']));
+
+        $request = Request::create('http://foo.com/foo/bar?name=taylor&page=1');
+        $this->assertSame('http://foo.com/foo/bar?page=1', $request->fullUrlOnlyWithQuery(['page']));
+
+        $request = Request::create('https://foo.com?name=taylor&key=value%20with%20spaces');
+        $this->assertSame('https://foo.com?key=value%20with%20spaces', $request->fullUrlOnlyWithQuery(['key']));
+
     }
 
     public function testIsMethod()
