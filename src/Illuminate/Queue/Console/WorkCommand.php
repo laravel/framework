@@ -207,7 +207,7 @@ class WorkCommand extends Command
     {
         $this->output->write(sprintf(
             '  <fg=gray>%s</> %s%s',
-            $this->getCurrentTimestamp()->format('Y-m-d H:i:s'),
+            $this->now()->format('Y-m-d H:i:s'),
             $job->resolveName(),
             $this->output->isVerbose()
                 ? sprintf(' <fg=gray>%s</>', $job->getJobId())
@@ -242,18 +242,21 @@ class WorkCommand extends Command
         });
     }
 
-    protected function getCurrentTimestamp(): Carbon
+    /**
+     * Get the current date / time.
+     *
+     * @return \Illuminate\Support\Carbon
+     */
+    protected function now()
     {
-        $appTimezone = $this->laravel['config']->get('app.timezone');
-        $queueLogTimezone = $this->laravel['config']->get('queue.log_timezone');
+        $queueTimezone = $this->laravel['config']->get('queue.output_timezone');
 
-        $timestamp = Carbon::now();
-
-        if ($queueLogTimezone && $queueLogTimezone !== $appTimezone) {
-            $timestamp->setTimezone($queueLogTimezone);
+        if ($queueTimezone &&
+            $queueTimezone !== $this->laravel['config']->get('app.timezone')) {
+            return Carbon::now()->setTimezone($queueTimezone);
         }
 
-        return $timestamp;
+        return Carbon::now();
     }
 
     /**
