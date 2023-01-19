@@ -11,14 +11,15 @@ use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
-use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
+use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\ArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsCollection;
 use Illuminate\Database\Eloquent\Casts\AsEncryptedArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsEncryptedCollection;
+use Illuminate\Database\Eloquent\Casts\AsEnumArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsEnumCollection;
 use Illuminate\Database\Eloquent\Casts\AsStringable;
 use Illuminate\Database\Eloquent\Collection;
@@ -325,6 +326,27 @@ class DatabaseEloquentModelTest extends TestCase
 
         $model->asEnumCollectionAttribute = ['draft', 'done'];
         $this->assertTrue($model->isDirty('asEnumCollectionAttribute'));
+    }
+
+    /**
+     * @requires PHP >= 8.1
+     */
+    public function testDirtyOnEnumArrayObject()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->setRawAttributes([
+            'asEnumArrayObjectAttribute' => json_encode(['draft', 'pending']),
+        ]);
+        $model->syncOriginal();
+
+        $this->assertInstanceOf(ArrayObject::class, $model->asEnumArrayObjectAttribute);
+        $this->assertFalse($model->isDirty('asEnumArrayObjectAttribute'));
+
+        $model->asEnumArrayObjectAttribute = ['draft', 'pending'];
+        $this->assertFalse($model->isDirty('asEnumArrayObjectAttribute'));
+
+        $model->asEnumArrayObjectAttribute = ['draft', 'done'];
+        $this->assertTrue($model->isDirty('asEnumArrayObjectAttribute'));
     }
 
     public function testCleanAttributes()
@@ -3017,6 +3039,7 @@ class EloquentModelCastingStub extends Model
         'asEncryptedCollectionAttribute' => AsEncryptedCollection::class,
         'asEncryptedArrayObjectAttribute' => AsEncryptedArrayObject::class,
         'asEnumCollectionAttribute' => AsEnumCollection::class.':'.StringStatus::class,
+        'asEnumArrayObjectAttribute' => AsEnumArrayObject::class.':'.StringStatus::class,
     ];
 
     public function jsonAttributeValue()

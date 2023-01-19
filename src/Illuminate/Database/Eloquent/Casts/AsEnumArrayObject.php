@@ -5,9 +5,10 @@ namespace Illuminate\Database\Eloquent\Casts;
 use BackedEnum;
 use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
+use Illuminate\Database\Eloquent\Casts\ArrayObject;
 use Illuminate\Support\Collection;
 
-class AsEnumCollection implements Castable
+class AsEnumArrayObject implements Castable
 {
     /**
      * Get the caster class to use when casting from / to this cast target.
@@ -39,27 +40,31 @@ class AsEnumCollection implements Castable
 
                 $enumClass = $this->arguments[0];
 
-                return (new Collection($data))->map(function ($value) use ($enumClass) {
+                return new ArrayObject((new Collection($data))->map(function ($value) use ($enumClass) {
                     return is_subclass_of($enumClass, BackedEnum::class)
                         ? $enumClass::from($value)
                         : constant($enumClass.'::'.$value);
-                });
+                })->toArray());
             }
 
             public function set($model, $key, $value, $attributes)
             {
-                $value = $value !== null
-                    ? (new Collection($value))->map(function ($enum) {
-                        return $this->getStorableEnumValue($enum);
-                    })->toJson()
-                    : null;
+                if ($value === null) {
+                    return [$key => null];
+                }
 
-                return [$key => $value];
+                $storable = [];
+
+                foreach ($value as $enum) {
+                    $storable[] = $this->getStorableEnumValue($enum);
+                }
+
+                return [$key => json_encode($storable)];
             }
 
             public function serialize($model, string $key, $value, array $attributes)
             {
-                return (new Collection($value))->map(function ($enum) {
+                return (new Collection($value->getArrayCopy()))->map(function ($enum) {
                     return $this->getStorableEnumValue($enum);
                 })->toArray();
             }
