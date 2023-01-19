@@ -17,7 +17,8 @@ class AsEnumCollection implements Castable
      */
     public static function castUsing(array $arguments)
     {
-        return new class($arguments) implements CastsAttributes {
+        return new class($arguments) implements CastsAttributes
+        {
             protected $arguments;
 
             public function __construct(array $arguments)
