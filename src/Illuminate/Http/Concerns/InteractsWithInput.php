@@ -246,7 +246,7 @@ trait InteractsWithInput
     }
 
     /**
-     * Determine if the given input key is an empty string for "has".
+     * Determine if the given input key is an empty string for "filled".
      *
      * @param  string  $key
      * @return bool
