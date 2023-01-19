@@ -314,10 +314,6 @@ trait HasAttributes
                 $attributes[$key] = isset($attributes[$key]) ? $this->getStorableEnumValue($attributes[$key]) : null;
             }
 
-            if ($this->isEnumArrayCastable($key)) {
-                $attributes[$key] = isset($attributes[$key]) ? $this->getStorableEnumArrayValue($attributes[$key]) : null;
-            }
-
             if ($attributes[$key] instanceof Arrayable) {
                 $attributes[$key] = $attributes[$key]->toArray();
             }
@@ -793,10 +789,6 @@ trait HasAttributes
             return $this->getEnumCastableAttributeValue($key, $value);
         }
 
-        if ($this->isEnumArrayCastable($key)) {
-            return $this->getEnumArrayCastableAttributeValue($key, $value);
-        }
-
         if ($this->isClassCastable($key)) {
             return $this->getClassCastableAttributeValue($key, $value);
         }
@@ -852,26 +844,6 @@ trait HasAttributes
         }
 
         return $this->getEnumCaseFromValue($castType, $value);
-    }
-
-    /**
-     * Cast the given attribute to an array of enums.
-     *
-     * @param  string  $key
-     * @param  mixed  $value
-     * @return mixed
-     */
-    protected function getEnumArrayCastableAttributeValue($key, $value)
-    {
-        if (is_null($value)) {
-            return;
-        }
-
-        $castType = Str::before($this->getCasts()[$key], ':array');
-
-        $value = is_array($value) ? $value : $this->fromJson($value);
-
-        return array_map(fn (string $value) => $this->getEnumCaseFromValue($castType, $value), $value);
     }
 
     /**
@@ -992,12 +964,6 @@ trait HasAttributes
 
         if ($this->isEnumCastable($key)) {
             $this->setEnumCastableAttribute($key, $value);
-
-            return $this;
-        }
-
-        if ($this->isEnumArrayCastable($key)) {
-            $this->setEnumArrayCastableAttribute($key, $value);
 
             return $this;
         }
@@ -1194,28 +1160,6 @@ trait HasAttributes
     }
 
     /**
-     * Set the value of an enum array castable attribute.
-     *
-     * @param  string  $key
-     * @param  array|string  $value
-     * @return void
-     */
-    protected function setEnumArrayCastableAttribute($key, $value)
-    {
-        $enumClass = Str::before($this->getCasts()[$key], ':array');
-
-        if (! isset($value)) {
-            $this->attributes[$key] = null;
-        } else {
-            $value = is_array($value) ? $value : $this->fromJson($value);
-
-            $this->attributes[$key] = $this->getStorableEnumArrayValue(
-                array_map(fn ($value) => is_object($value) ? $value : $this->getEnumCaseFromValue($enumClass, $value), $value)
-            );
-        }
-    }
-
-    /**
      * Get an enum case instance from a given class and value.
      *
      * @param  string  $enumClass
@@ -1238,21 +1182,8 @@ trait HasAttributes
     protected function getStorableEnumValue($value)
     {
         return $value instanceof BackedEnum
-            ? $value->value
-            : $value->name;
-    }
-
-    /**
-     * Get the storable value from the given enum.
-     *
-     * @param  array  $value
-     * @return string
-     */
-    protected function getStorableEnumArrayValue($value)
-    {
-        return json_encode(
-            array_map(fn ($value) => $this->getStorableEnumValue($value), $value)
-        );
+                ? $value->value
+                : $value->name;
     }
 
     /**
@@ -1690,33 +1621,6 @@ trait HasAttributes
     }
 
     /**
-     * Determine if the given key is cast using an array of enums.
-     *
-     * @param  string  $key
-     * @return bool
-     */
-    protected function isEnumArrayCastable($key)
-    {
-        $casts = $this->getCasts();
-
-        if (! array_key_exists($key, $casts)) {
-            return false;
-        }
-
-        $castType = $casts[$key];
-
-        if (in_array($castType, static::$primitiveCastTypes)) {
-            return false;
-        }
-
-        if (! Str::endsWith($castType, ':array')) {
-            return false;
-        }
-
-        return function_exists('enum_exists') && enum_exists(Str::before($castType, ':array'));
-    }
-
-    /**
      * Determine if the key is deviable using a custom class.
      *
      * @param  string  $key
@@ -1745,10 +1649,9 @@ trait HasAttributes
      */
     protected function isClassSerializable($key)
     {
-        return ! $this->isEnumCastable($key)
-            && ! $this->isEnumArrayCastable($key)
-            && $this->isClassCastable($key)
-            && method_exists($this->resolveCasterClass($key), 'serialize');
+        return ! $this->isEnumCastable($key) &&
+            $this->isClassCastable($key) &&
+            method_exists($this->resolveCasterClass($key), 'serialize');
     }
 
     /**
