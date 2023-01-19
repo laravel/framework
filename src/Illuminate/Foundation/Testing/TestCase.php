@@ -132,7 +132,7 @@ abstract class TestCase extends BaseTestCase
         }
 
         if (isset($uses[DatabaseTruncates::class])) {
-            $this->truncateTables();
+            $this->runDatabaseTruncates();
         }
 
         if (isset($uses[DatabaseTransactions::class])) {
