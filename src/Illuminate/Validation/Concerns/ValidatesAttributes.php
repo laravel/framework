@@ -1689,7 +1689,7 @@ trait ValidatesAttributes
      */
     public function validateProhibited($attribute, $value)
     {
-        return false;
+        return ! $this->validateRequired($attribute, $value);
     }
 
     /**
@@ -1744,7 +1744,15 @@ trait ValidatesAttributes
      */
     public function validateProhibits($attribute, $value, $parameters)
     {
-        return ! Arr::hasAny($this->data, $parameters);
+        if ($this->validateRequired($attribute, $value)) {
+            foreach ($parameters as $parameter) {
+                if ($this->validateRequired($parameter, Arr::get($this->data, $parameter))) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     /**
