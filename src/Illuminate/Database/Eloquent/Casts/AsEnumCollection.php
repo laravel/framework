@@ -51,7 +51,7 @@ class AsEnumCollection implements Castable
 				$value = $value !== null
 					? (new Collection($value))->map(function ($enum) {
 						return $this->getStorableAnumValue($enum);
-					})->toJson()
+					  })->toJson()
 					: null;
 				
 				return [$key => $value];
