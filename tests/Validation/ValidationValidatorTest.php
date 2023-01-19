@@ -22,6 +22,7 @@ use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
 use Illuminate\Validation\DatabasePresenceVerifierInterface;
 use Illuminate\Validation\Rules\Exists;
+use Illuminate\Validation\Rules\ProhibitedIf;
 use Illuminate\Validation\Rules\Unique;
 use Illuminate\Validation\ValidationData;
 use Illuminate\Validation\ValidationException;
@@ -1674,6 +1675,15 @@ class ValidationValidatorTest extends TestCase
             [['p' => 'prohibited_if:bar,1'], ['bar' => 1, 'p' => []], true],
             [['p' => 'prohibited_if:bar,1'], ['bar' => 1, 'p' => $emptyCountable], true],
             [['p' => 'prohibited_if:bar,1'], ['bar' => 1, 'p' => 'foo'], false],
+
+            // prohibitedIf...
+            [['p' => new ProhibitedIf(true)], [], true],
+            [['p' => new ProhibitedIf(true)], ['p' => ''], true],
+            [['p' => new ProhibitedIf(true)], ['p' => ' '], true],
+            [['p' => new ProhibitedIf(true)], ['p' => null], true],
+            [['p' => new ProhibitedIf(true)], ['p' => []], true],
+            [['p' => new ProhibitedIf(true)], ['p' => $emptyCountable], true],
+            [['p' => new ProhibitedIf(true)], ['p' => 'foo'], false],
 
             // prohibited_unless...
             [['p' => 'prohibited_unless:bar,1'], ['bar' => 2], true],
