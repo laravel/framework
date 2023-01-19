@@ -215,6 +215,16 @@ class Response implements ArrayAccess
     }
 
     /**
+     * Determine if the response was a 409 "Conflict" response.
+     *
+     * @return bool
+     */
+    public function conflict()
+    {
+        return $this->status() === 409;
+    }
+
+    /**
      * Determine if the response indicates a client or server error occurred.
      *
      * @return bool
