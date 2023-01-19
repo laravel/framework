@@ -50,7 +50,7 @@ class AsEnumCollection implements Castable
             {
                 $value = $value !== null
                     ? (new Collection($value))->map(function ($enum) {
-                        return $this->getStorableAnumValue($enum);
+                        return $this->getStorableEnumValue($enum);
                     })->toJson()
                     : null;
 
@@ -60,7 +60,7 @@ class AsEnumCollection implements Castable
             public function serialize($model, string $key, $value, array $attributes)
             {
                 return (new Collection($value))->map(function ($enum) {
-                    return $this->getStorableAnumValue($enum);
+                    return $this->getStorableEnumValue($enum);
                 })->toArray();
             }
 
@@ -68,7 +68,7 @@ class AsEnumCollection implements Castable
              * @param  \UnitEnum|int|string  $enum
              * @return string|int
              */
-            protected function getStorableAnumValue($enum)
+            protected function getStorableEnumValue($enum)
             {
                 // Enum is already the backed value, no need to convert it again.
                 if (is_string($enum) || is_int($enum)) {
