@@ -3,6 +3,7 @@
 namespace Illuminate\Http\Client;
 
 use ArrayAccess;
+use Closure;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Macroable;
 use LogicException;
@@ -351,28 +352,44 @@ class Response implements ArrayAccess
     }
 
     /**
-     * @param  int  $statusCode
+     * Throw an exception if the response status code matches the given code.
+     *
+     * @param  callable|int  $statusCode
      * @return $this
      *
      * @throws \Illuminate\Http\Client\RequestException
      */
     public function throwIfStatus($statusCode)
     {
+        if (is_callable($statusCode) &&
+            $statusCode($this->status(), $this)) {
+            return $this->throw();
+        }
+
         return $this->status() === $statusCode ? $this->throw() : $this;
     }
 
     /**
-     * @param  int  $statusCode
+     * Throw an exception unless the response status code matches the given code.
+     *
+     * @param  callable|int  $statusCode
      * @return $this
      *
      * @throws \Illuminate\Http\Client\RequestException
      */
     public function throwUnlessStatus($statusCode)
     {
+        if (is_callable($statusCode) &&
+            ! $statusCode($this->status(), $this)) {
+            return $this->throw();
+        }
+
         return $this->status() === $statusCode ? $this : $this->throw();
     }
 
     /**
+     * Throw an exception if the response status code is a 4xx level code.
+     *
      * @return $this
      *
      * @throws \Illuminate\Http\Client\RequestException
@@ -383,6 +400,8 @@ class Response implements ArrayAccess
     }
 
     /**
+     * Throw an exception if the response status code is a 5xx level code.
+     *
      * @return $this
      *
      * @throws \Illuminate\Http\Client\RequestException
