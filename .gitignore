@@ -7,4 +7,5 @@ Thumbs.db
 /.idea
 /.fleet
 /.vscode
+/.nova
 .phpunit.result.cache
