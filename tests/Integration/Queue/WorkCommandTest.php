@@ -55,7 +55,7 @@ class WorkCommandTest extends TestCase
 
     public function testRunTimestampOutputWithDefaultAppTimezone()
     {
-        // queue.log_timezone not set at all
+        // queue.output_tiemzone not set at all
         $this->travelTo(Carbon::create(2023, 1, 18, 10, 10, 11));
         Queue::connection('database')->push(new FirstJob);
 
@@ -69,7 +69,7 @@ class WorkCommandTest extends TestCase
 
     public function testRunTimestampOutputWithDifferentLogTimezone()
     {
-        $this->app['config']->set('queue.log_timezone', 'Europe/Helsinki');
+        $this->app['config']->set('queue.output_timezone', 'Europe/Helsinki');
 
         $this->travelTo(Carbon::create(2023, 1, 18, 10, 10, 11));
         Queue::connection('database')->push(new FirstJob);
@@ -84,7 +84,7 @@ class WorkCommandTest extends TestCase
 
     public function testRunTimestampOutputWithSameAppDefaultAndQueueLogDefault()
     {
-        $this->app['config']->set('queue.log_timezone', 'UTC');
+        $this->app['config']->set('queue.output_timezone', 'UTC');
 
         $this->travelTo(Carbon::create(2023, 1, 18, 10, 10, 11));
         Queue::connection('database')->push(new FirstJob);
