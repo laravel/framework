@@ -1707,7 +1707,7 @@ trait ValidatesAttributes
         [$values, $other] = $this->parseDependentRuleParameters($parameters);
 
         if (in_array($other, $values, is_bool($other) || is_null($other))) {
-            return ! $this->validateRequired($attribute, $value);
+            return is_string($value) && trim($value) === '';
         }
 
         return true;
@@ -1728,7 +1728,7 @@ trait ValidatesAttributes
         [$values, $other] = $this->parseDependentRuleParameters($parameters);
 
         if (! in_array($other, $values, is_bool($other) || is_null($other))) {
-            return ! $this->validateRequired($attribute, $value);
+            return is_string($value) && trim($value) === '';
         }
 
         return true;
@@ -1744,7 +1744,11 @@ trait ValidatesAttributes
      */
     public function validateProhibits($attribute, $value, $parameters)
     {
-        return ! Arr::hasAny($this->data, $parameters);
+        return collect($parameters)
+            ->filter(fn ($parameter) => Arr::has($this->data, $parameter))
+            ->map(fn ($parameter) => Arr::get($this->data, $parameter))
+            ->reject(fn ($value) => is_string($value) && trim($value) === '')
+            ->isEmpty();
     }
 
     /**
