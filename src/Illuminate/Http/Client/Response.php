@@ -3,7 +3,6 @@
 namespace Illuminate\Http\Client;
 
 use ArrayAccess;
-use Closure;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Macroable;
 use LogicException;
