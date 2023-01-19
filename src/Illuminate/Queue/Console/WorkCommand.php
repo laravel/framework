@@ -207,7 +207,7 @@ class WorkCommand extends Command
     {
         $this->output->write(sprintf(
             '  <fg=gray>%s</> %s%s',
-            Carbon::now()->format('Y-m-d H:i:s'),
+            $this->getCurrentTimestamp()->format('Y-m-d H:i:s'),
             $job->resolveName(),
             $this->output->isVerbose()
                 ? sprintf(' <fg=gray>%s</>', $job->getJobId())
@@ -240,6 +240,20 @@ class WorkCommand extends Command
             'released_after_exception' => ' <fg=yellow;options=bold>FAIL</>',
             default => ' <fg=red;options=bold>FAIL</>',
         });
+    }
+
+    protected function getCurrentTimestamp(): Carbon
+    {
+        $appTimezone = $this->laravel['config']->get('app.timezone');
+        $queueLogTimezone = $this->laravel['config']->get('queue.log_timezone');
+
+        $timestamp = Carbon::now();
+
+        if ($queueLogTimezone && $queueLogTimezone !== $appTimezone) {
+            $timestamp->setTimezone($queueLogTimezone);
+        }
+
+        return $timestamp;
     }
 
     /**
