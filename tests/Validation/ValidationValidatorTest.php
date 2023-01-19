@@ -1499,7 +1499,7 @@ class ValidationValidatorTest extends TestCase
 
         $file = new File('', false);
         $v = new Validator($trans, ['name' => $file], ['name' => 'prohibited']);
-        $this->assertTrue($v->fails());
+        $this->assertTrue($v->passes());
 
         $file = new File(__FILE__, false);
         $v = new Validator($trans, ['name' => $file], ['name' => 'prohibited']);
@@ -1594,15 +1594,15 @@ class ValidationValidatorTest extends TestCase
 
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['email' => 'foo', 'emails' => []], ['email' => 'prohibits:emails']);
-        $this->assertTrue($v->fails());
+        $this->assertTrue($v->passes());
 
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['email' => 'foo', 'emails' => ''], ['email' => 'prohibits:emails']);
-        $this->assertTrue($v->fails());
+        $this->assertTrue($v->passes());
 
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['email' => 'foo', 'emails' => null], ['email' => 'prohibits:emails']);
-        $this->assertTrue($v->fails());
+        $this->assertTrue($v->passes());
 
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['email' => 'foo', 'emails' => false], ['email' => 'prohibits:emails']);
@@ -1658,17 +1658,15 @@ class ValidationValidatorTest extends TestCase
 
         return [
             // prohibited...
-            // correct as per the docs. potentially incorrect behaviour.
             [['p' => 'prohibited'], [], true],
             [['p' => 'prohibited'], ['p' => ''], true],
             [['p' => 'prohibited'], ['p' => ' '], true],
-            [['p' => 'prohibited'], ['p' => null], false],
-            [['p' => 'prohibited'], ['p' => []], false],
-            [['p' => 'prohibited'], ['p' => $emptyCountable], false],
+            [['p' => 'prohibited'], ['p' => null], true],
+            [['p' => 'prohibited'], ['p' => []], true],
+            [['p' => 'prohibited'], ['p' => $emptyCountable], true],
             [['p' => 'prohibited'], ['p' => 'foo'], false],
 
             // prohibited_if...
-            // incorrect as per the docs. incorrect behaviour.
             [['p' => 'prohibited_if:bar,1'], ['bar' => 1], true],
             [['p' => 'prohibited_if:bar,1'], ['bar' => 1, 'p' => ''], true],
             [['p' => 'prohibited_if:bar,1'], ['bar' => 1, 'p' => ' '], true],
@@ -1678,7 +1676,6 @@ class ValidationValidatorTest extends TestCase
             [['p' => 'prohibited_if:bar,1'], ['bar' => 1, 'p' => 'foo'], false],
 
             // prohibited_unless...
-            // incorrect as per the docs.
             [['p' => 'prohibited_unless:bar,1'], ['bar' => 2], true],
             [['p' => 'prohibited_unless:bar,1'], ['bar' => 2, 'p' => ''], true],
             [['p' => 'prohibited_unless:bar,1'], ['bar' => 2, 'p' => ' '], true],
@@ -1687,24 +1684,22 @@ class ValidationValidatorTest extends TestCase
             [['p' => 'prohibited_unless:bar,1'], ['bar' => 2, 'p' => $emptyCountable], true],
             [['p' => 'prohibited_unless:bar,1'], ['bar' => 2, 'p' => 'foo'], false],
 
-            // prohibites, with "p" values...
-            // matches the first one, but is incorrect as per the docs.
+            // prohibits, with "p" values...
             [['p' => 'prohibits:bar'], [], true],
             [['p' => 'prohibits:bar'], ['bar' => 2, 'p' => ''], true],
             [['p' => 'prohibits:bar'], ['bar' => 2, 'p' => ' '], true],
-            [['p' => 'prohibits:bar'], ['bar' => 2, 'p' => null], false],
-            [['p' => 'prohibits:bar'], ['bar' => 2, 'p' => []], false],
-            [['p' => 'prohibits:bar'], ['bar' => 2, 'p' => $emptyCountable], false],
+            [['p' => 'prohibits:bar'], ['bar' => 2, 'p' => null], true],
+            [['p' => 'prohibits:bar'], ['bar' => 2, 'p' => []], true],
+            [['p' => 'prohibits:bar'], ['bar' => 2, 'p' => $emptyCountable], true],
             [['p' => 'prohibits:bar'], ['bar' => 2, 'p' => 'foo'], false],
 
-            // prohibites, with "bar" values...
-            // correct, and correct per the docs.
+            // prohibits, with "bar" values...
             [['p' => 'prohibits:bar'], ['p' => 'foo'], true],
-            [['p' => 'prohibits:bar'], ['bar' => '', 'p' => 'foo'], false],
-            [['p' => 'prohibits:bar'], ['bar' => ' ', 'p' => 'foo'], false],
-            [['p' => 'prohibits:bar'], ['bar' => null, 'p' => 'foo'], false],
-            [['p' => 'prohibits:bar'], ['bar' => [], 'p' => 'foo'], false],
-            [['p' => 'prohibits:bar'], ['bar' => $emptyCountable, 'p' => 'foo'], false],
+            [['p' => 'prohibits:bar'], ['bar' => '', 'p' => 'foo'], true],
+            [['p' => 'prohibits:bar'], ['bar' => ' ', 'p' => 'foo'], true],
+            [['p' => 'prohibits:bar'], ['bar' => null, 'p' => 'foo'], true],
+            [['p' => 'prohibits:bar'], ['bar' => [], 'p' => 'foo'], true],
+            [['p' => 'prohibits:bar'], ['bar' => $emptyCountable, 'p' => 'foo'], true],
             [['p' => 'prohibits:bar'], ['bar' => 'foo', 'p' => 'foo'], false],
         ];
     }
