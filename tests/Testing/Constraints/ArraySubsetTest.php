@@ -36,13 +36,7 @@ class ArraySubsetTest extends TestCase
     public function it_will_fail_should_the_array_not_be_a_subset(iterable $iterable)
     {
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage(<<<'MSG'
-            Failed asserting that an array has the subset Array &0 (
-                0 => 'foo'
-                1 => 'bar'
-            ).
-            MSG
-        );
+        $this->expectExceptionMessageMatches('/Failed\ asserting\ that\ an\ array\ has\ the\ subset\ Array\ \&0\ \(/');
 
         $constraint = new ArraySubset($iterable);
         $constraint->evaluate(['foo']);

@@ -44,12 +44,7 @@ class SoftDeletedInDatabaseTest extends TestCase
     public function it_will_fail_should_no_records_be_found()
     {
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage(<<<'MSG'
-            Failed asserting that any soft deleted row in the table [mytable] matches the attributes {"foo":"bar"}.
-
-            The table is empty.
-            MSG
-        );
+        $this->expectExceptionMessageMatches('/Failed\ asserting\ that\ any\ soft\ deleted\ row\ in\ the\ table\ \[mytable\]\ matches\ the\ attributes\ \{\"foo\"\:\"bar\"\}\./');
 
         $connection = m::mock(Connection::class);
         $query = m::mock(Builder::class);

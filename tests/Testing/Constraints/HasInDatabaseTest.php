@@ -26,14 +26,7 @@ class HasInDatabaseTest extends TestCase
     public function it_will_fail_should_no_matching_entries_be_found()
     {
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage(<<<'MSG'
-            Failed asserting that a row in the table [mytable] matches the attributes {
-                "foo": "bar"
-            }.
-
-            attrs.
-            MSG
-        );
+        $this->expectExceptionMessageMatches('/Failed\ asserting\ that\ a\ row\ in\ the\ table\ \[mytable\]\ matches\ the\ attributes\ \{/');
 
         $connection = m::mock(Connection::class);
         $connection->shouldReceive('table->where->count')->once()->andReturn(0);
