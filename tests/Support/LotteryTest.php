@@ -63,7 +63,7 @@ class LotteryTest extends TestCase
 
     public function testItCanBePassedAsCallable()
     {
-        // Exmaple...
+        // Example...
         // DB::whenQueryingForLongerThan(Interval::seconds(5), Lottery::odds(1, 5)->winner(function ($connection) {
         //     Alert the team
         // }));
@@ -180,5 +180,33 @@ class LotteryTest extends TestCase
 
         $this->assertFalse($wins);
         $this->assertTrue($loses);
+    }
+
+    public function testItCanSetFloatProperly()
+    {
+        $lottery1 = new FakeLottery(5.8, 10);
+        $lottery2 = new FakeLottery(3.88, 9);
+        $lottery3 = new FakeLottery(4.100, 10);
+
+        $this->assertEquals(58, $lottery1->getChances());
+        $this->assertEquals(100, $lottery1->getOutOf());
+        $this->assertEquals(388, $lottery2->getChances());
+        $this->assertEquals(900, $lottery2->getOutOf());
+        $this->assertEquals(41, $lottery3->getChances());
+        $this->assertEquals(100, $lottery3->getOutOf());
+    }
+}
+
+class FakeLottery extends Lottery
+{
+
+    public function getChances()
+    {
+       return $this->chances;
+    }
+
+    public function getOutOf()
+    {
+        return $this->outOf;
     }
 }

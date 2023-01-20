@@ -50,13 +50,45 @@ class Lottery
      */
     public function __construct($chances, $outOf = null)
     {
-        if ($outOf === null && is_float($chances) && $chances > 1) {
-            throw new RuntimeException('Float must not be greater than 1.');
-        }
+        [$chances, $outOf] = $this->parseChancesAndOutOf($chances, $outOf);
 
         $this->chances = $chances;
 
         $this->outOf = $outOf;
+    }
+
+    /**
+     * parse and validate chances and outOf
+     *
+     * @param  int|float  $chances
+     * @param  int|null  $outOf
+     * @return array
+     */
+    public function parseChancesAndOutOf($chances, $outOf)
+    {
+        if ($outOf === null && is_float($chances) && $chances > 1) {
+            throw new RuntimeException('Float must not be greater than 1.');
+        }
+
+        if (! is_null($outOf) && is_float($chances)) {
+            $multipleBy = $this->getMultiplyValue($chances);
+            $chances *= $multipleBy;
+            $outOf *= $multipleBy;
+        }
+
+        return [$chances, $outOf];
+    }
+
+    /**
+     * get the multiple value by a float value.
+     *
+     * @param  float  $value
+     * @return string
+     */
+    protected function getMultiplyValue($value)
+    {
+        $decimalsCount = strlen(explode('.', $value)[1]);
+        return '1'.str_repeat(0, $decimalsCount);
     }
 
     /**
