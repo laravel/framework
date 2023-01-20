@@ -5,7 +5,7 @@ namespace Illuminate\Support\Facades;
 /**
  * @method static array preloadedAssets()
  * @method static string|null cspNonce()
- * @method static string useCspNonce(?string $nonce = null)
+ * @method static string useCspNonce(string|null $nonce = null)
  * @method static \Illuminate\Foundation\Vite useIntegrityKey(string|false $key)
  * @method static \Illuminate\Foundation\Vite withEntryPoints(array $entryPoints)
  * @method static \Illuminate\Foundation\Vite useManifestFilename(string $filename)

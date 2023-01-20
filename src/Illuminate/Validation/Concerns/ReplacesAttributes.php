@@ -189,6 +189,66 @@ trait ReplacesAttributes
     }
 
     /**
+     * Replace all place-holders for the missing_if rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array<int,string>  $parameters
+     * @return string
+     */
+    protected function replaceMissingIf($message, $attribute, $rule, $parameters)
+    {
+        $parameters[1] = $this->getDisplayableValue($parameters[0], Arr::get($this->data, $parameters[0]));
+
+        $parameters[0] = $this->getDisplayableAttribute($parameters[0]);
+
+        return str_replace([':other', ':value'], $parameters, $message);
+    }
+
+    /**
+     * Replace all place-holders for the missing_unless rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array<int,string>  $parameters
+     * @return string
+     */
+    protected function replaceMissingUnless($message, $attribute, $rule, $parameters)
+    {
+        return $this->replaceMissingIf($message, $attribute, $rule, $parameters);
+    }
+
+    /**
+     * Replace all place-holders for the missing_with rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array<int,string>  $parameters
+     * @return string
+     */
+    protected function replaceMissingWith($message, $attribute, $rule, $parameters)
+    {
+        return str_replace(':values', implode(' / ', $this->getAttributeList($parameters)), $message);
+    }
+
+    /**
+     * Replace all place-holders for the missing_with_all rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array<int,string>  $parameters
+     * @return string
+     */
+    protected function replaceMissingWithAll($message, $attribute, $rule, $parameters)
+    {
+        return $this->replaceMissingWith($message, $attribute, $rule, $parameters);
+    }
+
+    /**
      * Replace all place-holders for the multiple_of rule.
      *
      * @param  string  $message

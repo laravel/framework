@@ -928,7 +928,7 @@ assertType('Illuminate\Support\Collection<(int|string), int>', $collection->make
     assertType('string', $string);
     assertType('int', $int);
 
-    return false;
+    return $string;
 }));
 
 assertType('Illuminate\Support\Collection<int, Illuminate\Support\Collection<int, int|User>>', $collection->zip([1]));

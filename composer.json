@@ -21,7 +21,7 @@
         "brick/math": "^0.10.2",
         "doctrine/inflector": "^2.0.6",
         "dragonmantank/cron-expression": "^3.3.2",
-        "egulias/email-validator": "^3.2.5",
+        "egulias/email-validator": "^3.2.5|^4.0",
         "fruitcake/php-cors": "^1.2",
         "laravel/serializable-closure": "^1.2.2",
         "league/commonmark": "^2.3.8",
@@ -100,7 +100,8 @@
         "phpstan/phpstan": "^1.9.7",
         "phpunit/phpunit": "^9.5.27",
         "predis/predis": "^2.0.3",
-        "symfony/cache": "^6.2.4"
+        "symfony/cache": "^6.2.4",
+        "symfony/http-client": "^6.2.4"
     },
     "provide": {
         "psr/container-implementation": "1.1|2.0",
@@ -139,7 +140,6 @@
         }
     },
     "suggest": {
-        "ext-bcmath": "Required to use the multiple_of validation rule.",
         "ext-ftp": "Required to use the Flysystem FTP driver.",
         "ext-gd": "Required to use Illuminate\\Http\\Testing\\FileFactory::image().",
         "ext-memcached": "Required to use the memcache cache driver.",

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Validation;
 
+use Countable;
 use DateTime;
 use DateTimeImmutable;
 use Egulias\EmailValidator\Validation\NoRFCWarningsValidation;
@@ -21,6 +22,7 @@ use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
 use Illuminate\Validation\DatabasePresenceVerifierInterface;
 use Illuminate\Validation\Rules\Exists;
+use Illuminate\Validation\Rules\ProhibitedIf;
 use Illuminate\Validation\Rules\Unique;
 use Illuminate\Validation\ValidationData;
 use Illuminate\Validation\ValidationException;
@@ -1498,7 +1500,7 @@ class ValidationValidatorTest extends TestCase
 
         $file = new File('', false);
         $v = new Validator($trans, ['name' => $file], ['name' => 'prohibited']);
-        $this->assertTrue($v->fails());
+        $this->assertTrue($v->passes());
 
         $file = new File(__FILE__, false);
         $v = new Validator($trans, ['name' => $file], ['name' => 'prohibited']);
@@ -1593,15 +1595,15 @@ class ValidationValidatorTest extends TestCase
 
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['email' => 'foo', 'emails' => []], ['email' => 'prohibits:emails']);
-        $this->assertTrue($v->fails());
+        $this->assertTrue($v->passes());
 
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['email' => 'foo', 'emails' => ''], ['email' => 'prohibits:emails']);
-        $this->assertTrue($v->fails());
+        $this->assertTrue($v->passes());
 
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['email' => 'foo', 'emails' => null], ['email' => 'prohibits:emails']);
-        $this->assertTrue($v->fails());
+        $this->assertTrue($v->passes());
 
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['email' => 'foo', 'emails' => false], ['email' => 'prohibits:emails']);
@@ -1635,6 +1637,81 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
         $this->assertTrue($v->messages()->has('foo.0.email'));
         $this->assertFalse($v->messages()->has('foo.1.email'));
+    }
+
+    /** @dataProvider prohibitedRulesData */
+    public function testProhibitedRulesAreConsistent($rules, $data, $result)
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $this->assertSame($result, (new Validator($trans, $data, $rules))->passes());
+    }
+
+    public function prohibitedRulesData()
+    {
+        $emptyCountable = new class implements Countable
+        {
+            public function count()
+            {
+                return 0;
+            }
+        };
+
+        return [
+            // prohibited...
+            [['p' => 'prohibited'], [], true],
+            [['p' => 'prohibited'], ['p' => ''], true],
+            [['p' => 'prohibited'], ['p' => ' '], true],
+            [['p' => 'prohibited'], ['p' => null], true],
+            [['p' => 'prohibited'], ['p' => []], true],
+            [['p' => 'prohibited'], ['p' => $emptyCountable], true],
+            [['p' => 'prohibited'], ['p' => 'foo'], false],
+
+            // prohibited_if...
+            [['p' => 'prohibited_if:bar,1'], ['bar' => 1], true],
+            [['p' => 'prohibited_if:bar,1'], ['bar' => 1, 'p' => ''], true],
+            [['p' => 'prohibited_if:bar,1'], ['bar' => 1, 'p' => ' '], true],
+            [['p' => 'prohibited_if:bar,1'], ['bar' => 1, 'p' => null], true],
+            [['p' => 'prohibited_if:bar,1'], ['bar' => 1, 'p' => []], true],
+            [['p' => 'prohibited_if:bar,1'], ['bar' => 1, 'p' => $emptyCountable], true],
+            [['p' => 'prohibited_if:bar,1'], ['bar' => 1, 'p' => 'foo'], false],
+
+            // prohibitedIf...
+            [['p' => new ProhibitedIf(true)], [], true],
+            [['p' => new ProhibitedIf(true)], ['p' => ''], true],
+            [['p' => new ProhibitedIf(true)], ['p' => ' '], true],
+            [['p' => new ProhibitedIf(true)], ['p' => null], true],
+            [['p' => new ProhibitedIf(true)], ['p' => []], true],
+            [['p' => new ProhibitedIf(true)], ['p' => $emptyCountable], true],
+            [['p' => new ProhibitedIf(true)], ['p' => 'foo'], false],
+
+            // prohibited_unless...
+            [['p' => 'prohibited_unless:bar,1'], ['bar' => 2], true],
+            [['p' => 'prohibited_unless:bar,1'], ['bar' => 2, 'p' => ''], true],
+            [['p' => 'prohibited_unless:bar,1'], ['bar' => 2, 'p' => ' '], true],
+            [['p' => 'prohibited_unless:bar,1'], ['bar' => 2, 'p' => null], true],
+            [['p' => 'prohibited_unless:bar,1'], ['bar' => 2, 'p' => []], true],
+            [['p' => 'prohibited_unless:bar,1'], ['bar' => 2, 'p' => $emptyCountable], true],
+            [['p' => 'prohibited_unless:bar,1'], ['bar' => 2, 'p' => 'foo'], false],
+
+            // prohibits, with "p" values...
+            [['p' => 'prohibits:bar'], [], true],
+            [['p' => 'prohibits:bar'], ['bar' => 2, 'p' => ''], true],
+            [['p' => 'prohibits:bar'], ['bar' => 2, 'p' => ' '], true],
+            [['p' => 'prohibits:bar'], ['bar' => 2, 'p' => null], true],
+            [['p' => 'prohibits:bar'], ['bar' => 2, 'p' => []], true],
+            [['p' => 'prohibits:bar'], ['bar' => 2, 'p' => $emptyCountable], true],
+            [['p' => 'prohibits:bar'], ['bar' => 2, 'p' => 'foo'], false],
+
+            // prohibits, with "bar" values...
+            [['p' => 'prohibits:bar'], ['p' => 'foo'], true],
+            [['p' => 'prohibits:bar'], ['bar' => '', 'p' => 'foo'], true],
+            [['p' => 'prohibits:bar'], ['bar' => ' ', 'p' => 'foo'], true],
+            [['p' => 'prohibits:bar'], ['bar' => null, 'p' => 'foo'], true],
+            [['p' => 'prohibits:bar'], ['bar' => [], 'p' => 'foo'], true],
+            [['p' => 'prohibits:bar'], ['bar' => $emptyCountable, 'p' => 'foo'], true],
+            [['p' => 'prohibits:bar'], ['bar' => 'foo', 'p' => 'foo'], false],
+        ];
     }
 
     public function testFailedFileUploads()
@@ -2159,6 +2236,201 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['foo' => 'false'], ['foo' => 'Declined']);
+        $this->assertTrue($v->passes());
+    }
+
+    public function testValidateMissing()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.missing' => 'The :attribute field must be missing.'], 'en');
+
+        $v = new Validator($trans, ['foo' => 'yes'], ['foo' => 'missing']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be missing.', $v->errors()->first('foo'));
+
+        $v = new Validator($trans, ['foo' => ''], ['foo' => 'missing']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be missing.', $v->errors()->first('foo'));
+
+        $v = new Validator($trans, ['foo' => ' '], ['foo' => 'missing']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be missing.', $v->errors()->first('foo'));
+
+        $v = new Validator($trans, ['foo' => null], ['foo' => 'missing']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be missing.', $v->errors()->first('foo'));
+
+        $v = new Validator($trans, ['foo' => []], ['foo' => 'missing']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be missing.', $v->errors()->first('foo'));
+
+        $v = new Validator($trans, ['foo' => new class implements Countable
+        {
+            public function count(): int
+            {
+                return 0;
+            }
+        }, ], ['foo' => 'missing']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be missing.', $v->errors()->first('foo'));
+
+        $v = new Validator($trans, ['bar' => 'bar'], ['foo' => 'missing']);
+        $this->assertTrue($v->passes());
+    }
+
+    public function testValidateMissingIf()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.missing_if' => 'The :attribute field must be missing when :other is :value.'], 'en');
+
+        $v = new Validator($trans, ['foo' => 'yes', 'bar' => '1'], ['foo' => 'missing_if:bar,1']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be missing when bar is 1.', $v->errors()->first('foo'));
+
+        $v = new Validator($trans, ['foo' => '', 'bar' => '1'], ['foo' => 'missing_if:bar,1']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be missing when bar is 1.', $v->errors()->first('foo'));
+
+        $v = new Validator($trans, ['foo' => ' ', 'bar' => '1'], ['foo' => 'missing_if:bar,1']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be missing when bar is 1.', $v->errors()->first('foo'));
+
+        $v = new Validator($trans, ['foo' => null, 'bar' => '1'], ['foo' => 'missing_if:bar,1']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be missing when bar is 1.', $v->errors()->first('foo'));
+
+        $v = new Validator($trans, ['foo' => [], 'bar' => '1'], ['foo' => 'missing_if:bar,1']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be missing when bar is 1.', $v->errors()->first('foo'));
+
+        $v = new Validator($trans, ['foo' => new class implements Countable
+        {
+            public function count(): int
+            {
+                return 0;
+            }
+        }, 'bar' => '1', ], ['foo' => 'missing_if:bar,1']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be missing when bar is 1.', $v->errors()->first('foo'));
+
+        $v = new Validator($trans, ['foo' => 'foo', 'bar' => '2'], ['foo' => 'missing_if:bar,1']);
+        $this->assertTrue($v->passes());
+    }
+
+    public function testValidateMissingUnless()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.missing_unless' => 'The :attribute field must be missing unless :other is :value.'], 'en');
+
+        $v = new Validator($trans, ['foo' => 'yes', 'bar' => '2'], ['foo' => 'missing_unless:bar,1']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be missing unless bar is 2.', $v->errors()->first('foo'));
+
+        $v = new Validator($trans, ['foo' => '', 'bar' => '2'], ['foo' => 'missing_unless:bar,1']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be missing unless bar is 2.', $v->errors()->first('foo'));
+
+        $v = new Validator($trans, ['foo' => ' ', 'bar' => '2'], ['foo' => 'missing_unless:bar,1']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be missing unless bar is 2.', $v->errors()->first('foo'));
+
+        $v = new Validator($trans, ['foo' => null, 'bar' => '2'], ['foo' => 'missing_unless:bar,1']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be missing unless bar is 2.', $v->errors()->first('foo'));
+
+        $v = new Validator($trans, ['foo' => [], 'bar' => '2'], ['foo' => 'missing_unless:bar,1']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be missing unless bar is 2.', $v->errors()->first('foo'));
+
+        $v = new Validator($trans, ['foo' => new class implements Countable
+        {
+            public function count(): int
+            {
+                return 0;
+            }
+        }, 'bar' => '2', ], ['foo' => 'missing_unless:bar,1']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be missing unless bar is 2.', $v->errors()->first('foo'));
+
+        $v = new Validator($trans, ['foo' => 'foo', 'bar' => '1'], ['foo' => 'missing_unless:bar,1']);
+        $this->assertTrue($v->passes());
+    }
+
+    public function testValidateMissingWith()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.missing_with' => 'The :attribute field must be missing when :values is present.'], 'en');
+
+        $v = new Validator($trans, ['foo' => 'yes', 'bar' => '2'], ['foo' => 'missing_with:baz,bar']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be missing when baz / bar is present.', $v->errors()->first('foo'));
+
+        $v = new Validator($trans, ['foo' => '', 'bar' => '2'], ['foo' => 'missing_with:baz,bar']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be missing when baz / bar is present.', $v->errors()->first('foo'));
+
+        $v = new Validator($trans, ['foo' => ' ', 'bar' => '2'], ['foo' => 'missing_with:baz,bar']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be missing when baz / bar is present.', $v->errors()->first('foo'));
+
+        $v = new Validator($trans, ['foo' => null, 'bar' => '2'], ['foo' => 'missing_with:baz,bar']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be missing when baz / bar is present.', $v->errors()->first('foo'));
+
+        $v = new Validator($trans, ['foo' => [], 'bar' => '2'], ['foo' => 'missing_with:baz,bar']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be missing when baz / bar is present.', $v->errors()->first('foo'));
+
+        $v = new Validator($trans, ['foo' => new class implements Countable
+        {
+            public function count(): int
+            {
+                return 0;
+            }
+        }, 'bar' => '2', ], ['foo' => 'missing_with:baz,bar']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be missing when baz / bar is present.', $v->errors()->first('foo'));
+
+        $v = new Validator($trans, ['foo' => 'foo', 'qux' => '1'], ['foo' => 'missing_with:baz,bar']);
+        $this->assertTrue($v->passes());
+    }
+
+    public function testValidateMissingWithAll()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.missing_with_all' => 'The :attribute field must be missing when :values are present.'], 'en');
+
+        $v = new Validator($trans, ['foo' => 'yes', 'bar' => '2', 'baz' => '2'], ['foo' => 'missing_with_all:baz,bar']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be missing when baz / bar are present.', $v->errors()->first('foo'));
+
+        $v = new Validator($trans, ['foo' => '', 'bar' => '2', 'baz' => '2'], ['foo' => 'missing_with_all:baz,bar']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be missing when baz / bar are present.', $v->errors()->first('foo'));
+
+        $v = new Validator($trans, ['foo' => ' ', 'bar' => '2', 'baz' => '2'], ['foo' => 'missing_with_all:baz,bar']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be missing when baz / bar are present.', $v->errors()->first('foo'));
+
+        $v = new Validator($trans, ['foo' => null, 'bar' => '2', 'baz' => '2'], ['foo' => 'missing_with_all:baz,bar']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be missing when baz / bar are present.', $v->errors()->first('foo'));
+
+        $v = new Validator($trans, ['foo' => [], 'bar' => '2', 'baz' => '2'], ['foo' => 'missing_with_all:baz,bar']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be missing when baz / bar are present.', $v->errors()->first('foo'));
+
+        $v = new Validator($trans, ['foo' => new class implements Countable
+        {
+            public function count(): int
+            {
+                return 0;
+            }
+        }, 'bar' => '2', 'baz' => '2', ], ['foo' => 'missing_with_all:baz,bar']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be missing when baz / bar are present.', $v->errors()->first('foo'));
+
+        $v = new Validator($trans, ['foo' => [], 'bar' => '2', 'qux' => '2'], ['foo' => 'missing_with_all:baz,bar']);
         $this->assertTrue($v->passes());
     }
 

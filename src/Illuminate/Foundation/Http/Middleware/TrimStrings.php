@@ -53,7 +53,7 @@ class TrimStrings extends TransformsRequest
             return $value;
         }
 
-        return preg_replace('~^[\s﻿​]+|[\s﻿​]+$~u', '', $value) ?? trim($value);
+        return preg_replace('~^[\s\x{FEFF}\x{200B}]+|[\s\x{FEFF}\x{200B}]+$~u', '', $value) ?? trim($value);
     }
 
     /**
