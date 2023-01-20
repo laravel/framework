@@ -35,7 +35,6 @@ class HasInDatabaseTest extends TestCase
             MSG
         );
 
-
         $connection = m::mock(Connection::class);
         $connection->shouldReceive('table->where->count')->once()->andReturn(0);
 

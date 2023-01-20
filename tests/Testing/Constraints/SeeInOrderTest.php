@@ -8,7 +8,6 @@ use PHPUnit\Framework\TestCase;
 
 class SeeInOrderTest extends TestCase
 {
-
     /**
      * @test
      */
@@ -30,5 +29,4 @@ class SeeInOrderTest extends TestCase
         $constraint = new SeeInOrder('foo bar baz');
         $constraint->evaluate(['foo', 'baz', 'bar']);
     }
-
 }

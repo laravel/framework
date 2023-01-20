@@ -28,7 +28,6 @@ class CountInDatabaseTest extends TestCase
             )->getMock();
     }
 
-
     /** @test */
     public function it_can_count_items_in_the_database()
     {
@@ -41,11 +40,9 @@ class CountInDatabaseTest extends TestCase
     public function it_will_fail_on_an_invalid_count()
     {
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('Failed asserting that table [mytable] matches expected entries count of 2. Entries found: 4.' . PHP_EOL . '.');
+        $this->expectExceptionMessage('Failed asserting that table [mytable] matches expected entries count of 2. Entries found: 4.'.PHP_EOL.'.');
 
         $constraint = new CountInDatabase($this->connection, 2);
-        $constraint->evaluate('mytable' );
+        $constraint->evaluate('mytable');
     }
-
-
 }

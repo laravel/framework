@@ -46,6 +46,5 @@ class ArraySubsetTest extends TestCase
 
         $constraint = new ArraySubset($iterable);
         $constraint->evaluate(['foo']);
-
     }
 }
