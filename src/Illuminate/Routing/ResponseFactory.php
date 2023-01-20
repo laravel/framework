@@ -299,5 +299,4 @@ class ResponseFactory implements FactoryContract
 
         // throw exception
     }
-
 }
