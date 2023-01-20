@@ -25,10 +25,9 @@ trait DatabaseTruncates
             return;
         }
 
-        // Always remove any test data before running the tests.
-        $this->truncateTables();
+        // Always clear any test data on subsequent runs.
+        $this->clearPreviousTestData();
 
-        // Seed the database on subsequent runs.
         if ($seeder = $this->seeder()) {
             // Use a specific seeder class.
             $this->artisan('db:seed', ['--class' => $seeder]);
@@ -42,42 +41,59 @@ trait DatabaseTruncates
         }
     }
 
-    protected function truncateTables(): void
+    protected function clearPreviousTestData(): void
     {
         /** @var \Illuminate\Database\DatabaseManager $database */
         $database = $this->app->make('db');
 
-        foreach ($this->connectionsToTruncate() as $name) {
-            $connection = $database->connection($name);
+        collect($this->connectionsToTruncate())
+            ->each(function ($name) use ($database) {
+                $connection = $database->connection($name);
 
-            $connection->getSchemaBuilder()->disableForeignKeyConstraints();
+                if (! $this->useForeignKeyChecks($name)) {
+                    $this->truncateTablesForConnection($connection, $name);
 
-            $dispatcher = $connection->getEventDispatcher();
-            $connection->unsetEventDispatcher();
+                    return;
+                }
 
-            $this->truncateTablesForConnection($connection, $name);
-
-            $connection->setEventDispatcher($dispatcher);
-            $connection->disconnect();
-        }
+                $connection->getSchemaBuilder()->withoutForeignKeyConstraints(
+                    fn () => $this->truncateTablesForConnection($connection, $name)
+                );
+            });
     }
 
     // Truncate all tables for a given connection.
     protected function truncateTablesForConnection(ConnectionInterface $connection, ?string $name): void
     {
+        $dispatcher = $connection->getEventDispatcher();
+        $connection->unsetEventDispatcher();
+
         collect(static::$allTables[$name] ??= $connection->getDoctrineSchemaManager()->listTableNames())
             ->diff($this->excludeTables($name))
             ->filter(fn ($table) => $connection->table($table)->exists())
             ->each(fn ($table) => $connection->table($table)->truncate());
+
+        $connection->setEventDispatcher($dispatcher);
     }
 
     // Get the tables that should not be truncated.
     protected function excludeTables(?string $connectionName): array
     {
-        return match ($connectionName) {
-            null => [$this->app['config']->get('database.migrations')],
-            default => [],
-        };
+        if (property_exists($this, 'excludeTables')) {
+            return $this->excludeTables[$connectionName] ?? [];
+        }
+
+        return [$this->app['config']->get('database.migrations')];
+    }
+
+    // Should foreign key checks be enabled after truncating tables?
+    protected function useForeignKeyChecks(?string $connectionName): bool
+    {
+        if (property_exists($this, 'useForeignKeyChecks')) {
+            return $this->useForeignKeyChecks[$connectionName] ?? true;
+        }
+
+        return true;
     }
 
     // The database connections that should be truncated.
