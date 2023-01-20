@@ -14,9 +14,6 @@ trait DatabaseTruncates
 
     protected function runDatabaseTruncates(): void
     {
-        // Always remove any test data before the application is destroyed.
-        $this->beforeApplicationDestroyed(fn () => $this->truncateTables());
-
         // Migrate and seed the database on first run.
         if (! RefreshDatabaseState::$migrated) {
             $this->artisan('migrate:fresh', $this->migrateFreshUsing());
@@ -27,6 +24,9 @@ trait DatabaseTruncates
 
             return;
         }
+
+        // Always remove any test data before running the tests.
+        $this->truncateTables();
 
         // Seed the database on subsequent runs.
         if ($seeder = $this->seeder()) {
