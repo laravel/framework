@@ -915,7 +915,7 @@ class Mailable implements MailableContract, Renderable
         }
 
         if ($file instanceof Attachment) {
-            return $file->attachTo($this);
+            return $file->attachTo($this, $options);
         }
 
         $this->attachments = collect($this->attachments)
@@ -958,14 +958,17 @@ class Mailable implements MailableContract, Renderable
             $file = $file->toMailAttachment();
         }
 
-        if ($file instanceof Attachment && $this->hasEnvelopeAttachment($file)) {
+        if ($file instanceof Attachment && $this->hasEnvelopeAttachment($file, $options)) {
             return true;
         }
 
         if ($file instanceof Attachment) {
             $parts = $file->attachWith(
-                fn ($path) => [$path, ['as' => $file->as, 'mime' => $file->mime]],
-                fn ($data) => $this->hasAttachedData($data(), $file->as, ['mime' => $file->mime])
+                fn ($path) => [$path, [
+                    'as' => $options['as'] ?? $file->as,
+                    'mime' => $options['mime'] ?? $file->mime,
+                ]],
+                fn ($data) => $this->hasAttachedData($data(), $options['as'] ?? $file->as, ['mime' => $options['mime'] ?? $file->mime])
             );
 
             if ($parts === true) {
@@ -986,9 +989,10 @@ class Mailable implements MailableContract, Renderable
      * Determine if the mailable has the given envelope attachment.
      *
      * @param  \Illuminate\Mail\Attachment  $attachment
+     * @param  array  $options
      * @return bool
      */
-    private function hasEnvelopeAttachment($attachment)
+    private function hasEnvelopeAttachment($attachment, $options = [])
     {
         if (! method_exists($this, 'envelope')) {
             return false;
@@ -998,7 +1002,7 @@ class Mailable implements MailableContract, Renderable
 
         return Collection::make(is_object($attachments) ? [$attachments] : $attachments)
                 ->map(fn ($attached) => $attached instanceof Attachable ? $attached->toMailAttachment() : $attached)
-                ->contains(fn ($attached) => $attached->isEquivalent($attachment));
+                ->contains(fn ($attached) => $attached->isEquivalent($attachment, $options));
     }
 
     /**
