@@ -119,10 +119,12 @@ class CommandDurationThresholdTest extends TestCase
     public function testItCanExceedThresholdWhenSpecifyingDurationAsDateTime()
     {
         Carbon::setTestNow(Carbon::now());
-        $kernel = $this->app[Kernel::class];
-        $kernel->command('foo', fn () => null);
+
         $input = new StringInput('foo');
         $called = false;
+
+        $kernel = $this->app[Kernel::class];
+        $kernel->command('foo', fn () => null);
         $kernel->whenCommandLifecycleIsLongerThan(Carbon::now()->addSecond()->addMillisecond(), function () use (&$called) {
             $called = true;
         });
@@ -131,10 +133,13 @@ class CommandDurationThresholdTest extends TestCase
 
         $this->assertFalse($called);
 
-        Carbon::setTestNow(Carbon::now()->addSeconds(1)->addMilliseconds(1));
+        Carbon::setTestNow(Carbon::now()->addSeconds(1)->addMillisecond());
+
         $kernel->terminate($input, 21);
 
-        $this->assertTrue($called);
+        retry(2, function () use (&$called) {
+            $this->assertTrue($called);
+        }, 500);
     }
 
     public function testItCanStayUnderThresholdWhenSpecifyingDurationAsDateTime()

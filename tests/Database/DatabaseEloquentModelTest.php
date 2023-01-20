@@ -19,6 +19,8 @@ use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsCollection;
 use Illuminate\Database\Eloquent\Casts\AsEncryptedArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsEncryptedCollection;
+use Illuminate\Database\Eloquent\Casts\AsEnumArrayObject;
+use Illuminate\Database\Eloquent\Casts\AsEnumCollection;
 use Illuminate\Database\Eloquent\Casts\AsStringable;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\JsonEncodingException;
@@ -42,6 +44,10 @@ use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use stdClass;
+
+if (PHP_VERSION_ID >= 80100) {
+    include 'Enums.php';
+}
 
 class DatabaseEloquentModelTest extends TestCase
 {
@@ -299,6 +305,48 @@ class DatabaseEloquentModelTest extends TestCase
 
         $model->asEncryptedArrayObjectAttribute = ['foo' => 'baz'];
         $this->assertTrue($model->isDirty('asEncryptedArrayObjectAttribute'));
+    }
+
+    /**
+     * @requires PHP >= 8.1
+     */
+    public function testDirtyOnEnumCollectionObject()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->setRawAttributes([
+            'asEnumCollectionAttribute' => json_encode(['draft', 'pending']),
+        ]);
+        $model->syncOriginal();
+
+        $this->assertInstanceOf(BaseCollection::class, $model->asEnumCollectionAttribute);
+        $this->assertFalse($model->isDirty('asEnumCollectionAttribute'));
+
+        $model->asEnumCollectionAttribute = ['draft', 'pending'];
+        $this->assertFalse($model->isDirty('asEnumCollectionAttribute'));
+
+        $model->asEnumCollectionAttribute = ['draft', 'done'];
+        $this->assertTrue($model->isDirty('asEnumCollectionAttribute'));
+    }
+
+    /**
+     * @requires PHP >= 8.1
+     */
+    public function testDirtyOnEnumArrayObject()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->setRawAttributes([
+            'asEnumArrayObjectAttribute' => json_encode(['draft', 'pending']),
+        ]);
+        $model->syncOriginal();
+
+        $this->assertInstanceOf(ArrayObject::class, $model->asEnumArrayObjectAttribute);
+        $this->assertFalse($model->isDirty('asEnumArrayObjectAttribute'));
+
+        $model->asEnumArrayObjectAttribute = ['draft', 'pending'];
+        $this->assertFalse($model->isDirty('asEnumArrayObjectAttribute'));
+
+        $model->asEnumArrayObjectAttribute = ['draft', 'done'];
+        $this->assertTrue($model->isDirty('asEnumArrayObjectAttribute'));
     }
 
     public function testCleanAttributes()
@@ -2823,7 +2871,7 @@ class EloquentModelDestroyStub extends Model
     public function newQuery()
     {
         $mock = m::mock(Builder::class);
-        $mock->shouldReceive('whereIn')->once()->with('id', [1, 2, 3])->andReturn($mock);
+        $mock->shouldReceive('whereKey')->once()->with([1, 2, 3])->andReturn($mock);
         $mock->shouldReceive('get')->once()->andReturn([$model = m::mock(stdClass::class)]);
         $model->shouldReceive('delete')->once();
 
@@ -2990,6 +3038,8 @@ class EloquentModelCastingStub extends Model
         'asStringableAttribute' => AsStringable::class,
         'asEncryptedCollectionAttribute' => AsEncryptedCollection::class,
         'asEncryptedArrayObjectAttribute' => AsEncryptedArrayObject::class,
+        'asEnumCollectionAttribute' => AsEnumCollection::class.':'.StringStatus::class,
+        'asEnumArrayObjectAttribute' => AsEnumArrayObject::class.':'.StringStatus::class,
     ];
 
     public function jsonAttributeValue()
