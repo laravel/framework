@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -1786,6 +1787,14 @@ class TestResponse implements ArrayAccess
     {
         if (static::hasMacro($method)) {
             return $this->macroCall($method, $args);
+        }
+
+        if (Str::startsWith($method, 'assert')) {
+            $httpStatusCodeConstant = Response::class.'::HTTP_'.Str::of($method)->after('assert')->snake()->upper();
+
+            if (defined($httpStatusCodeConstant) && array_key_exists($status = constant($httpStatusCodeConstant), Response::$statusTexts)) {
+                return $this->assertStatus($status);
+            }
         }
 
         return $this->baseResponse->{$method}(...$args);

@@ -609,6 +609,27 @@ class TestResponseTest extends TestCase
         $response->assertUnprocessable();
     }
 
+    public function testAssertMagicStatusCodes()
+    {
+        $response = TestResponse::fromBaseResponse((new Response)->setStatusCode(Response::HTTP_I_AM_A_TEAPOT));
+        $response->assertIAmATeapot();
+        try {
+            $response->assertUnavailableForLegalReasons();
+            $this->fail();
+        } catch (AssertionFailedError $e) {
+            $this->assertStringContainsString('Failed asserting that 451 is identical to 418.', $e->getMessage());
+        }
+
+        $response = TestResponse::fromBaseResponse((new Response)->setStatusCode(Response::HTTP_UNAVAILABLE_FOR_LEGAL_REASONS));
+        $response->assertUnavailableForLegalReasons();
+        try {
+            $response->assertIAmATeapot();
+            $this->fail();
+        } catch (AssertionFailedError $e) {
+            $this->assertStringContainsString('Failed asserting that 418 is identical to 451.', $e->getMessage());
+        }
+    }
+
     public function testAssertServerError()
     {
         $statusCode = 500;
