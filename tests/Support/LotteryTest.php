@@ -63,7 +63,7 @@ class LotteryTest extends TestCase
 
     public function testItCanBePassedAsCallable()
     {
-        // Exmaple...
+        // Example...
         // DB::whenQueryingForLongerThan(Interval::seconds(5), Lottery::odds(1, 5)->winner(function ($connection) {
         //     Alert the team
         // }));
@@ -180,5 +180,11 @@ class LotteryTest extends TestCase
 
         $this->assertFalse($wins);
         $this->assertTrue($loses);
+    }
+
+    public function testFloatProhibitsSecondParameter()
+    {
+        $this->expectException(RuntimeException::class);
+        Lottery::odds(0.4, 2);
     }
 }

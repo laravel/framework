@@ -50,8 +50,13 @@ class Lottery
      */
     public function __construct($chances, $outOf = null)
     {
-        if ($outOf === null && is_float($chances) && $chances > 1) {
-            throw new RuntimeException('Float must not be greater than 1.');
+        if (is_float($chances)) {
+            if ($outOf !== null) {
+                throw new RuntimeException('The second parameter cannot be used when the first parameter is a float.');
+            }
+            if ($chances > 1) {
+                throw new RuntimeException('Float must not be greater than 1.');
+            }
         }
 
         $this->chances = $chances;
