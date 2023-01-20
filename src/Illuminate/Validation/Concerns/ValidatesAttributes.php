@@ -2,6 +2,8 @@
 
 namespace Illuminate\Validation\Concerns;
 
+use Brick\Math\BigDecimal;
+use Brick\Math\Exception\MathException as BrickMathException;
 use DateTime;
 use DateTimeInterface;
 use Egulias\EmailValidator\EmailValidator;
@@ -13,6 +15,7 @@ use Egulias\EmailValidator\Validation\RFCValidation;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Exceptions\MathException;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Exists;
@@ -1605,11 +1608,26 @@ trait ValidatesAttributes
             return false;
         }
 
-        if ((float) $parameters[0] === 0.0) {
-            return false;
-        }
+        try {
+            $numerator = BigDecimal::of($value);
+            $denominator = BigDecimal::of($parameters[0]);
 
-        return bcmod($value, $parameters[0], 16) === '0.0000000000000000';
+            if ($numerator->isZero() && $denominator->isZero()) {
+                return false;
+            }
+
+            if ($numerator->isZero()) {
+                return true;
+            }
+
+            if ($denominator->isZero()) {
+                return false;
+            }
+
+            return $numerator->remainder($denominator)->isZero();
+        } catch (BrickMathException $e) {
+            throw new MathException('An error occurred while handling the mulitple_of input values.', previous: $e);
+        }
     }
 
     /**
