@@ -1826,4 +1826,16 @@ class Blueprint
                         : [$column->name => null];
         })->filter()->all();
     }
+
+    /**
+     * Indicate that the given foreign key index should be dropped with their index.
+     *
+     * @param array|string $index
+     */
+    public function dropForeignWithIndex(array|string $index): void
+    {
+        $this->dropForeign($index);
+
+        $this->dropIndex($index);
+    }
 }
