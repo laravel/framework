@@ -484,7 +484,7 @@ class Response implements ArrayAccess
             return $this->macroCall($method, $parameters);
         }
 
-        $statusConstant = HttpResponse::class.'::HTTP_'.Str::of($method)->after('assert')->snake()->upper();
+        $statusConstant = HttpResponse::class.'::HTTP_'.Str::of($method)->snake()->upper();
 
         if (defined($statusConstant) && array_key_exists($status = constant($statusConstant), HttpResponse::$statusTexts)) {
             return $this->status() === $status;
