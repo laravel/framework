@@ -362,6 +362,48 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertCount(2, $post->tags()->findMany(new Collection([$tag->id, $tag2->id])));
     }
 
+    public function testFindMethodStringyKey()
+    {
+        Schema::create('post_string_key', function (Blueprint $table) {
+            $table->string('id', 1)->primary();
+            $table->string('title', 10);
+        });
+
+        Schema::create('tag_string_key', function (Blueprint $table) {
+            $table->string('id', 1)->primary();
+            $table->string('title', 10);
+        });
+
+        Schema::create('post_tag_string_key', function (Blueprint $table) {
+            $table->id();
+            $table->string('post_id', 1);
+            $table->string('tag_id', 1);
+        });
+
+        $post = PostStringPrimaryKey::query()->create([
+            'id' => 'a',
+            'title' => Str::random(10),
+        ]);
+
+        $tag = TagStringPrimaryKey::query()->create([
+            'id' => 'b',
+            'title' => Str::random(10),
+        ]);
+
+        $tag2 = TagStringPrimaryKey::query()->create([
+            'id' => 'c',
+            'title' => Str::random(10),
+        ]);
+
+        $post->tags()->attach(TagStringPrimaryKey::all());
+
+        $this->assertEquals($tag2->name, $post->tags()->find($tag2->id)->name);
+        $this->assertCount(0, $post->tags()->findMany([]));
+        $this->assertCount(2, $post->tags()->findMany([$tag->id, $tag2->id]));
+        $this->assertCount(0, $post->tags()->findMany(new Collection));
+        $this->assertCount(2, $post->tags()->findMany(new Collection([$tag->id, $tag2->id])));
+    }
+
     public function testFindOrFailMethod()
     {
         $this->expectException(ModelNotFoundException::class);
@@ -1218,6 +1260,42 @@ class User extends Model
             ->using(UserPostPivot::class)
             ->withPivot('is_draft')
             ->withTimestamps();
+    }
+}
+
+class PostStringPrimaryKey extends Model
+{
+    public $incrementing = false;
+
+    public $timestamps = false;
+
+    protected $table = 'post_string_key';
+
+    protected $keyType = 'string';
+
+    protected $fillable = ['title', 'id'];
+
+    public function tags()
+    {
+        return $this->belongsToMany(TagStringPrimaryKey::class, 'post_tag_string_key', 'post_id', 'tag_id');
+    }
+}
+
+class TagStringPrimaryKey extends Model
+{
+    public $incrementing = false;
+
+    public $timestamps = false;
+
+    protected $table = 'tag_string_key';
+
+    protected $keyType = 'string';
+
+    protected $fillable = ['title', 'id'];
+
+    public function posts()
+    {
+        return $this->belongsToMany(PostStringPrimaryKey::class, 'post_tag_string_key', 'tag_id', 'post_id');
     }
 }
 
