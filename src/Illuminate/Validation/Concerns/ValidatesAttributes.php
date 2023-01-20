@@ -1505,6 +1505,91 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute is missing.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateMissing($attribute, $value, $parameters)
+    {
+        return ! Arr::has($this->data, $attribute);
+    }
+
+    /**
+     * Validate that an attribute is missing when another attribute has a given value.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateMissingIf($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(2, $parameters, 'missing_if');
+
+        [$values, $other] = $this->parseDependentRuleParameters($parameters);
+
+        if (in_array($other, $values, is_bool($other) || is_null($other))) {
+            return $this->validateMissing($attribute, $value, $parameters);
+        }
+
+        return true;
+    }
+
+    /**
+     * Validate that an attribute is missing unless another attribute has a given value.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateMissingUnless($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(2, $parameters, 'missing_unless');
+
+        [$values, $other] = $this->parseDependentRuleParameters($parameters);
+
+        if (! in_array($other, $values, is_bool($other) || is_null($other))) {
+            return $this->validateMissing($attribute, $value, $parameters);
+        }
+
+        return true;
+    }
+
+    /**
+     * Validate that an attribute is missing when any given attribute is present.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateMissingWith($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'missing_with');
+
+        return ! Arr::hasAny($this->data, $parameters);
+    }
+
+    /**
+     * Validate that an attribute is missing when all given attributes are present.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateMissingWithAll($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'missing_with');
+
+        return ! Arr::has($this->data, $parameters);
+    }
+
+    /**
      * Validate the value of an attribute is a multiple of a given value.
      *
      * @param  string  $attribute
