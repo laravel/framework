@@ -17,6 +17,7 @@ use Illuminate\Http\Client\Request;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Http\Client\ResponseSequence;
+use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Str;
@@ -87,6 +88,22 @@ class HttpClientTest extends TestCase
         $response = $this->factory->post('http://laravel.com');
 
         $this->assertTrue($response->notFound());
+    }
+
+    public function testMagicStatusMethods()
+    {
+        $this->factory->fake([
+            'forge.laravel.com' => $this->factory::response('', HttpResponse::HTTP_UNAVAILABLE_FOR_LEGAL_REASONS),
+            'laravel.com' => $this->factory::response('', HttpResponse::HTTP_I_AM_A_TEAPOT),
+        ]);
+
+        $response = $this->factory->post('http://laravel.com');
+        $this->assertTrue($response->iAmATeapot());
+        $this->assertFalse($response->unavailableForLegalReasons());
+
+        $response = $this->factory->post('http://forge.laravel.com');
+        $this->assertTrue($response->unavailableForLegalReasons());
+        $this->assertFalse($response->iAmATeapot());
     }
 
     public function testResponseBodyCasting()

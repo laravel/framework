@@ -3,7 +3,9 @@
 namespace Illuminate\Http\Client;
 
 use ArrayAccess;
+use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use LogicException;
 
@@ -478,8 +480,16 @@ class Response implements ArrayAccess
      */
     public function __call($method, $parameters)
     {
-        return static::hasMacro($method)
-                    ? $this->macroCall($method, $parameters)
-                    : $this->response->{$method}(...$parameters);
+        if (static::hasMacro($method)) {
+            return $this->macroCall($method, $parameters);
+        }
+
+        $statusConstant = HttpResponse::class.'::HTTP_'.Str::of($method)->after('assert')->snake()->upper();
+
+        if (defined($statusConstant) && array_key_exists($status = constant($statusConstant), HttpResponse::$statusTexts)) {
+            return $this->status() === $status;
+        }
+
+        return $this->response->{$method}(...$parameters);
     }
 }
