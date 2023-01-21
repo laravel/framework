@@ -10,7 +10,7 @@ class PostResourceWithGetSingleExtraData extends PostResource
             'id' => $this->id,
             'title' => $this->title,
             'body' => $this->body,
-            'is_admin' => $this->getAddition('is_admin', false)
+            'is_admin' => $this->getAddition('is_admin', false),
         ];
     }
 }
