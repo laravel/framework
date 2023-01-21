@@ -96,6 +96,35 @@ class AwsS3V3Adapter extends FilesystemAdapter
     }
 
     /**
+     * Get a temporary upload URL for the file at the given path.
+     *
+     * @param  string  $path
+     * @param  \DateTimeInterface  $expiration
+     * @param  array  $options
+     * @return string
+     */
+    public function temporaryUploadUrl($path, $expiration, array $options = [])
+    {
+        $command = $this->client->getCommand('PutObject', array_merge([
+            'Bucket' => $this->config['bucket'],
+            'Key' => $this->prefixer->prefixPath($path),
+        ], $options));
+
+        $uri = $this->client->createPresignedRequest(
+            $command, $expiration, $options
+        )->getUri();
+
+        // If an explicit base URL has been set on the disk configuration then we will use
+        // it as the base URL instead of the default path. This allows the developer to
+        // have full control over the base path for this filesystem's generated URLs.
+        if (isset($this->config['temporary_url'])) {
+            $uri = $this->replaceBaseUrl($uri, $this->config['temporary_url']);
+        }
+
+        return (string) $uri;
+    }
+
+    /**
      * Get the underlying S3 client.
      *
      * @return \Aws\S3\S3Client
