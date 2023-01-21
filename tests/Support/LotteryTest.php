@@ -63,7 +63,7 @@ class LotteryTest extends TestCase
 
     public function testItCanBePassedAsCallable()
     {
-        // Exmaple...
+        // Example...
         // DB::whenQueryingForLongerThan(Interval::seconds(5), Lottery::odds(1, 5)->winner(function ($connection) {
         //     Alert the team
         // }));
