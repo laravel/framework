@@ -45,6 +45,16 @@ class EloquentUserProvider implements UserProvider
     }
 
     /**
+     * Determine if Eloquent Model is required.
+     *
+     * @return bool
+     */
+    public function isUsingEloquentModel(): bool
+    {
+        return true;
+    }
+
+    /**
      * Retrieve a user by their unique identifier.
      *
      * @param  mixed  $identifier

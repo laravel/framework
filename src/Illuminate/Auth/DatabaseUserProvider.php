@@ -48,6 +48,24 @@ class DatabaseUserProvider implements UserProvider
     }
 
     /**
+     * Determine if Eloquent Model is required.
+     *
+     * @return bool
+     */
+    public function isUsingEloquentModel(): bool
+    {
+        return false;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTable(): string
+    {
+        return $this->table;
+    }
+
+    /**
      * Retrieve a user by their unique identifier.
      *
      * @param  mixed  $identifier

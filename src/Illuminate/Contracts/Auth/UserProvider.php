@@ -5,6 +5,13 @@ namespace Illuminate\Contracts\Auth;
 interface UserProvider
 {
     /**
+     * Determine if Eloquent Model is required.
+     *
+     * @return bool
+     */
+    public function isUsingEloquentModel(): bool;
+
+    /**
      * Retrieve a user by their unique identifier.
      *
      * @param  mixed  $identifier
