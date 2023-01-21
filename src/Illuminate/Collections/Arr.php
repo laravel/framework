@@ -4,12 +4,24 @@ namespace Illuminate\Support;
 
 use ArgumentCountError;
 use ArrayAccess;
+use Illuminate\Support\Arrayable;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 
 class Arr
 {
     use Macroable;
+
+    /**
+     * Get a new arrayable object from the given array.
+     *
+     * @param  array  $array
+     * @return \Illuminate\Support\Arrayable
+     */
+    public static function of($array)
+    {
+        return new Arrayable($array);
+    }
 
     /**
      * Determine whether the given value is array accessible.
@@ -803,9 +815,7 @@ class Arr
      */
     public static function whereNotNull($array)
     {
-        return static::where($array, function ($value) {
-            return ! is_null($value);
-        });
+        return static::where($array, fn ($value) => ! is_null($value));
     }
 
     /**
