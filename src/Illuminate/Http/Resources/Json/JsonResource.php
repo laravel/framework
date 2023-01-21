@@ -10,6 +10,7 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Http\Resources\ConditionallyLoadsAttributes;
 use Illuminate\Http\Resources\DelegatesToResource;
+use Illuminate\Support\Arr;
 use JsonSerializable;
 
 class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutable
@@ -162,6 +163,18 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
         $this->additional = $data;
 
         return $this;
+    }
+
+    /**
+     * Get the addition from the additional to the resource response.
+     *
+     * @param  string|int|null  $key
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function getAddition($key, $default = null)
+    {
+        return Arr::get($this->additional, $key, $default);
     }
 
     /**
