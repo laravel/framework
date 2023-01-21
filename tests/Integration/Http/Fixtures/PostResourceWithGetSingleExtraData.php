@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Http\Fixtures;
 
-class PostResourceWithIfHasExtraData extends PostResource
+class PostResourceWithGetSingleExtraData extends PostResource
 {
     public function toArray($request)
     {
