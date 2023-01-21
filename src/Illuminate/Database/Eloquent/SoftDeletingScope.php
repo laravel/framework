@@ -82,11 +82,11 @@ class SoftDeletingScope implements Scope
      */
     protected function addRestoreOrCreate(Builder $builder)
     {
-        $builder->macro('restoreOrCreate', function(Builder $builder, array $attributes = [], array $values = []) {
+        $builder->macro('restoreOrCreate', function (Builder $builder, array $attributes = [], array $values = []) {
             $builder->withTrashed();
 
-            return tap($builder->firstOrCreate($attributes, $values), function($instance) {
-                if($instance->wasRecentlyCreated) {
+            return tap($builder->firstOrCreate($attributes, $values), function ($instance) {
+                if ($instance->wasRecentlyCreated) {
                     return;
                 }
 
