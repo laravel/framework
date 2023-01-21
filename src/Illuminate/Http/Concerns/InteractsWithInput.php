@@ -610,7 +610,7 @@ trait InteractsWithInput
     /**
      * Dump the request items and end the script.
      *
-     * @param  mixed  $keys
+     * @param  mixed  ...$keys
      * @return never
      */
     public function dd(...$keys)
