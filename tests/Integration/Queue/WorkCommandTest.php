@@ -55,7 +55,7 @@ class WorkCommandTest extends TestCase
 
     public function testRunTimestampOutputWithDefaultAppTimezone()
     {
-        // queue.output_tiemzone not set at all
+        // queue.output_timezone not set at all
         $this->travelTo(Carbon::create(2023, 1, 18, 10, 10, 11));
         Queue::connection('database')->push(new FirstJob);
 

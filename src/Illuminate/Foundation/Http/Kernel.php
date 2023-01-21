@@ -245,7 +245,7 @@ class Kernel implements KernelContract
     }
 
     /**
-     * Register a callback to be invoked when the requests lifecyle duration exceeds a given amount of time.
+     * Register a callback to be invoked when the requests lifecycle duration exceeds a given amount of time.
      *
      * @param  \DateTimeInterface|\Carbon\CarbonInterval|float|int  $threshold
      * @param  callable  $handler
