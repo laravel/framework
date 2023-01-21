@@ -86,10 +86,6 @@ class SoftDeletingScope implements Scope
             $builder->withTrashed();
 
             return tap($builder->firstOrCreate($attributes, $values), function ($instance) {
-                if ($instance->wasRecentlyCreated) {
-                    return;
-                }
-
                 $instance->restore();
             });
         });
