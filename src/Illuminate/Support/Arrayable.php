@@ -2,9 +2,9 @@
 
 namespace Illuminate\Support;
 
+use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use Symfony\Component\VarDumper\VarDumper;
-use Illuminate\Support\Traits\Conditionable;
 
 class Arrayable
 {
@@ -203,7 +203,7 @@ class Arrayable
      */
     public function isList()
     {
-        return !$this->isAssoc();
+        return ! $this->isAssoc();
     }
 
     /**
@@ -238,7 +238,7 @@ class Arrayable
     public function prependKeysWith($prependWith)
     {
         $array = Collection::make($this->value)->mapWithKeys(function ($item, $key) use ($prependWith) {
-            return [$prependWith . $key => $item];
+            return [$prependWith.$key => $item];
         })->all();
 
         return new static($array);

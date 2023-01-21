@@ -4,7 +4,6 @@ namespace Illuminate\Support;
 
 use ArgumentCountError;
 use ArrayAccess;
-use Illuminate\Support\Arrayable;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 
