@@ -3,7 +3,9 @@
 namespace Illuminate\Tests\Session;
 
 use Illuminate\Cookie\CookieJar;
+use Illuminate\Database\ConnectionInterface;
 use Illuminate\Session\CookieSessionHandler;
+use Illuminate\Session\DatabaseSessionHandler;
 use Illuminate\Session\Store;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
@@ -643,6 +645,21 @@ class SessionStoreTest extends TestCase
         $this->assertSame('macroable', $this->getSession()->foo());
     }
 
+    public function testItCanSetExists()
+    {
+        $store = new Store(...$this->getMocks('php', $handler = $this->getFakeDatabaseHandler()));
+
+        $store->setExists(true);
+        $this->assertTrue($handler->getExists());
+
+        $store->setExists(false);
+        $this->assertFalse($handler->getExists());
+
+        $session = $this->getSession();
+        $session->getHandler()->shouldReceive('setExists')->never();
+        $session->setExists(false);
+    }
+
     public function getSession($serialization = 'php')
     {
         $reflection = new ReflectionClass(Store::class);
@@ -650,11 +667,12 @@ class SessionStoreTest extends TestCase
         return $reflection->newInstanceArgs($this->getMocks($serialization));
     }
 
-    public function getMocks($serialization = 'json')
+    public function getMocks($serialization = 'json', $mockHandler = null)
     {
+        $mockHandler ??= m::mock(SessionHandlerInterface::class);
         return [
             $this->getSessionName(),
-            m::mock(SessionHandlerInterface::class),
+            $mockHandler,
             $this->getSessionId(),
             $serialization,
         ];
@@ -668,5 +686,18 @@ class SessionStoreTest extends TestCase
     public function getSessionName()
     {
         return 'name';
+    }
+
+    public function getFakeDatabaseHandler()
+    {
+        return new FakeDatabaseSessionHandler(m::mock(ConnectionInterface::class), 'table', 60);
+    }
+}
+
+class FakeDatabaseSessionHandler extends DatabaseSessionHandler
+{
+    public function getExists()
+    {
+        return $this->exists;
     }
 }
