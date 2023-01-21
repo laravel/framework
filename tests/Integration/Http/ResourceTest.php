@@ -26,6 +26,7 @@ use Illuminate\Tests\Integration\Http\Fixtures\PostModelCollectionResource;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResource;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithAnonymousResourceCollectionWithPaginationInformation;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithExtraData;
+use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithIfHasExtraData;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithJsonOptions;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithJsonOptionsAndTypeHints;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalAppendedAttributes;
@@ -684,6 +685,29 @@ class ResourceTest extends TestCase
             ],
             'foo' => 'bar',
             'baz' => 'qux',
+        ]);
+    }
+
+    public function testResourcesMayCustomizeIfHasExtraData()
+    {
+        Route::get('/', function () {
+            return (new PostResourceWithIfHasExtraData(new Post([
+                'id' => 5,
+                'title' => 'Test title',
+            ])))->additional(['is_admin' => false]);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/',
+            ['Accept' => 'application/json']
+        );
+
+        $response->assertJson([
+            'data' => [
+                'id' => 5,
+                'title' => 'Test title',
+                'is_admin' => false,
+            ],
         ]);
     }
 
