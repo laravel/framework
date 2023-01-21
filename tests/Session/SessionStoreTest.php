@@ -670,6 +670,7 @@ class SessionStoreTest extends TestCase
     public function getMocks($serialization = 'json', $mockHandler = null)
     {
         $mockHandler ??= m::mock(SessionHandlerInterface::class);
+
         return [
             $this->getSessionName(),
             $mockHandler,
