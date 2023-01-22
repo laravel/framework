@@ -523,6 +523,11 @@ class BladeCompiler extends Compiler implements CompilerInterface
                    ! $this->hasEvenNumberOfParentheses($match[0])) {
                 $rest = Str::before(Str::after($template, $match[0]), ')');
 
+                if (isset($matches[0][$i + 1]) && Str::contains($rest.')', $matches[0][$i + 1])) {
+                    unset($matches[0][$i + 1]);
+                    $i++;
+                }
+
                 $match[0] = $match[0].$rest.')';
                 $match[3] = $match[3].$rest.')';
                 $match[4] = $match[4].$rest;
