@@ -16,7 +16,7 @@
     "require": {
         "php": "^8.0.2",
         "ext-json": "*",
-        "brick/math": "^0.10.2|^0.11",
+        "brick/math": "^0.9.3|^0.10.2|^0.11",
         "egulias/email-validator": "^3.2.1|^4.0",
         "illuminate/collections": "^9.0",
         "illuminate/container": "^9.0",
