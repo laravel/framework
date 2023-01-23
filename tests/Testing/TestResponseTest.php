@@ -18,6 +18,7 @@ use Illuminate\Session\ArraySessionHandler;
 use Illuminate\Session\Store;
 use Illuminate\Support\Collection;
 use Illuminate\Support\MessageBag;
+use Illuminate\Support\Str;
 use Illuminate\Support\ViewErrorBag;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Illuminate\Testing\TestResponse;
@@ -612,7 +613,7 @@ class TestResponseTest extends TestCase
     public function testAssertMagicStatusCodes()
     {
         $response = TestResponse::fromBaseResponse((new Response)->setStatusCode(Response::HTTP_I_AM_A_TEAPOT));
-        $response->assertIAmATeapot();
+        $response->assertImATeapot();
         try {
             $response->assertUnavailableForLegalReasons();
             $this->fail();
@@ -623,10 +624,27 @@ class TestResponseTest extends TestCase
         $response = TestResponse::fromBaseResponse((new Response)->setStatusCode(Response::HTTP_UNAVAILABLE_FOR_LEGAL_REASONS));
         $response->assertUnavailableForLegalReasons();
         try {
-            $response->assertIAmATeapot();
+            $response->assertImATeapot();
             $this->fail();
         } catch (AssertionFailedError $e) {
             $this->assertStringContainsString('Failed asserting that 418 is identical to 451.', $e->getMessage());
+        }
+
+        foreach (Response::$statusTexts as $code => $name) {
+            $response = TestResponse::fromBaseResponse((new Response)->setStatusCode($code));
+            $method = 'assert'.match($code) {
+                226 => 'ImUsed',
+                414 => 'UriTooLong',
+                default => Str::of($name)->slug('_', dictionary: [])->studly($name),
+            };
+
+            $response->{$method}();
+            try {
+                $response->assertStatus(0);
+                $this->fail();
+            } catch (AssertionFailedError $e) {
+                $this->assertStringContainsString("Failed asserting that 0 is identical to {$code}.", $e->getMessage());
+            }
         }
     }
 

@@ -1790,9 +1790,12 @@ class TestResponse implements ArrayAccess
         }
 
         if (Str::startsWith($method, 'assert')) {
-            $statusConstant = Response::class.'::HTTP_'.Str::of($method)->after('assert')->snake()->upper();
+            $status = collect(Response::$statusTexts)
+                ->map(fn ($status) => (string) Str::of($status)->slug()->studly())
+                ->flip()
+                ->get(Str::after($method, 'assert'));
 
-            if (defined($statusConstant) && array_key_exists($status = constant($statusConstant), Response::$statusTexts)) {
+            if ($status !== null) {
                 return $this->assertStatus($status);
             }
         }
