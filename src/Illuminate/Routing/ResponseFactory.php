@@ -275,28 +275,4 @@ class ResponseFactory implements FactoryContract
     {
         return $this->redirector->intended($default, $status, $headers, $secure);
     }
-
-    /**
-     * Dynamically proxy other methods to the underlying response.
-     *
-     * @param  string  $method
-     * @param  array  $parameters
-     * @return mixed
-     */
-    public function __call($method, $parameters)
-    {
-        if (static::hasMacro($method)) {
-            return $this->macroCall($method, $parameters);
-        }
-
-        // WIP
-
-        // $statusConstant = Response::class.'::HTTP_'.Str::of($method)->snake()->upper();
-
-        // if (defined($statusConstant) && array_key_exists($status = constant($statusConstant), HttpResponse::$statusTexts)) {
-        //     return $this->status() === $status;
-        // }
-
-        // throw exception
-    }
 }
