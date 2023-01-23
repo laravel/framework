@@ -381,6 +381,50 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute contains only ASCII alphabetic characters.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validateAsciiAlpha($attribute, $value)
+    {
+        return is_string($value) && preg_match('/^[a-zA-Z]+$/u', $value);
+    }
+
+    /**
+     * Validate that an attribute contains only ASCII alpha-numeric characters, dashes, and underscores.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validateAsciiAlphaDash($attribute, $value)
+    {
+        if (! is_string($value) && ! is_numeric($value)) {
+            return false;
+        }
+
+        return preg_match('/^[a-zA-Z0-9_-]+$/u', $value) > 0;
+    }
+
+    /**
+     * Validate that an attribute contains only ASCII alpha-numeric characters.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validateAsciiAlphaNum($attribute, $value)
+    {
+        if (! is_string($value) && ! is_numeric($value)) {
+            return false;
+        }
+
+        return preg_match('/^[a-zA-Z0-9]+$/u', $value) > 0;
+    }
+
+    /**
      * Validate that an attribute is an array.
      *
      * @param  string  $attribute
