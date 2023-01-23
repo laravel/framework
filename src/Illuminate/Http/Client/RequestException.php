@@ -34,9 +34,7 @@ class RequestException extends HttpClientException
     {
         $message = "HTTP request returned status code {$response->status()}";
 
-        $summary = class_exists(\GuzzleHttp\Psr7\Message::class)
-            ? \GuzzleHttp\Psr7\Message::bodySummary($response->toPsrResponse())
-            : \GuzzleHttp\Psr7\get_message_body_summary($response->toPsrResponse());
+        $summary = \GuzzleHttp\Psr7\Message::bodySummary($response->toPsrResponse());
 
         return is_null($summary) ? $message : $message .= ":\n{$summary}\n";
     }
