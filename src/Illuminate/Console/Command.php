@@ -61,6 +61,13 @@ class Command extends SymfonyCommand
     protected $hidden = false;
 
     /**
+     * The console command name aliases.
+     *
+     * @var array
+     */
+    protected $aliases;
+
+    /**
      * Create a new console command instance.
      *
      * @return void
@@ -88,6 +95,10 @@ class Command extends SymfonyCommand
         $this->setHelp((string) $this->help);
 
         $this->setHidden($this->isHidden());
+
+        if (isset($this->aliases)) {
+            $this->setAliases((array) $this->aliases);
+        }
 
         if (! isset($this->signature)) {
             $this->specifyParameters();
