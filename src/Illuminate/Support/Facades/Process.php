@@ -9,7 +9,6 @@ use Illuminate\Console\Process\Factory;
  * @method static \Illuminate\Console\Process\FakeProcessResult result(array|string $output = '', array|string $errorOutput = '', int $exitCode = 0)
  * @method static \Illuminate\Console\Process\FakeProcessDescription describe()
  * @method static \Illuminate\Console\Process\FakeProcessSequence sequence(array $processes = [])
- * @method static \Illuminate\Console\Process\Factory fake(\Closure|array|null $callback = null)
  * @method static bool isRecording()
  * @method static \Illuminate\Console\Process\Factory recordIfRecording(\Illuminate\Console\Process\PendingProcess $process, \Illuminate\Contracts\Console\Process\ProcessResult $result)
  * @method static \Illuminate\Console\Process\Factory record(\Illuminate\Console\Process\PendingProcess $process, \Illuminate\Contracts\Console\Process\ProcessResult $result)
