@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support\Facades;
 
+use Closure;
 use Illuminate\Console\Process\Factory;
 
 /**
@@ -40,4 +41,17 @@ class Process extends Facade
     {
         return Factory::class;
     }
+
+    /**
+     * Indicate that the process factory should fake processes.
+     *
+     * @param  \Closure|array|null  $callback
+     * @return \Illuminate\Console\Process\Factory
+     */
+     public static function fake(Closure|array $callback = null)
+     {
+         return tap(static::getFacadeRoot(), function ($fake) use ($callback) {
+             static::swap($fake->fake($callback));
+         });
+     }
 }
