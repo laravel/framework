@@ -338,7 +338,7 @@ trait ValidatesAttributes
 
     /**
      * Validate that an attribute contains only alphabetic characters.
-     * If the 'ascii' option is passed, validate that an attribute contains only ascii alphabetic characters
+     * If the 'ascii' option is passed, validate that an attribute contains only ascii alphabetic characters.
      *
      * @param  string  $attribute
      * @param  mixed  $value
