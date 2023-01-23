@@ -301,18 +301,6 @@ class ControllerMakeCommand extends GeneratorCommand
     }
 
     /**
-     * The questions that should be asked per missing input arguments.
-     *
-     * @return array
-     */
-    protected function missingInputQuestions()
-    {
-        return [
-            'name' => 'What should the controller be named?',
-        ];
-    }
-
-    /**
      * Interact further with the user if they were prompted for missing arguments.
      *
      * @param  \Symfony\Component\Console\Input\InputInterface  $input
