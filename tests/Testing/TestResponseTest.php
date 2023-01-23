@@ -631,9 +631,18 @@ class TestResponseTest extends TestCase
         }
 
         foreach (Response::$statusTexts as $code => $name) {
-            $response = TestResponse::fromBaseResponse((new Response)->setStatusCode($code));
-
             $method = 'assert'.Str::of($name)->slug(dictionary: [])->studly($name);
+
+            $response = TestResponse::fromBaseResponse((new Response)->setStatusCode(199));
+
+            try {
+                $response->{$method}();
+                $this->fail();
+            } catch (AssertionFailedError $e) {
+                $this->assertStringContainsString("Failed asserting that {$code} is identical to 199.", $e->getMessage());
+            }
+
+            $response = TestResponse::fromBaseResponse((new Response)->setStatusCode($code));
 
             $this->assertSame(
                 $response,
