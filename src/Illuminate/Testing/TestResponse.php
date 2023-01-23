@@ -967,7 +967,7 @@ class TestResponse implements ArrayAccess
     }
 
     /**
-     * Assert that the key that holding the data must be a json array.
+     * Assert that the given key is a JSON array.
      *
      * @param $key
      * @return $this
@@ -975,6 +975,7 @@ class TestResponse implements ArrayAccess
     public function assertJsonIsArray($key = null)
     {
         $data = $this->json($key);
+
         $encodedData = json_encode($data);
 
         PHPUnit::assertTrue(
@@ -987,7 +988,7 @@ class TestResponse implements ArrayAccess
     }
 
     /**
-     * Assert that the key that holding the data must be a json object.
+     * Assert that the given key is a JSON object.
      *
      * @param $key
      * @return $this
@@ -995,6 +996,7 @@ class TestResponse implements ArrayAccess
     public function assertJsonIsObject($key = null)
     {
         $data = $this->json($key);
+
         $encodedData = json_encode($data);
 
         PHPUnit::assertTrue(
