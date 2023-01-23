@@ -15,6 +15,8 @@ use Throwable;
 
 class ResponseFactory implements FactoryContract
 {
+    use Macroable;
+
     /**
      * The view factory instance.
      *
