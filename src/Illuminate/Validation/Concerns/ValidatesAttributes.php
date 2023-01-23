@@ -378,6 +378,50 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute contains only multibyte alphabetic characters.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validateAlphaMb($attribute, $value)
+    {
+        return is_string($value) && preg_match('/^[\pL\pM]+$/u', $value) > 0;
+    }
+
+    /**
+     * Validate that an attribute contains only multibyte alpha-numeric characters, dashes, and underscores.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validateAlphaDashMb($attribute, $value)
+    {
+        if (! is_string($value) && ! is_numeric($value)) {
+            return false;
+        }
+
+        return preg_match('/^[\pL\pM\pN_-]+$/u', $value) > 0;
+    }
+
+    /**
+     * Validate that an attribute contains only multibyte alpha-numeric characters.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validateAlphaNumMb($attribute, $value)
+    {
+        if (! is_string($value) && ! is_numeric($value)) {
+            return false;
+        }
+
+        return preg_match('/^[\pL\pM\pN]+$/u', $value) > 0;
+    }
+
+    /**
      * Validate that an attribute is an array.
      *
      * @param  string  $attribute
