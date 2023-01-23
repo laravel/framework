@@ -338,27 +338,38 @@ trait ValidatesAttributes
 
     /**
      * Validate that an attribute contains only alphabetic characters.
+     * If the 'ascii' option is passed, validate that an attribute contains only ascii alphabetic characters
      *
      * @param  string  $attribute
      * @param  mixed  $value
      * @return bool
      */
-    public function validateAlpha($attribute, $value)
+    public function validateAlpha($attribute, $value, $parameters)
     {
+        if (isset($parameters[0]) && $parameters[0] === 'ascii') {
+            return is_string($value) && preg_match('/^[a-zA-Z]+$/u', $value);
+        }
+
         return is_string($value) && preg_match('/^[\pL\pM]+$/u', $value);
     }
 
     /**
      * Validate that an attribute contains only alpha-numeric characters, dashes, and underscores.
+     * If the 'ascii' option is passed, validate that an attribute contains only ascii alpha-numeric characters,
+     * dashes, and underscores.
      *
      * @param  string  $attribute
      * @param  mixed  $value
      * @return bool
      */
-    public function validateAlphaDash($attribute, $value)
+    public function validateAlphaDash($attribute, $value, $parameters)
     {
         if (! is_string($value) && ! is_numeric($value)) {
             return false;
+        }
+
+        if (isset($parameters[0]) && $parameters[0] === 'ascii') {
+            return preg_match('/^[a-zA-Z0-9_-]+$/u', $value) > 0;
         }
 
         return preg_match('/^[\pL\pM\pN_-]+$/u', $value) > 0;
@@ -366,62 +377,23 @@ trait ValidatesAttributes
 
     /**
      * Validate that an attribute contains only alpha-numeric characters.
+     * If the 'ascii' option is passed, validate that an attribute contains only ascii alpha-numeric characters.
      *
      * @param  string  $attribute
      * @param  mixed  $value
      * @return bool
      */
-    public function validateAlphaNum($attribute, $value)
+    public function validateAlphaNum($attribute, $value, $parameters)
     {
         if (! is_string($value) && ! is_numeric($value)) {
             return false;
+        }
+
+        if (isset($parameters[0]) && $parameters[0] === 'ascii') {
+            return preg_match('/^[a-zA-Z0-9]+$/u', $value) > 0;
         }
 
         return preg_match('/^[\pL\pM\pN]+$/u', $value) > 0;
-    }
-
-    /**
-     * Validate that an attribute contains only ASCII alphabetic characters.
-     *
-     * @param  string  $attribute
-     * @param  mixed  $value
-     * @return bool
-     */
-    public function validateAsciiAlpha($attribute, $value)
-    {
-        return is_string($value) && preg_match('/^[a-zA-Z]+$/u', $value);
-    }
-
-    /**
-     * Validate that an attribute contains only ASCII alpha-numeric characters, dashes, and underscores.
-     *
-     * @param  string  $attribute
-     * @param  mixed  $value
-     * @return bool
-     */
-    public function validateAsciiAlphaDash($attribute, $value)
-    {
-        if (! is_string($value) && ! is_numeric($value)) {
-            return false;
-        }
-
-        return preg_match('/^[a-zA-Z0-9_-]+$/u', $value) > 0;
-    }
-
-    /**
-     * Validate that an attribute contains only ASCII alpha-numeric characters.
-     *
-     * @param  string  $attribute
-     * @param  mixed  $value
-     * @return bool
-     */
-    public function validateAsciiAlphaNum($attribute, $value)
-    {
-        if (! is_string($value) && ! is_numeric($value)) {
-            return false;
-        }
-
-        return preg_match('/^[a-zA-Z0-9]+$/u', $value) > 0;
     }
 
     /**
