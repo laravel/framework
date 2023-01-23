@@ -252,12 +252,12 @@ class ModelMakeCommand extends GeneratorCommand
         collect($this->components->choice('Would you like any of the following?', [
             'none',
             'all',
-            'migration',
-            'seed',
             'factory',
+            'form requests',
+            'migration',
             'policy',
             'resource controller',
-            'form requests',
+            'seed',
         ], default: 0, multiple: true))
         ->reject('none')
         ->map(fn ($option) => match ($option) {
