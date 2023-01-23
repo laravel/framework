@@ -633,15 +633,11 @@ class TestResponseTest extends TestCase
         foreach (Response::$statusTexts as $code => $name) {
             $response = TestResponse::fromBaseResponse((new Response)->setStatusCode($code));
 
-            $prefix = match($code) {
-                226 => 'ImUsed',
-                414 => 'UriTooLong',
-                default => Str::of($name)->slug('_', dictionary: [])->studly($name),
-            };
+            $method = 'assert'.Str::of($name)->slug(dictionary: [])->studly($name);
 
             $this->assertSame(
                 $response,
-                $response->{'assert'.$prefix}()
+                $response->{$method}()
             );
         }
     }

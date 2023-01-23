@@ -107,11 +107,7 @@ class HttpClientTest extends TestCase
         foreach (HttpResponse::$statusTexts as $code => $name) {
             $response = $this->factory->get("http://{$code}.example.com");
 
-            $method = match($code) {
-                226 => 'imUsed',
-                414 => 'uriTooLong',
-                default => (string) Str::of($name)->slug('_', dictionary: [])->camel($name),
-            };
+            $method = (string) Str::of($name)->slug(dictionary: [])->camel($name);
 
             $this->assertTrue($response->{$method}());
         }
