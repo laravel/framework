@@ -94,6 +94,7 @@ class HttpClientTest extends TestCase
     {
         $this->factory->fake(collect(HttpResponse::$statusTexts)
             ->mapWithKeys(fn ($status, $code) => ["{$code}.example.com" => $this->factory::response('', $code)])
+            ->merge(['99.example.com' => $this->factory::response('', 199)])
             ->all());
 
         $response = $this->factory->get('http://418.example.com');
@@ -105,10 +106,12 @@ class HttpClientTest extends TestCase
         $this->assertFalse($response->imATeapot());
 
         foreach (HttpResponse::$statusTexts as $code => $name) {
-            $response = $this->factory->get("http://{$code}.example.com");
-
             $method = (string) Str::of($name)->slug(dictionary: [])->camel($name);
 
+            $response = $this->factory->get("http://199.example.com");
+            $this->assertFalse($response->{$method}());
+
+            $response = $this->factory->get("http://{$code}.example.com");
             $this->assertTrue($response->{$method}());
         }
     }
