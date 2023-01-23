@@ -334,7 +334,7 @@ trait ValidatesAttributes
     }
 
     /**
-     * Validate that an attribute contains only alphabetic characters.
+     * Validate that an attribute contains only ascii alphabetic characters.
      *
      * @param  string  $attribute
      * @param  mixed  $value
@@ -342,11 +342,11 @@ trait ValidatesAttributes
      */
     public function validateAlpha($attribute, $value)
     {
-        return is_string($value) && preg_match('/^[\pL\pM]+$/u', $value);
+        return is_string($value) && preg_match('/^[a-zA-Z]+$/u', $value) > 0;
     }
 
     /**
-     * Validate that an attribute contains only alpha-numeric characters, dashes, and underscores.
+     * Validate that an attribute contains only ascii alpha-numeric characters, dashes, and underscores.
      *
      * @param  string  $attribute
      * @param  mixed  $value
@@ -358,11 +358,11 @@ trait ValidatesAttributes
             return false;
         }
 
-        return preg_match('/^[\pL\pM\pN_-]+$/u', $value) > 0;
+        return preg_match('/^[a-zA-Z0-9_-]+$/u', $value) > 0;
     }
 
     /**
-     * Validate that an attribute contains only alpha-numeric characters.
+     * Validate that an attribute contains only ascii alpha-numeric characters.
      *
      * @param  string  $attribute
      * @param  mixed  $value
@@ -374,7 +374,7 @@ trait ValidatesAttributes
             return false;
         }
 
-        return preg_match('/^[\pL\pM\pN]+$/u', $value) > 0;
+        return preg_match('/^[a-zA-Z0-9]+$/u', $value) > 0;
     }
 
     /**
