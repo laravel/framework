@@ -3,8 +3,8 @@
 namespace Illuminate\Validation\Concerns;
 
 use Brick\Math\BigDecimal;
-use Brick\Math\Exception\MathException as BrickMathException;
 use Brick\Math\BigNumber;
+use Brick\Math\Exception\MathException as BrickMathException;
 use DateTime;
 use DateTimeInterface;
 use Egulias\EmailValidator\EmailValidator;
