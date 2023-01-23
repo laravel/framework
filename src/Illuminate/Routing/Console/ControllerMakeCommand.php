@@ -6,7 +6,6 @@ use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
 use InvalidArgumentException;
 use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -309,7 +308,7 @@ class ControllerMakeCommand extends GeneratorCommand
     protected function missingInputQuestions()
     {
         return [
-            'name' => 'What should the controller be named?'
+            'name' => 'What should the controller be named?',
         ];
     }
 
