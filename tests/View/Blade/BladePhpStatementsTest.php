@@ -141,4 +141,35 @@ class BladePhpStatementsTest extends AbstractBladeTestCase
 
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
+
+    public function testNestedTagCalls()
+    {
+        $string = "<span @class(['k' => @empty(\$v)])></span>";
+        $expected = '<span class="<?php echo \Illuminate\Support\Arr::toCssClasses([\'k\' => @empty($v)]) ?>"></span>';
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+
+        $string = "<span @class(['k))' => @empty(\$v)])></span>";
+        $expected = '<span class="<?php echo \Illuminate\Support\Arr::toCssClasses([\'k))\' => @empty($v)]) ?>"></span>';
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+
+        $string = "<span @class(['k' => @empty(\$v), 't' => @empty(\$v1)])></span>";
+        $expected = '<span class="<?php echo \Illuminate\Support\Arr::toCssClasses([\'k\' => @empty($v), \'t\' => @empty($v1)]) ?>"></span>';
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+
+        $string = "<span @class(['k' => @empty(\$v), 't' => @empty(\$v1)])></span>";
+        $expected = '<span class="<?php echo \Illuminate\Support\Arr::toCssClasses([\'k\' => @empty($v), \'t\' => @empty($v1)]) ?>"></span>';
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+
+        $string = "<span @class(['k' => @empty(\$v), 't' => @empty(\$v1), 'r' => @empty(\$v2)])></span>";
+        $expected = '<span class="<?php echo \Illuminate\Support\Arr::toCssClasses([\'k\' => @empty($v), \'t\' => @empty($v1), \'r\' => @empty($v2)]) ?>"></span>';
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+
+        $string = "<span @class(['k' => @empty(\$v), 't))' => @empty(\$v1), 'r' => @empty(\$v2)])></span>";
+        $expected = '<span class="<?php echo \Illuminate\Support\Arr::toCssClasses([\'k\' => @empty($v), \'t))\' => @empty($v1), \'r\' => @empty($v2)]) ?>"></span>';
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+
+        $string = "<span @class(['k' => @empty(\$v), 't' => @empty(\$v1), 'r' => @empty(\$v2), 'l' => 'l'])></span><span @class(['k' => @empty(\$v)])></span>";
+        $expected = '<span class="<?php echo \Illuminate\Support\Arr::toCssClasses([\'k\' => @empty($v), \'t\' => @empty($v1), \'r\' => @empty($v2), \'l\' => \'l\']) ?>"></span><span class="<?php echo \Illuminate\Support\Arr::toCssClasses([\'k\' => @empty($v)]) ?>"></span>';
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
 }
