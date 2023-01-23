@@ -15,10 +15,6 @@ use Throwable;
 
 class ResponseFactory implements FactoryContract
 {
-    use Macroable {
-        __call as macroCall;
-    }
-
     /**
      * The view factory instance.
      *
