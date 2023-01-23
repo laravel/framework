@@ -632,19 +632,17 @@ class TestResponseTest extends TestCase
 
         foreach (Response::$statusTexts as $code => $name) {
             $response = TestResponse::fromBaseResponse((new Response)->setStatusCode($code));
-            $method = 'assert'.match($code) {
+
+            $prefix = match($code) {
                 226 => 'ImUsed',
                 414 => 'UriTooLong',
                 default => Str::of($name)->slug('_', dictionary: [])->studly($name),
             };
 
-            $response->{$method}();
-            try {
-                $response->assertStatus(0);
-                $this->fail();
-            } catch (AssertionFailedError $e) {
-                $this->assertStringContainsString("Failed asserting that 0 is identical to {$code}.", $e->getMessage());
-            }
+            $this->assertSame(
+                $response,
+                $response->{'assert'.$prefix}()
+            );
         }
     }
 

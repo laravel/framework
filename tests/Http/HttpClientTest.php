@@ -92,18 +92,29 @@ class HttpClientTest extends TestCase
 
     public function testMagicStatusMethods()
     {
-        $this->factory->fake([
-            'forge.laravel.com' => $this->factory::response('', HttpResponse::HTTP_UNAVAILABLE_FOR_LEGAL_REASONS),
-            'laravel.com' => $this->factory::response('', HttpResponse::HTTP_I_AM_A_TEAPOT),
-        ]);
+        $this->factory->fake(collect(HttpResponse::$statusTexts)
+            ->mapWithKeys(fn ($status, $code) => ["{$code}.example.com" => $this->factory::response('', $code)])
+            ->all());
 
-        $response = $this->factory->post('http://laravel.com');
-        $this->assertTrue($response->iAmATeapot());
+        $response = $this->factory->get('http://418.example.com');
+        $this->assertTrue($response->imATeapot());
         $this->assertFalse($response->unavailableForLegalReasons());
 
-        $response = $this->factory->post('http://forge.laravel.com');
+        $response = $this->factory->post('http://451.example.com');
         $this->assertTrue($response->unavailableForLegalReasons());
-        $this->assertFalse($response->iAmATeapot());
+        $this->assertFalse($response->imATeapot());
+
+        foreach (HttpResponse::$statusTexts as $code => $name) {
+            $response = $this->factory->get("http://{$code}.example.com");
+
+            $method = match($code) {
+                226 => 'imUsed',
+                414 => 'uriTooLong',
+                default => (string) Str::of($name)->slug('_', dictionary: [])->camel($name),
+            };
+
+            $this->assertTrue($response->{$method}());
+        }
     }
 
     public function testResponseBodyCasting()
