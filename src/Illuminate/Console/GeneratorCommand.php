@@ -481,7 +481,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
      *
      * @return array
      */
-    protected function promptForMissingInputUsing()
+    protected function promptForMissingArgumentsUsing()
     {
         return [
             'name' => 'What should the '.strtolower($this->type).' be named?',

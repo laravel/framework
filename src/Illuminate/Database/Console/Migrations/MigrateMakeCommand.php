@@ -135,7 +135,7 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
      *
      * @return array
      */
-    protected function promptForMissingInputUsing()
+    protected function promptForMissingArgumentsUsing()
     {
         return [
             'name' => 'What should the migration be named?',

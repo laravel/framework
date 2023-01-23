@@ -38,7 +38,7 @@ trait PromptsForMissingInput
             ->each(fn ($argument) => $input->setArgument(
                 $argument->getName(),
                 $this->askPersistently(
-                    $this->promptForMissingInputUsing()[$argument->getName()] ??
+                    $this->promptForMissingArgumentsUsing()[$argument->getName()] ??
                     'What is '.lcfirst($argument->getDescription()).'?'
                 )
             ))
@@ -54,7 +54,7 @@ trait PromptsForMissingInput
      *
      * @return array
      */
-    protected function promptForMissingInputUsing()
+    protected function promptForMissingArgumentsUsing()
     {
         return [];
     }
