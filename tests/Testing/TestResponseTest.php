@@ -1530,6 +1530,38 @@ class TestResponseTest extends TestCase
         $testResponse->assertJsonMissingValidationErrors('bar', 'data.errors');
     }
 
+    public function testAssertJsonIsArray()
+    {
+        $responseArray = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
+        $responseArray->assertJsonIsArray();
+    }
+
+    public function testAssertJsonIsNotArray()
+    {
+        $this->expectException(ExpectationFailedException::class);
+
+        $responseObject = TestResponse::fromBaseResponse(new Response([
+            'foo' => 'bar',
+        ]));
+        $responseObject->assertJsonIsArray();
+    }
+
+    public function testAssertJsonIsObject()
+    {
+        $responseObject = TestResponse::fromBaseResponse(new Response([
+            'foo' => 'bar',
+        ]));
+        $responseObject->assertJsonIsObject();
+    }
+
+    public function testAssertJsonIsNotObject()
+    {
+        $this->expectException(ExpectationFailedException::class);
+
+        $responseArray = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
+        $responseArray->assertJsonIsObject();
+    }
+
     public function testAssertDownloadOffered()
     {
         $files = new Filesystem;

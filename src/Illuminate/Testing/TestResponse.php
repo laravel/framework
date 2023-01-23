@@ -967,6 +967,48 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Assert that the given key is a JSON array.
+     *
+     * @param $key
+     * @return $this
+     */
+    public function assertJsonIsArray($key = null)
+    {
+        $data = $this->json($key);
+
+        $encodedData = json_encode($data);
+
+        PHPUnit::assertTrue(
+            is_array($data)
+            && str_starts_with($encodedData, '[')
+            && str_ends_with($encodedData, ']')
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert that the given key is a JSON object.
+     *
+     * @param $key
+     * @return $this
+     */
+    public function assertJsonIsObject($key = null)
+    {
+        $data = $this->json($key);
+
+        $encodedData = json_encode($data);
+
+        PHPUnit::assertTrue(
+            is_array($data)
+            && str_starts_with($encodedData, '{')
+            && str_ends_with($encodedData, '}')
+        );
+
+        return $this;
+    }
+
+    /**
      * Validate and return the decoded response JSON.
      *
      * @return \Illuminate\Testing\AssertableJsonString
