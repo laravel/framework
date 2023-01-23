@@ -1475,7 +1475,7 @@ class Blueprint
 
         $this->unsignedBigInteger("{$name}_id");
 
-        $this->index(["{$name}_type", "{$name}_id"], $indexName);
+        $this->index(["{$name}_id", "{$name}_type"], $indexName);
     }
 
     /**
@@ -1491,7 +1491,7 @@ class Blueprint
 
         $this->unsignedBigInteger("{$name}_id")->nullable();
 
-        $this->index(["{$name}_type", "{$name}_id"], $indexName);
+        $this->index(["{$name}_id", "{$name}_type"], $indexName);
     }
 
     /**
@@ -1507,7 +1507,7 @@ class Blueprint
 
         $this->uuid("{$name}_id");
 
-        $this->index(["{$name}_type", "{$name}_id"], $indexName);
+        $this->index(["{$name}_id", "{$name}_type"], $indexName);
     }
 
     /**
@@ -1523,7 +1523,7 @@ class Blueprint
 
         $this->uuid("{$name}_id")->nullable();
 
-        $this->index(["{$name}_type", "{$name}_id"], $indexName);
+        $this->index(["{$name}_id", "{$name}_type"], $indexName);
     }
 
     /**
@@ -1539,7 +1539,7 @@ class Blueprint
 
         $this->ulid("{$name}_id");
 
-        $this->index(["{$name}_type", "{$name}_id"], $indexName);
+        $this->index(["{$name}_id", "{$name}_type"], $indexName);
     }
 
     /**
@@ -1555,7 +1555,7 @@ class Blueprint
 
         $this->ulid("{$name}_id")->nullable();
 
-        $this->index(["{$name}_type", "{$name}_id"], $indexName);
+        $this->index(["{$name}_id", "{$name}_type"], $indexName);
     }
 
     /**
