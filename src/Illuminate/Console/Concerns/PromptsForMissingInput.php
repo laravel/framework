@@ -37,13 +37,26 @@ trait PromptsForMissingInput
             ->filter(fn ($argument) => $argument->isRequired() && is_null($input->getArgument($argument->getName())))
             ->each(fn ($argument) => $input->setArgument(
                 $argument->getName(),
-                $this->askPersistently('What is '.lcfirst($argument->getDescription()).'?')
+                $this->askPersistently(
+                    $this->promptForMissingInputUsing()[$argument->getName()] ??
+                    'What is '.lcfirst($argument->getDescription()).'?'
+                )
             ))
             ->isNotEmpty();
 
         if ($prompted) {
             $this->afterPromptingForMissingArguments($input, $output);
         }
+    }
+
+    /**
+     * Prompt for missing input arguments using the returned questions.
+     *
+     * @return array
+     */
+    protected function promptForMissingInputUsing()
+    {
+        return [];
     }
 
     /**

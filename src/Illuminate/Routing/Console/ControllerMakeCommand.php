@@ -6,6 +6,7 @@ use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
 use InvalidArgumentException;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -297,6 +298,18 @@ class ControllerMakeCommand extends GeneratorCommand
             ['requests', 'R', InputOption::VALUE_NONE, 'Generate FormRequest classes for store and update'],
             ['singleton', 's', InputOption::VALUE_NONE, 'Generate a singleton resource controller class'],
             ['creatable', null, InputOption::VALUE_NONE, 'Indicate that a singleton resource should be creatable'],
+        ];
+    }
+
+    /**
+     * The questions that should be asked per missing input arguments.
+     *
+     * @return array
+     */
+    protected function missingInputQuestions()
+    {
+        return [
+            'name' => 'What should the controller be named?'
         ];
     }
 

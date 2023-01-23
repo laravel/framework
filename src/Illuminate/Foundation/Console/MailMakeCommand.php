@@ -43,7 +43,7 @@ class MailMakeCommand extends GeneratorCommand
      *
      * @var string
      */
-    protected $type = 'Mail';
+    protected $type = 'Mailable';
 
     /**
      * Execute the console command.

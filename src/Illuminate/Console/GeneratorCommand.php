@@ -472,7 +472,19 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
     protected function getArguments()
     {
         return [
-            ['name', InputArgument::REQUIRED, 'The name of the class'],
+            ['name', InputArgument::REQUIRED, 'The name of the '.strtolower($this->type)],
+        ];
+    }
+
+    /**
+     * Prompt for missing input arguments using the returned questions.
+     *
+     * @return array
+     */
+    protected function promptForMissingInputUsing()
+    {
+        return [
+            'name' => 'What should the '.strtolower($this->type).' be named?',
         ];
     }
 }

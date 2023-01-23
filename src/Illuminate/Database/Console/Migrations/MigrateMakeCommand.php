@@ -129,4 +129,16 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
 
         return parent::getMigrationPath();
     }
+
+    /**
+     * Prompt for missing input arguments using the returned questions.
+     *
+     * @return array
+     */
+    protected function promptForMissingInputUsing()
+    {
+        return [
+            'name' => 'What should the migration be named?',
+        ];
+    }
 }
