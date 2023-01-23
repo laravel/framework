@@ -4497,6 +4497,95 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testValidateAsciiAlpha()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => 'aslsdlks'], ['x' => 'AsciiAlpha']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [
+            'x' => 'aslsdlks
+1
+1',
+        ], ['x' => 'Alpha']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 'http://google.com'], ['x' => 'AsciiAlpha']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 'ユニコードを基盤技術と'], ['x' => 'AsciiAlpha']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 'ユニコード を基盤技術と'], ['x' => 'AsciiAlpha']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 'नमस्कार'], ['x' => 'AsciiAlpha']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 'आपका स्वागत है'], ['x' => 'AsciiAlpha']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 'Continuación'], ['x' => 'AsciiAlpha']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 'ofreció su dimisión'], ['x' => 'AsciiAlpha']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => '❤'], ['x' => 'AsciiAlpha']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => '123'], ['x' => 'AsciiAlpha']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 123], ['x' => 'AsciiAlpha']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 'abc123'], ['x' => 'AsciiAlpha']);
+        $this->assertFalse($v->passes());
+    }
+
+    public function testValidateAsciiAlphaNum()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => 'asls13dlks'], ['x' => 'AsciiAlphaNum']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 'http://g232oogle.com'], ['x' => 'AsciiAlphaNum']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 'ユニコードを基盤技術と123'], ['x' => 'AsciiAlphaNum']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => '१२३'], ['x' => 'AsciiAlphaNum']); // numbers in Hindi
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => '٧٨٩'], ['x' => 'AsciiAlphaNum']); // eastern arabic numerals
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 'नमस्कार'], ['x' => 'AsciiAlphaNum']);
+        $this->assertFalse($v->passes());
+    }
+
+    public function testValidateAsciiAlphaDash()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => 'asls1-_3dlks'], ['x' => 'AsciiAlphaDash']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 'http://-g232oogle.com'], ['x' => 'AsciiAlphaDash']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 'ユニコードを基盤技術と-_123'], ['x' => 'AsciiAlphaDash']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 'नमस्कार-_'], ['x' => 'AsciiAlphaDash']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => '٧٨٩'], ['x' => 'AsciiAlphaDash']); // eastern arabic numerals
+        $this->assertFalse($v->passes());
+    }
+
     public function testValidateTimezone()
     {
         $trans = $this->getIlluminateArrayTranslator();
