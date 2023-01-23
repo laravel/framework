@@ -24,7 +24,7 @@ class Collection extends BaseCollection implements QueueableCollection
      *
      * @param  mixed  $key
      * @param  TFindDefault  $default
-     * @return static<TKey|TModel>|TModel|TFindDefault
+     * @return static<TKey, TModel>|TModel|TFindDefault
      */
     public function find($key, $default = null)
     {
