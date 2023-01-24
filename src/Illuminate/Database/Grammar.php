@@ -210,8 +210,8 @@ abstract class Grammar
     /**
      * Transforms expressions to their scalar types.
      *
-     * @param  scalar|\Illuminate\Contracts\Database\Query\Expression  $expression
-     * @return scalar
+     * @param  string|int|float|\Illuminate\Contracts\Database\Query\Expression  $expression
+     * @return string|int|float
      */
     public function getValue($expression)
     {
