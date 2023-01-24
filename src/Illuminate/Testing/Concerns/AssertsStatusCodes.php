@@ -82,6 +82,16 @@ trait AssertsStatusCodes
     }
 
     /**
+     * Assert that the response has a request timeout status code.
+     *
+     * @return $this
+     */
+    public function assertRequestTimeout()
+    {
+        return $this->assertStatus(408);
+    }
+
+    /**
      * Assert that the response has a 422 status code.
      *
      * @return $this
