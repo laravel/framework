@@ -176,6 +176,15 @@ class SupportStrTest extends TestCase
               Str::excerpt('This is the ultimate supercalifragilisticexpialidoceous very looooooooooooooooooong looooooooooooong beautiful morning with amazing sunshine and awesome temperatures. So what are you gonna do about it?', 'very',
               ['omission' => '[...]'],
         ));
+        $this->assertSame(
+            "...Just like...",
+            Str::excerpt(
+                "This is a multiline text.
+              Just like it could exist in a realworld application.",
+                'Just',
+                ['radius' => 5]
+            )
+        );
 
         $this->assertSame('...y...', Str::excerpt('taylor', 'y', ['radius' => 0]));
         $this->assertSame('...ayl...', Str::excerpt('taylor', 'Y', ['radius' => 1]));
