@@ -521,7 +521,11 @@ class BladeCompiler extends Compiler implements CompilerInterface
             while (isset($match[4]) &&
                    Str::endsWith($match[0], ')') &&
                    ! $this->hasEvenNumberOfParentheses($match[0])) {
-                $rest = Str::before(Str::after($template, $match[0]), ')');
+                if (($after = Str::after($template, $match[0])) === $template) {
+                    break;
+                }
+
+                $rest = Str::before($after, ')');
 
                 if (isset($matches[0][$i + 1]) && Str::contains($rest.')', $matches[0][$i + 1])) {
                     unset($matches[0][$i + 1]);

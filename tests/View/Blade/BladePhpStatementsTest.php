@@ -172,4 +172,10 @@ class BladePhpStatementsTest extends AbstractBladeTestCase
         $expected = '<span class="<?php echo \Illuminate\Support\Arr::toCssClasses([\'k\' => @empty($v), \'t\' => @empty($v1), \'r\' => @empty($v2), \'l\' => \'l\']) ?>"></span><span class="<?php echo \Illuminate\Support\Arr::toCssClasses([\'k\' => @empty($v)]) ?>"></span>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
+
+    public function testItDoesNotCompileInvalidSyntax()
+    {
+        $template = "<a @class(['k\' => ()])></a>";
+        $this->assertEquals($template, $this->compiler->compileString($template));
+    }
 }
