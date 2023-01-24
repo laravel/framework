@@ -302,6 +302,81 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Determine if the items equal the given items.
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable<array-key, TValue>|iterable<array-key, TValue>  $items
+     * @return bool
+     */
+    public function equals($items)
+    {
+        return $this->diff($items)->isEmpty()
+            && (new static($items))->diff($this->items)->isEmpty();
+    }
+
+    /**
+     * Determine if the items equal the given items, using the callback.
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable<array-key, TValue>|iterable<array-key, TValue>  $items
+     * @param  callable(TValue, TValue): int  $callback
+     * @return bool
+     */
+    public function equalsUsing($items, callable $callback)
+    {
+        return $this->diffUsing($items, $callback)->isEmpty()
+            && (new static($items))->diffUsing($this->items, $callback)->isEmpty();
+    }
+
+    /**
+     * Determine if the items equal the given items by comparing both keys and values.
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>  $items
+     * @return bool
+     */
+    public function equalsAssoc($items)
+    {
+        return $this->diffAssoc($items)->isEmpty()
+            && (new static($items))->diffAssoc($this->items)->isEmpty();
+    }
+
+    /**
+     * Determine if the items equal the given items by comparing both keys and values, using the callback.
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>  $items
+     * @param  callable(TValue, TValue): int  $callback
+     * @return bool
+     */
+    public function equalsAssocUsing($items, callable $callback)
+    {
+        return $this->diffAssocUsing($items, $callback)->isEmpty()
+            && (new static($items))->diffAssocUsing($this->items, $callback)->isEmpty();
+    }
+
+    /**
+     * Determine if the items equal the given items by comparing keys.
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>  $items
+     * @return bool
+     */
+    public function equalsKeys($items)
+    {
+        return $this->diffKeys($items)->isEmpty()
+            && (new static($items))->diffKeys($this->items)->isEmpty();
+    }
+
+    /**
+     * Determine if the items equal the given items by comparing keys, using the callback.
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>  $items
+     * @param  callable(TValue, TValue): int  $callback
+     * @return bool
+     */
+    public function equalsKeysUsing($items, callable $callback)
+    {
+        return $this->diffKeysUsing($items, $callback)->isEmpty()
+            && (new static($items))->diffKeysUsing($this->items, $callback)->isEmpty();
+    }
+
+    /**
      * Retrieve duplicate items from the collection.
      *
      * @param  (callable(TValue): bool)|string|null  $callback

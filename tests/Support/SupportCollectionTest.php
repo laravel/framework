@@ -1553,6 +1553,55 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['b' => 'brown', 'c' => 'blue', 'red'], $c1->diffAssocUsing($c2, 'strcasecmp')->all());
     }
 
+    public function testEqualsCollection()
+    {
+        $c = new Collection(['id' => 1, 'first_word' => 'Hello']);
+        $this->assertTrue($c->equals(['Hello', 1]));
+        $this->assertFalse($c->equals([1, 'Hello', false]));
+    }
+
+    public function testEqualsUsingWithCollection()
+    {
+        $c = new Collection(['fr', 'HR']);
+        // demonstrate that equals won't support case insensitivity
+        $this->assertFalse($c->equals(new Collection(['fr', 'hr'])));
+        // allow for case insensitive comparison
+        $this->assertTrue($c->equalsUsing(new Collection(['fr', 'hr']), 'strcasecmp'));
+    }
+
+    public function testEqualsAssoc()
+    {
+        $c = new Collection(['id' => 1]);
+        $this->assertTrue($c->equalsAssoc(['id' => 1]));
+        $this->assertFalse($c->equalsAssoc(['id' => 2]));
+        $this->assertFalse($c->equalsAssoc(['key' => 1]));
+    }
+
+    public function testEqualsAssocUsing()
+    {
+        $c = new Collection(['foo' => 'bar']);
+        // demonstrate that equalsAssoc won't support case insensitivity
+        $this->assertFalse($c->equalsAssoc(new Collection(['FOO' => 'bar'])));
+        // allow for case insensitive comparison
+        $this->assertTrue($c->equalsAssocUsing(new Collection(['FOO' => 'bar']), 'strcasecmp'));
+    }
+
+    public function testEqualsKeys()
+    {
+        $c = new Collection(['id' => 1, 'first_word' => 'Hello']);
+        $this->assertTrue($c->equalsKeys(['first_word' => 'foo', 'id' => 33]));
+        $this->assertFalse($c->equalsKeys(['key' => 1, 'second_word' => 'Hello']));
+    }
+
+    public function testEqualsKeysUsing()
+    {
+        $c = new Collection(['foo' => 'bar']);
+        // demonstrate that equalsAssoc won't support case insensitivity
+        $this->assertFalse($c->equalsKeys(new Collection(['FOO' => 123])));
+        // allow for case insensitive comparison
+        $this->assertTrue($c->equalsKeysUsing(new Collection(['FOO' => 123]), 'strcasecmp'));
+    }
+
     /**
      * @dataProvider collectionClassProvider
      */
