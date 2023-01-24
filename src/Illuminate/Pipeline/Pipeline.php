@@ -3,8 +3,8 @@
 namespace Illuminate\Pipeline;
 
 use Closure;
-use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Pipeline\Pipeline as PipelineContract;
+use Psr\Container\ContainerInterface;
 use RuntimeException;
 use Throwable;
 
@@ -13,7 +13,7 @@ class Pipeline implements PipelineContract
     /**
      * The container implementation.
      *
-     * @var \Illuminate\Contracts\Container\Container|null
+     * @var \Psr\Container\ContainerInterface|null
      */
     protected $container;
 
@@ -41,10 +41,10 @@ class Pipeline implements PipelineContract
     /**
      * Create a new class instance.
      *
-     * @param  \Illuminate\Contracts\Container\Container|null  $container
+     * @param  \Psr\Container\ContainerInterface|null  $container
      * @return void
      */
-    public function __construct(Container $container = null)
+    public function __construct(ContainerInterface $container = null)
     {
         $this->container = $container;
     }
@@ -166,7 +166,7 @@ class Pipeline implements PipelineContract
                         // If the pipe is a string we will parse the string and resolve the class out
                         // of the dependency injection container. We can then build a callable and
                         // execute the pipe function giving in the parameters that are required.
-                        $pipe = $this->getContainer()->make($name);
+                        $pipe = $this->getContainer()->get($name);
 
                         $parameters = array_merge([$passable, $stack], $parameters);
                     } else {
@@ -218,7 +218,7 @@ class Pipeline implements PipelineContract
     /**
      * Get the container instance.
      *
-     * @return \Illuminate\Contracts\Container\Container
+     * @return \Psr\Container\ContainerInterface
      *
      * @throws \RuntimeException
      */
@@ -234,10 +234,10 @@ class Pipeline implements PipelineContract
     /**
      * Set the container instance.
      *
-     * @param  \Illuminate\Contracts\Container\Container  $container
+     * @param  \Psr\Container\ContainerInterface  $container
      * @return $this
      */
-    public function setContainer(Container $container)
+    public function setContainer(ContainerInterface $container)
     {
         $this->container = $container;
 

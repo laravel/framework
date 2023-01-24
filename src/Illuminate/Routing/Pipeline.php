@@ -24,7 +24,7 @@ class Pipeline extends BasePipeline
     protected function handleCarry($carry)
     {
         return $carry instanceof Responsable
-            ? $carry->toResponse($this->getContainer()->make(Request::class))
+            ? $carry->toResponse($this->getContainer()->get(Request::class))
             : $carry;
     }
 
@@ -39,12 +39,12 @@ class Pipeline extends BasePipeline
      */
     protected function handleException($passable, Throwable $e)
     {
-        if (! $this->container->bound(ExceptionHandler::class) ||
+        if (! $this->getContainer()->has(ExceptionHandler::class) ||
             ! $passable instanceof Request) {
             throw $e;
         }
 
-        $handler = $this->container->make(ExceptionHandler::class);
+        $handler = $this->getContainer()->get(ExceptionHandler::class);
 
         $handler->report($e);
 

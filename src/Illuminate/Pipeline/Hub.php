@@ -3,15 +3,15 @@
 namespace Illuminate\Pipeline;
 
 use Closure;
-use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Pipeline\Hub as HubContract;
+use Psr\Container\ContainerInterface;
 
 class Hub implements HubContract
 {
     /**
      * The container implementation.
      *
-     * @var \Illuminate\Contracts\Container\Container|null
+     * @var \Psr\Container\ContainerInterface|null
      */
     protected $container;
 
@@ -25,10 +25,10 @@ class Hub implements HubContract
     /**
      * Create a new Hub instance.
      *
-     * @param  \Illuminate\Contracts\Container\Container|null  $container
+     * @param  \Psr\Container\ContainerInterface|null  $container
      * @return void
      */
-    public function __construct(Container $container = null)
+    public function __construct(ContainerInterface $container = null)
     {
         $this->container = $container;
     }
@@ -75,7 +75,7 @@ class Hub implements HubContract
     /**
      * Get the container instance used by the hub.
      *
-     * @return \Illuminate\Contracts\Container\Container
+     * @return \Psr\Container\ContainerInterface
      */
     public function getContainer()
     {
@@ -85,10 +85,10 @@ class Hub implements HubContract
     /**
      * Set the container instance used by the hub.
      *
-     * @param  \Illuminate\Contracts\Container\Container  $container
+     * @param  \Psr\Container\ContainerInterface  $container
      * @return $this
      */
-    public function setContainer(Container $container)
+    public function setContainer(ContainerInterface $container)
     {
         $this->container = $container;
 
