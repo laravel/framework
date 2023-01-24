@@ -593,6 +593,25 @@ class TestResponseTest extends TestCase
         $response->assertUnauthorized();
     }
 
+    public function testAssertBadRequest()
+    {
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_BAD_REQUEST)
+        );
+
+        $response->assertBadRequest();
+
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_OK)
+        );
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("Expected response status code [400] but received 200.\nFailed asserting that 400 is identical to 200.");
+
+        $response->assertBadRequest();
+        $this->fail();
+    }
+
     public function testAssertUnprocessable()
     {
         $statusCode = 500;
