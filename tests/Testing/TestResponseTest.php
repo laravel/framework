@@ -650,6 +650,25 @@ class TestResponseTest extends TestCase
         $this->fail();
     }
 
+    public function testAssertAccepted()
+    {
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_ACCEPTED)
+        );
+
+        $response->assertAccepted();
+
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_OK)
+        );
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("Expected response status code [202] but received 200.\nFailed asserting that 202 is identical to 200.");
+
+        $response->assertAccepted();
+        $this->fail();
+    }
+
     public function testAssertUnprocessable()
     {
         $statusCode = 500;

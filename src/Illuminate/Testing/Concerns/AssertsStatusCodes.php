@@ -27,6 +27,16 @@ trait AssertsStatusCodes
     }
 
     /**
+     * Assert that the response has an accepted status code.
+     *
+     * @return $this
+     */
+    public function assertAccepted()
+    {
+        return $this->assertStatus(202);
+    }
+
+    /**
      * Assert that the response has the given status code and no content.
      *
      * @param  int  $status
