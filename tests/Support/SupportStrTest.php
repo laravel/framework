@@ -177,12 +177,8 @@ class SupportStrTest extends TestCase
               ['omission' => '[...]'],
         ));
         $this->assertSame(
-            "...Just like...",
-            Str::excerpt(
-                "This is a multiline text.
-              Just like it could exist in a realworld application.",
-                'Just',
-                ['radius' => 5]
+            '...ext.'.PHP_EOL.'Just like...',
+            Str::excerpt('This is a multiline text.'.PHP_EOL.'Just like it could exist in a realworld application.','Just',['radius' => 5]
             )
         );
 
