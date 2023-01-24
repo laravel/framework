@@ -669,6 +669,25 @@ class TestResponseTest extends TestCase
         $this->fail();
     }
 
+    public function testAssertFound()
+    {
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_FOUND)
+        );
+
+        $response->assertFound();
+
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_OK)
+        );
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("Expected response status code [302] but received 200.\nFailed asserting that 302 is identical to 200.");
+
+        $response->assertFound();
+        $this->fail();
+    }
+
     public function testAssertAccepted()
     {
         $response = TestResponse::fromBaseResponse(

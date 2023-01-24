@@ -63,6 +63,17 @@ trait AssertsStatusCodes
     }
 
     /**
+     * Assert that the response has a found status code.
+     *
+     * @param  int  $status
+     * @return $this
+     */
+    public function assertFound()
+    {
+        return $this->assertStatus(302);
+    }
+
+    /**
      * Assert that the response has a bad request status code.
      *
      * @return $this
