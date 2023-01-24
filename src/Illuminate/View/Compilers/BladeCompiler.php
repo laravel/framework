@@ -526,6 +526,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
                 }
 
                 $rest = Str::before($after, ')');
+
                 if (isset($matches[0][$i + 1]) && Str::contains($rest.')', $matches[0][$i + 1])) {
                     unset($matches[0][$i + 1]);
                     $i++;
