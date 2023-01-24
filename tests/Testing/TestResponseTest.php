@@ -631,6 +631,25 @@ class TestResponseTest extends TestCase
         $this->fail();
     }
 
+    public function testAssertPaymetRequired()
+    {
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_PAYMENT_REQUIRED)
+        );
+
+        $response->assertPaymentRequired();
+
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_OK)
+        );
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("Expected response status code [402] but received 200.\nFailed asserting that 402 is identical to 200.");
+
+        $response->assertPaymentRequired();
+        $this->fail();
+    }
+
     public function testAssertUnprocessable()
     {
         $statusCode = 500;

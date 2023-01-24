@@ -62,6 +62,16 @@ trait AssertsStatusCodes
     }
 
     /**
+     * Assert that the response has a payment required status code.
+     *
+     * @return $this
+     */
+    public function assertPaymentRequired()
+    {
+        return $this->assertStatus(402);
+    }
+
+    /**
      * Assert that the response has a forbidden status code.
      *
      * @return $this
