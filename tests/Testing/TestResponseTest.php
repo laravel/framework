@@ -650,6 +650,25 @@ class TestResponseTest extends TestCase
         $this->fail();
     }
 
+    public function testAssertMovedPermanently()
+    {
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_MOVED_PERMANENTLY)
+        );
+
+        $response->assertMovedPermanently();
+
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_OK)
+        );
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("Expected response status code [301] but received 200.\nFailed asserting that 301 is identical to 200.");
+
+        $response->assertMovedPermanently();
+        $this->fail();
+    }
+
     public function testAssertAccepted()
     {
         $response = TestResponse::fromBaseResponse(

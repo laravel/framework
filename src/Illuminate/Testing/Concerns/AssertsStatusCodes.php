@@ -52,6 +52,17 @@ trait AssertsStatusCodes
     }
 
     /**
+     * Assert that the response has a moved permanently status code.
+     *
+     * @param  int  $status
+     * @return $this
+     */
+    public function assertMovedPermanently()
+    {
+        return $this->assertStatus(301);
+    }
+
+    /**
      * Assert that the response has a bad request status code.
      *
      * @return $this
