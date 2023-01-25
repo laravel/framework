@@ -17,6 +17,7 @@ use Illuminate\Http\Client\Request;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Http\Client\ResponseSequence;
+use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Str;
@@ -54,6 +55,160 @@ class HttpClientTest extends TestCase
         $response = $this->factory->post('http://laravel.com/test-missing-page');
 
         $this->assertTrue($response->ok());
+    }
+
+    public function testCreatedRequest()
+    {
+        $this->factory->fake([
+            'vapor.laravel.com' => $this->factory::response('', HttpResponse::HTTP_CREATED),
+            'forge.laravel.com' => $this->factory::response('', HttpResponse::HTTP_OK),
+        ]);
+
+        $response = $this->factory->post('http://vapor.laravel.com');
+        $this->assertTrue($response->created());
+
+        $response = $this->factory->post('http://forge.laravel.com');
+        $this->assertFalse($response->created());
+    }
+
+    public function testAcceptedRequest()
+    {
+        $this->factory->fake([
+            'vapor.laravel.com' => $this->factory::response('', HttpResponse::HTTP_ACCEPTED),
+            'forge.laravel.com' => $this->factory::response('', HttpResponse::HTTP_OK),
+        ]);
+
+        $response = $this->factory->post('http://vapor.laravel.com');
+        $this->assertTrue($response->accepted());
+
+        $response = $this->factory->post('http://forge.laravel.com');
+        $this->assertFalse($response->accepted());
+    }
+
+    public function testMovedPermanentlyRequest()
+    {
+        $this->factory->fake([
+            'vapor.laravel.com' => $this->factory::response('', HttpResponse::HTTP_MOVED_PERMANENTLY),
+            'forge.laravel.com' => $this->factory::response('', HttpResponse::HTTP_OK),
+        ]);
+
+        $response = $this->factory->post('http://vapor.laravel.com');
+        $this->assertTrue($response->movedPermanently());
+
+        $response = $this->factory->post('http://forge.laravel.com');
+        $this->assertFalse($response->movedPermanently());
+    }
+
+    public function testNoContentRequest()
+    {
+        $this->factory->fake([
+            'vapor.laravel.com' => $this->factory::response('', HttpResponse::HTTP_NO_CONTENT),
+            'forge.laravel.com' => $this->factory::response('', HttpResponse::HTTP_OK),
+        ]);
+
+        $response = $this->factory->post('http://vapor.laravel.com');
+        $this->assertTrue($response->noContent());
+
+        $response = $this->factory->post('http://forge.laravel.com');
+        $this->assertFalse($response->noContent());
+    }
+
+    public function testFoundRequest()
+    {
+        $this->factory->fake([
+            'vapor.laravel.com' => $this->factory::response('', HttpResponse::HTTP_FOUND),
+            'forge.laravel.com' => $this->factory::response('', HttpResponse::HTTP_OK),
+        ]);
+
+        $response = $this->factory->post('http://vapor.laravel.com');
+        $this->assertTrue($response->found());
+
+        $response = $this->factory->post('http://forge.laravel.com');
+        $this->assertFalse($response->found());
+    }
+
+    public function testBadRequestRequest()
+    {
+        $this->factory->fake([
+            'vapor.laravel.com' => $this->factory::response('', HttpResponse::HTTP_BAD_REQUEST),
+            'forge.laravel.com' => $this->factory::response('', HttpResponse::HTTP_OK),
+        ]);
+
+        $response = $this->factory->post('http://vapor.laravel.com');
+        $this->assertTrue($response->badRequest());
+
+        $response = $this->factory->post('http://forge.laravel.com');
+        $this->assertFalse($response->badRequest());
+    }
+
+    public function testPaymentRequiredRequest()
+    {
+        $this->factory->fake([
+            'vapor.laravel.com' => $this->factory::response('', HttpResponse::HTTP_PAYMENT_REQUIRED),
+            'forge.laravel.com' => $this->factory::response('', HttpResponse::HTTP_OK),
+        ]);
+
+        $response = $this->factory->post('http://vapor.laravel.com');
+        $this->assertTrue($response->paymentRequired());
+
+        $response = $this->factory->post('http://forge.laravel.com');
+        $this->assertFalse($response->paymentRequired());
+    }
+
+    public function testRequestTimeoutRequest()
+    {
+        $this->factory->fake([
+            'vapor.laravel.com' => $this->factory::response('', HttpResponse::HTTP_REQUEST_TIMEOUT),
+            'forge.laravel.com' => $this->factory::response('', HttpResponse::HTTP_OK),
+        ]);
+
+        $response = $this->factory->post('http://vapor.laravel.com');
+        $this->assertTrue($response->requestTimeout());
+
+        $response = $this->factory->post('http://forge.laravel.com');
+        $this->assertFalse($response->requestTimeout());
+    }
+
+    public function testConflictResponseRequest()
+    {
+        $this->factory->fake([
+            'vapor.laravel.com' => $this->factory::response('', HttpResponse::HTTP_CONFLICT),
+            'forge.laravel.com' => $this->factory::response('', HttpResponse::HTTP_OK),
+        ]);
+
+        $response = $this->factory->post('http://vapor.laravel.com');
+        $this->assertTrue($response->conflict());
+
+        $response = $this->factory->post('http://forge.laravel.com');
+        $this->assertFalse($response->conflict());
+    }
+
+    public function testUnprocessableEntityRequest()
+    {
+        $this->factory->fake([
+            'vapor.laravel.com' => $this->factory::response('', HttpResponse::HTTP_UNPROCESSABLE_ENTITY),
+            'forge.laravel.com' => $this->factory::response('', HttpResponse::HTTP_OK),
+        ]);
+
+        $response = $this->factory->post('http://vapor.laravel.com');
+        $this->assertTrue($response->unprocessableEntity());
+
+        $response = $this->factory->post('http://forge.laravel.com');
+        $this->assertFalse($response->unprocessableEntity());
+    }
+
+    public function testTooManyRequestsRequest()
+    {
+        $this->factory->fake([
+            'vapor.laravel.com' => $this->factory::response('', HttpResponse::HTTP_TOO_MANY_REQUESTS),
+            'forge.laravel.com' => $this->factory::response('', HttpResponse::HTTP_OK),
+        ]);
+
+        $response = $this->factory->post('http://vapor.laravel.com');
+        $this->assertTrue($response->tooManyRequests());
+
+        $response = $this->factory->post('http://forge.laravel.com');
+        $this->assertFalse($response->tooManyRequests());
     }
 
     public function testUnauthorizedRequest()
