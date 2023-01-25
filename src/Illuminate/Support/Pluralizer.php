@@ -27,7 +27,7 @@ class Pluralizer
      *
      * @var string[]
      */
-    public static $uncountable = [];
+    public static $uncountable = ['related'];
 
     /**
      * Get the plural form of an English word.
