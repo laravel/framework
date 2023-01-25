@@ -2,8 +2,6 @@
 
 namespace Illuminate\Foundation\Bus;
 
-use Illuminate\Contracts\Bus\Dispatcher;
-
 trait DispatchesJobs
 {
     /**
@@ -14,7 +12,7 @@ trait DispatchesJobs
      */
     protected function dispatch($job)
     {
-        return app(Dispatcher::class)->dispatch($job);
+        return dispatch($job);
     }
 
     /**
@@ -27,6 +25,6 @@ trait DispatchesJobs
      */
     public function dispatchSync($job)
     {
-        return app(Dispatcher::class)->dispatchSync($job);
+        return dispatch_sync($job);
     }
 }
