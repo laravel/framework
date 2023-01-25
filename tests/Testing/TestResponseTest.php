@@ -707,6 +707,25 @@ class TestResponseTest extends TestCase
         $this->fail();
     }
 
+    public function testAssertTooManyRequests()
+    {
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_TOO_MANY_REQUESTS)
+        );
+
+        $response->assertTooManyRequests();
+
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_OK)
+        );
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("Expected response status code [429] but received 200.\nFailed asserting that 429 is identical to 200.");
+
+        $response->assertTooManyRequests();
+        $this->fail();
+    }
+
     public function testAssertAccepted()
     {
         $response = TestResponse::fromBaseResponse(

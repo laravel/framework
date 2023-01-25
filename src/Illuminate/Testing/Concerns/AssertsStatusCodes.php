@@ -152,4 +152,14 @@ trait AssertsStatusCodes
     {
         return $this->assertStatus(422);
     }
+
+    /**
+     * Assert that the response has a too many requests status code.
+     *
+     * @return $this
+     */
+    public function assertTooManyRequests()
+    {
+        return $this->assertStatus(429);
+    }
 }
