@@ -425,7 +425,14 @@ if (! function_exists('with')) {
 }
 
 if (! function_exists('get_enum_values')) {
-    function get_enum_values(string $enum) {
+    /**
+     * Get all values of enum class.
+     *
+     * @param string $enum
+     * @return array
+     */
+    function get_enum_values(string $enum)
+    {
         $values = [];
 
         foreach ($enum::cases() as $val) {
