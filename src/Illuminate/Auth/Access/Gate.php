@@ -231,6 +231,35 @@ class Gate implements GateContract
     }
 
     /**
+     * Register abilities for a class.
+     *
+     * @param  string  $name
+     * @param  string  $class
+     * @return $this
+     *
+     * @throws \ReflectionException
+     */
+    public function register($name, $class)
+    {
+        $reflection = new ReflectionClass($class);
+
+        $traitMethods = (new Collection($reflection->getTraits()))
+            ->flatMap(fn ($item) => $item->getMethods())
+            ->map(fn ($item) => $item->name);
+
+        $abilities = (new Collection($reflection->getMethods()))
+            ->reject(fn ($item) => $item->isConstructor())
+            ->reject(fn ($item) => $item->getDeclaringClass()->name !== $class)
+            ->reject(fn ($item) => in_array($item->name, $traitMethods->toArray()));
+
+        foreach ($abilities as $ability) {
+            $this->define($name . '.' . $ability->name, $class . '@' . $ability->name);
+        }
+
+        return $this;
+    }
+
+    /**
      * Create the ability callback for a callback string.
      *
      * @param  string  $ability

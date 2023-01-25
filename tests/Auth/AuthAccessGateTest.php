@@ -221,6 +221,21 @@ class AuthAccessGateTest extends TestCase
         $this->assertTrue($gate->check('test.ability2'));
     }
 
+    public function testClassGatesCanBeRegistered()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->register('test', ClassGateTest::class);
+
+        $this->assertTrue($gate->has(''));
+        $this->assertTrue($gate->has(''));
+        $this->assertTrue($gate->has(''));
+        $this->assertTrue($gate->has(''));
+        $this->assertTrue($gate->has(''));
+        $this->assertFalse($gate->has(''));
+        $this->assertFalse($gate->has(''));
+    }
+
     public function testBeforeCallbacksCanOverrideResultIfNecessary()
     {
         $gate = $this->getBasicGate();
