@@ -134,6 +134,16 @@ trait AssertsStatusCodes
     }
 
     /**
+     * Assert that the response has a conflict status code.
+     *
+     * @return $this
+     */
+    public function assertConflict()
+    {
+        return $this->assertStatus(409);
+    }
+
+    /**
      * Assert that the response has a 422 status code.
      *
      * @return $this

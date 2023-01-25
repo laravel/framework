@@ -688,6 +688,25 @@ class TestResponseTest extends TestCase
         $this->fail();
     }
 
+    public function testAssertConflict()
+    {
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_CONFLICT)
+        );
+
+        $response->assertConflict();
+
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_OK)
+        );
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("Expected response status code [409] but received 200.\nFailed asserting that 409 is identical to 200.");
+
+        $response->assertConflict();
+        $this->fail();
+    }
+
     public function testAssertAccepted()
     {
         $response = TestResponse::fromBaseResponse(
