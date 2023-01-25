@@ -631,7 +631,7 @@ class TestResponseTest extends TestCase
         $this->fail();
     }
 
-    public function testAssertPaymetRequired()
+    public function testAssertPaymentRequired()
     {
         $response = TestResponse::fromBaseResponse(
             (new Response)->setStatusCode(Response::HTTP_PAYMENT_REQUIRED)

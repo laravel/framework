@@ -85,7 +85,7 @@ class HttpClientTest extends TestCase
         $this->assertFalse($response->accepted());
     }
 
-    public function testNoContentRequest()
+    public function testMovedPermanentlyRequest()
     {
         $this->factory->fake([
             'vapor.laravel.com' => $this->factory::response('', HttpResponse::HTTP_MOVED_PERMANENTLY),
@@ -99,7 +99,7 @@ class HttpClientTest extends TestCase
         $this->assertFalse($response->movedPermanently());
     }
 
-    public function testMovedPermanentlyRequest()
+    public function testNoContentRequest()
     {
         $this->factory->fake([
             'vapor.laravel.com' => $this->factory::response('', HttpResponse::HTTP_NO_CONTENT),
@@ -197,6 +197,19 @@ class HttpClientTest extends TestCase
         $this->assertFalse($response->unprocessableEntity());
     }
 
+    public function testTooManyRequestsRequest()
+    {
+        $this->factory->fake([
+            'vapor.laravel.com' => $this->factory::response('', HttpResponse::HTTP_TOO_MANY_REQUESTS),
+            'forge.laravel.com' => $this->factory::response('', HttpResponse::HTTP_OK),
+        ]);
+
+        $response = $this->factory->post('http://vapor.laravel.com');
+        $this->assertTrue($response->tooManyRequests());
+
+        $response = $this->factory->post('http://forge.laravel.com');
+        $this->assertFalse($response->tooManyRequests());
+    }
 
     public function testUnauthorizedRequest()
     {
@@ -218,20 +231,6 @@ class HttpClientTest extends TestCase
         $response = $this->factory->post('http://laravel.com');
 
         $this->assertTrue($response->forbidden());
-    }
-
-    public function testTooManyRequestsRequest()
-    {
-        $this->factory->fake([
-            'vapor.laravel.com' => $this->factory::response('', HttpResponse::HTTP_TOO_MANY_REQUESTS),
-            'forge.laravel.com' => $this->factory::response('', HttpResponse::HTTP_OK),
-        ]);
-
-        $response = $this->factory->post('http://vapor.laravel.com');
-        $this->assertTrue($response->tooManyRequests());
-
-        $response = $this->factory->post('http://forge.laravel.com');
-        $this->assertFalse($response->tooManyRequests());
     }
 
     public function testNotFoundResponse()
