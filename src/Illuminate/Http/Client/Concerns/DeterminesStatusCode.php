@@ -35,6 +35,16 @@ trait DeterminesStatusCode
     }
 
     /**
+     * Determine if the response code was "no content".
+     *
+     * @return bool
+     */
+    public function noContent($status = 204)
+    {
+        return $this->status() === $status && $this->body() === '';
+    }
+
+    /**
      * Determine if the response was a 401 "Unauthorized" response.
      *
      * @return bool
