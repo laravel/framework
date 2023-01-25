@@ -155,6 +155,20 @@ class HttpClientTest extends TestCase
         $this->assertFalse($response->paymentRequired());
     }
 
+    public function testRequestTimeoutTest()
+    {
+        $this->factory->fake([
+            'vapor.laravel.com' => $this->factory::response('', HttpResponse::HTTP_REQUEST_TIMEOUT),
+            'forge.laravel.com' => $this->factory::response('', HttpResponse::HTTP_OK),
+        ]);
+
+        $response = $this->factory->post('http://vapor.laravel.com');
+        $this->assertTrue($response->requestTimeout());
+
+        $response = $this->factory->post('http://forge.laravel.com');
+        $this->assertFalse($response->requestTimeout());
+    }
+
     public function testUnauthorizedRequest()
     {
         $this->factory->fake([

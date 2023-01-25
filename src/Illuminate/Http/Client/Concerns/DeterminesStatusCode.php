@@ -114,4 +114,14 @@ trait DeterminesStatusCode
     {
         return $this->status() === 404;
     }
+
+    /**
+     * Determine if the response was a "Request Timeout".
+     *
+     * @return bool
+     */
+    public function requestTimeout()
+    {
+        return $this->status() === 408;
+    }
 }
