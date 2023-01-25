@@ -37,11 +37,22 @@ trait DeterminesStatusCode
     /**
      * Determine if the response code was "no content".
      *
+     * @param  int  $status
      * @return bool
      */
     public function noContent($status = 204)
     {
         return $this->status() === $status && $this->body() === '';
+    }
+
+    /**
+     * Determine if the response code was "moved permanently".
+     *
+     * @return bool
+     */
+    public function movedPermanently()
+    {
+        return $this->status() === 301;
     }
 
     /**

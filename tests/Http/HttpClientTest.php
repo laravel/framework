@@ -88,18 +88,28 @@ class HttpClientTest extends TestCase
     public function testNoContentRequest()
     {
         $this->factory->fake([
+            'vapor.laravel.com' => $this->factory::response('', HttpResponse::HTTP_MOVED_PERMANENTLY),
+            'forge.laravel.com' => $this->factory::response('', HttpResponse::HTTP_OK),
+        ]);
+
+        $response = $this->factory->post('http://vapor.laravel.com');
+        $this->assertTrue($response->movedPermanently());
+
+        $response = $this->factory->post('http://forge.laravel.com');
+        $this->assertFalse($response->movedPermanently());
+    }
+
+    public function testMovedPermanentlyRequest()
+    {
+        $this->factory->fake([
             'vapor.laravel.com' => $this->factory::response('', HttpResponse::HTTP_NO_CONTENT),
             'forge.laravel.com' => $this->factory::response('', HttpResponse::HTTP_OK),
-            'basecamp.laravel.com' => $this->factory::response('foo', HttpResponse::HTTP_NO_CONTENT),
         ]);
 
         $response = $this->factory->post('http://vapor.laravel.com');
         $this->assertTrue($response->noContent());
 
         $response = $this->factory->post('http://forge.laravel.com');
-        $this->assertFalse($response->noContent());
-
-        $response = $this->factory->post('http://basecamp.laravel.com');
         $this->assertFalse($response->noContent());
     }
 
