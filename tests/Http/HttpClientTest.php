@@ -141,6 +141,20 @@ class HttpClientTest extends TestCase
         $this->assertFalse($response->badRequest());
     }
 
+    public function testPaymentRequiredTest()
+    {
+        $this->factory->fake([
+            'vapor.laravel.com' => $this->factory::response('', HttpResponse::HTTP_PAYMENT_REQUIRED),
+            'forge.laravel.com' => $this->factory::response('', HttpResponse::HTTP_OK),
+        ]);
+
+        $response = $this->factory->post('http://vapor.laravel.com');
+        $this->assertTrue($response->paymentRequired());
+
+        $response = $this->factory->post('http://forge.laravel.com');
+        $this->assertFalse($response->paymentRequired());
+    }
+
     public function testUnauthorizedRequest()
     {
         $this->factory->fake([

@@ -86,6 +86,16 @@ trait DeterminesStatusCode
     }
 
     /**
+     * Determine if the response was a "payment required".
+     *
+     * @return bool
+     */
+    public function paymentRequired()
+    {
+        return $this->status() === 402;
+    }
+
+    /**
      * Determine if the response was a 403 "Forbidden" response.
      *
      * @return bool
