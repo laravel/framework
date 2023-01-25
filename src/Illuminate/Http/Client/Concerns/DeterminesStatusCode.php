@@ -5,7 +5,7 @@ namespace Illuminate\Http\Client\Concerns;
 trait DeterminesStatusCode
 {
     /**
-     * Determine if the response code was "OK".
+     * Determine if the response code was 200 "OK" response.
      *
      * @return bool
      */
@@ -15,7 +15,7 @@ trait DeterminesStatusCode
     }
 
     /**
-     * Determine if the response code was "created".
+     * Determine if the response code was 201 "Created" response.
      *
      * @return bool
      */
@@ -25,7 +25,7 @@ trait DeterminesStatusCode
     }
 
     /**
-     * Determine if the response code was "accepted".
+     * Determine if the response code was 202 "Accepted" response.
      *
      * @return bool
      */
@@ -35,7 +35,7 @@ trait DeterminesStatusCode
     }
 
     /**
-     * Determine if the response code was "no content".
+     * Determine if the response code was the given status code and the body has no content.
      *
      * @param  int  $status
      * @return bool
@@ -46,7 +46,7 @@ trait DeterminesStatusCode
     }
 
     /**
-     * Determine if the response code was "moved permanently".
+     * Determine if the response code was a 301 "Moved Permanently".
      *
      * @return bool
      */
@@ -56,7 +56,7 @@ trait DeterminesStatusCode
     }
 
     /**
-     * Determine if the response code was "found".
+     * Determine if the response code was a 302 "Found" response.
      *
      * @return bool
      */
@@ -66,7 +66,7 @@ trait DeterminesStatusCode
     }
 
     /**
-     * Determine if the response was a "bad request".
+     * Determine if the response was a 400 "Bad Request" response.
      *
      * @return bool
      */
@@ -86,7 +86,7 @@ trait DeterminesStatusCode
     }
 
     /**
-     * Determine if the response was a "payment required".
+     * Determine if the response was a 402 "Payment Required" response.
      *
      * @return bool
      */
@@ -116,7 +116,7 @@ trait DeterminesStatusCode
     }
 
     /**
-     * Determine if the response was a "Request Timeout".
+     * Determine if the response was a 408 "Request Timeout" response.
      *
      * @return bool
      */
@@ -126,7 +126,7 @@ trait DeterminesStatusCode
     }
 
     /**
-     * Determine if the response was a "Conflict".
+     * Determine if the response was a 409 "Conflict" response.
      *
      * @return bool
      */
@@ -136,7 +136,7 @@ trait DeterminesStatusCode
     }
 
     /**
-     * Determine if the response was a "Unprocessable Entity".
+     * Determine if the response was a 422 "Unprocessable Entity" response.
      *
      * @return bool
      */
@@ -146,7 +146,7 @@ trait DeterminesStatusCode
     }
 
     /**
-     * Determine if the response was a "Too Many Requests".
+     * Determine if the response was a 429 "Too Many Requests" response.
      *
      * @return bool
      */

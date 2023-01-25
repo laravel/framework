@@ -141,7 +141,7 @@ class HttpClientTest extends TestCase
         $this->assertFalse($response->badRequest());
     }
 
-    public function testPaymentRequiredTest()
+    public function testPaymentRequiredRequest()
     {
         $this->factory->fake([
             'vapor.laravel.com' => $this->factory::response('', HttpResponse::HTTP_PAYMENT_REQUIRED),
@@ -155,7 +155,7 @@ class HttpClientTest extends TestCase
         $this->assertFalse($response->paymentRequired());
     }
 
-    public function testRequestTimeoutTest()
+    public function testRequestTimeoutRequest()
     {
         $this->factory->fake([
             'vapor.laravel.com' => $this->factory::response('', HttpResponse::HTTP_REQUEST_TIMEOUT),
@@ -169,7 +169,7 @@ class HttpClientTest extends TestCase
         $this->assertFalse($response->requestTimeout());
     }
 
-    public function testConflictResponseTest()
+    public function testConflictResponseRequest()
     {
         $this->factory->fake([
             'vapor.laravel.com' => $this->factory::response('', HttpResponse::HTTP_CONFLICT),
@@ -182,6 +182,21 @@ class HttpClientTest extends TestCase
         $response = $this->factory->post('http://forge.laravel.com');
         $this->assertFalse($response->conflict());
     }
+
+    public function testUnprocessableEntityRequest()
+    {
+        $this->factory->fake([
+            'vapor.laravel.com' => $this->factory::response('', HttpResponse::HTTP_UNPROCESSABLE_ENTITY),
+            'forge.laravel.com' => $this->factory::response('', HttpResponse::HTTP_OK),
+        ]);
+
+        $response = $this->factory->post('http://vapor.laravel.com');
+        $this->assertTrue($response->unprocessableEntity());
+
+        $response = $this->factory->post('http://forge.laravel.com');
+        $this->assertFalse($response->unprocessableEntity());
+    }
+
 
     public function testUnauthorizedRequest()
     {
@@ -203,20 +218,6 @@ class HttpClientTest extends TestCase
         $response = $this->factory->post('http://laravel.com');
 
         $this->assertTrue($response->forbidden());
-    }
-
-    public function testUnprocessableEntityRequest()
-    {
-        $this->factory->fake([
-            'vapor.laravel.com' => $this->factory::response('', HttpResponse::HTTP_UNPROCESSABLE_ENTITY),
-            'forge.laravel.com' => $this->factory::response('', HttpResponse::HTTP_OK),
-        ]);
-
-        $response = $this->factory->post('http://vapor.laravel.com');
-        $this->assertTrue($response->unprocessableEntity());
-
-        $response = $this->factory->post('http://forge.laravel.com');
-        $this->assertFalse($response->unprocessableEntity());
     }
 
     public function testTooManyRequestsRequest()

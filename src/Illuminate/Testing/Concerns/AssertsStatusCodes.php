@@ -7,7 +7,7 @@ use Illuminate\Testing\Assert as PHPUnit;
 trait AssertsStatusCodes
 {
     /**
-     * Assert that the response has a 200 status code.
+     * Assert that the response has a 200 "OK" status code.
      *
      * @return $this
      */
@@ -17,7 +17,7 @@ trait AssertsStatusCodes
     }
 
     /**
-     * Assert that the response has a 201 status code.
+     * Assert that the response has a 201 "Created" status code.
      *
      * @return $this
      */
@@ -27,7 +27,7 @@ trait AssertsStatusCodes
     }
 
     /**
-     * Assert that the response has an accepted status code.
+     * Assert that the response has a 202 "Accepted" status code.
      *
      * @return $this
      */
@@ -52,7 +52,7 @@ trait AssertsStatusCodes
     }
 
     /**
-     * Assert that the response has a moved permanently status code.
+     * Assert that the response has a 301 "Moved Permanently" status code.
      *
      * @param  int  $status
      * @return $this
@@ -63,7 +63,7 @@ trait AssertsStatusCodes
     }
 
     /**
-     * Assert that the response has a found status code.
+     * Assert that the response has a 302 "Found" status code.
      *
      * @param  int  $status
      * @return $this
@@ -74,7 +74,7 @@ trait AssertsStatusCodes
     }
 
     /**
-     * Assert that the response has a bad request status code.
+     * Assert that the response has a 400 "Bad Request" status code.
      *
      * @return $this
      */
@@ -84,7 +84,7 @@ trait AssertsStatusCodes
     }
 
     /**
-     * Assert that the response has an unauthorized status code.
+     * Assert that the response has a 402 "Unauthorized" status code.
      *
      * @return $this
      */
@@ -94,7 +94,7 @@ trait AssertsStatusCodes
     }
 
     /**
-     * Assert that the response has a payment required status code.
+     * Assert that the response has a 402 "Payment Required" status code.
      *
      * @return $this
      */
@@ -104,7 +104,7 @@ trait AssertsStatusCodes
     }
 
     /**
-     * Assert that the response has a forbidden status code.
+     * Assert that the response has a 403 "Forbidden" status code.
      *
      * @return $this
      */
@@ -114,7 +114,7 @@ trait AssertsStatusCodes
     }
 
     /**
-     * Assert that the response has a not found status code.
+     * Assert that the response has a 404 "Not Found" status code.
      *
      * @return $this
      */
@@ -124,7 +124,7 @@ trait AssertsStatusCodes
     }
 
     /**
-     * Assert that the response has a request timeout status code.
+     * Assert that the response has a 408 "Request Timeout" status code.
      *
      * @return $this
      */
@@ -134,7 +134,7 @@ trait AssertsStatusCodes
     }
 
     /**
-     * Assert that the response has a conflict status code.
+     * Assert that the response has a 409 "Conflict" status code.
      *
      * @return $this
      */
@@ -144,7 +144,7 @@ trait AssertsStatusCodes
     }
 
     /**
-     * Assert that the response has a 422 status code.
+     * Assert that the response has a 422 "Unprocessable Entity" status code.
      *
      * @return $this
      */
@@ -154,7 +154,7 @@ trait AssertsStatusCodes
     }
 
     /**
-     * Assert that the response has a too many requests status code.
+     * Assert that the response has a 429 "Too Many Requests" status code.
      *
      * @return $this
      */
