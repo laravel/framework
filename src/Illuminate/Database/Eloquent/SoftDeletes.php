@@ -57,6 +57,16 @@ trait SoftDeletes
     }
 
     /**
+     * Force a hard delete on a soft deleted model without raising any events.
+     *
+     * @return bool|null
+     */
+    public function forceDeleteQuietly()
+    {
+        return static::withoutEvents(fn () => $this->forceDelete());
+    }
+
+    /**
      * Perform the actual delete query on this model instance.
      *
      * @return mixed

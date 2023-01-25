@@ -631,9 +631,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function wrap(Closure $callback, array $parameters = [])
     {
-        return function () use ($callback, $parameters) {
-            return $this->call($callback, $parameters);
-        };
+        return fn () => $this->call($callback, $parameters);
     }
 
     /**
@@ -677,9 +675,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function factory($abstract)
     {
-        return function () use ($abstract) {
-            return $this->make($abstract);
-        };
+        return fn () => $this->make($abstract);
     }
 
     /**
@@ -1083,9 +1079,7 @@ class Container implements ArrayAccess, ContainerContract
             return $this->make($className);
         }
 
-        return array_map(function ($abstract) {
-            return $this->resolve($abstract);
-        }, $concrete);
+        return array_map(fn ($abstract) => $this->resolve($abstract), $concrete);
     }
 
     /**
@@ -1446,9 +1440,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function offsetSet($key, $value): void
     {
-        $this->bind($key, $value instanceof Closure ? $value : function () use ($value) {
-            return $value;
-        });
+        $this->bind($key, $value instanceof Closure ? $value : fn () => $value);
     }
 
     /**

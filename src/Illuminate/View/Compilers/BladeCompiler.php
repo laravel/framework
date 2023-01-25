@@ -521,7 +521,16 @@ class BladeCompiler extends Compiler implements CompilerInterface
             while (isset($match[4]) &&
                    Str::endsWith($match[0], ')') &&
                    ! $this->hasEvenNumberOfParentheses($match[0])) {
-                $rest = Str::before(Str::after($template, $match[0]), ')');
+                if (($after = Str::after($template, $match[0])) === $template) {
+                    break;
+                }
+
+                $rest = Str::before($after, ')');
+
+                if (isset($matches[0][$i + 1]) && Str::contains($rest.')', $matches[0][$i + 1])) {
+                    unset($matches[0][$i + 1]);
+                    $i++;
+                }
 
                 $match[0] = $match[0].$rest.')';
                 $match[3] = $match[3].$rest.')';
@@ -675,7 +684,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * Check the result of a condition.
      *
      * @param  string  $name
-     * @param  array  $parameters
+     * @param  array  ...$parameters
      * @return bool
      */
     public function check($name, ...$parameters)

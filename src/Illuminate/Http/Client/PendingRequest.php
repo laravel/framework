@@ -1176,7 +1176,7 @@ class PendingRequest
     /**
      * Replace the given options with the current request options.
      *
-     * @param  array  $options
+     * @param  array  ...$options
      * @return array
      */
     public function mergeOptions(...$options)

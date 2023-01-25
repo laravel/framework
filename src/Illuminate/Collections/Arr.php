@@ -730,6 +730,18 @@ class Arr
     }
 
     /**
+     * Sort the array in descending order using the given callback or "dot" notation.
+     *
+     * @param  array  $array
+     * @param  callable|array|string|null  $callback
+     * @return array
+     */
+    public static function sortDesc($array, $callback = null)
+    {
+        return Collection::make($array)->sortByDesc($callback)->all();
+    }
+
+    /**
      * Recursively sort an array by keys and values.
      *
      * @param  array  $array

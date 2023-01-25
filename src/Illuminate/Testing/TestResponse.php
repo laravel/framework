@@ -32,7 +32,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  */
 class TestResponse implements ArrayAccess
 {
-    use Tappable, Macroable {
+    use Concerns\AssertsStatusCodes, Tappable, Macroable {
         __call as macroCall;
     }
 
@@ -93,81 +93,6 @@ class TestResponse implements ArrayAccess
         );
 
         return $this;
-    }
-
-    /**
-     * Assert that the response has a 200 status code.
-     *
-     * @return $this
-     */
-    public function assertOk()
-    {
-        return $this->assertStatus(200);
-    }
-
-    /**
-     * Assert that the response has a 201 status code.
-     *
-     * @return $this
-     */
-    public function assertCreated()
-    {
-        return $this->assertStatus(201);
-    }
-
-    /**
-     * Assert that the response has the given status code and no content.
-     *
-     * @param  int  $status
-     * @return $this
-     */
-    public function assertNoContent($status = 204)
-    {
-        $this->assertStatus($status);
-
-        PHPUnit::assertEmpty($this->getContent(), 'Response content is not empty.');
-
-        return $this;
-    }
-
-    /**
-     * Assert that the response has a not found status code.
-     *
-     * @return $this
-     */
-    public function assertNotFound()
-    {
-        return $this->assertStatus(404);
-    }
-
-    /**
-     * Assert that the response has a forbidden status code.
-     *
-     * @return $this
-     */
-    public function assertForbidden()
-    {
-        return $this->assertStatus(403);
-    }
-
-    /**
-     * Assert that the response has an unauthorized status code.
-     *
-     * @return $this
-     */
-    public function assertUnauthorized()
-    {
-        return $this->assertStatus(401);
-    }
-
-    /**
-     * Assert that the response has a 422 status code.
-     *
-     * @return $this
-     */
-    public function assertUnprocessable()
-    {
-        return $this->assertStatus(422);
     }
 
     /**
@@ -962,6 +887,48 @@ class TestResponse implements ArrayAccess
                 "Found unexpected validation error for key: '{$key}'"
             );
         }
+
+        return $this;
+    }
+
+    /**
+     * Assert that the given key is a JSON array.
+     *
+     * @param $key
+     * @return $this
+     */
+    public function assertJsonIsArray($key = null)
+    {
+        $data = $this->json($key);
+
+        $encodedData = json_encode($data);
+
+        PHPUnit::assertTrue(
+            is_array($data)
+            && str_starts_with($encodedData, '[')
+            && str_ends_with($encodedData, ']')
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert that the given key is a JSON object.
+     *
+     * @param $key
+     * @return $this
+     */
+    public function assertJsonIsObject($key = null)
+    {
+        $data = $this->json($key);
+
+        $encodedData = json_encode($data);
+
+        PHPUnit::assertTrue(
+            is_array($data)
+            && str_starts_with($encodedData, '{')
+            && str_ends_with($encodedData, '}')
+        );
 
         return $this;
     }
