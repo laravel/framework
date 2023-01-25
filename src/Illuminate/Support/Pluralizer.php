@@ -27,12 +27,7 @@ class Pluralizer
      *
      * @var string[]
      */
-    public static $uncountable = [
-        'cattle',
-        'kin',
-        'recommended',
-        'related',
-    ];
+    public static $uncountable = [];
 
     /**
      * Get the plural form of an English word.
