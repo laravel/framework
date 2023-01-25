@@ -134,4 +134,14 @@ trait DeterminesStatusCode
     {
         return $this->status() === 409;
     }
+
+    /**
+     * Determine if the response was a "Unprocessable Entity".
+     *
+     * @return bool
+     */
+    public function unprocessableEntity()
+    {
+        return $this->status() === 422;
+    }
 }

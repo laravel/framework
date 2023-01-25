@@ -205,6 +205,20 @@ class HttpClientTest extends TestCase
         $this->assertTrue($response->forbidden());
     }
 
+    public function testUnprocessableEntityRequest()
+    {
+        $this->factory->fake([
+            'vapor.laravel.com' => $this->factory::response('', HttpResponse::HTTP_UNPROCESSABLE_ENTITY),
+            'forge.laravel.com' => $this->factory::response('', HttpResponse::HTTP_OK),
+        ]);
+
+        $response = $this->factory->post('http://vapor.laravel.com');
+        $this->assertTrue($response->unprocessableEntity());
+
+        $response = $this->factory->post('http://forge.laravel.com');
+        $this->assertFalse($response->unprocessableEntity());
+    }
+
     public function testNotFoundResponse()
     {
         $this->factory->fake([
