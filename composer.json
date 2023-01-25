@@ -19,7 +19,7 @@
         "ext-mbstring": "*",
         "ext-openssl": "*",
         "brick/math": "^0.9.3|^0.10.2|^0.11",
-        "doctrine/inflector": "^2.0",
+        "doctrine/inflector": "^2.0.5",
         "dragonmantank/cron-expression": "^3.3.2",
         "egulias/email-validator": "^3.2.1|^4.0",
         "fruitcake/php-cors": "^1.2",
