@@ -15,6 +15,16 @@ trait DeterminesStatusCode
     }
 
     /**
+     * Determine if the response code was "created".
+     *
+     * @return bool
+     */
+    public function created()
+    {
+        return $this->status() === 201;
+    }
+
+    /**
      * Determine if the response was a 401 "Unauthorized" response.
      *
      * @return bool

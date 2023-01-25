@@ -17,6 +17,7 @@ use Illuminate\Http\Client\Request;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Http\Client\ResponseSequence;
+use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Str;
@@ -54,6 +55,20 @@ class HttpClientTest extends TestCase
         $response = $this->factory->post('http://laravel.com/test-missing-page');
 
         $this->assertTrue($response->ok());
+    }
+
+    public function testCreatedRequest()
+    {
+        $this->factory->fake([
+            'vapor.laravel.com' => $this->factory::response('', HttpResponse::HTTP_CREATED),
+            'forge.laravel.com' => $this->factory::response('', HttpResponse::HTTP_OK),
+        ]);
+
+        $response = $this->factory->post('http://vapor.laravel.com');
+        $this->assertTrue($response->created());
+
+        $response = $this->factory->post('http://forge.laravel.com');
+        $this->assertFalse($response->created());
     }
 
     public function testUnauthorizedRequest()
