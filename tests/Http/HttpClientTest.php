@@ -219,6 +219,20 @@ class HttpClientTest extends TestCase
         $this->assertFalse($response->unprocessableEntity());
     }
 
+    public function testTooManyRequestsRequest()
+    {
+        $this->factory->fake([
+            'vapor.laravel.com' => $this->factory::response('', HttpResponse::HTTP_TOO_MANY_REQUESTS),
+            'forge.laravel.com' => $this->factory::response('', HttpResponse::HTTP_OK),
+        ]);
+
+        $response = $this->factory->post('http://vapor.laravel.com');
+        $this->assertTrue($response->tooManyRequests());
+
+        $response = $this->factory->post('http://forge.laravel.com');
+        $this->assertFalse($response->tooManyRequests());
+    }
+
     public function testNotFoundResponse()
     {
         $this->factory->fake([

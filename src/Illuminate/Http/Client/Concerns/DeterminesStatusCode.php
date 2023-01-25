@@ -144,4 +144,14 @@ trait DeterminesStatusCode
     {
         return $this->status() === 422;
     }
+
+    /**
+     * Determine if the response was a "Too Many Requests".
+     *
+     * @return bool
+     */
+    public function tooManyRequests()
+    {
+        return $this->status() === 429;
+    }
 }
