@@ -423,3 +423,15 @@ if (! function_exists('with')) {
         return is_null($callback) ? $value : $callback($value);
     }
 }
+
+if (! function_exists('get_enum_values')) {
+    function get_enum_values(string $enum) {
+        $values = [];
+
+        foreach ($enum::cases() as $val) {
+            $values[] = $val->value;
+        }
+
+        return $values;
+    }
+}
