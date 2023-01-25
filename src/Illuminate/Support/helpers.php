@@ -435,7 +435,7 @@ if (! function_exists('get_enum_values')) {
     {
         $values = [];
 
-        if ((float) PHP_VERSION <= 8.0) {
+        if ((float) PHP_VERSION <= 8.1) {
             throw new \RuntimeException("PHP version must be equal or more than 8.1");
         }
         if (! enum_exists($enum)) {
