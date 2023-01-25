@@ -127,6 +127,19 @@ class HttpClientTest extends TestCase
         $this->assertFalse($response->found());
     }
 
+    public function testBadRequestRequest()
+    {
+        $this->factory->fake([
+            'vapor.laravel.com' => $this->factory::response('', HttpResponse::HTTP_BAD_REQUEST),
+            'forge.laravel.com' => $this->factory::response('', HttpResponse::HTTP_OK),
+        ]);
+
+        $response = $this->factory->post('http://vapor.laravel.com');
+        $this->assertTrue($response->badRequest());
+
+        $response = $this->factory->post('http://forge.laravel.com');
+        $this->assertFalse($response->badRequest());
+    }
 
     public function testUnauthorizedRequest()
     {

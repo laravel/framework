@@ -66,6 +66,16 @@ trait DeterminesStatusCode
     }
 
     /**
+     * Determine if the response was a "bad request".
+     *
+     * @return bool
+     */
+    public function badRequest()
+    {
+        return $this->status() === 400;
+    }
+
+    /**
      * Determine if the response was a 401 "Unauthorized" response.
      *
      * @return bool
