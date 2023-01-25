@@ -56,6 +56,16 @@ trait DeterminesStatusCode
     }
 
     /**
+     * Determine if the response code was "found".
+     *
+     * @return bool
+     */
+    public function found()
+    {
+        return $this->status() === 302;
+    }
+
+    /**
      * Determine if the response was a 401 "Unauthorized" response.
      *
      * @return bool
