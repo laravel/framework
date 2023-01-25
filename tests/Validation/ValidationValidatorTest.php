@@ -4547,6 +4547,9 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['x' => 'abc123'], ['x' => 'Alpha']);
         $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => "abc\n"], ['x' => 'Alpha']); // ends with newline
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateAlphaNum()
@@ -4566,6 +4569,9 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['x' => 'नमस्कार'], ['x' => 'AlphaNum']);
         $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => "abc\n"], ['x' => 'AlphaNum']); // ends with newline
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateAlphaDash()
@@ -4582,6 +4588,9 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['x' => '٧٨٩'], ['x' => 'AlphaDash']); // eastern arabic numerals
         $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => "abc\n"], ['x' => 'AlphaDash']); // ends with newline
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateAlphaWithAsciiOption()
@@ -4630,6 +4639,9 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['x' => 'abc123'], ['x' => 'Alpha:ascii']);
         $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => "abc\n"], ['x' => 'Alpha:ascii']); // ends with newline
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateAlphaNumWithAsciiOption()
@@ -4652,6 +4664,9 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['x' => 'नमस्कार'], ['x' => 'AlphaNum:ascii']);
         $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => "abc\n"], ['x' => 'AlphaNum:ascii']); // ends with newline
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateAlphaDashWithAsciiOption()
@@ -4670,6 +4685,9 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['x' => '٧٨٩'], ['x' => 'AlphaDash:ascii']); // eastern arabic numerals
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => "abc\n"], ['x' => 'AlphaDash:ascii']); // ends with newline
         $this->assertFalse($v->passes());
     }
 

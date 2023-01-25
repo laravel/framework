@@ -348,10 +348,10 @@ trait ValidatesAttributes
     public function validateAlpha($attribute, $value, $parameters)
     {
         if (isset($parameters[0]) && $parameters[0] === 'ascii') {
-            return is_string($value) && preg_match('/^[a-zA-Z]+$/u', $value);
+            return is_string($value) && preg_match('/\A[a-zA-Z]+\z/u', $value);
         }
 
-        return is_string($value) && preg_match('/^[\pL\pM]+$/u', $value);
+        return is_string($value) && preg_match('/\A[\pL\pM]+\z/u', $value);
     }
 
     /**
@@ -370,10 +370,10 @@ trait ValidatesAttributes
         }
 
         if (isset($parameters[0]) && $parameters[0] === 'ascii') {
-            return preg_match('/^[a-zA-Z0-9_-]+$/u', $value) > 0;
+            return preg_match('/\A[a-zA-Z0-9_-]+\z/u', $value) > 0;
         }
 
-        return preg_match('/^[\pL\pM\pN_-]+$/u', $value) > 0;
+        return preg_match('/\A[\pL\pM\pN_-]+\z/u', $value) > 0;
     }
 
     /**
@@ -391,10 +391,10 @@ trait ValidatesAttributes
         }
 
         if (isset($parameters[0]) && $parameters[0] === 'ascii') {
-            return preg_match('/^[a-zA-Z0-9]+$/u', $value) > 0;
+            return preg_match('/\A[a-zA-Z0-9]+\z/u', $value) > 0;
         }
 
-        return preg_match('/^[\pL\pM\pN]+$/u', $value) > 0;
+        return preg_match('/\A[\pL\pM\pN]+\z/u', $value) > 0;
     }
 
     /**
