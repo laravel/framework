@@ -124,4 +124,14 @@ trait DeterminesStatusCode
     {
         return $this->status() === 408;
     }
+
+    /**
+     * Determine if the response was a "Conflict".
+     *
+     * @return bool
+     */
+    public function conflict()
+    {
+        return $this->status() === 409;
+    }
 }
