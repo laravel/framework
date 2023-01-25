@@ -25,6 +25,16 @@ trait DeterminesStatusCode
     }
 
     /**
+     * Determine if the response code was "accepted".
+     *
+     * @return bool
+     */
+    public function accepted()
+    {
+        return $this->status() === 202;
+    }
+
+    /**
      * Determine if the response was a 401 "Unauthorized" response.
      *
      * @return bool

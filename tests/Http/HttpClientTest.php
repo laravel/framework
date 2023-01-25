@@ -71,6 +71,20 @@ class HttpClientTest extends TestCase
         $this->assertFalse($response->created());
     }
 
+    public function testAcceptedRequest()
+    {
+        $this->factory->fake([
+            'vapor.laravel.com' => $this->factory::response('', HttpResponse::HTTP_ACCEPTED),
+            'forge.laravel.com' => $this->factory::response('', HttpResponse::HTTP_OK),
+        ]);
+
+        $response = $this->factory->post('http://vapor.laravel.com');
+        $this->assertTrue($response->accepted());
+
+        $response = $this->factory->post('http://forge.laravel.com');
+        $this->assertFalse($response->accepted());
+    }
+
     public function testUnauthorizedRequest()
     {
         $this->factory->fake([
