@@ -849,7 +849,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Get an array with the values of a given column.
+     * Get a collection with the values of a given column.
      *
      * @param  string|\Illuminate\Database\Query\Expression  $column
      * @param  string|null  $key
