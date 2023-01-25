@@ -1265,6 +1265,17 @@ class Blueprint
     }
 
     /**
+     * Create a new UUID primary column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function uuidPrimary($column = 'uuid')
+    {
+        return $this->uuid($column)->primary();
+    }
+
+    /**
      * Create a new UUID column on the table with a foreign key constraint.
      *
      * @param  string  $column
@@ -1288,6 +1299,18 @@ class Blueprint
     public function ulid($column = 'uuid', $length = 26)
     {
         return $this->char($column, $length);
+    }
+
+    /**
+     * Create a new ULID primary column on the table.
+     *
+     * @param  string  $column
+     * @param  int|null  $length
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function ulidPrimary($column = 'uuid', $length = 26)
+    {
+        return $this->ulid($column, $length)->primary();
     }
 
     /**

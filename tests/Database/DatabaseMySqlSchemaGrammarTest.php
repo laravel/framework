@@ -1057,6 +1057,50 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame('alter table `users` add `uuid` char(36) not null', $statements[0]);
     }
 
+    public function testAddingUlidPrimary()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->ulidPrimary('foo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(2, $statements);
+        $this->assertSame('alter table `users` add `foo` char(26) not null', $statements[0]);
+        $this->assertSame('alter table `users` add primary key (`foo`)', $statements[1]);
+    }
+
+    public function testAddingUlidPrimaryWithLength()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->ulidPrimary('foo', 36);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(2, $statements);
+        $this->assertSame('alter table `users` add `foo` char(36) not null', $statements[0]);
+        $this->assertSame('alter table `users` add primary key (`foo`)', $statements[1]);
+    }
+
+    public function testAddingUlidPrimaryDefaultsColumnName()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->ulidPrimary();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(2, $statements);
+        $this->assertSame('alter table `users` add `uuid` char(26) not null', $statements[0]);
+        $this->assertSame('alter table `users` add primary key (`uuid`)', $statements[1]);
+    }
+
+    public function testAddingUlidPrimaryDefaultsColumnNameWithLength()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->ulidPrimary(length: 36);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(2, $statements);
+        $this->assertSame('alter table `users` add `uuid` char(36) not null', $statements[0]);
+        $this->assertSame('alter table `users` add primary key (`uuid`)', $statements[1]);
+    }
+
     public function testAddingForeignUuid()
     {
         $blueprint = new Blueprint('users');
