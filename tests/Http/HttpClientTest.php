@@ -309,6 +309,7 @@ class HttpClientTest extends TestCase
 
         $fakeRequest = function (Request $request) use ($body) {
             self::assertSame($body, $request->body());
+            self::assertContains('application/json', $request->header('Content-Type'));
 
             return ['my' => 'response'];
         };
@@ -324,6 +325,7 @@ class HttpClientTest extends TestCase
 
         $fakeRequest = function (Request $request) use ($body) {
             self::assertSame($body, $request->body());
+            self::assertContains('text/plain', $request->header('Content-Type'));
 
             return ['my' => 'response'];
         };
