@@ -19,7 +19,7 @@ use Illuminate\Console\Process\Factory;
  * @method static \Illuminate\Console\Process\Factory assertNotRan(\Closure $callback)
  * @method static \Illuminate\Console\Process\Factory assertNothingRan()
  * @method static \Illuminate\Console\Process\Pool pool(callable $callback)
- * @method static \Illuminate\Console\Process\ProcessPoolResults concurrently(callable $callback, callable|null $output)
+ * @method static \Illuminate\Console\Process\ProcessPoolResults concurrently(callable $callback, callable|null $output = null)
  * @method static \Illuminate\Console\Process\PendingProcess newPendingProcess()
  * @method static void macro(string $name, object|callable $macro)
  * @method static void mixin(object $mixin, bool $replace = true)
