@@ -229,6 +229,17 @@ class Factory
     }
 
     /**
+     * Assert that a process was not recorded matching a given truth test.
+     *
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function assertDidntRun(Closure $callback)
+    {
+        return $this->assertNotRan($callback);
+    }
+
+    /**
      * Assert that no processes were recorded.
      *
      * @return $this
