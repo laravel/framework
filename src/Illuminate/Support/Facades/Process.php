@@ -17,6 +17,7 @@ use Illuminate\Console\Process\Factory;
  * @method static \Illuminate\Console\Process\Factory assertRan(\Closure $callback)
  * @method static \Illuminate\Console\Process\Factory assertRanTimes(\Closure $callback, int $times = 1)
  * @method static \Illuminate\Console\Process\Factory assertNotRan(\Closure $callback)
+ * @method static \Illuminate\Console\Process\Factory assertDidntRun(\Closure $callback)
  * @method static \Illuminate\Console\Process\Factory assertNothingRan()
  * @method static \Illuminate\Console\Process\Pool pool(callable $callback)
  * @method static \Illuminate\Console\Process\ProcessPoolResults concurrently(callable $callback, callable|null $output = null)
