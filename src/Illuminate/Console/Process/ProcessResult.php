@@ -77,6 +77,17 @@ class ProcessResult implements ProcessResultContract
     }
 
     /**
+     * Determine if the output contains the given string.
+     *
+     * @param  string  $output
+     * @return bool
+     */
+    public function seeInOutput(string $output)
+    {
+        return str_contains($this->output(), $output);
+    }
+
+    /**
      * Get the error output of the process.
      *
      * @return string
@@ -84,6 +95,17 @@ class ProcessResult implements ProcessResultContract
     public function errorOutput()
     {
         return $this->process->getErrorOutput();
+    }
+
+    /**
+     * Determine if the error output contains the given string.
+     *
+     * @param  string  $output
+     * @return bool
+     */
+    public function seeInErrorOutput(string $output)
+    {
+        return str_contains($this->errorOutput(), $output);
     }
 
     /**
