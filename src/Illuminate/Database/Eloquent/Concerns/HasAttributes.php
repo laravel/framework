@@ -2024,6 +2024,37 @@ trait HasAttributes
     }
 
     /**
+     * Retrieve the changed properties of the model according to the "all", "only" or "except" strategy.
+     *
+     * @param  string|null $strategy
+     * @param  null        $fields
+     * @return array
+     */
+    public function getModelChanges(string $strategy = null, array $fields = null)
+    {
+        $changes = [];
+
+        foreach ($this->getChanges() as $fieldName => $newVal) {
+            if ($strategy === 'only') {
+                if (!in_array($fieldName, $fields)) {
+                    continue;
+                }
+            }
+            if ($strategy === 'except') {
+                if (in_array($fieldName, $fields)) {
+                    continue;
+                }
+            }
+            $changes[$fieldName] = [
+                'old' => $this->getOriginal($fieldName),
+                'new' => $newVal,
+            ];
+        }
+
+        return $changes;
+    }
+
+    /**
      * Determine if the new and old values for a given key are equivalent.
      *
      * @param  string  $key
