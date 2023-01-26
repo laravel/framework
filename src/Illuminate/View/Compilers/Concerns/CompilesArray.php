@@ -11,8 +11,9 @@ trait CompilesArray
     protected function compileSum($arguments)
     {
         $arguments = str_replace(['[', ']'], '', $arguments);
-        $arguments = explode(',', $arguments);
+        $arguments = explode(', ', $arguments);
+        $sum = array_sum($arguments);
 
-        return "<?php echo array_sum($arguments) ?>";
+        return "<?php echo $sum; ?>";
     }
 }
