@@ -176,11 +176,13 @@ class Factory
     /**
      * Assert that a process was recorded matching a given truth test.
      *
-     * @param  \Closure  $callback
+     * @param  \Closure|string  $callback
      * @return $this
      */
-    public function assertRan(Closure $callback)
+    public function assertRan(Closure|string $callback)
     {
+        $callback = is_string($callback) ? fn ($process) => $process->command === $callback : $callback;
+
         PHPUnit::assertTrue(
             collect($this->recorded)->filter(function ($pair) use ($callback) {
                 return $callback($pair[0], $pair[1]);
@@ -194,12 +196,14 @@ class Factory
     /**
      * Assert that a process was recorded a given number of times matching a given truth test.
      *
-     * @param  \Closure  $callback
+     * @param  \Closure|string  $callback
      * @param  int  $times
      * @return $this
      */
-    public function assertRanTimes(Closure $callback, int $times = 1)
+    public function assertRanTimes(Closure|string $callback, int $times = 1)
     {
+        $callback = is_string($callback) ? fn ($process) => $process->command === $callback : $callback;
+
         $count = collect($this->recorded)->filter(function ($pair) use ($callback) {
             return $callback($pair[0], $pair[1]);
         })->count();
@@ -213,11 +217,13 @@ class Factory
     /**
      * Assert that a process was not recorded matching a given truth test.
      *
-     * @param  \Closure  $callback
+     * @param  \Closure|string  $callback
      * @return $this
      */
-    public function assertNotRan(Closure $callback)
+    public function assertNotRan(Closure|string $callback)
     {
+        $callback = is_string($callback) ? fn ($process) => $process->command === $callback : $callback;
+
         PHPUnit::assertTrue(
             collect($this->recorded)->filter(function ($pair) use ($callback) {
                 return $callback($pair[0], $pair[1]);
@@ -231,10 +237,10 @@ class Factory
     /**
      * Assert that a process was not recorded matching a given truth test.
      *
-     * @param  \Closure  $callback
+     * @param  \Closure|string  $callback
      * @return $this
      */
-    public function assertDidntRun(Closure $callback)
+    public function assertDidntRun(Closure|string $callback)
     {
         return $this->assertNotRan($callback);
     }
