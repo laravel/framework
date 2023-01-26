@@ -225,15 +225,17 @@ class AuthAccessGateTest extends TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->register('test', ClassGateTest::class);
+        $gate->register('test', AccessGateTestAutoRegistersMethods::class);
 
-        $this->assertTrue($gate->has(''));
-        $this->assertTrue($gate->has(''));
-        $this->assertTrue($gate->has(''));
-        $this->assertTrue($gate->has(''));
-        $this->assertTrue($gate->has(''));
-        $this->assertFalse($gate->has(''));
-        $this->assertFalse($gate->has(''));
+        $this->assertTrue($gate->has('test.gate1'));
+        $this->assertTrue($gate->has('test.gate2'));
+        $this->assertFalse($gate->has('test.__construct'));
+        $this->assertFalse($gate->has('test.parent1'));
+        $this->assertFalse($gate->has('test.parent2'));
+        $this->assertFalse($gate->has('test.trait1'));
+        $this->assertFalse($gate->has('test.trait2'));
+        $this->assertFalse($gate->has('test.trait3'));
+        $this->assertFalse($gate->has('test.trait4'));
     }
 
     public function testBeforeCallbacksCanOverrideResultIfNecessary()
@@ -1410,4 +1412,31 @@ class AccessGateTestPolicyThrowingAuthorizationException
     {
         throw new AuthorizationException('Not allowed.', 'some_code');
     }
+}
+
+class AccessGateTestAutoRegistersMethodsParent
+{
+    public function parent1() {}
+    public function parent2() {}
+}
+
+trait AccessGateTestAutoRegistersMethodsTraitOne
+{
+    public function trait1() {}
+    public function trait2() {}
+}
+
+trait AccessGateTestAutoRegistersMethodsTraitTwo
+{
+    public function trait3() {}
+    public function trait4() {}
+}
+
+class AccessGateTestAutoRegistersMethods extends AccessGateTestAutoRegistersMethodsParent
+{
+    use AccessGateTestAutoRegistersMethodsTraitOne, AccessGateTestAutoRegistersMethodsTraitTwo;
+
+    public function __construct(){}
+    public function gate1() {}
+    public function gate2() {}
 }
