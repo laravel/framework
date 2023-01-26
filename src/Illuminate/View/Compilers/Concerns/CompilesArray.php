@@ -10,7 +10,7 @@ trait CompilesArray
      */
     protected function compileSum($arguments)
     {
-        $arguments = str_replace(array('[', ']'), '', $arguments);
+        $arguments = str_replace(['[', ']'], '', $arguments);
         $arguments = explode(',', $arguments);
 
         return "<?php echo array_sum($arguments) ?>";
