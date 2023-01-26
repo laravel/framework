@@ -303,7 +303,7 @@ class HttpClientTest extends TestCase
         $this->assertEquals(collect(), $response->collect('missing_key'));
     }
 
-    public function testSendRequestBody()
+    public function testSendRequestBodyAsJsonByDefault()
     {
         $body = '{"test":"phpunit"}';
 
@@ -316,7 +316,7 @@ class HttpClientTest extends TestCase
 
         $this->factory->fake($fakeRequest);
 
-        $this->factory->withBody($body, 'application/json')->send('get', 'http://foo.com/api');
+        $this->factory->withBody($body)->send('get', 'http://foo.com/api');
     }
 
     public function testSendRequestBodyWithManyAmpersands()
