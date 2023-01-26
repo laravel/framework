@@ -15,16 +15,8 @@ class PostgresSchemaState extends SchemaState
      */
     public function dump(Connection $connection, $path)
     {
-        $excludedTables = collect($connection->getSchemaBuilder()->getAllTables())
-                        ->map->tablename
-                        ->reject(function ($table) {
-                            return $table === $this->migrationTable;
-                        })->map(function ($table) {
-                            return '--exclude-table-data="*.'.$table.'"';
-                        })->implode(' ');
-
         $this->makeProcess(
-            $this->baseDumpCommand().' --file="${:LARAVEL_LOAD_PATH}" '.$excludedTables
+            $this->baseDumpCommand().' --file="${:LARAVEL_LOAD_PATH}" '
         )->mustRun($this->output, array_merge($this->baseVariables($this->connection->getConfig()), [
             'LARAVEL_LOAD_PATH' => $path,
         ]));
@@ -58,7 +50,7 @@ class PostgresSchemaState extends SchemaState
      */
     protected function baseDumpCommand()
     {
-        return 'pg_dump --no-owner --no-acl -Fc --host="${:LARAVEL_LOAD_HOST}" --port="${:LARAVEL_LOAD_PORT}" --username="${:LARAVEL_LOAD_USER}" --dbname="${:LARAVEL_LOAD_DATABASE}"';
+        return 'pg_dump -s -T '.$this->migrationTable.' --no-owner --no-acl -Fc --host="${:LARAVEL_LOAD_HOST}" --port="${:LARAVEL_LOAD_PORT}" --username="${:LARAVEL_LOAD_USER}" --dbname="${:LARAVEL_LOAD_DATABASE}"';
     }
 
     /**
