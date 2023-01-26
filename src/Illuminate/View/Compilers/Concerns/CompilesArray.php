@@ -5,6 +5,8 @@ namespace Illuminate\View\Compilers\Concerns;
 trait CompilesArray
 {
     /**
+     *  Compile the "array_sum" statements into valid PHP.
+     *
      * @param  string  $arguments
      * @return string
      */
