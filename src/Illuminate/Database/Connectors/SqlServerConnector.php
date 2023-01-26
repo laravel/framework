@@ -33,6 +33,8 @@ class SqlServerConnector extends Connector implements ConnectorInterface
 
         $this->configureIsolationLevel($connection, $config);
 
+        $this->configureCustomInitCommands($connection, $config);
+
         return $connection;
     }
 

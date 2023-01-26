@@ -54,6 +54,8 @@ class PostgresConnector extends Connector implements ConnectorInterface
 
         $this->configureSynchronousCommit($connection, $config);
 
+        $this->configureCustomInitCommands($connection, $config);
+
         return $connection;
     }
 

@@ -22,7 +22,11 @@ class SQLiteConnector extends Connector implements ConnectorInterface
         // connection does. These are useful for tests or for short lifetime store
         // querying. In-memory databases may only have a single open connection.
         if ($config['database'] === ':memory:') {
-            return $this->createConnection('sqlite::memory:', $config, $options);
+            $connection = $this->createConnection('sqlite::memory:', $config, $options);
+
+            $this->configureCustomInitCommands($connection, $config);
+
+            return $connection;
         }
 
         $path = realpath($config['database']);
@@ -34,6 +38,10 @@ class SQLiteConnector extends Connector implements ConnectorInterface
             throw new SQLiteDatabaseDoesNotExistException($config['database']);
         }
 
-        return $this->createConnection("sqlite:{$path}", $config, $options);
+        $connection = $this->createConnection("sqlite:{$path}", $config, $options);
+
+        $this->configureCustomInitCommands($connection, $config);
+
+        return $connection;
     }
 }

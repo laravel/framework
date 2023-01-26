@@ -4,6 +4,7 @@ namespace Illuminate\Database\Connectors;
 
 use Doctrine\DBAL\Driver\PDOConnection;
 use Exception;
+use Illuminate\Database\Concerns\ConfiguresCustomInitCommands;
 use Illuminate\Database\DetectsLostConnections;
 use PDO;
 use Throwable;
@@ -11,6 +12,7 @@ use Throwable;
 class Connector
 {
     use DetectsLostConnections;
+    use ConfiguresCustomInitCommands;
 
     /**
      * The default PDO connection options.

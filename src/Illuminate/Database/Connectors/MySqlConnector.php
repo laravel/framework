@@ -38,6 +38,8 @@ class MySqlConnector extends Connector implements ConnectorInterface
 
         $this->setModes($connection, $config);
 
+        $this->configureCustomInitCommands($connection, $config);
+
         return $connection;
     }
 
