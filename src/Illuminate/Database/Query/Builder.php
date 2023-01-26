@@ -26,6 +26,10 @@ use InvalidArgumentException;
 use LogicException;
 use RuntimeException;
 
+/**
+ * @template TResult of array
+ * @uses \Illuminate\Database\Concerns\BuildsQueries<TResult>
+ */
 class Builder implements BuilderContract
 {
     use BuildsQueries, ExplainsQueries, ForwardsCalls, Macroable {
@@ -2565,7 +2569,7 @@ class Builder implements BuilderContract
      *
      * @param  int|string  $id
      * @param  array|string  $columns
-     * @return mixed|static
+     * @return TResult|null
      */
     public function find($id, $columns = ['*'])
     {
@@ -2642,7 +2646,7 @@ class Builder implements BuilderContract
      * Execute the query as a "select" statement.
      *
      * @param  array|string  $columns
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection<TResult>
      */
     public function get($columns = ['*'])
     {

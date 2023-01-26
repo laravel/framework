@@ -13,6 +13,11 @@ use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
 
+/**
+ * @template TRelated of \Illuminate\Database\Eloquent\Model where we are relating to, what we are querying.
+ * @template TParent of \Illuminate\Database\Eloquent\Model origin of the relationship
+ * @implements BuilderContract<TRelated>
+ */
 abstract class Relation implements BuilderContract
 {
     use ForwardsCalls, Macroable {
@@ -29,14 +34,14 @@ abstract class Relation implements BuilderContract
     /**
      * The parent model instance.
      *
-     * @var \Illuminate\Database\Eloquent\Model
+     * @var TParent
      */
     protected $parent;
 
     /**
      * The related model instance.
      *
-     * @var \Illuminate\Database\Eloquent\Model
+     * @var TRelated
      */
     protected $related;
 
@@ -78,8 +83,8 @@ abstract class Relation implements BuilderContract
     /**
      * Create a new relation instance.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  \Illuminate\Database\Eloquent\Model  $parent
+     * @param  \Illuminate\Database\Eloquent\Builder<TParent>  $query
+     * @param  TParent  $parent
      * @return void
      */
     public function __construct(Builder $query, Model $parent)
@@ -170,9 +175,9 @@ abstract class Relation implements BuilderContract
      * Execute the query and get the first result if it's the sole matching record.
      *
      * @param  array|string  $columns
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return TRelated
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<\Illuminate\Database\Eloquent\Model>
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<TRelated>
      * @throws \Illuminate\Database\MultipleRecordsFoundException
      */
     public function sole($columns = ['*'])
@@ -196,7 +201,7 @@ abstract class Relation implements BuilderContract
      * Execute the query as a "select" statement.
      *
      * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Database\Eloquent\Collection<TRelated>
      */
     public function get($columns = ['*'])
     {
@@ -349,7 +354,7 @@ abstract class Relation implements BuilderContract
     /**
      * Get the related model of the relation.
      *
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return TRelated
      */
     public function getRelated()
     {

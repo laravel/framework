@@ -11,6 +11,11 @@ use Illuminate\Database\Eloquent\Relations\Concerns\ComparesRelatedModels;
 use Illuminate\Database\Eloquent\Relations\Concerns\SupportsDefaultModels;
 use Illuminate\Database\Query\JoinClause;
 
+/**
+ * @template TRelated of \Illuminate\Database\Eloquent\Model
+ * @template TParent of \Illuminate\Database\Eloquent\Model origin of the relationship
+ * @extends HasOneOrMany<TRelated, TParent>
+ */
 class HasOne extends HasOneOrMany implements SupportsPartialRelations
 {
     use ComparesRelatedModels, CanBeOneOfMany, SupportsDefaultModels;
@@ -18,7 +23,7 @@ class HasOne extends HasOneOrMany implements SupportsPartialRelations
     /**
      * Get the results of the relationship.
      *
-     * @return mixed
+     * @return TRelated
      */
     public function getResults()
     {

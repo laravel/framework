@@ -14,6 +14,11 @@ use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 
+/**
+ * @template TRelated of \Illuminate\Database\Eloquent\Model
+ * @template TParent of \Illuminate\Database\Eloquent\Model origin of the relationship
+ * @extends Relation<TRelated, TParent>
+ */
 class BelongsToMany extends Relation
 {
     use InteractsWithDictionary, InteractsWithPivotTable;
@@ -133,8 +138,8 @@ class BelongsToMany extends Relation
     /**
      * Create a new belongs to many relationship instance.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  \Illuminate\Database\Eloquent\Model  $parent
+     * @param  \Illuminate\Database\Eloquent\Builder<TRelated>  $query
+     * @param  TParent  $parent
      * @param  string  $table
      * @param  string  $foreignPivotKey
      * @param  string  $relatedPivotKey
@@ -581,7 +586,7 @@ class BelongsToMany extends Relation
      *
      * @param  mixed  $id
      * @param  array  $columns
-     * @return \Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model
+     * @return TRelated|\Illuminate\Database\Eloquent\Collection<int, TRelated>
      */
     public function findOrNew($id, $columns = ['*'])
     {
@@ -597,7 +602,7 @@ class BelongsToMany extends Relation
      *
      * @param  array  $attributes
      * @param  array  $values
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return TRelated
      */
     public function firstOrNew(array $attributes = [], array $values = [])
     {
@@ -615,7 +620,7 @@ class BelongsToMany extends Relation
      * @param  array  $values
      * @param  array  $joining
      * @param  bool  $touch
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return TRelated
      */
     public function firstOrCreate(array $attributes = [], array $values = [], array $joining = [], $touch = true)
     {
@@ -637,7 +642,7 @@ class BelongsToMany extends Relation
      * @param  array  $values
      * @param  array  $joining
      * @param  bool  $touch
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return TRelated
      */
     public function updateOrCreate(array $attributes, array $values = [], array $joining = [], $touch = true)
     {
@@ -661,7 +666,7 @@ class BelongsToMany extends Relation
      *
      * @param  mixed  $id
      * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|null
+     * @return TRelated|\Illuminate\Database\Eloquent\Collection<int, TRelated>|null
      */
     public function find($id, $columns = ['*'])
     {
@@ -679,7 +684,7 @@ class BelongsToMany extends Relation
      *
      * @param  \Illuminate\Contracts\Support\Arrayable|array  $ids
      * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Database\Eloquent\Collection<int, TRelated>
      */
     public function findMany($ids, $columns = ['*'])
     {
@@ -699,9 +704,9 @@ class BelongsToMany extends Relation
      *
      * @param  mixed  $id
      * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection
+     * @return TRelated|\Illuminate\Database\Eloquent\Collection<int, TRelated>
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<\Illuminate\Database\Eloquent\Model>
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<TRelated>
      */
     public function findOrFail($id, $columns = ['*'])
     {
@@ -726,7 +731,7 @@ class BelongsToMany extends Relation
      * @param  mixed  $id
      * @param  \Closure|array  $columns
      * @param  \Closure|null  $callback
-     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|mixed
+     * @return TRelated|\Illuminate\Database\Eloquent\Collection<int, TRelated>|mixed
      */
     public function findOr($id, $columns = ['*'], Closure $callback = null)
     {
@@ -758,7 +763,7 @@ class BelongsToMany extends Relation
      * @param  mixed  $operator
      * @param  mixed  $value
      * @param  string  $boolean
-     * @return \Illuminate\Database\Eloquent\Model|static
+     * @return TRelated|null
      */
     public function firstWhere($column, $operator = null, $value = null, $boolean = 'and')
     {
@@ -769,22 +774,20 @@ class BelongsToMany extends Relation
      * Execute the query and get the first result.
      *
      * @param  array  $columns
-     * @return mixed
+     * @return TRelated|null
      */
     public function first($columns = ['*'])
     {
-        $results = $this->take(1)->get($columns);
-
-        return count($results) > 0 ? $results->first() : null;
+        return $this->take(1)->get($columns)->first();
     }
 
     /**
      * Execute the query and get the first result or throw an exception.
      *
      * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Model|static
+     * @return TRelated
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<\Illuminate\Database\Eloquent\Model>
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<TRelated>
      */
     public function firstOrFail($columns = ['*'])
     {
@@ -800,7 +803,7 @@ class BelongsToMany extends Relation
      *
      * @param  \Closure|array  $columns
      * @param  \Closure|null  $callback
-     * @return \Illuminate\Database\Eloquent\Model|static|mixed
+     * @return TRelated|mixed
      */
     public function firstOr($columns = ['*'], Closure $callback = null)
     {
@@ -820,7 +823,7 @@ class BelongsToMany extends Relation
     /**
      * Get the results of the relationship.
      *
-     * @return mixed
+     * @return Collection<int, TRelated>
      */
     public function getResults()
     {
@@ -833,7 +836,7 @@ class BelongsToMany extends Relation
      * Execute the query as a "select" statement.
      *
      * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Database\Eloquent\Collection<int, TRelated>
      */
     public function get($columns = ['*'])
     {
@@ -1009,7 +1012,7 @@ class BelongsToMany extends Relation
      * Query lazily, by chunks of the given size.
      *
      * @param  int  $chunkSize
-     * @return \Illuminate\Support\LazyCollection
+     * @return \Illuminate\Support\LazyCollection<int, TRelated>
      */
     public function lazy($chunkSize = 1000)
     {
@@ -1026,7 +1029,7 @@ class BelongsToMany extends Relation
      * @param  int  $chunkSize
      * @param  string|null  $column
      * @param  string|null  $alias
-     * @return \Illuminate\Support\LazyCollection
+     * @return \Illuminate\Support\LazyCollection<int, TRelated>
      */
     public function lazyById($chunkSize = 1000, $column = null, $alias = null)
     {
@@ -1046,7 +1049,7 @@ class BelongsToMany extends Relation
     /**
      * Get a lazy collection for the given query.
      *
-     * @return \Illuminate\Support\LazyCollection
+     * @return \Illuminate\Support\LazyCollection<int, TRelated>
      */
     public function cursor()
     {
@@ -1060,7 +1063,7 @@ class BelongsToMany extends Relation
     /**
      * Prepare the query builder for query execution.
      *
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @return \Illuminate\Database\Eloquent\Builder<TRelated>
      */
     protected function prepareQueryBuilder()
     {
@@ -1181,10 +1184,10 @@ class BelongsToMany extends Relation
     /**
      * Save a new model and attach it to the parent model.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  TRelated  $model
      * @param  array  $pivotAttributes
      * @param  bool  $touch
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return TRelated
      */
     public function save(Model $model, array $pivotAttributes = [], $touch = true)
     {
@@ -1198,10 +1201,10 @@ class BelongsToMany extends Relation
     /**
      * Save a new model without raising any events and attach it to the parent model.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  TRelated  $model
      * @param  array  $pivotAttributes
      * @param  bool  $touch
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return TRelated
      */
     public function saveQuietly(Model $model, array $pivotAttributes = [], $touch = true)
     {
@@ -1213,7 +1216,7 @@ class BelongsToMany extends Relation
     /**
      * Save an array of new models and attach them to the parent model.
      *
-     * @param  \Illuminate\Support\Collection|array  $models
+     * @param  \Illuminate\Support\Collection<TRelated>|iterable<TRelated>  $models
      * @param  array  $pivotAttributes
      * @return array
      */
@@ -1231,7 +1234,7 @@ class BelongsToMany extends Relation
     /**
      * Save an array of new models without raising any events and attach them to the parent model.
      *
-     * @param  \Illuminate\Support\Collection|array  $models
+     * @param  \Illuminate\Support\Collection<TRelated>|iterable<TRelated>  $models
      * @param  array  $pivotAttributes
      * @return array
      */
@@ -1248,7 +1251,7 @@ class BelongsToMany extends Relation
      * @param  array  $attributes
      * @param  array  $joining
      * @param  bool  $touch
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return TRelated
      */
     public function create(array $attributes = [], array $joining = [], $touch = true)
     {
@@ -1267,9 +1270,9 @@ class BelongsToMany extends Relation
     /**
      * Create an array of new instances of the related models.
      *
-     * @param  iterable  $records
+     * @param  iterable<array>  $records
      * @param  array  $joinings
-     * @return array
+     * @return array<TRelated>
      */
     public function createMany(iterable $records, array $joinings = [])
     {

@@ -7,6 +7,11 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
 
+/**
+ * @template TRelated of \Illuminate\Database\Eloquent\Model
+ * @template TParent of \Illuminate\Database\Eloquent\Model origin of the relationship
+ * @extends Relation<TRelated, TParent>
+ */
 abstract class HasOneOrMany extends Relation
 {
     use InteractsWithDictionary;
@@ -28,8 +33,8 @@ abstract class HasOneOrMany extends Relation
     /**
      * Create a new has one or many relationship instance.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  \Illuminate\Database\Eloquent\Model  $parent
+     * @param  \Illuminate\Database\Eloquent\Builder<TRelated>  $query
+     * @param  TParent  $parent
      * @param  string  $foreignKey
      * @param  string  $localKey
      * @return void
@@ -46,7 +51,7 @@ abstract class HasOneOrMany extends Relation
      * Create and return an un-saved instance of the related model.
      *
      * @param  array  $attributes
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return TRelated
      */
     public function make(array $attributes = [])
     {
@@ -59,7 +64,7 @@ abstract class HasOneOrMany extends Relation
      * Create and return an un-saved instance of the related models.
      *
      * @param  iterable  $records
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Database\Eloquent\Collection<int, TRelated>
      */
     public function makeMany($records)
     {
@@ -178,7 +183,7 @@ abstract class HasOneOrMany extends Relation
      * Build model dictionary keyed by the relation's foreign key.
      *
      * @param  \Illuminate\Database\Eloquent\Collection  $results
-     * @return array
+     * @return
      */
     protected function buildDictionary(Collection $results)
     {
@@ -212,7 +217,7 @@ abstract class HasOneOrMany extends Relation
      *
      * @param  array  $attributes
      * @param  array  $values
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return TRelated
      */
     public function firstOrNew(array $attributes = [], array $values = [])
     {
@@ -230,7 +235,7 @@ abstract class HasOneOrMany extends Relation
      *
      * @param  array  $attributes
      * @param  array  $values
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return TRelated
      */
     public function firstOrCreate(array $attributes = [], array $values = [])
     {
@@ -246,7 +251,7 @@ abstract class HasOneOrMany extends Relation
      *
      * @param  array  $attributes
      * @param  array  $values
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return TRelated
      */
     public function updateOrCreate(array $attributes, array $values = [])
     {
@@ -260,8 +265,8 @@ abstract class HasOneOrMany extends Relation
     /**
      * Attach a model instance to the parent model.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return \Illuminate\Database\Eloquent\Model|false
+     * @param  TRelated  $model
+     * @return TRelated|false
      */
     public function save(Model $model)
     {
@@ -273,8 +278,8 @@ abstract class HasOneOrMany extends Relation
     /**
      * Attach a model instance without raising any events to the parent model.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return \Illuminate\Database\Eloquent\Model|false
+     * @param  TRelated  $model
+     * @return TRelated|false
      */
     public function saveQuietly(Model $model)
     {
@@ -286,8 +291,8 @@ abstract class HasOneOrMany extends Relation
     /**
      * Attach a collection of models to the parent instance.
      *
-     * @param  iterable  $models
-     * @return iterable
+     * @param  iterable<TRelated>  $models
+     * @return iterable<TRelated>
      */
     public function saveMany($models)
     {
@@ -301,8 +306,8 @@ abstract class HasOneOrMany extends Relation
     /**
      * Attach a collection of models to the parent instance without raising any events to the parent model.
      *
-     * @param  iterable  $models
-     * @return iterable
+     * @param  iterable<TRelated>  $models
+     * @return iterable<TRelated>
      */
     public function saveManyQuietly($models)
     {
@@ -315,7 +320,7 @@ abstract class HasOneOrMany extends Relation
      * Create a new instance of the related model.
      *
      * @param  array  $attributes
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return TRelated
      */
     public function create(array $attributes = [])
     {
@@ -330,7 +335,7 @@ abstract class HasOneOrMany extends Relation
      * Create a new instance of the related model. Allow mass-assignment.
      *
      * @param  array  $attributes
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return TRelated
      */
     public function forceCreate(array $attributes = [])
     {
@@ -343,7 +348,7 @@ abstract class HasOneOrMany extends Relation
      * Create a Collection of new instances of the related model.
      *
      * @param  iterable  $records
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Database\Eloquent\Collection<int, TRelated>
      */
     public function createMany(iterable $records)
     {
@@ -359,7 +364,7 @@ abstract class HasOneOrMany extends Relation
     /**
      * Set the foreign ID for creating a related model.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  TRelated  $model
      * @return void
      */
     protected function setForeignAttributesForCreate(Model $model)

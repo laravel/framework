@@ -4,12 +4,18 @@ namespace Illuminate\Database\Eloquent\Relations;
 
 use Illuminate\Database\Eloquent\Collection;
 
+
+/**
+ * @template TRelated of \Illuminate\Database\Eloquent\Model
+ * @template TParent of \Illuminate\Database\Eloquent\Model origin of the relationship
+ * @extends HasOneOrMany<TRelated, TParent>
+ */
 class HasMany extends HasOneOrMany
 {
     /**
      * Get the results of the relationship.
      *
-     * @return mixed
+     * @return Collection<TRelated>
      */
     public function getResults()
     {

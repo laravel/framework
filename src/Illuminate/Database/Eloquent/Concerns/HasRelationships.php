@@ -206,7 +206,8 @@ trait HasRelationships
     /**
      * Define an inverse one-to-one or many relationship.
      *
-     * @param  string  $related
+     * @template TModel of \Illuminate\Database\Eloquent\Model
+     * @param  class-string<TModel>  $related
      * @param  string|null  $foreignKey
      * @param  string|null  $ownerKey
      * @param  string|null  $relation
