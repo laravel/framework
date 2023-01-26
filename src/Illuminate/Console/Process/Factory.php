@@ -261,7 +261,7 @@ class Factory
      * @param  callable|null  $output
      * @return \Illuminate\Console\Process\ProcessPoolResults
      */
-    public function concurrently(callable $callback, ?callable $output)
+    public function concurrently(callable $callback, ?callable $output = null)
     {
         return (new Pool($this, $callback))->start($output)->wait();
     }
