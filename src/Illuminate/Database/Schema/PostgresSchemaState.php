@@ -15,11 +15,16 @@ class PostgresSchemaState extends SchemaState
      */
     public function dump(Connection $connection, $path)
     {
-        $this->makeProcess(
-            $this->baseDumpCommand().' --file="${:LARAVEL_LOAD_PATH}" '
-        )->mustRun($this->output, array_merge($this->baseVariables($this->connection->getConfig()), [
-            'LARAVEL_LOAD_PATH' => $path,
-        ]));
+        $commands = collect([
+            $this->baseDumpCommand() . ' --schema-only > ' . $path,
+            $this->baseDumpCommand() . ' -t '. $this->migrationTable .' --data-only >> ' . $path,
+        ]);
+
+        $commands->map(function ($command, $path) {
+            $this->makeProcess($command)->mustRun($this->output, array_merge($this->baseVariables($this->connection->getConfig()), [
+                'LARAVEL_LOAD_PATH' => $path,
+            ]));
+        });
     }
 
     /**
@@ -50,7 +55,7 @@ class PostgresSchemaState extends SchemaState
      */
     protected function baseDumpCommand()
     {
-        return 'pg_dump -s -T '.$this->migrationTable.' --no-owner --no-acl -Fc --host="${:LARAVEL_LOAD_HOST}" --port="${:LARAVEL_LOAD_PORT}" --username="${:LARAVEL_LOAD_USER}" --dbname="${:LARAVEL_LOAD_DATABASE}"';
+        return 'pg_dump --no-owner --no-acl --host="${:LARAVEL_LOAD_HOST}" --port="${:LARAVEL_LOAD_PORT}" --username="${:LARAVEL_LOAD_USER}" --dbname="${:LARAVEL_LOAD_DATABASE}"';
     }
 
     /**
