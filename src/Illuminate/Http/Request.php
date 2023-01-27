@@ -356,6 +356,19 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
+     * Merge new input into validated request data's.
+     *
+     * @param  array  $input
+     * @return $this
+     */
+    public function mergeWithValidated(array $input)
+    {
+        $this->getValidatorInstance()->setMergeInputs($input);
+
+        return $this;
+    }
+
+    /**
      * Merge new input into the request's input, but only when that key is missing from the request.
      *
      * @param  array  $input
