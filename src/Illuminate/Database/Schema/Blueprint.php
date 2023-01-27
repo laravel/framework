@@ -1281,7 +1281,7 @@ class Blueprint
      * @param  int|null  $length
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function ulid($column = 'uuid', $length = 26)
+    public function ulid($column = 'ulid', $length = 26)
     {
         return $this->char($column, $length);
     }
