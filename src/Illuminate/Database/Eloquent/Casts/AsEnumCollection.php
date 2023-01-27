@@ -13,8 +13,9 @@ class AsEnumCollection implements Castable
      * Get the caster class to use when casting from / to this cast target.
      *
      * @template TEnum of \UnitEnum|\BackedEnum
+     *
      * @param    array{class-string<TEnum>}  $arguments
-     * @return   CastsAttributes<Collection<array-key, TEnum>, iterable<TEnum>>
+     * @return CastsAttributes<Collection<array-key, TEnum>, iterable<TEnum>>
      */
     public static function castUsing(array $arguments)
     {
