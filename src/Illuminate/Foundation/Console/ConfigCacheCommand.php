@@ -83,7 +83,7 @@ class ConfigCacheCommand extends Command
      */
     protected function getFreshConfiguration()
     {
-        $app = require $this->laravel->bootstrapPath().'/app.php';
+        $app = require $this->laravel->bootstrapPath('app.php');
 
         $app->useStoragePath($this->laravel->storagePath());
 
