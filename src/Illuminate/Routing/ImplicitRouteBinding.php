@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Routing\Exceptions\BackedEnumCaseNotFoundException;
 use Illuminate\Support\Reflector;
 use Illuminate\Support\Str;
+use Illuminate\Tests\Integration\Routing\ImplicitBindingUser;
 
 class ImplicitRouteBinding
 {
@@ -38,9 +39,10 @@ class ImplicitRouteBinding
      * @param  \Illuminate\Routing\Route  $route
      * @return void
      */
-    public static function resolveClosureBindingsForRoute($container, $route) {
-        foreach (array_filter($route->parameters(), 'is_callable') as $callable) {
-            $callable();
+    public static function resolveClosureBindingsForRoute($container, $route)
+    {
+        foreach (array_filter($route->parameters(), fn ($value) => $value instanceof RouteClosureBinding) as $binding) {
+            $binding->resolveForRoute($route);
         }
     }
 
@@ -73,7 +75,7 @@ class ImplicitRouteBinding
 
                 $model = static::resolveChildRouteBinding($route, $instance, $parent, $parameterName, $parameterValue);
             } else {
-                $model = static::resolveRouteBinding($route, $instance, $parent, $parameterName, $parameterValue);
+                $model = static::resolveRouteBinding($route, $instance, $parameterName, $parameterValue);
             }
 
             $route->setParameter($parameterName, $model);
@@ -83,26 +85,24 @@ class ImplicitRouteBinding
     /**
      * @param  \Illuminate\Routing\Route  $route
      * @param  mixed  $instance
-     * @param  mixed  $parent
      * @param  string  $parameterName
      * @param  mixed  $parameterValue
-     * @return \Closure|Model
+     * @return RouteClosureBinding|Model
      */
-    protected static function resolveRouteBinding($route, $instance, $parent, $parameterName, $parameterValue)
+    protected static function resolveRouteBinding($route, $instance, $parameterName, $parameterValue)
     {
-        $routeBindingMethod = match (true) {
-            $route->allowsTrashedBindings() && in_array(SoftDeletes::class, class_uses_recursive($instance)) => 'resolveSoftDeletableRouteBinding',
-            $route->usesLockBindings() => 'resolveLockRouteBinding',
-            default => 'resolveRouteBinding',
-        };
-
-        if ($routeBindingMethod === 'resolveLockRouteBinding') {
-            return fn () => $parent->{$routeBindingMethod}(
-                $parameterName, $parameterValue, $route->bindingFieldFor($parameterName)
-            );
+        if ($route->allowsTrashedBindings() && in_array(SoftDeletes::class, class_uses_recursive($instance))) {
+            $instance->resolveWithTrashed = true;
         }
 
-        if (! $model = $instance->{$routeBindingMethod}($parameterValue, $route->bindingFieldFor($parameterName))) {
+        if ($route->requiresLockBindings()) {
+            $instance->resolveWithLock = true;
+            return new RouteClosureBinding($parameterName, fn () => $instance->resolveRouteBinding(
+                $parameterValue, $route->bindingFieldFor($parameterName)
+            ));
+        }
+
+        if (! $model = $instance->resolveRouteBinding($parameterValue, $route->bindingFieldFor($parameterName))) {
             throw (new ModelNotFoundException)->setModel(get_class($instance), [$parameterValue]);
         }
 
@@ -115,23 +115,22 @@ class ImplicitRouteBinding
      * @param  mixed  $parent
      * @param  string  $parameterName
      * @param  mixed  $parameterValue
-     * @return \Closure|Model
+     * @return RouteClosureBinding|Model
      */
     protected static function resolveChildRouteBinding($route, $instance, $parent, $parameterName, $parameterValue)
     {
-        $childRouteBindingMethod = match (true) {
-            $route->allowsTrashedBindings() && in_array(SoftDeletes::class, class_uses_recursive($instance)) => 'resolveSoftDeletableChildRouteBinding',
-            $route->usesLockBindings() => 'resolveLockChildRouteBinding',
-            default => 'resolveChildRouteBinding',
-        };
-
-        if ($childRouteBindingMethod === 'resolveLockChildRouteBinding') {
-            return fn () => $parent->{$childRouteBindingMethod}(
-                $parameterName, $parameterValue, $route->bindingFieldFor($parameterName)
-            );
+        if ($route->allowsTrashedBindings() && in_array(SoftDeletes::class, class_uses_recursive($instance))) {
+            $instance->resolveWithTrashed = true;
         }
 
-        if (! $model = $parent->{$childRouteBindingMethod}(
+        if ($route->requiresLockBindings()) {
+            $instance->resolveWithLock = true;
+            return new RouteClosureBinding($parameterName, fn () => $parent->resolveChildRouteBinding(
+                $parameterName, $parameterValue, $route->bindingFieldFor($parameterName)
+            ));
+        }
+
+        if (! $model = $parent->resolveChildRouteBinding(
             $parameterName, $parameterValue, $route->bindingFieldFor($parameterName)
         )) {
             throw (new ModelNotFoundException)->setModel(get_class($instance), [$parameterValue]);

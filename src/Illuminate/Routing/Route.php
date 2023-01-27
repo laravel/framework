@@ -102,6 +102,14 @@ class Route
     protected $withTrashedBindings = false;
 
     /**
+     * Determines whether Eloquent model route bindings should be retrieved with a lock. A boolean value
+     * indicates a singular lock (true) or a shared lock (false). `null` indicates no lock.
+     *
+     * @var bool|null
+     */
+    protected $withLockBindings = null;
+
+    /**
      * Indicates the maximum number of seconds the route should acquire a session lock for.
      *
      * @var int|null
@@ -156,14 +164,6 @@ class Route
      * @var callable[]
      */
     protected $lockSubstitutions = [];
-
-    /**
-     * Determines whether Eloquent model route bindings should be retrieved with a lock. A boolean value
-     * indicates a singular lock (true) or a shared lock (false). `null` indicates no lock.
-     *
-     * @var bool|null
-     */
-    protected $withLockBindings;
 
     /**
      * The validators used by the routes.
@@ -614,21 +614,37 @@ class Route
         return $this;
     }
 
-    public function withLockBindings($lock = true)
+    /**
+     * Require models to be retrieved with a row-level lock.
+     *
+     * @param  bool  $lock
+     * @return $this
+     */
+    public function withLocks($lock = true)
     {
         $this->withLockBindings = $lock;
 
         return $this;
     }
 
-    public function withoutLockBindings()
+    /**
+     * Retrieve models without row-level locks.
+     *
+     * @return $this
+     */
+    public function withoutLocks()
     {
         $this->withLockBindings = null;
 
         return $this;
     }
 
-    public function usesLockBindings()
+    /**
+     * Determines if the route requires models to be retrieved with a row-level lock.
+     *
+     * @return bool
+     */
+    public function requiresLockBindings()
     {
         return is_bool($this->withLockBindings);
     }

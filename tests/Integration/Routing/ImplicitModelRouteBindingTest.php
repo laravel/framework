@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\Concerns\InteractsWithPublishedFiles;
@@ -132,6 +134,46 @@ PHP);
         Route::post('/user/{user}', function (ImplicitBindingUser $user) {
             return $user;
         })->middleware(['web'])->withTrashed();
+
+        $response = $this->postJson("/user/{$user->id}");
+
+        $response->assertJson([
+            'id' => $user->id,
+            'name' => $user->name,
+        ]);
+    }
+
+    public function testModelsCanBeRetrievedWithLockMethod()
+    {
+        $user = ImplicitBindingUser::create(['name' => 'Bert']);
+
+        config(['app.key' => str_repeat('a', 32)]);
+
+        Route::post('/user/{user}', function (ImplicitBindingUser $user) {
+            $this->assertEquals(1, DB::connection()->transactionLevel());
+            return $user;
+        })->middleware(['web'])->withLockBindings();
+
+        $response = $this->postJson("/user/{$user->id}");
+
+        $response->assertJson([
+            'id' => $user->id,
+            'name' => $user->name,
+        ]);
+    }
+
+    public function testModelsCanBeRetrievedWithLockAndWithTrashedMethod()
+    {
+        $user = ImplicitBindingUser::create(['name' => 'Bert']);
+
+        $user->delete();
+
+        config(['app.key' => str_repeat('a', 32)]);
+
+        Route::post('/user/{user}', function (ImplicitBindingUser $user) {
+            $this->assertEquals(1, DB::connection()->transactionLevel());
+            return $user;
+        })->middleware(['web'])->withLockBindings()->withTrashed();
 
         $response = $this->postJson("/user/{$user->id}");
 

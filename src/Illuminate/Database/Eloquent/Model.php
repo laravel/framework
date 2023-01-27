@@ -119,6 +119,20 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected $escapeWhenCastingToString = false;
 
     /**
+     * Determines if route bindings should resolve trashed models as well.
+     *
+     * @var bool
+     */
+    public $resolveWithTrashed;
+
+    /**
+     * Determines if route bindings should resolve with a row-level lock.
+     *
+     * @var bool
+     */
+    public $resolveWithLock;
+
+    /**
      * The connection resolver instance.
      *
      * @var \Illuminate\Database\ConnectionResolverInterface
@@ -2027,32 +2041,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function resolveRouteBinding($value, $field = null)
     {
-        return $this->resolveRouteBindingQuery($this, $value, $field)->first();
-    }
-
-    /**
-     * Retrieve the model for a bound value with a row-level lock.
-     *
-     * @param  mixed  $value
-     * @param  string|null  $field
-     * @param  bool  $lock
-     * @return \Illuminate\Database\Eloquent\Model|null
-     */
-    public function resolveLockRouteBinding($value, $field = null, $lock = true)
-    {
-        return $this->resolveRouteBindingQuery($this, $value, $field)->lock($lock)->first();
-    }
-
-    /**
-     * Retrieve the model for a bound value.
-     *
-     * @param  mixed  $value
-     * @param  string|null  $field
-     * @return \Illuminate\Database\Eloquent\Model|null
-     */
-    public function resolveSoftDeletableRouteBinding($value, $field = null)
-    {
-        return $this->resolveRouteBindingQuery($this, $value, $field)->withTrashed()->first();
+        return $this->resolveRouteBindingQuery($this, $value, $field)
+            ->when($this->resolveWithTrashed, fn ($query) => $query->withTrashed())
+            ->when($this->resolveWithLock, fn ($query) => $query->lock($this->resolveWithLock))
+            ->first();
     }
 
     /**
@@ -2065,34 +2057,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function resolveChildRouteBinding($childType, $value, $field)
     {
-        return $this->resolveChildRouteBindingQuery($childType, $value, $field)->first();
-    }
-
-    /**
-     * Retrieve the child model for a bound value with a row-level lock.
-     *
-     * @param  string  $childType
-     * @param  mixed  $value
-     * @param  string|null  $field
-     * @param  bool  $lock
-     * @return \Illuminate\Database\Eloquent\Model|null
-     */
-    public function resolveLockChildRouteBinding($childType, $value, $field, $lock = true)
-    {
-        return $this->resolveChildRouteBindingQuery($childType, $value, $field)->lock($lock)->first();
-    }
-
-    /**
-     * Retrieve the child model for a bound value.
-     *
-     * @param  string  $childType
-     * @param  mixed  $value
-     * @param  string|null  $field
-     * @return \Illuminate\Database\Eloquent\Model|null
-     */
-    public function resolveSoftDeletableChildRouteBinding($childType, $value, $field)
-    {
-        return $this->resolveChildRouteBindingQuery($childType, $value, $field)->withTrashed()->first();
+        return $this->resolveChildRouteBindingQuery($childType, $value, $field)
+            ->when($this->resolveWithTrashed, fn ($query) => $query->withTrashed())
+            ->when($this->resolveWithLock, fn ($query) => $query->lock($this->resolveWithLock))
+            ->first();
     }
 
     /**

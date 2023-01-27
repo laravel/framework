@@ -48,7 +48,7 @@ class SubstituteBindings
             throw $exception;
         }
 
-        if ($route->usesLockBindings()) {
+        if ($route->requiresLockBindings()) {
             return DB::transaction(function () use ($next, $request, $route) {
                 $this->router->substituteClosureBindings($route);
                 return $next($request);
