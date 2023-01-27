@@ -45,6 +45,10 @@ trait SoftDeletes
      */
     public function forceDelete()
     {
+        if ($this->fireModelEvent('forceDeleting') === false) {
+            return false;
+        }
+
         $this->forceDeleting = true;
 
         return tap($this->delete(), function ($deleted) {
@@ -189,6 +193,17 @@ trait SoftDeletes
     public static function restored($callback)
     {
         static::registerModelEvent('restored', $callback);
+    }
+
+    /**
+     * Register a "forceDeleting" model event callback with the dispatcher.
+     *
+     * @param  \Closure|string  $callback
+     * @return void
+     */
+    public static function forceDeleting($callback)
+    {
+        static::registerModelEvent('forceDeleting', $callback);
     }
 
     /**
