@@ -90,8 +90,6 @@ class ImplicitRouteBindingTest extends TestCase
 
         ImplicitRouteBinding::resolveForRoute($container, $route);
     }
-
-
 }
 
 class ImplicitRouteBindingUser extends Model
