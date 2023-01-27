@@ -11,6 +11,7 @@ class AsEncryptedArrayObject implements Castable
     /**
      * Get the caster class to use when casting from / to this cast target.
      *
+     * @param  array  $arguments
      * @return CastsAttributes<ArrayObject<array-key, mixed>, iterable>
      */
     public static function castUsing(array $arguments)
