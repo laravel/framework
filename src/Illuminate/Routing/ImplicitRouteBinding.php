@@ -95,6 +95,7 @@ class ImplicitRouteBinding
 
         if ($route->requiresLockBindings()) {
             $instance->resolveWithLock = true;
+
             return new RouteClosureBinding($parameterName, fn () => $instance->resolveRouteBinding(
                 $parameterValue, $route->bindingFieldFor($parameterName)
             ));
@@ -123,6 +124,7 @@ class ImplicitRouteBinding
 
         if ($route->requiresLockBindings()) {
             $instance->resolveWithLock = true;
+
             return new RouteClosureBinding($parameterName, fn () => $parent->resolveChildRouteBinding(
                 $parameterName, $parameterValue, $route->bindingFieldFor($parameterName)
             ));
