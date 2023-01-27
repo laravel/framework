@@ -9,6 +9,7 @@ use Illuminate\Session\SymfonySessionDecorator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Validation\ValidatesWhenResolvedTrait;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 use Symfony\Component\HttpFoundation\ParameterBag;
@@ -26,7 +27,8 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
         Concerns\InteractsWithContentTypes,
         Concerns\InteractsWithFlashData,
         Concerns\InteractsWithInput,
-        Macroable;
+        Macroable,
+        ValidatesWhenResolvedTrait;
 
     /**
      * The decoded JSON content for the request.
