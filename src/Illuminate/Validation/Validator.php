@@ -565,6 +565,8 @@ class Validator implements ValidatorContract
             }
         }
 
+        $results = array_merge($results, $this->inputMerge);
+
         return $this->replacePlaceholders($results);
     }
 
