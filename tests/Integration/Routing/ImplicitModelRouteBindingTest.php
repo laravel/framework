@@ -152,7 +152,7 @@ PHP);
         Route::post('/user/{user}', function (ImplicitBindingUser $user) {
             $this->assertEquals(1, DB::connection()->transactionLevel());
             return $user;
-        })->middleware(['web'])->withLockBindings();
+        })->middleware(['web'])->withLocks();
 
         $response = $this->postJson("/user/{$user->id}");
 
@@ -173,7 +173,7 @@ PHP);
         Route::post('/user/{user}', function (ImplicitBindingUser $user) {
             $this->assertEquals(1, DB::connection()->transactionLevel());
             return $user;
-        })->middleware(['web'])->withLockBindings()->withTrashed();
+        })->middleware(['web'])->withLocks()->withTrashed();
 
         $response = $this->postJson("/user/{$user->id}");
 
