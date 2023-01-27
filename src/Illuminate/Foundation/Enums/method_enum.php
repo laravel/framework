@@ -6,12 +6,12 @@ use Exception;
 
 enum method_enum : string
 {
-    case GET = "GET";
-    case POST = "POST";
-    case PUT = "PUT";
-    case DELETE = "DELETE";
-    case OPTIONS = "OPTIONS";
-    case PATCH = "PATCH";
+    case GET = 'GET';
+    case POST = 'POST';
+    case PUT = 'PUT';
+    case DELETE = 'DELETE';
+    case OPTIONS = 'OPTIONS';
+    case PATCH = 'PATCH';
 
     /**
      * @throws Exception
