@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\Concerns\CanBeOneOfMany;
 use Illuminate\Database\Eloquent\Relations\Concerns\ComparesRelatedModels;
 use Illuminate\Database\Eloquent\Relations\Concerns\SupportsDefaultModels;
 use Illuminate\Database\Query\JoinClause;
+use Illuminate\Support\Str;
 
 class HasOne extends HasOneOrMany implements SupportsPartialRelations
 {
@@ -133,5 +134,31 @@ class HasOne extends HasOneOrMany implements SupportsPartialRelations
     protected function getRelatedKeyFrom(Model $model)
     {
         return $model->getAttribute($this->getForeignKeyName());
+    }
+
+    /**
+     * Convert the this has-one relationship into a has-one-through relationship.
+     *
+     * @param  string  $through
+     * @param  string|null  $foreignKey
+     * @param  string|null  $localKey
+     * @return \Illuminate\Database\Eloquent\Relations\HasOneThrough
+     */
+    public function through($through, $foreignKey = null, $localKey = null): HasOneThrough
+    {
+        $through = new $through;
+
+        $foreignKey = $foreignKey ?: $through->getForeignKey();
+        $localKey = $localKey ?: $through->getKeyName();
+
+        return new HasOneThrough(
+            $this->getRelated()->newQuery(),
+            $this->getParent(),
+            new $through,
+            Str::after($this->foreignKey, '.'),
+            $foreignKey,
+            $this->localKey,
+            $localKey,
+        );
     }
 }

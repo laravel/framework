@@ -83,9 +83,15 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
         $this->migrateDefault();
         $this->seedDefaultData();
 
-        $contract = HasOneThroughDefaultTestPosition::first()->contract;
+        $model = HasOneThroughDefaultTestPosition::first();
+
+        $contract = $model->contract;
         $this->assertSame('A title', $contract->title);
         $this->assertArrayNotHasKey('email', $contract->getAttributes());
+
+        $contractAlt = $model->contractAlt;
+        $this->assertSame('A title', $contractAlt->title);
+        $this->assertArrayNotHasKey('email', $contractAlt->getAttributes());
 
         $this->resetDefault();
     }
@@ -451,6 +457,11 @@ class HasOneThroughDefaultTestPosition extends Eloquent
     public function contract()
     {
         return $this->hasOneThrough(HasOneThroughDefaultTestContract::class, HasOneThroughDefaultTestUser::class);
+    }
+
+    public function contractAlt()
+    {
+        return $this->hasOne(HasOneThroughDefaultTestContract::class)->through(HasOneThroughDefaultTestUser::class);
     }
 
     public function user()

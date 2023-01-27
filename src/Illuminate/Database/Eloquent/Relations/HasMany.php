@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Eloquent\Relations;
 
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Str;
 
 class HasMany extends HasOneOrMany
 {
@@ -45,5 +46,31 @@ class HasMany extends HasOneOrMany
     public function match(array $models, Collection $results, $relation)
     {
         return $this->matchMany($models, $results, $relation);
+    }
+
+    /**
+     * Convert this has-many relationship into a has-many-through relationship.
+     *
+     * @param  string  $through
+     * @param  string|null  $foreignKey
+     * @param  string|null  $localKey
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
+     */
+    public function through($through, $foreignKey = null, $localKey = null): HasManyThrough
+    {
+        $through = new $through;
+
+        $foreignKey = $foreignKey ?: $through->getForeignKey();
+        $localKey = $localKey ?: $through->getKeyName();
+
+        return new HasManyThrough(
+            $this->getRelated()->newQuery(),
+            $this->getParent(),
+            new $through,
+            Str::after($this->foreignKey, '.'),
+            $foreignKey,
+            $this->localKey,
+            $localKey,
+        );
     }
 }

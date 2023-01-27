@@ -75,10 +75,17 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
     public function testItLoadsAHasManyThroughRelationWithCustomKeys()
     {
         $this->seedData();
-        $posts = HasManyThroughTestCountry::first()->posts;
+        $model = HasManyThroughTestCountry::first();
+
+        $posts = $model->posts;
 
         $this->assertSame('A title', $posts[0]->title);
         $this->assertCount(2, $posts);
+
+        $postsAlt = $model->postsAlt;
+
+        $this->assertSame('A title', $postsAlt[0]->title);
+        $this->assertCount(2, $postsAlt);
     }
 
     public function testItLoadsADefaultHasManyThroughRelation()
@@ -614,6 +621,13 @@ class HasManyThroughTestCountry extends Eloquent
     public function posts()
     {
         return $this->hasManyThrough(HasManyThroughTestPost::class, HasManyThroughTestUser::class, 'country_id', 'user_id');
+    }
+
+    public function postsAlt()
+    {
+        return $this
+            ->hasMany(HasManyThroughTestPost::class, 'country_id')
+            ->through(HasManyThroughTestUser::class, 'user_id');
     }
 
     public function users()
