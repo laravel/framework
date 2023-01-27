@@ -151,6 +151,21 @@ class Route
     protected $bindingFields = [];
 
     /**
+     * The list of callables that retrieve Eloquent model substitutions that contain a row-level lock.
+     *
+     * @var callable[]
+     */
+    protected $lockSubstitutions = [];
+
+    /**
+     * Determines whether Eloquent model route bindings should be retrieved with a lock. A boolean value
+     * indicates a singular lock (true) or a shared lock (false). `null` indicates no lock.
+     *
+     * @var bool|null
+     */
+    protected $withLockBindings;
+
+    /**
      * The validators used by the routes.
      *
      * @var array
@@ -522,7 +537,7 @@ class Route
      * Get the parameters that are listed in the route / controller signature.
      *
      * @param  array  $conditions
-     * @return array
+     * @return array|\ReflectionParameter[]
      */
     public function signatureParameters($conditions = [])
     {
@@ -597,6 +612,25 @@ class Route
         $this->withTrashedBindings = $withTrashed;
 
         return $this;
+    }
+
+    public function withLockBindings($lock = true)
+    {
+        $this->withLockBindings = $lock;
+
+        return $this;
+    }
+
+    public function withoutLockBindings()
+    {
+        $this->withLockBindings = null;
+
+        return $this;
+    }
+
+    public function usesLockBindings()
+    {
+        return is_bool($this->withLockBindings);
     }
 
     /**
@@ -1070,6 +1104,16 @@ class Route
         return empty($models)
                     ? $this->middleware(['can:'.$ability])
                     : $this->middleware(['can:'.$ability.','.implode(',', Arr::wrap($models))]);
+    }
+
+    public function hasLockSubstitutions()
+    {
+        return ! empty($this->lockSubstitutions);
+    }
+
+    public function getLockSubstitutions()
+    {
+        return $this->lockSubstitutions;
     }
 
     /**

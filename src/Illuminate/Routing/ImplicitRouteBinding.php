@@ -3,6 +3,7 @@
 namespace Illuminate\Routing;
 
 use Illuminate\Contracts\Routing\UrlRoutable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Routing\Exceptions\BackedEnumCaseNotFoundException;
@@ -25,8 +26,32 @@ class ImplicitRouteBinding
     {
         $parameters = $route->parameters();
 
-        $route = static::resolveBackedEnumsForRoute($route, $parameters);
+        static::resolveBackedEnumsForRoute($route, $parameters);
 
+        static::resolveBindingsForRoute($container, $route, $parameters);
+    }
+
+    /**
+     * Resolve implicit route bindings for Eloquent models that require a lock.
+     *
+     * @param  \Illuminate\Container\Container  $container
+     * @param  \Illuminate\Routing\Route  $route
+     * @return void
+     */
+    public static function resolveClosureBindingsForRoute($container, $route) {
+        foreach (array_filter($route->parameters(), 'is_callable') as $callable) {
+            $callable();
+        }
+    }
+
+    /**
+     * @param  \Illuminate\Container\Container  $container
+     * @param  \Illuminate\Routing\Route  $route
+     * @param  array|null  $parameters
+     * @return void
+     */
+    protected static function resolveBindingsForRoute($container, $route, $parameters)
+    {
         foreach ($route->signatureParameters(['subClass' => UrlRoutable::class]) as $parameter) {
             if (! $parameterName = static::getParameterName($parameter->getName(), $parameters)) {
                 continue;
@@ -42,24 +67,13 @@ class ImplicitRouteBinding
 
             $parent = $route->parentOfParameter($parameterName);
 
-            $routeBindingMethod = $route->allowsTrashedBindings() && in_array(SoftDeletes::class, class_uses_recursive($instance))
-                        ? 'resolveSoftDeletableRouteBinding'
-                        : 'resolveRouteBinding';
-
             if ($parent instanceof UrlRoutable &&
                 ! $route->preventsScopedBindings() &&
                 ($route->enforcesScopedBindings() || array_key_exists($parameterName, $route->bindingFields()))) {
-                $childRouteBindingMethod = $route->allowsTrashedBindings() && in_array(SoftDeletes::class, class_uses_recursive($instance))
-                            ? 'resolveSoftDeletableChildRouteBinding'
-                            : 'resolveChildRouteBinding';
 
-                if (! $model = $parent->{$childRouteBindingMethod}(
-                    $parameterName, $parameterValue, $route->bindingFieldFor($parameterName)
-                )) {
-                    throw (new ModelNotFoundException)->setModel(get_class($instance), [$parameterValue]);
-                }
-            } elseif (! $model = $instance->{$routeBindingMethod}($parameterValue, $route->bindingFieldFor($parameterName))) {
-                throw (new ModelNotFoundException)->setModel(get_class($instance), [$parameterValue]);
+                $model = static::resolveChildRouteBinding($route, $instance, $parent, $parameterName, $parameterValue);
+            } else {
+                $model = static::resolveRouteBinding($route, $instance, $parent, $parameterName, $parameterValue);
             }
 
             $route->setParameter($parameterName, $model);
@@ -67,11 +81,71 @@ class ImplicitRouteBinding
     }
 
     /**
+     * @param  \Illuminate\Routing\Route  $route
+     * @param  mixed  $instance
+     * @param  mixed  $parent
+     * @param  string  $parameterName
+     * @param  mixed  $parameterValue
+     * @return \Closure|Model
+     */
+    protected static function resolveRouteBinding($route, $instance, $parent, $parameterName, $parameterValue)
+    {
+        $routeBindingMethod = match (true) {
+            $route->allowsTrashedBindings() && in_array(SoftDeletes::class, class_uses_recursive($instance)) => 'resolveSoftDeletableRouteBinding',
+            $route->usesLockBindings() => 'resolveLockRouteBinding',
+            default => 'resolveRouteBinding',
+        };
+
+        if ($routeBindingMethod === 'resolveLockRouteBinding') {
+            return fn () => $parent->{$routeBindingMethod}(
+                $parameterName, $parameterValue, $route->bindingFieldFor($parameterName)
+            );
+        }
+
+        if (! $model = $instance->{$routeBindingMethod}($parameterValue, $route->bindingFieldFor($parameterName))) {
+            throw (new ModelNotFoundException)->setModel(get_class($instance), [$parameterValue]);
+        }
+
+        return $model;
+    }
+
+    /**
+     * @param  \Illuminate\Routing\Route  $route
+     * @param  mixed  $instance
+     * @param  mixed  $parent
+     * @param  string  $parameterName
+     * @param  mixed  $parameterValue
+     * @return \Closure|Model
+     */
+    protected static function resolveChildRouteBinding($route, $instance, $parent, $parameterName, $parameterValue)
+    {
+        $childRouteBindingMethod = match (true) {
+            $route->allowsTrashedBindings() && in_array(SoftDeletes::class, class_uses_recursive($instance)) => 'resolveSoftDeletableChildRouteBinding',
+            $route->usesLockBindings() => 'resolveLockChildRouteBinding',
+            default => 'resolveChildRouteBinding',
+        };
+
+        if ($childRouteBindingMethod === 'resolveLockChildRouteBinding') {
+            return fn () => $parent->{$childRouteBindingMethod}(
+                $parameterName, $parameterValue, $route->bindingFieldFor($parameterName)
+            );
+        }
+
+        if (! $model = $parent->{$childRouteBindingMethod}(
+            $parameterName, $parameterValue, $route->bindingFieldFor($parameterName)
+        )) {
+            throw (new ModelNotFoundException)->setModel(get_class($instance), [$parameterValue]);
+        }
+
+        return $model;
+    }
+
+    /**
      * Resolve the Backed Enums route bindings for the route.
      *
      * @param  \Illuminate\Routing\Route  $route
      * @param  array  $parameters
-     * @return \Illuminate\Routing\Route
+     * @return void
      *
      * @throws \Illuminate\Routing\Exceptions\BackedEnumCaseNotFoundException
      */
@@ -94,8 +168,6 @@ class ImplicitRouteBinding
 
             $route->setParameter($parameterName, $backedEnum);
         }
-
-        return $route;
     }
 
     /**

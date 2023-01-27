@@ -102,4 +102,12 @@ interface Registrar
      * @return void
      */
     public function substituteImplicitBindings($route);
+
+    /**
+     * Substitute the route bindings that were passed as a closure to allow for delayed execution.
+     *
+     * @param  \Illuminate\Routing\Route  $route
+     * @return void
+     */
+    public function substituteClosureBindings($route);
 }

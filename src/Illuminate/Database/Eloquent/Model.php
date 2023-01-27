@@ -2031,6 +2031,19 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Retrieve the model for a bound value with a row-level lock.
+     *
+     * @param  mixed  $value
+     * @param  string|null  $field
+     * @param  bool  $lock
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
+    public function resolveLockRouteBinding($value, $field = null, $lock = true)
+    {
+        return $this->resolveRouteBindingQuery($this, $value, $field)->lock($lock)->first();
+    }
+
+    /**
      * Retrieve the model for a bound value.
      *
      * @param  mixed  $value
@@ -2053,6 +2066,20 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public function resolveChildRouteBinding($childType, $value, $field)
     {
         return $this->resolveChildRouteBindingQuery($childType, $value, $field)->first();
+    }
+
+    /**
+     * Retrieve the child model for a bound value with a row-level lock.
+     *
+     * @param  string  $childType
+     * @param  mixed  $value
+     * @param  string|null  $field
+     * @param  bool  $lock
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
+    public function resolveLockChildRouteBinding($childType, $value, $field, $lock = true)
+    {
+        return $this->resolveChildRouteBindingQuery($childType, $value, $field)->lock($lock)->first();
     }
 
     /**

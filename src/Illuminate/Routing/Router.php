@@ -917,7 +917,7 @@ class Router implements BindingRegistrar, RegistrarContract
      * Substitute the route bindings onto the route.
      *
      * @param  \Illuminate\Routing\Route  $route
-     * @return \Illuminate\Routing\Route
+     * @return void
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<\Illuminate\Database\Eloquent\Model>
      * @throws \Illuminate\Routing\Exceptions\BackedEnumCaseNotFoundException
@@ -929,8 +929,6 @@ class Router implements BindingRegistrar, RegistrarContract
                 $route->setParameter($key, $this->performBinding($key, $value, $route));
             }
         }
-
-        return $route;
     }
 
     /**
@@ -945,6 +943,19 @@ class Router implements BindingRegistrar, RegistrarContract
     public function substituteImplicitBindings($route)
     {
         ImplicitRouteBinding::resolveForRoute($this->container, $route);
+    }
+
+    /**
+     * Substitute the route bindings that were passed as a closure to allow for delayed execution.
+     *
+     * @param  \Illuminate\Routing\Route  $route
+     * @return void
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<\Illuminate\Database\Eloquent\Model>
+     */
+    public function substituteClosureBindings($route)
+    {
+        ImplicitRouteBinding::resolveClosureBindingsForRoute($this->container, $route);
     }
 
     /**

@@ -5,6 +5,7 @@ namespace Illuminate\Routing\Middleware;
 use Closure;
 use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\DB;
 
 class SubstituteBindings
 {
@@ -45,6 +46,13 @@ class SubstituteBindings
             }
 
             throw $exception;
+        }
+
+        if ($route->usesLockBindings()) {
+            return DB::transaction(function () use ($next, $request, $route) {
+                $this->router->substituteClosureBindings($route);
+                return $next($request);
+            });
         }
 
         return $next($request);
