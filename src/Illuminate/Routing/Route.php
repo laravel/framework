@@ -159,13 +159,6 @@ class Route
     protected $bindingFields = [];
 
     /**
-     * The list of callables that retrieve Eloquent model substitutions that contain a row-level lock.
-     *
-     * @var callable[]
-     */
-    protected $lockSubstitutions = [];
-
-    /**
      * The validators used by the routes.
      *
      * @var array
