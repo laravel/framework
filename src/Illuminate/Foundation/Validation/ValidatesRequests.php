@@ -42,16 +42,16 @@ trait ValidatesRequests
      * @param  \Illuminate\Http\Request  $request
      * @param  array  $rules
      * @param  array  $messages
-     * @param  array  $customAttributes
+     * @param  array  $attributes
      * @return array
      *
      * @throws \Illuminate\Validation\ValidationException
      */
     public function validate(Request $request, array $rules,
-                             array $messages = [], array $customAttributes = [])
+                             array $messages = [], array $attributes = [])
     {
         $validator = $this->getValidationFactory()->make(
-            $request->all(), $rules, $messages, $customAttributes
+            $request->all(), $rules, $messages, $attributes
         );
 
         if ($request->isPrecognitive()) {
@@ -71,16 +71,16 @@ trait ValidatesRequests
      * @param  \Illuminate\Http\Request  $request
      * @param  array  $rules
      * @param  array  $messages
-     * @param  array  $customAttributes
+     * @param  array  $attributes
      * @return array
      *
      * @throws \Illuminate\Validation\ValidationException
      */
     public function validateWithBag($errorBag, Request $request, array $rules,
-                                    array $messages = [], array $customAttributes = [])
+                                    array $messages = [], array $attributes = [])
     {
         try {
-            return $this->validate($request, $rules, $messages, $customAttributes);
+            return $this->validate($request, $rules, $messages, $attributes);
         } catch (ValidationException $e) {
             $e->errorBag = $errorBag;
 

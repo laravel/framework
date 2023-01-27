@@ -984,10 +984,10 @@ if (! function_exists('validator')) {
      * @param  array  $data
      * @param  array  $rules
      * @param  array  $messages
-     * @param  array  $customAttributes
+     * @param  array  $attributes
      * @return \Illuminate\Contracts\Validation\Validator|\Illuminate\Contracts\Validation\Factory
      */
-    function validator(array $data = [], array $rules = [], array $messages = [], array $customAttributes = [])
+    function validator(array $data = [], array $rules = [], array $messages = [], array $attributes = [])
     {
         $factory = app(ValidationFactory::class);
 
@@ -995,7 +995,7 @@ if (! function_exists('validator')) {
             return $factory;
         }
 
-        return $factory->make($data, $rules, $messages, $customAttributes);
+        return $factory->make($data, $rules, $messages, $attributes);
     }
 }
 
