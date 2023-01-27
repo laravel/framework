@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
@@ -151,6 +150,7 @@ PHP);
 
         Route::post('/user/{user}', function (ImplicitBindingUser $user) {
             $this->assertEquals(1, DB::connection()->transactionLevel());
+
             return $user;
         })->middleware(['web'])->withLocks();
 
@@ -172,6 +172,7 @@ PHP);
 
         Route::post('/user/{user}', function (ImplicitBindingUser $user) {
             $this->assertEquals(1, DB::connection()->transactionLevel());
+
             return $user;
         })->middleware(['web'])->withLocks()->withTrashed();
 

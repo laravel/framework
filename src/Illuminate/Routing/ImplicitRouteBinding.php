@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Routing\Exceptions\BackedEnumCaseNotFoundException;
 use Illuminate\Support\Reflector;
 use Illuminate\Support\Str;
-use Illuminate\Tests\Integration\Routing\ImplicitBindingUser;
 
 class ImplicitRouteBinding
 {
@@ -72,7 +71,6 @@ class ImplicitRouteBinding
             if ($parent instanceof UrlRoutable &&
                 ! $route->preventsScopedBindings() &&
                 ($route->enforcesScopedBindings() || array_key_exists($parameterName, $route->bindingFields()))) {
-
                 $model = static::resolveChildRouteBinding($route, $instance, $parent, $parameterName, $parameterValue);
             } else {
                 $model = static::resolveRouteBinding($route, $instance, $parameterName, $parameterValue);
