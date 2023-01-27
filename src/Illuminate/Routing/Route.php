@@ -1122,16 +1122,6 @@ class Route
                     : $this->middleware(['can:'.$ability.','.implode(',', Arr::wrap($models))]);
     }
 
-    public function hasLockSubstitutions()
-    {
-        return ! empty($this->lockSubstitutions);
-    }
-
-    public function getLockSubstitutions()
-    {
-        return $this->lockSubstitutions;
-    }
-
     /**
      * Get the middleware for the route's controller.
      *
