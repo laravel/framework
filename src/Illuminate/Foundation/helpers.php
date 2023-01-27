@@ -1,5 +1,6 @@
 <?php
 
+use Exception;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
@@ -525,10 +526,14 @@ if (! function_exists('method_field')) {
      *
      * @param  string  $method
      * @return \Illuminate\Support\HtmlString
+     *
+     * @throws Exception
      */
-    function method_field($method)
+    function method_field(string $method)
     {
-        return new HtmlString('<input type="hidden" name="_method" value="'.$method.'">');
+        $TYPE = Illuminate\Foundation\Enums\method_enum::get($method);
+
+        return new HtmlString('<input type="hidden" name="_method" value="'.$TYPE.'">');
     }
 }
 
