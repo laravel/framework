@@ -70,6 +70,17 @@ class EloquentDeleteTest extends DatabaseTestCase
         $this->assertEquals($role->id, RoleObserver::$model->id);
     }
 
+    public function testForceDeletingEventIsFired()
+    {
+        $role = Role::create([]);
+        $this->assertInstanceOf(Role::class, $role);
+        Role::observe(new RoleObserver());
+
+        $role->forceDelete();
+
+        $this->assertEquals($role->id, RoleObserver::$model->id);
+    }
+
     public function testDeleteQuietly()
     {
         $_SERVER['(-_-)'] = '\(^_^)/';
