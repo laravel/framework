@@ -1416,27 +1416,50 @@ class AccessGateTestPolicyThrowingAuthorizationException
 
 class AccessGateTestAutoRegistersMethodsParent
 {
-    public function parent1() {}
-    public function parent2() {}
+    public function parent1()
+    {
+    }
+
+    public function parent2()
+    {
+    }
 }
 
 trait AccessGateTestAutoRegistersMethodsTraitOne
 {
-    public function trait1() {}
-    public function trait2() {}
+    public function trait1()
+    {
+    }
+
+    public function trait2()
+    {
+    }
 }
 
 trait AccessGateTestAutoRegistersMethodsTraitTwo
 {
-    public function trait3() {}
-    public function trait4() {}
+    public function trait3()
+    {
+    }
+
+    public function trait4()
+    {
+    }
 }
 
 class AccessGateTestAutoRegistersMethods extends AccessGateTestAutoRegistersMethodsParent
 {
     use AccessGateTestAutoRegistersMethodsTraitOne, AccessGateTestAutoRegistersMethodsTraitTwo;
 
-    public function __construct(){}
-    public function gate1() {}
-    public function gate2() {}
+    public function __construct()
+    {
+    }
+
+    public function gate1()
+    {
+    }
+
+    public function gate2()
+    {
+    }
 }

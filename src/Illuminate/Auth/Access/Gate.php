@@ -253,7 +253,7 @@ class Gate implements GateContract
             ->reject(fn ($item) => in_array($item->name, $traitMethods->toArray()));
 
         foreach ($abilities as $ability) {
-            $this->define($name . '.' . $ability->name, $class . '@' . $ability->name);
+            $this->define($name.'.'.$ability->name, $class.'@'.$ability->name);
         }
 
         return $this;
