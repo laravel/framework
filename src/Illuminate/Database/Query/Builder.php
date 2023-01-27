@@ -757,11 +757,14 @@ class Builder implements BuilderContract
 
         $type = 'Basic';
 
+        $columnString = ($column instanceof ExpressionContract) 
+            ? $this->grammar->getValue($column) 
+            : $column;
+
         // If the column is making a JSON reference we'll check to see if the value
         // is a boolean. If it is, we'll add the raw boolean string as an actual
         // value to the query to ensure this is properly handled by the query.
-        $columnstr = ($column instanceof ExpressionContract) ? $this->grammar->getValue($column) : $column;
-        if (str_contains($columnstr, '->') && is_bool($value)) {
+        if (str_contains($columnString, '->') && is_bool($value)) {
             $value = new Expression($value ? 'true' : 'false');
 
             if (is_string($column)) {
