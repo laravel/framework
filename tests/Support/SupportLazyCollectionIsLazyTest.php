@@ -508,6 +508,39 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
     }
 
+    public function testIntersectUsingIsLazy()
+    {
+        $this->assertDoesNotEnumerate(function ($collection) {
+            $collection->intersectUsing([1, 2], 'strcasecmp');
+        });
+
+        $this->assertEnumeratesOnce(function ($collection) {
+            $collection->intersectUsing([1, 2], 'strcasecmp')->all();
+        });
+    }
+
+    public function testIntersectAssocIsLazy()
+    {
+        $this->assertDoesNotEnumerate(function ($collection) {
+            $collection->intersectAssoc([1, 2]);
+        });
+
+        $this->assertEnumeratesOnce(function ($collection) {
+            $collection->intersectAssoc([1, 2])->all();
+        });
+    }
+
+    public function testIntersectAssocUsingIsLazy()
+    {
+        $this->assertDoesNotEnumerate(function ($collection) {
+            $collection->intersectAssocUsing([1, 2], 'strcasecmp');
+        });
+
+        $this->assertEnumeratesOnce(function ($collection) {
+            $collection->intersectAssocUsing([1, 2], 'strcasecmp')->all();
+        });
+    }
+
     public function testIntersectByKeysIsLazy()
     {
         $this->assertDoesNotEnumerate(function ($collection) {
