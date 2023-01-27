@@ -210,17 +210,16 @@ abstract class Grammar
     /**
      * Transforms expressions to their scalar types.
      *
-     * @param  string|int|float|\Illuminate\Contracts\Database\Query\Expression  $expression
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string|int|float  $expression
      * @return string|int|float
      */
     public function getValue($expression)
     {
-        $value = $expression;
-        if ($this->isExpression($value)) {
-            $value = $this->getValue($value->getValue($this));
+        if ($this->isExpression($expression)) {
+            return $this->getValue($expression->getValue($this));
         }
 
-        return $value;
+        return $expression;
     }
 
     /**

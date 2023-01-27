@@ -3552,6 +3552,18 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Get all of the query builder's columns in a text-only array with all expressions evaluated.
+     *
+     * @return array
+     */
+    public function getColumns()
+    {
+        return ! is_null($this->columns)
+                ? array_map(fn ($column) => $this->grammar->getValue($column), $this->columns)
+                : [];
+    }
+
+    /**
      * Create a raw database expression.
      *
      * @param  mixed  $value
@@ -3811,20 +3823,6 @@ class Builder implements BuilderContract
     public function dd()
     {
         dd($this->toSql(), $this->getBindings());
-    }
-
-    /**
-     * Get all columns in a text-only array with expressions evaluated.
-     *
-     * @return array
-     */
-    public function getColumns()
-    {
-        if ($this->columns === null) {
-            return [];
-        }
-
-        return array_map(fn ($column) => $this->grammar->getValue($column), $this->columns);
     }
 
     /**
