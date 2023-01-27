@@ -1,5 +1,6 @@
 <?php
 
+use Exception;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
@@ -21,7 +22,6 @@ use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\HtmlString;
 use Symfony\Component\HttpFoundation\Response;
-use Exception;
 
 if (! function_exists('abort')) {
     /**
@@ -548,7 +548,7 @@ if (! function_exists('method_field')) {
     function method_field(string $method)
     {
         $TYPE = Illuminate\Foundation\Enums\method_enum::get($method);
-        
+
         return new HtmlString('<input type="hidden" name="_method" value="'.$TYPE.'">');
     }
 }
