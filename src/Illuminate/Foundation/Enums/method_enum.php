@@ -20,6 +20,6 @@ enum method_enum : string
     {
         $method = self::tryfrom(strtoupper($method));
 
-        return is_null($method) == true ? throw new Exception("Not Found Method!") : $method->value;
+        return is_null($method) == true ? throw new Exception('Not Found Method!') : $method->value;
     }
 }
