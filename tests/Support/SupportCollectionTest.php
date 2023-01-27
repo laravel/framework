@@ -1715,8 +1715,8 @@ class SupportCollectionTest extends TestCase
      */
     public function testIntersectAssocCollection($collection)
     {
-        $array1 = new $collection(["a" => "green", "b" => "brown", "c" => "blue", "red"]);
-        $array2 = new $collection(["a" => "green", "b" => "yellow", "blue", "red"]);
+        $array1 = new $collection(['a' => 'green', 'b' => 'brown', 'c' => 'blue', 'red']);
+        $array2 = new $collection(['a' => 'green', 'b' => 'yellow', 'blue', 'red']);
 
         $this->assertSame(['a' => 'green'], $array1->intersectAssoc($array2)->all());
     }
@@ -1726,8 +1726,8 @@ class SupportCollectionTest extends TestCase
      */
     public function testIntersectAssocUsingCollection($collection)
     {
-        $array1 = new $collection(["a" => "green", "b" => "brown", "c" => "blue", "red"]);
-        $array2 = new $collection(["a" => "GREEN", "B" => "brown", "yellow", "red"]);
+        $array1 = new $collection(['a' => 'green', 'b' => 'brown', 'c' => 'blue', 'red']);
+        $array2 = new $collection(['a' => 'GREEN', 'B' => 'brown', 'yellow', 'red']);
 
         $this->assertSame(['b' => 'brown'], $array1->intersectAssocUsing($array2, 'strcasecmp')->all());
     }
