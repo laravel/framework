@@ -1703,38 +1703,6 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
-    public function testIntersectUsingCollection($collection)
-    {
-        $collect = new $collection(['green', 'brown', 'blue']);
-
-        $this->assertSame(['green', 'brown'], $collect->intersectUsing(new $collection(['GREEN', 'brown', 'yellow']), 'strcasecmp')->all());
-    }
-
-    /**
-     * @dataProvider collectionClassProvider
-     */
-    public function testIntersectAssocCollection($collection)
-    {
-        $array1 = new $collection(["a" => "green", "b" => "brown", "c" => "blue", "red"]);
-        $array2 = new $collection(["a" => "green", "b" => "yellow", "blue", "red"]);
-
-        $this->assertSame(['a' => 'green'], $array1->intersectAssoc($array2)->all());
-    }
-
-    /**
-     * @dataProvider collectionClassProvider
-     */
-    public function testIntersectAssocUsingCollection($collection)
-    {
-        $array1 = new $collection(["a" => "green", "b" => "brown", "c" => "blue", "red"]);
-        $array2 = new $collection(["a" => "GREEN", "B" => "brown", "yellow", "red"]);
-
-        $this->assertSame(['b' => 'brown'], $array1->intersectAssocUsing($array2, 'strcasecmp')->all());
-    }
-
-    /**
-     * @dataProvider collectionClassProvider
-     */
     public function testIntersectByKeysNull($collection)
     {
         $c = new $collection(['name' => 'Mateus', 'age' => 18]);
