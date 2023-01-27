@@ -540,11 +540,13 @@ if (! function_exists('method_field')) {
      * Generate a form field to spoof the HTTP verb used by forms.
      *
      * @param  string  $method
+     * @throws Exception
      * @return \Illuminate\Support\HtmlString
      */
-    function method_field($method)
+    function method_field(string $method)
     {
-        return new HtmlString('<input type="hidden" name="_method" value="'.$method.'">');
+        $TYPE = Illuminate\Foundation\Enums\method_enum::get($method);
+        return new HtmlString('<input type="hidden" name="_method" value="'.$TYPE.'">');
     }
 }
 
