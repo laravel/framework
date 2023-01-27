@@ -231,7 +231,7 @@ class Gate implements GateContract
     }
 
     /**
-     * Register abilities for a class.
+     * Register abilities from a class.
      *
      * @param  string  $name
      * @param  string  $class
