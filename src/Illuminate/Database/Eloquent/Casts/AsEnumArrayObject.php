@@ -12,8 +12,10 @@ class AsEnumArrayObject implements Castable
     /**
      * Get the caster class to use when casting from / to this cast target.
      *
-     * @param  array  $arguments
-     * @return object|string
+     * @template TEnum
+     *
+     * @param  array{class-string<TEnum>}  $arguments
+     * @return CastsAttributes<ArrayObject<array-key, TEnum>, iterable<TEnum>>
      */
     public static function castUsing(array $arguments)
     {
