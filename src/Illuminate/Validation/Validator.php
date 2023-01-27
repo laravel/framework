@@ -124,6 +124,13 @@ class Validator implements ValidatorContract
     protected $after = [];
 
     /**
+     * All data's that addition to "validated" request data's.
+     *
+     * @var array
+     */
+    protected $inputMerge = [];
+
+    /**
      * The array of custom error messages.
      *
      * @var array
@@ -1038,6 +1045,19 @@ class Validator implements ValidatorContract
                 return [$rule, $parameters];
             }
         }
+    }
+
+    /**
+     * Set the input merge.
+     *
+     * @param  array  $input
+     * @return $this
+     */
+    public function setInputMerge(array $input)
+    {
+        $this->inputMerge = $input;
+
+        return $this;
     }
 
     /**
