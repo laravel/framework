@@ -1725,7 +1725,7 @@ class SupportCollectionTest extends TestCase
      */
     public function testIntersectAssocWithNull($collection)
     {
-        $array1 = new $collection(["a" => "green", "b" => "brown", "c" => "blue", "red"]);
+        $array1 = new $collection(['a' => 'green', 'b' => 'brown', 'c' => 'blue', 'red']);
 
         $this->assertEquals([], $array1->intersectAssoc(null)->all());
     }
@@ -1746,7 +1746,7 @@ class SupportCollectionTest extends TestCase
      */
     public function testIntersectAssocUsingWithNull($collection)
     {
-        $array1 = new $collection(["a" => "green", "b" => "brown", "c" => "blue", "red"]);
+        $array1 = new $collection(['a' => 'green', 'b' => 'brown', 'c' => 'blue', 'red']);
 
         $this->assertEquals([], $array1->intersectAssocUsing(null, 'strcasecmp')->all());
     }
