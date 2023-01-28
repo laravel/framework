@@ -1201,6 +1201,29 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Validate the new rules if the previous attribute have been validated.
+     *
+     * @param  string|array  $attribute
+     * @param  array  $rules
+     * @param  array  $messages
+     * @param  array  $customAttributes
+     * @return $this
+     */
+    public function validateIfPasses($attributes, array $rules, array $messages = [], array $customAttributes = [])
+    {
+        $attributes = (array)$attributes;
+
+        $this->after(function ($validator) use ($attributes, $rules, $messages, $customAttributes) {
+            if ($validator->messages()->hasAny($attributes)) {
+                return;
+            }
+            $validator->messages()->merge((new self($this->translator, $this->data, $rules, $messages, $customAttributes))->messages());
+        });
+
+        return $this;
+    }
+
+    /**
      * Instruct the validator to stop validating after the first rule failure.
      *
      * @param  bool  $stopOnFirstFailure

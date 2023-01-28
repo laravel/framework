@@ -49,6 +49,17 @@ interface Validator extends MessageProvider
     public function sometimes($attribute, $rules, callable $callback);
 
     /**
+     * Validate the new rules if the previous attribute have been validated.
+     *
+     * @param  string|array  $attribute
+     * @param  array  $rules
+     * @param  array  $messages
+     * @param  array  $customAttributes
+     * @return $this
+     */
+    public function validateIfPasses($attributes, array $rules, array $messages = [], array $customAttributes = []);
+
+    /**
      * Add an after validation callback.
      *
      * @param  callable|string  $callback
