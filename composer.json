@@ -140,10 +140,12 @@
         }
     },
     "suggest": {
-        "ext-ftp": "Required to use the Flysystem FTP driver.",
+        "ext-apcu": "Required to use the Flysystem FTP driver.",
+        "ext-ftp": "Required to use the APC Cache driver.",
         "ext-gd": "Required to use Illuminate\\Http\\Testing\\FileFactory::image().",
         "ext-memcached": "Required to use the memcache cache driver.",
         "ext-pcntl": "Required to use all features of the queue worker.",
+        "ext-pdo": "Required to use any Database driver.",
         "ext-posix": "Required to use all features of the queue worker.",
         "ext-redis": "Required to use the Redis cache and queue drivers (^4.0|^5.0).",
         "ably/ably-php": "Required to use the Ably broadcast driver (^1.0).",
