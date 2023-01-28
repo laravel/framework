@@ -542,11 +542,8 @@ class Builder implements BuilderContract
      */
     public function firstOrNew(array $attributes = [], array $values = [])
     {
-        if (! is_null($instance = $this->where($attributes)->first())) {
-            return $instance;
-        }
-
-        return $this->newModelInstance(array_merge($attributes, $values));
+        return $this->where($attributes)->first()
+            ?? $this->newModelInstance($attributes)->fill($values);
     }
 
     /**
@@ -558,13 +555,8 @@ class Builder implements BuilderContract
      */
     public function firstOrCreate(array $attributes = [], array $values = [])
     {
-        if (! is_null($instance = $this->where($attributes)->first())) {
-            return $instance;
-        }
-
-        return tap($this->newModelInstance(array_merge($attributes, $values)), function ($instance) {
-            $instance->save();
-        });
+        return $this->where($attributes)->first()
+            ?? $this->create(array_merge($attributes, $values));
     }
 
     /**
