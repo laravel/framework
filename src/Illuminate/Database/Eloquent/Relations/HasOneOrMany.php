@@ -216,8 +216,13 @@ abstract class HasOneOrMany extends Relation
      */
     public function firstOrNew(array $attributes = [], array $values = [])
     {
-        return $this->where($attributes)->first()
-            ?? $this->create(array_merge($attributes, $values));
+        if (is_null($instance = $this->where($attributes)->first())) {
+            $instance = $this->related->newInstance(array_merge($attributes, $values));
+
+            $this->setForeignAttributesForCreate($instance);
+        }
+
+        return $instance;
     }
 
     /**
