@@ -236,7 +236,7 @@ class DatabaseEloquentMorphTest extends TestCase
         $model->shouldReceive('setAttribute')->once()->with('morph_id', 1);
         $model->shouldReceive('setAttribute')->once()->with('morph_type', get_class($relation->getParent()));
         $model->shouldReceive('save')->once()->andReturn(true);
-        $model->shouldReceive('fill')->once()->with(['bar']);
+        $model->shouldReceive('fill')->once()->with(['bar'])->andReturn($model);
 
         $this->assertInstanceOf(Model::class, $relation->updateOrCreate(['foo'], ['bar']));
     }
