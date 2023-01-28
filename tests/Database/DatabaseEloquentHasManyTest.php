@@ -187,7 +187,7 @@ class DatabaseEloquentHasManyTest extends TestCase
         $relation->getQuery()->shouldReceive('first')->once()->with()->andReturn(null);
         $relation->getRelated()->shouldReceive('newInstance')->once()->with(['foo'])->andReturn($model = m::mock(Model::class));
         $model->shouldReceive('save')->once()->andReturn(true);
-        $model->shouldReceive('fill')->once()->with(['bar']);
+        $model->shouldReceive('fill')->once()->with(['bar'])->andReturn($model);
         $model->shouldReceive('setAttribute')->once()->with('foreign_key', 1);
 
         $this->assertInstanceOf(Model::class, $relation->updateOrCreate(['foo'], ['bar']));

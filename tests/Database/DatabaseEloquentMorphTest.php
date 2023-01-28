@@ -221,7 +221,7 @@ class DatabaseEloquentMorphTest extends TestCase
         $relation->getQuery()->shouldReceive('first')->once()->with()->andReturn($model = m::mock(Model::class));
         $relation->getRelated()->shouldReceive('newInstance')->never();
         $model->shouldReceive('setAttribute')->never();
-        $model->shouldReceive('fill')->once()->with(['bar']);
+        $model->shouldReceive('fill')->once()->with(['bar'])->andReturn($model);
         $model->shouldReceive('save')->once();
 
         $this->assertInstanceOf(Model::class, $relation->updateOrCreate(['foo'], ['bar']));
