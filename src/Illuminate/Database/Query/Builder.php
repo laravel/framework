@@ -28,10 +28,10 @@ use RuntimeException;
 
 /**
  * @template TResult of array
- * @uses \Illuminate\Database\Concerns\BuildsQueries<TResult>
  */
 class Builder implements BuilderContract
 {
+    /** @use \Illuminate\Database\Concerns\BuildsQueries<TResult> */
     use BuildsQueries, ExplainsQueries, ForwardsCalls, Macroable {
         __call as macroCall;
     }

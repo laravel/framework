@@ -25,12 +25,12 @@ use ReflectionMethod;
  * @property-read HigherOrderBuilderProxy $whereNot
  * @property-read HigherOrderBuilderProxy $orWhereNot
  * @template TModel of \Illuminate\Database\Eloquent\Model
- * @uses \Illuminate\Database\Concerns\BuildsQueries<TModel>
  * @implements BuilderContract<TModel>
  * @mixin \Illuminate\Database\Query\Builder<TModel>
  */
 class Builder implements BuilderContract
 {
+    /** @use \Illuminate\Database\Concerns\BuildsQueries<TModel> */
     use BuildsQueries, ForwardsCalls, QueriesRelationships {
         BuildsQueries::sole as baseSole;
     }
@@ -38,7 +38,7 @@ class Builder implements BuilderContract
     /**
      * The base query builder instance.
      *
-     * @var \Illuminate\Database\Query\Builder
+     * @var \Illuminate\Database\Query\Builder<array>
      */
     protected $query;
 
@@ -684,7 +684,7 @@ class Builder implements BuilderContract
      * Execute the query as a "select" statement.
      *
      * @param  array|string  $columns
-     * @return \Illuminate\Database\Eloquent\Collection<TModel>
+     * @return \Illuminate\Database\Eloquent\Collection<int, TModel>
      */
     public function get($columns = ['*'])
     {
