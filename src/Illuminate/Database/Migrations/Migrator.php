@@ -414,6 +414,7 @@ class Migrator
      * @param  object  $migration
      * @param  string  $method
      * @return void
+     * @throws \ReflectionException
      */
     protected function pretendToRun($migration, $method)
     {
@@ -435,7 +436,7 @@ class Migrator
 
             $this->write(Error::class, sprintf(
                 '[%s] failed to dump queries. This may be due to changing database columns using Doctrine, which is not supported while pretending to run migrations.',
-                $name,
+                $name
             ));
         }
     }
