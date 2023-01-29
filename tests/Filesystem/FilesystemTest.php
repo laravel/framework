@@ -98,7 +98,7 @@ class FilesystemTest extends TestCase
     }
 
     public function testFilePermissionRestoredAfterReplace(){
-        // For validation since getFilePermissions returns value in decimal
+        // For validation since getFilePermissions returns value in decimal, passing 774 after subtracting 2 for umask() i.e 0776 - 2 = 774
         $permissionValueInDecimal = base_convert(774,8,10);
         $tempFile = self::$tempDir.'/file.txt';
         $filesystem = new Filesystem;
