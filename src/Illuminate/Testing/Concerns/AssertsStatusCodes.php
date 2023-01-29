@@ -84,7 +84,7 @@ trait AssertsStatusCodes
     }
 
     /**
-     * Assert that the response has a 402 "Unauthorized" status code.
+     * Assert that the response has a 401 "Unauthorized" status code.
      *
      * @return $this
      */
