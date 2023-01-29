@@ -610,6 +610,32 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
+     * Execute the given callback if an item exists in the collection by key.
+     *
+     * @param  TKey|array<array-key, TKey>  $key
+     * @param  callable  $callback
+     * @param  callable|null  $default
+     * @return Collection
+     */
+    public function whenHas($key, $callback, $default = null)
+    {
+        return $this->when($this->has($key), $callback, $default);
+    }
+
+    /**
+     * Execute the given callback if any of the keys exist in the collection.
+     *
+     * @param  TKey|array<array-key, TKey>  $key
+     * @param  callable  $callback
+     * @param  callable|null  $default
+     * @return Collection
+     */
+    public function whenHasAny($key, $callback, $default = null)
+    {
+        return $this->when($this->hasAny($key), $callback, $default);
+    }
+
+    /**
      * Concatenate values of a given key as a string.
      *
      * @param  callable|string  $value
