@@ -12,6 +12,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Routing\Route any(string $uri, array|string|callable|null $action = null)
  * @method static \Illuminate\Routing\Route fallback(array|string|callable|null $action)
  * @method static \Illuminate\Routing\Route redirect(string $uri, string $destination, int $status = 302)
+ * @method static \Illuminate\Routing\Route redirectName(string $name, string $destinationRouteName, int $status = 302)
  * @method static \Illuminate\Routing\Route permanentRedirect(string $uri, string $destination)
  * @method static \Illuminate\Routing\Route view(string $uri, string $view, array $data = [], int|array $status = 200, array $headers = [])
  * @method static \Illuminate\Routing\Route match(array|string $methods, string $uri, array|string|callable|null $action = null)
