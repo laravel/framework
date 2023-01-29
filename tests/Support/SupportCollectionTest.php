@@ -2299,6 +2299,40 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testWhenHas($collection)
+    {
+        $data = new $collection(['account_id' => 1, 'product' => 'Desk']);
+
+        $data = $data->whenHas('product', fn ($c) => $c->merge('test'));
+        $this->assertEquals(['account_id' => 1, 'product' => 'Desk', 'test'], $data->all());
+
+        $data = $data->whenHas(['foo', 'amount'], fn ($c) => $c->merge('foo'), fn ($c) => $c->merge('bar'));
+        $this->assertEquals(['account_id' => 1, 'product' => 'Desk', 'test', 'bar'], $data->all());
+
+        $data = $data->whenHas('foo', fn ($c) => $c->merge('test'), fn ($c) => $c->merge('foo'));
+        $this->assertEquals(['account_id' => 1, 'product' => 'Desk', 'test', 'bar', 'foo'], $data->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testWhenHasAny($collection)
+    {
+        $data = new $collection(['product' => 'Desk', 'amount' => 5]);
+
+        $data = $data->whenHasAny(['product', 'amount'], fn ($c) => $c->merge('account'));
+        $this->assertEquals(['product' => 'Desk', 'amount' => 5, 'account'], $data->all());
+
+        $data = $data->whenHasAny(['foo', 'amount'], fn ($c) => $c->merge('foo'));
+        $this->assertEquals(['product' => 'Desk', 'amount' => 5, 'account', 'foo'], $data->all());
+
+        $data = $data->whenHasAny(['bar', 'baz'], fn ($c) => $c->merge('test'), fn ($c) => $c->merge('baz'));
+        $this->assertEquals(['product' => 'Desk', 'amount' => 5, 'account', 'foo', 'baz'], $data->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testImplode($collection)
     {
         $data = new $collection([['name' => 'taylor', 'email' => 'foo'], ['name' => 'dayle', 'email' => 'bar']]);

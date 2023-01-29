@@ -490,6 +490,32 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
     }
 
+    public function testWhenHasIsLazy()
+    {
+        $this->assertEnumerates(5, function ($collection) {
+            $collection->whenHas(4, fn ($c) => $c);
+        });
+
+        $this->assertEnumeratesOnce(function ($collection) {
+            $collection->whenHas('non-existent', fn ($c) => $c);
+        });
+    }
+
+    public function testWhenHasAnyIsLazy()
+    {
+        $this->assertEnumerates(5, function ($collection) {
+            $collection->whenHasAny(4, fn ($c) => $c);
+        });
+
+        $this->assertEnumerates(2, function ($collection) {
+            $collection->whenHasAny([1, 4], fn ($c) => $c);
+        });
+
+        $this->assertEnumeratesOnce(function ($collection) {
+            $collection->whenHasAny(['non', 'existent'], fn ($c) => $c);
+        });
+    }
+
     public function testImplodeEnumeratesOnce()
     {
         $this->assertEnumeratesOnce(function ($collection) {
