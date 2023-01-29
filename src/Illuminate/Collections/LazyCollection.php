@@ -615,7 +615,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      * @param  TKey|array<array-key, TKey>  $key
      * @param  callable  $callback
      * @param  callable|null  $default
-     * @return Collection
+     * @return LazyCollection
      */
     public function whenHas($key, $callback, $default = null)
     {
@@ -628,7 +628,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      * @param  TKey|array<array-key, TKey>  $key
      * @param  callable  $callback
      * @param  callable|null  $default
-     * @return Collection
+     * @return LazyCollection
      */
     public function whenHasAny($key, $callback, $default = null)
     {
