@@ -86,7 +86,7 @@ class ConsoleApplicationTest extends TestCase
             'testing'
         );
 
-        $app->resolveCommands([FakeCommandWithInputPrompting::class]);
+        $app->addCommands([new FakeCommandWithInputPrompting(false)]);
 
         $statusCode = $app->call('fake-command-for-testing', [
             'name' => 'foo',
