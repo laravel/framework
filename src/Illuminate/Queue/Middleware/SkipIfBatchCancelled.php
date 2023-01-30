@@ -2,7 +2,7 @@
 
 namespace Illuminate\Queue\Middleware;
 
-class SkipCancelled
+class SkipIfBatchCancelled
 {
     /**
      * Process the job.

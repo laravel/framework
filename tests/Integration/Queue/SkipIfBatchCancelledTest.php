@@ -8,11 +8,11 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\Middleware\SkipCancelled;
+use Illuminate\Queue\Middleware\SkipIfBatchCancelled;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
 
-class SkipCancelledTest extends TestCase
+class SkipIfBatchCancelledTest extends TestCase
 {
     protected function tearDown(): void
     {
@@ -76,6 +76,6 @@ class SkipCancelledBatchableTestJob
 
     public function middleware()
     {
-        return [new SkipCancelled];
+        return [new SkipIfBatchCancelled];
     }
 }
