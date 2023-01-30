@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Routing;
 
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Route;
 use Orchestra\Testbench\TestCase;
 
@@ -13,11 +14,11 @@ class RouteRedirectTest extends TestCase
     public function testRouteRedirect($redirectFrom, $redirectTo, $requestUri, $redirectUri)
     {
         $this->withoutExceptionHandling();
-        Route::redirect($redirectFrom, $redirectTo, 301);
+        Route::redirect($redirectFrom, $redirectTo, Response::HTTP_MOVED_PERMANENTLY);
 
         $response = $this->get($requestUri);
         $response->assertRedirect($redirectUri);
-        $response->assertStatus(301);
+        $response->assertMovedPermanently();
     }
 
     public function routeRedirectDataSets()
@@ -42,7 +43,7 @@ class RouteRedirectTest extends TestCase
         })->name('to');
 
         Route::get('from-301', function () {
-            return to_route('to', [], 301);
+            return to_route('to', [], Response::HTTP_MOVED_PERMANENTLY);
         });
 
         Route::get('from-302', function () {
@@ -51,12 +52,12 @@ class RouteRedirectTest extends TestCase
 
         $this->get('from-301')
             ->assertRedirect('to')
-            ->assertStatus(301)
+            ->assertMovedPermanently()
             ->assertSee('Redirecting to');
 
         $this->get('from-302')
             ->assertRedirect('to')
-            ->assertStatus(302)
+            ->assertFound()
             ->assertSee('Redirecting to');
     }
 }
