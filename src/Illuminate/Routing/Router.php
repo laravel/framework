@@ -255,17 +255,27 @@ class Router implements BindingRegistrar, RegistrarContract
     /**
      * Create a redirect from one route name to another.
      *
-     * @param  string  $name
-     * @param  string  $destinationRouteName
+     * @param  string  $fromRoute
+     * @param  string  $toRoute
      * @param  int  $status
      * @return \Illuminate\Routing\Route
      */
-    public function redirectName($name, $destinationRouteName, $status = 302)
+    public function redirectName($fromRoute, $toRoute, $status = 302)
     {
-        $uri = Str::after(route($name), request()->root());
-        $destination = Str::after(route($destinationRouteName), request()->root());
+        $uris = [];
 
-        return $this->redirect($uri, $destination, $status);
+        collect($this->routes->getRoutes())
+            ->filter(function ($route) {
+                return isset($route->action) && array_key_exists('as', $route->action);
+            })
+            ->filter(function ($route) use ($fromRoute, $toRoute) {
+                return in_array($route->action['as'], [$fromRoute, $toRoute]);
+            })
+            ->each(function ($route) use (&$uris) {
+                $uris[] = $route->uri;
+            });
+
+        return $this->redirect($uris[0], $uris[1], $status);
     }
 
     /**
