@@ -28,21 +28,6 @@ class CacheFileStoreTest extends TestCase
         $this->assertNull($value);
     }
 
-    public function testUnserializableFileContentGetDeleted()
-    {
-        $files = $this->mockFilesystem();
-        $hash = sha1('foo');
-        $cachePath = __DIR__.'/'.substr($hash, 0, 2).'/'.substr($hash, 2, 2).'/'.$hash;
-
-        $files->expects($this->once())->method('get')->willReturn('9999999999-I_am_unserializableee: \(~_~)/');
-        $files->expects($this->once())->method('exists')->with($this->equalTo($cachePath))->willReturn(true);
-        $files->expects($this->once())->method('delete')->with($this->equalTo($cachePath));
-
-        $value = (new FileStore($files, __DIR__))->get('foo');
-
-        $this->assertNull($value);
-    }
-
     public function testPutCreatesMissingDirectories()
     {
         $files = $this->mockFilesystem();

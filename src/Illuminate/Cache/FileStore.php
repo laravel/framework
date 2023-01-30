@@ -267,16 +267,9 @@ class FileStore implements Store, LockProvider
             return $this->emptyPayload();
         }
 
-        $e = null;
-        $data = false;
-
         try {
             $data = unserialize(substr($contents, 10));
         } catch (Exception $e) {
-            // ...
-        }
-
-        if ($data === false || ! is_null($e)) {
             $this->forget($key);
 
             return $this->emptyPayload();
