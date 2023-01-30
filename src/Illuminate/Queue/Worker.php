@@ -6,6 +6,7 @@ use Illuminate\Contracts\Cache\Repository as CacheContract;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Queue\Factory as QueueManager;
+use Illuminate\Contracts\Queue\Job;
 use Illuminate\Database\DetectsLostConnections;
 use Illuminate\Queue\Events\JobExceptionOccurred;
 use Illuminate\Queue\Events\JobProcessed;
@@ -14,6 +15,7 @@ use Illuminate\Queue\Events\JobReleasedAfterException;
 use Illuminate\Queue\Events\Looping;
 use Illuminate\Queue\Events\WorkerStopping;
 use Illuminate\Support\Carbon;
+use Symfony\Component\ErrorHandler\Error\FatalError;
 use Throwable;
 
 class Worker
@@ -94,6 +96,8 @@ class Worker
      */
     protected static $popCallbacks = [];
 
+    protected $currentJob;
+
     /**
      * Create a new queue worker.
      *
@@ -135,6 +139,17 @@ class Worker
 
         [$startTime, $jobsProcessed] = [hrtime(true) / 1e9, 0];
 
+        register_shutdown_function(function () use (&$job) {
+            $e = error_get_last();
+            if (!$job instanceof Job) {
+                return;
+            }
+            if (!str_contains($e['message'], 'memory size')) {
+                return;
+            }
+            $this->failJob($job, new FatalError($e['message'], 0, $e));
+        });
+
         while (true) {
             // Before reserving any jobs, we will make sure this queue is not paused and
             // if it is we will just pause this worker for a given amount of time and
@@ -156,21 +171,21 @@ class Worker
             // First, we will attempt to get the next job off of the queue. We will also
             // register the timeout handler and reset the alarm for this job so it is
             // not stuck in a frozen state forever. Then, we can fire off this job.
-            $job = $this->getNextJob(
+            $this->currentJob = $this->getNextJob(
                 $this->manager->connection($connectionName), $queue
             );
 
             if ($supportsAsyncSignals) {
-                $this->registerTimeoutHandler($job, $options);
+                $this->registerTimeoutHandler($this->currentJob, $options);
             }
 
             // If the daemon should run (not in maintenance mode, etc.), then we can run
             // fire off this job for processing. Otherwise, we will need to sleep the
             // worker so no more jobs are processed until they should be processed.
-            if ($job) {
+            if ($this->currentJob) {
                 $jobsProcessed++;
 
-                $this->runJob($job, $connectionName, $options);
+                $this->runJob($this->currentJob, $connectionName, $options);
 
                 if ($options->rest > 0) {
                     $this->sleep($options->rest);
@@ -187,7 +202,7 @@ class Worker
             // the queue should restart based on other indications. If so, we'll stop
             // this worker and let whatever is "monitoring" it restart the process.
             $status = $this->stopIfNecessary(
-                $options, $lastRestart, $startTime, $jobsProcessed, $job
+                $options, $lastRestart, $startTime, $jobsProcessed, $this->currentJob
             );
 
             if (! is_null($status)) {
