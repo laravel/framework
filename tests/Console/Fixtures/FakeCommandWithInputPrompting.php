@@ -27,7 +27,7 @@ class FakeCommandWithInputPrompting extends Command implements PromptsForMissing
     private function askPersistently($question)
     {
         if (! $this->expectToRequestInput) {
-            throw new BadMethodCallException("No prompts for input were expected, but a question was asked.");
+            throw new BadMethodCallException('No prompts for input were expected, but a question was asked.');
         }
 
         return $this->traitAskPersistently($question);
