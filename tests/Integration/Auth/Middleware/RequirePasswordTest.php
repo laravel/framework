@@ -46,7 +46,7 @@ class RequirePasswordTest extends TestCase
 
         $response = $this->withSession(['auth.password_confirmed_at' => time() - 10801])->get('test-route');
 
-        $response->assertStatus(302);
+        $response->assertFound();
         $response->assertRedirect($this->app->make(UrlGenerator::class)->route('password.confirm'));
     }
 
@@ -63,11 +63,11 @@ class RequirePasswordTest extends TestCase
 
         $router->get('test-route', function (): Response {
             return new Response('foobar');
-        })->middleware([StartSession::class, RequirePassword::class.':my-password.confirm']);
+        })->middleware([StartSession::class, RequirePassword::class . ':my-password.confirm']);
 
         $response = $this->withSession(['auth.password_confirmed_at' => time() - 10801])->get('test-route');
 
-        $response->assertStatus(302);
+        $response->assertFound();
         $response->assertRedirect($this->app->make(UrlGenerator::class)->route('my-password.confirm'));
     }
 
@@ -95,7 +95,7 @@ class RequirePasswordTest extends TestCase
 
         $response = $this->withSession(['auth.password_confirmed_at' => time() - 501])->get('test-route');
 
-        $response->assertStatus(302);
+        $response->assertFound();
         $response->assertRedirect($this->app->make(UrlGenerator::class)->route('password.confirm'));
     }
 }
