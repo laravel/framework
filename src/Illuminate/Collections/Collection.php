@@ -600,7 +600,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      * @param  TKey|array<array-key, TKey>  $key
      * @param  callable  $callback
      * @param  callable|null  $default
-     * @return Collection
+     * @return \Illuminate\Support\Collection
      */
     public function whenHas($key, $callback, $default = null)
     {
@@ -613,7 +613,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      * @param  TKey|array<array-key, TKey>  $key
      * @param  callable  $callback
      * @param  callable|null  $default
-     * @return Collection
+     * @return \Illuminate\Support\Collection
      */
     public function whenHasAny($key, $callback, $default = null)
     {
