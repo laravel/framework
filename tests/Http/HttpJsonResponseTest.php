@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Http;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 use InvalidArgumentException;
 use JsonSerializable;
 use PHPUnit\Framework\TestCase;
@@ -59,12 +60,12 @@ class HttpJsonResponseTest extends TestCase
 
     public function testSetAndRetrieveStatusCode()
     {
-        $response = new JsonResponse(['foo' => 'bar'], 404);
-        $this->assertSame(404, $response->getStatusCode());
+        $response = new JsonResponse(['foo' => 'bar'], Response::HTTP_NOT_FOUND);
+        $this->assertSame(Response::HTTP_NOT_FOUND, $response->getStatusCode());
 
         $response = new JsonResponse(['foo' => 'bar']);
-        $response->setStatusCode(404);
-        $this->assertSame(404, $response->getStatusCode());
+        $response->setStatusCode(Response::HTTP_NOT_FOUND);
+        $this->assertSame(Response::HTTP_NOT_FOUND, $response->getStatusCode());
     }
 
     /**
