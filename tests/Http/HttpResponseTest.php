@@ -109,14 +109,14 @@ class HttpResponseTest extends TestCase
     public function testSetAndRetrieveStatusCode()
     {
         $response = new Response('foo');
-        $response->setStatusCode(404);
-        $this->assertSame(404, $response->getStatusCode());
+        $response->setStatusCode(Response::HTTP_NOT_FOUND);
+        $this->assertSame(Response::HTTP_NOT_FOUND, $response->getStatusCode());
     }
 
     public function testSetStatusCodeAndRetrieveStatusText()
     {
         $response = new Response('foo');
-        $response->setStatusCode(404);
+        $response->setStatusCode(Response::HTTP_NOT_FOUND);
         $this->assertSame('Not Found', $response->statusText());
     }
 
