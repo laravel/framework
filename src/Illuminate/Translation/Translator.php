@@ -8,11 +8,13 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\NamespacedItemResolver;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Traits\ReflectsClosures;
 use InvalidArgumentException;
 
 class Translator extends NamespacedItemResolver implements TranslatorContract
 {
     use Macroable;
+    use ReflectsClosures;
 
     /**
      * The loader implementation.
@@ -55,6 +57,13 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      * @var callable
      */
     protected $determineLocalesUsing;
+
+    /**
+     * Custom rendering callbacks for stringable objects.
+     *
+     * @var array
+     */
+    protected $stringables = [];
 
     /**
      * Create a new translator instance.
@@ -171,6 +180,22 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     }
 
     /**
+     * Add a handler to be executed before replacing a given instance of a class.
+     *
+     * @param  string|callable  $class
+     * @param  callable|null  $handler
+     * @return void
+     */
+    public function stringable($class, $handler = null)
+    {
+        if ($class instanceof \Closure) {
+            [$class, $handler] = [$this->firstClosureParameterType($class), $class];
+        }
+
+        $this->stringables[$class] = $handler;
+    }
+
+    /**
      * Get the proper locale for a choice operation.
      *
      * @param  string|null  $locale
@@ -224,6 +249,10 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         $shouldReplace = [];
 
         foreach ($replace as $key => $value) {
+            if (is_object($value) && isset($this->stringables[get_class($value)])) {
+                $value = call_user_func($this->stringables[get_class($value)], $value);
+            }
+
             $shouldReplace[':'.Str::ucfirst($key ?? '')] = Str::ucfirst($value ?? '');
             $shouldReplace[':'.Str::upper($key ?? '')] = Str::upper($value ?? '');
             $shouldReplace[':'.$key] = $value;
