@@ -98,12 +98,13 @@ class FilesystemTest extends TestCase
     }
 
     public function testFilePermissionRestoredAfterReplace(){
-        // For validation since getFilePermissions returns value in decimal, passing 754 after subtracting 2 for umask() i.e 0756 - 2 = 754
-        $permissionValueInDecimal = base_convert("754",8,10);
         $tempFile = self::$tempDir.'/file.txt';
         $filesystem = new Filesystem;
         $filesystem->replace($tempFile, 'Hello World');
-        $this->assertEquals($permissionValueInDecimal, $this->getFilePermissions($tempFile));
+        $umaskValue = umask();
+        $permissionValueInDecimal = (int) base_convert("776",8,10);
+        $actualPermission = $permissionValueInDecimal - $umaskValue;
+        $this->assertEquals($actualPermission, $this->getFilePermissions($tempFile));
     }
 
     /**
@@ -130,22 +131,22 @@ class FilesystemTest extends TestCase
         // Test replacing non-existent file.
         $filesystem->replace($tempFile, 'Hello World');
         $this->assertStringEqualsFile($tempFile, 'Hello World');
-        $this->assertEquals($umask, 0756 - $this->getFilePermissions($tempFile));
+        $this->assertEquals($umask, 0776 - $this->getFilePermissions($tempFile));
 
         // Test replacing existing file.
         $filesystem->replace($tempFile, 'Something Else');
         $this->assertStringEqualsFile($tempFile, 'Something Else');
-        $this->assertEquals($umask, 0756 - $this->getFilePermissions($tempFile));
+        $this->assertEquals($umask, 0776 - $this->getFilePermissions($tempFile));
 
         // Test replacing symlinked file.
         $filesystem->replace($symlink, 'Yet Something Else Again');
         $this->assertStringEqualsFile($tempFile, 'Yet Something Else Again');
-        $this->assertEquals($umask, 0756 - $this->getFilePermissions($tempFile));
+        $this->assertEquals($umask, 0776 - $this->getFilePermissions($tempFile));
 
         umask($originalUmask);
 
         // Reset changes to symlink_dir
-        chmod($symlinkDir, 0756 - $originalUmask);
+        chmod($symlinkDir, 0776 - $originalUmask);
     }
 
     public function testSetChmod()
