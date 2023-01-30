@@ -3817,7 +3817,7 @@ class Builder implements BuilderContract
      *
      * @throws \BadMethodCallException
      */
-    public function __call($method, $parameters)
+    public function __call($method, array $parameters)
     {
         if (static::hasMacro($method)) {
             return $this->macroCall($method, $parameters);
