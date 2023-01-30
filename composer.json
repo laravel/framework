@@ -98,7 +98,7 @@
         "pda/pheanstalk": "^4.0",
         "phpstan/phpdoc-parser": "^1.15",
         "phpstan/phpstan": "^1.4.7",
-        "phpunit/phpunit": "^9.5.27 || ^10.0",
+        "phpunit/phpunit": "^9.5.8 || ^10.0",
         "predis/predis": "^2.0.2",
         "symfony/cache": "^6.2",
         "symfony/http-client": "^6.2.4"
