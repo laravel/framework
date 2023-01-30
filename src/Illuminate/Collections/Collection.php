@@ -628,6 +628,41 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Intersect the collection with the given items, using the callback.
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable<array-key, TValue>|iterable<array-key, TValue>  $items
+     * @param  callable(TValue, TValue): int  $callback
+     * @return static
+     */
+    public function intersectUsing($items, callable $callback)
+    {
+        return new static(array_uintersect($this->items, $this->getArrayableItems($items), $callback));
+    }
+
+    /**
+     * Intersect the collection with the given items with additional index check.
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>  $items
+     * @return static
+     */
+    public function intersectAssoc($items)
+    {
+        return new static(array_intersect_assoc($this->items, $this->getArrayableItems($items)));
+    }
+
+    /**
+     * Intersect the collection with the given items with additional index check, using the callback.
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable<array-key, TValue>|iterable<array-key, TValue>  $items
+     * @param  callable(TValue, TValue): int  $callback
+     * @return static
+     */
+    public function intersectAssocUsing($items, callable $callback)
+    {
+        return new static(array_intersect_uassoc($this->items, $this->getArrayableItems($items), $callback));
+    }
+
+    /**
      * Intersect the collection with the given items by key.
      *
      * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>  $items
