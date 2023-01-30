@@ -8,6 +8,7 @@ use Illuminate\Foundation\Events\MaintenanceModeDisabled;
 use Illuminate\Foundation\Events\MaintenanceModeEnabled;
 use Illuminate\Foundation\Http\MaintenanceModeBypassCookie;
 use Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance;
+use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
@@ -34,7 +35,7 @@ class MaintenanceModeTest extends TestCase
 
         $response = $this->get('/foo');
 
-        $response->assertStatus(503);
+        $response->assertStatus(Response::HTTP_SERVICE_UNAVAILABLE);
         $response->assertHeader('Retry-After', '60');
         $response->assertHeader('Refresh', '60');
     }
@@ -52,7 +53,7 @@ class MaintenanceModeTest extends TestCase
 
         $response = $this->get('/foo');
 
-        $response->assertStatus(200);
+        $response->assertOk();
         $response->assertHeader('Retry-After', '60');
     }
 
@@ -69,7 +70,7 @@ class MaintenanceModeTest extends TestCase
 
         $response = $this->get('/foo');
 
-        $response->assertStatus(503);
+        $response->assertStatus(Response::HTTP_SERVICE_UNAVAILABLE);
         $response->assertHeader('Retry-After', '60');
         $this->assertSame('Rendered Content', $response->original);
     }
@@ -88,7 +89,7 @@ class MaintenanceModeTest extends TestCase
 
         $response = $this->get('/foo');
 
-        $response->assertStatus(302);
+        $response->assertFound();
         $response->assertCookie('laravel_maintenance');
     }
 
@@ -109,7 +110,7 @@ class MaintenanceModeTest extends TestCase
             'laravel_maintenance' => $cookie->getValue(),
         ])->get('/test');
 
-        $response->assertStatus(200);
+        $response->assertOk();
         $this->assertSame('Hello World', $response->original);
     }
 
@@ -130,7 +131,7 @@ class MaintenanceModeTest extends TestCase
             'laravel_maintenance' => $cookie->getValue(),
         ])->get('/test');
 
-        $response->assertStatus(503);
+        $response->assertStatus(Response::HTTP_SERVICE_UNAVAILABLE);
     }
 
     public function testCanCreateBypassCookies()
