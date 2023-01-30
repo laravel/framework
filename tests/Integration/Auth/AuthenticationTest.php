@@ -64,16 +64,16 @@ class AuthenticationTest extends TestCase
 
     public function testBasicAuthProtectsRoute()
     {
-        $this->get('basic')->assertStatus(401);
+        $this->get('basic')->assertUnauthorized();
     }
 
     public function testBasicAuthPassesOnCorrectCredentials()
     {
         $response = $this->get('basic', [
-            'Authorization' => 'Basic '.base64_encode('email:password'),
+            'Authorization' => 'Basic ' . base64_encode('email:password'),
         ]);
 
-        $response->assertStatus(200);
+        $response->assertOk();
         $this->assertSame('email', $response->json()['email']);
     }
 
@@ -87,19 +87,19 @@ class AuthenticationTest extends TestCase
         ]);
 
         $this->get('basicWithCondition', [
-            'Authorization' => 'Basic '.base64_encode('email2:password2'),
-        ])->assertStatus(401);
+            'Authorization' => 'Basic ' . base64_encode('email2:password2'),
+        ])->assertUnauthorized();
 
         $this->get('basicWithCondition', [
-            'Authorization' => 'Basic '.base64_encode('email:password'),
-        ])->assertStatus(200);
+            'Authorization' => 'Basic ' . base64_encode('email:password'),
+        ])->assertOk();
     }
 
     public function testBasicAuthFailsOnWrongCredentials()
     {
         $this->get('basic', [
-            'Authorization' => 'Basic '.base64_encode('email:wrong_password'),
-        ])->assertStatus(401);
+            'Authorization' => 'Basic ' . base64_encode('email:wrong_password'),
+        ])->assertUnauthorized();
     }
 
     public function testLoggingInFailsViaAttempt()
