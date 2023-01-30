@@ -105,7 +105,6 @@ jobs:
           AWS_SECRET_ACCESS_KEY: random_secret
         if : matrix.phpunit != '9.0'
 
-
       - name: Store artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -148,7 +147,7 @@ jobs:
         with:
           timeout_minutes: 5
           max_attempts: 5
-          command: composer require symfony/css-selector:~6.0 --no-interaction --no-update
+          command: composer require phpunit/phpunit:^${{ matrix.phpunit }} symfony/css-selector:~6.0 --no-interaction --no-update
 
       - name: Set Minimum PHP 8.2 Versions
         uses: nick-fields/retry@v2
