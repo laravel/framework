@@ -134,9 +134,7 @@ class ComponentMakeCommand extends GeneratorCommand
         $name = str_replace('\\', '/', $this->argument('name'));
 
         return collect(explode('/', $name))
-            ->map(function ($part) {
-                return Str::kebab($part);
-            })
+            ->map(fn ($part) => Str::kebab($part))
             ->implode('.');
     }
 

@@ -273,18 +273,12 @@ class Schedule
      */
     public function compileArrayInput($key, $value)
     {
-        $value = collect($value)->map(function ($value) {
-            return ProcessUtils::escapeArgument($value);
-        });
+        $value = collect($value)->map(fn ($value) => ProcessUtils::escapeArgument($value));
 
         if (str_starts_with($key, '--')) {
-            $value = $value->map(function ($value) use ($key) {
-                return "{$key}={$value}";
-            });
+            $value = $value->map(fn ($value) =>"{$key}={$value}");
         } elseif (str_starts_with($key, '-')) {
-            $value = $value->map(function ($value) use ($key) {
-                return "{$key} {$value}";
-            });
+            $value = $value->map(fn ($value) =>"{$key} {$value}");
         }
 
         return $value->implode(' ');

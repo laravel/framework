@@ -87,9 +87,8 @@ class PackageManifest
      */
     public function config($key)
     {
-        return collect($this->getManifest())->flatMap(function ($configuration) use ($key) {
-            return (array) ($configuration[$key] ?? []);
-        })->filter()->all();
+        return collect($this->getManifest())
+            ->flatMap(fn ($configuration) => (array) ($configuration[$key] ?? []))->filter()->all();
     }
 
     /**

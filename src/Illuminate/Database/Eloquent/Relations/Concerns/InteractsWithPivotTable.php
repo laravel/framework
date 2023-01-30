@@ -136,9 +136,8 @@ trait InteractsWithPivotTable
      */
     public function syncWithPivotValues($ids, array $values, bool $detaching = true)
     {
-        return $this->sync(collect($this->parseIds($ids))->mapWithKeys(function ($id) use ($values) {
-            return [$id => $values];
-        }), $detaching);
+        return $this->sync(collect($this->parseIds($ids))
+            ->mapWithKeys(fn ($id) => [$id => $values]), $detaching);
     }
 
     /**
@@ -630,9 +629,7 @@ trait InteractsWithPivotTable
      */
     protected function castKeys(array $keys)
     {
-        return array_map(function ($v) {
-            return $this->castKey($v);
-        }, $keys);
+        return array_map(fn ($v) => $this->castKey($v), $keys);
     }
 
     /**

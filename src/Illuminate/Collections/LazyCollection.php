@@ -430,9 +430,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     public function filter(callable $callback = null)
     {
         if (is_null($callback)) {
-            $callback = function ($value) {
-                return (bool) $value;
-            };
+            $callback = fn ($value) => (bool) $value;
         }
 
         return new static(function () use ($callback) {
@@ -1500,9 +1498,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
         /** @var callable(TValue, TKey): bool $callback */
         $callback = $this->useAsCallable($value) ? $value : $this->equality($value);
 
-        return $this->takeUntil(function ($item, $key) use ($callback) {
-            return ! $callback($item, $key);
-        });
+        return $this->takeUntil(fn ($item, $key) => ! $callback($item, $key));
     }
 
     /**
@@ -1586,9 +1582,9 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
         $iterables = func_get_args();
 
         return new static(function () use ($iterables) {
-            $iterators = Collection::make($iterables)->map(function ($iterable) {
-                return $this->makeIterator($iterable);
-            })->prepend($this->getIterator());
+            $iterators = Collection::make($iterables)
+                ->map(fn ($iterable) => $this->makeIterator($iterable))
+                ->prepend($this->getIterator());
 
             while ($iterators->contains->valid()) {
                 yield new static($iterators->map->current());

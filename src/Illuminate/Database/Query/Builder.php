@@ -3383,9 +3383,7 @@ class Builder implements BuilderContract
 
         $bindings = $this->cleanBindings(array_merge(
             Arr::flatten($values, 1),
-            collect($update)->reject(function ($value, $key) {
-                return is_int($key);
-            })->all()
+            collect($update)->reject(fn ($value, $key) => is_int($key))->all()
         ));
 
         return $this->connection->affectingStatement(
@@ -3653,9 +3651,7 @@ class Builder implements BuilderContract
     public function cleanBindings(array $bindings)
     {
         return collect($bindings)
-                    ->reject(function ($binding) {
-                        return $binding instanceof Expression;
-                    })
+                    ->reject(fn ($binding) => $binding instanceof Expression)
                     ->map([$this, 'castBinding'])
                     ->values()
                     ->all();

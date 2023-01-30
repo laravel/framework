@@ -129,9 +129,8 @@ class Migrator
     protected function pendingMigrations($files, $ran)
     {
         return Collection::make($files)
-                ->reject(function ($file) use ($ran) {
-                    return in_array($this->getMigrationName($file), $ran);
-                })->values()->all();
+                ->reject(fn ($file) => in_array($this->getMigrationName($file), $ran))
+                ->values()->all();
     }
 
     /**
@@ -341,9 +340,7 @@ class Migrator
         // Since the getRan method that retrieves the migration name just gives us the
         // migration name, we will format the names into objects with the name as a
         // property on the objects so that we can pass it to the rollback method.
-        $migrations = collect($migrations)->map(function ($m) {
-            return (object) ['migration' => $m];
-        })->all();
+        $migrations = collect($migrations)->map(fn ($m) => (object) ['migration' => $m])->all();
 
         return $this->rollbackMigrations(
             $migrations, $paths, compact('pretend')
@@ -427,9 +424,9 @@ class Migrator
             }
 
             $this->write(TwoColumnDetail::class, $name);
-            $this->write(BulletList::class, collect($this->getQueries($migration, $method))->map(function ($query) {
-                return $query['query'];
-            }));
+            $this->write(BulletList::class, collect($this->getQueries($migration, $method))
+                ->map(fn ($query) => $query['query']));
+
         } catch (SchemaException $e) {
             $name = get_class($migration);
 
@@ -536,12 +533,12 @@ class Migrator
     public function getMigrationFiles($paths)
     {
         return Collection::make($paths)->flatMap(function ($path) {
-            return str_ends_with($path, '.php') ? [$path] : $this->files->glob($path.'/*_*.php');
-        })->filter()->values()->keyBy(function ($file) {
-            return $this->getMigrationName($file);
-        })->sortBy(function ($file, $key) {
-            return $key;
-        })->all();
+            return str_ends_with($path, '.php') ? [$path] : $this->files->glob($path . '/*_*.php');
+        })->filter()
+            ->values()
+            ->keyBy(fn ($file) => $this->getMigrationName($file))
+            ->sortBy(fn ($file, $key) => $key)
+            ->all();
     }
 
     /**

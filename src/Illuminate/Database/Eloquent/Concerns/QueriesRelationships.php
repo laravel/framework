@@ -240,9 +240,7 @@ trait QueriesRelationships
                     $belongsTo = $this->getBelongsToRelation($relation, $type);
 
                     if ($callback) {
-                        $callback = function ($query) use ($callback, $type) {
-                            return $callback($query, $type);
-                        };
+                        $callback = fn ($query) => $callback($query, $type);
                     }
 
                     $query->where($this->qualifyColumn($relation->getMorphType()), '=', (new $type)->getMorphClass())

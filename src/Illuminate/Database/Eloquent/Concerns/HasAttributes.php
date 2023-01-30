@@ -676,9 +676,7 @@ trait HasAttributes
 
         $attribute = $this->{Str::camel($key)}();
 
-        $value = call_user_func($attribute->get ?: function ($value) {
-            return $value;
-        }, $value, $this->attributes);
+        $value = call_user_func($attribute->get ?: fn ($value) => $value, $value, $this->attributes);
 
         if ($attribute->withCaching || (is_object($value) && $attribute->withObjectCaching)) {
             $this->attributeCastCache[$key] = $value;

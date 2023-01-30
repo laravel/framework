@@ -97,8 +97,8 @@ trait CallsCommands
             'no-interaction',
             'quiet',
             'verbose',
-        ])->filter()->mapWithKeys(function ($value, $key) {
-            return ["--{$key}" => $value];
-        })->all();
+        ])->filter()
+        ->mapWithKeys(fn ($value, $key) => ["--{$key}" => $value])
+        ->all();
     }
 }

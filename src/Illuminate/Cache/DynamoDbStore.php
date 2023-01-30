@@ -129,21 +129,15 @@ class DynamoDbStore implements LockProvider, Store
      */
     public function many(array $keys)
     {
-        $prefixedKeys = array_map(function ($key) {
-            return $this->prefix.$key;
-        }, $keys);
+        $prefixedKeys = array_map(fn ($key) => $this->prefix.$key, $keys);
 
         $response = $this->dynamo->batchGetItem([
             'RequestItems' => [
                 $this->table => [
                     'ConsistentRead' => false,
-                    'Keys' => collect($prefixedKeys)->map(function ($key) {
-                        return [
-                            $this->keyAttribute => [
-                                'S' => $key,
-                            ],
-                        ];
-                    })->all(),
+                    'Keys' => collect($prefixedKeys)->map(fn ($key) => [
+                        $this->keyAttribute => ['S' => $key],
+                    ])->all(),
                 ],
             ],
         ]);

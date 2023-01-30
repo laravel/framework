@@ -241,9 +241,7 @@ abstract class Factory
     public function createMany(iterable $records)
     {
         return new EloquentCollection(
-            collect($records)->map(function ($record) {
-                return $this->state($record)->create();
-            })
+            collect($records)->map(fn ($record) => $this->state($record)->create())
         );
     }
 
@@ -255,9 +253,7 @@ abstract class Factory
      */
     public function createManyQuietly(iterable $records)
     {
-        return Model::withoutEvents(function () use ($records) {
-            return $this->createMany($records);
-        });
+        return Model::withoutEvents(fn () => $this->createMany($records));
     }
 
     /**

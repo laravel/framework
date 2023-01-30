@@ -17,11 +17,9 @@ class PostgresSchemaState extends SchemaState
     {
         $excludedTables = collect($connection->getSchemaBuilder()->getAllTables())
                         ->map->tablename
-                        ->reject(function ($table) {
-                            return $table === $this->migrationTable;
-                        })->map(function ($table) {
-                            return '--exclude-table-data="*.'.$table.'"';
-                        })->implode(' ');
+                        ->reject(fn ($table) => $table === $this->migrationTable)
+                        ->map(fn ($table) => '--exclude-table-data="*.'.$table.'"')
+                        ->implode(' ');
 
         $this->makeProcess(
             $this->baseDumpCommand().' --file="${:LARAVEL_LOAD_PATH}" '.$excludedTables

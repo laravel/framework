@@ -108,9 +108,9 @@ class PruneCommand extends Command
     protected function models()
     {
         if (! empty($models = $this->option('model'))) {
-            return collect($models)->filter(function ($model) {
-                return class_exists($model);
-            })->values();
+            return collect($models)
+                ->filter(fn ($model) => class_exists($model))
+                ->values();
         }
 
         $except = $this->option('except');
@@ -129,14 +129,11 @@ class PruneCommand extends Command
                     Str::after($model->getRealPath(), realpath(app_path()).DIRECTORY_SEPARATOR)
                 );
             })->when(! empty($except), function ($models) use ($except) {
-                return $models->reject(function ($model) use ($except) {
-                    return in_array($model, $except);
-                });
-            })->filter(function ($model) {
-                return $this->isPrunable($model);
-            })->filter(function ($model) {
-                return class_exists($model);
-            })->values();
+                return $models->reject(fn ($model) => in_array($model, $except));
+            })
+            ->filter(fn ($model) => $this->isPrunable($model))
+            ->filter(fn ($model) => class_exists($model))
+            ->values();
     }
 
     /**

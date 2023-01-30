@@ -580,9 +580,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function qualifyColumns($columns)
     {
-        return collect($columns)->map(function ($column) {
-            return $this->qualifyColumn($column);
-        })->all();
+        return collect($columns)->map(fn ($column) => $this->qualifyColumn($column))->all();
     }
 
     /**
