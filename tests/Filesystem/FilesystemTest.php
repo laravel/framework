@@ -97,14 +97,24 @@ class FilesystemTest extends TestCase
         $this->assertStringEqualsFile($tempFile, 'Hello Taylor');
     }
 
+    public function testFilePermissionRestoredAfterReplace(){
+        $tempFile = self::$tempDir.'/file.txt';
+        $filesystem = new Filesystem;
+        $filesystem->replace($tempFile, 'Hello World');
+        $umaskValue = umask();
+        $permissionValueInDecimal = (int) base_convert("666",8,10);
+        $actualPermission = $permissionValueInDecimal - $umaskValue;
+        $this->assertEquals($actualPermission, $this->getFilePermissions($tempFile));
+    }
+
     /**
      * @requires OS Linux|Darwin
      */
     public function testReplaceWhenUnixSymlinkExists()
     {
-        $tempFile = self::$tempDir.'/file.txt';
-        $symlinkDir = self::$tempDir.'/symlink_dir';
-        $symlink = "{$symlinkDir}/symlink.txt";
+        $tempFile = self::$tempDir.'/'.time().'file.txt';
+        $symlinkDir = self::$tempDir.'/'.time().'symlink_dir';
+        $symlink = "{$symlinkDir}/'.time().'symlink.txt";
 
         mkdir($symlinkDir);
         symlink($tempFile, $symlink);
@@ -113,7 +123,7 @@ class FilesystemTest extends TestCase
         chmod($symlinkDir, 0555);
 
         // Test with a weird non-standard umask.
-        $umask = 0131;
+        $umask = 0031;
         $originalUmask = umask($umask);
 
         $filesystem = new Filesystem;
@@ -121,22 +131,22 @@ class FilesystemTest extends TestCase
         // Test replacing non-existent file.
         $filesystem->replace($tempFile, 'Hello World');
         $this->assertStringEqualsFile($tempFile, 'Hello World');
-        $this->assertEquals($umask, 0777 - $this->getFilePermissions($tempFile));
+        $this->assertEquals($umask, 0666 - $this->getFilePermissions($tempFile));
 
         // Test replacing existing file.
         $filesystem->replace($tempFile, 'Something Else');
         $this->assertStringEqualsFile($tempFile, 'Something Else');
-        $this->assertEquals($umask, 0777 - $this->getFilePermissions($tempFile));
+        $this->assertEquals($umask, 0666 - $this->getFilePermissions($tempFile));
 
         // Test replacing symlinked file.
         $filesystem->replace($symlink, 'Yet Something Else Again');
         $this->assertStringEqualsFile($tempFile, 'Yet Something Else Again');
-        $this->assertEquals($umask, 0777 - $this->getFilePermissions($tempFile));
+        $this->assertEquals($umask, 0666 - $this->getFilePermissions($tempFile));
 
         umask($originalUmask);
 
         // Reset changes to symlink_dir
-        chmod($symlinkDir, 0777 - $originalUmask);
+        chmod($symlinkDir, 0666 - $originalUmask);
     }
 
     public function testSetChmod()
