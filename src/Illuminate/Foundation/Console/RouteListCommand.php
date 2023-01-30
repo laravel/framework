@@ -213,7 +213,10 @@ class RouteListCommand extends Command
             $path = (new ReflectionFunction($route->action['uses']))
                                 ->getFileName();
         } elseif (is_string($route->action['uses']) &&
-                  str_contains($route->action['uses'], 'SerializableClosure')) {
+                  Str::contains($route->action['uses'], [
+                    'SerializableClosure',
+                    'UnsignedSerializableClosure',
+                ])) {
             return false;
         } elseif (is_string($route->action['uses'])) {
             if ($this->isFrameworkController($route)) {
