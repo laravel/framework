@@ -23,7 +23,7 @@
         "dragonmantank/cron-expression": "^3.3.2",
         "egulias/email-validator": "^3.2.1|^4.0",
         "fruitcake/php-cors": "^1.2",
-        "laravel/serializable-closure": "^1.2.2",
+        "laravel/serializable-closure": "dev-fix/unsigned-serializable-closures as 1.2.2",
         "league/commonmark": "^2.2.1",
         "league/flysystem": "^3.8.0",
         "monolog/monolog": "^3.0",
