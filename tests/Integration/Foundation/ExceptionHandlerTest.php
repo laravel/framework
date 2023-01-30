@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Foundation;
 
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\Access\Response;
+use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Support\Facades\Route;
 use Orchestra\Testbench\TestCase;
 
@@ -15,12 +16,12 @@ class ExceptionHandlerTest extends TestCase
 
         // HTTP request...
         $this->get('test-route')
-            ->assertStatus(403)
+            ->assertForbidden()
             ->assertSeeText('expected message');
 
         // JSON request...
         $this->getJson('test-route')
-            ->assertStatus(403)
+            ->assertForbidden()
             ->assertExactJson([
                 'message' => 'expected message',
             ]);
@@ -32,12 +33,12 @@ class ExceptionHandlerTest extends TestCase
 
         // HTTP request...
         $this->get('test-route')
-            ->assertStatus(404)
+            ->assertNotFound()
             ->assertSeeText('Not Found');
 
         // JSON request...
         $this->getJson('test-route')
-            ->assertStatus(404)
+            ->assertNotFound()
             ->assertExactJson([
                 'message' => 'expected message',
             ]);
@@ -45,30 +46,30 @@ class ExceptionHandlerTest extends TestCase
 
     public function testItRendersAuthorizationExceptionsWithStatusCodeTextWhenNoMessageIsSet()
     {
-        Route::get('test-route', fn () => Response::denyWithStatus(404)->authorize());
+        Route::get('test-route', fn () => Response::denyWithStatus(HttpResponse::HTTP_NOT_FOUND)->authorize());
 
         // HTTP request...
         $this->get('test-route')
-            ->assertStatus(404)
+            ->assertNotFound()
             ->assertSeeText('Not Found');
 
         // JSON request...
         $this->getJson('test-route')
-            ->assertStatus(404)
+            ->assertNotFound()
             ->assertExactJson([
                 'message' => 'Not Found',
             ]);
 
-        Route::get('test-route', fn () => Response::denyWithStatus(418)->authorize());
+        Route::get('test-route', fn () => Response::denyWithStatus(HttpResponse::HTTP_I_AM_A_TEAPOT)->authorize());
 
         // HTTP request...
         $this->get('test-route')
-            ->assertStatus(418)
+            ->assertStatus(HttpResponse::HTTP_I_AM_A_TEAPOT)
             ->assertSeeText("I'm a teapot", false);
 
         // JSON request...
         $this->getJson('test-route')
-            ->assertStatus(418)
+            ->assertStatus(HttpResponse::HTTP_I_AM_A_TEAPOT)
             ->assertExactJson([
                 'message' => "I'm a teapot",
             ]);
@@ -76,16 +77,16 @@ class ExceptionHandlerTest extends TestCase
 
     public function testItRendersAuthorizationExceptionsWithStatusButWithoutResponse()
     {
-        Route::get('test-route', fn () => throw (new AuthorizationException())->withStatus(418));
+        Route::get('test-route', fn () => throw (new AuthorizationException())->withStatus(HttpResponse::HTTP_I_AM_A_TEAPOT));
 
         // HTTP request...
         $this->get('test-route')
-            ->assertStatus(418)
+            ->assertStatus(HttpResponse::HTTP_I_AM_A_TEAPOT)
             ->assertSeeText("I'm a teapot", false);
 
         // JSON request...
         $this->getJson('test-route')
-            ->assertStatus(418)
+            ->assertStatus(HttpResponse::HTTP_I_AM_A_TEAPOT)
             ->assertExactJson([
                 'message' => "I'm a teapot",
             ]);
