@@ -1026,7 +1026,7 @@ class ResourceTest extends TestCase
                 'first' => null,
                 'last' => null,
                 'prev' => null,
-                'next' => '/?cursor=' . (new Cursor(['id' => 5]))->encode(),
+                'next' => '/?cursor='.(new Cursor(['id' => 5]))->encode(),
             ],
             'meta' => [
                 'path' => '/',
@@ -1069,7 +1069,7 @@ class ResourceTest extends TestCase
                 'first' => null,
                 'last' => null,
                 'prev' => null,
-                'next' => '/?framework=laravel&author=Otwell&cursor=' . (new Cursor(['id' => 5]))->encode(),
+                'next' => '/?framework=laravel&author=Otwell&cursor='.(new Cursor(['id' => 5]))->encode(),
             ],
             'meta' => [
                 'path' => '/',
@@ -1110,7 +1110,7 @@ class ResourceTest extends TestCase
                 'first' => null,
                 'last' => null,
                 'prev' => null,
-                'next' => '/?author=Taylor&cursor=' . (new Cursor(['id' => 5]))->encode(),
+                'next' => '/?author=Taylor&cursor='.(new Cursor(['id' => 5]))->encode(),
             ],
             'meta' => [
                 'path' => '/',

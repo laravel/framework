@@ -342,7 +342,7 @@ class PrecognitionTest extends TestCase
             precognitive(function () use ($request) {
                 $request->validate([
                     'required_integer' => 'required|integer',
-                    ...!$request->isPrecognitive() ? ['required_integer_when_not_precognitive' => 'required|integer'] : [],
+                    ...! $request->isPrecognitive() ? ['required_integer_when_not_precognitive' => 'required|integer'] : [],
                     'optional_integer_1' => 'integer',
                     'optional_integer_2' => 'integer',
                 ]);
@@ -379,7 +379,7 @@ class PrecognitionTest extends TestCase
             precognitive(function () use ($request) {
                 $request->validateWithBag('custom-bag', [
                     'required_integer' => 'required|integer',
-                    !$request->isPrecognitive() ? ['required_integer_when_not_precognitive' => 'required|integer'] : [],
+                    ! $request->isPrecognitive() ? ['required_integer_when_not_precognitive' => 'required|integer'] : [],
                     'optional_integer_1' => 'integer',
                     'optional_integer_2' => 'integer',
                 ]);
@@ -1081,7 +1081,7 @@ class PrecognitionTestController
         precognitive(function () use ($request) {
             $this->validate($request, [
                 'required_integer' => 'required|integer',
-                ...!$request->isPrecognitive() ? ['required_integer_when_not_precognitive' => 'required|integer'] : [],
+                ...! $request->isPrecognitive() ? ['required_integer_when_not_precognitive' => 'required|integer'] : [],
                 'optional_integer_1' => 'integer',
                 'optional_integer_2' => 'integer',
             ]);
@@ -1097,7 +1097,7 @@ class PrecognitionTestController
         precognitive(function () use ($request) {
             $this->validateWithBag('custom-bag', $request, [
                 'required_integer' => 'required|integer',
-                ...!$request->isPrecognitive() ? ['required_integer_when_not_precognitive' => 'required|integer'] : [],
+                ...! $request->isPrecognitive() ? ['required_integer_when_not_precognitive' => 'required|integer'] : [],
                 'optional_integer_1' => 'integer',
                 'optional_integer_2' => 'integer',
             ]);
@@ -1113,7 +1113,7 @@ class PrecognitionTestController
         precognitive(function () use ($request) {
             $this->validateWith([
                 'required_integer' => 'required|integer',
-                ...!$request->isPrecognitive() ? ['required_integer_when_not_precognitive' => 'required|integer'] : [],
+                ...! $request->isPrecognitive() ? ['required_integer_when_not_precognitive' => 'required|integer'] : [],
                 'optional_integer_1' => 'integer',
                 'optional_integer_2' => 'integer',
             ]);
@@ -1209,7 +1209,7 @@ class PrecognitionTestRequest extends FormRequest
             ' input with spaces ' => 'integer',
         ];
 
-        if (!$this->isPrecognitive()) {
+        if (! $this->isPrecognitive()) {
             $rules['required_integer_when_not_precognitive'] = 'required|integer';
         }
 

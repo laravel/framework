@@ -1694,11 +1694,11 @@ class TestResponseTest extends TestCase
     public function testAssertDownloadOffered()
     {
         $files = new Filesystem;
-        $tempDir = __DIR__ . '/tmp';
+        $tempDir = __DIR__.'/tmp';
         $files->makeDirectory($tempDir, 0755, false, true);
-        $files->put($tempDir . '/file.txt', 'Hello World');
+        $files->put($tempDir.'/file.txt', 'Hello World');
         $testResponse = TestResponse::fromBaseResponse(new Response(
-            $files->get($tempDir . '/file.txt'),
+            $files->get($tempDir.'/file.txt'),
             200,
             [
                 'Content-Disposition' => 'attachment; filename=file.txt',
@@ -1711,11 +1711,11 @@ class TestResponseTest extends TestCase
     public function testAssertDownloadOfferedWithAFileName()
     {
         $files = new Filesystem;
-        $tempDir = __DIR__ . '/tmp';
+        $tempDir = __DIR__.'/tmp';
         $files->makeDirectory($tempDir, 0755, false, true);
-        $files->put($tempDir . '/file.txt', 'Hello World');
+        $files->put($tempDir.'/file.txt', 'Hello World');
         $testResponse = TestResponse::fromBaseResponse(new Response(
-            $files->get($tempDir . '/file.txt'),
+            $files->get($tempDir.'/file.txt'),
             200,
             [
                 'Content-Disposition' => 'attachment; filename = file.txt',
@@ -1728,11 +1728,11 @@ class TestResponseTest extends TestCase
     public function testAssertDownloadOfferedWorksWithBinaryFileResponse()
     {
         $files = new Filesystem;
-        $tempDir = __DIR__ . '/tmp';
+        $tempDir = __DIR__.'/tmp';
         $files->makeDirectory($tempDir, 0755, false, true);
-        $files->put($tempDir . '/file.txt', 'Hello World');
+        $files->put($tempDir.'/file.txt', 'Hello World');
         $testResponse = TestResponse::fromBaseResponse(new BinaryFileResponse(
-            $tempDir . '/file.txt',
+            $tempDir.'/file.txt',
             200,
             [],
             true,
@@ -1746,11 +1746,11 @@ class TestResponseTest extends TestCase
     {
         $this->expectException(AssertionFailedError::class);
         $files = new Filesystem;
-        $tempDir = __DIR__ . '/tmp';
+        $tempDir = __DIR__.'/tmp';
         $files->makeDirectory($tempDir, 0755, false, true);
-        $files->put($tempDir . '/file.txt', 'Hello World');
+        $files->put($tempDir.'/file.txt', 'Hello World');
         $testResponse = TestResponse::fromBaseResponse(new BinaryFileResponse(
-            $tempDir . '/file.txt',
+            $tempDir.'/file.txt',
             200,
             [],
             true,
@@ -1763,11 +1763,11 @@ class TestResponseTest extends TestCase
     public function testAssertDownloadOfferedWithAFileNameWithSpacesInIt()
     {
         $files = new Filesystem;
-        $tempDir = __DIR__ . '/tmp';
+        $tempDir = __DIR__.'/tmp';
         $files->makeDirectory($tempDir, 0755, false, true);
-        $files->put($tempDir . '/file.txt', 'Hello World');
+        $files->put($tempDir.'/file.txt', 'Hello World');
         $testResponse = TestResponse::fromBaseResponse(new Response(
-            $files->get($tempDir . '/file.txt'),
+            $files->get($tempDir.'/file.txt'),
             200,
             [
                 'Content-Disposition' => 'attachment; filename = "test file.txt"',
@@ -1794,13 +1794,13 @@ class TestResponseTest extends TestCase
     public function testCanBeCreatedFromBinaryFileResponses()
     {
         $files = new Filesystem;
-        $tempDir = __DIR__ . '/tmp';
+        $tempDir = __DIR__.'/tmp';
         $files->makeDirectory($tempDir, 0755, false, true);
-        $files->put($tempDir . '/file.txt', 'Hello World');
+        $files->put($tempDir.'/file.txt', 'Hello World');
 
-        $response = TestResponse::fromBaseResponse(new BinaryFileResponse($tempDir . '/file.txt'));
+        $response = TestResponse::fromBaseResponse(new BinaryFileResponse($tempDir.'/file.txt'));
 
-        $this->assertEquals($tempDir . '/file.txt', $response->getFile()->getPathname());
+        $this->assertEquals($tempDir.'/file.txt', $response->getFile()->getPathname());
 
         $files->deleteDirectory($tempDir);
     }
@@ -1883,7 +1883,7 @@ class TestResponseTest extends TestCase
 
         $cookieName = 'cookie-name';
         $cookieValue = 'cookie-value';
-        $encryptedValue = $encrypter->encrypt(CookieValuePrefix::create($cookieName, $encrypter->getKey()) . $cookieValue, false);
+        $encryptedValue = $encrypter->encrypt(CookieValuePrefix::create($cookieName, $encrypter->getKey()).$cookieValue, false);
 
         $response = TestResponse::fromBaseResponse(
             (new Response)->withCookie(new Cookie($cookieName, $encryptedValue))
@@ -2127,7 +2127,7 @@ class TestResponseTest extends TestCase
         $cookieName = 'cookie-name';
         $cookieValue = 'cookie-value';
         $encryptedValue = $encrypter->encrypt(
-            CookieValuePrefix::create($cookieName, $encrypter->getKey()) . $cookieValue,
+            CookieValuePrefix::create($cookieName, $encrypter->getKey()).$cookieValue,
             false
         );
 

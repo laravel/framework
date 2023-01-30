@@ -63,7 +63,7 @@ class RequirePasswordTest extends TestCase
 
         $router->get('test-route', function (): Response {
             return new Response('foobar');
-        })->middleware([StartSession::class, RequirePassword::class . ':my-password.confirm']);
+        })->middleware([StartSession::class, RequirePassword::class.':my-password.confirm']);
 
         $response = $this->withSession(['auth.password_confirmed_at' => time() - 10801])->get('test-route');
 
