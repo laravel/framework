@@ -2,6 +2,8 @@
 
 namespace Illuminate\Http\Client\Concerns;
 
+use Illuminate\Http\Response;
+
 trait DeterminesStatusCode
 {
     /**
@@ -11,7 +13,7 @@ trait DeterminesStatusCode
      */
     public function ok()
     {
-        return $this->status() === 200;
+        return $this->status() === Response::HTTP_OK;
     }
 
     /**
@@ -21,7 +23,7 @@ trait DeterminesStatusCode
      */
     public function created()
     {
-        return $this->status() === 201;
+        return $this->status() === Response::HTTP_CREATED;
     }
 
     /**
@@ -31,7 +33,7 @@ trait DeterminesStatusCode
      */
     public function accepted()
     {
-        return $this->status() === 202;
+        return $this->status() === Response::HTTP_ACCEPTED;
     }
 
     /**
@@ -40,7 +42,7 @@ trait DeterminesStatusCode
      * @param  int  $status
      * @return bool
      */
-    public function noContent($status = 204)
+    public function noContent($status = Response::HTTP_NO_CONTENT)
     {
         return $this->status() === $status && $this->body() === '';
     }
@@ -52,7 +54,7 @@ trait DeterminesStatusCode
      */
     public function movedPermanently()
     {
-        return $this->status() === 301;
+        return $this->status() === Response::HTTP_MOVED_PERMANENTLY;
     }
 
     /**
@@ -62,7 +64,7 @@ trait DeterminesStatusCode
      */
     public function found()
     {
-        return $this->status() === 302;
+        return $this->status() === Response::HTTP_FOUND;
     }
 
     /**
@@ -72,7 +74,7 @@ trait DeterminesStatusCode
      */
     public function badRequest()
     {
-        return $this->status() === 400;
+        return $this->status() === Response::HTTP_BAD_REQUEST;
     }
 
     /**
@@ -82,7 +84,7 @@ trait DeterminesStatusCode
      */
     public function unauthorized()
     {
-        return $this->status() === 401;
+        return $this->status() === Response::HTTP_UNAUTHORIZED;
     }
 
     /**
@@ -92,7 +94,7 @@ trait DeterminesStatusCode
      */
     public function paymentRequired()
     {
-        return $this->status() === 402;
+        return $this->status() === Response::HTTP_PAYMENT_REQUIRED;
     }
 
     /**
@@ -102,7 +104,7 @@ trait DeterminesStatusCode
      */
     public function forbidden()
     {
-        return $this->status() === 403;
+        return $this->status() === Response::HTTP_FORBIDDEN;
     }
 
     /**
@@ -112,7 +114,7 @@ trait DeterminesStatusCode
      */
     public function notFound()
     {
-        return $this->status() === 404;
+        return $this->status() === Response::HTTP_NOT_FOUND;
     }
 
     /**
@@ -122,7 +124,7 @@ trait DeterminesStatusCode
      */
     public function requestTimeout()
     {
-        return $this->status() === 408;
+        return $this->status() === Response::HTTP_REQUEST_TIMEOUT;
     }
 
     /**
@@ -132,7 +134,7 @@ trait DeterminesStatusCode
      */
     public function conflict()
     {
-        return $this->status() === 409;
+        return $this->status() === Response::HTTP_CONFLICT;
     }
 
     /**
@@ -142,7 +144,7 @@ trait DeterminesStatusCode
      */
     public function unprocessableEntity()
     {
-        return $this->status() === 422;
+        return $this->status() === Response::HTTP_UNPROCESSABLE_ENTITY;
     }
 
     /**
@@ -152,6 +154,6 @@ trait DeterminesStatusCode
      */
     public function tooManyRequests()
     {
-        return $this->status() === 429;
+        return $this->status() === Response::HTTP_TOO_MANY_REQUESTS;
     }
 }
