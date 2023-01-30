@@ -516,14 +516,12 @@ class TestResponseTest extends TestCase
 
     public function testAssertOk()
     {
-        $statusCode = 500;
-
         $this->expectException(AssertionFailedError::class);
 
         $this->expectExceptionMessage('Expected response status code');
 
-        $baseResponse = tap(new Response, function ($response) use ($statusCode) {
-            $response->setStatusCode($statusCode);
+        $baseResponse = tap(new Response, function ($response) {
+            $response->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
         });
 
         $response = TestResponse::fromBaseResponse($baseResponse);
@@ -532,14 +530,12 @@ class TestResponseTest extends TestCase
 
     public function testAssertCreated()
     {
-        $statusCode = 500;
-
         $this->expectException(AssertionFailedError::class);
 
         $this->expectExceptionMessage('Expected response status code');
 
-        $baseResponse = tap(new Response, function ($response) use ($statusCode) {
-            $response->setStatusCode($statusCode);
+        $baseResponse = tap(new Response, function ($response) {
+            $response->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
         });
 
         $response = TestResponse::fromBaseResponse($baseResponse);
@@ -548,13 +544,11 @@ class TestResponseTest extends TestCase
 
     public function testAssertNotFound()
     {
-        $statusCode = 500;
-
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Expected response status code');
 
-        $baseResponse = tap(new Response, function ($response) use ($statusCode) {
-            $response->setStatusCode($statusCode);
+        $baseResponse = tap(new Response, function ($response) {
+            $response->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
         });
 
         $response = TestResponse::fromBaseResponse($baseResponse);
@@ -563,14 +557,12 @@ class TestResponseTest extends TestCase
 
     public function testAssertForbidden()
     {
-        $statusCode = 500;
-
         $this->expectException(AssertionFailedError::class);
 
         $this->expectExceptionMessage('Expected response status code');
 
-        $baseResponse = tap(new Response, function ($response) use ($statusCode) {
-            $response->setStatusCode($statusCode);
+        $baseResponse = tap(new Response, function ($response) {
+            $response->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
         });
 
         $response = TestResponse::fromBaseResponse($baseResponse);
@@ -579,14 +571,12 @@ class TestResponseTest extends TestCase
 
     public function testAssertUnauthorized()
     {
-        $statusCode = 500;
-
         $this->expectException(AssertionFailedError::class);
 
         $this->expectExceptionMessage('Expected response status code');
 
-        $baseResponse = tap(new Response, function ($response) use ($statusCode) {
-            $response->setStatusCode($statusCode);
+        $baseResponse = tap(new Response, function ($response) {
+            $response->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
         });
 
         $response = TestResponse::fromBaseResponse($baseResponse);
@@ -747,14 +737,12 @@ class TestResponseTest extends TestCase
 
     public function testAssertUnprocessable()
     {
-        $statusCode = 500;
-
         $this->expectException(AssertionFailedError::class);
 
         $this->expectExceptionMessage('Expected response status code');
 
-        $baseResponse = tap(new Response, function ($response) use ($statusCode) {
-            $response->setStatusCode($statusCode);
+        $baseResponse = tap(new Response, function ($response) {
+            $response->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
         });
 
         $response = TestResponse::fromBaseResponse($baseResponse);
@@ -763,10 +751,8 @@ class TestResponseTest extends TestCase
 
     public function testAssertServerError()
     {
-        $statusCode = 500;
-
-        $baseResponse = tap(new Response, function ($response) use ($statusCode) {
-            $response->setStatusCode($statusCode);
+        $baseResponse = tap(new Response, function ($response) {
+            $response->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
         });
 
         $response = TestResponse::fromBaseResponse($baseResponse);
@@ -775,14 +761,12 @@ class TestResponseTest extends TestCase
 
     public function testAssertNoContentAsserts204StatusCodeByDefault()
     {
-        $statusCode = 500;
-
         $this->expectException(AssertionFailedError::class);
 
         $this->expectExceptionMessage('Expected response status code');
 
-        $baseResponse = tap(new Response, function ($response) use ($statusCode) {
-            $response->setStatusCode($statusCode);
+        $baseResponse = tap(new Response, function ($response) {
+            $response->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
         });
 
         $response = TestResponse::fromBaseResponse($baseResponse);
@@ -791,19 +775,16 @@ class TestResponseTest extends TestCase
 
     public function testAssertNoContentAssertsExpectedStatusCode()
     {
-        $statusCode = 500;
-        $expectedStatusCode = 418;
-
         $this->expectException(AssertionFailedError::class);
 
         $this->expectExceptionMessage('Expected response status code');
 
-        $baseResponse = tap(new Response, function ($response) use ($statusCode) {
-            $response->setStatusCode($statusCode);
+        $baseResponse = tap(new Response, function ($response) {
+            $response->setStatusCode(Response::HTTP_I_AM_A_TEAPOT);
         });
 
         $response = TestResponse::fromBaseResponse($baseResponse);
-        $response->assertNoContent($expectedStatusCode);
+        $response->assertNoContent(Response::HTTP_INTERNAL_SERVER_ERROR);
     }
 
     public function testAssertNoContentAssertsEmptyContent()
@@ -813,7 +794,7 @@ class TestResponseTest extends TestCase
         $this->expectExceptionMessage('Response content is not empty');
 
         $baseResponse = tap(new Response, function ($response) {
-            $response->setStatusCode(204);
+            $response->setStatusCode(Response::HTTP_NO_CONTENT);
             $response->setContent('non-empty-response-content');
         });
 
@@ -823,19 +804,16 @@ class TestResponseTest extends TestCase
 
     public function testAssertStatus()
     {
-        $statusCode = 500;
-        $expectedStatusCode = 401;
-
         $this->expectException(AssertionFailedError::class);
 
         $this->expectExceptionMessage('Expected response status code');
 
-        $baseResponse = tap(new Response, function ($response) use ($statusCode) {
-            $response->setStatusCode($statusCode);
+        $baseResponse = tap(new Response, function ($response) {
+            $response->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
         });
 
         $response = TestResponse::fromBaseResponse($baseResponse);
-        $response->assertStatus($expectedStatusCode);
+        $response->assertUnauthorized();
     }
 
     public function testAssertHeader()
@@ -1273,8 +1251,7 @@ class TestResponseTest extends TestCase
 
         $store->put('errors', $errorBag = new ViewErrorBag);
 
-        $errorBag->put('default', new MessageBag([
-        ]));
+        $errorBag->put('default', new MessageBag([]));
 
         $testResponse = TestResponse::fromBaseResponse(new Response);
 
@@ -1717,11 +1694,13 @@ class TestResponseTest extends TestCase
     public function testAssertDownloadOffered()
     {
         $files = new Filesystem;
-        $tempDir = __DIR__.'/tmp';
+        $tempDir = __DIR__ . '/tmp';
         $files->makeDirectory($tempDir, 0755, false, true);
-        $files->put($tempDir.'/file.txt', 'Hello World');
+        $files->put($tempDir . '/file.txt', 'Hello World');
         $testResponse = TestResponse::fromBaseResponse(new Response(
-            $files->get($tempDir.'/file.txt'), 200, [
+            $files->get($tempDir . '/file.txt'),
+            200,
+            [
                 'Content-Disposition' => 'attachment; filename=file.txt',
             ]
         ));
@@ -1732,11 +1711,13 @@ class TestResponseTest extends TestCase
     public function testAssertDownloadOfferedWithAFileName()
     {
         $files = new Filesystem;
-        $tempDir = __DIR__.'/tmp';
+        $tempDir = __DIR__ . '/tmp';
         $files->makeDirectory($tempDir, 0755, false, true);
-        $files->put($tempDir.'/file.txt', 'Hello World');
+        $files->put($tempDir . '/file.txt', 'Hello World');
         $testResponse = TestResponse::fromBaseResponse(new Response(
-            $files->get($tempDir.'/file.txt'), 200, [
+            $files->get($tempDir . '/file.txt'),
+            200,
+            [
                 'Content-Disposition' => 'attachment; filename = file.txt',
             ]
         ));
@@ -1747,11 +1728,15 @@ class TestResponseTest extends TestCase
     public function testAssertDownloadOfferedWorksWithBinaryFileResponse()
     {
         $files = new Filesystem;
-        $tempDir = __DIR__.'/tmp';
+        $tempDir = __DIR__ . '/tmp';
         $files->makeDirectory($tempDir, 0755, false, true);
-        $files->put($tempDir.'/file.txt', 'Hello World');
+        $files->put($tempDir . '/file.txt', 'Hello World');
         $testResponse = TestResponse::fromBaseResponse(new BinaryFileResponse(
-            $tempDir.'/file.txt', 200, [], true, 'attachment'
+            $tempDir . '/file.txt',
+            200,
+            [],
+            true,
+            'attachment'
         ));
         $testResponse->assertDownload('file.txt');
         $files->deleteDirectory($tempDir);
@@ -1761,11 +1746,15 @@ class TestResponseTest extends TestCase
     {
         $this->expectException(AssertionFailedError::class);
         $files = new Filesystem;
-        $tempDir = __DIR__.'/tmp';
+        $tempDir = __DIR__ . '/tmp';
         $files->makeDirectory($tempDir, 0755, false, true);
-        $files->put($tempDir.'/file.txt', 'Hello World');
+        $files->put($tempDir . '/file.txt', 'Hello World');
         $testResponse = TestResponse::fromBaseResponse(new BinaryFileResponse(
-            $tempDir.'/file.txt', 200, [], true, 'inline'
+            $tempDir . '/file.txt',
+            200,
+            [],
+            true,
+            'inline'
         ));
         $testResponse->assertDownload();
         $files->deleteDirectory($tempDir);
@@ -1774,11 +1763,13 @@ class TestResponseTest extends TestCase
     public function testAssertDownloadOfferedWithAFileNameWithSpacesInIt()
     {
         $files = new Filesystem;
-        $tempDir = __DIR__.'/tmp';
+        $tempDir = __DIR__ . '/tmp';
         $files->makeDirectory($tempDir, 0755, false, true);
-        $files->put($tempDir.'/file.txt', 'Hello World');
+        $files->put($tempDir . '/file.txt', 'Hello World');
         $testResponse = TestResponse::fromBaseResponse(new Response(
-            $files->get($tempDir.'/file.txt'), 200, [
+            $files->get($tempDir . '/file.txt'),
+            200,
+            [
                 'Content-Disposition' => 'attachment; filename = "test file.txt"',
             ]
         ));
@@ -1795,20 +1786,21 @@ class TestResponseTest extends TestCase
         $response = TestResponse::fromBaseResponse(new Response);
 
         $this->assertSame(
-            'bar', $response->foo()
+            'bar',
+            $response->foo()
         );
     }
 
     public function testCanBeCreatedFromBinaryFileResponses()
     {
         $files = new Filesystem;
-        $tempDir = __DIR__.'/tmp';
+        $tempDir = __DIR__ . '/tmp';
         $files->makeDirectory($tempDir, 0755, false, true);
-        $files->put($tempDir.'/file.txt', 'Hello World');
+        $files->put($tempDir . '/file.txt', 'Hello World');
 
-        $response = TestResponse::fromBaseResponse(new BinaryFileResponse($tempDir.'/file.txt'));
+        $response = TestResponse::fromBaseResponse(new BinaryFileResponse($tempDir . '/file.txt'));
 
-        $this->assertEquals($tempDir.'/file.txt', $response->getFile()->getPathname());
+        $this->assertEquals($tempDir . '/file.txt', $response->getFile()->getPathname());
 
         $files->deleteDirectory($tempDir);
     }
@@ -1864,12 +1856,12 @@ class TestResponseTest extends TestCase
     public function testItCanBeTapped()
     {
         $response = TestResponse::fromBaseResponse(
-            (new Response)->setContent('')->setStatusCode(418)
+            (new Response)->setContent('')->setStatusCode(Response::HTTP_I_AM_A_TEAPOT)
         );
 
         $response->tap(function ($response) {
             $this->assertInstanceOf(TestResponse::class, $response);
-        })->assertStatus(418);
+        })->assertStatus(Response::HTTP_I_AM_A_TEAPOT);
     }
 
     public function testAssertPlainCookie()
@@ -1891,7 +1883,7 @@ class TestResponseTest extends TestCase
 
         $cookieName = 'cookie-name';
         $cookieValue = 'cookie-value';
-        $encryptedValue = $encrypter->encrypt(CookieValuePrefix::create($cookieName, $encrypter->getKey()).$cookieValue, false);
+        $encryptedValue = $encrypter->encrypt(CookieValuePrefix::create($cookieName, $encrypter->getKey()) . $cookieValue, false);
 
         $response = TestResponse::fromBaseResponse(
             (new Response)->withCookie(new Cookie($cookieName, $encryptedValue))
@@ -2135,7 +2127,8 @@ class TestResponseTest extends TestCase
         $cookieName = 'cookie-name';
         $cookieValue = 'cookie-value';
         $encryptedValue = $encrypter->encrypt(
-            CookieValuePrefix::create($cookieName, $encrypter->getKey()).$cookieValue, false
+            CookieValuePrefix::create($cookieName, $encrypter->getKey()) . $cookieValue,
+            false
         );
 
         $response = TestResponse::fromBaseResponse(
