@@ -112,9 +112,9 @@ class FilesystemTest extends TestCase
      */
     public function testReplaceWhenUnixSymlinkExists()
     {
-        $tempFile = self::$tempDir.'/file.txt';
-        $symlinkDir = self::$tempDir.'/symlink_dir';
-        $symlink = "{$symlinkDir}/symlink.txt";
+        $tempFile = self::$tempDir.'/'.time().'file.txt';
+        $symlinkDir = self::$tempDir.'/'.time().'symlink_dir';
+        $symlink = "{$symlinkDir}/'.time().'symlink.txt";
 
         mkdir($symlinkDir);
         symlink($tempFile, $symlink);
@@ -123,7 +123,7 @@ class FilesystemTest extends TestCase
         chmod($symlinkDir, 0555);
 
         // Test with a weird non-standard umask.
-        $umask = 0131;
+        $umask = 0031;
         $originalUmask = umask($umask);
 
         $filesystem = new Filesystem;
