@@ -5,16 +5,10 @@ namespace Illuminate\Tests\Integration\Queue;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Bus\Queueable;
-use Illuminate\Cache\RateLimiter;
-use Illuminate\Cache\RateLimiting\Limit;
-use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Queue\Job;
-use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\Middleware\RateLimited;
 use Illuminate\Queue\Middleware\SkipCancelled;
-use Illuminate\Support\Str;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
 
