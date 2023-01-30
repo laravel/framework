@@ -118,7 +118,7 @@ PHP);
 
         $response = $this->postJson("/user/{$user->id}");
 
-        $response->assertStatus(404);
+        $response->assertNotFound();
     }
 
     public function testSoftDeletedModelsCanBeRetrievedUsingWithTrashedMethod()
