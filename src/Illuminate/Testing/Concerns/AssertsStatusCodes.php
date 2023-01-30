@@ -2,6 +2,7 @@
 
 namespace Illuminate\Testing\Concerns;
 
+use Illuminate\Http\Response;
 use Illuminate\Testing\Assert as PHPUnit;
 
 trait AssertsStatusCodes
@@ -13,7 +14,7 @@ trait AssertsStatusCodes
      */
     public function assertOk()
     {
-        return $this->assertStatus(200);
+        return $this->assertStatus(Response::HTTP_OK);
     }
 
     /**
@@ -23,7 +24,7 @@ trait AssertsStatusCodes
      */
     public function assertCreated()
     {
-        return $this->assertStatus(201);
+        return $this->assertStatus(Response::HTTP_CREATED);
     }
 
     /**
@@ -33,7 +34,7 @@ trait AssertsStatusCodes
      */
     public function assertAccepted()
     {
-        return $this->assertStatus(202);
+        return $this->assertStatus(Response::HTTP_ACCEPTED);
     }
 
     /**
@@ -42,7 +43,7 @@ trait AssertsStatusCodes
      * @param  int  $status
      * @return $this
      */
-    public function assertNoContent($status = 204)
+    public function assertNoContent($status = Response::HTTP_NO_CONTENT)
     {
         $this->assertStatus($status);
 
@@ -59,7 +60,7 @@ trait AssertsStatusCodes
      */
     public function assertMovedPermanently()
     {
-        return $this->assertStatus(301);
+        return $this->assertStatus(Response::HTTP_MOVED_PERMANENTLY);
     }
 
     /**
@@ -70,7 +71,7 @@ trait AssertsStatusCodes
      */
     public function assertFound()
     {
-        return $this->assertStatus(302);
+        return $this->assertStatus(Response::HTTP_FOUND);
     }
 
     /**
@@ -80,7 +81,7 @@ trait AssertsStatusCodes
      */
     public function assertBadRequest()
     {
-        return $this->assertStatus(400);
+        return $this->assertStatus(Response::HTTP_BAD_REQUEST);
     }
 
     /**
@@ -90,7 +91,7 @@ trait AssertsStatusCodes
      */
     public function assertUnauthorized()
     {
-        return $this->assertStatus(401);
+        return $this->assertStatus(Response::HTTP_UNAUTHORIZED);
     }
 
     /**
@@ -100,7 +101,7 @@ trait AssertsStatusCodes
      */
     public function assertPaymentRequired()
     {
-        return $this->assertStatus(402);
+        return $this->assertStatus(Response::HTTP_PAYMENT_REQUIRED);
     }
 
     /**
@@ -110,7 +111,7 @@ trait AssertsStatusCodes
      */
     public function assertForbidden()
     {
-        return $this->assertStatus(403);
+        return $this->assertStatus(Response::HTTP_FORBIDDEN);
     }
 
     /**
@@ -120,7 +121,7 @@ trait AssertsStatusCodes
      */
     public function assertNotFound()
     {
-        return $this->assertStatus(404);
+        return $this->assertStatus(Response::HTTP_NOT_FOUND);
     }
 
     /**
@@ -130,7 +131,7 @@ trait AssertsStatusCodes
      */
     public function assertRequestTimeout()
     {
-        return $this->assertStatus(408);
+        return $this->assertStatus(Response::HTTP_REQUEST_TIMEOUT);
     }
 
     /**
@@ -140,7 +141,7 @@ trait AssertsStatusCodes
      */
     public function assertConflict()
     {
-        return $this->assertStatus(409);
+        return $this->assertStatus(Response::HTTP_CONFLICT);
     }
 
     /**
@@ -150,7 +151,7 @@ trait AssertsStatusCodes
      */
     public function assertUnprocessable()
     {
-        return $this->assertStatus(422);
+        return $this->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
     }
 
     /**
@@ -160,6 +161,6 @@ trait AssertsStatusCodes
      */
     public function assertTooManyRequests()
     {
-        return $this->assertStatus(429);
+        return $this->assertStatus(Response::HTTP_TOO_MANY_REQUESTS);
     }
 }
