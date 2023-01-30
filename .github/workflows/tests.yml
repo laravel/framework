@@ -66,7 +66,6 @@ jobs:
           timeout_minutes: 5
           max_attempts: 5
           command: composer require symfony/css-selector:^6.0 --no-interaction --no-update
-        if: matrix.php >= 8.1
 
       - name: Set Minimum PHP 8.2 Versions
         uses: nick-fields/retry@v2
@@ -134,16 +133,7 @@ jobs:
         with:
           timeout_minutes: 5
           max_attempts: 5
-          command: composer require ramsey/collection:^1.2 brick/math:^0.9.3 --no-interaction --no-update
-        if: matrix.php >= 8.1
-
-      - name: Set Minimum PHP 8.1 Versions
-        uses: nick-fields/retry@v2
-        with:
-          timeout_minutes: 5
-          max_attempts: 5
           command: composer require symfony/css-selector:~6.0 --no-interaction --no-update
-        if: matrix.php >= 8.1
 
       - name: Set Minimum PHP 8.2 Versions
         uses: nick-fields/retry@v2
