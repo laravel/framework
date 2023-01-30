@@ -127,7 +127,7 @@ class UrlSigningTest extends TestCase
         })->name('foo');
 
         $this->assertIsString($url = URL::signedRoute('foo', ['id' => 1]));
-        $this->assertSame('invalid', $this->get($url.'&appended')->original);
+        $this->assertSame('invalid', $this->get($url . '&appended')->original);
     }
 
     public function testSignedUrlParametersParsedCorrectly()
@@ -142,7 +142,8 @@ class UrlSigningTest extends TestCase
                 : 'invalid';
         })->name('foo');
 
-        $this->assertIsString($url = URL::signedRoute('foo', ['id' => 1,
+        $this->assertIsString($url = URL::signedRoute('foo', [
+            'id' => 1,
             'paramEmpty',
             'paramEmptyString' => '',
             'paramWithValue' => 'value',
@@ -156,12 +157,13 @@ class UrlSigningTest extends TestCase
             return $request->hasValidSignatureWhileIgnoring(['one', 'two', 'three']) ? 'valid' : 'invalid';
         })->name('foo');
 
-        $this->assertIsString($url = URL::signedRoute('foo', ['id' => 1,
+        $this->assertIsString($url = URL::signedRoute('foo', [
+            'id' => 1,
             'bar' => 'baz',
         ]));
 
-        $this->assertSame('valid', $this->get($url.'&one=value&two=another-value')->original);
-        $this->assertSame('valid', $this->get($url.'&two=value&one=&three')->original);
+        $this->assertSame('valid', $this->get($url . '&one=value&two=another-value')->original);
+        $this->assertSame('valid', $this->get($url . '&two=value&one=&three')->original);
     }
 
     public function testUnusualExceptedParametersWorksAsExpexted()
@@ -171,7 +173,8 @@ class UrlSigningTest extends TestCase
             return $request->hasValidSignatureWhileIgnoring(['']) ? 'valid' : 'invalid';
         })->name('foo');
 
-        $this->assertIsString($url = URL::signedRoute('foo', ['id' => 1,
+        $this->assertIsString($url = URL::signedRoute('foo', [
+            'id' => 1,
             'bar' => 'baz',
         ]));
 
@@ -181,11 +184,12 @@ class UrlSigningTest extends TestCase
             return $request->hasValidSignatureWhileIgnoring(['*', '[a-z]+']) ? 'valid' : 'invalid';
         })->name('foo');
 
-        $this->assertIsString($url = URL::signedRoute('foo', ['id' => 1,
+        $this->assertIsString($url = URL::signedRoute('foo', [
+            'id' => 1,
             'bar' => 'baz',
         ]));
 
-        $this->assertSame('valid', $this->get($url.'&*=value&[a-z]+=value')->original);
+        $this->assertSame('valid', $this->get($url . '&*=value&[a-z]+=value')->original);
     }
 
     public function testExceptedParameterCanBeAPrefixOrSuffixOfAnotherParameter()
@@ -194,12 +198,13 @@ class UrlSigningTest extends TestCase
             return $request->hasValidSignatureWhileIgnoring(['pre', 'fix']) ? 'valid' : 'invalid';
         })->name('foo');
 
-        $this->assertIsString($url = URL::signedRoute('foo', ['id' => 1,
+        $this->assertIsString($url = URL::signedRoute('foo', [
+            'id' => 1,
             'prefix' => 'value',
             'suffix' => 'value',
         ]));
 
-        $this->assertSame('valid', $this->get($url.'&pre=fix&fix=suff')->original);
+        $this->assertSame('valid', $this->get($url . '&pre=fix&fix=suff')->original);
     }
 
     public function testSignedMiddleware()
@@ -224,7 +229,7 @@ class UrlSigningTest extends TestCase
         Carbon::setTestNow(Carbon::create(2018, 1, 1)->addMinutes(10));
 
         $response = $this->get($url);
-        $response->assertStatus(403);
+        $response->assertForbidden();
     }
 
     public function testSignedMiddlewareWithRoutableParameter()
@@ -246,11 +251,11 @@ class UrlSigningTest extends TestCase
             return $request->hasValidSignature($absolute = false) ? 'valid' : 'invalid';
         })->name('foo')->middleware('signed:relative');
 
-        $this->assertIsString($url = 'https://fake.test'.URL::signedRoute('foo', [], null, $absolute = false));
+        $this->assertIsString($url = 'https://fake.test' . URL::signedRoute('foo', [], null, $absolute = false));
         $this->assertSame('valid', $this->get($url)->original);
 
         $response = $this->get('/foo/relative');
-        $response->assertStatus(403);
+        $response->assertForbidden();
     }
 
     public function testSignedMiddlewareIgnoringParameter()
@@ -258,7 +263,7 @@ class UrlSigningTest extends TestCase
         Route::get('/foo/{id}}', function (Request $request, $id) {
         })->name('foo')->middleware('signed:relative');
 
-        $this->assertIsString($url = URL::signedRoute('foo', ['id' => 1]).'&ignore=me');
+        $this->assertIsString($url = URL::signedRoute('foo', ['id' => 1]) . '&ignore=me');
         $request = Request::create($url);
         $middleware = $this->createValidateSignatureMiddleware(['ignore']);
 
