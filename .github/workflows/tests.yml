@@ -102,7 +102,7 @@ jobs:
         if: matrix.phpunit == '9.0'
 
       - name: Execute tests against PHPUnit ^10
-        run: vendor/bin/phpunit --verbose
+        run: vendor/bin/phpunit
         env:
           DB_PORT: ${{ job.services.mysql.ports[3306] }}
           DB_USERNAME: root
