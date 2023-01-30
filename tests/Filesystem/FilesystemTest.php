@@ -97,12 +97,13 @@ class FilesystemTest extends TestCase
         $this->assertStringEqualsFile($tempFile, 'Hello Taylor');
     }
 
-    public function testFilePermissionRestoredAfterReplace(){
+    public function testFilePermissionRestoredAfterReplace()
+    {
         $tempFile = self::$tempDir.'/file.txt';
         $filesystem = new Filesystem;
         $filesystem->replace($tempFile, 'Hello World');
         $umaskValue = umask();
-        $permissionValueInDecimal = (int) base_convert("666",8,10);
+        $permissionValueInDecimal = (int) base_convert('666', 8, 10);
         $actualPermission = $permissionValueInDecimal - $umaskValue;
         $this->assertEquals($actualPermission, $this->getFilePermissions($tempFile));
     }
