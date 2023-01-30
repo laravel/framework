@@ -76,13 +76,6 @@ jobs:
           command: composer require guzzlehttp/guzzle:^7.5 guzzlehttp/psr7:^2.4 predis/predis:^2.0.2 --no-interaction --no-update
         if: matrix.php >= 8.2
 
-      - name: Set PHPUnit
-        uses: nick-fields/retry@v2
-        with:
-          timeout_minutes: 5
-          max_attempts: 5
-          command: composer require phpunit/phpunit:~${{ matrix.phpunit }} --dev --no-interaction --no-update
-
       - name: Install dependencies
         uses: nick-fields/retry@v2
         with:
@@ -163,13 +156,6 @@ jobs:
           max_attempts: 5
           command: composer require guzzlehttp/guzzle:~7.5 guzzlehttp/psr7:~2.4 predis/predis:~2.0.2 --no-interaction --no-update
         if: matrix.php >= 8.2
-
-      - name: Set PHPUnit
-        uses: nick-fields/retry@v2
-        with:
-          timeout_minutes: 5
-          max_attempts: 5
-          command: composer require phpunit/phpunit:~${{ matrix.phpunit }} --dev --no-interaction --no-update
 
       - name: Install dependencies
         uses: nick-fields/retry@v2
