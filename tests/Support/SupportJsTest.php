@@ -5,6 +5,8 @@ namespace Illuminate\Tests\Support;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Js;
+use Illuminate\Tests\Support\Fixtures\IntBackedEnum;
+use Illuminate\Tests\Support\Fixtures\StringBackedEnum;
 use JsonSerializable;
 use PHPUnit\Framework\TestCase;
 
@@ -16,6 +18,7 @@ class SupportJsTest extends TestCase
         $this->assertSame('true', (string) Js::from(true));
         $this->assertSame('1', (string) Js::from(1));
         $this->assertSame('1.1', (string) Js::from(1.1));
+        $this->assertSame("'Hello world'", (string) Js::from('Hello world'));
         $this->assertEquals(
             "'\\u003Cdiv class=\\u0022foo\\u0022\\u003E\\u0027quoted html\\u0027\\u003C\\/div\\u003E'",
             (string) Js::from('<div class="foo">\'quoted html\'</div>')
@@ -120,5 +123,14 @@ class SupportJsTest extends TestCase
             "JSON.parse('{\\u0022foo\\u0022:\\u0022hello\\u0022,\\u0022bar\\u0022:\\u0022world\\u0022}')",
             (string) Js::from($data)
         );
+    }
+
+    /**
+     * @requires PHP >= 8.1
+     */
+    public function testBackedEnums()
+    {
+        $this->assertSame('2', (string) Js::from(IntBackedEnum::TWO));
+        $this->assertSame("'Hello world'", (string) Js::from(StringBackedEnum::HELLO_WORLD));
     }
 }
