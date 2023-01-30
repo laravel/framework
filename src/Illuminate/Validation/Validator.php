@@ -1211,7 +1211,7 @@ class Validator implements ValidatorContract
      */
     public function validateIfPasses($attributes, array $rules, array $messages = [], array $customAttributes = [])
     {
-        $attributes = (array)$attributes;
+        $attributes = (array) $attributes;
 
         $this->after(function ($validator) use ($attributes, $rules, $messages, $customAttributes) {
             if ($validator->messages()->hasAny($attributes)) {
