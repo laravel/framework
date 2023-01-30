@@ -1178,16 +1178,15 @@ class Builder implements BuilderContract
     /**
      * Delete records from the database.
      *
-     * @param  mixed  $id
      * @return mixed
      */
-    public function delete($id = null)
+    public function delete()
     {
         if (isset($this->onDelete)) {
             return call_user_func($this->onDelete, $this);
         }
 
-        return $this->toBase()->delete($id);
+        return $this->toBase()->delete();
     }
 
     /**
