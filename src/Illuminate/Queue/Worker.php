@@ -141,10 +141,10 @@ class Worker
 
         register_shutdown_function(function () use (&$job) {
             $e = error_get_last();
-            if (!$job instanceof Job) {
+            if (! $job instanceof Job) {
                 return;
             }
-            if (!str_contains($e['message'], 'memory size')) {
+            if (! str_contains($e['message'], 'memory size')) {
                 return;
             }
             $this->failJob($job, new FatalError($e['message'], 0, $e));
