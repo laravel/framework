@@ -108,7 +108,7 @@ class PrecognitionTest extends TestCase
             'Precognition' => 'true',
         ]);
 
-        $response->assertStatus(422);
+        $response->assertUnprocessable();
         $response->assertJsonPath('errors', [
             'required_integer' => [
                 'The required integer must be an integer.',
@@ -126,7 +126,7 @@ class PrecognitionTest extends TestCase
             'required_integer_when_not_precognitive' => 'foo',
         ]);
 
-        $response->assertStatus(422);
+        $response->assertUnprocessable();
         $response->assertJsonPath('errors', [
             'required_integer' => [
                 'The required integer must be an integer.',
@@ -151,7 +151,7 @@ class PrecognitionTest extends TestCase
             'Precognition-Validate-Only' => 'optional_integer_1,optional_integer_2',
         ]);
 
-        $response->assertStatus(422);
+        $response->assertUnprocessable();
         $response->assertJsonPath('errors', [
             'optional_integer_1' => [
                 'The optional integer 1 must be an integer.',
@@ -299,7 +299,7 @@ class PrecognitionTest extends TestCase
             'Precognition-Validate-Only' => 'optional_integer_1,optional_integer_2',
         ]);
 
-        $response->assertStatus(422);
+        $response->assertUnprocessable();
         $response->assertJsonPath('errors', [
             'optional_integer_1' => [
                 'The optional integer 1 must be an integer.',
@@ -325,7 +325,7 @@ class PrecognitionTest extends TestCase
             'Precognition-Validate-Only' => 'optional_integer_1,optional_integer_2',
         ]);
 
-        $response->assertStatus(422);
+        $response->assertUnprocessable();
         $response->assertJsonPath('errors', [
             'optional_integer_1' => [
                 'The optional integer 1 must be an integer.',
@@ -342,7 +342,7 @@ class PrecognitionTest extends TestCase
             precognitive(function () use ($request) {
                 $request->validate([
                     'required_integer' => 'required|integer',
-                    ...! $request->isPrecognitive() ? ['required_integer_when_not_precognitive' => 'required|integer'] : [],
+                    ...!$request->isPrecognitive() ? ['required_integer_when_not_precognitive' => 'required|integer'] : [],
                     'optional_integer_1' => 'integer',
                     'optional_integer_2' => 'integer',
                 ]);
@@ -362,7 +362,7 @@ class PrecognitionTest extends TestCase
             'Precognition-Validate-Only' => 'optional_integer_1,optional_integer_2',
         ]);
 
-        $response->assertStatus(422);
+        $response->assertUnprocessable();
         $response->assertJsonPath('errors', [
             'optional_integer_1' => [
                 'The optional integer 1 must be an integer.',
@@ -379,7 +379,7 @@ class PrecognitionTest extends TestCase
             precognitive(function () use ($request) {
                 $request->validateWithBag('custom-bag', [
                     'required_integer' => 'required|integer',
-                    ! $request->isPrecognitive() ? ['required_integer_when_not_precognitive' => 'required|integer'] : [],
+                    !$request->isPrecognitive() ? ['required_integer_when_not_precognitive' => 'required|integer'] : [],
                     'optional_integer_1' => 'integer',
                     'optional_integer_2' => 'integer',
                 ]);
@@ -400,7 +400,7 @@ class PrecognitionTest extends TestCase
             'Precognition-Validate-Only' => 'optional_integer_1,optional_integer_2',
         ]);
 
-        $response->assertStatus(422);
+        $response->assertUnprocessable();
         $response->assertJsonPath('errors', [
             'optional_integer_1' => [
                 'The optional integer 1 must be an integer.',
@@ -426,7 +426,7 @@ class PrecognitionTest extends TestCase
             'Precognition-Validate-Only' => 'optional_integer_1,optional_integer_2',
         ]);
 
-        $response->assertStatus(422);
+        $response->assertUnprocessable();
         $response->assertJsonPath('errors', [
             'optional_integer_1' => [
                 'The optional integer 1 must be an integer.',
@@ -464,7 +464,7 @@ class PrecognitionTest extends TestCase
             'Precognition-Validate-Only' => ' input with spaces ',
         ]);
 
-        $response->assertStatus(422);
+        $response->assertUnprocessable();
         $response->assertJsonPath('errors', [
             ' input with spaces ' => [
                 'The input with spaces must be an integer.',
@@ -519,7 +519,7 @@ class PrecognitionTest extends TestCase
             'Precognition-Validate-Only' => 'nested,nested.0.name',
         ]);
 
-        $response->assertStatus(422);
+        $response->assertUnprocessable();
         $response->assertExactJson([
             'message' => 'The nested.0.name field is required.',
             'errors' => [
@@ -554,7 +554,7 @@ class PrecognitionTest extends TestCase
             'Precognition-Validate-Only' => 'nested,nested.0.name',
         ]);
 
-        $response->assertStatus(422);
+        $response->assertUnprocessable();
         $response->assertExactJson([
             'message' => 'The nested.0.name field is required.',
             'errors' => [
@@ -584,7 +584,7 @@ class PrecognitionTest extends TestCase
             'Precognition-Validate-Only' => 'nested,nested.0.name',
         ]);
 
-        $response->assertStatus(422);
+        $response->assertUnprocessable();
         $response->assertExactJson([
             'message' => 'The nested.0.name field is required.',
             'errors' => [
@@ -614,7 +614,7 @@ class PrecognitionTest extends TestCase
             'Precognition-Validate-Only' => 'nested,nested.0.name',
         ]);
 
-        $response->assertStatus(422);
+        $response->assertUnprocessable();
         $response->assertExactJson([
             'message' => 'The nested.0.name field is required.',
             'errors' => [
@@ -660,7 +660,7 @@ class PrecognitionTest extends TestCase
             'Precognition-Validate-Only' => 'escaped\.dot',
         ]);
 
-        $response->assertStatus(422);
+        $response->assertUnprocessable();
         $response->assertExactJson([
             'message' => 'The escaped.dot field is required.',
             'errors' => [
@@ -689,7 +689,7 @@ class PrecognitionTest extends TestCase
             'Precognition-Validate-Only' => 'escaped\.dot',
         ]);
 
-        $response->assertStatus(422);
+        $response->assertUnprocessable();
         $response->assertExactJson([
             'message' => 'The escaped.dot field is required.',
             'errors' => [
@@ -713,7 +713,7 @@ class PrecognitionTest extends TestCase
             'Precognition-Validate-Only' => 'escaped\.dot',
         ]);
 
-        $response->assertStatus(422);
+        $response->assertUnprocessable();
         $response->assertExactJson([
             'message' => 'The escaped.dot field is required.',
             'errors' => [
@@ -737,7 +737,7 @@ class PrecognitionTest extends TestCase
             'Precognition-Validate-Only' => 'escaped\.dot',
         ]);
 
-        $response->assertStatus(422);
+        $response->assertUnprocessable();
         $response->assertExactJson([
             'message' => 'The escaped.dot field is required.',
             'errors' => [
@@ -1081,7 +1081,7 @@ class PrecognitionTestController
         precognitive(function () use ($request) {
             $this->validate($request, [
                 'required_integer' => 'required|integer',
-                ...! $request->isPrecognitive() ? ['required_integer_when_not_precognitive' => 'required|integer'] : [],
+                ...!$request->isPrecognitive() ? ['required_integer_when_not_precognitive' => 'required|integer'] : [],
                 'optional_integer_1' => 'integer',
                 'optional_integer_2' => 'integer',
             ]);
@@ -1097,7 +1097,7 @@ class PrecognitionTestController
         precognitive(function () use ($request) {
             $this->validateWithBag('custom-bag', $request, [
                 'required_integer' => 'required|integer',
-                ...! $request->isPrecognitive() ? ['required_integer_when_not_precognitive' => 'required|integer'] : [],
+                ...!$request->isPrecognitive() ? ['required_integer_when_not_precognitive' => 'required|integer'] : [],
                 'optional_integer_1' => 'integer',
                 'optional_integer_2' => 'integer',
             ]);
@@ -1113,7 +1113,7 @@ class PrecognitionTestController
         precognitive(function () use ($request) {
             $this->validateWith([
                 'required_integer' => 'required|integer',
-                ...! $request->isPrecognitive() ? ['required_integer_when_not_precognitive' => 'required|integer'] : [],
+                ...!$request->isPrecognitive() ? ['required_integer_when_not_precognitive' => 'required|integer'] : [],
                 'optional_integer_1' => 'integer',
                 'optional_integer_2' => 'integer',
             ]);
@@ -1209,7 +1209,7 @@ class PrecognitionTestRequest extends FormRequest
             ' input with spaces ' => 'integer',
         ];
 
-        if (! $this->isPrecognitive()) {
+        if (!$this->isPrecognitive()) {
             $rules['required_integer_when_not_precognitive'] = 'required|integer';
         }
 
