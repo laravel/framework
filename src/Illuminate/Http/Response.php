@@ -28,7 +28,7 @@ class Response extends SymfonyResponse
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct($content = '', $status = 200, array $headers = [])
+    public function __construct($content = '', $status = Response::HTTP_OK, array $headers = [])
     {
         $this->headers = new ResponseHeaderBag($headers);
 
@@ -83,10 +83,10 @@ class Response extends SymfonyResponse
     protected function shouldBeJson($content)
     {
         return $content instanceof Arrayable ||
-               $content instanceof Jsonable ||
-               $content instanceof ArrayObject ||
-               $content instanceof JsonSerializable ||
-               is_array($content);
+            $content instanceof Jsonable ||
+            $content instanceof ArrayObject ||
+            $content instanceof JsonSerializable ||
+            is_array($content);
     }
 
     /**
