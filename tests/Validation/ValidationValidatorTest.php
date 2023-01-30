@@ -803,7 +803,9 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['name' => ''], ['name' => 'required']);
 
-        $exception = new class($v) extends ValidationException {};
+        $exception = new class($v) extends ValidationException
+        {
+        };
         $v->setException($exception);
 
         try {
@@ -1647,7 +1649,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame($result, (new Validator($trans, $data, $rules))->passes());
     }
 
-    public function prohibitedRulesData()
+    public static function prohibitedRulesData()
     {
         $emptyCountable = new class implements Countable
         {
@@ -8229,28 +8231,36 @@ class ValidationValidatorTest extends TestCase
 class ImplicitTableModel extends Model
 {
     protected $guarded = [];
+
     public $timestamps = false;
 }
 
 class ExplicitTableModel extends Model
 {
     protected $table = 'explicits';
+
     protected $guarded = [];
+
     public $timestamps = false;
 }
 
 class ExplicitPrefixedTableModel extends Model
 {
     protected $table = 'prefix.explicits';
+
     protected $guarded = [];
+
     public $timestamps = false;
 }
 
 class ExplicitTableAndConnectionModel extends Model
 {
     protected $table = 'explicits';
+
     protected $connection = 'connection';
+
     protected $guarded = [];
+
     public $timestamps = false;
 }
 
