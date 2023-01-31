@@ -278,6 +278,21 @@ class MailMessage extends SimpleMessage implements Renderable
     }
 
     /**
+     * Attach multiple in-memory data as an attachments.
+     *
+     * @param  array  $data
+     * @return $this
+     */
+    public function attachManyData(array $data)
+    {
+        foreach ($data as $item) {
+            $this->attachData(...$item);
+        }
+
+        return $this;
+    }
+    
+    /**
      * Add a tag header to the message when supported by the underlying transport.
      *
      * @param  string  $value
