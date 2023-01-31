@@ -381,6 +381,10 @@ trait CompilesConditionals
     {
         $parts = array_map('trim', explode(',', $this->stripParentheses($expression), 2));
 
+        if (count($parts) === 1) {
+            return "<?php echo 'min=\'{$parts[0]}\''; endif; ?>";
+        }
+
         return "<?php if({$parts[0]}): echo 'min=\'{$parts[1]}\''; endif; ?>";
     }
 
@@ -393,6 +397,10 @@ trait CompilesConditionals
     protected function compileMax($expression)
     {
         $parts = array_map('trim', explode(',', $this->stripParentheses($expression), 2));
+
+        if (count($parts) === 1) {
+            return "<?php echo 'max=\'{$parts[0]}\''; endif; ?>";
+        }
 
         return "<?php if({$parts[0]}): echo 'max=\'{$parts[1]}\''; endif; ?>";
     }
@@ -407,6 +415,10 @@ trait CompilesConditionals
     {
         $parts = array_map('trim', explode(',', $this->stripParentheses($expression), 2));
 
+        if (count($parts) === 1) {
+            return "<?php echo 'minlength=\'{$parts[0]}\''; endif; ?>";
+        }
+
         return "<?php if({$parts[0]}): echo 'minlength=\'{$parts[1]}\''; endif; ?>";
     }
 
@@ -419,6 +431,10 @@ trait CompilesConditionals
     protected function compileMaxlength($expression)
     {
         $parts = array_map('trim', explode(',', $this->stripParentheses($expression), 2));
+
+        if (count($parts) === 1) {
+            return "<?php echo 'maxlength=\'{$parts[0]}\''; endif; ?>";
+        }
 
         return "<?php if({$parts[0]}): echo 'maxlength=\'{$parts[1]}\''; endif; ?>";
     }

@@ -52,10 +52,26 @@ class BladeCheckedStatementsTest extends AbstractBladeTestCase
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
+    public function testMinStatementsWithoutConditionAreCompiled()
+    {
+        $string = '<input @min(1)/>';
+        $expected = "<input <?php echo 'min=\'1\''; endif; ?>/>";
+
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
     public function testMaxStatementsAreCompiled()
     {
         $string = '<input @max(name(foo(bar)), 1)/>';
         $expected = "<input <?php if(name(foo(bar))): echo 'max=\'1\''; endif; ?>/>";
+
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
+    public function testMaxStatementsWithoutConditionAreCompiled()
+    {
+        $string = '<input @max(1)/>';
+        $expected = "<input <?php echo 'max=\'1\''; endif; ?>/>";
 
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
@@ -68,10 +84,26 @@ class BladeCheckedStatementsTest extends AbstractBladeTestCase
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
+    public function testMinlengthStatementsWithoutConditionAreCompiled()
+    {
+        $string = '<input @minlength(1)/>';
+        $expected = "<input <?php echo 'minlength=\'1\''; endif; ?>/>";
+
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
     public function testMaxlengthStatementsAreCompiled()
     {
         $string = '<input @maxlength(name(foo(bar)), 1)/>';
         $expected = "<input <?php if(name(foo(bar))): echo 'maxlength=\'1\''; endif; ?>/>";
+
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
+    public function testMaxlengthStatementsWithoutConditionAreCompiled()
+    {
+        $string = '<input @maxlength(1)/>';
+        $expected = "<input <?php echo 'maxlength=\'1\''; endif; ?>/>";
 
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
