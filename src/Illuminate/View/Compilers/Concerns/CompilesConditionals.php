@@ -361,6 +361,17 @@ trait CompilesConditionals
     }
 
     /**
+     * Compile an autofocus block into valid PHP.
+     *
+     * @param  string  $condition
+     * @return string
+     */
+    protected function compileAutofocus($condition)
+    {
+        return "<?php if{$condition}: echo 'autofocus'; endif; ?>";
+    }
+
+    /**
      * Compile a min block into valid PHP.
      *
      * @param  string  $expression

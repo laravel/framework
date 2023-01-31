@@ -36,6 +36,14 @@ class BladeCheckedStatementsTest extends AbstractBladeTestCase
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
+    public function testAutofocusStatementsAreCompiled()
+    {
+        $string = '<input @autofocus(name(foo(bar)))/>';
+        $expected = "<input <?php if(name(foo(bar))): echo 'autofocus'; endif; ?>/>";
+
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
     public function testMinStatementsAreCompiled()
     {
         $string = '<input @min(name(foo(bar)), 1)/>';
