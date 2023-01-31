@@ -59,4 +59,12 @@ class BladeCheckedStatementsTest extends AbstractBladeTestCase
 
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
+
+    public function testMaxlengthStatementsAreCompiled()
+    {
+        $string = '<input @maxlength(name(foo(bar)), 1)/>';
+        $expected = "<input <?php if(name(foo(bar))): echo 'maxlength=\'1\''; endif; ?>/>";
+
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
 }
