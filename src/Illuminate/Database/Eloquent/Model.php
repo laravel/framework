@@ -2257,6 +2257,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function offsetSet($offset, $value): void
     {
+        if($this->relationLoaded($offset)){
+            $this->setRelation($offset, $value);
+            return;
+        }
         $this->setAttribute($offset, $value);
     }
 
