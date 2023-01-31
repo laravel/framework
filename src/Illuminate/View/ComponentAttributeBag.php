@@ -222,6 +222,19 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
     }
 
     /**
+     * Conditionally merge styles into the attribute bag.
+     *
+     * @param  mixed|array  $styleList
+     * @return static
+     */
+    public function style($styleList)
+    {
+        $styleList = Arr::wrap($styleList);
+
+        return $this->merge(['style' => Arr::toCssStyles($styleList)]);
+    }
+
+    /**
      * Merge additional attributes / values into the attribute bag.
      *
      * @param  array  $attributeDefaults
