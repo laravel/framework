@@ -374,6 +374,19 @@ trait CompilesConditionals
     }
 
     /**
+     * Compile a max block into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileMax($expression)
+    {
+        $parts = array_map('trim', explode(',', $this->stripParentheses($expression), 2));
+
+        return "<?php if({$parts[0]}): echo 'max=\'{$parts[1]}\''; endif; ?>";
+    }
+
+    /**
      * Compile the push statements into valid PHP.
      *
      * @param  string  $expression
