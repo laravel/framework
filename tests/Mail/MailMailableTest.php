@@ -30,9 +30,8 @@ class MailMailableTest extends TestCase
         $mailable->to('taylor@laravel.com', 'Taylor Otwell');
 
         // Add the same recipient again, but with a different name. This should set the name correctly.
-        $this->assertTrue($mailable->hasTo('taylor@laravel.com','Taylor Otwell'));
+        $this->assertTrue($mailable->hasTo('taylor@laravel.com', 'Taylor Otwell'));
         $mailable->assertHasTo('taylor@laravel.com', 'Taylor Otwell');
-
 
         $mailable = new WelcomeMailableStub;
         $mailable->to('taylor@laravel.com', 'Taylor Otwell');
