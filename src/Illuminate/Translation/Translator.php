@@ -477,7 +477,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         if ($class instanceof Closure) {
             [$class, $handler] = [
                 $this->firstClosureParameterType($class),
-                $class
+                $class,
             ];
         }
 
