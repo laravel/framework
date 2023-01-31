@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Translation;
 
 use Illuminate\Contracts\Translation\Loader;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Translation\MessageSelector;
 use Illuminate\Translation\Translator;
@@ -219,6 +220,31 @@ class TranslationTranslatorTest extends TestCase
         $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
         $t->getLoader()->shouldReceive('load')->once()->with('en', 'foo :message', '*')->andReturn([]);
         $this->assertSame('foo ', $t->get('foo :message', ['message' => null]));
+    }
+
+    public function testGetJsonReplacesWithStringable()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+        $t->getLoader()
+            ->shouldReceive('load')
+            ->once()
+            ->with('en', '*', '*')
+            ->andReturn(['test' => 'the date is :date']);
+
+        $date = Carbon::createFromTimestamp(0);
+
+        $this->assertSame(
+            'the date is 1970-01-01 00:00:00',
+            $t->get('test', ['date' => $date])
+        );
+
+        $t->stringable(function (\Illuminate\Support\Carbon $carbon) {
+            return $carbon->format('jS M Y');
+        });
+        $this->assertSame(
+            'the date is 1st Jan 1970',
+            $t->get('test', ['date' => $date])
+        );
     }
 
     public function testDetermineLocalesUsingMethod()
