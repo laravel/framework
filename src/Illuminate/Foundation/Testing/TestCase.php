@@ -131,8 +131,8 @@ abstract class TestCase extends BaseTestCase
             $this->runDatabaseMigrations();
         }
 
-        if (isset($uses[DatabaseTruncates::class])) {
-            $this->runDatabaseTruncates();
+        if (isset($uses[DatabaseTruncation::class])) {
+            $this->truncateDatabaseTables();
         }
 
         if (isset($uses[DatabaseTransactions::class])) {
