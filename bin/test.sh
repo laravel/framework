@@ -13,7 +13,7 @@ while true; do
 done
 
 if $down; then
-    docker-compose down -t 0
+    docker compose down -t 0 || docker-compose down -t 0
 
     exit 0
 fi
@@ -27,7 +27,7 @@ fi
 
 echo "Ensuring services are running"
 
-docker-compose up -d
+docker compose up -d || docker-compose up -d
 
 if docker run -it --rm "registry.gitlab.com/grahamcampbell/php:$php-base" -r "\$tries = 0; while (true) { try { \$tries++; if (\$tries > 30) { throw new RuntimeException('MySQL never became available'); } sleep(1); new PDO('mysql:host=docker.for.mac.localhost;dbname=forge', 'root', '', [PDO::ATTR_TIMEOUT => 3]); break; } catch (PDOException \$e) {} }"; then
     echo "Running tests"
@@ -45,6 +45,6 @@ if docker run -it --rm "registry.gitlab.com/grahamcampbell/php:$php-base" -r "\$
         exit 1
     fi
 else
-    docker-compose logs
+    docker compose logs || docker-compose logs
     exit 1
 fi
