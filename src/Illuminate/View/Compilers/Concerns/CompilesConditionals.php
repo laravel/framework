@@ -387,6 +387,19 @@ trait CompilesConditionals
     }
 
     /**
+     * Compile a minlength block into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileMinlength($expression)
+    {
+        $parts = array_map('trim', explode(',', $this->stripParentheses($expression), 2));
+
+        return "<?php if({$parts[0]}): echo 'minlength=\'{$parts[1]}\''; endif; ?>";
+    }
+
+    /**
      * Compile the push statements into valid PHP.
      *
      * @param  string  $expression
