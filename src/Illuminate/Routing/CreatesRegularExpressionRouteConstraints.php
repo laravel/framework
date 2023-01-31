@@ -40,6 +40,30 @@ trait CreatesRegularExpressionRouteConstraints
     }
 
     /**
+     * Specify that the given route parameters must equals the given length.
+     *
+     * @param  array|string  $parameters
+     * @param  int  $length
+     * @return $this
+     */
+    public function whereLength($parameters, int $length)
+    {
+        return $this->assignExpressionToParameters($parameters, '[0-9]{'.$length.'}');
+    }
+
+    /**
+     * Specify that the given route parameters must equals the given value.
+     *
+     * @param  array|string  $parameters
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function whereEquals($parameters, $value)
+    {
+        return $this->assignExpressionToParameters($parameters, '('.$value.')');
+    }
+
+    /**
      * Specify that the given route parameters must be ULIDs.
      *
      * @param  array|string  $parameters
