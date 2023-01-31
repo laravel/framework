@@ -7,13 +7,12 @@ use Closure;
 use DateTimeInterface;
 use Generator;
 use Illuminate\Contracts\Support\CanBeEscapedWhenCastToString;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\EnumeratesValues;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use IteratorAggregate;
-use Traversable;
 use stdClass;
+use Traversable;
 
 /**
  * @template TKey of array-key
