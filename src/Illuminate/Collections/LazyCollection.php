@@ -1640,10 +1640,10 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
             $maybeTraversable = $source();
             return $maybeTraversable instanceof Traversable
                 ? $maybeTraversable
-                : new ArrayIterator((array)$maybeTraversable);
+                : new ArrayIterator((array) $maybeTraversable);
         }
 
-        return new ArrayIterator((array)$source);
+        return new ArrayIterator((array) $source);
     }
 
     /**

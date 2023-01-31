@@ -73,10 +73,10 @@ class SupportLazyCollectionTest extends TestCase
     public function testCanCreateCollectionFromNonGeneratorFunction()
     {
         $data = LazyCollection::make(function () {
-            return "laravel";
+            return 'laravel';
         });
 
-        $this->assertSame(["laravel"], $data->all());
+        $this->assertSame(['laravel'], $data->all());
     }
 
     public function testDoesNotCreateCollectionFromGenerator()
