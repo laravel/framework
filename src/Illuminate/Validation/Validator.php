@@ -14,6 +14,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
+use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\ValidatedInput;
 use InvalidArgumentException;
 use RuntimeException;
@@ -24,6 +25,10 @@ class Validator implements ValidatorContract
 {
     use Concerns\FormatsMessages,
         Concerns\ValidatesAttributes;
+        
+    use Macroable {
+        __call as macroCall;
+    }
 
     /**
      * The Translator implementation.
@@ -1550,6 +1555,10 @@ class Validator implements ValidatorContract
 
         if (isset($this->extensions[$rule])) {
             return $this->callExtension($rule, $parameters);
+        }
+
+        if (static::hasMacro($method)) {
+            return $this->macroCall($method, $parameters);
         }
 
         throw new BadMethodCallException(sprintf(
