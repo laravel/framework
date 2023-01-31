@@ -83,6 +83,8 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Routing\RouteRegistrar whereAlpha(array|string $parameters)
  * @method static \Illuminate\Routing\RouteRegistrar whereAlphaNumeric(array|string $parameters)
  * @method static \Illuminate\Routing\RouteRegistrar whereNumber(array|string $parameters)
+ * @method static \Illuminate\Routing\RouteRegistrar whereLength(array|string $parameters, int $length)
+ * @method static \Illuminate\Routing\RouteRegistrar whereEquals(array|string $parameters, mixed $value)
  * @method static \Illuminate\Routing\RouteRegistrar whereUlid(array|string $parameters)
  * @method static \Illuminate\Routing\RouteRegistrar whereUuid(array|string $parameters)
  * @method static \Illuminate\Routing\RouteRegistrar whereIn(array|string $parameters, array $values)
