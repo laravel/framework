@@ -25,7 +25,7 @@ class Validator implements ValidatorContract
 {
     use Concerns\FormatsMessages,
         Concerns\ValidatesAttributes;
-        
+    
     use Macroable {
         __call as macroCall;
     }
