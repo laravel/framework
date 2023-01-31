@@ -2,6 +2,7 @@
 
 namespace Illuminate\Translation;
 
+use Closure;
 use Illuminate\Contracts\Translation\Loader;
 use Illuminate\Contracts\Translation\Translator as TranslatorContract;
 use Illuminate\Support\Arr;
@@ -13,8 +14,7 @@ use InvalidArgumentException;
 
 class Translator extends NamespacedItemResolver implements TranslatorContract
 {
-    use Macroable;
-    use ReflectsClosures;
+    use Macroable, ReflectsClosures;
 
     /**
      * The loader implementation.
@@ -59,11 +59,11 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     protected $determineLocalesUsing;
 
     /**
-     * Custom rendering callbacks for stringable objects.
+     * The custom rendering callbacks for stringable objects.
      *
      * @var array
      */
-    protected $stringables = [];
+    protected $stringableHandlers = [];
 
     /**
      * Create a new translator instance.
@@ -180,22 +180,6 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     }
 
     /**
-     * Add a handler to be executed before replacing a given instance of a class.
-     *
-     * @param  string|callable  $class
-     * @param  callable|null  $handler
-     * @return void
-     */
-    public function stringable($class, $handler = null)
-    {
-        if ($class instanceof \Closure) {
-            [$class, $handler] = [$this->firstClosureParameterType($class), $class];
-        }
-
-        $this->stringables[$class] = $handler;
-    }
-
-    /**
      * Get the proper locale for a choice operation.
      *
      * @param  string|null  $locale
@@ -249,8 +233,8 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         $shouldReplace = [];
 
         foreach ($replace as $key => $value) {
-            if (is_object($value) && isset($this->stringables[get_class($value)])) {
-                $value = call_user_func($this->stringables[get_class($value)], $value);
+            if (is_object($value) && isset($this->stringableHandlers[get_class($value)])) {
+                $value = call_user_func($this->stringableHandlers[get_class($value)], $value);
             }
 
             $shouldReplace[':'.Str::ucfirst($key ?? '')] = Str::ucfirst($value ?? '');
@@ -479,5 +463,24 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     public function setLoaded(array $loaded)
     {
         $this->loaded = $loaded;
+    }
+
+    /**
+     * Add a handler to be executed in order to format a given class to a string during translation replacements.
+     *
+     * @param  callable|string  $class
+     * @param  callable|null  $handler
+     * @return void
+     */
+    public function stringable($class, $handler = null)
+    {
+        if ($class instanceof Closure) {
+            [$class, $handler] = [
+                $this->firstClosureParameterType($class),
+                $class
+            ];
+        }
+
+        $this->stringableHandlers[$class] = $handler;
     }
 }
