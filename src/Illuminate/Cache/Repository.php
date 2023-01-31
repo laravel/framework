@@ -589,7 +589,7 @@ class Repository implements ArrayAccess, CacheContract
      * Set the cache store implementation.
      *
      * @param \Illuminate\Contracts\Cache\Store
-     * @return Repository
+     * @return static
      */
     public function setStore($store)
     {

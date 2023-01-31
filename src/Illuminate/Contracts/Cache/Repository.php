@@ -117,7 +117,8 @@ interface Repository extends CacheInterface
     /**
      * Set the cache store implementation.
      *
+     * @param \Illuminate\Contracts\Cache\Store
      * @return static
      */
-    public function setStore();
+    public function setStore($store);
 }
