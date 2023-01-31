@@ -7,12 +7,13 @@ use Closure;
 use DateTimeInterface;
 use Generator;
 use Illuminate\Contracts\Support\CanBeEscapedWhenCastToString;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\EnumeratesValues;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use IteratorAggregate;
-use stdClass;
 use Traversable;
+use stdClass;
 
 /**
  * @template TKey of array-key
@@ -1671,7 +1672,15 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
             return new ArrayIterator($source);
         }
 
-        return $source();
+        if (is_callable($source)) {
+            $maybeTraversable = $source();
+
+            return $maybeTraversable instanceof Traversable
+                ? $maybeTraversable
+                : new ArrayIterator(Arr::wrap($maybeTraversable));
+        }
+
+        return new ArrayIterator((array) $source);
     }
 
     /**
