@@ -1,6 +1,51 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.48.0...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.49.0...9.x)
+
+
+## [v9.49.0](https://github.com/laravel/framework/compare/v9.48.0...v9.49.0) - 2023-01-31
+
+### Added
+- Added `Illuminate/Database/Schema/ForeignKeyDefinition::noActionOnDelete()` ([#45712](https://github.com/laravel/framework/pull/45712))
+- Added new throw helper methods to the HTTP Client ([#45704](https://github.com/laravel/framework/pull/45704))
+- Added configurable timezone support for WorkCommand output timestamps ([#45722](https://github.com/laravel/framework/pull/45722))
+- Added support for casting arrays containing enums ([#45621](https://github.com/laravel/framework/pull/45621))
+- Added "missing" validation rules ([#45717](https://github.com/laravel/framework/pull/45717))
+- Added `/Illuminate/Database/Eloquent/SoftDeletes::forceDeleteQuietly()` ([#45737](https://github.com/laravel/framework/pull/45737))
+- Added `Illuminate/Collections/Arr::sortDesc()` ([#45761](https://github.com/laravel/framework/pull/45761))
+- Added CLI Prompts ([#45629](https://github.com/laravel/framework/pull/45629), [#45864](https://github.com/laravel/framework/pull/45864))
+- Adds assertJsonIsArray and assertJsonIsObject for TestResponse ([#45731](https://github.com/laravel/framework/pull/45731))
+- Added `Illuminate/Database/Eloquent/Relations/HasOneOrMany::createQuietly()` ([#45783](https://github.com/laravel/framework/pull/45783))
+- Add validation rules: ascii_alpha, ascii_alpha_num, ascii_alpha_dash ([#45769](https://github.com/laravel/framework/pull/45769))
+- Extract status methods to traits ([#45789](https://github.com/laravel/framework/pull/45789))
+- Add "addRestoreOrCreate" extension to SoftDeletingScope ([#45754](https://github.com/laravel/framework/pull/45754))
+- Added connection established event ([f850d99](https://github.com/laravel/framework/commit/f850d99c50d173189ece2bb37b6c7ddcb456f1f9))
+- Add forceDeleting event to models ([#45836](https://github.com/laravel/framework/pull/45836))
+- Add title tag in mail template ([#45859](https://github.com/laravel/framework/pull/45859))
+- Added new methods to Collection ([#45839](https://github.com/laravel/framework/pull/45839))
+- Add skip cancelled middleware ([#45869](https://github.com/laravel/framework/pull/45869))
+
+### Fixed
+- Fix flushdb on cluster for `PredisClusterConnection.php` ([#45544](https://github.com/laravel/framework/pull/45544))
+- Fix blade tag issue with nested calls ([#45764](https://github.com/laravel/framework/pull/45764))
+- Fix infinite loop in blade compiler ([#45780](https://github.com/laravel/framework/pull/45780))
+- Fix ValidationValidator not to accept terminating newline ([#45790](https://github.com/laravel/framework/pull/45790))
+- Fix stubs publish command generating incorrect controller stubs ([#45812](https://github.com/laravel/framework/pull/45812))
+- fix: normalize route pipeline exception ([#45817](https://github.com/laravel/framework/pull/45817))
+- Fix Illuminate Filesystem replace() leaves file executable ([#45856](https://github.com/laravel/framework/pull/45856))
+
+### Changed
+- Ensures channel name matches from start of string ([#45692](https://github.com/laravel/framework/pull/45692))
+- Replace raw invisible characters in regex expressions with counterpart Unicode regex notations ([#45680](https://github.com/laravel/framework/pull/45680))
+- Optimize destroy method ([#45709](https://github.com/laravel/framework/pull/45709))
+- Unify prohibits behavior around prohibits_if ([#45723](https://github.com/laravel/framework/pull/45723))
+- Removes dependency on bcmath ([#45729](https://github.com/laravel/framework/pull/45729))
+- Allow brick/math 0.11 also ([#45762](https://github.com/laravel/framework/pull/45762))
+- Optimize findMany of BelongsToMany ([#45745](https://github.com/laravel/framework/pull/45745))
+- Ensure decimal rule handles large values ([#45693](https://github.com/laravel/framework/pull/45693))
+- Backed enum support for @js ([#45862](https://github.com/laravel/framework/pull/45862))
+- Restart syscalls for SIGALRM when worker times out a job ([#45871](https://github.com/laravel/framework/pull/45871))
+- Ensure subsiquent calls to Mailable->to() overwrite previous entries ([#45885](https://github.com/laravel/framework/pull/45885))
 
 
 ## [v9.48.0](https://github.com/laravel/framework/compare/v9.47.0...v9.48.0) - 2023-01-17
