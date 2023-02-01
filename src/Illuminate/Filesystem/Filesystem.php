@@ -195,9 +195,10 @@ class Filesystem
      *
      * @param  string  $path
      * @param  string  $content
+     * @param  int|null  $mode
      * @return void
      */
-    public function replace($path, $content)
+    public function replace($path, $content, $mode = null)
     {
         // If the path already exists and is a symlink, get the real path...
         clearstatcache(true, $path);
@@ -207,7 +208,11 @@ class Filesystem
         $tempPath = tempnam(dirname($path), basename($path));
 
         // Fix permissions of tempPath because `tempnam()` creates it with permissions set to 0600...
-        chmod($tempPath, 0777 - umask());
+        if (! is_null($mode)) {
+            chmod($tempPath, $mode);
+        } else {
+            chmod($tempPath, 0777 - umask());
+        }
 
         file_put_contents($tempPath, $content);
 
