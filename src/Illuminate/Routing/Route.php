@@ -1032,7 +1032,7 @@ class Route
     }
 
     /**
-     * Get or set the middlewares attached to the route.
+     * Get or set the middleware attached to the route.
      *
      * @param  array|string|null  $middleware
      * @return $this|array

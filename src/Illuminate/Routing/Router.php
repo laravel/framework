@@ -74,7 +74,7 @@ class Router implements BindingRegistrar, RegistrarContract
     protected $currentRequest;
 
     /**
-     * All of the short-hand keys for middlewares.
+     * All of the short-hand keys for middleware.
      *
      * @var array
      */

@@ -23,7 +23,7 @@ class SortedMiddleware extends Collection
     }
 
     /**
-     * Sort the middlewares by the given priority map.
+     * Sort the middleware by the given priority map.
      *
      * Each call to this method makes one discrete middleware movement if necessary.
      *

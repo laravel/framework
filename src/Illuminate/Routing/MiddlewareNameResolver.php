@@ -28,7 +28,7 @@ class MiddlewareNameResolver
         }
 
         // If the middleware is the name of a middleware group, we will return the array
-        // of middlewares that belong to the group. This allows developers to group a
+        // of middleware that belong to the group. This allows developers to group a
         // set of middleware under single keys that can be conveniently referenced.
         if (isset($middlewareGroups[$name])) {
             return static::parseMiddlewareGroup($name, $map, $middlewareGroups);
@@ -57,7 +57,7 @@ class MiddlewareNameResolver
         foreach ($middlewareGroups[$name] as $middleware) {
             // If the middleware is another middleware group we will pull in the group and
             // merge its middleware into the results. This allows groups to conveniently
-            // reference other groups without needing to repeat all their middlewares.
+            // reference other groups without needing to repeat all their middleware.
             if (isset($middlewareGroups[$middleware])) {
                 $results = array_merge($results, static::parseMiddlewareGroup(
                     $middleware, $map, $middlewareGroups
