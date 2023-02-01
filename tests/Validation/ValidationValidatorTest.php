@@ -8046,9 +8046,12 @@ class ValidationValidatorTest extends TestCase
         $validator = new Validator($trans, [
             'min' => ' 20 ',
             'multiple_of' => ' 0.5 ',
+            'between' => "\n 5 \n"
         ], [
             'min' => 'numeric|min: 20',
-            'multiple_of' => "multiple_of:0.25 "
+            'multiple_of' => "multiple_of:0.25 ",
+            'between' => "numeric|between:\t 4, 6\n",
+            // 'multiple_of' => "multiple_of:\n 0.25 \n"
         ], [], []);
         $this->assertTrue($validator->passes());
     }

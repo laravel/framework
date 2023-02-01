@@ -453,6 +453,8 @@ trait ValidatesAttributes
     {
         $this->requireParameterCount(2, $parameters, 'between');
 
+        $parameters = $this->trim($parameters);
+
         return with(
             BigNumber::of($this->getSize($attribute, $value)),
             fn ($size) => $size->isGreaterThanOrEqualTo($parameters[0]) && $size->isLessThanOrEqualTo($parameters[1])
@@ -1505,7 +1507,9 @@ trait ValidatesAttributes
     {
         $this->requireParameterCount(1, $parameters, 'min');
 
-        return BigNumber::of($this->getSize($attribute, $value))->isGreaterThanOrEqualTo($this->trim($parameters[0]));
+        $parameters = $this->trim($parameters);
+
+        return BigNumber::of($this->getSize($attribute, $value))->isGreaterThanOrEqualTo($parameters[0]);
     }
 
     /**
@@ -1626,9 +1630,11 @@ trait ValidatesAttributes
             return false;
         }
 
+        $parameters = $this->trim($parameters);
+
         try {
             $numerator = BigDecimal::of($this->trim($value));
-            $denominator = BigDecimal::of($this->trim($parameters[0]));
+            $denominator = BigDecimal::of($parameters[0]);
 
             if ($numerator->isZero() && $denominator->isZero()) {
                 return false;
@@ -2458,13 +2464,17 @@ trait ValidatesAttributes
     }
 
     /**
-     * Trim the value if it is a string.
+     * Trim the value.
      *
-     * @param  string  $value
+     * @param  mixed  $value
      * @return mixed
      */
     protected function trim($value)
     {
+        if (is_array($value)) {
+            return array_map(fn ($v) => $this->trim($v), $value);
+        }
+
         return is_string($value) ? trim($value) : $value;
     }
 }
