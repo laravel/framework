@@ -35,6 +35,7 @@ trait PromptsForMissingInput
     {
         $prompted = collect($this->getDefinition()->getArguments())
             ->filter(fn ($argument) => $argument->isRequired() && is_null($input->getArgument($argument->getName())))
+            ->filter(fn ($argument) => $argument->getName() !== 'command')
             ->each(fn ($argument) => $input->setArgument(
                 $argument->getName(),
                 $this->askPersistently(

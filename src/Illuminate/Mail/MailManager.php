@@ -271,7 +271,7 @@ class MailManager implements FactoryContract
      * Create an instance of the Symfony Mailgun Transport driver.
      *
      * @param  array  $config
-     * @return \Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunApiTransport
+     * @return \Symfony\Component\Mailer\Transport\TransportInterface
      */
     protected function createMailgunTransport(array $config)
     {

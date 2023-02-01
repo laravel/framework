@@ -2,17 +2,19 @@
 
 namespace Illuminate\Translation;
 
+use Closure;
 use Illuminate\Contracts\Translation\Loader;
 use Illuminate\Contracts\Translation\Translator as TranslatorContract;
 use Illuminate\Support\Arr;
 use Illuminate\Support\NamespacedItemResolver;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Traits\ReflectsClosures;
 use InvalidArgumentException;
 
 class Translator extends NamespacedItemResolver implements TranslatorContract
 {
-    use Macroable;
+    use Macroable, ReflectsClosures;
 
     /**
      * The loader implementation.
@@ -55,6 +57,13 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      * @var callable
      */
     protected $determineLocalesUsing;
+
+    /**
+     * The custom rendering callbacks for stringable objects.
+     *
+     * @var array
+     */
+    protected $stringableHandlers = [];
 
     /**
      * Create a new translator instance.
@@ -224,6 +233,10 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         $shouldReplace = [];
 
         foreach ($replace as $key => $value) {
+            if (is_object($value) && isset($this->stringableHandlers[get_class($value)])) {
+                $value = call_user_func($this->stringableHandlers[get_class($value)], $value);
+            }
+
             $shouldReplace[':'.Str::ucfirst($key ?? '')] = Str::ucfirst($value ?? '');
             $shouldReplace[':'.Str::upper($key ?? '')] = Str::upper($value ?? '');
             $shouldReplace[':'.$key] = $value;
@@ -450,5 +463,24 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     public function setLoaded(array $loaded)
     {
         $this->loaded = $loaded;
+    }
+
+    /**
+     * Add a handler to be executed in order to format a given class to a string during translation replacements.
+     *
+     * @param  callable|string  $class
+     * @param  callable|null  $handler
+     * @return void
+     */
+    public function stringable($class, $handler = null)
+    {
+        if ($class instanceof Closure) {
+            [$class, $handler] = [
+                $this->firstClosureParameterType($class),
+                $class,
+            ];
+        }
+
+        $this->stringableHandlers[$class] = $handler;
     }
 }

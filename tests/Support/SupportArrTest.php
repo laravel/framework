@@ -956,6 +956,25 @@ class SupportArrTest extends TestCase
         $this->assertSame('font-bold mt-4 ml-2', $classes);
     }
 
+    public function testToCssStyles()
+    {
+        $styles = Arr::toCssStyles([
+            'font-weight: bold',
+            'margin-top: 4px;',
+        ]);
+
+        $this->assertSame('font-weight: bold; margin-top: 4px;', $styles);
+
+        $styles = Arr::toCssStyles([
+            'font-weight: bold;',
+            'margin-top: 4px',
+            'margin-left: 2px;' => true,
+            'margin-right: 2px' => false,
+        ]);
+
+        $this->assertSame('font-weight: bold; margin-top: 4px; margin-left: 2px;', $styles);
+    }
+
     public function testWhere()
     {
         $array = [100, '200', 300, '400', 500];
