@@ -8039,6 +8039,18 @@ class ValidationValidatorTest extends TestCase
         $this->assertEquals($expectedResult, $validator->getMessageBag()->getMessages());
     }
 
+    public function testItTrimsSpaceFromParameters()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $validator = new Validator($trans, [
+            'min' => ' 20 ',
+        ], [
+            'min' => 'numeric|min: 20',
+        ], [], []);
+        $this->assertTrue($validator->passes());
+    }
+
     protected function getTranslator()
     {
         return m::mock(TranslatorContract::class);
