@@ -143,6 +143,17 @@ class EloquentDeleteTest extends DatabaseTestCase
         // Total of 3 queries.
         $this->assertCount(3, $logs);
 
+        // It can accept an array models
+        PostStringyKey::query()->delete();
+        $model1 = PostStringyKey::query()->create([]);
+        $model2 = PostStringyKey::query()->create([]);
+
+        $this->assertEquals(2, PostStringyKey::count());
+        $count = PostStringyKey::destroy([$model1, $model2]);
+        $this->assertEquals(0, $count);
+        // nothing is deleted
+        $this->assertEquals(2, PostStringyKey::count());
+
         PostStringyKey::reguard();
         unset($_SERVER['destroy']);
         Schema::drop('my_posts');
