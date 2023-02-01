@@ -12,6 +12,7 @@ use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Contracts\View\Factory as ViewFactory;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Bus\PendingClosureDispatch;
 use Illuminate\Foundation\Bus\PendingDispatch;
 use Illuminate\Foundation\Mix;
@@ -1033,5 +1034,128 @@ if (! function_exists('view')) {
         }
 
         return $factory->make($view, $data, $mergeData);
+    }
+}
+
+if (! function_exists('tag_instance_of')) {
+    /**
+     * Tag all services which implement a given interface or parent class.
+     *
+     * @param  array|string  $instancesOfFQCN
+     * @param  array|string  $tags
+     * @return void
+     * @throws ReflectionException
+     */
+    function tag_instance_of(array|string $instancesOfFQCN, array|string $tags): void {
+        if (is_array($instancesOfFQCN)) {
+            foreach ($instancesOfFQCN as $instance) {
+                tag_instance_of($instance, $tags);
+            }
+
+            return;
+        }
+
+        if (is_array($tags)) {
+            foreach ($tags as $tag) {
+                tag_instance_of($instancesOfFQCN, $tag);
+            }
+
+            return;
+        }
+
+        // Determine if cached results should be used
+        $useCachedServices = config('app.instance_of.cache', true);
+        // Define the namespaces that should be checked for tagging
+        $includeNamespaces = config('app.instance_of.namespaces.include', ['App\\']);
+        $excludeNamespaces = config('app.instance_of.namespaces.exclude', []);
+
+        $fileManager = app(Filesystem::class);
+
+        $cachedFile = app()->bootstrapPath('cache/tagged-instance-of-services.php');
+        $taggedServices = [];
+        if ($useCachedServices && $fileManager->isFile($cachedFile)) {
+            $taggedServices = $fileManager->getRequire()();
+        }
+
+        if (isset($taggedServices[$tags][$instancesOfFQCN])) {
+            app()->tag($taggedServices[$tags][$instancesOfFQCN], $tags);
+
+            return;
+        }
+
+        // Define the classmap that should be used
+        $classmap = config('app.instance_of.classmap', null);
+        if (!isset($classmap)) {
+            $classmap = [];
+
+            $classmapFile = app()->basePath('vendor/composer/autoload_classmap.php');
+            $classmapValues = $fileManager->getRequire($classmapFile)();
+
+            foreach ($classmapValues as $class => $value) {
+                if (! is_string($class)) {
+                    continue;
+                }
+
+                foreach ($excludeNamespaces as $excludeNamespace) {
+                    if (! str_starts_with($class, $excludeNamespace)) {
+                        continue;
+                    }
+
+                    continue 2;
+                }
+
+                foreach ($includeNamespaces as $includeNamespace) {
+                    if (! str_starts_with($class, $includeNamespace)) {
+                        continue;
+                    }
+
+                    if (! class_exists($class, false)) {
+                        continue 2;
+                    }
+
+                    $classImplements = array_merge(
+                        [$class], // In case the class itself is passed
+                        class_implements($class, false) ?: [], // For provided interface FQCN
+                        class_parents($class, false) ?: [] // For provided parent class FQCN
+                    );
+
+                    if ((new ReflectionClass($class))->isAbstract()) {
+                        continue 2;
+                    }
+
+                    $classmap[$class] = $classImplements;
+
+                    continue 2;
+                }
+            }
+
+            // Save the classmap in memory to prevent it being called again
+            // in the same run
+            config()->set('app.instance_of.classmap', $classmap);
+        }
+
+        $taggedServices[$tags][$instancesOfFQCN] = [];
+
+        foreach ($classmap as $class => $value) {
+            if (! in_array($instancesOfFQCN, $value, true)) {
+                continue;
+            }
+
+            $taggedServices[$tags][$instancesOfFQCN][] = $class;
+            app()->tag($class, $tags);
+        }
+
+        try {
+            if ($useCachedServices) {
+                $fileManager->ensureDirectoryExists(dirname($cachedFile));
+                $fileManager->put(
+                    $cachedFile,
+                    '<?php return '.var_export($taggedServices, true).';'.PHP_EOL,
+                    true
+                );
+            }
+        } catch (Throwable $throwable) {
+            // Ignore possible locked file errors
+        }
     }
 }

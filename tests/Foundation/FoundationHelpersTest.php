@@ -274,4 +274,105 @@ class FoundationHelpersTest extends TestCase
         // Should fallback to en_US
         $this->assertSame('Australian Capital Territory', fake()->state());
     }
+
+    public function testTagInstanceOf()
+    {
+        // Simulate the classmap created when loading the composer classmap file
+        $classmap = [];
+        foreach (get_declared_classes() as $class) {
+            $classmap[$class] = array_merge(
+                [$class], // In case the class itself is passed
+                class_implements($class, false) ?: [], // For provided interface FQCN
+                class_parents($class, false) ?: [] // For provided parent class FQCN
+            );
+        }
+
+        // Make the test classes under this class available for tagging tests
+        config()->set('app.instance_of.classmap', $classmap);
+        config()->set('app.instance_of.namespaces.include', [__NAMESPACE__]);
+
+        // test multiple tags
+        tag_instance_of(
+            IContainerTaggedContractStub::class,
+            ['foo-instanceof-interface-2', 'bar-instanceof-interface-2']
+        );
+
+        $this->assertCount(3, app()->tagged('foo-instanceof-interface-2'));
+        $this->assertCount(3, app()->tagged('bar-instanceof-interface-2'));
+
+        // test multiple classes
+        tag_instance_of(
+            [
+                IContainerTaggedContractStub::class,
+                IContainerTaggedContractStubTwo::class,
+            ],
+            'foo-instanceof-multiple-interface'
+        );
+        $this->assertCount(4, app()->tagged('foo-instanceof-multiple-interface'));
+
+        // test parent class
+        tag_instance_of(
+            ContainerWithoutImplementationTaggedStub::class,
+            'foo-instanceof-class'
+        );
+        $this->assertCount(2, app()->tagged('foo-instanceof-class'));
+
+        tag_instance_of(
+            [
+                ContainerImplementationTaggedStub::class,
+                ContainerWithoutImplementationTaggedStub::class,
+            ],
+            'foo-instanceof-multiple-classes'
+        );
+        $this->assertCount(4, app()->tagged('foo-instanceof-multiple-classes'));
+
+        // test combination of interface and parent class
+        tag_instance_of(
+            [
+                IContainerTaggedContractStub::class,
+                ContainerWithoutImplementationTaggedStub::class,
+            ],
+            'foo-instanceof-combined-classes-and-interfaces'
+        );
+        $this->assertCount(5, app()->tagged('foo-instanceof-combined-classes-and-interfaces'));
+    }
+}
+
+interface IContainerTaggedContractStub
+{
+    //
+}
+
+interface IContainerTaggedContractStubTwo
+{
+    //
+}
+
+class ContainerImplementationTaggedStub implements IContainerTaggedContractStub
+{
+    //
+}
+class ContainerImplementationTaggedStubTwo implements IContainerTaggedContractStub
+{
+    //
+}
+
+class ContainerExtendingContainerWithImplementationTaggedStub extends ContainerImplementationTaggedStub
+{
+    //
+}
+
+class ContainerWithoutImplementationTaggedStub
+{
+    //
+}
+
+class ContainerWithoutImplementationTaggedStubTwo extends ContainerWithoutImplementationTaggedStub
+{
+    //
+}
+
+class ContainerImplementationTaggedStubThree implements IContainerTaggedContractStubTwo
+{
+    //
 }
