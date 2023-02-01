@@ -1076,7 +1076,7 @@ if (! function_exists('tag_instance_of')) {
         $cachedFile = app()->bootstrapPath('cache/tagged-instance-of-services.php');
         $taggedServices = [];
         if ($useCachedServices && $fileManager->isFile($cachedFile)) {
-            $taggedServices = $fileManager->getRequire()();
+            $taggedServices = $fileManager->getRequire($cachedFile);
         }
 
         if (isset($taggedServices[$tags][$instancesOfFQCN])) {
@@ -1091,7 +1091,7 @@ if (! function_exists('tag_instance_of')) {
             $classmap = [];
 
             $classmapFile = app()->basePath('vendor/composer/autoload_classmap.php');
-            $classmapValues = $fileManager->getRequire($classmapFile)();
+            $classmapValues = $fileManager->getRequire($classmapFile);
 
             foreach ($classmapValues as $class => $value) {
                 if (! is_string($class)) {
