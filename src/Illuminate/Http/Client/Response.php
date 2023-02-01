@@ -327,6 +327,52 @@ class Response implements ArrayAccess
     }
 
     /**
+     * Throw an exception if a client error occurred.
+     *
+     * @param  \Closure|null  $callback
+     * @return $this
+     *
+     * @throws \Illuminate\Http\Client\RequestException
+     */
+    public function throwOnClientError()
+    {
+        $callback = func_get_args()[0] ?? null;
+
+        if ($this->clientError()) {
+            throw tap($this->toException(), function ($exception) use ($callback) {
+                if ($callback && is_callable($callback)) {
+                    $callback($this, $exception);
+                }
+            });
+        }
+
+        return $this;
+    }
+
+    /**
+     * Throw an exception if a server error occurred.
+     *
+     * @param  \Closure|null  $callback
+     * @return $this
+     *
+     * @throws \Illuminate\Http\Client\RequestException
+     */
+    public function throwOnServerError()
+    {
+        $callback = func_get_args()[0] ?? null;
+
+        if ($this->serverError()) {
+            throw tap($this->toException(), function ($exception) use ($callback) {
+                if ($callback && is_callable($callback)) {
+                    $callback($this, $exception);
+                }
+            });
+        }
+
+        return $this;
+    }
+
+    /**
      * Throw an exception if a server or client error occurred and the given condition evaluates to true.
      *
      * @param  \Closure|bool  $condition
