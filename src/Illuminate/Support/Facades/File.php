@@ -12,7 +12,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Support\LazyCollection lines(string $path)
  * @method static string hash(string $path, string $algorithm = 'md5')
  * @method static int|bool put(string $path, string $contents, bool $lock = false)
- * @method static void replace(string $path, string $content)
+ * @method static void replace(string $path, string $content, int|null $mode = null)
  * @method static void replaceInFile(array|string $search, array|string $replace, string $path)
  * @method static int prepend(string $path, string $data)
  * @method static int append(string $path, string $data)
