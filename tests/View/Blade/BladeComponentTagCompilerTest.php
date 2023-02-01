@@ -87,6 +87,15 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $this->assertSame("@slot('foo', null, ['class' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\Illuminate\Support\Arr::toCssClasses(\$classes))]) \n".' @endslot', trim($result));
     }
 
+    public function testSlotsWithStyleDirectiveCanBeCompiled()
+    {
+        $this->mockViewFactory();
+        $result = $this->compiler()->compileSlots('<x-slot name="foo" @style($styles)>
+</x-slot>');
+
+        $this->assertSame("@slot('foo', null, ['style' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\Illuminate\Support\Arr::toCssStyles(\$styles))]) \n".' @endslot', trim($result));
+    }
+
     public function testBasicComponentParsing()
     {
         $this->mockViewFactory();
@@ -269,6 +278,18 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 <?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
 <?php \$component->withAttributes(['class' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\Illuminate\Support\Arr::toCssClasses(['bar'=>true]))]); ?> @endComponentClass##END-COMPONENT-CLASS##", trim($result));
+    }
+
+    public function testStyleDirective()
+    {
+        $this->mockViewFactory();
+        $result = $this->compiler(['profile' => TestProfileComponent::class])->compileTags('<x-profile @style(["bar"=>true])></x-profile>');
+
+        $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestProfileComponent', 'profile', [])
+<?php if (isset(\$attributes) && \$attributes instanceof Illuminate\View\ComponentAttributeBag && \$constructor = (new ReflectionClass(Illuminate\Tests\View\Blade\TestProfileComponent::class))->getConstructor()): ?>
+<?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php \$component->withAttributes(['style' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\Illuminate\Support\Arr::toCssStyles(['bar'=>true]))]); ?> @endComponentClass##END-COMPONENT-CLASS##", trim($result));
     }
 
     public function testColonNestedComponentParsing()

@@ -796,6 +796,29 @@ class Arr
     }
 
     /**
+     * Conditionally compile styles from an array into a style list.
+     *
+     * @param  array  $array
+     * @return string
+     */
+    public static function toCssStyles($array)
+    {
+        $styleList = static::wrap($array);
+
+        $styles = [];
+
+        foreach ($styleList as $class => $constraint) {
+            if (is_numeric($class)) {
+                $styles[] = Str::finish($constraint, ';');
+            } elseif ($constraint) {
+                $styles[] = Str::finish($class, ';');
+            }
+        }
+
+        return implode(' ', $styles);
+    }
+
+    /**
      * Filter the array using the given callback.
      *
      * @param  array  $array
