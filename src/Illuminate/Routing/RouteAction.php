@@ -105,6 +105,7 @@ class RouteAction
     {
         return is_string($action['uses']) && Str::startsWith($action['uses'], [
             'O:47:"Laravel\\SerializableClosure\\SerializableClosure',
+            'O:55:"Laravel\\SerializableClosure\\UnsignedSerializableClosure',
         ]) !== false;
     }
 }
