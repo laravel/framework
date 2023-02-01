@@ -104,6 +104,13 @@ class Application extends Container implements ApplicationContract, CachesConfig
     protected $deferredServices = [];
 
     /**
+     * The custom bootstrap path defined by the developer.
+     *
+     * @var string
+     */
+    protected $bootstrapPath;
+
+    /**
      * The custom application path defined by the developer.
      *
      * @var string
@@ -323,12 +330,16 @@ class Application extends Container implements ApplicationContract, CachesConfig
         $this->instance('path.resources', $this->resourcePath());
         $this->instance('path.bootstrap', $this->bootstrapPath());
 
-        $this->useLangPath(value(function () {
-            if (is_dir($directory = $this->resourcePath('lang'))) {
-                return $directory;
-            }
+        $this->useBootstrapPath(value(function () {
+            return is_dir($directory = $this->basePath('.laravel'))
+                        ? $directory
+                        : $this->basePath('bootstrap');
+        }));
 
-            return $this->basePath('lang');
+        $this->useLangPath(value(function () {
+            return is_dir($directory = $this->resourcePath('lang'))
+                        ? $directory
+                        : $this->basePath('lang');
         }));
     }
 
@@ -379,7 +390,22 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function bootstrapPath($path = '')
     {
-        return $this->basePath.DIRECTORY_SEPARATOR.'bootstrap'.($path != '' ? DIRECTORY_SEPARATOR.$path : '');
+        return $this->bootstrapPath.($path != '' ? DIRECTORY_SEPARATOR.$path : '');
+    }
+
+    /**
+     * Set the bootstrap file directory.
+     *
+     * @param  string  $path
+     * @return $this
+     */
+    public function useBootstrapPath($path)
+    {
+        $this->bootstrapPath = $path;
+
+        $this->instance('path.bootstrap', $path);
+
+        return $this;
     }
 
     /**
@@ -567,7 +593,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Get or check the current application environment.
      *
-     * @param  string|array  $environments
+     * @param  string|array  ...$environments
      * @return string|bool
      */
     public function environment(...$environments)
@@ -656,9 +682,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     public function registerConfiguredProviders()
     {
         $providers = Collection::make($this->make('config')->get('app.providers'))
-                        ->partition(function ($provider) {
-                            return str_starts_with($provider, 'Illuminate\\');
-                        });
+                        ->partition(fn ($provider) => str_starts_with($provider, 'Illuminate\\'));
 
         $providers->splice(1, 0, [$this->make(PackageManifest::class)->providers()]);
 
@@ -738,9 +762,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     {
         $name = is_string($provider) ? $provider : get_class($provider);
 
-        return Arr::where($this->serviceProviders, function ($value) use ($name) {
-            return $value instanceof $name;
-        });
+        return Arr::where($this->serviceProviders, fn ($value) => $value instanceof $name);
     }
 
     /**

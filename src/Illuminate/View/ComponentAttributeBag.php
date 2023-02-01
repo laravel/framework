@@ -222,6 +222,19 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
     }
 
     /**
+     * Conditionally merge styles into the attribute bag.
+     *
+     * @param  mixed|array  $styleList
+     * @return static
+     */
+    public function style($styleList)
+    {
+        $styleList = Arr::wrap($styleList);
+
+        return $this->merge(['style' => Arr::toCssStyles($styleList)]);
+    }
+
+    /**
      * Merge additional attributes / values into the attribute bag.
      *
      * @param  array  $attributeDefaults
@@ -238,15 +251,20 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
 
         [$appendableAttributes, $nonAppendableAttributes] = collect($this->attributes)
                     ->partition(function ($value, $key) use ($attributeDefaults) {
-                        return $key === 'class' ||
-                               (isset($attributeDefaults[$key]) &&
-                                $attributeDefaults[$key] instanceof AppendableAttributeValue);
+                        return $key === 'class' || $key === 'style' || (
+                            isset($attributeDefaults[$key]) &&
+                            $attributeDefaults[$key] instanceof AppendableAttributeValue
+                        );
                     });
 
         $attributes = $appendableAttributes->mapWithKeys(function ($value, $key) use ($attributeDefaults, $escape) {
             $defaultsValue = isset($attributeDefaults[$key]) && $attributeDefaults[$key] instanceof AppendableAttributeValue
                         ? $this->resolveAppendableAttributeDefault($attributeDefaults, $key, $escape)
                         : ($attributeDefaults[$key] ?? '');
+
+            if ($key === 'style') {
+                $value = Str::finish($value, ';');
+            }
 
             return [$key => implode(' ', array_unique(array_filter([$defaultsValue, $value])))];
         })->merge($nonAppendableAttributes)->all();
@@ -421,7 +439,8 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
             }
 
             if ($value === true) {
-                $value = $key;
+                // Exception for Alpine...
+                $value = $key === 'x-data' ? '' : $key;
             }
 
             $string .= ' '.$key.'="'.str_replace('"', '\\"', trim($value)).'"';

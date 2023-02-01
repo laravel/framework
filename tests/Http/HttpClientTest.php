@@ -17,6 +17,7 @@ use Illuminate\Http\Client\Request;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Http\Client\ResponseSequence;
+use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Str;
@@ -56,6 +57,160 @@ class HttpClientTest extends TestCase
         $this->assertTrue($response->ok());
     }
 
+    public function testCreatedRequest()
+    {
+        $this->factory->fake([
+            'vapor.laravel.com' => $this->factory::response('', HttpResponse::HTTP_CREATED),
+            'forge.laravel.com' => $this->factory::response('', HttpResponse::HTTP_OK),
+        ]);
+
+        $response = $this->factory->post('http://vapor.laravel.com');
+        $this->assertTrue($response->created());
+
+        $response = $this->factory->post('http://forge.laravel.com');
+        $this->assertFalse($response->created());
+    }
+
+    public function testAcceptedRequest()
+    {
+        $this->factory->fake([
+            'vapor.laravel.com' => $this->factory::response('', HttpResponse::HTTP_ACCEPTED),
+            'forge.laravel.com' => $this->factory::response('', HttpResponse::HTTP_OK),
+        ]);
+
+        $response = $this->factory->post('http://vapor.laravel.com');
+        $this->assertTrue($response->accepted());
+
+        $response = $this->factory->post('http://forge.laravel.com');
+        $this->assertFalse($response->accepted());
+    }
+
+    public function testMovedPermanentlyRequest()
+    {
+        $this->factory->fake([
+            'vapor.laravel.com' => $this->factory::response('', HttpResponse::HTTP_MOVED_PERMANENTLY),
+            'forge.laravel.com' => $this->factory::response('', HttpResponse::HTTP_OK),
+        ]);
+
+        $response = $this->factory->post('http://vapor.laravel.com');
+        $this->assertTrue($response->movedPermanently());
+
+        $response = $this->factory->post('http://forge.laravel.com');
+        $this->assertFalse($response->movedPermanently());
+    }
+
+    public function testNoContentRequest()
+    {
+        $this->factory->fake([
+            'vapor.laravel.com' => $this->factory::response('', HttpResponse::HTTP_NO_CONTENT),
+            'forge.laravel.com' => $this->factory::response('', HttpResponse::HTTP_OK),
+        ]);
+
+        $response = $this->factory->post('http://vapor.laravel.com');
+        $this->assertTrue($response->noContent());
+
+        $response = $this->factory->post('http://forge.laravel.com');
+        $this->assertFalse($response->noContent());
+    }
+
+    public function testFoundRequest()
+    {
+        $this->factory->fake([
+            'vapor.laravel.com' => $this->factory::response('', HttpResponse::HTTP_FOUND),
+            'forge.laravel.com' => $this->factory::response('', HttpResponse::HTTP_OK),
+        ]);
+
+        $response = $this->factory->post('http://vapor.laravel.com');
+        $this->assertTrue($response->found());
+
+        $response = $this->factory->post('http://forge.laravel.com');
+        $this->assertFalse($response->found());
+    }
+
+    public function testBadRequestRequest()
+    {
+        $this->factory->fake([
+            'vapor.laravel.com' => $this->factory::response('', HttpResponse::HTTP_BAD_REQUEST),
+            'forge.laravel.com' => $this->factory::response('', HttpResponse::HTTP_OK),
+        ]);
+
+        $response = $this->factory->post('http://vapor.laravel.com');
+        $this->assertTrue($response->badRequest());
+
+        $response = $this->factory->post('http://forge.laravel.com');
+        $this->assertFalse($response->badRequest());
+    }
+
+    public function testPaymentRequiredRequest()
+    {
+        $this->factory->fake([
+            'vapor.laravel.com' => $this->factory::response('', HttpResponse::HTTP_PAYMENT_REQUIRED),
+            'forge.laravel.com' => $this->factory::response('', HttpResponse::HTTP_OK),
+        ]);
+
+        $response = $this->factory->post('http://vapor.laravel.com');
+        $this->assertTrue($response->paymentRequired());
+
+        $response = $this->factory->post('http://forge.laravel.com');
+        $this->assertFalse($response->paymentRequired());
+    }
+
+    public function testRequestTimeoutRequest()
+    {
+        $this->factory->fake([
+            'vapor.laravel.com' => $this->factory::response('', HttpResponse::HTTP_REQUEST_TIMEOUT),
+            'forge.laravel.com' => $this->factory::response('', HttpResponse::HTTP_OK),
+        ]);
+
+        $response = $this->factory->post('http://vapor.laravel.com');
+        $this->assertTrue($response->requestTimeout());
+
+        $response = $this->factory->post('http://forge.laravel.com');
+        $this->assertFalse($response->requestTimeout());
+    }
+
+    public function testConflictResponseRequest()
+    {
+        $this->factory->fake([
+            'vapor.laravel.com' => $this->factory::response('', HttpResponse::HTTP_CONFLICT),
+            'forge.laravel.com' => $this->factory::response('', HttpResponse::HTTP_OK),
+        ]);
+
+        $response = $this->factory->post('http://vapor.laravel.com');
+        $this->assertTrue($response->conflict());
+
+        $response = $this->factory->post('http://forge.laravel.com');
+        $this->assertFalse($response->conflict());
+    }
+
+    public function testUnprocessableEntityRequest()
+    {
+        $this->factory->fake([
+            'vapor.laravel.com' => $this->factory::response('', HttpResponse::HTTP_UNPROCESSABLE_ENTITY),
+            'forge.laravel.com' => $this->factory::response('', HttpResponse::HTTP_OK),
+        ]);
+
+        $response = $this->factory->post('http://vapor.laravel.com');
+        $this->assertTrue($response->unprocessableEntity());
+
+        $response = $this->factory->post('http://forge.laravel.com');
+        $this->assertFalse($response->unprocessableEntity());
+    }
+
+    public function testTooManyRequestsRequest()
+    {
+        $this->factory->fake([
+            'vapor.laravel.com' => $this->factory::response('', HttpResponse::HTTP_TOO_MANY_REQUESTS),
+            'forge.laravel.com' => $this->factory::response('', HttpResponse::HTTP_OK),
+        ]);
+
+        $response = $this->factory->post('http://vapor.laravel.com');
+        $this->assertTrue($response->tooManyRequests());
+
+        $response = $this->factory->post('http://forge.laravel.com');
+        $this->assertFalse($response->tooManyRequests());
+    }
+
     public function testUnauthorizedRequest()
     {
         $this->factory->fake([
@@ -76,6 +231,17 @@ class HttpClientTest extends TestCase
         $response = $this->factory->post('http://laravel.com');
 
         $this->assertTrue($response->forbidden());
+    }
+
+    public function testNotFoundResponse()
+    {
+        $this->factory->fake([
+            'laravel.com' => $this->factory::response('', 404),
+        ]);
+
+        $response = $this->factory->post('http://laravel.com');
+
+        $this->assertTrue($response->notFound());
     }
 
     public function testResponseBodyCasting()
@@ -137,19 +303,20 @@ class HttpClientTest extends TestCase
         $this->assertEquals(collect(), $response->collect('missing_key'));
     }
 
-    public function testSendRequestBody()
+    public function testSendRequestBodyAsJsonByDefault()
     {
         $body = '{"test":"phpunit"}';
 
         $fakeRequest = function (Request $request) use ($body) {
             self::assertSame($body, $request->body());
+            self::assertContains('application/json', $request->header('Content-Type'));
 
             return ['my' => 'response'];
         };
 
         $this->factory->fake($fakeRequest);
 
-        $this->factory->withBody($body, 'application/json')->send('get', 'http://foo.com/api');
+        $this->factory->withBody($body)->send('get', 'http://foo.com/api');
     }
 
     public function testSendRequestBodyWithManyAmpersands()
@@ -158,6 +325,7 @@ class HttpClientTest extends TestCase
 
         $fakeRequest = function (Request $request) use ($body) {
             self::assertSame($body, $request->body());
+            self::assertContains('text/plain', $request->header('Content-Type'));
 
             return ['my' => 'response'];
         };
@@ -1708,6 +1876,223 @@ class HttpClientTest extends TestCase
 
         $this->assertSame('{"result":{"foo":"bar"}}', $response->body());
         $this->assertFalse($hitThrowCallback);
+    }
+
+    public function testRequestExceptionIsThrownIfStatusCodeIsSatisfied()
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response('', 400),
+        ]);
+
+        $exception = null;
+
+        try {
+            $this->factory->get('http://foo.com/api')->throwIfStatus(400);
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
+    }
+
+    public function testRequestExceptionIsThrownIfStatusCodeIsSatisfiedWithClosure()
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response('', 400),
+        ]);
+
+        $exception = null;
+
+        try {
+            $this->factory->get('http://foo.com/api')->throwIfStatus(fn ($status) => $status === 400);
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
+    }
+
+    public function testRequestExceptionIsNotThrownIfStatusCodeIsNotSatisfied()
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response('', 400),
+        ]);
+
+        $exception = null;
+
+        try {
+            $this->factory->get('http://foo.com/api')->throwIfStatus(500);
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNull($exception);
+    }
+
+    public function testRequestExceptionIsThrownUnlessStatusCodeIsSatisfied()
+    {
+        $this->factory->fake([
+            'http://foo.com/api/400' => $this->factory::response('', 400),
+            'http://foo.com/api/408' => $this->factory::response('', 408),
+            'http://foo.com/api/500' => $this->factory::response('', 500),
+        ]);
+
+        $exception = null;
+
+        try {
+            $this->factory->get('http://foo.com/api/400')->throwUnlessStatus(500);
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
+
+        $exception = null;
+
+        $this->factory->fake([
+            'http://foo.com/api/400' => $this->factory::response('', 400),
+            'http://foo.com/api/408' => $this->factory::response('', 408),
+            'http://foo.com/api/500' => $this->factory::response('', 500),
+        ]);
+
+        $exception = null;
+
+        try {
+            $this->factory->get('http://foo.com/api/400')->throwUnlessStatus(fn ($status) => $status === 500);
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
+
+        $exception = null;
+
+        try {
+            $this->factory->get('http://foo.com/api/408')->throwUnlessStatus(500);
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
+
+        $exception = null;
+
+        try {
+            $this->factory->get('http://foo.com/api/500')->throwUnlessStatus(500);
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNull($exception);
+    }
+
+    public function testRequestExceptionIsThrownIfIsClientError()
+    {
+        $this->factory->fake([
+            'http://foo.com/api/400' => $this->factory::response('', 400),
+            'http://foo.com/api/408' => $this->factory::response('', 408),
+            'http://foo.com/api/500' => $this->factory::response('', 500),
+            'http://foo.com/api/504' => $this->factory::response('', 504),
+        ]);
+
+        $exception = null;
+
+        try {
+            $this->factory->get('http://foo.com/api/400')->throwIfClientError();
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
+
+        $exception = null;
+
+        try {
+            $this->factory->get('http://foo.com/api/408')->throwIfClientError();
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
+
+        $exception = null;
+
+        try {
+            $this->factory->get('http://foo.com/api/500')->throwIfClientError();
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNull($exception);
+
+        $exception = null;
+
+        try {
+            $this->factory->get('http://foo.com/api/504')->throwIfClientError();
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNull($exception);
+    }
+
+    public function testRequestExceptionIsThrownIfIsServerError()
+    {
+        $this->factory->fake([
+            'http://foo.com/api/400' => $this->factory::response('', 400),
+            'http://foo.com/api/408' => $this->factory::response('', 408),
+            'http://foo.com/api/500' => $this->factory::response('', 500),
+            'http://foo.com/api/504' => $this->factory::response('', 504),
+        ]);
+
+        $exception = null;
+
+        try {
+            $this->factory->get('http://foo.com/api/400')->throwIfServerError();
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNull($exception);
+
+        $exception = null;
+
+        try {
+            $this->factory->get('http://foo.com/api/408')->throwIfServerError();
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNull($exception);
+
+        $exception = null;
+
+        try {
+            $this->factory->get('http://foo.com/api/500')->throwIfServerError();
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
+
+        $exception = null;
+
+        try {
+            $this->factory->get('http://foo.com/api/504')->throwIfServerError();
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
     }
 
     public function testItCanEnforceFaking()

@@ -47,6 +47,11 @@ class QuestionHelper extends SymfonyQuestionHelper
                 $text = sprintf('<info>%s</info> [<comment>%s</comment>]', $text, OutputFormatter::escape($choices[$default] ?? $default));
 
                 break;
+
+            default:
+                $text = sprintf('<info>%s</info> [<comment>%s</comment>]', $text, OutputFormatter::escape($default));
+
+                break;
         }
 
         $output->writeln($text);

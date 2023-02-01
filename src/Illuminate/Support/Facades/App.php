@@ -14,6 +14,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Foundation\Application useAppPath(string $path)
  * @method static string basePath(string $path = '')
  * @method static string bootstrapPath(string $path = '')
+ * @method static \Illuminate\Foundation\Application useBootstrapPath(string $path)
  * @method static string configPath(string $path = '')
  * @method static string databasePath(string $path = '')
  * @method static \Illuminate\Foundation\Application useDatabasePath(string $path)

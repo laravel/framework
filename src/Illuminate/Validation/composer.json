@@ -16,7 +16,8 @@
     "require": {
         "php": "^8.2",
         "ext-json": "*",
-        "egulias/email-validator": "^3.2.1",
+        "brick/math": "^0.9.3|^0.10.2|^0.11",
+        "egulias/email-validator": "^3.2.5|^4.0",
         "illuminate/collections": "^11.0",
         "illuminate/container": "^11.0",
         "illuminate/contracts": "^11.0",
@@ -37,7 +38,6 @@
         }
     },
     "suggest": {
-        "ext-bcmath": "Required to use the multiple_of validation rule.",
         "illuminate/database": "Required to use the database presence verifier (^11.0)."
     },
     "config": {

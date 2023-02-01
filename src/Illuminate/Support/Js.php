@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support;
 
+use BackedEnum;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\Support\Jsonable;
@@ -67,6 +68,10 @@ class Js implements Htmlable
     {
         if ($data instanceof self) {
             return $data->toHtml();
+        }
+
+        if ($data instanceof BackedEnum) {
+            $data = $data->value;
         }
 
         $json = $this->jsonEncode($data, $flags, $depth);

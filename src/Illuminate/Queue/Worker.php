@@ -224,7 +224,7 @@ class Worker
             }
 
             $this->kill(static::EXIT_ERROR, $options);
-        });
+        }, true);
 
         pcntl_alarm(
             max($this->timeoutForJob($job, $options), 0)

@@ -849,7 +849,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Get an array with the values of a given column.
+     * Get a collection with the values of a given column.
      *
      * @param  string|\Illuminate\Database\Query\Expression  $column
      * @param  string|null  $key
@@ -1837,7 +1837,7 @@ class Builder implements BuilderContract
      * @param  array  $parameters
      * @return mixed
      */
-    public function __call($method, $parameters)
+    public function __call($method, array $parameters)
     {
         if ($method === 'macro') {
             $this->localMacros[$parameters[0]] = $parameters[1];

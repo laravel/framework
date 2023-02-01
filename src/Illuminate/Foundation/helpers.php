@@ -440,12 +440,16 @@ if (! function_exists('fake') && class_exists(\Faker\Factory::class)) {
     /**
      * Get a faker instance.
      *
-     * @param  ?string  $locale
+     * @param  string|null  $locale
      * @return \Faker\Generator
      */
     function fake($locale = null)
     {
-        $locale ??= app('config')->get('app.faker_locale') ?? 'en_US';
+        if (app()->bound('config')) {
+            $locale ??= app('config')->get('app.faker_locale');
+        }
+
+        $locale ??= 'en_US';
 
         $abstract = \Faker\Generator::class.':'.$locale;
 
@@ -980,10 +984,10 @@ if (! function_exists('validator')) {
      * @param  array  $data
      * @param  array  $rules
      * @param  array  $messages
-     * @param  array  $customAttributes
+     * @param  array  $attributes
      * @return \Illuminate\Contracts\Validation\Validator|\Illuminate\Contracts\Validation\Factory
      */
-    function validator(array $data = [], array $rules = [], array $messages = [], array $customAttributes = [])
+    function validator(array $data = [], array $rules = [], array $messages = [], array $attributes = [])
     {
         $factory = app(ValidationFactory::class);
 
@@ -991,7 +995,7 @@ if (! function_exists('validator')) {
             return $factory;
         }
 
-        return $factory->make($data, $rules, $messages, $customAttributes);
+        return $factory->make($data, $rules, $messages, $attributes);
     }
 }
 

@@ -553,7 +553,7 @@ class LogManager implements LoggerInterface
      * Unset the given channel instance.
      *
      * @param  string|null  $driver
-     * @return $this
+     * @return void
      */
     public function forgetChannel($driver = null)
     {

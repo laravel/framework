@@ -853,6 +853,32 @@ class SupportArrTest extends TestCase
         $this->assertEquals($expected, $sortedWithDotNotation);
     }
 
+    public function testSortDesc()
+    {
+        $unsorted = [
+            ['name' => 'Chair'],
+            ['name' => 'Desk'],
+        ];
+
+        $expected = [
+            ['name' => 'Desk'],
+            ['name' => 'Chair'],
+        ];
+
+        $sorted = array_values(Arr::sortDesc($unsorted));
+        $this->assertEquals($expected, $sorted);
+
+        // sort with closure
+        $sortedWithClosure = array_values(Arr::sortDesc($unsorted, function ($value) {
+            return $value['name'];
+        }));
+        $this->assertEquals($expected, $sortedWithClosure);
+
+        // sort with dot notation
+        $sortedWithDotNotation = array_values(Arr::sortDesc($unsorted, 'name'));
+        $this->assertEquals($expected, $sortedWithDotNotation);
+    }
+
     public function testSortRecursive()
     {
         $array = [
@@ -928,6 +954,25 @@ class SupportArrTest extends TestCase
         ]);
 
         $this->assertSame('font-bold mt-4 ml-2', $classes);
+    }
+
+    public function testToCssStyles()
+    {
+        $styles = Arr::toCssStyles([
+            'font-weight: bold',
+            'margin-top: 4px;',
+        ]);
+
+        $this->assertSame('font-weight: bold; margin-top: 4px;', $styles);
+
+        $styles = Arr::toCssStyles([
+            'font-weight: bold;',
+            'margin-top: 4px',
+            'margin-left: 2px;' => true,
+            'margin-right: 2px' => false,
+        ]);
+
+        $this->assertSame('font-weight: bold; margin-top: 4px; margin-left: 2px;', $styles);
     }
 
     public function testWhere()

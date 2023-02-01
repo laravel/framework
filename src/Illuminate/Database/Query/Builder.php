@@ -1094,6 +1094,8 @@ class Builder implements BuilderContract
             $values = $values->toArray();
         }
 
+        $values = Arr::flatten($values);
+
         foreach ($values as &$value) {
             $value = (int) $value;
         }
@@ -2504,7 +2506,7 @@ class Builder implements BuilderContract
     /**
      * Lock the selected rows in the table for updating.
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @return $this
      */
     public function lockForUpdate()
     {
@@ -2514,7 +2516,7 @@ class Builder implements BuilderContract
     /**
      * Share lock the selected rows in the table.
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @return $this
      */
     public function sharedLock()
     {
@@ -3416,11 +3418,31 @@ class Builder implements BuilderContract
             throw new InvalidArgumentException('Non-numeric value passed to increment method.');
         }
 
-        $wrapped = $this->grammar->wrap($column);
+        return $this->incrementEach([$column => $amount], $extra);
+    }
 
-        $columns = array_merge([$column => $this->raw("$wrapped + $amount")], $extra);
+    /**
+     * Increment the given column's values by the given amounts.
+     *
+     * @param  array<string, float|int|numeric-string>  $columns
+     * @param  array<string, mixed>  $extra
+     * @return int
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function incrementEach(array $columns, array $extra = [])
+    {
+        foreach ($columns as $column => $amount) {
+            if (! is_numeric($amount)) {
+                throw new InvalidArgumentException("Non-numeric value passed as increment amount for column: '$column'.");
+            } elseif (! is_string($column)) {
+                throw new InvalidArgumentException('Non-associative array passed to incrementEach method.');
+            }
 
-        return $this->update($columns);
+            $columns[$column] = $this->raw("{$this->grammar->wrap($column)} + $amount");
+        }
+
+        return $this->update(array_merge($columns, $extra));
     }
 
     /**
@@ -3439,11 +3461,31 @@ class Builder implements BuilderContract
             throw new InvalidArgumentException('Non-numeric value passed to decrement method.');
         }
 
-        $wrapped = $this->grammar->wrap($column);
+        return $this->decrementEach([$column => $amount], $extra);
+    }
 
-        $columns = array_merge([$column => $this->raw("$wrapped - $amount")], $extra);
+    /**
+     * Decrement the given column's values by the given amounts.
+     *
+     * @param  array<string, float|int|numeric-string>  $columns
+     * @param  array<string, mixed>  $extra
+     * @return int
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function decrementEach(array $columns, array $extra = [])
+    {
+        foreach ($columns as $column => $amount) {
+            if (! is_numeric($amount)) {
+                throw new InvalidArgumentException("Non-numeric value passed as decrement amount for column: '$column'.");
+            } elseif (! is_string($column)) {
+                throw new InvalidArgumentException('Non-associative array passed to decrementEach method.');
+            }
 
-        return $this->update($columns);
+            $columns[$column] = $this->raw("{$this->grammar->wrap($column)} - $amount");
+        }
+
+        return $this->update(array_merge($columns, $extra));
     }
 
     /**
@@ -3775,7 +3817,7 @@ class Builder implements BuilderContract
      *
      * @throws \BadMethodCallException
      */
-    public function __call($method, $parameters)
+    public function __call($method, array $parameters)
     {
         if (static::hasMacro($method)) {
             return $this->macroCall($method, $parameters);

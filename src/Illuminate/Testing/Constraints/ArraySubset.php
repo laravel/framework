@@ -190,7 +190,7 @@ if (class_exists(Version::class) && (int) Version::series()[0] >= 9) {
          * @throws \PHPUnit\Framework\ExpectationFailedException
          * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
          */
-        public function evaluate($other, string $description = '', bool $returnResult = false)
+        public function evaluate($other, string $description = '', bool $returnResult = false): ?bool
         {
             // type cast $other & $this->subset as an array to allow
             // support in standard array functions.

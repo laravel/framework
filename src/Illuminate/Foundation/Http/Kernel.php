@@ -51,23 +51,32 @@ class Kernel implements KernelContract
     /**
      * The application's middleware stack.
      *
-     * @var array
+     * @var array<int, class-string|string>
      */
     protected $middleware = [];
 
     /**
      * The application's route middleware groups.
      *
-     * @var array
+     * @var array<string, array<int, class-string|string>>
      */
     protected $middlewareGroups = [];
 
     /**
      * The application's route middleware.
      *
-     * @var array
+     * @var array<string, class-string|string>
+     *
+     * @deprecated
      */
     protected $routeMiddleware = [];
+
+    /**
+     * The application's middleware aliases.
+     *
+     * @var array<string, class-string|string>
+     */
+    protected $middlewareAliases = [];
 
     /**
      * All of the registered request duration handlers.
@@ -245,7 +254,7 @@ class Kernel implements KernelContract
     }
 
     /**
-     * Register a callback to be invoked when the requests lifecyle duration exceeds a given amount of time.
+     * Register a callback to be invoked when the requests lifecycle duration exceeds a given amount of time.
      *
      * @param  \DateTimeInterface|\Carbon\CarbonInterval|float|int  $threshold
      * @param  callable  $handler
@@ -445,7 +454,7 @@ class Kernel implements KernelContract
             $this->router->middlewareGroup($key, $middleware);
         }
 
-        foreach ($this->routeMiddleware as $key => $middleware) {
+        foreach (array_merge($this->routeMiddleware, $this->middlewareAliases) as $key => $middleware) {
             $this->router->aliasMiddleware($key, $middleware);
         }
     }
@@ -504,13 +513,25 @@ class Kernel implements KernelContract
     }
 
     /**
-     * Get the application's route middleware.
+     * Get the application's route middleware aliases.
      *
      * @return array
+     *
+     * @deprecated
      */
     public function getRouteMiddleware()
     {
-        return $this->routeMiddleware;
+        return $this->getMiddlewareAliases();
+    }
+
+    /**
+     * Get the application's route middleware aliases.
+     *
+     * @return array
+     */
+    public function getMiddlewareAliases()
+    {
+        return array_merge($this->routeMiddleware, $this->middlewareAliases);
     }
 
     /**

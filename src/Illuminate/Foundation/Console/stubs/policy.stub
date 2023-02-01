@@ -2,15 +2,12 @@
 
 namespace {{ namespace }};
 
-use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Auth\Access\Response;
 use {{ namespacedModel }};
 use {{ namespacedUserModel }};
 
 class {{ class }}
 {
-    use HandlesAuthorization;
-
     /**
      * Determine whether the user can view any models.
      */

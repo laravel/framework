@@ -91,6 +91,8 @@ trait GuardHelpers
     public function setUser(AuthenticatableContract $user)
     {
         $this->user = $user;
+
+        return $this;
     }
 
     /**

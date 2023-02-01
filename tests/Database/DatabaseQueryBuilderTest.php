@@ -936,10 +936,44 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select * from "users" where "id" in (?, ?, ?)', $builder->toSql());
         $this->assertEquals([0 => 1, 1 => 2, 2 => 3], $builder->getBindings());
 
+        // associative arrays as values:
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereIn('id', [
+            'issue' => 45582,
+            'id' => 2,
+            3,
+        ]);
+        $this->assertSame('select * from "users" where "id" in (?, ?, ?)', $builder->toSql());
+        $this->assertEquals([0 => 45582, 1 => 2, 2 => 3], $builder->getBindings());
+
+        // can accept some nested arrays as values.
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereIn('id', [
+            ['issue' => 45582],
+            ['id' => 2],
+            [3],
+        ]);
+        $this->assertSame('select * from "users" where "id" in (?, ?, ?)', $builder->toSql());
+        $this->assertEquals([0 => 45582, 1 => 2, 2 => 3], $builder->getBindings());
+
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->where('id', '=', 1)->orWhereIn('id', [1, 2, 3]);
         $this->assertSame('select * from "users" where "id" = ? or "id" in (?, ?, ?)', $builder->toSql());
         $this->assertEquals([0 => 1, 1 => 1, 2 => 2, 3 => 3], $builder->getBindings());
+    }
+
+    public function testBasicWhereInsException()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereIn('id', [
+            [
+                'a' => 1,
+                'b' => 1,
+            ],
+            ['c' => 2],
+            [3],
+        ]);
     }
 
     public function testBasicWhereNotIns()
@@ -998,6 +1032,15 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereIntegerInRaw('id', ['1a', 2]);
         $this->assertSame('select * from "users" where "id" in (1, 2)', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereIntegerInRaw('id', [
+            ['id' => '1a'],
+            ['id' => 2],
+            ['any' => '3'],
+        ]);
+        $this->assertSame('select * from "users" where "id" in (1, 2, 3)', $builder->toSql());
         $this->assertEquals([], $builder->getBindings());
     }
 
@@ -1976,6 +2019,22 @@ class DatabaseQueryBuilderTest extends TestCase
         });
         $this->assertSame('select * from "users" where "name" = ? or not ("email" = ?)', $builder->toSql());
         $this->assertEquals([0 => 'bar', 1 => 'foo'], $builder->getBindings());
+    }
+
+    public function testIncrementManyArgumentValidation1()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectErrorMessage('Non-numeric value passed as increment amount for column: \'col\'.');
+        $builder = $this->getBuilder();
+        $builder->from('users')->incrementEach(['col' => 'a']);
+    }
+
+    public function testIncrementManyArgumentValidation2()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectErrorMessage('Non-associative array passed to incrementEach method.');
+        $builder = $this->getBuilder();
+        $builder->from('users')->incrementEach([11 => 11]);
     }
 
     public function testWhereNotWithArrayConditions()

@@ -6,12 +6,14 @@ use Illuminate\Contracts\Support\Arrayable;
 
 enum StringStatus: string
 {
+    case draft = 'draft';
     case pending = 'pending';
     case done = 'done';
 }
 
 enum IntegerStatus: int
 {
+    case draft = 0;
     case pending = 1;
     case done = 2;
 }

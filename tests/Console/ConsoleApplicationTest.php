@@ -6,6 +6,7 @@ use Illuminate\Console\Application;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
+use Illuminate\Tests\Console\Fixtures\FakeCommandWithInputPrompting;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
@@ -75,6 +76,23 @@ class ConsoleApplicationTest extends TestCase
 
         $this->assertSame($codeOfCallingArrayInput, $codeOfCallingStringInput);
         $this->assertSame($outputOfCallingArrayInput, $outputOfCallingStringInput);
+    }
+
+    public function testCommandInputPromptingWorksCorrectly()
+    {
+        $app = new Application(
+            $app = new \Illuminate\Foundation\Application(__DIR__),
+            $events = m::mock(Dispatcher::class, ['dispatch' => null, 'fire' => null]),
+            'testing'
+        );
+
+        $app->addCommands([new FakeCommandWithInputPrompting(false)]);
+
+        $statusCode = $app->call('fake-command-for-testing', [
+            'name' => 'foo',
+        ]);
+
+        $this->assertSame(0, $statusCode);
     }
 
     protected function getMockConsole(array $methods)
