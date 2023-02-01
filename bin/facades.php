@@ -263,24 +263,28 @@ function resolveDocblockTypes($method, $typeNode)
             return (string) $typeNode;
         }
 
-        if (class_exists($typeNode->name)) {
-            return (string) $typeNode;
-        }
-
-        if (interface_exists($typeNode->name)) {
-            return (string) $typeNode;
-        }
-
-        if (enum_exists($typeNode->name)) {
-            return (string) $typeNode;
-        }
-
-        if (isKnownOptionalDependency($typeNode->name)) {
-            return (string) $typeNode;
-        }
-
         if ($typeNode->name === 'class-string') {
             return 'string';
+        }
+
+        $guessedFqcn = resolveClassImports($method->getDeclaringClass())->get($typeNode->name) ?? '\\'.$method->getDeclaringClass()->getNamespaceName().'\\'.$typeNode->name;
+
+        foreach ([$typeNode->name, $guessedFqcn] as $name) {
+            if (class_exists($name)) {
+                return (string) $name;
+            }
+
+            if (interface_exists($name)) {
+                return (string) $name;
+            }
+
+            if (enum_exists($name)) {
+                return (string) $name;
+            }
+
+            if (isKnownOptionalDependency($name)) {
+                return (string) $name;
+            }
         }
 
         return handleUnknownIdentifierType($method, $typeNode);
@@ -626,6 +630,24 @@ function resolveParameters($method)
         ->mapInto(DynamicParameter::class);
 
     return collect($method->getParameters())->merge($dynamicParameters);
+}
+
+/**
+ * Resolve the classes imports.
+ *
+ * @param  \ReflectionClass  $class
+ * @return \Illuminate\Support\Collection<string, class-string>
+ */
+function resolveClassImports($class)
+{
+    return Str::of(file_get_contents($class->getFileName()))
+        ->explode(PHP_EOL)
+        ->take($class->getStartLine() - 1)
+        ->filter(fn ($line) => preg_match('/^use [A-Za-z0-9\\\\]+( as [A-Za-z0-9]+)?;$/', $line) === 1)
+        ->map(fn ($line) => Str::of($line)->after('use ')->before(';'))
+        ->mapWithKeys(fn ($class) => [
+            ($class->contains(' as ') ? $class->after(' as ') : $class->classBasename())->toString() => $class->start('\\')->before(' as ')->toString(),
+        ]);
 }
 
 /**
