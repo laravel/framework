@@ -2871,7 +2871,7 @@ class EloquentModelDestroyStub extends Model
     public function newQuery()
     {
         $mock = m::mock(Builder::class);
-        $mock->shouldReceive('whereKey')->once()->with([1, 2, 3])->andReturn($mock);
+        $mock->shouldReceive('whereIn')->once()->with('id', [1, 2, 3])->andReturn($mock);
         $mock->shouldReceive('get')->once()->andReturn([$model = m::mock(stdClass::class)]);
         $model->shouldReceive('delete')->once();
 
