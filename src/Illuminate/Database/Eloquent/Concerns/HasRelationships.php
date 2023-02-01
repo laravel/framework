@@ -7,6 +7,7 @@ use Illuminate\Database\ClassMorphViolationException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\PendingHasThroughRelationship;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -334,6 +335,17 @@ trait HasRelationships
     protected function newMorphTo(Builder $query, Model $parent, $foreignKey, $ownerKey, $type, $relation)
     {
         return new MorphTo($query, $parent, $foreignKey, $ownerKey, $type, $relation);
+    }
+
+    /**
+     * Create a pending has-many-through or has-one-through relationship.
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\HasMany|\Illuminate\Database\Eloquent\Relations\HasOne  $localRelationship
+     * @return \Illuminate\Database\Eloquent\PendingHasThroughRelationship
+     */
+    public function through($localRelationship)
+    {
+        return new PendingHasThroughRelationship($this, $localRelationship);
     }
 
     /**
