@@ -757,8 +757,8 @@ class Builder implements BuilderContract
 
         $type = 'Basic';
 
-        $columnString = ($column instanceof ExpressionContract) 
-            ? $this->grammar->getValue($column) 
+        $columnString = ($column instanceof ExpressionContract)
+            ? $this->grammar->getValue($column)
             : $column;
 
         // If the column is making a JSON reference we'll check to see if the value
