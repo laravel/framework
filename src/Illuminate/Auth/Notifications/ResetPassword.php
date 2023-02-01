@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Lang;
 class ResetPassword extends Notification implements ShouldQueue
 {
     use Queueable;
+
     /**
      * The password reset token.
      *
