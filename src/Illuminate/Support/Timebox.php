@@ -22,14 +22,23 @@ class Timebox
      */
     public function call(callable $callback, int $microseconds)
     {
+        $exception = null;
         $start = microtime(true);
 
-        $result = $callback($this);
+        try {
+            $result = $callback($this);
+        } catch (\Throwable $caugth) {
+            $exception = $caugth;
+        }
 
         $remainder = intval($microseconds - ((microtime(true) - $start) * 1000000));
 
         if (! $this->earlyReturn && $remainder > 0) {
             $this->usleep($remainder);
+        }
+
+        if ($exception) {
+            throw $exception;
         }
 
         return $result;
