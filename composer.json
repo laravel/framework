@@ -37,7 +37,7 @@
         "symfony/error-handler": "^6.0",
         "symfony/finder": "^6.0",
         "symfony/http-foundation": "^6.0",
-        "symfony/http-kernel": "^6.0",
+        "symfony/http-kernel": "^6.2.6",
         "symfony/mailer": "^6.0",
         "symfony/mime": "^6.0",
         "symfony/process": "^6.0",
