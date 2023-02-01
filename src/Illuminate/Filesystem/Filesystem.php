@@ -207,7 +207,7 @@ class Filesystem
         $tempPath = tempnam(dirname($path), basename($path));
 
         // Fix permissions of tempPath because `tempnam()` creates it with permissions set to 0600...
-        chmod($tempPath, 0666 - umask());
+        chmod($tempPath, 0777 - umask());
 
         file_put_contents($tempPath, $content);
 
