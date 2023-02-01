@@ -1627,8 +1627,8 @@ trait ValidatesAttributes
         }
 
         try {
-            $numerator = BigDecimal::of($value);
-            $denominator = BigDecimal::of($parameters[0]);
+            $numerator = BigDecimal::of($this->trim($value));
+            $denominator = BigDecimal::of($this->trim($parameters[0]));
 
             if ($numerator->isZero() && $denominator->isZero()) {
                 return false;
