@@ -1044,9 +1044,11 @@ if (! function_exists('tag_instance_of')) {
      * @param  array|string  $instancesOfFQCN
      * @param  array|string  $tags
      * @return void
+     *
      * @throws ReflectionException
      */
-    function tag_instance_of(array|string $instancesOfFQCN, array|string $tags): void {
+    function tag_instance_of(array|string $instancesOfFQCN, array|string $tags)
+    {
         if (is_array($instancesOfFQCN)) {
             foreach ($instancesOfFQCN as $instance) {
                 tag_instance_of($instance, $tags);
@@ -1085,7 +1087,7 @@ if (! function_exists('tag_instance_of')) {
 
         // Define the classmap that should be used
         $classmap = config('app.instance_of.classmap', null);
-        if (!isset($classmap)) {
+        if (! isset($classmap)) {
             $classmap = [];
 
             $classmapFile = app()->basePath('vendor/composer/autoload_classmap.php');
