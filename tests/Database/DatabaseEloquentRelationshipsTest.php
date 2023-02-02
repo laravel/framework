@@ -122,7 +122,8 @@ class DatabaseEloquentRelationshipsTest extends TestCase
     public function testStringyHasThroughApi()
     {
         $fluent = (new FluentMechanic())->owner();
-        $stringy = (new class extends FluentMechanic {
+        $stringy = (new class extends FluentMechanic
+        {
             public function owner()
             {
                 return $this->through('car')->has('owner');
@@ -150,7 +151,8 @@ class DatabaseEloquentRelationshipsTest extends TestCase
         $this->assertSame('cars.mechanic_id', $fluent->getQualifiedFirstKeyName());
 
         $fluent = (new FluentProject())->deployments();
-        $stringy = (new class extends FluentProject {
+        $stringy = (new class extends FluentProject
+        {
             public function deployments()
             {
                 return $this->through('environments')->has('deployments');
@@ -181,7 +183,8 @@ class DatabaseEloquentRelationshipsTest extends TestCase
     public function testHigherOrderHasThroughApi()
     {
         $fluent = (new FluentMechanic())->owner();
-        $higher = (new class extends FluentMechanic {
+        $higher = (new class extends FluentMechanic
+        {
             public function owner()
             {
                 return $this->throughCar()->hasOwner();
@@ -209,8 +212,8 @@ class DatabaseEloquentRelationshipsTest extends TestCase
         $this->assertSame('cars.mechanic_id', $fluent->getQualifiedFirstKeyName());
 
         $fluent = (new FluentProject())->deployments();
-        $higher = (new class extends FluentProject {
-
+        $higher = (new class extends FluentProject
+        {
             public function deployments()
             {
                 return $this->through($this->environments())->has(fn ($env) => $env->deployments());
