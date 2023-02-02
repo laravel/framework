@@ -50,17 +50,7 @@ trait CompilesHelpers
     }
 
     /**
-     * Compile the patch method statements into valid PHP.
-     *
-     * @return string
-     */
-    protected function compilePatch()
-    {
-        return $this->compileMethod("('PATCH')");
-    }
-
-    /**
-     * Compile the put method statements into valid PHP.
+     * Compile the PUT method statements into valid PHP.
      *
      * @return string
      */
@@ -70,7 +60,17 @@ trait CompilesHelpers
     }
 
     /**
-     * Compile the delete method statements into valid PHP.
+     * Compile the PATCH method statements into valid PHP.
+     *
+     * @return string
+     */
+    protected function compilePatch()
+    {
+        return $this->compileMethod("('PATCH')");
+    }
+
+    /**
+     * Compile the DELETE method statements into valid PHP.
      *
      * @return string
      */
