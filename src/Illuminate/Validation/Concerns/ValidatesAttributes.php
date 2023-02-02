@@ -2186,7 +2186,7 @@ trait ValidatesAttributes
     {
         $this->requireParameterCount(1, $parameters, 'size');
 
-        return BigNumber::of($this->getSize($attribute, $value))->isEqualTo($parameters[0]);
+        return BigNumber::of($this->getSize($attribute, $value))->isEqualTo($this->trim($parameters[0]));
     }
 
     /**

@@ -8063,6 +8063,8 @@ class ValidationValidatorTest extends TestCase
             'lte_str' => ' abc ',
             'max' => ' 20 ',
             'max_str' => ' abc ',
+            'size' => ' 20 ',
+            'size_str' => ' abc ',
             'foo' => '4',
             ' foo' => ' 5',
             ' foo ' => ' 6 ',
@@ -8086,6 +8088,8 @@ class ValidationValidatorTest extends TestCase
             'lte_str' => "lte: foo",
             'max' => 'numeric|max: 20',
             'max_str' => 'max: 5',
+            'size' => 'numeric|size: 20',
+            'size_str' => 'size: 5',
         ], [], []);
         $this->assertTrue($validator->passes());
 
@@ -8109,6 +8113,8 @@ class ValidationValidatorTest extends TestCase
             'lte_str' => ' abc ',
             'max' => ' 20 ',
             'max_str' => ' abc ',
+            'size' => ' 20 ',
+            'size_str' => ' abc ',
             'foo' => '4',
             ' foo' => ' 5',
             ' foo ' => ' 6 ',
@@ -8132,6 +8138,8 @@ class ValidationValidatorTest extends TestCase
             'lte_str' => "lte:foo",
             'max' => 'numeric|max: 19',
             'max_str' => 'max: 4',
+            'size' => 'numeric|size: 19',
+            'size_str' => 'size: 4',
         ], [], []);
         $this->assertSame([
             'min',
@@ -8153,6 +8161,8 @@ class ValidationValidatorTest extends TestCase
             'lte_str',
             'max',
             'max_str',
+            'size',
+            'size_str',
         ], $validator->messages()->keys());
     }
 
