@@ -492,7 +492,6 @@ class SupportStrTest extends TestCase
         $results = [];
         // take 6.200.000 samples, because there are 62 different characters
         for ($i = 0; $i < 6200000; $i++) {
-
             $random = Str::random(1);
             $results[$random] = ($results[$random] ?? 0) + 1;
         }
