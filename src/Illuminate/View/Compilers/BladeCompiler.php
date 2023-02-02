@@ -573,7 +573,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
         if ($position !== false) {
             return [
                 substr_replace($subject, $replace, $position, strlen($search)),
-                $position + strlen($replace)
+                $position + strlen($replace),
             ];
         }
 
