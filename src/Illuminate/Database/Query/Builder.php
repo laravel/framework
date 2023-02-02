@@ -455,6 +455,19 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Set the as table which the query is targeting.
+     *
+     * @param  string  $as
+     * @return $this
+     */
+    public function as($as)
+    {
+        $this->from($this->from, $as);
+
+        return $this;
+    }
+
+    /**
      * Add a join clause to the query.
      *
      * @param  string  $table
