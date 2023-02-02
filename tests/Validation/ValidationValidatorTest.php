@@ -8089,7 +8089,16 @@ class ValidationValidatorTest extends TestCase
             'gt_field' => 'numeric|gt: foo ',
             'gt_str' => "gt: foo",
         ], [], []);
-        $this->assertFalse($validator->passes());
+        $this->assertSame([
+            'min',
+            'min_str',
+            'multiple_of',
+            'between',
+            'between_str',
+            'gt',
+            'gt_field',
+            'gt_str',
+        ], $validator->messages()->keys());
     }
 
     protected function getTranslator()
