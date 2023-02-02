@@ -5343,7 +5343,7 @@ SQL;
         $this->assertSame('select * from (select * from "users") as "u"', $builder->toSql());
     }
 
-    public function testAsChris()
+    public function testAs()
     {
         $builder = $this->getBuilder()->from('users')->as('u');
         $this->assertSame('select * from "users" as "u"', $builder->toSql());
