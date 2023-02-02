@@ -486,6 +486,24 @@ class SupportStrTest extends TestCase
         $this->assertIsString(Str::random());
     }
 
+    /** @test */
+    public function TestWhetherTheNumberOfGeneratedCharactersIsEquallyDistributed() {
+        $results = [];
+        // take 6.200.000 samples, because there are 62 different characters
+        for ($i = 0; $i < 6200000; $i++) {
+
+            $random = Str::random(1);
+            $results[$random] = ($results[$random] ?? 0)  + 1;
+        }
+
+        // Each character should occur 100,000 times with a variance of 2%.
+        foreach ($results as $result) {
+            $this->assertEqualsWithDelta(100000, $result, 2000);
+        }
+    }
+
+
+
     public function testRandomStringFactoryCanBeSet()
     {
         Str::createRandomStringsUsing(fn ($length) => 'length:'.$length);
