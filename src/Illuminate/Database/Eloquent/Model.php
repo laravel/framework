@@ -23,6 +23,9 @@ use Illuminate\Support\Traits\ForwardsCalls;
 use JsonSerializable;
 use LogicException;
 
+/**
+ * @mixin Builder
+ */
 abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToString, HasBroadcastChannel, Jsonable, JsonSerializable, QueueableEntity, UrlRoutable
 {
     use Concerns\HasAttributes,
