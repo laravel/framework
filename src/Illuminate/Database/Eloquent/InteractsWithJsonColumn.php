@@ -14,7 +14,7 @@ trait InteractsWithJsonColumn
      *
      * @return void
      */
-    protected static function bootInteractsWithJson()
+    protected static function bootInteractsWithJsonColumn()
     {
         static::retrieved(function ($model) {
             $model->registerJsonColumnMethods();
@@ -36,13 +36,11 @@ trait InteractsWithJsonColumn
                 continue;
             }
 
-            $jsonColumn = $column;
+            $getter = 'get'.Str::studly($column);
+            $setter = 'set'.Str::studly($column);
 
-            $getter = 'get'.Str::studly($jsonColumn);
-            $setter = 'set'.Str::studly($jsonColumn);
-
-            $this->dynamicMethods[$getter] = function ($key = null, $default = null) use ($jsonColumn) {
-                $data = $this->asArray($jsonColumn);
+            $this->dynamicMethods[$getter] = function ($key = null, $default = null) use ($column) {
+                $data = $this->asArray($column);
                 if (! $key) {
                     return $data;
                 }
@@ -53,14 +51,14 @@ trait InteractsWithJsonColumn
                 return Arr::get($data, $key, $default);
             };
 
-            $this->dynamicMethods[$setter] = function ($key, $value) use ($jsonColumn) {
+            $this->dynamicMethods[$setter] = function ($key, $value) use ($column) {
                 if (Str::contains($key, '->')) {
-                    return $this->update([$jsonColumn.'->'.$key => $value]);
+                    return $this->update([$column.'->'.$key => $value]);
                 }
-                $data = $this->asArray($jsonColumn);
+                $data = $this->asArray($column);
                 $data[$key] = $value;
 
-                return $this->update([$jsonColumn => $data]);
+                return $this->update([$column => $data]);
             };
         }
     }
