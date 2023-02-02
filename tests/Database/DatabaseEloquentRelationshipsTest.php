@@ -177,6 +177,70 @@ class DatabaseEloquentRelationshipsTest extends TestCase
         $this->assertSame('environments.pro_id', $stringy->getQualifiedFirstKeyName());
         $this->assertSame('environments.pro_id', $fluent->getQualifiedFirstKeyName());
     }
+
+    public function testHigherOrderHasThroughApi()
+    {
+        $fluent = (new FluentMechanic())->owner();
+        $higher = (new class extends FluentMechanic {
+            public function owner()
+            {
+                return $this->throughCar()->hasOwner();
+            }
+
+            public function getTable()
+            {
+                return 'higher_mechanics';
+            }
+        })->owner();
+
+        $this->assertInstanceOf(HasOneThrough::class, $fluent);
+        $this->assertInstanceOf(HasOneThrough::class, $higher);
+        $this->assertSame('m_id', $fluent->getLocalKeyName());
+        $this->assertSame('m_id', $higher->getLocalKeyName());
+        $this->assertSame('c_id', $fluent->getSecondLocalKeyName());
+        $this->assertSame('c_id', $higher->getSecondLocalKeyName());
+        $this->assertSame('mechanic_id', $fluent->getFirstKeyName());
+        $this->assertSame('mechanic_id', $higher->getFirstKeyName());
+        $this->assertSame('car_id', $fluent->getForeignKeyName());
+        $this->assertSame('car_id', $higher->getForeignKeyName());
+        $this->assertSame('fluent_mechanics.m_id', $fluent->getQualifiedLocalKeyName());
+        $this->assertSame('higher_mechanics.m_id', $higher->getQualifiedLocalKeyName());
+        $this->assertSame('cars.mechanic_id', $higher->getQualifiedFirstKeyName());
+        $this->assertSame('cars.mechanic_id', $fluent->getQualifiedFirstKeyName());
+
+        $fluent = (new FluentProject())->deployments();
+        $higher = (new class extends FluentProject {
+
+            public function deployments()
+            {
+                return $this->through($this->environments())->has(fn ($env) => $env->deployments());
+
+                return $this->through('environments')->has('deployments');
+
+                return $this->throughEnvironments()->hasDeployments();
+            }
+
+            public function getTable()
+            {
+                return 'higher_projects';
+            }
+        })->deployments();
+
+        $this->assertInstanceOf(HasManyThrough::class, $fluent);
+        $this->assertInstanceOf(HasManyThrough::class, $higher);
+        $this->assertSame('p_id', $fluent->getLocalKeyName());
+        $this->assertSame('p_id', $higher->getLocalKeyName());
+        $this->assertSame('e_id', $fluent->getSecondLocalKeyName());
+        $this->assertSame('e_id', $higher->getSecondLocalKeyName());
+        $this->assertSame('pro_id', $fluent->getFirstKeyName());
+        $this->assertSame('pro_id', $higher->getFirstKeyName());
+        $this->assertSame('env_id', $fluent->getForeignKeyName());
+        $this->assertSame('env_id', $higher->getForeignKeyName());
+        $this->assertSame('fluent_projects.p_id', $fluent->getQualifiedLocalKeyName());
+        $this->assertSame('higher_projects.p_id', $higher->getQualifiedLocalKeyName());
+        $this->assertSame('environments.pro_id', $higher->getQualifiedFirstKeyName());
+        $this->assertSame('environments.pro_id', $fluent->getQualifiedFirstKeyName());
+    }
 }
 
 class FakeRelationship extends Model

@@ -2,7 +2,9 @@
 
 namespace Illuminate\Database\Eloquent;
 
+use BadMethodCallException;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 class PendingHasThroughRelationship
 {
@@ -66,5 +68,23 @@ class PendingHasThroughRelationship
             $this->localRelationship->getLocalKeyName(),
             $distantRelation->getLocalKeyName(),
         );
+    }
+
+    /**
+     * Handle dynamic method calls into the model.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return mixed
+     */
+    public function __call($method, $parameters)
+    {
+        if (Str::startsWith($method, 'has')) {
+            return $this->has(Str::of($method)->after('has')->lcfirst()->toString());
+        }
+
+        throw new BadMethodCallException(sprintf(
+            'Call to undefined method %s::%s()', static::class, $method
+        ));
     }
 }
