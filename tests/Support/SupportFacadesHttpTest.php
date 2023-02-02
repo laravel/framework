@@ -25,9 +25,7 @@ class SupportFacadesHttpTest extends TestCase
 
     public function testFacadeRootIsSharedWhenFaked(): void
     {
-        Http::fake([
-            'https://laravel.com' => Http::response('OK!'),
-        ]);
+        Http::fake(['https://laravel.com' => Http::response('OK!')]);
 
         $factory = $this->app->make(Factory::class);
         $this->assertSame('OK!', $factory->get('https://laravel.com')->body());
@@ -49,17 +47,42 @@ class SupportFacadesHttpTest extends TestCase
         $this->assertSame('OK!', $factory->get('https://laravel.com')->body());
     }
 
-    public function testFacadeRootIsSharedWhenEnforcingFaking(): void
+    public function testFacadeRootIsShared(): void
     {
-        $client = Http::preventStrayRequests();
+        Http::fake(['https://laravel.com' => Http::response('OK!')]);
 
-        $this->assertSame($client, $this->app->make(Factory::class));
+        $factory = $this->app->make(Factory::class);
+        $this->assertSame('OK!', $factory->get('https://laravel.com')->body());
     }
 
     public function testFacadeRootIsSharedWhenAllowingStrayRequests(): void
     {
-        $client = Http::allowStrayRequests();
+        Http::allowStrayRequests();
 
-        $this->assertSame($client, $this->app->make(Factory::class));
+        $factory = $this->app->make(Factory::class);
+        $this->assertSame('OK!', $factory->get('https://laravel.com')->body());
+    }
+
+    public function testFakePreventsStrayRequestsByDefault(): void
+    {
+        Http::preventStrayRequests();
+        Http::fake(['https://laravel.com' => Http::response('OK!')]);
+
+        $client = $this->app->make(Factory::class);
+
+        $this->expectException(\RuntimeException::class);
+        $this->assertSame('OK!', $client->get('https://laravel.com')->body());
+        $client->get('https://example.com');
+    }
+
+    public function testAllowingStrayRequestsIsMaintained(): void
+    {
+        Http::allowStrayRequests();
+        Http::fake(['https://laravel.com' => Http::response('OK!')]);
+
+        $client = $this->app->make(Factory::class);
+
+        $this->assertSame('OK!', $client->get('https://laravel.com')->body());
+        $client->get('https://forge.laravel.com')->body();
     }
 }

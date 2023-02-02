@@ -82,6 +82,8 @@ use Illuminate\Http\Client\Factory;
  */
 class Http extends Facade
 {
+    protected static $preventStrayRequests = true;
+
     /**
      * Get the registered name of the component.
      *
@@ -101,7 +103,7 @@ class Http extends Facade
     public static function fake($callback = null)
     {
         return tap(static::getFacadeRoot(), function ($fake) use ($callback) {
-            static::swap($fake->preventStrayRequests()->fake($callback));
+            static::swap($fake->preventStrayRequests(static::$preventStrayRequests)->fake($callback));
         });
     }
 
@@ -114,7 +116,7 @@ class Http extends Facade
     public static function fakeSequence(string $urlPattern = '*')
     {
         $fake = tap(static::getFacadeRoot(), function ($fake) {
-            static::swap($fake->preventStrayRequests());
+            static::swap($fake->preventStrayRequests(static::$preventStrayRequests));
         });
 
         return $fake->fakeSequence($urlPattern);
@@ -128,6 +130,7 @@ class Http extends Facade
     public static function allowStrayRequests()
     {
         return tap(static::getFacadeRoot(), function ($fake) {
+            static::$preventStrayRequests = false;
             static::swap($fake->allowStrayRequests());
         });
     }
@@ -142,6 +145,7 @@ class Http extends Facade
     public static function preventStrayRequests()
     {
         return tap(static::getFacadeRoot(), function ($fake) {
+            static::$preventStrayRequests = true;
             static::swap($fake->preventStrayRequests());
         });
     }
