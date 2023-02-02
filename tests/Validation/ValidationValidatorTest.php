@@ -8058,6 +8058,9 @@ class ValidationValidatorTest extends TestCase
             'gte' => "\t5 ",
             'gte_field' => "\t5 ",
             'gte_str' => ' abc ',
+            'lte' => "\t5 ",
+            'lte_field' => "\t5 ",
+            'lte_str' => ' abc ',
             'foo' => '4',
             ' foo' => ' 5',
             ' foo ' => ' 6 ',
@@ -8076,6 +8079,9 @@ class ValidationValidatorTest extends TestCase
             'gte' => "numeric|gte: 5",
             'gte_field' => "numeric|gte: foo",
             'gte_str' => "gte: foo",
+            'lte' => "numeric|lte: 5",
+            'lte_field' => 'numeric|lte: foo',
+            'lte_str' => "lte: foo",
         ], [], []);
         $this->assertTrue($validator->passes());
 
@@ -8094,6 +8100,9 @@ class ValidationValidatorTest extends TestCase
             'gte' => "\t5 ",
             'gte_field' => "\t5 ",
             'gte_str' => ' abc ',
+            'lte' => "\t5 ",
+            'lte_field' => "\t5 ",
+            'lte_str' => ' abc ',
             'foo' => '4',
             ' foo' => ' 5',
             ' foo ' => ' 6 ',
@@ -8112,6 +8121,9 @@ class ValidationValidatorTest extends TestCase
             'gte' => "numeric|gte: 6",
             'gte_field' => "numeric|gte: foo ",
             'gte_str' => "gte: foo ",
+            'lte' => "numeric|lte: 4",
+            'lte_field' => 'numeric|lte:foo',
+            'lte_str' => "lte:foo",
         ], [], []);
         $this->assertSame([
             'min',
@@ -8128,6 +8140,9 @@ class ValidationValidatorTest extends TestCase
             'gte',
             'gte_field',
             'gte_str',
+            'lte',
+            'lte_field',
+            'lte_str',
         ], $validator->messages()->keys());
     }
 

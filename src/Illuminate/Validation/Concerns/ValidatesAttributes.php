@@ -1205,7 +1205,7 @@ trait ValidatesAttributes
         $this->shouldBeNumeric($attribute, 'Lte');
 
         if (is_null($comparedToValue) && (is_numeric($value) && is_numeric($parameters[0]))) {
-            return BigNumber::of($this->getSize($attribute, $value))->isLessThanOrEqualTo($parameters[0]);
+            return BigNumber::of($this->getSize($attribute, $value))->isLessThanOrEqualTo($this->trim($parameters[0]));
         }
 
         if (is_numeric($parameters[0])) {
@@ -1213,7 +1213,7 @@ trait ValidatesAttributes
         }
 
         if ($this->hasRule($attribute, $this->numericRules) && is_numeric($value) && is_numeric($comparedToValue)) {
-            return BigNumber::of($value)->isLessThanOrEqualTo($comparedToValue);
+            return BigNumber::of($this->trim($value))->isLessThanOrEqualTo($this->trim($comparedToValue));
         }
 
         if (! $this->isSameType($value, $comparedToValue)) {
