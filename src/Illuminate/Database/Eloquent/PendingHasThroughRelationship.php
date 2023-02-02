@@ -36,11 +36,15 @@ class PendingHasThroughRelationship
     /**
      * Define the distant relationship that this model has.
      *
-     * @param  (callable(\Illuminate\Database\Eloquent\Model): (\Illuminate\Database\Eloquent\Relations\HasOne|\Illuminate\Database\Eloquent\Relations\HasMany))  $callback
+     * @param  string|(callable(\Illuminate\Database\Eloquent\Model): (\Illuminate\Database\Eloquent\Relations\HasOne|\Illuminate\Database\Eloquent\Relations\HasMany))  $callback
      * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough|\Illuminate\Database\Eloquent\Relations\HasOneThrough
      */
     public function has($callback)
     {
+        if (is_string($callback)) {
+            $callback = fn () => $this->localRelationship->getRelated()->{$callback}();
+        }
+
         $distantRelation = $callback($this->localRelationship->getRelated());
 
         if ($distantRelation instanceof HasMany) {

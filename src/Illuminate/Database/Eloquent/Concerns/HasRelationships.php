@@ -340,12 +340,16 @@ trait HasRelationships
     /**
      * Create a pending has-many-through or has-one-through relationship.
      *
-     * @param  \Illuminate\Database\Eloquent\Relations\HasMany|\Illuminate\Database\Eloquent\Relations\HasOne  $localRelationship
+     * @param  string|\Illuminate\Database\Eloquent\Relations\HasMany|\Illuminate\Database\Eloquent\Relations\HasOne  $relationship
      * @return \Illuminate\Database\Eloquent\PendingHasThroughRelationship
      */
-    public function through($localRelationship)
+    public function through($relationship)
     {
-        return new PendingHasThroughRelationship($this, $localRelationship);
+        if (is_string($relationship)) {
+            $relationship = $this->{$relationship}();
+        }
+
+        return new PendingHasThroughRelationship($this, $relationship);
     }
 
     /**

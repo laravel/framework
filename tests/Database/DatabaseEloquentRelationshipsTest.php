@@ -82,40 +82,99 @@ class DatabaseEloquentRelationshipsTest extends TestCase
 
     public function testPendingHasThroughRelationship()
     {
-        $classic = (new FluentMechanic())->owner();
-        $fluent = (new ClassicMechanic())->owner();
+        $fluent = (new FluentMechanic())->owner();
+        $classic = (new ClassicMechanic())->owner();
+
+        $this->assertInstanceOf(HasOneThrough::class, $classic);
+        $this->assertInstanceOf(HasOneThrough::class, $fluent);
+        $this->assertSame('m_id', $classic->getLocalKeyName());
+        $this->assertSame('m_id', $fluent->getLocalKeyName());
+        $this->assertSame('c_id', $classic->getSecondLocalKeyName());
+        $this->assertSame('c_id', $fluent->getSecondLocalKeyName());
+        $this->assertSame('mechanic_id', $classic->getFirstKeyName());
+        $this->assertSame('mechanic_id', $fluent->getFirstKeyName());
+        $this->assertSame('car_id', $classic->getForeignKeyName());
+        $this->assertSame('car_id', $fluent->getForeignKeyName());
+        $this->assertSame('classic_mechanics.m_id', $classic->getQualifiedLocalKeyName());
+        $this->assertSame('fluent_mechanics.m_id', $fluent->getQualifiedLocalKeyName());
+        $this->assertSame('cars.mechanic_id', $fluent->getQualifiedFirstKeyName());
+        $this->assertSame('cars.mechanic_id', $classic->getQualifiedFirstKeyName());
+
+        $fluent = (new FluentProject())->deployments();
+        $classic = (new ClassicProject())->deployments();
+
+        $this->assertInstanceOf(HasManyThrough::class, $classic);
+        $this->assertInstanceOf(HasManyThrough::class, $fluent);
+        $this->assertSame('p_id', $classic->getLocalKeyName());
+        $this->assertSame('p_id', $fluent->getLocalKeyName());
+        $this->assertSame('e_id', $classic->getSecondLocalKeyName());
+        $this->assertSame('e_id', $fluent->getSecondLocalKeyName());
+        $this->assertSame('pro_id', $classic->getFirstKeyName());
+        $this->assertSame('pro_id', $fluent->getFirstKeyName());
+        $this->assertSame('env_id', $classic->getForeignKeyName());
+        $this->assertSame('env_id', $fluent->getForeignKeyName());
+        $this->assertSame('classic_projects.p_id', $classic->getQualifiedLocalKeyName());
+        $this->assertSame('fluent_projects.p_id', $fluent->getQualifiedLocalKeyName());
+        $this->assertSame('environments.pro_id', $fluent->getQualifiedFirstKeyName());
+        $this->assertSame('environments.pro_id', $classic->getQualifiedFirstKeyName());
+    }
+
+    public function testStringyHasThroughApi()
+    {
+        $fluent = (new FluentMechanic())->owner();
+        $stringy = (new class extends FluentMechanic {
+            public function owner()
+            {
+                return $this->through('car')->has('owner');
+            }
+
+            public function getTable()
+            {
+                return 'stringy_mechanics';
+            }
+        })->owner();
 
         $this->assertInstanceOf(HasOneThrough::class, $fluent);
-        $this->assertInstanceOf(HasOneThrough::class, $classic);
+        $this->assertInstanceOf(HasOneThrough::class, $stringy);
         $this->assertSame('m_id', $fluent->getLocalKeyName());
-        $this->assertSame('m_id', $classic->getLocalKeyName());
+        $this->assertSame('m_id', $stringy->getLocalKeyName());
         $this->assertSame('c_id', $fluent->getSecondLocalKeyName());
-        $this->assertSame('c_id', $classic->getSecondLocalKeyName());
+        $this->assertSame('c_id', $stringy->getSecondLocalKeyName());
         $this->assertSame('mechanic_id', $fluent->getFirstKeyName());
-        $this->assertSame('mechanic_id', $classic->getFirstKeyName());
+        $this->assertSame('mechanic_id', $stringy->getFirstKeyName());
         $this->assertSame('car_id', $fluent->getForeignKeyName());
-        $this->assertSame('car_id', $classic->getForeignKeyName());
-        $this->assertSame('classic_mechanics.m_id', $fluent->getQualifiedLocalKeyName());
-        $this->assertSame('fluent_mechanics.m_id', $classic->getQualifiedLocalKeyName());
-        $this->assertSame('cars.mechanic_id', $classic->getQualifiedFirstKeyName());
+        $this->assertSame('car_id', $stringy->getForeignKeyName());
+        $this->assertSame('fluent_mechanics.m_id', $fluent->getQualifiedLocalKeyName());
+        $this->assertSame('stringy_mechanics.m_id', $stringy->getQualifiedLocalKeyName());
+        $this->assertSame('cars.mechanic_id', $stringy->getQualifiedFirstKeyName());
         $this->assertSame('cars.mechanic_id', $fluent->getQualifiedFirstKeyName());
 
-        $classic = (new FluentProject())->deployments();
-        $fluent = (new ClassicProject())->deployments();
+        $fluent = (new FluentProject())->deployments();
+        $stringy = (new class extends FluentProject {
+            public function deployments()
+            {
+                return $this->through('environments')->has('deployments');
+            }
+
+            public function getTable()
+            {
+                return 'stringy_projects';
+            }
+        })->deployments();
 
         $this->assertInstanceOf(HasManyThrough::class, $fluent);
-        $this->assertInstanceOf(HasManyThrough::class, $classic);
+        $this->assertInstanceOf(HasManyThrough::class, $stringy);
         $this->assertSame('p_id', $fluent->getLocalKeyName());
-        $this->assertSame('p_id', $classic->getLocalKeyName());
+        $this->assertSame('p_id', $stringy->getLocalKeyName());
         $this->assertSame('e_id', $fluent->getSecondLocalKeyName());
-        $this->assertSame('e_id', $classic->getSecondLocalKeyName());
+        $this->assertSame('e_id', $stringy->getSecondLocalKeyName());
         $this->assertSame('pro_id', $fluent->getFirstKeyName());
-        $this->assertSame('pro_id', $classic->getFirstKeyName());
+        $this->assertSame('pro_id', $stringy->getFirstKeyName());
         $this->assertSame('env_id', $fluent->getForeignKeyName());
-        $this->assertSame('env_id', $classic->getForeignKeyName());
-        $this->assertSame('classic_projects.p_id', $fluent->getQualifiedLocalKeyName());
-        $this->assertSame('fluent_projects.p_id', $classic->getQualifiedLocalKeyName());
-        $this->assertSame('environments.pro_id', $classic->getQualifiedFirstKeyName());
+        $this->assertSame('env_id', $stringy->getForeignKeyName());
+        $this->assertSame('fluent_projects.p_id', $fluent->getQualifiedLocalKeyName());
+        $this->assertSame('stringy_projects.p_id', $stringy->getQualifiedLocalKeyName());
+        $this->assertSame('environments.pro_id', $stringy->getQualifiedFirstKeyName());
         $this->assertSame('environments.pro_id', $fluent->getQualifiedFirstKeyName());
     }
 }
