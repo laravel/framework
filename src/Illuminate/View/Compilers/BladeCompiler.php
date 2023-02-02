@@ -507,6 +507,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     {
         preg_match_all('/\B@(@?\w+(?:::\w+)?)([ \t]*)(\( ( [\S\s]*? ) \))?/x', $template, $matches);
 
+        $offset = 0;
         for ($i = 0; isset($matches[0][$i]); $i++) {
             $match = [
                 $matches[0][$i],
@@ -538,10 +539,32 @@ class BladeCompiler extends Compiler implements CompilerInterface
                 $match[4] = $match[4].$rest;
             }
 
-            $template = Str::replaceFirst($match[0], $this->compileStatement($match), $template);
+            [$template, $offset] = $this->replaceFirst(
+                $match[0],
+                $this->compileStatement($match),
+                $template,
+                $offset
+            );
         }
 
         return $template;
+    }
+
+    public function replaceFirst($search, $replace, $subject, $offset)
+    {
+        $search = (string) $search;
+
+        if ($search === '') {
+            return $subject;
+        }
+
+        $position = strpos($subject, $search, $offset);
+
+        if ($position !== false) {
+            return [substr_replace($subject, $replace, $position, strlen($search)), $position + strlen($replace)];
+        }
+
+        return [$subject, 0];
     }
 
     /**
