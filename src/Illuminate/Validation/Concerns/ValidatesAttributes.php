@@ -1592,7 +1592,11 @@ trait ValidatesAttributes
     {
         $this->requireParameterCount(1, $parameters, 'missing_with');
 
-        return ! Arr::hasAny($this->data, $parameters);
+        if (Arr::hasAny($this->data, $parameters)) {
+            return $this->validateMissing($attribute, $value, $parameters);
+        }
+
+        return true;
     }
 
     /**
@@ -1607,7 +1611,11 @@ trait ValidatesAttributes
     {
         $this->requireParameterCount(1, $parameters, 'missing_with');
 
-        return ! Arr::has($this->data, $parameters);
+        if (Arr::has($this->data, $parameters)) {
+            return $this->validateMissing($attribute, $value, $parameters);
+        }
+
+        return true;
     }
 
     /**
