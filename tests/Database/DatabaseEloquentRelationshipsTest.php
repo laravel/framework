@@ -99,6 +99,24 @@ class DatabaseEloquentRelationshipsTest extends TestCase
         $this->assertSame('fluent_mechanics.m_id', $classic->getQualifiedLocalKeyName());
         $this->assertSame('cars.mechanic_id', $classic->getQualifiedFirstKeyName());
         $this->assertSame('cars.mechanic_id', $fluent->getQualifiedFirstKeyName());
+
+        $classic = (new FluentProject())->deployments();
+        $fluent = (new ClassicProject())->deployments();
+
+        $this->assertInstanceOf(HasManyThrough::class, $fluent);
+        $this->assertInstanceOf(HasManyThrough::class, $classic);
+        $this->assertSame('p_id', $fluent->getLocalKeyName());
+        $this->assertSame('p_id', $classic->getLocalKeyName());
+        $this->assertSame('e_id', $fluent->getSecondLocalKeyName());
+        $this->assertSame('e_id', $classic->getSecondLocalKeyName());
+        $this->assertSame('pro_id', $fluent->getFirstKeyName());
+        $this->assertSame('pro_id', $classic->getFirstKeyName());
+        $this->assertSame('env_id', $fluent->getForeignKeyName());
+        $this->assertSame('env_id', $classic->getForeignKeyName());
+        $this->assertSame('classic_projects.p_id', $fluent->getQualifiedLocalKeyName());
+        $this->assertSame('fluent_projects.p_id', $classic->getQualifiedLocalKeyName());
+        $this->assertSame('environments.pro_id', $classic->getQualifiedFirstKeyName());
+        $this->assertSame('environments.pro_id', $fluent->getQualifiedFirstKeyName());
     }
 }
 
@@ -268,46 +286,37 @@ class CustomMorphTo extends MorphTo
     //
 }
 
-class Car extends Model
+class MockedConnectionModel extends Model
+{
+    public function getConnection()
+    {
+        $mock = m::mock(Connection::class);
+        $mock->shouldReceive('getQueryGrammar')->andReturn($grammar = m::mock(Grammar::class));
+        $grammar->shouldReceive('getBitwiseOperators')->andReturn([]);
+        $mock->shouldReceive('getPostProcessor')->andReturn($processor = m::mock(Processor::class));
+        $mock->shouldReceive('getName')->andReturn('name');
+        $mock->shouldReceive('query')->andReturnUsing(function () use ($mock, $grammar, $processor) {
+            return new BaseBuilder($mock, $grammar, $processor);
+        });
+
+        return $mock;
+    }
+}
+
+class Car extends MockedConnectionModel
 {
     public function owner()
     {
         return $this->hasOne(Owner::class, 'car_id', 'c_id');
     }
-
-    public function getConnection()
-    {
-        $mock = m::mock(Connection::class);
-        $mock->shouldReceive('getQueryGrammar')->andReturn($grammar = m::mock(Grammar::class));
-        $grammar->shouldReceive('getBitwiseOperators')->andReturn([]);
-        $mock->shouldReceive('getPostProcessor')->andReturn($processor = m::mock(Processor::class));
-        $mock->shouldReceive('getName')->andReturn('name');
-        $mock->shouldReceive('query')->andReturnUsing(function () use ($mock, $grammar, $processor) {
-            return new BaseBuilder($mock, $grammar, $processor);
-        });
-
-        return $mock;
-    }
 }
 
-class Owner extends Model
+class Owner extends MockedConnectionModel
 {
-    public function getConnection()
-    {
-        $mock = m::mock(Connection::class);
-        $mock->shouldReceive('getQueryGrammar')->andReturn($grammar = m::mock(Grammar::class));
-        $grammar->shouldReceive('getBitwiseOperators')->andReturn([]);
-        $mock->shouldReceive('getPostProcessor')->andReturn($processor = m::mock(Processor::class));
-        $mock->shouldReceive('getName')->andReturn('name');
-        $mock->shouldReceive('query')->andReturnUsing(function () use ($mock, $grammar, $processor) {
-            return new BaseBuilder($mock, $grammar, $processor);
-        });
-
-        return $mock;
-    }
+    //
 }
 
-class FluentMechanic extends Model
+class FluentMechanic extends MockedConnectionModel
 {
     public function owner()
     {
@@ -319,40 +328,53 @@ class FluentMechanic extends Model
     {
         return $this->hasOne(Car::class, 'mechanic_id', 'm_id');
     }
-
-    public function getConnection()
-    {
-        $mock = m::mock(Connection::class);
-        $mock->shouldReceive('getQueryGrammar')->andReturn($grammar = m::mock(Grammar::class));
-        $grammar->shouldReceive('getBitwiseOperators')->andReturn([]);
-        $mock->shouldReceive('getPostProcessor')->andReturn($processor = m::mock(Processor::class));
-        $mock->shouldReceive('getName')->andReturn('name');
-        $mock->shouldReceive('query')->andReturnUsing(function () use ($mock, $grammar, $processor) {
-            return new BaseBuilder($mock, $grammar, $processor);
-        });
-
-        return $mock;
-    }
 }
 
-class ClassicMechanic extends Model
+class ClassicMechanic extends MockedConnectionModel
 {
     public function owner()
     {
         return $this->hasOneThrough(Owner::class, Car::class, 'mechanic_id', 'car_id', 'm_id', 'c_id');
     }
+}
 
-    public function getConnection()
+class ClassicProject extends MockedConnectionModel
+{
+    public function deployments()
     {
-        $mock = m::mock(Connection::class);
-        $mock->shouldReceive('getQueryGrammar')->andReturn($grammar = m::mock(Grammar::class));
-        $grammar->shouldReceive('getBitwiseOperators')->andReturn([]);
-        $mock->shouldReceive('getPostProcessor')->andReturn($processor = m::mock(Processor::class));
-        $mock->shouldReceive('getName')->andReturn('name');
-        $mock->shouldReceive('query')->andReturnUsing(function () use ($mock, $grammar, $processor) {
-            return new BaseBuilder($mock, $grammar, $processor);
-        });
-
-        return $mock;
+        return $this->hasManyThrough(
+            Deployment::class,
+            Environment::class,
+            'pro_id',
+            'env_id',
+            'p_id',
+            'e_id',
+        );
     }
+}
+
+class FluentProject extends MockedConnectionModel
+{
+    public function deployments()
+    {
+        return $this->through($this->environments())->has(fn (Environment $env) => $env->deployments());
+    }
+
+    public function environments()
+    {
+        return $this->hasMany(Environment::class, 'pro_id', 'p_id');
+    }
+}
+
+class Environment extends MockedConnectionModel
+{
+    public function deployments()
+    {
+        return $this->hasMany(Deployment::class, 'env_id', 'e_id');
+    }
+}
+
+class Deployment extends MockedConnectionModel
+{
+    //
 }
