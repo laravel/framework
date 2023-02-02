@@ -121,12 +121,28 @@ class EloquentDeleteTest extends DatabaseTestCase
         PostStringyKey::deleting(fn ($model) => $_SERVER['destroy']['deleting'][] = $model->my_id);
         PostStringyKey::deleted(fn ($model) => $_SERVER['destroy']['deleted'][] = $model->my_id);
 
+        // In case 0 ids are matched out of 2:
+        PostStringyKey::query()->getConnection()->flushQueryLog();
         $_SERVER['destroy'] = [];
-        PostStringyKey::destroy(1, 2, 3, 4);
+
+        $count = PostStringyKey::destroy(33, 44);
+
+        $this->assertEquals(0, $count);
+        $logs = PostStringyKey::query()->getConnection()->getQueryLog();
+        $this->assertCount(1, $logs);
+        $this->assertEmpty($_SERVER['destroy']);
+        PostStringyKey::query()->getConnection()->flushQueryLog();
+
+        // In case 2 ids are matched out of 4:
+        $_SERVER['destroy'] = [];
+
+        $count = PostStringyKey::destroy(1, 2, 3, 4);
 
         $this->assertEquals([1, 2], $_SERVER['destroy']['retrieved']);
         $this->assertEquals([1, 2], $_SERVER['destroy']['deleting']);
         $this->assertEquals([1, 2], $_SERVER['destroy']['deleted']);
+
+        $this->assertEquals(2, $count);
 
         $logs = PostStringyKey::query()->getConnection()->getQueryLog();
 
@@ -142,6 +158,27 @@ class EloquentDeleteTest extends DatabaseTestCase
 
         // Total of 3 queries.
         $this->assertCount(3, $logs);
+
+        PostStringyKey::query()->getConnection()->flushQueryLog();
+        $_SERVER['destroy'] = [];
+        $count = PostStringyKey::destroy([]);
+        $logs = PostStringyKey::query()->getConnection()->getQueryLog();
+
+        // no queries, no model events:
+        $this->assertEmpty($logs);
+        $this->assertEmpty($_SERVER['destroy']);
+        $this->assertEquals(0, $count);
+
+        // It can delete an array of models.
+        $m1 = PostStringyKey::query()->create([]);
+        $m2 = PostStringyKey::query()->create([]);
+        PostStringyKey::query()->getConnection()->flushQueryLog();
+        $count = PostStringyKey::destroy([$m1, $m2]);
+        $logs = PostStringyKey::query()->getConnection()->getQueryLog();
+        $this->assertCount(3, $logs);
+        $this->assertEquals(2, $count);
+        $this->assertTrue($m1->exists);
+        $this->assertTrue($m2->exists);
 
         PostStringyKey::reguard();
         unset($_SERVER['destroy']);

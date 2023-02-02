@@ -1340,6 +1340,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
         $ids = is_array($ids) ? $ids : func_get_args();
 
+        $ids = array_map(fn ($id) => $id instanceof Model ? $id->getKey() : $id, $ids);
+
         if (count($ids) === 0) {
             return 0;
         }
