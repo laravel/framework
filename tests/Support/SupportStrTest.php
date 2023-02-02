@@ -496,9 +496,9 @@ class SupportStrTest extends TestCase
             $results[$random] = ($results[$random] ?? 0) + 1;
         }
 
-        // each character should occur 100.000 times with a variance of 2%.
+        // each character should occur 100.000 times with a variance of 5%.
         foreach ($results as $result) {
-            $this->assertEqualsWithDelta(10000, $result, 2000);
+            $this->assertEqualsWithDelta(10000, $result, 500);
         }
     }
 
