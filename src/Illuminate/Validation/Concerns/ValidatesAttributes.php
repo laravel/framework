@@ -1652,7 +1652,7 @@ trait ValidatesAttributes
 
             return $numerator->remainder($denominator)->isZero();
         } catch (BrickMathException $e) {
-            throw new MathException('An error occurred while handling the mulitple_of input values.', previous: $e);
+            throw new MathException('An error occurred while handling the multiple_of input values.', previous: $e);
         }
     }
 
