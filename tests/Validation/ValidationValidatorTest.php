@@ -8045,15 +8045,51 @@ class ValidationValidatorTest extends TestCase
 
         $validator = new Validator($trans, [
             'min' => ' 20 ',
+            'min_str' => ' abc ',
             'multiple_of' => ' 0.5 ',
-            'between' => "\n 5 \n"
+            'between' => "\n 5 \n",
+            'between_str' => ' abc ',
+            'gt' => "\t5 ",
+            'gt_field' => "\t5 ",
+            'gt_str' => ' abc ',
+            'foo' => '4',
+            ' foo' => ' 5',
+            ' foo ' => ' 6 ',
         ], [
             'min' => 'numeric|min: 20',
+            'min_str' => 'min: 5',
             'multiple_of' => "multiple_of:0.25 ",
             'between' => "numeric|between:\t 4, 6\n",
-            // 'multiple_of' => "multiple_of:\n 0.25 \n"
+            'between_str' => "between:\t 5, 6\n",
+            'gt' => "numeric|gt: 4",
+            'gt_field' => "numeric|gt:foo",
+            'gt_str' => "gt:foo",
         ], [], []);
         $this->assertTrue($validator->passes());
+
+        $validator = new Validator($trans, [
+            'min' => ' 20 ',
+            'min_str' => ' abc ',
+            'multiple_of' => ' 0.5 ',
+            'between' => "\n 5 \n",
+            'between_str' => ' abc ',
+            'gt' => "\t5 ",
+            'gt_field' => "\t5 ",
+            'gt_str' => ' abc ',
+            'foo' => '4',
+            ' foo' => ' 5',
+            ' foo ' => ' 6 ',
+        ], [
+            'min' => 'numeric|min: 21',
+            'min_str' => 'min: 6',
+            'multiple_of' => "multiple_of:0.3 ",
+            'between' => "numeric|between:\t 6, 7\n",
+            'between_str' => "between:\t 6, 7\n",
+            'gt' => "numeric|gt: 5",
+            'gt_field' => 'numeric|gt: foo ',
+            'gt_str' => "gt: foo",
+        ], [], []);
+        $this->assertFalse($validator->passes());
     }
 
     protected function getTranslator()
