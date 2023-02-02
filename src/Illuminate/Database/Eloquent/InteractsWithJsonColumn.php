@@ -32,7 +32,6 @@ trait InteractsWithJsonColumn
         $columns = $this->getConnection()->getSchemaBuilder()->getColumnListing($table);
 
         foreach ($columns as $column) {
-
             if ($this->getConnection()->getSchemaBuilder()->getColumnType($table, $column) !== 'json') {
                 continue;
             }
@@ -44,12 +43,13 @@ trait InteractsWithJsonColumn
 
             $this->dynamicMethods[$getter] = function ($key = null, $default = null) use ($jsonColumn) {
                 $data = $this->asArray($jsonColumn);
-                if (!$key) {
+                if (! $key) {
                     return $data;
                 }
                 if (Str::contains($key, '->')) {
                     $key = str_replace('->', '.', $key);
                 }
+
                 return Arr::get($data, $key, $default);
             };
 
@@ -59,6 +59,7 @@ trait InteractsWithJsonColumn
                 }
                 $data = $this->asArray($jsonColumn);
                 $data[$key] = $value;
+
                 return $this->update([$jsonColumn => $data]);
             };
         }
@@ -71,12 +72,12 @@ trait InteractsWithJsonColumn
      * @param  array  $arguments
      * @return mixed
      */
-
     public function __call($method, $arguments): mixed
     {
         if (array_key_exists($method, $this->dynamicMethods)) {
             return call_user_func_array($this->dynamicMethods[$method], $arguments);
         }
+
         return parent::__call($method, $arguments);
     }
 
@@ -85,7 +86,6 @@ trait InteractsWithJsonColumn
      * Convert the given value to an array.
      *
      * @param  string  $column
-     *
      * @return array
      */
     private function asArray($column)
@@ -94,12 +94,10 @@ trait InteractsWithJsonColumn
         if ($data === null) {
             return [];
         }
-        if (!is_array($data)) {
+        if (! is_array($data)) {
             $data = json_decode($data, true, 512, JSON_THROW_ON_ERROR);
         }
+
         return $data;
     }
-
-
 }
-
