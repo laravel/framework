@@ -80,8 +80,7 @@ trait InteractsWithJsonColumn
 
         return parent::__call($method, $arguments);
     }
-
-
+    
     /**
      * Convert the given value to an array.
      *
