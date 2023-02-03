@@ -1989,7 +1989,7 @@ class Builder implements BuilderContract
     /**
      * Add a "group by" clause to the query.
      *
-     * @param  array|string  ...$groups
+     * @param  array|string|\Illuminate\Contracts\Database\Query\Expression  ...$groups
      * @return $this
      */
     public function groupBy(...$groups)
