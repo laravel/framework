@@ -54,7 +54,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * @template TWrapKey of array-key
      * @template TWrapValue
      *
-     * @param  iterable<TWrapKey, TWrapValue>  $value
+     * @param  iterable<TWrapKey, TWrapValue>|mixed<TWrapValue>  $value
      * @return static<TWrapKey, TWrapValue>
      */
     public static function wrap($value);
