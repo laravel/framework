@@ -3,8 +3,8 @@
 namespace Illuminate\Tests\Testing;
 
 use Illuminate\Testing\Assert;
-use PHPUnit\Framework\ExpectationFailedException;
 use Illuminate\Testing\Exceptions\InvalidArgumentException;
+use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
