@@ -128,7 +128,7 @@ abstract class Grammar
      * Wrap the given JSON selector.
      *
      * @param  string  $value
-     * @return string
+     * @return void
      *
      * @throws \RuntimeException
      */

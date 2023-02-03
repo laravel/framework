@@ -112,7 +112,7 @@ class MySqlGrammar extends Grammar
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
      * @param  \Illuminate\Database\Connection  $connection
-     * @return array
+     * @return string
      */
     protected function compileCreateTable($blueprint, $command, $connection)
     {
