@@ -15,7 +15,6 @@ use Illuminate\View\Component;
 use Mockery;
 use Mockery\Exception\InvalidCountException;
 use PHPUnit\Framework\TestCase as BaseTestCase;
-use PHPUnit\Util\Annotation\Registry;
 use Throwable;
 
 abstract class TestCase extends BaseTestCase
@@ -261,11 +260,16 @@ abstract class TestCase extends BaseTestCase
     {
         static::$latestResponse = null;
 
-        if (class_exists(Registry::class)) {
-            (function () {
-                $this->classDocBlocks = [];
-                $this->methodDocBlocks = [];
-            })->call(Registry::getInstance());
+        foreach ([
+            \PHPUnit\Util\Annotation\Registry::class,
+            \PHPUnit\Metadata\Annotation\Parser\Registry::class,
+        ] as $class) {
+            if (class_exists($class)) {
+                (function () {
+                    $this->classDocBlocks = [];
+                    $this->methodDocBlocks = [];
+                })->call($class::getInstance());
+            }
         }
     }
 
