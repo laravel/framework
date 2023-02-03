@@ -20,7 +20,7 @@ class NotificationMessageTest extends TestCase
     public function testMessageFormatsMultiLineText()
     {
         $message = new Message;
-        $message->with('
+        $message->withLine('
             This is a
             single line of text.
         ');
@@ -28,7 +28,7 @@ class NotificationMessageTest extends TestCase
         $this->assertSame('This is a single line of text.', $message->introLines[0]);
 
         $message = new Message;
-        $message->with([
+        $message->withLine([
             'This is a',
             'single line of text.',
         ]);
