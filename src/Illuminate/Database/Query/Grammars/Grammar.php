@@ -699,7 +699,7 @@ class Grammar extends BaseGrammar
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $where
      * @return void
-     * 
+     *
      * @throws \RuntimeException
      */
     public function whereFullText(Builder $query, $where)
