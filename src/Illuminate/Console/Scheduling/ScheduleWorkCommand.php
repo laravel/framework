@@ -17,7 +17,7 @@ class ScheduleWorkCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'schedule:work {--run-output-file=}';
+    protected $signature = 'schedule:work {--run-output-file= : The file to direct <info>schedule:run</info> output to}';
 
     /**
      * The name of the console command.
