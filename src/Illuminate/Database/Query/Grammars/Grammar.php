@@ -156,7 +156,7 @@ class Grammar extends BaseGrammar
      * Compile the "from" portion of the query.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  \Illuminate\Database\Query\Expression|string  $table
+     * @param  string  $table
      * @return string
      */
     protected function compileFrom(Builder $query, $table)
@@ -602,7 +602,7 @@ class Grammar extends BaseGrammar
      *
      * @param  string  $column
      * @param  string  $value
-     * @return void
+     * @return string
      *
      * @throws \RuntimeException
      */
@@ -642,7 +642,7 @@ class Grammar extends BaseGrammar
      * Compile a "JSON contains key" statement into SQL.
      *
      * @param  string  $column
-     * @return void
+     * @return string
      *
      * @throws \RuntimeException
      */
@@ -673,7 +673,7 @@ class Grammar extends BaseGrammar
      * @param  string  $column
      * @param  string  $operator
      * @param  string  $value
-     * @return void
+     * @return string
      *
      * @throws \RuntimeException
      */
@@ -698,9 +698,7 @@ class Grammar extends BaseGrammar
      *
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $where
-     * @return void
-     * 
-     * @throws \RuntimeException
+     * @return string
      */
     public function whereFullText(Builder $query, $where)
     {
@@ -1031,7 +1029,7 @@ class Grammar extends BaseGrammar
      *
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $values
-     * @return void
+     * @return string
      *
      * @throws \RuntimeException
      */
@@ -1139,7 +1137,7 @@ class Grammar extends BaseGrammar
      * @param  array  $values
      * @param  array  $uniqueBy
      * @param  array  $update
-     * @return void
+     * @return string
      *
      * @throws \RuntimeException
      */

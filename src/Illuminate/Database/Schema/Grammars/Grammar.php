@@ -91,7 +91,7 @@ abstract class Grammar extends BaseGrammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
-     * @return void
+     * @return string
      *
      * @throws \RuntimeException
      */
@@ -105,7 +105,7 @@ abstract class Grammar extends BaseGrammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
-     * @return void
+     * @return string
      *
      * @throws \RuntimeException
      */
@@ -266,7 +266,7 @@ abstract class Grammar extends BaseGrammar
     /**
      * Wrap a table in keyword identifiers.
      *
-     * @param  Blueprint|Expression|string  $table
+     * @param  mixed  $table
      * @return string
      */
     public function wrapTable($table)
@@ -279,7 +279,7 @@ abstract class Grammar extends BaseGrammar
     /**
      * Wrap a value in keyword identifiers.
      *
-     * @param  Fluent|Expression|string  $value
+     * @param  \Illuminate\Database\Query\Expression|string  $value
      * @param  bool  $prefixAlias
      * @return string
      */
@@ -294,7 +294,7 @@ abstract class Grammar extends BaseGrammar
      * Format a value so that it can be used in "default" clauses.
      *
      * @param  mixed  $value
-     * @return Expression|string
+     * @return string
      */
     protected function getDefaultValue($value)
     {
