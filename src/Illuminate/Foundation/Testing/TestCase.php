@@ -114,26 +114,6 @@ abstract class TestCase extends BaseTestCase
     }
 
     /**
-     * {@inheritdoc}
-     */
-    protected function runTest(): mixed
-    {
-        $result = null;
-
-        try {
-            $result = parent::runTest();
-        } catch (Throwable $e) {
-            if (! is_null(static::$latestResponse)) {
-                static::$latestResponse->transformNotSuccessfulException($e);
-            }
-
-            throw $e;
-        }
-
-        return $result;
-    }
-
-    /**
      * Boot the testing helper traits.
      *
      * @return array
@@ -181,6 +161,26 @@ abstract class TestCase extends BaseTestCase
         }
 
         return $uses;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function runTest(): mixed
+    {
+        $result = null;
+
+        try {
+            $result = parent::runTest();
+        } catch (Throwable $e) {
+            if (! is_null(static::$latestResponse)) {
+                static::$latestResponse->transformNotSuccessfulException($e);
+            }
+
+            throw $e;
+        }
+
+        return $result;
     }
 
     /**
