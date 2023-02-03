@@ -9,6 +9,10 @@ class BladeMethodTest extends AbstractBladeTestCase
         $string = '@patch';
         $expected = "<?php echo method_field('PATCH'); ?>";
         $this->assertEquals($expected, $this->compiler->compileString($string));
+
+        $string = '@patch()';
+        $expected = "<?php echo method_field('PATCH'); ?>";
+        $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
     public function testPut()
@@ -16,11 +20,19 @@ class BladeMethodTest extends AbstractBladeTestCase
         $string = '@put';
         $expected = "<?php echo method_field('PUT'); ?>";
         $this->assertEquals($expected, $this->compiler->compileString($string));
+
+        $string = '@put()';
+        $expected = "<?php echo method_field('PUT'); ?>";
+        $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
     public function testDelete()
     {
         $string = '@delete';
+        $expected = "<?php echo method_field('DELETE'); ?>";
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+
+        $string = '@delete()';
         $expected = "<?php echo method_field('DELETE'); ?>";
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }

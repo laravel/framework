@@ -57,7 +57,7 @@ trait CompilesHelpers
      */
     protected function compilePut($arguments)
     {
-        if ($arguments === null) {
+        if ($arguments === null || $arguments === '()') {
             return $this->compileMethod("('PUT')");
         }
 
@@ -67,12 +67,12 @@ trait CompilesHelpers
     /**
      * Compile the PATCH method statements into valid PHP.
      *
-     * @param  string  $arguments
+     * @param  string|null  $arguments
      * @return string
      */
     protected function compilePatch($arguments)
     {
-        if ($arguments === null) {
+        if ($arguments === null || $arguments === '()') {
             return $this->compileMethod("('PATCH')");
         }
 
@@ -82,12 +82,12 @@ trait CompilesHelpers
     /**
      * Compile the DELETE method statements into valid PHP.
      *
-     * @param  string  $arguments
+     * @param  string|null  $arguments
      * @return string
      */
     protected function compileDelete($arguments)
     {
-        if ($arguments === null) {
+        if ($arguments === null || $arguments === '()') {
             return $this->compileMethod("('DELETE')");
         }
 
