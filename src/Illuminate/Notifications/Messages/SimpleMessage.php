@@ -3,9 +3,10 @@
 namespace Illuminate\Notifications\Messages;
 
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Mail\Mailable;
 use Illuminate\Notifications\Action;
 
-class SimpleMessage
+class SimpleMessage extends Mailable
 {
     /**
      * The "level" of the notification (info, success, error).
@@ -13,13 +14,6 @@ class SimpleMessage
      * @var string
      */
     public $level = 'info';
-
-    /**
-     * The subject of the notification.
-     *
-     * @var string
-     */
-    public $subject;
 
     /**
      * The notification's greeting.
@@ -108,19 +102,6 @@ class SimpleMessage
     }
 
     /**
-     * Set the subject of the notification.
-     *
-     * @param  string  $subject
-     * @return $this
-     */
-    public function subject($subject)
-    {
-        $this->subject = $subject;
-
-        return $this;
-    }
-
-    /**
      * Set the greeting of the notification.
      *
      * @param  string  $greeting
@@ -154,7 +135,7 @@ class SimpleMessage
      */
     public function line($line)
     {
-        return $this->with($line);
+        return $this->withLine($line);
     }
 
     /**
@@ -210,7 +191,7 @@ class SimpleMessage
      * @param  mixed  $line
      * @return $this
      */
-    public function with($line)
+    public function withLine($line)
     {
         if ($line instanceof Action) {
             $this->action($line->text, $line->url);
@@ -253,19 +234,6 @@ class SimpleMessage
     {
         $this->actionText = $text;
         $this->actionUrl = $url;
-
-        return $this;
-    }
-
-    /**
-     * Set the name of the mailer that should send the notification.
-     *
-     * @param  string  $mailer
-     * @return $this
-     */
-    public function mailer($mailer)
-    {
-        $this->mailer = $mailer;
 
         return $this;
     }

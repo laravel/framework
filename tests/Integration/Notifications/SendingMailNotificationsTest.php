@@ -18,11 +18,14 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
+use Symfony\Component\Mime\Email;
 
 class SendingMailNotificationsTest extends TestCase
 {
     public $mailFactory;
+
     public $mailer;
+
     public $markdown;
 
     protected function tearDown(): void
@@ -83,11 +86,13 @@ class SendingMailNotificationsTest extends TestCase
                 '__laravel_notification_id' => $notification->id,
                 '__laravel_notification' => get_class($notification),
                 '__laravel_notification_queued' => false,
+                'markdown' => 'notifications::email',
+                'mailer' => 'foo',
             ]),
             m::on(function ($closure) {
                 $message = m::mock(Message::class);
 
-                $message->shouldReceive('to')->once()->with(['taylor@laravel.com']);
+                $message->shouldReceive('to')->once()->with('taylor@laravel.com', null);
 
                 $message->shouldReceive('cc')->once()->with('cc@deepblue.com', 'cc');
 
@@ -99,7 +104,9 @@ class SendingMailNotificationsTest extends TestCase
 
                 $message->shouldReceive('subject')->once()->with('Test Mail Notification');
 
-                $message->shouldReceive('priority')->once()->with(1);
+                $message->shouldReceive('getSymfonyMessage')->once()->andReturn($mail = m::mock(Email::class));
+
+                $mail->shouldReceive('priority')->once()->with(1);
 
                 $closure($message);
 
@@ -129,11 +136,15 @@ class SendingMailNotificationsTest extends TestCase
                 '__laravel_notification_id' => $notification->id,
                 '__laravel_notification' => get_class($notification),
                 '__laravel_notification_queued' => false,
+                'markdown' => 'notifications::email',
+                'mailer' => 'foo',
             ]),
             m::on(function ($closure) {
-                $message = m::mock(Message::class);
+                $message = m::mock(Mailable::class);
 
-                $message->shouldReceive('to')->once()->with(['taylor@laravel.com' => 'Taylor Otwell', 'foo_taylor@laravel.com']);
+                $message->shouldReceive('to')->once()->with('taylor@laravel.com', 'Taylor Otwell');
+
+                $message->shouldReceive('to')->once()->with('foo_taylor@laravel.com', null);
 
                 $message->shouldReceive('cc')->once()->with('cc@deepblue.com', 'cc');
 
@@ -145,7 +156,9 @@ class SendingMailNotificationsTest extends TestCase
 
                 $message->shouldReceive('subject')->once()->with('Test Mail Notification');
 
-                $message->shouldReceive('priority')->once()->with(1);
+                $message->shouldReceive('getSymfonyMessage')->once()->andReturn($mail = m::mock(Email::class));
+
+                $mail->shouldReceive('priority')->once()->with(1);
 
                 $closure($message);
 
@@ -174,11 +187,13 @@ class SendingMailNotificationsTest extends TestCase
                 '__laravel_notification_id' => $notification->id,
                 '__laravel_notification' => get_class($notification),
                 '__laravel_notification_queued' => false,
+                'markdown' => 'notifications::email',
+                'mailer' => null,
             ]),
             m::on(function ($closure) {
                 $message = m::mock(Message::class);
 
-                $message->shouldReceive('to')->once()->with(['taylor@laravel.com']);
+                $message->shouldReceive('to')->once()->with('taylor@laravel.com', null);
 
                 $message->shouldReceive('subject')->once()->with('mail custom subject');
 
@@ -209,11 +224,15 @@ class SendingMailNotificationsTest extends TestCase
                 '__laravel_notification_id' => $notification->id,
                 '__laravel_notification' => get_class($notification),
                 '__laravel_notification_queued' => false,
+                'markdown' => 'notifications::email',
+                'mailer' => null,
             ]),
             m::on(function ($closure) {
                 $message = m::mock(Message::class);
 
-                $message->shouldReceive('to')->once()->with(['foo_taylor@laravel.com', 'bar_taylor@laravel.com']);
+                $message->shouldReceive('to')->once()->with('foo_taylor@laravel.com', null);
+
+                $message->shouldReceive('to')->once()->with('bar_taylor@laravel.com', null);
 
                 $message->shouldReceive('subject')->once()->with('mail custom subject');
 
@@ -252,11 +271,13 @@ class SendingMailNotificationsTest extends TestCase
                 '__laravel_notification_id' => $notification->id,
                 '__laravel_notification' => get_class($notification),
                 '__laravel_notification_queued' => false,
+                'markdown' => null,
+                'mailer' => null,
             ]),
             m::on(function ($closure) {
                 $message = m::mock(Message::class);
 
-                $message->shouldReceive('to')->once()->with(['taylor@laravel.com']);
+                $message->shouldReceive('to')->once()->with('taylor@laravel.com', null);
 
                 $message->shouldReceive('subject')->once()->with('Test Mail Notification With Html And Plain');
 
@@ -284,11 +305,13 @@ class SendingMailNotificationsTest extends TestCase
                 '__laravel_notification_id' => $notification->id,
                 '__laravel_notification' => get_class($notification),
                 '__laravel_notification_queued' => false,
+                'markdown' => null,
+                'mailer' => null,
             ]),
             m::on(function ($closure) {
                 $message = m::mock(Message::class);
 
-                $message->shouldReceive('to')->once()->with(['taylor@laravel.com']);
+                $message->shouldReceive('to')->once()->with('taylor@laravel.com', null);
 
                 $message->shouldReceive('subject')->once()->with('Test Mail Notification With Html Only');
 
@@ -316,11 +339,13 @@ class SendingMailNotificationsTest extends TestCase
                 '__laravel_notification_id' => $notification->id,
                 '__laravel_notification' => get_class($notification),
                 '__laravel_notification_queued' => false,
+                'markdown' => null,
+                'mailer' => null,
             ]),
             m::on(function ($closure) {
                 $message = m::mock(Message::class);
 
-                $message->shouldReceive('to')->once()->with(['taylor@laravel.com']);
+                $message->shouldReceive('to')->once()->with('taylor@laravel.com', null);
 
                 $message->shouldReceive('subject')->once()->with('Test Mail Notification With Plain Only');
 
@@ -339,6 +364,7 @@ class NotifiableUser extends Model
     use Notifiable;
 
     public $table = 'users';
+
     public $timestamps = false;
 }
 

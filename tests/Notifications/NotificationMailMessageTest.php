@@ -71,18 +71,18 @@ class NotificationMailMessageTest extends TestCase
         $message = new MailMessage;
         $message->cc('test@example.com');
 
-        $this->assertSame([['test@example.com', null]], $message->cc);
+        $this->assertSame([['name' => null, 'address' => 'test@example.com']], $message->cc);
 
         $message = new MailMessage;
         $message->cc('test@example.com')
-                ->cc('test@example.com', 'Test');
+                ->cc('joe@example.com', 'Test');
 
-        $this->assertSame([['test@example.com', null], ['test@example.com', 'Test']], $message->cc);
+        $this->assertSame([['name' => null, 'address' => 'test@example.com'], ['name' => 'Test', 'address' => 'joe@example.com']], $message->cc);
 
         $message = new MailMessage;
-        $message->cc(['test@example.com', 'Test' => 'test@example.com']);
+        $message->cc(['joe@example.com', ['name' => 'Test', 'email' => 'test@example.com']]);
 
-        $this->assertSame([['test@example.com', null], ['test@example.com', 'Test']], $message->cc);
+        $this->assertSame([['name' => null, 'address' => 'joe@example.com'], ['name' => 'Test', 'address' => 'test@example.com']], $message->cc);
     }
 
     public function testBccIsSetCorrectly()
@@ -90,18 +90,18 @@ class NotificationMailMessageTest extends TestCase
         $message = new MailMessage;
         $message->bcc('test@example.com');
 
-        $this->assertSame([['test@example.com', null]], $message->bcc);
+        $this->assertSame([['name' => null, 'address' => 'test@example.com']], $message->bcc);
 
         $message = new MailMessage;
         $message->bcc('test@example.com')
-                ->bcc('test@example.com', 'Test');
+                ->bcc('joe@example.com', 'Test');
 
-        $this->assertSame([['test@example.com', null], ['test@example.com', 'Test']], $message->bcc);
+        $this->assertSame([['name' => null, 'address' => 'test@example.com'], ['name' => 'Test', 'address' => 'joe@example.com']], $message->bcc);
 
         $message = new MailMessage;
-        $message->bcc(['test@example.com', 'Test' => 'test@example.com']);
+        $message->bcc(['joe@example.com', ['name' => 'Test', 'email' => 'test@example.com']]);
 
-        $this->assertSame([['test@example.com', null], ['test@example.com', 'Test']], $message->bcc);
+        $this->assertSame([['name' => null, 'address' => 'joe@example.com'], ['name' => 'Test', 'address' => 'test@example.com']], $message->bcc);
     }
 
     public function testReplyToIsSetCorrectly()
@@ -109,18 +109,18 @@ class NotificationMailMessageTest extends TestCase
         $message = new MailMessage;
         $message->replyTo('test@example.com');
 
-        $this->assertSame([['test@example.com', null]], $message->replyTo);
+        $this->assertSame([['name' => null, 'address' => 'test@example.com']], $message->replyTo);
 
         $message = new MailMessage;
         $message->replyTo('test@example.com')
-                ->replyTo('test@example.com', 'Test');
+                ->replyTo('joe@example.com', 'Test');
 
-        $this->assertSame([['test@example.com', null], ['test@example.com', 'Test']], $message->replyTo);
+        $this->assertSame([['name' => null, 'address' => 'test@example.com'], ['name' => 'Test', 'address' => 'joe@example.com']], $message->replyTo);
 
         $message = new MailMessage;
-        $message->replyTo(['test@example.com', 'Test' => 'test@example.com']);
+        $message->replyTo(['joe@example.com', ['name' => 'Test', 'email' => 'test@example.com']]);
 
-        $this->assertSame([['test@example.com', null], ['test@example.com', 'Test']], $message->replyTo);
+        $this->assertSame([['name' => null, 'address' => 'joe@example.com'], ['name' => 'Test', 'address' => 'test@example.com']], $message->replyTo);
     }
 
     public function testMetadataIsSetCorrectly()
@@ -129,10 +129,8 @@ class NotificationMailMessageTest extends TestCase
         $message->metadata('origin', 'test-suite');
         $message->metadata('user_id', 1);
 
-        $this->assertArrayHasKey('origin', $message->metadata);
-        $this->assertSame('test-suite', $message->metadata['origin']);
-        $this->assertArrayHasKey('user_id', $message->metadata);
-        $this->assertSame(1, $message->metadata['user_id']);
+        $this->assertTrue($message->hasMetadata('origin', 'test-suite'));
+        $this->assertTrue($message->hasMetadata('user_id', 1));
     }
 
     public function testTagIsSetCorrectly()
@@ -140,7 +138,7 @@ class NotificationMailMessageTest extends TestCase
         $message = new MailMessage;
         $message->tag('test');
 
-        $this->assertContains('test', $message->tags);
+        $message->assertHasTag('test');
     }
 
     public function testCallbackIsSetCorrectly()
@@ -165,7 +163,7 @@ class NotificationMailMessageTest extends TestCase
 
         $message = new MailMessage;
         $message->when(true, $callback);
-        $this->assertSame([['cc@example.com', null]], $message->cc);
+        $this->assertSame([['name' => null, 'address' => 'cc@example.com']], $message->cc);
 
         $message = new MailMessage;
         $message->when(false, $callback);
@@ -182,13 +180,13 @@ class NotificationMailMessageTest extends TestCase
 
         $message = new MailMessage;
         $message->when(true, $callback)->bcc('bcc@example.com');
-        $this->assertSame([['cc@example.com', null]], $message->cc);
-        $this->assertSame([['bcc@example.com', null]], $message->bcc);
+        $this->assertSame([['name' => null, 'address' => 'cc@example.com']], $message->cc);
+        $this->assertSame([['name' => null, 'address' => 'bcc@example.com']], $message->bcc);
 
         $message = new MailMessage;
         $message->when(false, $callback)->bcc('bcc@example.com');
         $this->assertSame([], $message->cc);
-        $this->assertSame([['bcc@example.com', null]], $message->bcc);
+        $this->assertSame([['name' => null, 'address' => 'bcc@example.com']], $message->bcc);
     }
 
     public function testWhenCallbackWithDefault()
@@ -207,11 +205,11 @@ class NotificationMailMessageTest extends TestCase
 
         $message = new MailMessage;
         $message->when('truthy', $callback, $default);
-        $this->assertSame([['truthy@example.com', null]], $message->cc);
+        $this->assertSame([['name' => null, 'address' => 'truthy@example.com']], $message->cc);
 
         $message = new MailMessage;
         $message->when(0, $callback, $default);
-        $this->assertSame([['zero@example.com', null]], $message->cc);
+        $this->assertSame([['name' => null, 'address' => 'zero@example.com']], $message->cc);
     }
 
     public function testUnlessCallback()
@@ -224,7 +222,7 @@ class NotificationMailMessageTest extends TestCase
 
         $message = new MailMessage;
         $message->unless(false, $callback);
-        $this->assertSame([['test@example.com', null]], $message->cc);
+        $this->assertSame([['name' => null, 'address' => 'test@example.com']], $message->cc);
 
         $message = new MailMessage;
         $message->unless(true, $callback);
@@ -241,13 +239,13 @@ class NotificationMailMessageTest extends TestCase
 
         $message = new MailMessage;
         $message->unless(false, $callback)->bcc('bcc@example.com');
-        $this->assertSame([['cc@example.com', null]], $message->cc);
-        $this->assertSame([['bcc@example.com', null]], $message->bcc);
+        $this->assertSame([['name' => null, 'address' => 'cc@example.com']], $message->cc);
+        $this->assertSame([['name' => null, 'address' => 'bcc@example.com']], $message->bcc);
 
         $message = new MailMessage;
         $message->unless(true, $callback)->bcc('bcc@example.com');
         $this->assertSame([], $message->cc);
-        $this->assertSame([['bcc@example.com', null]], $message->bcc);
+        $this->assertSame([['name' => null, 'address' => 'bcc@example.com']], $message->bcc);
     }
 
     public function testUnlessCallbackWithDefault()
@@ -266,11 +264,11 @@ class NotificationMailMessageTest extends TestCase
 
         $message = new MailMessage;
         $message->unless(0, $callback, $default);
-        $this->assertSame([['zero@example.com', null]], $message->cc);
+        $this->assertSame([['name' => null, 'address' => 'zero@example.com']], $message->cc);
 
         $message = new MailMessage;
         $message->unless('truthy', $callback, $default);
-        $this->assertSame([['truthy@example.com', null]], $message->cc);
+        $this->assertSame([['name' => null, 'address' => 'truthy@example.com']], $message->cc);
     }
 
     public function testItAttachesFilesViaAttachableContractFromPath()
