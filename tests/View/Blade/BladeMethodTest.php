@@ -2,8 +2,6 @@
 
 namespace Illuminate\Tests\View\Blade;
 
-use Illuminate\Support\Str;
-
 class BladeMethodTest extends AbstractBladeTestCase
 {
     public function testPatch()
@@ -48,4 +46,3 @@ class BladeMethodTest extends AbstractBladeTestCase
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 }
-
