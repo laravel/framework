@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Validation;
 
 use Illuminate\Contracts\Validation\DataAwareRule;
-use Illuminate\Contracts\Validation\InvokableRule;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
@@ -16,9 +16,8 @@ class ValidationInvokableRuleTest extends TestCase
     public function testItCanPass()
     {
         $trans = $this->getIlluminateArrayTranslator();
-        $rule = new class() implements InvokableRule
-        {
-            public function __invoke($attribute, $value, $fail)
+        $rule = new class() implements ValidationRule {
+            public function validate($attribute, $value, $fail): void
             {
                 //
             }
@@ -33,9 +32,8 @@ class ValidationInvokableRuleTest extends TestCase
     public function testItCanFail()
     {
         $trans = $this->getIlluminateArrayTranslator();
-        $rule = new class() implements InvokableRule
-        {
-            public function __invoke($attribute, $value, $fail)
+        $rule = new class() implements ValidationRule {
+            public function validate($attribute, $value, $fail): void
             {
                 $fail("The {$attribute} attribute is not 'foo'. Got '{$value}' instead.");
             }
@@ -54,9 +52,8 @@ class ValidationInvokableRuleTest extends TestCase
     public function testItCanReturnMultipleErrorMessages()
     {
         $trans = $this->getIlluminateArrayTranslator();
-        $rule = new class() implements InvokableRule
-        {
-            public function __invoke($attribute, $value, $fail)
+        $rule = new class() implements ValidationRule {
+            public function validate($attribute, $value, $fail): void
             {
                 $fail('Error message 1.');
                 $fail('Error message 2.');
@@ -78,9 +75,8 @@ class ValidationInvokableRuleTest extends TestCase
     {
         $trans = $this->getIlluminateArrayTranslator();
         $trans->addLines(['validation.translated-error' => 'Translated error message.'], 'en');
-        $rule = new class() implements InvokableRule
-        {
-            public function __invoke($attribute, $value, $fail)
+        $rule = new class() implements ValidationRule {
+            public function validate($attribute, $value, $fail): void
             {
                 $fail('validation.translated-error')->translate();
             }
@@ -100,9 +96,8 @@ class ValidationInvokableRuleTest extends TestCase
     {
         $trans = $this->getIlluminateArrayTranslator();
         $trans->addLines(['validation.translated-error' => 'attribute: :attribute input: :input position: :position index: :index baz: :baz'], 'en');
-        $rule = new class() implements InvokableRule
-        {
-            public function __invoke($attribute, $value, $fail)
+        $rule = new class() implements ValidationRule {
+            public function validate($attribute, $value, $fail): void
             {
                 if ($value !== null) {
                     $fail('validation.translated-error')->translate([
@@ -127,9 +122,8 @@ class ValidationInvokableRuleTest extends TestCase
         $trans = $this->getIlluminateArrayTranslator();
         $trans->addLines(['validation.translated-error' => 'attribute: :attribute'], 'en');
         $trans->addLines(['validation.attributes.foo' => 'email address'], 'en');
-        $rule = new class() implements InvokableRule
-        {
-            public function __invoke($attribute, $value, $fail)
+        $rule = new class() implements ValidationRule {
+            public function validate($attribute, $value, $fail): void
             {
                 if ($value !== null) {
                     $fail('validation.translated-error')->translate();
@@ -152,9 +146,8 @@ class ValidationInvokableRuleTest extends TestCase
         $trans = $this->getIlluminateArrayTranslator();
         $trans->addLines(['validation.translated-error' => 'English'], 'en');
         $trans->addLines(['validation.translated-error' => 'French'], 'fr');
-        $rule = new class() implements InvokableRule
-        {
-            public function __invoke($attribute, $value, $fail)
+        $rule = new class() implements ValidationRule {
+            public function validate($attribute, $value, $fail): void
             {
                 $fail('validation.translated-error')->translate([], 'en');
                 $fail('validation.translated-error')->translate([], 'fr');
@@ -175,8 +168,7 @@ class ValidationInvokableRuleTest extends TestCase
     public function testItCanAccessDataDuringValidation()
     {
         $trans = $this->getIlluminateArrayTranslator();
-        $rule = new class() implements InvokableRule, DataAwareRule
-        {
+        $rule = new class() implements ValidationRule, DataAwareRule {
             public $data = [];
 
             public function setData($data)
@@ -184,7 +176,7 @@ class ValidationInvokableRuleTest extends TestCase
                 $this->data = $data;
             }
 
-            public function __invoke($attribute, $value, $fail)
+            public function validate($attribute, $value, $fail): void
             {
                 if ($this->data === []) {
                     $fail('xxxx');
@@ -205,8 +197,7 @@ class ValidationInvokableRuleTest extends TestCase
     {
         $trans = $this->getIlluminateArrayTranslator();
 
-        $rule = new class() implements InvokableRule, ValidatorAwareRule
-        {
+        $rule = new class() implements ValidationRule, ValidatorAwareRule {
             public $validator = null;
 
             public function setValidator($validator)
@@ -214,7 +205,7 @@ class ValidationInvokableRuleTest extends TestCase
                 $this->validator = $validator;
             }
 
-            public function __invoke($attribute, $value, $fail)
+            public function validate($attribute, $value, $fail): void
             {
                 if ($this->validator === null) {
                     $fail('xxxx');
@@ -231,11 +222,10 @@ class ValidationInvokableRuleTest extends TestCase
     public function testItCanBeExplicit()
     {
         $trans = $this->getIlluminateArrayTranslator();
-        $rule = new class() implements InvokableRule
-        {
+        $rule = new class() implements ValidationRule {
             public $implicit = false;
 
-            public function __invoke($attribute, $value, $fail)
+            public function validate($attribute, $value, $fail): void
             {
                 $fail('xxxx');
             }
@@ -250,11 +240,10 @@ class ValidationInvokableRuleTest extends TestCase
     public function testItCanBeImplicit()
     {
         $trans = $this->getIlluminateArrayTranslator();
-        $rule = new class() implements InvokableRule
-        {
+        $rule = new class() implements ValidationRule {
             public $implicit = true;
 
-            public function __invoke($attribute, $value, $fail)
+            public function validate($attribute, $value, $fail): void
             {
                 $fail('xxxx');
             }
@@ -273,9 +262,8 @@ class ValidationInvokableRuleTest extends TestCase
     public function testItIsExplicitByDefault()
     {
         $trans = $this->getIlluminateArrayTranslator();
-        $rule = new class() implements InvokableRule
-        {
-            public function __invoke($attribute, $value, $fail)
+        $rule = new class() implements ValidationRule {
+            public function validate($attribute, $value, $fail): void
             {
                 $fail('xxxx');
             }
@@ -290,9 +278,8 @@ class ValidationInvokableRuleTest extends TestCase
     public function testItCanSpecifyTheValidationErrorKeyForTheErrorMessage()
     {
         $trans = $this->getIlluminateArrayTranslator();
-        $rule = new class() implements InvokableRule
-        {
-            public function __invoke($attribute, $value, $fail)
+        $rule = new class() implements ValidationRule {
+            public function validate($attribute, $value, $fail): void
             {
                 $fail('bar.baz', 'Another attribute error.');
                 $fail('This attribute error.');
@@ -316,9 +303,8 @@ class ValidationInvokableRuleTest extends TestCase
     {
         $trans = $this->getIlluminateArrayTranslator();
         $trans->addLines(['validation.translated-error' => 'There is one error.|There are many errors.'], 'en');
-        $rule = new class() implements InvokableRule
-        {
-            public function __invoke($attribute, $value, $fail)
+        $rule = new class() implements ValidationRule {
+            public function validate($attribute, $value, $fail): void
             {
                 $fail('validation.translated-error')->translateChoice(2);
             }
@@ -337,11 +323,10 @@ class ValidationInvokableRuleTest extends TestCase
     public function testExplicitRuleCanUseInlineValidationMessages()
     {
         $trans = $this->getIlluminateArrayTranslator();
-        $rule = new class() implements InvokableRule
-        {
+        $rule = new class() implements ValidationRule {
             public $implicit = false;
 
-            public function __invoke($attribute, $value, $fail)
+            public function validate($attribute, $value, $fail): void
             {
                 $fail('xxxx');
             }
@@ -369,11 +354,10 @@ class ValidationInvokableRuleTest extends TestCase
     public function testImplicitRuleCanUseInlineValidationMessages()
     {
         $trans = $this->getIlluminateArrayTranslator();
-        $rule = new class() implements InvokableRule
-        {
+        $rule = new class() implements ValidationRule {
             public $implicit = true;
 
-            public function __invoke($attribute, $value, $fail)
+            public function validate($attribute, $value, $fail): void
             {
                 $fail('xxxx');
             }
@@ -400,9 +384,8 @@ class ValidationInvokableRuleTest extends TestCase
 
     public function testItCanReturnInvokableRule()
     {
-        $rule = new class() implements InvokableRule
-        {
-            public function __invoke($attribute, $value, $fail)
+        $rule = new class() implements ValidationRule {
+            public function validate($attribute, $value, $fail): void
             {
                 $fail('xxxx');
             }
