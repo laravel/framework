@@ -2,7 +2,7 @@
 
 namespace Illuminate\Mail;
 
-use Aws\Ses\SesClient;
+use Aws\SesV2\SesV2Client;
 use Closure;
 use Illuminate\Contracts\Mail\Factory as FactoryContract;
 use Illuminate\Log\LogManager;
@@ -230,14 +230,14 @@ class MailManager implements FactoryContract
     {
         $config = array_merge(
             $this->app['config']->get('services.ses', []),
-            ['version' => 'latest', 'service' => 'email'],
+            ['version' => 'latest'],
             $config
         );
 
         $config = Arr::except($config, ['transport']);
 
         return new SesTransport(
-            new SesClient($this->addSesCredentials($config)),
+            new SesV2Client($this->addSesCredentials($config)),
             $config['options'] ?? []
         );
     }

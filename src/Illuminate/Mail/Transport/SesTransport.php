@@ -3,7 +3,7 @@
 namespace Illuminate\Mail\Transport;
 
 use Aws\Exception\AwsException;
-use Aws\Ses\SesClient;
+use Aws\SesV2\SesV2Client;
 use Exception;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\SentMessage;
@@ -15,7 +15,7 @@ class SesTransport extends AbstractTransport
     /**
      * The Amazon SES instance.
      *
-     * @var \Aws\Ses\SesClient
+     * @var \Aws\SesV2\SesV2Client
      */
     protected $ses;
 
@@ -29,11 +29,11 @@ class SesTransport extends AbstractTransport
     /**
      * Create a new SES transport instance.
      *
-     * @param  \Aws\Ses\SesClient  $ses
+     * @param  \Aws\SesV2\SesV2Client  $ses
      * @param  array  $options
      * @return void
      */
-    public function __construct(SesClient $ses, $options = [])
+    public function __construct(SesV2Client $ses, $options = [])
     {
         $this->ses = $ses;
         $this->options = $options;
@@ -60,14 +60,18 @@ class SesTransport extends AbstractTransport
             $result = $this->ses->sendRawEmail(
                 array_merge(
                     $options, [
-                        'Source' => $message->getEnvelope()->getSender()->toString(),
-                        'Destinations' => collect($message->getEnvelope()->getRecipients())
-                                ->map
-                                ->toString()
-                                ->values()
-                                ->all(),
-                        'RawMessage' => [
-                            'Data' => $message->toString(),
+                        'ReplyToAddresses' => [$message->getEnvelope()->getSender()->toString()],
+                        'Destination' => [
+                            'ToAddresses' => collect($message->getEnvelope()->getRecipients())
+                                    ->map
+                                    ->toString()
+                                    ->values()
+                                    ->all(),
+                        ],
+                        'Content' => [
+                            'Raw' => [
+                                'Data' => $message->toString(),
+                            ],
                         ],
                     ]
                 )
@@ -101,7 +105,7 @@ class SesTransport extends AbstractTransport
     /**
      * Get the Amazon SES client for the SesTransport instance.
      *
-     * @return \Aws\Ses\SesClient
+     * @return \Aws\SesV2\SesV2Client
      */
     public function ses()
     {
