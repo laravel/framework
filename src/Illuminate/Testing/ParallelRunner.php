@@ -159,8 +159,9 @@ class ParallelRunner implements RunnerInterface
                 };
 
                 return $applicationCreator->createApplication();
-            } elseif (file_exists(getcwd().'/bootstrap/app.php')) {
-                $app = require getcwd().'/bootstrap/app.php';
+            } elseif (file_exists($path = getcwd().'/bootstrap/app.php') ||
+                      file_exists($path = getcwd().'/.laravel/app.php')) {
+                $app = require $path;
 
                 $app->make(Kernel::class)->bootstrap();
 
