@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Mail;
 
-use Aws\Ses\SesClient;
+use Aws\SesV2\SesV2Client;
 use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
 use Illuminate\Mail\MailManager;
@@ -58,7 +58,7 @@ class MailSesTransportTest extends TestCase
         $message->bcc('you@example.com');
         $message->getHeaders()->add(new MetadataHeader('FooTag', 'TagValue'));
 
-        $client = m::mock(SesClient::class);
+        $client = m::mock(SesV2Client::class);
         $sesResult = m::mock();
         $sesResult->shouldReceive('get')
             ->with('MessageId')
