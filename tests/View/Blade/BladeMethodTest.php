@@ -6,21 +6,21 @@ class BladeMethodTest extends AbstractBladeTestCase
 {
     public function testPatch()
     {
-        $string = '@patch()';
+        $string = '@patch';
         $expected = "<?php echo method_field('PATCH'); ?>";
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
     public function testPut()
     {
-        $string = '@put()';
+        $string = '@put';
         $expected = "<?php echo method_field('PUT'); ?>";
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
     public function testDelete()
     {
-        $string = '@delete()';
+        $string = '@delete';
         $expected = "<?php echo method_field('DELETE'); ?>";
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
