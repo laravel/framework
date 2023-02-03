@@ -2063,6 +2063,7 @@ class HttpClientTest extends TestCase
         $this->assertFalse($flag);
         $this->assertNull($exception);
     }
+
     public function testRequestExceptionServerIfTheRequestServerError()
     {
         $exception = null;
