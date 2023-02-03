@@ -264,4 +264,28 @@ trait InteractsWithDatabase
 
         return $this;
     }
+
+    /**
+     * Specify the number of database queries that should occur throughout the test.
+     *
+     * @param  int  $expected
+     * @param  string|null  $connection
+     * @return $this
+     */
+    public function expectsDatabaseQueryCount($expected, $connection = null)
+    {
+        with($this->getConnection($connection), function ($connection) use ($expected) {
+            $actual = 0;
+
+            $connection->listen(function () use (&$actual) {
+                $actual++;
+            });
+
+            $this->beforeApplicationDestroyed(function () use (&$actual, $expected, $connection) {
+                $this->assertSame($actual, $expected, "Expected {$expected} database queries on the [{$connection->getName()}] connection. {$actual} occurred.");
+            });
+        });
+
+        return $this;
+    }
 }

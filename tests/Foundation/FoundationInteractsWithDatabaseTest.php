@@ -2,12 +2,17 @@
 
 namespace Illuminate\Tests\Foundation;
 
+use Illuminate\Container\Container;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithDatabase;
+use Illuminate\Foundation\Testing\TestCase as TestingTestCase;
+use Illuminate\Support\Facades\DB;
 use Mockery as m;
+use Orchestra\Testbench\Concerns\CreatesApplication;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 
@@ -318,6 +323,67 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertEquals($this->table, $this->getTable(ProductStub::class));
         $this->assertEquals($this->table, $this->getTable(new ProductStub));
         $this->assertEquals($this->table, $this->getTable($this->table));
+    }
+
+    public function testExpectsDatabaseQueryCount()
+    {
+        $case = new class extends TestingTestCase {
+            use CreatesApplication;
+
+            public function testExpectsDatabaseQueryCount()
+            {
+                $this->expectsDatabaseQueryCount(0);
+            }
+        };
+
+        $case->setUp();
+        $case->testExpectsDatabaseQueryCount();
+        $case->tearDown();
+
+        $case = new class extends TestingTestCase {
+            use CreatesApplication;
+
+            public function testExpectsDatabaseQueryCount()
+            {
+                $this->expectsDatabaseQueryCount(3);
+            }
+        };
+
+        $case->setUp();
+        $case->testExpectsDatabaseQueryCount();
+
+        try {
+            $case->tearDown();
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertSame("Expected 3 database queries on the [testing] connection. 0 occurred.\nFailed asserting that 3 is identical to 0.", $e->getMessage());
+        }
+
+        $case = new class extends TestingTestCase {
+            use CreatesApplication;
+
+            public function testExpectsDatabaseQueryCount()
+            {
+                $this->expectsDatabaseQueryCount(3);
+
+                DB::pretend(function ($db) {
+                    $db->table('foo')->count();
+                    $db->table('foo')->count();
+                    $db->table('foo')->count();
+                    $db->table('foo')->count();
+                });
+            }
+        };
+
+        $case->setUp();
+        $case->testExpectsDatabaseQueryCount();
+
+        try {
+            $case->tearDown();
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertSame("Expected 3 database queries on the [testing] connection. 4 occurred.\nFailed asserting that 3 is identical to 4.", $e->getMessage());
+        }
     }
 
     protected function mockCountBuilder($countResult, $deletedAtColumn = 'deleted_at')
