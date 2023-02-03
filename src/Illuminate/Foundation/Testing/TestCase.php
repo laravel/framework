@@ -260,10 +260,10 @@ abstract class TestCase extends BaseTestCase
     {
         static::$latestResponse = null;
 
-        foreach([
+        foreach ([
             \PHPUnit\Util\Annotation\Registry::class,
             \PHPUnit\Metadata\Annotation\Parser\Registry::class,
-            ] as $class) {
+        ] as $class) {
             if (class_exists($class)) {
                 (function () {
                     $this->classDocBlocks = [];
