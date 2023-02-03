@@ -45,7 +45,7 @@ class ScheduleWorkCommand extends Command
     public function handle()
     {
         $this->components->info(
-            'Running schedule tasks every minute.',
+            'Running scheduled tasks every minute.',
             $this->getLaravel()->isLocal() ? OutputInterface::VERBOSITY_NORMAL : OutputInterface::VERBOSITY_VERBOSE
         );
 
