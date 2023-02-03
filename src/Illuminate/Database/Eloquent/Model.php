@@ -1776,6 +1776,16 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Sugar method that allows to get the table associated with the model.
+     *
+     * @return string
+     */
+    public static function table()
+    {
+        return (new static())->getTable();
+    }
+
+    /**
      * Set the table associated with the model.
      *
      * @param  string  $table
