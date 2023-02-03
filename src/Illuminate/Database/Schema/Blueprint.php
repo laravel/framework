@@ -1202,8 +1202,8 @@ class Blueprint
 
         $this->timestampTz('updated_at', $precision)->nullable();
     }
-    
-     /**
+
+    /**
      * Add creation and update datetime columns to the table.
      *
      * @param  int|null  $precision
