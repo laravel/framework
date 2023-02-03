@@ -52,31 +52,46 @@ trait CompilesHelpers
     /**
      * Compile the PUT method statements into valid PHP.
      *
+     * @param  string  $arguments
      * @return string
      */
-    protected function compilePut()
+    protected function compilePut($arguments)
     {
-        return $this->compileMethod("('PUT')");
+        if ($arguments === '()') {
+            return $this->compileMethod("('PUT')");
+        }
+
+        return 'method="POST" action="<?php echo Illuminate\\Support\\Str::of'.$arguments.'->whenContains("?", fn ($url) => $url->append("&_method=PUT"), fn ($url) => $url->append("?_method=PUT"))->toString(); ?>"';
     }
 
     /**
      * Compile the PATCH method statements into valid PHP.
      *
+     * @param  string  $arguments
      * @return string
      */
-    protected function compilePatch()
+    protected function compilePatch($arguments)
     {
-        return $this->compileMethod("('PATCH')");
+        if ($arguments === '()') {
+            return $this->compileMethod("('PATCH')");
+        }
+
+        return 'method="POST" action="<?php echo Illuminate\\Support\\Str::of'.$arguments.'->whenContains("?", fn ($url) => $url->append("&_method=PATCH"), fn ($url) => $url->append("?_method=PATCH"))->toString(); ?>"';
     }
 
     /**
      * Compile the DELETE method statements into valid PHP.
      *
+     * @param  string  $arguments
      * @return string
      */
-    protected function compileDelete()
+    protected function compileDelete($arguments)
     {
-        return $this->compileMethod("('DELETE')");
+        if ($arguments === '()') {
+            return $this->compileMethod("('DELETE')");
+        }
+
+        return 'method="POST" action="<?php echo Illuminate\\Support\\Str::of'.$arguments.'->whenContains("?", fn ($url) => $url->append("&_method=DELETE"), fn ($url) => $url->append("?_method=DELETE"))->toString(); ?>"';
     }
 
     /**
