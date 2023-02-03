@@ -261,10 +261,12 @@ abstract class TestCase extends BaseTestCase
     {
         static::$latestResponse = null;
 
-        (function () {
-            $this->classDocBlocks = [];
-            $this->methodDocBlocks = [];
-        })->call(Registry::getInstance());
+        if (class_exists(Registry::class)) {
+            (function () {
+                $this->classDocBlocks = [];
+                $this->methodDocBlocks = [];
+            })->call(Registry::getInstance());
+        }
     }
 
     /**
