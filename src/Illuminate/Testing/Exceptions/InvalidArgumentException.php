@@ -14,6 +14,7 @@ class InvalidArgumentException extends Exception
     public static function create(int $argument, string $type): static
     {
         $stack = debug_backtrace();
+
         $function = $stack[1]['function'];
 
         if (isset($stack[1]['class'])) {
