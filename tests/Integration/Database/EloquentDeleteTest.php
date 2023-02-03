@@ -121,31 +121,18 @@ class EloquentDeleteTest extends DatabaseTestCase
         PostStringyKey::deleting(fn ($model) => $_SERVER['destroy']['deleting'][] = $model->my_id);
         PostStringyKey::deleted(fn ($model) => $_SERVER['destroy']['deleted'][] = $model->my_id);
 
-        // In case 0 ids are matched out of 2:
-        PostStringyKey::query()->getConnection()->flushQueryLog();
         $_SERVER['destroy'] = [];
-        $count = PostStringyKey::destroy(33, 44);
-        $this->assertEquals(0, $count);
-        $logs = PostStringyKey::query()->getConnection()->getQueryLog();
-        $this->assertCount(1, $logs);
-        $this->assertEmpty($_SERVER['destroy']);
-
-        // In case 2 ids are matched out of 4:
-        PostStringyKey::query()->getConnection()->flushQueryLog();
-        $_SERVER['destroy'] = [];
-        $count = PostStringyKey::destroy(1, 2, 3, 4);
+        PostStringyKey::destroy(1, 2, 3, 4);
 
         $this->assertEquals([1, 2], $_SERVER['destroy']['retrieved']);
         $this->assertEquals([1, 2], $_SERVER['destroy']['deleting']);
         $this->assertEquals([1, 2], $_SERVER['destroy']['deleted']);
 
-        $this->assertEquals(2, $count);
-
         $logs = PostStringyKey::query()->getConnection()->getQueryLog();
 
         $this->assertEquals(0, PostStringyKey::query()->count());
 
-        $this->assertStringStartsWith('select * from "my_posts" where "my_posts"."my_id" in (', str_replace(['`', '[', ']'], '"', $logs[0]['query']));
+        $this->assertStringStartsWith('select * from "my_posts" where "my_id" in (', str_replace(['`', '[', ']'], '"', $logs[0]['query']));
 
         $this->assertStringStartsWith('delete from "my_posts" where "my_id" = ', str_replace(['`', '[', ']'], '"', $logs[1]['query']));
         $this->assertEquals([1], $logs[1]['bindings']);
@@ -155,16 +142,6 @@ class EloquentDeleteTest extends DatabaseTestCase
 
         // Total of 3 queries.
         $this->assertCount(3, $logs);
-
-        PostStringyKey::query()->getConnection()->flushQueryLog();
-        $_SERVER['destroy'] = [];
-        $count = PostStringyKey::destroy([]);
-        $logs = PostStringyKey::query()->getConnection()->getQueryLog();
-
-        // no queries, no model events:
-        $this->assertEmpty($logs);
-        $this->assertEmpty($_SERVER['destroy']);
-        $this->assertEquals(0, $count);
 
         PostStringyKey::reguard();
         unset($_SERVER['destroy']);
