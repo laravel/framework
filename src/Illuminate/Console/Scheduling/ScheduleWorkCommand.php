@@ -51,7 +51,7 @@ class ScheduleWorkCommand extends Command
 
         [$lastExecutionStartedAt, $executions] = [null, []];
 
-        $command = implode(' ', array_map(ProcessUtils::escapeArgument(...), [
+        $command = implode(' ', array_map(fn ($arg) => ProcessUtils::escapeArgument($arg), [
             PHP_BINARY,
             defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan',
             'schedule:run',
