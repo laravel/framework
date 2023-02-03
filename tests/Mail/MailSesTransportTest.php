@@ -64,10 +64,11 @@ class MailSesTransportTest extends TestCase
             ->with('MessageId')
             ->once()
             ->andReturn('ses-message-id');
-        $client->shouldReceive('sendRawEmail')->once()
+        $client->shouldReceive('sendEmail')->once()
             ->with(m::on(function ($arg) {
-                return $arg['Source'] === 'myself@example.com' &&
-                    $arg['Destinations'] === ['me@example.com', 'you@example.com'] &&
+                return count($arg['ReplyToAddresses']) === 1 &&
+                    $arg['ReplyToAddresses'][0] === 'myself@example.com' &&
+                    $arg['Destination']['ToAddresses'] === ['me@example.com', 'you@example.com'] &&
                     $arg['Tags'] === [['Name' => 'FooTag', 'Value' => 'TagValue']];
             }))
             ->andReturn($sesResult);

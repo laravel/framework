@@ -57,7 +57,7 @@ class SesTransport extends AbstractTransport
         }
 
         try {
-            $result = $this->ses->sendRawEmail(
+            $result = $this->ses->sendEmail(
                 array_merge(
                     $options, [
                         'ReplyToAddresses' => [$message->getEnvelope()->getSender()->toString()],
