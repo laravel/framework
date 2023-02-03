@@ -52,7 +52,7 @@ trait CompilesHelpers
     /**
      * Compile the PUT method statements into valid PHP.
      *
-     * @param  string  $arguments
+     * @param  string|null  $arguments
      * @return string
      */
     protected function compilePut($arguments)
