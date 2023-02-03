@@ -1957,6 +1957,219 @@ class HttpClientTest extends TestCase
         $this->assertSame('{"result":{"foo":"bar"}}', $response->body());
     }
 
+    public function testRequestExceptionIfTheRequestClientError()
+    {
+        $exception = null;
+        $flag = false;
+
+        $client = $this->factory->fake([
+            'laravel.com' => $this->factory::response('', 401),
+        ]);
+
+        try {
+            $client->get('laravel.com')
+                ->throwOnClientError(function ($response, $e) use (&$flag, &$exception) {
+                    $flag = true;
+                    $exception = $e;
+                });
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertTrue($flag);
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
+    }
+
+    public function testRequestExceptionIfTheRequestNotClientError()
+    {
+        $exception = null;
+        $flag = false;
+
+        $client = $this->factory->fake([
+            'laravel.com' => $this->factory::response('', 101),
+        ]);
+
+        try {
+            $client->get('laravel.com')
+                ->throwOnClientError(function ($response, $e) use (&$flag, &$exception) {
+                    $flag = true;
+                    $exception = $e;
+                });
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertFalse($flag);
+        $this->assertNull($exception);
+
+        $exception = null;
+        $flag = false;
+
+        $client = $this->factory->fake([
+            'laravel.com' => $this->factory::response('', 201),
+        ]);
+
+        try {
+            $client->get('laravel.com')
+                ->throwOnClientError(function ($response, $e) use (&$flag, &$exception) {
+                    $flag = true;
+                    $exception = $e;
+                });
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertFalse($flag);
+        $this->assertNull($exception);
+
+        $exception = null;
+        $flag = false;
+
+        $client = $this->factory->fake([
+            'laravel.com' => $this->factory::response('', 301),
+        ]);
+
+        try {
+            $client->get('laravel.com')
+                ->throwOnClientError(function ($response, $e) use (&$flag, &$exception) {
+                    $flag = true;
+                    $exception = $e;
+                });
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertFalse($flag);
+        $this->assertNull($exception);
+
+        $exception = null;
+        $flag = false;
+
+        $client = $this->factory->fake([
+            'laravel.com' => $this->factory::response('', 501),
+        ]);
+
+        try {
+            $client->get('laravel.com')
+                ->throwOnClientError(function ($response, $e) use (&$flag, &$exception) {
+                    $flag = true;
+                    $exception = $e;
+                });
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertFalse($flag);
+        $this->assertNull($exception);
+    }
+    public function testRequestExceptionServerIfTheRequestServerError()
+    {
+        $exception = null;
+        $flag = false;
+
+        $client = $this->factory->fake([
+            'laravel.com' => $this->factory::response('', 501),
+        ]);
+
+        try {
+            $client->get('laravel.com')
+                ->throwOnServerError(function ($response, $e) use (&$flag, &$exception) {
+                    $flag = true;
+                    $exception = $e;
+                });
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertTrue($flag);
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
+    }
+
+    public function testRequestExceptionServerIfTheRequestNotServerError()
+    {
+        $exception = null;
+        $flag = false;
+
+        $client = $this->factory->fake([
+            'laravel.com' => $this->factory::response('', 101),
+        ]);
+
+        try {
+            $client->get('laravel.com')
+                ->throwOnServerError(function ($response, $e) use (&$flag, &$exception) {
+                    $flag = true;
+                    $exception = $e;
+                });
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertFalse($flag);
+        $this->assertNull($exception);
+
+        $exception = null;
+        $flag = false;
+
+        $client = $this->factory->fake([
+            'laravel.com' => $this->factory::response('', 201),
+        ]);
+
+        try {
+            $client->get('laravel.com')
+                ->throwOnServerError(function ($response, $e) use (&$flag, &$exception) {
+                    $flag = true;
+                    $exception = $e;
+                });
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertFalse($flag);
+        $this->assertNull($exception);
+
+        $exception = null;
+        $flag = false;
+
+        $client = $this->factory->fake([
+            'laravel.com' => $this->factory::response('', 301),
+        ]);
+
+        try {
+            $client->get('laravel.com')
+                ->throwOnServerError(function ($response, $e) use (&$flag, &$exception) {
+                    $flag = true;
+                    $exception = $e;
+                });
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertFalse($flag);
+        $this->assertNull($exception);
+
+        $exception = null;
+        $flag = false;
+
+        $client = $this->factory->fake([
+            'laravel.com' => $this->factory::response('', 401),
+        ]);
+
+        try {
+            $client->get('laravel.com')
+                ->throwOnServerError(function ($response, $e) use (&$flag, &$exception) {
+                    $flag = true;
+                    $exception = $e;
+                });
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertFalse($flag);
+        $this->assertNull($exception);
+    }
+
     public function testRequestExceptionIsThrowIfConditionIsSatisfied()
     {
         $this->factory->fake([
