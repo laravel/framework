@@ -2,12 +2,10 @@
 
 namespace Illuminate\Tests\Foundation;
 
-use Illuminate\Container\Container;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Query\Builder;
-use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithDatabase;
 use Illuminate\Foundation\Testing\TestCase as TestingTestCase;
 use Illuminate\Support\Facades\DB;
@@ -327,7 +325,8 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
     public function testExpectsDatabaseQueryCount()
     {
-        $case = new class extends TestingTestCase {
+        $case = new class extends TestingTestCase
+        {
             use CreatesApplication;
 
             public function testExpectsDatabaseQueryCount()
@@ -340,7 +339,8 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $case->testExpectsDatabaseQueryCount();
         $case->tearDown();
 
-        $case = new class extends TestingTestCase {
+        $case = new class extends TestingTestCase
+        {
             use CreatesApplication;
 
             public function testExpectsDatabaseQueryCount()
@@ -359,7 +359,8 @@ class FoundationInteractsWithDatabaseTest extends TestCase
             $this->assertSame("Expected 3 database queries on the [testing] connection. 0 occurred.\nFailed asserting that 3 is identical to 0.", $e->getMessage());
         }
 
-        $case = new class extends TestingTestCase {
+        $case = new class extends TestingTestCase
+        {
             use CreatesApplication;
 
             public function testExpectsDatabaseQueryCount()
