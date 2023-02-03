@@ -16,19 +16,23 @@ class TestCaseTest extends BaseTestCase
 {
     public function test_it_includes_response_exceptions_on_test_failures()
     {
-        $testCase = new ExampleTestCase();
+        $testCase = new ExampleTestCase('foo');
         $testCase::$latestResponse = TestResponse::fromBaseResponse(new Response())
             ->withExceptions(collect([new Exception('Unexpected exception.')]));
 
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessageMatches('/Assertion message.*Unexpected exception/s');
 
-        $testCase->onNotSuccessfulTest(new ExpectationFailedException('Assertion message.'));
+        $testCase::$latestResponse->transformNotSuccessfulException(
+            $exception = new ExpectationFailedException('Assertion message.'),
+        );
+
+        throw $exception;
     }
 
     public function test_it_includes_validation_errors_on_test_failures()
     {
-        $testCase = new ExampleTestCase();
+        $testCase = new ExampleTestCase('foo');
         $testCase::$latestResponse = TestResponse::fromBaseResponse(
             tap(new RedirectResponse('/'))
                 ->setSession(new Store('test-session', new NullSessionHandler()))
@@ -39,36 +43,51 @@ class TestCaseTest extends BaseTestCase
 
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessageMatches('/Assertion message.*The first name field is required/s');
-        $testCase->onNotSuccessfulTest(new ExpectationFailedException('Assertion message.'));
+
+        $testCase::$latestResponse->transformNotSuccessfulException(
+            $exception = new ExpectationFailedException('Assertion message.'),
+        );
+
+        throw $exception;
     }
 
     public function test_it_includes_json_validation_errors_on_test_failures()
     {
-        $testCase = new ExampleTestCase();
+        $testCase = new ExampleTestCase('foo');
         $testCase::$latestResponse = TestResponse::fromBaseResponse(
             new Response(['errors' => ['first_name' => 'The first name field is required.']])
         );
 
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessageMatches('/Assertion message.*The first name field is required/s');
-        $testCase->onNotSuccessfulTest(new ExpectationFailedException('Assertion message.'));
+
+        $testCase::$latestResponse->transformNotSuccessfulException(
+            $exception = new ExpectationFailedException('Assertion message.'),
+        );
+
+        throw $exception;
     }
 
     public function test_it_doesnt_fail_with_false_json()
     {
-        $testCase = new ExampleTestCase();
+        $testCase = new ExampleTestCase('foo');
         $testCase::$latestResponse = TestResponse::fromBaseResponse(
             new Response(false, 200, ['Content-Type' => 'application/json'])
         );
 
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessageMatches('/Assertion message/s');
-        $testCase->onNotSuccessfulTest(new ExpectationFailedException('Assertion message.'));
+
+        $testCase::$latestResponse->transformNotSuccessfulException(
+            $exception = new ExpectationFailedException('Assertion message.'),
+        );
+
+        throw $exception;
     }
 
     public function test_it_doesnt_fail_with_encoded_json()
     {
-        $testCase = new ExampleTestCase();
+        $testCase = new ExampleTestCase('foo');
         $testCase::$latestResponse = TestResponse::fromBaseResponse(
             tap(new Response, function ($response) {
                 $response->header('Content-Type', 'application/json');
@@ -79,7 +98,12 @@ class TestCaseTest extends BaseTestCase
 
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessageMatches('/Assertion message/s');
-        $testCase->onNotSuccessfulTest(new ExpectationFailedException('Assertion message.'));
+
+        $testCase::$latestResponse->transformNotSuccessfulException(
+            $exception = new ExpectationFailedException('Assertion message.'),
+        );
+
+        throw $exception;
     }
 
     public function tearDown(): void

@@ -40,9 +40,10 @@ jobs:
       fail-fast: true
       matrix:
         php: [8.1, 8.2]
+        phpunit: ['9.5.8', '10.0']
         stability: [prefer-lowest, prefer-stable]
 
-    name: PHP ${{ matrix.php }} - ${{ matrix.stability }}
+    name: PHP ${{ matrix.php }} - PHPUnit ${{ matrix.phpunit }} - ${{ matrix.stability }}
 
     steps:
       - name: Checkout code
@@ -75,6 +76,13 @@ jobs:
           command: composer require guzzlehttp/guzzle:^7.5 guzzlehttp/psr7:^2.4 predis/predis:^2.0.2 --no-interaction --no-update
         if: matrix.php >= 8.2
 
+      - name: Set PHPUnit
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer require phpunit/phpunit:~${{ matrix.phpunit }} --dev --no-interaction --no-update
+
       - name: Install dependencies
         uses: nick-fields/retry@v2
         with:
@@ -82,8 +90,8 @@ jobs:
           max_attempts: 5
           command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
 
-      - name: Execute tests
-        run: vendor/bin/phpunit --verbose
+      - name: Execute tests against PHPUnit ^9
+        run: vendor/bin/phpunit --verbose --configuration phpunit9.xml.dist
         env:
           DB_PORT: ${{ job.services.mysql.ports[3306] }}
           DB_USERNAME: root
@@ -91,6 +99,18 @@ jobs:
           DYNAMODB_ENDPOINT: "http://localhost:8888"
           AWS_ACCESS_KEY_ID: random_key
           AWS_SECRET_ACCESS_KEY: random_secret
+        if: matrix.phpunit != '10.0'
+
+      - name: Execute tests against PHPUnit ^10
+        run: vendor/bin/phpunit
+        env:
+          DB_PORT: ${{ job.services.mysql.ports[3306] }}
+          DB_USERNAME: root
+          DYNAMODB_CACHE_TABLE: laravel_dynamodb_test
+          DYNAMODB_ENDPOINT: "http://localhost:8888"
+          AWS_ACCESS_KEY_ID: random_key
+          AWS_SECRET_ACCESS_KEY: random_secret
+        if: matrix.phpunit == '10.0'
 
       - name: Store artifacts
         uses: actions/upload-artifact@v3
@@ -107,9 +127,10 @@ jobs:
       fail-fast: true
       matrix:
         php: [8.1, 8.2]
+        phpunit: ['9.5.8', '10.0']
         stability: [prefer-lowest, prefer-stable]
 
-    name: PHP ${{ matrix.php }} - ${{ matrix.stability }} - Windows
+    name: PHP ${{ matrix.php }} - PHPUnit ${{ matrix.phpunit }} - ${{ matrix.stability }} - Windows
 
     steps:
       - name: Set git to use LF
@@ -133,7 +154,7 @@ jobs:
         with:
           timeout_minutes: 5
           max_attempts: 5
-          command: composer require symfony/css-selector:~6.0 --no-interaction --no-update
+          command: composer require symfony/css-selector:~6.0 ramsey/collection:^1.2 brick/math:^0.9.3 --no-interaction --no-update
 
       - name: Set Minimum PHP 8.2 Versions
         uses: nick-fields/retry@v2
@@ -143,6 +164,13 @@ jobs:
           command: composer require guzzlehttp/guzzle:~7.5 guzzlehttp/psr7:~2.4 predis/predis:~2.0.2 --no-interaction --no-update
         if: matrix.php >= 8.2
 
+      - name: Set PHPUnit
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer require phpunit/phpunit:~${{ matrix.phpunit }} --dev --no-interaction --no-update
+
       - name: Install dependencies
         uses: nick-fields/retry@v2
         with:
@@ -150,11 +178,19 @@ jobs:
           max_attempts: 5
           command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
 
-      - name: Execute tests
-        run: vendor/bin/phpunit --verbose
+      - name: Execute tests against PHPUnit ^9
+        run: vendor/bin/phpunit --verbose --configuration phpunit9.xml.dist
         env:
           AWS_ACCESS_KEY_ID: random_key
           AWS_SECRET_ACCESS_KEY: random_secret
+        if: matrix.phpunit != '10.0'
+
+      - name: Execute tests against PHPUnit ^10
+        run: vendor/bin/phpunit
+        env:
+          AWS_ACCESS_KEY_ID: random_key
+          AWS_SECRET_ACCESS_KEY: random_secret
+        if: matrix.phpunit == '10.0'
 
       - name: Store artifacts
         uses: actions/upload-artifact@v3

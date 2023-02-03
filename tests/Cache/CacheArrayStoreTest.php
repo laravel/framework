@@ -248,7 +248,8 @@ class CacheArrayStoreTest extends TestCase
         $store->put('object', $object, 10);
         $object->bar = true;
 
-        $this->assertObjectNotHasAttribute('bar', $store->get('object'));
+        $this->assertInstanceOf(stdClass::class, $store->get('object'));
+        $this->assertFalse(isset($store->get('object')->bar));
     }
 
     public function testValuesAreStoredByReferenceIfSerializationIsDisabled()
@@ -260,7 +261,8 @@ class CacheArrayStoreTest extends TestCase
         $store->put('object', $object, 10);
         $object->bar = true;
 
-        $this->assertObjectHasAttribute('bar', $store->get('object'));
+        $this->assertInstanceOf(stdClass::class, $store->get('object'));
+        $this->assertTrue($store->get('object')->bar);
     }
 
     public function testReleasingLockAfterAlreadyForceReleasedByAnotherOwnerFails()

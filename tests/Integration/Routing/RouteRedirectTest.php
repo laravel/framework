@@ -20,7 +20,7 @@ class RouteRedirectTest extends TestCase
         $response->assertStatus(301);
     }
 
-    public function routeRedirectDataSets()
+    public static function routeRedirectDataSets()
     {
         return [
             'route redirect with no parameters' => ['from', 'to', '/from', '/to'],

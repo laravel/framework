@@ -205,7 +205,7 @@ class EncrypterTest extends TestCase
         $this->assertTrue(Encrypter::supported($key, 'aes-128-cbc'));
     }
 
-    public function provideTamperedData()
+    public static function provideTamperedData()
     {
         $validIv = base64_encode(str_repeat('.', 16));
 
