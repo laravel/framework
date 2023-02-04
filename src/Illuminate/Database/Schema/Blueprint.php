@@ -1239,7 +1239,7 @@ class Blueprint
     {
         return $this->timestampTz($column, $precision)->nullable();
     }
-    
+
     /**
      * Add a "deleted at" datetime column to the table.
      *
