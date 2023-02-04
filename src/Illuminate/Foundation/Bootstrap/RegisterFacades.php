@@ -3,11 +3,12 @@
 namespace Illuminate\Foundation\Bootstrap;
 
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Foundation\IsBootstrapper;
 use Illuminate\Foundation\AliasLoader;
 use Illuminate\Foundation\PackageManifest;
 use Illuminate\Support\Facades\Facade;
 
-class RegisterFacades
+class RegisterFacades implements IsBootstrapper
 {
     /**
      * Bootstrap the given application.

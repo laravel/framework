@@ -3,8 +3,9 @@
 namespace Illuminate\Foundation\Bootstrap;
 
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Foundation\IsBootstrapper;
 
-class RegisterProviders
+class RegisterProviders implements IsBootstrapper
 {
     /**
      * Bootstrap the given application.

@@ -6,10 +6,11 @@ use Exception;
 use Illuminate\Config\Repository;
 use Illuminate\Contracts\Config\Repository as RepositoryContract;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Foundation\IsBootstrapper;
 use SplFileInfo;
 use Symfony\Component\Finder\Finder;
 
-class LoadConfiguration
+class LoadConfiguration implements IsBootstrapper
 {
     /**
      * Bootstrap the given application.

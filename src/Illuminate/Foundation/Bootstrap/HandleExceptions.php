@@ -6,13 +6,14 @@ use ErrorException;
 use Exception;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Foundation\IsBootstrapper;
 use Illuminate\Log\LogManager;
 use Monolog\Handler\NullHandler;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\ErrorHandler\Error\FatalError;
 use Throwable;
 
-class HandleExceptions
+class HandleExceptions implements IsBootstrapper
 {
     /**
      * Reserved memory so that errors can be displayed properly on memory exhaustion.
