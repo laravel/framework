@@ -245,7 +245,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
 
                 $this['events']->dispatch('bootstrapped: '.$bootstrapper, [$this]);
             } else {
-                throw new \RuntimeException('The bootstrapper must be implements of IsBootstrapper');
+                throw new \RuntimeException('The' . $bootstrapper . 'must be implements of IsBootstrapper');
             }
         }
     }
