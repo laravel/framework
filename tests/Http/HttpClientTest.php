@@ -2159,6 +2159,6 @@ class HttpClientTest extends TestCase
 
         $client->contentType('foo');
 
-        $this->assertSame(['application/json', 'foo'], Arr::get($client->getOptions(), 'headers.Content-Type'));
+        $this->assertSame('foo', Arr::get($client->getOptions(), 'headers.Content-Type'));
     }
 }

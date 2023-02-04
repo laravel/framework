@@ -343,11 +343,7 @@ class PendingRequest
      */
     public function contentType(string $contentType)
     {
-        $currentContentTypes = Arr::wrap(Arr::get($this->options, 'headers.Content-Type'));
-
-        if (! in_array($contentType, $currentContentTypes)) {
-            $this->withHeaders(['Content-Type' => $contentType]);
-        }
+        $this->options['headers']['Content-Type'] = $contentType;
 
         return $this;
     }
