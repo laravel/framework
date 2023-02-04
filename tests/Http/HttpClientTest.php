@@ -18,6 +18,7 @@ use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Http\Client\ResponseSequence;
 use Illuminate\Http\Response as HttpResponse;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Str;
@@ -2143,5 +2144,21 @@ class HttpClientTest extends TestCase
         $request = $request->maxRedirects(10);
 
         $this->assertSame(['connect_timeout' => 10, 'http_errors' => false, 'timeout' => 30, 'allow_redirects' => ['max' => 10]], $request->getOptions());
+    }
+
+    public function testPreventDuplicatedContentType(): void
+    {
+        $client = $this->factory->asJson();
+
+        $this->assertSame('application/json', Arr::get($client->getOptions(), 'headers.Content-Type'));
+
+        $client->asJson();
+        $client->asJson();
+
+        $this->assertSame('application/json', Arr::get($client->getOptions(), 'headers.Content-Type'));
+
+        $client->contentType('foo');
+
+        $this->assertSame('foo', Arr::get($client->getOptions(), 'headers.Content-Type'));
     }
 }
