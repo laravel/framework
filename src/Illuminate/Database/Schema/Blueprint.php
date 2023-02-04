@@ -1248,7 +1248,7 @@ class Blueprint
      */
     public function softDeletesDatetime($precision = 0)
     {
-        $this->datetime('deleted_at', $precision)->nullable();
+        return $this->datetime('deleted_at', $precision)->nullable();
     }
 
     /**
