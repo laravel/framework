@@ -7,6 +7,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 use Illuminate\Contracts\Foundation\CachesConfiguration;
 use Illuminate\Contracts\Foundation\CachesRoutes;
+use Illuminate\Contracts\Foundation\IsBootstrapper;
 use Illuminate\Contracts\Foundation\MaintenanceMode as MaintenanceModeContract;
 use Illuminate\Contracts\Http\Kernel as HttpKernelContract;
 use Illuminate\Events\EventServiceProvider;
@@ -237,11 +238,15 @@ class Application extends Container implements ApplicationContract, CachesConfig
         $this->hasBeenBootstrapped = true;
 
         foreach ($bootstrappers as $bootstrapper) {
-            $this['events']->dispatch('bootstrapping: '.$bootstrapper, [$this]);
+            if (new $bootstrapper instanceof IsBootstrapper) {
+                $this['events']->dispatch('bootstrapping: ' . $bootstrapper, [$this]);
 
-            $this->make($bootstrapper)->bootstrap($this);
+                $this->make($bootstrapper)->bootstrap($this);
 
-            $this['events']->dispatch('bootstrapped: '.$bootstrapper, [$this]);
+                $this['events']->dispatch('bootstrapped: ' . $bootstrapper, [$this]);
+            } else {
+                throw new \RuntimeException('The bootstrapper must be implements of IsBootstrapper');
+            }
         }
     }
 
