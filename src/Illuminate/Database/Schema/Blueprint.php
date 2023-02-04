@@ -1244,7 +1244,7 @@ class Blueprint
      * Add a "deleted at" datetime column to the table.
      *
      * @param  int|null  $precision
-     * @return void
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function softDeletesDatetime($precision = 0)
     {
