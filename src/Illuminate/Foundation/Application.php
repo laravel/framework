@@ -239,11 +239,11 @@ class Application extends Container implements ApplicationContract, CachesConfig
 
         foreach ($bootstrappers as $bootstrapper) {
             if (new $bootstrapper instanceof IsBootstrapper) {
-                $this['events']->dispatch('bootstrapping: ' . $bootstrapper, [$this]);
+                $this['events']->dispatch('bootstrapping: '.$bootstrapper, [$this]);
 
                 $this->make($bootstrapper)->bootstrap($this);
 
-                $this['events']->dispatch('bootstrapped: ' . $bootstrapper, [$this]);
+                $this['events']->dispatch('bootstrapped: '.$bootstrapper, [$this]);
             } else {
                 throw new \RuntimeException('The bootstrapper must be implements of IsBootstrapper');
             }
