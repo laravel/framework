@@ -1243,12 +1243,13 @@ class Blueprint
     /**
      * Add a "deleted at" datetime column to the table.
      *
+     * @param  string  $column
      * @param  int|null  $precision
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function softDeletesDatetime($precision = 0)
+    public function softDeletesDatetime($column = 'deleted_at', $precision = 0)
     {
-        return $this->datetime('deleted_at', $precision)->nullable();
+        return $this->datetime($column, $precision)->nullable();
     }
 
     /**
