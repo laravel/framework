@@ -226,9 +226,9 @@ class FormRequest extends Request implements ValidatesWhenResolved
     }
 
     /**
-     * Get the validated data from the request except provided values
+     * Get the validated data from the request except provided values.
      *
-     * @param mixed|null $keys
+     * @param mixed|null  $keys
      * @return array
      */
     public function validatedExcept($keys = null)
