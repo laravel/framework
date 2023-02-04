@@ -740,6 +740,17 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
     }
 
+    public function testMergeIfMissingIsLazy()
+    {
+        $this->assertDoesNotEnumerate(function ($collection) {
+            $collection->mergeIfMissing([1, 2, 3]);
+        });
+
+        $this->assertEnumeratesOnce(function ($collection) {
+            $collection->mergeIfMissing([1, 2, 3])->all();
+        });
+    }
+
     public function testMergeRecursiveIsLazy()
     {
         $this->assertDoesNotEnumerate(function ($collection) {

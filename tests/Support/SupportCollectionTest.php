@@ -1333,6 +1333,33 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testMergeIfMissingArray($collection)
+    {
+        $c = new $collection(['foo', 'bar']);
+        $this->assertEquals(['foo', 'bar'], $c->mergeIfMissing(['foo'])->all());
+
+        $c = new $collection(['role' => 'admin']);
+        $this->assertEquals(['role' => 'admin', 'id' => 1], $c->mergeIfMissing(['id' => 1])->all());
+
+        $c = new $collection(['role' => 'admin', 'id' => 1]);
+        $this->assertEquals(['role' => 'admin', 'id' => 1], $c->mergeIfMissing(['id' => 2])->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testMergeIfMissingCollection($collection)
+    {
+        $c = new $collection(['role' => 'admin']);
+        $this->assertEquals(['role' => 'admin', 'id' => 1], $c->mergeIfMissing(new $collection(['id' => 1]))->all());
+
+        $c = new $collection(['role' => 'admin', 'id' => 1]);
+        $this->assertEquals(['role' => 'admin', 'id' => 1], $c->mergeIfMissing(new $collection(['id' => 2]))->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testMergeRecursiveNull($collection)
     {
         $c = new $collection(['name' => 'Hello']);

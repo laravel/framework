@@ -841,6 +841,17 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
+     * Merge the collection with the given items only if the items are missing.
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>  $items
+     * @return static
+     */
+    public function mergeIfMissing($items)
+    {
+        return $this->passthru('mergeIfMissing', func_get_args());
+    }
+
+    /**
      * Recursively merge the collection with the given items.
      *
      * @template TMergeRecursiveValue
