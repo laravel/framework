@@ -1239,6 +1239,17 @@ class Blueprint
     {
         return $this->timestampTz($column, $precision)->nullable();
     }
+    
+    /**
+     * Add a "deleted at" datetime column to the table.
+     *
+     * @param  int|null  $precision
+     * @return void
+     */
+    public function softDeletesDatetime($precision = 0)
+    {
+        $this->datetime('deleted_at', $precision)->nullable();
+    }
 
     /**
      * Create a new year column on the table.
