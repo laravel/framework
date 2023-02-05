@@ -16,6 +16,7 @@
     "require": {
         "php": "^8.0.2",
         "ext-PDO": "*",
+        "ext-mbstring": "*",
         "illuminate/collections": "^9.0",
         "illuminate/console": "^9.0",
         "illuminate/container": "^9.0",
