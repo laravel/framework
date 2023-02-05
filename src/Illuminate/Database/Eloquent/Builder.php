@@ -1012,6 +1012,19 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Perform dynamic update.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return int
+     */
+    protected function performDynamicUpdate(string $method, array $parameters)
+    {
+        $column = Str::of($method)->after('update')->snake()->value();
+        return $this->update([$column => $parameters[0]]);
+    }
+
+    /**
      * Insert new records or update the existing ones.
      *
      * @param  array  $values
@@ -1867,6 +1880,10 @@ class Builder implements BuilderContract
 
         if (in_array($method, $this->passthru)) {
             return $this->toBase()->{$method}(...$parameters);
+        }
+
+        if (str_starts_with($method, 'update')) {
+            return $this->performDynamicUpdate($method, $parameters);
         }
 
         $this->forwardCallTo($this->query, $method, $parameters);

@@ -2020,6 +2020,22 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(1, $result);
     }
 
+    public function testDynamicUpdate()
+    {
+        Carbon::setTestNow($now = '2017-10-10 10:10:10');
+
+        $query = new BaseBuilder(m::mock(ConnectionInterface::class), new Grammar, m::mock(Processor::class));
+        $builder = new Builder($query);
+        $model = new EloquentBuilderTestStub;
+        $this->mockConnectionForModel($model, '');
+        $builder->setModel($model);
+        $builder->getConnection()->shouldReceive('update')->once()
+            ->with('update "table" set "user_id" = ?, "table"."updated_at" = ?', [10, $now])->andReturn(1);
+        $result = $builder->updateUserId(10);
+
+        $this->assertEquals(1, $result);
+    }
+
     public function testUpdateWithTimestampValue()
     {
         $query = new BaseBuilder(m::mock(ConnectionInterface::class), new Grammar, m::mock(Processor::class));
