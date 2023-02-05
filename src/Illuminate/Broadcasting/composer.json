@@ -15,6 +15,7 @@
     ],
     "require": {
         "php": "^8.0.2",
+        "ext-hash": "*",
         "psr/log": "^1.0|^2.0|^3.0",
         "illuminate/bus": "^9.0",
         "illuminate/collections": "^9.0",
