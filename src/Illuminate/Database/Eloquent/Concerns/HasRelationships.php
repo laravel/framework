@@ -338,21 +338,6 @@ trait HasRelationships
     }
 
     /**
-     * Create a pending has-many-through or has-one-through relationship.
-     *
-     * @param  string|\Illuminate\Database\Eloquent\Relations\HasMany|\Illuminate\Database\Eloquent\Relations\HasOne  $relationship
-     * @return \Illuminate\Database\Eloquent\PendingHasThroughRelationship
-     */
-    public function through($relationship)
-    {
-        if (is_string($relationship)) {
-            $relationship = $this->{$relationship}();
-        }
-
-        return new PendingHasThroughRelationship($this, $relationship);
-    }
-
-    /**
      * Retrieve the actual class name for a given morph class.
      *
      * @param  string  $class
@@ -373,6 +358,21 @@ trait HasRelationships
         [$one, $two, $caller] = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
 
         return $caller['function'];
+    }
+
+    /**
+     * Create a pending has-many-through or has-one-through relationship.
+     *
+     * @param  string|\Illuminate\Database\Eloquent\Relations\HasMany|\Illuminate\Database\Eloquent\Relations\HasOne  $relationship
+     * @return \Illuminate\Database\Eloquent\PendingHasThroughRelationship
+     */
+    public function through($relationship)
+    {
+        if (is_string($relationship)) {
+            $relationship = $this->{$relationship}();
+        }
+
+        return new PendingHasThroughRelationship($this, $relationship);
     }
 
     /**
