@@ -4,6 +4,9 @@ namespace Illuminate\Contracts\Validation;
 
 use Closure;
 
+/**
+ * @deprecated see ValidationRule
+ */
 interface InvokableRule
 {
     /**
