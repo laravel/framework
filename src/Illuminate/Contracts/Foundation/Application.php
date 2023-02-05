@@ -54,6 +54,14 @@ interface Application extends Container
     public function langPath($path = '');
 
     /**
+     * Get the path to the public directory.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    public function publicPath($path = '');
+
+    /**
      * Get the path to the resources directory.
      *
      * @param  string  $path
