@@ -7,6 +7,7 @@ use Illuminate\Database\ClassMorphViolationException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\PendingHasThroughRelationship;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -357,6 +358,21 @@ trait HasRelationships
         [$one, $two, $caller] = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
 
         return $caller['function'];
+    }
+
+    /**
+     * Create a pending has-many-through or has-one-through relationship.
+     *
+     * @param  string|\Illuminate\Database\Eloquent\Relations\HasMany|\Illuminate\Database\Eloquent\Relations\HasOne  $relationship
+     * @return \Illuminate\Database\Eloquent\PendingHasThroughRelationship
+     */
+    public function through($relationship)
+    {
+        if (is_string($relationship)) {
+            $relationship = $this->{$relationship}();
+        }
+
+        return new PendingHasThroughRelationship($this, $relationship);
     }
 
     /**
