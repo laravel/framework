@@ -1021,6 +1021,7 @@ class Builder implements BuilderContract
     protected function performDynamicUpdate(string $method, array $parameters)
     {
         $column = Str::of($method)->after('update')->snake()->value();
+
         return $this->update([$column => $parameters[0]]);
     }
 
