@@ -3,16 +3,16 @@
 namespace {{ namespace }};
 
 use Closure;
-use Illuminate\Contracts\Validation\InvokableRule;
+use Illuminate\Contracts\Validation\ValidationRule;
 
-class {{ class }} implements InvokableRule
+class {{ class }} implements ValidationRule
 {
     /**
      * Run the validation rule.
      *
      * @param  \Closure(string): \Illuminate\Translation\PotentiallyTranslatedString  $fail
      */
-    public function __invoke(string $attribute, mixed $value, Closure $fail): void
+    public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         //
     }
