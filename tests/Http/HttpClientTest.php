@@ -2161,4 +2161,20 @@ class HttpClientTest extends TestCase
 
         $this->assertSame('foo', Arr::get($client->getOptions(), 'headers.Content-Type'));
     }
+
+    public function testItCanSubstituteUrlParams(): void
+    {
+        $this->factory->fake();
+
+        $this->factory->withUrlParameters([
+            'endpoint' => 'https://laravel.com',
+            'page' => 'docs',
+            'version' => '9.x',
+            'thing' => 'validation',
+        ])->get('{+endpoint}/{page}/{version}/{thing}');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'https://laravel.com/docs/9.x/validation';
+        });
+    }
 }

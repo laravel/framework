@@ -17,6 +17,7 @@
         "php": "^8.0.2",
         "ext-filter": "*",
         "fruitcake/php-cors": "^1.2",
+        "guzzlehttp/uri-template": "^1.0",
         "illuminate/collections": "^9.0",
         "illuminate/macroable": "^9.0",
         "illuminate/session": "^9.0",
