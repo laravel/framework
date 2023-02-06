@@ -335,6 +335,23 @@ class DatabaseEloquentModelAttributeCastingTest extends DatabaseTestCase
             $this->assertNotSame($previous, $previous = $model->virtualDateTimeWithoutCachingFluent);
         }
     }
+
+    public function testOffsetCheckDoesNotGetAttribute()
+    {
+        $model = New TestEloquentModelWithAttributeCast;
+
+        $this->assertTrue(isset($model['incrementing']));
+
+        $this->assertEquals(1, $model['incrementing']);
+    }
+
+    public function testOffsetCheckOnNull()
+    {
+        $model = New TestEloquentModelWithAttributeCast;
+
+        $this->assertFalse(isset($model['null']));
+        $this->assertNull($model['null']);
+    }
 }
 
 class TestEloquentModelWithAttributeCast extends Model
@@ -510,6 +527,23 @@ class TestEloquentModelWithAttributeCast extends Model
         return Attribute::get(function () {
             return Date::now()->addSeconds(mt_rand(0, 10000));
         })->withoutObjectCaching();
+    }
+
+
+    public int $timesCalled = 0;
+
+    public function incrementing(): Attribute
+    {
+        return Attribute::get(function () {
+            return ++$this->timesCalled;
+        });
+    }
+
+    public function null(): Attribute
+    {
+        return Attribute::get(function () {
+            return null;
+        });
     }
 }
 
