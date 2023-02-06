@@ -5,6 +5,7 @@ namespace Illuminate\Support\Testing\Fakes;
 use BadMethodCallException;
 use Closure;
 use Illuminate\Contracts\Queue\Queue;
+use Illuminate\Events\CallQueuedListener;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\ReflectsClosures;
@@ -256,6 +257,50 @@ class QueueFake extends QueueManager implements Queue
     public function assertNothingPushed()
     {
         PHPUnit::assertEmpty($this->jobs, 'Jobs were pushed unexpectedly.');
+    }
+
+    /**
+     * Assert if a listener was pushed based on a truth-test callback.
+     *
+     * @param  string
+     * @param  callable|int|null  $callback
+     * @return void
+     */
+    public function assertListenerPushed($listener, $callback = null)
+    {
+        $allQueuedListeners = collect(data_get($this->jobs, CallQueuedListener::class));
+
+        if ($allQueuedListeners->isEmpty()) {
+            PHPUnit::fail('No listeners were pushed.');
+        }
+
+        $requiredQueuedListener = $allQueuedListeners->filter(fn ($data) => $data['job']->class === $listener);
+
+        if (is_numeric($callback)) {
+            PHPUnit::assertSame(
+                $times = $callback,
+                $count = $requiredQueuedListener->count(),
+                "The expected [{$listener}] listener was pushed {$count} times instead of {$times} times."
+            );
+
+            return;
+        }
+
+        if ($callback !== null) {
+            PHPUnit::assertTrue(
+                $requiredQueuedListener
+                    ->filter(fn ($item) => $callback($item['job']->data[0], $item['queue'], $item['data']))
+                    ->isNotEmpty(),
+                "The expected [{$listener}] listener was not pushed according to callback."
+            );
+
+            return;
+        }
+
+        PHPUnit::assertTrue(
+            $requiredQueuedListener->isNotEmpty(),
+            "The expected [{$listener}] listener was not pushed."
+        );
     }
 
     /**

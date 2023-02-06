@@ -29,11 +29,64 @@ class QueuedListenersTest extends TestCase
             return $job->class == QueuedListenersTestListenerShouldNotQueue::class;
         });
     }
+
+    public function testAssertListenerPushed()
+    {
+        Queue::fake();
+
+        Event::listen(QueuedListenersTestEvent::class, QueuedListenersTestListenerShouldQueue::class);
+
+        Event::dispatch(
+            new QueuedListenersTestEvent
+        );
+
+        Queue::assertListenerPushed(QueuedListenersTestListenerShouldQueue::class);
+    }
+
+    public function testAssertListenerPushedTimes()
+    {
+        Queue::fake();
+
+        Event::listen(QueuedListenersTestEvent::class, QueuedListenersTestListenerShouldQueue::class);
+        Event::listen(QueuedListenersTestEvent::class, QueuedListenersTestListenerShouldQueue::class);
+        Event::listen(QueuedListenersTestEvent::class, QueuedListenersTestListenerShouldQueue::class);
+
+        Event::dispatch(
+            new QueuedListenersTestEvent
+        );
+
+        Queue::assertListenerPushed(QueuedListenersTestListenerShouldQueue::class, 3);
+    }
+
+    public function testAssertListenerPushedWithCallback()
+    {
+        Queue::fake();
+
+        Event::listen(QueuedListenersTestEventWithAttributes::class, QueuedListenersTestListenerShouldQueue::class);
+
+        Event::dispatch(
+            new QueuedListenersTestEventWithAttributes
+        );
+
+        Queue::assertListenerPushed(QueuedListenersTestListenerShouldQueue::class, function ($job) {
+            $this->assertTrue($job instanceof QueuedListenersTestEventWithAttributes);
+            $this->assertSame('first', $job->firstAttribute);
+            $this->assertSame('second', $job->secondAttribute);
+
+            return true;
+        });
+    }
 }
 
 class QueuedListenersTestEvent
 {
     //
+}
+
+class QueuedListenersTestEventWithAttributes
+{
+    public $firstAttribute = 'first';
+    public $secondAttribute = 'second';
 }
 
 class QueuedListenersTestListenerShouldQueue implements ShouldQueue
