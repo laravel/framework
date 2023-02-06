@@ -6,12 +6,14 @@ use Closure;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\ReflectsClosures;
 use PHPUnit\Framework\Assert as PHPUnit;
 use ReflectionFunction;
 
 class EventFake implements Dispatcher
 {
+    use ForwardsCalls;
     use ReflectsClosures;
 
     /**
@@ -54,6 +56,18 @@ class EventFake implements Dispatcher
         $this->dispatcher = $dispatcher;
 
         $this->eventsToFake = Arr::wrap($eventsToFake);
+    }
+
+    /**
+     * Handle dynamic method calls to the dispatcher.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return mixed
+     */
+    public function __call($method, $parameters)
+    {
+        return $this->forwardCallTo($this->dispatcher, $method, $parameters);
     }
 
     /**
