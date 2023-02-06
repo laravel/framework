@@ -38,7 +38,7 @@
         }
     },
     "suggest": {
-        "ext-PDO": "Required to use the database queue worker.",
+        "ext-pdo": "Required to use the database queue worker.",
         "ext-filter": "Required to use the SQS queue worker.",
         "ext-mbstring": "Required to use the database failed job providers.",
         "ext-pcntl": "Required to use all features of the queue worker.",
