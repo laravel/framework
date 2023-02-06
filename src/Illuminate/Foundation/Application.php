@@ -545,7 +545,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      * @param  string  $path
      * @return string
      */
-    protected function joinPaths($basePath, $path = '')
+    public function joinPaths($basePath, $path = '')
     {
         return $basePath.($path != '' ? DIRECTORY_SEPARATOR.ltrim($path, DIRECTORY_SEPARATOR) : '');
     }
