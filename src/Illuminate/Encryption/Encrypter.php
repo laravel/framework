@@ -112,7 +112,7 @@ class Encrypter implements EncrypterContract, StringEncrypter
         $tag = base64_encode($tag ?? '');
 
         $mac = self::$supportedCiphers[strtolower($this->cipher)]['aead']
-            ? '' // For AEAD-algoritms, the tag / MAC is returned by openssl_encrypt...
+            ? '' // For AEAD-algorithms, the tag / MAC is returned by openssl_encrypt...
             : $this->hash($iv, $value);
 
         $json = json_encode(compact('iv', 'value', 'mac', 'tag'), JSON_UNESCAPED_SLASHES);
@@ -229,8 +229,21 @@ class Encrypter implements EncrypterContract, StringEncrypter
      */
     protected function validPayload($payload)
     {
-        return is_array($payload) && isset($payload['iv'], $payload['value'], $payload['mac']) &&
-            strlen(base64_decode($payload['iv'], true)) === openssl_cipher_iv_length(strtolower($this->cipher));
+        if (! is_array($payload)) {
+            return false;
+        }
+
+        foreach (['iv', 'value', 'mac'] as $item) {
+            if (! isset($payload[$item]) || ! is_string($payload[$item])) {
+                return false;
+            }
+        }
+
+        if (isset($payload['tag']) && ! is_string($payload['tag'])) {
+            return false;
+        }
+
+        return strlen(base64_decode($payload['iv'], true)) === openssl_cipher_iv_length(strtolower($this->cipher));
     }
 
     /**

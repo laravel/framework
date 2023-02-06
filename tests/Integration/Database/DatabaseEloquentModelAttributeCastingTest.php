@@ -47,6 +47,10 @@ class DatabaseEloquentModelAttributeCastingTest extends DatabaseTestCase
 
         $this->assertSame('DRIES', $model->uppercase);
 
+        $model = $model->setAttribute('uppercase', 'james');
+
+        $this->assertInstanceOf(TestEloquentModelWithAttributeCast::class, $model);
+
         $model = new TestEloquentModelWithAttributeCast;
 
         $model->address = $address = new AttributeCastAddress('110 Kingsbrook St.', 'My Childhood House');

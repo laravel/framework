@@ -42,6 +42,7 @@ trait TestDatabases
             $databaseTraits = [
                 Testing\DatabaseMigrations::class,
                 Testing\DatabaseTransactions::class,
+                Testing\DatabaseTruncation::class,
                 Testing\RefreshDatabase::class,
             ];
 

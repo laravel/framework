@@ -10,7 +10,7 @@ class TrustProxies
     /**
      * The trusted proxies for the application.
      *
-     * @var array|string|null
+     * @var array<int, string>|string|null
      */
     protected $proxies;
 

@@ -51,11 +51,10 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Wrap the given value in a collection if applicable.
      *
-     * @template TWrapKey of array-key
      * @template TWrapValue
      *
-     * @param  iterable<TWrapKey, TWrapValue>  $value
-     * @return static<TWrapKey, TWrapValue>
+     * @param  iterable<array-key, TWrapValue>|TWrapValue  $value
+     * @return static<array-key, TWrapValue>
      */
     public static function wrap($value);
 
@@ -680,8 +679,11 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Map a collection and flatten the result by a single level.
      *
-     * @param  callable(TValue, TKey): mixed  $callback
-     * @return static<int, mixed>
+     * @template TFlatMapKey of array-key
+     * @template TFlatMapValue
+     *
+     * @param  callable(TValue, TKey): (\Illuminate\Support\Collection<TFlatMapKey, TFlatMapValue>|array<TFlatMapKey, TFlatMapValue>)  $callback
+     * @return static<TFlatMapKey, TFlatMapValue>
      */
     public function flatMap(callable $callback);
 
@@ -1101,7 +1103,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Create a collection of all elements that do not pass a given truth test.
      *
-     * @param  (callable(TValue, TKey): bool)|bool  $callback
+     * @param  (callable(TValue, TKey): bool)|bool|TValue  $callback
      * @return static
      */
     public function reject($callback = true);
@@ -1165,7 +1167,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Count the number of items in the collection by a field or using a callback.
      *
-     * @param  (callable(TValue, TKey): mixed)|string|null  $countBy
+     * @param  (callable(TValue, TKey): array-key)|string|null  $countBy
      * @return static<array-key, int>
      */
     public function countBy($countBy = null);

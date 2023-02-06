@@ -6,7 +6,9 @@ use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
 use InvalidArgumentException;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(name: 'make:controller')]
 class ControllerMakeCommand extends GeneratorCommand
@@ -296,5 +298,43 @@ class ControllerMakeCommand extends GeneratorCommand
             ['singleton', 's', InputOption::VALUE_NONE, 'Generate a singleton resource controller class'],
             ['creatable', null, InputOption::VALUE_NONE, 'Indicate that a singleton resource should be creatable'],
         ];
+    }
+
+    /**
+     * Interact further with the user if they were prompted for missing arguments.
+     *
+     * @param  \Symfony\Component\Console\Input\InputInterface  $input
+     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
+     * @return void
+     */
+    protected function afterPromptingForMissingArguments(InputInterface $input, OutputInterface $output)
+    {
+        if ($this->didReceiveOptions($input)) {
+            return;
+        }
+
+        $type = $this->components->choice('Which type of controller would you like', [
+            'empty',
+            'api',
+            'invokable',
+            'resource',
+            'singleton',
+        ], default: 0);
+
+        if ($type !== 'empty') {
+            $input->setOption($type, true);
+        }
+
+        if (in_array($type, ['api', 'resource', 'singleton'])) {
+            $model = $this->components->askWithCompletion(
+                "What model should this $type controller be for?",
+                $this->possibleModels(),
+                'none'
+            );
+
+            if ($model && $model !== 'none') {
+                $input->setOption('model', $model);
+            }
+        }
     }
 }

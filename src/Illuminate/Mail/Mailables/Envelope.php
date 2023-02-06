@@ -364,6 +364,6 @@ class Envelope
      */
     public function hasMetadata(string $key, string $value)
     {
-        return isset($this->metadata[$key]) && $this->metadata[$key] === $value;
+        return isset($this->metadata[$key]) && (string) $this->metadata[$key] === $value;
     }
 }

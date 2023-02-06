@@ -8,6 +8,7 @@ use Illuminate\Routing\Route;
 use Illuminate\Routing\RouteCollection;
 use LogicException;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class RouteCollectionTest extends TestCase
@@ -268,6 +269,7 @@ class RouteCollectionTest extends TestCase
     public function testRouteCollectionDontMatchNonMatchingDoubleSlashes()
     {
         $this->expectException(NotFoundHttpException::class);
+        $this->expectExceptionMessage('The route foo could not be found.');
 
         $this->routeCollection->add(new Route('GET', 'foo', [
             'uses' => 'FooController@index',
@@ -279,6 +281,20 @@ class RouteCollectionTest extends TestCase
         $request->server->set(
             'REQUEST_URI', '//foo'
         );
+        $this->routeCollection->match($request);
+    }
+
+    public function testRouteCollectionRequestMethodNotAllowed()
+    {
+        $this->expectException(MethodNotAllowedHttpException::class);
+        $this->expectExceptionMessage('The POST method is not supported for route users. Supported methods: GET, HEAD.');
+
+        $this->routeCollection->add(
+            new Route('GET', 'users', ['uses' => 'UsersController@index', 'as' => 'users'])
+        );
+
+        $request = Request::create('users', 'POST');
+
         $this->routeCollection->match($request);
     }
 

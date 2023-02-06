@@ -48,8 +48,11 @@ assertType('Illuminate\Support\LazyCollection<int, User>', $collection->each(fun
 
 assertType('Illuminate\Support\LazyCollection<int, int>', $collection->range(1, 100));
 
-assertType('Illuminate\Support\LazyCollection<int, string>', $collection->wrap(['string']));
-assertType('Illuminate\Support\LazyCollection<string, User>', $collection->wrap(['string' => new User]));
+assertType('Illuminate\Support\LazyCollection<(int|string), string>', $collection->wrap('string'));
+assertType('Illuminate\Support\LazyCollection<(int|string), User>', $collection->wrap(new User));
+
+assertType('Illuminate\Support\LazyCollection<(int|string), string>', $collection->wrap(['string']));
+assertType('Illuminate\Support\LazyCollection<(int|string), User>', $collection->wrap(['string' => new User]));
 
 assertType('array<int, string>', $collection->unwrap(['string']));
 assertType('array<int, User>', $collection->unwrap(
@@ -480,12 +483,12 @@ assertType('Illuminate\Support\LazyCollection<string, int>', $collection::make([
         return ['string' => 1];
     }));
 
-assertType('Illuminate\Support\LazyCollection<int, mixed>', $collection::make(['string'])
+assertType('Illuminate\Support\LazyCollection<int, string>', $collection::make(['string'])
     ->flatMap(function ($string, $int) {
         assertType('string', $string);
         assertType('int', $int);
 
-        return 1;
+        return [0 => 'string'];
     }));
 
 assertType('Illuminate\Support\LazyCollection<int, User>', $collection->mapInto(User::class));

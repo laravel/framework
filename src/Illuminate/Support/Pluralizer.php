@@ -28,8 +28,6 @@ class Pluralizer
      * @var string[]
      */
     public static $uncountable = [
-        'cattle',
-        'kin',
         'recommended',
         'related',
     ];

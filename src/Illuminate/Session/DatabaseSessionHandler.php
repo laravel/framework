@@ -39,7 +39,7 @@ class DatabaseSessionHandler implements ExistenceAwareInterface, SessionHandlerI
     /**
      * The container instance.
      *
-     * @var \Illuminate\Contracts\Container\Container
+     * @var \Illuminate\Contracts\Container\Container|null
      */
     protected $container;
 
@@ -242,7 +242,7 @@ class DatabaseSessionHandler implements ExistenceAwareInterface, SessionHandlerI
     /**
      * Get the IP address for the current request.
      *
-     * @return string
+     * @return string|null
      */
     protected function ipAddress()
     {

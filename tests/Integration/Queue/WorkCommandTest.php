@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Support\Carbon;
 use Orchestra\Testbench\TestCase;
 use Queue;
 
@@ -50,6 +51,50 @@ class WorkCommandTest extends TestCase
         $this->assertSame(1, Queue::connection('database')->size());
         $this->assertTrue(FirstJob::$ran);
         $this->assertFalse(SecondJob::$ran);
+    }
+
+    public function testRunTimestampOutputWithDefaultAppTimezone()
+    {
+        // queue.output_timezone not set at all
+        $this->travelTo(Carbon::create(2023, 1, 18, 10, 10, 11));
+        Queue::connection('database')->push(new FirstJob);
+
+        $this->artisan('queue:work', [
+            'connection' => 'database',
+            '--once' => true,
+            '--memory' => 1024,
+        ])->expectsOutputToContain('2023-01-18 10:10:11')
+            ->assertExitCode(0);
+    }
+
+    public function testRunTimestampOutputWithDifferentLogTimezone()
+    {
+        $this->app['config']->set('queue.output_timezone', 'Europe/Helsinki');
+
+        $this->travelTo(Carbon::create(2023, 1, 18, 10, 10, 11));
+        Queue::connection('database')->push(new FirstJob);
+
+        $this->artisan('queue:work', [
+            'connection' => 'database',
+            '--once' => true,
+            '--memory' => 1024,
+        ])->expectsOutputToContain('2023-01-18 12:10:11')
+            ->assertExitCode(0);
+    }
+
+    public function testRunTimestampOutputWithSameAppDefaultAndQueueLogDefault()
+    {
+        $this->app['config']->set('queue.output_timezone', 'UTC');
+
+        $this->travelTo(Carbon::create(2023, 1, 18, 10, 10, 11));
+        Queue::connection('database')->push(new FirstJob);
+
+        $this->artisan('queue:work', [
+            'connection' => 'database',
+            '--once' => true,
+            '--memory' => 1024,
+        ])->expectsOutputToContain('2023-01-18 10:10:11')
+            ->assertExitCode(0);
     }
 
     public function testDaemon()

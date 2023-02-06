@@ -185,7 +185,7 @@ class Kernel implements KernelContract
     }
 
     /**
-     * Register a callback to be invoked when the command lifecyle duration exceeds a given amount of time.
+     * Register a callback to be invoked when the command lifecycle duration exceeds a given amount of time.
      *
      * @param  \DateTimeInterface|\Carbon\CarbonInterval|float|int  $threshold
      * @param  callable  $handler

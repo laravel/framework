@@ -364,6 +364,24 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertCount(1, $role->users);
     }
 
+    public function test_relation_can_be_loaded_before_model_is_created()
+    {
+        $user = FactoryTestUserFactory::new(['name' => 'Taylor Otwell'])->createOne();
+
+        $post = FactoryTestPostFactory::new()
+            ->for($user, 'user')
+            ->afterMaking(function (FactoryTestPost $post) {
+                $post->load('user');
+            })
+            ->createOne();
+
+        $this->assertTrue($post->relationLoaded('user'));
+        $this->assertTrue($post->user->is($user));
+
+        $this->assertCount(1, FactoryTestUser::all());
+        $this->assertCount(1, FactoryTestPost::all());
+    }
+
     public function test_belongs_to_many_relationship_with_existing_model_instances()
     {
         $roles = FactoryTestRoleFactory::times(3)

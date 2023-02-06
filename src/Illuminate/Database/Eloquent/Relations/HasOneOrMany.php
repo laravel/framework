@@ -324,6 +324,17 @@ abstract class HasOneOrMany extends Relation
     }
 
     /**
+     * Create a new instance of the related model without raising any events to the parent model.
+     *
+     * @param  array  $attributes
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function createQuietly(array $attributes = [])
+    {
+        return Model::withoutEvents(fn () => $this->create($attributes));
+    }
+
+    /**
      * Create a new instance of the related model. Allow mass-assignment.
      *
      * @param  array  $attributes

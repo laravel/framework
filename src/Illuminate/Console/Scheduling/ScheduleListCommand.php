@@ -21,7 +21,10 @@ class ScheduleListCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'schedule:list {--timezone= : The timezone that times should be displayed in}';
+    protected $signature = 'schedule:list
+        {--timezone= : The timezone that times should be displayed in}
+        {--next : Sort the listed tasks by their next due date}
+    ';
 
     /**
      * The name of the console command.
@@ -39,7 +42,7 @@ class ScheduleListCommand extends Command
      *
      * @var string
      */
-    protected $description = 'List the scheduled commands';
+    protected $description = 'List all scheduled tasks';
 
     /**
      * The terminal width resolver callback.
@@ -72,22 +75,25 @@ class ScheduleListCommand extends Command
 
         $timezone = new DateTimeZone($this->option('timezone') ?? config('app.timezone'));
 
+        $events = $this->sortEvents($events, $timezone);
+
         $events = $events->map(function ($event) use ($terminalWidth, $expressionSpacing, $timezone) {
             $expression = $this->formatCronExpression($event->expression, $expressionSpacing);
 
-            $command = $event->command;
-            $description = $event->description;
+            $command = $event->command ?? '';
+
+            $description = $event->description ?? '';
 
             if (! $this->output->isVerbose()) {
                 $command = str_replace([Application::phpBinary(), Application::artisanBinary()], [
                     'php',
                     preg_replace("#['\"]#", '', Application::artisanBinary()),
-                ], $event->command);
+                ], $command);
             }
 
             if ($event instanceof CallbackEvent) {
-                if (class_exists($event->description)) {
-                    $command = $event->description;
+                if (class_exists($description)) {
+                    $command = $description;
                     $description = '';
                 } else {
                     $command = 'Closure at: '.$this->getClosureLocation($event);
@@ -98,10 +104,7 @@ class ScheduleListCommand extends Command
 
             $nextDueDateLabel = 'Next Due:';
 
-            $nextDueDate = Carbon::create((new CronExpression($event->expression))
-                ->getNextRunDate(Carbon::now()->setTimezone($event->timezone))
-                ->setTimezone($timezone)
-            );
+            $nextDueDate = $this->getNextDueDateForEvent($event, $timezone);
 
             $nextDueDate = $this->output->isVerbose()
                 ? $nextDueDate->format('Y-m-d H:i:s P')
@@ -147,7 +150,37 @@ class ScheduleListCommand extends Command
     {
         $rows = $events->map(fn ($event) => array_map('mb_strlen', preg_split("/\s+/", $event->expression)));
 
-        return collect($rows[0] ?? [])->keys()->map(fn ($key) => $rows->max($key));
+        return collect($rows[0] ?? [])->keys()->map(fn ($key) => $rows->max($key))->all();
+    }
+
+    /**
+     * Sorts the events by due date if option set.
+     *
+     * @param  \Illuminate\Support\Collection  $events
+     * @param  \DateTimeZone  $timezone
+     * @return \Illuminate\Support\Collection
+     */
+    private function sortEvents(\Illuminate\Support\Collection $events, DateTimeZone $timezone)
+    {
+        return $this->option('next')
+                    ? $events->sortBy(fn ($event) => $this->getNextDueDateForEvent($event, $timezone))
+                    : $events;
+    }
+
+    /**
+     * Get the next due date for an event.
+     *
+     * @param  \Illuminate\Console\Scheduling\Event  $event
+     * @param  \DateTimeZone  $timezone
+     * @return \Illuminate\Support\Carbon
+     */
+    private function getNextDueDateForEvent($event, DateTimeZone $timezone)
+    {
+        return Carbon::instance(
+            (new CronExpression($event->expression))
+                ->getNextRunDate(Carbon::now()->setTimezone($event->timezone))
+                ->setTimezone($timezone)
+        );
     }
 
     /**
@@ -188,8 +221,14 @@ class ScheduleListCommand extends Command
             );
         }
 
+        if (is_string($callback)) {
+            return $callback;
+        }
+
         if (is_array($callback)) {
-            return sprintf('%s::%s', $callback[0]::class, $callback[1]);
+            $className = is_string($callback[0]) ? $callback[0] : $callback[0]::class;
+
+            return sprintf('%s::%s', $className, $callback[1]);
         }
 
         return sprintf('%s::__invoke', $callback::class);

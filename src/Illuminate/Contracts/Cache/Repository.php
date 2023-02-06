@@ -10,9 +10,11 @@ interface Repository extends CacheInterface
     /**
      * Retrieve an item from the cache and delete it.
      *
-     * @param  string  $key
-     * @param  mixed  $default
-     * @return mixed
+     * @template TCacheValue
+     *
+     * @param  array|string  $key
+     * @param  TCacheValue|(\Closure(): TCacheValue)  $default
+     * @return (TCacheValue is null ? mixed : TCacheValue)
      */
     public function pull($key, $default = null);
 
@@ -66,28 +68,34 @@ interface Repository extends CacheInterface
     /**
      * Get an item from the cache, or execute the given Closure and store the result.
      *
+     * @template TCacheValue
+     *
      * @param  string  $key
      * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
-     * @param  \Closure  $callback
-     * @return mixed
+     * @param  \Closure(): TCacheValue  $callback
+     * @return TCacheValue
      */
     public function remember($key, $ttl, Closure $callback);
 
     /**
      * Get an item from the cache, or execute the given Closure and store the result forever.
      *
+     * @template TCacheValue
+     *
      * @param  string  $key
-     * @param  \Closure  $callback
-     * @return mixed
+     * @param  \Closure(): TCacheValue  $callback
+     * @return TCacheValue
      */
     public function sear($key, Closure $callback);
 
     /**
      * Get an item from the cache, or execute the given Closure and store the result forever.
      *
+     * @template TCacheValue
+     *
      * @param  string  $key
-     * @param  \Closure  $callback
-     * @return mixed
+     * @param  \Closure(): TCacheValue  $callback
+     * @return TCacheValue
      */
     public function rememberForever($key, Closure $callback);
 

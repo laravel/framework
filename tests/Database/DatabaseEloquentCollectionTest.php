@@ -462,6 +462,22 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertEquals([], $c[0]->getHidden());
     }
 
+    public function testSetVisibleReplacesVisibleOnEntireCollection()
+    {
+        $c = new Collection([new TestEloquentCollectionModel]);
+        $c = $c->setVisible(['hidden']);
+
+        $this->assertEquals(['hidden'], $c[0]->getVisible());
+    }
+
+    public function testSetHiddenReplacesHiddenOnEntireCollection()
+    {
+        $c = new Collection([new TestEloquentCollectionModel]);
+        $c = $c->setHidden(['visible']);
+
+        $this->assertEquals(['visible'], $c[0]->getHidden());
+    }
+
     public function testAppendsAddsTestOnEntireCollection()
     {
         $c = new Collection([new TestEloquentCollectionModel]);
@@ -480,6 +496,7 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertEquals(BaseCollection::class, get_class($a->collapse()));
         $this->assertEquals(BaseCollection::class, get_class($a->flatten()));
         $this->assertEquals(BaseCollection::class, get_class($a->zip(['a', 'b'], ['c', 'd'])));
+        $this->assertEquals(BaseCollection::class, get_class($a->countBy('foo')));
         $this->assertEquals(BaseCollection::class, get_class($b->flip()));
     }
 

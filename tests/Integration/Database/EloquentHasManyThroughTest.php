@@ -51,7 +51,9 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         User::create(['name' => Str::random()]);
 
         $this->assertEquals([$mate1->id, $mate2->id], $user->teamMates->pluck('id')->toArray());
+        $this->assertEquals([$mate1->id, $mate2->id], $user->teamMatesWithPendingRelation->pluck('id')->toArray());
         $this->assertEquals([$user->id], User::has('teamMates')->pluck('id')->toArray());
+        $this->assertEquals([$user->id], User::has('teamMatesWithPendingRelation')->pluck('id')->toArray());
 
         $result = $user->teamMates()->first();
         $this->assertEquals(
@@ -59,7 +61,19 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
             $result->getAttributes()
         );
 
+        $result = $user->teamMatesWithPendingRelation()->first();
+        $this->assertEquals(
+            $mate1->refresh()->getAttributes() + ['laravel_through_key' => '1'],
+            $result->getAttributes()
+        );
+
         $result = $user->teamMates()->firstWhere('name', 'Jack');
+        $this->assertEquals(
+            $mate2->refresh()->getAttributes() + ['laravel_through_key' => '1'],
+            $result->getAttributes()
+        );
+
+        $result = $user->teamMatesWithPendingRelation()->firstWhere('name', 'Jack');
         $this->assertEquals(
             $mate2->refresh()->getAttributes() + ['laravel_through_key' => '1'],
             $result->getAttributes()
@@ -75,7 +89,9 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         User::create(['name' => Str::random(), 'team_id' => $team1->id]);
 
         $teamMates = $user->teamMatesWithGlobalScope;
+        $this->assertEquals(['id' => 2, 'laravel_through_key' => 1], $teamMates[0]->getAttributes());
 
+        $teamMates = $user->teamMatesWithGlobalScopeWithPendingRelation;
         $this->assertEquals(['id' => 2, 'laravel_through_key' => 1], $teamMates[0]->getAttributes());
     }
 
@@ -88,7 +104,9 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         User::create(['name' => Str::random(), 'team_id' => $team->id]);
 
         $users = User::has('teamMates')->get();
+        $this->assertCount(1, $users);
 
+        $users = User::has('teamMatesWithPendingRelation')->get();
         $this->assertCount(1, $users);
     }
 
@@ -101,7 +119,9 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         User::create(['name' => Str::random(), 'team_id' => $team->id]);
 
         $users = User::has('teamMatesBySlug')->get();
+        $this->assertCount(1, $users);
 
+        $users = User::has('teamMatesBySlugWithPendingRelationship')->get();
         $this->assertCount(1, $users);
     }
 
@@ -132,14 +152,37 @@ class User extends Model
         return $this->hasManyThrough(self::class, Team::class, 'owner_id', 'team_id');
     }
 
+    public function teamMatesWithPendingRelation()
+    {
+        return $this->through($this->ownedTeams())
+            ->has(fn (Team $team) => $team->members());
+    }
+
     public function teamMatesBySlug()
     {
         return $this->hasManyThrough(self::class, Team::class, 'owner_slug', 'team_id', 'slug');
     }
 
+    public function teamMatesBySlugWithPendingRelationship()
+    {
+        return $this->through($this->hasMany(Team::class, 'owner_slug', 'slug'))
+            ->has(fn ($team) => $team->hasMany(User::class, 'team_id'));
+    }
+
     public function teamMatesWithGlobalScope()
     {
         return $this->hasManyThrough(UserWithGlobalScope::class, Team::class, 'owner_id', 'team_id');
+    }
+
+    public function teamMatesWithGlobalScopeWithPendingRelation()
+    {
+        return $this->through($this->ownedTeams())
+            ->has(fn (Team $team) => $team->membersWithGlobalScope());
+    }
+
+    public function ownedTeams()
+    {
+        return $this->hasMany(Team::class, 'owner_id');
     }
 }
 
@@ -164,6 +207,16 @@ class Team extends Model
     public $table = 'teams';
     public $timestamps = false;
     protected $guarded = [];
+
+    public function members()
+    {
+        return $this->hasMany(User::class, 'team_id');
+    }
+
+    public function membersWithGlobalScope()
+    {
+        return $this->hasMany(UserWithGlobalScope::class, 'team_id');
+    }
 }
 
 class Category extends Model

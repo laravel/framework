@@ -22,7 +22,7 @@ class CookieJar implements JarContract
     /**
      * The default domain (if specified).
      *
-     * @var string
+     * @var string|null
      */
     protected $domain;
 
@@ -135,7 +135,7 @@ class CookieJar implements JarContract
     /**
      * Queue a cookie to send with the next response.
      *
-     * @param  array  $parameters
+     * @param  mixed  ...$parameters
      * @return void
      */
     public function queue(...$parameters)
@@ -192,7 +192,7 @@ class CookieJar implements JarContract
      * Get the path and domain, or the default values.
      *
      * @param  string  $path
-     * @param  string  $domain
+     * @param  string|null  $domain
      * @param  bool|null  $secure
      * @param  string|null  $sameSite
      * @return array
@@ -206,8 +206,8 @@ class CookieJar implements JarContract
      * Set the default path and domain for the jar.
      *
      * @param  string  $path
-     * @param  string  $domain
-     * @param  bool  $secure
+     * @param  string|null  $domain
+     * @param  bool|null  $secure
      * @param  string|null  $sameSite
      * @return $this
      */

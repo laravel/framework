@@ -14,7 +14,7 @@ class FoundationDocsCommandTest extends TestCase
     /**
      * The URL opened by the command.
      *
-     * @var ?string
+     * @var string|null
      */
     protected $openedUrl;
 
@@ -321,6 +321,12 @@ Working directory: expected-working-directory');
             ->assertSuccessful();
 
         $this->assertSame($this->openedUrl, 'https://laravel.com/docs/8.x');
+    }
+
+    public function testCanGetHelpWithoutInstantiatingDependencies()
+    {
+        $help = (new DocsCommand())->getHelp();
+        $this->stringContains('php artisan docs', $help);
     }
 
     protected function command()

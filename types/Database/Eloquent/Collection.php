@@ -158,8 +158,8 @@ assertType('array<User>', $collection->getDictionary());
 assertType('array<User>', $collection->getDictionary($collection));
 assertType('array<User>', $collection->getDictionary([new User]));
 
-assertType('Illuminate\Support\Collection<int, mixed>', $collection->pluck('string'));
-assertType('Illuminate\Support\Collection<int, mixed>', $collection->pluck(['string']));
+assertType('Illuminate\Support\Collection<(int|string), mixed>', $collection->pluck('string'));
+assertType('Illuminate\Support\Collection<(int|string), mixed>', $collection->pluck(['string']));
 
 assertType('Illuminate\Support\Collection<int, int>', $collection->keys());
 

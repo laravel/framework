@@ -729,7 +729,7 @@ class Migrator
      * Write to the console's output.
      *
      * @param  string  $component
-     * @param  array<int, string>|string  $arguments
+     * @param  array<int, string>|string  ...$arguments
      * @return void
      */
     protected function write($component, ...$arguments)

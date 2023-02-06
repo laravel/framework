@@ -15,6 +15,7 @@
     ],
     "require": {
         "php": "^8.0.2",
+        "ext-mbstring": "*",
         "illuminate/collections": "^9.0",
         "illuminate/contracts": "^9.0",
         "illuminate/macroable": "^9.0",
@@ -35,6 +36,7 @@
         }
     },
     "suggest": {
+        "ext-pcntl": "Required to use signal trapping.",
         "dragonmantank/cron-expression": "Required to use scheduler (^3.3.2).",
         "guzzlehttp/guzzle": "Required to use the ping methods on schedules (^7.5).",
         "illuminate/bus": "Required to use the scheduled job dispatcher (^9.0).",

@@ -6,7 +6,9 @@ use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(name: 'make:listener')]
 class ListenerMakeCommand extends GeneratorCommand
@@ -124,5 +126,29 @@ class ListenerMakeCommand extends GeneratorCommand
             ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the listener already exists'],
             ['queued', null, InputOption::VALUE_NONE, 'Indicates the event listener should be queued'],
         ];
+    }
+
+    /**
+     * Interact further with the user if they were prompted for missing arguments.
+     *
+     * @param  \Symfony\Component\Console\Input\InputInterface  $input
+     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
+     * @return void
+     */
+    protected function afterPromptingForMissingArguments(InputInterface $input, OutputInterface $output)
+    {
+        if ($this->didReceiveOptions($input)) {
+            return;
+        }
+
+        $event = $this->components->askWithCompletion(
+            'What event should be listened for?',
+            $this->possibleEvents(),
+            'none'
+        );
+
+        if ($event && $event !== 'none') {
+            $input->setOption('event', $event);
+        }
     }
 }

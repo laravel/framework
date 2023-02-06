@@ -15,7 +15,8 @@
     ],
     "require": {
         "php": "^8.0.2",
-        "ext-json": "*",
+        "ext-ctype": "*",
+        "ext-filter": "*",
         "ext-mbstring": "*",
         "doctrine/inflector": "^2.0",
         "illuminate/collections": "^9.0",
@@ -44,7 +45,7 @@
     "suggest": {
         "illuminate/filesystem": "Required to use the composer class (^9.0).",
         "league/commonmark": "Required to use Str::markdown() and Stringable::markdown() (^2.0.2).",
-        "ramsey/uuid": "Required to use Str::uuid() (^4.2.2).",
+        "ramsey/uuid": "Required to use Str::uuid() (^4.7).",
         "symfony/process": "Required to use the composer class (^6.0).",
         "symfony/uid": "Required to use Str::ulid() (^6.0).",
         "symfony/var-dumper": "Required to use the dd function (^6.0).",

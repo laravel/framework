@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Schema\Grammars;
 
+use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Fluent;
 
@@ -127,6 +128,25 @@ class PostgresGrammar extends Grammar
         return collect($blueprint->autoIncrementingStartingValues())->map(function ($value, $column) use ($blueprint) {
             return 'alter sequence '.$blueprint->getTable().'_'.$column.'_seq restart with '.$value;
         })->all();
+    }
+
+    /**
+     * Compile a rename column command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @param  \Illuminate\Database\Connection  $connection
+     * @return array|string
+     */
+    public function compileRenameColumn(Blueprint $blueprint, Fluent $command, Connection $connection)
+    {
+        return $connection->usingNativeSchemaOperations()
+            ? sprintf('alter table %s rename column %s to %s',
+                $this->wrapTable($blueprint),
+                $this->wrap($command->from),
+                $this->wrap($command->to)
+            )
+            : parent::compileRenameColumn($blueprint, $command, $connection);
     }
 
     /**

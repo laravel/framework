@@ -204,6 +204,25 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Compile a rename column command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @param  \Illuminate\Database\Connection  $connection
+     * @return array|string
+     */
+    public function compileRenameColumn(Blueprint $blueprint, Fluent $command, Connection $connection)
+    {
+        return $connection->usingNativeSchemaOperations()
+            ? sprintf('alter table %s rename column %s to %s',
+                $this->wrapTable($blueprint),
+                $this->wrap($command->from),
+                $this->wrap($command->to)
+            )
+            : parent::compileRenameColumn($blueprint, $command, $connection);
+    }
+
+    /**
      * Compile a primary key command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
@@ -212,9 +231,11 @@ class MySqlGrammar extends Grammar
      */
     public function compilePrimary(Blueprint $blueprint, Fluent $command)
     {
-        $command->name(null);
-
-        return $this->compileKey($blueprint, $command, 'primary key');
+        return sprintf('alter table %s add primary key %s(%s)',
+            $this->wrapTable($blueprint),
+            $command->algorithm ? 'using '.$command->algorithm : '',
+            $this->columnize($command->columns)
+        );
     }
 
     /**

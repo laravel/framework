@@ -1703,6 +1703,68 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testIntersectUsingWithNull($collection)
+    {
+        $collect = new $collection(['green', 'brown', 'blue']);
+
+        $this->assertEquals([], $collect->intersectUsing(null, 'strcasecmp')->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testIntersectUsingCollection($collection)
+    {
+        $collect = new $collection(['green', 'brown', 'blue']);
+
+        $this->assertEquals(['green', 'brown'], $collect->intersectUsing(new $collection(['GREEN', 'brown', 'yellow']), 'strcasecmp')->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testIntersectAssocWithNull($collection)
+    {
+        $array1 = new $collection(['a' => 'green', 'b' => 'brown', 'c' => 'blue', 'red']);
+
+        $this->assertEquals([], $array1->intersectAssoc(null)->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testIntersectAssocCollection($collection)
+    {
+        $array1 = new $collection(['a' => 'green', 'b' => 'brown', 'c' => 'blue', 'red']);
+        $array2 = new $collection(['a' => 'green', 'b' => 'yellow', 'blue', 'red']);
+
+        $this->assertEquals(['a' => 'green'], $array1->intersectAssoc($array2)->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testIntersectAssocUsingWithNull($collection)
+    {
+        $array1 = new $collection(['a' => 'green', 'b' => 'brown', 'c' => 'blue', 'red']);
+
+        $this->assertEquals([], $array1->intersectAssocUsing(null, 'strcasecmp')->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testIntersectAssocUsingCollection($collection)
+    {
+        $array1 = new $collection(['a' => 'green', 'b' => 'brown', 'c' => 'blue', 'red']);
+        $array2 = new $collection(['a' => 'GREEN', 'B' => 'brown', 'yellow', 'red']);
+
+        $this->assertEquals(['b' => 'brown'], $array1->intersectAssocUsing($array2, 'strcasecmp')->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testIntersectByKeysNull($collection)
     {
         $c = new $collection(['name' => 'Mateus', 'age' => 18]);
