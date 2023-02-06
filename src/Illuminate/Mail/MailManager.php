@@ -2,8 +2,8 @@
 
 namespace Illuminate\Mail;
 
-use Aws\SesV2\SesV2Client;
 use Aws\Ses\SesClient;
+use Aws\SesV2\SesV2Client;
 use Closure;
 use Illuminate\Contracts\Mail\Factory as FactoryContract;
 use Illuminate\Log\LogManager;
