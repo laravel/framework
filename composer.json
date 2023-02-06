@@ -147,7 +147,7 @@
         "ext-ftp": "Required to use the Flysystem FTP driver.",
         "ext-gd": "Required to use Illuminate\\Http\\Testing\\FileFactory::image().",
         "ext-memcached": "Required to use the memcache cache driver.",
-        "ext-pcntl": "Required to use all features of the queue worker.",
+        "ext-pcntl": "Required to use all features of the queue worker and console signal trapping.",
         "ext-pdo": "Required to use all database features.",
         "ext-posix": "Required to use all features of the queue worker.",
         "ext-redis": "Required to use the Redis cache and queue drivers (^4.0|^5.0).",
