@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Brick\Math\BigDecimal;
 use Brick\Math\BigNumber;
 use GMP;
 use Illuminate\Contracts\Database\Eloquent\Castable;
