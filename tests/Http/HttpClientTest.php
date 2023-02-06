@@ -1654,4 +1654,20 @@ class HttpClientTest extends TestCase
 
         $this->assertSame(['connect_timeout' => 10, 'http_errors' => false, 'timeout' => 30, 'allow_redirects' => ['max' => 10]], $request->getOptions());
     }
+
+    public function testItCanSubstituteUrlParams(): void
+    {
+        $this->factory->fake();
+
+        $this->factory->withUrlParams([
+            'endpoint' => 'https://laravel.com',
+            'page' => 'docs',
+            'version' => '9.x',
+            'thing' => 'validation',
+        ])->get('{+endpoint}/{page}/{version}/{thing}');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'https://laravel.com/docs/9.x/validation';
+        });
+    }
 }

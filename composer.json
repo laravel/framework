@@ -22,6 +22,7 @@
         "dragonmantank/cron-expression": "^3.3.2",
         "egulias/email-validator": "^3.2.1",
         "fruitcake/php-cors": "^1.2",
+        "guzzlehttp/uri-template": "^1.0",
         "laravel/serializable-closure": "^1.2.2",
         "league/commonmark": "^2.2",
         "league/flysystem": "^3.8.0",
