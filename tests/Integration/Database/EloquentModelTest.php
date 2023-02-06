@@ -94,6 +94,22 @@ class EloquentModelTest extends DatabaseTestCase
         $user->save();
         $this->assertFalse($user->wasChanged());
     }
+
+    public function testOffsetAttribute()
+    {
+        $user = new TestModel2;
+        $user->name = 'works';
+
+        $this->assertTrue(isset($user['name']));
+    }
+
+    public function testOffsetAttributeOnNull()
+    {
+        $user = new TestModel2;
+        $user->name = null;
+
+        $this->assertFalse(isset($user['name']));
+    }
 }
 
 class TestModel1 extends Model

@@ -2227,16 +2227,35 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Determine if the given attribute exists.
      *
+     * In the case of an attribute, it will fetch the underlying attribute
+     * to check if the value of it is `null`. Relationships will not be
+     * fetched.
+     *
      * @param  mixed  $offset
      * @return bool
      */
     public function offsetExists($offset): bool
     {
-        try {
-            return ! is_null($this->getAttribute($offset));
-        } catch (MissingAttributeException) {
+        if (! $offset) {
             return false;
         }
+
+        // Checks if the attribute exists.
+        if (array_key_exists($offset, $this->attributes) ||
+            array_key_exists($offset, $this->casts) ||
+            $this->hasGetMutator($offset) ||
+            $this->hasAttributeMutator($offset) ||
+            $this->isClassCastable($offset)) {
+            return $this->getAttributeValue($offset) !== null;
+        }
+
+        // Checks for base class methods.
+        if (method_exists(self::class, $offset)) {
+            return false;
+        }
+
+        // Check if the relation exists.
+        return $this->isRelation($offset) || $this->relationLoaded($offset);
     }
 
     /**

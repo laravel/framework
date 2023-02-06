@@ -127,6 +127,23 @@ class EloquentBelongsToTest extends DatabaseTestCase
         $this->assertFalse($child->parent()->is($parent));
         $this->assertTrue($child->parent()->isNot($parent));
     }
+
+    public function testOffsetRelation()
+    {
+        $user = User::has('parent')->first();
+
+        $this->assertTrue(isset($user['parent']));
+        $this->assertFalse($user->relationLoaded('parent'));
+    }
+
+    public function testOffsetDynamicRelation()
+    {
+        $user = User::first();
+        $user->setRelation('newRelation', collect());
+
+        $this->assertTrue(isset($user['newRelation']));
+        $this->assertTrue($user->relationLoaded('newRelation'));
+    }
 }
 
 class User extends Model

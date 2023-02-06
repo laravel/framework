@@ -342,7 +342,7 @@ class DatabaseEloquentModelAttributeCastingTest extends DatabaseTestCase
 
         $this->assertTrue(isset($model['incrementing']));
 
-        $this->assertEquals(1, $model['incrementing']);
+        $this->assertEquals(2, $model['incrementing']);
     }
 
     public function testOffsetCheckOnNull()
