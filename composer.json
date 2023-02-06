@@ -16,8 +16,13 @@
     ],
     "require": {
         "php": "^8.0.2",
+        "ext-ctype": "*",
+        "ext-filter": "*",
+        "ext-hash": "*",
         "ext-mbstring": "*",
         "ext-openssl": "*",
+        "ext-session": "*",
+        "ext-tokenizer": "*",
         "brick/math": "^0.9.3|^0.10.2|^0.11",
         "doctrine/inflector": "^2.0.5",
         "dragonmantank/cron-expression": "^3.3.2",
@@ -83,6 +88,7 @@
         "illuminate/view": "self.version"
     },
     "require-dev": {
+        "ext-gmp": "*",
         "ably/ably-php": "^1.0",
         "aws/aws-sdk-php": "^3.235.5",
         "doctrine/dbal": "^2.13.3|^3.1.4",
@@ -140,10 +146,13 @@
         }
     },
     "suggest": {
+        "ext-apcu": "Required to use the APC cache driver.",
+        "ext-fileinfo": "Required to use the Filesystem class.",
         "ext-ftp": "Required to use the Flysystem FTP driver.",
         "ext-gd": "Required to use Illuminate\\Http\\Testing\\FileFactory::image().",
         "ext-memcached": "Required to use the memcache cache driver.",
-        "ext-pcntl": "Required to use all features of the queue worker.",
+        "ext-pcntl": "Required to use all features of the queue worker and console signal trapping.",
+        "ext-pdo": "Required to use all database features.",
         "ext-posix": "Required to use all features of the queue worker.",
         "ext-redis": "Required to use the Redis cache and queue drivers (^4.0|^5.0).",
         "ably/ably-php": "Required to use the Ably broadcast driver (^1.0).",

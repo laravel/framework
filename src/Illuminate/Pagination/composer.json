@@ -15,7 +15,7 @@
     ],
     "require": {
         "php": "^8.0.2",
-        "ext-json": "*",
+        "ext-filter": "*",
         "illuminate/collections": "^9.0",
         "illuminate/contracts": "^9.0",
         "illuminate/support": "^9.0"

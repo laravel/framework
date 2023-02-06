@@ -15,7 +15,8 @@
     ],
     "require": {
         "php": "^8.0.2",
-        "ext-json": "*",
+        "ext-ctype": "*",
+        "ext-session": "*",
         "illuminate/collections": "^9.0",
         "illuminate/contracts": "^9.0",
         "illuminate/filesystem": "^9.0",

@@ -15,7 +15,7 @@
     ],
     "require": {
         "php": "^8.0.2",
-        "ext-json": "*",
+        "ext-filter": "*",
         "fruitcake/php-cors": "^1.2",
         "illuminate/collections": "^9.0",
         "illuminate/macroable": "^9.0",
