@@ -2166,7 +2166,7 @@ class HttpClientTest extends TestCase
     {
         $this->factory->fake();
 
-        $this->factory->withUrlParams([
+        $this->factory->withUrlParameters([
             'endpoint' => 'https://laravel.com',
             'page' => 'docs',
             'version' => '9.x',

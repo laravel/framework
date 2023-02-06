@@ -58,11 +58,11 @@ class PendingRequest
     protected $baseUrl = '';
 
     /**
-     * The parameters to substitute into the URL.
+     * The parameters that can be substituted into the URL.
      *
      * @var array
      */
-    protected $urlParams = [];
+    protected $urlParameters = [];
 
     /**
      * The request body format.
@@ -448,15 +448,15 @@ class PendingRequest
     }
 
     /**
-     * Specify the URL parameters that will be substituted into the request URL.
+     * Specify the URL parameters that can be substituted into the request URL.
      *
-     * @param  array  $params
+     * @param  array  $parameters
      * @return $this
      */
-    public function withUrlParams(array $params = [])
+    public function withUrlParameters(array $parameters = [])
     {
-        return tap($this, function () use ($params) {
-            $this->urlParams = $params;
+        return tap($this, function () use ($parameters) {
+            $this->urlParameters = $parameters;
         });
     }
 
@@ -806,7 +806,7 @@ class PendingRequest
             $url = ltrim(rtrim($this->baseUrl, '/').'/'.ltrim($url, '/'), '/');
         }
 
-        $url = $this->buildUrl($url);
+        $url = $this->expandUrlParameters($url);
 
         $options = $this->parseHttpOptions($options);
 
@@ -861,6 +861,17 @@ class PendingRequest
 
             return $result;
         });
+    }
+
+    /**
+     * Substitute the URL parameters in the given URL.
+     *
+     * @param  string  $url
+     * @return string
+     */
+    protected function expandUrlParameters(string $url)
+    {
+        return UriTemplate::expand($url, $this->urlParameters);
     }
 
     /**
@@ -1259,17 +1270,6 @@ class PendingRequest
     public function getPromise()
     {
         return $this->promise;
-    }
-
-    /**
-     * Substitute the URL with any parameters.
-     *
-     * @param  string  $url
-     * @return string
-     */
-    protected function buildUrl(string $url)
-    {
-        return UriTemplate::expand($url, $this->urlParams);
     }
 
     /**
