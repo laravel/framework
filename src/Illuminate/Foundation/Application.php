@@ -344,18 +344,6 @@ class Application extends Container implements ApplicationContract, CachesConfig
     }
 
     /**
-     * Join the given paths together.
-     *
-     * @param  string  $basePath
-     * @param  string  $path
-     * @return string
-     */
-    protected function joinPaths($basePath, $path = '')
-    {
-        return $basePath.($path != '' ? DIRECTORY_SEPARATOR.ltrim($path, DIRECTORY_SEPARATOR) : '');
-    }
-
-    /**
      * Get the path to the application "app" directory.
      *
      * @param  string  $path
@@ -548,6 +536,18 @@ class Application extends Container implements ApplicationContract, CachesConfig
         $viewPath = rtrim($this['config']->get('view.paths')[0], DIRECTORY_SEPARATOR);
 
         return $this->joinPaths($viewPath, $path);
+    }
+
+    /**
+     * Join the given paths together.
+     *
+     * @param  string  $basePath
+     * @param  string  $path
+     * @return string
+     */
+    protected function joinPaths($basePath, $path = '')
+    {
+        return $basePath.($path != '' ? DIRECTORY_SEPARATOR.ltrim($path, DIRECTORY_SEPARATOR) : '');
     }
 
     /**
