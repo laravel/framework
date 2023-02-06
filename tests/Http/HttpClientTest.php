@@ -2161,7 +2161,7 @@ class HttpClientTest extends TestCase
 
         $this->assertSame('foo', Arr::get($client->getOptions(), 'headers.Content-Type'));
     }
-    
+
     public function testItCanSubstituteUrlParams(): void
     {
         $this->factory->fake();
