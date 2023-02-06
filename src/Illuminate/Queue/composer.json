@@ -15,7 +15,6 @@
     ],
     "require": {
         "php": "^8.0.2",
-        "ext-PDO": "*",
         "ext-filter": "*",
         "ext-mbstring": "*",
         "illuminate/collections": "^9.0",
@@ -41,6 +40,7 @@
         }
     },
     "suggest": {
+        "ext-PDO": "Required to use the database queue worker.",
         "ext-pcntl": "Required to use all features of the queue worker.",
         "ext-posix": "Required to use all features of the queue worker.",
         "aws/aws-sdk-php": "Required to use the SQS queue driver and DynamoDb failed job storage (^3.235.5).",
