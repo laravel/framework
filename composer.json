@@ -89,7 +89,6 @@
     },
     "require-dev": {
         "ext-gmp": "*",
-        "ext-bcmath": "*",
         "ably/ably-php": "^1.0",
         "aws/aws-sdk-php": "^3.235.5",
         "doctrine/dbal": "^2.13.3|^3.1.4",
