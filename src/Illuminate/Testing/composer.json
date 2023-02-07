@@ -15,6 +15,7 @@
     ],
     "require": {
         "php": "^8.2",
+        "ext-mbstring": "*",
         "illuminate/collections": "^11.0",
         "illuminate/contracts": "^11.0",
         "illuminate/macroable": "^11.0",

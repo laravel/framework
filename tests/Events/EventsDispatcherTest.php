@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Events;
 
+use Error;
 use Exception;
 use Illuminate\Container\Container;
 use Illuminate\Events\Dispatcher;
@@ -574,8 +575,11 @@ class EventsDispatcherTest extends TestCase
         // It throws an "Error" when there is no method to be called.
         $d = new Dispatcher;
         $d->listen('myEvent', TestListenerLean::class);
-        $this->expectError();
-        $this->expectErrorMessage('Call to undefined method '.TestListenerLean::class.'::__invoke()');
+        $e = null;
+
+        $this->expectException(Error::class);
+        $this->expectExceptionMessage('Call to undefined method '.TestListenerLean::class.'::__invoke()');
+
         $d->dispatch('myEvent', 'somePayload');
 
         unset($_SERVER['__event.test']);

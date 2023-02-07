@@ -2024,7 +2024,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testIncrementManyArgumentValidation1()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectErrorMessage('Non-numeric value passed as increment amount for column: \'col\'.');
+        $this->expectExceptionMessage('Non-numeric value passed as increment amount for column: \'col\'.');
         $builder = $this->getBuilder();
         $builder->from('users')->incrementEach(['col' => 'a']);
     }
@@ -2032,7 +2032,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testIncrementManyArgumentValidation2()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectErrorMessage('Non-associative array passed to incrementEach method.');
+        $this->expectExceptionMessage('Non-associative array passed to incrementEach method.');
         $builder = $this->getBuilder();
         $builder->from('users')->incrementEach([11 => 11]);
     }
@@ -2717,7 +2717,7 @@ class DatabaseQueryBuilderTest extends TestCase
         }, 'post');
         $count = $builder->count();
         $this->assertEquals(1, $count);
-        $this->assertSame('(select "foo", "bar" from "posts" where "title" = ?) as "post"', $builder->columns[0]->getValue());
+        $this->assertSame('(select "foo", "bar" from "posts" where "title" = ?) as "post"', $builder->getGrammar()->getValue($builder->columns[0]));
         $this->assertEquals(['foo'], $builder->getBindings());
     }
 

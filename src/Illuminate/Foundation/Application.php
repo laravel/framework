@@ -351,9 +351,9 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function path($path = '')
     {
-        $appPath = $this->appPath ?: $this->basePath.DIRECTORY_SEPARATOR.'app';
+        $appPath = $this->appPath ?: $this->basePath('app');
 
-        return $appPath.($path != '' ? DIRECTORY_SEPARATOR.$path : '');
+        return $this->joinPaths($appPath, $path);
     }
 
     /**
@@ -379,7 +379,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function basePath($path = '')
     {
-        return $this->basePath.($path != '' ? DIRECTORY_SEPARATOR.$path : '');
+        return $this->joinPaths($this->basePath, $path);
     }
 
     /**
@@ -390,7 +390,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function bootstrapPath($path = '')
     {
-        return $this->bootstrapPath.($path != '' ? DIRECTORY_SEPARATOR.$path : '');
+        return $this->joinPaths($this->bootstrapPath, $path);
     }
 
     /**
@@ -416,7 +416,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function configPath($path = '')
     {
-        return $this->basePath.DIRECTORY_SEPARATOR.'config'.($path != '' ? DIRECTORY_SEPARATOR.$path : '');
+        return $this->joinPaths($this->basePath('config'), $path);
     }
 
     /**
@@ -427,7 +427,9 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function databasePath($path = '')
     {
-        return ($this->databasePath ?: $this->basePath.DIRECTORY_SEPARATOR.'database').($path != '' ? DIRECTORY_SEPARATOR.$path : '');
+        $databasePath = $this->databasePath ?: $this->basePath('database');
+
+        return $this->joinPaths($databasePath, $path);
     }
 
     /**
@@ -453,7 +455,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function langPath($path = '')
     {
-        return $this->langPath.($path != '' ? DIRECTORY_SEPARATOR.$path : '');
+        return $this->joinPaths($this->langPath, $path);
     }
 
     /**
@@ -474,11 +476,12 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Get the path to the public / web directory.
      *
+     * @param  string  $path
      * @return string
      */
-    public function publicPath()
+    public function publicPath($path = '')
     {
-        return $this->basePath.DIRECTORY_SEPARATOR.'public';
+        return $this->joinPaths($this->basePath('public'), $path);
     }
 
     /**
@@ -489,8 +492,9 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function storagePath($path = '')
     {
-        return ($this->storagePath ?: $this->basePath.DIRECTORY_SEPARATOR.'storage')
-                            .($path != '' ? DIRECTORY_SEPARATOR.$path : '');
+        $storagePath = $this->storagePath ?: $this->basePath('storage');
+
+        return $this->joinPaths($storagePath, $path);
     }
 
     /**
@@ -516,7 +520,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function resourcePath($path = '')
     {
-        return $this->basePath.DIRECTORY_SEPARATOR.'resources'.($path != '' ? DIRECTORY_SEPARATOR.$path : '');
+        return $this->joinPaths($this->basePath('resources'), $path);
     }
 
     /**
@@ -529,9 +533,21 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function viewPath($path = '')
     {
-        $basePath = $this['config']->get('view.paths')[0];
+        $viewPath = rtrim($this['config']->get('view.paths')[0], DIRECTORY_SEPARATOR);
 
-        return rtrim($basePath, DIRECTORY_SEPARATOR).($path != '' ? DIRECTORY_SEPARATOR.$path : '');
+        return $this->joinPaths($viewPath, $path);
+    }
+
+    /**
+     * Join the given paths together.
+     *
+     * @param  string  $basePath
+     * @param  string  $path
+     * @return string
+     */
+    public function joinPaths($basePath, $path = '')
+    {
+        return $basePath.($path != '' ? DIRECTORY_SEPARATOR.ltrim($path, DIRECTORY_SEPARATOR) : '');
     }
 
     /**

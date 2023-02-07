@@ -374,7 +374,7 @@ trait QueriesRelationships
      * Add a basic where clause to a relationship query.
      *
      * @param  string  $relation
-     * @param  \Closure|string|array|\Illuminate\Database\Query\Expression  $column
+     * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return \Illuminate\Database\Eloquent\Builder|static
@@ -394,7 +394,7 @@ trait QueriesRelationships
      * Add an "or where" clause to a relationship query.
      *
      * @param  string  $relation
-     * @param  \Closure|string|array|\Illuminate\Database\Query\Expression  $column
+     * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return \Illuminate\Database\Eloquent\Builder|static
@@ -415,7 +415,7 @@ trait QueriesRelationships
      *
      * @param  \Illuminate\Database\Eloquent\Relations\MorphTo|string  $relation
      * @param  string|array  $types
-     * @param  \Closure|string|array|\Illuminate\Database\Query\Expression  $column
+     * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return \Illuminate\Database\Eloquent\Builder|static
@@ -432,7 +432,7 @@ trait QueriesRelationships
      *
      * @param  \Illuminate\Database\Eloquent\Relations\MorphTo|string  $relation
      * @param  string|array  $types
-     * @param  \Closure|string|array|\Illuminate\Database\Query\Expression  $column
+     * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return \Illuminate\Database\Eloquent\Builder|static

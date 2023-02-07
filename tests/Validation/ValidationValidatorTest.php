@@ -803,7 +803,9 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['name' => ''], ['name' => 'required']);
 
-        $exception = new class($v) extends ValidationException {};
+        $exception = new class($v) extends ValidationException
+        {
+        };
         $v->setException($exception);
 
         try {
@@ -1647,7 +1649,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame($result, (new Validator($trans, $data, $rules))->passes());
     }
 
-    public function prohibitedRulesData()
+    public static function prohibitedRulesData()
     {
         $emptyCountable = new class implements Countable
         {
@@ -2361,6 +2363,9 @@ class ValidationValidatorTest extends TestCase
         $trans = $this->getIlluminateArrayTranslator();
         $trans->addLines(['validation.missing_with' => 'The :attribute field must be missing when :values is present.'], 'en');
 
+        $v = new Validator($trans, ['bar' => '2'], ['foo' => 'missing_with:baz,bar']);
+        $this->assertTrue($v->passes());
+
         $v = new Validator($trans, ['foo' => 'yes', 'bar' => '2'], ['foo' => 'missing_with:baz,bar']);
         $this->assertFalse($v->passes());
         $this->assertSame('The foo field must be missing when baz / bar is present.', $v->errors()->first('foo'));
@@ -2399,6 +2404,9 @@ class ValidationValidatorTest extends TestCase
     {
         $trans = $this->getIlluminateArrayTranslator();
         $trans->addLines(['validation.missing_with_all' => 'The :attribute field must be missing when :values are present.'], 'en');
+
+        $v = new Validator($trans, ['bar' => '2', 'baz' => '2'], ['foo' => 'missing_with_all:baz,bar']);
+        $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['foo' => 'yes', 'bar' => '2', 'baz' => '2'], ['foo' => 'missing_with_all:baz,bar']);
         $this->assertFalse($v->passes());
@@ -8080,6 +8088,133 @@ class ValidationValidatorTest extends TestCase
         ], $validator->messages()->messages());
     }
 
+    public function testItTrimsSpaceFromParameters()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $validator = new Validator($trans, [
+            'min' => ' 20 ',
+            'min_str' => ' abc ',
+            'multiple_of' => ' 0.5 ',
+            'between' => "\n 5 \n",
+            'between_str' => ' abc ',
+            'gt' => "\t5 ",
+            'gt_field' => "\t5 ",
+            'gt_str' => ' abc ',
+            'lt' => "\t5 ",
+            'lt_field' => "\t5 ",
+            'lt_str' => ' abc ',
+            'gte' => "\t5 ",
+            'gte_field' => "\t5 ",
+            'gte_str' => ' abc ',
+            'lte' => "\t5 ",
+            'lte_field' => "\t5 ",
+            'lte_str' => ' abc ',
+            'max' => ' 20 ',
+            'max_str' => ' abc ',
+            'size' => ' 20 ',
+            'size_str' => ' abc ',
+            'foo' => '4',
+            ' foo' => ' 5',
+            ' foo ' => ' 6 ',
+        ], [
+            'min' => 'numeric|min: 20',
+            'min_str' => 'min: 5',
+            'multiple_of' => 'multiple_of:0.25 ',
+            'between' => "numeric|between:\t 4, 6\n",
+            'between_str' => "between:\t 5, 6\n",
+            'gt' => 'numeric|gt: 4',
+            'gt_field' => 'numeric|gt:foo',
+            'gt_str' => 'gt:foo',
+            'lt' => 'numeric|lt: 6',
+            'lt_field' => 'numeric|lt: foo ',
+            'lt_str' => 'lt: foo ',
+            'gte' => 'numeric|gte: 5',
+            'gte_field' => 'numeric|gte: foo',
+            'gte_str' => 'gte: foo',
+            'lte' => 'numeric|lte: 5',
+            'lte_field' => 'numeric|lte: foo',
+            'lte_str' => 'lte: foo',
+            'max' => 'numeric|max: 20',
+            'max_str' => 'max: 5',
+            'size' => 'numeric|size: 20',
+            'size_str' => 'size: 5',
+        ], [], []);
+        $this->assertTrue($validator->passes());
+
+        $validator = new Validator($trans, [
+            'min' => ' 20 ',
+            'min_str' => ' abc ',
+            'multiple_of' => ' 0.5 ',
+            'between' => "\n 5 \n",
+            'between_str' => ' abc ',
+            'gt' => "\t5 ",
+            'gt_field' => "\t5 ",
+            'gt_str' => ' abc ',
+            'lt' => "\t5 ",
+            'lt_field' => "\t5 ",
+            'lt_str' => ' abc ',
+            'gte' => "\t5 ",
+            'gte_field' => "\t5 ",
+            'gte_str' => ' abc ',
+            'lte' => "\t5 ",
+            'lte_field' => "\t5 ",
+            'lte_str' => ' abc ',
+            'max' => ' 20 ',
+            'max_str' => ' abc ',
+            'size' => ' 20 ',
+            'size_str' => ' abc ',
+            'foo' => '4',
+            ' foo' => ' 5',
+            ' foo ' => ' 6 ',
+        ], [
+            'min' => 'numeric|min: 21',
+            'min_str' => 'min: 6',
+            'multiple_of' => 'multiple_of:0.3 ',
+            'between' => "numeric|between:\t 6, 7\n",
+            'between_str' => "between:\t 6, 7\n",
+            'gt' => 'numeric|gt: 5',
+            'gt_field' => 'numeric|gt: foo ',
+            'gt_str' => 'gt: foo',
+            'lt' => 'numeric|lt: 5',
+            'lt_field' => 'numeric|lt: foo',
+            'lt_str' => 'lt: foo',
+            'gte' => 'numeric|gte: 6',
+            'gte_field' => 'numeric|gte: foo ',
+            'gte_str' => 'gte: foo ',
+            'lte' => 'numeric|lte: 4',
+            'lte_field' => 'numeric|lte:foo',
+            'lte_str' => 'lte:foo',
+            'max' => 'numeric|max: 19',
+            'max_str' => 'max: 4',
+            'size' => 'numeric|size: 19',
+            'size_str' => 'size: 4',
+        ], [], []);
+        $this->assertSame([
+            'min',
+            'min_str',
+            'multiple_of',
+            'between',
+            'between_str',
+            'gt',
+            'gt_field',
+            'gt_str',
+            'lt',
+            'lt_field',
+            'lt_str',
+            'gte',
+            'gte_field',
+            'gte_str',
+            'lte',
+            'lte_field',
+            'lte_str',
+            'max',
+            'max_str',
+            'size',
+            'size_str',
+        ], $validator->messages()->keys());
+    }
+
     protected function getTranslator()
     {
         return m::mock(TranslatorContract::class);
@@ -8096,28 +8231,36 @@ class ValidationValidatorTest extends TestCase
 class ImplicitTableModel extends Model
 {
     protected $guarded = [];
+
     public $timestamps = false;
 }
 
 class ExplicitTableModel extends Model
 {
     protected $table = 'explicits';
+
     protected $guarded = [];
+
     public $timestamps = false;
 }
 
 class ExplicitPrefixedTableModel extends Model
 {
     protected $table = 'prefix.explicits';
+
     protected $guarded = [];
+
     public $timestamps = false;
 }
 
 class ExplicitTableAndConnectionModel extends Model
 {
     protected $table = 'explicits';
+
     protected $connection = 'connection';
+
     protected $guarded = [];
+
     public $timestamps = false;
 }
 

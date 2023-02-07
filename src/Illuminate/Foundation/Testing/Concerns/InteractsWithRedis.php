@@ -42,7 +42,7 @@ trait InteractsWithRedis
         $host = Env::get('REDIS_HOST', '127.0.0.1');
         $port = Env::get('REDIS_PORT', 6379);
 
-        foreach ($this->redisDriverProvider() as $driver) {
+        foreach (static::redisDriverProvider() as $driver) {
             $this->redis[$driver[0]] = new RedisManager($app, $driver[0], [
                 'cluster' => false,
                 'options' => [
@@ -80,7 +80,7 @@ trait InteractsWithRedis
             $this->redis['phpredis']->connection()->flushdb();
         }
 
-        foreach ($this->redisDriverProvider() as $driver) {
+        foreach (static::redisDriverProvider() as $driver) {
             if (isset($this->redis[$driver[0]])) {
                 $this->redis[$driver[0]]->connection()->disconnect();
             }
@@ -92,7 +92,7 @@ trait InteractsWithRedis
      *
      * @return array
      */
-    public function redisDriverProvider()
+    public static function redisDriverProvider()
     {
         return [
             ['predis'],

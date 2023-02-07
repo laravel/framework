@@ -140,6 +140,6 @@ class InteractsWithDatabaseTest extends TestCase
             use InteractsWithDatabase;
         };
 
-        return $instance->castAsJson($value)->getValue();
+        return $instance->castAsJson($value)->getValue($grammar);
     }
 }

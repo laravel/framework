@@ -584,7 +584,7 @@ class AuthAccessGateTest extends TestCase
     {
         $this->expectException(AuthorizationException::class);
         $this->expectExceptionMessage('You are not an admin.');
-        $this->expectExceptionCode(null);
+        $this->expectExceptionCode(0);
 
         $gate = $this->getBasicGate();
 
