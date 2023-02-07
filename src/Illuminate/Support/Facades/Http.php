@@ -54,6 +54,7 @@ use Illuminate\Http\Client\Factory;
  * @method static \Illuminate\Http\Client\PendingRequest throwUnless(bool $condition)
  * @method static \Illuminate\Http\Client\PendingRequest dump()
  * @method static \Illuminate\Http\Client\PendingRequest dd()
+ * @method static \Illuminate\Http\Client\PendingRequest ndd()
  * @method static \Illuminate\Http\Client\Response get(string $url, array|string|null $query = null)
  * @method static \Illuminate\Http\Client\Response head(string $url, array|string|null $query = null)
  * @method static \Illuminate\Http\Client\Response post(string $url, array $data = [])

@@ -1436,6 +1436,16 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Dump the content from the response and continue the script.
+     *
+     * @return never
+     */
+    public function ndd()
+    {
+        $this->dump();
+    }
+
+    /**
      * Dump the headers from the response and end the script.
      *
      * @return never

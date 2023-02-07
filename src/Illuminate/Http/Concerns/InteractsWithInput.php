@@ -621,6 +621,17 @@ trait InteractsWithInput
     }
 
     /**
+     * Dump the request items and continue the script.
+     *
+     * @param  mixed  ...$keys
+     * @return never
+     */
+    public function ndd(...$keys)
+    {
+        $this->dump(...$keys);
+    }
+
+    /**
      * Dump the items.
      *
      * @param  mixed  $keys

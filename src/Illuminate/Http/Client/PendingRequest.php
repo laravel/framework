@@ -226,8 +226,8 @@ class PendingRequest
 
         $this->options = [
             'connect_timeout' => 10,
-            'http_errors' => false,
-            'timeout' => 30,
+            'http_errors'     => false,
+            'timeout'         => 30,
         ];
 
         $this->beforeSendingCallbacks = collect([function (Request $request, array $options, PendingRequest $pendingRequest) {
@@ -311,9 +311,9 @@ class PendingRequest
         $this->asMultipart();
 
         $this->pendingFiles[] = array_filter([
-            'name' => $name,
+            'name'     => $name,
             'contents' => $contents,
-            'headers' => $headers,
+            'headers'  => $headers,
             'filename' => $filename,
         ]);
 
@@ -670,11 +670,11 @@ class PendingRequest
     }
 
     /**
-     * Dump the request before sending and end the script.
+     * Dump the request before sending.
      *
      * @return $this
      */
-    public function dd()
+    public function ndd()
     {
         $values = func_get_args();
 
@@ -682,8 +682,28 @@ class PendingRequest
             foreach (array_merge($values, [$request, $options]) as $value) {
                 VarDumper::dump($value);
             }
+        });
+    }
 
-            exit(1);
+    /**
+     * Dump the request before sending and end the script.
+     *
+     * @param  bool $exit
+     *
+     * @return $this
+     */
+    public function dd(bool $exit = true)
+    {
+        $values = func_get_args();
+
+        return $this->beforeSending(function (Request $request, array $options) use ($values, $exit) {
+            foreach (array_merge($values, [$request, $options]) as $value) {
+                VarDumper::dump($value);
+            }
+
+            if ($exit == true) {
+                exit(1);
+            }
         });
     }
 
@@ -836,7 +856,7 @@ class PendingRequest
 
                         if ($this->throwCallback &&
                             ($this->throwIfCallback === null ||
-                             call_user_func($this->throwIfCallback, $response))) {
+                                call_user_func($this->throwIfCallback, $response))) {
                             $response->throw($this->throwCallback);
                         }
 
@@ -960,7 +980,7 @@ class PendingRequest
 
         return $this->buildClient()->$clientMethod($method, $url, $this->mergeOptions([
             'laravel_data' => $laravelData,
-            'on_stats' => function ($transferStats) {
+            'on_stats'     => function ($transferStats) {
                 $this->transferStats = $transferStats;
             },
         ], $options));
