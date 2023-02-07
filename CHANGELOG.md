@@ -1,6 +1,23 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.49.0...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.50.0...9.x)
+
+
+## [v9.50.0](https://github.com/laravel/framework/compare/v9.49.0...v9.50.0) - 2023-02-01
+
+### Added
+- Added `Illuminate/Translation/Translator::stringable()` ([#45874](https://github.com/laravel/framework/pull/45874))
+- Added `Illuminate/Foundation/Testing/DatabaseTruncation` ([#45726](https://github.com/laravel/framework/pull/45726))
+- Added @style Blade directive ([#45887](https://github.com/laravel/framework/pull/45887))
+
+### Reverted
+- Reverted: ["Fix Illuminate Filesystem replace() leaves file executable"](https://github.com/laravel/framework/pull/45856) ([5ea388d](https://github.com/laravel/framework/commit/5ea388d7fe6f786b6dbcb34e0b52341c0b38ad7e))
+
+### Fixed
+- Fixed LazyCollection::makeIterator() to accept non Generator Function ([#45881](https://github.com/laravel/framework/pull/45881))
+
+### Changed
+- Solve data to be dumped for separate schemes ([#45805](https://github.com/laravel/framework/pull/45805))
 
 
 ## [v9.49.0](https://github.com/laravel/framework/compare/v9.48.0...v9.49.0) - 2023-01-31
