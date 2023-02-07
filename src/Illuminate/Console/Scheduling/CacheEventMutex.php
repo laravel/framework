@@ -41,10 +41,9 @@ class CacheEventMutex implements EventMutex, CacheAware
     public function create(Event $event)
     {
         if ($this->cache->store($this->store)->getStore() instanceof LockProvider) {
-            $lock = $this->cache->store($this->store)->getStore()
-                ->lock($event->mutexName(), $event->expiresAt * 60);
-
-            return $lock->acquire();
+            return $this->cache->store($this->store)->getStore()
+                ->lock($event->mutexName(), $event->expiresAt * 60)
+                ->acquire();
         }
 
         return $this->cache->store($this->store)->add(
@@ -61,10 +60,9 @@ class CacheEventMutex implements EventMutex, CacheAware
     public function exists(Event $event)
     {
         if ($this->cache->store($this->store)->getStore() instanceof LockProvider) {
-            $lock = $this->cache->store($this->store)->getStore()
-                ->lock($event->mutexName(), $event->expiresAt * 60);
-
-            return ! $lock->get(fn () => true);
+            return ! $this->cache->store($this->store)->getStore()
+                ->lock($event->mutexName(), $event->expiresAt * 60)
+                ->get(fn () => true);
         }
 
         return $this->cache->store($this->store)->has($event->mutexName());
@@ -79,10 +77,9 @@ class CacheEventMutex implements EventMutex, CacheAware
     public function forget(Event $event)
     {
         if ($this->cache->store($this->store)->getStore() instanceof LockProvider) {
-            $lock = $this->cache->store($this->store)->getStore()
-                ->lock($event->mutexName(), $event->expiresAt * 60);
-
-            $lock->forceRelease();
+            $this->cache->store($this->store)->getStore()
+                ->lock($event->mutexName(), $event->expiresAt * 60)
+                ->forceRelease();
 
             return;
         }
