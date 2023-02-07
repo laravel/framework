@@ -55,8 +55,11 @@ assertType('Illuminate\Support\Collection<int, User>', $collection->each(functio
 
 assertType('Illuminate\Support\Collection<int, int>', $collection->range(1, 100));
 
-assertType('Illuminate\Support\Collection<int, string>', $collection->wrap(['string']));
-assertType('Illuminate\Support\Collection<string, User>', $collection->wrap(['string' => new User]));
+assertType('Illuminate\Support\Collection<(int|string), string>', $collection->wrap('string'));
+assertType('Illuminate\Support\Collection<(int|string), User>', $collection->wrap(new User));
+
+assertType('Illuminate\Support\Collection<(int|string), string>', $collection->wrap(['string']));
+assertType('Illuminate\Support\Collection<(int|string), User>', $collection->wrap(['string' => new User]));
 
 assertType('array<int, string>', $collection->unwrap(['string']));
 assertType('array<int, User>', $collection->unwrap(

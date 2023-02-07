@@ -37,6 +37,7 @@ use Illuminate\Http\Client\Factory;
  * @method static \Illuminate\Http\Client\PendingRequest withDigestAuth(string $username, string $password)
  * @method static \Illuminate\Http\Client\PendingRequest withToken(string $token, string $type = 'Bearer')
  * @method static \Illuminate\Http\Client\PendingRequest withUserAgent(string $userAgent)
+ * @method static \Illuminate\Http\Client\PendingRequest withUrlParameters(array $parameters = [])
  * @method static \Illuminate\Http\Client\PendingRequest withCookies(array $cookies, string $domain)
  * @method static \Illuminate\Http\Client\PendingRequest maxRedirects(int $max)
  * @method static \Illuminate\Http\Client\PendingRequest withoutRedirecting()

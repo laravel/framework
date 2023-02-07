@@ -16,7 +16,7 @@
     ],
     "require": {
         "php": "^8.1",
-        "ext-json": "*",
+        "ext-pdo": "*",
         "brick/math": "^0.9.3|^0.10.2|^0.11",
         "illuminate/collections": "^10.0",
         "illuminate/container": "^10.0",
@@ -35,6 +35,7 @@
         }
     },
     "suggest": {
+        "ext-filter": "Required to use the Postgres database driver.",
         "doctrine/dbal": "Required to rename columns and drop SQLite columns (^3.5.1).",
         "fakerphp/faker": "Required to use the eloquent factory builder (^1.21).",
         "illuminate/console": "Required to use the database commands (^10.0).",

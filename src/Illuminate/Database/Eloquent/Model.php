@@ -2312,6 +2312,11 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             return $resolver($this);
         }
 
+        if (Str::startsWith($method, 'through') &&
+            method_exists($this, $relationMethod = Str::of($method)->after('through')->lcfirst()->toString())) {
+            return $this->through($relationMethod);
+        }
+
         return $this->forwardCallTo($this->newQuery(), $method, $parameters);
     }
 
