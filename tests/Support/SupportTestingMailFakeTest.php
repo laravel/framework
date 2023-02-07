@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Support;
 
-use Mockery as m;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailer;
 use Illuminate\Support\Testing\Fakes\MailFake;
+use Mockery as m;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 

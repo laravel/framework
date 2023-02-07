@@ -48,7 +48,7 @@ class MailFake implements Factory, Mailer, MailQueue
     /**
      * Create a new mail fake.
      *
-     * @param Mailer $mailer
+     * @param  Mailer  $mailer
      * @return void
      */
     public function __construct(Mailer $mailer)
