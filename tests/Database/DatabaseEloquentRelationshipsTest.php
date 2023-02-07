@@ -216,10 +216,6 @@ class DatabaseEloquentRelationshipsTest extends TestCase
         {
             public function deployments()
             {
-                return $this->through($this->environments())->has(fn ($env) => $env->deployments());
-
-                return $this->through('environments')->has('deployments');
-
                 return $this->throughEnvironments()->hasDeployments();
             }
 
