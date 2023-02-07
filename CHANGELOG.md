@@ -1,6 +1,16 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.50.0...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.50.1...9.x)
+
+
+## [v9.50.1](https://github.com/laravel/framework/compare/v9.50.0...v9.50.1) - 2023-02-01
+
+### Reverted
+- Reverted ["Optimize destroy method"](https://github.com/laravel/framework/pull/45709) ([#45903](https://github.com/laravel/framework/pull/45903))
+
+### Changed
+- Allow scheme to be specified in `Illuminate/Mail/MailManager::createSmtpTransport()` ([68a8bfc](https://github.com/laravel/framework/commit/68a8bfc3ab758962c8f050160ec32833dc12e467))
+- Accept optional mode in `Illuminate/Filesystem/Filesystem::replace()` ([2664e7f](https://github.com/laravel/framework/commit/2664e7fcdfe3a290462ae8e326ba79a17c747c1e))
 
 
 ## [v9.50.0](https://github.com/laravel/framework/compare/v9.49.0...v9.50.0) - 2023-02-01
