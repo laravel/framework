@@ -15,6 +15,7 @@ use Illuminate\Support\ItemNotFoundException;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\MultipleItemsFoundException;
 use Illuminate\Support\Str;
+use Illuminate\Tests\Support\Fixtures\StringBackedEnum;
 use InvalidArgumentException;
 use IteratorAggregate;
 use JsonSerializable;
@@ -3310,6 +3311,25 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals([1 => [['rating' => 1, 'url' => '1'], ['rating' => 1, 'url' => '1']], 2 => [['rating' => 2, 'url' => '2']]], $result->toArray());
     }
 
+    /**
+     * @requires PHP >= 8.1
+     * @dataProvider collectionClassProvider
+     */
+    public function testGroupByAttributeWithEnumValue($collection)
+    {
+        $data = new $collection([
+            ['id' => 1, 'label' => StringBackedEnum::ADMIN_LABEL],
+            ['id' => 2, 'label' => StringBackedEnum::HELLO_WORLD],
+        ]);
+
+        $result = $data->groupBy('label');
+
+        $this->assertEquals([
+            'I am \'admin\'' => [['id' => 1, 'label' => StringBackedEnum::ADMIN_LABEL]],
+            'Hello world' => [['id' => 2, 'label' => StringBackedEnum::HELLO_WORLD]],
+        ], $result->toArray());
+    }
+
     public function sortByRating(array $value)
     {
         return $value['rating'];
@@ -3528,6 +3548,24 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals([
             '[0,"Taylor","Otwell"]' => ['firstname' => 'Taylor', 'lastname' => 'Otwell', 'locale' => 'US'],
             '[1,"Lucas","Michot"]' => ['firstname' => 'Lucas', 'lastname' => 'Michot', 'locale' => 'FR'],
+        ], $result->all());
+    }
+
+    /**
+     * @requires PHP >= 8.1
+     * @dataProvider collectionClassProvider
+     */
+    public function testKeyByAttributeWithEnumValue($collection)
+    {
+        $data = new $collection([
+            ['id' => 1, 'label' => StringBackedEnum::ADMIN_LABEL],
+            ['id' => 2, 'label' => StringBackedEnum::HELLO_WORLD],
+        ]);
+
+        $result = $data->keyBy('label');
+        $this->assertEquals([
+            'I am \'admin\'' => ['id' => 1, 'label' => StringBackedEnum::ADMIN_LABEL],
+            'Hello world' => ['id' => 2, 'label' => StringBackedEnum::HELLO_WORLD],
         ], $result->all());
     }
 

@@ -507,6 +507,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
                 $groupKey = match (true) {
                     is_bool($groupKey) => (int) $groupKey,
                     $groupKey instanceof \Stringable => (string) $groupKey,
+                    $groupKey instanceof \UnitEnum => $groupKey->value,
                     default => $groupKey,
                 };
 
@@ -542,9 +543,11 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         foreach ($this->items as $key => $item) {
             $resolvedKey = $keyBy($item, $key);
 
-            if (is_object($resolvedKey)) {
-                $resolvedKey = (string) $resolvedKey;
-            }
+            $resolvedKey = match (true) {
+                $resolvedKey instanceof \UnitEnum => $resolvedKey->value,
+                is_object($resolvedKey) => (string) $resolvedKey,
+                default => $resolvedKey,
+            };
 
             $results[$resolvedKey] = $item;
         }
