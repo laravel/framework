@@ -331,11 +331,10 @@ class Application extends Container implements ApplicationContract, CachesConfig
         $this->instance('path', $this->path());
         $this->instance('path.base', $this->basePath());
         $this->instance('path.config', $this->configPath());
-        $this->instance('path.public', $this->publicPath());
-        $this->instance('path.storage', $this->storagePath());
         $this->instance('path.database', $this->databasePath());
+        $this->instance('path.public', $this->publicPath());
         $this->instance('path.resources', $this->resourcePath());
-        $this->instance('path.bootstrap', $this->bootstrapPath());
+        $this->instance('path.storage', $this->storagePath());
 
         $this->useBootstrapPath(value(function () {
             return is_dir($directory = $this->basePath('.laravel'))
