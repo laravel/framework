@@ -117,9 +117,7 @@ class FoundationHelpersTest extends TestCase
 
     protected function makeManifest($directory = '')
     {
-        $this->app->singleton('path.public', function () {
-            return __DIR__;
-        });
+        app()->usePublicPath(__DIR__);
 
         $path = public_path(Str::finish($directory, '/').'mix-manifest.json');
 
