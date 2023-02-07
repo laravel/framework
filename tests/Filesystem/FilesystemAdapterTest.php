@@ -113,7 +113,7 @@ class FilesystemAdapterTest extends TestCase
         $files = new FilesystemAdapter($this->filesystem, $this->adapter);
         $response = $files->download('file.txt', 'привет.txt');
         $this->assertInstanceOf(StreamedResponse::class, $response);
-        $this->assertSame("attachment; filename=pizdiuk.txt; filename*=utf-8''%D0%BF%D0%B8%D0%B7%D0%B4%D1%8E%D0%BA.txt", $response->headers->get('content-disposition'));
+        $this->assertSame("attachment; filename=privet.txt; filename*=utf-8''%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82.txt", $response->headers->get('content-disposition'));
     }
 
     public function testDownloadNonAsciiEmptyFilename()
@@ -122,7 +122,7 @@ class FilesystemAdapterTest extends TestCase
         $files = new FilesystemAdapter($this->filesystem, $this->adapter);
         $response = $files->download('привет.txt');
         $this->assertInstanceOf(StreamedResponse::class, $response);
-        $this->assertSame('attachment; filename=pizdiuk.txt; filename*=utf-8\'\'%D0%BF%D0%B8%D0%B7%D0%B4%D1%8E%D0%BA.txt', $response->headers->get('content-disposition'));
+        $this->assertSame('attachment; filename=privet.txt; filename*=utf-8\'\'%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82.txt', $response->headers->get('content-disposition'));
     }
 
     public function testDownloadPercentInFilename()
