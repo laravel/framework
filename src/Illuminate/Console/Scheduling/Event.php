@@ -80,7 +80,7 @@ class Event
     public $onOneServer = false;
 
     /**
-     * The amount of time the mutex should be valid.
+     * The number of minutes the mutex should be valid.
      *
      * @var int
      */
