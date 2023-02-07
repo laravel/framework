@@ -29,6 +29,19 @@ trait Debugging
     }
 
     /**
+     * Dumps the given props and not exit.
+     *
+     * @param  string|null  $prop
+     * @return $this
+     */
+    public function ndd(string $prop = null): self
+    {
+        dump($this->prop($prop));
+
+        return $this;
+    }
+
+    /**
      * Retrieve a prop within the current scope using "dot" notation.
      *
      * @param  string|null  $key

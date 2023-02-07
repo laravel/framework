@@ -1126,6 +1126,16 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Dump the string and not end the script.
+     *
+     * @return never
+     */
+    public function ndd()
+    {
+        $this->dump();
+    }
+
+    /**
      * Get the underlying string value.
      *
      * @return string
