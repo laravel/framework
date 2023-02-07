@@ -21,17 +21,6 @@ class MonitorCommand extends DatabaseInspectionCommand
                 {--max= : The maximum number of connections that can be open before an event is dispatched}';
 
     /**
-     * The name of the console command.
-     *
-     * This name is used to identify the command during lazy loading.
-     *
-     * @var string|null
-     *
-     * @deprecated
-     */
-    protected static $defaultName = 'db:monitor';
-
-    /**
      * The console command description.
      *
      * @var string

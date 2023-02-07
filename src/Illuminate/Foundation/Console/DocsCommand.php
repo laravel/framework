@@ -27,17 +27,6 @@ class DocsCommand extends Command
     protected $signature = 'docs {page? : The documentation page to open} {section? : The section of the page to open}';
 
     /**
-     * The name of the console command.
-     *
-     * This name is used to identify the command during lazy loading.
-     *
-     * @var string|null
-     *
-     * @deprecated
-     */
-    protected static $defaultName = 'docs';
-
-    /**
      * The console command description.
      *
      * @var string
