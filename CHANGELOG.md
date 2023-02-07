@@ -1,6 +1,17 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.50.1...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.50.2...9.x)
+
+
+## [v9.50.2](https://github.com/laravel/framework/compare/v9.50.1...v9.50.2) - 2023-02-02
+
+### Fixed
+- Fixed missing_with and missing_with_all validation ([#45913](https://github.com/laravel/framework/pull/45913))
+- Fixes blade escaped tags issue ([#45928](https://github.com/laravel/framework/pull/45928))
+
+### Changed
+- Trims numeric validation values / parameters ([#45912](https://github.com/laravel/framework/pull/45912))
+- Random function doesn't generate evenly distributed random chars ([#45916](https://github.com/laravel/framework/pull/45916))
 
 
 ## [v9.50.1](https://github.com/laravel/framework/compare/v9.50.0...v9.50.1) - 2023-02-01
