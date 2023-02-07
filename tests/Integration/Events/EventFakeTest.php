@@ -164,7 +164,7 @@ class EventFakeTest extends TestCase
         Event::assertListening('eloquent.saving: '.Post::class, [PostObserver::class, 'saving']);
     }
 
-    public function testMacrosCanBeCalled()
+    public function testMissingMethodsAreForwarded()
     {
         Event::macro('foo', fn () => 'bar');
 
