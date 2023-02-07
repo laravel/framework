@@ -1,6 +1,24 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.50.2...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.51.0...9.x)
+
+
+## [v9.51.0](https://github.com/laravel/framework/compare/v9.50.2...v9.51.0) - 2023-02-07
+
+### Added
+- Added `Illuminate/Foundation/Testing/Concerns/InteractsWithDatabase::expectsDatabaseQueryCount()` ([#45932](https://github.com/laravel/framework/pull/45932))
+- Added pending has-many-through and has-one-through builder ([#45894](https://github.com/laravel/framework/pull/45894))
+- Added `Illuminate/Http/Client/PendingRequest::withUrlParameters()` ([#45982](https://github.com/laravel/framework/pull/45982))
+
+### Fixed
+- Fix: prevent duplicated content-type on HTTP client ([#45960](https://github.com/laravel/framework/pull/45960))
+- Add missing php extensions in composer ([#45941](https://github.com/laravel/framework/pull/45941))
+
+### Changed
+- Command schedule:work minor features: schedule:run output file & environment specific verbosity ([#45949](https://github.com/laravel/framework/pull/45949))
+- Added missing self reserved word to reservedNames array in `Illuminate/Console/GeneratorCommand.php` ([#46001](https://github.com/laravel/framework/pull/46001))
+- pass value along to ttl callback in `Illuminate/Cache/Repository::remember()` ([#46006](https://github.com/laravel/framework/pull/46006))
+- Make sure the lock_connection is used for schedule's withoutOverlapping() ([#45963](https://github.com/laravel/framework/pull/45963))
 
 
 ## [v9.50.2](https://github.com/laravel/framework/compare/v9.50.1...v9.50.2) - 2023-02-02
