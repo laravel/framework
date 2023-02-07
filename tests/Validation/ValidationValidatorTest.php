@@ -1651,7 +1651,7 @@ class ValidationValidatorTest extends TestCase
     {
         $emptyCountable = new class implements Countable
         {
-            public function count()
+            public function count(): int
             {
                 return 0;
             }
