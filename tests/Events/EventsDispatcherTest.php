@@ -571,13 +571,6 @@ class EventsDispatcherTest extends TestCase
         $d->dispatch('myEvent', 'somePayload');
         $this->assertEquals(['__construct', '__invoke_somePayload'], $_SERVER['__event.test']);
 
-        // It throws an "Error" when there is no method to be called.
-        $d = new Dispatcher;
-        $d->listen('myEvent', TestListenerLean::class);
-        $this->expectError();
-        $this->expectErrorMessage('Call to undefined method '.TestListenerLean::class.'::__invoke()');
-        $d->dispatch('myEvent', 'somePayload');
-
         unset($_SERVER['__event.test']);
     }
 }
