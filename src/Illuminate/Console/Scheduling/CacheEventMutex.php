@@ -3,6 +3,7 @@
 namespace Illuminate\Console\Scheduling;
 
 use Illuminate\Contracts\Cache\Factory as Cache;
+use Illuminate\Contracts\Cache\LockProvider;
 
 class CacheEventMutex implements EventMutex, CacheAware
 {
@@ -39,6 +40,12 @@ class CacheEventMutex implements EventMutex, CacheAware
      */
     public function create(Event $event)
     {
+        if ($this->cache->store($this->store)->getStore() instanceof LockProvider) {
+            return $this->cache->store($this->store)->getStore()
+                ->lock($event->mutexName(), $event->expiresAt * 60)
+                ->acquire();
+        }
+
         return $this->cache->store($this->store)->add(
             $event->mutexName(), true, $event->expiresAt * 60
         );
@@ -52,6 +59,12 @@ class CacheEventMutex implements EventMutex, CacheAware
      */
     public function exists(Event $event)
     {
+        if ($this->cache->store($this->store)->getStore() instanceof LockProvider) {
+            return ! $this->cache->store($this->store)->getStore()
+                ->lock($event->mutexName(), $event->expiresAt * 60)
+                ->get(fn () => true);
+        }
+
         return $this->cache->store($this->store)->has($event->mutexName());
     }
 
@@ -63,6 +76,14 @@ class CacheEventMutex implements EventMutex, CacheAware
      */
     public function forget(Event $event)
     {
+        if ($this->cache->store($this->store)->getStore() instanceof LockProvider) {
+            $this->cache->store($this->store)->getStore()
+                ->lock($event->mutexName(), $event->expiresAt * 60)
+                ->forceRelease();
+
+            return;
+        }
+
         $this->cache->store($this->store)->forget($event->mutexName());
     }
 
