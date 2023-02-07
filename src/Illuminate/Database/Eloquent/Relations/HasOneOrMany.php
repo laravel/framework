@@ -365,6 +365,17 @@ abstract class HasOneOrMany extends Relation
     }
 
     /**
+     * Create a Collection of new instances of the related model without raising any events to the parent model.
+     *
+     * @param  iterable  $records
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function createManyQuietly(iterable $records)
+    {
+        return Model::withoutEvents(fn () => $this->createMany($records));
+    }
+
+    /**
      * Set the foreign ID for creating a related model.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
