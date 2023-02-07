@@ -34,7 +34,9 @@ class CacheLock extends Lock
      */
     public function acquire()
     {
-        if (method_exists($this->store, 'add') && $this->seconds > 0) {
+        if ($this->store instanceof FileStore
+            || (method_exists($this->store, 'add') && $this->seconds > 0)
+        ) {
             return $this->store->add(
                 $this->name, $this->owner, $this->seconds
             );
