@@ -151,7 +151,7 @@ class EventFakeTest extends TestCase
 
         Post::observe(new PostObserver);
 
-        ($post = new Post)->save();
+        (new Post)->save();
 
         Event::assertListening('event', 'listener');
         Event::assertListening('event', PostEventSubscriber::class);
@@ -162,6 +162,13 @@ class EventFakeTest extends TestCase
         Event::assertListening(NonImportantEvent::class, Closure::class);
         Event::assertListening('eloquent.saving: '.Post::class, PostObserver::class.'@saving');
         Event::assertListening('eloquent.saving: '.Post::class, [PostObserver::class, 'saving']);
+    }
+
+    public function testMissingMethodsAreForwarded()
+    {
+        Event::macro('foo', fn () => 'bar');
+
+        $this->assertEquals('bar', Event::fake()->foo());
     }
 }
 
