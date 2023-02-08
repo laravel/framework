@@ -58,7 +58,7 @@ class PendingProcess
      *
      * @var array
      */
-    public $withoutOutput = false;
+    public $quietly = false;
 
     /**
      * Indicates if TTY mode should be enabled.
@@ -173,9 +173,9 @@ class PendingProcess
      *
      * @return $this
      */
-    public function withoutOutput()
+    public function quietly()
     {
-        $this->withoutOutput = true;
+        $this->quietly = true;
 
         return $this;
     }
@@ -279,7 +279,7 @@ class PendingProcess
             $process->setIdleTimeout($this->idleTimeout);
         }
 
-        if ($this->withoutOutput) {
+        if ($this->quietly) {
             $process->disableOutput();
         }
 
