@@ -4,6 +4,7 @@ namespace Illuminate\Console;
 
 use Illuminate\Console\View\Components\Factory;
 use Illuminate\Contracts\Console\Isolatable;
+use Illuminate\Contracts\Console\Validatable;
 use Illuminate\Support\Traits\Macroable;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -17,6 +18,7 @@ class Command extends SymfonyCommand
         Concerns\InteractsWithIO,
         Concerns\InteractsWithSignals,
         Concerns\PromptsForMissingInput,
+        Concerns\ValidatesInput,
         Macroable;
 
     /**
@@ -186,6 +188,16 @@ class Command extends SymfonyCommand
             return (int) (is_numeric($this->option('isolated'))
                         ? $this->option('isolated')
                         : self::SUCCESS);
+        }
+
+        if ($this instanceof Validatable) {
+            try {
+                $this->validateInput();
+            } catch (ValidationException $e) {
+                $this->displayFailedValidationErrors($e->getValidator());
+
+                return 1;
+            }
         }
 
         $method = method_exists($this, 'handle') ? 'handle' : '__invoke';
