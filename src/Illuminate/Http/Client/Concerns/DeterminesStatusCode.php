@@ -154,4 +154,14 @@ trait DeterminesStatusCode
     {
         return $this->status() === 429;
     }
+
+    /**
+     * Determine if the response was a 410 "Gone" response.
+     *
+     * @return bool
+     */
+    public function gone()
+    {
+        return $this->status() === 410;
+    }
 }

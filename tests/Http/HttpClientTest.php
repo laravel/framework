@@ -245,6 +245,17 @@ class HttpClientTest extends TestCase
         $this->assertTrue($response->notFound());
     }
 
+    public function testGoneResponse()
+    {
+        $this->factory->fake([
+            'laravel.com' => $this->factory::response('', 410),
+        ]);
+
+        $response = $this->factory->post('http://laravel.com');
+
+        $this->assertTrue($response->gone());
+    }
+
     public function testResponseBodyCasting()
     {
         $this->factory->fake([
