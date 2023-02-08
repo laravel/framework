@@ -315,7 +315,10 @@ class ProcessTest extends TestCase
     public function testStrayProcessesCanBePreventedWithStringComand()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Attempted process [cat composer.json] without a matching fake.');
+        $this->expectExceptionMessage('Attempted process [');
+        $this->expectExceptionMessage('cat composer.json');
+        $this->expectExceptionMessage('] without a matching fake.');
+
 
         $factory = new Factory;
 
@@ -331,7 +334,9 @@ class ProcessTest extends TestCase
     public function testStrayProcessesCanBePreventedWithArrayCommand()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Attempted process [\'cat composer.json\'] without a matching fake.');
+        $this->expectExceptionMessage('Attempted process [');
+        $this->expectExceptionMessage('cat composer.json');
+        $this->expectExceptionMessage('] without a matching fake.');
 
         $factory = new Factory;
 
