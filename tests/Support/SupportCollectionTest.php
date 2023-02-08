@@ -1133,6 +1133,17 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testWhereNotInstanceOf($collection)
+    {
+        $c = new $collection([new stdClass, new stdClass, new $collection, new stdClass, new Str]);
+        $this->assertCount(2, $c->whereNotInstanceOf(stdClass::class));
+
+        $this->assertCount(1, $c->whereNotInstanceOf([stdClass::class, Str::class]));
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testWhereIn($collection)
     {
         $c = new $collection([['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]]);

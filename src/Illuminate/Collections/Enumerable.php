@@ -467,6 +467,16 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function whereInstanceOf($type);
 
     /**
+     * Filter the items, removing any items that don't match the given type(s).
+     *
+     * @template TWhereInstanceOf
+     *
+     * @param  class-string<TWhereInstanceOf>|array<array-key, class-string<TWhereInstanceOf>>  $type
+     * @return static<TKey, TWhereInstanceOf>
+     */
+    public function whereNotInstanceOf($type);
+
+    /**
      * Get the first item from the enumerable passing the given truth test.
      *
      * @template TFirstDefault

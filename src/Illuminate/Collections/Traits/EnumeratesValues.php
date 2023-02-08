@@ -679,6 +679,31 @@ trait EnumeratesValues
     }
 
     /**
+     * Filter the items, removing any items that match the given type(s).
+     *
+     * @template TWhereNotInstanceOf
+     *
+     * @param  class-string<TWhereNotInstanceOf>|array<array-key, class-string<TWhereNotInstanceOf>>  $type
+     * @return static<TKey, TWhereNotInstanceOf>
+     */
+    public function whereNotInstanceOf($type)
+    {
+        return $this->filter(function ($value) use ($type) {
+            if (is_array($type)) {
+                foreach ($type as $classType) {
+                    if ($value instanceof $classType) {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            return ! ($value instanceof $type);
+        });
+    }
+
+    /**
      * Pass the collection to the given callback and return the result.
      *
      * @template TPipeReturnType
