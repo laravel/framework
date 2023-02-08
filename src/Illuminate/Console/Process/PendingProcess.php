@@ -3,6 +3,7 @@
 namespace Illuminate\Console\Process;
 
 use Closure;
+use Illuminate\Console\Process\Exceptions\ProcessTimedOutException;
 use Illuminate\Support\Str;
 use LogicException;
 use RuntimeException;
@@ -28,7 +29,7 @@ class PendingProcess
     /**
      * The working directory of the process.
      *
-     * @var string
+     * @var string|null
      */
     public $path;
 
@@ -56,7 +57,7 @@ class PendingProcess
     /**
      * Indicates whether output should be disabled for the process.
      *
-     * @var array
+     * @var bool
      */
     public $quietly = false;
 
@@ -160,6 +161,7 @@ class PendingProcess
      * Set the additional environent variables for the process.
      *
      * @param  array  $environment
+     * @return $this
      */
     public function env(array $environment)
     {
@@ -225,7 +227,7 @@ class PendingProcess
                     $this->factory->recordIfRecording($this, $result);
                 });
             } elseif ($this->factory->isRecording() && $this->factory->preventingStrayProcesses()) {
-                throw new RuntimeException('Attempted process ['.(string) $this->command.'] without a matching fake.');
+                throw new RuntimeException('Attempted process ['.$command.'] without a matching fake.');
             }
 
             return new ProcessResult(tap($process)->run($output));
@@ -252,7 +254,7 @@ class PendingProcess
                 $this->factory->recordIfRecording($this, $process->predictProcessResult());
             });
         } elseif ($this->factory->isRecording() && $this->factory->preventingStrayProcesses()) {
-            throw new RuntimeException('Attempted process ['.(string) $this->command.'] without a matching fake.');
+            throw new RuntimeException('Attempted process ['.$command.'] without a matching fake.');
         }
 
         return new InvokedProcess(tap($process)->start($output));
