@@ -111,7 +111,7 @@ class PrecognitionTest extends TestCase
         $response->assertStatus(422);
         $response->assertJsonPath('errors', [
             'required_integer' => [
-                'The required integer must be an integer.',
+                'The required integer field must be an integer.',
             ],
         ]);
     }
@@ -129,10 +129,10 @@ class PrecognitionTest extends TestCase
         $response->assertStatus(422);
         $response->assertJsonPath('errors', [
             'required_integer' => [
-                'The required integer must be an integer.',
+                'The required integer field must be an integer.',
             ],
             'required_integer_when_not_precognitive' => [
-                'The required integer when not precognitive must be an integer.',
+                'The required integer when not precognitive field must be an integer.',
             ],
         ]);
     }
@@ -154,10 +154,10 @@ class PrecognitionTest extends TestCase
         $response->assertStatus(422);
         $response->assertJsonPath('errors', [
             'optional_integer_1' => [
-                'The optional integer 1 must be an integer.',
+                'The optional integer 1 field must be an integer.',
             ],
             'optional_integer_2' => [
-                'The optional integer 2 must be an integer.',
+                'The optional integer 2 field must be an integer.',
             ],
         ]);
     }
@@ -302,10 +302,10 @@ class PrecognitionTest extends TestCase
         $response->assertStatus(422);
         $response->assertJsonPath('errors', [
             'optional_integer_1' => [
-                'The optional integer 1 must be an integer.',
+                'The optional integer 1 field must be an integer.',
             ],
             'optional_integer_2' => [
-                'The optional integer 2 must be an integer.',
+                'The optional integer 2 field must be an integer.',
             ],
         ]);
     }
@@ -328,10 +328,10 @@ class PrecognitionTest extends TestCase
         $response->assertStatus(422);
         $response->assertJsonPath('errors', [
             'optional_integer_1' => [
-                'The optional integer 1 must be an integer.',
+                'The optional integer 1 field must be an integer.',
             ],
             'optional_integer_2' => [
-                'The optional integer 2 must be an integer.',
+                'The optional integer 2 field must be an integer.',
             ],
         ]);
     }
@@ -365,10 +365,10 @@ class PrecognitionTest extends TestCase
         $response->assertStatus(422);
         $response->assertJsonPath('errors', [
             'optional_integer_1' => [
-                'The optional integer 1 must be an integer.',
+                'The optional integer 1 field must be an integer.',
             ],
             'optional_integer_2' => [
-                'The optional integer 2 must be an integer.',
+                'The optional integer 2 field must be an integer.',
             ],
         ]);
     }
@@ -403,10 +403,10 @@ class PrecognitionTest extends TestCase
         $response->assertStatus(422);
         $response->assertJsonPath('errors', [
             'optional_integer_1' => [
-                'The optional integer 1 must be an integer.',
+                'The optional integer 1 field must be an integer.',
             ],
             'optional_integer_2' => [
-                'The optional integer 2 must be an integer.',
+                'The optional integer 2 field must be an integer.',
             ],
         ]);
     }
@@ -429,10 +429,10 @@ class PrecognitionTest extends TestCase
         $response->assertStatus(422);
         $response->assertJsonPath('errors', [
             'optional_integer_1' => [
-                'The optional integer 1 must be an integer.',
+                'The optional integer 1 field must be an integer.',
             ],
             'optional_integer_2' => [
-                'The optional integer 2 must be an integer.',
+                'The optional integer 2 field must be an integer.',
             ],
         ]);
     }
@@ -467,7 +467,7 @@ class PrecognitionTest extends TestCase
         $response->assertStatus(422);
         $response->assertJsonPath('errors', [
             ' input with spaces ' => [
-                'The input with spaces must be an integer.',
+                'The input with spaces field must be an integer.',
             ],
         ]);
     }
