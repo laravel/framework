@@ -21,6 +21,7 @@ namespace Illuminate\Support\Facades;
  * @method static string langPath(string $path = '')
  * @method static \Illuminate\Foundation\Application useLangPath(string $path)
  * @method static string publicPath(string $path = '')
+ * @method static \Illuminate\Foundation\Application usePublicPath(string $path)
  * @method static string storagePath(string $path = '')
  * @method static \Illuminate\Foundation\Application useStoragePath(string $path)
  * @method static string resourcePath(string $path = '')
