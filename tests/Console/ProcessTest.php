@@ -319,7 +319,6 @@ class ProcessTest extends TestCase
         $this->expectExceptionMessage('cat composer.json');
         $this->expectExceptionMessage('] without a matching fake.');
 
-
         $factory = new Factory;
 
         $factory->preventStrayProcesses();
