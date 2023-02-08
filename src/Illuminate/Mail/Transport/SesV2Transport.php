@@ -93,16 +93,6 @@ class SesV2Transport extends AbstractTransport
     }
 
     /**
-     * Get the string representation of the transport.
-     *
-     * @return string
-     */
-    public function __toString(): string
-    {
-        return 'ses-v2';
-    }
-
-    /**
      * Get the Amazon SES V2 client for the SesV2Transport instance.
      *
      * @return \Aws\SesV2\SesV2Client
@@ -131,5 +121,15 @@ class SesV2Transport extends AbstractTransport
     public function setOptions(array $options)
     {
         return $this->options = $options;
+    }
+
+    /**
+     * Get the string representation of the transport.
+     *
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return 'ses-v2';
     }
 }
