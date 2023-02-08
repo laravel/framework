@@ -300,6 +300,23 @@ class Handler implements ExceptionHandlerContract
     }
 
     /**
+     * Remove the given exception class from the list of exceptions that should be ignored.
+     *
+     * @param  string  $exception
+     * @return $this
+     */
+    public function stopIgnoring(string $exception)
+    {
+        $this->dontReport = collect($this->dontReport)
+                ->reject(fn ($ignored) => $ignored === $exception)->values()->all();
+
+        $this->internalDontReport = collect($this->internalDontReport)
+                ->reject(fn ($ignored) => $ignored === $exception)->values()->all();
+
+        return $this;
+    }
+
+    /**
      * Create the context array for logging the given exception.
      *
      * @param  \Throwable  $e
