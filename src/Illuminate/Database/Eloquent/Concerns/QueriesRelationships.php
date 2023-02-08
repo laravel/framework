@@ -66,6 +66,27 @@ trait QueriesRelationships
         );
     }
 
+
+    /**
+     *  * Add a relationship count / exists condition to the query with where clauses.
+     *
+     * Also load the relationship with same condition.
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation|string  $relation
+     * @param string $operator
+     * @param int $count
+     * @param string $boolean
+     * @param Closure|NULL $callback
+     * @return Builder
+     */
+      public  function  withHas($relation,  $operator = '>=', int $count = 1,  $boolean = 'and', Closure $callback = NULL): Builder
+    {
+        return $this->has(Str::before($relation, ':'), $operator, $count, $boolean, $callback)
+             ->with($callback ? [$relation => fn ($query) => $callback($query)] : $relation);
+
+    }
+
+
     /**
      * Add nested relationship count / exists conditions to the query.
      *
