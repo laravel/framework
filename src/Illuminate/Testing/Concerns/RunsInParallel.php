@@ -125,7 +125,7 @@ trait RunsInParallel
 
         return $potentialExitCode === null
             ? $this->getExitCode()
-            : $potentiallyExitCode;
+            : $potentialExitCode;
     }
 
     /**
