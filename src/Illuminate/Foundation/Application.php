@@ -132,6 +132,13 @@ class Application extends Container implements ApplicationContract, CachesConfig
     protected $langPath;
 
     /**
+     * The custom public / web path defined by the developer.
+     *
+     * @var string
+     */
+    protected $publicPath;
+
+    /**
      * The custom storage path defined by the developer.
      *
      * @var string
@@ -324,11 +331,10 @@ class Application extends Container implements ApplicationContract, CachesConfig
         $this->instance('path', $this->path());
         $this->instance('path.base', $this->basePath());
         $this->instance('path.config', $this->configPath());
-        $this->instance('path.public', $this->publicPath());
-        $this->instance('path.storage', $this->storagePath());
         $this->instance('path.database', $this->databasePath());
+        $this->instance('path.public', $this->publicPath());
         $this->instance('path.resources', $this->resourcePath());
-        $this->instance('path.bootstrap', $this->bootstrapPath());
+        $this->instance('path.storage', $this->storagePath());
 
         $this->useBootstrapPath(value(function () {
             return is_dir($directory = $this->basePath('.laravel'))
@@ -481,9 +487,24 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function publicPath($path = '')
     {
-        $publicPath = $this->bound('path.public') ? $this->make('path.public') : $this->basePath('public');
+        $publicPath = $this->publicPath ?: $this->basePath('public');
 
         return $this->joinPaths($publicPath, $path);
+    }
+
+    /**
+     * Set the public / web directory.
+     *
+     * @param  string  $path
+     * @return $this
+     */
+    public function usePublicPath($path)
+    {
+        $this->publicPath = $path;
+
+        $this->instance('path.public', $path);
+
+        return $this;
     }
 
     /**
