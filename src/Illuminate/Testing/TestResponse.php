@@ -482,6 +482,8 @@ class TestResponse implements ArrayAccess
                 );
             }
         }
+
+        return null;
     }
 
     /**
