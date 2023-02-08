@@ -13,8 +13,7 @@ use ReflectionFunction;
 
 class EventFake implements Dispatcher
 {
-    use ForwardsCalls;
-    use ReflectsClosures;
+    use ForwardsCalls, ReflectsClosures;
 
     /**
      * The original event dispatcher.
@@ -56,18 +55,6 @@ class EventFake implements Dispatcher
         $this->dispatcher = $dispatcher;
 
         $this->eventsToFake = Arr::wrap($eventsToFake);
-    }
-
-    /**
-     * Handle dynamic method calls to the dispatcher.
-     *
-     * @param  string  $method
-     * @param  array  $parameters
-     * @return mixed
-     */
-    public function __call($method, $parameters)
-    {
-        return $this->forwardCallTo($this->dispatcher, $method, $parameters);
     }
 
     /**
@@ -390,5 +377,17 @@ class EventFake implements Dispatcher
     public function until($event, $payload = [])
     {
         return $this->dispatch($event, $payload, true);
+    }
+
+    /**
+     * Handle dynamic method calls to the dispatcher.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return mixed
+     */
+    public function __call($method, $parameters)
+    {
+        return $this->forwardCallTo($this->dispatcher, $method, $parameters);
     }
 }

@@ -14,8 +14,7 @@ use PHPUnit\Framework\Assert as PHPUnit;
 
 class MailFake implements Factory, Mailer, MailQueue
 {
-    use ForwardsCalls;
-    use ReflectsClosures;
+    use ForwardsCalls, ReflectsClosures;
 
     /**
      * The mailer instance.
@@ -54,18 +53,6 @@ class MailFake implements Factory, Mailer, MailQueue
     public function __construct(Mailer $mailer)
     {
         $this->mailer = $mailer;
-    }
-
-    /**
-     * Handle dynamic method calls to the mailer.
-     *
-     * @param  string  $method
-     * @param  array  $parameters
-     * @return mixed
-     */
-    public function __call($method, $parameters)
-    {
-        return $this->forwardCallTo($this->mailer, $method, $parameters);
     }
 
     /**
@@ -462,5 +449,17 @@ class MailFake implements Factory, Mailer, MailQueue
         $this->currentMailer = null;
 
         return $this;
+    }
+
+    /**
+     * Handle dynamic method calls to the mailer.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return mixed
+     */
+    public function __call($method, $parameters)
+    {
+        return $this->forwardCallTo($this->mailer, $method, $parameters);
     }
 }
