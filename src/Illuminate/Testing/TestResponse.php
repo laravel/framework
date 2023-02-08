@@ -632,6 +632,7 @@ class TestResponse implements ArrayAccess
      * @param  array|callable  $value
      * @param  bool  $strict
      * @return $this
+     * @throws \Throwable
      */
     public function assertJson($value, $strict = false)
     {
@@ -658,6 +659,7 @@ class TestResponse implements ArrayAccess
      * @param  string  $path
      * @param  mixed  $expect
      * @return $this
+     * @throws \Throwable
      */
     public function assertJsonPath($path, $expect)
     {
@@ -671,6 +673,7 @@ class TestResponse implements ArrayAccess
      *
      * @param  array  $data
      * @return $this
+     * @throws \Throwable
      */
     public function assertExactJson(array $data)
     {
@@ -684,6 +687,7 @@ class TestResponse implements ArrayAccess
      *
      * @param  array  $data
      * @return $this
+     * @throws \Throwable
      */
     public function assertSimilarJson(array $data)
     {
@@ -697,6 +701,7 @@ class TestResponse implements ArrayAccess
      *
      * @param  array  $data
      * @return $this
+     * @throws \Throwable
      */
     public function assertJsonFragment(array $data)
     {
@@ -711,6 +716,7 @@ class TestResponse implements ArrayAccess
      * @param  array  $data
      * @param  bool  $exact
      * @return $this
+     * @throws \Throwable
      */
     public function assertJsonMissing(array $data, $exact = false)
     {
@@ -724,6 +730,7 @@ class TestResponse implements ArrayAccess
      *
      * @param  array  $data
      * @return $this
+     * @throws \Throwable
      */
     public function assertJsonMissingExact(array $data)
     {
@@ -737,6 +744,7 @@ class TestResponse implements ArrayAccess
      *
      * @param  string  $path
      * @return $this
+     * @throws \Throwable
      */
     public function assertJsonMissingPath(string $path)
     {
@@ -751,6 +759,7 @@ class TestResponse implements ArrayAccess
      * @param  array|null  $structure
      * @param  array|null  $responseData
      * @return $this
+     * @throws \Throwable
      */
     public function assertJsonStructure(array $structure = null, $responseData = null)
     {
@@ -765,6 +774,7 @@ class TestResponse implements ArrayAccess
      * @param  int  $count
      * @param  string|null  $key
      * @return $this
+     * @throws \Throwable
      */
     public function assertJsonCount(int $count, $key = null)
     {
@@ -779,6 +789,7 @@ class TestResponse implements ArrayAccess
      * @param  string|array  $errors
      * @param  string  $responseKey
      * @return $this
+     * @throws \Throwable
      */
     public function assertJsonValidationErrors($errors, $responseKey = 'errors')
     {
@@ -830,6 +841,7 @@ class TestResponse implements ArrayAccess
      * @param  string  $key
      * @param  string  $responseKey
      * @return $this
+     * @throws \Throwable
      */
     public function assertJsonValidationErrorFor($key, $responseKey = 'errors')
     {
@@ -855,6 +867,7 @@ class TestResponse implements ArrayAccess
      * @param  string|array|null  $keys
      * @param  string  $responseKey
      * @return $this
+     * @throws \Throwable
      */
     public function assertJsonMissingValidationErrors($keys = null, $responseKey = 'errors')
     {
@@ -894,8 +907,9 @@ class TestResponse implements ArrayAccess
     /**
      * Assert that the given key is a JSON array.
      *
-     * @param $key
+     * @param  $key
      * @return $this
+     * @throws \Throwable
      */
     public function assertJsonIsArray($key = null)
     {
@@ -915,8 +929,9 @@ class TestResponse implements ArrayAccess
     /**
      * Assert that the given key is a JSON object.
      *
-     * @param $key
+     * @param  $key
      * @return $this
+     * @throws \Throwable
      */
     public function assertJsonIsObject($key = null)
     {
@@ -937,7 +952,6 @@ class TestResponse implements ArrayAccess
      * Validate and return the decoded response JSON.
      *
      * @return \Illuminate\Testing\AssertableJsonString
-     *
      * @throws \Throwable
      */
     public function decodeResponseJson()
@@ -962,6 +976,7 @@ class TestResponse implements ArrayAccess
      *
      * @param  string|null  $key
      * @return mixed
+     * @throws \Throwable
      */
     public function json($key = null)
     {
@@ -973,6 +988,7 @@ class TestResponse implements ArrayAccess
      *
      * @param  string|null  $key
      * @return \Illuminate\Support\Collection
+     * @throws \Throwable
      */
     public function collect($key = null)
     {
@@ -1107,6 +1123,7 @@ class TestResponse implements ArrayAccess
      * @param  string  $errorBag
      * @param  string  $responseKey
      * @return $this
+     * @throws \Throwable
      */
     public function assertValid($keys = null, $errorBag = 'default', $responseKey = 'errors')
     {
@@ -1150,6 +1167,7 @@ class TestResponse implements ArrayAccess
      * @param  string  $errorBag
      * @param  string  $responseKey
      * @return $this
+     * @throws \Throwable
      */
     public function assertInvalid($errors = null,
                                   $errorBag = 'default',
@@ -1562,6 +1580,7 @@ class TestResponse implements ArrayAccess
      *
      * @param  \Throwable  $exception
      * @return \Throwable
+     * @throws \ReflectionException
      */
     public function transformNotSuccessfulException($exception)
     {
@@ -1598,6 +1617,7 @@ class TestResponse implements ArrayAccess
      * @param  \Throwable  $exceptionToAppend
      * @param  \Throwable  $exception
      * @return \Throwable
+     * @throws \ReflectionException
      */
     protected function appendExceptionToException($exceptionToAppend, $exception)
     {
@@ -1625,6 +1645,7 @@ class TestResponse implements ArrayAccess
      * @param  \Throwable  $exception
      * @param  bool  $json
      * @return \Throwable
+     * @throws \ReflectionException
      */
     protected function appendErrorsToException($errors, $exception, $json = false)
     {
@@ -1652,6 +1673,7 @@ class TestResponse implements ArrayAccess
      * @param  string  $message
      * @param  \Throwable  $exception
      * @return \Throwable
+     * @throws \ReflectionException
      */
     protected function appendMessageToException($message, $exception)
     {
@@ -1694,6 +1716,7 @@ class TestResponse implements ArrayAccess
      *
      * @param  string  $offset
      * @return bool
+     * @throws \Throwable
      */
     public function offsetExists($offset): bool
     {
@@ -1707,6 +1730,7 @@ class TestResponse implements ArrayAccess
      *
      * @param  string  $offset
      * @return mixed
+     * @throws \Throwable
      */
     public function offsetGet($offset): mixed
     {
