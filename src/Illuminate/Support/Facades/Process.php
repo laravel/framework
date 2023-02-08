@@ -6,6 +6,18 @@ use Closure;
 use Illuminate\Console\Process\Factory;
 
 /**
+ * @method static \Illuminate\Console\Process\PendingProcess command(array|string $command)
+ * @method static \Illuminate\Console\Process\PendingProcess path(string $path)
+ * @method static \Illuminate\Console\Process\PendingProcess timeout(int $timeout)
+ * @method static \Illuminate\Console\Process\PendingProcess idleTimeout(int $timeout)
+ * @method static \Illuminate\Console\Process\PendingProcess forever()
+ * @method static \Illuminate\Console\Process\PendingProcess env(array $environment)
+ * @method static \Illuminate\Console\Process\PendingProcess quietly()
+ * @method static \Illuminate\Console\Process\PendingProcess tty(bool $tty = true)
+ * @method static \Illuminate\Console\Process\PendingProcess options(array $options)
+ * @method static \Illuminate\Contracts\Console\Process\ProcessResult run(array|string|null $command = null, callable|null $output = null)
+ * @method static \Illuminate\Console\Process\InvokedProcess start(array|string|null $command = null, callable $output = null)
+ * @method static \Illuminate\Console\Process\PendingProcess withFakeHandlers(array $fakeHandlers)
  * @method static \Illuminate\Console\Process\FakeProcessResult result(array|string $output = '', array|string $errorOutput = '', int $exitCode = 0)
  * @method static \Illuminate\Console\Process\FakeProcessDescription describe()
  * @method static \Illuminate\Console\Process\FakeProcessSequence sequence(array $processes = [])
@@ -28,6 +40,7 @@ use Illuminate\Console\Process\Factory;
  * @method static void flushMacros()
  * @method static mixed macroCall(string $method, array $parameters)
  *
+ * @see \Illuminate\Console\Process\PendingProcess
  * @see \Illuminate\Console\Process\Factory
  */
 class Process extends Facade

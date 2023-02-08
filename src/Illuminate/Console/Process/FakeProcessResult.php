@@ -4,7 +4,6 @@ namespace Illuminate\Console\Process;
 
 use Illuminate\Console\Process\Exceptions\ProcessFailedException;
 use Illuminate\Contracts\Console\Process\ProcessResult as ProcessResultContract;
-use Symfony\Component\Process\Process;
 
 class FakeProcessResult implements ProcessResultContract
 {

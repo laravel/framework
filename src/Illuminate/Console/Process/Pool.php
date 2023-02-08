@@ -4,6 +4,10 @@ namespace Illuminate\Console\Process;
 
 use InvalidArgumentException;
 
+/**
+ * @mixin \Illuminate\Console\Process\Factory
+ * @mixin \Illuminate\Console\Process\PendingProcess
+ */
 class Pool
 {
     /**

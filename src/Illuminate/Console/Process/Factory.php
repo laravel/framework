@@ -123,7 +123,7 @@ class Factory
     /**
      * Record the given process if processes should be recorded.
      *
-     * @param  \Illuminate\Console\Process\PendignProcess  $process
+     * @param  \Illuminate\Console\Process\PendingProcess  $process
      * @param  \Illuminate\Contracts\Console\Process\ProcessResult  $result
      * @return $this
      */
@@ -139,7 +139,7 @@ class Factory
     /**
      * Record the given process.
      *
-     * @param  \Illuminate\Console\Process\PendignProcess  $process
+     * @param  \Illuminate\Console\Process\PendingProcess  $process
      * @param  \Illuminate\Contracts\Console\Process\ProcessResult  $result
      * @return $this
      */

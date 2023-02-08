@@ -28,7 +28,7 @@ interface ProcessResult
     /**
      * Get the exit code of the process.
      *
-     * @return int
+     * @return int|null
      */
     public function exitCode();
 

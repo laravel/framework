@@ -3,6 +3,7 @@
 namespace Illuminate\Tests;
 
 use Illuminate\Console\Process\Exceptions\ProcessFailedException;
+use Illuminate\Console\Process\Exceptions\ProcessTimedOutException;
 use Illuminate\Console\Process\Factory;
 use Illuminate\Contracts\Console\Process\ProcessResult;
 use Mockery as m;
@@ -311,10 +312,12 @@ class ProcessTest extends TestCase
         $result = $factory->run('ls -la');
     }
 
-    public function testStrayProcessesCanBePrevented()
+    public function testStrayProcessesCanBePreventedWithStringComand()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Attempted process');
+        $this->expectExceptionMessage('Attempted process [');
+        $this->expectExceptionMessage('cat composer.json');
+        $this->expectExceptionMessage('] without a matching fake.');
 
         $factory = new Factory;
 
@@ -325,6 +328,24 @@ class ProcessTest extends TestCase
         ]);
 
         $result = $factory->run('cat composer.json');
+    }
+
+    public function testStrayProcessesCanBePreventedWithArrayCommand()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Attempted process [');
+        $this->expectExceptionMessage('cat composer.json');
+        $this->expectExceptionMessage('] without a matching fake.');
+
+        $factory = new Factory;
+
+        $factory->preventStrayProcesses();
+
+        $factory->fake([
+            'ls *' => 'ls command',
+        ]);
+
+        $result = $factory->run(['cat composer.json']);
     }
 
     public function testStrayProcessesActuallyRunByDefault()
@@ -396,9 +417,27 @@ class ProcessTest extends TestCase
         }
 
         $this->expectException(ProcessFailedException::class);
+        $this->expectExceptionMessage('The process "echo "Hello World" >&2; exit 1;" failed.');
 
         $factory = new Factory;
         $result = $factory->path(__DIR__)->run('echo "Hello World" >&2; exit 1;');
+
+        $result->throw();
+    }
+
+    public function testRealProcessesCanTimeout()
+    {
+        if (windows_os()) {
+            $this->markTestSkipped('Requires Linux.');
+        }
+
+        $this->expectException(ProcessTimedOutException::class);
+        $this->expectExceptionMessage(
+            'The process "sleep 2; exit 1;" exceeded the timeout of 1 seconds.'
+        );
+
+        $factory = new Factory;
+        $result = $factory->timeout(1)->path(__DIR__)->run('sleep 2; exit 1;');
 
         $result->throw();
     }

@@ -31,14 +31,14 @@ class FakeInvokedProcess implements InvokedProcessContract
     /**
      * The number of times the process should indicate that it is "running".
      *
-     * @var int
+     * @var int|null
      */
     protected $remainingRunIterations;
 
     /**
      * The general output handler callback.
      *
-     * @var null
+     * @var callable|null
      */
     protected $outputHandler;
 
@@ -135,7 +135,6 @@ class FakeInvokedProcess implements InvokedProcessContract
     /**
      * Invoke the asynchronous output handler with the next single line of output if necessary.
      *
-     * @param  callable  $until
      * @return array|false
      */
     protected function invokeOutputHandlerWithNextLineOfOutput()
@@ -258,7 +257,7 @@ class FakeInvokedProcess implements InvokedProcessContract
      * Wait for the process to finish.
      *
      * @param  callable|null  $output
-     * @return \Illuminate\Console\Process\ProcessResult
+     * @return \Illuminate\Contracts\Console\Process\ProcessResult
      */
     public function wait(callable $output = null)
     {
