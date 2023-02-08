@@ -312,8 +312,9 @@ class DatabaseConnectionTest extends TestCase
         $this->expectException(QueryException::class);
         $this->expectExceptionMessage('Deadlock found when trying to get lock (SQL: )');
 
-        $pdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['beginTransaction', 'commit', 'rollBack'])->getMock();
+        $pdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['inTransaction', 'beginTransaction', 'commit', 'rollBack'])->getMock();
         $mock = $this->getMockConnection([], $pdo);
+        $pdo->method('inTransaction')->willReturn(true);
         $pdo->expects($this->exactly(3))->method('beginTransaction');
         $pdo->expects($this->exactly(3))->method('rollBack');
         $pdo->expects($this->never())->method('commit');
@@ -324,8 +325,10 @@ class DatabaseConnectionTest extends TestCase
 
     public function testTransactionMethodRollsbackAndThrows()
     {
-        $pdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['beginTransaction', 'commit', 'rollBack'])->getMock();
+        $pdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['inTransaction', 'beginTransaction', 'commit', 'rollBack'])->getMock();
         $mock = $this->getMockConnection([], $pdo);
+        // $pdo->expects($this->once())->method('inTransaction');
+        $pdo->method('inTransaction')->willReturn(true);
         $pdo->expects($this->once())->method('beginTransaction');
         $pdo->expects($this->once())->method('rollBack');
         $pdo->expects($this->never())->method('commit');
