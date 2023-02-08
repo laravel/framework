@@ -13,7 +13,7 @@ class AsEncryptedCollection implements Castable
      * Get the caster class to use when casting from / to this cast target.
      *
      * @param  array  $arguments
-     * @return CastsAttributes<\Illuminate\Support\Collection<array-key, mixed>, iterable>
+     * @return \Illuminate\Contracts\Database\Eloquent\CastsAttributes<\Illuminate\Support\Collection<array-key, mixed>, iterable>
      */
     public static function castUsing(array $arguments)
     {
