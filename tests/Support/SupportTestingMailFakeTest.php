@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Support;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailer;
+use Illuminate\Mail\MailManager;
 use Illuminate\Support\Testing\Fakes\MailFake;
 use Mockery as m;
 use PHPUnit\Framework\ExpectationFailedException;
@@ -16,7 +16,7 @@ class SupportTestingMailFakeTest extends TestCase
     /**
      * @var \Mockery
      */
-    private $mailer;
+    private $mailManager;
 
     /**
      * @var \Illuminate\Support\Testing\Fakes\MailFake
@@ -31,8 +31,8 @@ class SupportTestingMailFakeTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->mailer = m::mock(Mailer::class);
-        $this->fake = new MailFake($this->mailer);
+        $this->mailManager = m::mock(MailManager::class);
+        $this->fake = new MailFake($this->mailManager);
         $this->mailable = new MailableStub;
     }
 
@@ -224,7 +224,7 @@ class SupportTestingMailFakeTest extends TestCase
 
     public function testMissingMethodsAreForwarded()
     {
-        $this->mailer->shouldReceive('foo')->andReturn('bar');
+        $this->mailManager->shouldReceive('foo')->andReturn('bar');
 
         $this->assertEquals('bar', $this->fake->foo());
     }
