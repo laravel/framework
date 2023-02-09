@@ -23,14 +23,6 @@ interface MessageBag extends Arrayable, Countable
     public function add($key, $message);
 
     /**
-     * Remove a message from the bag.
-     *
-     * @param  string  $key
-     * @return $this
-     */
-    public function remove($key);
-
-    /**
      * Merge a new array of messages into the bag.
      *
      * @param  \Illuminate\Contracts\Support\MessageProvider|array  $messages
@@ -71,6 +63,14 @@ interface MessageBag extends Arrayable, Countable
      * @return array
      */
     public function all($format = null);
+
+    /**
+     * Remove a message from the bag.
+     *
+     * @param  string  $key
+     * @return $this
+     */
+    public function forget($key);
 
     /**
      * Get the raw messages in the container.

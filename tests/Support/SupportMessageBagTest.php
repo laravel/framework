@@ -126,10 +126,10 @@ class SupportMessageBagTest extends TestCase
         $this->assertFalse($container->has('bar'));
     }
 
-    public function testRemove()
+    public function testForget()
     {
         $container = new MessageBag(['foo' => 'bar']);
-        $container->remove('foo');
+        $container->forget('foo');
         $this->assertFalse($container->has('foo'));
     }
 
