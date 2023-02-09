@@ -2276,7 +2276,7 @@ trait ValidatesAttributes
      */
     public function validateTimezone($attribute, $value)
     {
-        return in_array($value, timezone_identifiers_list(), true);
+        return in_array($value, iterator_to_array(IntlTimeZone::createTimeZoneIDEnumeration(IntlTimeZone::TYPE_CANONICAL_LOCATION)), true);
     }
 
     /**
