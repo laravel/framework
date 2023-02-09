@@ -719,6 +719,17 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
+     * Get a key from container.
+     *
+     * @param  string  $key
+     * @return mixed|string
+     */
+    public function getKey(string $key)
+    {
+        return $this[$key];
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @return mixed
