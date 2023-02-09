@@ -207,4 +207,13 @@ interface Container extends ContainerInterface
      * @return void
      */
     public function afterResolving($abstract, Closure $callback = null);
+
+    /**
+     * Set a key on container.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return mixed
+     */
+    public function setKey(string $key, $value);
 }
