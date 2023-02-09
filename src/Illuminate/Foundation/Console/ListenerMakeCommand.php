@@ -137,7 +137,7 @@ class ListenerMakeCommand extends GeneratorCommand
      */
     protected function afterPromptingForMissingArguments(InputInterface $input, OutputInterface $output)
     {
-        if ($this->didReceiveOptions($input)) {
+        if ($this->isReservedName($this->getNameInput()) || $this->didReceiveOptions($input)) {
             return;
         }
 
