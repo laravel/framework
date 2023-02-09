@@ -1,11 +1,11 @@
 <?php
 
-namespace Illuminate\Tests;
+namespace Illuminate\Tests\Process;
 
-use Illuminate\Console\Process\Exceptions\ProcessFailedException;
-use Illuminate\Console\Process\Exceptions\ProcessTimedOutException;
-use Illuminate\Console\Process\Factory;
-use Illuminate\Contracts\Console\Process\ProcessResult;
+use Illuminate\Contracts\Process\ProcessResult;
+use Illuminate\Process\Exceptions\ProcessFailedException;
+use Illuminate\Process\Exceptions\ProcessTimedOutException;
+use Illuminate\Process\Factory;
 use Mockery as m;
 use OutOfBoundsException;
 use PHPUnit\Framework\TestCase;

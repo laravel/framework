@@ -78,6 +78,7 @@
         "illuminate/notifications": "self.version",
         "illuminate/pagination": "self.version",
         "illuminate/pipeline": "self.version",
+        "illuminate/process": "self.version",
         "illuminate/queue": "self.version",
         "illuminate/redis": "self.version",
         "illuminate/routing": "self.version",

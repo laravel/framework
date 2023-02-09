@@ -41,6 +41,7 @@ remote mail git@github.com:illuminate/mail.git
 remote notifications git@github.com:illuminate/notifications.git
 remote pagination git@github.com:illuminate/pagination.git
 remote pipeline git@github.com:illuminate/pipeline.git
+remote process git@github.com:illuminate/process.git
 remote queue git@github.com:illuminate/queue.git
 remote redis git@github.com:illuminate/redis.git
 remote routing git@github.com:illuminate/routing.git
@@ -74,6 +75,7 @@ split 'src/Illuminate/Mail' mail
 split 'src/Illuminate/Notifications' notifications
 split 'src/Illuminate/Pagination' pagination
 split 'src/Illuminate/Pipeline' pipeline
+split 'src/Illuminate/Process' process
 split 'src/Illuminate/Queue' queue
 split 'src/Illuminate/Redis' redis
 split 'src/Illuminate/Routing' routing
