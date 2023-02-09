@@ -516,6 +516,16 @@ class FoundationApplicationTest extends TestCase
 
         $this->assertFalse($app->foo());
     }
+
+    /** @test */
+    public function testUseConfigPath(): void
+    {
+        $app = new Application;
+        $app->useConfigPath(__DIR__.'/fixtures/config');
+        $app->bootstrapWith([\Illuminate\Foundation\Bootstrap\LoadConfiguration::class]);
+
+        $this->assertSame('bar', $app->make('config')->get('app.foo'));
+    }
 }
 
 class ApplicationBasicServiceProviderStub extends ServiceProvider
