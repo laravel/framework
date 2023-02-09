@@ -16,4 +16,16 @@ class SupportMailTest extends TestCase
 
         $this->assertEquals('it works!', Mail::test('foo'));
     }
+
+    public function testItRegisterAndCallMacrosWhenFaked()
+    {
+        Mail::macro('test', fn (string $str) => $str === 'foo'
+            ? 'it works!'
+            : 'it failed.',
+        );
+
+        Mail::fake();
+
+        $this->assertEquals('it works!', Mail::test('foo'));
+    }
 }
