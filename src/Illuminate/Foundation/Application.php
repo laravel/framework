@@ -431,7 +431,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     {
         $configPath = $this->configPath ?: $this->basePath('config');
 
-        return $this->joinPaths($this->basePath($configPath), $path);
+        return $this->joinPaths($configPath, $path);
     }
 
     /**
