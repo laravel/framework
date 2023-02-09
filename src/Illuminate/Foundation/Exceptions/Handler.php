@@ -488,7 +488,7 @@ class Handler implements ExceptionHandlerContract
         }
 
         return $this->shouldReturnJson($request, $e)
-                    ? $this->invalidJson($request, $e)
+                    ? $this->invalidJson($e)
                     : $this->invalid($request, $e);
     }
 
@@ -509,11 +509,10 @@ class Handler implements ExceptionHandlerContract
     /**
      * Convert a validation exception into a JSON response.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  \Illuminate\Validation\ValidationException  $exception
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function invalidJson($request, ValidationException $exception)
+    protected function invalidJson(ValidationException $exception)
     {
         return response()->json([
             'message' => $exception->getMessage(),
