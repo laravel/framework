@@ -154,6 +154,16 @@ trait AssertsStatusCodes
     }
 
     /**
+     * Assert that the response has a 423 "Locked" status code.
+     *
+     * @return $this
+     */
+    public function assertLocked()
+    {
+        return $this->assertStatus(423);
+    }
+
+    /**
      * Assert that the response has a 429 "Too Many Requests" status code.
      *
      * @return $this
