@@ -8,6 +8,7 @@ use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Contracts\Mail\MailQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Mail\MailManager;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\ReflectsClosures;
 use PHPUnit\Framework\Assert as PHPUnit;
@@ -19,9 +20,9 @@ class MailFake implements Factory, Mailer, MailQueue
     /**
      * The mailer instance.
      *
-     * @var Mailer
+     * @var MailManager
      */
-    protected $mailer;
+    protected $manager;
 
     /**
      * The mailer currently being used to send a message.
@@ -47,12 +48,12 @@ class MailFake implements Factory, Mailer, MailQueue
     /**
      * Create a new mail fake.
      *
-     * @param  Mailer  $mailer
+     * @param  MailManager  $manager
      * @return void
      */
-    public function __construct(Mailer $mailer)
+    public function __construct(MailManager $manager)
     {
-        $this->mailer = $mailer;
+        $this->manager = $manager;
     }
 
     /**
@@ -460,6 +461,6 @@ class MailFake implements Factory, Mailer, MailQueue
      */
     public function __call($method, $parameters)
     {
-        return $this->forwardCallTo($this->mailer, $method, $parameters);
+        return $this->forwardCallTo($this->manager, $method, $parameters);
     }
 }
