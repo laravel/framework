@@ -2,8 +2,8 @@
 
 namespace Illuminate\Process;
 
-use Illuminate\Process\Exceptions\ProcessFailedException;
 use Illuminate\Contracts\Process\ProcessResult as ProcessResultContract;
+use Illuminate\Process\Exceptions\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
 class ProcessResult implements ProcessResultContract

@@ -2,8 +2,8 @@
 
 namespace Illuminate\Process;
 
-use Illuminate\Process\Exceptions\ProcessTimedOutException;
 use Illuminate\Contracts\Process\InvokedProcess as InvokedProcessContract;
+use Illuminate\Process\Exceptions\ProcessTimedOutException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException as SymfonyTimeoutException;
 use Symfony\Component\Process\Process;
 
