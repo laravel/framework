@@ -1771,6 +1771,23 @@ trait HasAttributes
     }
 
     /**
+     * Execute a callback over each attribute.
+     *
+     * @param  callable(TValue, TKey): mixed  $callback
+     * @return $this
+     */
+    public function each(callable $callback)
+    {
+        foreach ($this->getAttributes() as $key => $item) {
+            if ($callback($item, $key) === false) {
+                break;
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Get all of the current attributes on the model for an insert operation.
      *
      * @return array
