@@ -842,7 +842,7 @@ if (! function_exists('secure_asset')) {
 
 if (! function_exists('secure_url')) {
     /**
-     * Generate a HTTPS url for the application.
+     * Generate an HTTPS url for the application.
      *
      * @param  string  $path
      * @param  mixed  $parameters
