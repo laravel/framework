@@ -521,7 +521,7 @@ class FoundationApplicationTest extends TestCase
     public function testUseConfigPath(): void
     {
         $app = new Application;
-        $app->useConfigPath(__DIR__ . '/fixtures/config');
+        $app->useConfigPath(__DIR__.'/fixtures/config');
         $app->bootstrapWith([\Illuminate\Foundation\Bootstrap\LoadConfiguration::class]);
 
         $this->assertSame('bar', $app->make('config')->get('app.foo'));
