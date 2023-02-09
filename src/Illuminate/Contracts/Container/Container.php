@@ -216,4 +216,12 @@ interface Container extends ContainerInterface
      * @return mixed
      */
     public function setKey(string $key, $value);
+
+    /**
+     * Get a key from container.
+     *
+     * @param  string  $key
+     * @return mixed|string
+     */
+    public function getKey(string $key);
 }
