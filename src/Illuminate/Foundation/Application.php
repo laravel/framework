@@ -125,6 +125,13 @@ class Application extends Container implements ApplicationContract, CachesConfig
     protected $databasePath;
 
     /**
+     * The custom config path defined by the developer.
+     *
+     * @var string
+     */
+    protected $configPath;
+
+    /**
      * The custom language file path defined by the developer.
      *
      * @var string
@@ -422,7 +429,24 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function configPath($path = '')
     {
-        return $this->joinPaths($this->basePath('config'), $path);
+        $configPath = $this->configPath ?: $this->basePath('config');
+
+        return $this->joinPaths($this->basePath($configPath), $path);
+    }
+
+    /**
+     * Set the config directory.
+     *
+     * @param  string  $path
+     * @return $this
+     */
+    public function useConfigPath($path)
+    {
+        $this->configPath = $path;
+
+        $this->instance('path.config', $path);
+
+        return $this;
     }
 
     /**
