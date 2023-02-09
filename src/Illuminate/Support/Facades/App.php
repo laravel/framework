@@ -107,6 +107,8 @@ namespace Illuminate\Support\Facades;
  * @method static mixed call(callable|string $callback, array $parameters = [], string|null $defaultMethod = null)
  * @method static \Closure factory(string $abstract)
  * @method static mixed makeWith(string|callable $abstract, array $parameters = [])
+ * @method static mixed setKey(string $key, mixed $value)
+ * @method static mixed|string getKey(string $key)
  * @method static mixed get(string $id)
  * @method static mixed build(\Closure|string $concrete)
  * @method static void beforeResolving(\Closure|string $abstract, \Closure|null $callback = null)
