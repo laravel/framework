@@ -67,6 +67,13 @@ class Migrator
     protected $paths = [];
 
     /**
+     * The migrations that have already been required.
+     *
+     * @var array<string, \Illuminate\Database\Migrations\Migration>
+     */
+    protected static array $requiredMigrations = [];
+
+    /**
      * The output interface implementation.
      *
      * @var \Symfony\Component\Console\Output\OutputInterface
@@ -515,7 +522,11 @@ class Migrator
             return new $class;
         }
 
-        $migration = $this->files->getRequire($path);
+        if (! isset(static::$requiredMigrations[$path])) {
+            static::$requiredMigrations[$path] = $this->files->getRequire($path);
+        }
+
+        $migration = static::$requiredMigrations[$path];
 
         return is_object($migration) ? $migration : new $class;
     }
@@ -557,7 +568,9 @@ class Migrator
     public function requireFiles(array $files)
     {
         foreach ($files as $file) {
-            $this->files->requireOnce($file);
+            if (! isset(static::$requiredMigrations[$file])) {
+                static::$requiredMigrations[$file] = $this->files->requireOnce($file);
+            }
         }
     }
 
