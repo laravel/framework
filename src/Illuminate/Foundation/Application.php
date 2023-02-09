@@ -118,18 +118,18 @@ class Application extends Container implements ApplicationContract, CachesConfig
     protected $appPath;
 
     /**
+     * The custom configuration path defined by the developer.
+     *
+     * @var string
+     */
+    protected $configPath;
+
+    /**
      * The custom database path defined by the developer.
      *
      * @var string
      */
     protected $databasePath;
-
-    /**
-     * The custom config path defined by the developer.
-     *
-     * @var string
-     */
-    protected $configPath;
 
     /**
      * The custom language file path defined by the developer.
@@ -364,9 +364,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function path($path = '')
     {
-        $appPath = $this->appPath ?: $this->basePath('app');
-
-        return $this->joinPaths($appPath, $path);
+        return $this->joinPaths($this->appPath ?: $this->basePath('app'), $path);
     }
 
     /**
@@ -429,13 +427,11 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function configPath($path = '')
     {
-        $configPath = $this->configPath ?: $this->basePath('config');
-
-        return $this->joinPaths($configPath, $path);
+        return $this->joinPaths($this->configPath ?: $this->basePath('config'), $path);
     }
 
     /**
-     * Set the config directory.
+     * Set the configuration directory.
      *
      * @param  string  $path
      * @return $this
@@ -457,9 +453,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function databasePath($path = '')
     {
-        $databasePath = $this->databasePath ?: $this->basePath('database');
-
-        return $this->joinPaths($databasePath, $path);
+        return $this->joinPaths($this->databasePath ?: $this->basePath('database'), $path);
     }
 
     /**
@@ -511,9 +505,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function publicPath($path = '')
     {
-        $publicPath = $this->publicPath ?: $this->basePath('public');
-
-        return $this->joinPaths($publicPath, $path);
+        return $this->joinPaths($this->publicPath ?: $this->basePath('public'), $path);
     }
 
     /**
@@ -539,9 +531,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function storagePath($path = '')
     {
-        $storagePath = $this->storagePath ?: $this->basePath('storage');
-
-        return $this->joinPaths($storagePath, $path);
+        return $this->joinPaths($this->storagePath ?: $this->basePath('storage'), $path);
     }
 
     /**
