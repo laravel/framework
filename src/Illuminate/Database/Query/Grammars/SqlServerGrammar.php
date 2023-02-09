@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Query\Grammars;
 
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Query\IndexHint;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
@@ -601,6 +602,22 @@ class SqlServerGrammar extends Grammar
         }
 
         return $this->getValue($table);
+    }
+
+    /**
+     * Compile the index hints of the query.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  IndexHint  $indexHint
+     * @return string
+     */
+    protected function compileIndexHint(Builder $query, $indexHint)
+    {
+        if ($indexHint->type === 'force') {
+            return "with (index({$indexHint->index}))";
+        }
+
+        return '';
     }
 
     /**

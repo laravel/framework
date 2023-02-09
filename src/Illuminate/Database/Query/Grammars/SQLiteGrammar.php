@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Query\Grammars;
 
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Query\IndexHint;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
@@ -338,6 +339,22 @@ class SQLiteGrammar extends Grammar
             'delete from sqlite_sequence where name = ?' => [$query->from],
             'delete from '.$this->wrapTable($query->from) => [],
         ];
+    }
+
+    /**
+     * Compile the index hints of the query.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  IndexHint  $indexHint
+     * @return string
+     */
+    protected function compileIndexHint(Builder $query, $indexHint)
+    {
+        if ($indexHint->type === 'force') {
+            return "indexed by {$indexHint->index}";
+        }
+
+        return '';
     }
 
     /**

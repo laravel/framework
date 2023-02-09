@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Query\Grammars;
 
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Query\IndexHint;
 use Illuminate\Support\Str;
 
 class MySqlGrammar extends Grammar
@@ -298,6 +299,26 @@ class MySqlGrammar extends Grammar
         })->all();
 
         return parent::prepareBindingsForUpdate($bindings, $values);
+    }
+
+    /**
+     * Compile the index hints of the query.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  IndexHint  $indexHint
+     * @return string
+     */
+    protected function compileIndexHint(Builder $query, $indexHint)
+    {
+        if ($indexHint->type === 'hint') {
+            return "use index ({$indexHint->index})";
+        }
+
+        if ($indexHint->type === 'force') {
+            return "force index ({$indexHint->index})";
+        }
+
+        return "ignore index ({$indexHint->index})";
     }
 
     /**
