@@ -101,10 +101,9 @@ class AwsS3V3Adapter extends FilesystemAdapter
      * @param  string  $path
      * @param  \DateTimeInterface  $expiration
      * @param  array  $options
-     * @param  bool  $requiredHeaders
-     * @return string|array
+     * @return array
      */
-    public function temporaryUploadUrl($path, $expiration, array $options = [], bool $requiredHeaders = false)
+    public function temporaryUploadUrl($path, $expiration, array $options = [])
     {
         $command = $this->client->getCommand('PutObject', array_merge([
             'Bucket' => $this->config['bucket'],
@@ -124,14 +123,10 @@ class AwsS3V3Adapter extends FilesystemAdapter
             $uri = $this->replaceBaseUrl($uri, $this->config['temporary_url']);
         }
 
-        if($requiredHeaders) {
-            return [
-                'url' => (string) $uri,
-                'headers' => $signedRequest->getHeaders(),
-            ];
-        }
-
-        return (string) $uri;
+        return [
+            'url' => (string) $uri,
+            'headers' => $signedRequest->getHeaders(),
+        ];
     }
 
     /**
