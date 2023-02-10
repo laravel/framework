@@ -281,6 +281,8 @@ class Mailer implements MailerContract, MailQueueContract
         // its recipients. We will then fire the sent event for the sent message.
         $symfonyMessage = $message->getSymfonyMessage();
 
+        $data['mailer'] = $this->name;
+
         if ($this->shouldSendMessage($symfonyMessage, $data)) {
             $symfonySentMessage = $this->sendSymfonyMessage($symfonyMessage);
 
