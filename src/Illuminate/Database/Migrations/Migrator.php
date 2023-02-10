@@ -71,7 +71,7 @@ class Migrator
      *
      * @var array<string, \Illuminate\Database\Migrations\Migration|null>
      */
-    protected static $pathsAlreadyRequired = [];
+    protected static $requiredPathCache = [];
 
     /**
      * The output interface implementation.
@@ -518,7 +518,7 @@ class Migrator
             return new $class;
         }
 
-        $migration = static::$pathsAlreadyRequired[$path] ??= $this->files->getRequire($path);
+        $migration = static::$requiredPathCache[$path] ??= $this->files->getRequire($path);
 
         if (is_object($migration)) {
             return clone $migration;
