@@ -3,7 +3,6 @@
 namespace Illuminate\Database\Query\Grammars;
 
 use Illuminate\Database\Query\Builder;
-use Illuminate\Database\Query\IndexHint;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
