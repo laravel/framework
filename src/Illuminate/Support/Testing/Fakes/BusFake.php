@@ -215,6 +215,7 @@ class BusFake implements QueueingDispatcher
         if ($command instanceof Closure) {
             [$command, $callback] = [$this->firstClosureParameterType($command), $command];
         }
+
         $count = $this->dispatchedSync($command, $callback)->count();
 
         PHPUnit::assertSame(
@@ -268,13 +269,18 @@ class BusFake implements QueueingDispatcher
     /**
      * Assert if a job was pushed after the response was sent a number of times.
      *
-     * @param  string  $command
+     * @param  string|\Closure  $command
      * @param  int  $times
      * @return void
      */
     public function assertDispatchedAfterResponseTimes($command, $times = 1)
     {
-        $count = $this->dispatchedAfterResponse($command)->count();
+        $callback = null;
+        if ($command instanceof Closure) {
+            [$command, $callback] = [$this->firstClosureParameterType($command), $command];
+        }
+
+        $count = $this->dispatchedAfterResponse($command, $callback)->count();
 
         PHPUnit::assertSame(
             $times, $count,
