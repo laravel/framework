@@ -26,7 +26,7 @@ use Illuminate\Support\Testing\Fakes\BusFake;
  * @method static void assertNotDispatched(string|\Closure $command, callable|null $callback = null)
  * @method static void assertNothingDispatched()
  * @method static void assertDispatchedSync(string|\Closure $command, callable|int|null $callback = null)
- * @method static void assertDispatchedSyncTimes(string $command, int $times = 1)
+ * @method static void assertDispatchedSyncTimes(string|\Closure $command, int $times = 1)
  * @method static void assertNotDispatchedSync(string|\Closure $command, callable|null $callback = null)
  * @method static void assertDispatchedAfterResponse(string|\Closure $command, callable|int|null $callback = null)
  * @method static void assertDispatchedAfterResponseTimes(string $command, int $times = 1)
