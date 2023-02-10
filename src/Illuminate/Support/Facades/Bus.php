@@ -22,7 +22,7 @@ use Illuminate\Support\Testing\Fakes\BusFake;
  * @method static \Illuminate\Bus\Dispatcher map(array $map)
  * @method static void except(array|string $jobsToDispatch)
  * @method static void assertDispatched(string|\Closure $command, callable|int|null $callback = null)
- * @method static void assertDispatchedTimes(string $command, int $times = 1)
+ * @method static void assertDispatchedTimes(string|\Closure $command, int $times = 1)
  * @method static void assertNotDispatched(string|\Closure $command, callable|null $callback = null)
  * @method static void assertNothingDispatched()
  * @method static void assertDispatchedSync(string|\Closure $command, callable|int|null $callback = null)

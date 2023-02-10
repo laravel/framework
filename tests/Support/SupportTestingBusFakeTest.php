@@ -263,6 +263,30 @@ class SupportTestingBusFakeTest extends TestCase
         $this->fake->assertDispatchedTimes(BusJobStub::class, 2);
     }
 
+    public function testAssertDispatchedTimesWithCallbackFunction()
+    {
+        $this->fake->dispatch(new OtherBusJobStub(0));
+        $this->fake->dispatchNow(new OtherBusJobStub(1));
+        $this->fake->dispatchAfterResponse(new OtherBusJobStub(1));
+
+        try {
+            $this->fake->assertDispatchedTimes(function (OtherBusJobStub $job) {
+                return $job->id === 0;
+            }, 2);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\OtherBusJobStub] job was pushed 1 times instead of 2 times.'));
+        }
+
+        $this->fake->assertDispatchedTimes(function (OtherBusJobStub $job) {
+            return $job->id === 0;
+        });
+
+        $this->fake->assertDispatchedTimes(function (OtherBusJobStub $job) {
+            return $job->id === 1;
+        }, 2);
+    }
+
     public function testAssertDispatchedAfterResponseTimes()
     {
         $this->fake->dispatchAfterResponse(new BusJobStub);
