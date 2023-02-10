@@ -85,8 +85,8 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         $callback = $this->valueRetriever($callback);
 
         $items = $this
-            ->map(fn($value) => $callback($value))
-            ->filter(fn($value) => ! is_null($value));
+            ->map(fn ($value) => $callback($value))
+            ->filter(fn ($value) => ! is_null($value));
 
         if ($count = $items->count()) {
             return $items->sum() / $count;
