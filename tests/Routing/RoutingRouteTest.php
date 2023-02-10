@@ -1029,7 +1029,7 @@ class RoutingRouteTest extends TestCase
     public function testModelBindingWithNullReturn()
     {
         $this->expectException(ModelNotFoundException::class);
-        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Routing\RouteModelBindingNullStub].');
+        $this->expectExceptionMessage('No query results for model [RouteModelBindingNullStub].');
 
         $router = $this->getRouter();
         $router->get('foo/{bar}', ['middleware' => SubstituteBindings::class, 'uses' => function ($name) {
