@@ -407,7 +407,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
     public function testFindOrFailMethod()
     {
         $this->expectException(ModelNotFoundException::class);
-        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Integration\Database\EloquentBelongsToManyTest\Tag] 10');
+        $this->expectExceptionMessage('No query results for model [Tag] 10');
 
         $post = Post::create(['title' => Str::random()]);
 
@@ -421,7 +421,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
     public function testFindOrFailMethodWithMany()
     {
         $this->expectException(ModelNotFoundException::class);
-        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Integration\Database\EloquentBelongsToManyTest\Tag] 10, 11');
+        $this->expectExceptionMessage('No query results for model [Tag] 10, 11');
 
         $post = Post::create(['title' => Str::random()]);
 
@@ -435,7 +435,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
     public function testFindOrFailMethodWithManyUsingCollection()
     {
         $this->expectException(ModelNotFoundException::class);
-        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Integration\Database\EloquentBelongsToManyTest\Tag] 10, 11');
+        $this->expectExceptionMessage('No query results for model [Tag] 10, 11');
 
         $post = Post::create(['title' => Str::random()]);
 
