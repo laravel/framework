@@ -411,6 +411,10 @@ class Builder implements BuilderContract
 
                 $this->selectSub($column, $as);
             } else {
+                if (is_array($this->columns) && in_array($column, $this->columns, true)) {
+                    continue;
+                }
+
                 $this->columns[] = $column;
             }
         }

@@ -107,7 +107,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testAddingSelects()
     {
         $builder = $this->getBuilder();
-        $builder->select('foo')->addSelect('bar')->addSelect(['baz', 'boom'])->from('users');
+        $builder->select('foo')->addSelect('bar')->addSelect(['baz', 'boom'])->addSelect('bar')->from('users');
         $this->assertSame('select "foo", "bar", "baz", "boom" from "users"', $builder->toSql());
     }
 
