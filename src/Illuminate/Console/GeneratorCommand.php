@@ -453,6 +453,24 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
     }
 
     /**
+     * Checks whether the given class name is reserved or already exists.
+     *
+     * @return bool
+     */
+    protected function isReservedAOrExistenceName()
+    {
+        if ($this->isReservedName($this->getNameInput())) {
+            return true;
+        }
+
+        if ($this->alreadyExists($this->getNameInput())) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Get the first view directory path from the application configuration.
      *
      * @param  string  $path

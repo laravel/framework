@@ -309,7 +309,7 @@ class ControllerMakeCommand extends GeneratorCommand
      */
     protected function afterPromptingForMissingArguments(InputInterface $input, OutputInterface $output)
     {
-        if ($this->didReceiveOptions($input)) {
+        if ($this->isReservedAOrExistenceName() || $this->didReceiveOptions($input)) {
             return;
         }
 
