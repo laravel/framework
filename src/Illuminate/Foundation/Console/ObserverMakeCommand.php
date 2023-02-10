@@ -162,7 +162,7 @@ class ObserverMakeCommand extends GeneratorCommand
      */
     protected function afterPromptingForMissingArguments(InputInterface $input, OutputInterface $output)
     {
-        if ($this->isReservedAOrExistenceName() || $this->didReceiveOptions($input)) {
+        if ($this->isReservedOrExistingName() || $this->didReceiveOptions($input)) {
             return;
         }
 

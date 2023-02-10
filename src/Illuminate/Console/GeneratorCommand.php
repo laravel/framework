@@ -457,7 +457,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
      *
      * @return bool
      */
-    protected function isReservedAOrExistenceName()
+    protected function isReservedOrExistingName()
     {
         if ($this->isReservedName($this->getNameInput())) {
             return true;
