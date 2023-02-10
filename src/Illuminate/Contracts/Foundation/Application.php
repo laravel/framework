@@ -100,6 +100,13 @@ interface Application extends Container
     public function runningUnitTests();
 
     /**
+     * Determine if the application is running with debug mode enabled.
+     *
+     * @return bool
+     */
+    public function hasDebugModeEnabled();
+
+    /**
      * Get an instance of the maintenance mode manager implementation.
      *
      * @return \Illuminate\Contracts\Foundation\MaintenanceMode
