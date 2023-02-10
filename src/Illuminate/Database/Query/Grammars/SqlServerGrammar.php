@@ -98,6 +98,20 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile the index hints for the query.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  \Illuminate\Database\Query\IndexHint  $indexHint
+     * @return string
+     */
+    protected function compileIndexHint(Builder $query, $indexHint)
+    {
+        return $indexHint->type === 'force'
+                    ? "with (index({$indexHint->index}))"
+                    : '';
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -602,22 +616,6 @@ class SqlServerGrammar extends Grammar
         }
 
         return $this->getValue($table);
-    }
-
-    /**
-     * Compile the index hints of the query.
-     *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  IndexHint  $indexHint
-     * @return string
-     */
-    protected function compileIndexHint(Builder $query, $indexHint)
-    {
-        if ($indexHint->type === 'force') {
-            return "with (index({$indexHint->index}))";
-        }
-
-        return '';
     }
 
     /**

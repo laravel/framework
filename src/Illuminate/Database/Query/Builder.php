@@ -103,7 +103,7 @@ class Builder implements BuilderContract
     /**
      * The index hint for the query.
      *
-     * @var IndexHint
+     * @var \Illuminate\Database\Query\IndexHint
      */
     public $indexHint;
 

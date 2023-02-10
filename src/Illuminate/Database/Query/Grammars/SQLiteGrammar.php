@@ -119,6 +119,20 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
+     * Compile the index hints for the query.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  \Illuminate\Database\Query\IndexHint  $indexHint
+     * @return string
+     */
+    protected function compileIndexHint(Builder $query, $indexHint)
+    {
+        return $indexHint->type === 'force'
+                ? "indexed by {$indexHint->index}"
+                : '';
+    }
+
+    /**
      * Compile a "JSON length" statement into SQL.
      *
      * @param  string  $column
@@ -339,22 +353,6 @@ class SQLiteGrammar extends Grammar
             'delete from sqlite_sequence where name = ?' => [$query->from],
             'delete from '.$this->wrapTable($query->from) => [],
         ];
-    }
-
-    /**
-     * Compile the index hints of the query.
-     *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  IndexHint  $indexHint
-     * @return string
-     */
-    protected function compileIndexHint(Builder $query, $indexHint)
-    {
-        if ($indexHint->type === 'force') {
-            return "indexed by {$indexHint->index}";
-        }
-
-        return '';
     }
 
     /**
