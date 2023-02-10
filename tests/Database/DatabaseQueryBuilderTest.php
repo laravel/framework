@@ -5418,6 +5418,69 @@ SQL;
         $this->assertSame('select * from "users" where "roles" ??& ?', $builder->toSql());
     }
 
+    public function testUseIndexMySql()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('foo')->from('users')->useIndex('test_index');
+        $this->assertSame('select `foo` from `users` use index (test_index)', $builder->toSql());
+    }
+
+    public function testForceIndexMySql()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('foo')->from('users')->forceIndex('test_index');
+        $this->assertSame('select `foo` from `users` force index (test_index)', $builder->toSql());
+    }
+
+    public function testIgnoreIndexMySql()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('foo')->from('users')->ignoreIndex('test_index');
+        $this->assertSame('select `foo` from `users` ignore index (test_index)', $builder->toSql());
+    }
+
+    public function testUseIndexSqlite()
+    {
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('foo')->from('users')->useIndex('test_index');
+        $this->assertSame('select "foo" from "users"', $builder->toSql());
+    }
+
+    public function testForceIndexSqlite()
+    {
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('foo')->from('users')->forceIndex('test_index');
+        $this->assertSame('select "foo" from "users" indexed by test_index', $builder->toSql());
+    }
+
+    public function testIgnoreIndexSqlite()
+    {
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('foo')->from('users')->ignoreIndex('test_index');
+        $this->assertSame('select "foo" from "users"', $builder->toSql());
+    }
+
+    public function testUseIndexSqlServer()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('foo')->from('users')->useIndex('test_index');
+        $this->assertSame('select [foo] from [users]', $builder->toSql());
+    }
+
+    public function testForceIndexSqlServer()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('foo')->from('users')->forceIndex('test_index');
+        $this->assertSame('select [foo] from [users] with (index(test_index))', $builder->toSql());
+    }
+
+    public function testIgnoreIndexSqlServer()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('foo')->from('users')->ignoreIndex('test_index');
+        $this->assertSame('select [foo] from [users]', $builder->toSql());
+    }
+
     public function testClone()
     {
         $builder = $this->getBuilder();

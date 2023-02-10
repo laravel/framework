@@ -101,6 +101,13 @@ class Builder implements BuilderContract
     public $from;
 
     /**
+     * The index hint for the query.
+     *
+     * @var \Illuminate\Database\Query\IndexHint
+     */
+    public $indexHint;
+
+    /**
      * The table joins for the query.
      *
      * @var array
@@ -454,6 +461,45 @@ class Builder implements BuilderContract
         }
 
         $this->from = $as ? "{$table} as {$as}" : $table;
+
+        return $this;
+    }
+
+    /**
+     * Add an index hint to suggest a query index.
+     *
+     * @param  string  $index
+     * @return $this
+     */
+    public function useIndex($index)
+    {
+        $this->indexHint = new IndexHint('hint', $index);
+
+        return $this;
+    }
+
+    /**
+     * Add an index hint to force a query index.
+     *
+     * @param  string  $index
+     * @return $this
+     */
+    public function forceIndex($index)
+    {
+        $this->indexHint = new IndexHint('force', $index);
+
+        return $this;
+    }
+
+    /**
+     * Add an index hint to ignore a query index.
+     *
+     * @param  string  $index
+     * @return $this
+     */
+    public function ignoreIndex($index)
+    {
+        $this->indexHint = new IndexHint('ignore', $index);
 
         return $this;
     }

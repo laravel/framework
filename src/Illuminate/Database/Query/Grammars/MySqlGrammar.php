@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Query\Grammars;
 
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Query\IndexHint;
 use Illuminate\Support\Str;
 
 class MySqlGrammar extends Grammar
@@ -72,6 +73,22 @@ class MySqlGrammar extends Grammar
             : '';
 
         return "match ({$columns}) against (".$value."{$mode}{$expanded})";
+    }
+
+    /**
+     * Compile the index hints for the query.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  \Illuminate\Database\Query\IndexHint  $indexHint
+     * @return string
+     */
+    protected function compileIndexHint(Builder $query, $indexHint)
+    {
+        return match ($indexHint->type) {
+            'hint' => "use index ({$indexHint->index})",
+            'force' => "force index ({$indexHint->index})",
+            default => "ignore index ({$indexHint->index})",
+        };
     }
 
     /**
