@@ -134,6 +134,7 @@ class BusFake implements QueueingDispatcher
     public function assertDispatchedTimes($command, $times = 1)
     {
         $callback = null;
+
         if ($command instanceof Closure) {
             [$command, $callback] = [$this->firstClosureParameterType($command), $command];
         }
@@ -212,6 +213,7 @@ class BusFake implements QueueingDispatcher
     public function assertDispatchedSyncTimes($command, $times = 1)
     {
         $callback = null;
+
         if ($command instanceof Closure) {
             [$command, $callback] = [$this->firstClosureParameterType($command), $command];
         }
@@ -276,6 +278,7 @@ class BusFake implements QueueingDispatcher
     public function assertDispatchedAfterResponseTimes($command, $times = 1)
     {
         $callback = null;
+
         if ($command instanceof Closure) {
             [$command, $callback] = [$this->firstClosureParameterType($command), $command];
         }
