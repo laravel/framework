@@ -84,6 +84,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected $withCount = [];
 
     /**
+     * The relationship aggregates that should be eager loaded on every query.
+     *
+     * @var array
+     */
+    protected $withAggregate = [];
+
+    /**
      * Indicates whether lazy loading will be prevented on this model.
      *
      * @var bool
@@ -1525,9 +1532,32 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function newQueryWithoutScopes()
     {
-        return $this->newModelQuery()
-            ->with($this->with)
-            ->withCount($this->withCount);
+        return $this->withAggregates(
+            $this->newModelQuery()
+                ->with($this->with)
+                ->withCount($this->withCount)
+        );
+    }
+
+    /**
+     * Add default model aggregates to a query builder.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder|static  $query
+     * @return \Illuminate\Database\Eloquent\Builder|static
+     */
+    protected function withAggregates(Builder $query)
+    {
+        foreach ($this->withAggregate as $function => $aggregates) {
+            foreach ($aggregates as $aggregate) {
+                [$relations, $column] = explode(':', $aggregate, 2);
+
+                $relations = explode(',', $relations);
+
+                $query->withAggregate($relations, $column, $function);
+            }
+        }
+
+        return $query;
     }
 
     /**
