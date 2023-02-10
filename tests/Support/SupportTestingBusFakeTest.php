@@ -225,6 +225,30 @@ class SupportTestingBusFakeTest extends TestCase
         });
     }
 
+    public function testAssertDispatchedAfterResponseTimesWithCallbackFunction()
+    {
+        $this->fake->dispatchAfterResponse(new OtherBusJobStub(0));
+        $this->fake->dispatchAfterResponse(new OtherBusJobStub(1));
+        $this->fake->dispatchAfterResponse(new OtherBusJobStub(1));
+
+        try {
+            $this->fake->assertDispatchedAfterResponseTimes(function (OtherBusJobStub $job) {
+                return $job->id === 0;
+            }, 2);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\OtherBusJobStub] job was pushed 1 times instead of 2 times.'));
+        }
+
+        $this->fake->assertDispatchedAfterResponseTimes(function (OtherBusJobStub $job) {
+            return $job->id === 0;
+        });
+
+        $this->fake->assertDispatchedAfterResponseTimes(function (OtherBusJobStub $job) {
+            return $job->id === 1;
+        }, 2);
+    }
+
     public function testAssertDispatchedSyncWithCallbackFunction()
     {
         $this->fake->dispatchSync(new OtherBusJobStub);
@@ -263,6 +287,30 @@ class SupportTestingBusFakeTest extends TestCase
         $this->fake->assertDispatchedTimes(BusJobStub::class, 2);
     }
 
+    public function testAssertDispatchedTimesWithCallbackFunction()
+    {
+        $this->fake->dispatch(new OtherBusJobStub(0));
+        $this->fake->dispatchNow(new OtherBusJobStub(1));
+        $this->fake->dispatchAfterResponse(new OtherBusJobStub(1));
+
+        try {
+            $this->fake->assertDispatchedTimes(function (OtherBusJobStub $job) {
+                return $job->id === 0;
+            }, 2);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\OtherBusJobStub] job was pushed 1 times instead of 2 times.'));
+        }
+
+        $this->fake->assertDispatchedTimes(function (OtherBusJobStub $job) {
+            return $job->id === 0;
+        });
+
+        $this->fake->assertDispatchedTimes(function (OtherBusJobStub $job) {
+            return $job->id === 1;
+        }, 2);
+    }
+
     public function testAssertDispatchedAfterResponseTimes()
     {
         $this->fake->dispatchAfterResponse(new BusJobStub);
@@ -291,6 +339,30 @@ class SupportTestingBusFakeTest extends TestCase
         }
 
         $this->fake->assertDispatchedSyncTimes(BusJobStub::class, 2);
+    }
+
+    public function testAssertDispatchedSyncTimesWithCallbackFunction()
+    {
+        $this->fake->dispatchSync(new OtherBusJobStub(0));
+        $this->fake->dispatchSync(new OtherBusJobStub(1));
+        $this->fake->dispatchSync(new OtherBusJobStub(1));
+
+        try {
+            $this->fake->assertDispatchedSyncTimes(function (OtherBusJobStub $job) {
+                return $job->id === 0;
+            }, 2);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\OtherBusJobStub] job was synchronously pushed 1 times instead of 2 times.'));
+        }
+
+        $this->fake->assertDispatchedSyncTimes(function (OtherBusJobStub $job) {
+            return $job->id === 0;
+        });
+
+        $this->fake->assertDispatchedSyncTimes(function (OtherBusJobStub $job) {
+            return $job->id === 1;
+        }, 2);
     }
 
     public function testAssertNotDispatched()
