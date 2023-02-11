@@ -253,6 +253,8 @@ class Mailer implements MailerContract, MailQueueContract
             return $this->sendMailable($view);
         }
 
+        $data['mailer'] = $this->name;
+
         // First we need to parse the view, which could either be a string or an array
         // containing both an HTML and plain text versions of the view which should
         // be used when sending an e-mail. We will extract both of them out here.
@@ -280,8 +282,6 @@ class Mailer implements MailerContract, MailQueueContract
         // one final chance to stop this message and then we will send it to all of
         // its recipients. We will then fire the sent event for the sent message.
         $symfonyMessage = $message->getSymfonyMessage();
-
-        $data['mailer'] = $this->name;
 
         if ($this->shouldSendMessage($symfonyMessage, $data)) {
             $symfonySentMessage = $this->sendSymfonyMessage($symfonyMessage);
