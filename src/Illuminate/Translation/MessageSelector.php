@@ -85,7 +85,7 @@ class MessageSelector
      * Strip the inline conditions from each segment, just leaving the text.
      *
      * @param  array  $segments
-     * @return array|\Illuminate\Support\Collection
+     * @return array
      */
     private function stripConditions($segments)
     {
