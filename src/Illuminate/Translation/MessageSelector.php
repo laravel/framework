@@ -85,13 +85,13 @@ class MessageSelector
      * Strip the inline conditions from each segment, just leaving the text.
      *
      * @param  array  $segments
-     * @return array
+     * @return array|\Illuminate\Support\Collection
      */
     private function stripConditions($segments)
     {
-        return collect($segments)->map(function ($part) {
-            return preg_replace('/^[\{\[]([^\[\]\{\}]*)[\}\]]/', '', $part);
-        })->all();
+        return collect($segments)
+            ->map(fn ($part) => preg_replace('/^[\{\[]([^\[\]\{\}]*)[\}\]]/', '', $part))
+            ->all();
     }
 
     /**
