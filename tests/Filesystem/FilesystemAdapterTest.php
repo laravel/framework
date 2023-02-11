@@ -91,6 +91,7 @@ class FilesystemAdapterTest extends TestCase
         $files = m::mock(FilesystemAdapter::class, [$this->filesystem, $this->adapter])
             ->shouldAllowMockingProtectedMethods()
             ->makePartial();
+        $files->shouldAllowMockingProtectedMethods();
         $files->shouldReceive('fallbackName')->never();
 
         $files->response('file.txt', null, [
