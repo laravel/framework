@@ -253,6 +253,8 @@ class Mailer implements MailerContract, MailQueueContract
             return $this->sendMailable($view);
         }
 
+        $data['mailer'] = $this->name;
+
         // First we need to parse the view, which could either be a string or an array
         // containing both an HTML and plain text versions of the view which should
         // be used when sending an e-mail. We will extract both of them out here.
