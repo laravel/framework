@@ -1287,7 +1287,7 @@ class Grammar extends BaseGrammar
      */
     public function compileSavepointRelease($name)
     {
-        return 'RELEASE '.$name;
+        return 'RELEASE SAVEPOINT '.$name;
     }
 
     /**
