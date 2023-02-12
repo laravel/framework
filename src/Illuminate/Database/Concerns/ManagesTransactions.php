@@ -207,7 +207,6 @@ trait ManagesTransactions
      * Perform a commit within the database.
      *
      * @return void
-     *
      */
     protected function performCommit()
     {
@@ -228,7 +227,7 @@ trait ManagesTransactions
     {
         return $this->transactions == 0 ||
             ($this->transactionsManager &&
-                $this->transactionsManager->callbackApplicableTransactions()->count() === 1);
+            $this->transactionsManager->callbackApplicableTransactions()->count() === 1);
     }
 
     /**
