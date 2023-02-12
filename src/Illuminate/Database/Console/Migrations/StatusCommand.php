@@ -124,12 +124,9 @@ class StatusCommand extends BaseCommand
     {
         return [
             ['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use'],
-
+            ['pending', null, InputOption::VALUE_NONE, 'Only list pending migrations'],
             ['path', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'The path(s) to the migrations files to use'],
-
             ['realpath', null, InputOption::VALUE_NONE, 'Indicate any provided migration file paths are pre-resolved absolute paths'],
-
-            ['pending', null, InputOption::VALUE_NONE, 'Get only pending migrations'],
         ];
     }
 }
