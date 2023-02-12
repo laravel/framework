@@ -728,9 +728,10 @@ class Str
      * @param  bool  $letters
      * @param  bool  $numbers
      * @param  bool  $symbols
+     * @param  bool  $spaces
      * @return string
      */
-    public static function password($length = 32, $letters = true, $numbers = true, $symbols = true)
+    public static function password($length = 32, $letters = true, $numbers = true, $symbols = true, $spaces = true)
     {
         $characters = [];
 
@@ -756,6 +757,10 @@ class Str
                 '_', '.', ',', '<', '>', '?', '/', '\\', '{', '}', '[',
                 ']', '|', ':', ';',
             ]);
+        }
+
+        if ($spaces) {
+            $characters = array_merge($characters, [' ']);
         }
 
         $password = '';
