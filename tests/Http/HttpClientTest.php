@@ -17,6 +17,7 @@ use Illuminate\Http\Client\Request;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Http\Client\ResponseSequence;
+use Illuminate\Http\Client\Server;
 use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -2178,5 +2179,224 @@ class HttpClientTest extends TestCase
         $this->factory->assertSent(function (Request $request) {
             return $request->url() === 'https://laravel.com/docs/9.x/validation';
         });
+    }
+
+    public function testItThrowsWhenServerDoesNotExist(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The server "fail" is not defined.');
+
+        $this->factory->define(TestApp::class);
+
+        $this->factory->server('fail');
+    }
+
+    public function testItRetrievesDefinedServer(): void
+    {
+        $this->factory->fake();
+
+        $this->factory->define(TestApp::class);
+
+        $server = $this->factory->server('test app');
+
+        $server->get('test');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'https://chirper.app/api/test';
+        });
+    }
+
+    public function testItUsesDefaultRequestOptions(): void
+    {
+        $this->factory->fake();
+
+        $this->factory->define(TestApp::class);
+
+        $server = $this->factory->server('test app');
+
+        $server->get('test');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'https://chirper.app/api/test'
+                && count($request->headers()) === 2
+                && $request->hasHeader('Host')
+                && $request->hasHeader('User-Agent');
+        });
+    }
+
+    public function testItUsesCustomRequestOptions(): void
+    {
+        $this->factory->fake();
+
+        $this->factory->define(TestComplexApp::class);
+
+        $server = $this->factory->server('test complex app');
+
+        $server->get('test');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'https://chirper.app/api/test'
+                && count($request->headers()) === 4
+                && $request->hasHeader('Authorization', ['Bearer test-token'])
+                && $request->hasHeader('X-Cool', ['true']);
+        });
+    }
+
+    public function testItRetrievesDefinedServerDynamically(): void
+    {
+        $this->factory->fake();
+
+        $this->factory->define(TestApp::class);
+
+        $server = $this->factory->testApp();
+
+        $server->get('test');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'https://chirper.app/api/test';
+        });
+    }
+
+    public function testItSetsParameters(): void
+    {
+        $this->factory->fake();
+
+        $this->factory->define(TestApp::class);
+
+        $server = $this->factory->server('test app');
+
+        $server->parameters(['id' => 10])->view();
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'https://chirper.app/api/chirp/10';
+        });
+    }
+
+    public function testItRetrievesServerWithParameters(): void
+    {
+        $this->factory->fake();
+
+        $this->factory->define(TestApp::class);
+
+        $server = $this->factory->server('test app', ['id' => 10]);
+
+        $server->view();
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'https://chirper.app/api/chirp/10';
+        });
+    }
+
+    public function testItExecutesAction(): void
+    {
+        $this->factory->fake();
+
+        $this->factory->define(TestApp::class);
+
+        $server = $this->factory->server('test app');
+
+        $server->latest();
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'https://chirper.app/api/latest';
+        });
+    }
+
+    public function testItExecutesActionWithParameters(): void
+    {
+        $this->factory->fake();
+
+        $this->factory->define(TestApp::class);
+
+        $server = $this->factory->server('test app');
+
+        $server->chirp(['message' => 'hello world']);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'https://chirper.app/api/new'
+                && $request->method() === 'POST'
+                && $request->body() === '{"message":"hello world"}';
+        });
+    }
+
+    public function testItExecutesCustomAction(): void
+    {
+        $this->factory->fake();
+
+        $this->factory->define(TestActionsApp::class);
+
+        $server = $this->factory->server('test actions app');
+
+        $server->chirp('hello world');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'https://chirper.app/api/new'
+                && $request->method() === 'POST'
+                && $request->body() === '{"message":"hello world"}';
+        });
+    }
+
+    public function testItExecutesBuilder(): void
+    {
+        $this->factory->fake();
+
+        $this->factory->define(TestBuilderApp::class);
+
+        $server = $this->factory->server('test builder app');
+
+        $server->chirp(['message' => 'hello world']);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'https://chirper.app/api/new'
+                && $request->method() === 'POST'
+                && $request->body() === '{"message":"hello world"}'
+                && $request->hasHeader('X-Foo', ['bar']);
+        });
+    }
+}
+
+class TestApp extends Server
+{
+    protected $actions = [
+        'latest' => 'latest',
+        'chirp' => 'post:new',
+        'view' => 'chirp/{id}',
+    ];
+    protected $baseUrl = 'https://chirper.app/api';
+}
+
+class TestComplexApp extends Server
+{
+    protected $actions = [
+        'latest' => 'latest',
+        'chirp' => 'post:new',
+    ];
+
+    protected $baseUrl = 'https://chirper.app/api';
+    protected $headers = ['X-Cool' => 'true'];
+    protected $authToken = 'test-token';
+}
+
+class TestActionsApp extends Server
+{
+    protected $baseUrl = 'https://chirper.app/api';
+
+    public function chirp($message)
+    {
+        return $this->request()->post('new', ['message' => $message]);
+    }
+}
+
+class TestBuilderApp extends Server
+{
+    protected $actions = [
+        'chirp' => 'post:new',
+    ];
+
+    protected $baseUrl = 'https://chirper.app/api';
+
+    protected function build($request)
+    {
+        $request->withHeaders(['X-Foo' => 'bar']);
     }
 }

@@ -10,6 +10,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use PHPUnit\Framework\Assert as PHPUnit;
+use RuntimeException;
 
 /**
  * @mixin \Illuminate\Http\Client\PendingRequest
@@ -26,6 +27,13 @@ class Factory
      * @var \Illuminate\Contracts\Events\Dispatcher|null
      */
     protected $dispatcher;
+
+    /**
+     * The registered servers.
+     *
+     * @var \Illuminate\Support\Collection<\Illuminate\Http\Client\Server>
+     */
+    protected $servers;
 
     /**
      * The stub callables that will handle requests.
@@ -73,6 +81,34 @@ class Factory
         $this->dispatcher = $dispatcher;
 
         $this->stubCallbacks = collect();
+    }
+
+    /**
+     * Defines a new server to build requests.
+     *
+     * @param  string|class-string  $class
+     * @return void
+     */
+    public function define($class, $name = null)
+    {
+        $name ??= Str::lcfirst(class_basename($class));
+
+        $this->servers[$name] = $class;
+    }
+
+    /**
+     * Returns a previously saved server.
+     *
+     * @param  string  $name
+     * @return \Illuminate\Http\Client\Server
+     */
+    public function server($name, $parameters = [])
+    {
+        $server = $this->servers[$name] ?? $this->servers[Str::camel($name)];
+
+        return $server
+            ? tap(new $server($this, $parameters))
+            : throw new RuntimeException("The server \"$name\" is not defined.");
     }
 
     /**
@@ -367,6 +403,7 @@ class Factory
         return $this->dispatcher;
     }
 
+
     /**
      * Execute a method against a new pending request instance.
      *
@@ -378,6 +415,10 @@ class Factory
     {
         if (static::hasMacro($method)) {
             return $this->macroCall($method, $parameters);
+        }
+
+        if (isset($this->servers[$method])) {
+            return tap(new $this->servers[$method]($this, $parameters));
         }
 
         return tap($this->newPendingRequest(), function ($request) {
