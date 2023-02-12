@@ -42,9 +42,9 @@ trait ManagesTransactions
             }
 
             try {
-                if ($this->transactions == 1) {
+                if ($this->transactionLevel() > 0) {
                     $this->fireConnectionEvent('committing');
-                    $this->getPdo()->commit();
+                    $this->performCommit();
                 }
 
                 $this->transactions = max(0, $this->transactions - 1);
@@ -189,9 +189,9 @@ trait ManagesTransactions
      */
     public function commit()
     {
-        if ($this->transactionLevel() == 1) {
+        if ($this->transactionLevel() > 0) {
             $this->fireConnectionEvent('committing');
-            $this->getPdo()->commit();
+            $this->performCommit();
         }
 
         $this->transactions = max(0, $this->transactions - 1);
@@ -204,6 +204,22 @@ trait ManagesTransactions
     }
 
     /**
+     * Perform a commit within the database.
+     *
+     * @return void
+     *
+     */
+    protected function performCommit()
+    {
+        if ($this->transactionLevel() == 1) {
+            $this->getPdo()->commit();
+        } elseif ($this->queryGrammar->supportsSavepointsRelease()) {
+            $this->getPdo()->exec(
+                $this->queryGrammar->compileSavepointRelease('trans'.$this->transactions)
+            );
+        }
+    }
+    /**
      * Determine if after commit callbacks should be executed.
      *
      * @return bool
@@ -212,7 +228,7 @@ trait ManagesTransactions
     {
         return $this->transactions == 0 ||
             ($this->transactionsManager &&
-             $this->transactionsManager->callbackApplicableTransactions()->count() === 1);
+                $this->transactionsManager->callbackApplicableTransactions()->count() === 1);
     }
 
     /**

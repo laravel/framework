@@ -536,6 +536,14 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * @inheritdoc
+     */
+    public function supportsSavepointsRelease()
+    {
+        return false;
+    }
+
+    /**
      * Compile the SQL statement to define a savepoint.
      *
      * @param  string  $name

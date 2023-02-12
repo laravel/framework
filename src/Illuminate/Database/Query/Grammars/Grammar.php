@@ -1259,6 +1259,16 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Determine if the grammar supports savepoints release.
+     *
+     * @return bool
+     */
+    public function supportsSavepointsRelease()
+    {
+        return true;
+    }
+
+    /**
      * Compile the SQL statement to define a savepoint.
      *
      * @param  string  $name
@@ -1267,6 +1277,17 @@ class Grammar extends BaseGrammar
     public function compileSavepoint($name)
     {
         return 'SAVEPOINT '.$name;
+    }
+
+    /**
+     * Compile the SQL statement to execute a savepoint release.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    public function compileSavepointRelease($name)
+    {
+        return 'RELEASE '.$name;
     }
 
     /**
