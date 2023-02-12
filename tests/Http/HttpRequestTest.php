@@ -8,6 +8,7 @@ use Illuminate\Routing\Route;
 use Illuminate\Session\Store;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Stringable;
 use Illuminate\Tests\Database\Fixtures\Models\Money\Price;
 use InvalidArgumentException;
 use Mockery as m;
@@ -583,6 +584,32 @@ class HttpRequestTest extends TestCase
 
         $request = Request::create('/', 'GET', [], [], ['file' => new SymfonyUploadedFile(__FILE__, 'foo.php')]);
         $this->assertInstanceOf(SymfonyUploadedFile::class, $request['file']);
+    }
+
+    public function testStringMethod()
+    {
+        $request = Request::create('/', 'GET', [
+            'int' => 123,
+            'int_str' => '456',
+            'float' => 123.456,
+            'float_str' => '123.456',
+            'float_zero' => 0.000,
+            'float_str_zero' => '0.000',
+            'str' => 'abc',
+            'empty_str' => '',
+            'null' => null,
+        ]);
+        $this->assertTrue($request->string('int') instanceof Stringable);
+        $this->assertTrue($request->string('unknown_key') instanceof Stringable);
+        $this->assertSame('123', $request->string('int')->value());
+        $this->assertSame('456', $request->string('int_str')->value());
+        $this->assertSame('123.456', $request->string('float')->value());
+        $this->assertSame('123.456', $request->string('float_str')->value());
+        $this->assertSame('0', $request->string('float_zero')->value());
+        $this->assertSame('0.000', $request->string('float_str_zero')->value());
+        $this->assertSame('', $request->string('empty_str')->value());
+        $this->assertSame('', $request->string('null')->value());
+        $this->assertSame('', $request->string('unknown_key')->value());
     }
 
     public function testBooleanMethod()
