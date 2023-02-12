@@ -12,7 +12,7 @@ class DatabaseTransactionTest extends DatabaseTestCase
     protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->increments('id');
+            $table->unsignedInteger('id');
         });
     }
 
