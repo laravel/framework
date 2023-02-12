@@ -218,6 +218,7 @@ trait ManagesTransactions
             );
         }
     }
+
     /**
      * Determine if after commit callbacks should be executed.
      *
