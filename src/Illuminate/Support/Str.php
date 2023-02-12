@@ -722,6 +722,54 @@ class Str
     }
 
     /**
+     * Generate a random, secure password.
+     *
+     * @param  int  $length
+     * @param  bool  $letters
+     * @param  bool  $numbers
+     * @param  bool  $symbols
+     * @return string
+     */
+    public static function password($length = 32, $letters = true, $numbers = true, $symbols = true)
+    {
+        $characters = [];
+
+        if ($letters) {
+            $characters = array_merge($characters, [
+                'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k',
+                'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
+                'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G',
+                'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
+                'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+            ]);
+        }
+
+        if ($numbers) {
+            $characters = array_merge($characters, [
+                '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+            ]);
+        }
+
+        if ($symbols) {
+            $characters = array_merge($characters, [
+                '~', '!', '#', '$', '%', '^', '&', '*', '(', ')', '-',
+                '_', '.', ',', '<', '>', '?', '/', '\\', '{', '}', '[',
+                 ']', '|', ':', ';',
+            ]);
+        }
+
+        $password = '';
+
+        $possible = count($characters) - 1;
+
+        for ($i = 0; $i < $length; $i++) {
+            $password = $password.$characters[random_int(0, $possible)];
+        }
+
+        return $password;
+    }
+
+    /**
      * Generate a more truly "random" alpha-numeric string.
      *
      * @param  int  $length
