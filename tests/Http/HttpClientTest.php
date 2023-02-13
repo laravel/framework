@@ -2371,6 +2371,29 @@ class HttpClientTest extends TestCase
                 && $request->hasHeader('X-Foo', ['bar']);
         });
     }
+
+    public function testMultipleServerRequestsAreSentInThePool(): void
+    {
+        $this->factory->fake([
+            'https://chirper.app/api/200' => $this->factory::response('', 200),
+            'https://chirper.app/api/400' => $this->factory::response('', 400),
+            'https://chirper.app/api/500' => $this->factory::response('', 500),
+        ]);
+
+        $this->factory->define(TestBuilderApp::class);
+
+        $responses = $this->factory->pool(function (Pool $pool) {
+            return [
+                $pool->server('test builder app')->get('200'),
+                $pool->server('test builder app')->get('400'),
+                $pool->server('test builder app')->get('500'),
+            ];
+        });
+
+        $this->assertSame(200, $responses[0]->status());
+        $this->assertSame(400, $responses[1]->status());
+        $this->assertSame(500, $responses[2]->status());
+    }
 }
 
 class TestApp extends Server

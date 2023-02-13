@@ -99,6 +99,17 @@ abstract class Server
     }
 
     /**
+     * Redirects the wait procedure to the underlying request promise.
+     *
+     * @param  bool  $unwrap
+     * @return mixed
+     */
+    public function wait($unwrap = true)
+    {
+        return $this->getPromise()->wait($unwrap);
+    }
+
+    /**
      * Dynamically handle calls to the underlying request.
      *
      * @param  string  $method

@@ -79,6 +79,18 @@ class Pool
     }
 
     /**
+     * Returns a previously saved server.
+     *
+     * @param  string  $name
+     * @param  array  $parameters
+     * @return \Illuminate\Http\Client\Server
+     */
+    public function server($name, $parameters = [])
+    {
+        return $this->pool[] = $this->factory->server($name, $parameters)->setHandler($this->handler)->async();
+    }
+
+    /**
      * Add a request to the pool with a numeric index.
      *
      * @param  string  $method
