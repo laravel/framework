@@ -107,7 +107,7 @@ class Factory
         $server = $this->servers[$name] ?? $this->servers[Str::camel($name)];
 
         return $server
-            ? tap(new $server($this, $parameters))
+            ? new $server($this, $parameters)
             : throw new RuntimeException("The server \"$name\" is not defined.");
     }
 
@@ -418,7 +418,7 @@ class Factory
         }
 
         if (isset($this->servers[$method])) {
-            return tap(new $this->servers[$method]($this, $parameters));
+            return new $this->servers[$method]($this, $parameters);
         }
 
         return tap($this->newPendingRequest(), function ($request) {
