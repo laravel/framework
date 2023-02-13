@@ -733,45 +733,25 @@ class Str
      */
     public static function password($length = 32, $letters = true, $numbers = true, $symbols = true, $spaces = false)
     {
-        $characters = [];
-
-        if ($letters) {
-            $characters = array_merge($characters, [
-                'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k',
-                'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
-                'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G',
-                'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
-                'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-            ]);
-        }
-
-        if ($numbers) {
-            $characters = array_merge($characters, [
-                '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-            ]);
-        }
-
-        if ($symbols) {
-            $characters = array_merge($characters, [
-                '~', '!', '#', '$', '%', '^', '&', '*', '(', ')', '-',
-                '_', '.', ',', '<', '>', '?', '/', '\\', '{', '}', '[',
-                ']', '|', ':', ';',
-            ]);
-        }
-
-        if ($spaces) {
-            $characters = array_merge($characters, [' ']);
-        }
-
-        $password = '';
-
-        $possible = count($characters) - 1;
-
-        for ($i = 0; $i < $length; $i++) {
-            $password = $password.$characters[random_int(0, $possible)];
-        }
-
-        return $password;
+        return (new Collection)
+                ->when($letters, fn ($c) => $c->merge([
+                    'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k',
+                    'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
+                    'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G',
+                    'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
+                    'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+                ]))
+                ->when($numbers, fn ($c) => $c->merge([
+                    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+                ]))
+                ->when($symbols, fn ($c) => $c->merge([
+                    '~', '!', '#', '$', '%', '^', '&', '*', '(', ')', '-',
+                    '_', '.', ',', '<', '>', '?', '/', '\\', '{', '}', '[',
+                    ']', '|', ':', ';',
+                ]))
+                ->when($spaces, fn ($c) => $c->merge([' ']))
+                ->pipe(fn ($c) => Collection::times($length, fn () => $c[random_int(0, $c->count() - 1)]))
+                ->implode('');
     }
 
     /**
