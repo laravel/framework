@@ -840,7 +840,10 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function merge($items)
     {
-        return new static(array_merge($this->items, $this->getArrayableItems($items)));
+        return new static([
+            ...$this->items,
+            ...$this->getArrayableItems($items),
+        ]);
     }
 
     /**
