@@ -12,9 +12,9 @@ abstract class Server
     use ForwardsCalls;
 
     /**
-     * The quick actions for this server.
+     * The actions for this server.
      *
-     * @var array{string,string}
+     * @var array{string:string}
      */
     protected $actions = [];
 
