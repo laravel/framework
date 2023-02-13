@@ -86,7 +86,7 @@ abstract class Server
      *
      * @return \Illuminate\Http\Client\PendingRequest
      */
-    protected function request()
+    protected function buildRequest()
     {
         return $this->request ??= tap(
             $this->factory
@@ -125,9 +125,24 @@ abstract class Server
                 ? explode(':', $this->actions[$method], 2)
                 : ['get', $this->actions[$method]];
 
-            return $this->request()->{$verb}($path, ...$parameters);
+            return $this->buildRequest()->{$verb}($path, ...$parameters);
         }
 
-        return $this->forwardDecoratedCallTo($this->request(), $method, $parameters);
+        return $this->forwardDecoratedCallTo($this->buildRequest(), $method, $parameters);
+    }
+
+    /**
+     * Creates a new server instance.
+     *
+     * @param  array  $parameters
+     * @return static
+     */
+    public static function request($parameters = [])
+    {
+        $factory = class_exists('Illuminate\Container\Container')
+            ? \Illuminate\Container\Container::getInstance()->make(Factory::class)
+            : new Factory();
+
+        return $factory->server(static::class, $parameters);
     }
 }

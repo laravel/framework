@@ -2181,25 +2181,12 @@ class HttpClientTest extends TestCase
         });
     }
 
-    public function testItThrowsWhenServerDoesNotExist(): void
-    {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The server "fail" is not defined.');
-
-        $this->factory->define(TestApp::class);
-
-        $this->factory->server('fail');
-    }
 
     public function testItRetrievesDefinedServer(): void
     {
         $this->factory->fake();
 
-        $this->factory->define(TestApp::class);
-
-        $server = $this->factory->server('test app');
-
-        $server->get('test');
+        $this->factory->server(TestApp::class)->get('test');
 
         $this->factory->assertSent(function (Request $request) {
             return $request->url() === 'https://chirper.app/api/test';
@@ -2210,11 +2197,7 @@ class HttpClientTest extends TestCase
     {
         $this->factory->fake();
 
-        $this->factory->define(TestApp::class);
-
-        $server = $this->factory->server('test app');
-
-        $server->get('test');
+        $this->factory->server(TestApp::class)->get('test');
 
         $this->factory->assertSent(function (Request $request) {
             return $request->url() === 'https://chirper.app/api/test'
@@ -2228,11 +2211,7 @@ class HttpClientTest extends TestCase
     {
         $this->factory->fake();
 
-        $this->factory->define(TestComplexApp::class);
-
-        $server = $this->factory->server('test complex app');
-
-        $server->get('test');
+        $this->factory->server(TestComplexApp::class)->get('test');
 
         $this->factory->assertSent(function (Request $request) {
             return $request->url() === 'https://chirper.app/api/test'
@@ -2242,28 +2221,11 @@ class HttpClientTest extends TestCase
         });
     }
 
-    public function testItRetrievesDefinedServerDynamically(): void
-    {
-        $this->factory->fake();
-
-        $this->factory->define(TestApp::class);
-
-        $server = $this->factory->testApp();
-
-        $server->get('test');
-
-        $this->factory->assertSent(function (Request $request) {
-            return $request->url() === 'https://chirper.app/api/test';
-        });
-    }
-
     public function testItSetsParameters(): void
     {
         $this->factory->fake();
 
-        $this->factory->define(TestApp::class);
-
-        $server = $this->factory->server('test app');
+        $server = $this->factory->server(TestApp::class);
 
         $server->parameters(['id' => 10])->view();
 
@@ -2276,9 +2238,7 @@ class HttpClientTest extends TestCase
     {
         $this->factory->fake();
 
-        $this->factory->define(TestApp::class);
-
-        $server = $this->factory->server('test app', ['id' => 10]);
+        $server = $this->factory->server(TestApp::class, ['id' => 10]);
 
         $server->view();
 
@@ -2291,9 +2251,7 @@ class HttpClientTest extends TestCase
     {
         $this->factory->fake();
 
-        $this->factory->define(TestApp::class);
-
-        $server = $this->factory->server('test app');
+        $server = $this->factory->server(TestApp::class);
 
         $server->latest();
 
@@ -2306,9 +2264,7 @@ class HttpClientTest extends TestCase
     {
         $this->factory->fake();
 
-        $this->factory->define(TestApp::class);
-
-        $server = $this->factory->server('test app');
+        $server = $this->factory->server(TestApp::class);
 
         $server->chirp(['message' => 'hello world']);
 
@@ -2323,9 +2279,7 @@ class HttpClientTest extends TestCase
     {
         $this->factory->fake();
 
-        $this->factory->define(TestActionsApp::class);
-
-        $server = $this->factory->server('test actions app');
+        $server = $this->factory->server(TestActionsApp::class);
 
         $server->chirp('hello world');
 
@@ -2340,9 +2294,7 @@ class HttpClientTest extends TestCase
     {
         $this->factory->fake();
 
-        $this->factory->define(TestActionsApp::class);
-
-        $server = $this->factory->server('test actions app');
+        $server = $this->factory->server(TestActionsApp::class);
 
         $server->noReply()->chirp('hello world');
 
@@ -2358,9 +2310,7 @@ class HttpClientTest extends TestCase
     {
         $this->factory->fake();
 
-        $this->factory->define(TestBuilderApp::class);
-
-        $server = $this->factory->server('test builder app');
+        $server = $this->factory->server(TestBuilderApp::class);
 
         $server->chirp(['message' => 'hello world']);
 
@@ -2380,19 +2330,22 @@ class HttpClientTest extends TestCase
             'https://chirper.app/api/500' => $this->factory::response('', 500),
         ]);
 
-        $this->factory->define(TestBuilderApp::class);
-
         $responses = $this->factory->pool(function (Pool $pool) {
             return [
-                $pool->server('test builder app')->get('200'),
-                $pool->server('test builder app')->get('400'),
-                $pool->server('test builder app')->get('500'),
+                $pool->server(TestBuilderApp::class)->get('200'),
+                $pool->server(TestBuilderApp::class)->get('400'),
+                $pool->server(TestBuilderApp::class)->get('500'),
             ];
         });
 
         $this->assertSame(200, $responses[0]->status());
         $this->assertSame(400, $responses[1]->status());
         $this->assertSame(500, $responses[2]->status());
+    }
+
+    public function testItCreatesServerFromClass(): void
+    {
+        $this->assertInstanceOf(TestApp::class, TestApp::request());
     }
 }
 

@@ -29,13 +29,6 @@ class Factory
     protected $dispatcher;
 
     /**
-     * The registered servers.
-     *
-     * @var \Illuminate\Support\Collection<\Illuminate\Http\Client\Server>
-     */
-    protected $servers;
-
-    /**
      * The stub callables that will handle requests.
      *
      * @var \Illuminate\Support\Collection
@@ -84,31 +77,15 @@ class Factory
     }
 
     /**
-     * Defines a new server to build requests.
-     *
-     * @param  string|class-string  $class
-     * @return void
-     */
-    public function define($class, $name = null)
-    {
-        $name ??= Str::lcfirst(class_basename($class));
-
-        $this->servers[$name] = $class;
-    }
-
-    /**
      * Returns a previously saved server.
      *
-     * @param  string  $name
+     * @param  string|class-string  $server
+     * @param  array  $parameters
      * @return \Illuminate\Http\Client\Server
      */
-    public function server($name, $parameters = [])
+    public function server($server, $parameters = [])
     {
-        $server = $this->servers[$name] ?? $this->servers[Str::camel($name)];
-
-        return $server
-            ? new $server($this, $parameters)
-            : throw new RuntimeException("The server \"$name\" is not defined.");
+        return new $server($this, $parameters);
     }
 
     /**
