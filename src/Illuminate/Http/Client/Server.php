@@ -2,7 +2,6 @@
 
 namespace Illuminate\Http\Client;
 
-use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 
 /**
@@ -105,6 +104,7 @@ abstract class Server
      * @param  string  $method
      * @param  array  $parameters
      * @return $this|object
+     *
      * @throws \Exception
      */
     public function __call(string $method, array $parameters)

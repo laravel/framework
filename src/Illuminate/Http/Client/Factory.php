@@ -403,7 +403,6 @@ class Factory
         return $this->dispatcher;
     }
 
-
     /**
      * Execute a method against a new pending request instance.
      *
