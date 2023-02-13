@@ -85,21 +85,24 @@ class EventFake implements Dispatcher
             $actualListener = (new ReflectionFunction($listenerClosure))
                         ->getStaticVariables()['listener'];
 
+            // If both the actual and expected listeners are Class[@]method
+            // callback strings, we need to normalize them to the same format.
+            $expectedListenerNormalized = $expectedListener;
             if (is_string($actualListener) && Str::contains($actualListener, '@')) {
                 $actualListener = Str::parseCallback($actualListener);
 
                 if (is_string($expectedListener)) {
                     if (Str::contains($expectedListener, '@')) {
-                        $expectedListener = Str::parseCallback($expectedListener);
+                        $expectedListenerNormalized = Str::parseCallback($expectedListener);
                     } else {
-                        $expectedListener = [$expectedListener, 'handle'];
+                        $expectedListenerNormalized = [$expectedListener, 'handle'];
                     }
                 }
             }
 
-            if ($actualListener === $expectedListener ||
+            if ($actualListener === $expectedListenerNormalized ||
                 ($actualListener instanceof Closure &&
-                $expectedListener === Closure::class)) {
+                $expectedListenerNormalized === Closure::class)) {
                 PHPUnit::assertTrue(true);
 
                 return;
