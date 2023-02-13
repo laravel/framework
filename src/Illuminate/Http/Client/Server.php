@@ -2,6 +2,7 @@
 
 namespace Illuminate\Http\Client;
 
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 
 /**
@@ -110,6 +111,27 @@ abstract class Server
     }
 
     /**
+     * Returns an action by its name, or null if it doesn't exist.
+     *
+     * @param  string  $name
+     * @return string|null
+     */
+    public function findAction($name)
+    {
+        if (isset($this->actions[$name])) {
+            return $this->actions[$name];
+        }
+
+        foreach ($this->actions as $key => $action) {
+            if (Str::camel($key) === $name) {
+                return $action;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Dynamically handle calls to the underlying request.
      *
      * @param  string  $method
@@ -120,15 +142,15 @@ abstract class Server
      */
     public function __call(string $method, array $parameters)
     {
-        if (isset($this->actions[$method])) {
-            [$verb, $path] = str_contains($this->actions[$method], ':')
-                ? explode(':', $this->actions[$method], 2)
-                : ['get', $this->actions[$method]];
+        $request = $this->buildRequest();
 
-            return $this->buildRequest()->{$verb}($path, ...$parameters);
+        if ($action = $this->findAction($method)) {
+            [$verb, $path] = str_contains($action, ':') ? explode(':', $action, 2) : ['get', $action];
+
+            return $request->{$verb}($path, ...$parameters);
         }
 
-        return $this->forwardDecoratedCallTo($this->buildRequest(), $method, $parameters);
+        return $this->forwardDecoratedCallTo($request, $method, $parameters);
     }
 
     /**
