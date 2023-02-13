@@ -731,7 +731,7 @@ class Str
      * @param  bool  $spaces
      * @return string
      */
-    public static function password($length = 32, $letters = true, $numbers = true, $symbols = true, $spaces = true)
+    public static function password($length = 32, $letters = true, $numbers = true, $symbols = true, $spaces = false)
     {
         $characters = [];
 
