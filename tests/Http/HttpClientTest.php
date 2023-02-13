@@ -2336,6 +2336,24 @@ class HttpClientTest extends TestCase
         });
     }
 
+    public function testItChainsMultipleCustomActions(): void
+    {
+        $this->factory->fake();
+
+        $this->factory->define(TestActionsApp::class);
+
+        $server = $this->factory->server('test actions app');
+
+        $server->noReply()->chirp('hello world');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'https://chirper.app/api/new'
+                && $request->method() === 'POST'
+                && $request->hasHeader('X-Reply', ['false'])
+                && $request->body() === '{"message":"hello world"}';
+        });
+    }
+
     public function testItExecutesBuilder(): void
     {
         $this->factory->fake();
@@ -2383,7 +2401,12 @@ class TestActionsApp extends Server
 
     public function chirp($message)
     {
-        return $this->request()->post('new', ['message' => $message]);
+        return $this->post('new', ['message' => $message]);
+    }
+
+    public function noReply()
+    {
+        return $this->withHeaders(['X-Reply' => 'false']);
     }
 }
 
