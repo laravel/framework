@@ -2181,7 +2181,6 @@ class HttpClientTest extends TestCase
         });
     }
 
-
     public function testItRetrievesDefinedServer(): void
     {
         $this->factory->fake();
