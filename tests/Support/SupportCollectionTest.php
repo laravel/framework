@@ -1216,10 +1216,8 @@ class SupportCollectionTest extends TestCase
     {
         $c = new $collection([['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]]);
 
-        $this->assertEquals(
-            [['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]],
-            $c->whereBetween('v', [2, 4])->values()->all()
-        );
+        $this->assertEquals([['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]],
+            $c->whereBetween('v', [2, 4])->values()->all());
         $this->assertEquals([['v' => 1]], $c->whereBetween('v', [-1, 1])->all());
         $this->assertEquals([['v' => 3], ['v' => '3']], $c->whereBetween('v', [3, 3])->values()->all());
     }
@@ -1821,7 +1819,7 @@ class SupportCollectionTest extends TestCase
             3 => ['id' => 3, 'first' => 'Abigail', 'last' => 'Otwell'],
             5 => ['id' => 5, 'first' => 'Taylor', 'last' => 'Swift'],
         ], $c->unique(function ($item) {
-            return $item['first'] . $item['last'];
+            return $item['first'].$item['last'];
         })->all());
 
         $this->assertEquals([
@@ -2386,8 +2384,8 @@ class SupportCollectionTest extends TestCase
         $this->assertSame('taylor_dayle', $data->implode('_'));
 
         $data = new $collection([['name' => 'taylor', 'email' => 'foo'], ['name' => 'dayle', 'email' => 'bar']]);
-        $this->assertSame('taylor-foodayle-bar', $data->implode(fn ($user) => $user['name'] . '-' . $user['email']));
-        $this->assertSame('taylor-foo,dayle-bar', $data->implode(fn ($user) => $user['name'] . '-' . $user['email'], ','));
+        $this->assertSame('taylor-foodayle-bar', $data->implode(fn ($user) => $user['name'].'-'.$user['email']));
+        $this->assertSame('taylor-foo,dayle-bar', $data->implode(fn ($user) => $user['name'].'-'.$user['email'], ','));
     }
 
     /**
@@ -2828,15 +2826,15 @@ class SupportCollectionTest extends TestCase
     public function testTimesMethod($collection)
     {
         $two = $collection::times(2, function ($number) {
-            return 'slug-' . $number;
+            return 'slug-'.$number;
         });
 
         $zero = $collection::times(0, function ($number) {
-            return 'slug-' . $number;
+            return 'slug-'.$number;
         });
 
         $negative = $collection::times(-4, function ($number) {
-            return 'slug-' . $number;
+            return 'slug-'.$number;
         });
 
         $range = $collection::times(5);
@@ -2999,7 +2997,7 @@ class SupportCollectionTest extends TestCase
 
         $data = new $collection(['first' => 'taylor', 'last' => 'otwell']);
         $data = $data->map(function ($item, $key) {
-            return $key . '-' . strrev($item);
+            return $key.'-'.strrev($item);
         });
         $this->assertEquals(['first' => 'first-rolyat', 'last' => 'last-llewto'], $data->all());
     }
@@ -3265,7 +3263,7 @@ class SupportCollectionTest extends TestCase
     {
         $data = new Collection(['first' => 'taylor', 'last' => 'otwell']);
         $data->transform(function ($item, $key) {
-            return $key . '-' . strrev($item);
+            return $key.'-'.strrev($item);
         });
         $this->assertEquals(['first' => 'first-rolyat', 'last' => 'last-llewto'], $data->all());
     }
@@ -3298,7 +3296,7 @@ class SupportCollectionTest extends TestCase
                 {
                     return 'Framework';
                 }
-            }, 'url' => '2',],
+            }, 'url' => '2', ],
         ]);
 
         $result = $data->groupBy('name');
@@ -3517,7 +3515,7 @@ class SupportCollectionTest extends TestCase
             ['firstname' => 'Lucas', 'lastname' => 'Michot', 'locale' => 'FR'],
         ]);
         $result = $data->keyBy(function ($item, $key) {
-            return strtolower($key . '-' . $item['firstname'] . $item['lastname']);
+            return strtolower($key.'-'.$item['firstname'].$item['lastname']);
         });
         $this->assertEquals([
             '0-taylorotwell' => ['firstname' => 'Taylor', 'lastname' => 'Otwell', 'locale' => 'US'],
@@ -3935,7 +3933,7 @@ class SupportCollectionTest extends TestCase
             return $value > 4;
         }));
         $this->assertSame('foo', $c->search(function ($value) {
-            return !is_numeric($value);
+            return ! is_numeric($value);
         }));
     }
 
@@ -4405,7 +4403,7 @@ class SupportCollectionTest extends TestCase
             'baz' => 'qux',
         ]);
         $this->assertSame('foobarbazqux', $data->reduce(function ($carry, $element, $key) {
-            return $carry .= $key . $element;
+            return $carry .= $key.$element;
         }));
     }
 
@@ -5598,7 +5596,7 @@ class TestAccessorEloquentTestStub
 
     public function __get($attribute)
     {
-        $accessor = 'get' . lcfirst($attribute) . 'Attribute';
+        $accessor = 'get'.lcfirst($attribute).'Attribute';
         if (method_exists($this, $accessor)) {
             return $this->$accessor();
         }
@@ -5608,10 +5606,10 @@ class TestAccessorEloquentTestStub
 
     public function __isset($attribute)
     {
-        $accessor = 'get' . lcfirst($attribute) . 'Attribute';
+        $accessor = 'get'.lcfirst($attribute).'Attribute';
 
         if (method_exists($this, $accessor)) {
-            return !is_null($this->$accessor());
+            return ! is_null($this->$accessor());
         }
 
         return isset($this->$attribute);
