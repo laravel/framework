@@ -1768,6 +1768,9 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         $mean = $this->avg();
         $carry = 0;
         foreach ($this->items as $val) {
+            if (!is_numeric($val)) {
+                return false;
+            }
             $d = ((float) $val) - $mean;
             $carry += $d * $d;
         }
