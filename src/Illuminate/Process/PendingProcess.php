@@ -77,6 +77,8 @@ class PendingProcess
 
 
     /**
+     * The standard input data piped into the command
+     *
      * @var string|int|float|bool|resource|\Traversable|null
      */
     public $input;
