@@ -731,7 +731,26 @@ class SupportArrTest extends TestCase
         $this->assertCount(2, array_intersect_assoc(['one' => 'foo', 'two' => 'bar', 'three' => 'baz'], $random));
     }
 
-    public function testRandomOnEmptyArray()
+    public function testRandomIsActuallyRandom()
+    {
+        $values = [];
+
+        for ($i = 0; $i < 100; $i++) {
+            $values[] = Arr::random(['foo', 'bar', 'baz']);
+        }
+
+        $this->assertContains('foo', $values);
+        $this->assertContains('bar', $values);
+        $this->assertContains('baz', $values);
+    }
+
+    public function testRandomNotIncrementingKeys()
+    {
+        $random = Arr::random(['foo' => 'foo', 'bar' => 'bar', 'baz' => 'baz']);
+        $this->assertContains($random, ['foo', 'bar', 'baz']);
+    }
+
+        public function testRandomOnEmptyArray()
     {
         $random = Arr::random([], 0);
         $this->assertIsArray($random);
@@ -814,6 +833,14 @@ class SupportArrTest extends TestCase
         $this->assertEquals(
             Arr::shuffle(range(0, 100, 10), 1234),
             Arr::shuffle(range(0, 100, 10), 1234)
+        );
+    }
+
+    public function testShuffle()
+    {
+        $this->assertNotSame(
+            Arr::shuffle(range(0, 10)),
+            Arr::shuffle(range(0, 10))
         );
     }
 

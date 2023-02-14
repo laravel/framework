@@ -635,28 +635,15 @@ class Arr
         }
 
         if (is_null($number)) {
-            return $array[array_rand($array)];
+            $values = array_values($array);
+            return $values[random_int(0, $count - 1)];
         }
 
         if ((int) $number === 0) {
             return [];
         }
 
-        $keys = array_rand($array, $number);
-
-        $results = [];
-
-        if ($preserveKeys) {
-            foreach ((array) $keys as $key) {
-                $results[$key] = $array[$key];
-            }
-        } else {
-            foreach ((array) $keys as $key) {
-                $results[] = $array[$key];
-            }
-        }
-
-        return $results;
+        return array_slice(static::shuffle($array), 0, $number, $preserveKeys);
     }
 
     /**
@@ -708,15 +695,30 @@ class Arr
      */
     public static function shuffle($array, $seed = null)
     {
-        if (is_null($seed)) {
-            shuffle($array);
-        } else {
+        if (! is_null($seed)) {
             mt_srand($seed);
             shuffle($array);
             mt_srand();
+
+            return $array;
         }
 
-        return $array;
+        $keys = array_keys($array);
+
+        for ($i = count($keys) - 1; $i > 0; $i--) {
+            $j = random_int(0, $i);
+            $temp = $keys[$i];
+            $keys[$i] = $keys[$j];
+            $keys[$j] = $temp;
+        }
+
+        $shuffled = [];
+
+        foreach ($keys as $key) {
+            $shuffled[$key] = $array[$key];
+        }
+
+        return $shuffled;
     }
 
     /**
