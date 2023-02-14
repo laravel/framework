@@ -1339,6 +1339,16 @@ class Router implements BindingRegistrar, RegistrarContract
     }
 
     /**
+     * Get the current route middlewares.
+     *
+     * @return array
+     */
+    public function currentRouteMiddlewares()
+    {
+        return $this->getCurrentRoute()->gatherMiddleware();
+    }
+
+    /**
      * Set the unmapped global resource parameters to singular.
      *
      * @param  bool  $singular
