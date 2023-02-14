@@ -750,7 +750,7 @@ class SupportArrTest extends TestCase
         $this->assertContains($random, ['foo', 'bar', 'baz']);
     }
 
-        public function testRandomOnEmptyArray()
+    public function testRandomOnEmptyArray()
     {
         $random = Arr::random([], 0);
         $this->assertIsArray($random);
