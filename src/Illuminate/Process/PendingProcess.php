@@ -76,7 +76,7 @@ class PendingProcess
     public $options = [];
 
     /**
-     * The standard input data piped into the command
+     * The standard input data piped into the command.
      *
      * @var string|int|float|bool|resource|\Traversable|null
      */
@@ -218,7 +218,7 @@ class PendingProcess
     /**
      * Set the standard input that should be used when invoking the process.
      *
-     * @param  string|int|float|bool|resource|\Traversable|null $input
+     * @param  string|int|float|bool|resource|\Traversable|null  $input
      * @return PendingProcess
      */
     public function input($input)
