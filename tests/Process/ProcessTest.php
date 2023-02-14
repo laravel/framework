@@ -477,8 +477,8 @@ class ProcessTest extends TestCase
             $this->markTestSkipped('Requires Linux.');
         }
 
-        $pendingProcess = new PendingProcess(new Factory());
-        $result = $pendingProcess->input('foobar')->run('cat');
+        $factory = new Factory();
+        $result = $factory->input('foobar')->run('cat');
 
         $this->assertSame('foobar', $result->output());
     }
