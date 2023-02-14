@@ -236,7 +236,7 @@ class SupportTestingBusFakeTest extends TestCase
             }, 2);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\OtherBusJobStub] job was pushed 1 times instead of 2 times.'));
+            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\OtherBusJobStub] job was pushed 1 times instead of 2 times.', $e->getMessage());
         }
 
         $this->fake->assertDispatchedAfterResponseTimes(function (OtherBusJobStub $job) {
@@ -298,7 +298,7 @@ class SupportTestingBusFakeTest extends TestCase
             }, 2);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\OtherBusJobStub] job was pushed 1 times instead of 2 times.'));
+            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\OtherBusJobStub] job was pushed 1 times instead of 2 times.', $e->getMessage());
         }
 
         $this->fake->assertDispatchedTimes(function (OtherBusJobStub $job) {
@@ -352,7 +352,7 @@ class SupportTestingBusFakeTest extends TestCase
             }, 2);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\OtherBusJobStub] job was synchronously pushed 1 times instead of 2 times.'));
+            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\OtherBusJobStub] job was synchronously pushed 1 times instead of 2 times.', $e->getMessage());
         }
 
         $this->fake->assertDispatchedSyncTimes(function (OtherBusJobStub $job) {
