@@ -735,7 +735,7 @@ class Str
     {
         return (new Collection)
                 ->when($letters, fn ($c) => $c->merge([
-                    array_merge(range('a', 'z'), range('A', 'Z'))
+                    array_merge(range('a', 'z'), range('A', 'Z')),
                 ]))
                 ->when($numbers, fn ($c) => $c->merge([
                     '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
