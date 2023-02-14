@@ -252,6 +252,26 @@ class Arr
 
         return $result;
     }
+    
+    /**
+     * Flatten a multi-dimensional associative array into a single level.
+     *
+     * @param  array  $array
+     * @param  int  $depth
+     * @return array
+     */
+    public static function flattenAssoc($array, $depth = INF)
+    {
+        return array_reduce(array_keys($array), function ($result, $key) use ($array, $depth) {
+            $value = $array[$key] instanceof Collection ? $array[$key]->all() : $array[$key];
+            if (is_array($value) && $depth > 0) {
+                $result = array_merge($result, static::flattenAssoc($value, $depth - 1));
+            } else {
+                $result[$key] = $value;
+            }
+            return $result;
+        }, []);
+    }
 
     /**
      * Remove one or many array items from a given array using "dot" notation.
