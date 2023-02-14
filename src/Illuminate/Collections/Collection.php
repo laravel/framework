@@ -1753,7 +1753,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Calculate the standard deviation of the collection.
      *
-     * @param  bool  $sample [optional] 
+     * @param  bool  $sample  [optional]
      * @return float|false
      */
 
@@ -1773,7 +1773,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
             $carry += $d * $d;
         }
         if ($sample) {
-            --$count;
+            $count--;
         }
         return sqrt($carry / $count);
     }
