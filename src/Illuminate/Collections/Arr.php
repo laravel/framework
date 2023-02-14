@@ -635,8 +635,7 @@ class Arr
         }
 
         if (is_null($number)) {
-            $values = array_values($array);
-            return $values[random_int(0, $count - 1)];
+            return head(array_slice($array, random_int(0, $count - 1), 1));
         }
 
         if ((int) $number === 0) {
@@ -704,18 +703,12 @@ class Arr
         }
 
         $keys = array_keys($array);
-
-        for ($i = count($keys) - 1; $i > 0; $i--) {
-            $j = random_int(0, $i);
-            $temp = $keys[$i];
-            $keys[$i] = $keys[$j];
-            $keys[$j] = $temp;
-        }
-
         $shuffled = [];
 
-        foreach ($keys as $key) {
-            $shuffled[$key] = $array[$key];
+        for ($i = count($keys) - 1; $i >= 0; $i--) {
+            $j = random_int(0, $i);
+            $shuffled[$keys[$j]] = $array[$keys[$j]];
+            $keys[$j] = $keys[$i];
         }
 
         return $shuffled;
