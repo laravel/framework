@@ -59,6 +59,7 @@ use Illuminate\Filesystem\Filesystem;
  * @method static string url(string $path)
  * @method static bool providesTemporaryUrls()
  * @method static string temporaryUrl(string $path, \DateTimeInterface $expiration, array $options = [])
+ * @method static array temporaryUploadUrl(string $path, \DateTimeInterface $expiration, array $options = [])
  * @method static \League\Flysystem\FilesystemOperator getDriver()
  * @method static \League\Flysystem\FilesystemAdapter getAdapter()
  * @method static array getConfig()
