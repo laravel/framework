@@ -1767,7 +1767,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         }
         $mean = $this->avg();
         $carry = 0;
-        foreach ($this->item as $val) {
+        foreach ($this->items as $val) {
             $d = ((float) $val) - $mean;
             $carry += $d * $d;
         }
