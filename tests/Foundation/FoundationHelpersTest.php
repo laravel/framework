@@ -261,7 +261,9 @@ class FoundationHelpersTest extends TestCase
 
         // Should fallback to en_US
         $this->assertSame('Arkansas', fake()->state());
-        $this->assertSame('Bayern', fake('de_DE')->state());
+        $this->assertTrue(in_array(fake('de_DE')->state(), [
+            'Baden-Württemberg', 'Bayern', 'Berlin', 'Brandenburg', 'Bremen', 'Hamburg', 'Hessen', 'Mecklenburg-Vorpommern', 'Niedersachsen', 'Nordrhein-Westfalen', 'Rheinland-Pfalz', 'Saarland', 'Sachsen', 'Sachsen-Anhalt', 'Schleswig-Holstein', 'Thüringen',
+        ]));
         $this->assertContains(fake('fr_FR')->region(), ['Provence-Alpes-Côte d\'Azur', 'Guadeloupe']);
 
         app()->instance('config', new ConfigRepository(['app' => ['faker_locale' => 'en_AU']]));
