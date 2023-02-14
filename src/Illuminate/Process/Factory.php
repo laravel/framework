@@ -1,9 +1,9 @@
 <?php
 
-namespace Illuminate\Console\Process;
+namespace Illuminate\Process;
 
 use Closure;
-use Illuminate\Contracts\Console\Process\ProcessResult as ProcessResultContract;
+use Illuminate\Contracts\Process\ProcessResult as ProcessResultContract;
 use Illuminate\Support\Traits\Macroable;
 use PHPUnit\Framework\Assert as PHPUnit;
 
@@ -47,7 +47,7 @@ class Factory
      * @param  array|string  $output
      * @param  array|string  $errorOutput
      * @param  int  $exitCode
-     * @return \Illuminate\Console\Process\FakeProcessResult
+     * @return \Illuminate\Process\FakeProcessResult
      */
     public function result(array|string $output = '', array|string $errorOutput = '', int $exitCode = 0)
     {
@@ -61,7 +61,7 @@ class Factory
     /**
      * Begin describing a fake process lifecycle.
      *
-     * @return \Illuminate\Console\Process\FakeProcessDescription
+     * @return \Illuminate\Process\FakeProcessDescription
      */
     public function describe()
     {
@@ -72,7 +72,7 @@ class Factory
      * Begin describing a fake process sequence.
      *
      * @param  array  $processes
-     * @return \Illuminate\Console\Process\FakeProcessSequence
+     * @return \Illuminate\Process\FakeProcessSequence
      */
     public function sequence(array $processes = [])
     {
@@ -123,8 +123,8 @@ class Factory
     /**
      * Record the given process if processes should be recorded.
      *
-     * @param  \Illuminate\Console\Process\PendignProcess  $process
-     * @param  \Illuminate\Contracts\Console\Process\ProcessResult  $result
+     * @param  \Illuminate\Process\PendingProcess  $process
+     * @param  \Illuminate\Contracts\Process\ProcessResult  $result
      * @return $this
      */
     public function recordIfRecording(PendingProcess $process, ProcessResultContract $result)
@@ -139,8 +139,8 @@ class Factory
     /**
      * Record the given process.
      *
-     * @param  \Illuminate\Console\Process\PendignProcess  $process
-     * @param  \Illuminate\Contracts\Console\Process\ProcessResult  $result
+     * @param  \Illuminate\Process\PendingProcess  $process
+     * @param  \Illuminate\Contracts\Process\ProcessResult  $result
      * @return $this
      */
     public function record(PendingProcess $process, ProcessResultContract $result)
@@ -264,7 +264,7 @@ class Factory
      * Start defining a pool of processes.
      *
      * @param  callable  $callback
-     * @return \Illuminate\Console\Process\Pool
+     * @return \Illuminate\Process\Pool
      */
     public function pool(callable $callback)
     {
@@ -276,7 +276,7 @@ class Factory
      *
      * @param  callable  $callback
      * @param  callable|null  $output
-     * @return \Illuminate\Console\Process\ProcessPoolResults
+     * @return \Illuminate\Process\ProcessPoolResults
      */
     public function concurrently(callable $callback, ?callable $output = null)
     {
@@ -286,7 +286,7 @@ class Factory
     /**
      * Create a new pending process associated with this factory.
      *
-     * @return \Illuminate\Console\Process\PendingProcess
+     * @return \Illuminate\Process\PendingProcess
      */
     public function newPendingProcess()
     {

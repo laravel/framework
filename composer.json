@@ -23,6 +23,7 @@
         "ext-openssl": "*",
         "ext-session": "*",
         "ext-tokenizer": "*",
+        "composer-runtime-api": "^2.2",
         "brick/math": "^0.9.3|^0.10.2|^0.11",
         "doctrine/inflector": "^2.0.5",
         "dragonmantank/cron-expression": "^3.3.2",
@@ -78,6 +79,7 @@
         "illuminate/notifications": "self.version",
         "illuminate/pagination": "self.version",
         "illuminate/pipeline": "self.version",
+        "illuminate/process": "self.version",
         "illuminate/queue": "self.version",
         "illuminate/redis": "self.version",
         "illuminate/routing": "self.version",
@@ -105,7 +107,7 @@
         "pda/pheanstalk": "^4.0",
         "phpstan/phpdoc-parser": "^1.15",
         "phpstan/phpstan": "^1.4.7",
-        "phpunit/phpunit": "^9.6.0 || ^10.0.1",
+        "phpunit/phpunit": "^9.6.0 || ^10.0.7",
         "predis/predis": "^2.0.2",
         "symfony/cache": "^6.2",
         "symfony/http-client": "^6.2.4"
@@ -189,6 +191,6 @@
             "composer/package-versions-deprecated": true
         }
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "prefer-stable": true
 }

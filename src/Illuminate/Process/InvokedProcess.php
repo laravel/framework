@@ -1,9 +1,9 @@
 <?php
 
-namespace Illuminate\Console\Process;
+namespace Illuminate\Process;
 
-use Illuminate\Console\Process\Exceptions\ProcessTimedOutException;
-use Illuminate\Contracts\Console\Process\InvokedProcess as InvokedProcessContract;
+use Illuminate\Contracts\Process\InvokedProcess as InvokedProcessContract;
+use Illuminate\Process\Exceptions\ProcessTimedOutException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException as SymfonyTimeoutException;
 use Symfony\Component\Process\Process;
 
@@ -104,7 +104,7 @@ class InvokedProcess implements InvokedProcessContract
      * Wait for the process to finish.
      *
      * @param  callable|null  $output
-     * @return \Illuminate\Console\Process\ProcessResult
+     * @return \Illuminate\Process\ProcessResult
      */
     public function wait(callable $output = null)
     {

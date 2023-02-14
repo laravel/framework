@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Contracts\Console\Process;
+namespace Illuminate\Contracts\Process;
 
 interface InvokedProcess
 {

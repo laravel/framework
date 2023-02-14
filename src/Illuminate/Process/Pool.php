@@ -1,15 +1,19 @@
 <?php
 
-namespace Illuminate\Console\Process;
+namespace Illuminate\Process;
 
 use InvalidArgumentException;
 
+/**
+ * @mixin \Illuminate\Process\Factory
+ * @mixin \Illuminate\Process\PendingProcess
+ */
 class Pool
 {
     /**
      * The process factory instance.
      *
-     * @var \Illuminate\Console\Process\Factory
+     * @var \Illuminate\Process\Factory
      */
     protected $factory;
 
@@ -30,7 +34,7 @@ class Pool
     /**
      * Create a new process pool.
      *
-     * @param  \Illuminate\Console\Process\Factory  $factory
+     * @param  \Illuminate\Process\Factory  $factory
      * @param  callable  $callback
      * @return void
      */
@@ -44,7 +48,7 @@ class Pool
      * Add a process to the pool with a key.
      *
      * @param  string  $key
-     * @return \Illuminate\Console\Process\PendingProcess
+     * @return \Illuminate\Process\PendingProcess
      */
     public function as(string $key)
     {
@@ -57,7 +61,7 @@ class Pool
      * Start all of the processes in the pool.
      *
      * @param  callable|null  $output
-     * @return \Illuminate\Console\Process\InvokedProcessPool
+     * @return \Illuminate\Process\InvokedProcessPool
      */
     public function start(?callable $output = null)
     {
@@ -81,7 +85,7 @@ class Pool
     /**
      * Start and wait for the processes to finish.
      *
-     * @return \Illuminate\Console\Process\ProcessPoolResults
+     * @return \Illuminate\Process\ProcessPoolResults
      */
     public function run()
     {
@@ -91,7 +95,7 @@ class Pool
     /**
      * Start and wait for the processes to finish.
      *
-     * @return \Illuminate\Console\Process\ProcessPoolResults
+     * @return \Illuminate\Process\ProcessPoolResults
      */
     public function wait()
     {
@@ -103,7 +107,7 @@ class Pool
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return \Illuminate\Console\Process\PendingProcess
+     * @return \Illuminate\Process\PendingProcess
      */
     public function __call($method, $parameters)
     {

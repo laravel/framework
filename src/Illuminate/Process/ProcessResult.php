@@ -1,9 +1,9 @@
 <?php
 
-namespace Illuminate\Console\Process;
+namespace Illuminate\Process;
 
-use Illuminate\Console\Process\Exceptions\ProcessFailedException;
-use Illuminate\Contracts\Console\Process\ProcessResult as ProcessResultContract;
+use Illuminate\Contracts\Process\ProcessResult as ProcessResultContract;
+use Illuminate\Process\Exceptions\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
 class ProcessResult implements ProcessResultContract
@@ -59,7 +59,7 @@ class ProcessResult implements ProcessResultContract
     /**
      * Get the exit code of the process.
      *
-     * @return int
+     * @return int|null
      */
     public function exitCode()
     {

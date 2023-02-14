@@ -1,10 +1,9 @@
 <?php
 
-namespace Illuminate\Console\Process;
+namespace Illuminate\Process;
 
-use Illuminate\Console\Process\Exceptions\ProcessFailedException;
-use Illuminate\Contracts\Console\Process\ProcessResult as ProcessResultContract;
-use Symfony\Component\Process\Process;
+use Illuminate\Contracts\Process\ProcessResult as ProcessResultContract;
+use Illuminate\Process\Exceptions\ProcessFailedException;
 
 class FakeProcessResult implements ProcessResultContract
 {

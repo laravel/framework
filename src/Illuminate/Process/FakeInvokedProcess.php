@@ -1,8 +1,8 @@
 <?php
 
-namespace Illuminate\Console\Process;
+namespace Illuminate\Process;
 
-use Illuminate\Contracts\Console\Process\InvokedProcess as InvokedProcessContract;
+use Illuminate\Contracts\Process\InvokedProcess as InvokedProcessContract;
 use Symfony\Component\Process\Process;
 
 class FakeInvokedProcess implements InvokedProcessContract
@@ -17,7 +17,7 @@ class FakeInvokedProcess implements InvokedProcessContract
     /**
      * The underlying process description.
      *
-     * @var \Illuminate\Console\Process\FakeProcessDescription
+     * @var \Illuminate\Process\FakeProcessDescription
      */
     protected $process;
 
@@ -31,14 +31,14 @@ class FakeInvokedProcess implements InvokedProcessContract
     /**
      * The number of times the process should indicate that it is "running".
      *
-     * @var int
+     * @var int|null
      */
     protected $remainingRunIterations;
 
     /**
      * The general output handler callback.
      *
-     * @var null
+     * @var callable|null
      */
     protected $outputHandler;
 
@@ -60,7 +60,7 @@ class FakeInvokedProcess implements InvokedProcessContract
      * Create a new invoked process instance.
      *
      * @param  string  $command
-     * @param  \Illuminate\Console\Process\FakeProcessDescription  $process
+     * @param  \Illuminate\Process\FakeProcessDescription  $process
      * @return void
      */
     public function __construct(string $command, FakeProcessDescription $process)
@@ -135,7 +135,6 @@ class FakeInvokedProcess implements InvokedProcessContract
     /**
      * Invoke the asynchronous output handler with the next single line of output if necessary.
      *
-     * @param  callable  $until
      * @return array|false
      */
     protected function invokeOutputHandlerWithNextLineOfOutput()
@@ -258,7 +257,7 @@ class FakeInvokedProcess implements InvokedProcessContract
      * Wait for the process to finish.
      *
      * @param  callable|null  $output
-     * @return \Illuminate\Console\Process\ProcessResult
+     * @return \Illuminate\Contracts\Process\ProcessResult
      */
     public function wait(callable $output = null)
     {
@@ -282,7 +281,7 @@ class FakeInvokedProcess implements InvokedProcessContract
     /**
      * Get the ultimate process result that wil be returned by this "process".
      *
-     * @return \Illuminate\Contracts\Console\Process\ProcessResult
+     * @return \Illuminate\Contracts\Process\ProcessResult
      */
     public function predictProcessResult()
     {

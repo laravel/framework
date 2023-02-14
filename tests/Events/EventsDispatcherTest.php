@@ -575,7 +575,6 @@ class EventsDispatcherTest extends TestCase
         // It throws an "Error" when there is no method to be called.
         $d = new Dispatcher;
         $d->listen('myEvent', TestListenerLean::class);
-        $e = null;
 
         $this->expectException(Error::class);
         $this->expectExceptionMessage('Call to undefined method '.TestListenerLean::class.'::__invoke()');

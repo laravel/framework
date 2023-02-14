@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Contracts\Console\Process;
+namespace Illuminate\Contracts\Process;
 
 interface ProcessResult
 {
@@ -28,7 +28,7 @@ interface ProcessResult
     /**
      * Get the exit code of the process.
      *
-     * @return int
+     * @return int|null
      */
     public function exitCode();
 

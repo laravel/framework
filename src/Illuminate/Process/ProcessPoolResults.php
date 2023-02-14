@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Console\Process;
+namespace Illuminate\Process;
 
 use ArrayAccess;
 use Illuminate\Support\Collection;

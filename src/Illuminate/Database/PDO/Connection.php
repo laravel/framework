@@ -57,6 +57,8 @@ class Connection implements ServerInfoAwareConnection
      *
      * @param  string  $sql
      * @return \Doctrine\DBAL\Driver\Statement
+     *
+     * @throws \Doctrine\DBAL\Driver\PDO\Exception
      */
     public function prepare(string $sql): StatementInterface
     {
@@ -93,6 +95,8 @@ class Connection implements ServerInfoAwareConnection
      *
      * @param  string|null  $name
      * @return mixed
+     *
+     * @throws \Doctrine\DBAL\Driver\PDO\Exception
      */
     public function lastInsertId($name = null)
     {

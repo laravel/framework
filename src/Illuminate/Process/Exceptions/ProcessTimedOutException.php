@@ -1,8 +1,8 @@
 <?php
 
-namespace Illuminate\Console\Process\Exceptions;
+namespace Illuminate\Process\Exceptions;
 
-use Illuminate\Contracts\Console\Process\ProcessResult;
+use Illuminate\Contracts\Process\ProcessResult;
 use Symfony\Component\Process\Exception\ProcessTimedOutException as SymfonyTimeoutException;
 use Symfony\Component\Process\Exception\RuntimeException;
 
@@ -11,7 +11,7 @@ class ProcessTimedOutException extends RuntimeException
     /**
      * The process result instance.
      *
-     * @var \Illuminate\Contracts\Console\Process\ProcessResult
+     * @var \Illuminate\Contracts\Process\ProcessResult
      */
     public $result;
 
@@ -19,7 +19,7 @@ class ProcessTimedOutException extends RuntimeException
      * Create a new exception instance.
      *
      * @param  \Symfony\Component\Process\Exception\ProcessTimedOutException  $original
-     * @param  \Illuminate\Contracts\Console\Process\ProcessResult  $result
+     * @param  \Illuminate\Contracts\Process\ProcessResult  $result
      * @return void
      */
     public function __construct(SymfonyTimeoutException $original, ProcessResult $result)

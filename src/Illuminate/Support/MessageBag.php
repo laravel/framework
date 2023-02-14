@@ -251,6 +251,19 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
     }
 
     /**
+     * Remove a message from the message bag.
+     *
+     * @param  string  $key
+     * @return $this
+     */
+    public function forget($key)
+    {
+        unset($this->messages[$key]);
+
+        return $this;
+    }
+
+    /**
      * Format an array of messages.
      *
      * @param  array  $messages

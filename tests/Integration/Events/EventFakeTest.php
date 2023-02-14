@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Events;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\TestCase;
@@ -140,18 +141,27 @@ class EventFakeTest extends TestCase
     public function testAssertListening()
     {
         Event::fake();
-        Event::listen('event', 'listener');
-        Event::listen('event', PostEventSubscriber::class);
-        Event::listen('event', 'Illuminate\\Tests\\Integration\\Events\\PostAutoEventSubscriber@handle');
-        Event::listen('event', [PostEventSubscriber::class, 'foo']);
+
+        $listenersOfSameEventInRandomOrder = Arr::shuffle([
+            'listener',
+            'Illuminate\\Tests\\Integration\\Events\\PostAutoEventSubscriber@handle',
+            PostEventSubscriber::class,
+            [PostEventSubscriber::class, 'foo'],
+        ]);
+
+        foreach ($listenersOfSameEventInRandomOrder as $listener) {
+            Event::listen('event', $listener);
+        }
+
         Event::subscribe(PostEventSubscriber::class);
+
         Event::listen(function (NonImportantEvent $event) {
             // do something
         });
 
         Post::observe(new PostObserver);
 
-        ($post = new Post)->save();
+        (new Post)->save();
 
         Event::assertListening('event', 'listener');
         Event::assertListening('event', PostEventSubscriber::class);
@@ -162,6 +172,13 @@ class EventFakeTest extends TestCase
         Event::assertListening(NonImportantEvent::class, Closure::class);
         Event::assertListening('eloquent.saving: '.Post::class, PostObserver::class.'@saving');
         Event::assertListening('eloquent.saving: '.Post::class, [PostObserver::class, 'saving']);
+    }
+
+    public function testMissingMethodsAreForwarded()
+    {
+        Event::macro('foo', fn () => 'bar');
+
+        $this->assertEquals('bar', Event::fake()->foo());
     }
 }
 
