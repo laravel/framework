@@ -1341,7 +1341,7 @@ class Router implements BindingRegistrar, RegistrarContract
     /**
      * Get the current route middlewares.
      *
-     * @return array
+     * @return array|null
      */
     public function currentRouteMiddlewares()
     {
