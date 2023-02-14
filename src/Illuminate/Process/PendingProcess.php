@@ -75,6 +75,13 @@ class PendingProcess
      */
     public $options = [];
 
+
+    /**
+     * @var string|int|float|bool|resource|\Traversable|null
+     */
+    public $input;
+
+
     /**
      * The registered fake handler callbacks.
      *
@@ -209,6 +216,19 @@ class PendingProcess
     }
 
     /**
+     * Set the standard input that should be used when invoking the process.
+     *
+     * @param string|int|float|bool|resource|\Traversable|null $input
+     * @return PendingProcess
+     */
+    public function input($input)
+    {
+        $this->input = $input;
+
+        return $this;
+    }
+
+    /**
      * Run the process.
      *
      * @param  array<array-key, string>|string|null  $command
@@ -293,7 +313,7 @@ class PendingProcess
             $process->setOptions($this->options);
         }
 
-        return $process;
+        return $process->setInput($this->input);
     }
 
     /**

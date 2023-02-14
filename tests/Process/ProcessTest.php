@@ -6,6 +6,7 @@ use Illuminate\Contracts\Process\ProcessResult;
 use Illuminate\Process\Exceptions\ProcessFailedException;
 use Illuminate\Process\Exceptions\ProcessTimedOutException;
 use Illuminate\Process\Factory;
+use Illuminate\Process\PendingProcess;
 use Mockery as m;
 use OutOfBoundsException;
 use PHPUnit\Framework\TestCase;
@@ -468,6 +469,18 @@ class ProcessTest extends TestCase
         $result->throwIf(false);
 
         $this->assertTrue(true);
+    }
+
+    public function testRealProcessesCanUseStandardInput()
+    {
+        if (windows_os()) {
+            $this->markTestSkipped('Requires Linux.');
+        }
+
+        $pendingProcess = new PendingProcess(new Factory());
+        $result = $pendingProcess->input('foobar')->run('cat');
+
+        $this->assertSame('foobar', $result->output());
     }
 
     public function testFakeInvokedProcessOutputWithLatestOutput()
