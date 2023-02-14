@@ -724,7 +724,7 @@ class PendingRequest
      */
     public function post(string $url, $data = [])
     {
-        return $this->send('POST', $url, [
+        return $this->send('POST', $url, empty($data) ? [] : [
             $this->bodyFormat => $data,
         ]);
     }
@@ -738,7 +738,7 @@ class PendingRequest
      */
     public function patch(string $url, $data = [])
     {
-        return $this->send('PATCH', $url, [
+        return $this->send('PATCH', $url, empty($data) ? [] : [
             $this->bodyFormat => $data,
         ]);
     }
@@ -752,7 +752,7 @@ class PendingRequest
      */
     public function put(string $url, $data = [])
     {
-        return $this->send('PUT', $url, [
+        return $this->send('PUT', $url, empty($data) ? [] : [
             $this->bodyFormat => $data,
         ]);
     }
