@@ -1035,6 +1035,11 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([], $builder->getBindings());
 
         $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereIntegerInRaw('id', IntegerStatus::cases());
+        $this->assertSame('select * from "users" where "id" in (0, 1, 2)', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
+
+        $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereIntegerInRaw('id', [
             ['id' => '1a'],
             ['id' => 2],

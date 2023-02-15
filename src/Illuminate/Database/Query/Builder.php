@@ -25,6 +25,7 @@ use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use LogicException;
+use ReflectionEnum;
 use RuntimeException;
 
 class Builder implements BuilderContract
@@ -1152,7 +1153,11 @@ class Builder implements BuilderContract
         $values = Arr::flatten($values);
 
         foreach ($values as &$value) {
-            $value = (int) $value;
+            if ($value instanceof BackedEnum && (string) (new ReflectionEnum($value))->getBackingType() === 'int') {
+                $value = $value->value;
+            } else {
+                $value = (int) $value;
+            }
         }
 
         $this->wheres[] = compact('type', 'column', 'values', 'boolean');
