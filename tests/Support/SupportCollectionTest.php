@@ -5547,21 +5547,28 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
-
     public function testCanGetStandardDeviationFromCollection()
     {
         $data = new Collection([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
-        $this->assertEquals(2.8722813232690143, $data->sd(), '', 0.00001);
+        $this->assertEquals(2.8722813232690143, $data->stddev(), '', 0.00001);
     }
 
     /**
      * @dataProvider collectionClassProvider
      */
-
     public function testCanGetStandardDeviationFromCollectionWithSample()
     {
         $data = new Collection([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
-        $this->assertEquals(3.0276503540974917, $data->sd(true), '', 0.00001);
+        $this->assertEquals(3.0276503540974917, $data->stddev(true), '', 0.00001);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testCannotGetStandardDeviationFromCollectionNotNumeric()
+    {
+        $data = new Collection(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']);
+        $this->assertFalse($data->stddev());
     }
 }
 
