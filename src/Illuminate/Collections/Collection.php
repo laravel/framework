@@ -1762,18 +1762,24 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         if ($count === 0 || $count === 1) {
             return false;
         }
-        $mean = $this->avg();
+        $mean = null;
         $carry = 0;
         foreach ($this->items as $val) {
             if (! is_numeric($val)) {
                 return false;
             }
+
+            if($mean === null) {
+                $mean = $this->avg();
+            }
+
             $d = ((float) $val) - $mean;
             $carry += $d * $d;
         }
         if ($sample) {
             $count--;
         }
+        
         return sqrt($carry / $count);
     }
 }
