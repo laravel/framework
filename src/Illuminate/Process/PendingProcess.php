@@ -55,6 +55,13 @@ class PendingProcess
     public $environment = [];
 
     /**
+     * The standard input data that should be piped into the command.
+     *
+     * @var string|int|float|bool|resource|\Traversable|null
+     */
+    public $input;
+
+    /**
      * Indicates whether output should be disabled for the process.
      *
      * @var bool
@@ -171,6 +178,19 @@ class PendingProcess
     }
 
     /**
+     * Set the standard input that should be provided when invoking the process.
+     *
+     * @param  \Traversable|resource|string|int|float|bool|null  $input
+     * @return $this
+     */
+    public function input($input)
+    {
+        $this->input = $input;
+
+        return $this;
+    }
+
+    /**
      * Disable output for the process.
      *
      * @return $this
@@ -279,6 +299,10 @@ class PendingProcess
 
         if ($this->idleTimeout) {
             $process->setIdleTimeout($this->idleTimeout);
+        }
+
+        if ($this->input) {
+            $process->setInput($this->input);
         }
 
         if ($this->quietly) {

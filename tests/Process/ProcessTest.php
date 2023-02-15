@@ -470,6 +470,18 @@ class ProcessTest extends TestCase
         $this->assertTrue(true);
     }
 
+    public function testRealProcessesCanUseStandardInput()
+    {
+        if (windows_os()) {
+            $this->markTestSkipped('Requires Linux.');
+        }
+
+        $factory = new Factory();
+        $result = $factory->input('foobar')->run('cat');
+
+        $this->assertSame('foobar', $result->output());
+    }
+
     public function testFakeInvokedProcessOutputWithLatestOutput()
     {
         $factory = new Factory;

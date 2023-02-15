@@ -15,6 +15,7 @@ use Illuminate\Process\Factory;
  * @method static \Illuminate\Process\PendingProcess quietly()
  * @method static \Illuminate\Process\PendingProcess tty(bool $tty = true)
  * @method static \Illuminate\Process\PendingProcess options(array $options)
+ * @method static \Illuminate\Process\PendingProcess input(\Traversable|resource|string|int|float|bool|null $input)
  * @method static \Illuminate\Contracts\Process\ProcessResult run(array|string|null $command = null, callable|null $output = null)
  * @method static \Illuminate\Process\InvokedProcess start(array|string|null $command = null, callable $output = null)
  * @method static \Illuminate\Process\PendingProcess withFakeHandlers(array $fakeHandlers)
