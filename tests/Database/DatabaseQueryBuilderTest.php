@@ -1034,10 +1034,12 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select * from "users" where "id" in (1, 2)', $builder->toSql());
         $this->assertEquals([], $builder->getBindings());
 
-        $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->whereIntegerInRaw('id', IntegerStatus::cases());
-        $this->assertSame('select * from "users" where "id" in (0, 1, 2)', $builder->toSql());
-        $this->assertEquals([], $builder->getBindings());
+        if (function_exists('enum_exists')) {
+            $builder = $this->getBuilder();
+            $builder->select('*')->from('users')->whereIntegerInRaw('id', IntegerStatus::cases());
+            $this->assertSame('select * from "users" where "id" in (0, 1, 2)', $builder->toSql());
+            $this->assertEquals([], $builder->getBindings());
+        }
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereIntegerInRaw('id', [
