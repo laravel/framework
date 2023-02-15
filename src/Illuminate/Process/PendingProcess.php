@@ -55,6 +55,13 @@ class PendingProcess
     public $environment = [];
 
     /**
+     * The standard input data that should be piped into the command.
+     *
+     * @var string|int|float|bool|resource|\Traversable|null
+     */
+    public $input;
+
+    /**
      * Indicates whether output should be disabled for the process.
      *
      * @var bool
@@ -74,13 +81,6 @@ class PendingProcess
      * @var array
      */
     public $options = [];
-
-    /**
-     * The standard input data piped into the command.
-     *
-     * @var string|int|float|bool|resource|\Traversable|null
-     */
-    public $input;
 
     /**
      * The registered fake handler callbacks.
@@ -178,6 +178,19 @@ class PendingProcess
     }
 
     /**
+     * Set the standard input that should be provided when invoking the process.
+     *
+     * @param  \Traversable|resource|string|int|float|bool|null  $input
+     * @return $this
+     */
+    public function input($input)
+    {
+        $this->input = $input;
+
+        return $this;
+    }
+
+    /**
      * Disable output for the process.
      *
      * @return $this
@@ -211,19 +224,6 @@ class PendingProcess
     public function options(array $options)
     {
         $this->options = $options;
-
-        return $this;
-    }
-
-    /**
-     * Set the standard input that should be used when invoking the process.
-     *
-     * @param  string|int|float|bool|resource|\Traversable|null  $input
-     * @return PendingProcess
-     */
-    public function input($input)
-    {
-        $this->input = $input;
 
         return $this;
     }
@@ -301,6 +301,10 @@ class PendingProcess
             $process->setIdleTimeout($this->idleTimeout);
         }
 
+        if ($this->input) {
+            $process->setInput($this->input);
+        }
+
         if ($this->quietly) {
             $process->disableOutput();
         }
@@ -313,7 +317,7 @@ class PendingProcess
             $process->setOptions($this->options);
         }
 
-        return $process->setInput($this->input);
+        return $process;
     }
 
     /**
