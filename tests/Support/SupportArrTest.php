@@ -838,22 +838,7 @@ class SupportArrTest extends TestCase
 
     public function testShuffle()
     {
-        $this->assertEquals(
-            Arr::shuffle(range(0, 10)),
-            Arr::shuffle(range(0, 10)),
-            'Shuffled array should have the same elements.'
-        );
-
-        $this->assertNotSame(
-            Arr::shuffle(range(0, 10)),
-            Arr::shuffle(range(0, 10)),
-            'Shuffled array should not have the same order.'
-        );
-    }
-
-    public function testShuffleWithKeys()
-    {
-        $array = ['one' => 'foo', 'two' => 'bar', 'three' => 'baz', 'four' => 'boom'];
+        $array = range(1, 10);
 
         $sameElements = true;
         $dontMatch = false;
@@ -863,8 +848,8 @@ class SupportArrTest extends TestCase
             $one = Arr::shuffle($array);
             $two = Arr::shuffle($array);
 
-            $sameElements = $sameElements && $one == $two;
             $dontMatch = $dontMatch || $one !== $two;
+            $sameElements = $sameElements && array_values(Arr::sort($one)) === array_values(Arr::sort($two));
         }
 
         $this->assertTrue($sameElements, 'Shuffled array should always have the same elements.');

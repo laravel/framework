@@ -642,7 +642,23 @@ class Arr
             return [];
         }
 
-        return array_slice(static::shuffle($array), 0, $number, $preserveKeys);
+        $keys = array_keys($array);
+        $count = count($keys);
+        $selected = [];
+
+        for ($i = 0; $i < $number; $i++) {
+            $j = random_int($i, $count - $i - 1);
+
+            if ($preserveKeys) {
+                $selected[$keys[$j]] = $array[$keys[$j]];
+            } else {
+                $selected[] = $array[$keys[$j]];
+            }
+
+            $keys[$j] = $keys[$i];
+        }
+
+        return $selected;
     }
 
     /**
@@ -702,16 +718,16 @@ class Arr
             return $array;
         }
 
-        $keys = array_keys($array);
-        $shuffled = [];
+        $array = array_keys($array);
 
-        for ($i = count($keys) - 1; $i >= 0; $i--) {
+        for ($i = count($array) - 1; $i > 0; $i--) {
             $j = random_int(0, $i);
-            $shuffled[$keys[$j]] = $array[$keys[$j]];
-            $keys[$j] = $keys[$i];
+            $swap = $array[$i];
+            $array[$i] = $array[$j];
+            $array[$j] = $swap;
         }
 
-        return $shuffled;
+        return $array;
     }
 
     /**
