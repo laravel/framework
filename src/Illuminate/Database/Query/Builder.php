@@ -1151,7 +1151,7 @@ class Builder implements BuilderContract
             if (
                 function_exists('enum_exists') &&
                 $value instanceof BackedEnum &&
-                (string)(new ReflectionEnum($value))->getBackingType() === 'int'
+                (string) (new ReflectionEnum($value))->getBackingType() === 'int'
             ) {
                 $value = $value->value;
             } else {
