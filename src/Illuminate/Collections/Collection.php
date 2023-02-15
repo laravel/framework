@@ -1756,8 +1756,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      * @param  bool  $sample  [optional]
      * @return float|false
      */
-
-    public function sd($sample = false): float|false
+    public function stddev($sample = false): float|false
     {
         $count = count($this->items);
         if ($count === 0 || $count === 1) {
