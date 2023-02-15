@@ -646,8 +646,8 @@ class Arr
         $count = count($keys);
         $selected = [];
 
-        for ($i = 0; $i < $number; $i++) {
-            $j = random_int($i, $count - $i - 1);
+        for ($i = $count - 1; $i >= $count - $number; --$i) {
+            $j = random_int(0, $i);
 
             if ($preserveKeys) {
                 $selected[$keys[$j]] = $array[$keys[$j]];
