@@ -202,11 +202,13 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function to($path, $extra = [], $secure = null)
     {
-        // First we will check if the URL is already a valid URL. If it is we will not
-        // try to generate a new one but will simply return the URL as is, which is
-        // convenient since developers do not always have to check if it's valid.
+        // First we will check if the URL is already a valid URL. If it is we will not try to
+        // generate a new one but will simply return the URL after changing the scheme,
+        // which is convenient since we do not always have to check if it's valid.
         if ($this->isValidUrl($path)) {
-            return $path;
+            return str_starts_with($path, $this->formatScheme($secure))
+                ? $path
+                : preg_replace('~^https?://~', $this->formatScheme($secure), $path);
         }
 
         $tail = implode('/', array_map(
