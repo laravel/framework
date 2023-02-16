@@ -635,28 +635,30 @@ class Arr
         }
 
         if (is_null($number)) {
-            return $array[array_rand($array)];
+            return head(array_slice($array, random_int(0, $count - 1), 1));
         }
 
         if ((int) $number === 0) {
             return [];
         }
 
-        $keys = array_rand($array, $number);
+        $keys = array_keys($array);
+        $count = count($keys);
+        $selected = [];
 
-        $results = [];
+        for ($i = $count - 1; $i >= $count - $number; $i--) {
+            $j = random_int(0, $i);
 
-        if ($preserveKeys) {
-            foreach ((array) $keys as $key) {
-                $results[$key] = $array[$key];
+            if ($preserveKeys) {
+                $selected[$keys[$j]] = $array[$keys[$j]];
+            } else {
+                $selected[] = $array[$keys[$j]];
             }
-        } else {
-            foreach ((array) $keys as $key) {
-                $results[] = $array[$key];
-            }
+
+            $keys[$j] = $keys[$i];
         }
 
-        return $results;
+        return $selected;
     }
 
     /**
@@ -708,15 +710,25 @@ class Arr
      */
     public static function shuffle($array, $seed = null)
     {
-        if (is_null($seed)) {
-            shuffle($array);
-        } else {
+        if (! is_null($seed)) {
             mt_srand($seed);
             shuffle($array);
             mt_srand();
+
+            return $array;
         }
 
-        return $array;
+        $keys = array_keys($array);
+
+        for ($i = count($keys) - 1; $i > 0; $i--) {
+            $j = random_int(0, $i);
+            $shuffled[] = $array[$keys[$j]];
+            $keys[$j] = $keys[$i];
+        }
+
+        $shuffled[] = $array[$keys[0]];
+
+        return $shuffled;
     }
 
     /**
