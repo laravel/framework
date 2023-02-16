@@ -718,16 +718,18 @@ class Arr
             return $array;
         }
 
-        $array = array_keys($array);
+        $keys = array_keys($array);
 
-        for ($i = count($array) - 1; $i > 0; $i--) {
+
+        for ($i = count($keys) - 1; $i > 0; $i--) {
             $j = random_int(0, $i);
-            $swap = $array[$i];
-            $array[$i] = $array[$j];
-            $array[$j] = $swap;
+            $shuffled[] = $array[$keys[$j]];
+            $keys[$j] = $keys[$i];
         }
 
-        return $array;
+        $shuffled[] = $array[$keys[0]];
+
+        return $shuffled;
     }
 
     /**

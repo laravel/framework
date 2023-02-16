@@ -830,26 +830,30 @@ class SupportArrTest extends TestCase
 
     public function testShuffleWithSeed()
     {
-        $this->assertEquals(
+        $this->assertSame(
             Arr::shuffle(range(0, 100, 10), 1234),
+            Arr::shuffle(range(0, 100, 10), 1234)
+        );
+
+        $this->assertNotSame(
+            range(0, 100, 10),
             Arr::shuffle(range(0, 100, 10), 1234)
         );
     }
 
     public function testShuffle()
     {
-        $array = range(1, 10);
+        $source = range('a', 'z'); // alphabetic keys to ensure values are returned
 
         $sameElements = true;
         $dontMatch = false;
 
         // Attempt 5x times to prevent random failures
         for ($i = 0; $i < 5; $i++) {
-            $one = Arr::shuffle($array);
-            $two = Arr::shuffle($array);
+            $shuffled = Arr::shuffle($source);
 
-            $dontMatch = $dontMatch || $one !== $two;
-            $sameElements = $sameElements && array_values(Arr::sort($one)) === array_values(Arr::sort($two));
+            $dontMatch = $dontMatch || $source !== $shuffled;
+            $sameElements = $sameElements && $source === array_values(Arr::sort($shuffled));
         }
 
         $this->assertTrue($sameElements, 'Shuffled array should always have the same elements.');
