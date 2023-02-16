@@ -30,6 +30,14 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
      *
      * @var string[]
      */
+
+    /**
+     * type file generator
+     *
+     * @var string
+     */
+    protected $typeFileGenerator = '.php';
+
     protected $reservedNames = [
         '__halt_compiler',
         'abstract',
@@ -152,7 +160,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
         // language and that the class name will actually be valid. If it is not valid we
         // can error now and prevent from polluting the filesystem using invalid files.
         if ($this->isReservedName($this->getNameInput())) {
-            $this->components->error('The name "'.$this->getNameInput().'" is reserved by PHP.');
+            $this->components->error('The name "' . $this->getNameInput() . '" is reserved by PHP.');
 
             return false;
         }
@@ -164,10 +172,11 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
         // Next, We will check to see if the class already exists. If it does, we don't want
         // to create the class and overwrite the user's code. So, we will bail out so the
         // code is untouched. Otherwise, we will continue generating this class' files.
-        if ((! $this->hasOption('force') ||
-             ! $this->option('force')) &&
-             $this->alreadyExists($this->getNameInput())) {
-            $this->components->error($this->type.' already exists.');
+        if ((!$this->hasOption('force') ||
+                !$this->option('force')) &&
+            $this->alreadyExists($this->getNameInput())
+        ) {
+            $this->components->error($this->type . ' already exists.');
 
             return false;
         }
@@ -209,7 +218,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
         }
 
         return $this->qualifyClass(
-            $this->getDefaultNamespace(trim($rootNamespace, '\\')).'\\'.$name
+            $this->getDefaultNamespace(trim($rootNamespace, '\\')) . '\\' . $name
         );
     }
 
@@ -232,8 +241,8 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
         }
 
         return is_dir(app_path('Models'))
-                    ? $rootNamespace.'Models\\'.$model
-                    : $rootNamespace.$model;
+            ? $rootNamespace . 'Models\\' . $model
+            : $rootNamespace . $model;
     }
 
     /**
@@ -246,7 +255,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
         $modelPath = is_dir(app_path('Models')) ? app_path('Models') : app_path();
 
         return collect((new Finder)->files()->depth(0)->in($modelPath))
-            ->map(fn ($file) => $file->getBasename('.php'))
+            ->map(fn ($file) => $file->getBasename($this->typeFileGenerator))
             ->values()
             ->all();
     }
@@ -260,12 +269,12 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
     {
         $eventPath = app_path('Events');
 
-        if (! is_dir($eventPath)) {
+        if (!is_dir($eventPath)) {
             return [];
         }
 
         return collect((new Finder)->files()->depth(0)->in($eventPath))
-            ->map(fn ($file) => $file->getBasename('.php'))
+            ->map(fn ($file) => $file->getBasename($this->typeFileGenerator))
             ->values()
             ->all();
     }
@@ -302,7 +311,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
     {
         $name = Str::replaceFirst($this->rootNamespace(), '', $name);
 
-        return $this->laravel['path'].'/'.str_replace('\\', '/', $name).'.php';
+        return $this->laravel['path'] . '/' . str_replace('\\', '/', $name) . $this->typeFileGenerator;
     }
 
     /**
@@ -313,7 +322,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
      */
     protected function makeDirectory($path)
     {
-        if (! $this->files->isDirectory(dirname($path))) {
+        if (!$this->files->isDirectory(dirname($path))) {
             $this->files->makeDirectory(dirname($path), 0777, true, true);
         }
 
@@ -381,7 +390,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
      */
     protected function replaceClass($stub, $name)
     {
-        $class = str_replace($this->getNamespace($name).'\\', '', $name);
+        $class = str_replace($this->getNamespace($name) . '\\', '', $name);
 
         return str_replace(['DummyClass', '{{ class }}', '{{class}}'], $class, $stub);
     }
@@ -412,7 +421,11 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
      */
     protected function getNameInput()
     {
-        return trim($this->argument('name'));
+        $argName = $this->argument('name');
+        if (strtolower(substr($argName, -4, 4)) === $this->typeFileGenerator) {
+            $argName = substr($argName, 0, -4);
+        }
+        return trim($argName);
     }
 
     /**
@@ -434,7 +447,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
     {
         $config = $this->laravel['config'];
 
-        $provider = $config->get('auth.guards.'.$config->get('auth.defaults.guard').'.provider');
+        $provider = $config->get('auth.guards.' . $config->get('auth.defaults.guard') . '.provider');
 
         return $config->get("auth.providers.{$provider}.model");
     }
@@ -462,7 +475,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
     {
         $views = $this->laravel['config']['view.paths'][0] ?? resource_path('views');
 
-        return $views.($path ? DIRECTORY_SEPARATOR.$path : $path);
+        return $views . ($path ? DIRECTORY_SEPARATOR . $path : $path);
     }
 
     /**
@@ -473,7 +486,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
     protected function getArguments()
     {
         return [
-            ['name', InputArgument::REQUIRED, 'The name of the '.strtolower($this->type)],
+            ['name', InputArgument::REQUIRED, 'The name of the ' . strtolower($this->type)],
         ];
     }
 
@@ -485,7 +498,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
     protected function promptForMissingArgumentsUsing()
     {
         return [
-            'name' => 'What should the '.strtolower($this->type).' be named?',
+            'name' => 'What should the ' . strtolower($this->type) . ' be named?',
         ];
     }
 }
