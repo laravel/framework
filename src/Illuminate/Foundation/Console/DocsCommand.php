@@ -211,7 +211,7 @@ class DocsCommand extends Command
     {
         try {
             $strategy = require Env::get('ARTISAN_DOCS_ASK_STRATEGY');
-        } catch (Throwable $e) {
+        } catch (Throwable) {
             return null;
         }
 
@@ -346,7 +346,7 @@ class DocsCommand extends Command
     {
         try {
             $command = require Env::get('ARTISAN_DOCS_OPEN_STRATEGY');
-        } catch (Throwable $e) {
+        } catch (Throwable) {
             $command = null;
         }
 

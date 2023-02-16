@@ -44,7 +44,7 @@ class Enum implements Rule
 
         try {
             return ! is_null($this->type::tryFrom($value));
-        } catch (TypeError $e) {
+        } catch (TypeError) {
             return false;
         }
     }
