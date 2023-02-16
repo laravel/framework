@@ -113,7 +113,7 @@ class HasInDatabase extends Constraint
     public function toString($options = 0): string
     {
         foreach ($this->data as $key => $data) {
-            $output[$key] = $data instanceof Expression ? (string) $data : $data;
+            $output[$key] = $data instanceof Expression ? $data->getValue($this->database->getQueryGrammar()) : $data;
         }
 
         return json_encode($output ?? [], $options);
