@@ -8,19 +8,13 @@ use Illuminate\Support\Str;
 trait HasUlids
 {
     /**
-     * Boot the trait.
+     * Initialize the trait.
      *
      * @return void
      */
-    public static function bootHasUlids()
+    public function initializeHasUlids()
     {
-        static::creating(function (self $model) {
-            foreach ($model->uniqueIds() as $column) {
-                if (empty($model->{$column})) {
-                    $model->{$column} = $model->newUniqueId();
-                }
-            }
-        });
+        $this->uniqueIds = true;
     }
 
     /**
