@@ -720,7 +720,6 @@ class Arr
 
         $keys = array_keys($array);
 
-
         for ($i = count($keys) - 1; $i > 0; $i--) {
             $j = random_int(0, $i);
             $shuffled[] = $array[$keys[$j]];
