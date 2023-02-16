@@ -2917,7 +2917,7 @@ class Builder implements BuilderContract
     /**
      * Get a collection instance containing the values of a given column.
      *
-     * @param  string|ExpressionContract  $column
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @param  string|null  $key
      * @return \Illuminate\Support\Collection
      */
@@ -2963,7 +2963,7 @@ class Builder implements BuilderContract
             return $column;
         }
 
-        $columnString = ($column instanceof ExpressionContract)
+        $columnString = $column instanceof ExpressionContract
             ? $this->grammar->getValue($column)
             : $column;
 
