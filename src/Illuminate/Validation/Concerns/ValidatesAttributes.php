@@ -126,7 +126,7 @@ trait ValidatesAttributes
                 if (is_array($records) && count($records) > 0) {
                     return true;
                 }
-            } catch (Exception $e) {
+            } catch (Exception) {
                 return false;
             }
         }
@@ -332,7 +332,7 @@ trait ValidatesAttributes
     {
         try {
             return @Date::parse($value) ?: null;
-        } catch (Exception $e) {
+        } catch (Exception) {
             //
         }
     }
@@ -524,7 +524,7 @@ trait ValidatesAttributes
             if ((! is_string($value) && ! is_numeric($value)) || strtotime($value) === false) {
                 return false;
             }
-        } catch (Exception $e) {
+        } catch (Exception) {
             return false;
         }
 

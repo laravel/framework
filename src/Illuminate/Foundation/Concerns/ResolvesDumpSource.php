@@ -149,7 +149,7 @@ trait ResolvesDumpSource
     {
         try {
             $editor = config('app.editor');
-        } catch (Throwable $e) {
+        } catch (Throwable) {
             // ..
         }
 

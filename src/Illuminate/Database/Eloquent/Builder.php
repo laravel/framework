@@ -773,7 +773,7 @@ class Builder implements BuilderContract
         $relation = Relation::noConstraints(function () use ($name) {
             try {
                 return $this->getModel()->newInstance()->$name();
-            } catch (BadMethodCallException $e) {
+            } catch (BadMethodCallException) {
                 throw RelationNotFoundException::make($this->getModel(), $name);
             }
         });

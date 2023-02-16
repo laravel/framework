@@ -1388,7 +1388,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
                     $user->save();
                     throw new Exception;
                 });
-            } catch (Exception $e) {
+            } catch (Exception) {
                 // ignore the exception
             }
             $user = EloquentTestUser::first();
@@ -1421,7 +1421,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
                 $user->id = 'invalid';
                 $user->email = 'otwell@laravel.com';
                 $user->saveOrFail();
-            } catch (Exception $e) {
+            } catch (Exception) {
                 // ignore the exception
             }
 
@@ -1538,7 +1538,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         EloquentTestOrder::create(['id' => 1, 'item_type' => EloquentTestItem::class, 'item_id' => 1]);
         try {
             $item = EloquentTestOrder::first()->item;
-        } catch (Exception $e) {
+        } catch (Exception) {
             // ignore the exception
         }
 
