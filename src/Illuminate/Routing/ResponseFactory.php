@@ -273,4 +273,14 @@ class ResponseFactory implements FactoryContract
     {
         return $this->redirector->intended($default, $status, $headers, $secure);
     }
+
+    /**
+     * Get the string representation of the factory.
+     *
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return '';
+    }
 }

@@ -9,7 +9,9 @@ use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Auth\Middleware\Authorize;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Routing\Registrar;
+use Illuminate\Contracts\Routing\ResponseFactory as ResponseFactoryContract;
 use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Events\Dispatcher;
@@ -26,7 +28,9 @@ use Illuminate\Routing\ControllerDispatcher;
 use Illuminate\Routing\Events\Routing;
 use Illuminate\Routing\Exceptions\UrlGenerationException;
 use Illuminate\Routing\Middleware\SubstituteBindings;
+use Illuminate\Routing\Redirector;
 use Illuminate\Routing\ResourceRegistrar;
+use Illuminate\Routing\ResponseFactory;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\RouteCollection;
 use Illuminate\Routing\RouteGroup;
@@ -34,6 +38,7 @@ use Illuminate\Routing\Router;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Support\Str;
 use LogicException;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
@@ -42,6 +47,20 @@ use UnexpectedValueException;
 
 class RoutingRouteTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        $container = new Container;
+
+        $container->singleton(ResponseFactoryContract::class, function () {
+            return new ResponseFactory(
+                m::mock(ViewFactory::class),
+                m::mock(Redirector::class)
+            );
+        });
+
+        Container::setInstance($container);
+    }
+
     public function testBasicDispatchingOfRoutes()
     {
         $router = $this->getRouter();
@@ -125,6 +144,18 @@ class RoutingRouteTest extends TestCase
         $this->assertTrue($router->is('foo'));
         $this->assertTrue($router->is('foo', 'bar'));
         $this->assertFalse($router->is('bar'));
+
+        $router = $this->getRouter();
+        $router->get('foo/bar', function () {
+            return response();
+        });
+        $this->assertSame('', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+
+        $router = $this->getRouter();
+        $router->get('foo/bar', function () {
+            return response('');
+        });
+        $this->assertSame('', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
 
         $router = $this->getRouter();
         $router->get('foo/{file}', function ($file) {
