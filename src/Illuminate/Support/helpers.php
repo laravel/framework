@@ -380,9 +380,9 @@ if (! function_exists('transform')) {
      * @template TReturn of mixed
      * @template TDefault of mixed
      *
-     * @param TValue $value
-     * @param callable(TValue): TReturn $callback
-     * @param null|TDefault|callable(TValue): TDefault $default
+     * @param  TValue  $value
+     * @param  callable(TValue): TReturn  $callback
+     * @param  null|TDefault|callable(TValue): TDefault  $default
      * @return ($value is empty ? ($default is null ? null : TDefault) : TReturn)
      */
     function transform($value, callable $callback, $default = null)
