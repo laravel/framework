@@ -284,7 +284,7 @@ class Factory implements FactoryContract
     {
         try {
             $this->finder->find($view);
-        } catch (InvalidArgumentException $e) {
+        } catch (InvalidArgumentException) {
             return false;
         }
 
