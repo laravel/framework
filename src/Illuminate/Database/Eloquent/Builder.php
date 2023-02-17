@@ -1034,7 +1034,7 @@ class Builder implements BuilderContract
         }
 
         return $this->toBase()->upsert(
-            $this->addTimestampsToUpsertValues($values),
+            $this->addTimestampsToUpsertValues($this->addUniqueIdsToUpsertValues($values)),
             $uniqueBy,
             $this->addUpdatedAtToUpsertColumns($update)
         );
@@ -1146,6 +1146,29 @@ class Builder implements BuilderContract
         foreach ($columns as $column) {
             foreach ($values as &$row) {
                 $row = array_merge([$column => $timestamp], $row);
+            }
+        }
+
+        return $values;
+    }
+
+    /**
+     * Add Unique IDs to the inserted values.
+     *
+     * @param  array  $values
+     * @return array
+     */
+    protected function addUniqueIdsToUpsertValues(array $values)
+    {
+        if (! $this->model->usesUniqueIds()) {
+            return $values;
+        }
+
+        foreach ($this->model->uniqueIds() as $column) {
+            foreach ($values as &$row) {
+                if (empty($row[$column])) {
+                    $row = array_merge([$column => $this->model->newUniqueId()], $row);
+                }
             }
         }
 
