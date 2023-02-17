@@ -20,6 +20,13 @@ class EloquentUniqueStringPrimaryKeysTest extends DatabaseTestCase
             $table->timestamps();
         });
 
+        Schema::create('foo', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->string('email')->unique();
+            $table->string('name');
+            $table->timestamps();
+        });
+
         Schema::create('posts', function (Blueprint $table) {
             $table->ulid('id')->primary();
             $table->ulid('foo');
@@ -115,6 +122,16 @@ class EloquentUniqueStringPrimaryKeysTest extends DatabaseTestCase
 
         $this->assertTrue(Str::isUuid($user->uuid));
     }
+
+    public function testUpsertWithUuidPrimaryKey()
+    {
+        ModelUpsertWithUuidPrimaryKey::create(['email' => 'foo', 'name' => 'bar']);
+        ModelUpsertWithUuidPrimaryKey::create(['name' => 'bar1', 'email' => 'foo2']);
+
+        $result = ModelUpsertWithUuidPrimaryKey::upsert([['email' => 'foo3', 'name' => 'bar'], ['name' => 'bar2', 'email' => 'foo2']], ['email']);
+
+        $this->assertEquals(2, $result);
+    }
 }
 
 class ModelWithUuidPrimaryKey extends Eloquent
@@ -128,6 +145,20 @@ class ModelWithUuidPrimaryKey extends Eloquent
     public function uniqueIds()
     {
         return [$this->getKeyName(), 'foo', 'bar'];
+    }
+}
+
+class ModelUpsertWithUuidPrimaryKey extends Eloquent
+{
+    use HasUuids;
+
+    protected $table = 'foo';
+
+    protected $guarded = [];
+
+    public function uniqueIds()
+    {
+        return [$this->getKeyName()];
     }
 }
 
