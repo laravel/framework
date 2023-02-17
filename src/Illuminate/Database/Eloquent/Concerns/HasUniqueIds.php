@@ -22,11 +22,12 @@ trait HasUniqueIds
     }
 
     /**
-     * Generate a unique keys for model
+     * Generate a unique keys for model.
      *
      * @return void
      */
-    public function setUniqueIds() {
+    public function setUniqueIds()
+    {
         foreach ($this->uniqueIds() as $column) {
             if (empty($this->{$column})) {
                 $this->{$column} = $this->newUniqueId();
