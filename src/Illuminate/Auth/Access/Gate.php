@@ -21,10 +21,8 @@ class Gate implements GateContract
 
     /**
      * The container instance.
-     *
-     * @var \Illuminate\Contracts\Container\Container
      */
-    protected $container;
+    protected Container $container;
 
     /**
      * The user resolver callable.
@@ -38,35 +36,35 @@ class Gate implements GateContract
      *
      * @var array
      */
-    protected $abilities = [];
+    protected array $abilities = [];
 
     /**
      * All of the defined policies.
      *
-     * @var array
+     * @var array<string, string>
      */
-    protected $policies = [];
+    protected array $policies = [];
 
     /**
      * All of the registered before callbacks.
      *
-     * @var array
+     * @var array<callable>
      */
-    protected $beforeCallbacks = [];
+    protected array $beforeCallbacks = [];
 
     /**
      * All of the registered after callbacks.
      *
-     * @var array
+     * @var array<callable>
      */
-    protected $afterCallbacks = [];
+    protected array $afterCallbacks = [];
 
     /**
      * All of the defined abilities using class@method notation.
      *
-     * @var array
+     * @var array<callable>
      */
-    protected $stringCallbacks = [];
+    protected array $stringCallbacks = [];
 
     /**
      * The callback to be used to guess policy names.
@@ -77,20 +75,16 @@ class Gate implements GateContract
 
     /**
      * Create a new gate instance.
-     *
-     * @param  \Illuminate\Contracts\Container\Container  $container
-     * @param  callable  $userResolver
-     * @param  array  $abilities
-     * @param  array  $policies
-     * @param  array  $beforeCallbacks
-     * @param  array  $afterCallbacks
-     * @param  callable|null  $guessPolicyNamesUsingCallback
-     * @return void
      */
-    public function __construct(Container $container, callable $userResolver, array $abilities = [],
-                                array $policies = [], array $beforeCallbacks = [], array $afterCallbacks = [],
-                                callable $guessPolicyNamesUsingCallback = null)
-    {
+    public function __construct(
+        Container $container,
+        callable $userResolver,
+        array $abilities = [],
+        array $policies = [],
+        array $beforeCallbacks = [],
+        array $afterCallbacks = [],
+        callable $guessPolicyNamesUsingCallback = null
+    ) {
         $this->policies = $policies;
         $this->container = $container;
         $this->abilities = $abilities;
@@ -102,13 +96,10 @@ class Gate implements GateContract
 
     /**
      * Determine if a given ability has been defined.
-     *
-     * @param  string|array  $ability
-     * @return bool
      */
-    public function has($ability)
+    public function has(iterable|string $ability): bool
     {
-        $abilities = is_array($ability) ? $ability : func_get_args();
+        $abilities = is_iterable($ability) ? $ability : func_get_args();
 
         foreach ($abilities as $ability) {
             if (! isset($this->abilities[$ability])) {
@@ -122,29 +113,22 @@ class Gate implements GateContract
     /**
      * Perform an on-demand authorization check. Throw an authorization exception if the condition or callback is false.
      *
-     * @param  \Illuminate\Auth\Access\Response|\Closure|bool  $condition
-     * @param  string|null  $message
-     * @param  string|null  $code
-     * @return \Illuminate\Auth\Access\Response
-     *
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function allowIf($condition, $message = null, $code = null)
-    {
+    public function allowIf(
+        Response|Closure|bool $condition,
+        string|null $message = null,
+        string|null $code = null
+    ): Response {
         return $this->authorizeOnDemand($condition, $message, $code, true);
     }
 
     /**
      * Perform an on-demand authorization check. Throw an authorization exception if the condition or callback is true.
      *
-     * @param  \Illuminate\Auth\Access\Response|\Closure|bool  $condition
-     * @param  string|null  $message
-     * @param  string|null  $code
-     * @return \Illuminate\Auth\Access\Response
-     *
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function denyIf($condition, $message = null, $code = null)
+    public function denyIf(Response|Closure|bool $condition, string|null $message = null, string|null $code = null)
     {
         return $this->authorizeOnDemand($condition, $message, $code, false);
     }
@@ -152,22 +136,22 @@ class Gate implements GateContract
     /**
      * Authorize a given condition or callback.
      *
-     * @param  \Illuminate\Auth\Access\Response|\Closure|bool  $condition
-     * @param  string|null  $message
-     * @param  string|null  $code
-     * @param  bool  $allowWhenResponseIs
      * @return \Illuminate\Auth\Access\Response
      *
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    protected function authorizeOnDemand($condition, $message, $code, $allowWhenResponseIs)
-    {
+    protected function authorizeOnDemand(
+        Response|Closure|bool $condition,
+        ?string $message,
+        ?string $code,
+        bool $allowWhenResponseIs
+    ) {
         $user = $this->resolveUser();
 
         if ($condition instanceof Closure) {
             $response = $this->canBeCalledWithUser($user, $condition)
-                            ? $condition($user)
-                            : new Response(false, $message, $code);
+                ? $condition($user)
+                : new Response(false, $message, $code);
         } else {
             $response = $condition;
         }
@@ -181,12 +165,12 @@ class Gate implements GateContract
      * Define a new ability.
      *
      * @param  string  $ability
-     * @param  callable|array|string  $callback
+     * @param  callable|string  $callback
      * @return $this
      *
-     * @throws \InvalidArgumentException
+     * @throws \InvalidArgumentException: static
      */
-    public function define($ability, $callback)
+    public function define(string $ability, mixed $callback): static
     {
         if (is_array($callback) && isset($callback[0]) && is_string($callback[0])) {
             $callback = $callback[0].'@'.$callback[1];
@@ -208,12 +192,9 @@ class Gate implements GateContract
     /**
      * Define abilities for a resource.
      *
-     * @param  string  $name
-     * @param  string  $class
-     * @param  array|null  $abilities
-     * @return $this
+     * @param  array<string, string>|null  $abilities
      */
-    public function resource($name, $class, array $abilities = null)
+    public function resource(string $name, string $class, array $abilities = null): static
     {
         $abilities = $abilities ?: [
             'viewAny' => 'viewAny',
@@ -232,12 +213,8 @@ class Gate implements GateContract
 
     /**
      * Create the ability callback for a callback string.
-     *
-     * @param  string  $ability
-     * @param  string  $callback
-     * @return \Closure
      */
-    protected function buildAbilityCallback($ability, $callback)
+    protected function buildAbilityCallback(string $ability, string $callback): Closure
     {
         return function () use ($ability, $callback) {
             if (str_contains($callback, '@')) {
@@ -261,19 +238,17 @@ class Gate implements GateContract
             }
 
             return isset($method)
-                    ? $policy->{$method}(...func_get_args())
-                    : $policy(...func_get_args());
+                ? $policy->{$method}(...func_get_args())
+                : $policy(...func_get_args());
         };
     }
 
     /**
      * Define a policy class for a given class type.
      *
-     * @param  string  $class
-     * @param  string  $policy
-     * @return $this
+     * @param  class-string  $policy
      */
-    public function policy($class, $policy)
+    public function policy(string $class, string $policy): static
     {
         $this->policies[$class] = $policy;
 
@@ -283,10 +258,8 @@ class Gate implements GateContract
     /**
      * Register a callback to run before all Gate checks.
      *
-     * @param  callable  $callback
-     * @return $this
      */
-    public function before(callable $callback)
+    public function before(callable $callback): static
     {
         $this->beforeCallbacks[] = $callback;
 
@@ -296,10 +269,8 @@ class Gate implements GateContract
     /**
      * Register a callback to run after all Gate checks.
      *
-     * @param  callable  $callback
-     * @return $this
      */
-    public function after(callable $callback)
+    public function after(callable $callback): static
     {
         $this->afterCallbacks[] = $callback;
 
@@ -311,9 +282,8 @@ class Gate implements GateContract
      *
      * @param  string  $ability
      * @param  array|mixed  $arguments
-     * @return bool
      */
-    public function allows($ability, $arguments = [])
+    public function allows(string $ability, mixed $arguments = []): bool
     {
         return $this->check($ability, $arguments);
     }
@@ -323,9 +293,8 @@ class Gate implements GateContract
      *
      * @param  string  $ability
      * @param  array|mixed  $arguments
-     * @return bool
      */
-    public function denies($ability, $arguments = [])
+    public function denies(string $ability, mixed $arguments = []): bool
     {
         return ! $this->allows($ability, $arguments);
     }
@@ -333,37 +302,31 @@ class Gate implements GateContract
     /**
      * Determine if all of the given abilities should be granted for the current user.
      *
-     * @param  iterable|string  $abilities
      * @param  array|mixed  $arguments
-     * @return bool
      */
-    public function check($abilities, $arguments = [])
+    public function check(iterable|string $abilities, mixed $arguments = []): bool
     {
         return collect($abilities)->every(
-            fn ($ability) => $this->inspect($ability, $arguments)->allowed()
+            fn($ability) => $this->inspect($ability, $arguments)->allowed()
         );
     }
 
     /**
      * Determine if any one of the given abilities should be granted for the current user.
      *
-     * @param  iterable|string  $abilities
      * @param  array|mixed  $arguments
-     * @return bool
      */
-    public function any($abilities, $arguments = [])
+    public function any(iterable|string $abilities, mixed $arguments = []): bool
     {
-        return collect($abilities)->contains(fn ($ability) => $this->check($ability, $arguments));
+        return collect($abilities)->contains(fn($ability) => $this->check($ability, $arguments));
     }
 
     /**
      * Determine if all of the given abilities should be denied for the current user.
      *
-     * @param  iterable|string  $abilities
      * @param  array|mixed  $arguments
-     * @return bool
      */
-    public function none($abilities, $arguments = [])
+    public function none(iterable|string $abilities, mixed $arguments = []): bool
     {
         return ! $this->any($abilities, $arguments);
     }
@@ -371,13 +334,11 @@ class Gate implements GateContract
     /**
      * Determine if the given ability should be granted for the current user.
      *
-     * @param  string  $ability
      * @param  array|mixed  $arguments
-     * @return \Illuminate\Auth\Access\Response
      *
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function authorize($ability, $arguments = [])
+    public function authorize(string $ability, mixed $arguments = []): Response
     {
         return $this->inspect($ability, $arguments)->authorize();
     }
@@ -385,11 +346,9 @@ class Gate implements GateContract
     /**
      * Inspect the user for the given ability.
      *
-     * @param  string  $ability
      * @param  array|mixed  $arguments
-     * @return \Illuminate\Auth\Access\Response
      */
-    public function inspect($ability, $arguments = [])
+    public function inspect(string $ability, mixed $arguments = []): Response
     {
         try {
             $result = $this->raw($ability, $arguments);
@@ -407,13 +366,11 @@ class Gate implements GateContract
     /**
      * Get the raw result from the authorization callback.
      *
-     * @param  string  $ability
      * @param  array|mixed  $arguments
-     * @return mixed
      *
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function raw($ability, $arguments = [])
+    public function raw(string $ability, mixed $arguments = []): mixed
     {
         $arguments = Arr::wrap($arguments);
 
@@ -448,7 +405,7 @@ class Gate implements GateContract
      * @param  string|null  $method
      * @return bool
      */
-    protected function canBeCalledWithUser($user, $class, $method = null)
+    protected function canBeCalledWithUser($user, $class, ?string $method = null): bool
     {
         if (! is_null($user)) {
             return true;
@@ -469,12 +426,8 @@ class Gate implements GateContract
 
     /**
      * Determine if the given class method allows guests.
-     *
-     * @param  string  $class
-     * @param  string  $method
-     * @return bool
      */
-    protected function methodAllowsGuests($class, $method)
+    protected function methodAllowsGuests(object|string $class, string $method): bool
     {
         try {
             $reflection = new ReflectionClass($class);
@@ -496,12 +449,10 @@ class Gate implements GateContract
     /**
      * Determine if the callback allows guests.
      *
-     * @param  callable  $callback
-     * @return bool
      *
-     * @throws \ReflectionException
+     * @throws \ReflectionException: bool
      */
-    protected function callbackAllowsGuests($callback)
+    protected function callbackAllowsGuests(object|string $callback): bool
     {
         $parameters = (new ReflectionFunction($callback))->getParameters();
 
@@ -510,25 +461,19 @@ class Gate implements GateContract
 
     /**
      * Determine if the given parameter allows guests.
-     *
-     * @param  \ReflectionParameter  $parameter
-     * @return bool
      */
-    protected function parameterAllowsGuests($parameter)
+    protected function parameterAllowsGuests(\ReflectionParameter $parameter): bool
     {
         return ($parameter->hasType() && $parameter->allowsNull()) ||
-               ($parameter->isDefaultValueAvailable() && is_null($parameter->getDefaultValue()));
+            ($parameter->isDefaultValueAvailable() && is_null($parameter->getDefaultValue()));
     }
 
     /**
      * Resolve and call the appropriate authorization callback.
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
-     * @param  string  $ability
-     * @param  array  $arguments
-     * @return bool
      */
-    protected function callAuthCallback($user, $ability, array $arguments)
+    protected function callAuthCallback($user, string $ability, array $arguments): bool|null|Response
     {
         $callback = $this->resolveAuthCallback($user, $ability, $arguments);
 
@@ -539,11 +484,8 @@ class Gate implements GateContract
      * Call all of the before callbacks and return if a result is given.
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
-     * @param  string  $ability
-     * @param  array  $arguments
-     * @return bool|null
      */
-    protected function callBeforeCallbacks($user, $ability, array $arguments)
+    protected function callBeforeCallbacks($user, string $ability, array $arguments): bool|null|Response
     {
         foreach ($this->beforeCallbacks as $before) {
             if (! $this->canBeCalledWithUser($user, $before)) {
@@ -554,18 +496,16 @@ class Gate implements GateContract
                 return $result;
             }
         }
+
+        return null;
     }
 
     /**
      * Call all of the after callbacks with check result.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @param  string  $ability
-     * @param  array  $arguments
-     * @param  bool  $result
-     * @return bool|null
+     * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
      */
-    protected function callAfterCallbacks($user, $ability, array $arguments, $result)
+    protected function callAfterCallbacks($user, string $ability, array $arguments, bool|null|Response $result): bool|null|Response
     {
         foreach ($this->afterCallbacks as $after) {
             if (! $this->canBeCalledWithUser($user, $after)) {
@@ -584,12 +524,8 @@ class Gate implements GateContract
      * Dispatch a gate evaluation event.
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
-     * @param  string  $ability
-     * @param  array  $arguments
-     * @param  bool|null  $result
-     * @return void
      */
-    protected function dispatchGateEvaluatedEvent($user, $ability, array $arguments, $result)
+    protected function dispatchGateEvaluatedEvent($user, string $ability, array $arguments, bool|null|Response $result): void
     {
         if ($this->container->bound(Dispatcher::class)) {
             $this->container->make(Dispatcher::class)->dispatch(
@@ -602,11 +538,8 @@ class Gate implements GateContract
      * Resolve the callable for the given ability and arguments.
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
-     * @param  string  $ability
-     * @param  array  $arguments
-     * @return callable
      */
-    protected function resolveAuthCallback($user, $ability, array $arguments)
+    protected function resolveAuthCallback($user, string $ability, array $arguments): callable
     {
         if (isset($arguments[0]) &&
             ! is_null($policy = $this->getPolicyFor($arguments[0])) &&
@@ -635,17 +568,15 @@ class Gate implements GateContract
     /**
      * Get a policy instance for a given class.
      *
-     * @param  object|string  $class
-     * @return mixed
      */
-    public function getPolicyFor($class)
+    public function getPolicyFor(object|string $class)
     {
         if (is_object($class)) {
             $class = get_class($class);
         }
 
         if (! is_string($class)) {
-            return;
+            return null;
         }
 
         if (isset($this->policies[$class])) {
@@ -668,10 +599,9 @@ class Gate implements GateContract
     /**
      * Guess the policy name for the given class.
      *
-     * @param  string  $class
-     * @return array
+     * @param  class-string  $class
      */
-    protected function guessPolicyName($class)
+    protected function guessPolicyName(string $class): array
     {
         if ($this->guessPolicyNamesUsingCallback) {
             return Arr::wrap(call_user_func($this->guessPolicyNamesUsingCallback, $class));
@@ -681,11 +611,12 @@ class Gate implements GateContract
 
         $classDirnameSegments = explode('\\', $classDirname);
 
-        return Arr::wrap(Collection::times(count($classDirnameSegments), function ($index) use ($class, $classDirnameSegments) {
-            $classDirname = implode('\\', array_slice($classDirnameSegments, 0, $index));
+        return Arr::wrap(Collection::times(count($classDirnameSegments),
+            function ($index) use ($class, $classDirnameSegments) {
+                $classDirname = implode('\\', array_slice($classDirnameSegments, 0, $index));
 
-            return $classDirname.'\\Policies\\'.class_basename($class).'Policy';
-        })->reverse()->values()->first(function ($class) {
+                return $classDirname.'\\Policies\\'.class_basename($class).'Policy';
+            })->reverse()->values()->first(function ($class) {
             return class_exists($class);
         }) ?: [$classDirname.'\\Policies\\'.class_basename($class).'Policy']);
     }
@@ -693,10 +624,8 @@ class Gate implements GateContract
     /**
      * Specify a callback to be used to guess policy names.
      *
-     * @param  callable  $callback
-     * @return $this
      */
-    public function guessPolicyNamesUsing(callable $callback)
+    public function guessPolicyNamesUsing(callable $callback): static
     {
         $this->guessPolicyNamesUsingCallback = $callback;
 
@@ -711,7 +640,7 @@ class Gate implements GateContract
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
-    public function resolvePolicy($class)
+    public function resolvePolicy(object|string $class)
     {
         return $this->container->make($class);
     }
@@ -719,13 +648,9 @@ class Gate implements GateContract
     /**
      * Resolve the callback for a policy check.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @param  string  $ability
-     * @param  array  $arguments
-     * @param  mixed  $policy
-     * @return bool|callable
+     * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
      */
-    protected function resolvePolicyCallback($user, $ability, array $arguments, $policy)
+    protected function resolvePolicyCallback($user, string $ability, array $arguments, mixed $policy): bool|callable
     {
         if (! is_callable([$policy, $this->formatAbilityToMethod($ability)])) {
             return false;
@@ -755,33 +680,29 @@ class Gate implements GateContract
     /**
      * Call the "before" method on the given policy, if applicable.
      *
-     * @param  mixed  $policy
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @param  string  $ability
-     * @param  array  $arguments
-     * @return mixed
      */
-    protected function callPolicyBefore($policy, $user, $ability, $arguments)
+    protected function callPolicyBefore(mixed $policy, $user, string $ability, array $arguments): Response|bool|null
     {
         if (! method_exists($policy, 'before')) {
-            return;
+            return null;
         }
 
         if ($this->canBeCalledWithUser($user, $policy, 'before')) {
             return $policy->before($user, $ability, ...$arguments);
         }
+
+        return null;
     }
 
     /**
      * Call the appropriate method on the given policy.
      *
-     * @param  mixed  $policy
-     * @param  string  $method
      * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
      * @param  array  $arguments
      * @return mixed
      */
-    protected function callPolicyMethod($policy, $method, $user, array $arguments)
+    protected function callPolicyMethod(mixed $policy, string $method, $user, array $arguments)
     {
         // If this first argument is a string, that means they are passing a class name
         // to the policy. We will remove the first argument from this argument array
@@ -791,21 +712,18 @@ class Gate implements GateContract
         }
 
         if (! is_callable([$policy, $method])) {
-            return;
+            return null;
         }
 
         if ($this->canBeCalledWithUser($user, $policy, $method)) {
-            return $policy->{$method}($user, ...$arguments);
+            return $policy->{$method}($user, ...$arguments)?: null;
         }
     }
 
     /**
      * Format the policy ability into a method name.
-     *
-     * @param  string  $ability
-     * @return string
      */
-    protected function formatAbilityToMethod($ability)
+    protected function formatAbilityToMethod(string $ability): string
     {
         return str_contains($ability, '-') ? Str::camel($ability) : $ability;
     }
@@ -816,9 +734,9 @@ class Gate implements GateContract
      * @param  \Illuminate\Contracts\Auth\Authenticatable|mixed  $user
      * @return static
      */
-    public function forUser($user)
+    public function forUser($user): static
     {
-        $callback = fn () => $user;
+        $callback = fn() => $user;
 
         return new static(
             $this->container, $callback, $this->abilities,
@@ -840,9 +758,9 @@ class Gate implements GateContract
     /**
      * Get all of the defined abilities.
      *
-     * @return array
+     * @return array<string, string>
      */
-    public function abilities()
+    public function abilities(): array
     {
         return $this->abilities;
     }
@@ -850,20 +768,17 @@ class Gate implements GateContract
     /**
      * Get all of the defined policies.
      *
-     * @return array
+     * @return array<string, string>
      */
-    public function policies()
+    public function policies(): array
     {
         return $this->policies;
     }
 
     /**
      * Set the container instance used by the gate.
-     *
-     * @param  \Illuminate\Contracts\Container\Container  $container
-     * @return $this
      */
-    public function setContainer(Container $container)
+    public function setContainer(Container $container): static
     {
         $this->container = $container;
 
