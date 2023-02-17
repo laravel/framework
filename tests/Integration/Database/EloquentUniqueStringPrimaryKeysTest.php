@@ -126,9 +126,9 @@ class EloquentUniqueStringPrimaryKeysTest extends DatabaseTestCase
     public function testUpsertWithUuidPrimaryKey()
     {
         ModelUpsertWithUuidPrimaryKey::create(['email' => 'foo', 'name' => 'bar']);
-        ModelUpsertWithUuidPrimaryKey::create(['name' => 'bar1', 'email' => 'foo2']);
+        ModelUpsertWithUuidPrimaryKey::create(['name' => 'bar2', 'email' => 'foo2']);
 
-        $result = ModelUpsertWithUuidPrimaryKey::upsert([['email' => 'foo3', 'name' => 'bar'], ['name' => 'bar2', 'email' => 'foo2']], ['email']);
+        $result = ModelUpsertWithUuidPrimaryKey::upsert([['email' => 'foo', 'name' => 'bar'], ['name' => 'bar2', 'email' => 'foo2']], ['email']);
 
         $this->assertEquals(2, $result);
     }
