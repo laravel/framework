@@ -4904,6 +4904,49 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->fails());
     }
 
+    public function testDateJson()
+    {
+        date_default_timezone_set('UTC');
+        $trans = $this->getIlluminateArrayTranslator();
+        Carbon::setTestNow(new Carbon('2018-01-01'));
+
+        // With microseconds only
+        $v = new Validator($trans, ['x' => '2018-01-01T19:30:51.000000'], ['x' => 'date_json']);
+        $this->assertTrue($v->passes());
+
+        // With microseconds and timezone UTC
+        $v = new Validator($trans, ['x' => '2018-01-01T19:30:51.000000Z'], ['x' => 'date_json']);
+        $this->assertTrue($v->passes());
+
+        // With microseconds and custom timezone
+        $v = new Validator($trans, ['x' => '2018-01-01T19:30:51.000000+03:00'], ['x' => 'date_json']);
+        $this->assertTrue($v->passes());
+
+        // With milliseconds only
+        $v = new Validator($trans, ['x' => '2018-01-01T19:30:51.000'], ['x' => 'date_json']);
+        $this->assertTrue($v->passes());
+
+        // With milliseconds and timezone UTC
+        $v = new Validator($trans, ['x' => '2018-01-01T19:30:51.000Z'], ['x' => 'date_json']);
+        $this->assertTrue($v->passes());
+
+        // With milliseconds and custom timezone
+        $v = new Validator($trans, ['x' => '2018-01-01T19:30:51.000+03:00'], ['x' => 'date_json']);
+        $this->assertTrue($v->passes());
+
+        // Without microseconds
+        $v = new Validator($trans, ['x' => '2018-01-01T19:30:51'], ['x' => 'date_json']);
+        $this->assertTrue($v->passes());
+
+        // Without microseconds and timezone UTC
+        $v = new Validator($trans, ['x' => '2018-01-01T19:30:51Z'], ['x' => 'date_json']);
+        $this->assertTrue($v->passes());
+
+        // Without microseconds and custom timezone
+        $v = new Validator($trans, ['x' => '2018-01-01T19:30:51+03:00'], ['x' => 'date_json']);
+        $this->assertTrue($v->passes());
+    }
+
     public function testDateEqualsRespectsCarbonTestNowWhenParameterIsRelative()
     {
         date_default_timezone_set('UTC');

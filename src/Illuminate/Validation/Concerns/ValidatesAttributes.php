@@ -576,6 +576,24 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute matches a JSON date format.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateDateJson($attribute, $value, $parameters)
+    {
+        return $this->validateDateFormat($attribute, $value, [
+            'Y-m-d\TH:i:s.vp', 'Y-m-d\TH:i:s.v',
+            'Y-m-d\TH:i:s.up', 'Y-m-d\TH:i:s.u',
+            'Y-m-d\TH:i:s', 'Y-m-d\TH:i:sp',
+            'c'
+        ]);
+    }
+
+    /**
      * Validate that an attribute has a given number of decimal places.
      *
      * @param  string  $attribute
