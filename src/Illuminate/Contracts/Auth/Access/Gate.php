@@ -65,7 +65,6 @@ interface Gate
 
     /**
      * Register a callback to run after all Gate checks.
-     *
      */
     public function after(callable $callback): static;
 

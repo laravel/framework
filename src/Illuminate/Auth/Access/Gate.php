@@ -257,7 +257,6 @@ class Gate implements GateContract
 
     /**
      * Register a callback to run before all Gate checks.
-     *
      */
     public function before(callable $callback): static
     {
@@ -268,7 +267,6 @@ class Gate implements GateContract
 
     /**
      * Register a callback to run after all Gate checks.
-     *
      */
     public function after(callable $callback): static
     {
@@ -307,7 +305,7 @@ class Gate implements GateContract
     public function check(iterable|string $abilities, mixed $arguments = []): bool
     {
         return collect($abilities)->every(
-            fn($ability) => $this->inspect($ability, $arguments)->allowed()
+            fn ($ability) => $this->inspect($ability, $arguments)->allowed()
         );
     }
 
@@ -318,7 +316,7 @@ class Gate implements GateContract
      */
     public function any(iterable|string $abilities, mixed $arguments = []): bool
     {
-        return collect($abilities)->contains(fn($ability) => $this->check($ability, $arguments));
+        return collect($abilities)->contains(fn ($ability) => $this->check($ability, $arguments));
     }
 
     /**
@@ -505,8 +503,12 @@ class Gate implements GateContract
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
      */
-    protected function callAfterCallbacks($user, string $ability, array $arguments, bool|null|Response $result): bool|null|Response
-    {
+    protected function callAfterCallbacks(
+        $user,
+        string $ability,
+        array $arguments,
+        bool|null|Response $result
+    ): bool|null|Response {
         foreach ($this->afterCallbacks as $after) {
             if (! $this->canBeCalledWithUser($user, $after)) {
                 continue;
@@ -525,8 +527,12 @@ class Gate implements GateContract
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
      */
-    protected function dispatchGateEvaluatedEvent($user, string $ability, array $arguments, bool|null|Response $result): void
-    {
+    protected function dispatchGateEvaluatedEvent(
+        $user,
+        string $ability,
+        array $arguments,
+        bool|null|Response $result
+    ): void {
         if ($this->container->bound(Dispatcher::class)) {
             $this->container->make(Dispatcher::class)->dispatch(
                 new GateEvaluated($user, $ability, $result, $arguments)
@@ -567,7 +573,6 @@ class Gate implements GateContract
 
     /**
      * Get a policy instance for a given class.
-     *
      */
     public function getPolicyFor(object|string $class)
     {
@@ -611,19 +616,17 @@ class Gate implements GateContract
 
         $classDirnameSegments = explode('\\', $classDirname);
 
-        return Arr::wrap(Collection::times(count($classDirnameSegments),
-            function ($index) use ($class, $classDirnameSegments) {
-                $classDirname = implode('\\', array_slice($classDirnameSegments, 0, $index));
+        return Arr::wrap(Collection::times(count($classDirnameSegments), function ($index) use ($class, $classDirnameSegments) {
+            $classDirname = implode('\\', array_slice($classDirnameSegments, 0, $index));
 
-                return $classDirname.'\\Policies\\'.class_basename($class).'Policy';
-            })->reverse()->values()->first(function ($class) {
+            return $classDirname.'\\Policies\\'.class_basename($class).'Policy';
+        })->reverse()->values()->first(function ($class) {
             return class_exists($class);
         }) ?: [$classDirname.'\\Policies\\'.class_basename($class).'Policy']);
     }
 
     /**
      * Specify a callback to be used to guess policy names.
-     *
      */
     public function guessPolicyNamesUsing(callable $callback): static
     {
@@ -716,7 +719,7 @@ class Gate implements GateContract
         }
 
         if ($this->canBeCalledWithUser($user, $policy, $method)) {
-            return $policy->{$method}($user, ...$arguments)?: null;
+            return $policy->{$method}($user, ...$arguments);
         }
     }
 
@@ -736,7 +739,7 @@ class Gate implements GateContract
      */
     public function forUser($user): static
     {
-        $callback = fn() => $user;
+        $callback = fn () => $user;
 
         return new static(
             $this->container, $callback, $this->abilities,
