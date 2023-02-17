@@ -585,12 +585,7 @@ trait ValidatesAttributes
      */
     public function validateDateJson($attribute, $value, $parameters)
     {
-        return $this->validateDateFormat($attribute, $value, [
-            'Y-m-d\TH:i:s.vp', 'Y-m-d\TH:i:s.v',
-            'Y-m-d\TH:i:s.up', 'Y-m-d\TH:i:s.u',
-            'Y-m-d\TH:i:s', 'Y-m-d\TH:i:sp',
-            'c'
-        ]);
+        return $this->validateDateFormat($attribute, $value, ['Y-m-d\TH:i:s.vp', 'Y-m-d\TH:i:s.up']);
     }
 
     /**
