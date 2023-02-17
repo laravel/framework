@@ -437,7 +437,7 @@ class PendingRequest
     /**
      * Specify the user agent for the request.
      *
-     * @param  string  $userAgent
+     * @param  string|bool  $userAgent
      * @return $this
      */
     public function withUserAgent($userAgent)
