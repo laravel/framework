@@ -57,7 +57,7 @@ class Stringable implements JsonSerializable
     /**
      * Append the given values to the string.
      *
-     * @param  string  ...$values
+     * @param  string|array  ...$values
      * @return static
      */
     public function append(...$values)
