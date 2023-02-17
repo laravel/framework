@@ -580,10 +580,9 @@ trait ValidatesAttributes
      *
      * @param  string  $attribute
      * @param  mixed  $value
-     * @param  array<int, int|string>  $parameters
      * @return bool
      */
-    public function validateDateJson($attribute, $value, $parameters)
+    public function validateDateJson($attribute, $value)
     {
         return $this->validateDateFormat($attribute, $value, ['Y-m-d\TH:i:s.vp', 'Y-m-d\TH:i:s.up']);
     }
