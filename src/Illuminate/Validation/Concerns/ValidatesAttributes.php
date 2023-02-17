@@ -249,7 +249,7 @@ trait ValidatesAttributes
             return $this->checkDateTimeOrder($format, $value, $parameters[0], $operator);
         }
 
-        if (! $date = $this->getDateTimestamp($parameters[0])) {
+        if (is_null($date = $this->getDateTimestamp($parameters[0]))) {
             $date = $this->getDateTimestamp($this->getValue($parameters[0]));
         }
 
