@@ -741,6 +741,25 @@ class SupportArrTest extends TestCase
         $this->assertCount(2, array_intersect_assoc(['one' => 'foo', 'two' => 'bar', 'three' => 'baz'], $random));
     }
 
+    public function testRandomIsActuallyRandom()
+    {
+        $values = [];
+
+        for ($i = 0; $i < 100; $i++) {
+            $values[] = Arr::random(['foo', 'bar', 'baz']);
+        }
+
+        $this->assertContains('foo', $values);
+        $this->assertContains('bar', $values);
+        $this->assertContains('baz', $values);
+    }
+
+    public function testRandomNotIncrementingKeys()
+    {
+        $random = Arr::random(['foo' => 'foo', 'bar' => 'bar', 'baz' => 'baz']);
+        $this->assertContains($random, ['foo', 'bar', 'baz']);
+    }
+
     public function testRandomOnEmptyArray()
     {
         $random = Arr::random([], 0);
@@ -821,10 +840,34 @@ class SupportArrTest extends TestCase
 
     public function testShuffleWithSeed()
     {
-        $this->assertEquals(
+        $this->assertSame(
             Arr::shuffle(range(0, 100, 10), 1234),
             Arr::shuffle(range(0, 100, 10), 1234)
         );
+
+        $this->assertNotSame(
+            range(0, 100, 10),
+            Arr::shuffle(range(0, 100, 10), 1234)
+        );
+    }
+
+    public function testShuffle()
+    {
+        $source = range('a', 'z'); // alphabetic keys to ensure values are returned
+
+        $sameElements = true;
+        $dontMatch = false;
+
+        // Attempt 5x times to prevent random failures
+        for ($i = 0; $i < 5; $i++) {
+            $shuffled = Arr::shuffle($source);
+
+            $dontMatch = $dontMatch || $source !== $shuffled;
+            $sameElements = $sameElements && $source === array_values(Arr::sort($shuffled));
+        }
+
+        $this->assertTrue($sameElements, 'Shuffled array should always have the same elements.');
+        $this->assertTrue($dontMatch, 'Shuffled array should not have the same order.');
     }
 
     public function testSort()
