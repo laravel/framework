@@ -3094,7 +3094,7 @@ class Builder implements BuilderContract
     /**
      * Retrieve the "count" result of the query.
      *
-     * @param  string  $columns
+     * @param  string|ExpressionContract  $columns
      * @return int
      */
     public function count($columns = '*')
@@ -3105,7 +3105,7 @@ class Builder implements BuilderContract
     /**
      * Retrieve the minimum value of a given column.
      *
-     * @param  string  $column
+     * @param  string|ExpressionContract  $column
      * @return mixed
      */
     public function min($column)
@@ -3116,7 +3116,7 @@ class Builder implements BuilderContract
     /**
      * Retrieve the maximum value of a given column.
      *
-     * @param  string  $column
+     * @param  string|ExpressionContract  $column
      * @return mixed
      */
     public function max($column)
@@ -3127,7 +3127,7 @@ class Builder implements BuilderContract
     /**
      * Retrieve the sum of the values of a given column.
      *
-     * @param  string  $column
+     * @param  string|ExpressionContract  $column
      * @return mixed
      */
     public function sum($column)
@@ -3140,7 +3140,7 @@ class Builder implements BuilderContract
     /**
      * Retrieve the average of the values of a given column.
      *
-     * @param  string  $column
+     * @param  string|ExpressionContract  $column
      * @return mixed
      */
     public function avg($column)
@@ -3151,7 +3151,7 @@ class Builder implements BuilderContract
     /**
      * Alias for the "avg" method.
      *
-     * @param  string  $column
+     * @param  string|ExpressionContract  $column
      * @return mixed
      */
     public function average($column)
