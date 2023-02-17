@@ -633,7 +633,7 @@ class Builder implements BuilderContract
     {
         try {
             return $this->baseSole($columns);
-        } catch (RecordsNotFoundException $exception) {
+        } catch (RecordsNotFoundException) {
             throw (new ModelNotFoundException)->setModel(get_class($this->model));
         }
     }

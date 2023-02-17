@@ -556,7 +556,7 @@ trait QueriesRelationships
 
         try {
             $relationship = $this->model->{$relationshipName}();
-        } catch (BadMethodCallException $exception) {
+        } catch (BadMethodCallException) {
             throw RelationNotFoundException::make($this->model, $relationshipName);
         }
 
