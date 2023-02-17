@@ -1053,7 +1053,7 @@ class Builder implements BuilderContract
     /**
      * Add a "where in" clause to the query.
      *
-     * @param  string|ExpressionContract $column
+     * @param  string|ExpressionContract  $column
      * @param  mixed  $values
      * @param  string  $boolean
      * @param  bool  $not
@@ -1242,7 +1242,7 @@ class Builder implements BuilderContract
     /**
      * Add a where between statement to the query.
      *
-     * @param  string|ExpressionContract $column
+     * @param  string|ExpressionContract  $column
      * @param  iterable  $values
      * @param  string  $boolean
      * @param  bool  $not
@@ -2039,7 +2039,7 @@ class Builder implements BuilderContract
     /**
      * Add a "group by" clause to the query.
      *
-     * @param  array|string|ExpressionContract ...$groups
+     * @param  array|string|ExpressionContract  ...$groups
      * @return $this
      */
     public function groupBy(...$groups)
@@ -2917,7 +2917,7 @@ class Builder implements BuilderContract
     /**
      * Get a collection instance containing the values of a given column.
      *
-     * @param ExpressionContract|string  $column
+     * @param  ExpressionContract|string  $column
      * @param  string|null  $key
      * @return \Illuminate\Support\Collection
      */
