@@ -6,13 +6,14 @@ use {{ rootNamespace }}Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\View\View;
 
 class {{ class }} extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(): Response
+    public function index(): Response | View
     {
         //
     }
@@ -20,7 +21,7 @@ class {{ class }} extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(): Response
+    public function create(): Response | View
     {
         //
     }
@@ -36,7 +37,7 @@ class {{ class }} extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id): Response
+    public function show(string $id): Response | View
     {
         //
     }
@@ -44,7 +45,7 @@ class {{ class }} extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id): Response
+    public function edit(string $id): Response | View
     {
         //
     }
