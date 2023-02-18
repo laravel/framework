@@ -3,6 +3,7 @@
 namespace Illuminate\Http;
 
 use Illuminate\Contracts\Support\MessageProvider;
+use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Session\Store as SessionStore;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
@@ -12,7 +13,7 @@ use Illuminate\Support\ViewErrorBag;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 use Symfony\Component\HttpFoundation\RedirectResponse as BaseRedirectResponse;
 
-class RedirectResponse extends BaseRedirectResponse
+class RedirectResponse extends BaseRedirectResponse implements Responsable
 {
     use ForwardsCalls, ResponseTrait, Macroable {
         Macroable::__call as macroCall;
@@ -232,6 +233,17 @@ class RedirectResponse extends BaseRedirectResponse
     public function setSession(SessionStore $session)
     {
         $this->session = $session;
+    }
+
+    /**
+     * Create an HTTP response that represents the object.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function toResponse($request)
+    {
+        return $this;
     }
 
     /**

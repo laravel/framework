@@ -4,12 +4,13 @@ namespace Illuminate\Http;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use JsonSerializable;
 use Symfony\Component\HttpFoundation\JsonResponse as BaseJsonResponse;
 
-class JsonResponse extends BaseJsonResponse
+class JsonResponse extends BaseJsonResponse implements Responsable
 {
     use ResponseTrait, Macroable {
         Macroable::__call as macroCall;
@@ -135,5 +136,16 @@ class JsonResponse extends BaseJsonResponse
     public function hasEncodingOption($option)
     {
         return (bool) ($this->encodingOptions & $option);
+    }
+
+    /**
+     * Create an HTTP response that represents the object.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function toResponse($request)
+    {
+        return $this;
     }
 }

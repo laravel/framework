@@ -6,13 +6,14 @@ use ArrayObject;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use JsonSerializable;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
-class Response extends SymfonyResponse
+class Response extends SymfonyResponse implements Responsable
 {
     use ResponseTrait, Macroable {
         Macroable::__call as macroCall;
@@ -104,5 +105,16 @@ class Response extends SymfonyResponse
         }
 
         return json_encode($content);
+    }
+
+    /**
+     * Create an HTTP response that represents the object.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function toResponse($request)
+    {
+        return $this;
     }
 }

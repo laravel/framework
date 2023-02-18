@@ -8,15 +8,17 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\Support\MessageProvider;
 use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Contracts\View\Engine;
 use Illuminate\Contracts\View\View as ViewContract;
+use Illuminate\Http\Response;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\ViewErrorBag;
 use Throwable;
 
-class View implements ArrayAccess, Htmlable, ViewContract
+class View implements ArrayAccess, Htmlable, Responsable, ViewContract
 {
     use Macroable {
         __call as macroCall;
@@ -478,6 +480,17 @@ class View implements ArrayAccess, Htmlable, ViewContract
     public function toHtml()
     {
         return $this->render();
+    }
+
+    /**
+     * Create an HTTP response that represents the object.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function toResponse($request)
+    {
+        return new Response($this->toHtml());
     }
 
     /**

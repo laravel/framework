@@ -21,6 +21,7 @@
         "illuminate/contracts": "^10.0",
         "illuminate/events": "^10.0",
         "illuminate/filesystem": "^10.0",
+        "illuminate/http": "^10.0",
         "illuminate/macroable": "^10.0",
         "illuminate/support": "^10.0"
     },
