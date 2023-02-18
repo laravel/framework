@@ -397,7 +397,7 @@ class Builder implements BuilderContract
      * Create a collection of models from plain arrays.
      *
      * @param  array  $items
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Database\Eloquent\Collection<array-key,TModel>
      */
     public function hydrate(array $items)
     {
@@ -419,7 +419,7 @@ class Builder implements BuilderContract
      *
      * @param  string  $query
      * @param  array  $bindings
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Database\Eloquent\Collection<array-key,TModel>
      */
     public function fromQuery($query, $bindings = [])
     {
@@ -433,7 +433,7 @@ class Builder implements BuilderContract
      *
      * @param  mixed  $id
      * @param  array|string  $columns
-     * @return TModel|\Illuminate\Database\Eloquent\Collection|null
+     * @return TModel|\Illuminate\Database\Eloquent\Collection<array-key,TModel>|null
      */
     public function find($id, $columns = ['*'])
     {
@@ -449,7 +449,7 @@ class Builder implements BuilderContract
      *
      * @param  \Illuminate\Contracts\Support\Arrayable|array  $ids
      * @param  array|string  $columns
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Database\Eloquent\Collection<array-key,TModel>
      */
     public function findMany($ids, $columns = ['*'])
     {
@@ -467,7 +467,7 @@ class Builder implements BuilderContract
      *
      * @param  mixed  $id
      * @param  array|string  $columns
-     * @return TModel|\Illuminate\Database\Eloquent\Collection
+     * @return TModel|\Illuminate\Database\Eloquent\Collection<array-key,TModel>
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<TModel>
      */
@@ -518,7 +518,7 @@ class Builder implements BuilderContract
      * @param  mixed  $id
      * @param  \Closure|array|string  $columns
      * @param  \Closure|null  $callback
-     * @return TModel|\Illuminate\Database\Eloquent\Collection|mixed
+     * @return TModel|\Illuminate\Database\Eloquent\Collection<array-key,TModel>|mixed
      */
     public function findOr($id, $columns = ['*'], Closure $callback = null)
     {
@@ -684,7 +684,7 @@ class Builder implements BuilderContract
      * Execute the query as a "select" statement.
      *
      * @param  array|string  $columns
-     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     * @return \Illuminate\Database\Eloquent\Collection<array-key,TModel>
      */
     public function get($columns = ['*'])
     {
