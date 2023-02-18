@@ -170,7 +170,7 @@ class DatabaseConnectionTest extends TestCase
         $connection = $this->getMockConnection([], $pdo);
         try {
             $connection->beginTransaction();
-        } catch (Exception $e) {
+        } catch (Exception) {
             $this->assertEquals(0, $connection->transactionLevel());
         }
     }
@@ -213,7 +213,7 @@ class DatabaseConnectionTest extends TestCase
         $this->assertEquals(1, $connection->transactionLevel());
         try {
             $connection->beginTransaction();
-        } catch (Exception $e) {
+        } catch (Exception) {
             $this->assertEquals(1, $connection->transactionLevel());
         }
     }
@@ -310,7 +310,7 @@ class DatabaseConnectionTest extends TestCase
     public function testTransactionMethodRetriesOnDeadlock()
     {
         $this->expectException(QueryException::class);
-        $this->expectExceptionMessage('Deadlock found when trying to get lock (SQL: )');
+        $this->expectExceptionMessage('Deadlock found when trying to get lock (Connection: conn, SQL: )');
 
         $pdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['inTransaction', 'beginTransaction', 'commit', 'rollBack'])->getMock();
         $mock = $this->getMockConnection([], $pdo);
@@ -319,7 +319,7 @@ class DatabaseConnectionTest extends TestCase
         $pdo->expects($this->exactly(3))->method('rollBack');
         $pdo->expects($this->never())->method('commit');
         $mock->transaction(function () {
-            throw new QueryException('', [], new Exception('Deadlock found when trying to get lock'));
+            throw new QueryException('conn', '', [], new Exception('Deadlock found when trying to get lock'));
         }, 3);
     }
 
@@ -344,7 +344,7 @@ class DatabaseConnectionTest extends TestCase
     public function testOnLostConnectionPDOIsNotSwappedWithinATransaction()
     {
         $this->expectException(QueryException::class);
-        $this->expectExceptionMessage('server has gone away (SQL: foo)');
+        $this->expectExceptionMessage('server has gone away (Connection: , SQL: foo)');
 
         $pdo = m::mock(PDO::class);
         $pdo->shouldReceive('beginTransaction')->once();
@@ -390,14 +390,14 @@ class DatabaseConnectionTest extends TestCase
         $mock->expects($this->once())->method('tryAgainIfCausedByLostConnection');
 
         $method->invokeArgs($mock, ['', [], function () {
-            throw new QueryException('', [], new Exception);
+            throw new QueryException('', '', [], new Exception);
         }]);
     }
 
     public function testRunMethodNeverRetriesIfWithinTransaction()
     {
         $this->expectException(QueryException::class);
-        $this->expectExceptionMessage('(SQL: ) (SQL: )');
+        $this->expectExceptionMessage('(Connection: conn, SQL: ) (Connection: , SQL: )');
 
         $method = (new ReflectionClass(Connection::class))->getMethod('run');
         $method->setAccessible(true);
@@ -409,7 +409,7 @@ class DatabaseConnectionTest extends TestCase
         $mock->beginTransaction();
 
         $method->invokeArgs($mock, ['', [], function () {
-            throw new QueryException('', [], new Exception);
+            throw new QueryException('conn', '', [], new Exception);
         }]);
     }
 

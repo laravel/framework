@@ -765,6 +765,21 @@ trait EnumeratesValues
     }
 
     /**
+     * Reduce an associative collection to a single value.
+     *
+     * @template TReduceWithKeysInitial
+     * @template TReduceWithKeysReturnType
+     *
+     * @param  callable(TReduceWithKeysInitial|TReduceWithKeysReturnType, TValue, TKey): TReduceWithKeysReturnType  $callback
+     * @param  TReduceWithKeysInitial  $initial
+     * @return TReduceWithKeysReturnType
+     */
+    public function reduceWithKeys(callable $callback, $initial = null)
+    {
+        return $this->reduce($callback, $initial);
+    }
+
+    /**
      * Create a collection of all elements that do not pass a given truth test.
      *
      * @param  (callable(TValue, TKey): bool)|bool|TValue  $callback

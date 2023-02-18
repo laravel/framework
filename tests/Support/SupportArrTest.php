@@ -471,6 +471,16 @@ class SupportArrTest extends TestCase
         $this->assertTrue(Arr::isAssoc([1 => 'a', 2 => 'b']));
         $this->assertFalse(Arr::isAssoc([0 => 'a', 1 => 'b']));
         $this->assertFalse(Arr::isAssoc(['a', 'b']));
+
+        $this->assertFalse(Arr::isAssoc([]));
+        $this->assertFalse(Arr::isAssoc([1, 2, 3]));
+        $this->assertFalse(Arr::isAssoc(['foo', 2, 3]));
+        $this->assertFalse(Arr::isAssoc([0 => 'foo', 'bar']));
+
+        $this->assertTrue(Arr::isAssoc([1 => 'foo', 'bar']));
+        $this->assertTrue(Arr::isAssoc([0 => 'foo', 'bar' => 'baz']));
+        $this->assertTrue(Arr::isAssoc([0 => 'foo', 2 => 'bar']));
+        $this->assertTrue(Arr::isAssoc(['foo' => 'bar', 'baz' => 'qux']));
     }
 
     public function testIsList()
@@ -767,19 +777,19 @@ class SupportArrTest extends TestCase
 
         try {
             Arr::random([]);
-        } catch (InvalidArgumentException $e) {
+        } catch (InvalidArgumentException) {
             $exceptions++;
         }
 
         try {
             Arr::random([], 1);
-        } catch (InvalidArgumentException $e) {
+        } catch (InvalidArgumentException) {
             $exceptions++;
         }
 
         try {
             Arr::random([], 2);
-        } catch (InvalidArgumentException $e) {
+        } catch (InvalidArgumentException) {
             $exceptions++;
         }
 

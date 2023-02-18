@@ -89,24 +89,44 @@ class CacheRateLimiterTest extends TestCase
 
         $rateLimiter = new RateLimiter($cache);
 
-        $this->assertTrue($rateLimiter->attempt('key', 1, function () use (&$executed) {
+        $rateLimiter->attempt('key', 1, function () use (&$executed) {
             $executed = true;
-        }, 1));
+        }, 1);
         $this->assertTrue($executed);
     }
 
     public function testAttemptsCallbackReturnsCallbackReturn()
     {
         $cache = m::mock(Cache::class);
-        $cache->shouldReceive('get')->once()->with('key', 0)->andReturn(0);
-        $cache->shouldReceive('add')->once()->with('key:timer', m::type('int'), 1);
-        $cache->shouldReceive('add')->once()->with('key', 0, 1)->andReturns(1);
-        $cache->shouldReceive('increment')->once()->with('key')->andReturn(1);
+        $cache->shouldReceive('get')->times(6)->with('key', 0)->andReturn(0);
+        $cache->shouldReceive('add')->times(6)->with('key:timer', m::type('int'), 1);
+        $cache->shouldReceive('add')->times(6)->with('key', 0, 1)->andReturns(1);
+        $cache->shouldReceive('increment')->times(6)->with('key')->andReturn(1);
 
         $rateLimiter = new RateLimiter($cache);
 
         $this->assertSame('foo', $rateLimiter->attempt('key', 1, function () {
             return 'foo';
+        }, 1));
+
+        $this->assertSame(false, $rateLimiter->attempt('key', 1, function () {
+            return false;
+        }, 1));
+
+        $this->assertSame([], $rateLimiter->attempt('key', 1, function () {
+            return [];
+        }, 1));
+
+        $this->assertSame(0, $rateLimiter->attempt('key', 1, function () {
+            return 0;
+        }, 1));
+
+        $this->assertSame(0.0, $rateLimiter->attempt('key', 1, function () {
+            return 0.0;
+        }, 1));
+
+        $this->assertSame('', $rateLimiter->attempt('key', 1, function () {
+            return '';
         }, 1));
     }
 

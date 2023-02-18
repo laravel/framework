@@ -20,17 +20,6 @@ class ConfigCacheCommand extends Command
     protected $name = 'config:cache';
 
     /**
-     * The name of the console command.
-     *
-     * This name is used to identify the command during lazy loading.
-     *
-     * @var string|null
-     *
-     * @deprecated
-     */
-    protected static $defaultName = 'config:cache';
-
-    /**
      * The console command description.
      *
      * @var string
@@ -94,7 +83,7 @@ class ConfigCacheCommand extends Command
      */
     protected function getFreshConfiguration()
     {
-        $app = require $this->laravel->bootstrapPath().'/app.php';
+        $app = require $this->laravel->bootstrapPath('app.php');
 
         $app->useStoragePath($this->laravel->storagePath());
 

@@ -14,19 +14,19 @@
         }
     ],
     "require": {
-        "php": "^8.0.2",
+        "php": "^8.1",
         "ext-filter": "*",
         "ext-mbstring": "*",
         "brick/math": "^0.9.3|^0.10.2|^0.11",
-        "egulias/email-validator": "^3.2.1|^4.0",
-        "illuminate/collections": "^9.0",
-        "illuminate/container": "^9.0",
-        "illuminate/contracts": "^9.0",
-        "illuminate/macroable": "^9.0",
-        "illuminate/support": "^9.0",
-        "illuminate/translation": "^9.0",
-        "symfony/http-foundation": "^6.0",
-        "symfony/mime": "^6.0"
+        "egulias/email-validator": "^3.2.5|^4.0",
+        "illuminate/collections": "^10.0",
+        "illuminate/container": "^10.0",
+        "illuminate/contracts": "^10.0",
+        "illuminate/macroable": "^10.0",
+        "illuminate/support": "^10.0",
+        "illuminate/translation": "^10.0",
+        "symfony/http-foundation": "^6.2",
+        "symfony/mime": "^6.2"
     },
     "autoload": {
         "psr-4": {
@@ -35,11 +35,11 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "9.x-dev"
+            "dev-master": "10.x-dev"
         }
     },
     "suggest": {
-        "illuminate/database": "Required to use the database presence verifier (^9.0)."
+        "illuminate/database": "Required to use the database presence verifier (^10.0)."
     },
     "config": {
         "sort-packages": true

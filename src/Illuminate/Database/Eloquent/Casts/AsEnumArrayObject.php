@@ -15,7 +15,7 @@ class AsEnumArrayObject implements Castable
      * @template TEnum
      *
      * @param  array{class-string<TEnum>}  $arguments
-     * @return CastsAttributes<ArrayObject<array-key, TEnum>, iterable<TEnum>>
+     * @return \Illuminate\Contracts\Database\Eloquent\CastsAttributes<\Illuminate\Database\Eloquent\Casts\ArrayObject<array-key, TEnum>, iterable<TEnum>>
      */
     public static function castUsing(array $arguments)
     {

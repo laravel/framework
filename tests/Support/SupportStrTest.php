@@ -1031,7 +1031,7 @@ class SupportStrTest extends TestCase
                 $this->assertSame('1234', Str::uuid()->toString());
                 throw new \Exception('Something failed.');
             });
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             $this->assertNotSame('1234', Str::uuid()->toString());
         }
     }
@@ -1082,6 +1082,11 @@ class SupportStrTest extends TestCase
         } finally {
             Str::createUuidsNormally();
         }
+    }
+
+    public function testPasswordCreation()
+    {
+        $this->assertTrue(strlen(Str::password()) === 32);
     }
 }
 

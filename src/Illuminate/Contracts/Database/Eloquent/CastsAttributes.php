@@ -2,6 +2,8 @@
 
 namespace Illuminate\Contracts\Database\Eloquent;
 
+use Illuminate\Database\Eloquent\Model;
+
 /**
  * @template TGet
  * @template TSet
@@ -17,7 +19,7 @@ interface CastsAttributes
      * @param  array  $attributes
      * @return TGet|null
      */
-    public function get($model, string $key, $value, array $attributes);
+    public function get(Model $model, string $key, mixed $value, array $attributes);
 
     /**
      * Transform the attribute to its underlying model values.
@@ -28,5 +30,5 @@ interface CastsAttributes
      * @param  array  $attributes
      * @return mixed
      */
-    public function set($model, string $key, $value, array $attributes);
+    public function set(Model $model, string $key, mixed $value, array $attributes);
 }

@@ -157,9 +157,6 @@ class RoutingRedirectorTest extends TestCase
 
         $response = $this->redirect->route('home');
         $this->assertSame('http://foo.com/bar', $response->getTargetUrl());
-
-        $response = $this->redirect->home();
-        $this->assertSame('http://foo.com/bar', $response->getTargetUrl());
     }
 
     public function testSignedRoute()

@@ -17,17 +17,6 @@ class RuleMakeCommand extends GeneratorCommand
     protected $name = 'make:rule';
 
     /**
-     * The name of the console command.
-     *
-     * This name is used to identify the command during lazy loading.
-     *
-     * @var string|null
-     *
-     * @deprecated
-     */
-    protected static $defaultName = 'make:rule';
-
-    /**
      * The console command description.
      *
      * @var string
@@ -65,15 +54,9 @@ class RuleMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        $stub = '/stubs/rule.stub';
-
-        if ($this->option('invokable')) {
-            $stub = '/stubs/rule.invokable.stub';
-        }
-
-        if ($this->option('implicit') && $this->option('invokable')) {
-            $stub = str_replace('.stub', '.implicit.stub', $stub);
-        }
+        $stub = $this->option('implicit')
+            ? '/stubs/rule.implicit.stub'
+            : '/stubs/rule.stub';
 
         return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
             ? $customPath
@@ -101,7 +84,6 @@ class RuleMakeCommand extends GeneratorCommand
         return [
             ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the rule already exists'],
             ['implicit', 'i', InputOption::VALUE_NONE, 'Generate an implicit rule'],
-            ['invokable', null, InputOption::VALUE_NONE, 'Generate a single method, invokable rule class'],
         ];
     }
 }

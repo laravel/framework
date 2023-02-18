@@ -126,7 +126,7 @@ trait ValidatesAttributes
                 if (is_array($records) && count($records) > 0) {
                     return true;
                 }
-            } catch (Exception $e) {
+            } catch (Exception) {
                 return false;
             }
         }
@@ -249,7 +249,7 @@ trait ValidatesAttributes
             return $this->checkDateTimeOrder($format, $value, $parameters[0], $operator);
         }
 
-        if (! $date = $this->getDateTimestamp($parameters[0])) {
+        if (is_null($date = $this->getDateTimestamp($parameters[0]))) {
             $date = $this->getDateTimestamp($this->getValue($parameters[0]));
         }
 
@@ -332,7 +332,7 @@ trait ValidatesAttributes
     {
         try {
             return @Date::parse($value) ?: null;
-        } catch (Exception $e) {
+        } catch (Exception) {
             //
         }
     }
@@ -524,7 +524,7 @@ trait ValidatesAttributes
             if ((! is_string($value) && ! is_numeric($value)) || strtotime($value) === false) {
                 return false;
             }
-        } catch (Exception $e) {
+        } catch (Exception) {
             return false;
         }
 

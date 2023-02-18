@@ -2091,6 +2091,30 @@ class DatabaseQueryBuilderTest extends TestCase
             $q->select('*')->from('products')->where('products.id', '=', new Raw('"orders"."id"'));
         });
         $this->assertSame('select * from "orders" where "id" = ? or not exists (select * from "products" where "products"."id" = "orders"."id")', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('orders')->whereExists(
+            $this->getBuilder()->select('*')->from('products')->where('products.id', '=', new Raw('"orders"."id"'))
+        );
+        $this->assertSame('select * from "orders" where exists (select * from "products" where "products"."id" = "orders"."id")', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('orders')->whereNotExists(
+            $this->getBuilder()->select('*')->from('products')->where('products.id', '=', new Raw('"orders"."id"'))
+        );
+        $this->assertSame('select * from "orders" where not exists (select * from "products" where "products"."id" = "orders"."id")', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('orders')->where('id', '=', 1)->orWhereExists(
+            $this->getBuilder()->select('*')->from('products')->where('products.id', '=', new Raw('"orders"."id"'))
+        );
+        $this->assertSame('select * from "orders" where "id" = ? or exists (select * from "products" where "products"."id" = "orders"."id")', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('orders')->where('id', '=', 1)->orWhereNotExists(
+            $this->getBuilder()->select('*')->from('products')->where('products.id', '=', new Raw('"orders"."id"'))
+        );
+        $this->assertSame('select * from "orders" where "id" = ? or not exists (select * from "products" where "products"."id" = "orders"."id")', $builder->toSql());
     }
 
     public function testBasicJoins()
@@ -2693,7 +2717,7 @@ class DatabaseQueryBuilderTest extends TestCase
         }, 'post');
         $count = $builder->count();
         $this->assertEquals(1, $count);
-        $this->assertSame('(select "foo", "bar" from "posts" where "title" = ?) as "post"', $builder->columns[0]->getValue());
+        $this->assertSame('(select "foo", "bar" from "posts" where "title" = ?) as "post"', $builder->getGrammar()->getValue($builder->columns[0]));
         $this->assertEquals(['foo'], $builder->getBindings());
     }
 
@@ -3750,19 +3774,18 @@ SQL;
         $this->assertSame('select top 10 * from [users]', $builder->toSql());
 
         $builder = $this->getSqlServerBuilder();
-        $builder->select('*')->from('users')->skip(10);
-        $this->assertSame('select * from (select *, row_number() over (order by (select 0)) as row_num from [users]) as temp_table where row_num >= 11 order by row_num', $builder->toSql());
+        $builder->select('*')->from('users')->skip(10)->orderBy('email', 'desc');
+        $this->assertSame('select * from [users] order by [email] desc offset 10 rows', $builder->toSql());
 
         $builder = $this->getSqlServerBuilder();
         $builder->select('*')->from('users')->skip(10)->take(10);
-        $this->assertSame('select * from (select *, row_number() over (order by (select 0)) as row_num from [users]) as temp_table where row_num between 11 and 20 order by row_num', $builder->toSql());
+        $this->assertSame('select * from [users] order by (SELECT 0) offset 10 rows fetch next 10 rows only', $builder->toSql());
 
         $builder = $this->getSqlServerBuilder();
         $builder->select('*')->from('users')->skip(11)->take(10)->orderBy('email', 'desc');
         $this->assertSame('select * from [users] order by [email] desc offset 11 rows fetch next 10 rows only', $builder->toSql());
 
         $builder = $this->getSqlServerBuilder();
-        $subQueryBuilder = $this->getSqlServerBuilder();
         $subQuery = function ($query) {
             return $query->select('created_at')->from('logins')->where('users.name', 'nameBinding')->whereColumn('user_id', 'users.id')->limit(1);
         };

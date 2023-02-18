@@ -280,6 +280,7 @@ abstract class Facade
             'Mail' => Mail::class,
             'Notification' => Notification::class,
             'Password' => Password::class,
+            'Process' => Process::class,
             'Queue' => Queue::class,
             'RateLimiter' => RateLimiter::class,
             'Redirect' => Redirect::class,

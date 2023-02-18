@@ -2,39 +2,18 @@
 
 namespace {{ namespace }};
 
-use Illuminate\Contracts\Validation\{{ ruleType }};
+use Closure;
+use Illuminate\Contracts\Validation\ValidationRule;
 
-class {{ class }} implements {{ ruleType }}
+class {{ class }} implements ValidationRule
 {
     /**
-     * Create a new rule instance.
+     * Run the validation rule.
      *
-     * @return void
+     * @param  \Closure(string): \Illuminate\Translation\PotentiallyTranslatedString  $fail
      */
-    public function __construct()
+    public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         //
-    }
-
-    /**
-     * Determine if the validation rule passes.
-     *
-     * @param  string  $attribute
-     * @param  mixed  $value
-     * @return bool
-     */
-    public function passes($attribute, $value)
-    {
-        //
-    }
-
-    /**
-     * Get the validation error message.
-     *
-     * @return string
-     */
-    public function message()
-    {
-        return 'The validation error message.';
     }
 }

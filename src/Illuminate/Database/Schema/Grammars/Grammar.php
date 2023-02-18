@@ -4,10 +4,10 @@ namespace Illuminate\Database\Schema\Grammars;
 
 use Doctrine\DBAL\Schema\AbstractSchemaManager as SchemaManager;
 use Doctrine\DBAL\Schema\TableDiff;
+use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Database\Concerns\CompilesJsonPaths;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Grammar as BaseGrammar;
-use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Fluent;
 use LogicException;
@@ -16,6 +16,13 @@ use RuntimeException;
 abstract class Grammar extends BaseGrammar
 {
     use CompilesJsonPaths;
+
+    /**
+     * The possible column modifiers.
+     *
+     * @var string[]
+     */
+    protected $modifiers = [];
 
     /**
      * If this Grammar supports schema changes wrapped in a transaction.
@@ -77,7 +84,7 @@ abstract class Grammar extends BaseGrammar
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
      * @param  \Illuminate\Database\Connection  $connection
-     * @return array
+     * @return array|string
      *
      * @throws \RuntimeException
      */
@@ -155,7 +162,7 @@ abstract class Grammar extends BaseGrammar
     }
 
     /**
-     * Compile the blueprint's column definitions.
+     * Compile the blueprint's added column definitions.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @return array
@@ -279,7 +286,7 @@ abstract class Grammar extends BaseGrammar
     /**
      * Wrap a value in keyword identifiers.
      *
-     * @param  \Illuminate\Database\Query\Expression|string  $value
+     * @param  \Illuminate\Support\Fluent|\Illuminate\Contracts\Database\Query\Expression|string  $value
      * @param  bool  $prefixAlias
      * @return string
      */
@@ -299,7 +306,7 @@ abstract class Grammar extends BaseGrammar
     protected function getDefaultValue($value)
     {
         if ($value instanceof Expression) {
-            return $value;
+            return $this->getValue($value);
         }
 
         return is_bool($value)
@@ -319,7 +326,7 @@ abstract class Grammar extends BaseGrammar
         $table = $this->getTablePrefix().$blueprint->getTable();
 
         return tap(new TableDiff($table), function ($tableDiff) use ($schema, $table) {
-            $tableDiff->fromTable = $schema->listTableDetails($table);
+            $tableDiff->fromTable = $schema->introspectTable($table);
         });
     }
 

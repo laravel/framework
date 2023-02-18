@@ -24,17 +24,6 @@ class EnvironmentEncryptCommand extends Command
                     {--force : Overwrite the existing encrypted environment file}';
 
     /**
-     * The name of the console command.
-     *
-     * This name is used to identify the command during lazy loading.
-     *
-     * @var string|null
-     *
-     * @deprecated
-     */
-    protected static $defaultName = 'env:encrypt';
-
-    /**
      * The console command description.
      *
      * @var string

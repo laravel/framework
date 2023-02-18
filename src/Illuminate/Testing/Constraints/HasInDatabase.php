@@ -2,8 +2,8 @@
 
 namespace Illuminate\Testing\Constraints;
 
+use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Database\Connection;
-use Illuminate\Database\Query\Expression;
 use PHPUnit\Framework\Constraint\Constraint;
 
 class HasInDatabase extends Constraint
@@ -113,7 +113,7 @@ class HasInDatabase extends Constraint
     public function toString($options = 0): string
     {
         foreach ($this->data as $key => $data) {
-            $output[$key] = $data instanceof Expression ? (string) $data : $data;
+            $output[$key] = $data instanceof Expression ? $data->getValue($this->database->getQueryGrammar()) : $data;
         }
 
         return json_encode($output ?? [], $options);

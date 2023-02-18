@@ -149,7 +149,7 @@ trait BroadcastsEvents
      * @param  string  $event
      * @return \Illuminate\Database\Eloquent\BroadcastableModelEventOccurred
      */
-    protected function newBroadcastableEvent($event)
+    protected function newBroadcastableEvent(string $event)
     {
         return new BroadcastableModelEventOccurred($this, $event);
     }

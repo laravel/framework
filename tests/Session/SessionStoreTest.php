@@ -412,7 +412,7 @@ class SessionStoreTest extends TestCase
         $this->assertFalse($session->handlerNeedsRequest());
         $session->getHandler()->shouldReceive('setRequest')->never();
 
-        $session = new Store('test', m::mock(new CookieSessionHandler(new CookieJar, 60)));
+        $session = new Store('test', m::mock(new CookieSessionHandler(new CookieJar, 60, false)));
         $this->assertTrue($session->handlerNeedsRequest());
         $session->getHandler()->shouldReceive('setRequest')->once();
         $request = new Request;

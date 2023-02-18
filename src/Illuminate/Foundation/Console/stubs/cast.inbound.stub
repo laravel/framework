@@ -2,6 +2,7 @@
 
 namespace {{ namespace }};
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
 
 class {{ class }} implements CastsInboundAttributes
@@ -9,13 +10,9 @@ class {{ class }} implements CastsInboundAttributes
     /**
      * Prepare the given value for storage.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @param  string  $key
-     * @param  mixed  $value
-     * @param  array  $attributes
-     * @return mixed
+     * @param  array<string, mixed>  $attributes
      */
-    public function set($model, string $key, $value, array $attributes)
+    public function set(Model $model, string $key, mixed $value, array $attributes): mixed
     {
         return $value;
     }

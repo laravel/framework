@@ -20,17 +20,6 @@ class StubPublishCommand extends Command
                     {--force : Overwrite any existing files}';
 
     /**
-     * The name of the console command.
-     *
-     * This name is used to identify the command during lazy loading.
-     *
-     * @var string|null
-     *
-     * @deprecated
-     */
-    protected static $defaultName = 'stub:publish';
-
-    /**
      * The console command description.
      *
      * @var string

@@ -262,6 +262,10 @@ class Migrator
             return $this->repository->getMigrations($steps);
         }
 
+        if (($batch = $options['batch'] ?? 0) > 0) {
+            return $this->repository->getMigrationsByBatch($batch);
+        }
+
         return $this->repository->getLast();
     }
 
@@ -437,7 +441,7 @@ class Migrator
             $this->write(BulletList::class, collect($this->getQueries($migration, $method))->map(function ($query) {
                 return $query['query'];
             }));
-        } catch (SchemaException $e) {
+        } catch (SchemaException) {
             $name = get_class($migration);
 
             $this->write(Error::class, sprintf(
@@ -710,7 +714,7 @@ class Migrator
      */
     public function deleteRepository()
     {
-        return $this->repository->deleteRepository();
+        $this->repository->deleteRepository();
     }
 
     /**

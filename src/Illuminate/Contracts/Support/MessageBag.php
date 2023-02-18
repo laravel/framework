@@ -65,6 +65,14 @@ interface MessageBag extends Arrayable, Countable
     public function all($format = null);
 
     /**
+     * Remove a message from the bag.
+     *
+     * @param  string  $key
+     * @return $this
+     */
+    public function forget($key);
+
+    /**
      * Get the raw messages in the container.
      *
      * @return array

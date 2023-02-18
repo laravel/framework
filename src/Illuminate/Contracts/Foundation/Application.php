@@ -46,6 +46,22 @@ interface Application extends Container
     public function databasePath($path = '');
 
     /**
+     * Get the path to the language files.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    public function langPath($path = '');
+
+    /**
+     * Get the path to the public directory.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    public function publicPath($path = '');
+
+    /**
      * Get the path to the resources directory.
      *
      * @param  string  $path
@@ -82,6 +98,13 @@ interface Application extends Container
      * @return bool
      */
     public function runningUnitTests();
+
+    /**
+     * Determine if the application is running with debug mode enabled.
+     *
+     * @return bool
+     */
+    public function hasDebugModeEnabled();
 
     /**
      * Get an instance of the maintenance mode manager implementation.

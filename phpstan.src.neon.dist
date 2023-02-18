@@ -17,4 +17,3 @@ parameters:
     - "#Unsafe usage of new static#"
   excludePaths:
     - "src/Illuminate/Testing/ParallelRunner.php"
-    - "src/Illuminate/Testing/Constraints/ArraySubset.php"

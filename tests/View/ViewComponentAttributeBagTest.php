@@ -103,6 +103,16 @@ class ViewComponentAttributeBagTest extends TestCase
         ]));
     }
 
+    public function testItMakesAnExceptionForAlpineXdata()
+    {
+        $bag = new ComponentAttributeBag([
+            'required' => true,
+            'x-data' => true,
+        ]);
+
+        $this->assertSame('required="required" x-data=""', (string) $bag);
+    }
+
     public function testAttibuteExistence()
     {
         $bag = new ComponentAttributeBag(['name' => 'test']);

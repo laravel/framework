@@ -14,15 +14,15 @@
         }
     ],
     "require": {
-        "php": "^8.0.2",
+        "php": "^8.1",
         "ext-ctype": "*",
         "ext-filter": "*",
         "ext-mbstring": "*",
         "doctrine/inflector": "^2.0",
-        "illuminate/collections": "^9.0",
-        "illuminate/conditionable": "^9.0",
-        "illuminate/contracts": "^9.0",
-        "illuminate/macroable": "^9.0",
+        "illuminate/collections": "^10.0",
+        "illuminate/conditionable": "^10.0",
+        "illuminate/contracts": "^10.0",
+        "illuminate/macroable": "^10.0",
         "nesbot/carbon": "^2.62.1",
         "voku/portable-ascii": "^2.0"
     },
@@ -39,16 +39,16 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "9.x-dev"
+            "dev-master": "10.x-dev"
         }
     },
     "suggest": {
-        "illuminate/filesystem": "Required to use the composer class (^9.0).",
+        "illuminate/filesystem": "Required to use the composer class (^10.0).",
         "league/commonmark": "Required to use Str::markdown() and Stringable::markdown() (^2.0.2).",
         "ramsey/uuid": "Required to use Str::uuid() (^4.7).",
-        "symfony/process": "Required to use the composer class (^6.0).",
-        "symfony/uid": "Required to use Str::ulid() (^6.0).",
-        "symfony/var-dumper": "Required to use the dd function (^6.0).",
+        "symfony/process": "Required to use the composer class (^6.2).",
+        "symfony/uid": "Required to use Str::ulid() (^6.2).",
+        "symfony/var-dumper": "Required to use the dd function (^6.2).",
         "vlucas/phpdotenv": "Required to use the Env class and env helper (^5.4.1)."
     },
     "config": {

@@ -24,17 +24,6 @@ class RetryCommand extends Command
                             {--range=* : Range of job IDs (numeric) to be retried}';
 
     /**
-     * The name of the console command.
-     *
-     * This name is used to identify the command during lazy loading.
-     *
-     * @var string|null
-     *
-     * @deprecated
-     */
-    protected static $defaultName = 'queue:retry';
-
-    /**
      * The console command description.
      *
      * @var string

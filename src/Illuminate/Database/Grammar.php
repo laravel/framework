@@ -2,7 +2,7 @@
 
 namespace Illuminate\Database;
 
-use Illuminate\Database\Query\Expression;
+use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
 
@@ -31,7 +31,7 @@ abstract class Grammar
     /**
      * Wrap a table in keyword identifiers.
      *
-     * @param  \Illuminate\Database\Query\Expression|string  $table
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $table
      * @return string
      */
     public function wrapTable($table)
@@ -46,7 +46,7 @@ abstract class Grammar
     /**
      * Wrap a value in keyword identifiers.
      *
-     * @param  \Illuminate\Database\Query\Expression|string  $value
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $value
      * @param  bool  $prefixAlias
      * @return string
      */
@@ -208,14 +208,18 @@ abstract class Grammar
     }
 
     /**
-     * Get the value of a raw expression.
+     * Transforms expressions to their scalar types.
      *
-     * @param  \Illuminate\Database\Query\Expression  $expression
-     * @return mixed
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string|int|float  $expression
+     * @return string|int|float
      */
     public function getValue($expression)
     {
-        return $expression->getValue();
+        if ($this->isExpression($expression)) {
+            return $this->getValue($expression->getValue($this));
+        }
+
+        return $expression;
     }
 
     /**

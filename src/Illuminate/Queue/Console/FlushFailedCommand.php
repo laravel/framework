@@ -16,17 +16,6 @@ class FlushFailedCommand extends Command
     protected $signature = 'queue:flush {--hours= : The number of hours to retain failed job data}';
 
     /**
-     * The name of the console command.
-     *
-     * This name is used to identify the command during lazy loading.
-     *
-     * @var string|null
-     *
-     * @deprecated
-     */
-    protected static $defaultName = 'queue:flush';
-
-    /**
      * The console command description.
      *
      * @var string

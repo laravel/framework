@@ -350,6 +350,17 @@ class FilesystemAdapterTest extends TestCase
         $this->assertSame('normal file content', $filesystemAdapter->read($storagePath));
     }
 
+    public function testPutFileAsWithoutPath()
+    {
+        file_put_contents($filePath = $this->tempDir.'/foo.txt', 'normal file content');
+
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+
+        $storagePath = $filesystemAdapter->putFileAs($filePath, 'new.txt');
+
+        $this->assertSame('normal file content', $filesystemAdapter->read($storagePath));
+    }
+
     public function testPutFile()
     {
         file_put_contents($filePath = $this->tempDir.'/foo.txt', 'uploaded file content');
@@ -388,6 +399,17 @@ class FilesystemAdapterTest extends TestCase
             $storagePath,
             'uploaded file content'
         );
+    }
+
+    public function testPutFileWithoutPath()
+    {
+        file_put_contents($filePath = $this->tempDir.'/foo.txt', 'normal file content');
+
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+
+        $storagePath = $filesystemAdapter->putFile($filePath);
+
+        $this->assertSame('normal file content', $filesystemAdapter->read($storagePath));
     }
 
     /**
@@ -448,7 +470,7 @@ class FilesystemAdapterTest extends TestCase
 
         try {
             $adapter->get('/foo.txt');
-        } catch (UnableToReadFile $e) {
+        } catch (UnableToReadFile) {
             $this->assertTrue(true);
 
             return;
@@ -463,7 +485,7 @@ class FilesystemAdapterTest extends TestCase
 
         try {
             $adapter->readStream('/foo.txt');
-        } catch (UnableToReadFile $e) {
+        } catch (UnableToReadFile) {
             $this->assertTrue(true);
 
             return;
@@ -482,7 +504,7 @@ class FilesystemAdapterTest extends TestCase
 
         try {
             $adapter->put('/foo.txt', 'Hello World!');
-        } catch (UnableToWriteFile $e) {
+        } catch (UnableToWriteFile) {
             $this->assertTrue(true);
 
             return;
@@ -501,7 +523,7 @@ class FilesystemAdapterTest extends TestCase
 
         try {
             $adapter->mimeType('unknown.mime-type');
-        } catch (UnableToRetrieveMetadata $e) {
+        } catch (UnableToRetrieveMetadata) {
             $this->assertTrue(true);
 
             return;

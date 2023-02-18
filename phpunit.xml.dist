@@ -1,18 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit backupGlobals="false"
-         backupStaticAttributes="false"
          beStrictAboutTestsThatDoNotTestAnything="false"
          colors="true"
-         convertDeprecationsToExceptions="true"
-         convertErrorsToExceptions="true"
-         convertNoticesToExceptions="true"
-         convertWarningsToExceptions="true"
-         printerClass="Illuminate\Tests\IgnoreSkippedPrinter"
          processIsolation="false"
          stopOnError="false"
          stopOnFailure="false"
-         verbose="true"
->
+         cacheDirectory=".phpunit.cache"
+         backupStaticProperties="false">
     <testsuites>
         <testsuite name="Laravel Test Suite">
             <directory suffix="Test.php">./tests</directory>

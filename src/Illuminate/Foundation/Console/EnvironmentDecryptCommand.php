@@ -27,17 +27,6 @@ class EnvironmentDecryptCommand extends Command
                     {--filename= : Filename of the decrypted file}';
 
     /**
-     * The name of the console command.
-     *
-     * This name is used to identify the command during lazy loading.
-     *
-     * @var string|null
-     *
-     * @deprecated
-     */
-    protected static $defaultName = 'env:decrypt';
-
-    /**
      * The console command description.
      *
      * @var string

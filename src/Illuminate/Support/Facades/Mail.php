@@ -19,9 +19,9 @@ use Illuminate\Support\Testing\Fakes\MailFake;
  * @method static void alwaysReplyTo(string $address, string|null $name = null)
  * @method static void alwaysReturnPath(string $address)
  * @method static void alwaysTo(string $address, string|null $name = null)
- * @method static \Illuminate\Mail\PendingMail to(mixed $users)
- * @method static \Illuminate\Mail\PendingMail cc(mixed $users)
- * @method static \Illuminate\Mail\PendingMail bcc(mixed $users)
+ * @method static \Illuminate\Mail\PendingMail to(mixed $users, string|null $name = null)
+ * @method static \Illuminate\Mail\PendingMail cc(mixed $users, string|null $name = null)
+ * @method static \Illuminate\Mail\PendingMail bcc(mixed $users, string|null $name = null)
  * @method static \Illuminate\Mail\SentMessage|null html(string $html, mixed $callback)
  * @method static \Illuminate\Mail\SentMessage|null raw(string $text, mixed $callback)
  * @method static \Illuminate\Mail\SentMessage|null plain(string $view, array $data, mixed $callback)
@@ -52,7 +52,6 @@ use Illuminate\Support\Testing\Fakes\MailFake;
  * @method static bool hasSent(string $mailable)
  * @method static \Illuminate\Support\Collection queued(string|\Closure $mailable, callable|null $callback = null)
  * @method static bool hasQueued(string $mailable)
- * @method static array failures()
  *
  * @see \Illuminate\Mail\MailManager
  * @see \Illuminate\Support\Testing\Fakes\MailFake
@@ -66,7 +65,7 @@ class Mail extends Facade
      */
     public static function fake()
     {
-        static::swap($fake = new MailFake);
+        static::swap($fake = new MailFake(static::getFacadeRoot()));
 
         return $fake;
     }

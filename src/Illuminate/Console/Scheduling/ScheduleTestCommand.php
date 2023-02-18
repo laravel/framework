@@ -17,17 +17,6 @@ class ScheduleTestCommand extends Command
     protected $signature = 'schedule:test {--name= : The name of the scheduled command to run}';
 
     /**
-     * The name of the console command.
-     *
-     * This name is used to identify the command during lazy loading.
-     *
-     * @var string|null
-     *
-     * @deprecated
-     */
-    protected static $defaultName = 'schedule:test';
-
-    /**
      * The console command description.
      *
      * @var string

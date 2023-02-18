@@ -803,7 +803,9 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['name' => ''], ['name' => 'required']);
 
-        $exception = new class($v) extends ValidationException {};
+        $exception = new class($v) extends ValidationException
+        {
+        };
         $v->setException($exception);
 
         try {
@@ -1647,7 +1649,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame($result, (new Validator($trans, $data, $rules))->passes());
     }
 
-    public function prohibitedRulesData()
+    public static function prohibitedRulesData()
     {
         $emptyCountable = new class implements Countable
         {
@@ -5026,6 +5028,12 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['x' => '17:44'], ['x' => 'After:17:44:00']);
         $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => '0001-01-01T00:00'], ['x' => 'before:1970-01-01']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '0001-01-01T00:00'], ['x' => 'after:1970-01-01']);
+        $this->assertTrue($v->fails());
     }
 
     public function testBeforeAndAfterWithFormat()
@@ -8045,6 +8053,47 @@ class ValidationValidatorTest extends TestCase
         $this->assertEquals($expectedResult, $validator->getMessageBag()->getMessages());
     }
 
+    public function testItCanTranslateMessagesForClosureBasedRules()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.translated-error' => 'Translated error message.'], 'en');
+        $rule = function ($attribute, $value, $fail) {
+            $fail('validation.translated-error')->translate();
+            $fail('validation.not-translated-message')->translate();
+        };
+
+        $validator = new Validator($trans, ['foo' => 'bar'], ['foo' => $rule]);
+
+        $this->assertTrue($validator->fails());
+        $this->assertSame([
+            'foo' => [
+                'Translated error message.',
+                'validation.not-translated-message',
+            ],
+        ], $validator->messages()->messages());
+    }
+
+    public function testItCanSpecifyTheValidationErrorKeyForTheErrorMessageForClosureBasedRules()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $rule = function ($attribute, $value, $fail) {
+            $fail('bar.baz', 'Another attribute error.');
+            $fail('This attribute error.');
+        };
+
+        $validator = new Validator($trans, ['foo' => 'xxxx'], ['foo' => $rule]);
+
+        $this->assertFalse($validator->passes());
+        $this->assertSame([
+            'bar.baz' => [
+                'Another attribute error.',
+            ],
+            'foo' => [
+                'This attribute error.',
+            ],
+        ], $validator->messages()->messages());
+    }
+
     public function testItTrimsSpaceFromParameters()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -8188,28 +8237,36 @@ class ValidationValidatorTest extends TestCase
 class ImplicitTableModel extends Model
 {
     protected $guarded = [];
+
     public $timestamps = false;
 }
 
 class ExplicitTableModel extends Model
 {
     protected $table = 'explicits';
+
     protected $guarded = [];
+
     public $timestamps = false;
 }
 
 class ExplicitPrefixedTableModel extends Model
 {
     protected $table = 'prefix.explicits';
+
     protected $guarded = [];
+
     public $timestamps = false;
 }
 
 class ExplicitTableAndConnectionModel extends Model
 {
     protected $table = 'explicits';
+
     protected $connection = 'connection';
+
     protected $guarded = [];
+
     public $timestamps = false;
 }
 

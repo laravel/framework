@@ -16,17 +16,6 @@ class ClearCompiledCommand extends Command
     protected $name = 'clear-compiled';
 
     /**
-     * The name of the console command.
-     *
-     * This name is used to identify the command during lazy loading.
-     *
-     * @var string|null
-     *
-     * @deprecated
-     */
-    protected static $defaultName = 'clear-compiled';
-
-    /**
      * The console command description.
      *
      * @var string
