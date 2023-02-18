@@ -5,6 +5,7 @@ namespace Illuminate\Validation;
 use BadMethodCallException;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Translation\Translator;
+use Illuminate\Contracts\Validation\TransformsResultRule;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ImplicitRule;
 use Illuminate\Contracts\Validation\Rule as RuleContract;
@@ -833,6 +834,11 @@ class Validator implements ValidatorContract
                 $this->messages->add($key, $this->makeReplacements(
                     $message, $key, $ruleClass, []
                 ));
+            }
+        } elseif($rule instanceof TransformsResultRule){
+            $newValue = $rule->transform($attribute, $value, $this->data);
+            if($newValue !== $value){
+                Arr::set($this->data,  $attribute, $newValue);
             }
         }
     }

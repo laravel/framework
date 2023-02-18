@@ -11,6 +11,7 @@ use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
 use Illuminate\Validation\DatabasePresenceVerifier;
 use Illuminate\Validation\Validator;
+use Orchestra\Testbench\TestCase;
 
 class ValidatorTest extends DatabaseTestCase
 {
