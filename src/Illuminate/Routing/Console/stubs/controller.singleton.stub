@@ -26,7 +26,7 @@ class {{ class }} extends Controller
     /**
      * Display the resource.
      */
-    public function show(): mixed
+    public function show()
     {
         //
     }
@@ -34,7 +34,7 @@ class {{ class }} extends Controller
     /**
      * Show the form for editing the resource.
      */
-    public function edit(): mixed
+    public function edit()
     {
         //
     }
@@ -42,7 +42,7 @@ class {{ class }} extends Controller
     /**
      * Update the resource in storage.
      */
-    public function update(Request $request): mixed
+    public function update(Request $request)
     {
         //
     }

@@ -20,7 +20,7 @@ class {{ class }} extends Controller
     /**
      * Display the resource.
      */
-    public function show({{ parentModel }} ${{ parentModelVariable }}): mixed
+    public function show({{ parentModel }} ${{ parentModelVariable }})
     {
         //
     }
@@ -28,7 +28,7 @@ class {{ class }} extends Controller
     /**
      * Update the resource in storage.
      */
-    public function update(Request $request, {{ parentModel }} ${{ parentModelVariable }}): mixed
+    public function update(Request $request, {{ parentModel }} ${{ parentModelVariable }})
     {
         //
     }

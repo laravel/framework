@@ -11,7 +11,7 @@ class {{ class }} extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(): mixed
+    public function index()
     {
         //
     }
@@ -19,7 +19,7 @@ class {{ class }} extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store({{ storeRequest }} $request): mixed
+    public function store({{ storeRequest }} $request)
     {
         //
     }
@@ -27,7 +27,7 @@ class {{ class }} extends Controller
     /**
      * Display the specified resource.
      */
-    public function show({{ model }} ${{ modelVariable }}): mixed
+    public function show({{ model }} ${{ modelVariable }})
     {
         //
     }
@@ -35,7 +35,7 @@ class {{ class }} extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update({{ updateRequest }} $request, {{ model }} ${{ modelVariable }}): mixed
+    public function update({{ updateRequest }} $request, {{ model }} ${{ modelVariable }})
     {
         //
     }
@@ -43,7 +43,7 @@ class {{ class }} extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy({{ model }} ${{ modelVariable }}): mixed
+    public function destroy({{ model }} ${{ modelVariable }})
     {
         //
     }
