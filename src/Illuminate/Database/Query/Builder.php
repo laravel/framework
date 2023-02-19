@@ -508,7 +508,7 @@ class Builder implements BuilderContract
     /**
      * Add a join clause to the query.
      *
-     * @param  string  $table
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $table
      * @param  \Closure|string  $first
      * @param  string|null  $operator
      * @param  string|null  $second
@@ -548,7 +548,7 @@ class Builder implements BuilderContract
     /**
      * Add a "join where" clause to the query.
      *
-     * @param  string  $table
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $table
      * @param  \Closure|string  $first
      * @param  string  $operator
      * @param  string  $second
@@ -588,7 +588,7 @@ class Builder implements BuilderContract
     /**
      * Add a left join to the query.
      *
-     * @param  string  $table
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $table
      * @param  \Closure|string  $first
      * @param  string|null  $operator
      * @param  string|null  $second
@@ -602,7 +602,7 @@ class Builder implements BuilderContract
     /**
      * Add a "join where" clause to the query.
      *
-     * @param  string  $table
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $table
      * @param  \Closure|string  $first
      * @param  string  $operator
      * @param  string  $second
@@ -631,7 +631,7 @@ class Builder implements BuilderContract
     /**
      * Add a right join to the query.
      *
-     * @param  string  $table
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $table
      * @param  \Closure|string  $first
      * @param  string|null  $operator
      * @param  string|null  $second
@@ -645,7 +645,7 @@ class Builder implements BuilderContract
     /**
      * Add a "right join where" clause to the query.
      *
-     * @param  string  $table
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $table
      * @param  \Closure|string  $first
      * @param  string  $operator
      * @param  string  $second
@@ -674,7 +674,7 @@ class Builder implements BuilderContract
     /**
      * Add a "cross join" clause to the query.
      *
-     * @param  string  $table
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $table
      * @param  \Closure|string|null  $first
      * @param  string|null  $operator
      * @param  string|null  $second
