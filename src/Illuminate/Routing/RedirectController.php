@@ -39,6 +39,12 @@ class RedirectController extends Controller
             $url = Str::after($url, '/');
         }
 
+        $queryString = $request->getQueryString();
+
+        if (!empty($queryString)) {
+            $url = $url . '?' . $queryString;
+        }
+
         return new RedirectResponse($url, $status);
     }
 }
