@@ -31,6 +31,9 @@ use ReflectionMethod;
  */
 class Builder implements BuilderContract
 {
+    /**
+     * @use BuildsQueries<TModel>
+     */
     use BuildsQueries, ForwardsCalls, QueriesRelationships {
         BuildsQueries::sole as baseSole;
     }

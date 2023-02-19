@@ -18,6 +18,9 @@ use Illuminate\Support\Traits\Conditionable;
 use InvalidArgumentException;
 use RuntimeException;
 
+/**
+ * @template TModel
+ */
 trait BuildsQueries
 {
     use Conditionable;
@@ -289,7 +292,7 @@ trait BuildsQueries
      * Execute the query and get the first result.
      *
      * @param  array|string  $columns
-     * @return \Illuminate\Database\Eloquent\Model|object|static|null
+     * @return TModel|null
      */
     public function first($columns = ['*'])
     {
@@ -300,7 +303,7 @@ trait BuildsQueries
      * Execute the query and get the first result if it's the sole matching record.
      *
      * @param  array|string  $columns
-     * @return \Illuminate\Database\Eloquent\Model|object|static|null
+     * @return TModel|null
      *
      * @throws \Illuminate\Database\RecordsNotFoundException
      * @throws \Illuminate\Database\MultipleRecordsFoundException
