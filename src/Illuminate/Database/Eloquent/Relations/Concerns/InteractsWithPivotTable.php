@@ -140,6 +140,24 @@ trait InteractsWithPivotTable
             return [$id => $values];
         }), $detaching);
     }
+    
+     /**
+     * Sync the intermediate tables with a list of IDs or collection of models with the given pivot values associatively.
+     *
+     * @param  \Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model|array  $ids
+     * @param  array  $values
+     * @param  bool  $detaching
+     * @return array
+     */
+    public function syncWithAssocPivotValues($ids, array $values, bool $detaching = true)
+    {
+      array_splice($ids,count($values));
+        return $this->sync(collect($this->parseIds($ids))->mapWithKeys(function ($value, $key) use ($values) {
+          return [
+            $value => $values[$key]
+          ];
+        }), $detaching);
+    }
 
     /**
      * Format the sync / toggle record list so that it is keyed by ID.
