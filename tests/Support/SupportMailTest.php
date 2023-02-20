@@ -41,7 +41,6 @@ class SupportMailTest extends TestCase
     }
 }
 
-
 class TestMail extends Mailable
 {
     /**
