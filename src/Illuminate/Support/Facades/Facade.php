@@ -3,12 +3,17 @@
 namespace Illuminate\Support\Facades;
 
 use Closure;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Js;
 use Illuminate\Support\Str;
+use Illuminate\Support\Testing\Fakes\Fake;
 use Mockery;
+use Mockery\Expectation;
 use Mockery\LegacyMockInterface;
+use Mockery\MockInterface;
 use RuntimeException;
 
 abstract class Facade
@@ -16,7 +21,7 @@ abstract class Facade
     /**
      * The application instance being facaded.
      *
-     * @var \Illuminate\Contracts\Foundation\Application
+     * @var Application
      */
     protected static $app;
 
@@ -37,7 +42,7 @@ abstract class Facade
     /**
      * Run a Closure when the facade has been resolved.
      *
-     * @param  \Closure  $callback
+     * @param  Closure  $callback
      * @return void
      */
     public static function resolved(Closure $callback)
@@ -56,7 +61,7 @@ abstract class Facade
     /**
      * Convert the facade into a Mockery spy.
      *
-     * @return \Mockery\MockInterface
+     * @return MockInterface
      */
     public static function spy()
     {
@@ -72,7 +77,7 @@ abstract class Facade
     /**
      * Initiate a partial mock on the facade.
      *
-     * @return \Mockery\MockInterface
+     * @return MockInterface
      */
     public static function partialMock()
     {
@@ -88,7 +93,7 @@ abstract class Facade
     /**
      * Initiate a mock expectation on the facade.
      *
-     * @return \Mockery\Expectation
+     * @return Expectation
      */
     public static function shouldReceive()
     {
@@ -104,7 +109,7 @@ abstract class Facade
     /**
      * Initiate a mock expectation on the facade.
      *
-     * @return \Mockery\Expectation
+     * @return Expectation
      */
     public static function expects()
     {
@@ -120,7 +125,7 @@ abstract class Facade
     /**
      * Create a fresh mock instance for the given class.
      *
-     * @return \Mockery\MockInterface
+     * @return MockInterface
      */
     protected static function createFreshMockInstance()
     {
@@ -134,7 +139,7 @@ abstract class Facade
     /**
      * Create a fresh mock instance for the given class.
      *
-     * @return \Mockery\MockInterface
+     * @return MockInterface
      */
     protected static function createMock()
     {
@@ -172,15 +177,30 @@ abstract class Facade
      * Hotswap the underlying instance behind the facade.
      *
      * @param  mixed  $instance
+     * @paramm  bool  $fake
      * @return void
      */
-    public static function swap($instance)
+    public static function swap($instance, $fake = false)
     {
+
         static::$resolvedInstance[static::getFacadeAccessor()] = $instance;
 
         if (isset(static::$app)) {
             static::$app->instance(static::getFacadeAccessor(), $instance);
         }
+    }
+
+    /**
+     * Determines whether a "fake" is set as the instance of the facade.
+     *
+     * @return bool
+     */
+    protected static function isFake(): bool
+    {
+        $name = static::getFacadeAccessor();
+
+        return isset(static::$resolvedInstance[$name]) &&
+            static::$resolvedInstance[$name] instanceof Fake;
     }
 
     /**
@@ -198,7 +218,7 @@ abstract class Facade
      *
      * @return string
      *
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     protected static function getFacadeAccessor()
     {
@@ -250,7 +270,7 @@ abstract class Facade
     /**
      * Get the application default aliases.
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     public static function defaultAliases()
     {
@@ -301,7 +321,7 @@ abstract class Facade
     /**
      * Get the application instance behind the facade.
      *
-     * @return \Illuminate\Contracts\Foundation\Application
+     * @return Application
      */
     public static function getFacadeApplication()
     {
@@ -311,7 +331,7 @@ abstract class Facade
     /**
      * Set the application instance.
      *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
+     * @param  Application  $app
      * @return void
      */
     public static function setFacadeApplication($app)
@@ -326,7 +346,7 @@ abstract class Facade
      * @param  array  $args
      * @return mixed
      *
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public static function __callStatic($method, $args)
     {
