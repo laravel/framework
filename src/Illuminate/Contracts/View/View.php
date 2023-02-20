@@ -28,4 +28,38 @@ interface View extends Renderable
      * @return array
      */
     public function getData();
+
+    /**
+     * Get the evaluated contents of a given fragment.
+     *
+     * @param  string  $fragment
+     * @return string
+     */
+    public function fragment($fragment);
+
+    /**
+     * Get the evaluated contents for a given array of fragments.
+     *
+     * @param  array  $fragments
+     * @return string
+     */
+    public function fragments(array $fragments);
+
+    /**
+     * Get the evaluated contents of a given fragment if the given condition is true.
+     *
+     * @param  bool  $boolean
+     * @param  string  $fragment
+     * @return string
+     */
+    public function fragmentIf($boolean, $fragment);
+
+    /**
+     * Get the evaluated contents for a given array of fragments if the given condition is true.
+     *
+     * @param  bool  $boolean
+     * @param  array  $fragments
+     * @return string
+     */
+    public function fragmentsIf($boolean, array $fragments);
 }
