@@ -364,7 +364,7 @@ class Builder
     /**
      * Get all of the table names for the database.
      *
-     * @return void
+     * @return array
      *
      * @throws \LogicException
      */
