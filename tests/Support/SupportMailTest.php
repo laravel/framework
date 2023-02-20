@@ -8,7 +8,7 @@ use Orchestra\Testbench\TestCase;
 
 class SupportMailTest extends TestCase
 {
-    public function testItRegisterAndCallMacros(): void
+    public function testItRegisterAndCallMacros()
     {
         Mail::macro('test', fn (string $str) => $str === 'foo'
             ? 'it works!'
@@ -18,7 +18,7 @@ class SupportMailTest extends TestCase
         $this->assertEquals('it works!', Mail::test('foo'));
     }
 
-    public function testItRegisterAndCallMacrosWhenFaked(): void
+    public function testItRegisterAndCallMacrosWhenFaked()
     {
         Mail::macro('test', fn (string $str) => $str === 'foo'
             ? 'it works!'
@@ -30,7 +30,7 @@ class SupportMailTest extends TestCase
         $this->assertEquals('it works!', Mail::test('foo'));
     }
 
-    public function testEmailSent(): void
+    public function testEmailSent()
     {
         Mail::fake();
         Mail::assertNothingSent();
@@ -44,7 +44,12 @@ class SupportMailTest extends TestCase
 
 class TestMail extends Mailable
 {
-    public function build(): self
+    /**
+     * Build the message.
+     *
+     * @return $this
+     */
+    public function build()
     {
         return $this->view('view');
     }
