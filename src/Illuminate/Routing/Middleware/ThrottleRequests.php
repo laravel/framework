@@ -196,7 +196,7 @@ class ThrottleRequests
 
         return is_callable($responseCallback)
                     ? new HttpResponseException($responseCallback($request, $headers))
-                    : new ThrottleRequestsException('Too Many Attempts.', null, $headers);
+                    : new ThrottleRequestsException(__('passwords.throttled'), null, $headers);
     }
 
     /**
