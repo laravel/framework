@@ -173,10 +173,9 @@ abstract class Facade
      * Hotswap the underlying instance behind the facade.
      *
      * @param  mixed  $instance
-     * @paramm  bool  $fake
      * @return void
      */
-    public static function swap($instance, $fake = false)
+    public static function swap($instance)
     {
 
         static::$resolvedInstance[static::getFacadeAccessor()] = $instance;
