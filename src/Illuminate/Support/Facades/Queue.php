@@ -81,7 +81,6 @@ class Queue extends Facade
                 static::swap($fake);
             }
         });
-
     }
 
     /**
