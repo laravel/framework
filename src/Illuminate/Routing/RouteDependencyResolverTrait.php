@@ -71,6 +71,7 @@ trait RouteDependencyResolverTrait
      * @param object $skippableValue
      * @return mixed
      * @throws BindingResolutionException
+     * @throws \ReflectionException
      */
     protected function transformDependency(ReflectionParameter $parameter, $parameters, $skippableValue)
     {
