@@ -1,6 +1,15 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.1.0...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v10.1.1...10.x)
+
+
+## [v10.1.1 (2023-02-21)](https://github.com/laravel/framework/compare/v10.1.0...v10.1.1)
+
+### Added
+- Add the ability to re-resolve cache drivers ([#46203](https://github.com/laravel/framework/pull/46203))
+
+### Fixed
+- Fixed `Illuminate/Collections/Arr::shuffle()` for empty array ([0c6cae0](https://github.com/laravel/framework/commit/0c6cae0ef647158b9554cad05ff39db7e7ad0d33))
 
 
 ## [v10.1.0 (2023-02-21)](https://github.com/laravel/framework/compare/v10.0.3...v10.1.0)
