@@ -7,8 +7,10 @@ use Illuminate\Contracts\Mail\Attachable;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Mail\Attachment;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Mail\Mailer;
+use Illuminate\Mail\Markdown;
 use Illuminate\Mail\Transport\ArrayTransport;
 use Mockery as m;
 use PHPUnit\Framework\AssertionFailedError;
@@ -435,6 +437,52 @@ class MailMailableTest extends TestCase
                 $this->assertSame("Email was not from expected address [{$address}].\nFailed asserting that false is true.", $e->getMessage());
             }
         }
+    }
+
+    public function testMailableSetsMarkdownThemeCorrectly()
+    {
+        $viewFactory = m::mock(Factory::class);
+        $viewFactory->shouldReceive('flushFinderCache');
+        $viewFactory->shouldReceive('replaceNamespace')->andReturnSelf();
+        $viewFactory->shouldReceive('make')->andReturnSelf();
+        $viewFactory->shouldReceive('render')->andReturn('<html></html>', 'body {}');
+        $viewFactory->shouldReceive('exists')->andReturn(true);
+
+        Container::getInstance()->instance(Factory::class, $viewFactory);
+        Container::getInstance()->singleton(Markdown::class);
+        Container::getInstance()->instance('mailer', new class
+        {
+            public function render()
+            {
+                //
+            }
+        });
+
+        (new class() extends Mailable
+        {
+            public $theme = 'custom-theme';
+
+            public function content()
+            {
+                return new Content(
+                    markdown: 'mail.markdown',
+                );
+            }
+        })->render();
+
+        $this->assertEquals('custom-theme', Container::getInstance()->make(Markdown::class)->getTheme());
+
+        (new class() extends Mailable
+        {
+            public function content()
+            {
+                return new Content(
+                    markdown: 'mail.markdown',
+                );
+            }
+        })->render();
+
+        $this->assertEquals('default', Container::getInstance()->make(Markdown::class)->getTheme());
     }
 
     public function testMailableSetsSubjectCorrectly()
