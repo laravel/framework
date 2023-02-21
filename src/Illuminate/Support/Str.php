@@ -473,11 +473,7 @@ class Str
      */
     public static function length($value, $encoding = null)
     {
-        if ($encoding) {
-            return mb_strlen($value, $encoding);
-        }
-
-        return mb_strlen($value);
+        return mb_strlen($value, $encoding);
     }
 
     /**
