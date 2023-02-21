@@ -716,6 +716,10 @@ class Arr
             return $array;
         }
 
+        if (empty($array)) {
+            return [];
+        }
+
         $keys = array_keys($array);
 
         for ($i = count($keys) - 1; $i > 0; $i--) {

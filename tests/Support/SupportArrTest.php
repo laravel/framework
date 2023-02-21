@@ -870,6 +870,11 @@ class SupportArrTest extends TestCase
         $this->assertTrue($dontMatch, 'Shuffled array should not have the same order.');
     }
 
+    public function testEmptyShuffle()
+    {
+        $this->assertEquals([], Arr::shuffle([]));
+    }
+
     public function testSort()
     {
         $unsorted = [
