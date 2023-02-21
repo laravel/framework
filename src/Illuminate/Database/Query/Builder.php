@@ -2357,7 +2357,7 @@ class Builder implements BuilderContract
      * @param  array  $values
      * @return $this
      */
-    public function orderByField($column, $values)
+    public function orderByField(string $column, array $values)
     {
         return $this->orderByRaw($this->grammar->compileOrderField($column, $values));
     }

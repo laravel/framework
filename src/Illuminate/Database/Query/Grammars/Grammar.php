@@ -893,7 +893,7 @@ class Grammar extends BaseGrammar
      * @param  array  $values
      * @return string
      */
-    public function compileOrderField($column, $values)
+    public function compileOrderField(string $column, array $values)
     {
         throw new RuntimeException('This database engine does not support ordering by field.');
     }
