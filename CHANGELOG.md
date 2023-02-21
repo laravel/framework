@@ -1,6 +1,12 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.0.1...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v10.0.2...10.x)
+
+
+## [v10.0.2 (2023-02-16)](https://github.com/laravel/framework/compare/v10.0.1...v10.0.2)
+
+### Added
+-  Register policies automatically to the gate ([#46132](https://github.com/laravel/framework/pull/46132))
 
 
 ## [v10.0.1 (2023-02-16)](https://github.com/laravel/framework/compare/v10.0.0...v10.0.1)
@@ -14,6 +20,7 @@
 ### Changed
 - Add AddQueuedCookiesToResponse to middlewarePriority so it is handled in the right place ([#46130](https://github.com/laravel/framework/pull/46130))
 - Show queue connection in MonitorCommand ([#46122](https://github.com/laravel/framework/pull/46122))
+
 
 ## [v10.0.0 (2023-02-14)](https://github.com/laravel/framework/compare/v10.0.0...10.x)
 
