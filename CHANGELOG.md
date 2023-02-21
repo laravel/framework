@@ -1,6 +1,12 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.0.2...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v10.0.3...10.x)
+
+
+## [v10.0.3 (2023-02-17)](https://github.com/laravel/framework/compare/v10.0.2...v10.0.3)
+
+### Added
+- Added missing expression support for pluck in Builder ([#46146](https://github.com/laravel/framework/pull/46146))
 
 
 ## [v10.0.2 (2023-02-16)](https://github.com/laravel/framework/compare/v10.0.1...v10.0.2)
