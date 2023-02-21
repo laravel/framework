@@ -1375,11 +1375,12 @@ class Str
     /**
      * Generate a ULID.
      *
+     * @param  \DateTimeInterface|null  $time
      * @return \Symfony\Component\Uid\Ulid
      */
-    public static function ulid()
+    public static function ulid($time = null)
     {
-        return new Ulid();
+        return Ulid::generate($time);
     }
 
     /**
