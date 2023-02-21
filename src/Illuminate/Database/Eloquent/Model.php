@@ -467,7 +467,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
-     * Register a callback that is responsible for handling lazy loading violations.
+     * Register a callback that is responsible for handling missing attribute violations.
      *
      * @param  callable|null  $callback
      * @return void

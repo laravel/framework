@@ -387,7 +387,7 @@ class MorphTo extends BelongsTo
         // If we tried to call a method that does not exist on the parent Builder instance,
         // we'll assume that we want to call a query macro (e.g. withTrashed) that only
         // exists on related models. We will just store the call and replay it later.
-        catch (BadMethodCallException $e) {
+        catch (BadMethodCallException) {
             $this->macroBuffer[] = compact('method', 'parameters');
 
             return $this;

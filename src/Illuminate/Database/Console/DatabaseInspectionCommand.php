@@ -158,7 +158,7 @@ abstract class DatabaseInspectionCommand extends Command
             ]);
 
             return Arr::wrap((array) $result)['size'];
-        } catch (QueryException $e) {
+        } catch (QueryException) {
             return null;
         }
     }

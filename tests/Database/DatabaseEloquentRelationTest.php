@@ -205,7 +205,7 @@ class DatabaseEloquentRelationTest extends TestCase
             });
 
             $this->fail('Exception was not thrown');
-        } catch (Exception $exception) {
+        } catch (Exception) {
             // Does nothing.
         }
 

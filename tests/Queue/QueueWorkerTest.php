@@ -310,7 +310,7 @@ class QueueWorkerTest extends TestCase
             $worker->daemon('default', 'queue', $this->workerOptions());
 
             $this->fail('Expected LoopBreakerException to be thrown');
-        } catch (LoopBreakerException $e) {
+        } catch (LoopBreakerException) {
             $this->assertSame(1, $firstJob->attempts);
 
             $this->assertSame(0, $secondJob->attempts);

@@ -6,14 +6,13 @@ use {{ namespacedModel }};
 use {{ rootNamespace }}Http\Controllers\Controller;
 use {{ namespacedParentModel }};
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 
 class {{ class }} extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index({{ parentModel }} ${{ parentModelVariable }}): Response
+    public function index({{ parentModel }} ${{ parentModelVariable }})
     {
         //
     }
@@ -21,7 +20,7 @@ class {{ class }} extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, {{ parentModel }} ${{ parentModelVariable }}): Response
+    public function store(Request $request, {{ parentModel }} ${{ parentModelVariable }})
     {
         //
     }
@@ -29,7 +28,7 @@ class {{ class }} extends Controller
     /**
      * Display the specified resource.
      */
-    public function show({{ parentModel }} ${{ parentModelVariable }}, {{ model }} ${{ modelVariable }}): Response
+    public function show({{ parentModel }} ${{ parentModelVariable }}, {{ model }} ${{ modelVariable }})
     {
         //
     }
@@ -37,7 +36,7 @@ class {{ class }} extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, {{ parentModel }} ${{ parentModelVariable }}, {{ model }} ${{ modelVariable }}): Response
+    public function update(Request $request, {{ parentModel }} ${{ parentModelVariable }}, {{ model }} ${{ modelVariable }})
     {
         //
     }
@@ -45,7 +44,7 @@ class {{ class }} extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy({{ parentModel }} ${{ parentModelVariable }}, {{ model }} ${{ modelVariable }}): Response
+    public function destroy({{ parentModel }} ${{ parentModelVariable }}, {{ model }} ${{ modelVariable }})
     {
         //
     }

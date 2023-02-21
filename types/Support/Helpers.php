@@ -38,3 +38,18 @@ assertType('mixed', with(new User(), function ($user) {
 assertType('User', with(new User(), function ($user): User {
     return $user;
 }));
+
+// falls back to default if provided
+assertType('int|null', transform(optional(), fn () => 1));
+// default as callable
+assertType('int|string', transform(optional(), fn () => 1, fn () => 'string'));
+
+// non empty values
+assertType('int', transform('filled', fn () => 1));
+assertType('int', transform(['filled'], fn () => 1));
+assertType('int', transform(new User(), fn () => 1));
+
+// "empty" values
+assertType('null', transform(null, fn () => 1));
+assertType('null', transform('', fn () => 1));
+assertType('null', transform([], fn () => 1));

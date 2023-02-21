@@ -5,7 +5,6 @@ namespace {{ namespace }};
 use {{ namespacedModel }};
 use {{ rootNamespace }}Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use {{ namespacedParentModel }};
 
 class {{ class }} extends Controller
@@ -21,7 +20,7 @@ class {{ class }} extends Controller
     /**
      * Display the resource.
      */
-    public function show({{ parentModel }} ${{ parentModelVariable }}): Response
+    public function show({{ parentModel }} ${{ parentModelVariable }})
     {
         //
     }
@@ -29,7 +28,7 @@ class {{ class }} extends Controller
     /**
      * Update the resource in storage.
      */
-    public function update(Request $request, {{ parentModel }} ${{ parentModelVariable }}): Response
+    public function update(Request $request, {{ parentModel }} ${{ parentModelVariable }})
     {
         //
     }

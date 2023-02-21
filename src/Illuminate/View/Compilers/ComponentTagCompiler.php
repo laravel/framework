@@ -342,7 +342,7 @@ class ComponentTagCompiler
                 })) {
                     return $guess;
                 }
-            } catch (InvalidArgumentException $e) {
+            } catch (InvalidArgumentException) {
                 //
             }
         }
