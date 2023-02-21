@@ -2,6 +2,7 @@
 
 namespace Illuminate\Routing;
 
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Reflector;
 use ReflectionClass;
@@ -65,10 +66,11 @@ trait RouteDependencyResolverTrait
     /**
      * Attempt to transform the given parameter into a class instance.
      *
-     * @param  \ReflectionParameter  $parameter
-     * @param  array  $parameters
-     * @param  object  $skippableValue
+     * @param \ReflectionParameter $parameter
+     * @param array $parameters
+     * @param object $skippableValue
      * @return mixed
+     * @throws BindingResolutionException
      */
     protected function transformDependency(ReflectionParameter $parameter, $parameters, $skippableValue)
     {
