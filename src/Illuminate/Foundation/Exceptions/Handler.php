@@ -358,6 +358,7 @@ class Handler implements ExceptionHandlerContract
                 'userId' => Auth::id(),
             ]);
         } catch (Throwable $e) {
+            logger($e->getMessage());
             return [];
         }
     }
