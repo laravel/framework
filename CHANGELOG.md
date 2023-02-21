@@ -1,6 +1,12 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.52.1...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.52.2...10.x)
+
+## [v9.52.2](https://github.com/laravel/framework/compare/v9.52.1...v9.52.2) - 2023-02-21
+
+### Fixed
+
+- Fixed `Illuminate/Collections/Arr::shuffle()` with empty array ([0c6cae0](https://github.com/laravel/framework/commit/0c6cae0ef647158b9554cad05ff39db7e7ad0d33))
 
 ## [v9.52.1](https://github.com/laravel/framework/compare/v10.0.3...v9.52.1) - 2023-02-21
 
