@@ -212,7 +212,7 @@ abstract class Facade
      *
      * @return string
      *
-     * @throws RuntimeException
+     * @throws \RuntimeException
      */
     protected static function getFacadeAccessor()
     {
