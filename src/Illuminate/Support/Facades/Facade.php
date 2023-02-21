@@ -185,16 +185,16 @@ abstract class Facade
     }
 
     /**
-     * Determines whether a "fake" is set as the instance of the facade.
+     * Determines whether a "fake" has been set as the facade instance.
      *
      * @return bool
      */
-    protected static function isFake(): bool
+    protected static function isFake()
     {
         $name = static::getFacadeAccessor();
 
         return isset(static::$resolvedInstance[$name]) &&
-            static::$resolvedInstance[$name] instanceof Fake;
+               static::$resolvedInstance[$name] instanceof Fake;
     }
 
     /**
