@@ -428,12 +428,12 @@ if (! function_exists('with')) {
     }
 }
 
-if( ! function_exists('pipe')) {
+if (! function_exists('pipe')) {
     /**
      * Pass a payload through a series of pipelines.
      *
      * @param $payload
-     * @param array $pipelines
+     * @param  array  $pipelines
      * @return mixed
      */
     function pipe($payload, $pipelines = [])
