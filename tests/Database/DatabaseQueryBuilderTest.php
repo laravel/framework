@@ -1572,6 +1572,27 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select * from [users] order by NEWID()', $builder->toSql());
     }
 
+    public function testFieldOrderMySql()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->orderByField('id', [42, 1, 1000]);
+        $this->assertSame('select * from `users` order by field(`id`, 42, 1, 1000)', $builder->toSql());
+    }
+
+    public function testFieldOrderPostgres()
+    {
+        $this->expectException(RuntimeException::class);
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->orderByField('id', [42, 1, 1000]);
+    }
+
+    public function testFieldOrderSqlServer()
+    {
+        $this->expectException(RuntimeException::class);
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->orderByField('id', [42, 1, 1000]);
+    }
+
     public function testOrderBysSqlServer()
     {
         $builder = $this->getSqlServerBuilder();

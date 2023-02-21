@@ -2351,6 +2351,18 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Put the query's results in field order.
+     *
+     * @param  string  $column
+     * @param  array  $values
+     * @return $this
+     */
+    public function orderByField($column, $values)
+    {
+        return $this->orderByRaw($this->grammar->compileOrderField($column, $values));
+    }
+
+    /**
      * Add a raw "order by" clause to the query.
      *
      * @param  string  $sql

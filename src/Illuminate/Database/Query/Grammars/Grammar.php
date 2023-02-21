@@ -887,6 +887,18 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile the order by field statement into SQL.
+     *
+     * @param  string  $column
+     * @param  array  $values
+     * @return string
+     */
+    public function compileOrderField($column, $values)
+    {
+        throw new RuntimeException('This database engine does not support ordering by field.');
+    }
+
+    /**
      * Compile the "limit" portions of the query.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

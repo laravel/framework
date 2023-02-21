@@ -166,6 +166,11 @@ class MySqlGrammar extends Grammar
         return 'RAND('.$seed.')';
     }
 
+    public function compileOrderField($column, $values)
+    {
+        return 'field('.$this->wrap($column).', '.implode(', ', $values).')';
+    }
+
     /**
      * Compile the lock into SQL.
      *
