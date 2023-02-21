@@ -19,7 +19,7 @@ class InvokedProcess implements InvokedProcessContract
     /**
      * Create a new invoked process instance.
      *
-     * @param  \Symfony\Component\Process\Process  $process
+     * @param  \Symfony\Component\Process\Process $process
      * @return void
      */
     public function __construct(Process $process)
@@ -38,9 +38,19 @@ class InvokedProcess implements InvokedProcessContract
     }
 
     /**
+     * Get the process ID if the process is still running.
+     * @alias pid
+     * @return int|null
+     */
+    public function pid()
+    {
+        return $this->process->getPid();
+    }
+
+    /**
      * Send a signal to the process.
      *
-     * @param  int  $signal
+     * @param  int $signal
      * @return $this
      */
     public function signal(int $signal)
@@ -103,7 +113,7 @@ class InvokedProcess implements InvokedProcessContract
     /**
      * Wait for the process to finish.
      *
-     * @param  callable|null  $output
+     * @param  callable|null $output
      * @return \Illuminate\Process\ProcessResult
      */
     public function wait(callable $output = null)

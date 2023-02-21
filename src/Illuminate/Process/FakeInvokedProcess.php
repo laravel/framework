@@ -72,13 +72,24 @@ class FakeInvokedProcess implements InvokedProcessContract
     /**
      * Get the process ID if the process is still running.
      *
+     * @alias id
      * @return int|null
      */
-    public function id()
+    public function pid()
     {
         $this->invokeOutputHandlerWithNextLineOfOutput();
 
         return $this->process->processId;
+    }
+
+    /**
+     * Get the process ID if the process is still running.
+     *
+     * @return int|null
+     */
+    public function id()
+    {
+        return $this->pid();
     }
 
     /**

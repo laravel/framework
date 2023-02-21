@@ -9,7 +9,7 @@ interface InvokedProcess
      *
      * @return int|null
      */
-    public function id();
+    public function pid();
 
     /**
      * Send a signal to the process.
