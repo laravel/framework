@@ -1,6 +1,12 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.52.0...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.52.1...9.x)
+
+
+## [v9.52.1](https://github.com/laravel/framework/compare/v9.52.0...v9.52.1) - 2023-02-21
+
+### Changed
+- Use secure randomness in Arr:random and Arr:shuffle ([#46105](https://github.com/laravel/framework/pull/46105))
 
 
 ## [v9.52.0](https://github.com/laravel/framework/compare/v9.51.0...v9.52.0) - 2023-02-14
