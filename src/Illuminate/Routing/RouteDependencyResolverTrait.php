@@ -70,7 +70,7 @@ trait RouteDependencyResolverTrait
      * @param  array  $parameters
      * @param  object  $skippableValue
      * @return mixed
-     * 
+     *
      * @throws BindingResolutionException
      * @throws \ReflectionException
      */
