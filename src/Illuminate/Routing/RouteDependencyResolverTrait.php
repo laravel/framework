@@ -66,9 +66,9 @@ trait RouteDependencyResolverTrait
     /**
      * Attempt to transform the given parameter into a class instance.
      *
-     * @param \ReflectionParameter $parameter
-     * @param array $parameters
-     * @param object $skippableValue
+     * @param  \ReflectionParameter  $parameter
+     * @param  array  $parameters
+     * @param  object  $skippableValue
      * @return mixed
      * @throws BindingResolutionException
      * @throws \ReflectionException
