@@ -1380,7 +1380,11 @@ class Str
      */
     public static function ulid($time = null)
     {
-        return Ulid::generate($time);
+        if ($time === null) {
+            return new Ulid();
+        }
+
+        return new Ulid(Ulid::generate($time));
     }
 
     /**
