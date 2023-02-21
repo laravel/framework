@@ -427,3 +427,20 @@ if (! function_exists('with')) {
         return is_null($callback) ? $value : $callback($value);
     }
 }
+
+if( ! function_exists('pipe')) {
+    /**
+     * Pass a payload through a series of pipelines.
+     *
+     * @param $payload
+     * @param array $pipelines
+     * @return mixed
+     */
+    function pipe($payload, $pipelines = [])
+    {
+        return app(\Illuminate\Pipeline\Pipeline::class)
+            ->send($payload)
+            ->through($pipelines)
+            ->thenReturn();
+    }
+}
