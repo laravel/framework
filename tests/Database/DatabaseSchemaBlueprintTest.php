@@ -205,10 +205,10 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $connection->shouldReceive('usingNativeSchemaOperations')->andReturn(true);
 
         $blueprint = clone $base;
-        $this->assertEquals(['alter table `users` drop `foo`'], $blueprint->toSql($connection, new MySqlGrammar));
+        $this->assertEquals(['alter table `users` drop column if exists `foo`'], $blueprint->toSql($connection, new MySqlGrammar));
 
         $blueprint = clone $base;
-        $this->assertEquals(['alter table "users" drop column "foo"'], $blueprint->toSql($connection, new PostgresGrammar));
+        $this->assertEquals(['alter table "users" drop column if exists "foo"'], $blueprint->toSql($connection, new PostgresGrammar));
 
         $blueprint = clone $base;
         $this->assertEquals(['alter table "users" drop column "foo"'], $blueprint->toSql($connection, new SQLiteGrammar));
@@ -416,7 +416,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
         $this->assertEquals([
             'alter table `posts` drop foreign key `posts_user_id_foreign`',
-            'alter table `posts` drop `user_id`',
+            'alter table `posts` drop column if exists `user_id`',
         ], $blueprint->toSql($connection, new MySqlGrammar));
     }
 
@@ -434,7 +434,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
         $this->assertEquals([
             'alter table `posts` drop foreign key `posts_eloquent_model_uuid_stub_id_foreign`',
-            'alter table `posts` drop `eloquent_model_uuid_stub_id`',
+            'alter table `posts` drop column if exists `eloquent_model_uuid_stub_id`',
         ], $blueprint->toSql($connection, new MySqlGrammar));
     }
 

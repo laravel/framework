@@ -5,6 +5,8 @@ namespace Illuminate\Database\Schema\Grammars;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Fluent;
 use RuntimeException;
 
@@ -375,8 +377,7 @@ class MySqlGrammar extends Grammar
      */
     public function compileDropColumn(Blueprint $blueprint, Fluent $command)
     {
-        $columns = $this->prefixArray('drop', $this->wrapArray($command->columns));
-
+        $columns = $this->prefixArray('drop column if exists', $this->wrapArray($command->columns));
         return 'alter table '.$this->wrapTable($blueprint).' '.implode(', ', $columns);
     }
 

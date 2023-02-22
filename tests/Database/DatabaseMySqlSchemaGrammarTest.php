@@ -207,21 +207,21 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table `users` drop `foo`', $statements[0]);
+        $this->assertSame('alter table `users` drop column if exists `foo`', $statements[0]);
 
         $blueprint = new Blueprint('users');
         $blueprint->dropColumn(['foo', 'bar']);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table `users` drop `foo`, drop `bar`', $statements[0]);
+        $this->assertSame('alter table `users` drop column if exists `foo`, drop column if exists `bar`', $statements[0]);
 
         $blueprint = new Blueprint('users');
         $blueprint->dropColumn('foo', 'bar');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table `users` drop `foo`, drop `bar`', $statements[0]);
+        $this->assertSame('alter table `users` drop column if exists `foo`, drop column if exists `bar`', $statements[0]);
     }
 
     public function testDropPrimary()
@@ -281,7 +281,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table `users` drop `created_at`, drop `updated_at`', $statements[0]);
+        $this->assertSame('alter table `users` drop column if exists `created_at`, drop column if exists `updated_at`', $statements[0]);
     }
 
     public function testDropTimestampsTz()
@@ -291,7 +291,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table `users` drop `created_at`, drop `updated_at`', $statements[0]);
+        $this->assertSame('alter table `users` drop column if exists `created_at`, drop column if exists `updated_at`', $statements[0]);
     }
 
     public function testDropMorphs()
@@ -302,7 +302,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
 
         $this->assertCount(2, $statements);
         $this->assertSame('alter table `photos` drop index `photos_imageable_type_imageable_id_index`', $statements[0]);
-        $this->assertSame('alter table `photos` drop `imageable_type`, drop `imageable_id`', $statements[1]);
+        $this->assertSame('alter table `photos` drop column if exists `imageable_type`, drop column if exists `imageable_id`', $statements[1]);
     }
 
     public function testRenameTable()
