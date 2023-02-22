@@ -35,7 +35,6 @@ class SessionTableCommandTest extends TestCase
         $creator->shouldReceive('create')->once()->with('create_sessions_table', $path)->andReturn($path);
         $files->shouldReceive('get')->once()->andReturn('foo');
         $files->shouldReceive('put')->once()->with($path, 'foo');
-        $composer->shouldReceive('dumpAutoloads')->once();
 
         $this->runCommand($command);
     }
