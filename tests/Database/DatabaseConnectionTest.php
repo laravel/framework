@@ -18,6 +18,7 @@ use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\Schema\Builder;
+use Illuminate\Events\Dispatcher as EventsDispatcher;
 use Mockery as m;
 use PDO;
 use PDOException;
@@ -473,6 +474,31 @@ class DatabaseConnectionTest extends TestCase
         $schema = $connection->getSchemaBuilder();
         $this->assertInstanceOf(Builder::class, $schema);
         $this->assertSame($connection, $schema->getConnection());
+    }
+
+    public function testConnectionListenerIsScopedToCurrentInstance()
+    {
+        $events = new EventsDispatcher();
+        $mysql = (new Connection(new DatabaseConnectionTestMockPDO))->setEventDispatcher($events);
+        $sqlite = (new Connection(new DatabaseConnectionTestMockPDO))->setEventDispatcher($events);
+        $mysqlQueries = $sqliteQueries = 0;
+        $mysql->listen(function () use (&$mysqlQueries) {
+            $mysqlQueries++;
+        });
+        $sqlite->listen(function () use (&$sqliteQueries) {
+            $sqliteQueries++;
+        });
+
+        $mysql->pretend(function ($connection) {
+            $connection->table('foo')->count();
+        });
+        $sqlite->pretend(function ($connection) {
+            $connection->table('foo')->count();
+            $connection->table('foo')->count();
+        });
+
+        $this->assertSame(1, $mysqlQueries);
+        $this->assertSame(2, $sqliteQueries);
     }
 
     protected function getMockConnection($methods = [], $pdo = null)

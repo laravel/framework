@@ -108,7 +108,7 @@ class Connection implements ConnectionInterface
     /**
      * The event dispatcher instance.
      *
-     * @var \Illuminate\Contracts\Events\Dispatcher
+     * @var \Illuminate\Contracts\Events\Dispatcher|null
      */
     protected $events;
 
@@ -965,7 +965,11 @@ class Connection implements ConnectionInterface
      */
     public function listen(Closure $callback)
     {
-        $this->events?->listen(Events\QueryExecuted::class, $callback);
+        $this->events?->listen(Events\QueryExecuted::class, function ($event) use ($callback) {
+            if ($event->connection === $this) {
+                $callback($event);
+            }
+        });
     }
 
     /**
