@@ -111,9 +111,15 @@ class RouteRegistrar
         }
 
         if ($key === 'middleware') {
-            foreach ($value as $index => $middleware) {
-                $value[$index] = (string) $middleware;
+            $middleware = [];
+
+            foreach ($value as $k => $v) {
+                $middleware[] = (string) is_string($k)
+                    ? $k.':'.implode(',', $v)
+                    : $v;
             }
+
+            $value = $middleware;
         }
 
         $attributeKey = Arr::get($this->aliases, $key, $key);

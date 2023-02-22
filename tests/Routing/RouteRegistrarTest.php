@@ -31,6 +31,15 @@ class RouteRegistrarTest extends TestCase
         m::close();
     }
 
+    public function testMiddlewareAsHash()
+    {
+        $this->router->middleware(['one:1', 'two' => ['2']])->get('users', function () {
+            return 'all-users';
+        });
+
+        $this->assertEquals(['one:1', 'two:2'], $this->getRoute()->middleware());
+    }
+
     public function testMiddlewareFluentRegistration()
     {
         $this->router->middleware(['one', 'two'])->get('users', function () {
