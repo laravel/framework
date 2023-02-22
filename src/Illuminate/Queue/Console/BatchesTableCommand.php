@@ -65,8 +65,6 @@ class BatchesTableCommand extends Command
         );
 
         $this->components->info('Migration created successfully.');
-
-        $this->composer->dumpAutoloads();
     }
 
     /**
