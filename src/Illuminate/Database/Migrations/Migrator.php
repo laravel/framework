@@ -521,7 +521,9 @@ class Migrator
         $migration = static::$requiredPathCache[$path] ??= $this->files->getRequire($path);
 
         if (is_object($migration)) {
-            return clone $migration;
+            return method_exists($migration, '__construct')
+                    ? $this->files->getRequire($path)
+                    : clone $migration;
         }
 
         return new $class;
