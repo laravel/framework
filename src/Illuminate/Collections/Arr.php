@@ -657,7 +657,6 @@ class Arr
         return $results;
     }
 
-
     /**
      * Set an array item to a given value using "dot" notation.
      *
