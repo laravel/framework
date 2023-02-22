@@ -5,7 +5,6 @@ namespace Illuminate\Routing;
 use BadMethodCallException;
 use Closure;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Reflector;
 use InvalidArgumentException;
 
