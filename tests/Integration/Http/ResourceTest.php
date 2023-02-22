@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Http;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User;
 use Illuminate\Foundation\Http\Middleware\ValidatePostSize;
 use Illuminate\Http\Exceptions\PostTooLargeException;
 use Illuminate\Http\Request;
@@ -1648,6 +1649,7 @@ class ResourceTest extends TestCase
     {
         $this->assertInstanceOf(JsonResource::class, JsonResource::from(new stdClass));
         $this->assertInstanceOf(JsonResource::class, JsonResource::from('foo'));
+        $this->assertInstanceOf(JsonResource::class, JsonResource::from(new User()));
 
         $this->assertInstanceOf(AnonymousResourceCollection::class, JsonResource::from(['foo']));
         $this->assertInstanceOf(AnonymousResourceCollection::class, JsonResource::from(['foo' => 'bar']));
