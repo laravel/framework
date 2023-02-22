@@ -81,7 +81,7 @@ class RouteRegistrarTest extends TestCase
         })->middleware(['one:1', 'two' => []]);
         $this->assertEquals(['one:1', 'two:'], $this->getRoute()->middleware());
 
-        // boolean casting
+        // boolean casting...
 
         $this->router->middleware(['foo' => [true, false, true]])->get('users', function () {
             return 'all-users';
@@ -92,6 +92,18 @@ class RouteRegistrarTest extends TestCase
             return 'all-users';
         })->middleware(['foo' => [true, false, true]]);
         $this->assertEquals(['foo:1,0,1'], $this->getRoute()->middleware());
+
+        // backed enum handling...
+
+        $this->router->middleware(['foo' => [Suit::Diamonds, Suit::Clubs]])->get('users', function () {
+            return 'all-users';
+        });
+        $this->assertEquals(['foo:first,second'], $this->getRoute()->middleware());
+
+        $this->router->get('users', function () {
+            return 'all-users';
+        })->middleware(['foo' => [Suit::Diamonds, Suit::Clubs]]);
+        $this->assertEquals(['foo:first,second'], $this->getRoute()->middleware());
     }
 
     public function testMiddlewareFluentRegistration()
@@ -1210,7 +1222,8 @@ class InvokableRouteRegistrarControllerStub
     }
 }
 
-class RouteRegistrarMiddlewareStub
+enum Suit: string
 {
-    //
+    case Diamonds = 'first';
+    case Clubs = 'second';
 }

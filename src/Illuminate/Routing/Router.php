@@ -3,6 +3,7 @@
 namespace Illuminate\Routing;
 
 use ArrayObject;
+use BackedEnum;
 use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -1449,6 +1450,8 @@ class Router implements BindingRegistrar, RegistrarContract
                 ? (string) $value
                 : $key.':'.Collection::wrap($value)
                     ->map(fn ($v) => $v === false ? '0' : $v)
+                    ->map(fn ($v) => $v instanceof BackedEnum ? $v->value : $v)
+                    ->map(fn ($v) => (string) $v)
                     ->implode(','))
             ->values()
             ->all();
