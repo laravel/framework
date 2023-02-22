@@ -350,12 +350,14 @@ class Worker
             if (isset(static::$popCallbacks[$this->name])) {
                 $job = (static::$popCallbacks[$this->name])($popJobCallback, $queue);
                 $this->raiseAfterJobPopEvent($connection->getConnectionName(), $job);
+
                 return $job;
             }
 
             foreach (explode(',', $queue) as $queue) {
                 if (! is_null($job = $popJobCallback($queue))) {
                     $this->raiseAfterJobPopEvent($connection->getConnectionName(), $job);
+
                     return $job;
                 }
             }
