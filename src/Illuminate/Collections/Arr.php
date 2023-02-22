@@ -633,31 +633,30 @@ class Arr
         }
 
         if (is_null($number)) {
-            return head(array_slice($array, random_int(0, $count - 1), 1));
+            return $array[array_rand($array)];
         }
 
         if ((int) $number === 0) {
             return [];
         }
 
-        $keys = array_keys($array);
-        $count = count($keys);
-        $selected = [];
+        $keys = array_rand($array, $number);
 
-        for ($i = $count - 1; $i >= $count - $number; $i--) {
-            $j = random_int(0, $i);
+        $results = [];
 
-            if ($preserveKeys) {
-                $selected[$keys[$j]] = $array[$keys[$j]];
-            } else {
-                $selected[] = $array[$keys[$j]];
+        if ($preserveKeys) {
+            foreach ((array) $keys as $key) {
+                $results[$key] = $array[$key];
             }
-
-            $keys[$j] = $keys[$i];
+        } else {
+            foreach ((array) $keys as $key) {
+                $results[] = $array[$key];
+            }
         }
 
-        return $selected;
+        return $results;
     }
+
 
     /**
      * Set an array item to a given value using "dot" notation.
@@ -708,29 +707,15 @@ class Arr
      */
     public static function shuffle($array, $seed = null)
     {
-        if (! is_null($seed)) {
+        if (is_null($seed)) {
+            shuffle($array);
+        } else {
             mt_srand($seed);
             shuffle($array);
             mt_srand();
-
-            return $array;
         }
 
-        if (empty($array)) {
-            return [];
-        }
-
-        $keys = array_keys($array);
-
-        for ($i = count($keys) - 1; $i > 0; $i--) {
-            $j = random_int(0, $i);
-            $shuffled[] = $array[$keys[$j]];
-            $keys[$j] = $keys[$i];
-        }
-
-        $shuffled[] = $array[$keys[0]];
-
-        return $shuffled;
+        return $array;
     }
 
     /**
