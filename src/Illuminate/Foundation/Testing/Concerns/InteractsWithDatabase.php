@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Testing\Concerns;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Testing\Constraints\CountInDatabase;
@@ -177,15 +178,17 @@ trait InteractsWithDatabase
      */
     public function expectsDatabaseQueryCount($expected, $connection = null)
     {
-        with($this->getConnection($connection), function ($connection) use ($expected) {
+        with($this->getConnection($connection), function ($connectionObj) use ($expected, $connection) {
             $actual = 0;
 
-            $connection->listen(function () use (&$actual) {
-                $actual++;
+            $connectionObj->listen(function (QueryExecuted $event) use (&$actual, $connection) {
+                if ($connection === null || $event->connection->getName() === $connection) {
+                    $actual++;
+                }
             });
 
-            $this->beforeApplicationDestroyed(function () use (&$actual, $expected, $connection) {
-                $this->assertSame($actual, $expected, "Expected {$expected} database queries on the [{$connection->getName()}] connection. {$actual} occurred.");
+            $this->beforeApplicationDestroyed(function () use (&$actual, $expected, $connectionObj) {
+                $this->assertSame($actual, $expected, "Expected {$expected} database queries on the [{$connectionObj->getName()}] connection. {$actual} occurred.");
             });
         });
 
