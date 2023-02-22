@@ -60,6 +60,19 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     }
 
     /**
+     * Create a new resource or anonymous resource collection.
+     *
+     * @param  mixed  $resource
+     * @return static|\Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     */
+    public static function from($resource)
+    {
+        return is_iterable($resource)
+            ? static::collection($resource)
+            : static::make($resource);
+    }
+
+    /**
      * Create a new resource instance.
      *
      * @param  mixed  ...$parameters

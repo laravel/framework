@@ -7,6 +7,7 @@ use Illuminate\Foundation\Http\Middleware\ValidatePostSize;
 use Illuminate\Http\Exceptions\PostTooLargeException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\ConditionallyLoadsAttributes;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\MergeValue;
 use Illuminate\Http\Resources\MissingValue;
@@ -45,6 +46,7 @@ use Illuminate\Tests\Integration\Http\Fixtures\Subscription;
 use LogicException;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
+use stdClass;
 
 class ResourceTest extends TestCase
 {
@@ -1640,6 +1642,16 @@ class ResourceTest extends TestCase
             1 => 20,
             'total' => 30,
         ], ['data' => [0 => 10, 1 => 20, 'total' => 30]]);
+    }
+
+    public function testFromMethod()
+    {
+        $this->assertInstanceOf(JsonResource::class, JsonResource::from(new stdClass));
+        $this->assertInstanceOf(JsonResource::class, JsonResource::from('foo'));
+
+        $this->assertInstanceOf(AnonymousResourceCollection::class, JsonResource::from(['foo']));
+        $this->assertInstanceOf(AnonymousResourceCollection::class, JsonResource::from(['foo' => 'bar']));
+        $this->assertInstanceOf(AnonymousResourceCollection::class, JsonResource::from(collect()));
     }
 
     private function assertJsonResourceResponse($data, $expectedJson)
