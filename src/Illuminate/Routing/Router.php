@@ -1447,7 +1447,9 @@ class Router implements BindingRegistrar, RegistrarContract
         return Collection::make($middleware)
             ->map(fn ($value, $key) => is_int($key)
                 ? (string) $value
-                : $key.':'.Collection::wrap($value)->implode(','))
+                : $key.':'.Collection::wrap($value)
+                    ->map(fn ($v) => $v === false ? '0' : $v)
+                    ->implode(','))
             ->values()
             ->all();
     }

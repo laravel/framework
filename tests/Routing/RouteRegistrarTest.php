@@ -33,6 +33,8 @@ class RouteRegistrarTest extends TestCase
 
     public function testMiddlewareAsHash()
     {
+        // single value without wrapper...
+
         $this->router->middleware(['one:1', 'two' => '2'])->get('users', function () {
             return 'all-users';
         });
@@ -43,32 +45,53 @@ class RouteRegistrarTest extends TestCase
         })->middleware(['one:1', 'two' => '2']);
         $this->assertEquals(['one:1', 'two:2'], $this->getRoute()->middleware());
 
+        // single value...
+
         $this->router->middleware(['one:1', 'two' => ['2']])->get('users', function () {
             return 'all-users';
         });
         $this->assertEquals(['one:1', 'two:2'], $this->getRoute()->middleware());
+
         $this->router->get('users', function () {
             return 'all-users';
         })->middleware(['one:1', 'two' => ['2']]);
         $this->assertEquals(['one:1', 'two:2'], $this->getRoute()->middleware());
 
+        // multiple values...
+
         $this->router->middleware(['one:1', 'two' => ['2', 3, 'four', ' five ']])->get('users', function () {
             return 'all-users';
         });
         $this->assertEquals(['one:1', 'two:2,3,four, five '], $this->getRoute()->middleware());
+
         $this->router->get('users', function () {
             return 'all-users';
         })->middleware(['one:1', 'two' => ['2', 3, 'four', ' five ']]);
         $this->assertEquals(['one:1', 'two:2,3,four, five '], $this->getRoute()->middleware());
 
+        // empty array...
+
         $this->router->middleware(['one:1', 'two' => []])->get('users', function () {
             return 'all-users';
         });
         $this->assertEquals(['one:1', 'two:'], $this->getRoute()->middleware());
+
         $this->router->get('users', function () {
             return 'all-users';
         })->middleware(['one:1', 'two' => []]);
         $this->assertEquals(['one:1', 'two:'], $this->getRoute()->middleware());
+
+        // boolean casting
+
+        $this->router->middleware(['foo' => [true, false, true]])->get('users', function () {
+            return 'all-users';
+        });
+        $this->assertEquals(['foo:1,0,1'], $this->getRoute()->middleware());
+
+        $this->router->get('users', function () {
+            return 'all-users';
+        })->middleware(['foo' => [true, false, true]]);
+        $this->assertEquals(['foo:1,0,1'], $this->getRoute()->middleware());
     }
 
     public function testMiddlewareFluentRegistration()
