@@ -1048,12 +1048,9 @@ class Route
             $middleware = func_get_args();
         }
 
-        foreach ($middleware as $index => $value) {
-            $middleware[$index] = (string) $value;
-        }
-
         $this->action['middleware'] = array_merge(
-            (array) ($this->action['middleware'] ?? []), $middleware
+            (array) ($this->action['middleware'] ?? []),
+            $this->router->parseMiddleware($middleware),
         );
 
         return $this;

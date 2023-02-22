@@ -5,6 +5,7 @@ namespace Illuminate\Routing;
 use BadMethodCallException;
 use Closure;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Reflector;
 use InvalidArgumentException;
 
@@ -111,15 +112,7 @@ class RouteRegistrar
         }
 
         if ($key === 'middleware') {
-            $middleware = [];
-
-            foreach ($value as $k => $v) {
-                $middleware[] = (string) is_string($k)
-                    ? $k.':'.implode(',', $v)
-                    : $v;
-            }
-
-            $value = $middleware;
+            $value = $this->router->parseMiddleware($value);
         }
 
         $attributeKey = Arr::get($this->aliases, $key, $key);

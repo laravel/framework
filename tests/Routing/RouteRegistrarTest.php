@@ -33,11 +33,42 @@ class RouteRegistrarTest extends TestCase
 
     public function testMiddlewareAsHash()
     {
+        $this->router->middleware(['one:1', 'two' => '2'])->get('users', function () {
+            return 'all-users';
+        });
+        $this->assertEquals(['one:1', 'two:2'], $this->getRoute()->middleware());
+
+        $this->router->get('users', function () {
+            return 'all-users';
+        })->middleware(['one:1', 'two' => '2']);
+        $this->assertEquals(['one:1', 'two:2'], $this->getRoute()->middleware());
+
         $this->router->middleware(['one:1', 'two' => ['2']])->get('users', function () {
             return 'all-users';
         });
-
         $this->assertEquals(['one:1', 'two:2'], $this->getRoute()->middleware());
+        $this->router->get('users', function () {
+            return 'all-users';
+        })->middleware(['one:1', 'two' => ['2']]);
+        $this->assertEquals(['one:1', 'two:2'], $this->getRoute()->middleware());
+
+        $this->router->middleware(['one:1', 'two' => ['2', 3, 'four', ' five ']])->get('users', function () {
+            return 'all-users';
+        });
+        $this->assertEquals(['one:1', 'two:2,3,four, five '], $this->getRoute()->middleware());
+        $this->router->get('users', function () {
+            return 'all-users';
+        })->middleware(['one:1', 'two' => ['2', 3, 'four', ' five ']]);
+        $this->assertEquals(['one:1', 'two:2,3,four, five '], $this->getRoute()->middleware());
+
+        $this->router->middleware(['one:1', 'two' => []])->get('users', function () {
+            return 'all-users';
+        });
+        $this->assertEquals(['one:1', 'two:'], $this->getRoute()->middleware());
+        $this->router->get('users', function () {
+            return 'all-users';
+        })->middleware(['one:1', 'two' => []]);
+        $this->assertEquals(['one:1', 'two:'], $this->getRoute()->middleware());
     }
 
     public function testMiddlewareFluentRegistration()

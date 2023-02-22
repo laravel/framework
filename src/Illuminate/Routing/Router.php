@@ -1437,6 +1437,22 @@ class Router implements BindingRegistrar, RegistrarContract
     }
 
     /**
+     * Parse an array of middleware.
+     *
+     * @param  array  $middleware
+     * @return array
+     */
+    public function parseMiddleware($middleware)
+    {
+        return Collection::make($middleware)
+            ->map(fn ($value, $key) => is_int($key)
+                ? (string) $value
+                : $key.':'.Collection::wrap($value)->implode(','))
+            ->values()
+            ->all();
+    }
+
+    /**
      * Set the container instance used by the router.
      *
      * @param  \Illuminate\Container\Container  $container
