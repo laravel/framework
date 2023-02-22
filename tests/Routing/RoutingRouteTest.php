@@ -2126,7 +2126,11 @@ class RoutingRouteTest extends TestCase
 
     public function testRouteCanMiddlewareCanBeAssigned()
     {
+        $container = new Container;
+        $router = new Router(new Dispatcher, $container);
         $route = new Route(['GET'], '/', []);
+        $route->setRouter($router);
+
         $route->middleware(['foo'])->can('create', Route::class);
 
         $this->assertEquals([
@@ -2134,7 +2138,10 @@ class RoutingRouteTest extends TestCase
             'can:create,Illuminate\Routing\Route',
         ], $route->middleware());
 
+        $container = new Container;
+        $router = new Router(new Dispatcher, $container);
         $route = new Route(['GET'], '/', []);
+        $route->setRouter($router);
         $route->can('create');
 
         $this->assertEquals([
