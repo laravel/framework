@@ -694,8 +694,10 @@ trait EnumeratesValues
     /**
      * Pass the collection into a new class.
      *
-     * @param  class-string  $class
-     * @return mixed
+     * @template TPipeIntoValue
+     *
+     * @param  class-string<TPipeIntoValue>  $class
+     * @return TPipeIntoValue
      */
     public function pipeInto($class)
     {
