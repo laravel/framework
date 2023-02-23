@@ -281,28 +281,6 @@ class PendingProcess
     }
 
     /**
-     * Runs a sequence of processes, passing the result of the previous command as the input for the next.
-     *
-     * @param  array  $commands
-     * @param  callable|null  $output
-     * @return string
-     */
-    public function pipe(array $commands, callable $output = null): string
-    {
-        $result = null;
-        foreach ($commands as $command) {
-            if (! is_null($result)) {
-                $this->input($result);
-            }
-
-            $processResult = $this->run($command, $output);
-            $result = $processResult->output();
-        }
-
-        return $result;
-    }
-
-    /**
      * Get a Symfony Process instance from the current pending command.
      *
      * @param  array<array-key, string>|string|null  $command

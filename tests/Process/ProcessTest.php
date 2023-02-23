@@ -489,17 +489,19 @@ class ProcessTest extends TestCase
             $this->markTestSkipped('Requires Linux.');
         }
 
-        $factory = new Factory();
+        $factory = new Factory;
         $factory->fake([
             'cat *' => "Hello, world\nfoo\nbar",
         ]);
 
-        $result = $factory->pipe([
-            'cat test',
-            'grep -i "foo"',
-        ]);
+        $pipe = $factory->pipe(function ($pipe) {
+            return [
+                $pipe->command('cat test'),
+                $pipe->command('grep -i "foo"'),
+            ];
+        });
 
-        $this->assertSame("foo\n", $result);
+        $this->assertSame("foo\n", $pipe->run());
     }
 
     public function testFakeInvokedProcessOutputWithLatestOutput()
