@@ -808,7 +808,7 @@ class BusFake implements Fake, QueueingDispatcher
     }
 
     /**
-     * Remove any commands and batches that have been dispatched
+     * Remove any commands and batches that have been dispatched.
      *
      * @return void
      */

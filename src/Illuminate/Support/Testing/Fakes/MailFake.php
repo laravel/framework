@@ -453,7 +453,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
     }
 
     /**
-     * Remove any mailables that have been sent
+     * Remove any mailables that have been sent.
      *
      * @return void
      */

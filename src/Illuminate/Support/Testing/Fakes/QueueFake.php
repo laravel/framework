@@ -513,7 +513,7 @@ class QueueFake extends QueueManager implements Fake, Queue
     }
 
     /**
-     * Remove any jobs that have been dispatched
+     * Remove any jobs that have been dispatched.
      *
      * @return void
      */

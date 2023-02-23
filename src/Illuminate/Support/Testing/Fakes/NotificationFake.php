@@ -360,7 +360,7 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
     }
 
     /**
-     * Remove any notifications that have been sent
+     * Remove any notifications that have been sent.
      *
      * @return void
      */
