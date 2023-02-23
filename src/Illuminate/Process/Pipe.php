@@ -58,7 +58,7 @@ class Pipe
     }
 
     /**
-     * Runs the processes in the pipe
+     * Runs the processes in the pipe.
      *
      * @param  callable|null  $output
      * @return string
