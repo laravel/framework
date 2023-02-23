@@ -168,9 +168,7 @@ class MorphTo extends BelongsTo
     {
         return $keyType !== 'string'
                     ? array_keys($this->dictionary[$type])
-                    : array_map(function ($modelId) {
-                        return (string) $modelId;
-                    }, array_filter(array_keys($this->dictionary[$type])));
+                    : array_map(fn ($modelId) => (string) $modelId, array_filter(array_keys($this->dictionary[$type])));
     }
 
     /**

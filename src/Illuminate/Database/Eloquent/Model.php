@@ -580,9 +580,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function qualifyColumns($columns)
     {
-        return collect($columns)->map(function ($column) {
-            return $this->qualifyColumn($column);
-        })->all();
+        return collect($columns)->map(fn ($column) => $this->qualifyColumn($column))->all();
     }
 
     /**
@@ -1035,9 +1033,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     protected function incrementQuietly($column, $amount = 1, array $extra = [])
     {
-        return static::withoutEvents(function () use ($column, $amount, $extra) {
-            return $this->incrementOrDecrement($column, $amount, $extra, 'increment');
-        });
+        return static::withoutEvents(fn () => $this->incrementOrDecrement($column, $amount, $extra, 'increment'));
     }
 
     /**
@@ -1050,9 +1046,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     protected function decrementQuietly($column, $amount = 1, array $extra = [])
     {
-        return static::withoutEvents(function () use ($column, $amount, $extra) {
-            return $this->incrementOrDecrement($column, $amount, $extra, 'decrement');
-        });
+        return static::withoutEvents(fn () => $this->incrementOrDecrement($column, $amount, $extra, 'decrement'));
     }
 
     /**
@@ -1698,10 +1692,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
                 ->attributes
         );
 
-        $this->load(collect($this->relations)->reject(function ($relation) {
-            return $relation instanceof Pivot
-                || (is_object($relation) && in_array(AsPivot::class, class_uses_recursive($relation), true));
-        })->keys()->all());
+        $this->load(collect($this->relations)
+            ->reject(fn ($relation) => $relation instanceof Pivot || (is_object($relation) && in_array(AsPivot::class, class_uses_recursive($relation), true)))
+            ->keys()
+            ->all());
 
         $this->syncOriginal();
 

@@ -562,9 +562,7 @@ class Builder implements BuilderContract
             return $instance;
         }
 
-        return tap($this->newModelInstance(array_merge($attributes, $values)), function ($instance) {
-            $instance->save();
-        });
+        return tap($this->newModelInstance(array_merge($attributes, $values)), fn ($instance) => $instance->save());
     }
 
     /**
@@ -576,9 +574,7 @@ class Builder implements BuilderContract
      */
     public function updateOrCreate(array $attributes, array $values = [])
     {
-        return tap($this->firstOrNew($attributes), function ($instance) use ($values) {
-            $instance->fill($values)->save();
-        });
+        return tap($this->firstOrNew($attributes), fn ($instance) =>  $instance->fill($values)->save());
     }
 
     /**
@@ -831,9 +827,7 @@ class Builder implements BuilderContract
      */
     public function cursor()
     {
-        return $this->applyScopes()->query->cursor()->map(function ($record) {
-            return $this->newModelInstance()->newFromBuilder($record);
-        });
+        return $this->applyScopes()->query->cursor()->map(fn ($record) => $this->newModelInstance()->newFromBuilder($record));
     }
 
     /**
@@ -868,9 +862,7 @@ class Builder implements BuilderContract
             return $results;
         }
 
-        return $results->map(function ($value) use ($column) {
-            return $this->model->newFromBuilder([$column => $value])->{$column};
-        });
+        return $results->map(fn ($value) => $this->model->newFromBuilder([$column => $value])->{$column});
     }
 
     /**
@@ -982,9 +974,7 @@ class Builder implements BuilderContract
      */
     public function create(array $attributes = [])
     {
-        return tap($this->newModelInstance($attributes), function ($instance) {
-            $instance->save();
-        });
+        return tap($this->newModelInstance($attributes), fn ($instance) => $instance->save());
     }
 
     /**
@@ -995,9 +985,7 @@ class Builder implements BuilderContract
      */
     public function forceCreate(array $attributes)
     {
-        return $this->model->unguarded(function () use ($attributes) {
-            return $this->newModelInstance()->create($attributes);
-        });
+        return $this->model->unguarded(fn () => $this->newModelInstance()->create($attributes));
     }
 
     /**
@@ -1327,9 +1315,7 @@ class Builder implements BuilderContract
      */
     protected function callNamedScope($scope, array $parameters = [])
     {
-        return $this->callScope(function (...$parameters) use ($scope) {
-            return $this->model->callNamedScope($scope, $parameters);
-        }, $parameters);
+        return $this->callScope(fn (...$parameters) => $this->model->callNamedScope($scope, $parameters), $parameters);
     }
 
     /**

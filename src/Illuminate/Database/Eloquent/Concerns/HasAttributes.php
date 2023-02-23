@@ -582,9 +582,7 @@ trait HasAttributes
             ));
         }
 
-        return tap($relation->getResults(), function ($results) use ($method) {
-            $this->setRelation($method, $results);
-        });
+        return tap($relation->getResults(), fn ($results) => $this->setRelation($method, $results));
     }
 
     /**
@@ -667,9 +665,7 @@ trait HasAttributes
 
         $attribute = $this->{Str::camel($key)}();
 
-        $value = call_user_func($attribute->get ?: function ($value) {
-            return $value;
-        }, $value, $this->attributes);
+        $value = call_user_func($attribute->get ?: fn ($value) => $value, $value, $this->attributes);
 
         if ($attribute->withCaching || (is_object($value) && $attribute->withObjectCaching)) {
             $this->attributeCastCache[$key] = $value;
@@ -1047,9 +1043,7 @@ trait HasAttributes
     {
         $attribute = $this->{Str::camel($key)}();
 
-        $callback = $attribute->set ?: function ($value) use ($key) {
-            $this->attributes[$key] = $value;
-        };
+        $callback = $attribute->set ?: fn ($value) => $this->attributes[$key] = $value;
 
         $this->attributes = array_merge(
             $this->attributes,
@@ -1189,9 +1183,7 @@ trait HasAttributes
      */
     protected function getArrayAttributeWithValue($path, $key, $value)
     {
-        return tap($this->getArrayAttributeByKey($key), function (&$array) use ($path, $value) {
-            Arr::set($array, str_replace('->', '.', $path), $value);
-        });
+        return tap($this->getArrayAttributeByKey($key), fn (&$array) => Arr::set($array, str_replace('->', '.', $path), $value));
     }
 
     /**
@@ -1718,9 +1710,7 @@ trait HasAttributes
                 continue;
             }
 
-            $callback = $attribute->set ?: function ($value) use ($key) {
-                $this->attributes[$key] = $value;
-            };
+            $callback = $attribute->set ?: fn ($value) => $this->attributes[$key] = $value;
 
             $this->attributes = array_merge(
                 $this->attributes,
@@ -1815,9 +1805,7 @@ trait HasAttributes
             );
         }
 
-        return collect($this->original)->mapWithKeys(function ($value, $key) {
-            return [$key => $this->transformModelValue($key, $value)];
-        })->all();
+        return collect($this->original)->mapWithKeys(fn ($value, $key) => [$key => $this->transformModelValue($key, $value)])->all();
     }
 
     /**
@@ -2165,15 +2153,13 @@ trait HasAttributes
 
         static::$getAttributeMutatorCache[$class] =
             collect($attributeMutatorMethods = static::getAttributeMarkedMutatorMethods($classOrInstance))
-                    ->mapWithKeys(function ($match) {
-                        return [lcfirst(static::$snakeAttributes ? Str::snake($match) : $match) => true];
-                    })->all();
+                    ->mapWithKeys(fn ($match) => [lcfirst(static::$snakeAttributes ? Str::snake($match) : $match) => true])
+                    ->all();
 
         static::$mutatorCache[$class] = collect(static::getMutatorMethods($class))
                 ->merge($attributeMutatorMethods)
-                ->map(function ($match) {
-                    return lcfirst(static::$snakeAttributes ? Str::snake($match) : $match);
-                })->all();
+                ->map(fn ($match) => lcfirst(static::$snakeAttributes ? Str::snake($match) : $match))
+                ->all();
     }
 
     /**

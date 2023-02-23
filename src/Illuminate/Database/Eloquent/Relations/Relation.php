@@ -281,9 +281,7 @@ abstract class Relation implements BuilderContract
      */
     protected function getKeys(array $models, $key = null)
     {
-        return collect($models)->map(function ($value) use ($key) {
-            return $key ? $value->getAttribute($key) : $value->getKey();
-        })->values()->unique(null, true)->sort()->all();
+        return collect($models)->map(fn ($value) => $key ? $value->getAttribute($key) : $value->getKey())->values()->unique(null, true)->sort()->all();
     }
 
     /**
@@ -485,9 +483,7 @@ abstract class Relation implements BuilderContract
             return $models;
         }
 
-        return array_combine(array_map(function ($model) {
-            return (new $model)->getTable();
-        }, $models), $models);
+        return array_combine(array_map(fn ($model) => (new $model)->getTable(), $models), $models);
     }
 
     /**

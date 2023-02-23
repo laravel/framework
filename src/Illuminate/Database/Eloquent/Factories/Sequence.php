@@ -56,8 +56,6 @@ class Sequence implements Countable
      */
     public function __invoke()
     {
-        return tap(value($this->sequence[$this->index % $this->count], $this), function () {
-            $this->index = $this->index + 1;
-        });
+        return tap(value($this->sequence[$this->index % $this->count], $this), fn () => $this->index = $this->index + 1);
     }
 }

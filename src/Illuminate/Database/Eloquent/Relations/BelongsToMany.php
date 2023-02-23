@@ -886,9 +886,10 @@ class BelongsToMany extends Relation
     {
         $defaults = [$this->foreignPivotKey, $this->relatedPivotKey];
 
-        return collect(array_merge($defaults, $this->pivotColumns))->map(function ($column) {
-            return $this->qualifyPivotColumn($column).' as pivot_'.$column;
-        })->unique()->all();
+        return collect(array_merge($defaults, $this->pivotColumns))
+            ->map(fn ($column) => $this->qualifyPivotColumn($column).' as pivot_'.$column)
+            ->unique()
+            ->all();
     }
 
     /**
@@ -904,9 +905,7 @@ class BelongsToMany extends Relation
     {
         $this->query->addSelect($this->shouldSelect($columns));
 
-        return tap($this->query->paginate($perPage, $columns, $pageName, $page), function ($paginator) {
-            $this->hydratePivotRelation($paginator->items());
-        });
+        return tap($this->query->paginate($perPage, $columns, $pageName, $page), fn ($paginator) => $this->hydratePivotRelation($paginator->items()));
     }
 
     /**
@@ -922,9 +921,7 @@ class BelongsToMany extends Relation
     {
         $this->query->addSelect($this->shouldSelect($columns));
 
-        return tap($this->query->simplePaginate($perPage, $columns, $pageName, $page), function ($paginator) {
-            $this->hydratePivotRelation($paginator->items());
-        });
+        return tap($this->query->simplePaginate($perPage, $columns, $pageName, $page), fn ($paginator) => $this->hydratePivotRelation($paginator->items()));
     }
 
     /**
@@ -940,9 +937,7 @@ class BelongsToMany extends Relation
     {
         $this->query->addSelect($this->shouldSelect($columns));
 
-        return tap($this->query->cursorPaginate($perPage, $columns, $cursorName, $cursor), function ($paginator) {
-            $this->hydratePivotRelation($paginator->items());
-        });
+        return tap($this->query->cursorPaginate($perPage, $columns, $cursorName, $cursor), fn ($paginator) => $this->hydratePivotRelation($paginator->items()));
     }
 
     /**
@@ -1203,9 +1198,7 @@ class BelongsToMany extends Relation
      */
     public function saveQuietly(Model $model, array $pivotAttributes = [], $touch = true)
     {
-        return Model::withoutEvents(function () use ($model, $pivotAttributes, $touch) {
-            return $this->save($model, $pivotAttributes, $touch);
-        });
+        return Model::withoutEvents(fn () => $this->save($model, $pivotAttributes, $touch));
     }
 
     /**
@@ -1235,9 +1228,7 @@ class BelongsToMany extends Relation
      */
     public function saveManyQuietly($models, array $pivotAttributes = [])
     {
-        return Model::withoutEvents(function () use ($models, $pivotAttributes) {
-            return $this->saveMany($models, $pivotAttributes);
-        });
+        return Model::withoutEvents(fn () => $this->saveMany($models, $pivotAttributes));
     }
 
     /**

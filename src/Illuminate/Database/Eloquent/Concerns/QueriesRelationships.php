@@ -240,9 +240,7 @@ trait QueriesRelationships
                     $belongsTo = $this->getBelongsToRelation($relation, $type);
 
                     if ($callback) {
-                        $callback = function ($query) use ($callback, $type) {
-                            return $callback($query, $type);
-                        };
+                        $callback = fn ($query) => $callback($query, $type);
                     }
 
                     $query->where($this->qualifyColumn($relation->getMorphType()), '=', (new $type)->getMorphClass())
@@ -261,13 +259,7 @@ trait QueriesRelationships
      */
     protected function getBelongsToRelation(MorphTo $relation, $type)
     {
-        $belongsTo = Relation::noConstraints(function () use ($relation, $type) {
-            return $this->model->belongsTo(
-                $type,
-                $relation->getForeignKeyName(),
-                $relation->getOwnerKeyName()
-            );
-        });
+        $belongsTo = Relation::noConstraints(fn () => $this->model->belongsTo($type, $relation->getForeignKeyName(),$relation->getOwnerKeyName()));
 
         $belongsTo->getQuery()->mergeConstraintsFrom($relation->getQuery());
 
@@ -422,9 +414,7 @@ trait QueriesRelationships
      */
     public function whereMorphRelation($relation, $types, $column, $operator = null, $value = null)
     {
-        return $this->whereHasMorph($relation, $types, function ($query) use ($column, $operator, $value) {
-            $query->where($column, $operator, $value);
-        });
+        return $this->whereHasMorph($relation, $types, fn ($query) => $query->where($column, $operator, $value));
     }
 
     /**
@@ -439,9 +429,7 @@ trait QueriesRelationships
      */
     public function orWhereMorphRelation($relation, $types, $column, $operator = null, $value = null)
     {
-        return $this->orWhereHasMorph($relation, $types, function ($query) use ($column, $operator, $value) {
-            $query->where($column, $operator, $value);
-        });
+        return $this->orWhereHasMorph($relation, $types, fn ($query) => $query->where($column, $operator, $value));
     }
 
     /**
@@ -860,9 +848,7 @@ trait QueriesRelationships
      */
     protected function getRelationWithoutConstraints($relation)
     {
-        return Relation::noConstraints(function () use ($relation) {
-            return $this->getModel()->{$relation}();
-        });
+        return Relation::noConstraints(fn () => $this->getModel()->{$relation}());
     }
 
     /**

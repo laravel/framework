@@ -50,9 +50,7 @@ abstract class HasOneOrMany extends Relation
      */
     public function make(array $attributes = [])
     {
-        return tap($this->related->newInstance($attributes), function ($instance) {
-            $this->setForeignAttributesForCreate($instance);
-        });
+        return tap($this->related->newInstance($attributes), fn ($instance) => $this->setForeignAttributesForCreate($instance));
     }
 
     /**
@@ -184,9 +182,7 @@ abstract class HasOneOrMany extends Relation
     {
         $foreign = $this->getForeignKeyName();
 
-        return $results->mapToDictionary(function ($result) use ($foreign) {
-            return [$this->getDictionaryKey($result->{$foreign}) => $result];
-        })->all();
+        return $results->mapToDictionary(fn ($result) => [$this->getDictionaryKey($result->{$foreign}) => $result])->all();
     }
 
     /**
@@ -278,9 +274,7 @@ abstract class HasOneOrMany extends Relation
      */
     public function saveQuietly(Model $model)
     {
-        return Model::withoutEvents(function () use ($model) {
-            return $this->save($model);
-        });
+        return Model::withoutEvents(fn () => $this->save($model));
     }
 
     /**
@@ -306,9 +300,7 @@ abstract class HasOneOrMany extends Relation
      */
     public function saveManyQuietly($models)
     {
-        return Model::withoutEvents(function () use ($models) {
-            return $this->saveMany($models);
-        });
+        return Model::withoutEvents(fn () => $this->saveMany($models));
     }
 
     /**

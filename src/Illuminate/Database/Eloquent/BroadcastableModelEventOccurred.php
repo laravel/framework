@@ -77,9 +77,7 @@ class BroadcastableModelEventOccurred implements ShouldBroadcast
                 ? ($this->model->broadcastOn($this->event) ?: [])
                 : $this->channels;
 
-        return collect($channels)->map(function ($channel) {
-            return $channel instanceof Model ? new PrivateChannel($channel) : $channel;
-        })->all();
+        return collect($channels)->map(fn ($channel) => $channel instanceof Model ? new PrivateChannel($channel) : $channel)->all();
     }
 
     /**

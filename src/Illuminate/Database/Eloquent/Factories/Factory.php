@@ -205,9 +205,7 @@ abstract class Factory
             return $this->state($attributes)->getExpandedAttributes($parent);
         }
 
-        return array_map(function () use ($attributes, $parent) {
-            return $this->state($attributes)->getExpandedAttributes($parent);
-        }, range(1, $this->count));
+        return array_map(fn () => $this->state($attributes)->getExpandedAttributes($parent), range(1, $this->count));
     }
 
     /**
@@ -240,11 +238,7 @@ abstract class Factory
      */
     public function createMany(iterable $records)
     {
-        return new EloquentCollection(
-            collect($records)->map(function ($record) {
-                return $this->state($record)->create();
-            })
-        );
+        return new EloquentCollection(collect($records)->map(fn ($record) => $this->state($record)->create()));
     }
 
     /**
@@ -255,9 +249,7 @@ abstract class Factory
      */
     public function createManyQuietly(iterable $records)
     {
-        return Model::withoutEvents(function () use ($records) {
-            return $this->createMany($records);
-        });
+        return Model::withoutEvents(fn () => $this->createMany($records));
     }
 
     /**
@@ -297,9 +289,7 @@ abstract class Factory
      */
     public function createQuietly($attributes = [], ?Model $parent = null)
     {
-        return Model::withoutEvents(function () use ($attributes, $parent) {
-            return $this->create($attributes, $parent);
-        });
+        return Model::withoutEvents(fn () => $this->create($attributes, $parent));
     }
 
     /**
@@ -347,11 +337,7 @@ abstract class Factory
      */
     protected function createChildren(Model $model)
     {
-        Model::unguarded(function () use ($model) {
-            $this->has->each(function ($has) use ($model) {
-                $has->recycle($this->recycle)->createFor($model);
-            });
-        });
+        Model::unguarded(fn () => $this->has->each(fn ($has) => $has->recycle($this->recycle)->createFor($model)));
     }
 
     /**
@@ -379,18 +365,14 @@ abstract class Factory
         }
 
         if ($this->count === null) {
-            return tap($this->makeInstance($parent), function ($instance) {
-                $this->callAfterMaking(collect([$instance]));
-            });
+            return tap($this->makeInstance($parent), fn ($instance) => $this->callAfterMaking(collect([$instance])));
         }
 
         if ($this->count < 1) {
             return $this->newModel()->newCollection();
         }
 
-        $instances = $this->newModel()->newCollection(array_map(function () use ($parent) {
-            return $this->makeInstance($parent);
-        }, range(1, $this->count)));
+        $instances = $this->newModel()->newCollection(array_map(fn () => $this->makeInstance($parent), range(1, $this->count)));
 
         $this->callAfterMaking($instances);
 
@@ -455,9 +437,7 @@ abstract class Factory
     {
         $model = $this->newModel();
 
-        return $this->for->map(function (BelongsToRelationship $for) use ($model) {
-            return $for->recycle($this->recycle)->attributesFor($model);
-        })->collapse()->all();
+        return $this->for->map(fn (BelongsToRelationship $for) => $for->recycle($this->recycle)->attributesFor($model))->collapse()->all();
     }
 
     /**
@@ -501,13 +481,7 @@ abstract class Factory
      */
     public function state($state)
     {
-        return $this->newInstance([
-            'states' => $this->states->concat([
-                is_callable($state) ? $state : function () use ($state) {
-                    return $state;
-                },
-            ]),
-        ]);
+        return $this->newInstance(['states' => $this->states->concat([is_callable($state) ? $state : fn () => $state])]);
     }
 
     /**
@@ -684,11 +658,7 @@ abstract class Factory
      */
     protected function callAfterMaking(Collection $instances)
     {
-        $instances->each(function ($model) {
-            $this->afterMaking->each(function ($callback) use ($model) {
-                $callback($model);
-            });
-        });
+        $instances->each(fn ($model) => $this->afterMaking->each(fn ($callback) => $callback($model)));
     }
 
     /**
@@ -700,11 +670,7 @@ abstract class Factory
      */
     protected function callAfterCreating(Collection $instances, ?Model $parent = null)
     {
-        $instances->each(function ($model) use ($parent) {
-            $this->afterCreating->each(function ($callback) use ($model, $parent) {
-                $callback($model, $parent);
-            });
-        });
+        $instances->each(fn ($model) => $this->afterCreating->each(fn ($callback) => $callback($model, $parent)));
     }
 
     /**

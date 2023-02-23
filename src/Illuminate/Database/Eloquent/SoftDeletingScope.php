@@ -85,9 +85,7 @@ class SoftDeletingScope implements Scope
         $builder->macro('restoreOrCreate', function (Builder $builder, array $attributes = [], array $values = []) {
             $builder->withTrashed();
 
-            return tap($builder->firstOrCreate($attributes, $values), function ($instance) {
-                $instance->restore();
-            });
+            return tap($builder->firstOrCreate($attributes, $values), fn ($instance) => $instance->restore());
         });
     }
 
