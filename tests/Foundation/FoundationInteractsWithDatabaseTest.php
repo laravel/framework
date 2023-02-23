@@ -386,7 +386,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
             $this->assertSame("Expected 3 database queries on the [testing] connection. 4 occurred.\nFailed asserting that 3 is identical to 4.", $e->getMessage());
         }
 
-        $case = new class extends TestingTestCase
+        $case = new class('foo') extends TestingTestCase
         {
             use CreatesApplication;
 
