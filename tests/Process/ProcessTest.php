@@ -510,7 +510,7 @@ class ProcessTest extends TestCase
 
         $result = $factory->pipe([
             'cat test',
-            'grep -i "foo"'
+            'grep -i "foo"',
         ]);
 
         $this->assertSame("foo\n", $result);
