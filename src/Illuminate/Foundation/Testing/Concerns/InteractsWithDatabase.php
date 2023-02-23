@@ -178,17 +178,21 @@ trait InteractsWithDatabase
      */
     public function expectsDatabaseQueryCount($expected, $connection = null)
     {
-        with($this->getConnection($connection), function ($connectionObj) use ($expected, $connection) {
+        with($this->getConnection($connection), function ($connectionInstance) use ($expected, $connection) {
             $actual = 0;
 
-            $connectionObj->listen(function (QueryExecuted $event) use (&$actual, $connection) {
-                if ($connection === null || $event->connection->getName() === $connection) {
+            $connectionInstance->listen(function (QueryExecuted $event) use (&$actual, $connectionInstance, $connection) {
+                if (is_null($connection) || $connectionInstance === $event->connection) {
                     $actual++;
                 }
             });
 
-            $this->beforeApplicationDestroyed(function () use (&$actual, $expected, $connectionObj) {
-                $this->assertSame($actual, $expected, "Expected {$expected} database queries on the [{$connectionObj->getName()}] connection. {$actual} occurred.");
+            $this->beforeApplicationDestroyed(function () use (&$actual, $expected, $connectionInstance) {
+                $this->assertSame(
+                    $actual,
+                    $expected,
+                    "Expected {$expected} database queries on the [{$connectionInstance->getName()}] connection. {$actual} occurred."
+                );
             });
         });
 
