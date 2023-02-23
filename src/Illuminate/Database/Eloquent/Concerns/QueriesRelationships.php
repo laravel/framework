@@ -259,7 +259,7 @@ trait QueriesRelationships
      */
     protected function getBelongsToRelation(MorphTo $relation, $type)
     {
-        $belongsTo = Relation::noConstraints(fn () => $this->model->belongsTo($type, $relation->getForeignKeyName(),$relation->getOwnerKeyName()));
+        $belongsTo = Relation::noConstraints(fn () => $this->model->belongsTo($type, $relation->getForeignKeyName(), $relation->getOwnerKeyName()));
 
         $belongsTo->getQuery()->mergeConstraintsFrom($relation->getQuery());
 
