@@ -6,6 +6,7 @@ use Illuminate\Contracts\Process\ProcessResult;
 use Illuminate\Process\Exceptions\ProcessFailedException;
 use Illuminate\Process\Exceptions\ProcessTimedOutException;
 use Illuminate\Process\Factory;
+use Illuminate\Support\Facades\Process;
 use Mockery as m;
 use OutOfBoundsException;
 use PHPUnit\Framework\TestCase;
@@ -480,6 +481,25 @@ class ProcessTest extends TestCase
         $result = $factory->input('foobar')->run('cat');
 
         $this->assertSame('foobar', $result->output());
+    }
+
+    public function testProcessPipe()
+    {
+        if (windows_os()) {
+            $this->markTestSkipped('Requires Linux.');
+        }
+
+        $factory = new Factory();
+        $factory->fake([
+            'cat *' => "Hello, world\nfoo\nbar",
+        ]);
+
+        $result = $factory->pipe([
+            'cat test',
+            'grep -i "foo"'
+        ]);
+
+        $this->assertSame("foo\n", $result);
     }
 
     public function testFakeInvokedProcessOutputWithLatestOutput()
