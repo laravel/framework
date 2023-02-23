@@ -274,6 +274,17 @@ class Response implements ArrayAccess
     }
 
     /**
+     * Get key from http response.
+     *
+     * @param  string  $key
+     * @return void
+     */
+    public function get($key)
+    {
+        return data_get($this->object(), $key);
+    }
+
+    /**
      * Throw an exception if a server or client error occurred.
      *
      * @param  \Closure|null  $callback
