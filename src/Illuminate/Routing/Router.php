@@ -891,7 +891,7 @@ class Router implements BindingRegistrar, RegistrarContract
         if ($response instanceof PsrResponseInterface) {
             $response = (new HttpFoundationFactory)->createResponse($response);
         } elseif ($response instanceof Model && $response->wasRecentlyCreated) {
-            $response = new JsonResponse($response, 201);
+            $response = new JsonResponse($response, Response::HTTP_CREATED);
         } elseif ($response instanceof Stringable) {
             $response = new Response($response->__toString(), 200, ['Content-Type' => 'text/html']);
         } elseif (! $response instanceof SymfonyResponse &&
