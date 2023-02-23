@@ -41,6 +41,13 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     public readonly string $name;
 
     /**
+     * Add additional segments to the recaller cookie.
+     *
+     * @var callable(\Illuminate\Contracts\Auth\Authenticatable): string
+     */
+    public static $customRecallerSegments;
+
+    /**
      * The user we last attempted to retrieve.
      *
      * @var \Illuminate\Contracts\Auth\Authenticatable
@@ -545,9 +552,13 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      */
     protected function queueRecallerCookie(AuthenticatableContract $user)
     {
-        $this->getCookieJar()->queue($this->createRecaller(
-            $user->getAuthIdentifier().'|'.$user->getRememberToken().'|'.$user->getAuthPassword()
-        ));
+        $value = $user->getAuthIdentifier().'|'.$user->getRememberToken().'|'.$user->getAuthPassword();
+
+        if (isset(static::$customRecallerSegments)) {
+            $value .= '|'.(static::$customRecallerSegments)($user);
+        }
+
+        $this->getCookieJar()->queue($this->createRecaller($value));
     }
 
     /**
