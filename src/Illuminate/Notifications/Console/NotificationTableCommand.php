@@ -33,6 +33,8 @@ class NotificationTableCommand extends Command
 
     /**
      * @var \Illuminate\Support\Composer
+     *
+     * @deprecated Will be removed in a future Laravel version.
      */
     protected $composer;
 
@@ -63,8 +65,6 @@ class NotificationTableCommand extends Command
         $this->files->put($fullPath, $this->files->get(__DIR__.'/stubs/notifications.stub'));
 
         $this->components->info('Migration created successfully.');
-
-        $this->composer->dumpAutoloads();
     }
 
     /**

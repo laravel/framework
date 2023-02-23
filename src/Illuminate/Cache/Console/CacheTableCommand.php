@@ -33,6 +33,8 @@ class CacheTableCommand extends Command
 
     /**
      * @var \Illuminate\Support\Composer
+     *
+     * @deprecated Will be removed in a future Laravel version.
      */
     protected $composer;
 
@@ -63,8 +65,6 @@ class CacheTableCommand extends Command
         $this->files->put($fullPath, $this->files->get(__DIR__.'/stubs/cache.stub'));
 
         $this->components->info('Migration created successfully.');
-
-        $this->composer->dumpAutoloads();
     }
 
     /**
