@@ -358,4 +358,14 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
     {
         return $this->notifications;
     }
+
+    /**
+     * Remove any notifications that have been sent
+     *
+     * @return void
+     */
+    public function clear()
+    {
+        $this->notifications = [];
+    }
 }

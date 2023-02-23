@@ -382,6 +382,16 @@ class EventFake implements Dispatcher, Fake
     }
 
     /**
+     * Remove any events that have been dispatched
+     *
+     * @return void
+     */
+    public function clear()
+    {
+        $this->events = [];
+    }
+
+    /**
      * Handle dynamic method calls to the dispatcher.
      *
      * @param  string  $method

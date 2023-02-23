@@ -513,6 +513,16 @@ class QueueFake extends QueueManager implements Fake, Queue
     }
 
     /**
+     * Remove any jobs that have been dispatched
+     *
+     * @return void
+     */
+    public function clear()
+    {
+        $this->jobs = [];
+    }
+
+    /**
      * Override the QueueManager to prevent circular dependency.
      *
      * @param  string  $method

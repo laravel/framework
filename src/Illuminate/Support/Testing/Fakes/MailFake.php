@@ -453,6 +453,17 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
     }
 
     /**
+     * Remove any mailables that have been sent
+     *
+     * @return void
+     */
+    public function clear()
+    {
+        $this->mailables = [];
+        $this->queuedMailables = [];
+    }
+
+    /**
      * Handle dynamic method calls to the mailer.
      *
      * @param  string  $method

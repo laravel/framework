@@ -806,4 +806,15 @@ class BusFake implements Fake, QueueingDispatcher
 
         return $this;
     }
+
+    /**
+     * Remove any commands and batches that have been dispatched
+     *
+     * @return void
+     */
+    public function clear()
+    {
+        $this->commands = [];
+        $this->batches = [];
+    }
 }
