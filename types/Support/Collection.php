@@ -951,6 +951,9 @@ assertType('string|User', $collection->get(0, function () {
     return 'string';
 }));
 
+assertType('string|User', $collection->getOrPut(0, 'string'));
+assertType('string|User', $collection->getOrPut(0, fn () => 'string'));
+
 assertType('Illuminate\Support\Collection<int, User>', $collection->forget(1));
 assertType('Illuminate\Support\Collection<int, User>', $collection->forget([1, 2]));
 
