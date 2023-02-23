@@ -11,7 +11,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\ReflectsClosures;
 use PHPUnit\Framework\Assert as PHPUnit;
 
-class QueueFake extends QueueManager implements Queue
+class QueueFake extends QueueManager implements Fake, Queue
 {
     use ReflectsClosures;
 

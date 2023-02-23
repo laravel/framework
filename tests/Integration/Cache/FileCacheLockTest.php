@@ -71,7 +71,7 @@ class FileCacheLockTest extends TestCase
             $firstLock->block(1, function () {
                 throw new Exception('failed');
             });
-        } catch (Exception $e) {
+        } catch (Exception) {
             // Not testing the exception, just testing the lock
             // is released regardless of the how the exception
             // thrown by the callback was handled.

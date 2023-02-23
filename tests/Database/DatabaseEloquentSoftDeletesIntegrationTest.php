@@ -237,7 +237,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
 
         try {
             $user->forceDelete();
-        } catch (Exception $exception) {
+        } catch (Exception) {
         }
 
         $this->assertTrue($user->exists);

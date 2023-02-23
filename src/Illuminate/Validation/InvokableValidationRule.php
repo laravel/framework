@@ -61,7 +61,7 @@ class InvokableValidationRule implements Rule, ValidatorAwareRule
     /**
      * Create a new implicit or explicit Invokable validation rule.
      *
-     * @param  \Illuminate\Contracts\Validation\InvokableRule  $invokable
+     * @param  \Illuminate\Contracts\Validation\ValidationRule|\Illuminate\Contracts\Validation\InvokableRule  $invokable
      * @return \Illuminate\Contracts\Validation\Rule
      */
     public static function make($invokable)

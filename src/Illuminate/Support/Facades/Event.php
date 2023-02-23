@@ -47,12 +47,14 @@ class Event extends Facade
      */
     public static function fake($eventsToFake = [])
     {
-        static::swap($fake = new EventFake(static::getFacadeRoot(), $eventsToFake));
+        return tap(new EventFake(static::getFacadeRoot(), $eventsToFake), function ($fake) {
+            if (! static::isFake()) {
+                static::swap($fake);
 
-        Model::setEventDispatcher($fake);
-        Cache::refreshEventDispatcher();
-
-        return $fake;
+                Model::setEventDispatcher($fake);
+                Cache::refreshEventDispatcher();
+            }
+        });
     }
 
     /**

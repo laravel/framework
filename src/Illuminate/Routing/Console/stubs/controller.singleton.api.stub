@@ -4,7 +4,6 @@ namespace {{ namespace }};
 
 use {{ rootNamespace }}Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 
 class {{ class }} extends Controller
 {
@@ -19,7 +18,7 @@ class {{ class }} extends Controller
     /**
      * Display the resource.
      */
-    public function show(): Response
+    public function show()
     {
         //
     }
@@ -27,7 +26,7 @@ class {{ class }} extends Controller
     /**
      * Update the resource in storage.
      */
-    public function update(Request $request): Response
+    public function update(Request $request)
     {
         //
     }

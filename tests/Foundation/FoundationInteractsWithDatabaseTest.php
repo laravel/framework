@@ -385,6 +385,31 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         } catch (ExpectationFailedException $e) {
             $this->assertSame("Expected 3 database queries on the [testing] connection. 4 occurred.\nFailed asserting that 3 is identical to 4.", $e->getMessage());
         }
+
+        $case = new class extends TestingTestCase
+        {
+            use CreatesApplication;
+
+            public function testExpectsDatabaseQueryCount()
+            {
+                $this->expectsDatabaseQueryCount(4);
+                $this->expectsDatabaseQueryCount(1, 'mysql');
+
+                DB::pretend(function ($db) {
+                    $db->table('foo')->count();
+                    $db->table('foo')->count();
+                    $db->table('foo')->count();
+                });
+
+                DB::connection('mysql')->pretend(function ($db) {
+                    $db->table('foo')->count();
+                });
+            }
+        };
+
+        $case->setUp();
+        $case->testExpectsDatabaseQueryCount();
+        $case->tearDown();
     }
 
     protected function mockCountBuilder($countResult, $deletedAtColumn = 'deleted_at')

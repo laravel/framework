@@ -76,9 +76,11 @@ class Queue extends Facade
      */
     public static function fake($jobsToFake = [])
     {
-        static::swap($fake = new QueueFake(static::getFacadeApplication(), $jobsToFake, static::getFacadeRoot()));
-
-        return $fake;
+        return tap(new QueueFake(static::getFacadeApplication(), $jobsToFake, static::getFacadeRoot()), function ($fake) {
+            if (! static::isFake()) {
+                static::swap($fake);
+            }
+        });
     }
 
     /**

@@ -11,7 +11,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\ReflectsClosures;
 use PHPUnit\Framework\Assert as PHPUnit;
 
-class BusFake implements QueueingDispatcher
+class BusFake implements Fake, QueueingDispatcher
 {
     use ReflectsClosures;
 

@@ -12,6 +12,7 @@ use Illuminate\Process\Factory;
  * @method static \Illuminate\Process\PendingProcess idleTimeout(int $timeout)
  * @method static \Illuminate\Process\PendingProcess forever()
  * @method static \Illuminate\Process\PendingProcess env(array $environment)
+ * @method static \Illuminate\Process\PendingProcess input(\Traversable|resource|string|int|float|bool|null $input)
  * @method static \Illuminate\Process\PendingProcess quietly()
  * @method static \Illuminate\Process\PendingProcess tty(bool $tty = true)
  * @method static \Illuminate\Process\PendingProcess options(array $options)
