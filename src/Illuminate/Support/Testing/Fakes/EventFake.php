@@ -382,7 +382,7 @@ class EventFake implements Dispatcher, Fake
     }
 
     /**
-     * Remove any events that have been dispatched
+     * Remove any events that have been triggered
      *
      * @return void
      */

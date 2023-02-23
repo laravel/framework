@@ -20,6 +20,7 @@ use Illuminate\Support\Testing\Fakes\BusFake;
  * @method static void dispatchAfterResponse(mixed $command, mixed $handler = null)
  * @method static \Illuminate\Bus\Dispatcher pipeThrough(array $pipes)
  * @method static \Illuminate\Bus\Dispatcher map(array $map)
+ * @method static void clear()
  * @method static void except(array|string $jobsToDispatch)
  * @method static void assertDispatched(string|\Closure $command, callable|int|null $callback = null)
  * @method static void assertDispatchedTimes(string|\Closure $command, int $times = 1)

@@ -15,6 +15,7 @@ use Illuminate\Support\Testing\Fakes\MailFake;
  * @method static \Illuminate\Contracts\Foundation\Application getApplication()
  * @method static \Illuminate\Mail\MailManager setApplication(\Illuminate\Contracts\Foundation\Application $app)
  * @method static \Illuminate\Mail\MailManager forgetMailers()
+ * @method static void clear()
  * @method static void alwaysFrom(string $address, string|null $name = null)
  * @method static void alwaysReplyTo(string $address, string|null $name = null)
  * @method static void alwaysReturnPath(string $address)
