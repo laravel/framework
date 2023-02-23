@@ -281,7 +281,7 @@ class PendingProcess
     }
 
     /**
-     * Runs a sequence of processes, passing the result of the previous command as the input for the next
+     * Runs a sequence of processes, passing the result of the previous command as the input for the next.
      *
      * @param  array  $commands
      * @param  callable|null  $output
