@@ -29,6 +29,7 @@ use Illuminate\Support\Traits\ReflectsClosures;
 use Illuminate\Support\ViewErrorBag;
 use Illuminate\Validation\ValidationException;
 use InvalidArgumentException;
+use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Symfony\Component\Console\Application as ConsoleApplication;
@@ -358,6 +359,7 @@ class Handler implements ExceptionHandlerContract
                 'userId' => Auth::id(),
             ]);
         } catch (Throwable $e) {
+            (new Logger('Auth Error'))->error($e->getMessage());
             return [];
         }
     }
