@@ -154,6 +154,15 @@ class SupportTestingEventFakeTest extends TestCase
             $this->assertStringContainsString('2 unexpected events were dispatched.', $e->getMessage());
         }
     }
+
+    public function testClearEvents()
+    {
+        $this->fake->dispatch(EventStub::class);
+        $this->fake->assertDispatched(EventStub::class);
+
+        $this->fake->clear();
+        $this->fake->assertNothingDispatched();
+    }
 }
 
 class EventStub

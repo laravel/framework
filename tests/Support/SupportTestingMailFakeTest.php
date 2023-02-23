@@ -228,6 +228,15 @@ class SupportTestingMailFakeTest extends TestCase
 
         $this->assertEquals('bar', $this->fake->foo());
     }
+
+    public function testClearMailables()
+    {
+        $this->fake->send($this->mailable);
+        $this->fake->assertSent($this->mailable::class);
+
+        $this->fake->clear();
+        $this->fake->assertNothingSent();
+    }
 }
 
 class MailableStub extends Mailable

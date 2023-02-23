@@ -374,6 +374,15 @@ class SupportTestingQueueFakeTest extends TestCase
         $fake->assertNotPushed(JobStub::class);
         $fake->assertPushed(JobToFakeStub::class);
     }
+
+    public function testClearJobs()
+    {
+        $this->fake->push(JobStub::class);
+        $this->fake->assertPushed(JobStub::class);
+
+        $this->fake->clear();
+        $this->fake->assertNothingPushed();
+    }
 }
 
 class JobStub

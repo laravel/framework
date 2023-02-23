@@ -658,6 +658,24 @@ class SupportTestingBusFakeTest extends TestCase
         $this->assertSame(0, $batch->failedJobs);
         $this->assertSame(0, $batch->pendingJobs);
     }
+
+    public function testClearCommands()
+    {
+        $this->fake->dispatch(new ThirdJob);
+        $this->fake->assertDispatched(ThirdJob::class);
+
+        $this->fake->clear();
+        $this->fake->assertNothingDispatched();
+    }
+
+    public function testClearBatches()
+    {
+        $this->fake->dispatchFakeBatch('batch');
+        $this->fake->assertBatchCount(1);
+
+        $this->fake->clear();
+        $this->fake->assertNothingBatched();
+    }
 }
 
 class BusJobStub

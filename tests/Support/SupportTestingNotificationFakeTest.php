@@ -221,6 +221,15 @@ class SupportTestingNotificationFakeTest extends TestCase
 
         $this->fake->assertNotSentTo($user, NotificationWithFalsyShouldSendStub::class);
     }
+
+    public function testClearNotifications()
+    {
+        $this->fake->send(new LocalizedUserStub, new NotificationStub);
+        $this->fake->assertSentTimes(NotificationStub::class, 1);
+
+        $this->fake->clear();
+        $this->fake->assertNothingSent();
+    }
 }
 
 class NotificationStub extends Notification
