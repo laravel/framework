@@ -493,6 +493,10 @@ assertType('Illuminate\Support\Collection<int, mixed>', $collection::make(['stri
 assertType('User|null', $collection->firstWhere('string', 'string'));
 assertType('User|null', $collection->firstWhere('string', 'string', 'string'));
 
+assertType('User|null', $collection->value('string'));
+assertType('string|User', $collection->value('string', 'string'));
+assertType('string|User', $collection->value('string', fn () => 'string'));
+
 assertType('Illuminate\Support\Collection<string, int>', $collection::make(['string'])->flip());
 
 assertType('Illuminate\Support\Collection<(int|string), Illuminate\Support\Collection<(int|string), User>>', $collection->groupBy('name'));
