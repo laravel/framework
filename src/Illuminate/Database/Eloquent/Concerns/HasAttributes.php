@@ -1468,7 +1468,12 @@ trait HasAttributes
      */
     public function getDateFormat()
     {
-        return $this->dateFormat ?: $this->getConnection()->getQueryGrammar()->getDateFormat();
+        if (empty($dateFormat = $this->dateFormat)) {
+            $connection = $this->getConnection();
+            $dateFormat = $connection->getConfig('date_format') ?: $connection->getQueryGrammar()->getDateFormat();
+        }
+
+        return $dateFormat;
     }
 
     /**
