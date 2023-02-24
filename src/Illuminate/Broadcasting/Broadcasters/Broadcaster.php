@@ -97,16 +97,6 @@ abstract class Broadcaster implements BroadcasterContract
     }
 
     /**
-     * Return a Collection of registered private channels.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    public function getChannels()
-    {
-        return collect($this->channels);
-    }
-
-    /**
      * Authenticate the incoming request for a given channel.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -382,5 +372,15 @@ abstract class Broadcaster implements BroadcasterContract
     protected function channelNameMatchesPattern($channel, $pattern)
     {
         return preg_match('/^'.preg_replace('/\{(.*?)\}/', '([^\.]+)', $pattern).'$/', $channel);
+    }
+
+    /**
+     * Get all of the registered channels.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function getChannels()
+    {
+        return collect($this->channels);
     }
 }

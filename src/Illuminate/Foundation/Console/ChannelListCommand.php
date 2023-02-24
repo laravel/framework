@@ -24,14 +24,7 @@ class ChannelListCommand extends Command
      *
      * @var string
      */
-    protected $description = 'List all registered private broadcasting channels';
-
-    /**
-     * The broadcaster instance.
-     *
-     * @var \Illuminate\Contracts\Broadcasting\Broadcaster
-     */
-    protected $broadcaster;
+    protected $description = 'List all registered private broadcast channels';
 
     /**
      * The terminal width resolver callback.
@@ -41,28 +34,17 @@ class ChannelListCommand extends Command
     protected static $terminalWidthResolver;
 
     /**
-     * Create a new channel list command instance.
-     *
-     * @param  \Illuminate\Contracts\Broadcasting\Broadcaster  $broadcaster
-     * @return void
-     */
-    public function __construct(Broadcaster $broadcaster)
-    {
-        parent::__construct();
-
-        $this->broadcaster = $broadcaster;
-    }
-
-    /**
      * Execute the console command.
      *
+     * @param  \Illuminate\Contracts\Broadcasting\Broadcaster
      * @return void
      */
-    public function handle()
+    public function handle(Broadcaster $broadcaster)
     {
-        $channels = $this->broadcaster->getChannels();
+        $channels = $broadcaster->getChannels();
 
-        if (! $this->laravel->providerIsLoaded('App\Providers\BroadcastServiceProvider')) {
+        if (! $this->laravel->providerIsLoaded('App\Providers\BroadcastServiceProvider') &&
+            file_exists($this->laravel->path('Providers/BroadcastServiceProvider.php'))) {
             $this->components->warn('The [App\Providers\BroadcastServiceProvider] has not been loaded. Your private channels may not be loaded.');
         }
 
