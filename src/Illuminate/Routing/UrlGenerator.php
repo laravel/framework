@@ -160,8 +160,8 @@ class UrlGenerator implements UrlGeneratorContract
 
         if ($url && rtrim($url, '/') !== $this->request->fullUrl()) {
             return $url;
-        } elseif ($fallback && rtrim($fallback = $this->to($fallback), '/') !== $this->request->fullUrl()) {
-            return $fallback;
+        } elseif ($fallback) {
+            return $this->to($fallback);
         }
 
         return $this->to('/');
