@@ -15,6 +15,8 @@ class PrecognitionControllerDispatcher extends ControllerDispatcher
      * @param  mixed  $controller
      * @param  string  $method
      * @return void
+     *
+     * @throws \RuntimeException
      */
     public function dispatch(Route $route, $controller, $method)
     {
@@ -31,6 +33,8 @@ class PrecognitionControllerDispatcher extends ControllerDispatcher
      * @param  object  $controller
      * @param  string  $method
      * @return $this
+     *
+     * @throws \RuntimeException
      */
     protected function ensureMethodExists($controller, $method)
     {
