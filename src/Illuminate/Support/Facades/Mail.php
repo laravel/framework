@@ -65,11 +65,9 @@ class Mail extends Facade
      */
     public static function fake()
     {
-        return tap(new MailFake(static::getFacadeRoot()), function ($fake) {
-            if (! static::isFake()) {
-                static::swap($fake);
-            }
-        });
+        static::swap($fake = new MailFake(static::getFacadeRoot()));
+
+        return $fake;
     }
 
     /**

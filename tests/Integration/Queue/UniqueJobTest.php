@@ -48,9 +48,9 @@ class UniqueJobTest extends TestCase
             $this->app->get(Cache::class)->lock($this->getLockKey(UniqueTestJob::class), 10)->get()
         );
 
-        Bus::assertDispatchedTimes(UniqueTestJob::class);
+        Bus::fake();
         UniqueTestJob::dispatch();
-        Bus::assertDispatchedTimes(UniqueTestJob::class);
+        Bus::assertNotDispatched(UniqueTestJob::class);
 
         $this->assertFalse(
             $this->app->get(Cache::class)->lock($this->getLockKey(UniqueTestJob::class), 10)->get()
