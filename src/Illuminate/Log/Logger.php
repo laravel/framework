@@ -13,7 +13,7 @@ use RuntimeException;
 class Logger implements LoggerInterface
 {
     use Conditionable;
-    
+
     /**
      * The underlying logger implementation.
      *
