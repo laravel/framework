@@ -20,7 +20,7 @@ class BusFake implements Fake, QueueingDispatcher
      *
      * @var \Illuminate\Contracts\Bus\QueueingDispatcher
      */
-    protected $dispatcher;
+    public $dispatcher;
 
     /**
      * The job types that should be intercepted instead of dispatched.

@@ -20,7 +20,7 @@ class EventFake implements Dispatcher, Fake
      *
      * @var \Illuminate\Contracts\Events\Dispatcher
      */
-    protected $dispatcher;
+    public $dispatcher;
 
     /**
      * The event types that should be intercepted instead of dispatched.
