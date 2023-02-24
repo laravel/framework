@@ -1519,6 +1519,16 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
+     * Flatten a multi-dimensional associative array with dots.
+     *
+     * @return static
+     */
+    public function dot()
+    {
+        return $this->passthru('dot', []);
+    }
+
+    /**
      * Convert a flatten "dot" notation array into an expanded array.
      *
      * @return static
