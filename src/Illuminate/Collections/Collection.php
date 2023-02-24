@@ -1568,16 +1568,6 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
-     * Convert a flatten "dot" notation array into an expanded array.
-     *
-     * @return static
-     */
-    public function undot()
-    {
-        return new static(Arr::undot($this->all()));
-    }
-
-    /**
      * Flatten a multi-dimensional associative array with dots.
      *
      * @return static
@@ -1585,6 +1575,16 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     public function dot()
     {
         return new static(Arr::dot($this->all()));
+    }
+
+    /**
+     * Convert a flatten "dot" notation array into an expanded array.
+     *
+     * @return static
+     */
+    public function undot()
+    {
+        return new static(Arr::undot($this->all()));
     }
 
     /**
