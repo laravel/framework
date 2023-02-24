@@ -49,10 +49,8 @@ class Notification extends Facade
      */
     public static function fake()
     {
-        return tap(new NotificationFake(), function ($fake) {
-            if (! static::isFake()) {
-                static::swap($fake);
-            }
+        return tap(new NotificationFake, function ($fake) {
+            static::swap($fake);
         });
     }
 
