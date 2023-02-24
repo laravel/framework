@@ -433,10 +433,10 @@ if (! function_exists('pipe')) {
      * Pass a payload through a series of pipelines.
      *
      * @param  $payload
-     * @param  array $pipelines
+     * @param  array  $pipelines
      * @return \Illuminate\Pipeline\Pipeline
      */
-    function pipe($payload, $pipelines = []) : Illuminate\Pipeline\Pipeline
+    function pipe($payload, $pipelines = []): Illuminate\Pipeline\Pipeline
     {
         return app(\Illuminate\Pipeline\Pipeline::class)
             ->send($payload)
