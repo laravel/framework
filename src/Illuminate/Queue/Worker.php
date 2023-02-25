@@ -611,7 +611,7 @@ class Worker
     }
 
     /**
-     * Raise the after job has been popped.
+     * Raise the before job has been popped.
      *
      * @param  string  $connectionName
      * @return void
