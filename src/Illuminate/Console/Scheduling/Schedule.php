@@ -159,6 +159,21 @@ class Schedule
     }
 
     /**
+     * Add a new batch callback event to the schedule.
+     *
+     * @param  \Illuminate\Bus\PendingBatch $batch
+     * @return \Illuminate\Console\Scheduling\CallbackEvent
+     *
+     * @throws \RuntimeException
+     */
+    public function batch($batch)
+    {
+        return $this->call(function () use ($batch) {
+            return $batch->dispatch();
+        })->name("Batch of {$batch->jobs->count()} jobs");
+    }
+
+    /**
      * Dispatch the given job to the queue.
      *
      * @param  object  $job
