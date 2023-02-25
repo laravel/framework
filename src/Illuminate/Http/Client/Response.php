@@ -89,7 +89,7 @@ class Response implements ArrayAccess
      */
     public function object()
     {
-        return json_decode($this->body(), false);
+        return json_decode($this->body());
     }
 
     /**
