@@ -348,10 +348,10 @@ class Worker
 
         try {
             if (isset(static::$popCallbacks[$this->name])) {
-                $job = (static::$popCallbacks[$this->name])($popJobCallback, $queue);
-                $this->raiseAfterJobPopEvent($connection->getConnectionName(), $job);
-
-                return $job;
+                return tap(
+                    (static::$popCallbacks[$this->name])($popJobCallback, $queue),
+                    fn ($job) => $this->raiseAfterJobPopEvent($connection->getConnectionName(), $job)
+                );
             }
 
             foreach (explode(',', $queue) as $queue) {
