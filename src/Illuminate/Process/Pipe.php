@@ -70,7 +70,7 @@ class Pipe
         return collect($this->pendingProcesses)
                 ->reduce(function ($previousProcessResult, $pendingProcess) use ($output) {
                     if (! $pendingProcess instanceof PendingProcess) {
-                        throw new InvalidArgumentException('Process pipe must only contain process instances.');
+                        throw new InvalidArgumentException('Process pipe must only contain pending processes.');
                     }
 
                     return $pendingProcess->when(
