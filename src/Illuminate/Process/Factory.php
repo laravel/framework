@@ -272,7 +272,7 @@ class Factory
     }
 
     /**
-     * Start defining a pipe of processes.
+     * Start defining a series of piped processes.
      *
      * @param  callable  $callback
      * @return \Illuminate\Process\Pipe

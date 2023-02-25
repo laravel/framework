@@ -32,7 +32,7 @@ class Pipe
     protected $pendingProcesses = [];
 
     /**
-     * Create a new process pipe.
+     * Create a new series of piped processes.
      *
      * @param  \Illuminate\Process\Factory  $factory
      * @param  callable  $callback
@@ -61,27 +61,23 @@ class Pipe
      * Runs the processes in the pipe.
      *
      * @param  callable|null  $output
-     * @return string
+     * @return \Illuminate\Contracts\Process\ProcessResult
      */
     public function run(?callable $output = null)
     {
         call_user_func($this->callback, $this);
 
-        $result = null;
-        foreach ($this->pendingProcesses as $pendingProcess) {
-            if (! $pendingProcess instanceof PendingProcess) {
-                throw new InvalidArgumentException('Process pipe must only contain pending processes.');
-            }
+        return collect($this->pendingProcesses)
+                ->reduce(function ($previousProcessResult, $pendingProcess) use ($output) {
+                    if (! $pendingProcess instanceof PendingProcess) {
+                        throw new InvalidArgumentException('Process pipe must only contain process instances.');
+                    }
 
-            if (! is_null($result)) {
-                $pendingProcess->input($result);
-            }
-
-            $processResult = $pendingProcess->run(null, $output);
-            $result = $processResult->output();
-        }
-
-        return $result;
+                    return $pendingProcess->when(
+                        $previousProcessResult,
+                        fn () => $pendingProcess->input($previousProcessResult->output())
+                    )->run(output: $output);
+                });
     }
 
     /**

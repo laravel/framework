@@ -494,13 +494,11 @@ class ProcessTest extends TestCase
         ]);
 
         $pipe = $factory->pipe(function ($pipe) {
-            return [
-                $pipe->command('cat test'),
-                $pipe->command('grep -i "foo"'),
-            ];
+            $pipe->command('cat test');
+            $pipe->command('grep -i "foo"');
         });
 
-        $this->assertSame("foo\n", $pipe->run());
+        $this->assertSame("foo\n", $pipe->run()->output());
     }
 
     public function testFakeInvokedProcessOutputWithLatestOutput()
