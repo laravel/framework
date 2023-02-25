@@ -46,11 +46,7 @@ class ConsoleMakeCommand extends GeneratorCommand
     {
         $stub = parent::replaceClass($stub, $name);
 
-        $command = $this->option('command') ?: sprintf(
-            '%s:%s',
-            Str::of($this->laravel->getNamespace())->trim('\\')->lower()->replace('\\', '-')->toString(),
-            Str::of($name)->classBasename()->kebab()->toString()
-        );
+        $command = $this->option('command') ?: 'app:'.Str::of($name)->classBasename()->kebab()->value();
 
         return str_replace(['dummy:command', '{{ command }}'], $command, $stub);
     }
