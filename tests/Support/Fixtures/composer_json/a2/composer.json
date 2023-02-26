@@ -1,0 +1,37 @@
+{
+    "name": "iman/ghafoori2",
+    "description": "Some description is here.",
+    "keywords": ["keyword 1", "keyword 2"],
+    "license": "MIT",
+    "type": "project",
+    "require": {
+        "some/framework": "~5.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~4.0"
+    },
+    "autoload": {
+        "classmap": [
+            "database",
+            "tests/TestCase.php"
+        ],
+        "files": ["src/MyLibrary/functions.php"],
+        "psr-4": {
+            "G2\\": "ref",
+            "App2\\": "app2"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Imanghafoori\\LaravelMicroscope\\Tests\\": "tests"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "dont-discover": [
+                "*"
+            ]
+        }
+    },
+    "minimum-stability": "dev"
+}

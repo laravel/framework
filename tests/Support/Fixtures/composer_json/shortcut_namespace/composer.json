@@ -1,0 +1,10 @@
+{
+    "name": "iman/ghafoori",
+    "autoload": {
+        "psr-4": {
+            "Models\\": "app/Models",
+            "App\\": "app/",
+            "Tests\\": "tests/"
+        }
+    }
+}

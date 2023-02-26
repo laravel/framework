@@ -18,6 +18,7 @@ use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Database\Console\DbCommand;
 use Illuminate\Database\Console\DumpCommand;
 use Illuminate\Database\Console\Factories\FactoryMakeCommand;
+use Illuminate\Database\Console\ListModelsCommand;
 use Illuminate\Database\Console\MonitorCommand as DatabaseMonitorCommand;
 use Illuminate\Database\Console\PruneCommand;
 use Illuminate\Database\Console\Seeds\SeedCommand;
@@ -152,6 +153,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'ScheduleTest' => ScheduleTestCommand::class,
         'ScheduleWork' => ScheduleWorkCommand::class,
         'ShowModel' => ShowModelCommand::class,
+        'ListModel' => ListModelsCommand::class,
         'StorageLink' => StorageLinkCommand::class,
         'Up' => UpCommand::class,
         'ViewCache' => ViewCacheCommand::class,
