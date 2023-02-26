@@ -6,13 +6,14 @@ use {{ namespacedModel }};
 use {{ rootNamespace }}Http\Controllers\Controller;
 use {{ namespacedParentModel }};
 use Illuminate\Http\Request;
+{{ returnTypeUse }}
 
 class {{ class }} extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index({{ parentModel }} ${{ parentModelVariable }})
+    public function index({{ parentModel }} ${{ parentModelVariable }}){{ returnTypeClass }}
     {
         //
     }
@@ -20,7 +21,7 @@ class {{ class }} extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create({{ parentModel }} ${{ parentModelVariable }})
+    public function create({{ parentModel }} ${{ parentModelVariable }}){{ returnTypeClass }}
     {
         //
     }
@@ -36,7 +37,7 @@ class {{ class }} extends Controller
     /**
      * Display the specified resource.
      */
-    public function show({{ parentModel }} ${{ parentModelVariable }}, {{ model }} ${{ modelVariable }})
+    public function show({{ parentModel }} ${{ parentModelVariable }}, {{ model }} ${{ modelVariable }}){{ returnTypeClass }}
     {
         //
     }
@@ -44,7 +45,7 @@ class {{ class }} extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit({{ parentModel }} ${{ parentModelVariable }}, {{ model }} ${{ modelVariable }})
+    public function edit({{ parentModel }} ${{ parentModelVariable }}, {{ model }} ${{ modelVariable }}){{ returnTypeClass }}
     {
         //
     }

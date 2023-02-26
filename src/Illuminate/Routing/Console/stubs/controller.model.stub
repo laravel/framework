@@ -5,13 +5,14 @@ namespace {{ namespace }};
 use {{ namespacedModel }};
 use {{ rootNamespace }}Http\Controllers\Controller;
 use {{ namespacedRequests }}
+{{ returnTypeUse }}
 
 class {{ class }} extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(){{ returnTypeClass }}
     {
         //
     }
@@ -19,7 +20,7 @@ class {{ class }} extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(){{ returnTypeClass }}
     {
         //
     }
@@ -35,7 +36,7 @@ class {{ class }} extends Controller
     /**
      * Display the specified resource.
      */
-    public function show({{ model }} ${{ modelVariable }})
+    public function show({{ model }} ${{ modelVariable }}){{ returnTypeClass }}
     {
         //
     }
@@ -43,7 +44,7 @@ class {{ class }} extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit({{ model }} ${{ modelVariable }})
+    public function edit({{ model }} ${{ modelVariable }}){{ returnTypeClass }}
     {
         //
     }

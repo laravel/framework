@@ -4,6 +4,7 @@ namespace {{ namespace }};
 
 use {{ rootNamespace }}Http\Controllers\Controller;
 use Illuminate\Http\Request;
+{{ returnTypeUse }}
 
 class {{ class }} extends Controller
 {
@@ -26,7 +27,7 @@ class {{ class }} extends Controller
     /**
      * Display the resource.
      */
-    public function show()
+    public function show(){{ returnTypeClass }}
     {
         //
     }
@@ -34,7 +35,7 @@ class {{ class }} extends Controller
     /**
      * Show the form for editing the resource.
      */
-    public function edit()
+    public function edit(){{ returnTypeClass }}
     {
         //
     }

@@ -6,6 +6,7 @@ use {{ namespacedModel }};
 use {{ rootNamespace }}Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use {{ namespacedParentModel }};
+{{ returnTypeUse }}
 
 class {{ class }} extends Controller
 {
@@ -20,7 +21,7 @@ class {{ class }} extends Controller
     /**
      * Display the resource.
      */
-    public function show({{ parentModel }} ${{ parentModelVariable }})
+    public function show({{ parentModel }} ${{ parentModelVariable }}){{ returnTypeClass }}
     {
         //
     }

@@ -118,6 +118,8 @@ class ControllerMakeCommand extends GeneratorCommand
             $replace = $this->buildModelReplacements($replace);
         }
 
+        $replace = $this->buildReturnTypeReplacements($replace, $this->option('return'));
+
         if ($this->option('creatable')) {
             $replace['abort(404);'] = '//';
         }
@@ -269,6 +271,34 @@ class ControllerMakeCommand extends GeneratorCommand
     }
 
     /**
+     * Build the return type replacement values.
+     *
+     * @param  array  $replace
+     * @param  string|null  $return
+     * @return array
+     */
+    protected function buildReturnTypeReplacements(array $replace, string|null $returnType)
+    {
+        $returnTypes = match ($returnType) {
+            'response' => ['use Illuminate\Http\Response;', ': Response'],
+            'json' => ['use Illuminate\\Http\\JsonResponse;', ': JsonResponse'],
+            'view' => ['use Illuminate\Contracts\View;', ': View\\View|View\\Factory'],
+            'inertia' => ['use Inertia\Response;', ': Response'],
+            default => ['', ''],
+        };
+
+        $replace = array_merge($replace, [
+            '{{ returnTypeUse }}' => $returnTypes[0],
+            '{{returnTypeUse}}' => $returnTypes[0],
+            '{{ returnTypeClass }}' => $returnTypes[1],
+            '{{returnTypeUse}}' => $returnTypes[1],
+        ]);
+
+        $replace["\n\n\n"] = "\n\n";
+
+        return $replace;
+    }
+    /**
      * Get the console command options.
      *
      * @return array
@@ -286,6 +316,7 @@ class ControllerMakeCommand extends GeneratorCommand
             ['requests', 'R', InputOption::VALUE_NONE, 'Generate FormRequest classes for store and update'],
             ['singleton', 's', InputOption::VALUE_NONE, 'Generate a singleton resource controller class'],
             ['creatable', null, InputOption::VALUE_NONE, 'Indicate that a singleton resource should be creatable'],
+            ['return', null, InputOption::VALUE_OPTIONAL, 'Specify what type to return from methods'],
         ];
     }
 
@@ -323,6 +354,26 @@ class ControllerMakeCommand extends GeneratorCommand
 
             if ($model && $model !== 'none') {
                 $input->setOption('model', $model);
+            }
+        }
+
+        if ($type !== 'empty') {
+            $returnType = $this->components->choice('Which type should controller methods return?', [
+                'none',
+                'Response',
+                'JsonResponse',
+                'View',
+                'Inertia/Response'
+            ], default: 0);
+
+            if ($returnType !== 'none') {
+                $returnTypeValue = match ($returnType) {
+                    'Response' => 'response',
+                    'JsonResponse' => 'json',
+                    'View' => 'view',
+                    'Inertia/Response' => 'inertia',
+                };
+                $input->setOption('return', $returnTypeValue);
             }
         }
     }

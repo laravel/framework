@@ -6,13 +6,14 @@ use {{ namespacedModel }};
 use {{ rootNamespace }}Http\Controllers\Controller;
 use {{ namespacedParentModel }};
 use Illuminate\Http\Request;
+{{ returnTypeUse }}
 
 class {{ class }} extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index({{ parentModel }} ${{ parentModelVariable }})
+    public function index({{ parentModel }} ${{ parentModelVariable }}){{ returnTypeClass }}
     {
         //
     }
@@ -28,7 +29,7 @@ class {{ class }} extends Controller
     /**
      * Display the specified resource.
      */
-    public function show({{ parentModel }} ${{ parentModelVariable }}, {{ model }} ${{ modelVariable }})
+    public function show({{ parentModel }} ${{ parentModelVariable }}, {{ model }} ${{ modelVariable }}){{ returnTypeClass }}
     {
         //
     }

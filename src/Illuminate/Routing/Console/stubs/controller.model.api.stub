@@ -5,13 +5,14 @@ namespace {{ namespace }};
 use {{ namespacedModel }};
 use {{ rootNamespace }}Http\Controllers\Controller;
 use {{ namespacedRequests }}
+{{ returnTypeUse }}
 
 class {{ class }} extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(){{ returnTypeClass }}
     {
         //
     }
@@ -27,7 +28,7 @@ class {{ class }} extends Controller
     /**
      * Display the specified resource.
      */
-    public function show({{ model }} ${{ modelVariable }})
+    public function show({{ model }} ${{ modelVariable }}){{ returnTypeClass }}
     {
         //
     }
