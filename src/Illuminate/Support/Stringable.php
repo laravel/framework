@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support;
 
+use ArrayAccess;
 use Closure;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Traits\Conditionable;
@@ -10,7 +11,7 @@ use Illuminate\Support\Traits\Tappable;
 use JsonSerializable;
 use Symfony\Component\VarDumper\VarDumper;
 
-class Stringable implements JsonSerializable
+class Stringable implements JsonSerializable, ArrayAccess
 {
     use Conditionable, Macroable, Tappable;
 
@@ -396,7 +397,6 @@ class Stringable implements JsonSerializable
     /**
      * Convert GitHub flavored Markdown into HTML.
      *
-     * @param  array  $options
      * @return static
      */
     public function markdown(array $options = [])
@@ -407,7 +407,6 @@ class Stringable implements JsonSerializable
     /**
      * Convert inline Markdown into HTML.
      *
-     * @param  array  $options
      * @return static
      */
     public function inlineMarkdown(array $options = [])
@@ -512,7 +511,6 @@ class Stringable implements JsonSerializable
     /**
      * Call the given callback and return a new string.
      *
-     * @param  callable  $callback
      * @return static
      */
     public function pipe(callable $callback)
@@ -578,7 +576,6 @@ class Stringable implements JsonSerializable
     /**
      * Repeat the string.
      *
-     * @param  int  $times
      * @return static
      */
     public function repeat(int $times)
@@ -821,7 +818,6 @@ class Stringable implements JsonSerializable
     /**
      * Swap multiple keywords in a string with other keywords.
      *
-     * @param  array  $map
      * @return static
      */
     public function swap(array $map)
@@ -1197,8 +1193,6 @@ class Stringable implements JsonSerializable
 
     /**
      * Convert the object to a string when JSON encoded.
-     *
-     * @return string
      */
     public function jsonSerialize(): string
     {
@@ -1224,5 +1218,25 @@ class Stringable implements JsonSerializable
     public function __toString()
     {
         return (string) $this->value;
+    }
+
+    public function offsetExists(mixed $offset): bool
+    {
+        return isset($this->value[$offset]);
+    }
+
+    public function offsetGet(mixed $offset): string
+    {
+        return $this->value[$offset];
+    }
+
+    public function offsetSet(mixed $offset, mixed $value): void
+    {
+        $this->value[$offset] = $value;
+    }
+
+    public function offsetUnset(mixed $offset): void
+    {
+        unset($this->value[$offset]);
     }
 }
