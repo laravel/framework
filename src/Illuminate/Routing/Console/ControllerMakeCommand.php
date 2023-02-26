@@ -363,7 +363,7 @@ class ControllerMakeCommand extends GeneratorCommand
                 'Response',
                 'JsonResponse',
                 'View',
-                'Inertia/Response'
+                'Inertia/Response',
             ], default: 0);
 
             if ($returnType !== 'none') {
