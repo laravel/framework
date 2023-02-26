@@ -281,8 +281,8 @@ class ControllerMakeCommand extends GeneratorCommand
     {
         $returnTypes = match ($returnType) {
             'response' => ['use Illuminate\Http\Response;', ': Response'],
-            'json' => ['use Illuminate\\Http\\JsonResponse;', ': JsonResponse'],
-            'view' => ['use Illuminate\Contracts\View;', ': View\\View|View\\Factory'],
+            'json' => ['use Illuminate\Http\JsonResponse;', ': JsonResponse'],
+            'view' => ['use Illuminate\Contracts\View;', ': View\View|View\Factory'],
             'inertia' => ['use Inertia\Response;', ': Response'],
             default => ['', ''],
         };
