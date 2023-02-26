@@ -291,13 +291,14 @@ class ControllerMakeCommand extends GeneratorCommand
             '{{ returnTypeUse }}' => $returnTypes[0],
             '{{returnTypeUse}}' => $returnTypes[0],
             '{{ returnTypeClass }}' => $returnTypes[1],
-            '{{returnTypeUse}}' => $returnTypes[1],
+            '{{returnTypeClass}}' => $returnTypes[1],
         ]);
 
         $replace["\n\n\n"] = "\n\n";
 
         return $replace;
     }
+
     /**
      * Get the console command options.
      *
