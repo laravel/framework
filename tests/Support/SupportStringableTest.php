@@ -1184,7 +1184,7 @@ class SupportStringableTest extends TestCase
     {
         $str = $this->stringable('my string');
         $this->assertSame('m', $str[0]);
-        $this->assertSame('s', $str[4]);
+        $this->assertSame('t', $str[4]);
         $this->assertTrue(isset($str[2]));
         $this->assertFalse(isset($str[10]));
     }

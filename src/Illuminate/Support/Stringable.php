@@ -397,6 +397,7 @@ class Stringable implements JsonSerializable, ArrayAccess
     /**
      * Convert GitHub flavored Markdown into HTML.
      *
+     * @param  array  $options
      * @return static
      */
     public function markdown(array $options = [])
@@ -407,6 +408,7 @@ class Stringable implements JsonSerializable, ArrayAccess
     /**
      * Convert inline Markdown into HTML.
      *
+     * @param  array  $options
      * @return static
      */
     public function inlineMarkdown(array $options = [])
@@ -511,6 +513,7 @@ class Stringable implements JsonSerializable, ArrayAccess
     /**
      * Call the given callback and return a new string.
      *
+     * @param  callable  $callback
      * @return static
      */
     public function pipe(callable $callback)
@@ -576,6 +579,7 @@ class Stringable implements JsonSerializable, ArrayAccess
     /**
      * Repeat the string.
      *
+     * @param  int  $times
      * @return static
      */
     public function repeat(int $times)
@@ -818,6 +822,7 @@ class Stringable implements JsonSerializable, ArrayAccess
     /**
      * Swap multiple keywords in a string with other keywords.
      *
+     * @param  array  $map
      * @return static
      */
     public function swap(array $map)
@@ -1193,6 +1198,8 @@ class Stringable implements JsonSerializable, ArrayAccess
 
     /**
      * Convert the object to a string when JSON encoded.
+     *
+     * @return string
      */
     public function jsonSerialize(): string
     {
