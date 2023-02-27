@@ -86,12 +86,12 @@ class RouteRegistrarTest extends TestCase
         $this->router->middleware(['foo' => [true, false, true]])->get('users', function () {
             return 'all-users';
         });
-        $this->assertEquals(['foo:1,0,1'], $this->getRoute()->middleware());
+        $this->assertEquals(['foo:1,,1'], $this->getRoute()->middleware());
 
         $this->router->get('users', function () {
             return 'all-users';
         })->middleware(['foo' => [true, false, true]]);
-        $this->assertEquals(['foo:1,0,1'], $this->getRoute()->middleware());
+        $this->assertEquals(['foo:1,,1'], $this->getRoute()->middleware());
 
         // backed enum handling...
 

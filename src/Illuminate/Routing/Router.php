@@ -1449,9 +1449,9 @@ class Router implements BindingRegistrar, RegistrarContract
             ->map(fn ($value, $key) => is_int($key)
                 ? (string) $value
                 : $key.':'.Collection::wrap($value)
-                    ->map(fn ($v) => $v === false ? '0' : $v)
-                    ->map(fn ($v) => $v instanceof BackedEnum ? $v->value : $v)
-                    ->map(fn ($v) => (string) $v)
+                    ->map(fn ($v) => $v instanceof BackedEnum
+                        ? (string) $v->value
+                        : (string) $v)
                     ->implode(','))
             ->values()
             ->all();
