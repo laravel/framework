@@ -1,6 +1,12 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.52.3...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.52.4...10.x)
+
+## [v9.52.4](https://github.com/laravel/framework/compare/v9.52.3...v9.52.4) - 2023-02-22
+
+### Fixed
+
+- Fixes constructable migrations ([#46223](https://github.com/laravel/framework/pull/46223))
 
 ## [v9.52.3](https://github.com/laravel/framework/compare/v10.1.1...v9.52.3) - 2023-02-22
 
