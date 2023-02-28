@@ -2,8 +2,10 @@
 
 namespace Illuminate\Validation\Rules;
 
+use BackedEnum;
 use Illuminate\Contracts\Validation\Rule;
 use TypeError;
+use UnitEnum;
 
 class Enum implements Rule
 {
@@ -38,8 +40,12 @@ class Enum implements Rule
             return true;
         }
 
-        if (is_null($value) || ! function_exists('enum_exists') || ! enum_exists($this->type) || ! method_exists($this->type, 'tryFrom')) {
+        if (is_null($value) || ! function_exists('enum_exists') || ! enum_exists($this->type)) {
             return false;
+        }
+
+        if (! is_subclass_of($this->type, BackedEnum::class)) {
+            return defined($this->type.'::'.$value) and constant($this->type.'::'.$value) instanceof UnitEnum;
         }
 
         try {

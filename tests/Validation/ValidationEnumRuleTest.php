@@ -140,7 +140,7 @@ class ValidationEnumRuleTest extends TestCase
         $this->assertFalse($v->fails());
     }
 
-    public function testValidationFailsOnPureEnum()
+    public function testValidationPassesOnPureEnum()
     {
         $v = new Validator(
             resolve('translator'),
@@ -152,7 +152,7 @@ class ValidationEnumRuleTest extends TestCase
             ]
         );
 
-        $this->assertTrue($v->fails());
+        $this->assertFalse($v->fails());
     }
 
     public function testValidationFailsWhenProvidingStringToIntegerType()
