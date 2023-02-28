@@ -5538,6 +5538,42 @@ SQL;
         $this->assertEquals([], $clone->getBindings());
     }
 
+    public function testWhereTrue()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereTrue('is_admin');
+
+        $this->assertSame('select * from "users" where "is_admin" = ?', $builder->toSql());
+        $this->assertEquals([true], $builder->getBindings());
+    }
+
+    public function testOrWhereTrue()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereTrue('is_admin');
+
+        $this->assertSame('select * from "users" where "id" = ? or "is_admin" = ?', $builder->toSql());
+        $this->assertEquals([1, true], $builder->getBindings());
+    }
+
+    public function testWhereFalse()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereFalse('is_admin');
+
+        $this->assertSame('select * from "users" where "is_admin" = ?', $builder->toSql());
+        $this->assertEquals([false], $builder->getBindings());
+    }
+
+    public function testOrWhereFalse()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereFalse('is_admin');
+
+        $this->assertSame('select * from "users" where "id" = ? or "is_admin" = ?', $builder->toSql());
+        $this->assertEquals([1, false], $builder->getBindings());
+    }
+
     protected function getConnection()
     {
         $connection = m::mock(ConnectionInterface::class);

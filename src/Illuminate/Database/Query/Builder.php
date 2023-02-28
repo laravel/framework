@@ -2037,6 +2037,52 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a "where 'field' = true" clause to the query.
+     *
+     * @param  string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereTrue($column, $boolean = 'and')
+    {
+        return $this->where($column, '=', true, $boolean);
+    }
+
+    /**
+     * Add a "or where 'field' is true" clause to the query.
+     *
+     * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @return $this
+     */
+    public function orWhereTrue($column)
+    {
+        return $this->whereTrue($column, 'or');
+    }
+
+    /**
+     * Add a "where 'field' is false" clause to the query.
+     *
+     * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereFalse($column, $boolean = 'and')
+    {
+        return $this->where($column, '=', false, $boolean);
+    }
+
+    /**
+     * Add a "or where 'field' is false" clause to the query.
+     *
+     * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @return $this
+     */
+    public function orWhereFalse($column)
+    {
+        return $this->whereFalse($column, 'or');
+    }
+
+    /**
      * Add a "group by" clause to the query.
      *
      * @param  array|\Illuminate\Contracts\Database\Query\Expression|string  ...$groups

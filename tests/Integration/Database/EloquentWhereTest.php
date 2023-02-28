@@ -19,6 +19,7 @@ class EloquentWhereTest extends DatabaseTestCase
             $table->string('name');
             $table->string('email');
             $table->string('address');
+            $table->boolean('is_admin')->default(false);
         });
     }
 
@@ -325,6 +326,98 @@ class EloquentWhereTest extends DatabaseTestCase
         $this->assertSame('first-name', $results[0]);
         $this->assertSame('second-name', $results[1]);
         $this->assertCount(3, DB::getQueryLog());
+    }
+
+    public function testWhereTrue()
+    {
+        $adminUser = UserWhereTest::create([
+            'name' => 'first-name',
+            'email' => 'first-email',
+            'address' => 'first-address',
+            'is_admin' => true,
+        ]);
+
+        $nonAdminUser = UserWhereTest::create([
+            'name' => 'second-name',
+            'email' => 'second-email',
+            'address' => 'second-address',
+            'is_admin' => false,
+        ]);
+
+        $this->assertTrue($adminUser->is(UserWhereTest::whereTrue('is_admin')->first()));
+        $this->assertFalse($nonAdminUser->is(UserWhereTest::whereTrue('is_admin')->first()));
+    }
+
+    public function testWhereFalse()
+    {
+        $adminUser = UserWhereTest::create([
+            'name' => 'first-name',
+            'email' => 'first-email',
+            'address' => 'first-address',
+            'is_admin' => true,
+        ]);
+
+        $nonAdminUser = UserWhereTest::create([
+            'name' => 'second-name',
+            'email' => 'second-email',
+            'address' => 'second-address',
+            'is_admin' => false,
+        ]);
+
+        $this->assertFalse($adminUser->is(UserWhereTest::whereFalse('is_admin')->first()));
+        $this->assertTrue($nonAdminUser->is(UserWhereTest::whereFalse('is_admin')->first()));
+    }
+
+    public function testOrWhereTrue()
+    {
+        UserWhereTest::create([
+            'name' => 'first-name',
+            'email' => 'first-email',
+            'address' => 'first-address',
+            'is_admin' => true,
+        ]);
+
+        UserWhereTest::create([
+            'name' => 'second-name',
+            'email' => 'second-email',
+            'address' => 'second-address',
+            'is_admin' => false,
+        ]);
+
+        UserWhereTest::create([
+            'name' => 'third-name',
+            'email' => 'third-email',
+            'address' => 'third-address',
+            'is_admin' => false,
+        ]);
+
+        $this->assertCount(2, UserWhereTest::where('name', 'second-name')->orWhereTrue('is_admin')->get());
+    }
+
+    public function testOrWhereFalse()
+    {
+        UserWhereTest::create([
+            'name' => 'first-name',
+            'email' => 'first-email',
+            'address' => 'first-address',
+            'is_admin' => true,
+        ]);
+
+        UserWhereTest::create([
+            'name' => 'second-name',
+            'email' => 'second-email',
+            'address' => 'second-address',
+            'is_admin' => false,
+        ]);
+
+        UserWhereTest::create([
+            'name' => 'third-name',
+            'email' => 'third-email',
+            'address' => 'third-address',
+            'is_admin' => true,
+        ]);
+
+        $this->assertCount(2, UserWhereTest::where('name', 'first-name')->orWhereFalse('is_admin')->get());
     }
 }
 
