@@ -14,7 +14,7 @@ use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\ReflectsClosures;
 use PHPUnit\Framework\Assert as PHPUnit;
 
-class NotificationFake implements NotificationDispatcher, NotificationFactory
+class NotificationFake implements Fake, NotificationDispatcher, NotificationFactory
 {
     use Macroable, ReflectsClosures;
 

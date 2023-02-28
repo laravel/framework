@@ -13,7 +13,7 @@ use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\ReflectsClosures;
 use PHPUnit\Framework\Assert as PHPUnit;
 
-class MailFake implements Factory, Mailer, MailQueue
+class MailFake implements Factory, Fake, Mailer, MailQueue
 {
     use ForwardsCalls, ReflectsClosures;
 
@@ -22,7 +22,7 @@ class MailFake implements Factory, Mailer, MailQueue
      *
      * @var MailManager
      */
-    protected $manager;
+    public $manager;
 
     /**
      * The mailer currently being used to send a message.

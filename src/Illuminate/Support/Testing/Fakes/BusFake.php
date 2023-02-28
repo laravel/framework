@@ -11,7 +11,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\ReflectsClosures;
 use PHPUnit\Framework\Assert as PHPUnit;
 
-class BusFake implements QueueingDispatcher
+class BusFake implements Fake, QueueingDispatcher
 {
     use ReflectsClosures;
 
@@ -20,7 +20,7 @@ class BusFake implements QueueingDispatcher
      *
      * @var \Illuminate\Contracts\Bus\QueueingDispatcher
      */
-    protected $dispatcher;
+    public $dispatcher;
 
     /**
      * The job types that should be intercepted instead of dispatched.

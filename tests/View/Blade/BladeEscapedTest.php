@@ -22,11 +22,13 @@ class BladeEscapedTest extends AbstractBladeTestCase
         $template = '
 @foreach($cols as $col)
     @@foreach($issues as $issue_45915)
+        👋 سلام 👋
     @@endforeach
 @endforeach';
         $compiled = '
 <?php $__currentLoopData = $cols; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $col): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
     @foreach($issues as $issue_45915)
+        👋 سلام 👋
     @endforeach
 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>';
         $this->assertSame($compiled, $this->compiler->compileString($template));
