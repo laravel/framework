@@ -22,7 +22,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
      *
      * @var MailManager
      */
-    protected $manager;
+    public $manager;
 
     /**
      * The mailer currently being used to send a message.
