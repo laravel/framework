@@ -1,6 +1,16 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.1.4...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v10.1.5...10.x)
+
+
+## [v10.1.5 (2023-02-24)](https://github.com/laravel/framework/compare/v10.1.4...v10.1.5)
+
+### Fixed
+- Fixed `Illuminate/Foundation/Testing/Concerns/InteractsWithDatabase::expectsDatabaseQueryCount()` $connection parameter ([#46228](https://github.com/laravel/framework/pull/46228))
+- Fixed Facade Fake ([#46257](https://github.com/laravel/framework/pull/46257))
+
+### Changed
+- Remove autoload dumping from make:migration ([#46215](https://github.com/laravel/framework/pull/46215))
 
 
 ## [v10.1.4 (2023-02-23)](https://github.com/laravel/framework/compare/v10.1.3...v10.1.4)
