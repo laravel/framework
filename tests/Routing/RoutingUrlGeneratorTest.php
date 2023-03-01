@@ -911,6 +911,72 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertTrue($url2->hasValidSignature($request));
         $this->assertFalse($url->hasValidSignature($request));
     }
+
+    public function testIsValidSignedUrl()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+
+        $url->setKeyResolver(function () {
+            return 'secret';
+        });
+
+        $route = new Route(['GET'], 'foo', ['as' => 'foo', function () {
+            //
+        }]);
+        $routes->add($route);
+
+        // [PASS] Absolute without extra parameters
+        $this->assertTrue(
+            $url->isValidSignedUrl($url->signedRoute('foo', [], null, true))
+        );
+
+        // [PASS] Absolute with extra parameters
+        $this->assertTrue(
+            $url->isValidSignedUrl($url->signedRoute('foo', ['bar' => 'baz'], null, true))
+        );
+
+        // [PASS] Temporary absolute without extra parameters
+        $this->assertTrue(
+            $url->isValidSignedUrl($url->temporarySignedRoute('foo', now()->addDay(), [], true)
+        ));
+
+        // [PASS] Relative without extra parameters
+        $this->assertTrue(
+            $url->isValidSignedUrl(
+                $url->signedRoute('foo', [], null, false),
+                false
+            )
+        );
+
+        // [PASS] Relative with extra parameters
+        $this->assertTrue(
+            $url->isValidSignedUrl(
+                $url->signedRoute('foo', ['bar' => 'baz'], null, false),
+                false,
+            )
+        );
+
+        // [FAIL] Absolute that is tempered
+        $this->assertFalse(
+            $url->isValidSignedUrl($url->signedRoute('foo', [], null, true).'?tempered=true')
+        );
+
+        // [FAIL] Expired, temporary absolute
+        $this->assertFalse(
+            $url->isValidSignedUrl($url->temporarySignedRoute('foo', now()->subDay(), true))
+        );
+
+        // [FAIL] URL that is not signed at all
+        $this->assertFalse(
+            $url->isValidSignedUrl($url->route('foo', []))
+        );
+
+        // [FAIL] String that is not a URL
+        $this->assertFalse($url->isValidSignedUrl('INVALID'));
+    }
 }
 
 class RoutableInterfaceStub implements UrlRoutable
