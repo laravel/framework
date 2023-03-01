@@ -1,6 +1,40 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.1.1...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v10.1.5...10.x)
+
+
+## [v10.1.5 (2023-02-24)](https://github.com/laravel/framework/compare/v10.1.4...v10.1.5)
+
+### Fixed
+- Fixed `Illuminate/Foundation/Testing/Concerns/InteractsWithDatabase::expectsDatabaseQueryCount()` $connection parameter ([#46228](https://github.com/laravel/framework/pull/46228))
+- Fixed Facade Fake ([#46257](https://github.com/laravel/framework/pull/46257))
+
+### Changed
+- Remove autoload dumping from make:migration ([#46215](https://github.com/laravel/framework/pull/46215))
+
+
+## [v10.1.4 (2023-02-23)](https://github.com/laravel/framework/compare/v10.1.3...v10.1.4)
+
+### Changed
+- Improve Facade Fake Awareness ([#46188](https://github.com/laravel/framework/pull/46188), [#46232](https://github.com/laravel/framework/pull/46232))
+
+
+## [v10.1.3 (2023-02-22)](https://github.com/laravel/framework/compare/v10.1.2...v10.1.3)
+
+### Added
+- Added protected method `Illuminate/Http/Resources/Json/JsonResource::newCollection()` for simplifies collection customisation ([#46217](https://github.com/laravel/framework/pull/46217))
+
+### Fixed
+- Fixes constructable migrations ([#46223](https://github.com/laravel/framework/pull/46223))
+
+### Changes
+- Accept time when generating ULID in `Str::ulid()` ([#46201](https://github.com/laravel/framework/pull/46201))
+
+
+## [v10.1.2 (2023-02-22)](https://github.com/laravel/framework/compare/v10.1.1...v10.1.2)
+
+### Reverted
+- Revert changes from `Arr::random()` ([cf3eb90](https://github.com/laravel/framework/commit/cf3eb90a6473444bb7a78d1a3af1e9312a62020d))
 
 
 ## [v10.1.1 (2023-02-21)](https://github.com/laravel/framework/compare/v10.1.0...v10.1.1)
@@ -33,7 +67,7 @@
 ## [v10.0.2 (2023-02-16)](https://github.com/laravel/framework/compare/v10.0.1...v10.0.2)
 
 ### Added
--  Register policies automatically to the gate ([#46132](https://github.com/laravel/framework/pull/46132))
+- Register policies automatically to the gate ([#46132](https://github.com/laravel/framework/pull/46132))
 
 
 ## [v10.0.1 (2023-02-16)](https://github.com/laravel/framework/compare/v10.0.0...v10.0.1)
