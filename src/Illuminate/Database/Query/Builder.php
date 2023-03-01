@@ -3403,10 +3403,10 @@ class Builder implements BuilderContract
      * @param  array  $values
      * @return bool
      */
-    public function updateOrInsert(array $attributes, array $values = [])
+    public function updateOrInsert(array $attributes, array $values = [],array $only_insert = [])
     {
         if (! $this->where($attributes)->exists()) {
-            return $this->insert(array_merge($attributes, $values));
+            return $this->insert(array_merge($attributes, $values, $only_insert));
         }
 
         if (empty($values)) {
