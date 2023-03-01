@@ -6,12 +6,9 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 
-
-
 abstract class SingletonController extends Controller
 {
     use AuthorizesRequests, ValidatesRequests;
-
 
     /**
      * Show the form for creating the resource.
@@ -28,7 +25,6 @@ abstract class SingletonController extends Controller
     {
         abort(404);
     }
-
 
     /**
      * Remove the resource from storage.
