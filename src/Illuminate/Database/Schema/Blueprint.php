@@ -1645,7 +1645,7 @@ class Blueprint
      * @param  array  $columns
      * @return string
      */
-    protected function createIndexName($type, array $columns)
+    public function createIndexName(string $type, array $columns): string
     {
         $index = strtolower($this->prefix.$this->table.'_'.implode('_', $columns).'_'.$type);
 
