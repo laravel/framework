@@ -2,26 +2,11 @@
 
 namespace {{ namespace }};
 
-use {{ rootNamespace }}Http\Controllers\Controller;
+use Illuminate\Routing\SingletonController as Controller;
 use Illuminate\Http\Request;
 
 class {{ class }} extends Controller
 {
-    /**
-     * Show the form for creating the resource.
-     */
-    public function create(): never
-    {
-        abort(404);
-    }
-
-    /**
-     * Store the newly created resource in storage.
-     */
-    public function store(Request $request): never
-    {
-        abort(404);
-    }
 
     /**
      * Display the resource.
@@ -45,13 +30,5 @@ class {{ class }} extends Controller
     public function update(Request $request)
     {
         //
-    }
-
-    /**
-     * Remove the resource from storage.
-     */
-    public function destroy(): never
-    {
-        abort(404);
     }
 }
