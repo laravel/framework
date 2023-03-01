@@ -486,6 +486,27 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->assertSame($newFoo->id, $user->last_updated_foo_state->id);
     }
 
+    public function testItGetsCorrectResultUsingAtLeastTwoAggregatesDistinctFromId()
+    {
+        $user = HasOneOfManyTestUser::create();
+
+        $expectedState = $user->states()->create([
+            'state' => 'state',
+            'type' => 'type',
+            'created_at' => '2023-01-01',
+            'updated_at' => '2023-01-03',
+        ]);
+
+        $user->states()->create([
+            'state' => 'state',
+            'type' => 'type',
+            'created_at' => '2023-01-01',
+            'updated_at' => '2023-01-02',
+        ]);
+
+        $this->assertSame($user->latest_updated_latest_created_state->id, $expectedState->id);
+    }
+
     /**
      * Get a database connection instance.
      *
@@ -620,6 +641,14 @@ class HasOneOfManyTestUser extends Eloquent
         ], function ($q) {
             $q->where('published_at', '<', now());
         });
+    }
+
+    public function latest_updated_latest_created_state()
+    {
+        return $this->hasOne(HasOneOfManyTestState::class, 'user_id')->ofMany([
+            'updated_at' => 'max',
+            'created_at' => 'max',
+        ]);
     }
 }
 
