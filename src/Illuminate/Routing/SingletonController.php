@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 
 
-class SingletonController extends Controller
+abstract class SingletonController extends Controller
 {
     use AuthorizesRequests, ValidatesRequests;
   
