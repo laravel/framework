@@ -716,7 +716,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     protected function registerSeederMakeCommand()
     {
         $this->app->singleton(SeederMakeCommand::class, function ($app) {
-            return new SeederMakeCommand($app['files'], $app['composer']);
+            return new SeederMakeCommand($app['files']);
         });
     }
 

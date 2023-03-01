@@ -79,7 +79,7 @@ class DownCommand extends Command
             'retry' => $this->getRetryTime(),
             'refresh' => $this->option('refresh'),
             'secret' => $this->option('secret'),
-            'status' => (int) $this->option('status', 503),
+            'status' => (int) $this->option('status') ?: 503,
             'template' => $this->option('render') ? $this->prerenderView() : null,
         ];
     }
