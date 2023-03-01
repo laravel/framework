@@ -260,7 +260,7 @@ class Handler implements ExceptionHandlerContract
 
         try {
             $logger = $this->container->make(LoggerInterface::class);
-        } catch (Exception $ex) {
+        } catch (Exception) {
             throw $e;
         }
 
@@ -758,7 +758,7 @@ class Handler implements ExceptionHandlerContract
                 $message .= '. Did you mean one of these?';
 
                 with(new Error($output))->render($message);
-                with(new BulletList($output))->render($e->getAlternatives());
+                with(new BulletList($output))->render($alternatives);
 
                 $output->writeln('');
             } else {
