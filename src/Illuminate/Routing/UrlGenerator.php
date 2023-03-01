@@ -451,9 +451,9 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Determine whether the given URL is a valid, signed URL.
      *
-     * @param string $url
-     * @param bool $absolute
-     * @param array $ignoreQuery
+     * @param  string  $url
+     * @param  bool  $absolute
+     * @param  array  $ignoreQuery
      * @return bool
      */
     public function isValidSignedUrl(string $url, bool $absolute = true, array $ignoreQuery = [])
