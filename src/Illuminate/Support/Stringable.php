@@ -311,17 +311,6 @@ class Stringable implements JsonSerializable
     }
 
     /**
-     * Determine if a given string matches a given pattern.
-     *
-     * @param  string|iterable<string>  $pattern
-     * @return bool
-     */
-    public function isMatch($pattern)
-    {
-        return Str::isMatch($pattern, $this->value);
-    }
-
-    /**
      * Determine if a given string is a valid UUID.
      *
      * @return bool
@@ -449,6 +438,17 @@ class Stringable implements JsonSerializable
     public function match($pattern)
     {
         return new static(Str::match($pattern, $this->value));
+    }
+
+    /**
+     * Determine if a given string matches a given pattern.
+     *
+     * @param  string|iterable<string>  $pattern
+     * @return bool
+     */
+    public function isMatch($pattern)
+    {
+        return Str::isMatch($pattern, $this->value);
     }
 
     /**
