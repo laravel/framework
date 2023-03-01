@@ -1207,6 +1207,50 @@ class Stringable implements JsonSerializable, ArrayAccess
     }
 
     /**
+     * Determine if the given offset exists.
+     *
+     * @param  mixed  $offset
+     * @return bool
+     */
+    public function offsetExists(mixed $offset): bool
+    {
+        return isset($this->value[$offset]);
+    }
+
+    /**
+     * Get the value at the given offset.
+     *
+     * @param  mixed  $offset
+     * @return string
+     */
+    public function offsetGet(mixed $offset): string
+    {
+        return $this->value[$offset];
+    }
+
+    /**
+     * Set the value at the given offset.
+     *
+     * @param  mixed  $offset
+     * @return void
+     */
+    public function offsetSet(mixed $offset, mixed $value): void
+    {
+        $this->value[$offset] = $value;
+    }
+
+    /**
+     * Unset the value at the given offset.
+     *
+     * @param  mixed  $offset
+     * @return void
+     */
+    public function offsetUnset(mixed $offset): void
+    {
+        unset($this->value[$offset]);
+    }
+
+    /**
      * Proxy dynamic properties onto methods.
      *
      * @param  string  $key
@@ -1225,25 +1269,5 @@ class Stringable implements JsonSerializable, ArrayAccess
     public function __toString()
     {
         return (string) $this->value;
-    }
-
-    public function offsetExists(mixed $offset): bool
-    {
-        return isset($this->value[$offset]);
-    }
-
-    public function offsetGet(mixed $offset): string
-    {
-        return $this->value[$offset];
-    }
-
-    public function offsetSet(mixed $offset, mixed $value): void
-    {
-        $this->value[$offset] = $value;
-    }
-
-    public function offsetUnset(mixed $offset): void
-    {
-        unset($this->value[$offset]);
     }
 }
