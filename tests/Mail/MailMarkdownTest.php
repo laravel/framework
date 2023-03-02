@@ -20,9 +20,9 @@ class MailMarkdownTest extends TestCase
         $this->configRepository = new Repository([
             'mail' => [
                 'markdown' => [
-                    'theme' => 'default',
-                ],
-            ],
+                    'theme' => 'default'
+                ]
+            ]
         ]);
 
         parent::setUp();
