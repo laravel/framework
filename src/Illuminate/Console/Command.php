@@ -171,11 +171,9 @@ class Command extends SymfonyCommand
     /**
      * Execute the console command.
      *
-     * @param  \Symfony\Component\Console\Input\InputInterface  $input
-     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
      * @return int
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute()
     {
         if ($this instanceof Isolatable && $this->option('isolated') !== false &&
             ! $this->commandIsolationMutex()->create($this)) {
