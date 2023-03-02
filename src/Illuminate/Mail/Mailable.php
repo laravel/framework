@@ -2,6 +2,7 @@
 
 namespace Illuminate\Mail;
 
+use Illuminate\Config\Repository as ConfigRepository;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
 use Illuminate\Contracts\Mail\Attachable;
@@ -323,8 +324,9 @@ class Mailable implements MailableContract, Renderable
     protected function buildMarkdownView()
     {
         $markdown = Container::getInstance()->make(Markdown::class);
+        $config = Container::getInstance()->get(ConfigRepository::class);
 
-        $markdown->theme($this->theme ?? 'default');
+        $markdown->theme($this->theme ?? $config->get('mail.markdown.theme', 'default'));
 
         $data = $this->buildViewData();
 
