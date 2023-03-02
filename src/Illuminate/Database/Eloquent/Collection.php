@@ -5,6 +5,7 @@ namespace Illuminate\Database\Eloquent;
 use Illuminate\Contracts\Queue\QueueableCollection;
 use Illuminate\Contracts\Queue\QueueableEntity;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
 use LogicException;
@@ -17,6 +18,8 @@ use LogicException;
  */
 class Collection extends BaseCollection implements QueueableCollection
 {
+    use InteractsWithDictionary;
+
     /**
      * Find a model in the collection by key.
      *
@@ -322,7 +325,7 @@ class Collection extends BaseCollection implements QueueableCollection
         $dictionary = $this->getDictionary();
 
         foreach ($items as $item) {
-            $dictionary[$item->getKey()] = $item;
+            $dictionary[$this->getDictionaryKey($item->getKey())] = $item;
         }
 
         return new static(array_values($dictionary));
@@ -398,7 +401,7 @@ class Collection extends BaseCollection implements QueueableCollection
         $dictionary = $this->getDictionary($items);
 
         foreach ($this->items as $item) {
-            if (! isset($dictionary[$item->getKey()])) {
+            if (! isset($dictionary[$this->getDictionaryKey($item->getKey())])) {
                 $diff->add($item);
             }
         }
@@ -423,7 +426,7 @@ class Collection extends BaseCollection implements QueueableCollection
         $dictionary = $this->getDictionary($items);
 
         foreach ($this->items as $item) {
-            if (isset($dictionary[$item->getKey()])) {
+            if (isset($dictionary[$this->getDictionaryKey($item->getKey())])) {
                 $intersect->add($item);
             }
         }
@@ -459,7 +462,7 @@ class Collection extends BaseCollection implements QueueableCollection
             return new static($this->items);
         }
 
-        $dictionary = Arr::only($this->getDictionary(), $keys);
+        $dictionary = Arr::only($this->getDictionary(), array_map($this->getDictionaryKey(...), (array) $keys));
 
         return new static(array_values($dictionary));
     }
@@ -472,7 +475,7 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function except($keys)
     {
-        $dictionary = Arr::except($this->getDictionary(), $keys);
+        $dictionary = Arr::except($this->getDictionary(), array_map($this->getDictionaryKey(...), (array) $keys));
 
         return new static(array_values($dictionary));
     }
@@ -545,7 +548,7 @@ class Collection extends BaseCollection implements QueueableCollection
         $dictionary = [];
 
         foreach ($items as $value) {
-            $dictionary[$value->getKey()] = $value;
+            $dictionary[$this->getDictionaryKey($value->getKey())] = $value;
         }
 
         return $dictionary;

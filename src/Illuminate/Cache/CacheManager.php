@@ -91,7 +91,7 @@ class CacheManager implements FactoryContract
      *
      * @throws \InvalidArgumentException
      */
-    protected function resolve($name)
+    public function resolve($name)
     {
         $config = $this->getConfig($name);
 

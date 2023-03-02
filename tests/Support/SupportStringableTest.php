@@ -1179,4 +1179,13 @@ class SupportStringableTest extends TestCase
 
         $this->stringable('not a date')->toDate();
     }
+
+    public function testArrayAccess()
+    {
+        $str = $this->stringable('my string');
+        $this->assertSame('m', $str[0]);
+        $this->assertSame('t', $str[4]);
+        $this->assertTrue(isset($str[2]));
+        $this->assertFalse(isset($str[10]));
+    }
 }

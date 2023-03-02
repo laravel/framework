@@ -588,6 +588,19 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
+     * Set the cache store implementation.
+     *
+     * @param  \Illuminate\Contracts\Cache\Store  $store
+     * @return static
+     */
+    public function setStore($store)
+    {
+        $this->store = $store;
+
+        return $this;
+    }
+
+    /**
      * Fire an event for this cache instance.
      *
      * @param  object|string  $event

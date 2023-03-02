@@ -11,7 +11,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\ReflectsClosures;
 use PHPUnit\Framework\Assert as PHPUnit;
 
-class QueueFake extends QueueManager implements Queue
+class QueueFake extends QueueManager implements Fake, Queue
 {
     use ReflectsClosures;
 
@@ -20,7 +20,7 @@ class QueueFake extends QueueManager implements Queue
      *
      * @var \Illuminate\Contracts\Queue\Queue
      */
-    protected $queue;
+    public $queue;
 
     /**
      * The job types that should be intercepted instead of pushed to the queue.
