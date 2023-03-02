@@ -3,7 +3,6 @@
 namespace Illuminate\Mail;
 
 use Illuminate\Contracts\View\Factory as ViewFactory;
-use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use League\CommonMark\Environment\Environment;
@@ -22,10 +21,11 @@ class Markdown
     protected $view;
 
     /**
+     * The current theme being used when generating emails.
      *
-     * @var \Illuminate\Contracts\Config\Repository
+     * @var string
      */
-    protected $config;
+    protected $theme = 'default';
 
     /**
      * The registered component paths.
@@ -41,10 +41,10 @@ class Markdown
      * @param  array  $options
      * @return void
      */
-    public function __construct(ViewFactory $view, ConfigRepository $config, array $options = [])
+    public function __construct(ViewFactory $view, array $options = [])
     {
         $this->view = $view;
-        $this->config = $config;
+        $this->theme = $options['theme'] ?? 'default';
         $this->loadComponentsFrom($options['paths'] ?? []);
     }
 
@@ -56,22 +56,20 @@ class Markdown
      * @param  \TijsVerkoyen\CssToInlineStyles\CssToInlineStyles|null  $inliner
      * @return \Illuminate\Support\HtmlString
      */
-    public function render($view, array $data = [], $inliner = null, ?string $theme = null)
+    public function render($view, array $data = [], $inliner = null)
     {
         $this->view->flushFinderCache();
-
-        $theme = $theme ?? $this->config->get('mail.markdown.theme', 'default');
 
         $contents = $this->view->replaceNamespace(
             'mail', $this->htmlComponentPaths()
         )->make($view, $data)->render();
 
-        if ($this->view->exists($customTheme = Str::start($theme, 'mail.'))) {
+        if ($this->view->exists($customTheme = Str::start($this->theme, 'mail.'))) {
             $theme = $customTheme;
         } else {
-            $theme = str_contains($theme, '::')
-                ? $theme
-                : 'mail::themes.'.$theme;
+            $theme = str_contains($this->theme, '::')
+                ? $this->theme
+                : 'mail::themes.'.$this->theme;
         }
 
         return new HtmlString(($inliner ?: new CssToInlineStyles)->convert(
@@ -164,5 +162,28 @@ class Markdown
     public function loadComponentsFrom(array $paths = [])
     {
         $this->componentPaths = $paths;
+    }
+
+    /**
+     * Set the default theme to be used.
+     *
+     * @param  string  $theme
+     * @return $this
+     */
+    public function theme($theme)
+    {
+        $this->theme = $theme;
+
+        return $this;
+    }
+
+    /**
+     * Get the theme currently being used by the renderer.
+     *
+     * @return string
+     */
+    public function getTheme()
+    {
+        return $this->theme;
     }
 }

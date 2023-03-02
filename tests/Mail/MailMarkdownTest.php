@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Mail;
 
-use Illuminate\Config\Repository;
 use Illuminate\Mail\Markdown;
 use Illuminate\View\Factory;
 use Mockery as m;
@@ -10,24 +9,6 @@ use PHPUnit\Framework\TestCase;
 
 class MailMarkdownTest extends TestCase
 {
-    /**
-     * @var \Illuminate\Config\Repository
-     */
-    protected $configRepository;
-
-    protected function setUp(): void
-    {
-        $this->configRepository = new Repository([
-            'mail' => [
-                'markdown' => [
-                    'theme' => 'default'
-                ]
-            ]
-        ]);
-
-        parent::setUp();
-    }
-
     protected function tearDown(): void
     {
         m::close();
@@ -36,7 +17,7 @@ class MailMarkdownTest extends TestCase
     public function testRenderFunctionReturnsHtml()
     {
         $viewFactory = m::mock(Factory::class);
-        $markdown = new Markdown($viewFactory, $this->configRepository);
+        $markdown = new Markdown($viewFactory);
         $viewFactory->shouldReceive('flushFinderCache')->once();
         $viewFactory->shouldReceive('replaceNamespace')->once()->with('mail', $markdown->htmlComponentPaths())->andReturnSelf();
         $viewFactory->shouldReceive('exists')->with('mail.default')->andReturn(false);
@@ -52,7 +33,8 @@ class MailMarkdownTest extends TestCase
     public function testRenderFunctionReturnsHtmlWithCustomTheme()
     {
         $viewFactory = m::mock(Factory::class);
-        $markdown = new Markdown($viewFactory, $this->configRepository);
+        $markdown = new Markdown($viewFactory);
+        $markdown->theme('yaz');
         $viewFactory->shouldReceive('flushFinderCache')->once();
         $viewFactory->shouldReceive('replaceNamespace')->once()->with('mail', $markdown->htmlComponentPaths())->andReturnSelf();
         $viewFactory->shouldReceive('exists')->with('mail.yaz')->andReturn(true);
@@ -60,7 +42,7 @@ class MailMarkdownTest extends TestCase
         $viewFactory->shouldReceive('make')->with('mail.yaz', [])->andReturnSelf();
         $viewFactory->shouldReceive('render')->twice()->andReturn('<html></html>', 'body {}');
 
-        $result = $markdown->render('view', [], theme: 'yaz');
+        $result = $markdown->render('view', []);
 
         $this->assertStringContainsString('<html></html>', $result);
     }
@@ -68,7 +50,8 @@ class MailMarkdownTest extends TestCase
     public function testRenderFunctionReturnsHtmlWithCustomThemeWithMailPrefix()
     {
         $viewFactory = m::mock(Factory::class);
-        $markdown = new Markdown($viewFactory, $this->configRepository);
+        $markdown = new Markdown($viewFactory);
+        $markdown->theme('mail.yaz');
         $viewFactory->shouldReceive('flushFinderCache')->once();
         $viewFactory->shouldReceive('replaceNamespace')->once()->with('mail', $markdown->htmlComponentPaths())->andReturnSelf();
         $viewFactory->shouldReceive('exists')->with('mail.yaz')->andReturn(true);
@@ -76,7 +59,7 @@ class MailMarkdownTest extends TestCase
         $viewFactory->shouldReceive('make')->with('mail.yaz', [])->andReturnSelf();
         $viewFactory->shouldReceive('render')->twice()->andReturn('<html></html>', 'body {}');
 
-        $result = $markdown->render('view', [], theme: 'mail.yaz');
+        $result = $markdown->render('view', []);
 
         $this->assertStringContainsString('<html></html>', $result);
     }
@@ -84,7 +67,7 @@ class MailMarkdownTest extends TestCase
     public function testRenderTextReturnsText()
     {
         $viewFactory = m::mock(Factory::class);
-        $markdown = new Markdown($viewFactory, $this->configRepository);
+        $markdown = new Markdown($viewFactory);
         $viewFactory->shouldReceive('flushFinderCache')->once();
         $viewFactory->shouldReceive('replaceNamespace')->once()->with('mail', $markdown->textComponentPaths())->andReturnSelf();
         $viewFactory->shouldReceive('make')->with('view', [])->andReturnSelf();
@@ -98,7 +81,7 @@ class MailMarkdownTest extends TestCase
     public function testParseReturnsParsedMarkdown()
     {
         $viewFactory = m::mock(Factory::class);
-        $markdown = new Markdown($viewFactory, $this->configRepository);
+        $markdown = new Markdown($viewFactory);
 
         $result = $markdown->parse('# Something')->toHtml();
 
