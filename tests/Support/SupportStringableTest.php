@@ -62,6 +62,24 @@ class SupportStringableTest extends TestCase
         $this->assertFalse($this->stringable(null)->isJson());
     }
 
+    public function testIsMatch()
+    {
+        $this->assertTrue($this->stringable('Hello, Laravel!')->isMatch('/.*,.*!/'));
+        $this->assertTrue($this->stringable('Hello, Laravel!')->isMatch('/^.*$(.*)/'));
+        $this->assertTrue($this->stringable('Hello, Laravel!')->isMatch('/laravel/i'));
+        $this->assertTrue($this->stringable('Hello, Laravel!')->isMatch('/^(.*(.*(.*)))/'));
+
+        $this->assertFalse($this->stringable('Hello, Laravel!')->isMatch('/H.o/'));
+        $this->assertFalse($this->stringable('Hello, Laravel!')->isMatch('/^laravel!/i'));
+        $this->assertFalse($this->stringable('Hello, Laravel!')->isMatch('/laravel!(.*)/'));
+        $this->assertFalse($this->stringable('Hello, Laravel!')->isMatch('/^[a-zA-Z,!]+$/'));
+
+        $this->assertTrue($this->stringable('Hello, Laravel!')->isMatch(['/.*,.*!/', '/H.o/']));
+        $this->assertTrue($this->stringable('Hello, Laravel!')->isMatch(['/^laravel!/i', '/^.*$(.*)/']));
+        $this->assertTrue($this->stringable('Hello, Laravel!')->isMatch(['/laravel/i', '/laravel!(.*)/']));
+        $this->assertTrue($this->stringable('Hello, Laravel!')->isMatch(['/^[a-zA-Z,!]+$/', '/^(.*(.*(.*)))/']));
+    }
+
     public function testIsEmpty()
     {
         $this->assertTrue($this->stringable('')->isEmpty());
