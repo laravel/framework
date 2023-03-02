@@ -50,8 +50,7 @@ class MailServiceProvider extends ServiceProvider implements DeferrableProvider
         $this->app->singleton(Markdown::class, function ($app) {
             $config = $app->make('config');
 
-            return new Markdown($app->make('view'), [
-                'theme' => $config->get('mail.markdown.theme', 'default'),
+            return new Markdown($app->make('view'), $app->make('config'), [
                 'paths' => $config->get('mail.markdown.paths', []),
             ]);
         });
