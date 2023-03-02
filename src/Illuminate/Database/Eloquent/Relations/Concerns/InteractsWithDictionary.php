@@ -23,8 +23,7 @@ trait InteractsWithDictionary
                 return $attribute->__toString();
             }
 
-            if (function_exists('enum_exists') &&
-                $attribute instanceof UnitEnum) {
+            if ($attribute instanceof UnitEnum) {
                 return $attribute instanceof BackedEnum ? $attribute->value : $attribute->name;
             }
 
