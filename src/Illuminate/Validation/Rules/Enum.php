@@ -2,9 +2,9 @@
 
 namespace Illuminate\Validation\Rules;
 
+use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 use TypeError;
-use Closure;
 
 class Enum implements ValidationRule
 {
