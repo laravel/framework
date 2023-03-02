@@ -204,9 +204,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function resolved($abstract)
     {
-        if ($this->isAlias($abstract)) {
-            $abstract = $this->getAlias($abstract);
-        }
+        $abstract = $this->getAlias($abstract);
 
         return isset($this->resolved[$abstract]) ||
                isset($this->instances[$abstract]);
@@ -1298,9 +1296,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function getAlias($abstract)
     {
-        return isset($this->aliases[$abstract])
-                    ? $this->getAlias($this->aliases[$abstract])
-                    : $abstract;
+        return $this->aliases[$abstract] ?? $abstract;
     }
 
     /**
