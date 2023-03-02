@@ -2,8 +2,8 @@
 
 namespace Illuminate\Mail;
 
-use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
+use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use League\CommonMark\Environment\Environment;
@@ -22,7 +22,6 @@ class Markdown
     protected $view;
 
     /**
-     *
      * @var \Illuminate\Contracts\Config\Repository
      */
     protected $config;

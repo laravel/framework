@@ -7,10 +7,8 @@ use Illuminate\Contracts\Mail\Attachable;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Mail\Attachment;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Mail\Mailer;
-use Illuminate\Mail\Markdown;
 use Illuminate\Mail\Transport\ArrayTransport;
 use Mockery as m;
 use PHPUnit\Framework\AssertionFailedError;
@@ -438,7 +436,6 @@ class MailMailableTest extends TestCase
             }
         }
     }
-
 
     public function testMailableSetsSubjectCorrectly()
     {
