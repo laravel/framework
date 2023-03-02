@@ -15,7 +15,7 @@ include 'Enums.php';
 
 class ValidationEnumRuleTest extends TestCase
 {
-    public function testvalidationPassesWhenPassingCorrectEnum()
+    public function testValidationPassesWhenPassingCorrectEnum()
     {
         $v = new Validator(
             resolve('translator'),
@@ -32,7 +32,7 @@ class ValidationEnumRuleTest extends TestCase
         $this->assertFalse($v->fails());
     }
 
-    public function testvalidationPassesWhenPassingInstanceOfEnum()
+    public function testValidationPassesWhenPassingInstanceOfEnum()
     {
         $v = new Validator(
             resolve('translator'),
@@ -47,7 +47,7 @@ class ValidationEnumRuleTest extends TestCase
         $this->assertFalse($v->fails());
     }
 
-    public function testvalidationPassesWhenPassingInstanceOfPureEnum()
+    public function testValidationPassesWhenPassingInstanceOfPureEnum()
     {
         $v = new Validator(
             resolve('translator'),
@@ -75,7 +75,7 @@ class ValidationEnumRuleTest extends TestCase
         );
 
         $this->assertTrue($v->fails());
-        $this->assertEquals(['The selected status is invalid.'], $v->messages()->get('status'));
+        $this->assertEquals(['validation.enum'], $v->messages()->get('status'));
     }
 
     public function testValidationFailsWhenProvidingDifferentType()
@@ -91,7 +91,7 @@ class ValidationEnumRuleTest extends TestCase
         );
 
         $this->assertTrue($v->fails());
-        $this->assertEquals(['The selected status is invalid.'], $v->messages()->get('status'));
+        $this->assertEquals(['validation.enum'], $v->messages()->get('status'));
     }
 
     public function testValidationPassesWhenProvidingDifferentTypeThatIsCastableToTheEnumType()
@@ -122,7 +122,7 @@ class ValidationEnumRuleTest extends TestCase
         );
 
         $this->assertTrue($v->fails());
-        $this->assertEquals(['The selected status is invalid.'], $v->messages()->get('status'));
+        $this->assertEquals(['validation.enum'], $v->messages()->get('status'));
     }
 
     public function testValidationPassesWhenProvidingNullButTheFieldIsNullable()
@@ -168,7 +168,7 @@ class ValidationEnumRuleTest extends TestCase
         );
 
         $this->assertTrue($v->fails());
-        $this->assertEquals(['The selected status is invalid.'], $v->messages()->get('status'));
+        $this->assertEquals(['validation.enum'], $v->messages()->get('status'));
     }
 
     protected function setUp(): void
