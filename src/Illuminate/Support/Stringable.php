@@ -468,6 +468,8 @@ class Stringable implements JsonSerializable, ArrayAccess
      *
      * @param  string  $pattern
      * @return bool
+     * 
+     * @deprecated use isMatch instead
      */
     public function test($pattern)
     {
@@ -981,6 +983,19 @@ class Stringable implements JsonSerializable, ArrayAccess
     }
 
     /**
+     * Execute the given callback if the string matches the given pattern.
+     *
+     * @param  string|iterable<string>  $pattern
+     * @param  callable  $callback
+     * @param  callable|null  $default
+     * @return static
+     */
+    public function whenMatch($pattern, $callback, $default = null)
+    {
+        return $this->when($this->isMatch($pattern), $callback, $default);
+    }
+
+    /**
      * Execute the given callback if the string is not an exact match with the given value.
      *
      * @param  string  $value
@@ -1062,6 +1077,8 @@ class Stringable implements JsonSerializable, ArrayAccess
      * @param  callable  $callback
      * @param  callable|null  $default
      * @return static
+     * 
+     * @deprecated use whenMatch instead
      */
     public function whenTest($pattern, $callback, $default = null)
     {
