@@ -637,6 +637,32 @@ class Str
     }
 
     /**
+     * Determine if a given string matches all given patterns.
+     *
+     * @param  string|iterable<string>  $pattern
+     * @param  string  $value
+     * @return bool
+     */
+    public static function isMatchAll($pattern, $value)
+    {
+        $value = (string) $value;
+
+        if (! is_iterable($pattern)) {
+            return preg_match((string) $pattern, $value) === 1;
+        }
+
+        foreach ($pattern as $pattern) {
+            $pattern = (string) $pattern;
+
+            if (preg_match($pattern, $value) !== 1) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Get the string matching the given pattern.
      *
      * @param  string  $pattern
