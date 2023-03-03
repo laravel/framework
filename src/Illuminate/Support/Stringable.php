@@ -471,7 +471,7 @@ class Stringable implements JsonSerializable, ArrayAccess
      */
     public function test($pattern)
     {
-        return $this->match($pattern)->isNotEmpty();
+        return $this->isMatch($pattern);
     }
 
     /**
