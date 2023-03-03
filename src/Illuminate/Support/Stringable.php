@@ -110,6 +110,17 @@ class Stringable implements JsonSerializable, ArrayAccess
     }
 
     /**
+     * Get character at the specified index.
+     *
+     * @param  int  $index
+     * @return string|null
+     */
+    public function charAt($index)
+    {
+        return Str::charAt($this->value, $index); 
+    }
+
+    /**
      * Get the portion of a string before the first occurrence of a given value.
      *
      * @param  string  $search

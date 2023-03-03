@@ -936,6 +936,16 @@ class SupportStringableTest extends TestCase
         $this->assertSame('fooBarBaz', (string) $this->stringable('foo-bar_baz')->camel());
     }
 
+    public function testCharAt()
+    {
+        $this->assertEquals('р', $this->stringable('Привет, мир!')->charAt(1));
+        $this->assertEquals('ち', $this->stringable('「こんにちは世界」')->charAt(4));
+        $this->assertEquals('w', $this->stringable('Привет, world!')->charAt(8));
+        $this->assertEquals('界', $this->stringable('「こんにちは世界」')->charAt(-2));
+        $this->assertEquals(null, $this->stringable('「こんにちは世界」')->charAt(-200));
+        $this->assertEquals(null, $this->stringable('Привет, мир!')->charAt('Привет, мир!', 100));
+    }
+
     public function testSubstr()
     {
         $this->assertSame('Ё', (string) $this->stringable('БГДЖИЛЁ')->substr(-1));

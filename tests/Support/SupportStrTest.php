@@ -749,6 +749,16 @@ class SupportStrTest extends TestCase
         $this->assertSame('fooBarBaz', Str::camel('foo-bar_baz'));
     }
 
+    public function testCharAt()
+    {
+        $this->assertEquals('р', Str::charAt('Привет, мир!', 1));
+        $this->assertEquals('ち', Str::charAt('「こんにちは世界」', 4));
+        $this->assertEquals('w', Str::charAt('Привет, world!', 8));
+        $this->assertEquals('界', Str::charAt('「こんにちは世界」', -2));
+        $this->assertEquals(null, Str::charAt('「こんにちは世界」', -200));
+        $this->assertEquals(null, Str::charAt('Привет, мир!', 100));
+    }
+
     public function testSubstr()
     {
         $this->assertSame('Ё', Str::substr('БГДЖИЛЁ', -1));
