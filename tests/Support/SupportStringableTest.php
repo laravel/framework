@@ -80,6 +80,33 @@ class SupportStringableTest extends TestCase
         $this->assertTrue($this->stringable('Hello, Laravel!')->isMatch(['/^[a-zA-Z,!]+$/', '/^(.*(.*(.*)))/']));
     }
 
+    public function testIsMatchAll()
+    {
+        $stringable = $this->stringable('Laravel is best PHP framework!');
+
+        $truePatterns = [
+            '/laravel/i',
+            '/^(.*)is(.*)[.!?]$/',
+        ];
+
+        $falsePatterns = [
+            '/php/',
+            '/^(.*)is the(.*)[.!?]$/',
+        ];
+
+        $this->assertTrue($stringable->isMatchAll($truePatterns));
+        $this->assertTrue($stringable->isMatchAll($truePatterns[0]));
+        $this->assertTrue($stringable->isMatchAll($truePatterns[1]));
+
+        $this->assertFalse($stringable->isMatchAll($falsePatterns));
+        $this->assertFalse($stringable->isMatchAll($falsePatterns[0]));
+        $this->assertFalse($stringable->isMatchAll($falsePatterns[1]));
+
+        $this->assertFalse($stringable->isMatchAll([...$truePatterns, ...$falsePatterns]));
+        $this->assertFalse($stringable->isMatchAll([$truePatterns[1], $falsePatterns[0]]));
+        $this->assertFalse($stringable->isMatchAll([$falsePatterns[1], $truePatterns[0]]));
+    }
+
     public function testIsEmpty()
     {
         $this->assertTrue($this->stringable('')->isEmpty());

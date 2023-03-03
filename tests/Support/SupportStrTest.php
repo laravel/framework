@@ -458,6 +458,33 @@ class SupportStrTest extends TestCase
         $this->assertTrue(Str::isMatch(['/^[a-zA-Z,!]+$/', '/^(.*(.*(.*)))/'], 'Hello, Laravel!'));
     }
 
+    public function testIsMatchAll()
+    {
+        $string = 'Laravel is best PHP framework!';
+
+        $truePatterns = [
+            '/laravel/i',
+            '/^(.*)is(.*)[.!?]$/',
+        ];
+
+        $falsePatterns = [
+            '/php/',
+            '/^(.*)is the(.*)[.!?]$/',
+        ];
+
+        $this->assertTrue(Str::isMatchAll($truePatterns, $string));
+        $this->assertTrue(Str::isMatchAll($truePatterns[0], $string));
+        $this->assertTrue(Str::isMatchAll($truePatterns[1], $string));
+
+        $this->assertFalse(Str::isMatchAll($falsePatterns, $string));
+        $this->assertFalse(Str::isMatchAll($falsePatterns[0], $string));
+        $this->assertFalse(Str::isMatchAll($falsePatterns[1], $string));
+
+        $this->assertFalse(Str::isMatchAll([...$truePatterns, ...$falsePatterns], $string));
+        $this->assertFalse(Str::isMatchAll([$truePatterns[1], $falsePatterns[0]], $string));
+        $this->assertFalse(Str::isMatchAll([$falsePatterns[1], $truePatterns[0]], $string));
+    }
+
     public function testKebab()
     {
         $this->assertSame('laravel-php-framework', Str::kebab('LaravelPhpFramework'));
