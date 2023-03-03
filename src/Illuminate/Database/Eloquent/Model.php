@@ -1287,7 +1287,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             $this->updateTimestamps();
         }
 
-        // Set the Unique IDs
         if ($this->usesUniqueIds()) {
             $this->setUniqueIds();
         }

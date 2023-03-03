@@ -18,6 +18,16 @@ trait HasUlids
     }
 
     /**
+     * Get the columns that should receive a unique identifier.
+     *
+     * @return array
+     */
+    public function uniqueIds()
+    {
+        return [$this->getKeyName()];
+    }
+
+    /**
      * Generate a new ULID for the model.
      *
      * @return string
@@ -48,16 +58,6 @@ trait HasUlids
         }
 
         return parent::resolveRouteBindingQuery($query, $value, $field);
-    }
-
-    /**
-     * Get the columns that should receive a unique identifier.
-     *
-     * @return array
-     */
-    public function uniqueIds()
-    {
-        return [$this->getKeyName()];
     }
 
     /**

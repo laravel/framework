@@ -18,16 +18,6 @@ trait HasUuids
     }
 
     /**
-     * Generate a new UUID for the model.
-     *
-     * @return string
-     */
-    public function newUniqueId()
-    {
-        return (string) Str::orderedUuid();
-    }
-
-    /**
      * Get the columns that should receive a unique identifier.
      *
      * @return array
@@ -35,6 +25,16 @@ trait HasUuids
     public function uniqueIds()
     {
         return [$this->getKeyName()];
+    }
+
+    /**
+     * Generate a new UUID for the model.
+     *
+     * @return string
+     */
+    public function newUniqueId()
+    {
+        return (string) Str::orderedUuid();
     }
 
     /**
