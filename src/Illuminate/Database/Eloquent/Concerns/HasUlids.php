@@ -14,7 +14,7 @@ trait HasUlids
      */
     public function initializeHasUlids()
     {
-        $this->uniqueIds = true;
+        $this->usesUniqueIds = true;
     }
 
     /**

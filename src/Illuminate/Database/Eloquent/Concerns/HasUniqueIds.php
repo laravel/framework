@@ -9,7 +9,7 @@ trait HasUniqueIds
      *
      * @var bool
      */
-    public $uniqueIds = false;
+    public $usesUniqueIds = false;
 
     /**
      * Determine if the model uses unique ids.
@@ -18,7 +18,7 @@ trait HasUniqueIds
      */
     public function usesUniqueIds()
     {
-        return $this->uniqueIds;
+        return $this->usesUniqueIds;
     }
 
     /**
