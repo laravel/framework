@@ -1,5 +1,18 @@
 version: '3'
 services:
+
+
+  laravel:
+    build:
+      context: ./
+      dockerfile: ./docker/DockerFile
+    # awk-landmark (do not remove) #
+    restart: unless-stopped
+    volumes:
+      - .:/var/www/html
+      - /www/html/vendor/
+      - /www/html/docker-compose.yml
+      - /www/html/DockerFile/
   dynamodb:
     image: amazon/dynamodb-local
     ports:
