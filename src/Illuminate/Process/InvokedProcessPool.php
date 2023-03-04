@@ -34,6 +34,16 @@ class InvokedProcessPool
     }
 
     /**
+     * Get the total number of processes.
+     *
+     * @return int
+     */
+    public function total()
+    {
+        return count($this->invokedProcesses);
+    }
+
+    /**
      * Get the processes in the pool that are still currently running.
      *
      * @return \Illuminate\Support\Collection
