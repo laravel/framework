@@ -24,8 +24,12 @@ RUN set -eux; \
     apt-get upgrade -y; \
     apt-get install -y --no-install-recommends \
             curl \
+            git \
+            libzip-dev \
             libmemcached-dev \
             libz-dev \
+            libicu-dev \
+            libgmp-dev \
             libpq-dev \
             libjpeg-dev \
             libpng-dev \
@@ -36,6 +40,15 @@ RUN set -eux; \
             libmcrypt-dev \
             libonig-dev; \
     rm -rf /var/lib/apt/lists/*
+
+
+USER root
+
+# Get latest Composer
+COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
+
+COPY ./docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 RUN set -eux; \
     # Install the PHP pdo_mysql extention
@@ -49,5 +62,13 @@ RUN set -eux; \
             --with-webp \
             --with-xpm \
             --with-freetype; \
-    docker-php-ext-install gd; \
-    php -r 'var_dump(gd_info());'
+    docker-php-ext-install gd;
+
+
+RUN docker-php-ext-configure intl
+RUN docker-php-ext-install intl
+RUN docker-php-ext-install gmp
+RUN docker-php-ext-install zip
+
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
