@@ -104,7 +104,7 @@ class DatabaseExpressionWithBindingsTest extends TestCase
 
     protected function mockModelConnection()
     {
-        $processor =  new Processor;
+        $processor = new Processor;
 
         $connection = m::mock(Connection::class)->makePartial();
         $connection->shouldReceive('getQueryGrammar')->andReturn($this->grammar);

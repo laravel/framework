@@ -3714,8 +3714,9 @@ class Builder implements BuilderContract
      */
     public function castBinding($value)
     {
-        if ($value instanceof ExpressionWithBindings)
+        if ($value instanceof ExpressionWithBindings) {
             return $value->getBindings($this->grammar);
+        }
 
         return $value instanceof BackedEnum ? $value->value : $value;
     }

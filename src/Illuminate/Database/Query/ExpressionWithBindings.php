@@ -13,7 +13,8 @@ class ExpressionWithBindings implements Contract
     public function __construct(
         protected readonly string $sql,
         protected readonly array $bindings = [],
-    ) {}
+    ) {
+    }
 
     /**
      * Get the value of the expression.
