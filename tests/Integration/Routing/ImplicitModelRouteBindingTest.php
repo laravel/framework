@@ -7,71 +7,10 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\Concerns\InteractsWithPublishedFiles;
 use Orchestra\Testbench\TestCase;
-
-class ImplicitController extends Controller
-{
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(ImplicitBindingUser $user)
-    {
-        return $user;
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(ImplicitBindingUser $user)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, ImplicitBindingUser $user)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(ImplicitBindingUser $user)
-    {
-        //
-    }
-}
 
 class ImplicitModelRouteBindingTest extends TestCase
 {
@@ -195,26 +134,6 @@ PHP);
         })->middleware(['web'])->withTrashed();
 
         $response = $this->postJson("/user/{$user->id}");
-
-        $response->assertJson([
-            'id' => $user->id,
-            'name' => $user->name,
-        ]);
-    }
-
-    public function testSoftDeletedModelsCanBeRetrievedUsingWithTrashedMethodWithSpecificFunction()
-    {
-        $user = ImplicitBindingUser::create(['name' => 'Dries']);
-
-        $user->delete();
-
-        config(['app.key' => str_repeat('a', 32)]);
-
-        Route::resource('users', ImplicitController::class)
-            ->middleware(['web'])
-            ->withTrashed('show');
-
-        $response = $this->getJson("/users/{$user->id}");
 
         $response->assertJson([
             'id' => $user->id,
