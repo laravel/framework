@@ -52,6 +52,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Database\Connection beforeExecuting(\Closure $callback)
  * @method static void listen(\Closure $callback)
  * @method static \Illuminate\Contracts\Database\Query\Expression raw(mixed $value)
+ * @method static \Illuminate\Contracts\Database\Query\ExpressionWithBindings expression(string $sql, ...$bindings)
  * @method static bool hasModifiedRecords()
  * @method static void recordsHaveBeenModified(bool $value = true)
  * @method static \Illuminate\Database\Connection setRecordModificationState(bool $value)

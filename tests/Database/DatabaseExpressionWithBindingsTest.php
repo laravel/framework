@@ -2,6 +2,9 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Database\Query\ExpressionWithBindings as QueryExpressionWithBindings;
+use Illuminate\Database\Capsule\Manager as DatabaseManager;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Eloquent\Model;
@@ -9,6 +12,8 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\ExpressionWithBindings;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Facade;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -77,6 +82,26 @@ class DatabaseExpressionWithBindingsTest extends TestCase
         $model->save();
     }
 
+    public function testExpressionCreationViaDbFacade(): void
+    {
+        $sql = 'ST_Transform(ST_SetSRID(ST_MakePoint(?, ?), ?), ?)';
+        $coords = [56.97, 24.09];
+        $srid = 4326;
+        $newSrid = 3857;
+
+        $this->bootDbFacade();
+
+        $expression = DB::expression($sql, $coords, $srid, $newSrid);
+
+        $this->assertInstanceOf(QueryExpressionWithBindings::class, $expression);
+        $this->assertEquals($sql, $expression->getValue($this->grammar));
+        $this->assertEquals([
+            ...$coords,
+            $srid,
+            $newSrid,
+        ], $expression->getBindings($this->grammar));
+    }
+
     protected function mockModelConnection()
     {
         $processor =  new Processor;
@@ -90,6 +115,20 @@ class DatabaseExpressionWithBindingsTest extends TestCase
         $resolver->shouldReceive('connection')->andReturn($connection);
 
         return $connection;
+    }
+
+    protected function bootDbFacade()
+    {
+        $db = new DatabaseManager;
+        $db->addConnection([
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+        ]);
+
+        $container = new Container;
+        $container->instance('db', $db->getDatabaseManager());
+
+        Facade::setFacadeApplication($container);
     }
 }
 

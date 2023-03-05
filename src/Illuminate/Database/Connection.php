@@ -17,6 +17,7 @@ use Illuminate\Database\Events\TransactionCommitting;
 use Illuminate\Database\Events\TransactionRolledBack;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Query\Expression;
+use Illuminate\Database\Query\ExpressionWithBindings;
 use Illuminate\Database\Query\Grammars\Grammar as QueryGrammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Database\Schema\Builder as SchemaBuilder;
@@ -1005,6 +1006,16 @@ class Connection implements ConnectionInterface
     public function raw($value)
     {
         return new Expression($value);
+    }
+
+    /**
+     * Get a new database expression with bindings.
+     *
+     * @param  mixed[]  $bindings
+     */
+    public function expression(string $sql, ...$bindings): ExpressionWithBindings
+    {
+        return new ExpressionWithBindings($sql, Arr::flatten($bindings));
     }
 
     /**

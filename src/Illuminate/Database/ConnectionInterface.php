@@ -3,6 +3,7 @@
 namespace Illuminate\Database;
 
 use Closure;
+use Illuminate\Contracts\Database\Query\ExpressionWithBindings;
 
 interface ConnectionInterface
 {
@@ -22,6 +23,13 @@ interface ConnectionInterface
      * @return \Illuminate\Contracts\Database\Query\Expression
      */
     public function raw($value);
+
+    /**
+     * Get a new database expression with bindings.
+     *
+     * @param  mixed[]  $bindings
+     */
+    public function expression(string $sql, ...$bindings): ExpressionWithBindings;
 
     /**
      * Run a select statement and return a single result.

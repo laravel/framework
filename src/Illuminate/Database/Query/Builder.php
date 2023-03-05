@@ -3630,6 +3630,16 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Create a new database expression with bindings.
+     *
+     * @param  mixed[]  $bindings
+     */
+    public function expression(string $sql, ...$bindings): ExpressionWithBindings
+    {
+        return $this->connection->expression($sql, $bindings);
+    }
+
+    /**
      * Get the current query value bindings in a flattened array.
      *
      * @return array
