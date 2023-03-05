@@ -100,17 +100,7 @@ class Stringable implements JsonSerializable, ArrayAccess
     }
 
     /**
-     * Get the basename of the class path.
-     *
-     * @return static
-     */
-    public function classBasename()
-    {
-        return new static(class_basename($this->value));
-    }
-
-    /**
-     * Get character at the specified index.
+     * Get the character at the specified index.
      *
      * @param  int  $index
      * @return string|null
@@ -118,6 +108,16 @@ class Stringable implements JsonSerializable, ArrayAccess
     public function charAt($index)
     {
         return Str::charAt($this->value, $index); 
+    }
+
+    /**
+     * Get the basename of the class path.
+     *
+     * @return static
+     */
+    public function classBasename()
+    {
+        return new static(class_basename($this->value));
     }
 
     /**
