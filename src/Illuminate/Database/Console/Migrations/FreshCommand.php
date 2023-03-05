@@ -94,6 +94,7 @@ class FreshCommand extends Command
             '--database' => $database,
             '--class' => $this->option('seeder') ?: 'Database\\Seeders\\DatabaseSeeder',
             '--force' => true,
+            '--rof' => true,
         ]));
     }
 

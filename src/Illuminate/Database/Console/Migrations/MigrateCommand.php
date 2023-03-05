@@ -97,6 +97,7 @@ class MigrateCommand extends BaseCommand implements Isolatable
                 $this->call('db:seed', [
                     '--class' => $this->option('seeder') ?: 'Database\\Seeders\\DatabaseSeeder',
                     '--force' => true,
+                    '--rof' => true,
                 ]);
             }
         });
