@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Console\Seeds;
 
+use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
@@ -53,6 +54,7 @@ class SeedCommand extends Command
      * Execute the console command.
      *
      * @return int
+     * @throws Exception
      */
     public function handle()
     {
@@ -66,15 +68,52 @@ class SeedCommand extends Command
 
         $this->resolver->setDefaultConnection($this->getDatabase());
 
-        Model::unguarded(function () {
-            $this->getSeeder()->__invoke();
-        });
+        //if rof (rollback on failure) is set, then start transaction and rollback in cause of a failure
+        if ($this->hasOption('rof') && $this->option('rof')) {
+            $this->seedWithRollback();
+        } else {
+            $this->seed();
+        }
 
         if ($previousConnection) {
             $this->resolver->setDefaultConnection($previousConnection);
         }
 
         return 0;
+    }
+
+    /**
+     * If the seeder triggers an error,
+     * then do a rollback
+     *
+     * @return void
+     * @throws Exception
+     */
+    protected function seedWithRollback(): void
+    {
+        $this->resolver->connection()?->beginTransaction();
+
+        try {
+            $this->seed();
+            // Commit the transaction if no errors
+            $this->resolver->connection()?->commit();
+        } catch (Exception $e) {
+            // Rollback the transaction if any errors
+            $this->resolver->connection()?->rollBack();
+            throw $e;
+        }
+    }
+
+    /**
+     * Execute the seeder
+     *
+     * @return void
+     */
+    protected function seed(): void
+    {
+        Model::unguarded(function () {
+            $this->getSeeder()->__invoke();
+        });
     }
 
     /**
@@ -135,6 +174,7 @@ class SeedCommand extends Command
             ['class', null, InputOption::VALUE_OPTIONAL, 'The class name of the root seeder', 'Database\\Seeders\\DatabaseSeeder'],
             ['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to seed'],
             ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production'],
+            ['rof', null, InputOption::VALUE_NONE, 'Rollback on failure - seed with a transaction and rollback in cause of a failure']
         ];
     }
 }

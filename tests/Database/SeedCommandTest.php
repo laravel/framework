@@ -55,6 +55,46 @@ class SeedCommandTest extends TestCase
 
         $container->shouldHaveReceived('call')->with([$command, 'handle']);
     }
+    public function testRof()
+    {
+        $input = new ArrayInput([
+            '--force' => true,
+            '--database' => 'sqlite',
+            '--rof' => true
+        ]);
+        $output = new NullOutput;
+        $outputStyle = new OutputStyle($input, $output);
+
+        $seeder = m::mock(Seeder::class);
+        $seeder->shouldReceive('setContainer')->once()->andReturnSelf();
+        $seeder->shouldReceive('setCommand')->once()->andReturnSelf();
+        $seeder->shouldReceive('__invoke')->once();
+
+        $resolver = m::mock(ConnectionResolverInterface::class);
+        $resolver->shouldReceive('getDefaultConnection')->once();
+        $resolver->shouldReceive('setDefaultConnection')->once()->with('sqlite');
+        $resolver->shouldReceive('connection')->twice();
+
+        $container = m::mock(Container::class);
+        $container->shouldReceive('call');
+        $container->shouldReceive('environment')->once()->andReturn('testing');
+        $container->shouldReceive('make')->with('DatabaseSeeder')->andReturn($seeder);
+        $container->shouldReceive('make')->with(OutputStyle::class, m::any())->andReturn(
+            $outputStyle
+        );
+        $container->shouldReceive('make')->with(Factory::class, m::any())->andReturn(
+            new Factory($outputStyle)
+        );
+
+        $command = new SeedCommand($resolver);
+        $command->setLaravel($container);
+
+        // call run to set up IO, then fire manually.
+        $command->run($input, $output);
+        $command->handle();
+
+        $container->shouldHaveReceived('call')->with([$command, 'handle']);
+    }
 
     public function testWithoutModelEvents()
     {
