@@ -202,6 +202,26 @@ PHP);
         ]);
     }
 
+    public function testSoftDeletedModelsCanBeRetrievedUsingWithTrashedMethodWithSpecificFunction()
+    {
+        $user = ImplicitBindingUser::create(['name' => 'Dries']);
+
+        $user->delete();
+
+        config(['app.key' => str_repeat('a', 32)]);
+
+        Route::resource('users', ImplicitController::class)
+            ->middleware(['web'])
+            ->withTrashed('show');
+
+        $response = $this->getJson("/users/{$user->id}");
+
+        $response->assertJson([
+            'id' => $user->id,
+            'name' => $user->name,
+        ]);
+    }
+
     public function testEnforceScopingImplicitRouteBindings()
     {
         $user = ImplicitBindingUser::create(['name' => 'Dries']);
