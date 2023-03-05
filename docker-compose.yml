@@ -9,10 +9,19 @@ services:
     # awk-landmark (do not remove) #
     restart: unless-stopped
     volumes:
-      - .:/var/www/html
-      - /www/html/vendor/
-      - /www/html/docker-compose.yml
-      - /www/html/DockerFile/
+      - ./src/:/var/www/html/src/
+      - ./tests/:/var/www/html/tests/
+      - ./types/:/var/www/html/types/
+      - ./vendor/:/var/www/html/vendor/
+      - ./CHANGELOG.md:/var/www/html/CHANGELOG.md
+      - ./LICENSE.md:/var/www/html/LICENSE.md
+      - ./README.md:/var/www/html/README.md
+      - ./.styleci.yml:/var/www/html/.styleci.yml
+      - ./composer.json:/var/www/html/composer.json
+      - ./composer.lock:/var/www/html/composer.lock
+      - ./phpunit.xml.dist:/var/www/html/phpunit.xml.dist
+      - ./phpstan.src.neon.dist:/var/www/html/phpstan.src.neon.dist
+      - ./phpstan.types.neon.dist:/var/www/html/phpstan.types.neon.dist
   dynamodb:
     image: amazon/dynamodb-local
     ports:

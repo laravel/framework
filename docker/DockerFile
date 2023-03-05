@@ -14,14 +14,10 @@ ENV DEBIAN_FRONTEND noninteractive
 # Software's Installation
 #--------------------------------------------------------------------------
 #
-# Installing tools and PHP extentions using "apt", "docker-php", "pecl",
+# Installing tools and PHP extensions using "apt", "docker-php", "pecl",
 #
 
-# Install "curl", "libmemcached-dev", "libpq-dev", "libjpeg-dev",
-#         "libpng-dev", "libfreetype6-dev", "libssl-dev", "libmcrypt-dev",
-RUN set -eux; \
-    apt-get update; \
-    apt-get upgrade -y; \
+RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
             curl \
             git \
@@ -38,11 +34,16 @@ RUN set -eux; \
             libwebp-dev \
             libxpm-dev \
             libmcrypt-dev \
-            libonig-dev; \
+            libonig-dev && \
     rm -rf /var/lib/apt/lists/*
 
-
-USER root
+RUN docker-php-ext-configure gd \
+            --prefix=/usr \
+            --with-jpeg \
+            --with-webp \
+            --with-xpm \
+            --with-freetype && \
+    docker-php-ext-install gd pdo_mysql pdo_pgsql intl gmp zip
 
 # Get latest Composer
 COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
@@ -50,25 +51,6 @@ COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 COPY ./docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
-RUN set -eux; \
-    # Install the PHP pdo_mysql extention
-    docker-php-ext-install pdo_mysql; \
-    # Install the PHP pdo_pgsql extention
-    docker-php-ext-install pdo_pgsql; \
-    # Install the PHP gd library
-    docker-php-ext-configure gd \
-            --prefix=/usr \
-            --with-jpeg \
-            --with-webp \
-            --with-xpm \
-            --with-freetype; \
-    docker-php-ext-install gd;
-
-
-RUN docker-php-ext-configure intl
-RUN docker-php-ext-install intl
-RUN docker-php-ext-install gmp
-RUN docker-php-ext-install zip
-
+WORKDIR /var/www/html
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
