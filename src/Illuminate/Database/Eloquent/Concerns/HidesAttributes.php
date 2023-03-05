@@ -121,4 +121,38 @@ trait HidesAttributes
     {
         return value($condition, $this) ? $this->makeHidden($attributes) : $this;
     }
+
+    /**
+     * @param  string  $relation
+     * @return array
+     */
+    public function getVisibleForRelation(string $relation): array
+    {
+        $visibleRelations = [];
+
+        foreach ($this->getVisible() as $visible) {
+            if (str_starts_with($visible, $relation . '.')) {
+                $visibleRelations[] = explode($relation.'.', $visible)[1];
+            }
+        }
+
+        return $visibleRelations;
+    }
+
+    /**
+     * @param  string  $relation
+     * @return array
+     */
+    public function getHiddenForRelation(string $relation): array
+    {
+        $hiddenRelations = [];
+
+        foreach ($this->getHidden() as $hidden) {
+            if (str_starts_with($hidden, $relation . '.')) {
+                $hiddenRelations[] = explode($relation.'.', $hidden)[1];
+            }
+        }
+
+        return $hiddenRelations;
+    }
 }
