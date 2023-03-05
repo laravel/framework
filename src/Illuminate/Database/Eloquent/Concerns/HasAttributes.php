@@ -353,9 +353,7 @@ trait HasAttributes
         $attributes = [];
 
         foreach ($this->getArrayableRelations() as $key => $value) {
-
             if ($value instanceof Collection || $value instanceof Model) {
-
                 if (count($this->getVisibleForRelation($key))) {
                     $value->setVisible($this->getVisibleForRelation($key));
                 }

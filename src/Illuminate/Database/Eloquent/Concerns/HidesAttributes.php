@@ -131,7 +131,7 @@ trait HidesAttributes
         $visibleRelations = [];
 
         foreach ($this->getVisible() as $visible) {
-            if (str_starts_with($visible, $relation . '.')) {
+            if (str_starts_with($visible, $relation.'.')) {
                 $visibleRelations[] = explode($relation.'.', $visible)[1];
             }
         }
@@ -148,7 +148,7 @@ trait HidesAttributes
         $hiddenRelations = [];
 
         foreach ($this->getHidden() as $hidden) {
-            if (str_starts_with($hidden, $relation . '.')) {
+            if (str_starts_with($hidden, $relation.'.')) {
                 $hiddenRelations[] = explode($relation.'.', $hidden)[1];
             }
         }
