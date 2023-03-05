@@ -107,7 +107,7 @@ class Stringable implements JsonSerializable, ArrayAccess
      */
     public function charAt($index)
     {
-        return Str::charAt($this->value, $index); 
+        return Str::charAt($this->value, $index);
     }
 
     /**
