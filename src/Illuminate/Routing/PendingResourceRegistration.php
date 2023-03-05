@@ -230,15 +230,11 @@ class PendingResourceRegistration
     /**
      * Define which routes should allow "trashed" models to be retrieved when resolving implicit model bindings.
      *
-     * @param  array|string  $methods
+     * @param  array  $methods
      * @return \Illuminate\Routing\PendingResourceRegistration
      */
-    public function withTrashed(array|string $methods = [])
+    public function withTrashed(array $methods = [])
     {
-        if (is_string($methods)) {
-            $methods = (array) $methods;
-        }
-
         $this->options['trashed'] = $methods;
 
         return $this;
