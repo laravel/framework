@@ -3,6 +3,7 @@
 namespace Illuminate\Database;
 
 use Illuminate\Contracts\Database\Query\Expression;
+use Illuminate\Contracts\Database\Query\ExpressionWithBindings;
 use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
 
@@ -204,7 +205,7 @@ abstract class Grammar
      */
     public function isExpression($value)
     {
-        return $value instanceof Expression;
+        return $value instanceof Expression || $value instanceof ExpressionWithBindings;
     }
 
     /**

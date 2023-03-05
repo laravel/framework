@@ -8,6 +8,7 @@ use Closure;
 use DateTimeInterface;
 use Illuminate\Contracts\Database\Query\Builder as BuilderContract;
 use Illuminate\Contracts\Database\Query\Expression as ExpressionContract;
+use Illuminate\Contracts\Database\Query\ExpressionWithBindings;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Concerns\ExplainsQueries;
@@ -3703,6 +3704,9 @@ class Builder implements BuilderContract
      */
     public function castBinding($value)
     {
+        if ($value instanceof ExpressionWithBindings)
+            return $value->getBindings($this->grammar);
+
         return $value instanceof BackedEnum ? $value->value : $value;
     }
 
@@ -3732,6 +3736,7 @@ class Builder implements BuilderContract
                         return $binding instanceof ExpressionContract;
                     })
                     ->map([$this, 'castBinding'])
+                    ->flatten()
                     ->values()
                     ->all();
     }
