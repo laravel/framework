@@ -6,8 +6,8 @@ services:
     build:
       context: ./
       dockerfile: ./docker/DockerFile
-    # awk-landmark (do not remove) #
     restart: unless-stopped
+    container_name: laravel_local
     volumes:
       - ./src/:/var/www/html/src/
       - ./tests/:/var/www/html/tests/
