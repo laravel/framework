@@ -217,7 +217,7 @@ class Str
     }
 
     /**
-     * Get character at the specified index.
+     * Get the character at the specified index.
      *
      * @param  string  $subject
      * @param  int  $index
