@@ -221,14 +221,14 @@ class Str
      *
      * @param  string  $subject
      * @param  int  $index
-     * @return string|null
+     * @return string|false
      */
     public static function charAt($subject, $index)
     {
         $length = mb_strlen($subject);
 
         if ($index < 0 ? $index < -$length : $index > $length - 1) {
-            return null;
+            return false;
         }
 
         return mb_substr($subject, $index, 1);

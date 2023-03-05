@@ -103,7 +103,7 @@ class Stringable implements JsonSerializable, ArrayAccess
      * Get the character at the specified index.
      *
      * @param  int  $index
-     * @return string|null
+     * @return string|false
      */
     public function charAt($index)
     {
