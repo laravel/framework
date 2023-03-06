@@ -17,6 +17,26 @@ class ValidateSignature
     ];
 
     /**
+     * Specify the url signature is for a relative URL.
+     *
+     * @return string
+     */
+    public static function relative()
+    {
+        return static::class.':relative';
+    }
+
+    /**
+     * Specify the url signature is for a absolute URL.
+     *
+     * @return class-string
+     */
+    public static function absolute()
+    {
+        return static::class;
+    }
+
+    /**
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request

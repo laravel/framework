@@ -29,6 +29,18 @@ class Authenticate implements AuthenticatesRequests
     }
 
     /**
+     * Specify the guards for the middleware.
+     *
+     * @param  string  $guard
+     * @param  string  $others
+     * @return string
+     */
+    public static function using($guard, ...$others)
+    {
+        return static::class.':'.implode(',', [$guard, ...$others]);
+    }
+
+    /**
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
