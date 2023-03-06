@@ -407,11 +407,10 @@ class LogManager implements LoggerInterface
             [
                 $this->prepareHandler(
                     $this->app->make($config['handler'], $with), $config
-                )
+                ),
             ],
             collect($config['processors'] ?? [])
-                ->map(fn ($processor) =>
-                    $this->app->make($processor['processor'] ?? $processor, $processor['with'] ?? [])
+                ->map(fn ($processor) => $this->app->make($processor['processor'] ?? $processor, $processor['with'] ?? [])
         )->toArray());
     }
 
