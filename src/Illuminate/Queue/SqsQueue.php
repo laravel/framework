@@ -173,6 +173,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
             $args['MessageGroupId'] = (string) $options['MessageGroupId'];
             $args['MessageDeduplicationId'] = (string) $options['MessageDeduplicationId'];
         }
+
         return $this->sqs->sendMessage($args)->get('MessageId');
     }
 
