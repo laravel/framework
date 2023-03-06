@@ -314,6 +314,20 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a basic where clause to the query, and return the results.
+     *
+     * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @param  string  $boolean
+     * @return Builder[]|Collection|null
+     */
+    public function getWhere($column, $operator = null, $value = null, $boolean = 'and')
+    {
+        return $this->where($column, $operator, $value, $boolean)->get();
+    }
+
+    /**
      * Add an "or where" clause to the query.
      *
      * @param  \Closure|array|string|\Illuminate\Contracts\Database\Query\Expression  $column
