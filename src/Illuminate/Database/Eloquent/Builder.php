@@ -324,7 +324,7 @@ class Builder implements BuilderContract
      */
     public function getWhere($column, $operator = null, $value = null, $boolean = 'and')
     {
-        return $this->where($column, $operator, $value, $boolean)->get();
+        return $this->where(...func_get_args())->get();
     }
 
     /**
