@@ -3,6 +3,7 @@
 namespace Illuminate\Queue;
 
 use Aws\Sqs\SqsClient;
+use BadMethodCallException;
 use Illuminate\Contracts\Queue\ClearableQueue;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Queue\Jobs\SqsJob;
@@ -39,6 +40,34 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     protected $suffix;
 
     /**
+     * The SQS queue type.
+     *
+     * @var string
+     */
+    private $type;
+
+    /**
+     * The message group id.
+     *
+     * @var string
+     */
+    private $messageGroupId;
+
+    /**
+     * The message deduplication id.
+     *
+     * @var string
+     */
+    private $messageDeduplicationId;
+
+    /**
+     * The flag for FIFO delays on queue.
+     *
+     * @var bool
+     */
+    private $allowDelay;
+
+    /**
      * Create a new Amazon SQS queue instance.
      *
      * @param  \Aws\Sqs\SqsClient  $sqs
@@ -46,19 +75,42 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      * @param  string  $prefix
      * @param  string  $suffix
      * @param  bool  $dispatchAfterCommit
+     * @param  string  $type
+     * @param  string  $messageGroupId
+     * @param  string  $messageDeduplicationId
+     * @param  bool  $allowDelay
      * @return void
      */
-    public function __construct(SqsClient $sqs,
-                                $default,
-                                $prefix = '',
-                                $suffix = '',
-                                $dispatchAfterCommit = false)
-    {
+    public function __construct(
+        SqsClient $sqs,
+        $default,
+        $prefix = '',
+        $suffix = '',
+        $dispatchAfterCommit = false,
+        $type = 'standard',
+        $messageGroupId = null,
+        $messageDeduplicationId = null,
+        $allowDelay = false
+    ) {
         $this->sqs = $sqs;
         $this->prefix = $prefix;
         $this->default = $default;
         $this->suffix = $suffix;
         $this->dispatchAfterCommit = $dispatchAfterCommit;
+        $this->type = $type;
+        $this->messageGroupId = $messageGroupId;
+        $this->messageDeduplicationId = $messageDeduplicationId;
+        $this->allowDelay = $allowDelay;
+    }
+
+    /**
+     * Check if the queue is FIFO.
+     * 
+     * @return bool
+     */
+    protected function isFifoQueue()
+    {
+        return $this->type == 'fifo';
     }
 
     /**
@@ -82,7 +134,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     /**
      * Push a new job onto the queue.
      *
-     * @param  string  $job
+     * @param  mixed  $job
      * @param  mixed  $data
      * @param  string|null  $queue
      * @return mixed
@@ -94,8 +146,11 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
             $this->createPayload($job, $queue ?: $this->default, $data),
             $queue,
             null,
-            function ($payload, $queue) {
-                return $this->pushRaw($payload, $queue);
+            function ($payload, $queue) use (&$job) {
+                return $this->pushRaw($payload, $queue, $this->isFifoQueue() ? [
+                    'MessageGroupId' => $job->messageGroupId ?? $this->messageGroupId,
+                    'MessageDeduplicationId' => $job->messageDeduplicationId ?? $this->messageDeduplicationId
+                ] : []);
             }
         );
     }
@@ -110,13 +165,23 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function pushRaw($payload, $queue = null, array $options = [])
     {
-        return $this->sqs->sendMessage([
-            'QueueUrl' => $this->getQueue($queue), 'MessageBody' => $payload,
-        ])->get('MessageId');
+        $args = [
+            'QueueUrl' => $this->getQueue($queue),
+            'MessageBody' => $payload,
+        ];
+        if ($this->isFifoQueue()) {
+            $args['MessageGroupId'] = (string) $options['MessageGroupId'];
+            $args['MessageDeduplicationId'] = (string) $options['MessageDeduplicationId'];
+        }
+        return $this->sqs->sendMessage($args)->get('MessageId');
     }
 
     /**
      * Push a new job onto the queue after (n) seconds.
+     * Note that SQS FIFO doesn't support delay per 
+     * message, instead it uses default delay on 
+     * queue which is configurable via AWS SQS 
+     * panel or API.
      *
      * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  string  $job
@@ -126,6 +191,14 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function later($delay, $job, $data = '', $queue = null)
     {
+        if ($this->isFifoQueue()) {
+            if ($this->allowDelay) {
+                return $this->push($job, $data, $queue);
+            }
+
+            throw new BadMethodCallException('FIFO queues do not support per-message delays.');
+        }
+
         return $this->enqueueUsing(
             $job,
             $this->createPayload($job, $queue ?: $this->default, $data),
@@ -175,8 +248,11 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
 
         if (! is_null($response['Messages']) && count($response['Messages']) > 0) {
             return new SqsJob(
-                $this->container, $this->sqs, $response['Messages'][0],
-                $this->connectionName, $queue
+                $this->container,
+                $this->sqs,
+                $response['Messages'][0],
+                $this->connectionName,
+                $queue
             );
         }
     }
@@ -205,6 +281,10 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     public function getQueue($queue)
     {
         $queue = $queue ?: $this->default;
+
+        if ($this->isFifoQueue()) {
+            $queue = sprintf('%s%s', $queue, '.fifo');
+        }
 
         return filter_var($queue, FILTER_VALIDATE_URL) === false
             ? $this->suffixQueue($queue, $this->suffix)

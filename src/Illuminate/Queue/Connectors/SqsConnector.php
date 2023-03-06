@@ -29,7 +29,11 @@ class SqsConnector implements ConnectorInterface
             $config['queue'],
             $config['prefix'] ?? '',
             $config['suffix'] ?? '',
-            $config['after_commit'] ?? null
+            $config['after_commit'] ?? null,
+            $config['type'] ?? 'standard',
+            $config['message_group_id'] ?? null,
+            $config['message_deduplication_id'] ?? null,
+            $config['allow_delay'] ?? false
         );
     }
 
