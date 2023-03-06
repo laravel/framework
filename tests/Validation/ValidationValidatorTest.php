@@ -4601,6 +4601,25 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testValidateAlphaDashChar()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => 'asls-_dlks'], ['x' => 'AlphaDashChar']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 'http://-g232oogle.com'], ['x' => 'AlphaDashChar']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 'नमस्कार-_'], ['x' => 'AlphaDashChar']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 'من_هنا'], ['x' => 'AlphaDashChar']); // eastern arabic letters
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => "abc\n"], ['x' => 'AlphaDashChar']); // ends with newline
+        $this->assertFalse($v->passes());
+    }
+
     public function testValidateAlphaWithAsciiOption()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -4696,6 +4715,31 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['x' => "abc\n"], ['x' => 'AlphaDash:ascii']); // ends with newline
+        $this->assertFalse($v->passes());
+    }
+
+    public function testValidateAlphaDashCharWithAsciiOption()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => 'asls-_dlks'], ['x' => 'AlphaDashChar:ascii']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 'aslsdlks'], ['x' => 'AlphaDashChar:ascii']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 'http://-g232oogle.com'], ['x' => 'AlphaDashChar:ascii']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 'ユニコードを基盤技術と-_'], ['x' => 'AlphaDashChar:ascii']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 'नमस्कार-_'], ['x' => 'AlphaDashChar:ascii']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 'من-هنا'], ['x' => 'AlphaDashChar:ascii']); // eastern arabic letters
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => "abc\n"], ['x' => 'AlphaDashChar:ascii']); // ends with newline
         $this->assertFalse($v->passes());
     }
 

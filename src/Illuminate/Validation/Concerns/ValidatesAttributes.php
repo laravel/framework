@@ -377,6 +377,28 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute contains only characters, dashes, and underscores.
+     * If the 'ascii' option is passed, validate that an attribute contains only ascii characters,
+     * dashes, and underscores.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validateAlphaDashChar($attribute, $value, $parameters)
+    {
+        if (! is_string($value) && ! is_numeric($value)) {
+            return false;
+        }
+
+        if (isset($parameters[0]) && $parameters[0] === 'ascii') {
+            return preg_match('/\A[a-zA-Z_-]+\z/u', $value) > 0;
+        }
+
+        return preg_match('/\A[\pL\pM_-]+\z/u', $value) > 0;
+    }
+
+    /**
      * Validate that an attribute contains only alpha-numeric characters.
      * If the 'ascii' option is passed, validate that an attribute contains only ascii alpha-numeric characters.
      *
