@@ -290,6 +290,7 @@ class LogManagerTest extends TestCase
             'driver' => 'single',
             'name' => 'ds',
             'path' => storage_path('logs/laravel.log'),
+            'replace_placeholders' => true,
         ]);
 
         $manager = new LogManager($this->app);
@@ -311,7 +312,7 @@ class LogManagerTest extends TestCase
             'formatter_with' => [
                 'dateFormat' => 'Y/m/d--test',
             ],
-            'with_placeholders' => false,
+            'replace_placeholders' => false,
         ]);
 
         $logger = $manager->channel('formattedsingle');
@@ -335,6 +336,7 @@ class LogManagerTest extends TestCase
             'driver' => 'daily',
             'name' => 'dd',
             'path' => storage_path('logs/laravel.log'),
+            'replace_placeholders' => true,
         ]);
 
         $manager = new LogManager($this->app);
@@ -356,7 +358,7 @@ class LogManagerTest extends TestCase
             'formatter_with' => [
                 'dateFormat' => 'Y/m/d--test',
             ],
-            'with_placeholders' => false,
+            'replace_placeholders' => false,
         ]);
 
         $logger = $manager->channel('formatteddaily');
@@ -379,6 +381,7 @@ class LogManagerTest extends TestCase
         $config->set('logging.channels.defaultsyslog', [
             'driver' => 'syslog',
             'name' => 'ds',
+            'replace_placeholders' => true,
         ]);
 
         $manager = new LogManager($this->app);
@@ -399,7 +402,7 @@ class LogManagerTest extends TestCase
             'formatter_with' => [
                 'dateFormat' => 'Y/m/d--test',
             ],
-            'with_placeholders' => false,
+            'replace_placeholders' => false,
         ]);
 
         $logger = $manager->channel('formattedsyslog');
