@@ -686,7 +686,7 @@ abstract class Factory
     {
         $instances->each(function ($model) {
             $this->afterMaking->each(function ($callback) use ($model) {
-                $callback($model);
+                $callback($model, $this);
             });
         });
     }
@@ -702,7 +702,7 @@ abstract class Factory
     {
         $instances->each(function ($model) use ($parent) {
             $this->afterCreating->each(function ($callback) use ($model, $parent) {
-                $callback($model, $parent);
+                $callback($model, $parent, $this);
             });
         });
     }
