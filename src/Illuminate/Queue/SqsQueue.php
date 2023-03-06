@@ -105,7 +105,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
 
     /**
      * Check if the queue is FIFO.
-     * 
+     *
      * @return bool
      */
     protected function isFifoQueue()
@@ -149,7 +149,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
             function ($payload, $queue) use (&$job) {
                 return $this->pushRaw($payload, $queue, $this->isFifoQueue() ? [
                     'MessageGroupId' => $job->messageGroupId ?? $this->messageGroupId,
-                    'MessageDeduplicationId' => $job->messageDeduplicationId ?? $this->messageDeduplicationId
+                    'MessageDeduplicationId' => $job->messageDeduplicationId ?? $this->messageDeduplicationId,
                 ] : []);
             }
         );
@@ -178,9 +178,9 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
 
     /**
      * Push a new job onto the queue after (n) seconds.
-     * Note that SQS FIFO doesn't support delay per 
-     * message, instead it uses default delay on 
-     * queue which is configurable via AWS SQS 
+     * Note that SQS FIFO doesn't support delay per
+     * message, instead it uses default delay on
+     * queue which is configurable via AWS SQS
      * panel or API.
      *
      * @param  \DateTimeInterface|\DateInterval|int  $delay

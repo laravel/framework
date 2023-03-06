@@ -161,6 +161,7 @@ class QueueSqsQueueTest extends TestCase
         $this->assertEquals($this->mockedMessageId, $id);
         $container->shouldHaveReceived('bound')->with('events')->once();
     }
+
     public function testPushFifoProperlyPushesJobOntoSqs()
     {
         $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['createPayload', 'getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account, null, false, 'fifo', $this->mockedMessageGroupId, $this->mockedMessageDeduplicationId])->getMock();
@@ -172,7 +173,7 @@ class QueueSqsQueueTest extends TestCase
         $this->assertEquals($this->mockedMessageId, $id);
         $container->shouldHaveReceived('bound')->with('events')->once();
     }
-    
+
     public function testSizeProperlyReadsSqsQueueSize()
     {
         $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
