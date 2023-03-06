@@ -249,6 +249,33 @@ class EloquentWhereTest extends DatabaseTestCase
         );
     }
 
+    public function testGetWhere()
+    {
+        $user1 = UserWhereTest::create([
+            'name' => 'test-name-1',
+            'email' => 'test-email-1',
+            'address' => 'test-address-1',
+        ]);
+        $user2 = UserWhereTest::create([
+            'name' => 'test-name-2',
+            'email' => 'test-email-2',
+            'address' => 'test-address-2',
+        ]);
+        $user3 = UserWhereTest::create([
+            'name' => 'test-name-3',
+            'email' => 'test-email-3',
+            'address' => 'test-address-3',
+        ]);
+
+        $this->assertEquals($user1->name, UserWhereTest::getWhere('name', 'test-name-1')[0]->name);
+        $this->assertEquals($user2->name, UserWhereTest::getWhere('name', 'test-name-2')[0]->name);
+        $this->assertEquals($user3->name, UserWhereTest::getWhere('name', 'test-name-3')[0]->name);
+        $this->assertTrue($user1->is(UserWhereTest::getWhere('name', 'test-name-1')[0]));
+        $this->assertTrue($user2->is(UserWhereTest::getWhere('name', 'test-name-2')[0]));
+        $this->assertTrue($user3->is(UserWhereTest::getWhere('name', 'test-name-3')[0]));
+        $this->assertIsArray(UserWhereTest::getWhere('name', 'test-name-1')->toArray());
+    }
+
     public function testSole()
     {
         $expected = UserWhereTest::create([
