@@ -54,6 +54,20 @@ class ProcessTest extends TestCase
         $this->assertTrue(str_contains($results[1]->output(), 'ProcessTest.php'));
     }
 
+    public function testInvokedProcessPoolCount()
+    {
+        $factory = new Factory;
+
+        $pool = $factory->pool(function ($pool) {
+            return [
+                $pool->path(__DIR__)->command($this->ls()),
+                $pool->path(__DIR__)->command($this->ls()),
+            ];
+        })->start();
+
+        $this->assertCount(2, $pool);
+    }
+
     public function testProcessPoolCanReceiveOutputForEachProcessViaStartMethod()
     {
         $factory = new Factory;
