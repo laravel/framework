@@ -81,7 +81,7 @@ class ResourceResponse implements Responsable
      */
     protected function haveDefaultWrapperAndDataIsUnwrapped($data)
     {
-        return $this->wrapper() && ! array_key_exists($this->wrapper(), $data);
+        return $this->wrapper();
     }
 
     /**
@@ -94,9 +94,7 @@ class ResourceResponse implements Responsable
      */
     protected function haveAdditionalInformationAndDataIsUnwrapped($data, $with, $additional)
     {
-        return (! empty($with) || ! empty($additional)) &&
-               (! $this->wrapper() ||
-                ! array_key_exists($this->wrapper(), $data));
+        return (! empty($with) || ! empty($additional)) && ! $this->wrapper();
     }
 
     /**
