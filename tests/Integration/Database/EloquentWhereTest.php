@@ -265,13 +265,17 @@ class EloquentWhereTest extends DatabaseTestCase
         // firstUser assertions
         $this->assertTrue($firstUser->is(UserWhereTest::firstWhere('name', $firstUser->name)));
         $this->assertEquals('test-name', UserWhereTest::firstWhere('name', 'test-name', columns: 'name')->name);
+        $this->assertEquals('test-name', UserWhereTest::firstWhere('name', 'test-name', columns: ['name', 'email'])->name);
         $this->assertEquals('test-email', UserWhereTest::firstWhere('email', 'test-email', columns: 'email')->email);
+        $this->assertEquals('test-email', UserWhereTest::firstWhere('email', 'test-email', columns: ['name', 'email'])->email);
         $this->assertNull(UserWhereTest::firstWhere('email', 'test-email', columns: 'name')->email);
 
         // secondUser assertions
         $this->assertTrue($secondUser->is(UserWhereTest::firstWhere('name', $secondUser->name)));
         $this->assertEquals('test-name1', UserWhereTest::firstWhere('name', 'test-name1', columns: 'name')->name);
+        $this->assertEquals('test-name1', UserWhereTest::firstWhere('name', 'test-name1', columns: ['name', 'email'])->name);
         $this->assertEquals('test-email1', UserWhereTest::firstWhere('email', 'test-email1', columns: 'email')->email);
+        $this->assertEquals('test-email1', UserWhereTest::firstWhere('email', 'test-email1', columns: ['name', 'email'])->email);
         $this->assertNull(UserWhereTest::firstWhere('email', 'test-email1', columns: 'name')->email);
     }
 
