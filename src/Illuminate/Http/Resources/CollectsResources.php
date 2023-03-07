@@ -31,13 +31,15 @@ trait CollectsResources
 
         $collects = $this->collects();
 
-        $this->collection = $collects && ! $resource->first() instanceof $collects
+        $this->collection = $collects && !$resource->first() instanceof $collects
             ? $resource->mapInto($collects)
             : $resource->toBase();
 
-        return ($resource instanceof AbstractPaginator || $resource instanceof AbstractCursorPaginator)
-                    ? $resource->setCollection($this->collection)
-                    : $this->collection;
+        if ($resource instanceof AbstractPaginator || $resource instanceof AbstractCursorPaginator) {
+            return $resource->setCollection($this->collection);
+        }
+
+        return $this->collection;
     }
 
     /**
