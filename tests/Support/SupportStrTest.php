@@ -628,6 +628,11 @@ class SupportStrTest extends TestCase
         $this->assertSame('Foobar', Str::remove(['f', '|'], 'Foo|bar'));
     }
 
+    public function testRemoveSpaces()
+    {
+        $this->assertSame('Foobar', Str::removeSpaces('Foo bar'));
+    }
+
     public function testReverse()
     {
         $this->assertSame('FooBar', Str::reverse('raBooF'));

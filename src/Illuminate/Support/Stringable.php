@@ -589,6 +589,16 @@ class Stringable implements JsonSerializable, ArrayAccess
     }
 
     /**
+     * Remove all space characters.
+     *
+     * @return static
+     */
+    public function removeSpaces()
+    {
+        return new static(Str::removeSpaces($this->value));
+    }
+
+    /**
      * Reverse the string.
      *
      * @return static

@@ -1006,6 +1006,17 @@ class Str
     }
 
     /**
+     * Remove all occurrence of space characters from the given subject.
+     *
+     * @param  string  $subject
+     * @return string
+     */
+    public static function removeSpaces(string $subject)
+    {
+        return str_ireplace(' ', '', $subject);
+    }
+
+    /**
      * Reverse the given string.
      *
      * @param  string  $value

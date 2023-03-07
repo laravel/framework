@@ -882,6 +882,11 @@ class SupportStringableTest extends TestCase
         $this->assertSame('Foobar', (string) $this->stringable('Foo|bar')->remove(['f', '|']));
     }
 
+    public function testRemoveSpaces()
+    {
+        $this->assertSame('Foobar', (string) $this->stringable('Foo bar')->removeSpaces());
+    }
+
     public function testReverse()
     {
         $this->assertSame('FooBar', (string) $this->stringable('raBooF')->reverse());
