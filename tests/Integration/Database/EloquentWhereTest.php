@@ -249,6 +249,32 @@ class EloquentWhereTest extends DatabaseTestCase
         );
     }
 
+    public function testFirstWhereWithSelectColumns()
+    {
+        $firstUser = UserWhereTest::create([
+            'name' => 'test-name',
+            'email' => 'test-email',
+            'address' => 'test-address',
+        ]);
+        $secondUser = UserWhereTest::create([
+            'name' => 'test-name1',
+            'email' => 'test-email1',
+            'address' => 'test-address1',
+        ]);
+
+        // firstUser assertions
+        $this->assertTrue($firstUser->is(UserWhereTest::firstWhere('name', $firstUser->name)));
+        $this->assertEquals('test-name', UserWhereTest::firstWhere('name', 'test-name', columns: 'name')->name);
+        $this->assertEquals('test-email', UserWhereTest::firstWhere('email', 'test-email', columns: 'email')->email);
+        $this->assertNull(UserWhereTest::firstWhere('email', 'test-email', columns: 'name')->email);
+
+        // secondUser assertions
+        $this->assertTrue($secondUser->is(UserWhereTest::firstWhere('name', $secondUser->name)));
+        $this->assertEquals('test-name1', UserWhereTest::firstWhere('name', 'test-name1', columns: 'name')->name);
+        $this->assertEquals('test-email1', UserWhereTest::firstWhere('email', 'test-email1', columns: 'email')->email);
+        $this->assertNull(UserWhereTest::firstWhere('email', 'test-email1', columns: 'name')->email);
+    }
+
     public function testSole()
     {
         $expected = UserWhereTest::create([
