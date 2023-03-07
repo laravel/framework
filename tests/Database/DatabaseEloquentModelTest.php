@@ -2678,7 +2678,7 @@ class DatabaseEloquentModelTest extends TestCase
     public function testToJsonWithNumeric()
     {
         $model = new EloquentModelStub([
-            'number' => '12345.678'
+            'number' => '12345.678',
         ]);
 
         $json = $model->toJson();
@@ -2695,7 +2695,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->expectException(JsonEncodingException::class);
 
         $model = new EloquentModelStub([
-            'name' => "\xB1\x31" // an invalid UTF-8 sequence
+            'name' => "\xB1\x31", // an invalid UTF-8 sequence
         ]);
 
         $json = $model->toJson();
@@ -2706,7 +2706,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->expectException(\JsonException::class);
 
         $model = new EloquentModelStub([
-            'name' => "\xB1\x31" // an invalid UTF-8 sequence
+            'name' => "\xB1\x31", // an invalid UTF-8 sequence
         ]);
 
         $json = $model->toJson(JSON_THROW_ON_ERROR);
@@ -2718,7 +2718,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->expectException(\JsonException::class);
 
         $model = new EloquentModelStub([
-            'name' => "\xB1\x31" // an invalid UTF-8 sequence
+            'name' => "\xB1\x31", // an invalid UTF-8 sequence
         ]);
 
         $json = $model->toJson(JSON_THROW_ON_ERROR);
@@ -2729,7 +2729,7 @@ class DatabaseEloquentModelTest extends TestCase
         @json_decode('[invalid json]');
 
         $model = new EloquentModelStub([
-            'name' => "Taylor Otwell" // an invalid UTF-8 sequence
+            'name' => 'Taylor Otwell', // an invalid UTF-8 sequence
         ]);
 
         $json = $model->toJson();
