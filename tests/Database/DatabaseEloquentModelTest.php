@@ -2703,7 +2703,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testJsonThrowsOnInvalidWithThrowOnErrorFlag()
     {
-        $this->expectException(JsonEncodingException::class);
+        $this->expectException(\JsonException::class);
 
         $model = new EloquentModelStub([
             'name' => "\xB1\x31" // an invalid UTF-8 sequence
@@ -2712,10 +2712,10 @@ class DatabaseEloquentModelTest extends TestCase
         $json = $model->toJson(JSON_THROW_ON_ERROR);
     }
 
-    public function testJsonThrowsOnInvalidWithThrowOnErrorFlagEvenWithExistingError()
+    public function testJsonThrowsJsonExceptionOnInvalidWithThrowOnErrorFlagEvenWithExistingError()
     {
         @json_decode('[invalid json]');
-        $this->expectException(JsonEncodingException::class);
+        $this->expectException(\JsonException::class);
 
         $model = new EloquentModelStub([
             'name' => "\xB1\x31" // an invalid UTF-8 sequence
