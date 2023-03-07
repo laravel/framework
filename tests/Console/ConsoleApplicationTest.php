@@ -22,11 +22,12 @@ class ConsoleApplicationTest extends TestCase
     {
         $app = $this->getMockConsole(['addToParent']);
         $command = m::mock(Command::class);
-        $command->shouldReceive('setLaravel')->once()->with(m::type(ApplicationContract::class));
-        $app->expects($this->once())->method('addToParent')->with($this->equalTo($command))->willReturn($command);
+        $application = m::type(ApplicationContract::class);
+        $command->shouldReceive('setLaravel')->once()->with($application);
+        $app->expects($this->once())->method('addToParent')->with($command)->willReturn($command);
         $result = $app->add($command);
-
-        $this->assertEquals($command, $result);
+        
+        $this->assertSame($command, $result);
     }
 
     public function testLaravelNotSetOnSymfonyCommands()
