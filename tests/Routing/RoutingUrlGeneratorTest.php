@@ -738,26 +738,44 @@ class RoutingUrlGeneratorTest extends TestCase
     {
         $url = new UrlGenerator(
             new RouteCollection,
-            Request::create('http://www.foo.com/')
+            Request::create('http://www.foo.com/')->setRouteResolver(function () {
+                return new Route('GET', '/', fn() => null);
+            })
         );
 
         $url->getRequest()->headers->set('referer', 'http://www.foo.com/');
         $this->assertSame('http://www.foo.com', $url->previous());
         $this->assertSame('http://www.foo.com/bar', $url->previous('/bar'));
 
-        $url->setRequest(Request::create('http://www.foo.com/bar'));
+        $url->setRequest(Request::create('http://www.foo.com/bar')->setRouteResolver(function () {
+            return new Route('GET', '/bar', fn() => null);
+        }));
 
         $url->getRequest()->headers->set('referer', 'http://www.foo.com/bar');
         $this->assertSame('http://www.foo.com', $url->previous());
         $this->assertSame('http://www.foo.com/bar', $url->previous('/bar'));
         $this->assertSame('http://www.foo.com/baz', $url->previous('/baz'));
 
-        $url->setRequest(Request::create('http://www.foo.com/bar?page=2'));
+        $url->setRequest(Request::create('http://www.foo.com/bar?page=2')->setRouteResolver(function () {
+            return new Route('GET', '/bar', fn() => null);
+        }));
 
         $url->getRequest()->headers->set('referer', 'http://www.foo.com/bar?page=2');
         $this->assertSame('http://www.foo.com', $url->previous());
         $this->assertSame('http://www.foo.com/bar', $url->previous('/bar'));
         $this->assertSame('http://www.foo.com/bar?page=2', $url->previous('/bar?page=2'));
+    }
+
+    public function testWhenPreviousIsEqualToCurrentButMethodIsDifferrent()
+    {
+        $url = new UrlGenerator(
+            new RouteCollection,
+            Request::create('http://www.foo.com/bar', 'POST')
+        );
+
+        $url->getRequest()->headers->set('referer', 'http://www.foo.com/');
+        $this->assertSame('http://www.foo.com/', $url->previous());
+        $this->assertSame('http://www.foo.com/', $url->previous('/bar'));
     }
 
     public function testRouteNotDefinedException()
