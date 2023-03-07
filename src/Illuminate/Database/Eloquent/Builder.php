@@ -306,11 +306,12 @@ class Builder implements BuilderContract
      * @param  mixed  $operator
      * @param  mixed  $value
      * @param  string  $boolean
+     * @param array|string  $columns
      * @return \Illuminate\Database\Eloquent\Model|static|null
      */
-    public function firstWhere($column, $operator = null, $value = null, $boolean = 'and')
+    public function firstWhere($column, $operator = null, $value = null, $boolean = 'and', $columns = ['*'])
     {
-        return $this->where(...func_get_args())->first();
+        return $this->where(...func_get_args())->first($columns);
     }
 
     /**
