@@ -2644,6 +2644,98 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertNull($user->getOriginal('name'));
         $this->assertNull($user->getAttribute('name'));
     }
+
+    public function testToJson()
+    {
+        $model = new EloquentModelStub([
+            'name' => 'Taylor Otwell',
+        ]);
+
+        $json = $model->toJson();
+
+        $this->assertSame($json, '{"name":"Taylor Otwell"}');
+
+        $json = $model->toJson(JSON_PRETTY_PRINT);
+
+        $this->assertSame($json, "{\n    \"name\": \"Taylor Otwell\"\n}");
+    }
+
+    public function testToJsonWithAdditionalOptions()
+    {
+        $model = new EloquentModelStub([
+            'name' => 'Taylor Otwell & \' "',
+        ]);
+
+        $json = $model->toJson();
+
+        $this->assertSame($json, '{"name":"Taylor Otwell & \' \\""}');
+
+        $json = $model->toJson(JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+
+        $this->assertSame($json, '{"name":"Taylor Otwell \u0026 \u0027 \u0022"}');
+    }
+
+    public function testToJsonWithNumeric()
+    {
+        $model = new EloquentModelStub([
+            'number' => '12345.678'
+        ]);
+
+        $json = $model->toJson();
+
+        $this->assertSame($json, '{"number":"12345.678"}');
+
+        $json = $model->toJson(JSON_NUMERIC_CHECK);
+
+        $this->assertSame($json, '{"number":12345.678}');
+    }
+
+    public function testJsonThrowsOnInvalid()
+    {
+        $this->expectException(JsonEncodingException::class);
+
+        $model = new EloquentModelStub([
+            'name' => "\xB1\x31" // an invalid UTF-8 sequence
+        ]);
+
+        $json = $model->toJson();
+    }
+
+    public function testJsonThrowsOnInvalidWithThrowOnErrorFlag()
+    {
+        $this->expectException(JsonEncodingException::class);
+
+        $model = new EloquentModelStub([
+            'name' => "\xB1\x31" // an invalid UTF-8 sequence
+        ]);
+
+        $json = $model->toJson(JSON_THROW_ON_ERROR);
+    }
+
+    public function testJsonThrowsOnInvalidWithThrowOnErrorFlagEvenWithExistingError()
+    {
+        @json_decode('[invalid json]');
+        $this->expectException(JsonEncodingException::class);
+
+        $model = new EloquentModelStub([
+            'name' => "\xB1\x31" // an invalid UTF-8 sequence
+        ]);
+
+        $json = $model->toJson(JSON_THROW_ON_ERROR);
+    }
+
+    public function testJsonDoesntThrowOnInvalidWithExistingError()
+    {
+        @json_decode('[invalid json]');
+
+        $model = new EloquentModelStub([
+            'name' => "Taylor Otwell" // an invalid UTF-8 sequence
+        ]);
+
+        $json = $model->toJson();
+
+        $this->assertSame($json, '{"name":"Taylor Otwell"}');
+    }
 }
 
 class EloquentTestObserverStub
