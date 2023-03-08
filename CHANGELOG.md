@@ -1,6 +1,30 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.1.5...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v10.2.0...10.x)
+
+
+## [v10.2.0 (2023-03-02)](https://github.com/laravel/framework/compare/v10.1.5...v10.2.0)
+
+### Added
+- Adding `Conditionable` train to Logger ([#46259](https://github.com/laravel/framework/pull/46259))
+- Added "dot" method to Illuminate\Support\Collection class ([#46265](https://github.com/laravel/framework/pull/46265))
+- Added a "channel:list" command ([#46248](https://github.com/laravel/framework/pull/46248))
+- Added JobPopping and JobPopped events ([#46220](https://github.com/laravel/framework/pull/46220))
+- Add isMatch method to Str and Stringable helpers ([#46303](https://github.com/laravel/framework/pull/46303))
+- Add ArrayAccess to Stringable ([#46279](https://github.com/laravel/framework/pull/46279))
+
+### Reverted
+- Revert "[10.x] Fix custom themes not reseting on Markdown renderer" ([#46328](https://github.com/laravel/framework/pull/46328))
+
+### Fixed
+- Fix typo in function `createMissingSqliteDatbase` name in `src/Illuminate/Database/Console/Migrations/MigrateCommand.php` ([#46326](https://github.com/laravel/framework/pull/46326))
+
+### Changed
+- Generate default command name based on class name in `ConsoleMakeCommand` ([#46256](https://github.com/laravel/framework/pull/46256))
+- Do not mutate underlying values on redirect ([#46281](https://github.com/laravel/framework/pull/46281))
+- Do not use null to initialise $lastExecutionStartedAt in `ScheduleWorkCommand` ([#46285](https://github.com/laravel/framework/pull/46285))
+- Remove obsolete function_exists('enum_exists') calls ([#46319](https://github.com/laravel/framework/pull/46319))
+- Cast json decoded failed_job_ids to array in DatabaseBatchRepository::toBatch ([#46329](https://github.com/laravel/framework/pull/46329))
 
 
 ## [v10.1.5 (2023-02-24)](https://github.com/laravel/framework/compare/v10.1.4...v10.1.5)
