@@ -648,7 +648,7 @@ class Builder implements BuilderContract
     public function value($column)
     {
         if ($result = $this->first([$column])) {
-            $column = $column instanceof Expression ? $query->getGrammar->wrap($column) : $column;
+            $column = $column instanceof Expression ? $query->getGrammar()->wrap($column) : $column;
 
             return $result->{Str::afterLast($column, '.')};
         }
@@ -665,7 +665,7 @@ class Builder implements BuilderContract
      */
     public function soleValue($column)
     {
-        $column = $column instanceof Expression ? $query->getGrammar->wrap($column) : $column;
+        $column = $column instanceof Expression ? $query->getGrammar()->wrap($column) : $column;
 
         return $this->sole([$column])->{Str::afterLast($column, '.')};
     }
@@ -680,7 +680,7 @@ class Builder implements BuilderContract
      */
     public function valueOrFail($column)
     {
-        $column = $column instanceof Expression ? $query->getGrammar->wrap($column) : $column;
+        $column = $column instanceof Expression ? $query->getGrammar()->wrap($column) : $column;
 
         return $this->firstOrFail([$column])->{Str::afterLast($column, '.')};
     }
@@ -866,7 +866,7 @@ class Builder implements BuilderContract
     {
         $results = $this->toBase()->pluck($column, $key);
 
-        $column = $column instanceof Expression ? $query->getGrammar->wrap($column) : $column;
+        $column = $column instanceof Expression ? $query->getGrammar()->wrap($column) : $column;
 
         // If the model has a mutator for the requested column, we will spin through
         // the results and mutate the values so that the mutated version of these
@@ -1784,7 +1784,7 @@ class Builder implements BuilderContract
      */
     public function qualifyColumn($column)
     {
-        $column = $column instanceof Expression ? $query->getGrammar->wrap($column) : $column;
+        $column = $column instanceof Expression ? $query->getGrammar()->wrap($column) : $column;
 
         return $this->model->qualifyColumn($column);
     }
