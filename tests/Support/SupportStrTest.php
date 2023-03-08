@@ -651,6 +651,7 @@ class SupportStrTest extends TestCase
         $this->assertSame('foo-bar', Str::snake('foo-bar'));
         $this->assertSame('foo-_bar', Str::snake('Foo-Bar'));
         $this->assertSame('foo__bar', Str::snake('Foo_Bar'));
+        $this->assertSame('foo_2_bar', Str::snake('foo 2 bar'));
         $this->assertSame('żółtałódka', Str::snake('ŻółtaŁódka'));
     }
 
