@@ -48,6 +48,11 @@ class RouteUriTest extends TestCase
                 '/foo/{bar}',
                 ['bar' => 'slug'],
             ],
+		    [
+                '/foo/{bar:slug:foo}',
+                '/foo/{bar}',
+                ['bar' => ['slug', 'foo']],
+            ],
             [
                 '/foo/{bar}/baz/{qux:slug}',
                 '/foo/{bar}/baz/{qux}',
@@ -57,11 +62,21 @@ class RouteUriTest extends TestCase
                 '/foo/{bar}/baz/{qux:slug}',
                 '/foo/{bar}/baz/{qux}',
                 ['qux' => 'slug'],
+            ],
+		    [
+                '/foo/{bar}/baz/{qux:slug:foo}',
+                '/foo/{bar}/baz/{qux}',
+                ['qux' => ['slug', 'foo']],
             ],
             [
                 '/foo/{bar}/baz/{qux:slug?}',
                 '/foo/{bar}/baz/{qux?}',
                 ['qux' => 'slug'],
+            ],
+		    [
+                '/foo/{bar}/baz/{qux:slug:foo?}',
+                '/foo/{bar}/baz/{qux?}',
+                ['qux' => ['slug', 'foo']],
             ],
             [
                 '/foo/{bar}/baz/{qux:slug?}/{test:id?}',
