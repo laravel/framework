@@ -174,7 +174,7 @@ class PostgresConnector extends Connector implements ConnectorInterface
         // If a port was specified, we will add it to this Postgres DSN connections
         // format. Once we have done that we are ready to return this connection
         // string back out for usage, as this has been fully constructed here.
-        if ($port !== null) {
+        if (! is_null($port)) {
             $dsn .= ";port={$port}";
         }
 
