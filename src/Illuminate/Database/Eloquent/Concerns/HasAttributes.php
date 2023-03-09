@@ -444,10 +444,40 @@ trait HasAttributes
             return $this->throwMissingAttributeExceptionIfApplicable($key);
         }
 
-        return $this->isRelation($key) || $this->relationLoaded($key)
-                    ? $this->getRelationValue($key)
-                    : $this->throwMissingAttributeExceptionIfApplicable($key);
+        if($this->isRelation($key) || $this->relationLoaded($key)) {
+            return $this->getRelationValue($key);
+        }
+
+        if(str_ends_with($key, "_carbon") && $attribute = $this->parseCarbon($key)) {
+            return $attribute;
+        }
+        
+        return $this->throwMissingAttributeExceptionIfApplicable($key);
     }
+
+
+    
+    /**
+     * carbon parse the attribute ends with _carbon
+     * 
+     * @param string $key
+     * 
+     * @return Illuminate\Support\Carbon | false
+     * 
+     * @throws Carbon\Exceptions\InvalidFormatException
+     */
+
+     public function parseCarbon($key)
+     {
+ 
+         $dateAttribute = substr($key, 0, -7);
+ 
+         return array_key_exists($dateAttribute, $this->attributes)
+                ? Carbon::parse($this->attributes[$dateAttribute])
+                : false;
+     }
+ 
+
 
     /**
      * Either throw a missing attribute exception or return null depending on Eloquent's configuration.
