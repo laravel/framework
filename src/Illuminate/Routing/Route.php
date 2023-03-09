@@ -216,7 +216,7 @@ class Route
      *
      * @return bool
      */
-    protected function isControllerAction()
+    public function isControllerAction()
     {
         return is_string($this->action['uses']) && ! $this->isSerializedClosure();
     }

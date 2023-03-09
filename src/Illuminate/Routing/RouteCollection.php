@@ -86,10 +86,8 @@ class RouteCollection extends AbstractRouteCollection
         // When the route is routing to a controller we will also store the action that
         // is used by the route. This will let us reverse route to controllers while
         // processing a request and easily generate URLs to the given controllers.
-        $action = $route->getAction();
-
-        if (isset($action['controller'])) {
-            $this->addToActionList($action, $route);
+        if ($route->isControllerAction()) {
+            $this->addToActionList($route->getAction(), $route);
         }
     }
 
@@ -135,7 +133,7 @@ class RouteCollection extends AbstractRouteCollection
         $this->actionList = [];
 
         foreach ($this->allRoutes as $route) {
-            if (isset($route->getAction()['controller'])) {
+            if ($route->isControllerAction()) {
                 $this->addToActionList($route->getAction(), $route);
             }
         }
