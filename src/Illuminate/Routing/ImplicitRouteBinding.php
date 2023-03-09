@@ -53,17 +53,44 @@ class ImplicitRouteBinding
                             ? 'resolveSoftDeletableChildRouteBinding'
                             : 'resolveChildRouteBinding';
 
-                if (! $model = $parent->{$childRouteBindingMethod}(
-                    $parameterName, $parameterValue, $route->bindingFieldFor($parameterName)
-                )) {
+                if (! $model = static::getModel($parent, $childRouteBindingMethod, $parameterName, $parameterValue, $route)) {
                     throw (new ModelNotFoundException)->setModel(get_class($instance), [$parameterValue]);
                 }
-            } elseif (! $model = $instance->{$routeBindingMethod}($parameterValue, $route->bindingFieldFor($parameterName))) {
+            } elseif (! $model = static::getModel($instance, $routeBindingMethod, $parameterName, $parameterValue, $route)) {
                 throw (new ModelNotFoundException)->setModel(get_class($instance), [$parameterValue]);
             }
 
             $route->setParameter($parameterName, $model);
         }
+    }
+
+    /**
+     * get the model form the route.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model |  \Illuminate\Contracts\Routing\UrlRoutable $instance
+     * @param  string  $binding_method
+     * @param  string  $parameterName
+     * @param  string  $parameterValue
+     * @param  \Illuminate\Routing\Route  $route
+     * @return \Illuminate\Database\Eloquent\Model | null
+     */
+    public static function getModel($instance, $binding_method, $parameterName, $parameterValue, $route)
+    {
+        $fields = (array) $route->bindingFieldFor($parameterName);
+
+        $parameters = str_contains($binding_method, 'Child') ? [$parameterName, $parameterValue] : [$parameterValue];
+
+        if (!$fields) {
+            return $instance->{$binding_method}(...array_merge($parameters, [null]));
+        }
+
+        foreach ($fields as $field) {
+            if ($model = $instance->{$binding_method}(...array_merge($parameters, [$field]))) {
+                return $model;
+            }
+        }
+
+        return null;
     }
 
     /**
