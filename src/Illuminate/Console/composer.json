@@ -22,8 +22,8 @@
         "illuminate/support": "^11.0",
         "illuminate/view": "^11.0",
         "nunomaduro/termwind": "^1.13",
-        "symfony/console": "^6.2",
-        "symfony/process": "^6.2"
+        "symfony/console": "^6.3",
+        "symfony/process": "^6.3"
     },
     "autoload": {
         "psr-4": {
