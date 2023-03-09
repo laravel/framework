@@ -370,6 +370,22 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile a "where like" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereLike(Builder $query, $where)
+    {
+        $operator = $where['not'] ? ' not like ' : ' like ';
+
+        $value = $this->parameter($where['value']);
+
+        return $this->wrap($where['column']).$operator.$value;
+    }
+
+    /**
      * Compile a "between" where clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
