@@ -280,11 +280,11 @@ class Route
     /**
      * Get the controller class used for the route.
      *
-     * @return string
+     * @return string|null
      */
     public function getControllerClass()
     {
-        return $this->parseControllerCallback()[0];
+        return $this->isControllerAction() ? $this->parseControllerCallback()[0] : null;
     }
 
     /**
