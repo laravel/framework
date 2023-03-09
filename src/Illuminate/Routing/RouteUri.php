@@ -50,7 +50,7 @@ class RouteUri
 
             $segments = explode(':', trim($match, '{}?'));
 
-            $bindingFields[$segments[0]] = $segments[1];
+            $bindingFields[$segments[0]] = count($segments) > 2 ? array_slice($segments, 1) : $segments[1];
 
             $uri = str_contains($match, '?')
                 ? str_replace($match, '{'.$segments[0].'?}', $uri)
