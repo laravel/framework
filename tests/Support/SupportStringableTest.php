@@ -62,6 +62,24 @@ class SupportStringableTest extends TestCase
         $this->assertFalse($this->stringable(null)->isJson());
     }
 
+    public function testIsMatch()
+    {
+        $this->assertTrue($this->stringable('Hello, Laravel!')->isMatch('/.*,.*!/'));
+        $this->assertTrue($this->stringable('Hello, Laravel!')->isMatch('/^.*$(.*)/'));
+        $this->assertTrue($this->stringable('Hello, Laravel!')->isMatch('/laravel/i'));
+        $this->assertTrue($this->stringable('Hello, Laravel!')->isMatch('/^(.*(.*(.*)))/'));
+
+        $this->assertFalse($this->stringable('Hello, Laravel!')->isMatch('/H.o/'));
+        $this->assertFalse($this->stringable('Hello, Laravel!')->isMatch('/^laravel!/i'));
+        $this->assertFalse($this->stringable('Hello, Laravel!')->isMatch('/laravel!(.*)/'));
+        $this->assertFalse($this->stringable('Hello, Laravel!')->isMatch('/^[a-zA-Z,!]+$/'));
+
+        $this->assertTrue($this->stringable('Hello, Laravel!')->isMatch(['/.*,.*!/', '/H.o/']));
+        $this->assertTrue($this->stringable('Hello, Laravel!')->isMatch(['/^laravel!/i', '/^.*$(.*)/']));
+        $this->assertTrue($this->stringable('Hello, Laravel!')->isMatch(['/laravel/i', '/laravel!(.*)/']));
+        $this->assertTrue($this->stringable('Hello, Laravel!')->isMatch(['/^[a-zA-Z,!]+$/', '/^(.*(.*(.*)))/']));
+    }
+
     public function testIsEmpty()
     {
         $this->assertTrue($this->stringable('')->isEmpty());
@@ -918,6 +936,16 @@ class SupportStringableTest extends TestCase
         $this->assertSame('fooBarBaz', (string) $this->stringable('foo-bar_baz')->camel());
     }
 
+    public function testCharAt()
+    {
+        $this->assertEquals('р', $this->stringable('Привет, мир!')->charAt(1));
+        $this->assertEquals('ち', $this->stringable('「こんにちは世界」')->charAt(4));
+        $this->assertEquals('w', $this->stringable('Привет, world!')->charAt(8));
+        $this->assertEquals('界', $this->stringable('「こんにちは世界」')->charAt(-2));
+        $this->assertEquals(null, $this->stringable('「こんにちは世界」')->charAt(-200));
+        $this->assertEquals(null, $this->stringable('Привет, мир!')->charAt('Привет, мир!', 100));
+    }
+
     public function testSubstr()
     {
         $this->assertSame('Ё', (string) $this->stringable('БГДЖИЛЁ')->substr(-1));
@@ -1178,5 +1206,14 @@ class SupportStringableTest extends TestCase
         $this->expectException(\Carbon\Exceptions\InvalidFormatException::class);
 
         $this->stringable('not a date')->toDate();
+    }
+
+    public function testArrayAccess()
+    {
+        $str = $this->stringable('my string');
+        $this->assertSame('m', $str[0]);
+        $this->assertSame('t', $str[4]);
+        $this->assertTrue(isset($str[2]));
+        $this->assertFalse(isset($str[10]));
     }
 }

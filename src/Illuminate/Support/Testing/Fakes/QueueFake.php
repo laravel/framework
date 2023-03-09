@@ -20,7 +20,7 @@ class QueueFake extends QueueManager implements Fake, Queue
      *
      * @var \Illuminate\Contracts\Queue\Queue
      */
-    protected $queue;
+    public $queue;
 
     /**
      * The job types that should be intercepted instead of pushed to the queue.
