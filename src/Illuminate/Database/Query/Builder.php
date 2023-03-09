@@ -1240,6 +1240,92 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a where like clause to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  string|null|int  $value
+     * @param  string  $boolean
+     * @param  bool  $not
+     * @return $this
+     */
+    public function whereLike($column, $value, $boolean = 'and', $not = false)
+    {
+        $type = 'like';
+
+        $this->wheres[] = compact('type', 'value', 'column', 'boolean','not');
+
+        $this->addBinding($value, 'where');
+
+        return $this;
+    }
+
+    /**
+     * Add a where like any word clause to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  string|null|int  $value
+     * @param  string  $boolean
+     * @param  bool  $not
+     * @return $this
+     */
+    public function whereLikeContain($column, $value, $boolean = 'and', $not = false)
+    {
+        return $this->whereLike($column, "%$value%", $boolean, $not);
+    }
+
+    /**
+     * Add an or where not like clause to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  string|null|int  $value
+     * @param  bool  $not
+     * @return $this
+     */
+    public function orWhereLike($column, $value, $not = false)
+    {
+        return $this->whereLike($column, $value, 'or', $not);
+    }
+
+    /**
+     * Add an or where not like clause to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  string|null|int  $value
+     * @param  bool  $not
+     * @return $this
+     */
+    public function orWhereLikeContain($column, $value, $not = false)
+    {
+        return $this->whereLikeContain($column, $value, 'or', $not);
+    }
+
+    /**
+     * Add a where not like clause to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  string|null|int  $value
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereNotLike($column, $value, $boolean = 'and')
+    {
+        return $this->whereLike($column, $value, $boolean, true);
+    }
+
+    /**
+     * Add a where like any word clause to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  string|null|int  $value
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereNotLikeContain($column, $value, $boolean = 'and')
+    {
+        return $this->whereLikeContain($column, $value, $boolean, true);
+    }
+
+    /**
      * Add a where between statement to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
