@@ -417,7 +417,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => '%1%'], $builder->getBindings());
 
         $builder = $this->getMySqlBuilder();
-        $builder->select('*')->from('users')->whereLike('id','1')->orWhereLike('id','2');
+        $builder->select('*')->from('users')->whereLike('id', '1')->orWhereLike('id', '2');
         $this->assertSame(
             'select * from `users` where `id` like ? or `id` like ?',
             $builder->toSql()
@@ -425,7 +425,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => '1', 1 => 2], $builder->getBindings());
 
         $builder = $this->getMySqlBuilder();
-        $builder->select('*')->from('users')->whereLike('id','1')->orWhereLikeContain('id','2');
+        $builder->select('*')->from('users')->whereLike('id', '1')->orWhereLikeContain('id', '2');
         $this->assertSame(
             'select * from `users` where `id` like ? or `id` like ?',
             $builder->toSql()
@@ -456,7 +456,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => '%1%'], $builder->getBindings());
 
         $builder = $this->getPostgresBuilder();
-        $builder->select('*')->from('users')->whereLike('id','1')->orWhereLike('id','2');
+        $builder->select('*')->from('users')->whereLike('id', '1')->orWhereLike('id', '2');
         $this->assertSame(
             'select * from "users" where "id"::text like ? or "id"::text like ?',
             $builder->toSql()
@@ -464,7 +464,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => '1', 1 => 2], $builder->getBindings());
 
         $builder = $this->getPostgresBuilder();
-        $builder->select('*')->from('users')->whereLike('id','1')->orWhereLikeContain('id','2');
+        $builder->select('*')->from('users')->whereLike('id', '1')->orWhereLikeContain('id', '2');
         $this->assertSame(
             'select * from "users" where "id"::text like ? or "id"::text like ?',
             $builder->toSql()
@@ -495,7 +495,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => '%1%'], $builder->getBindings());
 
         $builder = $this->getSqlServerBuilder();
-        $builder->select('*')->from('users')->whereLike('id','1')->orWhereLike('id','2');
+        $builder->select('*')->from('users')->whereLike('id', '1')->orWhereLike('id', '2');
         $this->assertSame(
             'select * from [users] where [id] like ? or [id] like ?',
             $builder->toSql()
@@ -503,7 +503,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => '1', 1 => 2], $builder->getBindings());
 
         $builder = $this->getSqlServerBuilder();
-        $builder->select('*')->from('users')->whereLike('id','1')->orWhereLikeContain('id','2');
+        $builder->select('*')->from('users')->whereLike('id', '1')->orWhereLikeContain('id', '2');
         $this->assertSame(
             'select * from [users] where [id] like ? or [id] like ?',
             $builder->toSql()

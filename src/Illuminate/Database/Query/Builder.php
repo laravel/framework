@@ -1252,7 +1252,7 @@ class Builder implements BuilderContract
     {
         $type = 'like';
 
-        $this->wheres[] = compact('type', 'value', 'column', 'boolean','not');
+        $this->wheres[] = compact('type', 'value', 'column', 'boolean', 'not');
 
         $this->addBinding($value, 'where');
 
