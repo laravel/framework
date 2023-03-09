@@ -405,6 +405,19 @@ class RoutingRouteTest extends TestCase
         $this->assertNull($route->getAction('unknown_property'));
     }
 
+    public function testRouteGetControllerClass()
+    {
+        $router = $this->getRouter();
+
+        $controllerRoute = $router->get('foo/bar')->uses(RouteTestControllerStub::class.'@index');
+        $closureRoute = $router->get('foo', function () {
+            return 'foo';
+        });
+
+        $this->assertSame(RouteTestControllerStub::class, $controllerRoute->getControllerClass());
+        $this->assertNull($closureRoute->getControllerClass());
+    }
+
     public function testResolvingBindingParameters()
     {
         $router = $this->getRouter();
