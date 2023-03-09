@@ -25,7 +25,7 @@
         "illuminate/support": "^11.0",
         "laravel/serializable-closure": "^1.2.2",
         "ramsey/uuid": "^4.7",
-        "symfony/process": "^6.2"
+        "symfony/process": "^6.3"
     },
     "autoload": {
         "psr-4": {
