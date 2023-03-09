@@ -404,6 +404,123 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([], $builder->getBindings());
     }
 
+    public function testWhereLikeAndWhereLikeContainMySQL()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereLike('id', '1');
+        $this->assertSame('select * from `users` where `id` like ?', $builder->toSql());
+        $this->assertEquals([0 => '1'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereLikeContain('id', '1');
+        $this->assertSame('select * from `users` where `id` like ?', $builder->toSql());
+        $this->assertEquals([0 => '%1%'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereLike('id','1')->orWhereLike('id','2');
+        $this->assertSame(
+            'select * from `users` where `id` like ? or `id` like ?',
+            $builder->toSql()
+        );
+        $this->assertEquals([0 => '1', 1 => 2], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereLike('id','1')->orWhereLikeContain('id','2');
+        $this->assertSame(
+            'select * from `users` where `id` like ? or `id` like ?',
+            $builder->toSql()
+        );
+        $this->assertEquals([0 => '1', 1 => '%2%'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereNotLike('id', '1');
+        $this->assertSame('select * from `users` where `id` not like ?', $builder->toSql());
+        $this->assertEquals([0 => '1'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereNotLikeContain('id', '1');
+        $this->assertSame('select * from `users` where `id` not like ?', $builder->toSql());
+        $this->assertEquals([0 => '%1%'], $builder->getBindings());
+    }
+
+    public function testWhereLikeAndWhereLikeContainPostgres()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereLike('id', '1');
+        $this->assertSame('select * from "users" where "id"::text like ?', $builder->toSql());
+        $this->assertEquals([0 => '1'], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereLikeContain('id', '1');
+        $this->assertSame('select * from "users" where "id"::text like ?', $builder->toSql());
+        $this->assertEquals([0 => '%1%'], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereLike('id','1')->orWhereLike('id','2');
+        $this->assertSame(
+            'select * from "users" where "id"::text like ? or "id"::text like ?',
+            $builder->toSql()
+        );
+        $this->assertEquals([0 => '1', 1 => 2], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereLike('id','1')->orWhereLikeContain('id','2');
+        $this->assertSame(
+            'select * from "users" where "id"::text like ? or "id"::text like ?',
+            $builder->toSql()
+        );
+        $this->assertEquals([0 => '1', 1 => '%2%'], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereNotLike('id', '1');
+        $this->assertSame('select * from "users" where "id"::text not like ?', $builder->toSql());
+        $this->assertEquals([0 => '1'], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereNotLikeContain('id', '1');
+        $this->assertSame('select * from "users" where "id"::text not like ?', $builder->toSql());
+        $this->assertEquals([0 => '%1%'], $builder->getBindings());
+    }
+
+    public function testWhereLikeAndWhereLikeContainSqlServer()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereLike('id', '1');
+        $this->assertSame('select * from [users] where [id] like ?', $builder->toSql());
+        $this->assertEquals([0 => '1'], $builder->getBindings());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereLikeContain('id', '1');
+        $this->assertSame('select * from [users] where [id] like ?', $builder->toSql());
+        $this->assertEquals([0 => '%1%'], $builder->getBindings());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereLike('id','1')->orWhereLike('id','2');
+        $this->assertSame(
+            'select * from [users] where [id] like ? or [id] like ?',
+            $builder->toSql()
+        );
+        $this->assertEquals([0 => '1', 1 => 2], $builder->getBindings());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereLike('id','1')->orWhereLikeContain('id','2');
+        $this->assertSame(
+            'select * from [users] where [id] like ? or [id] like ?',
+            $builder->toSql()
+        );
+        $this->assertEquals([0 => '1', 1 => '%2%'], $builder->getBindings());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereNotLike('id', '1');
+        $this->assertSame('select * from [users] where [id] not like ?', $builder->toSql());
+        $this->assertEquals([0 => '1'], $builder->getBindings());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereNotLikeContain('id', '1');
+        $this->assertSame('select * from [users] where [id] not like ?', $builder->toSql());
+        $this->assertEquals([0 => '%1%'], $builder->getBindings());
+    }
+
     public function testWhereDateMySql()
     {
         $builder = $this->getMySqlBuilder();
