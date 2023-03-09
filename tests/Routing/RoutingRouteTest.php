@@ -391,6 +391,19 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('foo.bar', $router->currentRouteName());
     }
 
+    public function testRouteIsControllerAction()
+    {
+        $router = $this->getRouter();
+
+        $controllerRoute = $router->get('foo/bar')->uses(RouteTestControllerStub::class.'@index');
+        $closureRoute = $router->get('foo', function () {
+            return 'foo';
+        });
+
+        $this->assertTrue($controllerRoute->isControllerAction());
+        $this->assertFalse($closureRoute->isControllerAction());
+    }
+
     public function testRouteGetAction()
     {
         $router = $this->getRouter();
