@@ -56,6 +56,50 @@ class TrimStringsTest extends TestCase
             $this->assertSame("\xE9", $request->get('binary'));
         });
     }
+
+    public function testTrimStringsSkipsWhenMatch()
+    {
+        TrimStrings::skipWhen(fn ($request) => $request->has('abc'));
+        $middleware = new TrimStrings;
+        $symfonyRequest = new SymfonyRequest([
+                                                 'abc' => '  123  ',
+                                                 'xyz' => '  456  ',
+                                                 'foo' => '  789  ',
+                                                 'bar' => '  010  ',
+                                             ]);
+        $symfonyRequest->server->set('REQUEST_METHOD', 'GET');
+        $request = Request::createFromBase($symfonyRequest);
+
+        $middleware->handle($request, function (Request $request) {
+            $this->assertSame('  123  ', $request->get('abc'));
+            $this->assertSame('  456  ', $request->get('xyz'));
+            $this->assertSame('  789  ', $request->get('foo'));
+            $this->assertSame('  010  ', $request->get('bar'));
+        });
+        TrimStrings::clearSkips();
+    }
+
+    public function testTrimStringsDoesNotSkipWhenNoMatch()
+    {
+        TrimStrings::skipWhen(fn ($request) => $request->has('def'));
+        $middleware = new TrimStrings;
+        $symfonyRequest = new SymfonyRequest([
+                                                 'abc' => '  123  ',
+                                                 'xyz' => '  456  ',
+                                                 'foo' => '  789  ',
+                                                 'bar' => '  010  ',
+                                             ]);
+        $symfonyRequest->server->set('REQUEST_METHOD', 'GET');
+        $request = Request::createFromBase($symfonyRequest);
+
+        $middleware->handle($request, function (Request $request) {
+            $this->assertSame('123', $request->get('abc'));
+            $this->assertSame('456', $request->get('xyz'));
+            $this->assertSame('789', $request->get('foo'));
+            $this->assertSame('010', $request->get('bar'));
+        });
+        TrimStrings::clearSkips();
+    }
 }
 
 class TrimStringsWithExceptAttribute extends TrimStrings

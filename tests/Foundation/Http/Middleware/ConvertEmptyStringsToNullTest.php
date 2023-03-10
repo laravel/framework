@@ -24,4 +24,40 @@ class ConvertEmptyStringsToNullTest extends TestCase
             $this->assertNull($request->get('bar'));
         });
     }
+
+    public function testConvertEmptyStringsToNullSkipsWhenMatch()
+    {
+        ConvertEmptyStringsToNull::skipWhen(fn ($request) => $request->has('foo'));
+        $middleware = new ConvertEmptyStringsToNull;
+        $symfonyRequest = new SymfonyRequest([
+            'foo' => 'bar',
+            'baz' => '',
+        ]);
+        $symfonyRequest->server->set('REQUEST_METHOD', 'GET');
+        $request = Request::createFromBase($symfonyRequest);
+
+        $middleware->handle($request, function (Request $request) {
+            $this->assertSame('bar', $request->get('foo'));
+            $this->assertSame('', $request->get('baz'));
+        });
+        ConvertEmptyStringsToNull::clearSkips();
+    }
+
+    public function testConvertEmptyStringsToNullDoesNotSkipWhenNoMatch()
+    {
+        ConvertEmptyStringsToNull::skipWhen(fn ($request) => $request->has('abc'));
+        $middleware = new ConvertEmptyStringsToNull;
+        $symfonyRequest = new SymfonyRequest([
+            'foo' => 'bar',
+            'baz' => '',
+        ]);
+        $symfonyRequest->server->set('REQUEST_METHOD', 'GET');
+        $request = Request::createFromBase($symfonyRequest);
+
+        $middleware->handle($request, function (Request $request) {
+            $this->assertSame('bar', $request->get('foo'));
+            $this->assertNull($request->get('baz'));
+        });
+        ConvertEmptyStringsToNull::clearSkips();
+    }
 }
