@@ -3,15 +3,11 @@
 namespace Illuminate\Foundation\Http\Middleware;
 
 use Closure;
+use Illuminate\Foundation\Http\Middleware\Concerns\HasSkipCallbacks;
 
 class TrimStrings extends TransformsRequest
 {
-    /**
-     * All of the registered skip callbacks.
-     *
-     * @var array
-     */
-    protected static $skipCallbacks = [];
+    use HasSkipCallbacks;
 
     /**
      * The attributes that should not be trimmed.
@@ -31,10 +27,8 @@ class TrimStrings extends TransformsRequest
      */
     public function handle($request, Closure $next)
     {
-        foreach (static::$skipCallbacks as $callback) {
-            if ($callback($request)) {
-                return $next($request);
-            }
+        if ($this->shouldSkipDueToCallback($request)) {
+            return $next($request);
         }
 
         return parent::handle($request, $next);
@@ -54,16 +48,5 @@ class TrimStrings extends TransformsRequest
         }
 
         return preg_replace('~^[\s\x{FEFF}\x{200B}]+|[\s\x{FEFF}\x{200B}]+$~u', '', $value) ?? trim($value);
-    }
-
-    /**
-     * Register a callback that instructs the middleware to be skipped.
-     *
-     * @param  \Closure  $callback
-     * @return void
-     */
-    public static function skipWhen(Closure $callback)
-    {
-        static::$skipCallbacks[] = $callback;
     }
 }
