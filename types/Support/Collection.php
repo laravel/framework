@@ -493,6 +493,10 @@ assertType('Illuminate\Support\Collection<int, mixed>', $collection::make(['stri
 assertType('User|null', $collection->firstWhere('string', 'string'));
 assertType('User|null', $collection->firstWhere('string', 'string', 'string'));
 
+assertType('User|null', $collection->value('string'));
+assertType('string|User', $collection->value('string', 'string'));
+assertType('string|User', $collection->value('string', fn () => 'string'));
+
 assertType('Illuminate\Support\Collection<string, int>', $collection::make(['string'])->flip());
 
 assertType('Illuminate\Support\Collection<(int|string), Illuminate\Support\Collection<(int|string), User>>', $collection->groupBy('name'));
@@ -875,7 +879,7 @@ assertType('int', $collection->make([1])->pipe(function ($collection) {
     return 1;
 }));
 
-assertType('mixed', $collection->pipeInto(User::class));
+assertType('User', $collection->pipeInto(User::class));
 
 assertType('Illuminate\Support\Collection<(int|string), mixed>', $collection->make(['string' => 'string'])->pluck('string'));
 assertType('Illuminate\Support\Collection<(int|string), mixed>', $collection->make(['string' => 'string'])->pluck('string', 'string'));
@@ -950,6 +954,9 @@ assertType('string|User', $collection->get(0, 'string'));
 assertType('string|User', $collection->get(0, function () {
     return 'string';
 }));
+
+assertType('string|User', $collection->getOrPut(0, 'string'));
+assertType('string|User', $collection->getOrPut(0, fn () => 'string'));
 
 assertType('Illuminate\Support\Collection<int, User>', $collection->forget(1));
 assertType('Illuminate\Support\Collection<int, User>', $collection->forget([1, 2]));
