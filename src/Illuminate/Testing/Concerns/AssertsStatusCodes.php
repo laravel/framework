@@ -144,16 +144,6 @@ trait AssertsStatusCodes
     }
 
     /**
-     * Assert that the response has a 415 "Unsupported Media Type" status code.
-     *
-     * @return $this
-     */
-    public function assertUnsupportedMediaType()
-    {
-        return $this->assertStatus(415);
-    }
-
-    /**
      * Assert that the response has a 422 "Unprocessable Entity" status code.
      *
      * @return $this
