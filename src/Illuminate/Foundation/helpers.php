@@ -800,7 +800,7 @@ if (! function_exists('route')) {
     /**
      * Generate the URL to a named route.
      *
-     * @param  array|string  $name
+     * @param  string  $name
      * @param  mixed  $parameters
      * @param  bool  $absolute
      * @return string
