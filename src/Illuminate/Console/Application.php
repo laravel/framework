@@ -13,6 +13,7 @@ use Illuminate\Support\ProcessUtils;
 use Symfony\Component\Console\Application as SymfonyApplication;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
+use Symfony\Component\Console\Exception\ExceptionInterface;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputDefinition;
@@ -93,13 +94,14 @@ class Application extends SymfonyApplication implements ApplicationContract
             $input = $input ?: new ArgvInput
         );
 
-        $command->mergeApplicationDefinition();
+        try {
+            $input->bind(tap($command)->mergeApplicationDefinition()->getDefinition());
+        } catch (ExceptionInterface) {
+            // ...
+        }
 
         $this->events->dispatch(
-            new CommandStarting(
-                $commandName,
-                tap($input)->bind($command->getDefinition()), $output = $output ?: new BufferedConsoleOutput
-            )
+            new CommandStarting($commandName, $input, $output = $output ?: new BufferedConsoleOutput)
         );
 
         $exitCode = parent::doRunCommand($command, $input, $output);
