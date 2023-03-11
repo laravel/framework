@@ -87,19 +87,22 @@ class Application extends SymfonyApplication implements ApplicationContract
      *
      * @return int
      */
-    public function run(InputInterface $input = null, OutputInterface $output = null): int
+    protected function doRunCommand(SymfonyCommand $command, InputInterface $input, OutputInterface $output)
     {
         $commandName = $this->getCommandName(
             $input = $input ?: new ArgvInput
         );
 
+        $command->mergeApplicationDefinition();
+
         $this->events->dispatch(
             new CommandStarting(
-                $commandName, $input, $output = $output ?: new BufferedConsoleOutput
+                $commandName,
+                tap($input)->bind($command->getDefinition()), $output = $output ?: new BufferedConsoleOutput
             )
         );
 
-        $exitCode = parent::run($input, $output);
+        $exitCode = parent::doRunCommand($command, $input, $output);
 
         $this->events->dispatch(
             new CommandFinished($commandName, $input, $output, $exitCode)
