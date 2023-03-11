@@ -58,7 +58,7 @@ class CommandEventsTest extends TestCase
         $this->fs->delete($this->logfile);
         $this->fs->delete(base_path('artisan'));
 
-        if (!is_null($this->originalArtisan)) {
+        if (! is_null($this->originalArtisan)) {
             $this->fs->put(base_path('artisan'), $this->originalArtisan);
         }
 
@@ -90,7 +90,7 @@ class CommandEventsTest extends TestCase
                         $event->input->getOption('occupation'),
                     ]);
                 });
-                switch($argumentType) {
+                switch ($argumentType) {
                     case 'array':
                         $this->artisan(CommandEventsTestCommand::class, [
                             'firstname' => 'taylor',
