@@ -511,6 +511,27 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('Nuno Maduro', $user4->name);
     }
 
+    public function testUpdateMany()
+    {
+        EloquentTestUser::create(['name' => 'taylor', 'email' => 'taylorotwell@gmail.com']);
+        EloquentTestUser::create(['name' => 'milwad', 'email' => 'milwad.dev@gmail.com']);
+        EloquentTestUser::create(['name' => 'lorem', 'email' => 'lorem@gmail.com']);
+        EloquentTestUser::create(['name' => 'test', 'email' => 'test@gmail.com']);
+
+        EloquentTestUser::updateMany([1, 2, 3], ['name' => 'laravel']);
+
+        $this->assertEquals('laravel', EloquentTestUser::where('id', 1)->value('name'));
+        $this->assertEquals('laravel', EloquentTestUser::where('id', 2)->value('name'));
+        $this->assertEquals('laravel', EloquentTestUser::where('id', 3)->value('name'));
+        $this->assertEquals('test', EloquentTestUser::where('id', 4)->value('name'));
+        $this->assertNotEquals('laravel', EloquentTestUser::where('id', 4)->value('name'));
+        $this->assertEquals(4, EloquentTestUser::count());
+
+        EloquentTestUser::updateMany([4], ['email' => 'john@gmail.com']);
+
+        $this->assertEquals('john@gmail.com', EloquentTestUser::where('id', 4)->value('email'));
+    }
+
     public function testUpdateOrCreate()
     {
         $user1 = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
