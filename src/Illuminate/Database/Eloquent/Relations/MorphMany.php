@@ -59,4 +59,14 @@ class MorphMany extends MorphOneOrMany
 
         return parent::forceCreate($attributes);
     }
+
+    /**
+     * Create a new MorphOne relationship from MorphMany relationship.
+     *
+     * @return MorphOne
+     */
+    public function morphOne(): MorphOne
+    {
+        return new MorphOne($this->getQuery(), $this->getParent(), $this->morphType, $this->foreignKey, $this->localKey);
+    }
 }

@@ -46,4 +46,14 @@ class HasMany extends HasOneOrMany
     {
         return $this->matchMany($models, $results, $relation);
     }
+
+    /**
+     * Convert the relationship to HasOne.
+     *
+     * @return HasOne
+     */
+    public function hasOne(): HasOne
+    {
+        return new HasOne($this->getQuery(), $this->parent, $this->foreignKey, $this->localKey);
+    }
 }
