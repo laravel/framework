@@ -1049,6 +1049,11 @@ class Builder implements BuilderContract
         );
     }
 
+    public function updateMany(array $updateValues, array $values, string $column = 'id')
+    {
+        return $this->whereIn($column, $values)->update($updateValues);
+    }
+
     /**
      * Update the column's update timestamp.
      *
