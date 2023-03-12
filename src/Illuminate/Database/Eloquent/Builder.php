@@ -1057,7 +1057,7 @@ class Builder implements BuilderContract
      * @param  string  $column
      * @return int
      */
-    public function updateMany(array $updateValues, array $values, string $column = 'id')
+    public function updateMany(array $values, array $updateValues, string $column = 'id')
     {
         return $this->whereIn($column, $values)->update($updateValues);
     }
