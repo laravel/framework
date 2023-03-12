@@ -57,6 +57,18 @@ class CacheRateLimiterTest extends TestCase
         $this->assertEquals(2, $rateLimiter->retriesLeft('key', 5));
     }
 
+    public function testNoRetriesLeftReturnsCorrectStatus()
+    {
+        $cache = m::mock(Cache::class);
+
+        $cache->shouldReceive('get')->once()->with('key', 0)->andReturn(3);
+        $rateLimiter = new RateLimiter($cache);
+        $this->assertFalse($rateLimiter->NoRetriesLeft('key', 5));
+
+        $cache->shouldReceive('get')->once()->with('key', 0)->andReturn(5);
+        $this->assertTrue($rateLimiter->NoRetriesLeft('key', 5));
+    }
+
     public function testClearClearsTheCacheKeys()
     {
         $cache = m::mock(Cache::class);

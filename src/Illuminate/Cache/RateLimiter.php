@@ -185,6 +185,18 @@ class RateLimiter
     }
 
     /**
+     * Check if no retries are left for the given key.
+     *
+     * @param  string  $key
+     * @param  int  $maxAttempts
+     * @return bool
+     */
+    public function noRetriesLeft($key, $maxAttempts)
+    {
+        return $this->remaining($key, $maxAttempts) === 0;
+    }
+
+    /**
      * Clear the hits and lockout timer for the given key.
      *
      * @param  string  $key
