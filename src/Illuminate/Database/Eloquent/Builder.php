@@ -1049,6 +1049,14 @@ class Builder implements BuilderContract
         );
     }
 
+    /**
+     * Update many rows.
+     *
+     * @param  array  $updateValues
+     * @param  array  $values
+     * @param  string  $column
+     * @return int
+     */
     public function updateMany(array $updateValues, array $values, string $column = 'id')
     {
         return $this->whereIn($column, $values)->update($updateValues);
