@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+
 use function PHPStan\Testing\assertType;
 
 /**

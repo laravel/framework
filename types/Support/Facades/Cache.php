@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Cache;
+
 use function PHPStan\Testing\assertType;
 
 assertType('mixed', Cache::get('key'));
