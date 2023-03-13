@@ -86,12 +86,12 @@ class RouteCacheCommand extends Command
             $routes->refreshActionLookups();
         });
 
-        if($application->has('octane')) {
+        if( $application->has('octane')) {
             $warning = 'Running route:cache while running swoole decreases memory performance';
             $this->components->warn($warning);
             collect($application->octane->getRoutes())
-                ->each( function ($callback, $signature) use ($application) {
-                    list($method, $uri) = explode('/',$signature, 2);
+                ->each(function ($callback, $signature) use ($application) {
+                    [$method, $uri] = explode('/', $signature, 2);
                     $application['router']->addRoute($method, $uri, $callback);
                 });
         }
