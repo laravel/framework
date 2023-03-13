@@ -11,7 +11,7 @@ class HasMany extends HasOneOrMany
      *
      * @return Illuminate\Database\Eloquent\Relations\HasOne
      */
-    public function hasOne()
+    public function one()
     {
         return new HasOne($this->getQuery(), $this->parent, $this->foreignKey, $this->localKey);
     }

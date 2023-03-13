@@ -64,7 +64,7 @@ class EloquentMorphManyTest extends DatabaseTestCase
         Carbon::setTestNow('2022-01-01 00:00:00');
         $latestComment = tap((new Comment(['name' => 'The Silver Chair']))->commentable()->associate($post))->save();
 
-        $this->assertInstanceOf(MorphOne::class, $post->comments()->morphOne());
+        $this->assertInstanceOf(MorphOne::class, $post->comments()->one());
 
         $this->assertEquals($latestComment->id, $post->latestComment->id);
         $this->assertEquals($oldestComment->id, $post->oldestComment->id);
@@ -85,12 +85,12 @@ class Post extends Model
 
     public function latestComment(): MorphOne
     {
-        return $this->comments()->morphOne()->latestOfMany();
+        return $this->comments()->one()->latestOfMany();
     }
 
     public function oldestComment(): MorphOne
     {
-        return $this->comments()->morphOne()->oldestOfMany();
+        return $this->comments()->one()->oldestOfMany();
     }
 }
 

@@ -28,7 +28,7 @@ class EloquentHasManyTest extends DatabaseTestCase
 
         $user->logins()->create(['login_time' => now()]);
 
-        $this->assertInstanceOf(HasOne::class, $user->logins()->hasOne());
+        $this->assertInstanceOf(HasOne::class, $user->logins()->one());
     }
 
     public function testHasOneRelationshipFromHasMany()
@@ -65,12 +65,12 @@ class EloquentHasManyTestUser extends Model
 
     public function latestLogin(): HasOne
     {
-        return $this->logins()->hasOne()->latestOfMany('login_time');
+        return $this->logins()->one()->latestOfMany('login_time');
     }
 
     public function oldestLogin(): HasOne
     {
-        return $this->logins()->hasOne()->oldestOfMany('login_time');
+        return $this->logins()->one()->oldestOfMany('login_time');
     }
 }
 

@@ -11,7 +11,7 @@ class MorphMany extends MorphOneOrMany
      *
      * @return \Illuminate\Database\Eloquent\Relations\MorphOne
      */
-    public function morphOne()
+    public function one()
     {
         return new MorphOne($this->getQuery(), $this->getParent(), $this->morphType, $this->foreignKey, $this->localKey);
     }

@@ -86,7 +86,7 @@ class HasManyThrough extends Relation
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasOneThrough
      */
-    public function hasOneThrough()
+    public function one()
     {
         return new HasOneThrough(
             $this->getQuery(),
