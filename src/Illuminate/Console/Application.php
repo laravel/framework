@@ -100,7 +100,7 @@ class Application extends SymfonyApplication implements ApplicationContract
                 new CommandStarting(
                     $event->getCommand()->getName(),
                     $event->getInput(),
-                    $event->getOutput() ?: new BufferedConsoleOutput,
+                    $event->getOutput(),
                 )
             );
         });
@@ -110,7 +110,7 @@ class Application extends SymfonyApplication implements ApplicationContract
                 new CommandFinished(
                     $event->getCommand()->getName(),
                     $event->getInput(),
-                    $event->getOutput() ?: new BufferedConsoleOutput,
+                    $event->getOutput(),
                     $event->getExitCode(),
                 )
             );
