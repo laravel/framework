@@ -1950,7 +1950,7 @@ class TestResponseTest extends TestCase
         app()->instance('url', $url = new UrlGenerator(new RouteCollection, new Request));
 
         $response = TestResponse::fromBaseResponse(
-            (new RedirectResponse($url->to('https://foo.com')))
+            new RedirectResponse($url->to('https://foo.com'))
         );
 
         $response->assertLocation('https://foo.com');
