@@ -461,7 +461,7 @@ class DocsCommand extends Command
      */
     protected function version()
     {
-        return Str::before(($this->version ?? $this->laravel->version()), '.').'.x';
+        return Str::before($this->version ?? $this->laravel->version(), '.').'.x';
     }
 
     /**
