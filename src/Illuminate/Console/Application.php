@@ -80,7 +80,7 @@ class Application extends SymfonyApplication implements ApplicationContract
 
         $this->events->dispatch(new ArtisanStarting($this));
 
-        $this->rerouteSymfonyEvents();
+        // $this->rerouteSymfonyCommandEvents();
 
         $this->bootstrap();
     }
@@ -90,10 +90,9 @@ class Application extends SymfonyApplication implements ApplicationContract
      *
      * @return void
      */
-    protected function rerouteSymfonyEvents()
+    protected function rerouteSymfonyCommandEvents()
     {
-        $dispatcher = new EventDispatcher();
-        $this->setDispatcher($dispatcher);
+        $this->setDispatcher($dispatcher = new EventDispatcher);
 
         $dispatcher->addListener(ConsoleEvents::COMMAND, function (ConsoleCommandEvent $event) {
             $this->events->dispatch(
