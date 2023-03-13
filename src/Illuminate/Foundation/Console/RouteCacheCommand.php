@@ -86,7 +86,7 @@ class RouteCacheCommand extends Command
             $routes->refreshActionLookups();
         });
 
-        if( $application->has('octane')) {
+        if ($application->has('octane')) {
             $warning = 'Running route:cache while running swoole decreases memory performance';
             $this->components->warn($warning);
             collect($application->octane->getRoutes())
