@@ -132,8 +132,9 @@ class Pipeline implements PipelineContract
     }
 
     /**
-     *
-     * @param Closure $callback
+     * Set the catch callback for the pipeline.
+     * 
+     * @param \Closure $callback
      * @return $this
      */
     public function catch(Closure $callback)

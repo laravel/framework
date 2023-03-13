@@ -37,4 +37,12 @@ interface Pipeline
      * @return mixed
      */
     public function then(Closure $destination);
+
+    /**
+     * Set the catch callback for the pipeline.
+     *
+     * @param  \Closure $callback
+     * @return $this
+     */
+    public function catch(Closure $callback);
 }
