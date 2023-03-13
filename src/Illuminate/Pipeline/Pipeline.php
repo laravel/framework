@@ -39,6 +39,13 @@ class Pipeline implements PipelineContract
     protected $method = 'handle';
 
     /**
+     * The closures to be called on exceptions.
+     *
+     * @var Closure
+     */
+    protected $catchCallback;
+
+    /**
      * Create a new class instance.
      *
      * @param  \Illuminate\Contracts\Container\Container|null  $container
@@ -113,7 +120,27 @@ class Pipeline implements PipelineContract
             array_reverse($this->pipes()), $this->carry(), $this->prepareDestination($destination)
         );
 
-        return $pipeline($this->passable);
+        if ($this->catchCallback) {
+            try {
+                return $pipeline($this->passable);
+            } catch (\Throwable $th) {
+                return call_user_func($this->catchCallback, $th, $this->passable);
+            }
+        }
+
+       return $pipeline($this->passable);
+    }
+
+    /**
+     *
+     * @param Closure $callback
+     * @return $this
+     */
+    public function catch(Closure $callback)
+    {
+        $this->catchCallback = $callback;
+
+        return $this;
     }
 
     /**
