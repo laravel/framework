@@ -11,19 +11,19 @@ class EloquentHasManyTest extends DatabaseTestCase
 {
     protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
-        Schema::create('users', function ($table) {
+        Schema::create('eloquent_has_many_test_users', function ($table) {
             $table->id();
         });
 
-        Schema::create('logins', function ($table) {
+        Schema::create('eloquent_has_many_test_logins', function ($table) {
             $table->id();
-            $table->foreignId('user_id');
+            $table->foreignId('eloquent_has_many_test_user_id');
             $table->timestamp('login_time');
         });
     }
 
     public function testCanGetHasOneFromHasManyRelationship() {
-        $user = User::create();
+        $user = EloquentHasManyTestUser::create();
 
         $user->logins()->create(['login_time' => now()]);
 
@@ -31,12 +31,20 @@ class EloquentHasManyTest extends DatabaseTestCase
     }
 
     public function testHasOneRelationshipFromHasMany() {
-        $user = User::create();
+        $user = EloquentHasManyTestUser::create();
 
-        Login::create(['user_id' => '99999'.$user->id, 'login_time' => '2020-09-29']);
-        $latestLogin = Login::create(['user_id' => $user->id, 'login_time' => '2023-03-14']);
-        $oldestLogin = Login::create(['user_id' => $user->id, 'login_time' => '2010-01-01']);
-
+        EloquentHasManyTestLogin::create([
+            'eloquent_has_many_test_user_id' => $user->id,
+            'login_time' => '2020-09-29',
+        ]);
+        $latestLogin = EloquentHasManyTestLogin::create([
+            'eloquent_has_many_test_user_id' => $user->id,
+            'login_time' => '2023-03-14',
+        ]);
+        $oldestLogin = EloquentHasManyTestLogin::create([
+            'eloquent_has_many_test_user_id' => $user->id,
+            'login_time' => '2010-01-01'
+        ]);
 
         $this->assertEquals($oldestLogin->id, $user->oldestLogin->id);
         $this->assertEquals($latestLogin->id, $user->latestLogin->id);
@@ -45,13 +53,13 @@ class EloquentHasManyTest extends DatabaseTestCase
 }
 
 
-class User extends Model
+class EloquentHasManyTestUser extends Model
 {
     protected $guarded = [];
     public $timestamps = false;
 
     public function logins(): HasMany {
-        return $this->hasMany(Login::class);
+        return $this->hasMany(EloquentHasManyTestLogin::class);
     }
 
     public function latestLogin(): HasOne
@@ -64,7 +72,7 @@ class User extends Model
     }
 }
 
-class Login extends Model
+class EloquentHasManyTestLogin extends Model
 {
     protected $guarded = [];
     public $timestamps = false;
