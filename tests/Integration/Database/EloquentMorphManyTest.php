@@ -83,11 +83,13 @@ class Post extends Model
         return $this->morphMany(Comment::class, 'commentable');
     }
 
-    public function latestComment(): MorphOne {
+    public function latestComment(): MorphOne
+    {
         return $this->comments()->morphOne()->latestOfMany();
     }
 
-    public function oldestComment(): MorphOne {
+    public function oldestComment(): MorphOne
+    {
         return $this->comments()->morphOne()->oldestOfMany();
     }
 }

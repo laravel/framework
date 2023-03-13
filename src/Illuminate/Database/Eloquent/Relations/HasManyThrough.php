@@ -771,4 +771,20 @@ class HasManyThrough extends Relation
     {
         return $this->secondLocalKey;
     }
+
+    /**
+     * @return HasOneThrough
+     */
+    public function hasOneThrough(): HasOneThrough {
+        return new HasOneThrough(
+            $this->getQuery(),
+            $this->farParent,
+            $this->throughParent,
+            $this->getFirstKeyName(),
+            $this->secondKey,
+            $this->getLocalKeyName(),
+            $this->getSecondLocalKeyName(),
+        );
+
+    }
 }
