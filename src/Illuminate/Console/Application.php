@@ -80,7 +80,7 @@ class Application extends SymfonyApplication implements ApplicationContract
 
         $this->events->dispatch(new ArtisanStarting($this));
 
-        // $this->rerouteSymfonyCommandEvents();
+        $this->rerouteSymfonyCommandEvents();
 
         $this->bootstrap();
     }
