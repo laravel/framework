@@ -51,6 +51,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Contracts\Cache\Lock restoreLock(string $name, string $owner)
  *
  * @see \Illuminate\Cache\CacheManager
+ *
  * @mixin \Illuminate\Cache\Repository
  */
 class Cache extends Facade

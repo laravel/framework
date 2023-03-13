@@ -666,15 +666,15 @@ class ComponentTagCompiler
     protected function parseComponentTagClassStatements(string $attributeString)
     {
         return preg_replace_callback(
-             '/@(class)(\( ( (?>[^()]+) | (?2) )* \))/x', function ($match) {
-                 if ($match[1] === 'class') {
-                     $match[2] = str_replace('"', "'", $match[2]);
+            '/@(class)(\( ( (?>[^()]+) | (?2) )* \))/x', function ($match) {
+                if ($match[1] === 'class') {
+                    $match[2] = str_replace('"', "'", $match[2]);
 
-                     return ":class=\"\Illuminate\Support\Arr::toCssClasses{$match[2]}\"";
-                 }
+                    return ":class=\"\Illuminate\Support\Arr::toCssClasses{$match[2]}\"";
+                }
 
-                 return $match[0];
-             }, $attributeString
+                return $match[0];
+            }, $attributeString
         );
     }
 
@@ -687,15 +687,15 @@ class ComponentTagCompiler
     protected function parseComponentTagStyleStatements(string $attributeString)
     {
         return preg_replace_callback(
-             '/@(style)(\( ( (?>[^()]+) | (?2) )* \))/x', function ($match) {
-                 if ($match[1] === 'style') {
-                     $match[2] = str_replace('"', "'", $match[2]);
+            '/@(style)(\( ( (?>[^()]+) | (?2) )* \))/x', function ($match) {
+                if ($match[1] === 'style') {
+                    $match[2] = str_replace('"', "'", $match[2]);
 
-                     return ":style=\"\Illuminate\Support\Arr::toCssStyles{$match[2]}\"";
-                 }
+                    return ":style=\"\Illuminate\Support\Arr::toCssStyles{$match[2]}\"";
+                }
 
-                 return $match[0];
-             }, $attributeString
+                return $match[0];
+            }, $attributeString
         );
     }
 

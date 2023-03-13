@@ -735,7 +735,7 @@ class Str
             while (($len = strlen($string)) < $length) {
                 $size = $length - $len;
 
-                $bytesSize = (int) ceil(($size) / 3) * 3;
+                $bytesSize = (int) ceil($size / 3) * 3;
 
                 $bytes = random_bytes($bytesSize);
 
