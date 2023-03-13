@@ -4,8 +4,10 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Routing\RouteCollection;
+use Laravel\Octane\Octane;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'route:cache')]
@@ -78,10 +80,33 @@ class RouteCacheCommand extends Command
      */
     protected function getFreshApplicationRoutes()
     {
-        return tap($this->getFreshApplication()['router']->getRoutes(), function ($routes) {
+        $application = $this->getFreshApplication();
+
+        $routes = tap($application['router']->getRoutes(), function ($routes) {
             $routes->refreshNameLookups();
             $routes->refreshActionLookups();
         });
+
+        if($this->hasOctane($application)) {
+            $warning = 'Running route:cache while running swoole decreases memory performance';
+            $this->components->warn($warning);
+            collect($application->octane->getRoutes())
+                ->each( function ($callback, $signature) use ($application) {
+                    list($method, $uri) = explode('/',$signature, 2);
+                    $application['router']->addRoute($method, $uri, $callback);
+                });
+        }
+
+        return $routes;
+    }
+
+    /**
+     * @param Application $application
+     * @return bool
+     */
+    protected function hasOctane(Application $application): bool
+    {
+        return $application?->octane !== null;
     }
 
     /**
