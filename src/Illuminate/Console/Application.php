@@ -86,7 +86,7 @@ class Application extends SymfonyApplication implements ApplicationContract
     }
 
     /**
-     * Reroute specific Symfony events to the Laravel counterpart.
+     * Re-route the Symfony command events to their Laravel counterparts.
      *
      * @return void
      */
