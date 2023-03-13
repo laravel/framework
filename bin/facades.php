@@ -89,7 +89,7 @@ resolveFacades($finder)->each(function ($facade) use ($linting) {
     /**
     {$methods->join(PHP_EOL)}
      *
-    {$proxies->map(fn ($class) => " * @see {$class}")->merge($directMixins->map(fn ($class) => " * @mixin {$class}"))->join(PHP_EOL)}
+    {$proxies->map(fn ($class) => " * @see {$class}")->merge($proxies->isNotEmpty() && $directMixins->isNotEmpty() ? [' *'] : [])->merge($directMixins->map(fn ($class) => " * @mixin {$class}"))->join(PHP_EOL)}
      */
     PHP;
 
