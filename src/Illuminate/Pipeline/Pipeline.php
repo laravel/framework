@@ -133,7 +133,7 @@ class Pipeline implements PipelineContract
 
     /**
      * Set the catch callback for the pipeline.
-     * 
+     *
      * @param  \Closure  $callback
      * @return $this
      */
