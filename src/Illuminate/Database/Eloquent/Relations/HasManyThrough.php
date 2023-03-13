@@ -82,6 +82,24 @@ class HasManyThrough extends Relation
     }
 
     /**
+     * Convert the relationship to a "has one through" relationship.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOneThrough
+     */
+    public function hasOneThrough()
+    {
+        return new HasOneThrough(
+            $this->getQuery(),
+            $this->farParent,
+            $this->throughParent,
+            $this->getFirstKeyName(),
+            $this->secondKey,
+            $this->getLocalKeyName(),
+            $this->getSecondLocalKeyName(),
+        );
+    }
+
+    /**
      * Set the base constraints on the relation query.
      *
      * @return void
@@ -770,21 +788,5 @@ class HasManyThrough extends Relation
     public function getSecondLocalKeyName()
     {
         return $this->secondLocalKey;
-    }
-
-    /**
-     * @return HasOneThrough
-     */
-    public function hasOneThrough(): HasOneThrough {
-        return new HasOneThrough(
-            $this->getQuery(),
-            $this->farParent,
-            $this->throughParent,
-            $this->getFirstKeyName(),
-            $this->secondKey,
-            $this->getLocalKeyName(),
-            $this->getSecondLocalKeyName(),
-        );
-
     }
 }

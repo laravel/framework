@@ -7,6 +7,16 @@ use Illuminate\Database\Eloquent\Collection;
 class HasMany extends HasOneOrMany
 {
     /**
+     * Convert the relationship to a "has one" relationship.
+     *
+     * @return Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function hasOne()
+    {
+        return new HasOne($this->getQuery(), $this->parent, $this->foreignKey, $this->localKey);
+    }
+
+    /**
      * Get the results of the relationship.
      *
      * @return mixed
@@ -45,15 +55,5 @@ class HasMany extends HasOneOrMany
     public function match(array $models, Collection $results, $relation)
     {
         return $this->matchMany($models, $results, $relation);
-    }
-
-    /**
-     * Convert the relationship to HasOne.
-     *
-     * @return HasOne
-     */
-    public function hasOne(): HasOne
-    {
-        return new HasOne($this->getQuery(), $this->parent, $this->foreignKey, $this->localKey);
     }
 }

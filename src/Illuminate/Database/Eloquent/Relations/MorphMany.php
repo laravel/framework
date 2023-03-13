@@ -7,6 +7,16 @@ use Illuminate\Database\Eloquent\Collection;
 class MorphMany extends MorphOneOrMany
 {
     /**
+     * Convert the relationship to a "morph one" relationship.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\MorphOne
+     */
+    public function morphOne()
+    {
+        return new MorphOne($this->getQuery(), $this->getParent(), $this->morphType, $this->foreignKey, $this->localKey);
+    }
+
+    /**
      * Get the results of the relationship.
      *
      * @return mixed
@@ -58,15 +68,5 @@ class MorphMany extends MorphOneOrMany
         $attributes[$this->getMorphType()] = $this->morphClass;
 
         return parent::forceCreate($attributes);
-    }
-
-    /**
-     * Create a new MorphOne relationship from MorphMany relationship.
-     *
-     * @return MorphOne
-     */
-    public function morphOne(): MorphOne
-    {
-        return new MorphOne($this->getQuery(), $this->getParent(), $this->morphType, $this->foreignKey, $this->localKey);
     }
 }
