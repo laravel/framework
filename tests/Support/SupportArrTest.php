@@ -502,7 +502,7 @@ class SupportArrTest extends TestCase
 
         try {
             Arr::isList(null);
-            $this->fail("No TypeError thrown");
+            $this->fail('No TypeError thrown');
         } catch (Throwable $throwable) {
             $this->assertInstanceOf(TypeError::class, $throwable);
         }
