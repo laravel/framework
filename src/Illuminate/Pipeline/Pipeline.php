@@ -128,13 +128,13 @@ class Pipeline implements PipelineContract
             }
         }
 
-       return $pipeline($this->passable);
+        return $pipeline($this->passable);
     }
 
     /**
      * Set the catch callback for the pipeline.
      * 
-     * @param \Closure $callback
+     * @param  \Closure  $callback
      * @return $this
      */
     public function catch(Closure $callback)

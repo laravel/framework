@@ -41,7 +41,7 @@ interface Pipeline
     /**
      * Set the catch callback for the pipeline.
      *
-     * @param  \Closure $callback
+     * @param  \Closure  $callback
      * @return $this
      */
     public function catch(Closure $callback);
