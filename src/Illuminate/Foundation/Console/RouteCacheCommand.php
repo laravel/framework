@@ -86,7 +86,7 @@ class RouteCacheCommand extends Command
             $routes->refreshActionLookups();
         });
 
-        if($this->hasOctane($application)) {
+        if($application->has('octane')) {
             $warning = 'Running route:cache while running swoole decreases memory performance';
             $this->components->warn($warning);
             collect($application->octane->getRoutes())
@@ -97,15 +97,6 @@ class RouteCacheCommand extends Command
         }
 
         return $routes;
-    }
-
-    /**
-     * @param Application $application
-     * @return bool
-     */
-    protected function hasOctane(Application $application): bool
-    {
-        return $application?->octane !== null;
     }
 
     /**
