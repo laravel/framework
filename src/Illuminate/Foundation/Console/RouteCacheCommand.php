@@ -7,7 +7,6 @@ use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Routing\RouteCollection;
-use Laravel\Octane\Octane;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'route:cache')]
