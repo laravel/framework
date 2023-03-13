@@ -803,9 +803,7 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['name' => ''], ['name' => 'required']);
 
-        $exception = new class($v) extends ValidationException
-        {
-        };
+        $exception = new class($v) extends ValidationException {};
         $v->setException($exception);
 
         try {

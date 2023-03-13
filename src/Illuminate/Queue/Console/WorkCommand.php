@@ -14,6 +14,7 @@ use Illuminate\Queue\WorkerOptions;
 use Illuminate\Support\Carbon;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Terminal;
+
 use function Termwind\terminal;
 
 #[AsCommand(name: 'queue:work')]

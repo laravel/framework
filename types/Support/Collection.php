@@ -2,6 +2,7 @@
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
+
 use function PHPStan\Testing\assertType;
 
 $collection = collect([new User]);
