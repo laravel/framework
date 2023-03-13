@@ -9,6 +9,8 @@ use Illuminate\Support\Collection;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use stdClass;
+use Throwable;
+use TypeError;
 
 class SupportArrTest extends TestCase
 {
@@ -497,6 +499,13 @@ class SupportArrTest extends TestCase
         $this->assertFalse(Arr::isList([0 => 'foo', 'bar' => 'baz']));
         $this->assertFalse(Arr::isList([0 => 'foo', 2 => 'bar']));
         $this->assertFalse(Arr::isList(['foo' => 'bar', 'baz' => 'qux']));
+
+        try {
+            Arr::isList(null);
+            $this->fail("No TypeError thrown");
+        } catch (Throwable $throwable) {
+            $this->assertInstanceOf(TypeError::class, $throwable);
+        }
     }
 
     public function testOnly()
