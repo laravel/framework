@@ -2,6 +2,8 @@
 
 namespace Illuminate\Console\Scheduling;
 
+use Cron\CronExpression;
+use DateTimeZone;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\ProcessUtils;
@@ -29,12 +31,13 @@ class ScheduleWorkCommand extends Command
     /**
      * Execute the console command.
      *
+     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
      * @return void
      */
-    public function handle()
+    public function handle(Schedule $schedule)
     {
         $this->components->info(
-            'Running scheduled tasks every minute.',
+            'Running scheduled tasks every minute. '.$this->getNextDueInformation($schedule),
             $this->getLaravel()->isLocal() ? OutputInterface::VERBOSITY_NORMAL : OutputInterface::VERBOSITY_VERBOSE
         );
 
@@ -73,5 +76,48 @@ class ScheduleWorkCommand extends Command
                 }
             }
         }
+    }
+
+    /**
+     * Get the next due information for scheduled events.
+     *
+     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
+     * @return string
+     */
+    private function getNextDueInformation(Schedule $schedule)
+    {
+        $events = collect($schedule->events());
+
+        if ($events->isEmpty()) {
+            return 'No scheduled tasks have been defined.';
+        }
+
+        $timezone = new DateTimeZone(config('app.timezone'));
+
+        $nextDueDate = $events->map(function ($event) use ($timezone) {
+            return $this->getNextDueDateForEvent($event, $timezone);
+        })->sort()->first();
+
+        $nextDueDate = $this->output->isVerbose()
+            ? $nextDueDate->format('Y-m-d H:i:s P')
+            : $nextDueDate->diffForHumans();
+
+        return 'Next Due: '.$nextDueDate;
+    }
+
+    /**
+     * Get the next due date for an event.
+     *
+     * @param  \Illuminate\Console\Scheduling\Event  $event
+     * @param  \DateTimeZone  $timezone
+     * @return \Illuminate\Support\Carbon
+     */
+    private function getNextDueDateForEvent($event, DateTimeZone $timezone)
+    {
+        return Carbon::instance(
+            (new CronExpression($event->expression))
+                ->getNextRunDate(Carbon::now()->setTimezone($event->timezone))
+                ->setTimezone($timezone)
+        );
     }
 }
