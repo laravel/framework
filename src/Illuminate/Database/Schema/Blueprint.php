@@ -943,6 +943,12 @@ class Blueprint
                     : $this->foreignUuid($column ?: $model->getForeignKey());
     }
 
+    /**
+     * @param  string  $column
+     * @param  string|null  $table
+     * @param  string  $on
+     * @return \Illuminate\Database\Schema\ForeignKeyDefinition
+     */
     public function foreignIdCascadeDelete($column, $table = null, $on = 'id')
     {
         return $this->foreignId($column)->constrained($table, $on)->cascadeOnDelete();
