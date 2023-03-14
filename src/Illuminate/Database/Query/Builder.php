@@ -1689,7 +1689,7 @@ class Builder implements BuilderContract
             // compile the whole thing in the grammar and insert it into the SQL.
             $callback($query);
         } else {
-            $query = $callback;
+            $query = $callback instanceof EloquentBuilder ? $callback->toBase() : $callback;
         }
 
         return $this->addWhereExistsQuery($query, $boolean, $not);

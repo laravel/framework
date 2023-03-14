@@ -2115,6 +2115,12 @@ class DatabaseQueryBuilderTest extends TestCase
             $this->getBuilder()->select('*')->from('products')->where('products.id', '=', new Raw('"orders"."id"'))
         );
         $this->assertSame('select * from "orders" where "id" = ? or not exists (select * from "products" where "products"."id" = "orders"."id")', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('orders')->whereExists(
+            (new EloquentBuilder($this->getBuilder()))->select('*')->from('products')->where('products.id', '=', new Raw('"orders"."id"'))
+        );
+        $this->assertSame('select * from "orders" where exists (select * from "products" where "products"."id" = "orders"."id")', $builder->toSql());
     }
 
     public function testBasicJoins()
