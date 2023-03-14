@@ -293,9 +293,11 @@ if (! function_exists('tap')) {
     /**
      * Call the given Closure with the given value then return the value.
      *
-     * @param  mixed  $value
+     * @template TTapValue
+     *
+     * @param  TTapValue  $value
      * @param  callable|null  $callback
-     * @return mixed
+     * @return TTapValue|\Illuminate\Support\HigherOrderTapProxy
      */
     function tap($value, $callback = null)
     {
