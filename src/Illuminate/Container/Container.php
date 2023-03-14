@@ -293,7 +293,7 @@ class Container implements ArrayAccess, ContainerContract
             }
 
             return $container->resolve(
-                $concrete, $parameters, $raiseEvents = false
+                $concrete, $parameters, false
             );
         };
     }
