@@ -1,6 +1,15 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.3.1...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v10.3.2...10.x)
+
+
+## [v10.3.2 (2023-03-08)](https://github.com/laravel/framework/compare/v10.3.1...v10.3.2)
+
+### Reverted
+- Reverted ["FIX on CanBeOneOfMany trait giving erroneous results"](https://github.com/laravel/framework/pull/46309) ([#46402](https://github.com/laravel/framework/pull/46402))
+
+### Fixed
+- Fixes Expression no longer implements Stringable ([#46395](https://github.com/laravel/framework/pull/46395))
 
 
 ## [v10.3.1 (2023-03-08)](https://github.com/laravel/framework/compare/v10.3.0...v10.3.1)
