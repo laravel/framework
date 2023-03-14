@@ -31,13 +31,12 @@ class ScheduleWorkCommand extends Command
     /**
      * Execute the console command.
      *
-     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
      * @return void
      */
-    public function handle(Schedule $schedule)
+    public function handle()
     {
         $this->components->info(
-            'Running scheduled tasks every minute. '.$this->getNextDueInformation($schedule),
+            'Running scheduled tasks every minute. '.$this->getNextDueInformation(app(Schedule::class)),
             $this->getLaravel()->isLocal() ? OutputInterface::VERBOSITY_NORMAL : OutputInterface::VERBOSITY_VERBOSE
         );
 
