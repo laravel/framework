@@ -97,6 +97,23 @@ class PipelineTest extends TestCase
         unset($_SERVER['__test.pipe.one']);
     }
 
+    public function testPipeAndCatchException()
+    {
+        $function = function ($piped, $next) {
+            throw new RuntimeException('foo');
+        };
+
+        (new Pipeline(new Container))
+            ->send('bar')
+            ->through([$function])
+            ->catch(function ($e, $passable) {
+                $this->assertInstanceOf(RuntimeException::class, $e);
+                $this->assertSame('bar', $passable);
+                $this->assertSame('foo', $e->getMessage());
+            })
+            ->thenReturn();
+    }
+
     public function testPipelineUsageWithPipe()
     {
         $object = new stdClass();
