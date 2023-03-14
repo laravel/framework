@@ -943,6 +943,11 @@ class Blueprint
                     : $this->foreignUuid($column ?: $model->getForeignKey());
     }
 
+    public function foreignIdCascadeDelete($column, $table = null, $on = 'id')
+    {
+        return $this->foreignId($column)->constrained($table, $on)->cascadeOnDelete();
+    }
+
     /**
      * Create a new float column on the table.
      *
