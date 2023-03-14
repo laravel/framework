@@ -427,3 +427,22 @@ if (! function_exists('with')) {
         return is_null($callback) ? $value : $callback($value);
     }
 }
+
+if (! function_exists('are_null')) {
+    /**
+     * Check if the all given variables are null.
+     *
+     * @param  mixed  ...$parameters
+     * @return bool
+     */
+    function are_null(...$parameters)
+    {
+        foreach ($parameters as $parameter) {
+            if (! is_null($parameter)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+}
