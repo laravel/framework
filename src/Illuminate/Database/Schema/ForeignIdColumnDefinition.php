@@ -47,6 +47,6 @@ class ForeignIdColumnDefinition extends ColumnDefinition
      */
     public function references($column)
     {
-        return $this->blueprint->foreign($this->name)->references($column);
+        return $this->blueprint->foreign($this->name, $this->index)->references($column);
     }
 }
