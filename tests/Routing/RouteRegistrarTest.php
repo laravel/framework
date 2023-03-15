@@ -884,6 +884,33 @@ class RouteRegistrarTest extends TestCase
         }
     }
 
+    public function testWhereEnumRegistration()
+    {
+        $wheres = ['foo' => 'People|Fruits', 'bar' => 'People|Fruits'];
+
+        $this->router->get('/{foo}/{bar}')->whereEnum(['foo', 'bar'], CategoryEnum::class);
+        $this->router->get('/api/{bar}/{foo}')->whereEnum(['bar', 'foo'], '\Illuminate\Tests\Routing\CategoryEnum');
+
+        /** @var \Illuminate\Routing\Route $route */
+        foreach ($this->router->getRoutes() as $route) {
+            $this->assertEquals($wheres, $route->wheres);
+        }
+    }
+
+    public function testWhereEnumRegistrationForBackedEnum()
+    {
+        $wheres = ['foo' => 'people|fruits', 'bar' => 'people|fruits'];
+
+        $this->router->get('/{foo}/{bar}')->whereEnum(['foo', 'bar'], CategoryBackedEnum::class);
+        $this->router->get('/api/{bar}/{foo}')->whereEnum(['bar', 'foo'],
+            '\Illuminate\Tests\Routing\CategoryBackedEnum');
+
+        /** @var \Illuminate\Routing\Route $route */
+        foreach ($this->router->getRoutes() as $route) {
+            $this->assertEquals($wheres, $route->wheres);
+        }
+    }
+
     public function testGroupWhereNumberRegistrationOnRouteRegistrar()
     {
         $wheres = ['foo' => '[0-9]+', 'bar' => '[0-9]+'];
@@ -1011,6 +1038,42 @@ class RouteRegistrarTest extends TestCase
         });
 
         $this->router->whereIn(['bar', 'foo'], ['one', 'two'])->prefix('/api/{bar}/{foo}')->group(function ($router) {
+            $router->get('/');
+        });
+
+        /** @var \Illuminate\Routing\Route $route */
+        foreach ($this->router->getRoutes() as $route) {
+            $this->assertEquals($wheres, $route->wheres);
+        }
+    }
+
+    public function testGroupWhereEnumRegistrationOnRouter()
+    {
+        $wheres = ['foo' => 'People|Fruits', 'bar' => 'People|Fruits'];
+
+        $this->router->whereEnum(['foo', 'bar'], CategoryEnum::class)->prefix('/{foo}/{bar}')->group(function ($router) {
+            $router->get('/');
+        });
+
+        $this->router->whereEnum(['bar', 'foo'], '\Illuminate\Tests\Routing\CategoryEnum')->prefix('/api/{bar}/{foo}')->group(function ($router) {
+            $router->get('/');
+        });
+
+        /** @var \Illuminate\Routing\Route $route */
+        foreach ($this->router->getRoutes() as $route) {
+            $this->assertEquals($wheres, $route->wheres);
+        }
+    }
+
+    public function testGroupWhereEnumRegistrationOnRouterForBackedEnum()
+    {
+        $wheres = ['foo' => 'people|fruits', 'bar' => 'people|fruits'];
+
+        $this->router->whereEnum(['foo', 'bar'], CategoryBackedEnum::class)->prefix('/{foo}/{bar}')->group(function ($router) {
+            $router->get('/');
+        });
+
+        $this->router->whereEnum(['bar', 'foo'], '\Illuminate\Tests\Routing\CategoryBackedEnum')->prefix('/api/{bar}/{foo}')->group(function ($router) {
             $router->get('/');
         });
 

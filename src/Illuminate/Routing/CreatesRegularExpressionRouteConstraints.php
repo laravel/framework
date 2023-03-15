@@ -2,7 +2,9 @@
 
 namespace Illuminate\Routing;
 
+use BackedEnum;
 use Illuminate\Support\Arr;
+use InvalidArgumentException;
 
 trait CreatesRegularExpressionRouteConstraints
 {
@@ -71,6 +73,28 @@ trait CreatesRegularExpressionRouteConstraints
     public function whereIn($parameters, array $values)
     {
         return $this->assignExpressionToParameters($parameters, implode('|', $values));
+    }
+
+    /**
+     * Specify that the given route parameters must be valid case of provided enum.
+     *
+     * @param array|string $parameters
+     * @param class-string $enum
+     * @return $this
+     */
+    public function whereEnum($parameters, $enum)
+    {
+        if (! enum_exists($enum)) {
+            throw new InvalidArgumentException(
+                "Enum [{$enum}] not found"
+            );
+        }
+
+        $cases = collect($enum::cases())
+            ->map(fn ($case) => $case instanceof BackedEnum ? $case->value : $case->name)
+            ->implode('|');
+
+        return $this->assignExpressionToParameters($parameters, $cases);
     }
 
     /**
