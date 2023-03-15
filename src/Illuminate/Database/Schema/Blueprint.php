@@ -913,7 +913,7 @@ class Blueprint
      * Create a new unsigned big integer (8-byte) column on the table.
      *
      * @param  string  $column
-     * @param  string|null $name
+     * @param  string|null  $name
      * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
      */
     public function foreignId($column, $name = null)
@@ -1291,7 +1291,7 @@ class Blueprint
      * Create a new UUID column on the table with a foreign key constraint.
      *
      * @param  string  $column
-     * @param  string|null $name
+     * @param  string|null  $name
      * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
      */
     public function foreignUuid($column, $name = null)
@@ -1299,7 +1299,7 @@ class Blueprint
         return $this->addColumnDefinition(new ForeignIdColumnDefinition($this, [
             'type' => 'uuid',
             'name' => $column,
-            'index' => $name
+            'index' => $name,
         ]));
     }
 
