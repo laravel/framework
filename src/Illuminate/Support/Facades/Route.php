@@ -53,6 +53,7 @@ namespace Illuminate\Support\Facades;
  * @method static array getPatterns()
  * @method static void pattern(string $key, string $pattern)
  * @method static void patterns(array $patterns)
+ * @method static void prefixAll(string $uri)
  * @method static bool hasGroupStack()
  * @method static array getGroupStack()
  * @method static mixed input(string $key, string|null $default = null)
