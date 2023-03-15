@@ -722,7 +722,7 @@ class Router implements BindingRegistrar, RegistrarContract
     {
         return $this->prefixAll === ''
             ? $this->prefix($uri)
-            : $this->prefixAll . '/' . $this->prefix($uri);
+            : $this->prefixAll.'/'.$this->prefix($uri);
     }
 
     /**
