@@ -74,6 +74,13 @@ class Router implements BindingRegistrar, RegistrarContract
     protected $currentRequest;
 
     /**
+     * The prefix for all routes.
+     *
+     * @var string
+     */
+    protected $prefixAll;
+
+    /**
      * All of the short-hand keys for middlewares.
      *
      * @var array
@@ -1183,6 +1190,17 @@ class Router implements BindingRegistrar, RegistrarContract
         foreach ($patterns as $key => $pattern) {
             $this->pattern($key, $pattern);
         }
+    }
+
+    /**
+     * Set a global prefix on all routes.
+     *
+     * @param  string $uri
+     * @return void
+     */
+    public function prefixAll($uri)
+    {
+        $this->prefixAll = $uri;
     }
 
     /**
