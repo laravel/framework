@@ -1320,7 +1320,7 @@ class Blueprint
      *
      * @param  string  $column
      * @param  int|null  $length
-     * @param  string|null $name
+     * @param  string|null  $name
      * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
      */
     public function foreignUlid($column, $length = 26, $name = null)
