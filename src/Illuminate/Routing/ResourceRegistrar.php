@@ -611,7 +611,7 @@ class ResourceRegistrar
             $value = Str::singular($value);
         }
 
-        return str_replace('-', '_', $value);
+        return Str::camel($value);
     }
 
     /**
