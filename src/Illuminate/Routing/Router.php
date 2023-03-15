@@ -557,8 +557,10 @@ class Router implements BindingRegistrar, RegistrarContract
             $action = $this->convertToControllerAction($action);
         }
 
+        $prefix = $this->prefixAll . '/' . $this->prefix($uri);
+
         $route = $this->newRoute(
-            $methods, $this->prefix($uri), $action
+            $methods, $prefix, $action
         );
 
         // If we have groups that need to be merged, we will merge them now after this
