@@ -665,6 +665,53 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
+     * Checks if driver supports locks
+     * @return bool
+     */
+    public function supportsLocks(): bool {
+        return method_exists($this->store, 'lock');
+    }
+
+    /**
+     * Remembers, ensuring that the remember callable only runs once.
+     * @param $key
+     * @param $ttl
+     * @param callable $callback
+     * @param $sleepMilliseconds
+     * @param int $lockAttempts
+     * @param int $lockTimeout
+     * @return mixed
+     * @throws \Exception
+     */
+    public function rememberLock($key, $ttl, callable $callback, $sleepMilliseconds = 500, int $lockAttempts = 25, int $lockTimeout = 10) {
+        return retry($lockAttempts, function() use ($key, $ttl,  $callback, $sleepMilliseconds , $lockAttempts, $lockTimeout) {
+            if(!$this->supportsLocks()) {
+                throw new BadMethodCallException('This cache store does not support locking.');
+            }
+            $lockKey = 'lock:'.$key;
+            $value = $this->get($key);
+            if(!is_null($value)) {
+                return $value;
+            }
+            $lock = $this->store->lock($lockKey, $lockTimeout);
+            if($lock->acquire()) {
+                try {
+                    $result = $callback($lock);
+                    $this->set($key, $result, $ttl);
+                    return $result;
+                } finally {
+                    $lock->release();
+                }
+            } else {
+                throw new \Exception('Failed to acquire lock');
+            }
+        }, $sleepMilliseconds, function(\Exception $exception) {
+            return $exception->getMessage() === 'Failed to acquire lock';
+        });
+
+    }
+
+    /**
      * Handle dynamic calls into macros or pass missing methods to the store.
      *
      * @param  string  $method
