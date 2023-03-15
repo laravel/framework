@@ -557,9 +557,7 @@ class Router implements BindingRegistrar, RegistrarContract
             $action = $this->convertToControllerAction($action);
         }
 
-        $prefix = $this->prefixAll === ''
-            ? $this->prefix($uri)
-            : $this->prefixAll.'/'.$this->prefix($uri);
+        $prefix = $this->getCorrectPrefix($uri);
 
         $route = $this->newRoute(
             $methods, $prefix, $action
@@ -712,6 +710,19 @@ class Router implements BindingRegistrar, RegistrarContract
             $route->getAction(),
             $prependExistingPrefix = false
         ));
+    }
+
+    /**
+     * Get correct prefix.
+     *
+     * @param  string  $uri
+     * @return string
+     */
+    protected function getCorrectPrefix(string $uri): string
+    {
+        return $this->prefixAll === ''
+            ? $this->prefix($uri)
+            : $this->prefixAll . '/' . $this->prefix($uri);
     }
 
     /**
