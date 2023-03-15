@@ -557,7 +557,7 @@ class Router implements BindingRegistrar, RegistrarContract
             $action = $this->convertToControllerAction($action);
         }
 
-        $prefix = $this->prefixAll . '/' . $this->prefix($uri);
+        $prefix = $this->prefixAll.'/'.$this->prefix($uri);
 
         $route = $this->newRoute(
             $methods, $prefix, $action
@@ -1197,7 +1197,7 @@ class Router implements BindingRegistrar, RegistrarContract
     /**
      * Set a global prefix on all routes.
      *
-     * @param  string $uri
+     * @param  string  $uri
      * @return void
      */
     public function prefixAll($uri)
