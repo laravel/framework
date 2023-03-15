@@ -78,7 +78,7 @@ class Router implements BindingRegistrar, RegistrarContract
      *
      * @var string
      */
-    protected $prefixAll;
+    protected $prefixAll = '';
 
     /**
      * All of the short-hand keys for middlewares.
