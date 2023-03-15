@@ -1322,11 +1322,12 @@ class Blueprint
      * @param  int|null  $length
      * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
      */
-    public function foreignUlid($column, $length = 26)
+    public function foreignUlid($column, $length = 26, $name = null)
     {
         return $this->addColumnDefinition(new ForeignIdColumnDefinition($this, [
             'type' => 'char',
             'name' => $column,
+            'index' => $name,
             'length' => $length,
         ]));
     }
