@@ -346,6 +346,20 @@ class FilesystemTest extends TestCase
         $files->getRequire(self::$tempDir.'/file.php');
     }
 
+    public function testJsonReturnsDecodedJsonData()
+    {
+        file_put_contents(self::$tempDir.'/file.json', '{"foo": "bar"}');
+        $files = new Filesystem;
+        $this->assertSame(['foo' => 'bar'], $files->json(self::$tempDir.'/file.json'));
+    }
+
+    public function testJsonReturnsNullIfJsonDataIsInvalid()
+    {
+        file_put_contents(self::$tempDir.'/file.json', '{"foo":');
+        $files = new Filesystem;
+        $this->assertNull($files->json(self::$tempDir . '/file.json'));
+    }
+
     public function testAppendAddsDataToFile()
     {
         file_put_contents(self::$tempDir.'/file.txt', 'foo');

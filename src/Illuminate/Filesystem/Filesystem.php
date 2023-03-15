@@ -60,6 +60,22 @@ class Filesystem
     }
 
     /**
+     * Get the json decoded contents of a file.
+     *
+     * @param  string  $path
+     * @param  bool  $lock
+     * @return array
+     *
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     */
+    public function json($path, $lock = false)
+    {
+        $contents = $this->get($path, $lock);
+
+        return json_decode($contents, true);
+    }
+
+    /**
      * Get contents of a file with shared access.
      *
      * @param  string  $path
