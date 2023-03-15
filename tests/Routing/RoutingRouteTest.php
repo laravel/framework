@@ -1456,21 +1456,21 @@ class RoutingRouteTest extends TestCase
         $routes = $router->getRoutes();
         $routes = $routes->getRoutes();
 
-        $this->assertSame('foo-bars/{foo_bar}', $routes[0]->uri());
+        $this->assertSame('foo-bars/{fooBar}', $routes[0]->uri());
 
         $router = $this->getRouter();
         $router->resource('foo-bar.foo-baz', 'FooController', ['only' => ['show']]);
         $routes = $router->getRoutes();
         $routes = $routes->getRoutes();
 
-        $this->assertSame('foo-bar/{foo_bar}/foo-baz/{foo_baz}', $routes[0]->uri());
+        $this->assertSame('foo-bar/{fooBar}/foo-baz/{fooBaz}', $routes[0]->uri());
 
         $router = $this->getRouter();
         $router->resource('foo-bars', 'FooController', ['only' => ['show'], 'as' => 'prefix']);
         $routes = $router->getRoutes();
         $routes = $routes->getRoutes();
 
-        $this->assertSame('foo-bars/{foo_bar}', $routes[0]->uri());
+        $this->assertSame('foo-bars/{fooBar}', $routes[0]->uri());
         $this->assertSame('prefix.foo-bars.show', $routes[0]->getName());
 
         ResourceRegistrar::verbs([

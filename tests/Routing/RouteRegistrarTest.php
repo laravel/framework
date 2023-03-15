@@ -767,12 +767,12 @@ class RouteRegistrarTest extends TestCase
     public function testCanOverrideParametersOnRegisteredResource()
     {
         $this->router->resource('users', RouteRegistrarControllerStub::class)
-                     ->parameters(['users' => 'admin_user']);
+                     ->parameters(['users' => 'adminUser']);
 
         $this->router->resource('posts', RouteRegistrarControllerStub::class)
                      ->parameter('posts', 'topic');
 
-        $this->assertStringContainsString('admin_user', $this->router->getRoutes()->getByName('users.show')->uri);
+        $this->assertStringContainsString('adminUser', $this->router->getRoutes()->getByName('users.show')->uri);
         $this->assertStringContainsString('topic', $this->router->getRoutes()->getByName('posts.show')->uri);
     }
 
