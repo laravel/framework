@@ -557,7 +557,7 @@ class Router implements BindingRegistrar, RegistrarContract
             $action = $this->convertToControllerAction($action);
         }
 
-        $prefix = is_null($this->prefixAll)
+        $prefix = $this->prefixAll === ''
             ? $this->prefix($uri)
             : $this->prefixAll.'/'.$this->prefix($uri);
 
