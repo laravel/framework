@@ -357,7 +357,7 @@ class FilesystemTest extends TestCase
     {
         file_put_contents(self::$tempDir.'/file.json', '{"foo":');
         $files = new Filesystem;
-        $this->assertNull($files->json(self::$tempDir . '/file.json'));
+        $this->assertNull($files->json(self::$tempDir.'/file.json'));
     }
 
     public function testAppendAddsDataToFile()
