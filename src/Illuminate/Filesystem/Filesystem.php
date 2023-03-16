@@ -60,7 +60,7 @@ class Filesystem
     }
 
     /**
-     * Get the json decoded contents of a file.
+     * Get the contents of a file as decoded JSON.
      *
      * @param  string  $path
      * @param  bool  $lock
@@ -70,9 +70,7 @@ class Filesystem
      */
     public function json($path, $lock = false)
     {
-        $contents = $this->get($path, $lock);
-
-        return json_decode($contents, true);
+        return json_decode($this->get($path, $lock), true);
     }
 
     /**
