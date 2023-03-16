@@ -150,7 +150,7 @@ class Reflector
     {
         $backedEnumClass = $parameter->getType()?->getName();
 
-        if (null === $backedEnumClass) {
+        if (is_null($backedEnumClass)) {
             return false;
         }
 
