@@ -1893,6 +1893,20 @@ class RoutingRouteTest extends TestCase
         $router->dispatch(Request::create('foo', 'GET'))->getContent();
     }
 
+    public function testImplicitBindingsWithOptionalParameterUsingEnumIsAlwaysCastedToEnum()
+    {
+        include_once 'enums.php';
+
+        $router = $this->getRouter();
+        $router->get('foo/{bar?}', [
+            'middleware' => SubstituteBindings::class,
+            'uses' => function (?\Illuminate\Tests\Routing\CategoryBackedEnum $bar = null) {
+                $this->assertInstanceOf(CategoryBackedEnum::class, $bar);
+            },
+        ]);
+        $router->dispatch(Request::create('foo/people', 'GET'))->getContent();
+    }
+
     public function testImplicitBindingsWithOptionalParameterWithNonExistingKeyInUri()
     {
         $this->expectException(ModelNotFoundException::class);
