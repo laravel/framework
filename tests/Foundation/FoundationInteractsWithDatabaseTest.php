@@ -95,20 +95,23 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertDatabaseHas($this->table, $this->data);
     }
 
-    public function testSeeAmountInDatabaseFindsResults(){
+    public function testSeeAmountInDatabaseFindsResults()
+    {
         $this->mockCountBuilder(1);
 
         $this->assertDatabaseHasCount($this->table, 1, $this->data);
     }
 
-    public function testAssertDatabaseHasCountSupportModels(){
+    public function testAssertDatabaseHasCountSupportModels()
+    {
         $this->mockCountBuilder(1);
 
         $this->assertDatabaseHasCount(ProductStub::class, 1, $this->data);
         $this->assertDatabaseHasCount(new ProductStub, 1, $this->data);
     }
 
-    public function testSeeAmountInDatabaseDoesNotFindResults(){
+    public function testSeeAmountInDatabaseDoesNotFindResults()
+    {
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage('The table is empty.');
 
