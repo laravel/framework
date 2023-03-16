@@ -95,6 +95,70 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertDatabaseHas($this->table, $this->data);
     }
 
+    public function testSeeAmountInDatabaseFindsResults(){
+        $this->mockCountBuilder(1);
+
+        $this->assertDatabaseHasCount($this->table, 1, $this->data);
+    }
+
+    public function testAssertDatabaseHasCountSupportModels(){
+        $this->mockCountBuilder(1);
+
+        $this->assertDatabaseHasCount(ProductStub::class, 1, $this->data);
+        $this->assertDatabaseHasCount(new ProductStub, 1, $this->data);
+    }
+
+    public function testSeeAmountInDatabaseDoesNotFindResults(){
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('The table is empty.');
+
+        $builder = $this->mockCountBuilder(0);
+
+        $builder->shouldReceive('get')->andReturn(collect());
+
+        $this->assertDatabaseHasCount($this->table, 1, $this->data);
+    }
+
+    public function testSeeAmountInDatabaseFindsNotMatchingResults()
+    {
+        $this->expectException(ExpectationFailedException::class);
+
+        $this->expectExceptionMessage('Found similar results: '.json_encode([['title' => 'Forge']], JSON_PRETTY_PRINT));
+
+        $builder = $this->mockCountBuilder(0);
+
+        $builder->shouldReceive('take')->andReturnSelf();
+        $builder->shouldReceive('get')->andReturn(collect([['title' => 'Forge']]));
+
+        $this->assertDatabaseHasCount($this->table, 1, $this->data);
+    }
+
+    public function testSeeAmountInDatabaseFindsManyNotMatchingResults()
+    {
+        $this->expectException(ExpectationFailedException::class);
+
+        $this->expectExceptionMessage('Found similar results: '.json_encode(['data', 'data', 'data'], JSON_PRETTY_PRINT).' and 2 others.');
+
+        $builder = $this->mockCountBuilder(0);
+        $builder->shouldReceive('count')->andReturn(0, 5);
+
+        $builder->shouldReceive('take')->andReturnSelf();
+        $builder->shouldReceive('get')->andReturn(
+            collect(array_fill(0, 3, 'data'))
+        );
+
+        $this->assertDatabaseHasCount($this->table, 1, $this->data);
+    }
+
+    public function testAssertTableEntriesCountWrongForCondition()
+    {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Failed asserting that table [products] matches expected entries count of 3. Entries found: 1.');
+        $this->mockCountBuilder(1);
+
+        $this->assertDatabaseHasCount($this->table, 3, $this->data);
+    }
+
     public function testDontSeeInDatabaseDoesNotFindResults()
     {
         $this->mockCountBuilder(0);
