@@ -1895,7 +1895,7 @@ class RoutingRouteTest extends TestCase
 
     public function testImplicitBindingsWithOptionalParameterUsingEnumIsAlwaysCastedToEnum()
     {
-        include_once 'enums.php';
+        include_once 'Enums.php';
 
         $router = $this->getRouter();
         $router->get('foo/{bar?}', [
