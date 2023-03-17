@@ -2,7 +2,7 @@
 
 namespace Illuminate\Routing;
 
-trait ControllerMiddlewareFilterTrait
+trait FiltersControllerMiddleware
 {
     /**
      * Determine if the given options exclude a particular method.

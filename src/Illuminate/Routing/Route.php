@@ -22,7 +22,7 @@ use Symfony\Component\Routing\Route as SymfonyRoute;
 
 class Route
 {
-    use CreatesRegularExpressionRouteConstraints, ControllerMiddlewareFilterTrait, Macroable, RouteDependencyResolverTrait;
+    use CreatesRegularExpressionRouteConstraints, FiltersControllerMiddleware, Macroable, ResolvesRouteDependencies;
 
     /**
      * The URI pattern the route responds to.

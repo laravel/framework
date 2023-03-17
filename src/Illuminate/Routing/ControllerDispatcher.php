@@ -7,7 +7,7 @@ use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherCon
 
 class ControllerDispatcher implements ControllerDispatcherContract
 {
-    use ControllerMiddlewareFilterTrait, RouteDependencyResolverTrait;
+    use FiltersControllerMiddleware, ResolvesRouteDependencies;
 
     /**
      * The container instance.
