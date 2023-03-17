@@ -1871,7 +1871,7 @@ class Builder implements BuilderContract
      * @param  array  $parameters
      * @return mixed
      */
-    public function __call($method, array $parameters)
+    public function __call($method, $parameters)
     {
         if ($method === 'macro') {
             $this->localMacros[$parameters[0]] = $parameters[1];
