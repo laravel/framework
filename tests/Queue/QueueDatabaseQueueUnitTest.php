@@ -56,9 +56,9 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $uuid = Str::uuid()->toString();
 
         return [
-            [ $uuid, new MyTestJob, 'MyTestJob', 'CallQueuedHandler' ],
-            [ $uuid, fn () => 0, 'Closure', 'CallQueuedHandler' ],
-            [ $uuid, 'foo', 'foo', 'foo' ],
+            [$uuid, new MyTestJob, 'MyTestJob', 'CallQueuedHandler'],
+            [$uuid, fn () => 0, 'Closure', 'CallQueuedHandler'],
+            [$uuid, 'foo', 'foo', 'foo'],
         ];
     }
 
