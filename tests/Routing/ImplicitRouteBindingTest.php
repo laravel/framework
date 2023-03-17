@@ -9,7 +9,7 @@ use Illuminate\Routing\ImplicitRouteBinding;
 use Illuminate\Routing\Route;
 use PHPUnit\Framework\TestCase;
 
-include 'Enums.php';
+include_once 'Enums.php';
 
 class ImplicitRouteBindingTest extends TestCase
 {
