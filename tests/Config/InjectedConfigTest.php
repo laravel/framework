@@ -18,7 +18,7 @@ class InjectedConfigTest extends TestCase
             ->getMock();
     }
 
-    public function testItInjectsValuesForInjectedConfigAttibutedProperties(): void
+    public function testItInjectsValuesForInjectedConfigAttributedProperties(): void
     {
         $container = new Container();
         $mock = m::mock(Repository::class);
@@ -52,7 +52,6 @@ class InjectedConfigTest extends TestCase
         self::assertEquals(null, $testClass->fooNullableFloat);
         self::assertEquals(null, $testClass->fooNullableArray);
     }
-
 }
 
 class ConfigInjectionTestClass

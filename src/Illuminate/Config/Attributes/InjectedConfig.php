@@ -5,7 +5,9 @@ namespace Illuminate\Config\Attributes;
 use Attribute;
 
 #[Attribute]
-abstract class InjectedConfig
+class InjectedConfig
 {
-    abstract public function __construct(string $key = '');
+     public function __construct(string $key = ''){
+         
+     }
 }
