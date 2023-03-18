@@ -829,6 +829,17 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Resolves class names contained in collection to an instance using service container
+     *
+     * @return $this|Collection
+     *
+     */
+    public function mapInstance(?array $parameters = [])
+    {
+        return $this->map(fn($class) => app($class, $parameters));
+    }
+
+    /**
      * Merge the collection with the given items.
      *
      * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>  $items

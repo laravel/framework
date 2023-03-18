@@ -7,6 +7,7 @@ use ArrayIterator;
 use ArrayObject;
 use CachingIterator;
 use Exception;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Collection;
@@ -3129,6 +3130,20 @@ class SupportCollectionTest extends TestCase
             ['Blastoise' => 'Water', 'Charmander' => 'Fire', 'Dragonair' => 'Dragon'],
             $data->all()
         );
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testMapInstance($collection)
+    {
+        $data = new $collection([
+            Container::class
+        ]);
+
+        $data = $data->mapInstance();
+
+        $this->assertInstanceOf(Container::class, $data->first());
     }
 
     /**
