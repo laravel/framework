@@ -492,11 +492,11 @@ class Kernel implements KernelContract
      *
      * @internal
      *
-     * @return void
+     * @return $this
      */
     public function rerouteSymfonyCommandEvents()
     {
-        if (! isset($this->symfonyDispatcher)) {
+        if (is_null($this->symfonyDispatcher)) {
             $this->symfonyDispatcher = new EventDispatcher;
 
             $this->symfonyDispatcher->addListener(ConsoleEvents::COMMAND, function (ConsoleCommandEvent $event) {
@@ -520,5 +520,7 @@ class Kernel implements KernelContract
                 );
             });
         }
+
+        return $this;
     }
 }

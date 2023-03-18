@@ -8,6 +8,7 @@ use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
 
@@ -84,7 +85,7 @@ class CommandEventsTest extends TestCase
     {
         switch ($processType) {
             case 'foreground':
-                $this->app[\Illuminate\Contracts\Console\Kernel::class]->registerCommand(new CommandEventsTestCommand);
+                $this->app[ConsoleKernel::class]->registerCommand(new CommandEventsTestCommand);
                 $this->app[Dispatcher::class]->listen(function (CommandStarting $event) {
                     array_map(fn ($e) => $this->fs->append($this->logfile, $e."\n"), [
                         'CommandStarting',
@@ -118,7 +119,11 @@ class CommandEventsTest extends TestCase
             case 'background':
                 // Initialize empty logfile.
                 $this->fs->append($this->logfile, '');
-                exec('php '.base_path('artisan').' command-events-test-command-'.$this->id.' taylor otwell --occupation=coding');
+
+                Process::env(['APP_ENV' => 'local'])
+                    ->run('php '.base_path('artisan').' command-events-test-command-'.$this->id.' taylor otwell --occupation=coding');
+
+                //exec('APP_ENV=local php '.base_path('artisan').' command-events-test-command-'.$this->id.' taylor otwell --occupation=coding');
                 // Since our command is running in a separate process, we need to wait
                 // until it has finished executing before running our assertions.
                 $this->waitForLogMessages(
@@ -197,6 +202,7 @@ require __DIR__.'/../../../autoload.php';
 
 \$app = require_once __DIR__.'/bootstrap/app.php';
 \$kernel = \$app->make(Illuminate\Contracts\Console\Kernel::class);
+\$kernel->rerouteSymfonyCommandEvents();
 
 class CommandEventsTestCommand extends Illuminate\Console\Command
 {
