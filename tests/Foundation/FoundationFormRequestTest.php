@@ -149,6 +149,41 @@ class FoundationFormRequestTest extends TestCase
         $this->assertSame('bar', $request->validated('nested.foo'));
     }
 
+    public function testAfterMethod()
+    {
+        $request = new class extends FormRequest {
+            public function rules()
+            {
+                return [];
+            }
+
+            public function val()
+            {
+                return $this->getValidatorInstance();
+            }
+
+            public function after(InjectedDependency $dep)
+            {
+                return [
+                    AfterValidationRule::class,
+                    fn ($validator) => $validator->errors()->add('closure', $dep->value),
+                ];
+            }
+        };
+        $request->setContainer($container = new Container);
+        $container->instance(\Illuminate\Contracts\Validation\Factory::class, (new \Illuminate\Validation\Factory(
+            new \Illuminate\Translation\Translator(new \Illuminate\Translation\ArrayLoader(), 'en')
+        ))->setContainer($container));
+        $container->instance(InjectedDependency::class, new InjectedDependency('expected-value'));
+        $messages = $request->val()->messages()->messages();
+
+        $this->assertSame([
+            'class' => ['true'],
+            'closure' => ['expected-value'],
+        ], $messages);
+    }
+
+
     /**
      * Catch the given exception thrown from the executor, and return it.
      *
@@ -375,5 +410,21 @@ class FoundationTestFormRequestPassesWithResponseStub extends FormRequest
     public function authorize()
     {
         return Response::allow('baz');
+    }
+}
+
+class AfterValidationRule
+{
+    public function __invoke($validator)
+    {
+        $validator->errors()->add('class', 'true');
+    }
+}
+
+class InjectedDependency
+{
+    public function __construct(public $value)
+    {
+        //
     }
 }
