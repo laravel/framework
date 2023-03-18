@@ -521,8 +521,6 @@ class Kernel implements KernelContract
                     )
                 );
             });
-
-            $this->symfonyDispatcher;
         }
     }
 }
