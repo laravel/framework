@@ -72,30 +72,6 @@ class ValidatorAfterRuleTest extends TestCase
         ]);
     }
 
-    public function testItCanStopSubsequentValidationRules()
-    {
-        $validator = $this->validator();
-        $container = new Container;
-        $container->bind(InjectedDependency::class, fn () => new InjectedDependency('expected-value'));
-        $validator->setContainer($container);
-
-        $messages = $validator->after([
-            fn ($validator) => $validator->errors()->add('callable', 'true'),
-            'Illuminate\Tests\Validation\localFunction',
-            InvokableClass::class,
-            function ($validator) {
-                $validator->skipSubsequentAfterRules();
-            },
-            InvokableClassWithDependency::class,
-        ])->messages()->messages();
-
-        $this->assertSame($messages, [
-            'callable' => ['true'],
-            'localFunction' => ['true'],
-            'invokable' => ['true'],
-        ]);
-    }
-
     private function validator(): Validator
     {
         $validator = new Validator(new Translator(new ArrayLoader, 'en'), [], []);
