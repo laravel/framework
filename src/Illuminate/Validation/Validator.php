@@ -124,7 +124,7 @@ class Validator implements ValidatorContract
     protected $after = [];
 
     /**
-     * The sentinal value to stop executing after rules.
+     * Indicates that the validator should skip subsequent after validation rules.
      *
      * @var bool
      */
