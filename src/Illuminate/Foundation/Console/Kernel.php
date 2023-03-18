@@ -50,7 +50,7 @@ class Kernel implements KernelContract
      *
      * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface|null
      */
-    protected $symfonyDispatcher = null;
+    protected $symfonyDispatcher;
 
     /**
      * The Artisan application instance.
@@ -197,6 +197,8 @@ class Kernel implements KernelContract
         }
 
         $this->commandStartedAt = null;
+
+        unset($this->symfonyDispatcher);
     }
 
     /**
@@ -492,29 +494,33 @@ class Kernel implements KernelContract
      *
      * @return void
      */
-    protected function rerouteSymfonyCommandEvents()
+    public function rerouteSymfonyCommandEvents()
     {
-        $this->symfonyDispatcher = new EventDispatcher;
+        if (! isset($this->symfonyDispatcher)) {
+            $this->symfonyDispatcher = new EventDispatcher;
 
-        $this->symfonyDispatcher->addListener(ConsoleEvents::COMMAND, function (ConsoleCommandEvent $event) {
-            $this->events->dispatch(
-                new CommandStarting(
-                    $event->getCommand()->getName(),
-                    $event->getInput(),
-                    $event->getOutput(),
-                )
-            );
-        });
+            $this->symfonyDispatcher->addListener(ConsoleEvents::COMMAND, function (ConsoleCommandEvent $event) {
+                $this->events->dispatch(
+                    new CommandStarting(
+                        $event->getCommand()->getName(),
+                        $event->getInput(),
+                        $event->getOutput(),
+                    )
+                );
+            });
 
-        $this->symfonyDispatcher->addListener(ConsoleEvents::TERMINATE, function (ConsoleTerminateEvent $event) {
-            $this->events->dispatch(
-                new CommandFinished(
-                    $event->getCommand()->getName(),
-                    $event->getInput(),
-                    $event->getOutput(),
-                    $event->getExitCode(),
-                )
-            );
-        });
+            $this->symfonyDispatcher->addListener(ConsoleEvents::TERMINATE, function (ConsoleTerminateEvent $event) {
+                $this->events->dispatch(
+                    new CommandFinished(
+                        $event->getCommand()->getName(),
+                        $event->getInput(),
+                        $event->getOutput(),
+                        $event->getExitCode(),
+                    )
+                );
+            });
+
+            $this->symfonyDispatcher;
+        }
     }
 }

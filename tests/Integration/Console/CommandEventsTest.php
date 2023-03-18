@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Console;
 
 use Illuminate\Console\Events\CommandFinished;
 use Illuminate\Console\Events\CommandStarting;
+use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Event;
@@ -66,14 +67,14 @@ class CommandEventsTest extends TestCase
     }
 
     /**
-     * Resolve application Console Kernel implementation.
+     * Define environment setup.
      *
      * @param  \Illuminate\Foundation\Application  $app
      * @return void
      */
-    protected function resolveApplicationConsoleKernel($app)
+    protected function defineEnvironment($app)
     {
-        $app->singleton('Illuminate\Contracts\Console\Kernel', 'Illuminate\Foundation\Console\Kernel');
+        $app->make(ConsoleKernel::class)->rerouteSymfonyCommandEvents();
     }
 
     /**
