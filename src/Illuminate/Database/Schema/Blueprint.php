@@ -158,12 +158,6 @@ class Blueprint
                     "SQLite doesn't support multiple calls to dropColumn / renameColumn in a single modification."
                 );
             }
-
-            if ($this->commandsNamed(['dropForeign'])->count() > 0) {
-                throw new BadMethodCallException(
-                    "SQLite doesn't support dropping foreign keys (you would need to re-create the table)."
-                );
-            }
         }
     }
 
@@ -453,6 +447,28 @@ class Blueprint
     }
 
     /**
+     * Indicate that the given constraint should be dropped.
+     *
+     * @param  string  $name
+     * @return \Illuminate\Support\Fluent
+     */
+    public function dropConstraint($name)
+    {
+        return $this->addCommand('dropConstraint', ['symbol' => $name]);
+    }
+
+    /**
+     * Indicate that the given check constraint should be dropped.
+     *
+     * @param  string  $name
+     * @return \Illuminate\Support\Fluent
+     */
+    public function dropCheck($name)
+    {
+        return $this->dropConstraint($name);
+    }
+
+    /**
      * Indicate that the given indexes should be renamed.
      *
      * @param  string  $from
@@ -633,6 +649,18 @@ class Blueprint
         $this->commands[count($this->commands) - 1] = $command;
 
         return $command;
+    }
+
+    /**
+     * Specify a check constraint for the table.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $expression
+     * @param  string|null  $name
+     * @return \Illuminate\Support\Fluent
+     */
+    public function check($expression, $name = null)
+    {
+        return $this->addCommand('check', ['expression' => $expression, 'symbol' => $name]);
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Schema\Grammars;
 
+use BadMethodCallException;
 use Doctrine\DBAL\Schema\Index;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Expression;
@@ -56,12 +57,13 @@ class SQLiteGrammar extends Grammar
      */
     public function compileCreate(Blueprint $blueprint, Fluent $command)
     {
-        return sprintf('%s table %s (%s%s%s)',
+        return sprintf('%s table %s (%s%s%s%s)',
             $blueprint->temporary ? 'create temporary' : 'create',
             $this->wrapTable($blueprint),
             implode(', ', $this->getColumns($blueprint)),
             (string) $this->addForeignKeys($blueprint),
-            (string) $this->addPrimaryKeys($blueprint)
+            (string) $this->addPrimaryKeys($blueprint),
+            (string) $this->addCheckConstraints($blueprint),
         );
     }
 
@@ -125,6 +127,24 @@ class SQLiteGrammar extends Grammar
         if (! is_null($primary = $this->getCommandByName($blueprint, 'primary'))) {
             return ", primary key ({$this->columnize($primary->columns)})";
         }
+    }
+
+    /**
+     * Get the check constraint syntax for a table creation statement.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @return string|null
+     */
+    protected function addCheckConstraints(Blueprint $blueprint)
+    {
+        $constraints = $this->getCommandsByName($blueprint, 'check');
+
+        return collect($constraints)->reduce(function ($sql, $constraint) {
+            return $sql.sprintf(',%s check (%s)',
+                $constraint->symbol ? ' constraint '.$this->wrap($constraint->symbol) : '',
+                $this->getValue($constraint->expression)
+            );
+        }, '');
     }
 
     /**
@@ -218,6 +238,18 @@ class SQLiteGrammar extends Grammar
      * @return string|null
      */
     public function compileForeign(Blueprint $blueprint, Fluent $command)
+    {
+        // Handled on table creation...
+    }
+
+    /**
+     * Compile a check constraint command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string|null
+     */
+    public function compileCheck(Blueprint $blueprint, Fluent $command)
     {
         // Handled on table creation...
     }
@@ -368,6 +400,32 @@ class SQLiteGrammar extends Grammar
     public function compileDropSpatialIndex(Blueprint $blueprint, Fluent $command)
     {
         throw new RuntimeException('The database driver in use does not support spatial indexes.');
+    }
+
+    /**
+     * Compile a drop foreign key command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileDropForeign(Blueprint $blueprint, Fluent $command)
+    {
+        throw new BadMethodCallException(
+            "SQLite doesn't support dropping foreign keys (you would need to re-create the table)."
+        );
+    }
+
+    /**
+     * Compile a drop constraint command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileDropConstraint(Blueprint $blueprint, Fluent $command)
+    {
+        throw new RuntimeException('This database driver does not support dropping constraints.');
     }
 
     /**

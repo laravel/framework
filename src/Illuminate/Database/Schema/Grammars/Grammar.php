@@ -162,6 +162,37 @@ abstract class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile a check constraint command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileCheck(Blueprint $blueprint, Fluent $command)
+    {
+        return sprintf('alter table %s add%s check (%s)',
+            $this->wrapTable($blueprint),
+            $command->symbol ? ' constraint '.$this->wrap($command->symbol) : '',
+            $this->getValue($command->expression)
+        );
+    }
+
+    /**
+     * Compile a drop constraint command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileDropConstraint(Blueprint $blueprint, Fluent $command)
+    {
+        return sprintf('alter table %s drop constraint %s',
+            $this->wrapTable($blueprint),
+            $this->wrap($command->symbol)
+        );
+    }
+
+    /**
      * Compile the blueprint's added column definitions.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint

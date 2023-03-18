@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Database;
 use BadMethodCallException;
 use Illuminate\Container\Container;
 use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar;
 use Illuminate\Database\Schema\Grammars\PostgresGrammar;
@@ -587,6 +588,80 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
 
         $this->assertContains(
             'drop index "users_name_unique" on "users"',
+            $blueprint->toSql($connection, new SqlServerGrammar)
+        );
+    }
+
+    public function testAddCheckConstraintWorks()
+    {
+        $connection = $this->db->connection();
+
+        $blueprint = new Blueprint('users', function (Blueprint $table) {
+            $table->create();
+            $table->integer('c1');
+            $table->check('c1 > 10');
+            $table->check('c1 > 10', 'foo');
+            $table->check(new Expression('c1 > 10'));
+            $table->check(new Expression('c1 > 10'), 'foo');
+        });
+
+        $this->assertEquals([
+            'create table `users` (`c1` int not null)',
+            'alter table `users` add check (c1 > 10)',
+            'alter table `users` add constraint `foo` check (c1 > 10)',
+            'alter table `users` add check (c1 > 10)',
+            'alter table `users` add constraint `foo` check (c1 > 10)',
+        ], $blueprint->toSql($connection, new MySqlGrammar));
+
+        $this->assertEquals([
+            'create table "users" ("c1" integer not null)',
+            'alter table "users" add check (c1 > 10)',
+            'alter table "users" add constraint "foo" check (c1 > 10)',
+            'alter table "users" add check (c1 > 10)',
+            'alter table "users" add constraint "foo" check (c1 > 10)',
+        ], $blueprint->toSql($connection, new PostgresGrammar));
+
+        $this->assertEquals([
+            'create table "users" ("c1" integer not null, '.
+            'check (c1 > 10), '.
+            'constraint "foo" check (c1 > 10), '.
+            'check (c1 > 10), '.
+            'constraint "foo" check (c1 > 10))',
+        ], $blueprint->toSql($connection, new SQLiteGrammar));
+
+        $this->assertEquals([
+            'create table "users" ("c1" int not null)',
+            'alter table "users" add check (c1 > 10)',
+            'alter table "users" add constraint "foo" check (c1 > 10)',
+            'alter table "users" add check (c1 > 10)',
+            'alter table "users" add constraint "foo" check (c1 > 10)',
+        ], $blueprint->toSql($connection, new SqlServerGrammar));
+    }
+
+    public function testDropCheckConstraintWorks()
+    {
+        $connection = $this->db->connection();
+
+        $blueprint = new Blueprint('users', function (Blueprint $table) {
+            $table->dropCheck('foo');
+        });
+
+        $this->assertEquals(
+            ['alter table `users` drop constraint `foo`'],
+            $blueprint->toSql($connection, new MySqlGrammar)
+        );
+
+        $this->assertEquals(
+            ['alter table "users" drop constraint "foo"'],
+            $blueprint->toSql($connection, new PostgresGrammar)
+        );
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('This database driver does not support dropping constraints.');
+        $blueprint->toSql($connection, new SQLiteGrammar);
+
+        $this->assertEquals(
+            ['alter table "users" drop constraint "foo"'],
             $blueprint->toSql($connection, new SqlServerGrammar)
         );
     }
