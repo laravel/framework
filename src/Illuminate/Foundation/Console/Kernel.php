@@ -46,7 +46,7 @@ class Kernel implements KernelContract
     protected $events;
 
     /**
-     * The symfony event dispatcher instance.
+     * The Symfony event dispatcher implementation.
      *
      * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface|null
      */
@@ -125,6 +125,34 @@ class Kernel implements KernelContract
         $this->app->booted(function () {
             $this->defineConsoleSchedule();
         });
+    }
+
+    /**
+     * Re-route the Symfony command events to their Laravel counterparts.
+     *
+     * @internal
+     *
+     * @return $this
+     */
+    public function rerouteSymfonyCommandEvents()
+    {
+        if (is_null($this->symfonyDispatcher)) {
+            $this->symfonyDispatcher = new EventDispatcher;
+
+            $this->symfonyDispatcher->addListener(ConsoleEvents::COMMAND, function (ConsoleCommandEvent $event) {
+                $this->events->dispatch(
+                    new CommandStarting($event->getCommand()->getName(), $event->getInput(), $event->getOutput())
+                );
+            });
+
+            $this->symfonyDispatcher->addListener(ConsoleEvents::TERMINATE, function (ConsoleTerminateEvent $event) {
+                $this->events->dispatch(
+                    new CommandFinished($event->getCommand()->getName(), $event->getInput(), $event->getOutput(), $event->getExitCode())
+                );
+            });
+        }
+
+        return $this;
     }
 
     /**
@@ -485,42 +513,5 @@ class Kernel implements KernelContract
     protected function renderException($output, Throwable $e)
     {
         $this->app[ExceptionHandler::class]->renderForConsole($output, $e);
-    }
-
-    /**
-     * Re-route the Symfony command events to their Laravel counterparts.
-     *
-     * @internal
-     *
-     * @return $this
-     */
-    public function rerouteSymfonyCommandEvents()
-    {
-        if (is_null($this->symfonyDispatcher)) {
-            $this->symfonyDispatcher = new EventDispatcher;
-
-            $this->symfonyDispatcher->addListener(ConsoleEvents::COMMAND, function (ConsoleCommandEvent $event) {
-                $this->events->dispatch(
-                    new CommandStarting(
-                        $event->getCommand()->getName(),
-                        $event->getInput(),
-                        $event->getOutput(),
-                    )
-                );
-            });
-
-            $this->symfonyDispatcher->addListener(ConsoleEvents::TERMINATE, function (ConsoleTerminateEvent $event) {
-                $this->events->dispatch(
-                    new CommandFinished(
-                        $event->getCommand()->getName(),
-                        $event->getInput(),
-                        $event->getOutput(),
-                        $event->getExitCode(),
-                    )
-                );
-            });
-        }
-
-        return $this;
     }
 }
