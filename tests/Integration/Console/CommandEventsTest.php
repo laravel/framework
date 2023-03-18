@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
+use Symfony\Component\Process\PhpExecutableFinder;
 
 class CommandEventsTest extends TestCase
 {
@@ -83,6 +84,8 @@ class CommandEventsTest extends TestCase
      */
     public function testCommandEventsReceiveParsedInput($processType, $argumentType)
     {
+        $phpBinary = (new PhpExecutableFinder)->find();
+
         switch ($processType) {
             case 'foreground':
                 $this->app[ConsoleKernel::class]->registerCommand(new CommandEventsTestCommand);
@@ -120,16 +123,7 @@ class CommandEventsTest extends TestCase
                 // Initialize empty logfile.
                 $this->fs->append($this->logfile, '');
 
-                Process::env(['APP_ENV' => 'local'])
-                    ->run('php '.base_path('artisan').' command-events-test-command-'.$this->id.' taylor otwell --occupation=coding');
-
-                //exec('APP_ENV=local php '.base_path('artisan').' command-events-test-command-'.$this->id.' taylor otwell --occupation=coding');
-                // Since our command is running in a separate process, we need to wait
-                // until it has finished executing before running our assertions.
-                $this->waitForLogMessages(
-                    'CommandStarting', 'taylor', 'otwell', 'coding',
-                    'CommandFinished', 'taylor', 'otwell', 'coding',
-                );
+                Process::run($phpBinary.' '.base_path('artisan').' command-events-test-command-'.$this->id.' taylor otwell --occupation=coding');
                 break;
         }
 
