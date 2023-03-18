@@ -4,11 +4,14 @@ namespace Illuminate\Tests\Integration\Console;
 
 use Illuminate\Console\Events\CommandFinished;
 use Illuminate\Console\Events\CommandStarting;
+use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
+use Symfony\Component\Process\PhpExecutableFinder;
 
 class CommandEventsTest extends TestCase
 {
@@ -66,13 +69,26 @@ class CommandEventsTest extends TestCase
     }
 
     /**
+     * Define environment setup.
+     *
+     * @param  \Illuminate\Foundation\Application  $app
+     * @return void
+     */
+    protected function defineEnvironment($app)
+    {
+        $app->make(ConsoleKernel::class)->rerouteSymfonyCommandEvents();
+    }
+
+    /**
      * @dataProvider commandEventsProvider
      */
     public function testCommandEventsReceiveParsedInput($processType, $argumentType)
     {
+        $phpBinary = (new PhpExecutableFinder)->find();
+
         switch ($processType) {
             case 'foreground':
-                $this->app[\Illuminate\Contracts\Console\Kernel::class]->registerCommand(new CommandEventsTestCommand);
+                $this->app[ConsoleKernel::class]->registerCommand(new CommandEventsTestCommand);
                 $this->app[Dispatcher::class]->listen(function (CommandStarting $event) {
                     array_map(fn ($e) => $this->fs->append($this->logfile, $e."\n"), [
                         'CommandStarting',
@@ -106,13 +122,8 @@ class CommandEventsTest extends TestCase
             case 'background':
                 // Initialize empty logfile.
                 $this->fs->append($this->logfile, '');
-                exec('php '.base_path('artisan').' command-events-test-command-'.$this->id.' taylor otwell --occupation=coding');
-                // Since our command is running in a separate process, we need to wait
-                // until it has finished executing before running our assertions.
-                $this->waitForLogMessages(
-                    'CommandStarting', 'taylor', 'otwell', 'coding',
-                    'CommandFinished', 'taylor', 'otwell', 'coding',
-                );
+
+                Process::run($phpBinary.' '.base_path('artisan').' command-events-test-command-'.$this->id.' taylor otwell --occupation=coding');
                 break;
         }
 
@@ -185,6 +196,7 @@ require __DIR__.'/../../../autoload.php';
 
 \$app = require_once __DIR__.'/bootstrap/app.php';
 \$kernel = \$app->make(Illuminate\Contracts\Console\Kernel::class);
+\$kernel->rerouteSymfonyCommandEvents();
 
 class CommandEventsTestCommand extends Illuminate\Console\Command
 {
