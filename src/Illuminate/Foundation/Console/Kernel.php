@@ -433,7 +433,7 @@ class Kernel implements KernelContract
                                     ->resolveCommands($this->commands)
                                     ->setContainerCommandLoader();
 
-            if (! $this->app->runningUnitTests()) {
+            if ($this->symfonyDispatcher instanceof EventDispatcher) {
                 $this->artisan->setDispatcher($this->symfonyDispatcher);
             }
         }

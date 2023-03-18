@@ -66,6 +66,17 @@ class CommandEventsTest extends TestCase
     }
 
     /**
+     * Resolve application Console Kernel implementation.
+     *
+     * @param  \Illuminate\Foundation\Application  $app
+     * @return void
+     */
+    protected function resolveApplicationConsoleKernel($app)
+    {
+        $app->singleton('Illuminate\Contracts\Console\Kernel', 'Illuminate\Foundation\Console\Kernel');
+    }
+
+    /**
      * @dataProvider commandEventsProvider
      */
     public function testCommandEventsReceiveParsedInput($processType, $argumentType)
