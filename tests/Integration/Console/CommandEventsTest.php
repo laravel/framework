@@ -124,14 +124,6 @@ class CommandEventsTest extends TestCase
                 $this->fs->append($this->logfile, '');
 
                 Process::run($phpBinary.' '.base_path('artisan').' command-events-test-command-'.$this->id.' taylor otwell --occupation=coding');
-
-                //exec('APP_ENV=local php '.base_path('artisan').' command-events-test-command-'.$this->id.' taylor otwell --occupation=coding');
-                // Since our command is running in a separate process, we need to wait
-                // until it has finished executing before running our assertions.
-                // $this->waitForLogMessages(
-                //     'CommandStarting', 'taylor', 'otwell', 'coding',
-                //     'CommandFinished', 'taylor', 'otwell', 'coding',
-                // );
                 break;
         }
 
