@@ -124,6 +124,13 @@ class Validator implements ValidatorContract
     protected $after = [];
 
     /**
+     * The sentinal value to stop executing after rules.
+     *
+     * @var bool
+     */
+    protected $skipSubsequentAfterRules = false;
+
+    /**
      * The array of custom error messages.
      *
      * @var array
@@ -383,12 +390,26 @@ class Validator implements ValidatorContract
     /**
      * Add an after validation callback.
      *
-     * @param  callable|string  $callback
+     * @param  callable|string|array  $callback
      * @return $this
      */
     public function after($callback)
     {
-        $this->after[] = fn () => $callback($this);
+        if (is_array($callback) && ! is_callable($callback)) {
+            foreach ($callback as $c) {
+                $this->after($c);
+            }
+
+            return $this;
+        }
+
+        $this->after[] = function () use ($callback) {
+            if (is_callable($callback)) {
+                return $callback($this);
+            }
+
+            return $this->container->make($callback)($this);
+        };
 
         return $this;
     }
@@ -433,11 +454,17 @@ class Validator implements ValidatorContract
             }
         }
 
+        $this->skipSubsequentAfterRules = false;
+
         // Here we will spin through all of the "after" hooks on this validator and
         // fire them off. This gives the callbacks a chance to perform all kinds
         // of other validation that needs to get wrapped up in this operation.
         foreach ($this->after as $after) {
             $after();
+
+            if ($this->skipSubsequentAfterRules) {
+                break;
+            }
         }
 
         return $this->messages->isEmpty();
@@ -469,6 +496,18 @@ class Validator implements ValidatorContract
         }
 
         return false;
+    }
+
+    /**
+     * Indicate that the validator should skip subsequent after rules.
+     *
+     * @return $this
+     */
+    public function skipSubsequentAfterRules()
+    {
+        $this->skipSubsequentAfterRules = true;
+
+        return $this;
     }
 
     /**
