@@ -124,13 +124,6 @@ class Validator implements ValidatorContract
     protected $after = [];
 
     /**
-     * Indicates that the validator should skip subsequent after validation rules.
-     *
-     * @var bool
-     */
-    protected $skipSubsequentAfterRules = false;
-
-    /**
      * The array of custom error messages.
      *
      * @var array
@@ -454,17 +447,11 @@ class Validator implements ValidatorContract
             }
         }
 
-        $this->skipSubsequentAfterRules = false;
-
         // Here we will spin through all of the "after" hooks on this validator and
         // fire them off. This gives the callbacks a chance to perform all kinds
         // of other validation that needs to get wrapped up in this operation.
         foreach ($this->after as $after) {
             $after();
-
-            if ($this->skipSubsequentAfterRules) {
-                break;
-            }
         }
 
         return $this->messages->isEmpty();
@@ -496,18 +483,6 @@ class Validator implements ValidatorContract
         }
 
         return false;
-    }
-
-    /**
-     * Indicate that the validator should skip subsequent after rules.
-     *
-     * @return $this
-     */
-    public function skipSubsequentAfterRules()
-    {
-        $this->skipSubsequentAfterRules = true;
-
-        return $this;
     }
 
     /**
