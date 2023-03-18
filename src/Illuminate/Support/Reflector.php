@@ -148,7 +148,7 @@ class Reflector
      */
     public static function isParameterBackedEnumWithStringBackingType($parameter)
     {
-        if(! $parameter->getType() instanceof ReflectionNamedType) {
+        if (! $parameter->getType() instanceof ReflectionNamedType) {
             return false;
         }
 
