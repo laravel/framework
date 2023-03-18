@@ -828,10 +828,9 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
-     * Resolves class names contained in collection to an instance using service container
+     * Resolves class names contained in collection to an instance using service container.
      *
      * @return $this|Collection
-     *
      */
     public function mapInstance(?array $parameters = [])
     {

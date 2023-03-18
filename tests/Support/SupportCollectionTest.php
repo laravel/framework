@@ -3138,7 +3138,7 @@ class SupportCollectionTest extends TestCase
     public function testMapInstance($collection)
     {
         $data = new $collection([
-            Container::class
+            Container::class,
         ]);
 
         $data = $data->mapInstance();

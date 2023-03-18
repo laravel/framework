@@ -829,14 +829,13 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
-     * Resolves class names contained in collection to an instance using service container
+     * Resolves class names contained in collection to an instance using service container.
      *
      * @return $this|Collection
-     *
      */
     public function mapInstance(?array $parameters = [])
     {
-        return $this->map(fn($class) => app($class, $parameters));
+        return $this->map(fn ($class) => app($class, $parameters));
     }
 
     /**
