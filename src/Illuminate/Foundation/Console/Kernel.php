@@ -199,8 +199,6 @@ class Kernel implements KernelContract
         }
 
         $this->commandStartedAt = null;
-
-        unset($this->symfonyDispatcher);
     }
 
     /**
