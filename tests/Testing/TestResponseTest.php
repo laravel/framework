@@ -2217,7 +2217,8 @@ class TestResponseTest extends TestCase
 
     private function makeMockJsonResponse(array $data): TestResponse
     {
-        return TestResponse::fromBaseResponse(new Response(new class ($data) implements JsonSerializable {
+        return TestResponse::fromBaseResponse(new Response(new class($data) implements JsonSerializable
+        {
             public function __construct(public array $data)
             {
                 //
