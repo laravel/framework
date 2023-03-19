@@ -60,7 +60,7 @@ class ChangeColumn
     {
         $current = $schema->introspectTable($grammar->getTablePrefix().$blueprint->getTable());
 
-        return (new Comparator)->compareTables(
+        return $schema->createComparator()->compareTables(
             $current, static::getTableWithColumnChanges($blueprint, $current)
         );
     }
