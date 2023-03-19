@@ -73,6 +73,18 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
                 'INSERT INTO users (first_name, age) SELECT name, age FROM __temp__users',
                 'DROP TABLE __temp__users',
             ],
+            [
+                'CREATE TEMPORARY TABLE __temp__users AS SELECT name, age FROM users',
+                'DROP TABLE users',
+                'CREATE TABLE users (name VARCHAR(255) NOT NULL COLLATE "BINARY", age INTEGER NOT NULL)',
+                'INSERT INTO users (name, age) SELECT name, age FROM __temp__users',
+                'DROP TABLE __temp__users',
+                'CREATE TEMPORARY TABLE __temp__users AS SELECT name, age FROM users',
+                'DROP TABLE users',
+                'CREATE TABLE users (first_name VARCHAR(255) NOT NULL, age VARCHAR(255) NOT NULL)',
+                'INSERT INTO users (first_name, age) SELECT name, age FROM __temp__users',
+                'DROP TABLE __temp__users',
+            ],
         ];
 
         $this->assertContains($queries, $expected);
@@ -334,6 +346,13 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
                 'INSERT INTO users (name) SELECT name FROM __temp__users',
                 'DROP TABLE __temp__users',
             ],
+            [
+                'CREATE TEMPORARY TABLE __temp__users AS SELECT name FROM users',
+                'DROP TABLE users',
+                'CREATE TABLE users (name CHAR(50) NOT NULL COLLATE "BINARY")',
+                'INSERT INTO users (name) SELECT name FROM __temp__users',
+                'DROP TABLE __temp__users',
+            ]
         ];
 
         $this->assertContains($queries, $expected);
