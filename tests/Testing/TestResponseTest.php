@@ -1214,6 +1214,59 @@ class TestResponseTest extends TestCase
         $response->assertJsonMissingPath('numeric_keys.3');
     }
 
+    public function testAssertSeeInJson()
+    {
+        $response = $this->makeMockJsonResponse([
+            'users' => ['name' => 'Taylor'],
+            'invites' => ['name' => 'Sjors'],
+        ]);
+
+        $response->assertSeeInJson('users', 'Taylor');
+        $response->assertDontSeeInJson('users', 'Sjors');
+
+        $response->assertSeeInJson('invites', 'Sjors');
+        $response->assertDontSeeInJson('invites', 'Taylor');
+    }
+
+    public function testAssertSeeInJsonCanFail()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = $this->makeMockJsonResponse([
+            'users' => ['name' => 'Taylor'],
+            'invites' => ['name' => 'Sjors'],
+        ]);
+
+        $response->assertSeeInJson('invites', 'Taylor');
+    }
+
+    public function testAssertSeeInJsonWorksWithUnicode()
+    {
+        $response = $this->makeMockJsonResponse([
+            'greetings' => [
+                'cn' => ['text' => '你好'],
+                'nl' => ['text' => 'Hallo'],
+            ],
+        ]);
+
+        $response->assertSeeInJson('greetings', '你好');
+        $response->assertSeeInJson('greetings.cn', '你好');
+        $response->assertDontSeeInJson('greetings.nl', '你好');
+    }
+
+    public function testAssertSeeInJsonWorksWitSlashes()
+    {
+        $response = $this->makeMockJsonResponse([
+            'greetings' => [
+                'cn' => ['text' => '你好'],
+                'nl' => ['text' => 'Hallo/Hey'],
+            ],
+        ]);
+
+        $response->assertSeeInJson('greetings.nl', 'Hallo');
+        $response->assertSeeInJson('greetings.nl', 'Hallo/Hey');
+    }
+
     public function testAssertJsonValidationErrors()
     {
         $data = [
@@ -2156,6 +2209,21 @@ class TestResponseTest extends TestCase
         });
 
         return TestResponse::fromBaseResponse($baseResponse);
+    }
+
+    private function makeMockJsonResponse(array $data): TestResponse
+    {
+        return TestResponse::fromBaseResponse(new Response(new class ($data) implements JsonSerializable {
+            public function __construct(public array $data)
+            {
+                //
+            }
+
+            public function jsonSerialize(): array
+            {
+                return $this->data;
+            }
+        }));
     }
 }
 

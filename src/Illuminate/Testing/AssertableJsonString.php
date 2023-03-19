@@ -299,6 +299,38 @@ class AssertableJsonString implements ArrayAccess, Countable
     }
 
     /**
+     * Assert that the expected value is contained within the given path of the JSON.
+     *
+     * @param  string|null  $path
+     * @param  string  $value
+     * @return $this
+     */
+    public function assertSee($path, string $value)
+    {
+        $json = json_encode($this->json($path), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
+        PHPUnit::assertStringContainsString($value, $json);
+
+        return $this;
+    }
+
+    /**
+     * Assert that the expected value is not contained within the given path of the JSON.
+     *
+     * @param  string|null  $path
+     * @param  string  $value
+     * @return $this
+     */
+    public function assertDontSee($path, string $value)
+    {
+        $json = json_encode($this->json($path), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
+        PHPUnit::assertStringNotContainsString($value, $json);
+
+        return $this;
+    }
+
+    /**
      * Reorder associative array keys to make it easy to compare arrays.
      *
      * @param  array  $data

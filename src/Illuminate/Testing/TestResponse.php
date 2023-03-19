@@ -746,6 +746,34 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Assert that the expected value is contained within the given path in the response.
+     *
+     * @param  string|null  $path
+     * @param  string  $value
+     * @return $this
+     */
+    public function assertSeeInJson($path, string $value)
+    {
+        $this->decodeResponseJson()->assertSee($path, $value);
+
+        return $this;
+    }
+
+    /**
+     * Assert that the expected value is not contained within the given path in the response.
+     *
+     * @param  string|null  $path
+     * @param  string  $value
+     * @return $this
+     */
+    public function assertDontSeeInJson($path, string $value)
+    {
+        $this->decodeResponseJson()->assertDontSee($path, $value);
+
+        return $this;
+    }
+
+    /**
      * Assert that the response has a given JSON structure.
      *
      * @param  array|null  $structure
