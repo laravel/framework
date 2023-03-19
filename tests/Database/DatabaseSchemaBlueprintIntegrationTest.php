@@ -352,7 +352,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
                 'CREATE TABLE users (name CHAR(50) NOT NULL COLLATE "BINARY")',
                 'INSERT INTO users (name) SELECT name FROM __temp__users',
                 'DROP TABLE __temp__users',
-            ]
+            ],
         ];
 
         $this->assertContains($queries, $expected);
