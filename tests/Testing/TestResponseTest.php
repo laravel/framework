@@ -1249,6 +1249,10 @@ class TestResponseTest extends TestCase
             ],
         ]);
 
+        $response->assertSeeInJson(null, '你好');
+        $response->assertSeeInJson(null, 'Hallo');
+        $response->assertSeeInJson('greetings.nl.text', 'Hallo');
+
         $response->assertSeeInJson('greetings', '你好');
         $response->assertSeeInJson('greetings.cn', '你好');
         $response->assertDontSeeInJson('greetings.nl', '你好');
