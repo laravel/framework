@@ -95,7 +95,7 @@ class SchemaBuilderTest extends DatabaseTestCase
         }
 
         Schema::create('test', function (Blueprint $table) {
-            $table->text('test_column');
+            $table->integer('test_column');
         });
 
         foreach (['tinyText', 'text', 'mediumText', 'longText'] as $type) {
