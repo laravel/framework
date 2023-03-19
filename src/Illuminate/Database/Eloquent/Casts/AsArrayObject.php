@@ -38,7 +38,7 @@ class AsArrayObject implements Castable
             public function set($model, $key, $value, $attributes)
             {
                 $encodingFlag = isset($this->arguments[0]) ? $this->arguments[0] : 0;
-                
+
                 return [$key => json_encode($value, $encodingFlag)];
             }
 

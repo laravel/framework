@@ -39,7 +39,7 @@ class AsEncryptedCollection implements Castable
             {
                 if (! is_null($value)) {
                     $encodingFlag = isset($this->arguments[0]) ? $this->arguments[0] : 0;
-                    
+
                     return [$key => Crypt::encryptString(json_encode($value, $encodingFlag))];
                 }
 
