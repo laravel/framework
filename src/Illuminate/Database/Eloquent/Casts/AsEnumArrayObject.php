@@ -61,7 +61,9 @@ class AsEnumArrayObject implements Castable
                     $storable[] = $this->getStorableEnumValue($enum);
                 }
 
-                return [$key => json_encode($storable)];
+                $encodingFlag = isset($this->arguments[1]) ? $this->arguments[1] : 0;
+
+                return [$key => json_encode($storable, $encodingFlag)];
             }
 
             public function serialize($model, string $key, $value, array $attributes)

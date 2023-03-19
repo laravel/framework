@@ -16,8 +16,15 @@ class AsEncryptedArrayObject implements Castable
      */
     public static function castUsing(array $arguments)
     {
-        return new class implements CastsAttributes
+        return new class($arguments) implements CastsAttributes
         {
+            protected $arguments;
+
+            public function __construct(array $arguments)
+            {
+                $this->arguments = $arguments;
+            }
+
             public function get($model, $key, $value, $attributes)
             {
                 if (isset($attributes[$key])) {
@@ -30,7 +37,9 @@ class AsEncryptedArrayObject implements Castable
             public function set($model, $key, $value, $attributes)
             {
                 if (! is_null($value)) {
-                    return [$key => Crypt::encryptString(json_encode($value))];
+                    $encodingFlag = isset($this->arguments[0]) ? $this->arguments[0] : 0;
+
+                    return [$key => Crypt::encryptString(json_encode($value, $encodingFlag))];
                 }
 
                 return null;
