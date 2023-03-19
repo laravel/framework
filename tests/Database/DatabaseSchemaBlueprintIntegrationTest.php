@@ -81,7 +81,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
                 'DROP TABLE __temp__users',
                 'CREATE TEMPORARY TABLE __temp__users AS SELECT name, age FROM users',
                 'DROP TABLE users',
-                'CREATE TABLE users (first_name VARCHAR(255) NOT NULL, age VARCHAR(255) NOT NULL)',
+                'CREATE TABLE users (first_name VARCHAR(255) NOT NULL, age VARCHAR(255) NOT NULL COLLATE "BINARY")',
                 'INSERT INTO users (first_name, age) SELECT name, age FROM __temp__users',
                 'DROP TABLE __temp__users',
             ],
