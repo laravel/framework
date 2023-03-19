@@ -323,11 +323,10 @@ abstract class Grammar extends BaseGrammar
      */
     public function getDoctrineTableDiff(Blueprint $blueprint, SchemaManager $schema)
     {
-        $table = $this->getTablePrefix().$blueprint->getTable();
+        $tableName = $this->getTablePrefix().$blueprint->getTable();
+        $table = $schema->introspectTable($tableName);
 
-        return tap(new TableDiff($table), function ($tableDiff) use ($schema, $table) {
-            $tableDiff->fromTable = $schema->introspectTable($table);
-        });
+        return new TableDiff(tableName: $tableName, fromTable: $table);
     }
 
     /**
