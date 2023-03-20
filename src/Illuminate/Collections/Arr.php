@@ -427,6 +427,17 @@ class Arr
     }
 
     /**
+     * Determine whether the given value is an array.
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    public static function isArray($value)
+    {
+        return is_array($value);
+    }
+
+    /**
      * Join all items using a string. The final items can use a separate glue string.
      *
      * @param  array  $array

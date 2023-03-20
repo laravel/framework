@@ -499,6 +499,18 @@ class SupportArrTest extends TestCase
         $this->assertFalse(Arr::isList(['foo' => 'bar', 'baz' => 'qux']));
     }
 
+    public function testIsArray()
+    {
+        $this->assertTrue(Arr::isArray([]));
+        $this->assertTrue(Arr::isArray([1, 2, 3]));
+        $this->assertTrue(Arr::isArray(['foo' => 'bar']));
+        
+        $this->assertFalse(Arr::isArray('not an array'));
+        $this->assertFalse(Arr::isArray(123));
+        $this->assertFalse(Arr::isArray(null));
+        $this->assertFalse(Arr::isArray(false));
+    }
+
     public function testOnly()
     {
         $array = ['name' => 'Desk', 'price' => 100, 'orders' => 10];
