@@ -62,6 +62,7 @@ class Pipe
      *
      * @param  callable|null  $output
      * @return \Illuminate\Contracts\Process\ProcessResult
+     *
      * @throws ProcessPipeException
      */
     public function run(?callable $output = null)
