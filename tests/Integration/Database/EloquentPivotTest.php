@@ -26,6 +26,7 @@ class EloquentPivotTest extends DatabaseTestCase
         Schema::create('collaborators', function (Blueprint $table) {
             $table->integer('user_id');
             $table->integer('project_id');
+            $table->string('role')->nullable();
             $table->text('permissions')->nullable();
         });
 
@@ -41,10 +42,12 @@ class EloquentPivotTest extends DatabaseTestCase
     {
         $user = PivotTestUser::forceCreate(['email' => 'taylor@laravel.com']);
         $user2 = PivotTestUser::forceCreate(['email' => 'ralph@ralphschindler.com']);
+        $user3 = PivotTestUser::forceCreate(['email' => 'admin@laravel.com']);
         $project = PivotTestProject::forceCreate(['name' => 'Test Project']);
 
         $project->contributors()->attach($user);
         $project->collaborators()->attach($user2);
+        $project->admins()->attach($user3);
 
         tap($project->contributors->first()->pivot, function ($pivot) {
             $this->assertEquals(1, $pivot->getKey());
@@ -58,6 +61,15 @@ class EloquentPivotTest extends DatabaseTestCase
             $this->assertSame('project_id:1:user_id:2', $pivot->getQueueableId());
             $this->assertSame('user_id', $pivot->getRelatedKey());
             $this->assertSame('project_id', $pivot->getForeignKey());
+            $this->assertNull($pivot->role);
+        });
+
+        tap($project->admins->first()->pivot, function ($pivot) {
+            $this->assertNull($pivot->getKey());
+            $this->assertSame('project_id:1:user_id:3', $pivot->getQueueableId());
+            $this->assertSame('user_id', $pivot->getRelatedKey());
+            $this->assertSame('project_id', $pivot->getForeignKey());
+            $this->assertSame('admin', $pivot->role);
         });
     }
 }
@@ -73,23 +85,35 @@ class PivotTestProject extends Model
 
     public function collaborators()
     {
-        return $this->belongsToMany(
-            PivotTestUser::class, 'collaborators', 'project_id', 'user_id'
-        )->withPivot('permissions')
-        ->using(PivotTestCollaborator::class);
+        return $this->belongsToMany(PivotTestUser::class, 'collaborators', 'project_id', 'user_id')
+                    ->withPivot(['permissions', 'role'])
+                    ->wherePivotNull('role')
+                    ->using(PivotTestCollaborator::class);
+    }
+
+    public function admins()
+    {
+        return $this->belongsToMany(PivotTestUser::class, 'collaborators', 'project_id', 'user_id')
+                    ->withPivot(['permissions', 'role'])
+                    ->withPivotValue('role', 'admin')
+                    ->using(PivotTestCollaborator::class);
     }
 
     public function contributors()
     {
         return $this->belongsToMany(PivotTestUser::class, 'contributors', 'project_id', 'user_id')
-            ->withPivot('id', 'permissions')
-            ->using(PivotTestContributor::class);
+                    ->withPivot('id', 'permissions')
+                    ->using(PivotTestContributor::class);
     }
 }
 
 class PivotTestCollaborator extends Pivot
 {
     public $table = 'collaborators';
+
+    protected $attributes = [
+        'role' => null,
+    ];
 
     protected $casts = [
         'permissions' => 'json',
