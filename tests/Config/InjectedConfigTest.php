@@ -34,7 +34,6 @@ class InjectedConfigTest extends TestCase
         $mock = $this->mockConfigInjection($mock, 'foo.nullable.float', null);
         $mock = $this->mockConfigInjection($mock, 'foo.nullable.array', null);
 
-
         $container->instance(Repository::class, $mock);
         $container->bind('config', Repository::class);
         $testClass = $container->get(ConfigInjectionTestClass::class);

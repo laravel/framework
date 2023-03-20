@@ -651,10 +651,10 @@ class Container implements ArrayAccess, ContainerContract
         $pushedToBuildStack = false;
 
         if (is_array($callback) && ! in_array(
-                $className = (is_string($callback[0]) ? $callback[0] : get_class($callback[0])),
-                $this->buildStack,
-                true
-            )) {
+            $className = (is_string($callback[0]) ? $callback[0] : get_class($callback[0])),
+            $this->buildStack,
+            true
+        )) {
             $this->buildStack[] = $className;
 
             $pushedToBuildStack = true;
@@ -1065,9 +1065,9 @@ class Container implements ArrayAccess, ContainerContract
                 : $this->make(Util::getParameterClassName($parameter));
         }
 
-            // If we can not resolve the class instance, we will check to see if the value
-            // is optional, and if it is we will return the optional parameter value as
-            // the value of the dependency, similarly to how we do this with scalars.
+        // If we can not resolve the class instance, we will check to see if the value
+        // is optional, and if it is we will return the optional parameter value as
+        // the value of the dependency, similarly to how we do this with scalars.
         catch (BindingResolutionException $e) {
             if ($parameter->isDefaultValueAvailable()) {
                 array_pop($this->with);
