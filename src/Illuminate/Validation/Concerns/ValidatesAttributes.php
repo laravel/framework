@@ -508,6 +508,19 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that the password of the currently authenticated user doesn't matches the given value.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    protected function validateNotCurrentPassword($attribute, $value, $parameters)
+    {
+        return ! $this->validateCurrentPassword($attribute, $value, $parameters);
+    }
+
+    /**
      * Validate that an attribute is a valid date.
      *
      * @param  string  $attribute
