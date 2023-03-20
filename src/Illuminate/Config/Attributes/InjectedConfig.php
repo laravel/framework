@@ -7,7 +7,6 @@ use Attribute;
 #[Attribute]
 class InjectedConfig
 {
-     public function __construct(string $key = ''){
-         
-     }
+    public function __construct(string $key = ''){
+    }
 }

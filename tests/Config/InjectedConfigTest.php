@@ -78,7 +78,6 @@ class ConfigInjectionTestClass
         public ?float $fooNullableFloat,
         #[InjectedConfig('foo.nullable.array')]
         public ?array $fooNullableArray,
-    )
-    {
+    ) {
     }
 }

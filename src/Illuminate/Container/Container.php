@@ -6,7 +6,6 @@ use ArrayAccess;
 use Closure;
 use Exception;
 use Illuminate\Config\Attributes\InjectedConfig;
-use Illuminate\Config\Repository;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\CircularDependencyException;
 use Illuminate\Contracts\Container\Container as ContainerContract;
