@@ -6,10 +6,10 @@ use ArrayAccess;
 use Closure;
 use Exception;
 use Illuminate\Config\Attributes\InjectedConfig;
+use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\CircularDependencyException;
 use Illuminate\Contracts\Container\Container as ContainerContract;
-use InvalidArgumentException;
 use LogicException;
 use ReflectionClass;
 use ReflectionException;
@@ -184,8 +184,8 @@ class Container implements ArrayAccess, ContainerContract
     public function bound($abstract)
     {
         return isset($this->bindings[$abstract]) ||
-            isset($this->instances[$abstract]) ||
-            $this->isAlias($abstract);
+               isset($this->instances[$abstract]) ||
+               $this->isAlias($abstract);
     }
 
     /**
@@ -211,7 +211,7 @@ class Container implements ArrayAccess, ContainerContract
         }
 
         return isset($this->resolved[$abstract]) ||
-            isset($this->instances[$abstract]);
+               isset($this->instances[$abstract]);
     }
 
     /**
@@ -223,8 +223,8 @@ class Container implements ArrayAccess, ContainerContract
     public function isShared($abstract)
     {
         return isset($this->instances[$abstract]) ||
-            (isset($this->bindings[$abstract]['shared']) &&
-                $this->bindings[$abstract]['shared'] === true);
+               (isset($this->bindings[$abstract]['shared']) &&
+               $this->bindings[$abstract]['shared'] === true);
     }
 
     /**
@@ -439,7 +439,7 @@ class Container implements ArrayAccess, ContainerContract
      * @param  \Closure  $closure
      * @return void
      *
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     public function extend($abstract, Closure $closure)
     {
@@ -644,7 +644,7 @@ class Container implements ArrayAccess, ContainerContract
      * @param  string|null  $defaultMethod
      * @return mixed
      *
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     public function call($callback, array $parameters = [], $defaultMethod = null)
     {
@@ -957,8 +957,8 @@ class Container implements ArrayAccess, ContainerContract
             // primitive type which we can not resolve since it is not a class and
             // we will just bomb out with an error since we have no-where to go.
             $result = is_null(Util::getParameterClassName($dependency))
-                ? $this->resolvePrimitive($dependency)
-                : $this->resolveClass($dependency);
+                            ? $this->resolvePrimitive($dependency)
+                            : $this->resolveClass($dependency);
 
             if ($dependency->isVariadic()) {
                 $results = array_merge($results, $result);
@@ -1011,6 +1011,7 @@ class Container implements ArrayAccess, ContainerContract
      * @return mixed
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws \InvalidArgumentException
      */
     protected function resolvePrimitive(ReflectionParameter $parameter)
     {
@@ -1026,7 +1027,7 @@ class Container implements ArrayAccess, ContainerContract
             return [];
         }
 
-        if (isset($this['config'])) {
+        if ($this->hasConfigRepository()) {
             foreach ($parameter->getAttributes() as $attribute) {
                 $attributeName = $attribute->getName();
 
@@ -1035,7 +1036,7 @@ class Container implements ArrayAccess, ContainerContract
                 }
 
                 if (count($attribute->getArguments()) !== 1) {
-                    throw new InvalidArgumentException(
+                    throw new \InvalidArgumentException(
                         'ConfigValueWrapper attribute must have exactly one argument'
                     );
                 }
@@ -1061,8 +1062,8 @@ class Container implements ArrayAccess, ContainerContract
     {
         try {
             return $parameter->isVariadic()
-                ? $this->resolveVariadicClass($parameter)
-                : $this->make(Util::getParameterClassName($parameter));
+                        ? $this->resolveVariadicClass($parameter)
+                        : $this->make(Util::getParameterClassName($parameter));
         }
 
         // If we can not resolve the class instance, we will check to see if the value
@@ -1303,6 +1304,14 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
+     * @return bool
+     */
+    public function hasConfigRepository(): bool
+    {
+        return isset($this['config']) && class_exists(Repository::class) && $this['config'] instanceof Repository;
+    }
+
+    /**
      * Get the container's bindings.
      *
      * @return array
@@ -1321,8 +1330,8 @@ class Container implements ArrayAccess, ContainerContract
     public function getAlias($abstract)
     {
         return isset($this->aliases[$abstract])
-            ? $this->getAlias($this->aliases[$abstract])
-            : $abstract;
+                    ? $this->getAlias($this->aliases[$abstract])
+                    : $abstract;
     }
 
     /**
