@@ -190,9 +190,9 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Indicates if the application routes cache was resolved.
      *
-     * @var bool
+     * @var bool|null
      */
-    protected $routesAreCached = false;
+    protected $routesAreCached = null;
 
     /**
      * Create a new Illuminate application instance.
@@ -1127,11 +1127,9 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function routesAreCached()
     {
-        if ($this->routesAreCached) {
-            return true;
+        if (is_null($this->routesAreCached)) {
+            $this->routesAreCached = $this['files']->exists($this->getCachedRoutesPath());
         }
-
-        $this->routesAreCached = $this['files']->exists($this->getCachedRoutesPath());
 
         return $this->routesAreCached;
     }
