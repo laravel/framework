@@ -62,6 +62,20 @@ trait MakesArtisanScript
     }
 
     /**
+     * Execute the Artisan script in a separate process and return the output and exit code.
+     *
+     * @param  string  $command
+     * @return array
+     */
+    public function artisanScript($command): array
+    {
+        $output = $exitCode = null;
+        exec('php '.base_path('artisan').' '.$command, $output, $exitCode);
+
+        return [$output, $exitCode];
+    }
+
+    /**
      * Build a custom Artisan script containing specific scripts.
      *
      * @param  string  $uuid

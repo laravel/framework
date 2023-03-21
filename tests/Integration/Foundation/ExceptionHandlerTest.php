@@ -159,8 +159,7 @@ Illuminate\Console\Application::starting(function (\$artisan) {
 PHP;
         });
 
-        $output = $exitCode = null;
-        exec('php '.base_path('artisan').' throw-exception-command', $output, $exitCode);
+        [, $exitCode] = $this->artisanScript('throw-exception-command');
 
         $this->assertEquals($shouldThrow, $exitCode);
 
