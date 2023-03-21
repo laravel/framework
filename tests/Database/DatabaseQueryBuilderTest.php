@@ -1411,6 +1411,19 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 1], $builder->getBindings());
     }
 
+    public function testBasicWhereNullExpressionsMysql()
+    {
+        $builder = $this->getMysqlBuilder();
+        $builder->select('*')->from('users')->whereNull(new Raw('id'));
+        $this->assertSame('select * from `users` where id is null', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
+
+        $builder = $this->getMysqlBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereNull(new Raw('id'));
+        $this->assertSame('select * from `users` where `id` = ? or id is null', $builder->toSql());
+        $this->assertEquals([0 => 1], $builder->getBindings());
+    }
+
     public function testJsonWhereNullMysql()
     {
         $builder = $this->getMySqlBuilder();
@@ -1422,6 +1435,20 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->whereNotNull('items->id');
+        $this->assertSame('select * from `users` where (json_extract(`items`, \'$."id"\') is not null AND json_type(json_extract(`items`, \'$."id"\')) != \'NULL\')', $builder->toSql());
+    }
+
+    public function testJsonWhereNullExpressionMysql()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereNull(new Raw('items->id'));
+        $this->assertSame('select * from `users` where (json_extract(`items`, \'$."id"\') is null OR json_type(json_extract(`items`, \'$."id"\')) = \'NULL\')', $builder->toSql());
+    }
+
+    public function testJsonWhereNotNullExpressionMysql()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereNotNull(new Raw('items->id'));
         $this->assertSame('select * from `users` where (json_extract(`items`, \'$."id"\') is not null AND json_type(json_extract(`items`, \'$."id"\')) != \'NULL\')', $builder->toSql());
     }
 
