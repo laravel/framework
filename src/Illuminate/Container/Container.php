@@ -6,7 +6,6 @@ use ArrayAccess;
 use Closure;
 use Exception;
 use Illuminate\Config\Attributes\InjectedConfig;
-use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\CircularDependencyException;
 use Illuminate\Contracts\Container\Container as ContainerContract;
@@ -1026,7 +1025,7 @@ class Container implements ArrayAccess, ContainerContract
         if ($parameter->isVariadic()) {
             return [];
         }
-        
+
         if ($this->hasConfigRepository()) {
             foreach ($parameter->getAttributes(InjectedConfig::class) as $attribute) {
 
@@ -1309,7 +1308,9 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function hasConfigRepository(): bool
     {
-        return isset($this['config']) && class_exists(Repository::class) && $this['config'] instanceof Repository;
+        return isset($this['config']) &&
+               interface_exists(\Illuminate\Contracts\Config\Repository::class) &&
+               $this['config'] instanceof \Illuminate\Contracts\Config\Repository::class;
     }
 
     /**
