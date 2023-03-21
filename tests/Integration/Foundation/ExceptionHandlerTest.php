@@ -4,11 +4,14 @@ namespace Illuminate\Tests\Integration\Foundation;
 
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\Access\Response;
+use Illuminate\Foundation\Testing\Concerns\MakesArtisanScript;
 use Illuminate\Support\Facades\Route;
 use Orchestra\Testbench\TestCase;
 
 class ExceptionHandlerTest extends TestCase
 {
+    use MakesArtisanScript;
+
     public function testItRendersAuthorizationExceptions()
     {
         Route::get('test-route', fn () => Response::deny('expected message', 321)->authorize());
@@ -106,5 +109,69 @@ class ExceptionHandlerTest extends TestCase
             ->assertExactJson([
                 'message' => 'Whoops, looks like something went wrong.',
             ]);
+    }
+
+    /**
+     * @dataProvider exitCodesProvider
+     */
+    public function testItReturnsNonZeroExitCodesForUncaughtExceptions($shouldThrow)
+    {
+        $this->setUpArtisanScript(function () use ($shouldThrow) {
+            return <<<PHP
+class ThrowExceptionCommand extends \Illuminate\Console\Command
+{
+    protected \$signature = 'throw-exception-command';
+
+    public function handle()
+    {
+        throw new \Exception('Thrown inside ThrowExceptionCommand');
+    }
+}
+
+class ThrowExceptionLogHandler extends \Monolog\Handler\AbstractProcessingHandler
+{
+    protected function write(array \$record): void
+    {
+        if ({$shouldThrow}) {
+            throw new \Exception('Thrown inside ThrowExceptionLogHandler');
+        }
+    }
+}
+
+\$config = \$app['config'];
+
+\$config->set('logging.channels.stack', [
+    'driver' => 'stack',
+    'path' => storage_path('logs/stacklog.log'),
+    'channels' => ['throw_exception'],
+    'ignore_exceptions' => false,
+]);
+
+\$config->set('logging.channels.throw_exception', [
+    'driver' => 'monolog',
+    'handler' => ThrowExceptionLogHandler::class,
+]);
+
+Illuminate\Console\Application::starting(function (\$artisan) {
+    \$artisan->add(new ThrowExceptionCommand);
+});
+
+PHP;
+        });
+
+        $output = $exitCode = null;
+        exec('php '.base_path('artisan').' throw-exception-command', $output, $exitCode);
+
+        $this->assertEquals($shouldThrow, $exitCode);
+
+        $this->tearDownArtisanScript();
+    }
+
+    public static function exitCodesProvider()
+    {
+        return [
+            ['Throw exception' => 1],
+            ['Do not throw exception' => 0],
+        ];
     }
 }
