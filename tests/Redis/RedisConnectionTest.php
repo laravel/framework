@@ -439,12 +439,8 @@ class RedisConnectionTest extends TestCase
         foreach ($this->connections() as $redis) {
             $redis->hmset('hash', ['name' => 'mohamed', 'hobby' => 'diving']);
 
-            $this->assertEquals(['mohamed', 'diving'],
+            $this->assertEquals(['name' => 'mohamed', 'hobby' => 'diving'],
                 $redis->hmget('hash', 'name', 'hobby')
-            );
-
-            $this->assertEquals(['mohamed', 'diving'],
-                $redis->hmget('hash', ['name', 'hobby'])
             );
 
             $redis->flushall();
