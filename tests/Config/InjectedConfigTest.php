@@ -5,51 +5,48 @@ namespace Illuminate\Tests\Config;
 use Illuminate\Config\Attributes\InjectedConfig;
 use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
-use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 class InjectedConfigTest extends TestCase
 {
-    private function mockConfigInjection(Repository $mock, $key, $expectedValue): m\LegacyMockInterface|m\MockInterface|Repository|null
-    {
-        return $mock->allows('get')
-            ->with($key)
-            ->andReturns($expectedValue)
-            ->getMock();
-    }
-
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function testItInjectsValuesForInjectedConfigAttributedProperties(): void
     {
+        $config = [
+            'foo.string'=> 'Laravel',
+            'foo.boolean'=> true,
+            'foo.int'=> 1,
+            'foo.float'=> 1.1,
+            'foo.array'=> [],
+
+            'foo.nullable.string'=> null,
+            'foo.nullable.boolean'=> null,
+            'foo.nullable.int'=> null,
+            'foo.nullable.float'=> null,
+            'foo.nullable.array'=> null,
+        ];
+
         $container = new Container();
-        $mock = m::mock(Repository::class);
-        $mock = $this->mockConfigInjection($mock, 'foo.string', 'Laravel');
-        $mock = $this->mockConfigInjection($mock, 'foo.boolean', true);
-        $mock = $this->mockConfigInjection($mock, 'foo.int', 1);
-        $mock = $this->mockConfigInjection($mock, 'foo.float', 1.1);
-        $mock = $this->mockConfigInjection($mock, 'foo.array', []);
-
-        $mock = $this->mockConfigInjection($mock, 'foo.nullable.string', null);
-        $mock = $this->mockConfigInjection($mock, 'foo.nullable.boolean', null);
-        $mock = $this->mockConfigInjection($mock, 'foo.nullable.int', null);
-        $mock = $this->mockConfigInjection($mock, 'foo.nullable.float', null);
-        $mock = $this->mockConfigInjection($mock, 'foo.nullable.array', null);
-
-        $container->instance(Repository::class, $mock);
-        $container->bind('config', Repository::class);
+        $container->instance('config', new Repository($config));
         $testClass = $container->get(ConfigInjectionTestClass::class);
 
-        self::assertEquals('Laravel', $testClass->fooString);
-        self::assertEquals(true, $testClass->fooBoolean);
-        self::assertEquals(1, $testClass->fooInt);
-        self::assertEquals(1.1, $testClass->fooFloat);
-        self::assertEquals([], $testClass->fooArray);
-        self::assertEquals(null, $testClass->fooNull);
+        $this->assertEquals('Laravel', $testClass->fooString);
+        $this->assertEquals(true, $testClass->fooBoolean);
+        $this->assertEquals(1, $testClass->fooInt);
+        $this->assertEquals(1.1, $testClass->fooFloat);
+        $this->assertEquals([], $testClass->fooArray);
+        $this->assertEquals(null, $testClass->fooNull);
 
-        self::assertEquals(null, $testClass->fooNullableString);
-        self::assertEquals(null, $testClass->fooNullableBoolean);
-        self::assertEquals(null, $testClass->fooNullableInt);
-        self::assertEquals(null, $testClass->fooNullableFloat);
-        self::assertEquals(null, $testClass->fooNullableArray);
+        $this->assertEquals(null, $testClass->fooNullableString);
+        $this->assertEquals(null, $testClass->fooNullableBoolean);
+        $this->assertEquals(null, $testClass->fooNullableInt);
+        $this->assertEquals(null, $testClass->fooNullableFloat);
+        $this->assertEquals(null, $testClass->fooNullableArray);
     }
 }
 
