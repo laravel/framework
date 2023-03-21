@@ -444,7 +444,7 @@ class RedisConnectionTest extends TestCase
             );
 
             $this->assertEquals(['name' => 'mohamed', 'hobby' => 'diving'],
-                $redis->hmget('hash', 'name', 'hobby')
+                $redis->hmget('hash', ['name', 'hobby'])
             );
 
             $redis->flushall();
