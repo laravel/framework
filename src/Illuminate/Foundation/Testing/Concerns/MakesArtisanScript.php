@@ -25,10 +25,10 @@ trait MakesArtisanScript
     /**
      * Create an Artisan script in the Laravel testbench core for external testing.
      *
-     * @param  array<string, callable>|callable  $parts
+     * @param  array<string, callable>|callable  $slots
      * @return string
      */
-    public function setUpArtisanScript($parts = []): string
+    public function setUpArtisanScript($slots = []): string
     {
         $this->fileSystem = new Filesystem;
         $path = base_path('artisan');
@@ -42,7 +42,7 @@ trait MakesArtisanScript
 
         $this->fileSystem->put(
             base_path('artisan'),
-            $this->buildArtisanScript($uuid, $parts)
+            $this->buildArtisanScript($uuid, $slots)
         );
 
         return $uuid;
@@ -79,19 +79,19 @@ trait MakesArtisanScript
      * Build a custom Artisan script containing specific scripts.
      *
      * @param  string  $uuid
-     * @param  array<string, callable>|callable  $parts
+     * @param  array<string, callable>|callable  $slots
      * @return string
      */
-    protected function buildArtisanScript($uuid, $parts = []): string
+    protected function buildArtisanScript($uuid, $slots = []): string
     {
         // If no array is passed, the default "preHandle" slot is assumed.
-        $parts = !is_array($parts) ? ['preHandle' => $parts] : $parts;
+        $slots = !is_array($slots) ? ['preHandle' => $slots] : $slots;
 
         $thisFile = __FILE__;
 
-        $parts = array_merge([
+        $slots = array_merge([
             'preBootstrap' => '', 'preKernel' => '', 'preHandle' => '', 'preTerminate' => '', 'preExit' => '',
-        ], Arr::map($parts, fn ($part) => value($part, $uuid)));
+        ], Arr::map($slots, fn ($part) => value($part, $uuid)));
 
         return <<<PHP
 #!/usr/bin/env php
@@ -105,26 +105,26 @@ define('LARAVEL_START', microtime(true));
 
 require __DIR__.'/../../../autoload.php';
 
-{$parts['preBootstrap']}
+{$slots['preBootstrap']}
 
 \$app = require_once __DIR__.'/bootstrap/app.php';
 
-{$parts['preKernel']}
+{$slots['preKernel']}
 
 \$kernel = \$app->make(Illuminate\Contracts\Console\Kernel::class);
 
-{$parts['preHandle']}
+{$slots['preHandle']}
 
 \$status = \$kernel->handle(
     \$input = new Symfony\Component\Console\Input\ArgvInput,
     new Symfony\Component\Console\Output\ConsoleOutput
 );
 
-{$parts['preTerminate']}
+{$slots['preTerminate']}
 
 \$kernel->terminate(\$input, \$status);
 
-{$parts['preExit']}
+{$slots['preExit']}
 
 exit(\$status);
 
