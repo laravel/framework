@@ -1,6 +1,12 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.4.0...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v10.4.1...10.x)
+
+
+## [v10.4.1 (2023-03-18)](https://github.com/laravel/framework/compare/v10.4.0...v10.4.1)
+
+### Changed
+- Move Symfony events dispatcher registration to Console\Kernel ([#46508](https://github.com/laravel/framework/pull/46508))
 
 
 ## [v10.4.0 (2023-03-17)](https://github.com/laravel/framework/compare/v10.3.3...v10.4.0)
