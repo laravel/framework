@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Testing\Concerns;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Symfony\Component\Process\PhpExecutableFinder;
 
 trait MakesArtisanScript
 {
@@ -70,7 +71,7 @@ trait MakesArtisanScript
     public function artisanScript($command): array
     {
         $output = $exitCode = null;
-        exec('php '.base_path('artisan').' '.$command, $output, $exitCode);
+        exec((new PhpExecutableFinder)->find().' '.base_path('artisan').' '.$command, $output, $exitCode);
 
         return [$output, $exitCode];
     }
