@@ -3,8 +3,8 @@
 namespace Illuminate\Tests\Integration\Migration;
 
 use Illuminate\Support\Facades\DB;
-use Mockery as m;
 use Illuminate\Tests\Integration\TestCase;
+use Mockery as m;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class MigratorTest extends TestCase

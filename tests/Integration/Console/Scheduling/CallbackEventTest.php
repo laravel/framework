@@ -5,8 +5,8 @@ namespace Illuminate\Tests\Integration\Console\Scheduling;
 use Exception;
 use Illuminate\Console\Scheduling\CallbackEvent;
 use Illuminate\Console\Scheduling\EventMutex;
-use Mockery as m;
 use Illuminate\Tests\Integration\TestCase;
+use Mockery as m;
 
 class CallbackEventTest extends TestCase
 {

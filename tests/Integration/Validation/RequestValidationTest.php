@@ -3,8 +3,8 @@
 namespace Illuminate\Tests\Integration\Validation;
 
 use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Tests\Integration\TestCase;
+use Illuminate\Validation\ValidationException;
 
 class RequestValidationTest extends TestCase
 {

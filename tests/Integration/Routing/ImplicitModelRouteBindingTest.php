@@ -9,8 +9,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
-use Orchestra\Testbench\Concerns\InteractsWithPublishedFiles;
 use Illuminate\Tests\Integration\TestCase;
+use Orchestra\Testbench\Concerns\InteractsWithPublishedFiles;
 
 class ImplicitModelRouteBindingTest extends TestCase
 {

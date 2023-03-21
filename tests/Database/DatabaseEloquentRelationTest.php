@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Database;
 
-use Illuminate\Database\Capsule\Manager as DB;
 use Exception;
+use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;

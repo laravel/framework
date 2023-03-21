@@ -27,7 +27,6 @@ class FilesystemTest extends TestCase
                 File::delete($this->stubFile);
             }
         });
-
     }
 
     public function testItCanDeleteViaFilesystemShouldUpdatesFileExists()

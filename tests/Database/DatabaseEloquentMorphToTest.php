@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Tests\Database\stubs\TestEnum;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Database\Capsule\Manager as DB;
 
 class DatabaseEloquentMorphToTest extends TestCase
 {

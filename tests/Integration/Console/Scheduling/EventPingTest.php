@@ -11,8 +11,8 @@ use Illuminate\Console\Scheduling\Event;
 use Illuminate\Console\Scheduling\EventMutex;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Debug\ExceptionHandler;
-use Mockery as m;
 use Illuminate\Tests\Integration\TestCase;
+use Mockery as m;
 
 class EventPingTest extends TestCase
 {

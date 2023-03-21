@@ -4,8 +4,8 @@ namespace Illuminate\Tests\Integration\View;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\View;
-use Illuminate\View\Component;
 use Illuminate\Tests\Integration\TestCase;
+use Illuminate\View\Component;
 
 class BladeTest extends TestCase
 {

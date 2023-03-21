@@ -7,8 +7,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\DatabaseTransactionsManager;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Bus;
-use Mockery as m;
 use Illuminate\Tests\Integration\TestCase;
+use Mockery as m;
 use Throwable;
 
 class QueueConnectionTest extends TestCase

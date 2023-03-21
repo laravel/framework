@@ -2,12 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Http\Middleware;
 
-use Illuminate\Container\Container;
 use Illuminate\Foundation\Vite;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Facade;
 use Illuminate\Tests\Integration\TestCase;
 
 class VitePreloadingTest extends TestCase

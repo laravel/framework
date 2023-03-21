@@ -5,8 +5,8 @@ namespace Illuminate\Tests\Integration\Console;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\File;
-use Mockery as m;
 use Illuminate\Tests\Integration\TestCase;
+use Mockery as m;
 
 class EnvironmentEncryptCommandTest extends TestCase
 {

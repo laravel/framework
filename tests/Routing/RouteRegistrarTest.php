@@ -7,14 +7,14 @@ use FooController;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Http\Request;
+use Illuminate\Routing\CallableDispatcher;
+use Illuminate\Routing\Contracts\CallableDispatcher as CallableDispatcherContract;
+use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
+use Illuminate\Routing\ControllerDispatcher;
 use Illuminate\Routing\Router;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Stringable;
-use Illuminate\Routing\Contracts\CallableDispatcher as CallableDispatcherContract;
-use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
-use Illuminate\Routing\CallableDispatcher;
-use Illuminate\Routing\ControllerDispatcher;
 
 class RouteRegistrarTest extends TestCase
 {

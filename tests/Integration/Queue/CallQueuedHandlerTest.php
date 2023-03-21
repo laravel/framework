@@ -10,8 +10,8 @@ use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Event;
-use Mockery as m;
 use Illuminate\Tests\Integration\TestCase;
+use Mockery as m;
 
 class CallQueuedHandlerTest extends TestCase
 {

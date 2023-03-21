@@ -16,8 +16,8 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
-use Mockery as m;
 use Illuminate\Tests\Integration\TestCase;
+use Mockery as m;
 
 class SendingMailNotificationsTest extends TestCase
 {

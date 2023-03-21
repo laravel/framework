@@ -9,8 +9,8 @@ use Illuminate\Routing\Middleware\ValidateSignature;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
-use InvalidArgumentException;
 use Illuminate\Tests\Integration\TestCase;
+use InvalidArgumentException;
 
 class UrlSigningTest extends TestCase
 {

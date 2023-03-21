@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Queue\SerializesModels;
-use LogicException;
 use Illuminate\Tests\Integration\TestCase;
+use LogicException;
 use Schema;
 
 class ModelSerializationTest extends TestCase

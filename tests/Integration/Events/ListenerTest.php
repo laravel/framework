@@ -4,8 +4,8 @@ namespace Illuminate\Tests\Integration\Events;
 
 use Illuminate\Database\DatabaseTransactionsManager;
 use Illuminate\Support\Facades\Event;
-use Mockery as m;
 use Illuminate\Tests\Integration\TestCase;
+use Mockery as m;
 
 class ListenerTest extends TestCase
 {

@@ -3,8 +3,6 @@
 namespace Illuminate\Tests\Integration;
 
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Storage;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
 class TestCase extends BaseTestCase
@@ -21,7 +19,7 @@ class TestCase extends BaseTestCase
         $fs = new Filesystem();
 
         $applicationBasePath = parent::applicationBasePath();
-        $workerApplicationBasePath = $applicationBasePath . '_' . $_SERVER['TEST_TOKEN'];
+        $workerApplicationBasePath = $applicationBasePath.'_'.$_SERVER['TEST_TOKEN'];
 
         if (! $fs->exists($workerApplicationBasePath)) {
             $fs->copyDirectory($applicationBasePath, $workerApplicationBasePath);

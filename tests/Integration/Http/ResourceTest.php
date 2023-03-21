@@ -42,9 +42,9 @@ use Illuminate\Tests\Integration\Http\Fixtures\ReallyEmptyPostResource;
 use Illuminate\Tests\Integration\Http\Fixtures\ResourceWithPreservedKeys;
 use Illuminate\Tests\Integration\Http\Fixtures\SerializablePostResource;
 use Illuminate\Tests\Integration\Http\Fixtures\Subscription;
+use Illuminate\Tests\Integration\TestCase;
 use LogicException;
 use Mockery as m;
-use Illuminate\Tests\Integration\TestCase;
 
 class ResourceTest extends TestCase
 {

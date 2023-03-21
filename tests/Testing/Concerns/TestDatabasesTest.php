@@ -4,11 +4,11 @@ namespace Illuminate\Tests\Testing\Concerns;
 
 use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
+use Illuminate\Database\Capsule\Manager;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Testing\Concerns\TestDatabases;
-use Illuminate\Database\Capsule\Manager;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;

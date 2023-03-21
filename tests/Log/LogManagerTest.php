@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Log;
 
 use Illuminate\Log\Logger;
 use Illuminate\Log\LogManager;
+use Illuminate\Tests\Integration\TestCase;
 use Monolog\Formatter\HtmlFormatter;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Formatter\NormalizerFormatter;
@@ -18,7 +19,6 @@ use Monolog\Logger as Monolog;
 use Monolog\Processor\MemoryUsageProcessor;
 use Monolog\Processor\PsrLogMessageProcessor;
 use Monolog\Processor\UidProcessor;
-use Illuminate\Tests\Integration\TestCase;
 use ReflectionProperty;
 use RuntimeException;
 

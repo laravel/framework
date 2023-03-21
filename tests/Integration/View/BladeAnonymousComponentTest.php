@@ -4,8 +4,8 @@ namespace Illuminate\Tests\Integration\View;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\View;
-use InvalidArgumentException;
 use Illuminate\Tests\Integration\TestCase;
+use InvalidArgumentException;
 
 class BladeAnonymousComponentTest extends TestCase
 {

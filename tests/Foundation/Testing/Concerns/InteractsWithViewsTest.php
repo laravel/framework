@@ -3,8 +3,8 @@
 namespace Illuminate\Tests\Foundation\Testing\Concerns;
 
 use Illuminate\Foundation\Testing\Concerns\InteractsWithViews;
-use Illuminate\View\Component;
 use Illuminate\Tests\Integration\TestCase;
+use Illuminate\View\Component;
 
 class InteractsWithViewsTest extends TestCase
 {
