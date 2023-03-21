@@ -188,7 +188,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     protected $absoluteCachePathPrefixes = ['/', '\\'];
 
     /**
-     * Indicates if the application cache was resolved.
+     * Indicates if the application routes cache was resolved.
      *
      * @var bool
      */
