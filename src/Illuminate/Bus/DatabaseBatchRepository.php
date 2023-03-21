@@ -339,7 +339,7 @@ class DatabaseBatchRepository implements PrunableBatchRepository
             ! Str::contains($serialized, [':', ';'])) {
             $serialized = base64_decode($serialized);
         }
-        
+
         try {
             return unserialize($serialized);
         } catch (ModelNotFoundException $e) {
