@@ -188,6 +188,13 @@ class Application extends Container implements ApplicationContract, CachesConfig
     protected $absoluteCachePathPrefixes = ['/', '\\'];
 
     /**
+     * Indicates if the application cache was resolved.
+     *
+     * @var bool
+     */
+    protected $routesAreCached = false;
+
+    /**
      * Create a new Illuminate application instance.
      *
      * @param  string|null  $basePath
@@ -1120,7 +1127,13 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function routesAreCached()
     {
-        return $this['files']->exists($this->getCachedRoutesPath());
+        if ($this->routesAreCached) {
+            return true;
+        }
+
+        $this->routesAreCached = $this['files']->exists($this->getCachedRoutesPath());
+
+        return $this->routesAreCached;
     }
 
     /**
