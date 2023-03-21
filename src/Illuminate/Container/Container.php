@@ -1026,9 +1026,10 @@ class Container implements ArrayAccess, ContainerContract
         if ($parameter->isVariadic()) {
             return [];
         }
-
+        
         if ($this->hasConfigRepository()) {
-            foreach ($parameter->getAttributes() as $attribute) {
+            foreach ($parameter->getAttributes(InjectedConfig::class) as $attribute) {
+
                 $attributeName = $attribute->getName();
 
                 if ($attributeName !== InjectedConfig::class) {
