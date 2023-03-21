@@ -1028,15 +1028,8 @@ class Container implements ArrayAccess, ContainerContract
 
         if ($this->hasConfigRepository()) {
             foreach ($parameter->getAttributes(InjectedConfig::class) as $attribute) {
-                if (count($attribute->getArguments()) < 1) {
-                    throw new \InvalidArgumentException(
-                        'InjectedConfig attribute must have at least one argument'
-                    );
-                }
-
-                $configKey = $attribute->getArguments()[0];
-
-                return $this['config']->get($configKey);
+                $injectedConfig = $attribute->newInstance();
+                return $this['config']->get($injectedConfig->key);
             }
         }
 
