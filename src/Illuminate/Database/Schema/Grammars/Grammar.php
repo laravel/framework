@@ -172,7 +172,7 @@ abstract class Grammar extends BaseGrammar
     {
         return sprintf('alter table %s add%s check (%s)',
             $this->wrapTable($blueprint),
-            $command->symbol ? ' constraint '.$this->wrap($command->symbol) : '',
+            $command->constraint ? ' constraint '.$this->wrap($command->constraint) : '',
             $this->getValue($command->expression)
         );
     }
@@ -188,7 +188,7 @@ abstract class Grammar extends BaseGrammar
     {
         return sprintf('alter table %s drop constraint %s',
             $this->wrapTable($blueprint),
-            $this->wrap($command->symbol)
+            $this->wrap($command->constraint)
         );
     }
 

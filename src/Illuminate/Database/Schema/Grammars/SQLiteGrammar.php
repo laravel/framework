@@ -141,7 +141,7 @@ class SQLiteGrammar extends Grammar
 
         return collect($constraints)->reduce(function ($sql, $constraint) {
             return $sql.sprintf(',%s check (%s)',
-                $constraint->symbol ? ' constraint '.$this->wrap($constraint->symbol) : '',
+                $constraint->constraint ? ' constraint '.$this->wrap($constraint->constraint) : '',
                 $this->getValue($constraint->expression)
             );
         }, '');
@@ -369,9 +369,7 @@ class SQLiteGrammar extends Grammar
      */
     public function compileDropUnique(Blueprint $blueprint, Fluent $command)
     {
-        $index = $this->wrap($command->index);
-
-        return "drop index {$index}";
+        return $this->compileDropIndex($blueprint, $command);
     }
 
     /**

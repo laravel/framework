@@ -339,9 +339,11 @@ class SqlServerGrammar extends Grammar
      */
     public function compileDropPrimary(Blueprint $blueprint, Fluent $command)
     {
-        $index = $this->wrap($command->index);
+        $command->constraint = $command->index;
 
-        return "alter table {$this->wrapTable($blueprint)} drop constraint {$index}";
+        $command->index = null;
+
+        return $this->compileDropConstraint($blueprint, $command);
     }
 
     /**
@@ -353,9 +355,7 @@ class SqlServerGrammar extends Grammar
      */
     public function compileDropUnique(Blueprint $blueprint, Fluent $command)
     {
-        $index = $this->wrap($command->index);
-
-        return "drop index {$index} on {$this->wrapTable($blueprint)}";
+        return $this->compileDropIndex($blueprint, $command);
     }
 
     /**

@@ -401,9 +401,7 @@ class MySqlGrammar extends Grammar
      */
     public function compileDropUnique(Blueprint $blueprint, Fluent $command)
     {
-        $index = $this->wrap($command->index);
-
-        return "alter table {$this->wrapTable($blueprint)} drop index {$index}";
+        return $this->compileDropIndex($blueprint, $command);
     }
 
     /**

@@ -427,9 +427,9 @@ class PostgresGrammar extends Grammar
      */
     public function compileDropPrimary(Blueprint $blueprint, Fluent $command)
     {
-        $index = $this->wrap("{$blueprint->getTable()}_pkey");
+        $command->constraint = $this->wrap("{$blueprint->getTable()}_pkey");
 
-        return 'alter table '.$this->wrapTable($blueprint)." drop constraint {$index}";
+        return $this->compileDropConstraint($blueprint, $command);
     }
 
     /**
@@ -441,9 +441,11 @@ class PostgresGrammar extends Grammar
      */
     public function compileDropUnique(Blueprint $blueprint, Fluent $command)
     {
-        $index = $this->wrap($command->index);
+        $command->constraint = $command->index;
 
-        return "alter table {$this->wrapTable($blueprint)} drop constraint {$index}";
+        $command->index = null;
+
+        return $this->compileDropConstraint($blueprint, $command);
     }
 
     /**
@@ -491,9 +493,11 @@ class PostgresGrammar extends Grammar
      */
     public function compileDropForeign(Blueprint $blueprint, Fluent $command)
     {
-        $index = $this->wrap($command->index);
+        $command->constraint = $command->index;
 
-        return "alter table {$this->wrapTable($blueprint)} drop constraint {$index}";
+        $command->index = null;
+
+        return $this->compileDropConstraint($blueprint, $command);
     }
 
     /**

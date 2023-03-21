@@ -656,14 +656,14 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
             $blueprint->toSql($connection, new PostgresGrammar)
         );
 
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('This database driver does not support dropping constraints.');
-        $blueprint->toSql($connection, new SQLiteGrammar);
-
         $this->assertEquals(
             ['alter table "users" drop constraint "foo"'],
             $blueprint->toSql($connection, new SqlServerGrammar)
         );
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('This database driver does not support dropping constraints.');
+        $blueprint->toSql($connection, new SQLiteGrammar);
     }
 
     public function testItEnsuresDroppingMultipleColumnsIsAvailable()

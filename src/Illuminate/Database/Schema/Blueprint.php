@@ -454,7 +454,7 @@ class Blueprint
      */
     public function dropConstraint($name)
     {
-        return $this->addCommand('dropConstraint', ['symbol' => $name]);
+        return $this->addCommand('dropConstraint', ['constraint' => $name]);
     }
 
     /**
@@ -660,7 +660,7 @@ class Blueprint
      */
     public function check($expression, $name = null)
     {
-        return $this->addCommand('check', ['expression' => $expression, 'symbol' => $name]);
+        return $this->addCommand('check', ['expression' => $expression, 'constraint' => $name]);
     }
 
     /**
