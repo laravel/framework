@@ -686,13 +686,13 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
         $this->assertEquals([
             'alter table "users" '.
             'add column "c1" integer not null check (c1 > 10), '.
-            'add column "c2" integer not null check (c2 > 10)'
+            'add column "c2" integer not null check (c2 > 10)',
         ], $blueprint->toSql($connection, new PostgresGrammar));
 
         $blueprint = clone $base;
         $this->assertEquals([
             'alter table "users" add column "c1" integer not null check (c1 > 10)',
-            'alter table "users" add column "c2" integer not null check (c2 > 10)'
+            'alter table "users" add column "c2" integer not null check (c2 > 10)',
         ], $blueprint->toSql($connection, new SQLiteGrammar));
 
         $blueprint = clone $base;
