@@ -1310,7 +1310,7 @@ class Container implements ArrayAccess, ContainerContract
     {
         return isset($this['config']) &&
                interface_exists(\Illuminate\Contracts\Config\Repository::class) &&
-               $this['config'] instanceof \Illuminate\Contracts\Config\Repository::class;
+               is_subclass_of($this['config'], \Illuminate\Contracts\Config\Repository::class);
     }
 
     /**
