@@ -427,7 +427,7 @@ class PostgresGrammar extends Grammar
      */
     public function compileDropPrimary(Blueprint $blueprint, Fluent $command)
     {
-        $command->constraint = $this->wrap("{$blueprint->getTable()}_pkey");
+        $command->constraint = "{$blueprint->getTable()}_pkey";
 
         return $this->compileDropConstraint($blueprint, $command);
     }
