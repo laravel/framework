@@ -17,7 +17,7 @@ class MySqlGrammar extends Grammar
      */
     protected $modifiers = [
         'Unsigned', 'Charset', 'Collate', 'VirtualAs', 'StoredAs', 'Nullable',
-        'Srid', 'Default', 'OnUpdate', 'Invisible', 'Increment', 'Comment', 'After', 'First',
+        'Srid', 'Default', 'OnUpdate', 'Invisible', 'Increment', 'Comment', 'Check', 'After', 'First',
     ];
 
     /**
@@ -1245,6 +1245,20 @@ class MySqlGrammar extends Grammar
     {
         if (is_int($column->srid) && $column->srid > 0) {
             return ' srid '.$column->srid;
+        }
+    }
+
+    /**
+     * Get the SQL for a check constraint column modifier.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string|null
+     */
+    protected function modifyCheck(Blueprint $blueprint, Fluent $column)
+    {
+        if (! is_null($column->check)) {
+            return ' check ('.$this->getValue($column->check).')';
         }
     }
 

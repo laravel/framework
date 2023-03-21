@@ -497,7 +497,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "role" varchar check ("role" in (\'member\', \'admin\')) not null', $statements[0]);
+        $this->assertSame('alter table "users" add column "role" varchar not null check ("role" in (\'member\', \'admin\'))', $statements[0]);
     }
 
     public function testAddingJson()

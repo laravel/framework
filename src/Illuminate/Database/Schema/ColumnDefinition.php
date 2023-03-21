@@ -10,12 +10,13 @@ use Illuminate\Support\Fluent;
  * @method $this autoIncrement() Set INTEGER columns as auto-increment (primary key)
  * @method $this change() Change the column
  * @method $this charset(string $charset) Specify a character set for the column (MySQL)
+ * @method $this check(\Illuminate\Contracts\Database\Query\Expression|string $expression) Specify a check constraint for the column
  * @method $this collation(string $collation) Specify a collation for the column (MySQL/PostgreSQL/SQL Server)
  * @method $this comment(string $comment) Add a comment to the column (MySQL/PostgreSQL)
  * @method $this default(mixed $value) Specify a "default" value for the column
  * @method $this first() Place the column "first" in the table (MySQL)
  * @method $this from(int $startingValue) Set the starting value of an auto-incrementing field (MySQL / PostgreSQL)
- * @method $this generatedAs(string|Expression $expression = null) Create a SQL compliant identity column (PostgreSQL)
+ * @method $this generatedAs(\Illuminate\Contracts\Database\Query\Expression|string $expression = null) Create a SQL compliant identity column (PostgreSQL)
  * @method $this index(string $indexName = null) Add an index
  * @method $this invisible() Specify that the column should be invisible to "SELECT *" (MySQL)
  * @method $this nullable(bool $value = true) Allow NULL values to be inserted into the column

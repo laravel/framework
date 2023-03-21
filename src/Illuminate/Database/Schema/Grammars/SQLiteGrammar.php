@@ -18,7 +18,7 @@ class SQLiteGrammar extends Grammar
      *
      * @var string[]
      */
-    protected $modifiers = ['Increment', 'Nullable', 'Default', 'VirtualAs', 'StoredAs'];
+    protected $modifiers = ['Increment', 'Nullable', 'Check', 'Default', 'VirtualAs', 'StoredAs'];
 
     /**
      * The columns available as serials.
@@ -688,11 +688,12 @@ class SQLiteGrammar extends Grammar
      */
     protected function typeEnum(Fluent $column)
     {
-        return sprintf(
-            'varchar check ("%s" in (%s))',
-            $column->name,
+        $column->check(sprintf('%s in (%s)',
+            $this->wrap($column),
             $this->quoteString($column->allowed)
-        );
+        ));
+
+        return 'varchar';
     }
 
     /**
@@ -1048,6 +1049,20 @@ class SQLiteGrammar extends Grammar
     {
         if (in_array($column->type, $this->serials) && $column->autoIncrement) {
             return ' primary key autoincrement';
+        }
+    }
+
+    /**
+     * Get the SQL for a check constraint column modifier.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string|null
+     */
+    protected function modifyCheck(Blueprint $blueprint, Fluent $column)
+    {
+        if (! is_null($column->check)) {
+            return ' check ('.$this->getValue($column->check).')';
         }
     }
 

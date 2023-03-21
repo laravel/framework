@@ -22,7 +22,7 @@ class PostgresGrammar extends Grammar
      *
      * @var string[]
      */
-    protected $modifiers = ['Collate', 'Nullable', 'Default', 'VirtualAs', 'StoredAs', 'GeneratedAs', 'Increment'];
+    protected $modifiers = ['Collate', 'Nullable', 'Check', 'Default', 'VirtualAs', 'StoredAs', 'GeneratedAs', 'Increment'];
 
     /**
      * The columns available as serials.
@@ -789,11 +789,12 @@ class PostgresGrammar extends Grammar
      */
     protected function typeEnum(Fluent $column)
     {
-        return sprintf(
-            'varchar(255) check ("%s" in (%s))',
-            $column->name,
+        $column->check(sprintf('%s in (%s)',
+            $this->wrap($column),
             $this->quoteString($column->allowed)
-        );
+        ));
+
+        return 'varchar(255)';
     }
 
     /**
@@ -1219,5 +1220,19 @@ class PostgresGrammar extends Grammar
         }
 
         return $sql;
+    }
+
+    /**
+     * Get the SQL for a check constraint column modifier.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string|null
+     */
+    protected function modifyCheck(Blueprint $blueprint, Fluent $column)
+    {
+        if (! $column->change && ! is_null($column->check)) {
+            return ' check ('.$this->getValue($column->check).')';
+        }
     }
 }

@@ -666,6 +666,43 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
         $blueprint->toSql($connection, new SQLiteGrammar);
     }
 
+    public function testCheckConstraintOnColumnsWorks()
+    {
+        $connection = $this->db->connection();
+
+        $base = new Blueprint('users', function (Blueprint $table) {
+            $table->integer('c1')->check('c1 > 10');
+            $table->integer('c2')->check(new Expression('c2 > 10'));
+        });
+
+        $blueprint = clone $base;
+        $this->assertEquals([
+            'alter table `users` '.
+            'add `c1` int not null check (c1 > 10), '.
+            'add `c2` int not null check (c2 > 10)',
+        ], $blueprint->toSql($connection, new MySqlGrammar));
+
+        $blueprint = clone $base;
+        $this->assertEquals([
+            'alter table "users" '.
+            'add column "c1" integer not null check (c1 > 10), '.
+            'add column "c2" integer not null check (c2 > 10)'
+        ], $blueprint->toSql($connection, new PostgresGrammar));
+
+        $blueprint = clone $base;
+        $this->assertEquals([
+            'alter table "users" add column "c1" integer not null check (c1 > 10)',
+            'alter table "users" add column "c2" integer not null check (c2 > 10)'
+        ], $blueprint->toSql($connection, new SQLiteGrammar));
+
+        $blueprint = clone $base;
+        $this->assertEquals([
+            'alter table "users" add '.
+            '"c1" int not null check (c1 > 10), '.
+            '"c2" int not null check (c2 > 10)',
+        ], $blueprint->toSql($connection, new SqlServerGrammar));
+    }
+
     public function testItEnsuresDroppingMultipleColumnsIsAvailable()
     {
         $this->expectException(BadMethodCallException::class);

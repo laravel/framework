@@ -21,7 +21,7 @@ class SqlServerGrammar extends Grammar
      *
      * @var string[]
      */
-    protected $modifiers = ['Collate', 'Nullable', 'Default', 'Persisted', 'Increment'];
+    protected $modifiers = ['Collate', 'Nullable', 'Default', 'Persisted', 'Increment', 'Check'];
 
     /**
      * The columns available as serials.
@@ -670,11 +670,12 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeEnum(Fluent $column)
     {
-        return sprintf(
-            'nvarchar(255) check ("%s" in (%s))',
-            $column->name,
+        $column->check(sprintf('%s in (%s)',
+            $this->wrap($column),
             $this->quoteString($column->allowed)
-        );
+        ));
+
+        return 'nvarchar(255)';
     }
 
     /**
@@ -1015,6 +1016,20 @@ class SqlServerGrammar extends Grammar
 
         if ($column->persisted) {
             return ' persisted';
+        }
+    }
+
+    /**
+     * Get the SQL for a check constraint column modifier.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string|null
+     */
+    protected function modifyCheck(Blueprint $blueprint, Fluent $column)
+    {
+        if (! $column->change && ! is_null($column->check)) {
+            return ' check ('.$this->getValue($column->check).')';
         }
     }
 

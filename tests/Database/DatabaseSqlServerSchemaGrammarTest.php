@@ -542,7 +542,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add "role" nvarchar(255) check ("role" in (N\'member\', N\'admin\')) not null', $statements[0]);
+        $this->assertSame('alter table "users" add "role" nvarchar(255) not null check ("role" in (N\'member\', N\'admin\'))', $statements[0]);
     }
 
     public function testAddingJson()
