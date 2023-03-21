@@ -443,6 +443,10 @@ class RedisConnectionTest extends TestCase
                 $redis->hmget('hash', 'name', 'hobby')
             );
 
+            $this->assertEquals(['name' => 'mohamed', 'hobby' => 'diving'],
+                $redis->hmget('hash', 'name', 'hobby')
+            );
+
             $redis->flushall();
         }
     }
