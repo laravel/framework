@@ -6,7 +6,7 @@ use Exception;
 use Illuminate\Foundation\Vite;
 use Illuminate\Support\Facades\Vite as ViteFacade;
 use Illuminate\Support\Str;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 
 class FoundationViteTest extends TestCase
 {

@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Mail;
 
+use Illuminate\Tests\Integration\TestCase;
 use InvalidArgumentException;
-use Orchestra\Testbench\TestCase;
 
 class MailManagerTest extends TestCase
 {

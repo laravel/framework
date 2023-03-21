@@ -18,7 +18,7 @@ use Monolog\Logger as Monolog;
 use Monolog\Processor\MemoryUsageProcessor;
 use Monolog\Processor\PsrLogMessageProcessor;
 use Monolog\Processor\UidProcessor;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 use ReflectionProperty;
 use RuntimeException;
 

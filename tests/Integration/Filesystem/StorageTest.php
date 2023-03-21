@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Integration\Filesystem;
 
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 use Symfony\Component\Process\Process;
 
 /**
@@ -16,6 +16,8 @@ class StorageTest extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->afterApplicationCreated(function () {
             File::put($file = storage_path('app/public/StardewTaylor.png'), File::get(__DIR__.'/Fixtures/StardewTaylor.png'));
             $this->stubFile = $file;
@@ -26,8 +28,6 @@ class StorageTest extends TestCase
                 File::delete($this->stubFile);
             }
         });
-
-        parent::setUp();
     }
 
     public function testItCanDeleteViaStorage()

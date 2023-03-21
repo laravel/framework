@@ -8,7 +8,7 @@ use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Http\Response;
 use Illuminate\Session\Middleware\StartSession;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 
 class RequirePasswordTest extends TestCase
 {

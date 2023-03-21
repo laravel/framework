@@ -3,10 +3,10 @@
 namespace Illuminate\Tests\Integration\Testing;
 
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Tests\Integration\TestCase;
 use Mockery as m;
 use Mockery\Exception\InvalidCountException;
 use Mockery\Exception\InvalidOrderException;
-use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\AssertionFailedError;
 
 class ArtisanCommandTest extends TestCase

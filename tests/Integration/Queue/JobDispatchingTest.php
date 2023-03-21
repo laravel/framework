@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Integration\Queue;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 
 class JobDispatchingTest extends TestCase
 {

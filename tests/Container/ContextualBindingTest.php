@@ -46,7 +46,7 @@ class ContextualBindingTest extends TestCase
     {
         $container = new Container;
 
-        $container->instance(IContainerContextContractStub::class, new ContainerImplementationStub);
+        $container->instance(IContainerContextContractStub::class, new ContainerContextStub);
 
         $container->when(ContainerTestContextInjectOne::class)->needs(IContainerContextContractStub::class)->give(ContainerContextImplementationStubTwo::class);
 
@@ -59,7 +59,7 @@ class ContextualBindingTest extends TestCase
 
         $container->when(ContainerTestContextInjectOne::class)->needs(IContainerContextContractStub::class)->give(ContainerContextImplementationStubTwo::class);
 
-        $container->instance(IContainerContextContractStub::class, new ContainerImplementationStub);
+        $container->instance(IContainerContextContractStub::class, new ContainerContextStub);
 
         $this->assertInstanceOf(
             ContainerContextImplementationStubTwo::class,
@@ -71,7 +71,7 @@ class ContextualBindingTest extends TestCase
     {
         $container = new Container;
 
-        $container->instance('stub', new ContainerImplementationStub);
+        $container->instance('stub', new ContainerContextStub);
         $container->alias('stub', IContainerContextContractStub::class);
 
         $container->when(ContainerTestContextInjectOne::class)->needs(IContainerContextContractStub::class)->give(ContainerContextImplementationStubTwo::class);
@@ -88,7 +88,7 @@ class ContextualBindingTest extends TestCase
 
         $container->when(ContainerTestContextInjectOne::class)->needs(IContainerContextContractStub::class)->give(ContainerContextImplementationStubTwo::class);
 
-        $container->instance('stub', new ContainerImplementationStub);
+        $container->instance('stub', new ContainerContextStub);
         $container->alias('stub', IContainerContextContractStub::class);
 
         $this->assertInstanceOf(
@@ -162,7 +162,7 @@ class ContextualBindingTest extends TestCase
 
         $container = new Container;
 
-        $container->instance(IContainerContextContractStub::class, new ContainerImplementationStub);
+        $container->instance(IContainerContextContractStub::class, new ContainerContextStub);
         $container->instance(ContainerTestContextInjectInstantiations::class, new ContainerTestContextInjectInstantiations);
 
         $this->assertEquals(1, ContainerTestContextInjectInstantiations::$instantiations);
@@ -180,16 +180,16 @@ class ContextualBindingTest extends TestCase
     public function testContainerCanInjectSimpleVariable()
     {
         $container = new Container;
-        $container->when(ContainerInjectVariableStub::class)->needs('$something')->give(100);
-        $instance = $container->make(ContainerInjectVariableStub::class);
+        $container->when(ContainerInjectContainerContext::class)->needs('$something')->give(100);
+        $instance = $container->make(ContainerInjectContainerContext::class);
         $this->assertEquals(100, $instance->something);
 
         $container = new Container;
-        $container->when(ContainerInjectVariableStub::class)->needs('$something')->give(function ($container) {
-            return $container->make(ContainerConcreteStub::class);
+        $container->when(ContainerInjectContainerContext::class)->needs('$something')->give(function ($container) {
+            return $container->make(ContainerContextStub::class);
         });
-        $instance = $container->make(ContainerInjectVariableStub::class);
-        $this->assertInstanceOf(ContainerConcreteStub::class, $instance->something);
+        $instance = $container->make(ContainerInjectContainerContext::class);
+        $this->assertInstanceOf(ContainerContextStub::class, $instance->something);
     }
 
     public function testContextualBindingWorksWithAliasedTargets()
@@ -619,4 +619,24 @@ class ContainerTestContextInjectFromConfigArray
     {
         $this->settings = $settings;
     }
+}
+
+class ContainerInjectContainerContext
+{
+    public $something;
+
+    public function __construct(ContainerContextStub $concrete, $something)
+    {
+        $this->something = $something;
+    }
+}
+
+interface ContainerContractStub
+{
+    //
+}
+
+class ContainerContextStub implements ContainerContractStub
+{
+    //
 }

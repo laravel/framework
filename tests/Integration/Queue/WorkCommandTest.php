@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Carbon;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 use Queue;
 
 class WorkCommandTest extends TestCase

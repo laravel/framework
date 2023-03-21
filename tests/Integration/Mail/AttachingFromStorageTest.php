@@ -6,7 +6,7 @@ use Illuminate\Mail\Attachment;
 use Illuminate\Mail\Mailable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Storage;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 
 class AttachingFromStorageTest extends TestCase
 {

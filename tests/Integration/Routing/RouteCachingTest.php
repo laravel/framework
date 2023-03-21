@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Routing;
 
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 
 class RouteCachingTest extends TestCase
 {

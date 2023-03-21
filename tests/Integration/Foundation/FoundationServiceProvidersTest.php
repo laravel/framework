@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Integration\Foundation;
 
 use Illuminate\Support\ServiceProvider;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 
 class FoundationServiceProvidersTest extends TestCase
 {

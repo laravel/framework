@@ -40,6 +40,10 @@ class ParallelTestingTest extends TestCase
             $state = true;
         });
 
+        $parallelTesting->resolveTokenUsing(function () {
+            return false;
+        });
+
         $parallelTesting->{$caller}($this);
         $this->assertFalse($state);
 
@@ -76,6 +80,10 @@ class ParallelTestingTest extends TestCase
     public function testToken()
     {
         $parallelTesting = new ParallelTesting(Container::getInstance());
+
+        $parallelTesting->resolveTokenUsing(function () {
+            return false;
+        });
 
         $this->assertFalse($parallelTesting->token());
 

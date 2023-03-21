@@ -10,6 +10,13 @@ use ReflectionClass;
 
 class SupportStrTest extends TestCase
 {
+    public function tearDown(): void
+    {
+        parent::tearDown();
+
+        Str::createUuidsNormally();
+    }
+
     public function testStringCanBeLimitedByWords()
     {
         $this->assertSame('Taylor...', Str::words('Taylor Otwell', 1));

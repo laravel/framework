@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Foundation\Testing\Concerns;
 
 use Illuminate\Foundation\Mix;
 use Illuminate\Foundation\Vite;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 use stdClass;
 
 class InteractsWithContainerTest extends TestCase

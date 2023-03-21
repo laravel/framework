@@ -772,8 +772,8 @@ class SupportStringableTest extends TestCase
 
         $this->assertTrue($this->stringable('blah/baz/foo')->is('*/foo'));
 
-        $valueObject = new StringableObjectStub('foo/bar/baz');
-        $patternObject = new StringableObjectStub('foo/*');
+        $valueObject = new SupportStringableObjectStub('foo/bar/baz');
+        $patternObject = new SupportStringableObjectStub('foo/*');
 
         $this->assertTrue($this->stringable($valueObject)->is('foo/bar/baz'));
         $this->assertTrue($this->stringable($valueObject)->is($patternObject));
@@ -1215,5 +1215,20 @@ class SupportStringableTest extends TestCase
         $this->assertSame('t', $str[4]);
         $this->assertTrue(isset($str[2]));
         $this->assertFalse(isset($str[10]));
+    }
+}
+
+class SupportStringableObjectStub
+{
+    private $value;
+
+    public function __construct($value)
+    {
+        $this->value = $value;
+    }
+
+    public function __toString()
+    {
+        return $this->value;
     }
 }

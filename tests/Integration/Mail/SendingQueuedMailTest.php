@@ -8,7 +8,7 @@ use Illuminate\Queue\Middleware\RateLimited;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\View;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 
 class SendingQueuedMailTest extends TestCase
 {

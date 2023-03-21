@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Support;
 
 use Illuminate\Mail\Mailable;
 use Illuminate\Support\Facades\Mail;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 
 class SupportMailTest extends TestCase
 {

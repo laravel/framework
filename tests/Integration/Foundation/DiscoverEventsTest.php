@@ -9,7 +9,7 @@ use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Listeners\Ab
 use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Listeners\Listener;
 use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Listeners\ListenerInterface;
 use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\UnionListeners\UnionListener;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 
 class DiscoverEventsTest extends TestCase
 {

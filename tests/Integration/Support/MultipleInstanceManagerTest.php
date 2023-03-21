@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Integration\Support;
 
 use Illuminate\Tests\Integration\Support\Fixtures\MultipleInstanceManager;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 use RuntimeException;
 
 class MultipleInstanceManagerTest extends TestCase

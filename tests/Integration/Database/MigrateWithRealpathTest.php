@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Support\Facades\Schema;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 
 class MigrateWithRealpathTest extends TestCase
 {

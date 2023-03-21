@@ -44,7 +44,7 @@ use Illuminate\Tests\Integration\Http\Fixtures\SerializablePostResource;
 use Illuminate\Tests\Integration\Http\Fixtures\Subscription;
 use LogicException;
 use Mockery as m;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 
 class ResourceTest extends TestCase
 {

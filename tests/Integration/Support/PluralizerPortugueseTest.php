@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Integration\Support;
 
 use Illuminate\Support\Pluralizer;
 use Illuminate\Support\Str;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 
 class PluralizerPortugueseTest extends TestCase
 {

@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Foundation\Testing\Concerns;
 use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Http\RedirectResponse;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 
 class MakesHttpRequestsTest extends TestCase
 {

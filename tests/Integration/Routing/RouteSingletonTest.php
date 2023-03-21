@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Tests\Integration\Routing\Fixtures\CreatableSingletonTestController;
 use Illuminate\Tests\Integration\Routing\Fixtures\NestedSingletonTestController;
 use Illuminate\Tests\Integration\Routing\Fixtures\SingletonTestController;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 
 class RouteSingletonTest extends TestCase
 {

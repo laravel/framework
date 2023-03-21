@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Integration\Routing;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Session\SessionServiceProvider;
 use Illuminate\Support\Facades\Route;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 
 class PreviousUrlTest extends TestCase
 {

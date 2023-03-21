@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Database\Capsule\Manager as DB;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -15,9 +16,28 @@ use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentRelationTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $db = new DB;
+
+        $db->addConnection([
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+        ]);
+
+        $db->bootEloquent();
+        $db->setAsGlobal();
+    }
+
     protected function tearDown(): void
     {
+        Model::unsetConnectionResolver();
+
         m::close();
+
+        parent::tearDown();
     }
 
     public function testSetRelationFail()

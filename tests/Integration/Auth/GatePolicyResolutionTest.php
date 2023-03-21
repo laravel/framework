@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Tests\Integration\Auth\Fixtures\AuthenticationTestUser;
 use Illuminate\Tests\Integration\Auth\Fixtures\Policies\AuthenticationTestUserPolicy;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 
 class GatePolicyResolutionTest extends TestCase
 {

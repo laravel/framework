@@ -3,8 +3,8 @@
 namespace Illuminate\Tests\Integration\Support;
 
 use Illuminate\Tests\Integration\Support\Fixtures\NullableManager;
+use Illuminate\Tests\Integration\TestCase;
 use InvalidArgumentException;
-use Orchestra\Testbench\TestCase;
 
 class ManagerTest extends TestCase
 {

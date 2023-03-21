@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Integration\Routing;
 
 use Illuminate\Support\Facades\Route;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 
 include 'Enums.php';
 

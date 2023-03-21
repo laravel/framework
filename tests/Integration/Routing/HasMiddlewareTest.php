@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Integration\Routing;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Route;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 
 class HasMiddlewareTest extends TestCase
 {

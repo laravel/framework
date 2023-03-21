@@ -7,7 +7,7 @@ use Aws\Exception\AwsException;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 
 class DynamoDbStoreTest extends TestCase
 {

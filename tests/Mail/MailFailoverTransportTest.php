@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Mail;
 
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 use Symfony\Component\Mailer\Transport\FailoverTransport;
 
 class MailFailoverTransportTest extends TestCase

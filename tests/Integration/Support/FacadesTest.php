@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Integration\Support;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Facade;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 use ReflectionClass;
 
 class FacadesTest extends TestCase

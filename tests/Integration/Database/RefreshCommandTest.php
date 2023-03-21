@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Support\Facades\DB;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 
 class RefreshCommandTest extends TestCase
 {

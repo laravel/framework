@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Integration\Cache;
 
 use Illuminate\Support\Facades\Cache;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 
 class NoLockTest extends TestCase
 {

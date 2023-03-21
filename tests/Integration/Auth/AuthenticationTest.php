@@ -19,8 +19,8 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Support\Testing\Fakes\EventFake;
 use Illuminate\Tests\Integration\Auth\Fixtures\AuthenticationTestUser;
+use Illuminate\Tests\Integration\TestCase;
 use InvalidArgumentException;
-use Orchestra\Testbench\TestCase;
 
 class AuthenticationTest extends TestCase
 {

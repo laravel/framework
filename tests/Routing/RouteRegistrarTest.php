@@ -11,6 +11,10 @@ use Illuminate\Routing\Router;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Stringable;
+use Illuminate\Routing\Contracts\CallableDispatcher as CallableDispatcherContract;
+use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
+use Illuminate\Routing\CallableDispatcher;
+use Illuminate\Routing\ControllerDispatcher;
 
 class RouteRegistrarTest extends TestCase
 {
@@ -23,7 +27,10 @@ class RouteRegistrarTest extends TestCase
     {
         parent::setUp();
 
-        $this->router = new Router(m::mock(Dispatcher::class), Container::getInstance());
+        $this->router = new Router(m::mock(Dispatcher::class), $container = Container::getInstance());
+
+        $container->bind(ControllerDispatcherContract::class, fn ($app) => new ControllerDispatcher($app));
+        $container->bind(CallableDispatcherContract::class, fn ($app) => new CallableDispatcher($app));
     }
 
     protected function tearDown(): void

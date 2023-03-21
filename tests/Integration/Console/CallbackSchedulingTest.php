@@ -13,7 +13,7 @@ use Illuminate\Console\Scheduling\SchedulingMutex;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Factory;
 use Illuminate\Contracts\Events\Dispatcher;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 use RuntimeException;
 
 class CallbackSchedulingTest extends TestCase

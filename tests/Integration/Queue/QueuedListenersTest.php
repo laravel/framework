@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Integration\Queue;
 use Event;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Events\CallQueuedListener;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 use Queue;
 
 class QueuedListenersTest extends TestCase

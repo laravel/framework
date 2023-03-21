@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Integration\Routing;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Support\Facades\Route;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 
 class RouteRedirectTest extends TestCase
 {

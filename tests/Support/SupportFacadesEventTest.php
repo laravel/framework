@@ -37,10 +37,10 @@ class SupportFacadesEventTest extends TestCase
 
     protected function tearDown(): void
     {
+        m::close();
+
         Event::clearResolvedInstances();
         Event::setFacadeApplication(null);
-
-        m::close();
     }
 
     public function testFakeFor()

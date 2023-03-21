@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Integration\Log;
 
 use Illuminate\Support\Facades\Log;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 
 class LoggingIntegrationTest extends TestCase
 {

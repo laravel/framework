@@ -6,7 +6,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Auth\User as FoundationUser;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 
 /**
  * @requires extension pdo_mysql

@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Notification as NotificationFacade;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\View;
 use Illuminate\Testing\Assert;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 
 class SendingNotificationsWithLocaleTest extends TestCase
 {

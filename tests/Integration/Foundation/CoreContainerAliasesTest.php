@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Integration\Foundation;
 
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\DatabaseManager;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 
 class CoreContainerAliasesTest extends TestCase
 {

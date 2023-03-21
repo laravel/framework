@@ -8,8 +8,8 @@ use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Auth\Fixtures\AuthenticationTestUser;
+use Illuminate\Tests\Integration\TestCase;
 use Orchestra\Testbench\Factories\UserFactory;
-use Orchestra\Testbench\TestCase;
 
 class ForgotPasswordTest extends TestCase
 {

@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Integration\Migration;
 
 use Illuminate\Support\Facades\DB;
 use Mockery as m;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class MigratorTest extends TestCase

@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Integration\Validation;
 
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 
 class RequestValidationTest extends TestCase
 {

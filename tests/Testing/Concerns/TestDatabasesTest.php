@@ -4,8 +4,11 @@ namespace Illuminate\Tests\Testing\Concerns;
 
 use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Facade;
 use Illuminate\Testing\Concerns\TestDatabases;
+use Illuminate\Database\Capsule\Manager;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
@@ -17,6 +20,17 @@ class TestDatabasesTest extends TestCase
         parent::setUp();
 
         Container::setInstance($container = new Container);
+        Facade::setFacadeApplication($container);
+
+        $db = new Manager;
+
+        $db->addConnection([
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+        ]);
+
+        $db->bootEloquent();
+        $db->setAsGlobal();
 
         $container->singleton('config', function () {
             return m::mock(Config::class)
@@ -26,6 +40,8 @@ class TestDatabasesTest extends TestCase
                 ->andReturn('mysql')
                 ->getMock();
         });
+
+        $container->singleton('db', fn () => $db);
 
         $_SERVER['LARAVEL_PARALLEL_TESTING'] = 1;
     }
@@ -102,8 +118,10 @@ class TestDatabasesTest extends TestCase
         parent::tearDown();
 
         Container::setInstance(null);
-        DB::clearResolvedInstances();
-        DB::setFacadeApplication(null);
+        Facade::clearResolvedInstances();
+        Facade::setFacadeApplication(null);
+
+        Model::unsetConnectionResolver();
 
         unset($_SERVER['LARAVEL_PARALLEL_TESTING']);
 

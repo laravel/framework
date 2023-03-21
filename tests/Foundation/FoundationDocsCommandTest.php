@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Foundation;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Console\DocsCommand;
 use Illuminate\Support\Facades\Http;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 use RuntimeException;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 

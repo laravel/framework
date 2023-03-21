@@ -6,7 +6,7 @@ use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Routing\Middleware\ThrottleRequestsWithRedis;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Route;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 use Throwable;
 
 class ThrottleRequestsWithRedisTest extends TestCase

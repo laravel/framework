@@ -16,7 +16,7 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 
 function fail()
 {

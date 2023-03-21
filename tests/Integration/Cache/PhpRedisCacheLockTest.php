@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Integration\Cache;
 
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Support\Facades\Cache;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 use Redis;
 
 class PhpRedisCacheLockTest extends TestCase

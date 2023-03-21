@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 
 class EloquentModelConnectionsTest extends TestCase
 {
@@ -98,7 +98,9 @@ class EloquentModelConnectionsTest extends TestCase
 class ParentModel extends Model
 {
     public $table = 'parent';
+
     public $timestamps = false;
+
     protected $guarded = [];
 
     public function children()
@@ -115,7 +117,9 @@ class ParentModel extends Model
 class ChildModel extends Model
 {
     public $table = 'child';
+
     public $timestamps = false;
+
     protected $guarded = [];
 
     public function parent()
@@ -127,8 +131,11 @@ class ChildModel extends Model
 class ChildModelDefaultConn2 extends Model
 {
     public $connection = 'conn2';
+
     public $table = 'child';
+
     public $timestamps = false;
+
     protected $guarded = [];
 
     public function parent()

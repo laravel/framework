@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Integration\Cache;
 use Exception;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Support\Facades\Cache;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 
 class RedisCacheLockTest extends TestCase
 {

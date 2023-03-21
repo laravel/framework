@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Tests\Database\stubs\TestEnum;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Database\Capsule\Manager as DB;
 
 class DatabaseEloquentMorphToTest extends TestCase
 {
@@ -15,8 +16,23 @@ class DatabaseEloquentMorphToTest extends TestCase
 
     protected $related;
 
+    protected function setUp(): void
+    {
+        $db = new DB;
+
+        $db->addConnection([
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+        ]);
+
+        $db->bootEloquent();
+        $db->setAsGlobal();
+    }
+
     protected function tearDown(): void
     {
+        Model::unsetConnectionResolver();
+
         m::close();
     }
 

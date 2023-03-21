@@ -6,7 +6,7 @@ use Illuminate\Encryption\Encrypter;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\File;
 use Mockery as m;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 
 class EnvironmentEncryptCommandTest extends TestCase
 {

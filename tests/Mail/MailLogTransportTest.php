@@ -4,9 +4,9 @@ namespace Illuminate\Tests\Mail;
 
 use Illuminate\Mail\Message;
 use Illuminate\Mail\Transport\LogTransport;
+use Illuminate\Tests\Integration\TestCase;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
-use Orchestra\Testbench\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\Mime\Email;

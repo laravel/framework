@@ -6,7 +6,7 @@ use Exception;
 use Illuminate\Console\Scheduling\CallbackEvent;
 use Illuminate\Console\Scheduling\EventMutex;
 use Mockery as m;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 
 class CallbackEventTest extends TestCase
 {

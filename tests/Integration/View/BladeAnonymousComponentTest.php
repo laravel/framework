@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Integration\View;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\View;
 use InvalidArgumentException;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 
 class BladeAnonymousComponentTest extends TestCase
 {

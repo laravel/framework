@@ -6,7 +6,7 @@ use Exception;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 
 class RenderableViewExceptionTest extends TestCase
 {

@@ -80,13 +80,13 @@ class DatabaseEloquentIntegrationWithTablePrefixTest extends TestCase
 
     public function testBasicModelHydration()
     {
-        EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
-        EloquentTestUser::create(['email' => 'abigailotwell@gmail.com']);
+        DatabaseEloquentIntegrationUser::create(['email' => 'taylorotwell@gmail.com']);
+        DatabaseEloquentIntegrationUser::create(['email' => 'abigailotwell@gmail.com']);
 
-        $models = EloquentTestUser::fromQuery('SELECT * FROM prefix_users WHERE email = ?', ['abigailotwell@gmail.com']);
+        $models = DatabaseEloquentIntegrationUser::fromQuery('SELECT * FROM prefix_users WHERE email = ?', ['abigailotwell@gmail.com']);
 
         $this->assertInstanceOf(Collection::class, $models);
-        $this->assertInstanceOf(EloquentTestUser::class, $models[0]);
+        $this->assertInstanceOf(DatabaseEloquentIntegrationUser::class, $models[0]);
         $this->assertSame('abigailotwell@gmail.com', $models[0]->email);
         $this->assertCount(1, $models);
     }
@@ -113,5 +113,52 @@ class DatabaseEloquentIntegrationWithTablePrefixTest extends TestCase
     protected function schema($connection = 'default')
     {
         return $this->connection($connection)->getSchemaBuilder();
+    }
+}
+
+class DatabaseEloquentIntegrationUser extends Eloquent
+{
+    protected $table = 'users';
+
+    protected $casts = ['birthday' => 'datetime'];
+
+    protected $guarded = [];
+
+    public function friends()
+    {
+        return $this->belongsToMany(self::class, 'friends', 'user_id', 'friend_id');
+    }
+
+    public function friendsOne()
+    {
+        return $this->belongsToMany(self::class, 'friends', 'user_id', 'friend_id')->wherePivot('user_id', 1);
+    }
+
+    public function friendsTwo()
+    {
+        return $this->belongsToMany(self::class, 'friends', 'user_id', 'friend_id')->wherePivot('user_id', 2);
+    }
+
+    public function posts()
+    {
+        return $this->hasMany(EloquentTestPost::class, 'user_id');
+    }
+
+    public function post()
+    {
+        return $this->hasOne(EloquentTestPost::class, 'user_id');
+    }
+
+    public function photos()
+    {
+        return $this->morphMany(EloquentTestPhoto::class, 'imageable');
+    }
+
+    public function postWithPhotos()
+    {
+        return $this->post()->join('photo', function ($join) {
+            $join->on('photo.imageable_id', 'post.id');
+            $join->where('photo.imageable_type', 'EloquentTestPost');
+        });
     }
 }

@@ -4,11 +4,19 @@ namespace Illuminate\Tests\Foundation\Testing;
 
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\Wormhole;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
 use PHPUnit\Framework\TestCase;
 
 class WormholeTest extends TestCase
 {
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        Carbon::setTestNow();
+    }
+
     public function testCanTravelBackToPresent()
     {
         // Preserve the timelines we want to compare the reality with...

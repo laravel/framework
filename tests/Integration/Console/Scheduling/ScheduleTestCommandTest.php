@@ -7,7 +7,7 @@ use Illuminate\Console\Command;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Scheduling\ScheduleTestCommand;
 use Illuminate\Support\Carbon;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 
 class ScheduleTestCommandTest extends TestCase
 {

@@ -4,11 +4,12 @@ namespace Illuminate\Tests\Integration\Http\Middleware;
 
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Http\Request;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 
 class VerifyCsrfTokenExceptTest extends TestCase
 {
     private $stub;
+
     private $request;
 
     protected function setUp(): void

@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Integration\Cache;
 
+use Illuminate\Tests\Integration\TestCase;
 use Memcached;
-use Orchestra\Testbench\TestCase;
 
 abstract class MemcachedIntegrationTestCase extends TestCase
 {

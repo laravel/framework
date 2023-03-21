@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Http\Middleware;
+namespace Illuminate\Tests\Integration\Http\Middleware;
 
 use Illuminate\Container\Container;
 use Illuminate\Foundation\Vite;
@@ -8,25 +8,12 @@ use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Facade;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 
 class VitePreloadingTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        Facade::setFacadeApplication(null);
-        Facade::clearResolvedInstances();
-    }
-
     public function testItDoesNotSetLinkTagWhenNoTagsHaveBeenPreloaded()
     {
-        $app = new Container();
-        $app->instance(Vite::class, new class extends Vite
-        {
-            protected $preloadedAssets = [];
-        });
-        Facade::setFacadeApplication($app);
-
         $response = (new AddLinkHeadersForPreloadedAssets)->handle(new Request, function () {
             return new Response('Hello Laravel');
         });
@@ -36,8 +23,7 @@ class VitePreloadingTest extends TestCase
 
     public function testItAddsPreloadLinkHeader()
     {
-        $app = new Container();
-        $app->instance(Vite::class, new class extends Vite
+        $this->app->instance(Vite::class, new class extends Vite
         {
             protected $preloadedAssets = [
                 'https://laravel.com/app.js' => [
@@ -46,7 +32,6 @@ class VitePreloadingTest extends TestCase
                 ],
             ];
         });
-        Facade::setFacadeApplication($app);
 
         $response = (new AddLinkHeadersForPreloadedAssets)->handle(new Request, function () {
             return new Response('Hello Laravel');

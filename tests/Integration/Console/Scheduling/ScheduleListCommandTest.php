@@ -7,7 +7,7 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Scheduling\ScheduleListCommand;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\ProcessUtils;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 
 class ScheduleListCommandTest extends TestCase
 {

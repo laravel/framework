@@ -4,8 +4,8 @@ namespace Illuminate\Tests\Integration\Http;
 
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Tests\Integration\TestCase;
 use JsonSerializable;
-use Orchestra\Testbench\TestCase;
 
 class ResponseTest extends TestCase
 {

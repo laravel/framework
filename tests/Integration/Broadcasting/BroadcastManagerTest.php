@@ -14,8 +14,8 @@ use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Tests\Integration\TestCase;
 use InvalidArgumentException;
-use Orchestra\Testbench\TestCase;
 
 class BroadcastManagerTest extends TestCase
 {

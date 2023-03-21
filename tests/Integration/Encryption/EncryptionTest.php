@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Integration\Encryption;
 
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Encryption\EncryptionServiceProvider;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 use RuntimeException;
 
 class EncryptionTest extends TestCase

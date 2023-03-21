@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 
 class InteractsWithAuthenticationTest extends TestCase
 {
@@ -80,6 +80,7 @@ class InteractsWithAuthenticationTest extends TestCase
 class AuthenticationTestUser extends Authenticatable
 {
     public $table = 'users';
+
     public $timestamps = false;
 
     /**

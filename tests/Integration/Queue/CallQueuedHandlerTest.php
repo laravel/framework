@@ -11,7 +11,7 @@ use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Event;
 use Mockery as m;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 
 class CallQueuedHandlerTest extends TestCase
 {

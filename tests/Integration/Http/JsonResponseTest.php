@@ -5,8 +5,8 @@ namespace Illuminate\Tests\Integration\Http;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Tests\Integration\TestCase;
 use JsonSerializable;
-use Orchestra\Testbench\TestCase;
 
 class JsonResponseTest extends TestCase
 {

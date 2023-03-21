@@ -6,7 +6,7 @@ use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Support\Facades\Facade;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 
 class AssertRedirectToSignedRouteTest extends TestCase
 {

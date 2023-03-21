@@ -9,7 +9,7 @@ use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Route;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 use Throwable;
 
 class ThrottleRequestsTest extends TestCase

@@ -9,7 +9,7 @@ use Illuminate\Foundation\Testing\Concerns\InteractsWithDeprecationHandling;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Facade;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 
 class RouteListCommandTest extends TestCase
 {

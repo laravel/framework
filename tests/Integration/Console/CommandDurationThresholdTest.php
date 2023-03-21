@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Integration\Console;
 use Carbon\CarbonInterval;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Carbon;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
 

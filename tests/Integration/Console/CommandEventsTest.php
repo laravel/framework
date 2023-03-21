@@ -10,7 +10,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Str;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 use Symfony\Component\Process\PhpExecutableFinder;
 
 class CommandEventsTest extends TestCase
@@ -59,7 +59,8 @@ class CommandEventsTest extends TestCase
     protected function tearDown(): void
     {
         $this->fs->delete($this->logfile);
-        $this->fs->delete(base_path('artisan'));
+        $this->fs->delete($path = base_path('artisan'));
+        $this->fs->delete("$path.lock");
 
         if (! is_null($this->originalArtisan)) {
             $this->fs->put(base_path('artisan'), $this->originalArtisan);
@@ -170,6 +171,12 @@ class CommandEventsTest extends TestCase
     protected function writeArtisanScript()
     {
         $path = base_path('artisan');
+
+        while ($this->fs->exists("$path.lock")) {
+            //
+        }
+
+        $this->fs->put("$path.lock", '');
 
         // Save existing artisan script if there is one
         if ($this->fs->exists($path)) {

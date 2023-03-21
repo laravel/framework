@@ -6,7 +6,7 @@ use Illuminate\Events\CallQueuedListener;
 use Illuminate\Events\InvokeQueuedClosure;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 
 class QueuedClosureListenerTest extends TestCase
 {

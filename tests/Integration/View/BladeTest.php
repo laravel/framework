@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Integration\View;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\View;
 use Illuminate\View\Component;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 
 class BladeTest extends TestCase
 {

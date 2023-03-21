@@ -58,7 +58,7 @@ class BroadcastedEventsTest extends TestCase
 
         $this->assertFalse($d->shouldBroadcast([$event]));
 
-        $event = new ExampleEvent;
+        $event = new RegularEvent;
 
         $this->assertFalse($d->shouldBroadcast([$event]));
     }
@@ -91,4 +91,9 @@ class BroadcastFalseCondition extends BroadcastEvent
     {
         return false;
     }
+}
+
+class RegularEvent
+{
+    //
 }

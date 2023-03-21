@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database\EloquentRelationshipsTest;
 
+use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -23,6 +24,19 @@ use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentRelationshipsTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        $db = new DB;
+
+        $db->addConnection([
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+        ]);
+
+        $db->bootEloquent();
+        $db->setAsGlobal();
+    }
+
     public function testStandardRelationships()
     {
         $post = new Post;
@@ -239,6 +253,13 @@ class DatabaseEloquentRelationshipsTest extends TestCase
         $this->assertSame('higher_projects.p_id', $higher->getQualifiedLocalKeyName());
         $this->assertSame('environments.pro_id', $higher->getQualifiedFirstKeyName());
         $this->assertSame('environments.pro_id', $fluent->getQualifiedFirstKeyName());
+    }
+
+    protected function tearDown(): void
+    {
+        Model::unsetConnectionResolver();
+
+        parent::tearDown();
     }
 }
 

@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Integration\Routing;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 
 class RouteViewTest extends TestCase
 {

@@ -9,7 +9,7 @@ use Illuminate\Database\Events\MigrationStarted;
 use Illuminate\Database\Events\NoPendingMigrations;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\Event;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 
 class MigratorEventsTest extends TestCase
 {

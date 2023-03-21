@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Integration\Cache;
 
 use Exception;
 use Illuminate\Support\Facades\Cache;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\TestCase;
 
 class FileCacheLockTest extends TestCase
 {
