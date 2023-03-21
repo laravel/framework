@@ -1029,6 +1029,7 @@ class Container implements ArrayAccess, ContainerContract
         if ($this->hasConfigRepository()) {
             foreach ($parameter->getAttributes(InjectedConfig::class) as $attribute) {
                 $injectedConfig = $attribute->newInstance();
+
                 return $this['config']->get($injectedConfig->key);
             }
         }
