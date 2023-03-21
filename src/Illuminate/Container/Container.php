@@ -1028,9 +1028,9 @@ class Container implements ArrayAccess, ContainerContract
 
         if ($this->hasConfigRepository()) {
             foreach ($parameter->getAttributes(InjectedConfig::class) as $attribute) {
-                if (count($attribute->getArguments()) >= 1) {
+                if (count($attribute->getArguments()) < 1) {
                     throw new \InvalidArgumentException(
-                        'ConfigValueWrapper attribute must have at least one argument'
+                        'InjectedConfig attribute must have at least one argument'
                     );
                 }
 
