@@ -85,7 +85,7 @@ trait MakesArtisanScript
     protected function buildArtisanScript($uuid, $slots = []): string
     {
         // If no array is passed, the default "preHandle" slot is assumed.
-        $slots = !is_array($slots) ? ['preHandle' => $slots] : $slots;
+        $slots = ! is_array($slots) ? ['preHandle' => $slots] : $slots;
 
         $thisFile = __FILE__;
 
