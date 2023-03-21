@@ -76,9 +76,7 @@ trait MakesArtisanScript
         $thisFile = __FILE__;
 
         $parts = array_merge([
-            'preKernel' => '',
-            'preHandle' => '',
-            'postHandle' => '',
+            'preBootstrap' => '', 'preKernel' => '', 'preHandle' => '', 'preTerminate' => '', 'preExit' => '',
         ], Arr::map($parts, fn ($part) => value($part, $uuid)));
 
         return <<<PHP
@@ -93,6 +91,8 @@ define('LARAVEL_START', microtime(true));
 
 require __DIR__.'/../../../autoload.php';
 
+{$parts['preBootstrap']}
+
 \$app = require_once __DIR__.'/bootstrap/app.php';
 
 {$parts['preKernel']}
@@ -106,9 +106,11 @@ require __DIR__.'/../../../autoload.php';
     new Symfony\Component\Console\Output\ConsoleOutput
 );
 
-{$parts['postHandle']}
+{$parts['preTerminate']}
 
 \$kernel->terminate(\$input, \$status);
+
+{$parts['preExit']}
 
 exit(\$status);
 
