@@ -47,9 +47,6 @@ class InjectedConfigTest extends TestCase
         $this->assertEquals(null, $testClass->fooNullableInt);
         $this->assertEquals(null, $testClass->fooNullableFloat);
         $this->assertEquals(null, $testClass->fooNullableArray);
-
-        $container->forgetInstance('config');
-        unset($container['config'], $container);
     }
 }
 
