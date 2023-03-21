@@ -65,16 +65,16 @@ class CommandSchedulingTest extends TestCase
     /**
      * @dataProvider executionProvider
      */
-    public function testExecutionOrder($background)
+    public function testExecutionOrder($background, $expected)
     {
         $event = $this->app->make(Schedule::class)
             ->command("test:{$this->id}")
             ->onOneServer()
             ->after(function () {
-                $this->fs->append($this->logfile, "after\n");
+                $this->fs->append($this->logfile, "foreground:after\n");
             })
             ->before(function () {
-                $this->fs->append($this->logfile, "before\n");
+                $this->fs->append($this->logfile, "foreground:before\n");
             });
 
         if ($background) {
@@ -89,17 +89,17 @@ class CommandSchedulingTest extends TestCase
         if ($background) {
             // Since our command is running in a separate process, we need to wait
             // until it has finished executing before running our assertions.
-            $this->waitForLogMessages('before', 'handled', 'after');
+            $this->waitForLogMessages(...$expected);
         }
 
-        $this->assertLogged('before', 'handled', 'after');
+        $this->assertLogged(...$expected);
     }
 
     public static function executionProvider()
     {
         return [
-            'Foreground' => [false],
-            'Background' => [true],
+            'Foreground' => [false, ['foreground:before', 'handled', 'foreground:after']],
+            'Background' => [true, ['foreground:before', 'handled', 'background:after']],
         ];
     }
 
@@ -184,11 +184,11 @@ Illuminate\Foundation\Application::getInstance()
             \$schedule->command("test:{$this->id}")
                 ->after(function() use (\$fs) {
                     \$logfile = {$logfile};
-                    \$fs->append(\$logfile, "after\\n");
+                    \$fs->append(\$logfile, "background:after\\n");
                 })
                 ->before(function() use (\$fs) {
                     \$logfile = {$logfile};
-                    \$fs->append(\$logfile, "before\\n");
+                    \$fs->append(\$logfile, "background:before\\n");
                 });
         });
     });
