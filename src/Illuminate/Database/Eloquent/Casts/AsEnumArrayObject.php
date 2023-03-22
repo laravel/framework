@@ -21,11 +21,8 @@ class AsEnumArrayObject implements Castable
     {
         return new class($arguments) implements CastsAttributes
         {
-            protected $arguments;
-
-            public function __construct(array $arguments)
+            public function __construct(protected array $arguments)
             {
-                $this->arguments = $arguments;
             }
 
             public function get($model, $key, $value, $attributes)
@@ -61,9 +58,9 @@ class AsEnumArrayObject implements Castable
                     $storable[] = $this->getStorableEnumValue($enum);
                 }
 
-                $encodingFlag = isset($this->arguments[1]) ? $this->arguments[1] : 0;
+                $flags = isset($this->arguments[1]) ? $this->arguments[1] : 0;
 
-                return [$key => json_encode($storable, $encodingFlag)];
+                return [$key => json_encode($storable, $flags)];
             }
 
             public function serialize($model, string $key, $value, array $attributes)

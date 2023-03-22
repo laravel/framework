@@ -18,11 +18,8 @@ class AsCollection implements Castable
     {
         return new class($arguments) implements CastsAttributes
         {
-            protected $arguments;
-
-            public function __construct(array $arguments)
+            public function __construct(protected array $arguments)
             {
-                $this->arguments = $arguments;
             }
 
             public function get($model, $key, $value, $attributes)
@@ -38,9 +35,9 @@ class AsCollection implements Castable
 
             public function set($model, $key, $value, $attributes)
             {
-                $encodingFlag = isset($this->arguments[0]) ? $this->arguments[0] : 0;
+                $flags = isset($this->arguments[0]) ? $this->arguments[0] : 0;
 
-                return [$key => json_encode($value, $encodingFlag)];
+                return [$key => json_encode($value, $flags)];
             }
         };
     }

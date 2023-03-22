@@ -21,11 +21,8 @@ class AsEnumCollection implements Castable
     {
         return new class($arguments) implements CastsAttributes
         {
-            protected $arguments;
-
-            public function __construct(array $arguments)
+            public function __construct(protected array $arguments)
             {
-                $this->arguments = $arguments;
             }
 
             public function get($model, $key, $value, $attributes)
@@ -51,12 +48,12 @@ class AsEnumCollection implements Castable
 
             public function set($model, $key, $value, $attributes)
             {
-                $encodingFlag = isset($this->arguments[1]) ? $this->arguments[1] : 0;
+                $flags = isset($this->arguments[1]) ? $this->arguments[1] : 0;
 
                 $value = $value !== null
                     ? (new Collection($value))->map(function ($enum) {
                         return $this->getStorableEnumValue($enum);
-                    })->toJson($encodingFlag)
+                    })->toJson($flags)
                     : null;
 
                 return [$key => $value];
@@ -64,11 +61,11 @@ class AsEnumCollection implements Castable
 
             public function serialize($model, string $key, $value, array $attributes)
             {
-                $encodingFlag = isset($this->arguments[1]) ? $this->arguments[1] : 0;
+                $flags = isset($this->arguments[1]) ? $this->arguments[1] : 0;
 
                 return (new Collection($value))->map(function ($enum) {
                     return $this->getStorableEnumValue($enum);
-                })->toArray($encodingFlag);
+                })->toArray($flags);
             }
 
             protected function getStorableEnumValue($enum)
