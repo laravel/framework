@@ -263,6 +263,22 @@ class FilesystemAdapter implements CloudFilesystemContract
     }
 
     /**
+     * Get the contents of a file as decoded JSON.
+     *
+     * @param  string  $path
+     * @return array|null
+     */
+    public function json($path)
+    {
+        $content = $this->get($path);
+        if ($content === null) {
+            return null;
+        }
+
+        return json_decode($content, true);
+    }
+
+    /**
      * Create a streamed response for a given file.
      *
      * @param  string  $path
