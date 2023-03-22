@@ -257,7 +257,10 @@ class Connection implements ConnectionInterface
      */
     protected function getDefaultQueryGrammar()
     {
-        return new QueryGrammar;
+        $grammar = new QueryGrammar();
+        $grammar->setConnection($this);
+
+        return $grammar;
     }
 
     /**

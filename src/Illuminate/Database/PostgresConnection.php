@@ -19,7 +19,10 @@ class PostgresConnection extends Connection
      */
     protected function getDefaultQueryGrammar()
     {
-        return $this->withTablePrefix(new QueryGrammar);
+        $grammar = new QueryGrammar();
+        $grammar->setConnection($this);
+
+        return $this->withTablePrefix($grammar);
     }
 
     /**
@@ -43,7 +46,10 @@ class PostgresConnection extends Connection
      */
     protected function getDefaultSchemaGrammar()
     {
-        return $this->withTablePrefix(new SchemaGrammar);
+        $grammar = new SchemaGrammar();
+        $grammar->setConnection($this);
+
+        return $this->withTablePrefix($grammar);
     }
 
     /**
