@@ -1,0 +1,52 @@
+<?php
+
+namespace Illuminate\Database\Eloquent\Casts;
+
+class Json
+{
+    /**
+     * The custom JSON encoder.
+     *
+     * @var callable|null
+     */
+    protected $encoder;
+
+    /**
+     * The custom JSON decode.
+     *
+     * @var callable|null
+     */
+    protected $decoder;
+
+    /**
+     * Encode the given value.
+     */
+    public static function encode(mixed $value): mixed
+    {
+        return isset(static::$encoder) ? (static::$encoder)($value) : json_encode($value);
+    }
+
+    /**
+     * Decode the given value.
+     */
+    public static function decode(mixed $value): mixed
+    {
+        return isset(static::$decoder) ? (static::$decoder)($value) : json_decode($value, true);
+    }
+
+    /**
+     * Encode all values using the given callable.
+     */
+    public static function encodeUsing(?callable $encoder): void
+    {
+        static::$encoder = $encoder;
+    }
+
+    /**
+     * Decode all values using the given callable.
+     */
+    public static function decodeUsing(?callable $decoder): void
+    {
+        static::$decoder = $decoder;
+    }
+}
