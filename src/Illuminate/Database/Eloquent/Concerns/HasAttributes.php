@@ -729,7 +729,7 @@ trait HasAttributes
     {
         $castType = $this->getCastType($key);
 
-        if (is_null($value) && in_array($castType, static::$primitiveCastTypes)) {
+        if (is_null($value) && $this->isPrimitiveCast($key)) {
             return $value;
         }
 
@@ -1540,7 +1540,13 @@ trait HasAttributes
      */
     protected function isEncryptedCastable($key)
     {
-        return $this->hasCast($key, ['encrypted', 'encrypted:array', 'encrypted:collection', 'encrypted:json', 'encrypted:object']);
+        if (array_key_exists($key, $this->getCasts())) {
+            $castType = $this->getCastType($key);
+
+            return str_starts_with("{$castType}:", 'encrypted:');
+        }
+
+        return false;
     }
 
     /**
@@ -1561,7 +1567,7 @@ trait HasAttributes
 
         $castType = $this->parseCasterClass($casts[$key]);
 
-        if (in_array($castType, static::$primitiveCastTypes)) {
+        if ($this->isPrimitiveCast($key)) {
             return false;
         }
 
@@ -1588,7 +1594,7 @@ trait HasAttributes
 
         $castType = $casts[$key];
 
-        if (in_array($castType, static::$primitiveCastTypes)) {
+        if ($this->isPrimitiveCast($key)) {
             return false;
         }
 
@@ -2037,7 +2043,7 @@ trait HasAttributes
             }
 
             return abs($this->castAttribute($key, $attribute) - $this->castAttribute($key, $original)) < PHP_FLOAT_EPSILON * 4;
-        } elseif ($this->hasCast($key, static::$primitiveCastTypes)) {
+        } elseif ($this->isPrimitiveCast($key)) {
             return $this->castAttribute($key, $attribute) ===
                 $this->castAttribute($key, $original);
         } elseif ($this->isClassCastable($key) && in_array($this->getCasts()[$key], [AsArrayObject::class, AsCollection::class])) {
@@ -2211,5 +2217,22 @@ trait HasAttributes
 
             return false;
         })->map->name->values()->all();
+    }
+
+    /**
+     * Return whether the cast key is of a primitive type.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    protected function isPrimitiveCast($key)
+    {
+        if (array_key_exists($key, $this->getCasts())) {
+            $castType = $this->getCastType($key);
+
+            return in_array($castType, static::$primitiveCastTypes) || $this->isEncryptedCastable($key);
+        }
+
+        return false;
     }
 }
