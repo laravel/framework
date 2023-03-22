@@ -29,9 +29,11 @@ class Json
     /**
      * Decode the given value.
      */
-    public static function decode(mixed $value): mixed
+    public static function decode(mixed $value, ?bool $associative = true): mixed
     {
-        return isset(static::$decoder) ? (static::$decoder)($value) : json_decode($value, true);
+        return isset(static::$decoder)
+                ? (static::$decoder)($value, $associative)
+                : json_decode($value, $associative);
     }
 
     /**
