@@ -51,7 +51,7 @@ trait InteractsWithRedis
                 'default' => [
                     'host' => $host,
                     'port' => $port,
-                    'database' => 5,
+                    'database' => 5 + intval(getenv('TEST_TOKEN')),
                     'timeout' => 0.5,
                     'name' => 'default',
                 ],
