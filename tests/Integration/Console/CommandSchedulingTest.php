@@ -134,7 +134,7 @@ class CommandSchedulingTest extends TestCase
         $path = base_path('artisan');
 
         while ($this->fs->exists("$path.lock")) {
-            //
+            usleep(100 * 1000);
         }
 
         $this->fs->put("$path.lock", '');
