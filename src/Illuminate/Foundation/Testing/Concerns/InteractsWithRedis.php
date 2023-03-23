@@ -46,7 +46,7 @@ trait InteractsWithRedis
             $this->redis[$driver[0]] = new RedisManager($app, $driver[0], [
                 'cluster' => false,
                 'options' => [
-                    'prefix' => 'test',
+                    'prefix' => 'test_',
                 ],
                 'default' => [
                     'host' => $host,
