@@ -6,6 +6,7 @@ use Exception;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response as Psr7Response;
+use GuzzleHttp\TransferStats;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Client\Events\RequestSending;
@@ -20,6 +21,7 @@ use Illuminate\Http\Client\ResponseSequence;
 use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Str;
 use JsonSerializable;
@@ -2178,5 +2180,24 @@ class HttpClientTest extends TestCase
         $this->factory->assertSent(function (Request $request) {
             return $request->url() === 'https://laravel.com/docs/9.x/validation';
         });
+    }
+
+    public function testTheTransferStatsAreCustomable()
+    {
+        Log::shouldReceive()
+            ->info('closure_stats')
+            ->once();
+
+        $stats = $this->factory
+            ->withOptions([
+                'on_stats' => function (TransferStats $stats) {
+                    Log::info('closure_stats');
+                },
+            ])
+            ->get('https://example.com')
+            ->handlerStats();
+
+        $this->assertIsArray($stats);
+        $this->assertNotEmpty($stats);
     }
 }

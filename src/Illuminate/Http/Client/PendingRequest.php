@@ -2,6 +2,7 @@
 
 namespace Illuminate\Http\Client;
 
+use Closure;
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
@@ -958,11 +959,20 @@ class PendingRequest
 
         $laravelData = $this->parseRequestData($method, $url, $options);
 
+        $onStats = function ($transferStats) {
+            $this->transferStats = $transferStats;
+        };
+
+        if (data_get($this->options, 'on_stats') instanceof Closure) {
+            $onStats = function ($transferStats) use ($onStats) {
+                $onStats($transferStats);
+                call_user_func($this->options['on_stats'], $transferStats);
+            };
+        }
+
         return $this->buildClient()->$clientMethod($method, $url, $this->mergeOptions([
             'laravel_data' => $laravelData,
-            'on_stats' => function ($transferStats) {
-                $this->transferStats = $transferStats;
-            },
+            'on_stats' => $onStats,
         ], $options));
     }
 
