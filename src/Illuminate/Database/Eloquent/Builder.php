@@ -1148,7 +1148,7 @@ class Builder implements BuilderContract
         foreach ($this->model->uniqueIds() as $uniqueIdAttribute) {
             foreach ($values as &$row) {
                 if (! array_key_exists($uniqueIdAttribute, $row)) {
-                    $row = array_merge([$uniqueIdAttribute => $this->model->newUniqueId()], $row);
+                    $row = array_merge([$uniqueIdAttribute => $this->model->newUniqueId($uniqueIdAttribute)], $row);
                 }
             }
         }

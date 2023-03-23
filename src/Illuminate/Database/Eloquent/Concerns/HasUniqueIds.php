@@ -30,7 +30,7 @@ trait HasUniqueIds
     {
         foreach ($this->uniqueIds() as $column) {
             if (empty($this->{$column})) {
-                $this->{$column} = $this->newUniqueId();
+                $this->{$column} = $this->newUniqueId($column);
             }
         }
     }
@@ -40,7 +40,7 @@ trait HasUniqueIds
      *
      * @return string
      */
-    public function newUniqueId()
+    public function newUniqueId(string $column)
     {
         return null;
     }

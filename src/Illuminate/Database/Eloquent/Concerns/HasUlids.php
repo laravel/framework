@@ -32,7 +32,7 @@ trait HasUlids
      *
      * @return string
      */
-    public function newUniqueId()
+    public function newUniqueId(string $column)
     {
         return strtolower((string) Str::ulid());
     }
