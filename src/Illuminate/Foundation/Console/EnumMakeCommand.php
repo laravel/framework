@@ -89,6 +89,7 @@ class EnumMakeCommand extends GeneratorCommand
     {
         return [
             ['int', 'i', InputOption::VALUE_NONE, 'Create a integer backed enum'],
+            ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the enum already exists'],
         ];
     }
 }
