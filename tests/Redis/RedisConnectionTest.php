@@ -56,7 +56,7 @@ class RedisConnectionTest extends TestCase
             $this->assertNotEquals(-1, $redis->ttl('three'));
             $this->assertNotEquals(-1, $redis->pttl('three'));
 
-            $redis->flushall();
+            $redis->flushdb();
         }
     }
 
@@ -76,7 +76,7 @@ class RedisConnectionTest extends TestCase
             $this->assertNull($redis->get('two'));
             $this->assertNull($redis->get('three'));
 
-            $redis->flushall();
+            $redis->flushdb();
         }
     }
 
@@ -91,7 +91,7 @@ class RedisConnectionTest extends TestCase
             $this->assertEquals(2, $redis->exists('one', 'two'));
             $this->assertEquals(2, $redis->exists('one', 'two', 'nothing'));
 
-            $redis->flushall();
+            $redis->flushdb();
         }
     }
 
@@ -112,7 +112,7 @@ class RedisConnectionTest extends TestCase
 
             $this->assertEquals(0, $redis->pexpire('nothing', 10));
 
-            $redis->flushall();
+            $redis->flushdb();
         }
     }
 
@@ -134,7 +134,7 @@ class RedisConnectionTest extends TestCase
             $this->assertSame('mohamed', $redis->get('four'));
             $this->assertSame('adam', $redis->get('three'));
 
-            $redis->flushall();
+            $redis->flushdb();
         }
     }
 
@@ -165,7 +165,7 @@ class RedisConnectionTest extends TestCase
             $redis->zadd('set', ['mohamed' => 100]);
             $this->assertEquals(100, $redis->zscore('set', 'mohamed'));
 
-            $redis->flushall();
+            $redis->flushdb();
         }
     }
 
@@ -178,7 +178,7 @@ class RedisConnectionTest extends TestCase
             $this->assertEquals(2, $redis->zcount('set', '-inf', '+inf'));
             $this->assertEquals(2, $redis->zcard('set'));
 
-            $redis->flushall();
+            $redis->flushdb();
         }
     }
 
@@ -189,7 +189,7 @@ class RedisConnectionTest extends TestCase
             $redis->zincrby('set', 2, 'jeffrey');
             $this->assertEquals(3, $redis->zscore('set', 'jeffrey'));
 
-            $redis->flushall();
+            $redis->flushdb();
         }
     }
 
@@ -204,7 +204,7 @@ class RedisConnectionTest extends TestCase
             $this->assertSame(1, $redis->setnx('boss', 'taylor'));
             $this->assertSame('taylor', $redis->get('boss'));
 
-            $redis->flushall();
+            $redis->flushdb();
         }
     }
 
@@ -219,7 +219,7 @@ class RedisConnectionTest extends TestCase
             $this->assertSame(1, $redis->hsetnx('person', 'boss', 'taylor'));
             $this->assertSame('taylor', $redis->hget('person', 'boss'));
 
-            $redis->flushall();
+            $redis->flushdb();
         }
     }
 
@@ -248,7 +248,7 @@ class RedisConnectionTest extends TestCase
             $this->assertEquals(3, $redis->zscore('output3', 'jeffrey'));
             $this->assertEquals(6, $redis->zscore('output3', 'matt'));
 
-            $redis->flushall();
+            $redis->flushdb();
         }
     }
 
@@ -280,7 +280,7 @@ class RedisConnectionTest extends TestCase
             $this->assertEquals(6, $redis->zscore('output3', 'matt'));
             $this->assertEquals(9, $redis->zscore('output3', 'taylor'));
 
-            $redis->flushall();
+            $redis->flushdb();
         }
     }
 
@@ -297,7 +297,7 @@ class RedisConnectionTest extends TestCase
                 $this->assertEquals(['jeffrey' => 1, 'matt' => 5], $redis->zrange('set', 0, 1, true));
             }
 
-            $redis->flushall();
+            $redis->flushdb();
         }
     }
 
@@ -314,7 +314,7 @@ class RedisConnectionTest extends TestCase
                 $this->assertEquals(['matt' => 5, 'taylor' => 10], $redis->ZREVRANGE('set', 0, 1, true));
             }
 
-            $redis->flushall();
+            $redis->flushdb();
         }
     }
 
@@ -335,7 +335,7 @@ class RedisConnectionTest extends TestCase
                 'limit' => [1, 2],
             ]));
 
-            $redis->flushall();
+            $redis->flushdb();
         }
     }
 
@@ -356,7 +356,7 @@ class RedisConnectionTest extends TestCase
                 'limit' => [1, 2],
             ]));
 
-            $redis->flushall();
+            $redis->flushdb();
         }
     }
 
@@ -368,7 +368,7 @@ class RedisConnectionTest extends TestCase
             $this->assertEquals(0, $redis->zrank('set', 'jeffrey'));
             $this->assertEquals(2, $redis->zrank('set', 'taylor'));
 
-            $redis->flushall();
+            $redis->flushdb();
         }
     }
 
@@ -380,7 +380,7 @@ class RedisConnectionTest extends TestCase
             $this->assertEquals(1, $redis->zscore('set', 'jeffrey'));
             $this->assertEquals(10, $redis->zscore('set', 'taylor'));
 
-            $redis->flushall();
+            $redis->flushdb();
         }
     }
 
@@ -395,7 +395,7 @@ class RedisConnectionTest extends TestCase
             $redis->zrem('set', 'matt', 'adam');
             $this->assertEquals(1, $redis->zcard('set'));
 
-            $redis->flushall();
+            $redis->flushdb();
         }
     }
 
@@ -406,7 +406,7 @@ class RedisConnectionTest extends TestCase
             $redis->ZREMRANGEBYSCORE('set', 5, '+inf');
             $this->assertEquals(1, $redis->zcard('set'));
 
-            $redis->flushall();
+            $redis->flushdb();
         }
     }
 
@@ -417,7 +417,7 @@ class RedisConnectionTest extends TestCase
             $redis->ZREMRANGEBYRANK('set', 1, -1);
             $this->assertEquals(1, $redis->zcard('set'));
 
-            $redis->flushall();
+            $redis->flushdb();
         }
     }
 
@@ -430,7 +430,7 @@ class RedisConnectionTest extends TestCase
             $redis->hmset('hash2', 'name', 'mohamed', 'hobby', 'diving');
             $this->assertEquals(['name' => 'mohamed', 'hobby' => 'diving'], $redis->hgetall('hash2'));
 
-            $redis->flushall();
+            $redis->flushdb();
         }
     }
 
@@ -447,7 +447,7 @@ class RedisConnectionTest extends TestCase
                 $redis->hmget('hash', ['name', 'hobby'])
             );
 
-            $redis->flushall();
+            $redis->flushdb();
         }
     }
 
@@ -463,7 +463,7 @@ class RedisConnectionTest extends TestCase
                 $redis->mget(array_keys($valueSet))
             );
 
-            $redis->flushall();
+            $redis->flushdb();
         }
     }
 
@@ -501,7 +501,7 @@ class RedisConnectionTest extends TestCase
 
             $this->assertSame('mohamed', $redis->get('name'));
 
-            $redis->flushall();
+            $redis->flushdb();
         }
     }
 
@@ -519,7 +519,7 @@ class RedisConnectionTest extends TestCase
             $this->assertEquals(1, $result[1]);
             $this->assertEquals(2, $result[3]);
 
-            $redis->flushall();
+            $redis->flushdb();
         }
     }
 
@@ -537,7 +537,7 @@ class RedisConnectionTest extends TestCase
             $this->assertEquals(1, $result[1]);
             $this->assertEquals(2, $result[3]);
 
-            $redis->flushall();
+            $redis->flushdb();
         }
     }
 
@@ -550,7 +550,7 @@ class RedisConnectionTest extends TestCase
                 1, $redis->executeRaw(['GET', 'test:raw:1'])
             );
 
-            $redis->flushall();
+            $redis->flushdb();
         }
     }
 
@@ -610,7 +610,7 @@ class RedisConnectionTest extends TestCase
                 }
             } while ($iterator > 0);
 
-            $redis->flushAll();
+            $redis->flushdb();
         }
     }
 
@@ -651,7 +651,7 @@ class RedisConnectionTest extends TestCase
             [$iterator, $returned] = $redis->zscan('set', $iterator, ['count' => 5]);
             $this->assertCount(2, $returned);
 
-            $redis->flushAll();
+            $redis->flushdb();
         }
     }
 
@@ -688,7 +688,7 @@ class RedisConnectionTest extends TestCase
             [$iterator, $returned] = $redis->hscan('hash', $iterator, ['count' => 5]);
             $this->assertCount(2, $returned);
 
-            $redis->flushAll();
+            $redis->flushdb();
         }
     }
 
@@ -723,7 +723,7 @@ class RedisConnectionTest extends TestCase
             [$iterator, $returned] = $redis->sscan('set', $iterator, ['count' => 5]);
             $this->assertCount(2, $returned);
 
-            $redis->flushAll();
+            $redis->flushdb();
         }
     }
 
@@ -750,7 +750,7 @@ class RedisConnectionTest extends TestCase
             $this->assertIsArray($result);
             $this->assertCount(2, $result);
 
-            $redis->flushAll();
+            $redis->flushdb();
         }
     }
 
