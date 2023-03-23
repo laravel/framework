@@ -9,14 +9,14 @@ class Json
      *
      * @var callable|null
      */
-    protected $encoder;
+    protected static $encoder;
 
     /**
      * The custom JSON decode.
      *
      * @var callable|null
      */
-    protected $decoder;
+    protected static $decoder;
 
     /**
      * Encode the given value.
