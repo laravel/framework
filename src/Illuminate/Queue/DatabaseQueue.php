@@ -114,7 +114,7 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
     /**
      * Push a new job onto the queue after (n) seconds.
      *
-     * @param  \DateTimeInterface|\DateInterval|int|null  $delay
+     * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  string  $job
      * @param  mixed  $data
      * @param  string|null  $queue
