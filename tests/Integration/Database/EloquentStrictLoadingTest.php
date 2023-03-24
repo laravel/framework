@@ -26,7 +26,6 @@ class EloquentStrictLoadingTest extends DatabaseTestCase
         $this->tearDown();
     }
 
-
     protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
         Schema::create('test_model1', function (Blueprint $table) {

@@ -35,6 +35,7 @@ class RouteListCommandTest extends TestCase
             return 70;
         });
     }
+
     public function testDisplayRoutesForCliInVerboseMode()
     {
         $this->router->get('closure', function () {
