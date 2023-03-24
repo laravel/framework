@@ -328,7 +328,7 @@ abstract class Queue
     protected function shouldDispatchAfterCommit($job)
     {
         $afterCommit = data_get($job, 'afterCommit');
-        if (!is_null($afterCommit)) {
+        if (! is_null($afterCommit)) {
             return $afterCommit;
         }
 
