@@ -80,13 +80,17 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
     /**
      * Push a new job onto the queue.
      *
-     * @param  string  $job
+     * @param  object|string  $job
      * @param  mixed  $data
      * @param  string|null  $queue
      * @return mixed
      */
     public function push($job, $data = '', $queue = null)
     {
+        if ($job->delay ?? null) {
+            return $this->later($job->delay, $job, $data, $queue);
+        }
+
         return $this->enqueueUsing(
             $job,
             $this->createPayload($job, $this->getQueue($queue), $data),
@@ -118,7 +122,7 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
      * @param  string  $job
      * @param  mixed  $data
      * @param  string|null  $queue
-     * @return void
+     * @return mixed
      */
     public function later($delay, $job, $data = '', $queue = null)
     {

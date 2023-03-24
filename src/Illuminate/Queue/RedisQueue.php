@@ -131,6 +131,10 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function push($job, $data = '', $queue = null)
     {
+        if ($job->delay ?? null) {
+            return $this->later($job->delay, $job, $data, $queue);
+        }
+
         return $this->enqueueUsing(
             $job,
             $this->createPayload($job, $this->getQueue($queue), $data),
