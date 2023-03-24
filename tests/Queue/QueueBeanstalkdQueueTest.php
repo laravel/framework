@@ -25,6 +25,8 @@ class QueueBeanstalkdQueueTest extends TestCase
 
     protected function tearDown(): void
     {
+        Str::createUuidsNormally();
+
         m::close();
     }
 
