@@ -74,6 +74,7 @@ class AssertRedirectToRouteTest extends TestCase
     {
         parent::tearDown();
 
+        Facade::clearResolvedInstances();
         Facade::setFacadeApplication(null);
     }
 }
