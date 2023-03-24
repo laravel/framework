@@ -63,15 +63,17 @@ class Filesystem
      * Get the contents of a file as decoded JSON.
      *
      * @param  string  $path
-     * @param  int  $flags
      * @param  bool  $lock
+     * @param  ?bool  $associative
+     * @param  int  $depth
+     * @param  int  $flags
      * @return array
      *
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
-    public function json($path, $flags = 0, $lock = false)
+    public function json($path, $lock = false, $associative = null, $depth = 512, $flags = 0)
     {
-        return json_decode($this->get($path, $lock), true, 512, $flags);
+        return json_decode($this->get($path, $lock), $associative, $depth, $flags);
     }
 
     /**
