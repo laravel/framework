@@ -13,7 +13,13 @@ class HasMany extends HasOneOrMany
      */
     public function one()
     {
-        return new HasOne($this->getQuery(), $this->parent, $this->foreignKey, $this->localKey);
+        return HasOne::noConstraints(fn() => new HasOne(
+            $this->getQuery(),
+            $this->parent,
+            $this->foreignKey,
+            $this->localKey
+        ));
+
     }
 
     /**
