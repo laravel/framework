@@ -2,8 +2,6 @@
 
 namespace Illuminate\Foundation\Testing\Traits;
 
-use Illuminate\Support\Facades\File;
-
 trait CanConfigureMigrationCommands
 {
     /**
@@ -85,12 +83,12 @@ trait CanConfigureMigrationCommands
         }
 
         // check if the path is simply the filename of the schema
-        if (file_exists($schemaPathWithinDatabaseMigrationsPath = database_path('schema/' . $schemaPath))) {
+        if (file_exists($schemaPathWithinDatabaseMigrationsPath = database_path('schema/'.$schemaPath))) {
             return $schemaPathWithinDatabaseMigrationsPath;
         }
 
         // check if the path provided is relative to the root database path
-        if (file_exists(($schemaPathWithinDatabasePath = database_path($schemaPath)))) {
+        if (file_exists($schemaPathWithinDatabasePath = database_path($schemaPath))) {
             return $schemaPathWithinDatabasePath;
         }
 
