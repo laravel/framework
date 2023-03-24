@@ -116,7 +116,7 @@ trait InteractsWithRedis
     }
 
     /**
-     * Get a redis database that is safe for parallel testing.
+     * Get a Redis database that is safe for use during parallel testing.
      *
      * @return int
      */
