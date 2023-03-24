@@ -2199,4 +2199,21 @@ class HttpClientTest extends TestCase
         $this->assertNotEmpty($stats);
         $this->assertTrue($onStatsFunctionCalled);
     }
+
+    public function testTheTransferStatsAreCustomizableOnFake(): void
+    {
+        $onStatsFunctionCalled = false;
+
+        $this->factory
+            ->fake()
+            ->withOptions([
+                'on_stats' => function (TransferStats $stats) use (&$onStatsFunctionCalled) {
+                    $onStatsFunctionCalled = true;
+                },
+            ])
+            ->get('https://foo.bar')
+            ->handlerStats();
+
+        $this->assertTrue($onStatsFunctionCalled);
+    }
 }
