@@ -13,7 +13,7 @@ class MorphMany extends MorphOneOrMany
      */
     public function one()
     {
-        return MorphMany::noConstraints(fn () => new MorphOne(
+        return MorphOne::noConstraints(fn () => new MorphOne(
             $this->getQuery(),
             $this->getParent(),
             $this->morphType,
