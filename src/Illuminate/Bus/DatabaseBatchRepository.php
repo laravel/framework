@@ -141,7 +141,7 @@ class DatabaseBatchRepository implements PrunableBatchRepository
             return [
                 'pending_jobs' => $batch->pending_jobs - 1,
                 'failed_jobs' => $batch->failed_jobs,
-                'failed_job_ids' => json_encode(array_values(array_diff(json_decode($batch->failed_job_ids, true), [$jobId]))),
+                'failed_job_ids' => json_encode(array_values(array_diff((array) json_decode($batch->failed_job_ids, true), [$jobId]))),
             ];
         });
 
@@ -164,7 +164,7 @@ class DatabaseBatchRepository implements PrunableBatchRepository
             return [
                 'pending_jobs' => $batch->pending_jobs,
                 'failed_jobs' => $batch->failed_jobs + 1,
-                'failed_job_ids' => json_encode(array_values(array_unique(array_merge(json_decode($batch->failed_job_ids, true), [$jobId])))),
+                'failed_job_ids' => json_encode(array_values(array_unique(array_merge((array) json_decode($batch->failed_job_ids, true), [$jobId])))),
             ];
         });
 
