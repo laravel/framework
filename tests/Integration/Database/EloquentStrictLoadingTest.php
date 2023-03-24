@@ -23,7 +23,7 @@ class EloquentStrictLoadingTest extends DatabaseTestCase
     {
         Model::preventLazyLoading(false);
 
-        $this->tearDown();
+        parent::tearDown();
     }
 
     protected function defineDatabaseMigrationsAfterDatabaseRefreshed()

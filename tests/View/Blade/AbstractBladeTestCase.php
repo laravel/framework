@@ -4,6 +4,7 @@ namespace Illuminate\Tests\View\Blade;
 
 use Illuminate\Container\Container;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Str;
 use Illuminate\View\Compilers\BladeCompiler;
 use Illuminate\View\Component;
 use Mockery as m;
@@ -29,6 +30,8 @@ abstract class AbstractBladeTestCase extends TestCase
         Component::flushCache();
         Component::forgetComponentsResolver();
         Component::forgetFactory();
+
+        Str::createUuidsNormally();
 
         m::close();
 

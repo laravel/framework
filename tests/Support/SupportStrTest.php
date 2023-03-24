@@ -12,9 +12,9 @@ class SupportStrTest extends TestCase
 {
     public function tearDown(): void
     {
-        parent::tearDown();
-
         Str::createUuidsNormally();
+
+        parent::tearDown();
     }
 
     public function testStringCanBeLimitedByWords()
