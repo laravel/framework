@@ -24,12 +24,20 @@ class ThrottleRequestsWithRedisTest extends TestCase
         $app['config']->set('hashing', ['driver' => 'bcrypt']);
     }
 
-    public function testLockOpensImmediatelyAfterDecay()
+    /**
+     * @dataProvider redisDriverProvider
+     */
+    public function testLockOpensImmediatelyAfterDecay($driver)
     {
-        $this->ifRedisAvailable(function () {
+        $this->ifRedisAvailable(function () use ($driver) {
             $now = Carbon::now();
 
             Carbon::setTestNow($now);
+
+            $this->swap(
+                \Illuminate\Contracts\Redis\Factory::class,
+                $this->redis[$driver]
+            );
 
             Route::get('/', function () {
                 return 'yes';

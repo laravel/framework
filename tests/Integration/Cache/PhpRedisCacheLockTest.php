@@ -28,6 +28,7 @@ class PhpRedisCacheLockTest extends TestCase
     public function testRedisLockCanBeAcquiredAndReleasedWithoutSerializationAndCompression()
     {
         $this->app['config']->set('database.redis.client', 'phpredis');
+        $this->app['config']->set('database.redis.default.database', 5 + intval(getenv('TEST_TOKEN')));
         $this->app['config']->set('cache.stores.redis.connection', 'default');
         $this->app['config']->set('cache.stores.redis.lock_connection', 'default');
 
@@ -49,6 +50,7 @@ class PhpRedisCacheLockTest extends TestCase
     public function testRedisLockCanBeAcquiredAndReleasedWithPhpSerialization()
     {
         $this->app['config']->set('database.redis.client', 'phpredis');
+        $this->app['config']->set('database.redis.default.database', 5 + intval(getenv('TEST_TOKEN')));
         $this->app['config']->set('cache.stores.redis.connection', 'default');
         $this->app['config']->set('cache.stores.redis.lock_connection', 'default');
 
@@ -70,6 +72,7 @@ class PhpRedisCacheLockTest extends TestCase
     public function testRedisLockCanBeAcquiredAndReleasedWithJsonSerialization()
     {
         $this->app['config']->set('database.redis.client', 'phpredis');
+        $this->app['config']->set('database.redis.default.database', 5 + intval(getenv('TEST_TOKEN')));
         $this->app['config']->set('cache.stores.redis.connection', 'default');
         $this->app['config']->set('cache.stores.redis.lock_connection', 'default');
 
@@ -95,6 +98,7 @@ class PhpRedisCacheLockTest extends TestCase
         }
 
         $this->app['config']->set('database.redis.client', 'phpredis');
+        $this->app['config']->set('database.redis.default.database', 5 + intval(getenv('TEST_TOKEN')));
         $this->app['config']->set('cache.stores.redis.connection', 'default');
         $this->app['config']->set('cache.stores.redis.lock_connection', 'default');
 
@@ -120,6 +124,7 @@ class PhpRedisCacheLockTest extends TestCase
         }
 
         $this->app['config']->set('database.redis.client', 'phpredis');
+        $this->app['config']->set('database.redis.default.database', 5 + intval(getenv('TEST_TOKEN')));
         $this->app['config']->set('cache.stores.redis.connection', 'default');
         $this->app['config']->set('cache.stores.redis.lock_connection', 'default');
 
@@ -148,6 +153,7 @@ class PhpRedisCacheLockTest extends TestCase
         }
 
         $this->app['config']->set('database.redis.client', 'phpredis');
+        $this->app['config']->set('database.redis.default.database', 5 + intval(getenv('TEST_TOKEN')));
         $this->app['config']->set('cache.stores.redis.connection', 'default');
         $this->app['config']->set('cache.stores.redis.lock_connection', 'default');
 
@@ -177,6 +183,7 @@ class PhpRedisCacheLockTest extends TestCase
         }
 
         $this->app['config']->set('database.redis.client', 'phpredis');
+        $this->app['config']->set('database.redis.default.database', 5 + intval(getenv('TEST_TOKEN')));
         $this->app['config']->set('cache.stores.redis.connection', 'default');
         $this->app['config']->set('cache.stores.redis.lock_connection', 'default');
 
@@ -225,6 +232,7 @@ class PhpRedisCacheLockTest extends TestCase
         }
 
         $this->app['config']->set('database.redis.client', 'phpredis');
+        $this->app['config']->set('database.redis.default.database', 5 + intval(getenv('TEST_TOKEN')));
         $this->app['config']->set('cache.stores.redis.connection', 'default');
         $this->app['config']->set('cache.stores.redis.lock_connection', 'default');
 
@@ -273,6 +281,7 @@ class PhpRedisCacheLockTest extends TestCase
         }
 
         $this->app['config']->set('database.redis.client', 'phpredis');
+        $this->app['config']->set('database.redis.default.database', 5 + intval(getenv('TEST_TOKEN')));
         $this->app['config']->set('cache.stores.redis.connection', 'default');
         $this->app['config']->set('cache.stores.redis.lock_connection', 'default');
 
