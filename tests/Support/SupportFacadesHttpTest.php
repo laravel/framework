@@ -14,6 +14,8 @@ class SupportFacadesHttpTest extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->app = new Container;
         Facade::setFacadeApplication($this->app);
     }
@@ -22,6 +24,8 @@ class SupportFacadesHttpTest extends TestCase
     {
         Facade::clearResolvedInstances();
         Facade::setFacadeApplication(null);
+
+        parent::tearDown();
     }
 
     public function testFacadeRootIsNotSharedByDefault(): void
@@ -41,10 +45,10 @@ class SupportFacadesHttpTest extends TestCase
 
     public function testFacadeRootIsSharedWhenFakedWithSequence(): void
     {
-        Http::fakeSequence('laravel.com/*')->push('OK!');
+        Http::fakeSequence('https://laravel.*')->push('OK!');
 
         $factory = $this->app->make(Factory::class);
-        $this->assertSame('OK!', $factory->get('https://laravel.com')->body());
+        $this->assertSame('OK!', $factory->get('https://laravel.com/')->body());
     }
 
     public function testFacadeRootIsSharedWhenStubbingUrls(): void
