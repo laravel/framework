@@ -301,7 +301,7 @@ abstract class Queue
      */
     protected function enqueueUsing($job, $payload, $queue, $delay, $callback)
     {
-        $delay = $delay ?? $job?->delay;
+        $delay = $delay ?? data_get($job, 'delay');
 
         if ($this->shouldDispatchAfterCommit($job) &&
             $this->container->bound('db.transactions')) {
@@ -327,8 +327,8 @@ abstract class Queue
      */
     protected function shouldDispatchAfterCommit($job)
     {
-        if (! $job instanceof Closure && is_object($job) && isset($job->afterCommit)) {
-            return $job->afterCommit;
+        if ($afterCommit = data_get($job, 'afterCommit')) {
+            return $afterCommit;
         }
 
         if (isset($this->dispatchAfterCommit)) {
