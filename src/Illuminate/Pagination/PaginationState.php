@@ -32,4 +32,13 @@ class PaginationState
             return Cursor::fromEncoded($app['request']->input($cursorName));
         });
     }
+
+    /**
+     * Unbind the pagination state resolvers.
+     */
+    public static function forgetApp()
+    {
+        Paginator::forgetResolvers();
+        CursorPaginator::forgetResolvers();
+    }
 }

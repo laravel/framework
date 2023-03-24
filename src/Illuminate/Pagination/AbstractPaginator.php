@@ -646,6 +646,17 @@ abstract class AbstractPaginator implements Htmlable
     }
 
     /**
+     * Forgets all of the registered resolvers.
+     */
+    public static function forgetResolvers()
+    {
+        static::$currentPageResolver = null;
+        static::$currentPathResolver = null;
+        static::$queryStringResolver = null;
+        static::$viewFactoryResolver = null;
+    }
+
+    /**
      * Get an iterator for the items.
      *
      * @return \ArrayIterator

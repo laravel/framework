@@ -2,7 +2,10 @@
 
 namespace Illuminate\Tests\Integration;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Pagination\PaginationState;
+use Illuminate\Support\Facades\Facade;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
 class TestCase extends BaseTestCase
@@ -26,5 +29,17 @@ class TestCase extends BaseTestCase
         }
 
         return $workerApplicationBasePath;
+    }
+
+    /**
+     * Setup the test environment.
+     */
+    protected function setUp(): void
+    {
+        $this->beforeApplicationDestroyed(function () {
+            PaginationState::forgetApp();
+        });
+
+        parent::setUp();
     }
 }

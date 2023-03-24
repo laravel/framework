@@ -510,6 +510,14 @@ abstract class AbstractCursorPaginator implements Htmlable
     }
 
     /**
+     * Forgets all of the registered resolvers.
+     */
+    public static function forgetResolvers()
+    {
+        static::$currentCursorResolver = null;
+    }
+
+    /**
      * Get an instance of the view factory from the resolver.
      *
      * @return \Illuminate\Contracts\View\Factory
