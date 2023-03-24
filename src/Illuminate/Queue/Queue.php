@@ -301,6 +301,8 @@ abstract class Queue
      */
     protected function enqueueUsing($job, $payload, $queue, $delay, $callback)
     {
+        $delay = $delay ?? $job?->delay;
+
         if ($this->shouldDispatchAfterCommit($job) &&
             $this->container->bound('db.transactions')) {
             return $this->container->make('db.transactions')->addCallback(
