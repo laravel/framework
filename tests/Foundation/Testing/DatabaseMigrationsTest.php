@@ -94,6 +94,31 @@ class DatabaseMigrationsTest extends TestCase
 
         $refreshTestDatabaseReflection->invoke($this->traitObject);
     }
+
+    public function testRefreshDatabaseWithSchema()
+    {
+        $tempDirectory = sys_get_temp_dir().'/tmp';
+        @mkdir($tempDirectory);
+        touch($file = $tempDirectory.'/schema.sql');
+
+        $this->traitObject->schemaPath = $file;
+
+        $this->traitObject
+            ->expects($this->once())
+            ->method('artisan')
+            ->with('migrate:fresh', [
+                '--drop-views' => false,
+                '--drop-types' => false,
+                '--seed' => false,
+                '--schema-path' => $file,
+            ]);
+        $refreshTestDatabaseReflection = $this->__reflectAndSetupAccessibleForProtectedTraitMethod('runDatabaseMigrations');
+
+        $refreshTestDatabaseReflection->invoke($this->traitObject);
+
+        unlink($file);
+        rmdir($tempDirectory);
+    }
 }
 
 class DatabaseMigrationsTestMockClass
@@ -105,4 +130,6 @@ class DatabaseMigrationsTestMockClass
     public $dropViews = false;
 
     public $dropTypes = false;
+
+    public $schemaPath = false;
 }
