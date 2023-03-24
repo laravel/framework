@@ -960,15 +960,11 @@ class PendingRequest
         $laravelData = $this->parseRequestData($method, $url, $options);
 
         $onStats = function ($transferStats) {
+            if (($callback = $this->options['on_stats'] ?? false) instanceof Closure) {
+                $transferStats = $callback($transferStats) ?? $transferStats;
+            }
             $this->transferStats = $transferStats;
         };
-
-        if (data_get($this->options, 'on_stats') instanceof Closure) {
-            $onStats = function ($transferStats) use ($onStats) {
-                $onStats($transferStats);
-                call_user_func($this->options['on_stats'], $transferStats);
-            };
-        }
 
         return $this->buildClient()->$clientMethod($method, $url, $this->mergeOptions([
             'laravel_data' => $laravelData,
