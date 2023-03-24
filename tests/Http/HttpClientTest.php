@@ -2182,16 +2182,14 @@ class HttpClientTest extends TestCase
         });
     }
 
-    public function testTheTransferStatsAreCustomable()
+    public function testTheTransferStatsAreCustomizable(): void
     {
-        Log::shouldReceive()
-            ->info('closure_stats')
-            ->once();
+        $onStatsFunctionCalled = false;
 
         $stats = $this->factory
             ->withOptions([
-                'on_stats' => function (TransferStats $stats) {
-                    Log::info('closure_stats');
+                'on_stats' => function (TransferStats $stats) use (&$onStatsFunctionCalled) {
+                    $onStatsFunctionCalled = true;
                 },
             ])
             ->get('https://example.com')
@@ -2199,5 +2197,6 @@ class HttpClientTest extends TestCase
 
         $this->assertIsArray($stats);
         $this->assertNotEmpty($stats);
+        $this->assertTrue($onStatsFunctionCalled);
     }
 }
