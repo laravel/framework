@@ -812,7 +812,7 @@ class RedisConnectionTest extends TestCase
                 'url' => "redis://user@$host:$port",
                 'host' => 'overwrittenByUrl',
                 'port' => 'overwrittenByUrl',
-                'database' => 5 + intval(getenv('TEST_TOKEN')),
+                'database' => $this->redisTestDatabase(),
                 'options' => ['prefix' => 'laravel:'],
                 'timeout' => 0.5,
             ],
@@ -823,7 +823,7 @@ class RedisConnectionTest extends TestCase
             'default' => [
                 'host' => $host,
                 'port' => $port,
-                'database' => 5 + intval(getenv('TEST_TOKEN')),
+                'database' => $this->redisTestDatabase(),
                 'options' => ['prefix' => 'laravel:'],
                 'timeout' => 0.5,
                 'persistent' => true,
@@ -836,7 +836,7 @@ class RedisConnectionTest extends TestCase
             'default' => [
                 'host' => $host,
                 'port' => $port,
-                'database' => 5 + intval(getenv('TEST_TOKEN')),
+                'database' => $this->redisTestDatabase(),
                 'options' => ['serializer' => Redis::SERIALIZER_JSON],
                 'timeout' => 0.5,
             ],
@@ -847,7 +847,7 @@ class RedisConnectionTest extends TestCase
             'default' => [
                 'host' => $host,
                 'port' => $port,
-                'database' => 5 + intval(getenv('TEST_TOKEN')),
+                'database' => $this->redisTestDatabase(),
                 'options' => ['scan' => Redis::SCAN_RETRY],
                 'timeout' => 0.5,
             ],
@@ -859,7 +859,7 @@ class RedisConnectionTest extends TestCase
                 'default' => [
                     'host' => $host,
                     'port' => $port,
-                    'database' => 5 + intval(getenv('TEST_TOKEN')),
+                    'database' => $this->redisTestDatabase(),
                     'options' => [
                         'compression' => Redis::COMPRESSION_LZF,
                         'name' => 'compression_lzf',
@@ -875,7 +875,7 @@ class RedisConnectionTest extends TestCase
                 'default' => [
                     'host' => $host,
                     'port' => $port,
-                    'database' => 5 + intval(getenv('TEST_TOKEN')),
+                    'database' => $this->redisTestDatabase(),
                     'options' => [
                         'compression' => Redis::COMPRESSION_ZSTD,
                         'name' => 'compression_zstd',
@@ -889,7 +889,7 @@ class RedisConnectionTest extends TestCase
                 'default' => [
                     'host' => $host,
                     'port' => $port,
-                    'database' => 5 + intval(getenv('TEST_TOKEN')),
+                    'database' => $this->redisTestDatabase(),
                     'options' => [
                         'compression' => Redis::COMPRESSION_ZSTD,
                         'compression_level' => Redis::COMPRESSION_ZSTD_DEFAULT,
@@ -904,7 +904,7 @@ class RedisConnectionTest extends TestCase
                 'default' => [
                     'host' => $host,
                     'port' => $port,
-                    'database' => 5 + intval(getenv('TEST_TOKEN')),
+                    'database' => $this->redisTestDatabase(),
                     'options' => [
                         'compression' => Redis::COMPRESSION_ZSTD,
                         'compression_level' => Redis::COMPRESSION_ZSTD_MIN,
@@ -919,7 +919,7 @@ class RedisConnectionTest extends TestCase
                 'default' => [
                     'host' => $host,
                     'port' => $port,
-                    'database' => 5 + intval(getenv('TEST_TOKEN')),
+                    'database' => $this->redisTestDatabase(),
                     'options' => [
                         'compression' => Redis::COMPRESSION_ZSTD,
                         'compression_level' => Redis::COMPRESSION_ZSTD_MAX,
@@ -936,7 +936,7 @@ class RedisConnectionTest extends TestCase
                 'default' => [
                     'host' => $host,
                     'port' => $port,
-                    'database' => 5 + intval(getenv('TEST_TOKEN')),
+                    'database' => $this->redisTestDatabase(),
                     'options' => [
                         'compression' => Redis::COMPRESSION_LZ4,
                         'name' => 'compression_lz4',
@@ -950,7 +950,7 @@ class RedisConnectionTest extends TestCase
                 'default' => [
                     'host' => $host,
                     'port' => $port,
-                    'database' => 5 + intval(getenv('TEST_TOKEN')),
+                    'database' => $this->redisTestDatabase(),
                     'options' => [
                         'compression' => Redis::COMPRESSION_LZ4,
                         'compression_level' => 0,
@@ -965,7 +965,7 @@ class RedisConnectionTest extends TestCase
                 'default' => [
                     'host' => $host,
                     'port' => $port,
-                    'database' => 5 + intval(getenv('TEST_TOKEN')),
+                    'database' => $this->redisTestDatabase(),
                     'options' => [
                         'compression' => Redis::COMPRESSION_LZ4,
                         'compression_level' => 1,
@@ -980,7 +980,7 @@ class RedisConnectionTest extends TestCase
                 'default' => [
                     'host' => $host,
                     'port' => $port,
-                    'database' => 5 + intval(getenv('TEST_TOKEN')),
+                    'database' => $this->redisTestDatabase(),
                     'options' => [
                         'compression' => Redis::COMPRESSION_LZ4,
                         'compression_level' => 12,

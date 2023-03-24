@@ -51,7 +51,7 @@ trait InteractsWithRedis
                 'default' => [
                     'host' => $host,
                     'port' => $port,
-                    'database' => 5 + intval(getenv('TEST_TOKEN')),
+                    'database' => $this->redisTestDatabase(),
                     'timeout' => 0.5,
                     'name' => 'default',
                 ],
@@ -113,5 +113,15 @@ trait InteractsWithRedis
         $callback();
 
         $this->tearDownRedis();
+    }
+
+    /**
+     * Get a redis database that is safe for parallel testing.
+     *
+     * @return int
+     */
+    public function redisTestDatabase()
+    {
+        return 5 + intval(getenv('TEST_TOKEN'));
     }
 }
