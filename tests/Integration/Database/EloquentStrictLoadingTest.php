@@ -19,6 +19,14 @@ class EloquentStrictLoadingTest extends DatabaseTestCase
         Model::preventLazyLoading();
     }
 
+    protected function tearDown(): void
+    {
+        Model::preventLazyLoading(false);
+
+        $this->tearDown();
+    }
+
+
     protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
         Schema::create('test_model1', function (Blueprint $table) {

@@ -62,6 +62,7 @@ class DatabaseEloquentModelTest extends TestCase
         m::close();
         Carbon::setTestNow(null);
 
+        Model::preventAccessingMissingAttributes(false);
         Model::unsetEventDispatcher();
         Carbon::resetToStringFormat();
     }
