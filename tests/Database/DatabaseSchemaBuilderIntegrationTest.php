@@ -6,7 +6,6 @@ use Illuminate\Container\Container;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Facade;
-use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
 
 include 'Enums.php';
@@ -135,7 +134,7 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
 
     public function testCanUseIntegerBackedEnumAsDefault()
     {
-        $this->schemaBuilder()->create('articles', function(Blueprint $table) {
+        $this->schemaBuilder()->create('articles', function (Blueprint $table) {
             $table->string('name');
             $table->integer('status')->default(IntegerStatus::pending);
         });
@@ -152,7 +151,7 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
 
     public function testCanUseStringBackedEnumAsDefault()
     {
-        $this->schemaBuilder()->create('articles', function(Blueprint $table) {
+        $this->schemaBuilder()->create('articles', function (Blueprint $table) {
             $table->string('name');
             $table->string('status')->default(StringStatus::unknown);
         });
@@ -168,7 +167,7 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
 
     public function testCanUseUnitEnumAsDefault()
     {
-        $this->schemaBuilder()->create('articles', function(Blueprint $table) {
+        $this->schemaBuilder()->create('articles', function (Blueprint $table) {
             $table->string('name');
             $table->string('status')->default(UnitEnumStatus::Draft);
         });
