@@ -54,6 +54,7 @@ class ModelMakeCommand extends GeneratorCommand
             $this->input->setOption('controller', true);
             $this->input->setOption('policy', true);
             $this->input->setOption('resource', true);
+            $this->input->setOption('requests', true);
         }
 
         if ($this->option('factory')) {
