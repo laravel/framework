@@ -41,10 +41,10 @@ class InjectedConfigTest extends TestCase
         $mock = $this->mockConfig($mock, 'foo.nullable.array', null, null);
 
         $mock = $this->mockConfig($mock, 'foo.missing.string', 'default', 'default');
-        $mock = $this->mockConfig($mock, 'foo.missing.boolean', true, true,);
-        $mock = $this->mockConfig($mock, 'foo.missing.int', 1, 1,);
-        $mock = $this->mockConfig($mock, 'foo.missing.float', 1.0, 1.0,);
-        $mock = $this->mockConfig($mock, 'foo.missing.array', [], [],);
+        $mock = $this->mockConfig($mock, 'foo.missing.boolean', true, true);
+        $mock = $this->mockConfig($mock, 'foo.missing.int', 1, 1);
+        $mock = $this->mockConfig($mock, 'foo.missing.float', 1.0, 1.0);
+        $mock = $this->mockConfig($mock, 'foo.missing.array', [], []);
 
         $container->instance(Repository::class, $mock);
         $container->bind('config', Repository::class);
@@ -75,37 +75,37 @@ class ConfigInjectionTestClass
 {
     public function __construct(
         #[InjectedConfig('foo.string')]
-        public string  $fooString,
+        public string $fooString,
         #[InjectedConfig('foo.boolean')]
-        public string  $fooBoolean,
+        public string $fooBoolean,
         #[InjectedConfig('foo.int')]
-        public int     $fooInt,
+        public int $fooInt,
         #[InjectedConfig('foo.float')]
-        public float   $fooFloat,
+        public float $fooFloat,
         #[InjectedConfig('foo.array')]
-        public array   $fooArray,
+        public array $fooArray,
 
         #[InjectedConfig('foo.nullable.string')]
         public ?string $fooNullableString,
         #[InjectedConfig('foo.nullable.boolean')]
-        public ?bool   $fooNullableBoolean,
+        public ?bool $fooNullableBoolean,
         #[InjectedConfig('foo.nullable.int')]
-        public ?int    $fooNullableInt,
+        public ?int $fooNullableInt,
         #[InjectedConfig('foo.nullable.float')]
-        public ?float  $fooNullableFloat,
+        public ?float $fooNullableFloat,
         #[InjectedConfig('foo.nullable.array')]
-        public ?array  $fooNullableArray,
+        public ?array $fooNullableArray,
 
         #[InjectedConfig('foo.missing.string', 'default')]
         public ?string $fooDefaultString,
         #[InjectedConfig('foo.missing.boolean', true)]
-        public ?bool   $fooDefaultBoolean,
+        public ?bool $fooDefaultBoolean,
         #[InjectedConfig('foo.missing.int', 1)]
-        public ?int    $fooDefaultInt,
+        public ?int $fooDefaultInt,
         #[InjectedConfig('foo.missing.float', 1.0)]
-        public ?float  $fooDefaultFloat,
+        public ?float $fooDefaultFloat,
         #[InjectedConfig('foo.missing.array', [])]
-        public ?array  $fooDefaultArray,
+        public ?array $fooDefaultArray,
     )
     {
     }
