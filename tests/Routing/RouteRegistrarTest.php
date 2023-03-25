@@ -639,6 +639,22 @@ class RouteRegistrarTest extends TestCase
         $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.destroy'));
     }
 
+    public function testCanRegisterApiResourceWithoutSpecificPrefixInGroup()
+    {
+        $this->router->prefix('users')->name('users.')->group(function ($router) {
+            $router->apiResource('/', RouteRegistrarControllerStub::class);
+        });
+
+        $this->assertCount(5, $this->router->getRoutes());
+
+        $this->assertStringContainsString('{user}', $this->router->getRoutes()->getByName('users.update')->uri);
+        $this->assertStringContainsString('{user}', $this->router->getRoutes()->getByName('users.show')->uri);
+        $this->assertStringContainsString('{user}', $this->router->getRoutes()->getByName('users.destroy')->uri);
+
+        $this->assertFalse($this->router->getRoutes()->hasNamedRoute('users.create'));
+        $this->assertFalse($this->router->getRoutes()->hasNamedRoute('users.edit'));
+    }
+
     public function testCanRegisterApiResourcesWithExceptOption()
     {
         $this->router->apiResources([

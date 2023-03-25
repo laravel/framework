@@ -84,6 +84,10 @@ class ResourceRegistrar
             $this->parameters = $options['parameters'];
         }
 
+        if ($name === '/') {
+            $name = '';
+        }
+
         // If the resource name contains a slash, we will assume the developer wishes to
         // register these resource routes with a prefix so we will set that up out of
         // the box so they don't have to mess with it. Otherwise, we will continue.
@@ -603,6 +607,12 @@ class ResourceRegistrar
      */
     public function getResourceWildcard($value)
     {
+        // If the name is empty and route in a group stack, then we will take name from the last group
+        if (empty($value) && $this->hasGroupStack()) {
+            $prefix = $this->getLastGroupPrefix();
+            [$value] = $this->getResourcePrefix($prefix);
+        }
+
         if (isset($this->parameters[$value])) {
             $value = $this->parameters[$value];
         } elseif (isset(static::$parameterMap[$value])) {
@@ -677,6 +687,26 @@ class ResourceRegistrar
         $prefix = isset($options['as']) ? $options['as'].'.' : '';
 
         return trim(sprintf('%s%s.%s', $prefix, $name, $method), '.');
+    }
+
+    /**
+     * Determine if the router currently has a group stack.
+     *
+     * @return bool
+     */
+    protected function hasGroupStack()
+    {
+        return $this->router->hasGroupStack();
+    }
+
+    /**
+     * Get the prefix from the last group on the stack of router.
+     *
+     * @return string
+     */
+    protected function getLastGroupPrefix()
+    {
+        return $this->router->getLastGroupPrefix();
     }
 
     /**
