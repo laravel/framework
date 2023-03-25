@@ -1030,7 +1030,7 @@ class Container implements ArrayAccess, ContainerContract
             foreach ($parameter->getAttributes(InjectedConfig::class) as $attribute) {
                 $injectedConfig = $attribute->newInstance();
 
-                return $this['config']->get($injectedConfig->key);
+                return $this['config']->get($injectedConfig->key, $injectedConfig->default);
             }
         }
 
