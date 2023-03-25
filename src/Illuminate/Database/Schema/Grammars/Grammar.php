@@ -7,6 +7,7 @@ use Doctrine\DBAL\Schema\TableDiff;
 use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Database\Concerns\CompilesJsonPaths;
 use Illuminate\Database\Connection;
+use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
 use Illuminate\Database\Grammar as BaseGrammar;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Fluent;
@@ -16,6 +17,7 @@ use RuntimeException;
 abstract class Grammar extends BaseGrammar
 {
     use CompilesJsonPaths;
+    use InteractsWithDictionary;
 
     /**
      * The possible column modifiers.
@@ -308,6 +310,8 @@ abstract class Grammar extends BaseGrammar
         if ($value instanceof Expression) {
             return $this->getValue($value);
         }
+
+        $value = $this->getDictionaryKey($value);
 
         return is_bool($value)
                     ? "'".(int) $value."'"

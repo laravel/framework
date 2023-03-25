@@ -6,7 +6,10 @@ use Illuminate\Container\Container;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Facade;
+use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
+
+include 'Enums.php';
 
 class DatabaseSchemaBuilderIntegrationTest extends TestCase
 {
@@ -128,6 +131,55 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
         $this->schemaBuilder()->dropColumns('pandemic_table', ['covid19', 'wear_mask']);
         $this->assertFalse($this->schemaBuilder()->hasColumn('pandemic_table', 'wear_mask'));
         $this->assertFalse($this->schemaBuilder()->hasColumn('pandemic_table', 'covid19'));
+    }
+
+    public function testCanUseIntegerBackedEnumAsDefault()
+    {
+        $this->schemaBuilder()->create('articles', function(Blueprint $table) {
+            $table->string('name');
+            $table->integer('status')->default(IntegerStatus::pending);
+        });
+
+        $this->assertEquals(
+            (string) IntegerStatus::pending->value,
+            $this->schemaBuilder()
+                ->getConnection()
+                ->getDoctrineSchemaManager()
+                ->listTableColumns('articles')['status']
+                ->getDefault()
+        );
+    }
+
+    public function testCanUseStringBackedEnumAsDefault()
+    {
+        $this->schemaBuilder()->create('articles', function(Blueprint $table) {
+            $table->string('name');
+            $table->string('status')->default(StringStatus::unknown);
+        });
+        $this->assertEquals(
+            StringStatus::unknown->value,
+            $this->schemaBuilder()
+                ->getConnection()
+                ->getDoctrineSchemaManager()
+                ->listTableColumns('articles')['status']
+                ->getDefault()
+        );
+    }
+
+    public function testCanUseUnitEnumAsDefault()
+    {
+        $this->schemaBuilder()->create('articles', function(Blueprint $table) {
+            $table->string('name');
+            $table->string('status')->default(UnitEnumStatus::Draft);
+        });
+        $this->assertEquals(
+            UnitEnumStatus::Draft->name,
+            $this->schemaBuilder()
+                ->getConnection()
+                ->getDoctrineSchemaManager()
+                ->listTableColumns('articles')['status']
+                ->getDefault()
+        );
     }
 
     private function schemaBuilder()

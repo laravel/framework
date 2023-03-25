@@ -9,6 +9,7 @@ enum StringStatus: string
     case draft = 'draft';
     case pending = 'pending';
     case done = 'done';
+    case unknown = 'we do not know';
 }
 
 enum IntegerStatus: int
@@ -39,4 +40,9 @@ enum ArrayableStatus: string implements Arrayable
             'description' => $this->description(),
         ];
     }
+}
+
+enum UnitEnumStatus
+{
+    case Draft;
 }
