@@ -210,7 +210,6 @@ class HandleExceptions
         } else {
             $this->renderHttpResponse($e);
         }
-
     }
 
     /**
