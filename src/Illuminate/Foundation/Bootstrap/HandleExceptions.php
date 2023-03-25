@@ -204,13 +204,13 @@ class HandleExceptions
 
         if (static::$app->runningInConsole()) {
             $this->renderForConsole($e);
+            if ($uncaught) {
+                exit(1);
+            }
         } else {
             $this->renderHttpResponse($e);
         }
 
-        if ($uncaught) {
-            exit(1);
-        }
     }
 
     /**
