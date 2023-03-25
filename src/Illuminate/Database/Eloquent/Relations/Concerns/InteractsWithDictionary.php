@@ -24,12 +24,23 @@ trait InteractsWithDictionary
             }
 
             if ($attribute instanceof UnitEnum) {
-                return $attribute instanceof BackedEnum ? $attribute->value : $attribute->name;
+                return $this->getEnumValue($attribute);
             }
 
             throw new InvalidArgumentException('Model attribute value is an object but does not have a __toString method.');
         }
 
         return $attribute;
+    }
+
+    /**
+     * Get a value from an enum case if it is backed, otherwise use the case name.
+     *
+     * @param  UnitEnum  $attribute
+     * @return mixed
+     */
+    protected function getEnumValue(UnitEnum $attribute)
+    {
+        return $attribute instanceof BackedEnum ? $attribute->value : $attribute->name;
     }
 }

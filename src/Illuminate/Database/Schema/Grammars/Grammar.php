@@ -311,7 +311,9 @@ abstract class Grammar extends BaseGrammar
             return $this->getValue($value);
         }
 
-        $value = $this->getDictionaryKey($value);
+        if ($value instanceof \UnitEnum) {
+            $value = $this->getEnumValue($value);
+        }
 
         return is_bool($value)
                     ? "'".(int) $value."'"
