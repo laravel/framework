@@ -6,6 +6,7 @@ use Exception;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response as Psr7Response;
+use GuzzleHttp\TransferStats;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Client\Events\RequestSending;
@@ -2178,5 +2179,40 @@ class HttpClientTest extends TestCase
         $this->factory->assertSent(function (Request $request) {
             return $request->url() === 'https://laravel.com/docs/9.x/validation';
         });
+    }
+
+    public function testTheTransferStatsAreCustomizable(): void
+    {
+        $onStatsFunctionCalled = false;
+
+        $stats = $this->factory
+            ->withOptions([
+                'on_stats' => function (TransferStats $stats) use (&$onStatsFunctionCalled) {
+                    $onStatsFunctionCalled = true;
+                },
+            ])
+            ->get('https://example.com')
+            ->handlerStats();
+
+        $this->assertIsArray($stats);
+        $this->assertNotEmpty($stats);
+        $this->assertTrue($onStatsFunctionCalled);
+    }
+
+    public function testTheTransferStatsAreCustomizableOnFake(): void
+    {
+        $onStatsFunctionCalled = false;
+
+        $this->factory
+            ->fake()
+            ->withOptions([
+                'on_stats' => function (TransferStats $stats) use (&$onStatsFunctionCalled) {
+                    $onStatsFunctionCalled = true;
+                },
+            ])
+            ->get('https://foo.bar')
+            ->handlerStats();
+
+        $this->assertTrue($onStatsFunctionCalled);
     }
 }
