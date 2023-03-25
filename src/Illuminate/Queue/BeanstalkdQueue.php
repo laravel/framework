@@ -88,9 +88,7 @@ class BeanstalkdQueue extends Queue implements QueueContract
             $this->createPayload($job, $this->getQueue($queue), $data),
             $queue,
             null,
-            function ($payload, $queue) {
-                return $this->pushRaw($payload, $queue);
-            }
+            fn ($payload, $queue, $delay) => $this->pushRaw($payload, $queue, ['delay' => $delay])
         );
     }
 
@@ -105,7 +103,10 @@ class BeanstalkdQueue extends Queue implements QueueContract
     public function pushRaw($payload, $queue = null, array $options = [])
     {
         return $this->pheanstalk->useTube($this->getQueue($queue))->put(
-            $payload, Pheanstalk::DEFAULT_PRIORITY, Pheanstalk::DEFAULT_DELAY, $this->timeToRun
+            $payload,
+            Pheanstalk::DEFAULT_PRIORITY,
+            ($delay = $options['delay'] ?? false) ? $this->secondsUntil($delay) : Pheanstalk::DEFAULT_DELAY,
+            $this->timeToRun
         );
     }
 
@@ -125,14 +126,7 @@ class BeanstalkdQueue extends Queue implements QueueContract
             $this->createPayload($job, $this->getQueue($queue), $data),
             $queue,
             $delay,
-            function ($payload, $queue, $delay) {
-                return $this->pheanstalk->useTube($this->getQueue($queue))->put(
-                    $payload,
-                    Pheanstalk::DEFAULT_PRIORITY,
-                    $this->secondsUntil($delay),
-                    $this->timeToRun
-                );
-            }
+            fn ($payload, $queue, $delay) => $this->pushRaw($payload, $queue, ['delay' => $delay])
         );
     }
 

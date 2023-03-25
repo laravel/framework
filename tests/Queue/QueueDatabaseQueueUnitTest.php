@@ -6,6 +6,7 @@ use Illuminate\Container\Container;
 use Illuminate\Database\Connection;
 use Illuminate\Queue\DatabaseQueue;
 use Illuminate\Queue\Queue;
+use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Str;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -17,6 +18,10 @@ class QueueDatabaseQueueUnitTest extends TestCase
     protected function tearDown(): void
     {
         m::close();
+
+        Facade::clearResolvedInstances();
+        Facade::setFacadeApplication(null);
+        Container::setInstance(null);
     }
 
     /**
@@ -168,10 +173,55 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $this->assertArrayHasKey('payload', $record);
         $this->assertArrayHasKey('payload', array_slice($record, -1, 1, true));
     }
+
+    /**
+     * @dataProvider delayDataProvider
+     */
+    public function testDelayProperty($function, $queueArgs, $expected)
+    {
+        $container = new Container();
+
+        $container->bind('queue', function () use ($expected) {
+            $queue = m::mock(DatabaseQueue::class)->shouldAllowMockingProtectedMethods()->makePartial();
+            $queue->shouldReceive('pushToDatabase')->once()->withArgs(function (...$args) use ($expected) {
+                // Assert the expectation of the $delay argument.
+                return $args[2] === $expected;
+            });
+            $queue->shouldReceive('raiseJobQueuedEvent')->once()->andReturnNull();
+
+            return $queue;
+        });
+
+        Facade::setFacadeApplication($container);
+
+        \Illuminate\Support\Facades\Queue::{$function}(...$queueArgs);
+    }
+
+    public static function delayDataProvider()
+    {
+        return [
+            'job-no-delay without delay override' => ['push', [new MyTestJob], null],
+            'job-no-delay with delay override' => ['later', [60, new MyTestJob], 60],
+            'job-with-delay without delay override' => ['push', [new MyTestJobWithDelay], 20],
+            'job-with-delay with 0 delay override' => ['later', [0, new MyTestJobWithDelay], 0],
+            'job-with-delay with null delay override' => ['later', [null, new MyTestJobWithDelay], 20],
+            'job-with-delay with 60 delay override' => ['later', [40, new MyTestJobWithDelay], 40],
+        ];
+    }
 }
 
 class MyTestJob
 {
+    public function handle()
+    {
+        // ...
+    }
+}
+
+class MyTestJobWithDelay
+{
+    public $delay = 20;
+
     public function handle()
     {
         // ...
