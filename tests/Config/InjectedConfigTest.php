@@ -106,7 +106,6 @@ class ConfigInjectionTestClass
         public ?float $fooDefaultFloat,
         #[InjectedConfig('foo.missing.array', [])]
         public ?array $fooDefaultArray,
-    )
-    {
+    ) {
     }
 }
