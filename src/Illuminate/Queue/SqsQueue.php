@@ -113,7 +113,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
         return $this->sqs->sendMessage([
             'QueueUrl' => $this->getQueue($queue),
             'MessageBody' => $payload,
-        ] + $delay ? ['DelaySeconds' => $this->secondsUntil($delay)] : [])->get('MessageId');
+        ] + ($delay ? ['DelaySeconds' => $this->secondsUntil($delay)] : []))->get('MessageId');
     }
 
     /**
