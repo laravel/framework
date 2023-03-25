@@ -8,7 +8,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Facade;
 use PHPUnit\Framework\TestCase;
 
-include 'Enums.php';
+include_once 'Enums.php';
 
 class DatabaseSchemaBuilderIntegrationTest extends TestCase
 {
