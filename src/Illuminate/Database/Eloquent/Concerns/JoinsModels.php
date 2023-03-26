@@ -32,7 +32,7 @@ trait JoinsModels
     }
 
     /**
-     * @param class-string|Model $model
+     * @param class-string|Model|Builder<Model> $model
      * @param string $joinType
      * @param string|null $overrideBaseColumn
      * @return static
