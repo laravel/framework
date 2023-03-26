@@ -149,7 +149,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * The array of global scopes on the model.
      *
-     * @var array
+     * @var array<Scope>
      */
     protected static $globalScopes = [];
 

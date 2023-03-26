@@ -8,6 +8,7 @@ use Exception;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Concerns\BuildsQueries;
+use Illuminate\Database\Eloquent\Concerns\JoinsModels;
 use Illuminate\Database\Eloquent\Concerns\QueriesRelationships;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -29,7 +30,7 @@ use ReflectionMethod;
  */
 class Builder implements BuilderContract
 {
-    use BuildsQueries, ForwardsCalls, QueriesRelationships {
+    use BuildsQueries, ForwardsCalls, QueriesRelationships, JoinsModels {
         BuildsQueries::sole as baseSole;
     }
 
@@ -1288,6 +1289,13 @@ class Builder implements BuilderContract
         }
 
         return $builder;
+    }
+
+    /**
+     * @return array<Scope>
+     */
+    public function getScopes(): array {
+        return $this->scopes;
     }
 
     /**

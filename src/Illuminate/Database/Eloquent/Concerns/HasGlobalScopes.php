@@ -62,7 +62,7 @@ trait HasGlobalScopes
     /**
      * Get the global scopes for this class instance.
      *
-     * @return array
+     * @return array<Scope>
      */
     public function getGlobalScopes()
     {
