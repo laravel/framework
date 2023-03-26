@@ -73,7 +73,7 @@ trait JoinsModels
     {
         $modelToJoin = $builderToJoin->getModel();
         $joinColumnName = $overrideBaseColumnName ?? $modelToJoin->getKeyName();
-        $baseColumnName = $overrideJoinColumnName ?? (Str::singular($baseModel->getTable()). '_' . $baseModel->getKeyName());
+        $baseColumnName = $overrideJoinColumnName ?? (Str::singular($modelToJoin->getTable()). '_' . $modelToJoin->getKeyName());
         $this->join(
             $modelToJoin->getTable(), fn(JoinClause $join) =>
                 $join->on(
