@@ -50,7 +50,7 @@ class DatabaseEloquentJoinsModelsTest extends TestCase
     public function testRunsScopes(){
         $blog = new Blog();
         $query = $blog->newQuery()->joinMany(DeletableComment::class)->toSql();
-        $this->assertSame('select * from "blogs" inner join "deletable_comments" on "deletable_comments"."blog_id" = "blogs"."id" where "deletable_comments"."deleted_at" is null', $query);
+        $this->assertSame('select * from "blogs" inner join "deletable_comments" on "deletable_comments"."blog_id" = "blogs"."id" and ("deletable_comments"."deleted_at" is null)', $query);
     }
 
     public function testCanJoinBuilder(){
@@ -61,8 +61,8 @@ class DatabaseEloquentJoinsModelsTest extends TestCase
 
     public function testAddWhereStatements(){
         $blog = new Blog();
-        $query = $blog->newQuery()->joinMany(Comment::query()->whereNull('deleted_at'))->toSql();
-        $this->assertSame('select * from "blogs" inner join "comments" on "comments"."blog_id" = "blogs"."id" where "comments"."deleted_at" is null', $query);
+        $query = $blog->newQuery()->joinMany(Comment::query()->whereNull('comments.deleted_at'))->toSql();
+        $this->assertSame('select * from "blogs" inner join "comments" on "comments"."blog_id" = "blogs"."id" and ("comments"."deleted_at" is null)', $query);
     }
 }
 

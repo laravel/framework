@@ -6,7 +6,9 @@ namespace Illuminate\Database\Eloquent\Concerns;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\Scope;
+use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Str;
 
 trait JoinsModels
@@ -18,18 +20,15 @@ trait JoinsModels
      * @return static
      */
     public function joinMany($model, string $joinType = 'inner', ?string $overrideJoinColumnName = null): static  {
-        $modelToJoin = is_string($model) ? new $model() : $model;
-        if($model instanceof Builder){
-            $scopes = $model->getScopes();
-            $modelToJoin = $model->getModel();
-        } else {
-            $scopes = $modelToJoin->getGlobalScopes();
-        }
+        /** @var Builder $builder */
+        $builder = match(true) {
+            is_string($model) => (new $model())->newQuery(),
+            $model instanceof Builder => $model,
+            $model instanceof Model => $model->newQuery(),
+            $model instanceof Relation => $model->getQuery(),
+        };
 
-        $this->joinManyOn($this->getModel(), $modelToJoin, $joinType,null, $overrideJoinColumnName);
-        $this->applyScopesWith($scopes, $modelToJoin);
-
-        return $this;
+        return $this->joinManyOn($this->getModel(), $builder, $joinType,null, $overrideJoinColumnName);
     }
 
     /**
@@ -39,46 +38,57 @@ trait JoinsModels
      * @return static
      */
     public function joinOne($model, string $joinType = 'inner', ?string $overrideBaseColumn = null): static {
-        $modelToJoin = is_string($model) ? new $model() : $model;
-        if($model instanceof Builder){
-            $scopes = $model->getScopes();
-            $modelToJoin = $model->getModel();
-        } else {
-            $scopes = $modelToJoin->getGlobalScopes();
-        }
-        $this->joinOneOn($this->getModel(), $modelToJoin, $joinType, $overrideBaseColumn);
-        $this->applyScopesWith($scopes, $modelToJoin);
+        $builder = match(true) {
+            is_string($model) => (new $model())->newQuery(),
+            $model instanceof Builder => $model,
+            $model instanceof Model => $model->newQuery(),
+            $model instanceof Relation => $model->getQuery(),
+        };
+
+        $this->joinOneOn($this->getModel(), $builder, $joinType, $overrideBaseColumn);
 
         return $this;
     }
 
 
-    private function joinManyOn(Model $baseModel, Model $modelToJoin, ?string $joinType = 'inner', ?string $overrideBaseColumnName = null, ?string $overrideJoinColumnName = null): static
+    private function joinManyOn(Model $baseModel, Builder $builderToJoin, ?string $joinType = 'inner', ?string $overrideBaseColumnName = null, ?string $overrideJoinColumnName = null): static
     {
+        $modelToJoin = $builderToJoin->getModel();
         $manyJoinColumnName = $overrideJoinColumnName ?? (Str::singular($baseModel->getTable()). '_' . $baseModel->getKeyName());
-        return $this->join(
-            $modelToJoin->getTable(),
-            $modelToJoin->qualifyColumn($manyJoinColumnName),
-            '=',
-            $baseModel->qualifyColumn($overrideBaseColumnName ?? $baseModel->getKeyName()),
-            $joinType
+        $baseColumnName = $overrideBaseColumnName ?? $baseModel->getKeyName();
+        $this->join(
+            $modelToJoin->getTable(), fn(JoinClause $join) =>
+                $join->on(
+                    $modelToJoin->qualifyColumn($manyJoinColumnName),
+                    '=',
+                    $baseModel->qualifyColumn($baseColumnName),
+                )->addNestedWhereQuery($builderToJoin->applyScopes()->getQuery()),
+            type: $joinType
         );
+
+        return $this;
     }
 
-    private function joinOneOn(Model $baseModel, Model $modelToJoin, string $joinType = 'inner', string $overrideBaseColumnName = null, string $overrideJoinColumnName = null): static
+    private function joinOneOn(Model $baseModel, Builder $builderToJoin, string $joinType = 'inner', string $overrideBaseColumnName = null, string $overrideJoinColumnName = null): static
     {
-        $manyJoinColumnName = $overrideBaseColumnName ?? (Str::singular($modelToJoin->getTable()). '_' . $modelToJoin->getKeyName());
-        return $this->join(
-            $modelToJoin->getTable(),
-            $modelToJoin->qualifyColumn($overrideJoinColumnName ?? $modelToJoin->getKeyName()),
-            '=',
-            $baseModel->qualifyColumn($manyJoinColumnName),
-            $joinType
+        $modelToJoin = $builderToJoin->getModel();
+        $joinColumnName = $overrideBaseColumnName ?? $modelToJoin->getKeyName();
+        $baseColumnName = $overrideJoinColumnName ?? (Str::singular($baseModel->getTable()). '_' . $baseModel->getKeyName());
+        $this->join(
+            $modelToJoin->getTable(), fn(JoinClause $join) =>
+                $join->on(
+                    $modelToJoin->qualifyColumn($joinColumnName),
+                    '=',
+                    $baseModel->qualifyColumn($baseColumnName),
+                )->addNestedWhereQuery($builderToJoin->getQuery()),
+            type: $joinType
         );
+        $this->applyScopesWith($builderToJoin->getScopes(), $modelToJoin);
+        return $this;
     }
 
     /**
-     * @param Scope $scopes
+     * @param Scope[] $scopes
      * @param Model $model
      * @return static
      */
