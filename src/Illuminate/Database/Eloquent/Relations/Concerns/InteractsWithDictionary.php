@@ -37,7 +37,7 @@ trait InteractsWithDictionary
      * Get a value from an enum case if it is backed, otherwise use the case name.
      *
      * @param  UnitEnum  $attribute
-     * @return mixed
+     * @return string | int
      */
     protected function getEnumValue(UnitEnum $attribute)
     {
