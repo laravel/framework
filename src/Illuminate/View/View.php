@@ -114,7 +114,7 @@ class View implements ArrayAccess, Htmlable, ViewContract
             return $this->fragment($fragment);
         }
 
-        return $this->render();
+        return $this;
     }
 
     /**
@@ -130,7 +130,7 @@ class View implements ArrayAccess, Htmlable, ViewContract
             return $this->fragments($fragments);
         }
 
-        return $this->render();
+        return $this;
     }
 
     /**
