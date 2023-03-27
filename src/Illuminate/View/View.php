@@ -106,7 +106,7 @@ class View implements ArrayAccess, Htmlable, ViewContract
      *
      * @param  bool  $boolean
      * @param  string  $fragment
-     * @return string
+     * @return string|\Illuminate\View\View
      */
     public function fragmentIf($boolean, $fragment)
     {
@@ -122,7 +122,7 @@ class View implements ArrayAccess, Htmlable, ViewContract
      *
      * @param  bool  $boolean
      * @param  array  $fragments
-     * @return string
+     * @return string|\Illuminate\View\View
      */
     public function fragmentsIf($boolean, array $fragments)
     {
