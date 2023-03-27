@@ -357,7 +357,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Get the path to the application "app" directory.
      *
-     * @param  string  $path
+     * @param  string|array  $path
      * @return string
      */
     public function path($path = '')
@@ -383,7 +383,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Get the base path of the Laravel installation.
      *
-     * @param  string  $path
+     * @param  string|array  $path
      * @return string
      */
     public function basePath($path = '')
@@ -394,7 +394,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Get the path to the bootstrap directory.
      *
-     * @param  string  $path
+     * @param  string|array  $path
      * @return string
      */
     public function bootstrapPath($path = '')
@@ -420,7 +420,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Get the path to the application configuration files.
      *
-     * @param  string  $path
+     * @param  string|array  $path
      * @return string
      */
     public function configPath($path = '')
@@ -446,7 +446,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Get the path to the database directory.
      *
-     * @param  string  $path
+     * @param  string|array  $path
      * @return string
      */
     public function databasePath($path = '')
@@ -472,7 +472,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Get the path to the language files.
      *
-     * @param  string  $path
+     * @param  string|array  $path
      * @return string
      */
     public function langPath($path = '')
@@ -524,7 +524,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Get the path to the storage directory.
      *
-     * @param  string  $path
+     * @param  string|array  $path
      * @return string
      */
     public function storagePath($path = '')
@@ -550,7 +550,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Get the path to the resources directory.
      *
-     * @param  string  $path
+     * @param  string|array  $path
      * @return string
      */
     public function resourcePath($path = '')
@@ -563,7 +563,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      *
      * This method returns the first configured path in the array of view paths.
      *
-     * @param  string  $path
+     * @param  string|array  $path
      * @return string
      */
     public function viewPath($path = '')
@@ -576,12 +576,13 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Join the given paths together.
      *
-     * @param  string  $basePath
-     * @param  string  $path
+     * @param  string        $basePath
+     * @param  string|array  $path
      * @return string
      */
     public function joinPaths($basePath, $path = '')
     {
+        $path = is_array($path) ? implode(DIRECTORY_SEPERATOR, $path) : $path;
         return $basePath.($path != '' ? DIRECTORY_SEPARATOR.ltrim($path, DIRECTORY_SEPARATOR) : '');
     }
 
