@@ -2794,6 +2794,21 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(1, $result);
     }
 
+    public function testInsertUsingWithEmptyColumns()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert into "table1" select * from "table2" where "foreign_id" = ?', [5])->andReturn(1);
+
+        $result = $builder->from('table1')->insertUsing(
+            [],
+            function (Builder $query) {
+                $query->from('table2')->where('foreign_id', '=', 5);
+            }
+        );
+
+        $this->assertEquals(1, $result);
+    }
+
     public function testInsertUsingInvalidSubquery()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -3351,11 +3366,11 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testPreservedAreAppliedByInsertUsing()
     {
         $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert into "users" () select *', []);
+        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert into "users" ("email") select *', []);
         $builder->beforeQuery(function ($builder) {
             $builder->from('users');
         });
-        $builder->insertUsing([], $this->getBuilder());
+        $builder->insertUsing(['email'], $this->getBuilder());
     }
 
     public function testPreservedAreAppliedByUpsert()
