@@ -89,12 +89,23 @@ class DatabaseEloquentJoinsModelsTest extends TestCase
         $query = $blog->newQuery()->joinMany(Comment::query()->whereNull('comments.deleted_at'))->toSql();
         $this->assertSame('select * from "blogs" inner join "comments" on "comments"."blog_id" = "blogs"."id" and ("comments"."deleted_at" is null)', $query);
     }
+
+    public function testAddingOnRelation()
+    {
+        $blog = new Blog();
+        $query = $blog->comments()->joinOne(User::class)->toSql();
+        $this->assertSame('select * from "comments" inner join "users" on "users"."id" = "comments"."user_id" where "comments"."blog_id" is null and "comments"."blog_id" is not null', $query);
+    }
 }
 
 
-class Blog extends Model {}
+class Blog extends Model {
+    public function comments(){
+        return $this->hasMany(Comment::class);
+    }
+}
 class Comment extends Model {}
-
+class User extends Model {}
 
 class DeletableComment extends Model {
     use SoftDeletes;
