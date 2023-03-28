@@ -496,6 +496,10 @@ class ContextualBindingTest extends TestCase
         // array callable syntax...
         $valueResolvedUsingArraySyntax = $container->call([$object, 'method']);
         $this->assertInstanceOf(ContainerContextImplementationStub::class, $valueResolvedUsingArraySyntax);
+
+        // first class callable syntax...
+        $valueResolvedUsingFirstClassSyntax = $container->call($object->method(...));
+        $this->assertInstanceOf(ContainerContextImplementationStub::class, $valueResolvedUsingFirstClassSyntax);
     }
 }
 
