@@ -74,7 +74,7 @@ class Str
     public static function acronym(string $string): string
     {
         $acronym = '';
-        foreach (explode(' ', $string) as $word) {
+        foreach (preg_split('/\s+/', $string) as $word) {
             $acronym .= $word[0];
         }
 

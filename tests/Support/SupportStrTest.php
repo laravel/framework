@@ -78,7 +78,8 @@ class SupportStrTest extends TestCase
     {
         $this->assertSame('lidsa', Str::acronym('lorem ipsum dolor sit amet'));
         $this->assertSame('Life', Str::acronym('Laravel is freaking everywhere'));
-        $this->assertSame('fB', Str::acronym('foo Bar'));
+        $this->assertSame('fB', Str::acronym('foo  Bar'));
+        $this->assertSame('lpf', Str::acronym("laravel\t\tphp\n\nframework"));
     }
 
     public function testStringAscii()
