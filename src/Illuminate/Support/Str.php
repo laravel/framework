@@ -77,6 +77,7 @@ class Str
         foreach (explode(' ', $string) as $word) {
             $acronym .= $word[0];
         }
+
         return $acronym;
     }
 
