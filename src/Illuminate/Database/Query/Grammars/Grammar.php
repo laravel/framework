@@ -1064,7 +1064,7 @@ class Grammar extends BaseGrammar
     {
         $table = $this->wrapTable($query->from);
 
-        if (empty($columns)) {
+        if (empty($columns) || $columns === ['*']) {
             return "insert into {$table} $sql";
         }
 
