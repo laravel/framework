@@ -69,7 +69,7 @@ class Str
     }
 
     /**
-     * Get an acronym consisting of the first letter of each word in a given string
+     * Get an acronym consisting of the first letter of each word in a given string.
      */
     public static function acronym(string $string): string
     {
