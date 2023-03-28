@@ -1450,7 +1450,7 @@ class Router implements BindingRegistrar, RegistrarContract
     }
 
     /**
-     * Set the container instance used by the router.
+     * Get the container instance used by the router.
      *
      * @return \Illuminate\Container\Container
      */
