@@ -934,7 +934,9 @@ class Str
             $subject = collect($subject)->all();
         }
 
-        return $caseSensitive ? str_replace($search, $replace, $subject) : str_ireplace($search, $replace, $subject);
+        return $caseSensitive
+                ? str_replace($search, $replace, $subject)
+                : str_ireplace($search, $replace, $subject);
     }
 
     /**
