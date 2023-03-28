@@ -16,11 +16,13 @@ class AsCollection implements Castable
      */
     public static function castUsing(array $arguments)
     {
-        return new class($arguments[0] ?? Collection::class) implements CastsAttributes
+        return new class($arguments) implements CastsAttributes
         {
-            public function __construct(
-                protected string $collectionClass,
-            ) {
+            protected $arguments;
+
+            public function __construct(array $arguments)
+            {
+                $this->arguments = $arguments;
             }
 
             public function get($model, $key, $value, $attributes)
@@ -31,7 +33,9 @@ class AsCollection implements Castable
 
                 $data = Json::decode($attributes[$key]);
 
-                return is_array($data) ? new $this->collectionClass($data) : null;
+                $collectionClass = $this->arguments[0] ?? Collection::class;
+
+                return is_array($data) ? new $collectionClass($data) : null;
             }
 
             public function set($model, $key, $value, $attributes)
