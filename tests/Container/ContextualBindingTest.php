@@ -481,6 +481,22 @@ class ContextualBindingTest extends TestCase
         $this->assertSame('hunter42', $resolvedInstance->settings['password']);
         $this->assertSame('lumen', $resolvedInstance->settings['alias']);
     }
+
+    public function testContextualBindingWorksForMethodInvocation()
+    {
+        $container = new Container;
+
+        $container
+            ->when(ContainerTestContextInjectMethodArgument::class)
+            ->needs(IContainerContextContractStub::class)
+            ->give(ContainerContextImplementationStub::class);
+
+        $object = new ContainerTestContextInjectMethodArgument;
+
+        // array callable syntax...
+        $valueResolvedUsingArraySyntax = $container->call([$object, 'method']);
+        $this->assertInstanceOf(ContainerContextImplementationStub::class, $valueResolvedUsingArraySyntax);
+    }
 }
 
 interface IContainerContextContractStub
@@ -618,5 +634,13 @@ class ContainerTestContextInjectFromConfigArray
     public function __construct($settings)
     {
         $this->settings = $settings;
+    }
+}
+
+class ContainerTestContextInjectMethodArgument
+{
+    public function method(IContainerContextContractStub $dependency)
+    {
+        return $dependency;
     }
 }
