@@ -34,6 +34,14 @@ class Stringable implements JsonSerializable, ArrayAccess
     }
 
     /**
+     * Get an acronym consisting of the first letter of each word in a given string.
+     */
+    public static function acronym(string $string): string
+    {
+        return new static(Str::acronym($string));
+    }
+
+    /**
      * Return the remainder of a string after the first occurrence of a given value.
      *
      * @param  string  $search
