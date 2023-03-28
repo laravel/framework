@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Support;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use PHPUnit\Framework\TestCase;
 
@@ -17,6 +18,11 @@ class SupportStringableTest extends TestCase
     protected function stringable($string = '')
     {
         return new Stringable($string);
+    }
+
+    public function testAcronym()
+    {
+        $this->assertSame('lidsa', $this->stringable('lorem ipsum dolor sit amet')->acronym());
     }
 
     public function testClassBasename()
