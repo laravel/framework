@@ -16,10 +16,12 @@ class AsCollection implements Castable
      */
     public static function castUsing(array $arguments)
     {
-        return new class($arguments[0] ?? Collection::class) implements CastsAttributes {
+        return new class($arguments[0] ?? Collection::class) implements CastsAttributes
+        {
             public function __construct(
                 protected string $collectionClass,
-            ) {}
+            ) {
+            }
 
             public function get($model, $key, $value, $attributes)
             {
