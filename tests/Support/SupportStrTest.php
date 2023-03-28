@@ -74,6 +74,13 @@ class SupportStrTest extends TestCase
         $this->assertEquals($nbsp, Str::words($nbsp));
     }
 
+    public function testStringAcronym()
+    {
+        $this->assertSame('lidsa', Str::acronym('lorem ipsum dolor sit amet'));
+        $this->assertSame('Life', Str::acronym('Laravel is freaking everywhere'));
+        $this->assertSame('fB', Str::acronym('foo Bar'));
+    }
+
     public function testStringAscii()
     {
         $this->assertSame('@', Str::ascii('@'));

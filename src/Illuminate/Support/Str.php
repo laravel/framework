@@ -69,6 +69,18 @@ class Str
     }
 
     /**
+     * Get an acronym consisting of the first letter of each word in a given string
+     */
+    public static function acronym(string $string): string
+    {
+        $acronym = '';
+        foreach (explode(' ', $string) as $word) {
+            $acronym .= $word[0];
+        }
+        return $acronym;
+    }
+
+    /**
      * Return the remainder of a string after the first occurrence of a given value.
      *
      * @param  string  $subject
