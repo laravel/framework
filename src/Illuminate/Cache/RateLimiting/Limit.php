@@ -21,7 +21,7 @@ class Limit
     /**
      * The number of minutes until the rate limit is reset.
      *
-     * @var int
+     * @var int|float
      */
     public $decayMinutes;
 
@@ -37,10 +37,10 @@ class Limit
      *
      * @param  mixed  $key
      * @param  int  $maxAttempts
-     * @param  int  $decayMinutes
+     * @param  int|float  $decayMinutes
      * @return void
      */
-    public function __construct($key = '', int $maxAttempts = 60, int $decayMinutes = 1)
+    public function __construct($key = '', int $maxAttempts = 60, int|float $decayMinutes = 1)
     {
         $this->key = $key;
         $this->maxAttempts = $maxAttempts;
@@ -92,6 +92,18 @@ class Limit
     public static function perDay($maxAttempts, $decayDays = 1)
     {
         return new static('', $maxAttempts, 60 * 24 * $decayDays);
+    }
+
+    /**
+     * Create a new rate limit using seconds as decay time.
+     *
+     * @param  int  $maxAttempts
+     * @param  int  $decaySeconds
+     * @return static
+     */
+    public static function perSeconds($maxAttempts, $decaySeconds)
+    {
+        return new static('', $maxAttempts, $decaySeconds / 60);
     }
 
     /**
