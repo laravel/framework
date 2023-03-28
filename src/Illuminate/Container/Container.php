@@ -669,7 +669,7 @@ class Container implements ArrayAccess, ContainerContract
 
     /**
      * Get the class name for the given callback, if one can be determined.
-     * 
+     *
      * @param  callable|string  $callback
      * @return string|false
      */
@@ -681,7 +681,7 @@ class Container implements ArrayAccess, ContainerContract
         ) {
             return $reflector->getClosureScopeClass()->name;
         }
-        
+
         return false;
     }
 
