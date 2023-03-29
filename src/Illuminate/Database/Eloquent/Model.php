@@ -1279,7 +1279,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         if ($this->usesUniqueIds()) {
             $this->setUniqueIds();
         }
-        
+
         if ($this->fireModelEvent('creating') === false) {
             return false;
         }
