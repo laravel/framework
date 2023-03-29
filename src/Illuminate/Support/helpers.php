@@ -357,7 +357,7 @@ if (! function_exists('trait_uses_recursive')) {
     /**
      * Returns all traits used by a trait and its traits.
      *
-     * @param  string  $trait
+     * @param  object|string  $trait
      * @return array
      */
     function trait_uses_recursive($trait)
