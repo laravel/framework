@@ -1,6 +1,19 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.5.0...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v10.5.1...10.x)
+
+
+## [v10.5.1 (2023-03-29)](https://github.com/laravel/framework/compare/v10.5.0...v10.5.1)
+
+### Added
+- Added methods to determine if API resource has pivot loaded ([#46555](https://github.com/laravel/framework/pull/46555))
+- Added caseSensitive flag to Stringable replace function ([#46578](https://github.com/laravel/framework/pull/46578))
+- Allow insert..select (insertUsing()) to have empty $columns ([#46605](https://github.com/laravel/framework/pull/46605), [399bff9](https://github.com/laravel/framework/commit/399bff9331252e64a3439ea43e05f87f901dad55))
+- Added `Illuminate/Database/Connection::selectResultSets()` ([#46592](https://github.com/laravel/framework/pull/46592))
+
+### Changed
+- Make sure pivot model has previously defined values ([#46559](https://github.com/laravel/framework/pull/46559))
+- Move SetUniqueIds to run before the creating event ([#46622](https://github.com/laravel/framework/pull/46622))
 
 
 ## [v10.5.0 (2023-03-28)](https://github.com/laravel/framework/compare/v10.4.1...v10.5.0)
