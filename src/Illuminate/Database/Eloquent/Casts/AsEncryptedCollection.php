@@ -6,7 +6,6 @@ use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Crypt;
-use InvalidArgumentException;
 
 class AsEncryptedCollection implements Castable
 {
@@ -30,10 +29,6 @@ class AsEncryptedCollection implements Castable
             public function get($model, $key, $value, $attributes)
             {
                 $collectionClass = $this->arguments[0] ?? Collection::class;
-
-                if (! is_subclass_of($collectionClass, Collection::class)) {
-                    throw new InvalidArgumentException('The provided class must be a Collection');
-                }
 
                 if (isset($attributes[$key])) {
                     return new $collectionClass(Json::decode(Crypt::decryptString($attributes[$key])));
