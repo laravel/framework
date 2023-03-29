@@ -789,8 +789,8 @@ class Str
                     '_', '.', ',', '<', '>', '?', '/', '\\', '{', '}', '[',
                     ']', '|', ':', ';',
                 ]))
-                ->when($spaces, fn ($c) => $c->merge([' ']))
                 ->pipe(fn ($c) => Collection::times($length, fn () => $c[random_int(0, $c->count() - 1)]))
+                ->when($spaces, fn ($c) => $c->put(random_int(1, max(1, $c->count() - 2)), ' '))
                 ->implode('');
     }
 

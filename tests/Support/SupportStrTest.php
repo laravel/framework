@@ -1114,9 +1114,110 @@ class SupportStrTest extends TestCase
         }
     }
 
-    public function testPasswordCreation()
+    /**
+     * @dataProvider dataProviderPasswordCreation
+     *
+     * @param  int  $length
+     * @param  bool  $letters
+     * @param  bool  $numbers
+     * @param  bool  $symbols
+     * @param  bool  $spaces
+     *
+     * @return void
+     */
+    public function testPasswordCreation(
+        int $length,
+        bool $letters,
+        bool $numbers,
+        bool $symbols,
+        bool $spaces
+    ): void {
+        $password = Str::password($length, $letters, $numbers, $symbols, $spaces);
+
+        $this->assertTrue(strlen($password) === $length);
+        $this->assertThat(Str::contains($password, ' '), $spaces ? $this->isTrue() : $this->isFalse());
+
+        $this->assertFalse(Str::substr($password, 0, 1) === ' ');
+        $this->assertFalse(Str::substr($password, Str::length($password) - 1, 1) === ' ');
+    }
+
+    /**
+     * @return array<string, array<string, mixed>>
+     */
+    public static function dataProviderPasswordCreation(): array
     {
-        $this->assertTrue(strlen(Str::password()) === 32);
+        return [
+            'only letters' => [
+                'length' => 16,
+                'letters' => true,
+                'numbers' => false,
+                'symbols' => false,
+                'spaces' => false,
+            ],
+            'only numbers' => [
+                'length' => 16,
+                'letters' => false,
+                'numbers' => true,
+                'symbols' => false,
+                'spaces' => false,
+            ],
+            'only symbols' => [
+                'length' => 16,
+                'letters' => false,
+                'numbers' => false,
+                'symbols' => true,
+                'spaces' => false,
+            ],
+            'only letters with spaces' => [
+                'length' => 16,
+                'letters' => true,
+                'numbers' => false,
+                'symbols' => false,
+                'spaces' => true,
+            ],
+            'only numbers with spaces' => [
+                'length' => 16,
+                'letters' => false,
+                'numbers' => true,
+                'symbols' => false,
+                'spaces' => true,
+            ],
+            'only symbols with spaces' => [
+                'length' => 16,
+                'letters' => false,
+                'numbers' => false,
+                'symbols' => true,
+                'spaces' => true,
+            ],
+            'letters and numbers and symbols' => [
+                'length' => 16,
+                'letters' => true,
+                'numbers' => true,
+                'symbols' => true,
+                'spaces' => false,
+            ],
+            'letters and numbers and symbols with spaces' => [
+                'length' => 16,
+                'letters' => true,
+                'numbers' => true,
+                'symbols' => true,
+                'spaces' => true,
+            ],
+            'short password' => [
+                'length' => 1,
+                'letters' => true,
+                'numbers' => false,
+                'symbols' => false,
+                'spaces' => false,
+            ],
+            'long password' => [
+                'length' => 2048,
+                'letters' => true,
+                'numbers' => true,
+                'symbols' => true,
+                'spaces' => true,
+            ],
+        ];
     }
 }
 
