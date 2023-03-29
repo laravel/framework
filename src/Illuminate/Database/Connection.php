@@ -423,14 +423,14 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Run a select statement against the database and returns all the result sets.
+     * Run a select statement against the database and returns all of the result sets.
      *
      * @param  string  $query
      * @param  array  $bindings
      * @param  bool  $useReadPdo
      * @return array
      */
-    public function selectResultsets($query, $bindings = [], $useReadPdo = true)
+    public function selectResultSets($query, $bindings = [], $useReadPdo = true)
     {
         return $this->run($query, $bindings, function ($query, $bindings) use ($useReadPdo) {
             if ($this->pretending()) {
