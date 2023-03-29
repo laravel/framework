@@ -38,6 +38,7 @@ use LogicException;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionNamedType;
+use ReflectionUnionType;
 
 trait HasAttributes
 {
@@ -617,11 +618,8 @@ trait HasAttributes
             return static::$attributeMutatorCache[get_class($this)][$key] = false;
         }
 
-        $returnType = (new ReflectionMethod($this, $method))->getReturnType();
-
         return static::$attributeMutatorCache[get_class($this)][$key] =
-                    $returnType instanceof ReflectionNamedType &&
-                    $returnType->getName() === Attribute::class;
+                    static::hasAttributeReturnType($this, $method);
     }
 
     /**
@@ -1019,11 +1017,8 @@ trait HasAttributes
             return static::$setAttributeMutatorCache[$class][$key] = false;
         }
 
-        $returnType = (new ReflectionMethod($this, $method))->getReturnType();
-
         return static::$setAttributeMutatorCache[$class][$key] =
-                    $returnType instanceof ReflectionNamedType &&
-                    $returnType->getName() === Attribute::class &&
+                    static::hasAttributeReturnType($this, $method) &&
                     is_callable($this->{$method}()->set);
     }
 
@@ -2203,10 +2198,7 @@ trait HasAttributes
         $instance = is_object($class) ? $class : new $class;
 
         return collect((new ReflectionClass($instance))->getMethods())->filter(function ($method) use ($instance) {
-            $returnType = $method->getReturnType();
-
-            if ($returnType instanceof ReflectionNamedType &&
-                $returnType->getName() === Attribute::class) {
+            if (static::hasAttributeReturnType($instance, $method->getName())) {
                 $method->setAccessible(true);
 
                 if (is_callable($method->invoke($instance)->get)) {
@@ -2216,5 +2208,30 @@ trait HasAttributes
 
             return false;
         })->map->name->values()->all();
+    }
+
+    /**
+     * Determine if a "Attribute" return type exists for an attribute.
+     *
+     * @param  string  $method
+     * @return bool
+     */
+    protected static function hasAttributeReturnType($instance, $method)
+    {
+        $returnType = (new ReflectionMethod($instance, $method))->getReturnType();
+
+        if ($returnType instanceof ReflectionNamedType && $returnType->getName() === Attribute::class) {
+            return true;
+        }
+
+        if ($returnType instanceof ReflectionUnionType) {
+            foreach ($returnType->getTypes() as $returnType) {
+                if ($returnType->getName() === Attribute::class) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }
