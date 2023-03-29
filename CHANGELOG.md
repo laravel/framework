@@ -1,6 +1,17 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.52.4...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.52.5...9.x)
+
+
+## [v9.52.5](https://github.com/laravel/framework/compare/v9.52.4...v9.52.5) - 2023-02-25
+
+### Fixed
+- Fixed `Illuminate/Foundation/Testing/Concerns/InteractsWithDatabase::expectsDatabaseQueryCount()` $connection parameter ([#46228](https://github.com/laravel/framework/pull/46228))
+- PHP 8.0 fix for Closure jobs ([#46505](https://github.com/laravel/framework/pull/46505))
+- Fix preg_split error when there is a slash in the attribute ([#46549](https://github.com/laravel/framework/pull/46549))
+
+### Changed
+- Allow WithFaker to be used when app is not bound ([#46529](https://github.com/laravel/framework/pull/46529))
 
 
 ## [v9.52.4](https://github.com/laravel/framework/compare/v9.52.3...v9.52.4) - 2023-02-22
