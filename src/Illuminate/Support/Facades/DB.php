@@ -33,6 +33,7 @@ namespace Illuminate\Support\Facades;
  * @method static mixed scalar(string $query, array $bindings = [], bool $useReadPdo = true)
  * @method static array selectFromWriteConnection(string $query, array $bindings = [])
  * @method static array select(string $query, array $bindings = [], bool $useReadPdo = true)
+ * @method static array selectResultSets(string $query, array $bindings = [], bool $useReadPdo = true)
  * @method static \Generator cursor(string $query, array $bindings = [], bool $useReadPdo = true)
  * @method static bool insert(string $query, array $bindings = [])
  * @method static int update(string $query, array $bindings = [])
