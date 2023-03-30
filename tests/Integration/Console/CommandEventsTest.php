@@ -17,14 +17,6 @@ use Symfony\Component\Process\PhpExecutableFinder;
 class CommandEventsTest extends TestCase
 {
     /**
-     * Each run of this test is assigned a random ID to ensure that separate runs
-     * do not interfere with each other.
-     *
-     * @var string
-     */
-    protected $id;
-
-    /**
      * The path to the file that execution logs will be written to.
      *
      * @var string
@@ -43,9 +35,7 @@ class CommandEventsTest extends TestCase
         parent::setUp();
 
         $this->files = new Filesystem;
-
-        $this->id = Str::random();
-        $this->logfile = storage_path("logs/command_events_test_{$this->id}.log");
+        $this->logfile = storage_path(sprintf('logs/command_events_test_%s.log', (string) Str::random()));
 
         $this->beforeApplicationDestroyed(function () {
             $this->files->delete($this->logfile);
@@ -114,7 +104,7 @@ class CommandEventsTest extends TestCase
     {
         $this->files->append($this->logfile, '');
 
-        $application = Testbench::create(
+        $laravel = \Orchestra\Testbench\container(
             basePath: static::applicationBasePath(),
             resolvingCallback: function ($app) {
                 $fs = new Filesystem;
@@ -138,9 +128,9 @@ class CommandEventsTest extends TestCase
                     ]);
                 });
             },
-        );
+        )->createApplication();
 
-        tap($application[ConsoleKernel::class], function ($kernel) {
+        tap($laravel[ConsoleKernel::class], function ($kernel) {
             $kernel->rerouteSymfonyCommandEvents();
             $kernel->registerCommand(new CommandEventsTestCommand);
 
