@@ -275,5 +275,7 @@ class FoundationHelpersTest extends TestCase
 
         // Should fallback to en_US
         $this->assertSame('Australian Capital Territory', fake()->state());
+
+        app()->flush();
     }
 }
