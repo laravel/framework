@@ -7,6 +7,7 @@ use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Env;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\Foundation\Application as Testbench;
@@ -103,8 +104,11 @@ class CommandEventsTest extends TestCase
         }];
     }
 
+    /** @group debug */
     public function testCommandEventsReceiveParsedInputFromBackground()
     {
+        Env::disablePutenv();
+
         $laravel = Testbench::create(
             basePath: static::applicationBasePath(),
             resolvingCallback: function ($app) {
@@ -129,6 +133,7 @@ class CommandEventsTest extends TestCase
                     ]);
                 });
             },
+            options: ['extra' => ['env' => ['APP_DEBUG=(false)']]],
         );
 
         tap($laravel[ConsoleKernel::class], function ($kernel) {
