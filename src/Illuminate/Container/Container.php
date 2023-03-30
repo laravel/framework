@@ -679,7 +679,7 @@ class Container implements ArrayAccess, ContainerContract
             is_callable($callback) &&
             ! ($reflector = new \ReflectionFunction($callback(...)))->isAnonymous()
         ) {
-            return $reflector->getClosureScopeClass()->name;
+            return $reflector->getClosureScopeClass()->name ?? false;
         }
 
         return false;
