@@ -99,7 +99,7 @@ trait InteractsWithConsole
      *
      * @return $this
      */
-    protected function withCommandEvents()
+    protected function withConsoleEvents()
     {
         $this->app[Kernel::class]->rerouteSymfonyCommandEvents();
     }
