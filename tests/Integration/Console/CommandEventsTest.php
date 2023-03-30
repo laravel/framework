@@ -32,14 +32,16 @@ class CommandEventsTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
-        $this->files = new Filesystem;
-        $this->logfile = storage_path(sprintf('logs/command_events_test_%s.log', (string) Str::random()));
+        $this->afterApplicationCreated(function () {
+            $this->files = new Filesystem;
+            $this->logfile = storage_path(sprintf('logs/command_events_test_%s.log', (string) Str::random()));
+        });
 
         $this->beforeApplicationDestroyed(function () {
             $this->files->delete($this->logfile);
         });
+
+        parent::setUp();
     }
 
     /**
