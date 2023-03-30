@@ -105,8 +105,6 @@ class CommandEventsTest extends TestCase
 
     public function testCommandEventsReceiveParsedInputFromBackground()
     {
-        $this->files->append($this->logfile, '');
-
         $laravel = Testbench::create(
             basePath: static::applicationBasePath(),
             resolvingCallback: function ($app) {
