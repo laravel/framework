@@ -2215,4 +2215,112 @@ class HttpClientTest extends TestCase
 
         $this->assertTrue($onStatsFunctionCalled);
     }
+
+    public function testDefaultOptionsAreApplied()
+    {
+        $this->factory->fake();
+
+        $this->factory->withDefaultOptions([
+            'headers' => [
+                'X-Custom-Header' => 'custom-value',
+            ],
+        ]);
+
+        $this->factory->get('https://foo.com');
+
+        $this->factory->assertSent(function ($request) {
+            return $request->hasHeader('X-Custom-Header', 'custom-value');
+        });
+    }
+
+    public function testDefaultOptionsWillBeIgnored()
+    {
+        $this->factory->fake();
+
+        $this->factory->withDefaultOptions([
+            'headers' => [
+                'X-Custom-Header' => 'custom-value',
+            ],
+        ]);
+
+        $this->factory->withoutDefaultOptions();
+
+        $this->factory->get('https://foo.com');
+
+        $this->factory->assertNotSent(function ($request) {
+            return $request->hasHeader('X-Custom-Header', 'custom-value');
+        });
+    }
+
+    public function testChainAdditionalOptionsBesideDefaultOptions()
+    {
+        $this->factory->fake();
+
+        $this->factory->withDefaultOptions([
+            'headers' => [
+                'X-Custom-Header' => 'custom-value',
+            ],
+        ]);
+
+        $this->factory->withOptions([
+            'headers' => [
+                'X-Another-Custom-Header' => 'another-custom-value',
+            ],
+        ])->get('https://foo.com');
+
+        $this->factory->assertSent(function ($request) {
+            return $request->hasHeader('X-Custom-Header', 'custom-value') &&
+                $request->hasHeader('X-Another-Custom-Header', 'another-custom-value');
+        });
+    }
+
+    public function testIgnoreSpecificDefaultOption()
+    {
+        $this->factory->fake();
+
+        $this->factory->withDefaultOptions([
+            'headers' => [
+                'X-Custom-Header' => 'custom-value',
+            ],
+        ]);
+
+        $this->factory->withoutDefaultOptions('headers');
+
+        $this->factory->get('https://foo.com');
+
+        $this->factory->assertNotSent(function ($request) {
+            return $request->hasHeader('X-Custom-Header', 'custom-value');
+        });
+    }
+
+    public function testIgnoreSpecificDefaultOptionUsingDotNotation()
+    {
+        $this->factory->fake();
+
+        $this->factory->withDefaultOptions([
+            'headers' => [
+                'X-Custom-Header' => 'custom-value',
+                'X-Another-Custom-Header' => 'another-custom-value',
+            ],
+        ]);
+
+        $this->factory->withoutDefaultOptions('headers.X-Another-Custom-Header');
+
+        $this->factory->get('https://foo.com');
+
+        $this->factory->assertNotSent(function ($request) {
+            return $request->hasHeader('X-Another-Custom-Header', 'another-custom-value');
+        });
+    }
+
+    public function testUsageOfTheClientWithoutDefaultOptionsSet()
+    {
+        $this->factory->fake([
+            '*' => $this->factory->response(),
+        ]);
+
+        $response = $this->factory->get('https://foo.com');
+
+        $this->assertEquals(200, $response->status());
+    }
 }

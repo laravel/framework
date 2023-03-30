@@ -7,6 +7,7 @@ use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response as Psr7Response;
 use GuzzleHttp\TransferStats;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use PHPUnit\Framework\Assert as PHPUnit;
@@ -61,6 +62,20 @@ class Factory
      * @var bool
      */
     protected $preventStrayRequests = false;
+
+    /**
+     * The default options for the request.
+     *
+     * @var array
+     */
+    protected $defaultOptions = [];
+
+    /**
+     * Whether to ignore the default options for the next request.
+     *
+     * @var bool
+     */
+    protected $ignoreDefaultOptions = false;
 
     /**
      * Create a new factory instance.
@@ -358,6 +373,48 @@ class Factory
     }
 
     /**
+     * Ignore the default options for the next request.
+     *
+     * @return void
+     */
+    public function ignoreDefaultOptions()
+    {
+        $this->ignoreDefaultOptions = true;
+    }
+
+    /**
+     * Set the default options for the request.
+     *
+     * @param  array  $options
+     * @return $this
+     */
+    public function withDefaultOptions(array $options)
+    {
+        $this->defaultOptions = $options;
+
+        return $this;
+    }
+
+    /**
+     * Remove the specified keys from the default options.
+     *
+     * @param  $keys
+     * @return $this
+     */
+    public function withoutDefaultOptions($keys = null)
+    {
+        if (is_null($keys)) {
+            return $this->ignoreDefaultOptions();
+        }
+
+        foreach (Arr::wrap($keys) as $key) {
+            Arr::forget($this->defaultOptions, $key);
+        }
+
+        return $this;
+    }
+
+    /**
      * Get the current event dispatcher implementation.
      *
      * @return \Illuminate\Contracts\Events\Dispatcher|null
@@ -381,7 +438,11 @@ class Factory
         }
 
         return tap($this->newPendingRequest(), function ($request) {
-            $request->stub($this->stubCallbacks)->preventStrayRequests($this->preventStrayRequests);
+            $request->when($this->defaultOptions && ! $this->ignoreDefaultOptions, function ($request) {
+                $request->withOptions($this->defaultOptions);
+            })
+                ->stub($this->stubCallbacks)
+                ->preventStrayRequests($this->preventStrayRequests);
         })->{$method}(...$parameters);
     }
 }
