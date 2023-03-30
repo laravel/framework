@@ -93,4 +93,14 @@ trait InteractsWithConsole
 
         return $this;
     }
+
+    /**
+     * Enable rerouting Symfony command events on tests.
+     *
+     * @return $this
+     */
+    protected function withRerouteSymfonyCommandEvents()
+    {
+        $this->app[Kernel::class]->rerouteSymfonyCommandEvents();
+    }
 }
