@@ -168,20 +168,27 @@ class WorkCommand extends Command
     protected function listenForEvents()
     {
         $this->laravel['events']->listen(JobProcessing::class, function ($event) {
-            $this->writeOutput($event->job, 'starting');
+            if ($event->connectionName != 'sync') {
+                $this->writeOutput($event->job, 'starting');
+            }
         });
 
         $this->laravel['events']->listen(JobProcessed::class, function ($event) {
-            $this->writeOutput($event->job, 'success');
+            if ($event->connectionName != 'sync') {
+                $this->writeOutput($event->job, 'success');
+            }
         });
 
         $this->laravel['events']->listen(JobReleasedAfterException::class, function ($event) {
-            $this->writeOutput($event->job, 'released_after_exception');
+            if ($event->connectionName != 'sync') {
+                $this->writeOutput($event->job, 'released_after_exception');
+            }
         });
 
         $this->laravel['events']->listen(JobFailed::class, function ($event) {
-            $this->writeOutput($event->job, 'failed');
-
+            if ($event->connectionName != 'sync') {
+                $this->writeOutput($event->job, 'failed');
+            }
             $this->logFailedJob($event);
         });
     }
