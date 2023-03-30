@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Foundation;
 
 use Exception;
-use Illuminate\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Mix;
