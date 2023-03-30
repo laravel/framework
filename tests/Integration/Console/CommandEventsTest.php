@@ -150,6 +150,8 @@ class CommandEventsTest extends TestCase
             'CommandStarting', 'taylor', 'otwell', 'coding',
             'CommandFinished', 'taylor', 'otwell', 'coding',
         );
+
+        Env::enablePutenv();
     }
 
     protected function assertLogged(...$messages)
