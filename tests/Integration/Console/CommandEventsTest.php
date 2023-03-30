@@ -104,7 +104,7 @@ class CommandEventsTest extends TestCase
     {
         $this->files->append($this->logfile, '');
 
-        $laravel = \Orchestra\Testbench\container(
+        $laravel = Testbench::create(
             basePath: static::applicationBasePath(),
             resolvingCallback: function ($app) {
                 $fs = new Filesystem;
@@ -128,7 +128,7 @@ class CommandEventsTest extends TestCase
                     ]);
                 });
             },
-        )->createApplication();
+        );
 
         tap($laravel[ConsoleKernel::class], function ($kernel) {
             $kernel->rerouteSymfonyCommandEvents();
