@@ -4,10 +4,8 @@ namespace Illuminate\Tests\Integration\Foundation;
 
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\Access\Response;
-use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
 use Illuminate\Support\Facades\Route;
 use Orchestra\Testbench\TestCase;
-use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\PhpProcess;
 
 class ExceptionHandlerTest extends TestCase
