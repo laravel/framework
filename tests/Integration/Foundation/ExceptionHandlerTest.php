@@ -4,13 +4,24 @@ namespace Illuminate\Tests\Integration\Foundation;
 
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\Access\Response;
-use Illuminate\Foundation\Testing\Concerns\MakesArtisanScript;
+use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
 use Illuminate\Support\Facades\Route;
 use Orchestra\Testbench\TestCase;
+use Symfony\Component\Process\PhpExecutableFinder;
+use Symfony\Component\Process\PhpProcess;
 
 class ExceptionHandlerTest extends TestCase
 {
-    use MakesArtisanScript;
+    /**
+     * Resolve application HTTP exception handler.
+     *
+     * @param  \Illuminate\Foundation\Application  $app
+     * @return void
+     */
+    protected function resolveApplicationExceptionHandler($app)
+    {
+        $app->singleton('Illuminate\Contracts\Debug\ExceptionHandler', 'Illuminate\Foundation\Exceptions\Handler');
+    }
 
     public function testItRendersAuthorizationExceptions()
     {
@@ -114,63 +125,32 @@ class ExceptionHandlerTest extends TestCase
     /**
      * @dataProvider exitCodesProvider
      */
-    public function testItReturnsNonZeroExitCodesForUncaughtExceptions($shouldThrow)
+    public function testItReturnsNonZeroExitCodesForUncaughtExceptions($providers, $successful)
     {
-        $this->setUpArtisanScript(function () use ($shouldThrow) {
-            return <<<PHP
-class ThrowExceptionCommand extends \Illuminate\Console\Command
-{
-    protected \$signature = 'throw-exception-command';
+        $basePath = static::applicationBasePath();
+        $providers = json_encode($providers, true);
 
-    public function handle()
-    {
-        throw new \Exception('Thrown inside ThrowExceptionCommand');
-    }
-}
+        $process = new PhpProcess(<<<EOF
+<?php
 
-class ThrowExceptionLogHandler extends \Monolog\Handler\AbstractProcessingHandler
-{
-    protected function write(array \$record): void
-    {
-        if ({$shouldThrow}) {
-            throw new \Exception('Thrown inside ThrowExceptionLogHandler');
-        }
-    }
-}
+require 'vendor/autoload.php';
 
-\$config = \$app['config'];
+\$laravel = Orchestra\Testbench\Foundation\Application::create(basePath: '$basePath', options: ['extra' => ['providers' => $providers]]);
+\$laravel->singleton('Illuminate\Contracts\Debug\ExceptionHandler', 'Illuminate\Foundation\Exceptions\Handler');
 
-\$config->set('logging.channels.stack', [
-    'driver' => 'stack',
-    'path' => storage_path('logs/stacklog.log'),
-    'channels' => ['throw_exception'],
-    'ignore_exceptions' => false,
-]);
+\$kernel = \$laravel[Illuminate\Contracts\Console\Kernel::class];
 
-\$config->set('logging.channels.throw_exception', [
-    'driver' => 'monolog',
-    'handler' => ThrowExceptionLogHandler::class,
-]);
+return \$kernel->call('throw-exception-command');
+EOF, __DIR__.'/../../../', ['APP_RUNNING_IN_CONSOLE' => true]);
 
-Illuminate\Console\Application::starting(function (\$artisan) {
-    \$artisan->add(new ThrowExceptionCommand);
-});
+        $process->run();
 
-PHP;
-        });
-
-        [, $exitCode] = $this->artisanScript('throw-exception-command');
-
-        $this->assertEquals($shouldThrow, $exitCode);
-
-        $this->tearDownArtisanScript();
+        $this->assertSame($successful, $process->isSuccessful());
     }
 
     public static function exitCodesProvider()
     {
-        return [
-            ['Throw exception' => 1],
-            ['Do not throw exception' => 0],
-        ];
+        yield 'Throw exception' => [[Fixtures\Providers\ThrowUncaughtExceptionServiceProvider::class], false];
+        yield 'Do not throw exception' => [[Fixtures\Providers\ThrowExceptionServiceProvider::class], true];
     }
 }
