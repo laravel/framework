@@ -116,6 +116,17 @@ class FoundationHelpersTest extends TestCase
         unlink($manifest);
     }
 
+    public function testFakeReturnsSameInstance()
+    {
+        app()->instance('config', new ConfigRepository([]));
+
+        $this->assertSame(fake(), fake());
+        $this->assertSame(fake(), fake('en_US'));
+        $this->assertSame(fake('en_AU'), fake('en_AU'));
+        $this->assertNotSame(fake('en_US'), fake('en_AU'));
+
+        app()->flush();
+    }
 
     public function testFakeUsesLocale()
     {
