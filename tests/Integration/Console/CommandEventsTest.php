@@ -8,11 +8,9 @@ use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\Foundation\Application as Testbench;
 use Orchestra\Testbench\TestCase;
-use Symfony\Component\Process\PhpExecutableFinder;
 
 class CommandEventsTest extends TestCase
 {
