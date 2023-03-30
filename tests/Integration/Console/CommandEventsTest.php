@@ -106,8 +106,6 @@ class CommandEventsTest extends TestCase
 
     public function testCommandEventsReceiveParsedInputFromBackground()
     {
-        Env::disablePutenv();
-
         $laravel = Testbench::create(
             basePath: static::applicationBasePath(),
             resolvingCallback: function ($app) {
@@ -132,7 +130,6 @@ class CommandEventsTest extends TestCase
                     ]);
                 });
             },
-            options: ['extra' => ['env' => ['APP_DEBUG=(false)']]],
         );
 
         tap($laravel[ConsoleKernel::class], function ($kernel) {
@@ -151,7 +148,7 @@ class CommandEventsTest extends TestCase
             'CommandFinished', 'taylor', 'otwell', 'coding',
         );
 
-        Env::enablePutenv();
+        Env::getRepository()->clear('APP_DEBUG');
     }
 
     protected function assertLogged(...$messages)
