@@ -63,7 +63,7 @@ class CommandEventsTest extends TestCase
     {
         $this->app[ConsoleKernel::class]->registerCommand(new CommandEventsTestCommand);
         $this->app[Dispatcher::class]->listen(function (CommandStarting $event) {
-            array_map(fn ($e) => $this->files->append($this->logfile, $e."\n"), [
+            array_map(fn ($e) => $this->files->append($this->logfile, $e.PHP_EOL), [
                 'CommandStarting',
                 $event->input->getArgument('firstname'),
                 $event->input->getArgument('lastname'),
@@ -72,7 +72,7 @@ class CommandEventsTest extends TestCase
         });
 
         Event::listen(function (CommandFinished $event) {
-            array_map(fn ($e) => $this->files->append($this->logfile, $e."\n"), [
+            array_map(fn ($e) => $this->files->append($this->logfile, $e.PHP_EOL), [
                 'CommandFinished',
                 $event->input->getArgument('firstname'),
                 $event->input->getArgument('lastname'),
@@ -108,8 +108,8 @@ class CommandEventsTest extends TestCase
         $laravel = Testbench::create(
             basePath: static::applicationBasePath(),
             resolvingCallback: function ($app) {
-                $fs = new Filesystem;
-                $log = fn ($msg) => $fs->append($this->logfile, $msg.PHP_EOL);
+                $files = new Filesystem;
+                $log = fn ($msg) => $files->append($this->logfile, $msg.PHP_EOL);
 
                 $app['events']->listen(function (CommandStarting $event) use ($log) {
                     array_map(fn ($msg) => $log($msg), [
@@ -152,7 +152,7 @@ class CommandEventsTest extends TestCase
     {
         $log = trim($this->files->get($this->logfile));
 
-        $this->assertEquals(implode("\n", $messages), $log);
+        $this->assertEquals(implode(PHP_EOL, $messages), $log);
     }
 }
 
