@@ -104,7 +104,6 @@ class CommandEventsTest extends TestCase
         }];
     }
 
-    /** @group debug */
     public function testCommandEventsReceiveParsedInputFromBackground()
     {
         Env::disablePutenv();

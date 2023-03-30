@@ -9,7 +9,6 @@ use Orchestra\Testbench\TestCase;
 
 class ExceptionHandlerTest extends TestCase
 {
-    /** @group debug */
     public function testItRendersAuthorizationExceptions()
     {
         Route::get('test-route', fn () => Response::deny('expected message', 321)->authorize());
