@@ -32,7 +32,7 @@ class QueryBuilderKeyByBench extends DatabaseTestCase
             $data[] = [
                 'title' => $i === $loc ? 'Foo Post' : $fake->title,
                 'content' => $fake->text(100),
-                'created_at' => new Carbon($fake->date('Y-m-d H:i:s'))
+                'created_at' => new Carbon($fake->date('Y-m-d H:i:s')),
             ];
         }
 
