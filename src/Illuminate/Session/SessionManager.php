@@ -10,13 +10,6 @@ use Illuminate\Support\Manager;
 class SessionManager extends Manager
 {
     /**
-     * The container instance.
-     *
-     * @var \Illuminate\Contracts\Container\Container
-     */
-    protected $container;
-
-    /**
      * Call a custom driver creator.
      *
      * @param  string  $driver
@@ -272,18 +265,5 @@ class SessionManager extends Manager
     public function setDefaultDriver($name)
     {
         $this->container['config']->set('session.driver', $name);
-    }
-
-    /**
-     * Set the container instance used by the manager.
-     *
-     * @param  \Illuminate\Contracts\Container\Container  $container
-     * @return $this
-     */
-    public function setContainer($container)
-    {
-        $this->container = $container;
-
-        return $this;
     }
 }
