@@ -425,7 +425,11 @@ class Connection implements ConnectionInterface
 
             $statement->execute();
 
-            return $statement->fetchAll($this->fetchAllMode);
+            if (! is_null($this->fetchAllMode)) {
+                return $statement->fetchAll($this->fetchAllMode);
+            }
+
+            return $statement->fetchAll();
         });
     }
 
