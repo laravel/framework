@@ -1670,7 +1670,7 @@ trait HasAttributes
      */
     protected function parseCasterClass($class)
     {
-        return explode(':', $class)[0];
+        return explode(':', $class, 2)[0];
     }
 
     /**
