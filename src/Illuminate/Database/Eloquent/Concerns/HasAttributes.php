@@ -1670,9 +1670,7 @@ trait HasAttributes
      */
     protected function parseCasterClass($class)
     {
-        return ! str_contains($class, ':')
-            ? $class
-            : explode(':', $class, 2)[0];
+        return explode(':', $class)[0];
     }
 
     /**
