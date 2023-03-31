@@ -19,11 +19,8 @@ class AsEncryptedCollection implements Castable
     {
         return new class($arguments) implements CastsAttributes
         {
-            protected $arguments;
-
-            public function __construct(array $arguments)
+            public function __construct(protected array $arguments)
             {
-                $this->arguments = $arguments;
             }
 
             public function get($model, $key, $value, $attributes)
