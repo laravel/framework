@@ -9,6 +9,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
+
 use function Termwind\terminal;
 
 #[AsCommand(name: 'serve')]
@@ -68,6 +69,7 @@ class ServeCommand extends Command
     public static $passthroughVariables = [
         'APP_ENV',
         'LARAVEL_SAIL',
+        'PATH',
         'PHP_CLI_SERVER_WORKERS',
         'PHP_IDE_CONFIG',
         'SYSTEMROOT',

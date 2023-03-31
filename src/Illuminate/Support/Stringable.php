@@ -57,7 +57,7 @@ class Stringable implements JsonSerializable
     /**
      * Append the given values to the string.
      *
-     * @param  array  $values
+     * @param  string  ...$values
      * @return static
      */
     public function append(...$values)
@@ -545,7 +545,7 @@ class Stringable implements JsonSerializable
     /**
      * Prepend the given values to the string.
      *
-     * @param  array  $values
+     * @param  string  ...$values
      * @return static
      */
     public function prepend(...$values)
@@ -784,11 +784,12 @@ class Stringable implements JsonSerializable
      *
      * @param  int  $start
      * @param  int|null  $length
+     * @param  string  $encoding
      * @return static
      */
-    public function substr($start, $length = null)
+    public function substr($start, $length = null, $encoding = 'UTF-8')
     {
-        return new static(Str::substr($this->value, $start, $length));
+        return new static(Str::substr($this->value, $start, $length, $encoding));
     }
 
     /**
@@ -1015,6 +1016,18 @@ class Stringable implements JsonSerializable
     public function whenIsUuid($callback, $default = null)
     {
         return $this->when($this->isUuid(), $callback, $default);
+    }
+
+    /**
+     * Execute the given callback if the string is a valid ULID.
+     *
+     * @param  callable  $callback
+     * @param  callable|null  $default
+     * @return static
+     */
+    public function whenIsUlid($callback, $default = null)
+    {
+        return $this->when($this->isUlid(), $callback, $default);
     }
 
     /**

@@ -504,6 +504,251 @@ class PrecognitionTest extends TestCase
         $response->assertHeader('Precognition', 'true');
     }
 
+    public function testItStopsExecutionAfterFailedValidationWithNestedValidationFilteringUsingFormRequest()
+    {
+        Route::post('test-route', function (NestedPrecognitionTestRequest $request) {
+            fail();
+        })->middleware(PrecognitionInvokingController::class);
+
+        $response = $this->postJson('test-route', [
+            'nested' => [
+                ['namsse' => 'sdsd'],
+            ],
+        ], [
+            'Precognition' => 'true',
+            'Precognition-Validate-Only' => 'nested,nested.0.name',
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertExactJson([
+            'message' => 'The nested.0.name field is required.',
+            'errors' => [
+                'nested' => [
+                    [
+                        'name' => [
+                            'The nested.0.name field is required.',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+        $response->assertHeader('Precognition', 'true');
+    }
+
+    public function testItStopsExecutionAfterFailedValidationWithNestedValidationFilteringUsingRequestValidate()
+    {
+        Route::post('test-route', function (Request $request) {
+            $request->validate([
+                'nested' => ['required', 'array', 'min:1'],
+                'nested.*.name' => ['required', 'string'],
+            ]);
+            fail();
+        })->middleware(PrecognitionInvokingController::class);
+
+        $response = $this->postJson('test-route', [
+            'nested' => [
+                ['namsse' => 'sdsd'],
+            ],
+        ], [
+            'Precognition' => 'true',
+            'Precognition-Validate-Only' => 'nested,nested.0.name',
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertExactJson([
+            'message' => 'The nested.0.name field is required.',
+            'errors' => [
+                'nested' => [
+                    [
+                        'name' => [
+                            'The nested.0.name field is required.',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+        $response->assertHeader('Precognition', 'true');
+    }
+
+    public function testItStopsExecutionAfterFailedValidationWithNestedValidationFilteringUsingControllerValidate()
+    {
+        Route::post('test-route', [PrecognitionTestController::class, 'methodWhereNestedRulesAreValidatedViaControllerValidate'])
+            ->middleware(PrecognitionInvokingController::class);
+
+        $response = $this->postJson('test-route', [
+            'nested' => [
+                ['namsse' => 'sdsd'],
+            ],
+        ], [
+            'Precognition' => 'true',
+            'Precognition-Validate-Only' => 'nested,nested.0.name',
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertExactJson([
+            'message' => 'The nested.0.name field is required.',
+            'errors' => [
+                'nested' => [
+                    [
+                        'name' => [
+                            'The nested.0.name field is required.',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+        $response->assertHeader('Precognition', 'true');
+    }
+
+    public function testItStopsExecutionAfterFailedValidationWithNestedValidationFilteringUsingControllerValidateWith()
+    {
+        Route::post('test-route', [PrecognitionTestController::class, 'methodWhereNestedRulesAreValidatedViaControllerValidateWith'])
+            ->middleware(PrecognitionInvokingController::class);
+
+        $response = $this->postJson('test-route', [
+            'nested' => [
+                ['namsse' => 'sdsd'],
+            ],
+        ], [
+            'Precognition' => 'true',
+            'Precognition-Validate-Only' => 'nested,nested.0.name',
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertExactJson([
+            'message' => 'The nested.0.name field is required.',
+            'errors' => [
+                'nested' => [
+                    [
+                        'name' => [
+                            'The nested.0.name field is required.',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+        $response->assertHeader('Precognition', 'true');
+    }
+
+    public function testItCanPassValidationForEscapedDotsAfterFilteringWithPrecognition()
+    {
+        Route::post('test-route', function (PrecognitionRequestWithEscapedDots $request) {
+            fail();
+        })->middleware(PrecognitionInvokingController::class);
+
+        $response = $this->postJson('test-route', [
+            'escaped.dot' => 'value',
+        ], [
+            'Precognition' => 'true',
+            'Precognition-Validate-Only' => 'escaped\.dot',
+        ]);
+
+        $response->assertNoContent();
+        $response->assertHeader('Precognition', 'true');
+    }
+
+    public function testItCanFilterRulesWithEscapedDotsUsingFormRequest()
+    {
+        Route::post('test-route', function (PrecognitionRequestWithEscapedDots $request) {
+            fail();
+        })->middleware(PrecognitionInvokingController::class);
+
+        $response = $this->postJson('test-route', [
+            //
+        ], [
+            'Precognition' => 'true',
+            'Precognition-Validate-Only' => 'escaped\.dot',
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertExactJson([
+            'message' => 'The escaped.dot field is required.',
+            'errors' => [
+                'escaped.dot' => [
+                    'The escaped.dot field is required.',
+                ],
+            ],
+        ]);
+        $response->assertHeader('Precognition', 'true');
+    }
+
+    public function testItCanFilterRulesWithEscapedDotsWhenUsingRequestValidate()
+    {
+        Route::post('test-route', function (Request $request) {
+            $request->validate([
+                'escaped\.dot' => 'required',
+            ]);
+
+            fail();
+        })->middleware(PrecognitionInvokingController::class);
+
+        $response = $this->postJson('test-route', [
+            //
+        ], [
+            'Precognition' => 'true',
+            'Precognition-Validate-Only' => 'escaped\.dot',
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertExactJson([
+            'message' => 'The escaped.dot field is required.',
+            'errors' => [
+                'escaped.dot' => [
+                    'The escaped.dot field is required.',
+                ],
+            ],
+        ]);
+        $response->assertHeader('Precognition', 'true');
+    }
+
+    public function testItCanFilterRulesWithEscapedDotsWhenUsingControllerValidate()
+    {
+        Route::post('test-route', [PrecognitionTestController::class, 'methodWhereEscapedDotRuleIsValidatedViaControllerValidate'])
+            ->middleware(PrecognitionInvokingController::class);
+
+        $response = $this->postJson('test-route', [
+            //
+        ], [
+            'Precognition' => 'true',
+            'Precognition-Validate-Only' => 'escaped\.dot',
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertExactJson([
+            'message' => 'The escaped.dot field is required.',
+            'errors' => [
+                'escaped.dot' => [
+                    'The escaped.dot field is required.',
+                ],
+            ],
+        ]);
+        $response->assertHeader('Precognition', 'true');
+    }
+
+    public function testItCanFilterRulesWithEscapedDotsWhenUsingControllerValidateWith()
+    {
+        Route::post('test-route', [PrecognitionTestController::class, 'methodWhereEscapedDotRuleIsValidatedViaControllerValidateWith'])
+            ->middleware(PrecognitionInvokingController::class);
+
+        $response = $this->postJson('test-route', [
+            //
+        ], [
+            'Precognition' => 'true',
+            'Precognition-Validate-Only' => 'escaped\.dot',
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertExactJson([
+            'message' => 'The escaped.dot field is required.',
+            'errors' => [
+                'escaped.dot' => [
+                    'The escaped.dot field is required.',
+                ],
+            ],
+        ]);
+        $response->assertHeader('Precognition', 'true');
+    }
+
     public function testItContinuesExecutionAfterSuccessfulValidationWithoutValidationFilteringAndFormRequest()
     {
         Route::post('test-route', function (PrecognitionTestRequest $request, ClassThatBindsOnInstantiation $foo) {
@@ -777,6 +1022,60 @@ class PrecognitionTestController
 {
     use ValidatesRequests;
 
+    public function methodWhereEscapedDotRuleIsValidatedViaControllerValidate(Request $request)
+    {
+        precognitive(function () use ($request) {
+            $this->validate($request, [
+                'escaped\.dot' => 'required',
+            ]);
+
+            fail();
+        });
+
+        fail();
+    }
+
+    public function methodWhereEscapedDotRuleIsValidatedViaControllerValidateWith()
+    {
+        precognitive(function () {
+            $this->validateWith([
+                'escaped\.dot' => 'required',
+            ]);
+
+            fail();
+        });
+
+        fail();
+    }
+
+    public function methodWhereNestedRulesAreValidatedViaControllerValidate(Request $request)
+    {
+        precognitive(function () use ($request) {
+            $this->validate($request, [
+                'nested' => ['required', 'array', 'min:1'],
+                'nested.*.name' => ['required', 'string'],
+            ]);
+
+            fail();
+        });
+
+        fail();
+    }
+
+    public function methodWhereNestedRulesAreValidatedViaControllerValidateWith(Request $request)
+    {
+        precognitive(function () {
+            $this->validateWith([
+                'nested' => ['required', 'array', 'min:1'],
+                'nested.*.name' => ['required', 'string'],
+            ]);
+
+            fail();
+        });
+
+        fail();
+    }
+
     public function methodWherePredicitionValidatesViaControllerValidate(Request $request)
     {
         precognitive(function () use ($request) {
@@ -915,6 +1214,27 @@ class PrecognitionTestRequest extends FormRequest
         }
 
         return $rules;
+    }
+}
+
+class NestedPrecognitionTestRequest extends FormRequest
+{
+    public function rules()
+    {
+        return [
+            'nested' => ['required', 'array', 'min:1'],
+            'nested.*.name' => ['required', 'string'],
+        ];
+    }
+}
+
+class PrecognitionRequestWithEscapedDots extends FormRequest
+{
+    public function rules()
+    {
+        return [
+            'escaped\.dot' => ['required'],
+        ];
     }
 }
 

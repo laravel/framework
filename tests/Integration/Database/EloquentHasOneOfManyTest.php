@@ -8,6 +8,8 @@ use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentHasOneOfManyTest extends DatabaseTestCase
 {
+    public $retrievedLogins;
+
     protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
         Schema::create('users', function ($table) {

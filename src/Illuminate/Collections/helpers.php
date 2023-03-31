@@ -13,7 +13,7 @@ if (! function_exists('collect')) {
      * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>|null  $value
      * @return \Illuminate\Support\Collection<TKey, TValue>
      */
-    function collect($value = null)
+    function collect($value = [])
     {
         return new Collection($value);
     }
@@ -180,7 +180,7 @@ if (! function_exists('value')) {
      * Return the default value of the given value.
      *
      * @param  mixed  $value
-     * @param  mixed  $args
+     * @param  mixed  ...$args
      * @return mixed
      */
     function value($value, ...$args)

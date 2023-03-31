@@ -66,10 +66,7 @@ class InvokableValidationRule implements Rule, ValidatorAwareRule
     public static function make($invokable)
     {
         if ($invokable->implicit ?? false) {
-            return new class($invokable) extends InvokableValidationRule implements ImplicitRule
-            {
-                //
-            };
+            return new class($invokable) extends InvokableValidationRule implements ImplicitRule {};
         }
 
         return new InvokableValidationRule($invokable);
@@ -153,7 +150,7 @@ class InvokableValidationRule implements Rule, ValidatorAwareRule
      * Create a pending potentially translated string.
      *
      * @param  string  $attribute
-     * @param  ?string  $message
+     * @param  string|null  $message
      * @return \Illuminate\Translation\PotentiallyTranslatedString
      */
     protected function pendingPotentiallyTranslatedString($attribute, $message)

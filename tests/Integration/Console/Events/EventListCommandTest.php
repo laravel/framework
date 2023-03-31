@@ -10,6 +10,8 @@ use Orchestra\Testbench\TestCase;
 
 class EventListCommandTest extends TestCase
 {
+    public $dispatcher;
+
     protected function setUp(): void
     {
         parent::setUp();

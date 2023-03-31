@@ -336,6 +336,8 @@ class BroadcasterTest extends TestCase
             ['something.23.test.42', 'something.test.{id}', false],
             ['something-23-test-42', 'something-{id}-test', false],
             ['23:test', '{id}:test:abcd', false],
+            ['customer.order.1', 'order.{id}', false],
+            ['customerorder.1', 'order.{id}', false],
         ];
     }
 }

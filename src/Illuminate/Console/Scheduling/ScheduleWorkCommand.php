@@ -4,18 +4,20 @@ namespace Illuminate\Console\Scheduling;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\ProcessUtils;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
 
 #[AsCommand(name: 'schedule:work')]
 class ScheduleWorkCommand extends Command
 {
     /**
-     * The console command name.
+     * The name and signature of the console command.
      *
      * @var string
      */
-    protected $name = 'schedule:work';
+    protected $signature = 'schedule:work {--run-output-file= : The file to direct <info>schedule:run</info> output to}';
 
     /**
      * The name of the console command.
@@ -42,20 +44,29 @@ class ScheduleWorkCommand extends Command
      */
     public function handle()
     {
-        $this->components->info('Running schedule tasks every minute.');
+        $this->components->info(
+            'Running scheduled tasks every minute.',
+            $this->getLaravel()->isLocal() ? OutputInterface::VERBOSITY_NORMAL : OutputInterface::VERBOSITY_VERBOSE
+        );
 
         [$lastExecutionStartedAt, $executions] = [null, []];
+
+        $command = implode(' ', array_map(fn ($arg) => ProcessUtils::escapeArgument($arg), [
+            PHP_BINARY,
+            defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan',
+            'schedule:run',
+        ]));
+
+        if ($this->option('run-output-file')) {
+            $command .= ' >> '.ProcessUtils::escapeArgument($this->option('run-output-file')).' 2>&1';
+        }
 
         while (true) {
             usleep(100 * 1000);
 
             if (Carbon::now()->second === 0 &&
                 ! Carbon::now()->startOfMinute()->equalTo($lastExecutionStartedAt)) {
-                $executions[] = $execution = new Process([
-                    PHP_BINARY,
-                    defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan',
-                    'schedule:run',
-                ]);
+                $executions[] = $execution = Process::fromShellCommandline($command);
 
                 $execution->start();
 
@@ -64,7 +75,7 @@ class ScheduleWorkCommand extends Command
 
             foreach ($executions as $key => $execution) {
                 $output = $execution->getIncrementalOutput().
-                          $execution->getIncrementalErrorOutput();
+                    $execution->getIncrementalErrorOutput();
 
                 $this->output->write(ltrim($output, "\n"));
 

@@ -218,7 +218,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
                 $file->seek($method->getStartLine() - 1);
                 $code = '';
                 while ($file->key() < $method->getEndLine()) {
-                    $code .= $file->current();
+                    $code .= trim($file->current());
                     $file->next();
                 }
 

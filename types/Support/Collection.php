@@ -2,6 +2,7 @@
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
+
 use function PHPStan\Testing\assertType;
 
 $collection = collect([new User]);
@@ -55,8 +56,11 @@ assertType('Illuminate\Support\Collection<int, User>', $collection->each(functio
 
 assertType('Illuminate\Support\Collection<int, int>', $collection->range(1, 100));
 
-assertType('Illuminate\Support\Collection<int, string>', $collection->wrap(['string']));
-assertType('Illuminate\Support\Collection<string, User>', $collection->wrap(['string' => new User]));
+assertType('Illuminate\Support\Collection<(int|string), string>', $collection->wrap('string'));
+assertType('Illuminate\Support\Collection<(int|string), User>', $collection->wrap(new User));
+
+assertType('Illuminate\Support\Collection<(int|string), string>', $collection->wrap(['string']));
+assertType('Illuminate\Support\Collection<(int|string), User>', $collection->wrap(['string' => new User]));
 
 assertType('array<int, string>', $collection->unwrap(['string']));
 assertType('array<int, User>', $collection->unwrap(
@@ -851,8 +855,8 @@ assertType('int', $collection->make([1])->pipe(function ($collection) {
 
 assertType('mixed', $collection->pipeInto(User::class));
 
-assertType('Illuminate\Support\Collection<int, mixed>', $collection->make(['string' => 'string'])->pluck('string'));
-assertType('Illuminate\Support\Collection<int, mixed>', $collection->make(['string' => 'string'])->pluck('string', 'string'));
+assertType('Illuminate\Support\Collection<(int|string), mixed>', $collection->make(['string' => 'string'])->pluck('string'));
+assertType('Illuminate\Support\Collection<(int|string), mixed>', $collection->make(['string' => 'string'])->pluck('string', 'string'));
 
 assertType('Illuminate\Support\Collection<int, User>', $collection->reject());
 assertType('Illuminate\Support\Collection<int, User>', $collection->reject(new User));
@@ -905,7 +909,7 @@ assertType('Illuminate\Support\Collection<(int|string), int>', $collection->make
     assertType('string', $string);
     assertType('int', $int);
 
-    return false;
+    return $string;
 }));
 
 assertType('Illuminate\Support\Collection<int, Illuminate\Support\Collection<int, int|User>>', $collection->zip([1]));

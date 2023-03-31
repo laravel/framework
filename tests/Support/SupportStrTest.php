@@ -172,10 +172,10 @@ class SupportStrTest extends TestCase
         $this->assertSame('...abc...', Str::excerpt('z  abc  d', 'b', ['radius' => 1]));
         $this->assertSame('[...]is a beautiful morn[...]', Str::excerpt('This is a beautiful morning', 'beautiful', ['omission' => '[...]', 'radius' => 5]));
         $this->assertSame(
-              'This is the ultimate supercalifragilisticexpialidoceous very looooooooooooooooooong looooooooooooong beautiful morning with amazing sunshine and awesome tempera[...]',
-              Str::excerpt('This is the ultimate supercalifragilisticexpialidoceous very looooooooooooooooooong looooooooooooong beautiful morning with amazing sunshine and awesome temperatures. So what are you gonna do about it?', 'very',
-              ['omission' => '[...]'],
-        ));
+            'This is the ultimate supercalifragilisticexpialidoceous very looooooooooooooooooong looooooooooooong beautiful morning with amazing sunshine and awesome tempera[...]',
+            Str::excerpt('This is the ultimate supercalifragilisticexpialidoceous very looooooooooooooooooong looooooooooooong beautiful morning with amazing sunshine and awesome temperatures. So what are you gonna do about it?', 'very',
+                ['omission' => '[...]'],
+            ));
 
         $this->assertSame('...y...', Str::excerpt('taylor', 'y', ['radius' => 0]));
         $this->assertSame('...ayl...', Str::excerpt('taylor', 'Y', ['radius' => 1]));
@@ -484,6 +484,22 @@ class SupportStrTest extends TestCase
         $randomInteger = random_int(1, 100);
         $this->assertEquals($randomInteger, strlen(Str::random($randomInteger)));
         $this->assertIsString(Str::random());
+    }
+
+    /** @test */
+    public function TestWhetherTheNumberOfGeneratedCharactersIsEquallyDistributed()
+    {
+        $results = [];
+        // take 6.200.000 samples, because there are 62 different characters
+        for ($i = 0; $i < 620000; $i++) {
+            $random = Str::random(1);
+            $results[$random] = ($results[$random] ?? 0) + 1;
+        }
+
+        // each character should occur 100.000 times with a variance of 5%.
+        foreach ($results as $result) {
+            $this->assertEqualsWithDelta(10000, $result, 500);
+        }
     }
 
     public function testRandomStringFactoryCanBeSet()

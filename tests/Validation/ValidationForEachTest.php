@@ -211,7 +211,7 @@ class ValidationForEachTest extends TestCase
 
         $rules = [
             'items.*' => Rule::forEach(function () {
-                return ['users.*.type' => 'regex:/^(super|admin)$/i'];
+                return ['users.*.type' => 'regex:/^(super)$/i'];
             }),
         ];
 

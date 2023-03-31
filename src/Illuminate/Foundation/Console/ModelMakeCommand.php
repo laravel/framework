@@ -6,7 +6,9 @@ use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(name: 'make:model')]
 class ModelMakeCommand extends GeneratorCommand
@@ -232,5 +234,37 @@ class ModelMakeCommand extends GeneratorCommand
             ['api', null, InputOption::VALUE_NONE, 'Indicates if the generated controller should be an API resource controller'],
             ['requests', 'R', InputOption::VALUE_NONE, 'Create new form request classes and use them in the resource controller'],
         ];
+    }
+
+    /**
+     * Interact further with the user if they were prompted for missing arguments.
+     *
+     * @param  \Symfony\Component\Console\Input\InputInterface  $input
+     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
+     * @return void
+     */
+    protected function afterPromptingForMissingArguments(InputInterface $input, OutputInterface $output)
+    {
+        if ($this->isReservedName($this->getNameInput()) || $this->didReceiveOptions($input)) {
+            return;
+        }
+
+        collect($this->components->choice('Would you like any of the following?', [
+            'none',
+            'all',
+            'factory',
+            'form requests',
+            'migration',
+            'policy',
+            'resource controller',
+            'seed',
+        ], default: 0, multiple: true))
+        ->reject('none')
+        ->map(fn ($option) => match ($option) {
+            'resource controller' => 'resource',
+            'form requests' => 'requests',
+            default => $option,
+        })
+        ->each(fn ($option) => $input->setOption($option, true));
     }
 }

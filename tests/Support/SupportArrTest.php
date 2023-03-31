@@ -731,6 +731,12 @@ class SupportArrTest extends TestCase
         $this->assertCount(2, array_intersect_assoc(['one' => 'foo', 'two' => 'bar', 'three' => 'baz'], $random));
     }
 
+    public function testRandomNotIncrementingKeys()
+    {
+        $random = Arr::random(['foo' => 'foo', 'bar' => 'bar', 'baz' => 'baz']);
+        $this->assertContains($random, ['foo', 'bar', 'baz']);
+    }
+
     public function testRandomOnEmptyArray()
     {
         $random = Arr::random([], 0);
@@ -817,6 +823,11 @@ class SupportArrTest extends TestCase
         );
     }
 
+    public function testEmptyShuffle()
+    {
+        $this->assertEquals([], Arr::shuffle([]));
+    }
+
     public function testSort()
     {
         $unsorted = [
@@ -840,6 +851,32 @@ class SupportArrTest extends TestCase
 
         // sort with dot notation
         $sortedWithDotNotation = array_values(Arr::sort($unsorted, 'name'));
+        $this->assertEquals($expected, $sortedWithDotNotation);
+    }
+
+    public function testSortDesc()
+    {
+        $unsorted = [
+            ['name' => 'Chair'],
+            ['name' => 'Desk'],
+        ];
+
+        $expected = [
+            ['name' => 'Desk'],
+            ['name' => 'Chair'],
+        ];
+
+        $sorted = array_values(Arr::sortDesc($unsorted));
+        $this->assertEquals($expected, $sorted);
+
+        // sort with closure
+        $sortedWithClosure = array_values(Arr::sortDesc($unsorted, function ($value) {
+            return $value['name'];
+        }));
+        $this->assertEquals($expected, $sortedWithClosure);
+
+        // sort with dot notation
+        $sortedWithDotNotation = array_values(Arr::sortDesc($unsorted, 'name'));
         $this->assertEquals($expected, $sortedWithDotNotation);
     }
 
@@ -918,6 +955,25 @@ class SupportArrTest extends TestCase
         ]);
 
         $this->assertSame('font-bold mt-4 ml-2', $classes);
+    }
+
+    public function testToCssStyles()
+    {
+        $styles = Arr::toCssStyles([
+            'font-weight: bold',
+            'margin-top: 4px;',
+        ]);
+
+        $this->assertSame('font-weight: bold; margin-top: 4px;', $styles);
+
+        $styles = Arr::toCssStyles([
+            'font-weight: bold;',
+            'margin-top: 4px',
+            'margin-left: 2px;' => true,
+            'margin-right: 2px' => false,
+        ]);
+
+        $this->assertSame('font-weight: bold; margin-top: 4px; margin-left: 2px;', $styles);
     }
 
     public function testWhere()

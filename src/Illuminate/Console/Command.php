@@ -16,6 +16,7 @@ class Command extends SymfonyCommand
         Concerns\HasParameters,
         Concerns\InteractsWithIO,
         Concerns\InteractsWithSignals,
+        Concerns\PromptsForMissingInput,
         Macroable;
 
     /**
@@ -42,7 +43,7 @@ class Command extends SymfonyCommand
     /**
      * The console command description.
      *
-     * @var string
+     * @var string|null
      */
     protected $description;
 

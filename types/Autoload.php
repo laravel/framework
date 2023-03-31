@@ -7,3 +7,7 @@ class User extends Authenticatable
 {
     use HasFactory;
 }
+
+enum UserType
+{
+}
