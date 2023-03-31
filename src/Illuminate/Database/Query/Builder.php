@@ -2741,9 +2741,23 @@ class Builder implements BuilderContract
      */
     protected function getKeyed($key, $columns = ['*'])
     {
-        return collect($this->onceWithColumns(Arr::prepend(Arr::wrap($columns), $key), function () {
+        return collect($this->onceWithColumns(Arr::prepend($this->qualifyStarColumns($columns), $key), function () {
             return $this->processor->processSelect($this, $this->runSelect(\PDO::FETCH_UNIQUE));
         }));
+    }
+
+    /**
+     * Qualify columns with their table name if they have not been assigned.
+     * 
+     * @param  array|string  $columns
+     * @return array
+     */
+    protected function qualifyStarColumns($columns)
+    {
+        return array_map(
+            fn ($column) => $column === '*' ? $this->from.'.'.$column : $column,
+            Arr::wrap($columns)
+        );
     }
 
     /**
