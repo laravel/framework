@@ -754,7 +754,7 @@ trait HasAttributes
             case 'double':
                 return $this->fromFloat($value);
             case 'decimal':
-                return $this->asDecimal($value, explode(':', $this->getCasts()[$key], 2)[1]);
+                return $this->asDecimal($value, explode(':', $this->resolveCastType($key), 2)[1]);
             case 'string':
                 return (string) $value;
             case 'bool':
@@ -833,13 +833,31 @@ trait HasAttributes
             return;
         }
 
-        $castType = $this->getCasts()[$key];
+        $castType = $this->resolveCastType($key);
 
         if ($value instanceof $castType) {
             return $value;
         }
 
         return $this->getEnumCaseFromValue($castType, $value);
+    }
+
+    /**
+     * Resolve the cast type of the given model attribute.
+     *
+     * @param  string  $key
+     * @return string
+     */
+    protected function resolveCastType($key)
+    {
+        $castType = $this->getCasts()[$key];
+
+        if (is_array($castType)) {
+            [$castType, $arguments] = [array_shift($castType), $castType];
+            $castType = $castType.':'.implode(',', $arguments);
+        }
+
+        return $castType;
     }
 
     /**
@@ -850,7 +868,7 @@ trait HasAttributes
      */
     protected function getCastType($key)
     {
-        $castType = $this->getCasts()[$key];
+        $castType = $this->resolveCastType($key);
 
         if (isset(static::$castTypeCache[$castType])) {
             return static::$castTypeCache[$castType];
@@ -1142,7 +1160,7 @@ trait HasAttributes
      */
     protected function setEnumCastableAttribute($key, $value)
     {
-        $enumClass = $this->getCasts()[$key];
+        $enumClass = $this->resolveCastType($key);
 
         if (! isset($value)) {
             $this->attributes[$key] = null;
@@ -1562,7 +1580,7 @@ trait HasAttributes
             return false;
         }
 
-        $castType = $this->parseCasterClass($casts[$key]);
+        $castType = $this->parseCasterClass($this->resolveCastType($key));
 
         if (in_array($castType, static::$primitiveCastTypes)) {
             return false;
@@ -1589,7 +1607,7 @@ trait HasAttributes
             return false;
         }
 
-        $castType = $casts[$key];
+        $castType = $this->getCastType($key);
 
         if (in_array($castType, static::$primitiveCastTypes)) {
             return false;
@@ -1640,7 +1658,7 @@ trait HasAttributes
      */
     protected function resolveCasterClass($key)
     {
-        $castType = $this->getCasts()[$key];
+        $castType = $this->resolveCastType($key);
 
         $arguments = [];
 
@@ -2043,11 +2061,11 @@ trait HasAttributes
         } elseif ($this->hasCast($key, static::$primitiveCastTypes)) {
             return $this->castAttribute($key, $attribute) ===
                 $this->castAttribute($key, $original);
-        } elseif ($this->isClassCastable($key) && in_array($this->getCasts()[$key], [AsArrayObject::class, AsCollection::class])) {
+        } elseif ($this->isClassCastable($key) && in_array($this->resolveCastType($key), [AsArrayObject::class, AsCollection::class])) {
             return $this->fromJson($attribute) === $this->fromJson($original);
-        } elseif ($this->isClassCastable($key) && Str::startsWith($this->getCasts()[$key], [AsEnumArrayObject::class, AsEnumCollection::class])) {
+        } elseif ($this->isClassCastable($key) && Str::startsWith($this->resolveCastType($key), [AsEnumArrayObject::class, AsEnumCollection::class])) {
             return $this->fromJson($attribute) === $this->fromJson($original);
-        } elseif ($this->isClassCastable($key) && $original !== null && in_array($this->getCasts()[$key], [AsEncryptedArrayObject::class, AsEncryptedCollection::class])) {
+        } elseif ($this->isClassCastable($key) && $original !== null && in_array($this->resolveCastType($key), [AsEncryptedArrayObject::class, AsEncryptedCollection::class])) {
             return $this->fromEncryptedString($attribute) === $this->fromEncryptedString($original);
         }
 
