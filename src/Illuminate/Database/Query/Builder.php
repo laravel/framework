@@ -230,6 +230,13 @@ class Builder implements BuilderContract
     public $useWritePdo = false;
 
     /**
+     * When set, the query result array is keyed by the given column.
+     *
+     * @var string|null
+     */
+    public $keyBy;
+
+    /**
      * Create a new query builder instance.
      *
      * @param  \Illuminate\Database\ConnectionInterface  $connection
@@ -444,6 +451,19 @@ class Builder implements BuilderContract
         } else {
             $this->distinct = true;
         }
+
+        return $this;
+    }
+
+    /**
+     * Force query results to be keyed by the given column.
+     *
+     * @param  string  $column
+     * @return $this
+     */
+    public function keyBy($column)
+    {
+        $this->keyBy = $column;
 
         return $this;
     }
@@ -2703,8 +2723,26 @@ class Builder implements BuilderContract
      */
     public function get($columns = ['*'])
     {
+        if (! is_null($keyBy = $this->keyBy)) {
+            return $this->getKeyed($keyBy, $columns);
+        }
+
         return collect($this->onceWithColumns(Arr::wrap($columns), function () {
             return $this->processor->processSelect($this, $this->runSelect());
+        }));
+    }
+
+    /**
+     * Execute the query as a "select" statement where the resulting array is keyed by the given column.
+     *
+     * @param  string  $key
+     * @param  array|string  $columns
+     * @return \Illuminate\Support\Collection
+     */
+    protected function getKeyed($key, $columns = ['*'])
+    {
+        return collect($this->onceWithColumns(Arr::prepend(Arr::wrap($columns), $key), function () {
+            return $this->processor->processSelect($this, $this->runSelect(\PDO::FETCH_UNIQUE));
         }));
     }
 
@@ -2713,10 +2751,15 @@ class Builder implements BuilderContract
      *
      * @return array
      */
-    protected function runSelect()
+    protected function runSelect($fetchAllMode = null)
     {
-        return $this->connection->select(
+        if (! is_null($fetchAllMode)) {
+            $this->connection->setFetchAllMode($fetchAllMode);
+        }
+
+        return tap($this->connection->select(
             $this->toSql(), $this->getBindings(), ! $this->useWritePdo
+        ), fn () => $this->connection->setFetchAllMode(null, false)
         );
     }
 

@@ -140,6 +140,25 @@ class QueryBuilderTest extends DatabaseTestCase
         Schema::drop('accounting');
     }
 
+    /**
+     * @dataProvider keyByDataProvider
+     */
+    public function testKeyBy($keyBy, $columns, $key, $expected)
+    {
+        $this->assertEquals($expected, json_encode(DB::table('posts')->keyBy($keyBy)->get($columns)[$key]));
+    }
+
+    public static function keyByDataProvider()
+    {
+        return [
+            'Key by title with all columns' => ['title', ['*'], 'Foo Post', '{"id":1,"title":"Foo Post","content":"Lorem Ipsum.","created_at":"2017-11-12 13:14:15"}'],
+            'Key by title with selected columns not including key' => ['title', ['id', 'content'], 'Bar Post', '{"id":2,"content":"Lorem Ipsum."}'],
+            'Key by id with selected columns including key' => ['id', ['id', 'content'], 2, '{"id":2,"content":"Lorem Ipsum."}'],
+            'Key by id with selected dot-columns including key' => ['id', ['posts.id', 'posts.content'], 2, '{"id":2,"content":"Lorem Ipsum."}'],
+            'Key by dot-title with selected dot-columns including key' => ['posts.title', ['posts.title', 'posts.content'], 'Foo Post', '{"title":"Foo Post","content":"Lorem Ipsum."}'],
+        ];
+    }
+
     public function testSole()
     {
         $expected = ['id' => '1', 'title' => 'Foo Post'];
