@@ -340,6 +340,11 @@ trait BuildsQueries
         }
 
         $orders = $this->ensureOrderForCursorPagination(! is_null($cursor) && $cursor->pointsToPreviousItems());
+        $orders->each(function ($order) {
+            if (is_object($order['column']) && $order['column']::class === Expression::class) {
+                throw new RuntimeException("The query expression [{$order['column']}] in \"order by\" clause are supported only if it's aliased and added to the \"select\" clause as well.");
+            }
+        });
 
         if (! is_null($cursor)) {
             $addCursorConditions = function (self $builder, $previousColumn, $i) use (&$addCursorConditions, $cursor, $orders) {
