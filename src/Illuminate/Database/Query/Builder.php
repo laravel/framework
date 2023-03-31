@@ -2748,7 +2748,7 @@ class Builder implements BuilderContract
 
     /**
      * Qualify columns with their table name if they have not been assigned.
-     * 
+     *
      * @param  array|string  $columns
      * @return array
      */
