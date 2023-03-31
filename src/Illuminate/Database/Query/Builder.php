@@ -2773,7 +2773,7 @@ class Builder implements BuilderContract
 
         return tap($this->connection->select(
             $this->toSql(), $this->getBindings(), ! $this->useWritePdo
-        ), fn () => $this->connection->setFetchAllMode(null, false)
+        ), fn () => ! is_null($fetchAllMode) ? $this->connection->setFetchAllMode(null, false) : null
         );
     }
 
