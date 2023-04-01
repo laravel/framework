@@ -148,7 +148,7 @@ class CommandEventsTest extends TestCase
             'CommandFinished', 'taylor', 'otwell', 'coding',
         );
 
-        Env::getRepository()->clear('APP_DEBUG');
+        $laravel->terminate();
     }
 
     protected function assertLogged(...$messages)
