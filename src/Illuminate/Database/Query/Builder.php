@@ -2755,8 +2755,8 @@ class Builder implements BuilderContract
      *
      * After running the callback, the fetch mode is reverted.
      *
-     * @param $mode
-     * @param Closure $callback
+     * @param  int  $mode
+     * @param  Closure  $callback
      * @return \Illuminate\Support\HigherOrderTapProxy|mixed
      */
     protected function onceWithFetchAllMode($mode, Closure $callback)
