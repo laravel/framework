@@ -2747,7 +2747,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Qualify columns with their table name if they have not been assigned.
+     * Qualify star columns with their table name if they have not been prefixed.
      *
      * @param  array|string  $columns
      * @return array
@@ -2763,6 +2763,7 @@ class Builder implements BuilderContract
     /**
      * Run the query as a "select" statement against the connection.
      *
+     * @param  int|null  $fetchAllMode
      * @return array
      */
     protected function runSelect($fetchAllMode = null)
@@ -2773,7 +2774,7 @@ class Builder implements BuilderContract
 
         return tap($this->connection->select(
             $this->toSql(), $this->getBindings(), ! $this->useWritePdo
-        ), fn () => ! is_null($fetchAllMode) ? $this->connection->setFetchAllMode(null, false) : null
+        ), fn () => ! is_null($fetchAllMode) ? $this->connection->resetFetchAllMode() : null
         );
     }
 
