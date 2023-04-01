@@ -2744,8 +2744,26 @@ class Builder implements BuilderContract
         return collect($this->onceWithColumns(Arr::wrap($columns), function () use ($key) {
             $this->columns = Arr::prepend($this->qualifyStarColumns($this->columns), $key);
 
-            return $this->processor->processSelect($this, $this->runSelect(\PDO::FETCH_UNIQUE));
+            return $this->onceWithFetchAllMode(\PDO::FETCH_UNIQUE, function () {
+                return $this->processor->processSelect($this, $this->runSelect());
+            });
         }));
+    }
+
+    /**
+     * Execute the given callback while setting a specific PDO fetch mode.
+     *
+     * After running the callback, the fetch mode is reverted.
+     *
+     * @param $mode
+     * @param Closure $callback
+     * @return \Illuminate\Support\HigherOrderTapProxy|mixed
+     */
+    protected function onceWithFetchAllMode($mode, Closure $callback)
+    {
+        $this->connection->setFetchAllMode($mode);
+
+        return tap($callback(), fn () => $this->connection->resetFetchAllMode());
     }
 
     /**
@@ -2765,18 +2783,12 @@ class Builder implements BuilderContract
     /**
      * Run the query as a "select" statement against the connection.
      *
-     * @param  int|null  $fetchAllMode
      * @return array
      */
-    protected function runSelect($fetchAllMode = null)
+    protected function runSelect()
     {
-        if (! is_null($fetchAllMode)) {
-            $this->connection->setFetchAllMode($fetchAllMode);
-        }
-
-        return tap($this->connection->select(
+        return $this->connection->select(
             $this->toSql(), $this->getBindings(), ! $this->useWritePdo
-        ), fn () => ! is_null($fetchAllMode) ? $this->connection->resetFetchAllMode() : null
         );
     }
 
