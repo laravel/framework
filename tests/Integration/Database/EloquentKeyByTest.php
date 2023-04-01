@@ -56,10 +56,8 @@ class EloquentKeyByTest extends DatabaseTestCase
     public static function keyByWithSelectDataProvider()
     {
         return [
-            // The "name" column is supposed to remain empty here since SELECT does not include an extra prepended keyBy column:
-            'SELECT without including extra keyBy column' => ['name', ['name', 'address'], 'Taylor Otwell', ['address' => '5th Avenue']],
-            // Since we prepend an extra "name" column here, we account for PDO to shift the first column as the array key:
-            'SELECT with including extra keyBy column' => ['name', ['name', 'name', 'address'], 'Taylor Otwell', ['name' => 'Taylor Otwell', 'address' => '5th Avenue']],
+            'keyBy column does not become part of the result if not SELECTed' => ['name', ['address'], 'Taylor Otwell', ['address' => '5th Avenue']],
+            'keyBy column becomes part of the result if SELECTed' => ['name', ['name', 'address'], 'Taylor Otwell', ['name' => 'Taylor Otwell', 'address' => '5th Avenue']],
         ];
     }
 }
