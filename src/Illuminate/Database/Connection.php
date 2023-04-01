@@ -507,13 +507,25 @@ class Connection implements ConnectionInterface
     /**
      * Set the fetch mode override for calling $statement->fetchAll().
      *
-     * @param  int|null  $fetchAllMode
+     * @param  int  $fetchAllMode
      * @param  bool  $prepend
      * @return $this
      */
     public function setFetchAllMode($fetchAllMode, $prepend = true)
     {
         $this->fetchAllMode = $fetchAllMode | ($prepend ? $this->fetchMode : 0);
+
+        return $this;
+    }
+
+    /**
+     * Reset the fetch mode override for calling $statement->fetchAll().
+     *
+     * @return $this
+     */
+    public function resetFetchAllMode()
+    {
+        $this->fetchAllMode = null;
 
         return $this;
     }
