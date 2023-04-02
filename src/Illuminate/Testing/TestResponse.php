@@ -980,6 +980,19 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * 
+     *
+     * @param  string  $url
+     * @return $this
+     */
+    public function assertUrlIs($url)
+    {
+        PHPUnit::assertEquals($url, request()->path());
+
+        return $this;
+    }
+
+    /**
      * Assert that the response view equals the given value.
      *
      * @param  string  $value
