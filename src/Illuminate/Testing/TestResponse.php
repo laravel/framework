@@ -980,7 +980,7 @@ class TestResponse implements ArrayAccess
     }
 
     /**
-     * 
+     * Assert that the response url equals the given url.
      *
      * @param  string  $url
      * @return $this
