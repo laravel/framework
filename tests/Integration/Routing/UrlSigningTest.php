@@ -21,6 +21,11 @@ class UrlSigningTest extends TestCase
         Carbon::setTestNow(null);
     }
 
+    protected function defineEnvironment($app): void
+    {
+        $app['config']->set(['app.key' => 'AckfSECXIvnK5r28GVIWUAxmbBSjTsmF']);
+    }
+
     public function testSigningUrl()
     {
         Route::get('/foo/{id}', function (Request $request, $id) {

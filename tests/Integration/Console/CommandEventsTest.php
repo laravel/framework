@@ -7,7 +7,6 @@ use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Env;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\Foundation\Application as Testbench;
@@ -148,7 +147,7 @@ class CommandEventsTest extends TestCase
             'CommandFinished', 'taylor', 'otwell', 'coding',
         );
 
-        Env::getRepository()->clear('APP_DEBUG');
+        $laravel->terminate();
     }
 
     protected function assertLogged(...$messages)
