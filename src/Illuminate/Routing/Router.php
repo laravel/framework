@@ -427,7 +427,7 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function apiSingleton($name, $controller, array $options = [])
     {
-        $only = ['show', 'update', 'destroy'];
+        $only = ['store', 'show', 'update', 'destroy'];
 
         if (isset($options['except'])) {
             $only = array_diff($only, (array) $options['except']);
