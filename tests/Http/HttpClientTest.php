@@ -1576,6 +1576,31 @@ class HttpClientTest extends TestCase
         $this->factory->assertSentCount(1);
     }
 
+    public function testRequestsWillBeWaitingSleepMillisecondsReceivedBeforeRetry()
+    {
+        $startTime = microtime(true);
+
+        $this->factory->fake([
+            '*' => $this->factory->sequence()
+                ->push(['error'], 500)
+                ->push(['error'], 500)
+                ->push(['ok'], 200),
+        ]);
+
+        $this->factory
+            ->retry(3, function ($attempt, $exception) {
+                $this->assertInstanceOf(RequestException::class, $exception);
+
+                return $attempt * 100;
+            }, null, true)
+            ->get('http://foo.com/get');
+
+        $this->factory->assertSentCount(3);
+
+        // Make sure was waited 300ms for the first two attempts
+        $this->assertEqualsWithDelta(0.3, microtime(true) - $startTime, 0.03);
+    }
+
     public function testMiddlewareRunsWhenFaked()
     {
         $this->factory->fake(function (Request $request) {
