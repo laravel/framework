@@ -29,6 +29,13 @@ class ResourceRegistrar
     protected $singletonResourceDefaults = ['show', 'edit', 'update'];
 
     /**
+     * The default actions for a api singleton resource controller.
+     *
+     * @var string[]
+     */
+    protected $apiSingletonResourceDefaults = ['show', 'update'];
+
+    /**
      * The parameters set for this resource instance.
      *
      * @var array|string
@@ -147,7 +154,9 @@ class ResourceRegistrar
             return;
         }
 
-        $defaults = $this->singletonResourceDefaults;
+        $defaults = $options['apiSingleton'] ?? false
+            ? $this->apiSingletonResourceDefaults
+            : $this->singletonResourceDefaults;
 
         $collection = new RouteCollection;
 
@@ -241,30 +250,32 @@ class ResourceRegistrar
     {
         $methods = $defaults;
 
+        if ($options['creatable'] ?? false === true) {
+            if ($options['apiSingleton'] ?? false === true) {
+                $methods = array_merge(['store'], $methods);
+            } else {
+                $methods = array_merge(['create', 'store'], $methods);
+            }
+
+            // Check if the user hasn't explicitly set the destroyable option to false
+            if ($options['destroyable'] ?? null !== false) {
+                $methods = array_merge(['destroy'], $methods);
+
+                // Set the destroyable option to false so it won't be added again
+                $options['destroyable'] = false;
+            }
+        }
+
+        if ($options['destroyable'] ?? false === true) {
+            $methods = array_merge(['destroy'], $methods);
+        }
+
         if (isset($options['only'])) {
             $methods = array_intersect($methods, (array) $options['only']);
         }
 
         if (isset($options['except'])) {
             $methods = array_diff($methods, (array) $options['except']);
-        }
-
-        if (isset($options['creatable'])) {
-            $methods = isset($options['apiSingleton'])
-                            ? array_merge(['store', 'destroy'], $methods)
-                            : array_merge(['create', 'store', 'destroy'], $methods);
-
-            return $this->getResourceMethods(
-                $methods, array_values(Arr::except($options, ['creatable']))
-            );
-        }
-
-        if (isset($options['destroyable'])) {
-            $methods = array_merge(['destroy'], $methods);
-
-            return $this->getResourceMethods(
-                $methods, array_values(Arr::except($options, ['destroyable']))
-            );
         }
 
         return $methods;
