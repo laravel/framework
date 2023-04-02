@@ -101,7 +101,7 @@
         "league/flysystem-read-only": "^3.3",
         "league/flysystem-sftp-v3": "^3.0",
         "mockery/mockery": "^1.5.1",
-        "orchestra/testbench-core": "^7.16",
+        "orchestra/testbench-core": "^7.24",
         "pda/pheanstalk": "^4.0",
         "phpstan/phpdoc-parser": "^1.15",
         "phpstan/phpstan": "^1.4.7",
