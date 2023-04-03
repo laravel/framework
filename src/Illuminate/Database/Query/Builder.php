@@ -397,7 +397,6 @@ class Builder implements BuilderContract
             }
 
             foreach ($query->joins as $join) {
-                /** @var JoinClause $join */
                 if (! str_starts_with($join->table, $databaseName) && ! str_contains($join->table, '.')) {
                     $join->table = $databaseName . '.' . $join->table;
                 }
