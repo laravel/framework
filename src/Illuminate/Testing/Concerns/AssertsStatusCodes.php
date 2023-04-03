@@ -144,6 +144,16 @@ trait AssertsStatusCodes
     }
 
     /**
+     * Assert that the response has a 410 "Gone" status code.
+     *
+     * @return $this
+     */
+    public function assertGone()
+    {
+        return $this->assertStatus(409);
+    }
+
+    /**
      * Assert that the response has a 415 "Unsupported Media Type" status code.
      *
      * @return $this
