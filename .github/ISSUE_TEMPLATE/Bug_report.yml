@@ -1,0 +1,38 @@
+name: Bug Report
+description: Report something that's broken. Please ensure your Laravel version is still supported: https://laravel.com/docs/releases#support-policy
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: input
+    id: laravel-version
+    attributes:
+      label: Laravel Version
+      description: Please provide the full Laravel version you're using.
+      placeholder: x.y.z
+    validations:
+      required: true
+  - type: input
+    id: php-version
+    attributes:
+      label: PHP Version
+      description: Please provide the full PHP version you're using.
+      placeholder: x.y.z
+  - type: input
+    id: database-version
+    attributes:
+      label: Database Driver & Version
+      description: If applicable, please provide the database driver and full version you're using.
+      placeholder: x.y.z
+    validations:
+      required: false
+  - type: markdown
+    id: description
+    attributes:
+      label: Description
+      description: Please provide a detailed description of the issue you're facing. Don't write a book but provide enough details for us.
+  - type: markdown
+    id: reproduce
+    attributes:
+      label: Steps To Reproduce
+      description: Provide detailed steps to reproduce your issue. If possible, please provide a GitHub repository to demonstrate your issue using `laravel new bug-report --github="--public"`.
+      
