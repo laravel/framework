@@ -3039,7 +3039,7 @@ class EloquentModelCastingStub extends Model
         'asEncryptedCollectionAttribute' => AsEncryptedCollection::class,
         'asEncryptedArrayObjectAttribute' => AsEncryptedArrayObject::class,
         'asEnumCollectionAttribute' => AsEnumCollection::class.':'.StringStatus::class,
-        'asEnumArrayObjectAttribute' => [AsEnumArrayObject::class, StringStatus::class],
+        'asEnumArrayObjectAttribute' => AsEnumArrayObject::class.':'.StringStatus::class,
     ];
 
     public function jsonAttributeValue()
