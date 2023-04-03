@@ -780,14 +780,15 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      * @template TMapToDictionaryValue
      *
      * @param  callable(TValue, TKey): array<TMapToDictionaryKey, TMapToDictionaryValue>  $callback
+     * @param  bool $keepKeys
      * @return static<TMapToDictionaryKey, array<int, TMapToDictionaryValue>>
      */
-    public function mapToDictionary(callable $callback)
+    public function mapToDictionary(callable $callback, $keepKeys = false)
     {
         $dictionary = [];
 
-        foreach ($this->items as $key => $item) {
-            $pair = $callback($item, $key);
+        foreach ($this->items as $originalKey => $item) {
+            $pair = $callback($item, $originalKey);
 
             $key = key($pair);
 
@@ -797,7 +798,11 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
                 $dictionary[$key] = [];
             }
 
-            $dictionary[$key][] = $value;
+            if ($keepKeys) {
+                $dictionary[$key][$originalKey] = $value;
+            } else {
+                $dictionary[$key][] = $value;
+            }
         }
 
         return new static($dictionary);
