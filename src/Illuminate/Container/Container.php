@@ -11,6 +11,7 @@ use Illuminate\Contracts\Container\Container as ContainerContract;
 use LogicException;
 use ReflectionClass;
 use ReflectionException;
+use ReflectionFunction;
 use ReflectionParameter;
 use TypeError;
 
@@ -675,10 +676,8 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function getClassForCallable($callback)
     {
-        if (
-            is_callable($callback) &&
-            ! ($reflector = new \ReflectionFunction($callback(...)))->isAnonymous()
-        ) {
+        if (is_callable($callback) &&
+            ! ($reflector = new ReflectionFunction($callback(...)))->isAnonymous()) {
             return $reflector->getClosureScopeClass()->name ?? false;
         }
 
