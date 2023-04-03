@@ -306,10 +306,12 @@ class BelongsToMany extends Relation
         // parents without having a possibly slow inner loop for every model.
         $dictionary = [];
 
-        foreach ($results as $result) {
+        $isKeyed = ! is_null($this->getBaseQuery()->keyBy);
+
+        foreach ($results as $key => $result) {
             $value = $this->getDictionaryKey($result->{$this->accessor}->{$this->foreignPivotKey});
 
-            $dictionary[$value][] = $result;
+            $isKeyed ? $dictionary[$value][$key] = $result : $dictionary[$value][] = $result;
         }
 
         return $dictionary;

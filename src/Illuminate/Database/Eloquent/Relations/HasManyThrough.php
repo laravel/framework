@@ -237,11 +237,13 @@ class HasManyThrough extends Relation
     {
         $dictionary = [];
 
+        $isKeyed = ! is_null($this->getBaseQuery()->keyBy);
+
         // First we will create a dictionary of models keyed by the foreign key of the
         // relationship as this will allow us to quickly access all of the related
         // models without having to do nested looping which will be quite slow.
-        foreach ($results as $result) {
-            $dictionary[$result->laravel_through_key][] = $result;
+        foreach ($results as $key => $result) {
+            $isKeyed ? $dictionary[$result->laravel_through_key][$key] = $result : $dictionary[$result->laravel_through_key][] = $result;
         }
 
         return $dictionary;

@@ -2742,7 +2742,7 @@ class Builder implements BuilderContract
     protected function getKeyed($key, $columns = ['*'])
     {
         return collect($this->onceWithColumns(Arr::wrap($columns), function () use ($key) {
-            $this->columns = Arr::prepend($this->qualifyStarColumns($this->columns), $key);
+            $this->columns = Arr::prepend($this->qualifyStarColumns($this->columns), $this->from.'.'.$key);
 
             return $this->onceWithFetchAllMode(\PDO::FETCH_UNIQUE, function () {
                 return $this->processor->processSelect($this, $this->runSelect());
