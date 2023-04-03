@@ -676,12 +676,20 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function getClassForCallable($callback)
     {
-        if (is_callable($callback) &&
-            ! ($reflector = new ReflectionFunction($callback(...)))->isAnonymous()) {
-            return $reflector->getClosureScopeClass()->name ?? false;
+        if (PHP_VERSION_ID >= 80200) {
+            if (is_callable($callback) &&
+                ! ($reflector = new ReflectionFunction($callback(...)))->isAnonymous()) {
+                return $reflector->getClosureScopeClass()->name ?? false;
+            }
+
+            return false;
         }
 
-        return false;
+        if (! is_array($callback)) {
+            return false;
+        }
+
+        return is_string($callback[0]) ? $callback[0] : get_class($callback[0]);
     }
 
     /**
