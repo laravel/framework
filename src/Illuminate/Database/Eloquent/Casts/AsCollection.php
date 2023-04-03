@@ -34,7 +34,7 @@ class AsCollection implements Castable
                 $collectionClass = $this->arguments[0] ?? Collection::class;
 
                 if (! is_a($collectionClass, Collection::class, true)) {
-                    throw new InvalidArgumentException('The provided class must be a Collection');
+                    throw new InvalidArgumentException('The provided class must extend ['.Collection::class.']');
                 }
 
                 return is_array($data) ? new $collectionClass($data) : null;
