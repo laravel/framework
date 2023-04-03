@@ -798,11 +798,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
                 $dictionary[$key] = [];
             }
 
-            if ($keepKeys) {
-                $dictionary[$key][$originalKey] = $value;
-            } else {
-                $dictionary[$key][] = $value;
-            }
+            $keepKeys ? $dictionary[$key][$originalKey] = $value : $dictionary[$key][] = $value;
         }
 
         return new static($dictionary);
