@@ -987,7 +987,7 @@ class TestResponse implements ArrayAccess
      */
     public function assertUrlPathIs($url)
     {
-        PHPUnit::assertEquals($url, request()->path());
+        PHPUnit::assertEquals($url, app('request')->path());
 
         return $this;
     }
