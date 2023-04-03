@@ -150,7 +150,7 @@ trait AssertsStatusCodes
      */
     public function assertGone()
     {
-        return $this->assertStatus(409);
+        return $this->assertStatus(410);
     }
 
     /**
