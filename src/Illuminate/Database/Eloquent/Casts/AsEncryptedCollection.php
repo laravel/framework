@@ -29,7 +29,7 @@ class AsEncryptedCollection implements Castable
                 $collectionClass = $this->arguments[0] ?? Collection::class;
 
                 if (! is_a($collectionClass, Collection::class, true)) {
-                    throw new InvalidArgumentException('The provided class must extend ['.Collection::class.']');
+                    throw new InvalidArgumentException('The provided class must extend ['.Collection::class.'].');
                 }
 
                 if (isset($attributes[$key])) {
