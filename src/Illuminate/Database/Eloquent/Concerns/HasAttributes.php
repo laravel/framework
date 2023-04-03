@@ -1498,16 +1498,16 @@ trait HasAttributes
         $casts = array_map(static function (array|string $castType) {
             if (is_array($castType)) {
                 [$castType, $arguments] = [array_shift($castType), $castType];
-                $castType = $castType . ':' . implode(',', $arguments);
+                $castType = $castType.':'.implode(',', $arguments);
             }
-    
+
             return $castType;
         }, $this->casts);
-    
+
         if ($this->getIncrementing()) {
             return array_merge([$this->getKeyName() => $this->getKeyType()], $casts);
         }
-    
+
         return $casts;
     }
 
