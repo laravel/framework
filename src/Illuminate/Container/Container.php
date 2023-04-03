@@ -1026,7 +1026,10 @@ class Container implements ArrayAccess, ContainerContract
             return [];
         }
 
-        if ($this->hasConfigRepository()) {
+        if (isset($this['config']) &&
+            interface_exists(\Illuminate\Contracts\Config\Repository::class) &&
+            is_subclass_of($this['config'], \Illuminate\Contracts\Config\Repository::class)
+        ) {
             foreach ($parameter->getAttributes(InjectedConfig::class) as $attribute) {
                 $injectedConfig = $attribute->newInstance();
 
@@ -1288,16 +1291,6 @@ class Container implements ArrayAccess, ContainerContract
         foreach ($callbacks as $callback) {
             $callback($object, $this);
         }
-    }
-
-    /**
-     * @return bool
-     */
-    public function hasConfigRepository(): bool
-    {
-        return isset($this['config']) &&
-               interface_exists(\Illuminate\Contracts\Config\Repository::class) &&
-               is_subclass_of($this['config'], \Illuminate\Contracts\Config\Repository::class);
     }
 
     /**
