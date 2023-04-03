@@ -1026,8 +1026,7 @@ class Container implements ArrayAccess, ContainerContract
             return [];
         }
 
-        if (isset($this['config']) &&
-            interface_exists(\Illuminate\Contracts\Config\Repository::class) &&
+        if ($this->has('config') &&
             is_subclass_of($this['config'], \Illuminate\Contracts\Config\Repository::class)
         ) {
             foreach ($parameter->getAttributes(InjectedConfig::class) as $attribute) {
