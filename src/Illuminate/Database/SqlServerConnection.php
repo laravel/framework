@@ -130,7 +130,7 @@ class SqlServerConnection extends Connection
     /**
      * Escapes a binary value for safe SQL embedding.
      *
-     * @param string $value
+     * @param  string  $value
      * @return string
      */
     protected function escapeBinary($value)

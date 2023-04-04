@@ -1627,7 +1627,7 @@ class Connection implements ConnectionInterface
      * Escapes a value for safe SQL embedding.
      *
      * @param  string|float|int|bool  $value
-     * @param  bool $binary
+     * @param  bool  $binary
      * @return string
      */
     public function escape($value, $binary = false)
@@ -1636,7 +1636,7 @@ class Connection implements ConnectionInterface
             return $this->escapeBinary($value);
         } else if (is_numeric($value)) {
             return (string) $value;
-        } else if (is_bool($value)) {
+        } elseif (is_bool($value)) {
             return $this->escapeBool($value);
         } else {
             // As many desktop tools and other programming languages still have problems with null bytes, they are
@@ -1666,7 +1666,7 @@ class Connection implements ConnectionInterface
     /**
      * Escapes a string value for safe SQL embedding.
      *
-     * @param string $value
+     * @param  string  $value
      * @return string
      */
     protected function escapeString($value)
@@ -1677,7 +1677,7 @@ class Connection implements ConnectionInterface
     /**
      * Escapes a bool value for safe SQL embedding.
      *
-     * @param bool $value
+     * @param  bool  $value
      * @return string
      */
     protected function escapeBool($value)
@@ -1688,7 +1688,7 @@ class Connection implements ConnectionInterface
     /**
      * Escapes a binary value for safe SQL embedding.
      *
-     * @param string $value
+     * @param  string  $value
      * @return string
      */
     protected function escapeBinary($value)

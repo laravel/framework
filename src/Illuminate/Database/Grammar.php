@@ -279,7 +279,7 @@ abstract class Grammar
      * Escapes a value for safe SQL embedding.
      *
      * @param  string|float|int|bool  $value
-     * @param  bool $binary
+     * @param  bool  $binary
      * @return string
      */
     public function escape($value, $binary = false)
