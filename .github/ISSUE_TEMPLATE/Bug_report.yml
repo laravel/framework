@@ -1,5 +1,5 @@
 name: Bug Report
-description: Report something that's broken. Please ensure your Laravel version is still supported: https://laravel.com/docs/releases#support-policy
+description: "Report something that's broken. Please ensure your Laravel version is still supported: https://laravel.com/docs/releases#support-policy"
 title: "[Bug]: "
 labels: ["bug"]
 body:
