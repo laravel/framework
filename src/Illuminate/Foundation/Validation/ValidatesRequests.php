@@ -23,7 +23,7 @@ trait ValidatesRequests
         $request = $request ?: request();
 
         if (is_array($validator)) {
-            $validator = $this->getValidationFactory()->make($request->all(), $validator);
+            $validator = $this->getValidationFactory()->make($this->validationData($request), $validator);
         }
 
         if ($request->isPrecognitive()) {
@@ -51,7 +51,7 @@ trait ValidatesRequests
                              array $messages = [], array $attributes = [])
     {
         $validator = $this->getValidationFactory()->make(
-            $request->all(), $rules, $messages, $attributes
+            $this->validationData($request), $rules, $messages, $attributes
         );
 
         if ($request->isPrecognitive()) {
@@ -86,6 +86,17 @@ trait ValidatesRequests
 
             throw $e;
         }
+    }
+
+    /**
+     * Get data to be validated from the request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
+    public function validationData(Request $request)
+    {
+        return $request->all();
     }
 
     /**
