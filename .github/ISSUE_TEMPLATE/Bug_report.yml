@@ -8,7 +8,7 @@ body:
     attributes:
       label: Laravel Version
       description: Please provide the full Laravel version you're using.
-      placeholder: x.y.z
+      placeholder: 10.4.1
     validations:
       required: true
   - type: input
@@ -16,13 +16,13 @@ body:
     attributes:
       label: PHP Version
       description: Please provide the full PHP version you're using.
-      placeholder: x.y.z
+      placeholder: 8.1.4
   - type: input
     id: database-version
     attributes:
       label: Database Driver & Version
       description: If applicable, please provide the database driver and full version you're using.
-      placeholder: x.y.z
+      placeholder: "mysql Ver 8.0.31 for macos13.0 on arm64 (Homebrew)"
     validations:
       required: false
   - type: textarea
