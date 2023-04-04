@@ -147,6 +147,7 @@ class EventFakeTest extends TestCase
             'Illuminate\\Tests\\Integration\\Events\\PostAutoEventSubscriber@handle',
             PostEventSubscriber::class,
             [PostEventSubscriber::class, 'foo'],
+            InvokableEventSubscriber::class
         ]);
 
         foreach ($listenersOfSameEventInRandomOrder as $listener) {
@@ -172,6 +173,7 @@ class EventFakeTest extends TestCase
         Event::assertListening(NonImportantEvent::class, Closure::class);
         Event::assertListening('eloquent.saving: '.Post::class, PostObserver::class.'@saving');
         Event::assertListening('eloquent.saving: '.Post::class, [PostObserver::class, 'saving']);
+        Event::assertListening('event', InvokableEventSubscriber::class);
     }
 
     public function testMissingMethodsAreForwarded()
@@ -226,6 +228,14 @@ class PostEventSubscriber
 class PostAutoEventSubscriber
 {
     public function handle($event)
+    {
+        //
+    }
+}
+
+class InvokableEventSubscriber
+{
+    public function __invoke($event)
     {
         //
     }
