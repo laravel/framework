@@ -27,12 +27,10 @@ body:
       required: false
   - type: markdown
     id: description
-    attributes:
-      description: Please provide a detailed description of the issue you're facing. Don't write a book but provide enough details for us.
-      value: "Test"
+    attributes
+      value: Please provide a detailed description of the issue you're facing. Don't write a book but provide enough details for us.
   - type: markdown
     id: reproduce
     attributes:
-      description: Provide detailed steps to reproduce your issue. If possible, please provide a GitHub repository to demonstrate your issue using `laravel new bug-report --github="--public"`.
-      value: "Test"
+      value: Provide detailed steps to reproduce your issue. If possible, please provide a GitHub repository to demonstrate your issue using `laravel new bug-report --github="--public"`.
       
