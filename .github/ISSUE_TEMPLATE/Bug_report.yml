@@ -16,6 +16,8 @@ body:
       label: PHP Version
       description: Please provide the full PHP version you're using.
       placeholder: 8.1.4
+    validations:
+      required: true
   - type: input
     id: database-version
     attributes:
@@ -29,9 +31,13 @@ body:
     attributes:
       label: Description
       description: Please provide a detailed description of the issue you're facing. Don't write a book but provide enough details for us.
+    validations:
+      required: true
   - type: textarea
     id: reproduce
     attributes:
       label: Steps To Reproduce
       description: Provide detailed steps to reproduce your issue. If possible, please provide a GitHub repository to demonstrate your issue using `laravel new bug-report --github="--public"`.
+    validations:
+      required: true
       
