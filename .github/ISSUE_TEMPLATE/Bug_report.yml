@@ -4,7 +4,7 @@ labels: ["bug"]
 body:
   - type: markdown
     attributes:
-      value: "[Please ensure your Laravel version is still supported.](https://laravel.com/docs/releases#support-policy)"
+      value: "Before submitting your report, [please ensure your Laravel version is still supported](https://laravel.com/docs/releases#support-policy)."
   - type: input
     id: laravel-version
     attributes:
