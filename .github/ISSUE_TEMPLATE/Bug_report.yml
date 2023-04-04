@@ -27,7 +27,7 @@ body:
       required: false
   - type: markdown
     id: description
-    attributes
+    attributes:
       value: Please provide a detailed description of the issue you're facing. Don't write a book but provide enough details for us.
   - type: markdown
     id: reproduce
