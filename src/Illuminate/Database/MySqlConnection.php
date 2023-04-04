@@ -94,4 +94,16 @@ class MySqlConnection extends Connection
     {
         return new MySqlDriver;
     }
+    /**
+     * Escapes a binary value for safe SQL embedding.
+     *
+     * @param string $value
+     * @return string
+     */
+    protected function escapeBinary($value)
+    {
+        $hex = bin2hex($value);
+
+        return "x'{$hex}'";
+    }
 }
