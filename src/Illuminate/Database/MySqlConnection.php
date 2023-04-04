@@ -94,6 +94,7 @@ class MySqlConnection extends Connection
     {
         return new MySqlDriver;
     }
+
     /**
      * Escapes a binary value for safe SQL embedding.
      *
