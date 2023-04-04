@@ -25,12 +25,14 @@ body:
       placeholder: x.y.z
     validations:
       required: false
-  - type: markdown
+  - type: textarea
     id: description
     attributes:
-      value: Please provide a detailed description of the issue you're facing. Don't write a book but provide enough details for us.
-  - type: markdown
+      label: Description
+      description: Please provide a detailed description of the issue you're facing. Don't write a book but provide enough details for us.
+  - type: textarea
     id: reproduce
     attributes:
-      value: Provide detailed steps to reproduce your issue. If possible, please provide a GitHub repository to demonstrate your issue using `laravel new bug-report --github="--public"`.
+      label: Steps To Reproduce
+      description: Provide detailed steps to reproduce your issue. If possible, please provide a GitHub repository to demonstrate your issue using `laravel new bug-report --github="--public"`.
       
