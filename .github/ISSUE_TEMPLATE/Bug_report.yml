@@ -9,7 +9,7 @@ body:
     id: laravel-version
     attributes:
       label: Laravel Version
-      description: Please provide the full Laravel version you're using.
+      description: Provide the Laravel version that you are using.
       placeholder: 10.4.1
     validations:
       required: true
@@ -17,7 +17,7 @@ body:
     id: php-version
     attributes:
       label: PHP Version
-      description: Please provide the full PHP version you're using.
+      description: Provide the PHP version that you are using.
       placeholder: 8.1.4
     validations:
       required: true
@@ -25,22 +25,22 @@ body:
     id: database-version
     attributes:
       label: Database Driver & Version
-      description: If applicable, please provide the database driver and full version you're using.
-      placeholder: "mysql Ver 8.0.31 for macos13.0 on arm64 (Homebrew)"
+      description: If applicable, provide the database driver and version you are using.
+      placeholder: "MySQL 8.0.31 for macOS 13.0 on arm64 (Homebrew)"
     validations:
       required: false
   - type: textarea
     id: description
     attributes:
       label: Description
-      description: Please provide a detailed description of the issue you're facing. Don't write a book but provide enough details for us.
+      description: Provide a detailed description of the issue you are facing.
     validations:
       required: true
   - type: textarea
     id: reproduce
     attributes:
       label: Steps To Reproduce
-      description: Provide detailed steps to reproduce your issue. If possible, please provide a GitHub repository to demonstrate your issue using `laravel new bug-report --github="--public"`.
+      description: Provide detailed steps to reproduce your issue. If necessary, please provide a GitHub repository to demonstrate your issue using `laravel new bug-report --github="--public"`.
     validations:
       required: true
       
