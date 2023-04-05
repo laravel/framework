@@ -270,7 +270,8 @@ trait HasRelationships
         // If no name is provided, we will use the backtrace to get the function name
         // since that is most likely the name of the polymorphic interface. We can
         // use that to get both the class and foreign key that will be utilized.
-        $name = $name ?: $this->guessBelongsToRelation();
+        $functionName = $this->guessBelongsToRelation();
+        $name = $name ?: $functionName;
 
         [$type, $id] = $this->getMorphs(
             Str::snake($name), $type, $id
@@ -280,8 +281,8 @@ trait HasRelationships
         // the relationship. In this case we'll just pass in a dummy query where we
         // need to remove any eager loads that may already be defined on a model.
         return is_null($class = $this->getAttributeFromArray($type)) || $class === ''
-                    ? $this->morphEagerTo($this->guessBelongsToRelation(), $type, $id, $ownerKey)
-                    : $this->morphInstanceTo($class, $this->guessBelongsToRelation(), $type, $id, $ownerKey);
+                    ? $this->morphEagerTo($functionName, $type, $id, $ownerKey)
+                    : $this->morphInstanceTo($class, $functionName, $type, $id, $ownerKey);
     }
 
     /**
