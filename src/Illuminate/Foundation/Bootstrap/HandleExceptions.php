@@ -194,18 +194,16 @@ class HandleExceptions
     {
         self::$reservedMemory = null;
 
-        $uncaught = false;
-
         try {
             $this->getExceptionHandler()->report($e);
         } catch (Exception $e) {
-            $uncaught = true;
+            $exceptionHandlerFailed = true;
         }
 
         if (static::$app->runningInConsole()) {
             $this->renderForConsole($e);
 
-            if ($uncaught) {
+            if ($exceptionHandlerFailed ?? false) {
                 exit(1);
             }
         } else {
