@@ -134,6 +134,8 @@ trait BuildsQueries
             if ($countResults == 0) {
                 break;
             }
+            
+            $lastId = data_get($results->last(), $alias);
 
             // On each chunk result set, we will pass them to the callback and then let the
             // developer take care of everything within the callback, which allows us to
@@ -141,8 +143,6 @@ trait BuildsQueries
             if ($callback($results, $page) === false) {
                 return false;
             }
-
-            $lastId = data_get($results->last(), $alias);
 
             if ($lastId === null) {
                 throw new RuntimeException("The chunkById operation was aborted because the [{$alias}] column is not present in the query result.");
