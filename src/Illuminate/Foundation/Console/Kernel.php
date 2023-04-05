@@ -118,11 +118,11 @@ class Kernel implements KernelContract
         $this->app = $app;
         $this->events = $events;
 
-        if (! $this->app->runningUnitTests()) {
-            $this->rerouteSymfonyCommandEvents();
-        }
-
         $this->app->booted(function () {
+            if (! $this->app->runningUnitTests()) {
+                $this->rerouteSymfonyCommandEvents();
+            }
+
             $this->defineConsoleSchedule();
         });
     }

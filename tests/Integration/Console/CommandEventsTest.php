@@ -7,6 +7,7 @@ use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Foundation\Testing\WithConsoleEvents;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\Foundation\Application as Testbench;
@@ -14,6 +15,8 @@ use Orchestra\Testbench\TestCase;
 
 class CommandEventsTest extends TestCase
 {
+    use WithConsoleEvents;
+
     /**
      * The path to the file that execution logs will be written to.
      *
@@ -43,17 +46,6 @@ class CommandEventsTest extends TestCase
         });
 
         parent::setUp();
-    }
-
-    /**
-     * Define environment setup.
-     *
-     * @param  \Illuminate\Foundation\Application  $app
-     * @return void
-     */
-    protected function defineEnvironment($app)
-    {
-        $app->make(ConsoleKernel::class)->rerouteSymfonyCommandEvents();
     }
 
     /**
