@@ -1,6 +1,18 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.5.1...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v10.6.0...10.x)
+
+
+## [v10.6.0 (2023-04-04)](https://github.com/laravel/framework/compare/v10.5.1...v10.6.0)
+
+### Added
+- Added ability to set a custom class for the AsCollection and AsEncryptedCollection casts ([#46619](https://github.com/laravel/framework/pull/46619))
+
+### Changed
+- Set container instance on session manager ([#46621](https://github.com/laravel/framework/pull/46621))
+- Added empty string definition to Str::squish function ([#46660](https://github.com/laravel/framework/pull/46660))
+- Allow $sleepMilliseconds parameter receive a Closure in retry method from PendingRequest ([#46653](https://github.com/laravel/framework/pull/46653))
+- Support contextual binding on first class callables ([de8d515](https://github.com/laravel/framework/commit/de8d515fc6d1fabc8f14450342554e0eb67df725), [e511a3b](https://github.com/laravel/framework/commit/e511a3bdb15c294866428b4fe665a4ad14540038))
 
 
 ## [v10.5.1 (2023-03-29)](https://github.com/laravel/framework/compare/v10.5.0...v10.5.1)
