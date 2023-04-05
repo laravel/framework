@@ -3,6 +3,7 @@
 namespace Illuminate\Routing;
 
 use Illuminate\Support\Arr;
+use InvalidArgumentException;
 
 trait CreatesRegularExpressionRouteConstraints
 {
@@ -71,6 +72,22 @@ trait CreatesRegularExpressionRouteConstraints
     public function whereIn($parameters, array $values)
     {
         return $this->assignExpressionToParameters($parameters, implode('|', $values));
+    }
+
+    /**
+     * Specify that the given route parameters must be one of the enum values.
+     *
+     * @param  array|string  $parameters
+     * @param  class-string<\UnitEnum>  $enum
+     * @return $this
+     */
+    public function whereEnum($parameters, string $enum)
+    {
+        if (! enum_exists($enum)) {
+            throw new InvalidArgumentException("The enum [{$enum}] does not exist.");
+        }
+
+        return $this->whereIn($parameters, array_column($enum::cases(), 'value'));
     }
 
     /**
