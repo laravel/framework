@@ -62,8 +62,6 @@ class Pipe
      *
      * @param  callable|null  $output
      * @return \Illuminate\Contracts\Process\ProcessResult
-     *
-     * @throws ProcessPipeException
      */
     public function run(?callable $output = null)
     {
@@ -75,16 +73,14 @@ class Pipe
                         throw new InvalidArgumentException('Process pipe must only contain pending processes.');
                     }
 
-                    $result = $pendingProcess->when(
+                    if ($previousProcessResult && $previousProcessResult->failed()) {
+                        return $previousProcessResult;
+                    }
+
+                    return $pendingProcess->when(
                         $previousProcessResult,
                         fn () => $pendingProcess->input($previousProcessResult->output())
                     )->run(output: $output);
-
-                    if ($result->failed()) {
-                        throw new ProcessPipeException($pendingProcess);
-                    }
-
-                    return $result;
                 });
     }
 
