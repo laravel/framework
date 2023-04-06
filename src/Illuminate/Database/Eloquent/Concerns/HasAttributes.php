@@ -177,6 +177,13 @@ trait HasAttributes
     public static $encrypter;
 
     /**
+     * Indicates whether all attributes are dirty.
+     *
+     * @var bool
+     */
+    protected $isAllAttributesAreDirty = false;
+
+    /**
      * Convert the model's attributes to an array.
      *
      * @return array
@@ -1971,11 +1978,13 @@ trait HasAttributes
         // all of the attributes for the entire array we will return false at end.
         foreach (Arr::wrap($attributes) as $attribute) {
             if (array_key_exists($attribute, $changes)) {
-                return true;
+                $this->isAllAttributesAreDirty = $this->isAllAttributesAreDirty || true;
+            } elseif (!array_key_exists($attribute, $changes)) {
+                $this->isAllAttributesAreDirty = $this->isAllAttributesAreDirty || false;
             }
         }
 
-        return false;
+        return $this->isAllAttributesAreDirty;
     }
 
     /**
