@@ -53,10 +53,10 @@ class EscapeTest extends DatabaseTestCase
 
     public function testEscapeString()
     {
-        $this->assertSame("'2147483647'", $this->app['db']->escape("2147483647"));
-        $this->assertSame("'true'", $this->app['db']->escape("true"));
-        $this->assertSame("'false'", $this->app['db']->escape("false"));
-        $this->assertSame("'null'", $this->app['db']->escape("null"));
+        $this->assertSame("'2147483647'", $this->app['db']->escape('2147483647'));
+        $this->assertSame("'true'", $this->app['db']->escape('true'));
+        $this->assertSame("'false'", $this->app['db']->escape('false'));
+        $this->assertSame("'null'", $this->app['db']->escape('null'));
         $this->assertSame("'Hello''World'", $this->app['db']->escape("Hello'World"));
     }
 

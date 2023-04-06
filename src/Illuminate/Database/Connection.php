@@ -1634,7 +1634,7 @@ class Connection implements ConnectionInterface
     {
         if ($value === null) {
             return 'null';
-        } else if ($binary) {
+        } elseif ($binary) {
             return $this->escapeBinary($value);
         } elseif (is_int($value) || is_float($value)) {
             return (string) $value;
