@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Database;
+namespace Illuminate\Tests\Integration\Database\EloquentCrossDatabaseTest;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\QueryException;
@@ -114,7 +114,6 @@ class EloquentCrossDatabaseTest extends MySqlTestCase
                 ['hits' => 123, 'viewable_id' => 1, 'viewable_type' => Post::class],
             ]);
         });
-
     }
 
     protected function destroyDatabaseMigrations()
@@ -137,7 +136,8 @@ class EloquentCrossDatabaseTest extends MySqlTestCase
             $this->assertInstanceOf(Collection::class, Post::query()->whereHas($relation)->get());
         }
 
-        collect(array_merge($db1->getQueryLog(), $db2->getQueryLog()))->each(fn($i) => dump($i['query']));
+        // @TODO debug code
+        collect(array_merge($db1->getQueryLog(), $db2->getQueryLog()))->each(fn ($i) => dump($i['query']));
     }
 }
 
