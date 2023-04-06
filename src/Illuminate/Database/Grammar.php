@@ -285,7 +285,7 @@ abstract class Grammar
     public function escape($value, $binary = false)
     {
         if (null === $this->connection) {
-            throw new RuntimeException('The grammar does not support escaping values.');
+            throw new RuntimeException("The database driver's grammar implementation does not support escaping values.");
         }
 
         return $this->connection->escape($value, $binary);
