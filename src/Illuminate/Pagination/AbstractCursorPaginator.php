@@ -214,6 +214,10 @@ abstract class AbstractCursorPaginator implements Htmlable
                 if ($item instanceof Model &&
                     ! is_null($parameter = $this->getPivotParameterForItem($item, $parameterName))) {
                     return $parameter;
+                } elseif ($item instanceof Model) {
+                    return $this->ensureParameterIsPrimitive(
+                        $item->getAttributes()[$parameterName] ?? $item->getAttributes()[Str::afterLast($parameterName, '.')]
+                    );
                 } elseif ($item instanceof ArrayAccess || is_array($item)) {
                     return $this->ensureParameterIsPrimitive(
                         $item[$parameterName] ?? $item[Str::afterLast($parameterName, '.')]
