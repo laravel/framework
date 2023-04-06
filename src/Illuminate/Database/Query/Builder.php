@@ -383,11 +383,13 @@ class Builder implements BuilderContract
     /**
      * Prepend the database name if the given query is on another database.
      *
-     * @param  mixed  $query
+     * @param  self|EloquentBuilder|Relation  $query
      * @return mixed
      */
-    protected function prependDatabaseNameIfCrossDatabaseQuery($query)
+    public function prependDatabaseNameIfCrossDatabaseQuery($query)
     {
+        $query = $query instanceof EloquentBuilder ? $query->getQuery() : $query;
+
         if ($query->getConnection()->getDatabaseName() !==
             $this->getConnection()->getDatabaseName()) {
             $databaseName = $query->getConnection()->getDatabaseName();
@@ -396,7 +398,7 @@ class Builder implements BuilderContract
                 $query->from($databaseName.'.'.$query->from);
             }
 
-            foreach ($query->joins as $join) {
+            foreach ($query->joins ?? [] as $join) {
                 if (! str_starts_with($join->table, $databaseName) && ! str_contains($join->table, '.')) {
                     $join->table = $databaseName . '.' . $join->table;
                 }
