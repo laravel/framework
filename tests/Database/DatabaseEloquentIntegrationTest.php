@@ -2244,7 +2244,7 @@ class EloquentTestUserWithOmittingGlobalScope extends EloquentTestUser
 
 class EloquentTestUserWithCastOnCursorParameter extends EloquentTestUser
 {
-    public function email() : CastAttribute
+    public function email(): CastAttribute
     {
         return CastAttribute::make(
             get: fn () => 'foobar',
