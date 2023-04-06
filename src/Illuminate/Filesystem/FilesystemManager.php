@@ -214,7 +214,7 @@ class FilesystemManager implements FactoryContract
     {
         $provider = SftpConnectionProvider::fromArray($config);
 
-        $root = $config['root'] ?? '/';
+        $root = $config['root'] ?? '';
 
         $visibility = PortableVisibilityConverter::fromArray(
             $config['permissions'] ?? []
