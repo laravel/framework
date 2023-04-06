@@ -388,8 +388,6 @@ class Builder implements BuilderContract
      */
     public function prependDatabaseNameIfCrossDatabaseQuery($query)
     {
-        $query = $query instanceof EloquentBuilder ? $query->getQuery() : $query;
-
         if ($query->getConnection()->getDatabaseName() !==
             $this->getConnection()->getDatabaseName()) {
             $databaseName = $query->getConnection()->getDatabaseName();
@@ -398,7 +396,8 @@ class Builder implements BuilderContract
                 $query->from($databaseName.'.'.$query->from);
             }
 
-            foreach ($query->joins ?? [] as $join) {
+            $baseQuery = ($query instanceof EloquentBuilder || $query instanceof Relation) ? $query->getQuery() : $query;
+            foreach ($baseQuery->joins ?? [] as $join) {
                 if (! str_starts_with($join->table, $databaseName) && ! str_contains($join->table, '.')) {
                     $join->table = $databaseName.'.'.$join->table;
                 }
