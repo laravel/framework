@@ -6,6 +6,7 @@ use DateTimeInterface;
 use Exception;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute as CastAttribute;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Model as Eloquent;
@@ -466,6 +467,22 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $this->assertCount(0, $models);
         $this->assertInstanceOf(CursorPaginator::class, $models);
+    }
+
+    public function testCursorPaginatedModelWithCastOnCursorParameter()
+    {
+        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 3, 'email' => 'foo@gmail.com']);
+
+        CursorPaginator::currentCursorResolver(function () {
+            return null;
+        });
+        $models = EloquentTestUserWithCastOnCursorParameter::oldest('id')->orderBy('email')->cursorPaginate(2);
+
+        $this->assertCount(2, $models);
+        $this->assertInstanceOf(CursorPaginator::class, $models);
+        $this->assertSame(['id' => 2, 'email' => 'abigailotwell@gmail.com', '_pointsToNextItems' => true], $models->nextCursor()->toArray());
     }
 
     public function testFirstOrNew()
@@ -2222,6 +2239,16 @@ class EloquentTestUserWithOmittingGlobalScope extends EloquentTestUser
         static::addGlobalScope(function ($builder) {
             $builder->where('email', '!=', 'taylorotwell@gmail.com');
         });
+    }
+}
+
+class EloquentTestUserWithCastOnCursorParameter extends EloquentTestUser
+{
+    public function email() : CastAttribute
+    {
+        return CastAttribute::make(
+            get: fn () => 'foobar',
+        );
     }
 }
 
