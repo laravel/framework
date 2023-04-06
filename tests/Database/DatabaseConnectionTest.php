@@ -463,6 +463,10 @@ class DatabaseConnectionTest extends TestCase
         $conn->setQueryGrammar($grammar);
         $result = $conn->prepareBindings($bindings);
         $this->assertEquals(['test' => 'bar'], $result);
+
+        $jsonBindings = ['test' => ['key' => 'value']];
+        $result = $conn->prepareBindings($jsonBindings);
+        $this->assertEquals(['test' => json_encode(['key' => 'value'])], $result);
     }
 
     public function testLogQueryFiresEventsIfSet()

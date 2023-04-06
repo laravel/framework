@@ -716,11 +716,12 @@ class Connection implements ConnectionInterface
             // We need to transform all instances of DateTimeInterface into the actual
             // date string. Each query grammar maintains its own date string format
             // so we'll just ask the grammar for the format to get from the date.
-            if ($value instanceof DateTimeInterface) {
-                $bindings[$key] = $value->format($grammar->getDateFormat());
-            } elseif (is_bool($value)) {
-                $bindings[$key] = (int) $value;
-            }
+            $bindings[$key] = match (true) {
+                $value instanceof DateTimeInterface => $value->format($grammar->getDateFormat()),
+                is_bool($value) => (int) $value,
+                is_array($value) => json_encode($value),
+                default => $value
+            };
         }
 
         return $bindings;
