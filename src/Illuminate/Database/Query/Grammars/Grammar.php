@@ -504,10 +504,9 @@ class Grammar extends BaseGrammar
         // Here we will calculate what portion of the string we need to remove. If this
         // is a join clause query, we need to remove the "on" portion of the SQL and
         // if it is a normal query we need to take the leading "where" of queries.
-        $sql = $this->compileWheres($where['query']);
-        $offset = $query instanceof JoinClause && !str_starts_with($sql, 'where ') ? 3 : 6;
+        $offset = $query['query'] instanceof JoinClause ? 3 : 6;
 
-        return '('.substr($sql, $offset).')';
+        return '('.substr($this->compileWheres($where['query']), $offset).')';
     }
 
     /**
