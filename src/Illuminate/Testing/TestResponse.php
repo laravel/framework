@@ -83,7 +83,7 @@ class TestResponse implements ArrayAccess
     /**
      * Assert that response has a correct acting user.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable $user
+     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @return $this
      */
     public function assertActingIs($user)
