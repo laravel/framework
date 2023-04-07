@@ -80,6 +80,12 @@ class TestResponse implements ArrayAccess
         return new static($response);
     }
 
+    /**
+     * Assert that response has a correct acting user.
+     *
+     * @param  \Illuminate\Contracts\Auth\Authenticatable $user
+     * @return $this
+     */
     public function assertActingIs($user)
     {
         PHPUnit::assertEquals($user, app('auth')->user());
