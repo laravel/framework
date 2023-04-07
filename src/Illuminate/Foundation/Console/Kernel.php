@@ -474,7 +474,7 @@ class Kernel implements KernelContract
     /**
      * Set the Artisan application instance.
      *
-     * @param  \Illuminate\Console\Application  $artisan
+     * @param  \Illuminate\Console\Application|null  $artisan
      * @return void
      */
     public function setArtisan($artisan)
