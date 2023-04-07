@@ -80,6 +80,13 @@ class TestResponse implements ArrayAccess
         return new static($response);
     }
 
+    public function assertActingIs($user)
+    {
+        PHPUnit::assertEquals($user, app('auth')->user());
+
+        return $this;
+    }
+
     /**
      * Assert that the response has a successful status code.
      *
