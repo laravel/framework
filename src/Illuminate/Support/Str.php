@@ -1445,8 +1445,7 @@ class Str
         static::$camelCache = [];
         static::$studlyCache = [];
     }
-
-
+    
     /**
      * Persian and Arabic character convert to English letter.
      *
