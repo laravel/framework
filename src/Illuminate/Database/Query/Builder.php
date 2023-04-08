@@ -388,18 +388,21 @@ class Builder implements BuilderContract
      */
     public function prependDatabaseNameIfCrossDatabaseQuery($query)
     {
-        if ($query->getConnection()->getDatabaseName() !==
+        if (($databaseName = $query->getConnection()->getDatabaseName()) !==
             $this->getConnection()->getDatabaseName()) {
-            $databaseName = $query->getConnection()->getDatabaseName();
+            $schema = $query->getConnection()->getDriverName() === 'sqlsrv' ?
+                ($query->getConnection()->getConfig('options.schema_name') ?? 'dbo').'.' : '';
 
-            if (! str_starts_with($query->from, $databaseName) && ! str_contains($query->from, '.')) {
-                $query->from($databaseName.'.'.$query->from);
+            $shouldPrefix = fn ($table) => ! str_starts_with($table, $databaseName) && ! str_contains($table, '.');
+
+            if ($shouldPrefix($query->from)) {
+                $query->from($databaseName.'.'.$schema.$query->from);
             }
 
             $baseQuery = ($query instanceof EloquentBuilder || $query instanceof Relation) ? $query->getQuery() : $query;
             foreach ($baseQuery->joins ?? [] as $join) {
-                if (! str_starts_with($join->table, $databaseName) && ! str_contains($join->table, '.')) {
-                    $join->table = $databaseName.'.'.$join->table;
+                if ($shouldPrefix($join->table)) {
+                    $join->table = $databaseName.'.'.$schema.$join->table;
                 }
             }
         }
