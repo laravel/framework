@@ -1445,4 +1445,43 @@ class Str
         static::$camelCache = [];
         static::$studlyCache = [];
     }
+
+
+    /**
+     * Persian and Arabic character convert to English letter
+     * @param  string $string
+     * @return array|string[]
+     */
+    public static function toEnglish($string) {
+        if (is_string($string) || is_array($string)) {
+            $newNumbers = range(0, 9);
+
+            $persianDecimal = ['&#1776;', '&#1777;', '&#1778;', '&#1779;', '&#1780;', '&#1781;', '&#1782;', '&#1783;', '&#1784;', '&#1785;'];
+            $arabicDecimal = ['&#1632;', '&#1633;', '&#1634;', '&#1635;', '&#1636;', '&#1637;', '&#1638;', '&#1639;', '&#1640;', '&#1641;'];
+            $arabic = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+            $persian = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+
+            $string = str_replace($persianDecimal, $newNumbers, $string);
+            $string = str_replace($arabicDecimal, $newNumbers, $string);
+            $string = str_replace($arabic, $newNumbers, $string);
+            $string = str_replace($persian, $newNumbers, $string);
+            $string = static::toPersianCharacter($string);
+        }
+
+        return $string;
+    }
+
+    /**
+     * Arabic character convert to Persian letter
+     * @param  string $string
+     * @return array|string[]
+     */
+    public static function toPersianCharacter($string) {
+        if (is_string($string) || is_array($string)) {
+            $string = trim($string);
+            $string = str_replace(array('ي', 'ك', 'ة'), array('ی', 'ک', 'ه'), $string);
+        }
+
+        return $string;
+    }
 }
