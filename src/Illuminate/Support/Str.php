@@ -1449,7 +1449,7 @@ class Str
 
     /**
      * Persian and Arabic character convert to English letter
-     * @param  string $string
+     * @param  string  $string
      * @return array|string[]
      */
     public static function toEnglish($string) {
@@ -1473,7 +1473,7 @@ class Str
 
     /**
      * Arabic character convert to Persian letter
-     * @param  string $string
+     * @param  string  $string
      * @return array|string[]
      */
     public static function toPersianCharacter($string) {
