@@ -138,17 +138,13 @@ class EloquentCrossDatabaseTest extends MySqlTestCase
 
     public function testRelationships()
     {
-        ($db1 = DB::connection(self::DEFAULT_CONNECTION))->enableQueryLog();
-        ($db2 = DB::connection(self::SECONDARY_CONNECTION))->enableQueryLog();
-
+        // We only test general compilation without errors here, indicating that cross-database queries have been
+        // executed correctly.
         foreach (['user', 'comments', 'tags', 'view'] as $relation) {
             $this->assertInstanceOf(Collection::class, Post::query()->with($relation)->get());
             $this->assertInstanceOf(Collection::class, Post::query()->withCount($relation)->get());
             $this->assertInstanceOf(Collection::class, Post::query()->whereHas($relation)->get());
         }
-
-        // @TODO debug code
-        collect(array_merge($db1->getQueryLog(), $db2->getQueryLog()))->each(fn ($i) => dump($i['query']));
     }
 }
 
