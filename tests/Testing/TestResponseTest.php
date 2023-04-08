@@ -773,6 +773,18 @@ class TestResponseTest extends TestCase
         $response->assertServerError();
     }
 
+    public function testAssertInternalServerError()
+    {
+        $statusCode = 500;
+
+        $baseResponse = tap(new Response, function ($response) use ($statusCode) {
+            $response->setStatusCode($statusCode);
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response->assertInternalServerError();
+    }
+
     public function testAssertNoContentAsserts204StatusCodeByDefault()
     {
         $statusCode = 500;

@@ -170,4 +170,14 @@ trait AssertsStatusCodes
     {
         return $this->assertStatus(429);
     }
+
+    /**
+     * Assert that the response has a 500 "Internal Server Error" status code.
+     *
+     * @return $this
+     */
+    public function assertInternalServerError()
+    {
+        return $this->assertStatus(500);
+    }
 }
