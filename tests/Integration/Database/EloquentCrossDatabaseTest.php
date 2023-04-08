@@ -23,7 +23,7 @@ class EloquentCrossDatabaseTest extends DatabaseTestCase
         define('__TEST_SECONDARY_CONNECTION', $default.'_two');
 
         // Create a second connection based on the first connection, but with a different database.
-        $app['config']->set('database.connections'.__TEST_SECONDARY_CONNECTION, array_merge(
+        $app['config']->set('database.connections.'.__TEST_SECONDARY_CONNECTION, array_merge(
             $app['config']->get('database.connections.'.__TEST_DEFAULT_CONNECTION),
             ['database' => 'forge_two']
         ));
