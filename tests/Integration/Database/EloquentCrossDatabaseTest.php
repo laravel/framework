@@ -23,13 +23,15 @@ class EloquentCrossDatabaseTest extends MySqlTestCase
 
     protected function getEnvironmentSetUp($app)
     {
+        if ($app['config']->get('database.default') !== 'mysql') {
+            $this->markTestSkipped('Test requires a MySQL connection.');
+        }
+
         // Create a second connection based on the first connection, but with a different database.
         $app['config']->set('database.connections.'.self::SECONDARY_CONNECTION, array_merge(
             $app['config']->get('database.connections.'.self::DEFAULT_CONNECTION),
             ['database' => 'forge_two']
         ));
-
-        $app['config']->set('database.default', self::DEFAULT_CONNECTION);
 
         parent::getEnvironmentSetUp($app);
     }
