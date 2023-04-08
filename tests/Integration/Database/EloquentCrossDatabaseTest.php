@@ -11,30 +11,34 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\MySql\MySqlTestCase;
 
+/**
+ * @requires extension pdo_mysql
+ * @requires OS Linux|Darwin
+ */
 class EloquentCrossDatabaseTest extends MySqlTestCase
 {
-    protected $defaultConnection = 'mysql';
+    public const DEFAULT_CONNECTION = 'mysql';
 
-    protected $secondaryConnection = 'mysql2';
+    public const SECONDARY_CONNECTION = 'mysql2';
 
     protected function getEnvironmentSetUp($app)
     {
         // Create a second connection based on the first connection, but with a different database.
-        $app['config']->set('database.connections.'.$this->secondaryConnection, array_merge(
-            $app['config']->get('database.connections.'.$this->defaultConnection),
+        $app['config']->set('database.connections.'.self::SECONDARY_CONNECTION, array_merge(
+            $app['config']->get('database.connections.'.self::DEFAULT_CONNECTION),
             ['database' => 'forge_two']
         ));
 
-        $app['config']->set('database.default', $this->defaultConnection);
+        $app['config']->set('database.default', self::DEFAULT_CONNECTION);
 
         parent::getEnvironmentSetUp($app);
     }
 
     protected function setUpDatabaseRequirements(Closure $callback): void
     {
-        $db = $this->app['config']->get('database.connections.'.$this->secondaryConnection.'.database');
+        $db = $this->app['config']->get('database.connections.'.self::SECONDARY_CONNECTION.'.database');
         try {
-            $this->app['db']->connection()->statement('CREATE DATABASE ' . $db);
+            $this->app['db']->connection()->statement('CREATE DATABASE '.$db);
         } catch(QueryException $e) {
             // ...
         }
@@ -44,7 +48,7 @@ class EloquentCrossDatabaseTest extends MySqlTestCase
 
     protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
-        tap(Schema::connection($this->defaultConnection), function ($schema) {
+        tap(Schema::connection(self::DEFAULT_CONNECTION), function ($schema) {
             try {
                 $schema->create('posts', function (Blueprint $table) {
                     $table->increments('id');
@@ -56,7 +60,7 @@ class EloquentCrossDatabaseTest extends MySqlTestCase
             }
         });
 
-        tap(Schema::connection($this->secondaryConnection), function ($schema) {
+        tap(Schema::connection(self::SECONDARY_CONNECTION), function ($schema) {
             try {
                 $schema->create('users', function (Blueprint $table) {
                     $table->increments('id');
@@ -95,14 +99,14 @@ class EloquentCrossDatabaseTest extends MySqlTestCase
             }
         });
 
-        tap(DB::connection($this->defaultConnection), function ($db) {
+        tap(DB::connection(self::DEFAULT_CONNECTION), function ($db) {
             $db->table('posts')->insert([
                 ['title' => 'Foobar', 'user_id' => 1],
                 ['title' => 'The title', 'user_id' => 1],
             ]);
         });
 
-        tap(DB::connection($this->secondaryConnection), function ($db) {
+        tap(DB::connection(self::SECONDARY_CONNECTION), function ($db) {
             $db->table('users')->insert([
                 ['username' => 'Lortay Wellot'],
             ]);
@@ -126,14 +130,14 @@ class EloquentCrossDatabaseTest extends MySqlTestCase
         Schema::dropIfExists('posts');
 
         foreach (['users', 'sub_posts', 'comments', 'views', 'tags', 'post_tag'] as $table) {
-            Schema::connection($this->secondaryConnection)->dropIfExists($table);
+            Schema::connection(self::SECONDARY_CONNECTION)->dropIfExists($table);
         }
     }
 
     public function testRelationships()
     {
-        ($db1 = DB::connection($this->defaultConnection))->enableQueryLog();
-        ($db2 = DB::connection($this->secondaryConnection))->enableQueryLog();
+        ($db1 = DB::connection(self::DEFAULT_CONNECTION))->enableQueryLog();
+        ($db2 = DB::connection(self::SECONDARY_CONNECTION))->enableQueryLog();
 
         foreach (['user', 'comments', 'tags', 'view'] as $relation) {
             $this->assertInstanceOf(Collection::class, Post::query()->with($relation)->get());
@@ -154,12 +158,12 @@ abstract class BaseModel extends Model
 
 abstract class SecondaryBaseModel extends BaseModel
 {
-    protected $connection = 'mysql2';
+    protected $connection = EloquentCrossDatabaseTest::SECONDARY_CONNECTION;
 }
 
 class Post extends BaseModel
 {
-    protected $connection = 'mysql';
+    protected $connection = EloquentCrossDatabaseTest::DEFAULT_CONNECTION;
 
     public function tags()
     {
