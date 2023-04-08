@@ -1448,11 +1448,13 @@ class Str
 
 
     /**
-     * Persian and Arabic character convert to English letter
+     * Persian and Arabic character convert to English letter.
+     *
      * @param  string  $string
      * @return array|string[]
      */
-    public static function toEnglish($string) {
+    public static function toEnglish($string)
+    {
         if (is_string($string) || is_array($string)) {
             $newNumbers = range(0, 9);
 
@@ -1472,14 +1474,16 @@ class Str
     }
 
     /**
-     * Arabic character convert to Persian letter
+     * Arabic character convert to Persian letter.
+     *
      * @param  string  $string
      * @return array|string[]
      */
-    public static function toPersianCharacter($string) {
+    public static function toPersianCharacter($string)
+    {
         if (is_string($string) || is_array($string)) {
             $string = trim($string);
-            $string = str_replace(array('ي', 'ك', 'ة'), array('ی', 'ک', 'ه'), $string);
+            $string = str_replace(['ي', 'ك', 'ة'], ['ی', 'ک', 'ه'], $string);
         }
 
         return $string;
