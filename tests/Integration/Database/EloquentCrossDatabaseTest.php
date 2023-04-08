@@ -9,27 +9,22 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Tests\Integration\Database\MySql\MySqlTestCase;
+use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
-/**
- * @requires extension pdo_mysql
- * @requires OS Linux|Darwin
- */
-class EloquentCrossDatabaseTest extends MySqlTestCase
+class EloquentCrossDatabaseTest extends DatabaseTestCase
 {
-    public const DEFAULT_CONNECTION = 'mysql';
-
-    public const SECONDARY_CONNECTION = 'mysql2';
-
     protected function getEnvironmentSetUp($app)
     {
-        if ($app['config']->get('database.default') !== 'mysql') {
-            $this->markTestSkipped('Test requires a MySQL connection.');
+        if (($default = $app['config']->get('database.default')) === 'sqlite') {
+            $this->markTestSkipped('Cross database queries not supported for SQLite.');
         }
 
+        define('__TEST_DEFAULT_CONNECTION', $default);
+        define('__TEST_SECONDARY_CONNECTION', $default.'_two');
+
         // Create a second connection based on the first connection, but with a different database.
-        $app['config']->set('database.connections.'.self::SECONDARY_CONNECTION, array_merge(
-            $app['config']->get('database.connections.'.self::DEFAULT_CONNECTION),
+        $app['config']->set('database.connections'.__TEST_SECONDARY_CONNECTION, array_merge(
+            $app['config']->get('database.connections.'.__TEST_DEFAULT_CONNECTION),
             ['database' => 'forge_two']
         ));
 
@@ -38,7 +33,7 @@ class EloquentCrossDatabaseTest extends MySqlTestCase
 
     protected function setUpDatabaseRequirements(Closure $callback): void
     {
-        $db = $this->app['config']->get('database.connections.'.self::SECONDARY_CONNECTION.'.database');
+        $db = $this->app['config']->get('database.connections.'.__TEST_SECONDARY_CONNECTION.'.database');
         try {
             $this->app['db']->connection()->statement('CREATE DATABASE '.$db);
         } catch(QueryException $e) {
@@ -50,7 +45,7 @@ class EloquentCrossDatabaseTest extends MySqlTestCase
 
     protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
-        tap(Schema::connection(self::DEFAULT_CONNECTION), function ($schema) {
+        tap(Schema::connection(__TEST_DEFAULT_CONNECTION), function ($schema) {
             try {
                 $schema->create('posts', function (Blueprint $table) {
                     $table->increments('id');
@@ -62,7 +57,7 @@ class EloquentCrossDatabaseTest extends MySqlTestCase
             }
         });
 
-        tap(Schema::connection(self::SECONDARY_CONNECTION), function ($schema) {
+        tap(Schema::connection(__TEST_SECONDARY_CONNECTION), function ($schema) {
             try {
                 $schema->create('users', function (Blueprint $table) {
                     $table->increments('id');
@@ -101,14 +96,14 @@ class EloquentCrossDatabaseTest extends MySqlTestCase
             }
         });
 
-        tap(DB::connection(self::DEFAULT_CONNECTION), function ($db) {
+        tap(DB::connection(__TEST_DEFAULT_CONNECTION), function ($db) {
             $db->table('posts')->insert([
                 ['title' => 'Foobar', 'user_id' => 1],
                 ['title' => 'The title', 'user_id' => 1],
             ]);
         });
 
-        tap(DB::connection(self::SECONDARY_CONNECTION), function ($db) {
+        tap(DB::connection(__TEST_SECONDARY_CONNECTION), function ($db) {
             $db->table('users')->insert([
                 ['username' => 'Lortay Wellot'],
             ]);
@@ -132,7 +127,7 @@ class EloquentCrossDatabaseTest extends MySqlTestCase
         Schema::dropIfExists('posts');
 
         foreach (['users', 'sub_posts', 'comments', 'views', 'tags', 'post_tag'] as $table) {
-            Schema::connection(self::SECONDARY_CONNECTION)->dropIfExists($table);
+            Schema::connection(__TEST_SECONDARY_CONNECTION)->dropIfExists($table);
         }
     }
 
@@ -156,12 +151,12 @@ abstract class BaseModel extends Model
 
 abstract class SecondaryBaseModel extends BaseModel
 {
-    protected $connection = EloquentCrossDatabaseTest::SECONDARY_CONNECTION;
+    protected $connection = __TEST_SECONDARY_CONNECTION;
 }
 
 class Post extends BaseModel
 {
-    protected $connection = EloquentCrossDatabaseTest::DEFAULT_CONNECTION;
+    protected $connection = __TEST_DEFAULT_CONNECTION;
 
     public function tags()
     {
