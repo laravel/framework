@@ -113,7 +113,7 @@ class Limit
      */
     public function by($key, $prefix = '')
     {
-        $this->key = $prefix . $key;
+        $this->key = $prefix.$key;
 
         return $this;
     }
