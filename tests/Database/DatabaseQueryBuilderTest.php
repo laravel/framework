@@ -2580,6 +2580,42 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('bar', $results);
     }
 
+    public function testValueMethodReturnsNotFound()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('select')->once()->with('select "foo" from "users" where "id" = ? limit 1', [2], true)->andReturn(null);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, null)->andReturn(null);
+        $results = $builder->from('users')->where('id', '=', 2)->value('foo');
+        $this->assertNull($results);
+    }
+
+    public function testValueDefaultMethodReturnsSingleColumn()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('select')->once()->with('select "foo" from "users" where "id" = ? limit 1', [1], true)->andReturn([['foo' => 'bar']]);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [['foo' => 'bar']])->andReturn([['foo' => 'bar']]);
+        $results = $builder->from('users')->where('id', '=', 1)->value('foo', 'notbar');
+        $this->assertSame('bar', $results);
+    }
+
+    public function testValueDefaultMethodReturnsNotFound()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('select')->once()->with('select "foo" from "users" where "id" = ? limit 1', [2], true)->andReturn(null);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, null)->andReturn(null);
+        $results = $builder->from('users')->where('id', '=', 2)->value('foo', 'notbar');
+        $this->assertSame('notbar', $results);
+    }
+
+    public function testValueDefaultMethodReturnsNotFoundClosure()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('select')->once()->with('select "foo" from "users" where "id" = ? limit 1', [2], true)->andReturn(null);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, null)->andReturn(null);
+        $results = $builder->from('users')->where('id', '=', 2)->value('foo', static fn () => 'notbar');
+        $this->assertSame('notbar', $results);
+    }
+
     public function testRawValueMethodReturnsSingleColumn()
     {
         $builder = $this->getBuilder();
@@ -2587,6 +2623,33 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [['UPPER("foo")' => 'BAR']])->andReturn([['UPPER("foo")' => 'BAR']]);
         $results = $builder->from('users')->where('id', '=', 1)->rawValue('UPPER("foo")');
         $this->assertSame('BAR', $results);
+    }
+
+    public function testRawValueMethodReturnsNotFound()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('select')->once()->with('select UPPER("foo") from "users" where "id" = ? limit 1', [2], true)->andReturn(null);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, null)->andReturn(null);
+        $results = $builder->from('users')->where('id', '=', 2)->rawValue('UPPER("foo")');
+        $this->assertNull($results);
+    }
+
+    public function testRawValueDefaultMethodReturnsSingleColumn()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('select')->once()->with('select UPPER("foo") from "users" where "id" = ? limit 1', [1], true)->andReturn([['UPPER("foo")' => 'BAR']]);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [['UPPER("foo")' => 'BAR']])->andReturn([['UPPER("foo")' => 'BAR']]);
+        $results = $builder->from('users')->where('id', '=', 1)->rawValue('UPPER("foo")', default: 'NOTBAR');
+        $this->assertSame('BAR', $results);
+    }
+
+    public function testRawValueDefaultMethodReturnsNotFound()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('select')->once()->with('select UPPER("foo") from "users" where "id" = ? limit 1', [2], true)->andReturn(null);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, null)->andReturn(null);
+        $results = $builder->from('users')->where('id', '=', 2)->rawValue('UPPER("foo")', default: 'NOTBAR');
+        $this->assertSame('NOTBAR', $results);
     }
 
     public function testAggregateFunctions()
