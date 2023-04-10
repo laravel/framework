@@ -327,6 +327,16 @@ abstract class HasOneOrMany extends Relation
     }
 
     /**
+     * @param  array  $attributes
+     * @return \Illuminate\Database\Eloquent\Model
+     * @throws \Throwable
+     */
+    public function createOrFail(array $attributes = [])
+    {
+        return $this->getConnection()->transaction(fn () => $this->create($attributes));
+    }
+
+    /**
      * Create a new instance of the related model without raising any events to the parent model.
      *
      * @param  array  $attributes

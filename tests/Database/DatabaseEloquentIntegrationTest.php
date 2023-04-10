@@ -1354,6 +1354,25 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $post->saveOrFail();
     }
 
+    public function testCreateOrFailHasMany()
+    {
+        $user = EloquentTestUser::firstOrCreate(['id' => 1, 'email' => 'john@mulaney.net']);
+        $this->assertInstanceOf(
+            EloquentTestPost::class,
+            $user->posts()->createOrFail(['name' => 'New In Town', 'created_at' => now()])
+        );
+    }
+
+    public function testHasManyCreateOrFailOnDuplicateEntry()
+    {
+        $user = EloquentTestUser::firstOrCreate(['id' => 1, 'email' => 'mitch@hedberg.com']);
+        $user->posts()->create(['id' => 1, 'name' => 'Fork lift', 'created_at' => now()]);
+
+        $this->expectException(QueryException::class);
+        $this->expectExceptionMessage('SQLSTATE[23000]:');
+        $user->posts()->createOrFail(['id' => 1, 'name' => 'Lift a crate of forks', 'created_at' => now()]);
+    }
+
     public function testMultiInsertsWithDifferentValues()
     {
         $date = '1970-01-01';
