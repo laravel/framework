@@ -2671,13 +2671,14 @@ class Builder implements BuilderContract
      *
      * @param  string  $expression
      * @param  array  $bindings
+     * @param  mixed  $default
      * @return mixed
      */
-    public function rawValue(string $expression, array $bindings = [])
+    public function rawValue(string $expression, array $bindings = [], $default = null)
     {
         $result = (array) $this->selectRaw($expression, $bindings)->first();
 
-        return count($result) > 0 ? reset($result) : null;
+        return count($result) > 0 ? reset($result) : value($default);
     }
 
     /**
