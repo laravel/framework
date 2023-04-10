@@ -108,11 +108,12 @@ class Limit
      * Set the key of the rate limit.
      *
      * @param  mixed  $key
+     * @param  string  $prefix
      * @return $this
      */
-    public function by($key)
+    public function by($key, $prefix = '')
     {
-        $this->key = $key;
+        $this->key = $prefix . $key;
 
         return $this;
     }
