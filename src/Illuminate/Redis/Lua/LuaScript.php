@@ -2,65 +2,64 @@
 
 namespace Illuminate\Redis\Lua;
 
-use Illuminate\Redis\Connections\Connection;
 use Illuminate\Redis\Lua\Exception\LuaScriptLoadException;
 
 /**
- * The LuaScript class represents a Redis Lua script that can be executed by a Redis connection.
+ * The `LuaScript` class represents a Redis Lua script that can be executed by a Redis connection.
  */
 class LuaScript
 {
     /**
      * The Redis connection instance.
      *
-     * @var Connection
+     * @var \Illuminate\Redis\Connections\Connection
      */
-    public readonly Connection $connection;
+    public $connection;
 
     /**
      * The SHA1 hash of the script that's already loaded in Redis.
      *
      * @var string|null
      */
-    public readonly ?string $sha1;
+    private $sha1;
 
     /**
      * The lua script code.
      *
      * @var string|null
      */
-    public readonly ?string $script;
+    private $script;
 
     /**
-     * The list of keys to be passed to the script.
+     * The list of the keys to be passed to the script.
      *
      * @var array
      */
-    public array $keys;
+    private $keys;
 
     /**
-     * The list of arguments to be passed to the script.
+     * The list of the arguments to be passed to the script.
      *
      * @var array|null
      */
-    public ?array $arguments;
+    private $arguments;
 
     /**
      * The boolean flag that indicates whether the script should be cached or not.
      *
      * @var bool
      */
-    public readonly bool $isCachingEnable;
+    private $isCachingEnable;
 
     /**
      * Create a new LuaScript instance.
      *
-     * @param  Connection  $connection  The Redis connection instance.
+     * @param  \Illuminate\Redis\Connections\Connection  $connection  The Redis connection instance.
      * @param  string|null  $sha1  The SHA1 hash of the script, if it has already been registered on the Redis server.
      * @param  string|null  $script  The lua script code.
      * @param  bool  $isCachingEnable  Whether to enable caching feature or not.
      */
-    protected function __construct(Connection $connection, ?string $sha1, ?string $script, bool $isCachingEnable = false)
+    protected function __construct($connection, $sha1, $script, $isCachingEnable = false)
     {
         $this->connection = $connection;
         $this->sha1 = $sha1;
@@ -71,12 +70,12 @@ class LuaScript
     /**
      * Create a new LuaScript instance from a script string.
      *
-     * @param  Connection  $connection  The Redis connection instance.
+     * @param  \Illuminate\Redis\Connections\Connection  $connection  The Redis connection instance.
      * @param  string  $script  The script code.
      * @param  bool  $isCachingEnable  Whether to enable caching feature or not.
-     * @return  self
+     * @return self
      */
-    public static function fromScript(Connection $connection, string $script, bool $isCachingEnable = false): self
+    public static function fromScript($connection, $script, $isCachingEnable = false)
     {
         return new static($connection, null, $script, $isCachingEnable);
     }
@@ -84,13 +83,63 @@ class LuaScript
     /**
      * Create a new LuaScript instance from a SHA1 hash.
      *
-     * @param  Connection  $connection  The Redis connection instance.
+     * @param  \Illuminate\Redis\Connections\Connection  $connection  The Redis connection instance.
      * @param  string  $sha1  The SHA1 hash of the script, if it has already been registered on the Redis server.
      * @return self
      */
-    public static function fromSha1(Connection $connection, string $sha1): self
+    public static function fromSha1($connection, $sha1)
     {
         return new static($connection, $sha1, null, false);
+    }
+
+    /**
+     * The boolean flag that indicates whether the script should be cached or not.
+     *
+     * @return bool
+     */
+    public function isCachingEnable()
+    {
+        return $this->isCachingEnable;
+    }
+
+    /**
+     * Get the list of the keys to be passed to the script.
+     *
+     * @return array
+     */
+    public function getKeys()
+    {
+        return $this->keys;
+    }
+
+    /**
+     * Get the list of the arguments to be passed to the script.
+     *
+     * @return array|null
+     */
+    public function getArguments()
+    {
+        return $this->arguments;
+    }
+
+    /**
+     * Get the lua script code.
+     *
+     * @return string|null
+     */
+    public function getScript()
+    {
+        return $this->script;
+    }
+
+    /**
+     * Get the SHA1 hash of the script that's already loaded in Redis.
+     *
+     * @return string|null
+     */
+    public function getSha1()
+    {
+        return $this->sha1;
     }
 
     /**
@@ -100,7 +149,7 @@ class LuaScript
      * @param  array|null  $arguments  The list of arguments to be passed to the script.
      * @return $this
      */
-    public function with(array $keys, array $arguments = null): self
+    public function with($keys, $arguments = null)
     {
         $this->keys = $keys;
         $this->arguments = $arguments;
@@ -114,7 +163,7 @@ class LuaScript
      * @param  string  $sha  The SHA1 hash of the Lua script.
      * @return mixed The result of the script execution.
      */
-    protected function executeWithHash(string $sha): mixed
+    protected function executeWithHash($sha)
     {
         return $this->connection->command('evalsh', [$sha, $this->keys, $this->arguments, count($this->keys)]);
     }
@@ -124,7 +173,7 @@ class LuaScript
      *
      * @return mixed The result of the script execution.
      */
-    protected function executeWithScript(): mixed
+    protected function executeWithScript()
     {
         return $this->connection->eval($this->script, count($this->keys), $this->keys, $this->arguments);
     }
@@ -134,9 +183,9 @@ class LuaScript
      *
      * @return mixed The result of the script execution.
      *
-     * @throws LuaScriptLoadException If the lua script could not be loaded.
+     * @throws \Illuminate\Redis\Lua\Exception\LuaScriptLoadException If the lua script could not be loaded.
      */
-    public function execute(): mixed
+    public function execute()
     {
         if ($this->sha1 !== null) {
             return $this->executeWithHash($this->sha1);
@@ -165,6 +214,7 @@ class LuaScript
 
     /**
      * Load this lua script to redis.
+     *
      * @return false|string Returns the SHA1 hash of the loaded script on success, or false on failure.
      */
     public function loadScript(): false|string
@@ -174,13 +224,15 @@ class LuaScript
 
     /**
      * Check is provided SHA1 key is exists in Redis server.
+     *
      * @return bool A boolean indicating whether the provided SHA1 key exists in the Redis server.
      */
     public function exist(): bool
     {
-        if ($this->sha1 === null)
+        if ($this->sha1 === null) {
             return true;
+        }
 
-        return (bool)$this->connection->script('exists', $this->sha1);
+        return (bool) $this->connection->script('exists', $this->sha1);
     }
 }
