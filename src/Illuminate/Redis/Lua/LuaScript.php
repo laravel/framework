@@ -165,7 +165,7 @@ class LuaScript
      */
     protected function executeWithHash($sha)
     {
-        return $this->connection->command('evalsh', [$sha, $this->keys, $this->arguments, count($this->keys)]);
+        return $this->connection->command('evalsha', [$sha, $this->keys, $this->arguments, count($this->keys)]);
     }
 
     /**
