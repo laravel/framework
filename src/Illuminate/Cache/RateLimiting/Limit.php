@@ -83,6 +83,18 @@ class Limit
     }
 
     /**
+     * Create a new rate limit using hours as decay time.
+     *
+     * @param  int  $decayHours
+     * @param  int  $maxAttempts
+     * @return static
+     */
+    public static function perHours($decayHours, $maxAttempts)
+    {
+        return new static('', $maxAttempts, 60 * $decayHours);
+    }
+
+    /**
      * Create a new rate limit using days as decay time.
      *
      * @param  int  $maxAttempts
@@ -90,6 +102,18 @@ class Limit
      * @return static
      */
     public static function perDay($maxAttempts, $decayDays = 1)
+    {
+        return new static('', $maxAttempts, 60 * 24 * $decayDays);
+    }
+
+    /**
+     * Create a new rate limit using days as decay time.
+     *
+     * @param  int  $decayDays
+     * @param  int  $maxAttempts
+     * @return static
+     */
+    public static function perDays($decayDays, $maxAttempts)
     {
         return new static('', $maxAttempts, 60 * 24 * $decayDays);
     }
