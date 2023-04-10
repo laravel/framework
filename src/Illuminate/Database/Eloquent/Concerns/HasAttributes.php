@@ -1495,15 +1495,17 @@ trait HasAttributes
      */
     public function getCasts()
     {
-        $casts = array_map(static function (array|string $castType) {
-            if (is_array($castType)) {
-                [$castType, $arguments] = [array_shift($castType), $castType];
+        $casts = [];
 
-                $castType = $castType.':'.implode(',', $arguments);
+        foreach ($this->casts as $attribute => $cast) {
+            if (is_array($cast)) {
+                [$cast, $arguments] = [array_shift($cast), $cast];
+
+                $cast = $cast.':'.implode(',', $arguments);
             }
 
-            return $castType;
-        }, $this->casts);
+            $casts[$attribute] = $cast;
+        }
 
         if ($this->getIncrementing()) {
             return array_merge([$this->getKeyName() => $this->getKeyType()], $casts);
