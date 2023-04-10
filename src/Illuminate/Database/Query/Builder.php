@@ -2656,13 +2656,14 @@ class Builder implements BuilderContract
      * Get a single column's value from the first result of a query.
      *
      * @param  string  $column
+     * @param  mixed  $default
      * @return mixed
      */
-    public function value($column)
+    public function value($column, $default = null)
     {
         $result = (array) $this->first([$column]);
 
-        return count($result) > 0 ? reset($result) : null;
+        return count($result) > 0 ? reset($result) : value($default);
     }
 
     /**

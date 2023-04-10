@@ -643,15 +643,18 @@ class Builder implements BuilderContract
      * Get a single column's value from the first result of a query.
      *
      * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  mixed  $default
      * @return mixed
      */
-    public function value($column)
+    public function value($column, $default = null)
     {
         if ($result = $this->first([$column])) {
             $column = $column instanceof Expression ? $column->getValue($this->getGrammar()) : $column;
 
             return $result->{Str::afterLast($column, '.')};
         }
+
+        return value($default);
     }
 
     /**
