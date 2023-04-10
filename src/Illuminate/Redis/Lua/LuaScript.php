@@ -216,7 +216,7 @@ class LuaScript
      *
      * @return false|string Returns the SHA1 hash of the loaded script on success, or false on failure.
      */
-    public function loadScript(): false|string
+    public function loadScript()
     {
         return $this->connection->script('load', $this->script);
     }
@@ -226,7 +226,7 @@ class LuaScript
      *
      * @return bool A boolean indicating whether the provided SHA1 key exists in the Redis server.
      */
-    public function exist(): bool
+    public function exist()
     {
         if ($this->sha1 === null) {
             return true;
