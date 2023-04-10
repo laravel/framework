@@ -191,7 +191,6 @@ class LuaScript
             return $this->executeWithHash($this->sha1);
         } else {
             if ($this->isCachingEnable) {
-
                 // Try to execute the script.
                 $hash = sha1($this->script);
                 $result = $this->executeWithHash($hash);
