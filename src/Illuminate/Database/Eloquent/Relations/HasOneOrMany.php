@@ -329,6 +329,7 @@ abstract class HasOneOrMany extends Relation
     /**
      * @param  array  $attributes
      * @return \Illuminate\Database\Eloquent\Model
+     *
      * @throws \Throwable
      */
     public function createOrFail(array $attributes = [])
