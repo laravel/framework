@@ -2211,8 +2211,9 @@ trait HasAttributes
     }
 
     /**
-     * Determine if a "Attribute" return type exists for an attribute.
+     * Determine if an attribute return type exists for an attribute.
      *
+     * @param  object  $instance
      * @param  string  $method
      * @return bool
      */
@@ -2220,7 +2221,8 @@ trait HasAttributes
     {
         $returnType = (new ReflectionMethod($instance, $method))->getReturnType();
 
-        if ($returnType instanceof ReflectionNamedType && $returnType->getName() === Attribute::class) {
+        if ($returnType instanceof ReflectionNamedType &&
+            $returnType->getName() === Attribute::class) {
             return true;
         }
 
