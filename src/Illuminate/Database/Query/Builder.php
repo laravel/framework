@@ -390,8 +390,11 @@ class Builder implements BuilderContract
     {
         if (($databaseName = $query->getConnection()->getDatabaseName()) !==
             $this->getConnection()->getDatabaseName()) {
-            $schema = $query->getConnection()->getDriverName() === 'sqlsrv' ?
-                ($query->getConnection()->getConfig('options.schema_name') ?? 'dbo').'.' : '';
+
+            $schema = '';
+            if ($query->getConnection()->getDriverName() === 'sqlsrv') {
+                $schema = ($query->getConnection()->getConfig('schema') ?? 'dbo').'.';
+            }
 
             $shouldPrefix = fn ($table) => ! str_starts_with($table, $databaseName) && ! str_contains($table, '.');
 

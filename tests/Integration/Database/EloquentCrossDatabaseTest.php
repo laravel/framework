@@ -15,7 +15,7 @@ class EloquentCrossDatabaseTest extends DatabaseTestCase
 {
     protected function getEnvironmentSetUp($app)
     {
-        if (! in_array($default = $app['config']->get('database.default'), ['mysql', 'pgsql', 'sqlsrv'])) {
+        if (! in_array($default = $app['config']->get('database.default'), ['mysql', 'sqlsrv'])) {
             $this->markTestSkipped("Cross database queries not supported for $default.");
         }
 
