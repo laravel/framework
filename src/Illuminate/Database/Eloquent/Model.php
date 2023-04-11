@@ -1565,7 +1565,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function newEloquentBuilder($query)
     {
-        return new Builder($query);
+        $returnType = (new \ReflectionMethod(static::class, 'query'))->getReturnType()?->getName();
+
+        if (! $returnType) {
+            return new Builder($query);
+        }
+
+        return new $returnType($query);
     }
 
     /**
