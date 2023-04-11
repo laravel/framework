@@ -534,6 +534,44 @@ class ProcessTest extends TestCase
         $this->assertTrue($pipe->failed());
     }
 
+    public function testProcessSimplePipe()
+    {
+        if (windows_os()) {
+            $this->markTestSkipped('Requires Linux.');
+        }
+
+        $factory = new Factory;
+        $factory->fake([
+            'cat *' => "Hello, world\nfoo\nbar",
+        ]);
+
+        $pipe = $factory->pipe([
+            'cat test',
+            'grep -i "foo"',
+        ]);
+
+        $this->assertSame("foo\n", $pipe->output());
+    }
+
+    public function testProcessSimplePipeFailed()
+    {
+        if (windows_os()) {
+            $this->markTestSkipped('Requires Linux.');
+        }
+
+        $factory = new Factory;
+        $factory->fake([
+            'cat *' => $factory->result(exitCode: 1),
+        ]);
+
+        $pipe = $factory->pipe([
+            'cat test',
+            'grep -i "foo"',
+        ]);
+
+        $this->assertTrue($pipe->failed());
+    }
+
     public function testFakeInvokedProcessOutputWithLatestOutput()
     {
         $factory = new Factory;

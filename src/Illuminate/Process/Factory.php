@@ -274,12 +274,16 @@ class Factory
     /**
      * Start defining a series of piped processes.
      *
-     * @param  callable  $callback
+     * @param  callable|array  $callback
      * @return \Illuminate\Process\Pipe
      */
-    public function pipe(callable $callback, ?callable $output = null)
+    public function pipe(callable|array $callback, ?callable $output = null)
     {
-        return (new Pipe($this, $callback))->run(output: $output);
+        return is_array($callback)
+            ? (new Pipe($this, fn ($pipe) => collect($callback)->each(
+                fn ($command) => $pipe->command($command)
+            )))->run(output: $output)
+            : (new Pipe($this, $callback))->run(output: $output);
     }
 
     /**
