@@ -1087,6 +1087,18 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Set the value of a given attribute.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return void
+     */
+    public function setValue($attribute, $value)
+    {
+        Arr::set($this->data, $attribute, $value);
+    }
+
+    /**
      * Get the validation rules.
      *
      * @return array
