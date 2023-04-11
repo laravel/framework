@@ -1502,9 +1502,11 @@ trait HasAttributes
      */
     public function getCasts()
     {
-        if (! is_null(static::$castsCache)) {
-            return static::$castsCache;
+        if (isset(static::$castsCache[static::class])) {
+            return static::$castsCache[static::class];
         }
+
+        static::$castsCache[static::class] = [];
 
         foreach ($this->casts as $attribute => $cast) {
             if (is_array($cast)) {
@@ -1513,14 +1515,14 @@ trait HasAttributes
                 $cast = $cast.':'.implode(',', $arguments);
             }
 
-            static::$castsCache[$attribute] = $cast;
+            static::$castsCache[static::class][$attribute] = $cast;
         }
 
         if ($this->getIncrementing()) {
-            static::$castsCache[$this->getKeyName()] = $this->getKeyType();
+            static::$castsCache[static::class][$this->getKeyName()] = $this->getKeyType();
         }
 
-        return static::$castsCache;
+        return static::$castsCache[static::class];
     }
 
     /**
