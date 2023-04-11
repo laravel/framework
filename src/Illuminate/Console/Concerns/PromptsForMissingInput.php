@@ -38,14 +38,20 @@ trait PromptsForMissingInput
         $prompted = collect($this->getDefinition()->getArguments())
             ->filter(fn ($argument) => $argument->isRequired() && is_null($input->getArgument($argument->getName())))
             ->filter(fn ($argument) => $argument->getName() !== 'command')
-            ->each(fn ($argument) => $input->setArgument(
-                $argument->getName(),
-                text(
-                    label: $this->promptForMissingArgumentsUsing()[$argument->getName()] ??
-                        'What is '.lcfirst($argument->getDescription()).'?',
+            ->each(function ($argument) use ($input) {
+                $label = $this->promptForMissingArgumentsUsing()[$argument->getName()] ??
+                    'What is '.lcfirst($argument->getDescription()).'?';
+
+                if (is_array($label)) {
+                    [$label, $placeholder] = $label;
+                }
+
+                $input->setArgument($argument->getName(), text(
+                    label: $label,
+                    placeholder: $placeholder ?? '',
                     validate: fn ($value) => empty($value) ? "The {$argument->getName()} is required." : null,
-                )
-            ))
+                ));
+            })
             ->isNotEmpty();
 
         if ($prompted) {
