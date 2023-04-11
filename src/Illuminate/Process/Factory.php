@@ -280,7 +280,9 @@ class Factory
     public function pipe(callable|array $callback, ?callable $output = null)
     {
         return is_array($callback)
-            ? (new Pipe($this, $callback))->runSimple()
+            ? (new Pipe($this, fn ($pipe) => collect($callback)->each(
+                fn ($command) => $pipe->command($command)
+            )))->run(output: $output)
             : (new Pipe($this, $callback))->run(output: $output);
     }
 
