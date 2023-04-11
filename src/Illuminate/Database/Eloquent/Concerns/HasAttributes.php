@@ -173,6 +173,13 @@ trait HasAttributes
     protected static $castTypeCache = [];
 
     /**
+     * The cache of the casts.
+     *
+     * @var null|array
+     */
+    protected static $castsCache = null;
+
+    /**
      * The encrypter instance that is used to encrypt attributes.
      *
      * @var \Illuminate\Contracts\Encryption\Encrypter|null
@@ -1495,7 +1502,9 @@ trait HasAttributes
      */
     public function getCasts()
     {
-        $casts = [];
+        if (! is_null(static::$castsCache)) {
+            return static::$castsCache;
+        }
 
         foreach ($this->casts as $attribute => $cast) {
             if (is_array($cast)) {
@@ -1504,14 +1513,14 @@ trait HasAttributes
                 $cast = $cast.':'.implode(',', $arguments);
             }
 
-            $casts[$attribute] = $cast;
+            static::$castsCache[$attribute] = $cast;
         }
 
         if ($this->getIncrementing()) {
-            return array_merge([$this->getKeyName() => $this->getKeyType()], $casts);
+            static::$castsCache[$this->getKeyName()] = $this->getKeyType();
         }
 
-        return $casts;
+        return static::$castsCache;
     }
 
     /**
