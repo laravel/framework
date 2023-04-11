@@ -277,9 +277,9 @@ class Factory
      * @param  callable  $callback
      * @return \Illuminate\Process\Pipe
      */
-    public function pipe(callable $callback)
+    public function pipe(callable $callback, ?callable $output = null)
     {
-        return new Pipe($this, $callback);
+        return (new Pipe($this, $callback))->run(output: $output);
     }
 
     /**

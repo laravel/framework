@@ -512,7 +512,7 @@ class ProcessTest extends TestCase
             $pipe->command('grep -i "foo"');
         });
 
-        $this->assertSame("foo\n", $pipe->run()->output());
+        $this->assertSame("foo\n", $pipe->output());
     }
 
     public function testProcessPipeFailed()
@@ -531,7 +531,7 @@ class ProcessTest extends TestCase
             $pipe->command('grep -i "foo"');
         });
 
-        $this->assertTrue($pipe->run()->failed());
+        $this->assertTrue($pipe->failed());
     }
 
     public function testFakeInvokedProcessOutputWithLatestOutput()
