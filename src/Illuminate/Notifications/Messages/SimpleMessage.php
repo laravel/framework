@@ -214,7 +214,7 @@ class SimpleMessage
     {
         if ($line instanceof Action) {
             $this->action($line->text, $line->url);
-        } elseif (! $this->actionText) {
+        } elseif (!$this->actionText) {
             $this->introLines[] = $this->formatLine($line);
         } else {
             $this->outroLines[] = $this->formatLine($line);
@@ -256,6 +256,23 @@ class SimpleMessage
 
         return $this;
     }
+
+    /**
+     * Add a button to the notification if the given condition is true.
+     * 
+     * @param  bool  $boolean
+     * @param  mixed  $line
+     * @return $this
+     */
+    public function actionIf($boolean, $text, $url)
+    {
+        if ($boolean) {
+            return $this->action($text, $url);
+        }
+
+        return $this;
+    }
+
 
     /**
      * Set the name of the mailer that should send the notification.
