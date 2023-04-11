@@ -1721,8 +1721,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function replicate(array $except = null)
     {
-        $this->clearCastsCache();
-
         $defaults = array_values(array_filter([
             $this->getKeyName(),
             $this->getCreatedAtColumn(),

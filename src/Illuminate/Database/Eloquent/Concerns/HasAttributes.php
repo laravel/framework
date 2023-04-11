@@ -173,13 +173,6 @@ trait HasAttributes
     protected static $castTypeCache = [];
 
     /**
-     * The cache of the casts.
-     *
-     * @var null|array
-     */
-    protected static $castsCache = null;
-
-    /**
      * The encrypter instance that is used to encrypt attributes.
      *
      * @var \Illuminate\Contracts\Encryption\Encrypter|null
@@ -723,21 +716,9 @@ trait HasAttributes
      */
     public function mergeCasts($casts)
     {
-        $this->clearCastsCache();
-
         $this->casts = array_merge($this->casts, $casts);
 
         return $this;
-    }
-
-    /**
-     * Clear the casts cache.
-     *
-     * @return void
-     */
-    protected function clearCastsCache()
-    {
-        unset(static::$castsCache[static::class]);
     }
 
     /**
@@ -1514,11 +1495,7 @@ trait HasAttributes
      */
     public function getCasts()
     {
-        if (isset(static::$castsCache[static::class])) {
-            return static::$castsCache[static::class];
-        }
-
-        static::$castsCache[static::class] = [];
+        $casts = [];
 
         foreach ($this->casts as $attribute => $cast) {
             if (is_array($cast)) {
@@ -1527,14 +1504,14 @@ trait HasAttributes
                 $cast = $cast.':'.implode(',', $arguments);
             }
 
-            static::$castsCache[static::class][$attribute] = $cast;
+            $casts[$attribute] = $cast;
         }
 
         if ($this->getIncrementing()) {
-            static::$castsCache[static::class] = array_merge([$this->getKeyName() => $this->getKeyType()], static::$castsCache[static::class]);
+            return array_merge([$this->getKeyName() => $this->getKeyType()], $casts);
         }
 
-        return static::$castsCache[static::class];
+        return $casts;
     }
 
     /**
