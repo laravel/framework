@@ -258,6 +258,23 @@ class SimpleMessage
     }
 
     /**
+     * Add a button to the notification if the given condition is true.
+     * 
+     * @param  bool  $boolean
+     * @param  mixed  $text
+     * @param  mixed  $url
+     * @return $this
+     */
+    public function actionIf($boolean, $text, $url)
+    {
+        if ($boolean) {
+            return $this->action($text, $url);
+        }
+
+        return $this;
+    }
+
+    /**
      * Set the name of the mailer that should send the notification.
      *
      * @param  string  $mailer
