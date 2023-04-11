@@ -227,62 +227,118 @@ class ServeCommand extends Command
     protected function handleProcessOutput()
     {
         return fn ($type, $buffer) => str($buffer)->explode("\n")->each(function ($line) {
+            if (empty($line)) {
+                return;
+            }
+
             if (str($line)->contains('Development Server (http')) {
-                if ($this->serverRunningHasBeenDisplayed) {
-                    return;
-                }
-
-                $this->components->info("Server running on [http://{$this->host()}:{$this->port()}].");
-                $this->comment('  <fg=yellow;options=bold>Press Ctrl+C to stop the server</>');
-
-                $this->newLine();
-
-                $this->serverRunningHasBeenDisplayed = true;
+                $this->handleProcessOutputStart($line);
             } elseif (str($line)->contains(' Accepted')) {
-                $requestPort = $this->getRequestPortFromLine($line);
-
-                $this->requestsPool[$requestPort] = [
-                    $this->getDateFromLine($line),
-                    false,
-                ];
+                $this->handleProcessOutputAccepted($line);
             } elseif (str($line)->contains([' [200]: GET '])) {
-                $requestPort = $this->getRequestPortFromLine($line);
-
-                $this->requestsPool[$requestPort][1] = trim(explode('[200]: GET', $line)[1]);
+                $this->handleProcessOutputGet($line);
             } elseif (str($line)->contains(' Closing')) {
-                $requestPort = $this->getRequestPortFromLine($line);
-
-                if (empty($this->requestsPool[$requestPort])) {
-                    return;
-                }
-
-                [$startDate, $file] = $this->requestsPool[$requestPort];
-
-                $formattedStartedAt = $startDate->format('Y-m-d H:i:s');
-
-                unset($this->requestsPool[$requestPort]);
-
-                [$date, $time] = explode(' ', $formattedStartedAt);
-
-                $this->output->write("  <fg=gray>$date</> $time");
-
-                $runTime = $this->getDateFromLine($line)->diffInSeconds($startDate);
-
-                if ($file) {
-                    $this->output->write($file = " $file");
-                }
-
-                $dots = max(terminal()->width() - mb_strlen($formattedStartedAt) - mb_strlen($file) - mb_strlen($runTime) - 9, 0);
-
-                $this->output->write(' '.str_repeat('<fg=gray>.</>', $dots));
-                $this->output->writeln(" <fg=gray>~ {$runTime}s</>");
-            } elseif (str($line)->contains(['Closed without sending a request'])) {
-                // ...
-            } elseif (! empty($line)) {
-                $warning = explode('] ', $line);
-                $this->components->warn(count($warning) > 1 ? $warning[1] : $warning[0]);
+                $this->handleProcessOutputClosing($line);
+            } elseif (! str($line)->contains(['Closed without sending a request'])) {
+                $this->handleProcessOutputWarning($line);
             }
         });
+    }
+
+    /**
+     * Handle the Process Output: Development Server Start
+     *
+     * @param  string  $line
+     * @return void
+     */
+    protected function handleProcessOutputStart(string $line): void
+    {
+        if ($this->serverRunningHasBeenDisplayed) {
+            return;
+        }
+
+        $this->components->info("Server running on [http://{$this->host()}:{$this->port()}].");
+        $this->comment('  <fg=yellow;options=bold>Press Ctrl+C to stop the server</>');
+
+        $this->newLine();
+
+        $this->serverRunningHasBeenDisplayed = true;
+    }
+
+    /**
+     * Handle the Process Output: Accepted
+     *
+     * @param  string  $line
+     * @return void
+     */
+    protected function handleProcessOutputAccepted(string $line): void
+    {
+        $this->requestsPool[$this->getRequestPoolKey($line)] = [
+            $this->getDateFromLine($line),
+            false,
+        ];
+    }
+
+    /**
+     * Handle the Process Output: Get
+     *
+     * @param  string  $line
+     * @return void
+     */
+    protected function handleProcessOutputGet(string $line): void
+    {
+        $key = $this->getRequestPoolKey($line);
+
+        $this->requestsPool[$key][1] = trim(explode('[200]: GET', $line)[1]);
+    }
+
+    /**
+     * Handle the Process Output: Closing
+     *
+     * @param  string  $line
+     * @return void
+     */
+    protected function handleProcessOutputClosing(string $line): void
+    {
+        $key = $this->getRequestPoolKey($line);
+
+        if (empty($this->requestsPool[$key])) {
+            return;
+        }
+
+        [$startDate, $file] = $this->requestsPool[$key];
+
+        unset($this->requestsPool[$key]);
+
+        $formattedStartedAt = $startDate->format('Y-m-d H:i:s');
+
+        [$date, $time] = explode(' ', $formattedStartedAt);
+
+        $this->output->write("  <fg=gray>$date</> $time");
+
+        $runTime = $this->getDateFromLine($line)->diffInSeconds($startDate);
+
+        if ($file) {
+            $this->output->write($file = " $file");
+        }
+
+        $dots = max(terminal()->width() - mb_strlen($formattedStartedAt) - mb_strlen($file) - mb_strlen($runTime) - 9, 0);
+
+        $this->output->write(' '.str_repeat('<fg=gray>.</>', $dots));
+        $this->output->writeln(" <fg=gray>~ {$runTime}s</>");
+    }
+
+    /**
+     * Handle the Process Output: Warning
+     *
+     * @param  string  $line
+     * @return void
+     */
+    protected function handleProcessOutputWarning(string $line): void
+    {
+        $warning = explode('] ', $line);
+
+        $this->components->warn(count($warning) > 1 ? $warning[1] : $warning[0]);
     }
 
     /**
@@ -291,7 +347,7 @@ class ServeCommand extends Command
      * @param  string  $line
      * @return \Illuminate\Support\Carbon
      */
-    protected function getDateFromLine($line)
+    protected function getDateFromLine(string $line): Carbon
     {
         $regex = env('PHP_CLI_SERVER_WORKERS', 1) > 1
             ? '/^\[\d+]\s\[([a-zA-Z0-9: ]+)\]/'
@@ -306,13 +362,13 @@ class ServeCommand extends Command
      * Get the request port from the given PHP server output.
      *
      * @param  string  $line
-     * @return int
+     * @return string
      */
-    protected function getRequestPortFromLine($line)
+    protected function getRequestPoolKey(string $line): string
     {
-        preg_match('/:(\d+)\s(?:(?:\w+$)|(?:\[.*))/', $line, $matches);
+        preg_match('/\]\s([^:]+):(\d+)\s(?:(?:\w+$)|(?:\[.*))/', $line, $matches);
 
-        return (int) $matches[1];
+        return $matches[1].':'.$matches[2];
     }
 
     /**
