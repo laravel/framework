@@ -88,7 +88,7 @@ class Pipe
     }
 
     /**
-     * Runs the processes in the pipe as simple commands
+     * Runs the processes in the pipe as simple commands.
      *
      * @return \Illuminate\Contracts\Process\ProcessResult
      */
