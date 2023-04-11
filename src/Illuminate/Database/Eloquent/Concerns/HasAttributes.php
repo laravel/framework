@@ -1521,7 +1521,7 @@ trait HasAttributes
         }
 
         if ($this->getIncrementing()) {
-            static::$castsCache[static::class][$this->getKeyName()] = $this->getKeyType();
+            static::$castsCache[static::class] = array_merge([$this->getKeyName() => $this->getKeyType()], static::$castsCache[static::class]);
         }
 
         return static::$castsCache[static::class];
