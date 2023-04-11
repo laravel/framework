@@ -259,7 +259,7 @@ class SimpleMessage
 
     /**
      * Add a button to the notification if the given condition is true.
-     * 
+     *
      * @param  bool  $boolean
      * @param  mixed  $text
      * @param  mixed  $url
