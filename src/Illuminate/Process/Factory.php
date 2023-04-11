@@ -272,6 +272,17 @@ class Factory
     }
 
     /**
+     * Start defining a series of piped processes.
+     *
+     * @param  callable  $callback
+     * @return \Illuminate\Process\Pipe
+     */
+    public function pipe(callable $callback)
+    {
+        return new Pipe($this, $callback);
+    }
+
+    /**
      * Run a pool of processes and wait for them to finish executing.
      *
      * @param  callable  $callback

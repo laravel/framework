@@ -27,6 +27,11 @@ class ImplicitModelRouteBindingTest extends TestCase
         parent::tearDown();
     }
 
+    protected function defineEnvironment($app): void
+    {
+        $app['config']->set(['app.key' => 'AckfSECXIvnK5r28GVIWUAxmbBSjTsmF']);
+    }
+
     protected function defineDatabaseMigrations(): void
     {
         Schema::create('users', function (Blueprint $table) {

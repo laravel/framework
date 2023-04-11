@@ -6,6 +6,7 @@ use Exception;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response as Psr7Response;
+use GuzzleHttp\TransferStats;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Client\Events\RequestSending;
@@ -1575,6 +1576,31 @@ class HttpClientTest extends TestCase
         $this->factory->assertSentCount(1);
     }
 
+    public function testRequestsWillBeWaitingSleepMillisecondsReceivedBeforeRetry()
+    {
+        $startTime = microtime(true);
+
+        $this->factory->fake([
+            '*' => $this->factory->sequence()
+                ->push(['error'], 500)
+                ->push(['error'], 500)
+                ->push(['ok'], 200),
+        ]);
+
+        $this->factory
+            ->retry(3, function ($attempt, $exception) {
+                $this->assertInstanceOf(RequestException::class, $exception);
+
+                return $attempt * 100;
+            }, null, true)
+            ->get('http://foo.com/get');
+
+        $this->factory->assertSentCount(3);
+
+        // Make sure was waited 300ms for the first two attempts
+        $this->assertEqualsWithDelta(0.3, microtime(true) - $startTime, 0.03);
+    }
+
     public function testMiddlewareRunsWhenFaked()
     {
         $this->factory->fake(function (Request $request) {
@@ -2178,5 +2204,40 @@ class HttpClientTest extends TestCase
         $this->factory->assertSent(function (Request $request) {
             return $request->url() === 'https://laravel.com/docs/9.x/validation';
         });
+    }
+
+    public function testTheTransferStatsAreCustomizable(): void
+    {
+        $onStatsFunctionCalled = false;
+
+        $stats = $this->factory
+            ->withOptions([
+                'on_stats' => function (TransferStats $stats) use (&$onStatsFunctionCalled) {
+                    $onStatsFunctionCalled = true;
+                },
+            ])
+            ->get('https://example.com')
+            ->handlerStats();
+
+        $this->assertIsArray($stats);
+        $this->assertNotEmpty($stats);
+        $this->assertTrue($onStatsFunctionCalled);
+    }
+
+    public function testTheTransferStatsAreCustomizableOnFake(): void
+    {
+        $onStatsFunctionCalled = false;
+
+        $this->factory
+            ->fake()
+            ->withOptions([
+                'on_stats' => function (TransferStats $stats) use (&$onStatsFunctionCalled) {
+                    $onStatsFunctionCalled = true;
+                },
+            ])
+            ->get('https://foo.bar')
+            ->handlerStats();
+
+        $this->assertTrue($onStatsFunctionCalled);
     }
 }

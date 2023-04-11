@@ -199,7 +199,7 @@ class EventListCommand extends Command
     /**
      * Get the event dispatcher.
      *
-     * @return Illuminate\Events\Dispatcher
+     * @return \Illuminate\Events\Dispatcher
      */
     public function getEventsDispatcher()
     {
