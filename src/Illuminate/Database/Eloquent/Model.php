@@ -22,6 +22,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use JsonSerializable;
 use LogicException;
+use ReflectionMethod;
 
 abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToString, HasBroadcastChannel, Jsonable, JsonSerializable, QueueableEntity, UrlRoutable
 {
@@ -1565,7 +1566,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function newEloquentBuilder($query)
     {
-        $returnType = (new \ReflectionMethod(static::class, 'query'))->getReturnType()?->getName();
+        $returnType = (new ReflectionMethod(static::class, 'query'))->getReturnType()?->getName();
 
         if (! $returnType) {
             return new Builder($query);
