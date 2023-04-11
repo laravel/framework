@@ -10,6 +10,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use function Laravel\Prompts\suggest;
+
 #[AsCommand(name: 'make:policy')]
 class PolicyMakeCommand extends GeneratorCommand
 {
@@ -214,13 +216,12 @@ class PolicyMakeCommand extends GeneratorCommand
             return;
         }
 
-        $model = $this->components->askWithCompletion(
-            'What model should this policy apply to?',
+        $model = suggest(
+            'What model should this policy apply to? (Optional)',
             $this->possibleModels(),
-            'none'
         );
 
-        if ($model && $model !== 'none') {
+        if ($model) {
             $input->setOption('model', $model);
         }
     }

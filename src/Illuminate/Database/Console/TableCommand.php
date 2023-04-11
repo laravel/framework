@@ -10,6 +10,8 @@ use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
 
+use function Laravel\Prompts\select;
+
 #[AsCommand(name: 'db:table')]
 class TableCommand extends DatabaseInspectionCommand
 {
@@ -47,7 +49,7 @@ class TableCommand extends DatabaseInspectionCommand
 
         $this->registerTypeMappings($connection->getDoctrineConnection()->getDatabasePlatform());
 
-        $table = $this->argument('table') ?: $this->components->choice(
+        $table = $this->argument('table') ?: select(
             'Which table would you like to inspect?',
             collect($schema->listTables())->flatMap(fn (Table $table) => [$table->getName()])->toArray()
         );

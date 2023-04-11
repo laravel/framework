@@ -6,6 +6,8 @@ use Illuminate\Console\Application;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Attribute\AsCommand;
 
+use function Laravel\Prompts\select;
+
 #[AsCommand(name: 'schedule:test')]
 class ScheduleTestCommand extends Command
 {
@@ -60,7 +62,7 @@ class ScheduleTestCommand extends Command
 
             $index = key($matches);
         } else {
-            $index = array_search($this->components->choice('Which command would you like to run?', $commandNames), $commandNames);
+            $index = array_search(select('Which command would you like to run?', $commandNames), $commandNames);
         }
 
         $event = $commands[$index];
