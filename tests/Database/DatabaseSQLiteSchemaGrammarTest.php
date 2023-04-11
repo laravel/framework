@@ -321,6 +321,15 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         ], $statements);
     }
 
+    public function testAddingForeignIdSpecifyingIndexNameInConstraint()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->foreignId('company_id')->constrained(null, null, 'my_index');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertSame([
+            'alter table "users" add column "company_id" integer not null'
+        ], $statements);
+    }
     public function testAddingBigIncrementingID()
     {
         $blueprint = new Blueprint('users');
