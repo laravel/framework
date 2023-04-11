@@ -771,6 +771,25 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Run a map over each of the items recursively.
+     * 
+     * @template TMapRecursiveValue
+     * 
+     * @param  callable(TValue, TKey): TMapRecursiveValue  $callback
+     * @return static<TKey, TMapRecursiveValue>
+     */
+    public function mapRecursive(callable $callback)
+    {
+        return Arr::map($this->items, function ($item) use ($callback) {
+            if (is_array($item)) {
+                return (new static($item))->mapRecursive($callback);
+            }
+
+            return $callback($item);
+        });
+    }
+
+    /**
      * Run a dictionary map over the items.
      *
      * The callback should return an associative array with a single key/value pair.
@@ -826,6 +845,27 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         }
 
         return new static($result);
+    }
+
+    /**
+     * Run an associative map over each of the items recursively.
+     *
+     * The callback should return an associative array with a single key/value pair.
+     *
+     * @param  callable(TValue, TKey) $callback
+     * @return static
+     */
+    public function mapWithKeysRecursive(callable $callback)
+    {
+        $recursiveMap = function ($item, $key) use (&$recursiveMap, $callback) {
+            if (is_array($item)) {
+                $item = (new static($item))->mapWithKeys($recursiveMap);
+            }
+
+            return $callback($item, $key);
+        };
+
+        return $this->mapWithKeys($recursiveMap);
     }
 
     /**
