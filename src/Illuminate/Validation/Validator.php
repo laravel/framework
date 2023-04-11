@@ -1089,8 +1089,8 @@ class Validator implements ValidatorContract
     /**
      * Set the value of a given attribute.
      *
-     * @param  string  $attribute  name of attribute (supports dot notation).
-     * @param  mixed  $value  value to set.
+     * @param  string  $attribute
+     * @param  mixed  $value
      * @return void
      */
     public function setValue($attribute, $value)
