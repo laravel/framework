@@ -18,9 +18,10 @@ class Pipe
     protected $factory;
 
     /**
-     * The callback that resolves the pending processes.
+     * The callback that resolves the pending processes,
+     * or array of string processes to run.
      *
-     * @var callable
+     * @var callable|array
      */
     protected $callback;
 
@@ -35,10 +36,10 @@ class Pipe
      * Create a new series of piped processes.
      *
      * @param  \Illuminate\Process\Factory  $factory
-     * @param  callable  $callback
+     * @param  callable|array  $callback
      * @return void
      */
-    public function __construct(Factory $factory, callable $callback)
+    public function __construct(Factory $factory, callable|array $callback)
     {
         $this->factory = $factory;
         $this->callback = $callback;
@@ -84,6 +85,32 @@ class Pipe
                         $output($type, $buffer, $key);
                     } : null);
                 });
+    }
+
+    /**
+     * Runs the processes in the pipe as simple commands
+     *
+     * @return \Illuminate\Contracts\Process\ProcessResult
+     */
+    public function runSimple()
+    {
+        return collect($this->callback)
+            ->reduce(function ($previousProcessResult, $command) {
+                if (! is_string($command)) {
+                    throw new InvalidArgumentException('Process pipe must only contain strings.');
+                }
+
+                if ($previousProcessResult && $previousProcessResult->failed()) {
+                    return $previousProcessResult;
+                }
+
+                $pendingProcess = $this->command($command);
+
+                return $pendingProcess->when(
+                    $previousProcessResult,
+                    fn () => $pendingProcess->input($previousProcessResult->output())
+                )->run();
+            });
     }
 
     /**
