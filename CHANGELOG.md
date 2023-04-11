@@ -1,6 +1,16 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.6.1...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v10.6.2...10.x)
+
+
+## [v10.6.2 (2023-04-05)](https://github.com/laravel/framework/compare/v10.6.1...v10.6.2)
+
+### Added
+- Added trait `Illuminate/Foundation/Testing/WithConsoleEvents` ([#46694](https://github.com/laravel/framework/pull/46694))
+
+### Changed
+- Added missing ignored methods to `Illuminate/View/Component` ([#46692](https://github.com/laravel/framework/pull/46692))
+- console.stub: remove void return type from handle ([#46697](https://github.com/laravel/framework/pull/46697))
 
 
 ## [v10.6.1 (2023-04-04)](https://github.com/laravel/framework/compare/v10.6.0...v10.6.1)
