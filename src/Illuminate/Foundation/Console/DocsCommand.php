@@ -16,6 +16,8 @@ use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
 use Throwable;
 
+use function Laravel\Prompts\suggest;
+
 #[AsCommand(name: 'docs')]
 class DocsCommand extends Command
 {
@@ -229,13 +231,15 @@ class DocsCommand extends Command
      */
     protected function askForPageViaAutocomplete()
     {
-        $choice = $this->components->choice(
-            'Which page would you like to open?',
-            $this->pages()->mapWithKeys(fn ($option) => [
-                Str::lower($option['title']) => $option['title'],
-            ])->all(),
-            'installation',
-            3
+        $choice = suggest(
+            label: 'Which page would you like to open?',
+            options: fn ($value) => $this->pages()
+                ->mapWithKeys(fn ($option) => [
+                    Str::lower($option['title']) => $option['title'],
+                ])
+                ->filter(fn ($title) => Str::contains($title, $value, true))
+                ->all(),
+            placeholder: 'E.g. Collections'
         );
 
         return $this->pages()->filter(

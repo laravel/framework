@@ -6,6 +6,8 @@ use Illuminate\Contracts\Console\PromptsForMissingInput as PromptsForMissingInpu
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use function Laravel\Prompts\text;
+
 trait PromptsForMissingInput
 {
     /**
@@ -38,9 +40,10 @@ trait PromptsForMissingInput
             ->filter(fn ($argument) => $argument->getName() !== 'command')
             ->each(fn ($argument) => $input->setArgument(
                 $argument->getName(),
-                $this->askPersistently(
-                    $this->promptForMissingArgumentsUsing()[$argument->getName()] ??
-                    'What is '.lcfirst($argument->getDescription()).'?'
+                text(
+                    label: $this->promptForMissingArgumentsUsing()[$argument->getName()] ??
+                        'What is '.lcfirst($argument->getDescription()).'?',
+                    validate: fn ($value) => empty($value) ? "The {$argument->getName()} is required." : null,
                 )
             ))
             ->isNotEmpty();
@@ -83,26 +86,5 @@ trait PromptsForMissingInput
         return collect($this->getDefinition()->getOptions())
             ->reject(fn ($option) => $input->getOption($option->getName()) === $option->getDefault())
             ->isNotEmpty();
-    }
-
-    /**
-     * Continue asking a question until an answer is provided.
-     *
-     * @param  string  $question
-     * @return string
-     */
-    private function askPersistently($question)
-    {
-        $answer = null;
-
-        while ($answer === null) {
-            $answer = $this->components->ask($question);
-
-            if ($answer === null) {
-                $this->components->error('The answer is required.');
-            }
-        }
-
-        return $answer;
     }
 }
