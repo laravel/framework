@@ -723,11 +723,21 @@ trait HasAttributes
      */
     public function mergeCasts($casts)
     {
-        unset(static::$castsCache[static::class]);
+        $this->clearCastsCache();
 
         $this->casts = array_merge($this->casts, $casts);
 
         return $this;
+    }
+
+    /**
+     * Clear the casts cache.
+     *
+     * @return void
+     */
+    protected function clearCastsCache()
+    {
+        unset(static::$castsCache[static::class]);
     }
 
     /**
