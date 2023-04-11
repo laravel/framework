@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Support\Providers;
 use Closure;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Traits\ForwardsCalls;
 
@@ -65,12 +66,31 @@ class RouteServiceProvider extends ServiceProvider
     /**
      * Register the callback that will be used to load the application's routes.
      *
-     * @param  \Closure  $routesCallback
+     * @param  \Closure|null  $routesCallback
+     * @param  string|null  $web
+     * @param  string|null  $api
      * @return $this
      */
-    protected function routes(Closure $routesCallback)
+    protected function routes(?Closure $routesCallback = null, ?string $web = null, ?string $api = null)
     {
-        $this->loadRoutesUsing = $routesCallback;
+        if (is_null($web) && is_null($api)) {
+            $this->loadRoutesUsing = $routesCallback;
+        } else {
+            $this->loadRoutesUsing = function () use ($web, $api) {
+                if ($api) {
+                    $this->app[Router::class]
+                        ->middleware('api')
+                        ->prefix('api')
+                        ->group($api);
+                }
+
+                if ($web) {
+                    $this->app[Router::class]
+                        ->middleware('web')
+                        ->group($web);
+                }
+            };
+        }
 
         return $this;
     }
