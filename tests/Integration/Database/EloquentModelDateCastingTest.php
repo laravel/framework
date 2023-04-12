@@ -44,13 +44,16 @@ class EloquentModelDateCastingTest extends DatabaseTestCase
         });
 
         TestModel1::create([
-            'date_field' => '2019-10-01',
-            'datetime_field' => '2019-10-01 10:15:20',
-            'immutable_date_field' => '2019-10-01',
-            'immutable_datetime_field' => '2019-10-01 10:15',
+            'date_field' => '2019-10-31',
+            'datetime_field' => '2019-10-31 10:15:20',
+            'immutable_date_field' => '2019-10-31',
+            'immutable_datetime_field' => '2019-10-31 10:15',
         ]);
 
-        $this->assertSame(['2019-10-01', '2019-10-01 10:15:20', '2019-10-01', '2019-10-01 10:15'], $bindings);
+        $this->assertSame([
+            '2019-10-31 00:00:00',
+            '2019-10-31 10:15:20',
+            '2019-10-31 00:00:00', '2019-10-31 10:15:00'], $bindings);
     }
 
     public function testDatesFormattedArrayAndJson()
