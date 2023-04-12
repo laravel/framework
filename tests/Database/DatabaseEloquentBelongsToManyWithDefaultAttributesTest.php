@@ -53,7 +53,7 @@ class DatabaseEloquentBelongsToManyWithDefaultAttributesTest extends TestCase
         $related->shouldReceive('qualifyColumn')->with('id')->andReturn('users.id');
 
         $builder->shouldReceive('join')->once()->with(
-            m::on( fn ($arg) => is_string($arg)), m::on( fn($arg) => is_callable($arg))
+            m::on(fn ($arg) => is_string($arg)), m::on(fn ($arg) => is_callable($arg))
         );
         $builder->shouldReceive('where')->once()->with('club_user.club_id', '=', 1);
         $builder->shouldReceive('where')->once()->with('club_user.is_admin', '=', 1, 'and');
