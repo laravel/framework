@@ -915,10 +915,15 @@ trait HasAttributes
      */
     protected function isCustomDateTimeCast($cast)
     {
-        return //str_starts_with($cast, 'date:') ||
-                str_starts_with($cast, 'datetime:');
+        return str_starts_with($cast, 'datetime:');
     }
 
+    /**
+     * Determine if the cast type is a custom date cast.
+     *
+     * @param  string  $cast
+     * @return bool
+     */
     protected function isCustomDateCast($cast)
     {
         return str_starts_with($cast, 'date:');
