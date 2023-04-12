@@ -116,7 +116,8 @@ class VendorPublishCommand extends Command
     {
         $choice = select(
             "Which provider or tag's files would you like to publish?",
-            $choices = $this->publishableChoices()
+            $choices = $this->publishableChoices(),
+            scroll: 15,
         );
 
         if ($choice == $choices[0] || is_null($choice)) {
@@ -134,7 +135,7 @@ class VendorPublishCommand extends Command
     protected function publishableChoices()
     {
         return array_merge(
-            ['<comment>Publish files from all providers and tags listed below</comment>'],
+            ['All providers and tags'],
             preg_filter('/^/', '<fg=gray>Provider:</> ', Arr::sort(ServiceProvider::publishableProviders())),
             preg_filter('/^/', '<fg=gray>Tag:</> ', Arr::sort(ServiceProvider::publishableGroups()))
         );
