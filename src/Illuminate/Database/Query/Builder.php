@@ -112,7 +112,7 @@ class Builder implements BuilderContract
      *
      * @var \Illuminate\Database\Query\JoinClause[]
      */
-    public $joins = [];
+    public $joins;
 
     /**
      * The where constraints for the query.
@@ -408,7 +408,7 @@ class Builder implements BuilderContract
      */
     public function prependDatabaseNameForJoins()
     {
-        foreach ($this->joins as $join) {
+        foreach ($this->joins ?? [] as $join) {
             $schema = '';
             if ($join->getConnection()->getDriverName() === 'sqlsrv') {
                 $schema = ($join->getConnection()->getConfig('schema') ?? 'dbo').'.';
