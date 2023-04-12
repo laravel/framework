@@ -299,7 +299,7 @@ trait HasAttributes
             }
 
             if (isset($attributes[$key]) && ($this->isCustomDateTimeCast($value) ||
-                $this->isImmutableCustomDateTimeCast($value))) {
+                $this->isImmutableCustomDateTimeCast($value) || $this->isCustomDateCast($value))) {
                 $attributes[$key] = $attributes[$key]->format(explode(':', $value, 2)[1]);
             }
 
@@ -774,6 +774,7 @@ trait HasAttributes
             case 'collection':
                 return new BaseCollection($this->fromJson($value));
             case 'date':
+            case 'custom_date':
                 return $this->asDate($value);
             case 'datetime':
             case 'custom_datetime':
@@ -866,6 +867,8 @@ trait HasAttributes
             $convertedCastType = 'custom_datetime';
         } elseif ($this->isImmutableCustomDateTimeCast($castType)) {
             $convertedCastType = 'immutable_custom_datetime';
+        } elseif ($this->isCustomDateCast($castType)) {
+            $convertedCastType = 'custom_date';
         } elseif ($this->isDecimalCast($castType)) {
             $convertedCastType = 'decimal';
         } else {
@@ -912,8 +915,13 @@ trait HasAttributes
      */
     protected function isCustomDateTimeCast($cast)
     {
-        return str_starts_with($cast, 'date:') ||
+        return //str_starts_with($cast, 'date:') ||
                 str_starts_with($cast, 'datetime:');
+    }
+
+    protected function isCustomDateCast($cast)
+    {
+        return str_starts_with($cast, 'date:');
     }
 
     /**
@@ -1085,8 +1093,7 @@ trait HasAttributes
     protected function isDateAttribute($key)
     {
         return in_array($key, $this->getDates(), true) ||
-            $this->isDateCastable($key) ||
-            $this->isDateCastableWithCustomFormat($key);
+            $this->isDateCastable($key);
     }
 
     /**
@@ -1534,7 +1541,7 @@ trait HasAttributes
      */
     protected function isDateCastableWithCustomFormat($key)
     {
-        return $this->hasCast($key, ['custom_datetime', 'immutable_custom_datetime']);
+        return $this->hasCast($key, ['custom_datetime', 'immutable_custom_datetime', 'custom_date']);
     }
 
     /**
