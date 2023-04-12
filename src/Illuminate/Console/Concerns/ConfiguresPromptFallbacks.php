@@ -23,26 +23,20 @@ trait ConfiguresPromptFallbacks
     {
         Prompt::fallbackWhen(! $input->isInteractive() || windows_os());
 
-        TextPrompt::fallbackUsing(fn (TextPrompt $prompt) =>
-            $this->promptUntilValid(
-                fn () => $this->components->ask($prompt->label, $prompt->default ?: null) ?? '',
-                $prompt->validate
-            )
-        );
+        TextPrompt::fallbackUsing(fn (TextPrompt $prompt) => $this->promptUntilValid(
+            fn () => $this->components->ask($prompt->label, $prompt->default ?: null) ?? '',
+            $prompt->validate
+        ));
 
-        PasswordPrompt::fallbackUsing(fn (PasswordPrompt $prompt) =>
-            $this->promptUntilValid(
-                fn () => $this->components->secret($prompt->label),
-                $prompt->validate
-            )
-        );
+        PasswordPrompt::fallbackUsing(fn (PasswordPrompt $prompt) => $this->promptUntilValid(
+            fn () => $this->components->secret($prompt->label),
+            $prompt->validate
+        ));
 
-        ConfirmPrompt::fallbackUsing(fn (ConfirmPrompt $prompt) =>
-            $this->promptUntilValid(
-                fn () => $this->components->confirm($prompt->label, $prompt->default),
-                $prompt->validate
-            )
-        );
+        ConfirmPrompt::fallbackUsing(fn (ConfirmPrompt $prompt) => $this->promptUntilValid(
+            fn () => $this->components->confirm($prompt->label, $prompt->default),
+            $prompt->validate
+        ));
 
         SelectPrompt::fallbackUsing(function (SelectPrompt $prompt) {
             if ($prompt->default === null) {
@@ -73,12 +67,10 @@ trait ConfiguresPromptFallbacks
             );
         });
 
-        SuggestPrompt::fallbackUsing(fn (SuggestPrompt $prompt) =>
-            $this->promptUntilValid(
-                fn () => $this->components->askWithCompletion($prompt->label, $prompt->options, $prompt->default ?: null) ?? '',
-                $prompt->validate
-            )
-        );
+        SuggestPrompt::fallbackUsing(fn (SuggestPrompt $prompt) => $this->promptUntilValid(
+            fn () => $this->components->askWithCompletion($prompt->label, $prompt->options, $prompt->default ?: null) ?? '',
+            $prompt->validate
+        ));
     }
 
     /**
@@ -98,6 +90,7 @@ trait ConfiguresPromptFallbacks
 
                 if (is_string($error) && strlen($error) > 0) {
                     $this->components->error($error);
+
                     continue;
                 }
             }
