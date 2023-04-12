@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Database\EloquentCrossDatabaseTest;
 
 use Closure;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Collection;
@@ -141,15 +142,18 @@ class EloquentCrossDatabaseTest extends DatabaseTestCase
     {
         // We only test general compilation without errors here, indicating that cross-database queries have been
         // executed correctly.
-        foreach (['comments'] as $relation) {
-//            $this->assertInstanceOf(Collection::class, Post::query()->with($relation)->get());
-//            $this->assertInstanceOf(Collection::class, Post::query()->withCount($relation)->get());
-//            $this->assertInstanceOf(Collection::class, Post::query()->whereHas($relation)->get());
+
+        foreach (['comments', 'rootTag', 'subPosts', 'tags', 'user', 'view', 'viewables'] as $relation) {
+            $this->assertInstanceOf(Collection::class, Post::query()->with($relation)->get());
+            $this->assertInstanceOf(Collection::class, Post::query()->withCount($relation)->get());
+            $this->assertInstanceOf(Collection::class, Post::query()->whereHas($relation)->get());
         }
 
-//        Post::query()->withCount('subPosts')->get();
-        View::query()->with(['posts'])->get();
-//        View::query()->with(['viewable'])->get();
+        $this->assertInstanceOf(Collection::class, View::query()->with('posts')->get());
+        $this->assertInstanceOf(Collection::class, View::query()->withCount('posts')->get());
+        $this->assertInstanceOf(Collection::class, View::query()->whereHas('posts')->get());
+        $this->assertInstanceOf(Collection::class, View::query()->with('viewable')->get());
+        $this->assertInstanceOf(Collection::class, View::query()->whereHas('viewable')->get());
     }
 }
 
@@ -168,19 +172,14 @@ class Post extends BaseModel
 {
     protected $connection = __TEST_DEFAULT_CONNECTION;
 
+    public function comments()
+    {
+        return $this->hasManyThrough(Comment::class, SubPost::class, 'post_id', 'id');
+    }
+
     public function rootTag()
     {
         return $this->hasOne(Tag::class, 'id', 'root_tag_id');
-    }
-
-    public function tags()
-    {
-        return $this->belongsToMany(Tag::class);
-    }
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
     }
 
     public function subPosts()
@@ -188,9 +187,14 @@ class Post extends BaseModel
         return $this->hasMany(SubPost::class);
     }
 
-    public function comments()
+    public function tags()
     {
-        return $this->hasManyThrough(Comment::class, SubPost::class, 'post_id', 'id');
+        return $this->belongsToMany(Tag::class)->using(PostTag::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function view()
@@ -200,7 +204,7 @@ class Post extends BaseModel
 
     public function viewables()
     {
-        return $this->morphToMany(View::class, 'viewable');
+        return $this->morphToMany(View::class, 'viewable', 'viewables')->using(Viewable::class);
     }
 }
 
@@ -226,13 +230,23 @@ class Tag extends SecondaryBaseModel
 
 class View extends SecondaryBaseModel
 {
-    public function viewable()
-    {
-        return $this->morphTo();
-    }
-
     public function posts()
     {
         return $this->morphedByMany(Post::class, 'viewable');
     }
+
+    public function viewable()
+    {
+        return $this->morphTo();
+    }
+}
+
+class PostTag extends Pivot
+{
+    protected $connection = __TEST_SECONDARY_CONNECTION;
+}
+
+class Viewable extends Pivot
+{
+    protected $connection = __TEST_SECONDARY_CONNECTION;
 }

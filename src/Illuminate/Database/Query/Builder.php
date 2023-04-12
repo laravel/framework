@@ -384,7 +384,7 @@ class Builder implements BuilderContract
      * Prepend the database name if the given query is on another database.
      *
      * @param  self  $query
-     * @return mixed
+     * @return void
      */
     public function prependDatabaseNameIfCrossDatabaseQuery($query)
     {
@@ -396,26 +396,25 @@ class Builder implements BuilderContract
 
             if ($this->shouldPrefixDatabaseName($query->from, $database)) {
                 $query->from($database.'.'.$schema.$query->from);
+                $query->prependDatabaseNameForJoins();
             }
-
-            $query->qualifyJoinsIfCrossDatabaseQuery($this);
         }
     }
 
-    public function qualifyJoinsIfCrossDatabaseQuery(self $query)
+    /**
+     * Prepend the database name to each join table.
+     *
+     * @return void
+     */
+    public function prependDatabaseNameForJoins()
     {
-        $database = $query->getConnection()->getDatabaseName();
-
         foreach ($this->joins as $join) {
             $schema = '';
             if ($join->getConnection()->getDriverName() === 'sqlsrv') {
                 $schema = ($join->getConnection()->getConfig('schema') ?? 'dbo').'.';
             }
 
-            if (
-                ($joinDatabase = $join->getConnection()->getDatabaseName()) !== $database &&
-                $this->shouldPrefixDatabaseName($join->table, $joinDatabase)
-            ) {
+            if ($this->shouldPrefixDatabaseName($join->table, $joinDatabase = $join->getConnection()->getDatabaseName())) {
                 $join->table = $joinDatabase.'.'.$schema.$join->table;
             }
         }

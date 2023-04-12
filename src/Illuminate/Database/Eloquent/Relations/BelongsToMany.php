@@ -208,22 +208,15 @@ class BelongsToMany extends Relation
         // We need to join to the intermediate table on the related model's primary
         // key column with the intermediate table's foreign key for the related
         // model instance. Then we can set the "where" for the parent models.
-//        $query->join(
-//            $this->table,
-//            $this->getQualifiedRelatedKeyName(),
-//            '=',
-//            $this->getQualifiedRelatedPivotKeyName()
-//        );
-
         $query->join(
             $this->table,
             function ($join) {
                 $join->on($this->getQualifiedRelatedKeyName(), '=', $this->getQualifiedRelatedPivotKeyName());
-                $join->setConnection($this->parent->getConnection());
+                if (is_null($this->using)) {
+                    $join->setConnection($this->parent->getConnection());
+                }
             }
         );
-
-//        $this->parent->newQuery()->toBase()->prependDatabaseNameIfCrossDatabaseQuery($query);
 
         return $this;
     }
@@ -343,6 +336,10 @@ class BelongsToMany extends Relation
     public function using($class)
     {
         $this->using = $class;
+
+        foreach ($this->getBaseQuery()->joins as $join) {
+            $join->setConnection((new $class)->getConnection());
+        }
 
         return $this;
     }
