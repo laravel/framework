@@ -337,7 +337,7 @@ class BelongsToMany extends Relation
     {
         $this->using = $class;
 
-        foreach ($this->getBaseQuery()->joins as $join) {
+        foreach ($this->query?->getQuery()->joins ?? [] as $join) {
             $join->setConnection((new $class)->getConnection());
         }
 

@@ -110,7 +110,7 @@ class Builder implements BuilderContract
     /**
      * The table joins for the query.
      *
-     * @var \Illuminate\Database\Query\JoinClause[]
+     * @var \Illuminate\Database\Query\JoinClause[]|null
      */
     public $joins;
 
