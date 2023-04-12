@@ -111,7 +111,7 @@ class AuthenticateSession implements AuthenticatesSessions
     }
 
     /**
-     * Get the path the user should be redirected to when they are not authenticated.
+     * Get the path the user should be redirected to when their session is not autheneticated.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return string|null
