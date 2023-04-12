@@ -21,7 +21,7 @@ trait ConfiguresPromptFallbacks
      */
     protected function configurePromptFallbacks(InputInterface $input)
     {
-        Prompt::fallbackWhen(! $input->isInteractive() || windows_os());
+        Prompt::fallbackWhen(! $input->isInteractive() || windows_os() || app()->runningUnitTests());
 
         TextPrompt::fallbackUsing(fn (TextPrompt $prompt) => $this->promptUntilValid(
             fn () => $this->components->ask($prompt->label, $prompt->default ?: null) ?? '',
