@@ -110,9 +110,9 @@ class Builder implements BuilderContract
     /**
      * The table joins for the query.
      *
-     * @var array
+     * @var \Illuminate\Database\Query\JoinClause[]
      */
-    public $joins;
+    public $joins = [];
 
     /**
      * The where constraints for the query.
@@ -367,8 +367,8 @@ class Builder implements BuilderContract
      */
     protected function parseSub($query)
     {
-        if ($query instanceof self || $query instanceof EloquentBuilder || $query instanceof Relation) {
-            $query = $this->prependDatabaseNameIfCrossDatabaseQuery($query);
+        if ($query instanceof self || $query instanceof EloquentBuilder) {
+            $this->prependDatabaseNameIfCrossDatabaseQuery($query instanceof EloquentBuilder ? $query->getQuery() : $query);
 
             return [$query->toSql(), $query->getBindings()];
         } elseif (is_string($query)) {
@@ -383,34 +383,52 @@ class Builder implements BuilderContract
     /**
      * Prepend the database name if the given query is on another database.
      *
-     * @param  self|EloquentBuilder|Relation  $query
+     * @param  self  $query
      * @return mixed
      */
     public function prependDatabaseNameIfCrossDatabaseQuery($query)
     {
-        if (($databaseName = $query->getConnection()->getDatabaseName()) !==
-            $this->getConnection()->getDatabaseName()) {
-
+        if (($database = $query->getConnection()->getDatabaseName()) !== $this->getConnection()->getDatabaseName()) {
             $schema = '';
             if ($query->getConnection()->getDriverName() === 'sqlsrv') {
                 $schema = ($query->getConnection()->getConfig('schema') ?? 'dbo').'.';
             }
 
-            $shouldPrefix = fn ($table) => ! str_starts_with($table, $databaseName) && ! str_contains($table, '.');
-
-            if ($shouldPrefix($query->from)) {
-                $query->from($databaseName.'.'.$schema.$query->from);
+            if ($this->shouldPrefixDatabaseName($query->from, $database)) {
+                $query->from($database.'.'.$schema.$query->from);
             }
 
-            $baseQuery = ($query instanceof EloquentBuilder || $query instanceof Relation) ? $query->getQuery() : $query;
-            foreach ($baseQuery->joins ?? [] as $join) {
-                if ($shouldPrefix($join->table)) {
-                    $join->table = $databaseName.'.'.$schema.$join->table;
-                }
+            $query->qualifyJoinsIfCrossDatabaseQuery($this);
+        }
+    }
+
+    public function qualifyJoinsIfCrossDatabaseQuery(self $query)
+    {
+        $database = $query->getConnection()->getDatabaseName();
+
+        foreach ($this->joins as $join) {
+            $schema = '';
+            if ($join->getConnection()->getDriverName() === 'sqlsrv') {
+                $schema = ($join->getConnection()->getConfig('schema') ?? 'dbo').'.';
+            }
+
+            if (
+                ($joinDatabase = $join->getConnection()->getDatabaseName()) !== $database &&
+                $this->shouldPrefixDatabaseName($join->table, $joinDatabase)
+            ) {
+                $join->table = $joinDatabase.'.'.$schema.$join->table;
             }
         }
+    }
 
-        return $query;
+    /**
+     * @param  string  $table
+     * @param  string  $database
+     * @return bool
+     */
+    protected function shouldPrefixDatabaseName($table, $database)
+    {
+        return ! str_starts_with($table, $database) && ! str_contains($table, '.');
     }
 
     /**

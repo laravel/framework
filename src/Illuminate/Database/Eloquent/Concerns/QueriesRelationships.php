@@ -54,7 +54,7 @@ trait QueriesRelationships
             $relation->getRelated()->newQueryWithoutRelationships(), $this
         );
 
-        $this->query->prependDatabaseNameIfCrossDatabaseQuery($hasQuery);
+        $this->query->prependDatabaseNameIfCrossDatabaseQuery($hasQuery->getQuery());
 
         // Next we will call any given callback as an "anonymous" scope so they can get the
         // proper logical grouping of the where clauses if needed by this Eloquent query

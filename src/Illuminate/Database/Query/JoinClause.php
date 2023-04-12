@@ -122,6 +122,12 @@ class JoinClause extends Builder
         return new static($this->newParentQuery(), $this->type, $this->table);
     }
 
+    public function setConnection($c)
+    {
+        $this->connection = $c;
+        return $this;
+    }
+
     /**
      * Create a new query instance for sub-query.
      *
