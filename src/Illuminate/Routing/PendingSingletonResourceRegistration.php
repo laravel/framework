@@ -64,7 +64,7 @@ class PendingSingletonResourceRegistration
     /**
      * Set the methods the controller should apply to.
      *
-     * @param  array|string|dynamic  $methods
+     * @param  array|string|mixed  $methods
      * @return \Illuminate\Routing\PendingSingletonResourceRegistration
      */
     public function only($methods)
@@ -77,7 +77,7 @@ class PendingSingletonResourceRegistration
     /**
      * Set the methods the controller should exclude.
      *
-     * @param  array|string|dynamic  $methods
+     * @param  array|string|mixed  $methods
      * @return \Illuminate\Routing\PendingSingletonResourceRegistration
      */
     public function except($methods)
@@ -90,12 +90,11 @@ class PendingSingletonResourceRegistration
     /**
      * Indicate that the resource should have creation and storage routes.
      *
-     * @param  bool  $creatable
      * @return $this
      */
-    public function creatable($creatable = true)
+    public function creatable()
     {
-        $this->options['creatable'] = $creatable;
+        $this->options['creatable'] = true;
 
         return $this;
     }
@@ -103,12 +102,11 @@ class PendingSingletonResourceRegistration
     /**
      * Indicate that the resource should have a deletion route.
      *
-     * @param  bool  $destroyable
      * @return $this
      */
-    public function destroyable($destroyable = true)
+    public function destroyable()
     {
-        $this->options['destroyable'] = $destroyable;
+        $this->options['destroyable'] = true;
 
         return $this;
     }

@@ -9,6 +9,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
+
 use function Termwind\terminal;
 
 #[AsCommand(name: 'serve')]
@@ -250,9 +251,12 @@ class ServeCommand extends Command
                 $this->requestsPool[$requestPort][1] = trim(explode('[200]: GET', $line)[1]);
             } elseif (str($line)->contains(' Closing')) {
                 $requestPort = $this->getRequestPortFromLine($line);
-                $request = $this->requestsPool[$requestPort];
 
-                [$startDate, $file] = $request;
+                if (empty($this->requestsPool[$requestPort])) {
+                    return;
+                }
+
+                [$startDate, $file] = $this->requestsPool[$requestPort];
 
                 $formattedStartedAt = $startDate->format('Y-m-d H:i:s');
 

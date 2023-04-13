@@ -405,6 +405,19 @@ class RoutingRouteTest extends TestCase
         $this->assertNull($route->getAction('unknown_property'));
     }
 
+    public function testRouteGetControllerClass()
+    {
+        $router = $this->getRouter();
+
+        $controllerRoute = $router->get('foo/bar')->uses(RouteTestControllerStub::class.'@index');
+        $closureRoute = $router->get('foo', function () {
+            return 'foo';
+        });
+
+        $this->assertSame(RouteTestControllerStub::class, $controllerRoute->getControllerClass());
+        $this->assertNull($closureRoute->getControllerClass());
+    }
+
     public function testResolvingBindingParameters()
     {
         $router = $this->getRouter();
@@ -1878,6 +1891,20 @@ class RoutingRouteTest extends TestCase
             },
         ]);
         $router->dispatch(Request::create('foo', 'GET'))->getContent();
+    }
+
+    public function testImplicitBindingsWithOptionalParameterUsingEnumIsAlwaysCastedToEnum()
+    {
+        include_once 'Enums.php';
+
+        $router = $this->getRouter();
+        $router->get('foo/{bar?}', [
+            'middleware' => SubstituteBindings::class,
+            'uses' => function (?\Illuminate\Tests\Routing\CategoryBackedEnum $bar = null) {
+                $this->assertInstanceOf(CategoryBackedEnum::class, $bar);
+            },
+        ]);
+        $router->dispatch(Request::create('foo/people', 'GET'))->getContent();
     }
 
     public function testImplicitBindingsWithOptionalParameterWithNonExistingKeyInUri()

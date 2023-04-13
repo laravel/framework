@@ -50,7 +50,8 @@ class PaginatedResourceResponse extends ResourceResponse
             'meta' => $this->meta($paginated),
         ];
 
-        if (method_exists($this->resource, 'paginationInformation')) {
+        if (method_exists($this->resource, 'paginationInformation') ||
+            $this->resource->hasMacro('paginationInformation')) {
             return $this->resource->paginationInformation($request, $paginated, $default);
         }
 

@@ -22,7 +22,7 @@ use Symfony\Component\Routing\Route as SymfonyRoute;
 
 class Route
 {
-    use CreatesRegularExpressionRouteConstraints, Macroable, RouteDependencyResolverTrait;
+    use CreatesRegularExpressionRouteConstraints, FiltersControllerMiddleware, Macroable, ResolvesRouteDependencies;
 
     /**
      * The URI pattern the route responds to.
@@ -280,11 +280,11 @@ class Route
     /**
      * Get the controller class used for the route.
      *
-     * @return string
+     * @return string|null
      */
     public function getControllerClass()
     {
-        return $this->parseControllerCallback()[0];
+        return $this->isControllerAction() ? $this->parseControllerCallback()[0] : null;
     }
 
     /**
@@ -1114,7 +1114,7 @@ class Route
     protected function staticallyProvidedControllerMiddleware(string $class, string $method)
     {
         return collect($class::middleware())->reject(function ($middleware) use ($method) {
-            return $this->controllerDispatcher()::methodExcludedByOptions(
+            return static::methodExcludedByOptions(
                 $method, ['only' => $middleware->only, 'except' => $middleware->except]
             );
         })->map->middleware->values()->all();
