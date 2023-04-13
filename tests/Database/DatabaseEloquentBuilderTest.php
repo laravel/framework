@@ -786,6 +786,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     public function testRelationshipEagerLoadProcessForImplicitlyEmpty()
     {
         $queryBuilder = $this->getMockQueryBuilder();
+        $queryBuilder->shouldReceive('prependDatabaseNameIfCrossDatabaseQuery')->once();
         $builder = m::mock(Builder::class.'[getRelation]', [$queryBuilder]);
         $builder->setEagerLoads(['parentFoo' => function ($query) {
             $_SERVER['__eloquent.constrain'] = $query;
