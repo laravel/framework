@@ -1247,19 +1247,19 @@ class SupportArrTest extends TestCase
         $testValue2 = 0; // int
 
         $testArray2 = [
-            1 => "One",
-            2 => "Two",
-            3 => "Three",
-            0 => 0,
-            4 => "Four"
+            "One" => 1,
+            "Two" => 2,
+            "Three" => 3,
+            "Zero" => 0,
+            "Four" => 4
         ];
 
         $testExpect2 = [
-            1 => "One",
-            2 => "Two",
-            3 => "Three",
-            4 => "Four",
-            0 => 0,
+            "One" => 1,
+            "Two" => 2,
+            "Three" => 3,
+            "Four" => 4,
+            "Zero" => 0,
         ];
 
         $this->assertSame($testExpect2, Arr::moveToBottomByValue($testArray2, $testValue2));
