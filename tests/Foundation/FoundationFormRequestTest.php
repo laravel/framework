@@ -151,7 +151,8 @@ class FoundationFormRequestTest extends TestCase
 
     public function testAfterMethod()
     {
-        $request = new class extends FormRequest {
+        $request = new class extends FormRequest
+        {
             public $value = 'value-from-request';
 
             public function rules()
@@ -161,7 +162,8 @@ class FoundationFormRequestTest extends TestCase
 
             protected function failedValidation(Validator $validator)
             {
-                throw new class ($validator) extends Exception {
+                throw new class($validator) extends Exception
+                {
                     public function __construct(public $validator)
                     {
                         //
@@ -201,7 +203,6 @@ class FoundationFormRequestTest extends TestCase
             'closure' => ['true'],
         ], $messages);
     }
-
 
     /**
      * Catch the given exception thrown from the executor, and return it.
@@ -436,8 +437,8 @@ class InvokableAfterValidationRule
 {
     public function __construct(private $value)
     {
-
     }
+
     public function __invoke($validator)
     {
         $validator->errors()->add('invokable', $this->value);

@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Validation;
 
-use Illuminate\Container\Container;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
 use Illuminate\Validation\Validator;
