@@ -44,9 +44,11 @@ class ParallelTestingServiceProvider extends ServiceProvider implements Deferrab
     public function provides()
     {
         $services = [];
+
         if ($this->app->runningInConsole()) {
             $services[] = ParallelTesting::class;
         }
+
         return $services;
     }
 }
