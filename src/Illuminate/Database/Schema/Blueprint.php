@@ -258,6 +258,17 @@ class Blueprint
                 continue;
             }
 
+            //if the public after varible is set and the column has no after tag add the after tag
+            if($this->after && !$column['after']){
+                $column['after'] = $this->after;
+            }
+
+            //set value for the public after varible to be set in the up comming column in current migration file
+            if($column['after']){
+                $this->after = $column['name'];
+            }
+
+
             foreach ($grammar->getFluentCommands() as $commandName) {
                 $this->addCommand($commandName, compact('column'));
             }
