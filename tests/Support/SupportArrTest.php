@@ -1178,4 +1178,176 @@ class SupportArrTest extends TestCase
             ],
         ], Arr::prependKeysWith($array, 'test.'));
     }
+
+    public function testMoveToTopByValue()
+    {
+        $testValue1 = "Zero"; // string
+
+        $testArray1 = [
+            1 => "One",
+            2 => "Two",
+            3 => "Three",
+            0 => "Zero",
+            4 => "Four"
+        ];
+
+        $testExpect1 = [
+            0 => "Zero",
+            1 => "One",
+            2 => "Two",
+            3 => "Three",
+            4 => "Four",
+        ];
+
+        $this->assertSame($testExpect1, Arr::moveToTopByValue($testArray1, $testValue1));
+
+        $testValue2 = 0; // int
+
+        $testArray2 = [
+            "One" => 1,
+            "Two" => 2,
+            "Three" => 3,
+            "Zero" => 0,
+            "Four" => 4
+        ];
+
+        $testExpect2 = [
+            "Zero" => 0,
+            "One" => 1,
+            "Two" => 2,
+            "Three" => 3,
+            "Four" => 4
+        ];
+
+        $this->assertSame($testExpect2, Arr::moveToTopByValue($testArray2, $testValue2));
+    }
+
+    public function testMoveToBottomByValue()
+    {
+        $testValue1 = "Zero"; // string
+
+        $testArray1 = [
+            1 => "One",
+            2 => "Two",
+            3 => "Three",
+            0 => "Zero",
+            4 => "Four"
+        ];
+
+        $testExpect1 = [
+            1 => "One",
+            2 => "Two",
+            3 => "Three",
+            4 => "Four",
+            0 => "Zero",
+        ];
+
+        $this->assertSame($testExpect1, Arr::moveToBottomByValue($testArray1, $testValue1));
+
+        $testValue2 = 0; // int
+
+        $testArray2 = [
+            1 => "One",
+            2 => "Two",
+            3 => "Three",
+            0 => 0,
+            4 => "Four"
+        ];
+
+        $testExpect2 = [
+            1 => "One",
+            2 => "Two",
+            3 => "Three",
+            4 => "Four",
+            0 => 0,
+        ];
+
+        $this->assertSame($testExpect2, Arr::moveToBottomByValue($testArray2, $testValue2));
+    }
+
+    public function testMoveToTopByKey()
+    {
+        $testValue1 = "Zero"; // string
+
+        $testArray1 = [
+            "One" => 1,
+            "Two" => 2,
+            "Three" => 3,
+            "Zero" => 0,
+            "Four" => 4
+        ];
+
+        $testExpect1 = [
+            "Zero" => 0,
+            "One" => 1,
+            "Two" => 2,
+            "Three" => 3,
+            "Four" => 4
+        ];
+
+        $this->assertSame($testExpect1, Arr::moveToTopByKey($testArray1, $testValue1));
+
+        $testValue2 = 0; // int
+
+        $testArray2 = [
+            1 => "One",
+            2 => "Two",
+            3 => "Three",
+            0 => "Zero",
+            4 => "Four"
+        ];
+
+        $testExpect2 = [
+            0 => "Zero",
+            1 => "One",
+            2 => "Two",
+            3 => "Three",
+            4 => "Four",
+        ];
+
+        $this->assertSame($testExpect2, Arr::moveToTopByKey($testArray2, $testValue2));
+    }
+
+    public function testMoveToBottomByKey()
+    {
+        $testValue1 = "Zero"; // string
+
+        $testArray1 = [
+            "One" => 1,
+            "Two" => 2,
+            "Three" => 3,
+            "Zero" => 0,
+            "Four" => 4
+        ];
+
+        $testExpect1 = [
+            "One" => 1,
+            "Two" => 2,
+            "Three" => 3,
+            "Four" => 4,
+            "Zero" => 0,
+        ];
+
+        $this->assertSame($testExpect1, Arr::moveToBottomByKey($testArray1, $testValue1));
+
+        $testValue2 = 0; // int
+
+        $testArray2 = [
+            1 => "One",
+            2 => "Two",
+            3 => "Three",
+            0 => "Zero",
+            4 => "Four"
+        ];
+
+        $testExpect2 = [
+            1 => "One",
+            2 => "Two",
+            3 => "Three",
+            4 => "Four",
+            0 => "Zero",
+        ];
+
+        $this->assertSame($testExpect2, Arr::moveToBottomByKey($testArray2, $testValue2));
+    }
 }
