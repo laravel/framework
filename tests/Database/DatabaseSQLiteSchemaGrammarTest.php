@@ -206,7 +206,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $blueprint->create();
         $blueprint->string('foo')->primary();
         $blueprint->string('order_id');
-        $blueprint->foreign('order_id')->references('id')->on('orders')->index("custom_name");
+        $blueprint->foreign('order_id')->references('id')->on('orders')->index('custom_name');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
         $this->assertSame('create table "users" ("foo" varchar not null, "order_id" varchar not null, foreign key("order_id") references "orders"("id"), primary key ("foo"))', $statements[0]);

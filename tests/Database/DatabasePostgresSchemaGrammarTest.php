@@ -993,7 +993,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertSame('alter table "users" add constraint "users_parent_id_foreign" foreign key ("parent_id") references "parents" ("id") on delete cascade deferrable', $statements[0]);
 
         $blueprint = new Blueprint('users');
-        $blueprint->foreign('parent_id')->references('id')->on('parents')->onDelete('cascade')->deferrable()->index("custom_index_name");
+        $blueprint->foreign('parent_id')->references('id')->on('parents')->onDelete('cascade')->deferrable()->index('custom_index_name');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
@@ -1019,7 +1019,6 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('alter table "users" add constraint "users_parent_id_foreign" foreign key ("parent_id") references "parents" ("id") on delete cascade deferrable not valid', $statements[0]);
-
     }
 
     public function testAddingGeometry()
