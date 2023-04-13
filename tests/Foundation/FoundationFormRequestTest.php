@@ -149,6 +149,60 @@ class FoundationFormRequestTest extends TestCase
         $this->assertSame('bar', $request->validated('nested.foo'));
     }
 
+    public function testAfterMethod()
+    {
+        $request = new class extends FormRequest {
+            public $value = 'value-from-request';
+
+            public function rules()
+            {
+                return [];
+            }
+
+            protected function failedValidation(Validator $validator)
+            {
+                throw new class ($validator) extends Exception {
+                    public function __construct(public $validator)
+                    {
+                        //
+                    }
+                };
+            }
+
+            public function after(InjectedDependency $dep)
+            {
+                return [
+                    new AfterValidationRule($dep->value),
+                    new InvokableAfterValidationRule($this->value),
+                    fn ($validator) => $validator->errors()->add('closure', 'true'),
+                ];
+            }
+        };
+        $request->setContainer($container = new Container);
+        $container->instance(\Illuminate\Contracts\Validation\Factory::class, (new \Illuminate\Validation\Factory(
+            new \Illuminate\Translation\Translator(new \Illuminate\Translation\ArrayLoader(), 'en')
+        ))->setContainer($container));
+        $container->instance(InjectedDependency::class, new InjectedDependency('value-from-dependency'));
+
+        $messages = [];
+
+        try {
+            $request->validateResolved();
+            $this->fail();
+        } catch (Exception $e) {
+            if (property_exists($e, 'validator')) {
+                $messages = $e->validator->messages()->messages();
+            }
+        }
+
+        $this->assertSame([
+            'after' => ['value-from-dependency'],
+            'invokable' => ['value-from-request'],
+            'closure' => ['true'],
+        ], $messages);
+    }
+
+
     /**
      * Catch the given exception thrown from the executor, and return it.
      *
@@ -375,5 +429,38 @@ class FoundationTestFormRequestPassesWithResponseStub extends FormRequest
     public function authorize()
     {
         return Response::allow('baz');
+    }
+}
+
+class InvokableAfterValidationRule
+{
+    public function __construct(private $value)
+    {
+
+    }
+    public function __invoke($validator)
+    {
+        $validator->errors()->add('invokable', $this->value);
+    }
+}
+
+class AfterValidationRule
+{
+    public function __construct(private $value)
+    {
+        //
+    }
+
+    public function after($validator)
+    {
+        $validator->errors()->add('after', $this->value);
+    }
+}
+
+class InjectedDependency
+{
+    public function __construct(public $value)
+    {
+        //
     }
 }

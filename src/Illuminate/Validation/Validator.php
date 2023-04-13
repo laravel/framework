@@ -383,11 +383,19 @@ class Validator implements ValidatorContract
     /**
      * Add an after validation callback.
      *
-     * @param  callable|string  $callback
+     * @param  callable|array|string  $callback
      * @return $this
      */
     public function after($callback)
     {
+        if (is_array($callback) && ! is_callable($callback)) {
+            foreach ($callback as $rule) {
+                $this->after(method_exists($rule, 'after') ? $rule->after(...) : $rule);
+            }
+
+            return $this;
+        }
+
         $this->after[] = fn () => $callback($this);
 
         return $this;
