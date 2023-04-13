@@ -369,7 +369,7 @@ class Builder implements BuilderContract
     protected function parseSub($query)
     {
         if ($query instanceof self || $query instanceof EloquentBuilder || $query instanceof Relation) {
-            $baseQuery = match(get_class($query)) {
+            $baseQuery = match (get_class($query)) {
                 EloquentBuilder::class => $query->getQuery(),
                 Relation::class => $query->getQuery()->getQuery(),
                 default => $query
