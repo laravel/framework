@@ -763,7 +763,9 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testRelationshipEagerLoadProcess()
     {
-        $builder = m::mock(Builder::class.'[getRelation]', [$this->getMockQueryBuilder()]);
+        $baseBuilder = $this->getMockQueryBuilder();
+        $baseBuilder->shouldReceive('prependDatabaseNameIfCrossDatabaseQuery')->once();
+        $builder = m::mock(Builder::class.'[getRelation]', [$baseBuilder]);
         $builder->setEagerLoads(['orders' => function ($query) {
             $_SERVER['__eloquent.constrain'] = $query;
         }]);
@@ -772,6 +774,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $relation->shouldReceive('initRelation')->once()->with(['models'], 'orders')->andReturn(['models']);
         $relation->shouldReceive('getEager')->once()->andReturn(['results']);
         $relation->shouldReceive('match')->once()->with(['models'], ['results'], 'orders')->andReturn(['models.matched']);
+        $relation->shouldReceive('getBaseQuery')->once()->andReturn(new \stdClass);
         $builder->shouldReceive('getRelation')->once()->with('orders')->andReturn($relation);
         $results = $builder->eagerLoadRelations(['models']);
 

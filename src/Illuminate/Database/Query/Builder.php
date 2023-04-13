@@ -111,7 +111,7 @@ class Builder implements BuilderContract
     /**
      * The table joins for the query.
      *
-     * @var array
+     * @var \Illuminate\Database\Query\JoinClause[]|null
      */
     public $joins;
 
@@ -369,7 +369,12 @@ class Builder implements BuilderContract
     protected function parseSub($query)
     {
         if ($query instanceof self || $query instanceof EloquentBuilder || $query instanceof Relation) {
-            $query = $this->prependDatabaseNameIfCrossDatabaseQuery($query);
+            $baseQuery = match(get_class($query)) {
+                EloquentBuilder::class => $query->getQuery(),
+                Relation::class => $query->getQuery()->getQuery(),
+                default => $query
+            };
+            $this->prependDatabaseNameIfCrossDatabaseQuery($baseQuery);
 
             return [$query->toSql(), $query->getBindings()];
         } elseif (is_string($query)) {
@@ -384,21 +389,57 @@ class Builder implements BuilderContract
     /**
      * Prepend the database name if the given query is on another database.
      *
-     * @param  mixed  $query
+     * @param  self  $query
      * @return mixed
+     *
+     * @internal This method is not meant to be used or overwritten outside the framework.
      */
-    protected function prependDatabaseNameIfCrossDatabaseQuery($query)
+    public function prependDatabaseNameIfCrossDatabaseQuery($query)
     {
-        if ($query->getConnection()->getDatabaseName() !==
-            $this->getConnection()->getDatabaseName()) {
-            $databaseName = $query->getConnection()->getDatabaseName();
+        if (($database = $query->getConnection()->getDatabaseName()) !== $this->getConnection()->getDatabaseName()) {
+            $schema = '';
+            if ($query->getConnection()->getDriverName() === 'sqlsrv') {
+                $schema = ($query->getConnection()->getConfig('schema') ?? 'dbo').'.';
+            }
 
-            if (! str_starts_with($query->from, $databaseName) && ! str_contains($query->from, '.')) {
-                $query->from($databaseName.'.'.$query->from);
+            if ($this->shouldPrefixDatabaseName($query->from, $database)) {
+                $query->from($database.'.'.$schema.$query->from);
+                $query->prependDatabaseNameForJoins();
             }
         }
+    }
 
-        return $query;
+    /**
+     * Prepend the database name to each join table.
+     *
+     * @return void
+     *
+     * @internal This method is not meant to be used or overwritten outside the framework.
+     */
+    public function prependDatabaseNameForJoins()
+    {
+        foreach ($this->joins ?? [] as $join) {
+            $schema = '';
+            if ($join->getConnection()->getDriverName() === 'sqlsrv') {
+                $schema = ($join->getConnection()->getConfig('schema') ?? 'dbo').'.';
+            }
+
+            if ($this->shouldPrefixDatabaseName($join->table, $joinDatabase = $join->getConnection()->getDatabaseName())) {
+                $join->table = $joinDatabase.'.'.$schema.$join->table;
+            }
+        }
+    }
+
+    /**
+     * Determine if the table should be prefixed with the database name.
+     *
+     * @param  string  $table
+     * @param  string  $database
+     * @return bool
+     */
+    protected function shouldPrefixDatabaseName($table, $database)
+    {
+        return ! str_starts_with($table, $database) && ! str_contains($table, '.');
     }
 
     /**

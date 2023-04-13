@@ -101,7 +101,9 @@ class DatabaseEloquentMorphToManyTest extends TestCase
         $related->shouldReceive('qualifyColumn')->with('id')->andReturn('tags.id');
         $related->shouldReceive('getMorphClass')->andReturn(get_class($related));
 
-        $builder->shouldReceive('join')->once()->with('taggables', 'tags.id', '=', 'taggables.tag_id');
+        $builder->shouldReceive('join')->once()->with(
+            m::on(fn ($arg) => is_string($arg)), m::on(fn ($arg) => is_callable($arg))
+        );
         $builder->shouldReceive('where')->once()->with('taggables.taggable_id', '=', 1);
         $builder->shouldReceive('where')->once()->with('taggables.taggable_type', get_class($parent));
 

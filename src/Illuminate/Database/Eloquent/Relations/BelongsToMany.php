@@ -210,9 +210,12 @@ class BelongsToMany extends Relation
         // model instance. Then we can set the "where" for the parent models.
         $query->join(
             $this->table,
-            $this->getQualifiedRelatedKeyName(),
-            '=',
-            $this->getQualifiedRelatedPivotKeyName()
+            function ($join) {
+                $join->on($this->getQualifiedRelatedKeyName(), '=', $this->getQualifiedRelatedPivotKeyName());
+                if (is_null($this->using)) {
+                    $join->setConnection($this->parent->getConnection());
+                }
+            }
         );
 
         return $this;
@@ -334,6 +337,10 @@ class BelongsToMany extends Relation
     public function using($class)
     {
         $this->using = $class;
+
+        foreach ($this->query?->getQuery()->joins ?? [] as $join) {
+            $join->setConnection((new $class)->getConnection());
+        }
 
         return $this;
     }

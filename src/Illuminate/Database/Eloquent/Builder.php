@@ -757,6 +757,8 @@ class Builder implements BuilderContract
 
         $constraints($relation);
 
+        $this->query->prependDatabaseNameIfCrossDatabaseQuery($relation->getBaseQuery());
+
         // Once we have the results, we just match those back up to their parent models
         // using the relationship instance. Then we just return the finished arrays
         // of models which have been eagerly hydrated and are readied for return.

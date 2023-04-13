@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Query;
 
 use Closure;
+use Illuminate\Database\ConnectionInterface;
 
 class JoinClause extends Builder
 {
@@ -120,6 +121,19 @@ class JoinClause extends Builder
     public function newQuery()
     {
         return new static($this->newParentQuery(), $this->type, $this->table);
+    }
+
+    /**
+     * Set the connection for this join clause.
+     *
+     * @param  \Illuminate\Database\ConnectionInterface  $connection
+     * @return $this
+     */
+    public function setConnection(ConnectionInterface $connection)
+    {
+        $this->connection = $connection;
+
+        return $this;
     }
 
     /**

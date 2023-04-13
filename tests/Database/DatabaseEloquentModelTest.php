@@ -545,6 +545,8 @@ class DatabaseEloquentModelTest extends TestCase
     public function testWithWhereHasWithSpecificColumns()
     {
         $model = new EloquentModelWithWhereHasStub;
+        $connection = $this->addMockConnection($model);
+        $connection->shouldReceive('getDatabaseName')->andReturn('forge');
         $instance = $model->newInstance()->newQuery()->withWhereHas('foo:diaa,fares');
         $builder = m::mock(Builder::class);
         $builder->shouldReceive('select')->once()->with(['diaa', 'fares']);
@@ -2524,6 +2526,8 @@ class DatabaseEloquentModelTest extends TestCase
         $connection->shouldReceive('query')->andReturnUsing(function () use ($connection, $grammar, $processor) {
             return new BaseBuilder($connection, $grammar, $processor);
         });
+
+        return $connection;
     }
 
     public function testTouchingModelWithTimestamps()
