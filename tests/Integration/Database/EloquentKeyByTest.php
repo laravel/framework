@@ -1,11 +1,12 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Database;
+namespace Illuminate\Tests\Integration\Database\EloquentKeyByTest;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentKeyByTest extends DatabaseTestCase
 {
@@ -23,6 +24,7 @@ class EloquentKeyByTest extends DatabaseTestCase
             $table->unsignedInteger('user_id');
             $table->string('title')->nullable();
             $table->string('content');
+            $table->timestamps();
         });
 
         Schema::create('comments', function (Blueprint $table) {
@@ -31,7 +33,7 @@ class EloquentKeyByTest extends DatabaseTestCase
             $table->string('content');
         });
 
-        Schema::create('posts_tags', function (Blueprint $table) {
+        Schema::create('post_tag', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('post_id');
             $table->unsignedInteger('tag_id');
@@ -48,12 +50,12 @@ class EloquentKeyByTest extends DatabaseTestCase
         ]);
 
         DB::table('posts')->insert([
-            ['user_id' => 1, 'title' => 'The Post', 'content' => 'Welcome to Laravel!'],
-            ['user_id' => 1, 'title' => 'The Post', 'content' => 'Welcome to the Laravel Ecosystem!'],
-            ['user_id' => 1, 'title' => null, 'content' => 'Lorem Ipsum'],
-            ['user_id' => 1, 'title' => 'A title', 'content' => 'Roses are red'],
-            ['user_id' => 2, 'title' => 'Another title', 'content' => 'Violets are blue'],
-            ['user_id' => 2, 'title' => 'Another title', 'content' => 'Taylor is turquoise'],
+            ['user_id' => 1, 'title' => 'The Post', 'content' => 'Welcome to Laravel!', 'created_at' => '2023-01-04 12:00:00'],
+            ['user_id' => 1, 'title' => 'The Post', 'content' => 'Welcome to the Laravel Ecosystem!', 'created_at' => '2023-03-04 13:00:00'],
+            ['user_id' => 1, 'title' => null, 'content' => 'Lorem Ipsum', 'created_at' => '2023-05-04 14:00:00'],
+            ['user_id' => 1, 'title' => 'A title', 'content' => 'Roses are red', 'created_at' => '2023-07-04 15:00:00'],
+            ['user_id' => 2, 'title' => 'Another title', 'content' => 'Violets are blue', 'created_at' => '2023-09-04 16:00:00'],
+            ['user_id' => 2, 'title' => 'Another title', 'content' => 'Taylor is turquoise', 'created_at' => '2023-11-04 17:00:00'],
         ]);
 
         DB::table('tags')->insert([
@@ -62,7 +64,7 @@ class EloquentKeyByTest extends DatabaseTestCase
             ['tag' => 'Bar'],
         ]);
 
-        DB::table('posts_tags')->insert([
+        DB::table('post_tag')->insert([
             ['post_id' => 1, 'tag_id' => 1],
             ['post_id' => 1, 'tag_id' => 2],
             ['post_id' => 2, 'tag_id' => 1],
@@ -78,7 +80,7 @@ class EloquentKeyByTest extends DatabaseTestCase
      */
     public function testKeyBy($keyBy, $columns, $key, $expected)
     {
-        $this->assertEquals($expected, json_encode(UserKeyByTest::query()->keyBy($keyBy)->get($columns)[$key]));
+        $this->assertEquals($expected, json_encode(User::query()->keyBy($keyBy)->get($columns)[$key]));
     }
 
     public static function keyByDataProvider()
@@ -97,7 +99,7 @@ class EloquentKeyByTest extends DatabaseTestCase
      */
     public function testKeyByWithSelect($keyBy, $columns, $key, $expected)
     {
-        $results = UserKeyByTest::query()->keyBy($keyBy)->select($columns)->get();
+        $results = User::query()->keyBy($keyBy)->select($columns)->get();
 
         $this->assertSame($expected, $results[$key]->getAttributes());
     }
@@ -113,72 +115,85 @@ class EloquentKeyByTest extends DatabaseTestCase
     public function testHasManyRelation()
     {
         $this->assertInstanceOf(
-            PostKeyByTest::class,
-            UserKeyByTest::query()->with('posts')->first()->posts['The Post']
+            Post::class,
+            User::query()->with('posts')->first()->posts['The Post']
         );
     }
 
     public function testHasManyThroughRelation()
     {
-        $this->assertInstanceOf(
-            CommentKeyByTest::class,
-            UserKeyByTest::query()->with('posts', 'comments')->first()->comments['This is a comment']
-        );
+        $user = User::query()->with('posts', 'comments')->first();
+        $this->assertInstanceOf(Comment::class, $user->comments['This is a comment']);
+        $this->assertInstanceOf(Post::class, $user->posts['The Post']);
     }
 
     public function testBelongsToMany()
     {
         $this->assertInstanceOf(
-            TagKeyByTest::class,
-            UserKeyByTest::query()->with('tags')->first()->tags['Foo']
+            Tag::class,
+            Post::query()->with('tags')->first()->tags['Foo']
+        );
+    }
+
+    public function testKeyByCustomColumn()
+    {
+        $results = User::query()->with('postsByDate')->first();
+        $this->assertSame(
+            ['2023-01-04', '2023-03-04', '2023-05-04', '2023-07-04'],
+            $results->postsByDate->keys()->toArray()
         );
     }
 }
 
-class UserKeyByTest extends Model
+class BaseModel extends Model
 {
-    protected $table = 'users';
-    protected $guarded = [];
     public $timestamps = false;
+}
+
+class User extends BaseModel
+{
+    public function comments()
+    {
+        return $this->hasManyThrough(Comment::class, Post::class)->keyBy('content');
+    }
 
     public function posts()
     {
-        return $this->hasMany(PostKeyByTest::class, 'user_id')->keyBy('title');
+        return $this->hasMany(Post::class)->keyBy('title');
     }
 
-    public function comments()
+    public function postsByDate()
     {
-        return $this->hasManyThrough(CommentKeyByTest::class, PostKeyByTest::class, 'user_id', 'post_id')->keyBy('content');
+        $cast = match (DB::connection()->getDriverName()) {
+            'mysql', 'sqlite' => 'SUBSTR(created_at, 1, 10)',
+            'pgsql' => 'SUBSTR(CAST(created_at AS varchar), 1, 10)',
+            'sqlsrv' => 'SUBSTRING(CAST(created_at AS varchar), 1, 10)'
+        };
+        return $this->hasMany(Post::class)->keyBy(DB::raw($cast));
     }
+}
+
+class Post extends BaseModel
+{
+    public $timestamps = true;
 
     public function tags()
     {
-        return $this->belongsToMany(TagKeyByTest::class, 'posts_tags', 'tag_id', 'post_id')->keyBy('tag');
+        return $this->belongsToMany(Tag::class)->keyBy('tag');
     }
-}
-
-class PostKeyByTest extends Model
-{
-    protected $table = 'posts';
-    protected $guarded = [];
-    public $timestamps = true;
 
     public function user()
     {
-        return $this->belongsTo(UserKeyByTest::class);
+        return $this->belongsTo(User::class);
     }
 }
 
-class CommentKeyByTest extends Model
+class Comment extends BaseModel
 {
-    protected $table = 'comments';
-    protected $guarded = [];
-    public $timestamps = true;
+    //
 }
 
-class TagKeyByTest extends Model
+class Tag extends BaseModel
 {
-    protected $table = 'tags';
-    protected $guarded = [];
-    public $timestamps = true;
+    //
 }

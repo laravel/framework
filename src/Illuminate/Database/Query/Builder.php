@@ -232,7 +232,7 @@ class Builder implements BuilderContract
     /**
      * When set, the query result array is keyed by the given column.
      *
-     * @var string|null
+     * @var string|null|\Illuminate\Contracts\Database\Query\Expression
      */
     public $keyBy;
 
@@ -458,7 +458,7 @@ class Builder implements BuilderContract
     /**
      * Force query results to be keyed by the given column.
      *
-     * @param  string  $column
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
      * @return $this
      */
     public function keyBy($column)
@@ -2735,14 +2735,17 @@ class Builder implements BuilderContract
     /**
      * Execute the query as a "select" statement where the resulting array is keyed by the given column.
      *
-     * @param  string  $key
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $key
      * @param  array|string  $columns
      * @return \Illuminate\Support\Collection
      */
     protected function getKeyed($key, $columns = ['*'])
     {
         return collect($this->onceWithColumns(Arr::wrap($columns), function () use ($key) {
-            $this->columns = Arr::prepend($this->qualifyStarColumns($this->columns), $this->from.'.'.$key);
+            if (is_string($key) && !str_contains($key, '.')) {
+                $key = $this->from.'.'.$key;
+            }
+            $this->columns = Arr::prepend($this->qualifyStarColumns($this->columns), $key);
 
             return $this->onceWithFetchAllMode(\PDO::FETCH_UNIQUE, function () {
                 return $this->processor->processSelect($this, $this->runSelect());
