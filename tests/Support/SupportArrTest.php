@@ -1267,7 +1267,7 @@ class SupportArrTest extends TestCase
 
     public function testMoveToTopByKey()
     {
-        $testValue1 = "Zero"; // string
+        $testKey1 = "Zero"; // string
 
         $testArray1 = [
             "One" => 1,
@@ -1285,9 +1285,9 @@ class SupportArrTest extends TestCase
             "Four" => 4
         ];
 
-        $this->assertSame($testExpect1, Arr::moveToTopByKey($testArray1, $testValue1));
+        $this->assertSame($testExpect1, Arr::moveToTopByKey($testArray1, $testKey1));
 
-        $testValue2 = 0; // int
+        $testKey2 = 0; // int
 
         $testArray2 = [
             1 => "One",
@@ -1305,12 +1305,12 @@ class SupportArrTest extends TestCase
             4 => "Four",
         ];
 
-        $this->assertSame($testExpect2, Arr::moveToTopByKey($testArray2, $testValue2));
+        $this->assertSame($testExpect2, Arr::moveToTopByKey($testArray2, $testKey2));
     }
 
     public function testMoveToBottomByKey()
     {
-        $testValue1 = "Zero"; // string
+        $testKey1 = "Zero"; // string
 
         $testArray1 = [
             "One" => 1,
@@ -1328,9 +1328,9 @@ class SupportArrTest extends TestCase
             "Zero" => 0,
         ];
 
-        $this->assertSame($testExpect1, Arr::moveToBottomByKey($testArray1, $testValue1));
+        $this->assertSame($testExpect1, Arr::moveToBottomByKey($testArray1, $testKey1));
 
-        $testValue2 = 0; // int
+        $testKey2 = 0; // int
 
         $testArray2 = [
             1 => "One",
@@ -1348,6 +1348,6 @@ class SupportArrTest extends TestCase
             0 => "Zero",
         ];
 
-        $this->assertSame($testExpect2, Arr::moveToBottomByKey($testArray2, $testValue2));
+        $this->assertSame($testExpect2, Arr::moveToBottomByKey($testArray2, $testKey2));
     }
 }
