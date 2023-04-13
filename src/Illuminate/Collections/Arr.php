@@ -853,4 +853,64 @@ class Arr
 
         return is_array($value) ? $value : [$value];
     }
+
+    /**
+     * Move specific element to top of the array using "value".
+     *
+     * @param array $array
+     * @param int|string $value
+     * @return array
+     */
+    public static function moveToTopByValue(array $array, int|string $value) : array
+    {
+        $getArr = [(array_keys($array, $value)[0]) => $value];
+        $key = (array_keys($array, $value)[0]);
+        unset($array[$key]);
+        $getArr += $array;
+        return $getArr;
+    }
+
+    /**
+     * Move specific element to bottom of the array using "value".
+     *
+     * @param array $array
+     * @param int|string $value
+     * @return array
+     */
+    public static function moveToBottomByValue(array $array, int|string $value) : array
+    {
+        $key = (array_keys($array, $value)[0]);
+        unset($array[$key]);
+        $array[$key] = $value;
+        return $array;
+    }
+
+    /**
+     * Move specific element to top of the array using "key".
+     *
+     * @param array $array
+     * @param int|string $key
+     * @return array
+     */
+    public static function moveToTopByKey(array $array, int|string $key) : array
+    {
+        $getArr = array($key => $array[$key]);
+        unset($array[$key]);
+        return $getArr + $array;
+    }
+
+    /**
+     * Move specific element to bottom of the array using "key".
+     *
+     * @param array $array
+     * @param int|string $key
+     * @return array
+     */
+    public static function moveToBottomByKey(array $array, int|string $key) : array
+    {
+        $value = $array[$key];
+        unset($array[$key]);
+        $array[$key] = $value;
+        return $array;
+    }
 }
