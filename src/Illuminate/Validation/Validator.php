@@ -383,7 +383,7 @@ class Validator implements ValidatorContract
     /**
      * Add an after validation callback.
      *
-     * @param  callable|string|array  $callback
+     * @param  callable|array|string  $callback
      * @return $this
      */
     public function after($callback)
