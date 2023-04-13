@@ -855,6 +855,8 @@ class Arr
     }
 
     /**
+     * Move a specific element to top of the array using "key" or "value"
+     *
      * @param array $array
      * @param int|string $data
      * @param string $by
@@ -878,6 +880,8 @@ class Arr
     }
 
     /**
+     * Move a specific element to bottom of the array using "key" or "value"
+     *
      * @param array $array
      * @param int|string $data
      * @param string $by
