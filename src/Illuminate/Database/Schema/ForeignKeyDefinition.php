@@ -75,13 +75,13 @@ class ForeignKeyDefinition extends Fluent
     }
 
     /**
-     * Set a column index name or otherwise default to the existing index created for the foreign-key.
+     * Set a column index name or default to the existing index created for the foreign-key.
      *
      * @return $this
      */
     public function index()
     {
-        $this->attributes['index'] = count($parameters = func_get_args()) > 0 ? reset($parameters) : ($this->index ?? true);
+        $this->attributes['index'] = count($parameters = func_get_args()) > 0 ? $parameters : ($this->index ?? true);
 
         return $this;
     }
