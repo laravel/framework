@@ -855,62 +855,48 @@ class Arr
     }
 
     /**
-     * Move specific element to top of the array using "value".
-     *
      * @param array $array
-     * @param int|string $value
+     * @param int|string $data
+     * @param string $by
      * @return array
      */
-    public static function moveToTopByValue(array $array, int|string $value) : array
+    public static function moveToTop(array $array, int|string $data, string $by = "key") : array
     {
-        $getArr = [(array_keys($array, $value)[0]) => $value];
-        $key = (array_keys($array, $value)[0]);
-        unset($array[$key]);
-        $getArr += $array;
-        return $getArr;
-    }
+        if ($by === "value") {
+            $getArr = [(array_keys($array, $data)[0]) => $data];
+            $key = (array_keys($array, $data)[0]);
+            unset($array[$key]);
+            $getArr += $array;
+            return $getArr;
+        }
 
-    /**
-     * Move specific element to bottom of the array using "value".
-     *
-     * @param array $array
-     * @param int|string $value
-     * @return array
-     */
-    public static function moveToBottomByValue(array $array, int|string $value) : array
-    {
-        $key = (array_keys($array, $value)[0]);
-        unset($array[$key]);
-        $array[$key] = $value;
-        return $array;
-    }
-
-    /**
-     * Move specific element to top of the array using "key".
-     *
-     * @param array $array
-     * @param int|string $key
-     * @return array
-     */
-    public static function moveToTopByKey(array $array, int|string $key) : array
-    {
-        $getArr = array($key => $array[$key]);
-        unset($array[$key]);
+        //by "key"
+        $getArr = array($data => $array[$data]);
+        unset($array[$data]);
         return $getArr + $array;
+
     }
 
     /**
-     * Move specific element to bottom of the array using "key".
-     *
      * @param array $array
-     * @param int|string $key
+     * @param int|string $data
+     * @param string $by
      * @return array
      */
-    public static function moveToBottomByKey(array $array, int|string $key) : array
+    public static function moveToBottom(array $array, int|string $data, string $by = "key") : array
     {
-        $value = $array[$key];
-        unset($array[$key]);
-        $array[$key] = $value;
+        if ($by === "value") {
+            $key = (array_keys($array, $data)[0]);
+            unset($array[$key]);
+            $array[$key] = $data;
+            return $array;
+        }
+
+        //by "key"
+        $value = $array[$data];
+        unset($array[$data]);
+        $array[$data] = $value;
         return $array;
+
     }
 }
