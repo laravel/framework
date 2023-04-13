@@ -1761,4 +1761,29 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     {
         unset($this->items[$key]);
     }
+
+
+    /**
+     * @param $data
+     * @param $by
+     * @return $this
+     */
+    public function moveToTop($data, $by)
+    {
+        $this->items = Arr::moveToTop($this->items, $data, $by);
+        return $this;
+    }
+
+    /**
+     * @param $data
+     * @param $by
+     * @return $this
+     */
+    public function moveToBottom($data, $by)
+    {
+        $this->items = Arr::moveToBottom($this->items, $data, $by);
+        return $this;
+    }
+
+
 }
