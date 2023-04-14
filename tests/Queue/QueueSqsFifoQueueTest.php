@@ -4,11 +4,9 @@ namespace Illuminate\Tests\Queue;
 
 use Aws\Result;
 use Aws\Sqs\SqsClient;
-use BadMethodCallException;
 use Illuminate\Container\Container;
 use Illuminate\Queue\Jobs\SqsJob;
 use Illuminate\Queue\SqsFifoQueue;
-use Illuminate\Support\Carbon;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -52,9 +50,9 @@ class QueueSqsFifoQueueTest extends TestCase
         $this->baseUrl = 'https://sqs.someregion.amazonaws.com';
 
         // This is how the modified getQueue builds the queueUrl
-        $this->prefix = $this->baseUrl . '/' . $this->account . '/';
+        $this->prefix = $this->baseUrl.'/'.$this->account.'/';
         $this->suffix = false;
-        $this->queueUrl = $this->prefix . $this->queueName;
+        $this->queueUrl = $this->prefix.$this->queueName;
         $this->allowDelay = true;
         $this->mockedJob = 'foo';
         $this->mockedData = ['data'];
@@ -151,37 +149,37 @@ class QueueSqsFifoQueueTest extends TestCase
     public function testGetQueueProperlyResolvesFifoUrlWithPrefix()
     {
         $this->queueName = 'emails';
-        $this->queueUrl = $this->prefix . $this->queueName;
+        $this->queueUrl = $this->prefix.$this->queueName;
         $queue = new SqsFifoQueue($this->sqs, $this->queueName, $this->prefix, null, false, 'fifo', $this->mockedMessageGroupId, $this->mockedMessageDeduplicationId);
-        $this->assertEquals($this->queueUrl . $this::FIFO_POSTFIX, $queue->getQueue(null));
-        $queueUrl = $this->baseUrl . '/' . $this->account . '/test';
-        $this->assertEquals($queueUrl . $this::FIFO_POSTFIX, $queue->getQueue('test'));
+        $this->assertEquals($this->queueUrl.$this::FIFO_POSTFIX, $queue->getQueue(null));
+        $queueUrl = $this->baseUrl.'/'.$this->account.'/test';
+        $this->assertEquals($queueUrl.$this::FIFO_POSTFIX, $queue->getQueue('test'));
     }
 
     public function testGetQueueProperlyResolvesFifoUrlWithoutPrefix()
     {
         $this->queueName = 'emails';
-        $this->queueUrl = $this->prefix . $this->queueName;
+        $this->queueUrl = $this->prefix.$this->queueName;
         $queue = new SqsFifoQueue($this->sqs, $this->queueUrl, null, null, false, 'fifo', $this->mockedMessageGroupId, $this->mockedMessageDeduplicationId);
-        $this->assertEquals($this->queueUrl . $this::FIFO_POSTFIX, $queue->getQueue(null));
-        $fifoQueueUrl = $this->baseUrl . '/' . $this->account . '/test';
-        $this->assertEquals($fifoQueueUrl . $this::FIFO_POSTFIX, $queue->getQueue($fifoQueueUrl));
+        $this->assertEquals($this->queueUrl.$this::FIFO_POSTFIX, $queue->getQueue(null));
+        $fifoQueueUrl = $this->baseUrl.'/'.$this->account.'/test';
+        $this->assertEquals($fifoQueueUrl.$this::FIFO_POSTFIX, $queue->getQueue($fifoQueueUrl));
     }
 
     public function testGetQueueProperlyResolvesFifoUrlWithSuffix()
     {
         $this->queueName = 'emails';
         $queue = new SqsFifoQueue($this->sqs, $this->queueName, $this->prefix, $suffix = '-staging', false, 'fifo', $this->mockedMessageGroupId, $this->mockedMessageDeduplicationId);
-        $this->assertEquals("{$this->prefix}emails-staging" . $this::FIFO_POSTFIX, $queue->getQueue(null));
-        $queueUrl = $this->baseUrl . '/' . $this->account . '/test' . $suffix;
-        $this->assertEquals($queueUrl . $this::FIFO_POSTFIX, $queue->getQueue('test'));
+        $this->assertEquals("{$this->prefix}emails-staging".$this::FIFO_POSTFIX, $queue->getQueue(null));
+        $queueUrl = $this->baseUrl.'/'.$this->account.'/test'.$suffix;
+        $this->assertEquals($queueUrl.$this::FIFO_POSTFIX, $queue->getQueue('test'));
     }
 
     public function testGetFifoQueueEnsuresTheQueueIsOnlySuffixedOnce()
     {
         $queue = new SqsFifoQueue($this->sqs, "{$this->queueName}-staging", $this->prefix, $suffix = '-staging', false, 'fifo', $this->mockedMessageGroupId, $this->mockedMessageDeduplicationId);
-        $this->assertEquals("{$this->prefix}{$this->queueName}{$suffix}" . $this::FIFO_POSTFIX, $queue->getQueue(null));
-        $queueUrl = $this->baseUrl . '/' . $this->account . '/test' . $suffix;
-        $this->assertEquals($queueUrl . $this::FIFO_POSTFIX, $queue->getQueue('test-staging'));
+        $this->assertEquals("{$this->prefix}{$this->queueName}{$suffix}".$this::FIFO_POSTFIX, $queue->getQueue(null));
+        $queueUrl = $this->baseUrl.'/'.$this->account.'/test'.$suffix;
+        $this->assertEquals($queueUrl.$this::FIFO_POSTFIX, $queue->getQueue('test-staging'));
     }
 }

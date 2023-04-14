@@ -7,7 +7,6 @@ use BadMethodCallException;
 use Illuminate\Contracts\Queue\ClearableQueue;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Queue\Jobs\SqsJob;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class SqsFifoQueue extends Queue implements QueueContract, ClearableQueue
@@ -150,7 +149,7 @@ class SqsFifoQueue extends Queue implements QueueContract, ClearableQueue
             'QueueUrl' => $this->getQueue($queue),
             'MessageBody' => $payload,
             'MessageGroupId' => (string) $options['MessageGroupId'],
-            'MessageDeduplicationId' => (string) $options['MessageDeduplicationId']
+            'MessageDeduplicationId' => (string) $options['MessageDeduplicationId'],
         ];
 
         return $this->sqs->sendMessage($args)->get('MessageId');
