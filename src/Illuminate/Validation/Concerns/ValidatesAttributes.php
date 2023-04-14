@@ -115,13 +115,13 @@ trait ValidatesAttributes
      */
     public function validateActiveUrl($attribute, $value)
     {
-        if (! is_string($value)) {
+        if (!is_string($value)) {
             return false;
         }
 
         if ($url = parse_url($value, PHP_URL_HOST)) {
             try {
-                $records = $this->getDnsRecords($url.'.', DNS_A | DNS_AAAA);
+                $records = $this->getDnsRecords($url . '.', DNS_A | DNS_AAAA);
 
                 if (is_array($records) && count($records) > 0) {
                     return true;
@@ -241,7 +241,7 @@ trait ValidatesAttributes
      */
     protected function compareDates($attribute, $value, $parameters, $operator)
     {
-        if (! is_string($value) && ! is_numeric($value) && ! $value instanceof DateTimeInterface) {
+        if (!is_string($value) && !is_numeric($value) && !$value instanceof DateTimeInterface) {
             return false;
         }
 
@@ -295,7 +295,7 @@ trait ValidatesAttributes
     {
         $firstDate = $this->getDateTimeWithOptionalFormat($format, $first);
 
-        if (! $secondDate = $this->getDateTimeWithOptionalFormat($format, $second)) {
+        if (!$secondDate = $this->getDateTimeWithOptionalFormat($format, $second)) {
             if (is_null($second = $this->getValue($second))) {
                 return true;
             }
@@ -315,7 +315,7 @@ trait ValidatesAttributes
      */
     protected function getDateTimeWithOptionalFormat($format, $value)
     {
-        if ($date = DateTime::createFromFormat('!'.$format, $value)) {
+        if ($date = DateTime::createFromFormat('!' . $format, $value)) {
             return $date;
         }
 
@@ -365,7 +365,7 @@ trait ValidatesAttributes
      */
     public function validateAlphaDash($attribute, $value, $parameters)
     {
-        if (! is_string($value) && ! is_numeric($value)) {
+        if (!is_string($value) && !is_numeric($value)) {
             return false;
         }
 
@@ -386,7 +386,7 @@ trait ValidatesAttributes
      */
     public function validateAlphaNum($attribute, $value, $parameters)
     {
-        if (! is_string($value) && ! is_numeric($value)) {
+        if (!is_string($value) && !is_numeric($value)) {
             return false;
         }
 
@@ -407,7 +407,7 @@ trait ValidatesAttributes
      */
     public function validateArray($attribute, $value, $parameters = [])
     {
-        if (! is_array($value)) {
+        if (!is_array($value)) {
             return false;
         }
 
@@ -428,12 +428,12 @@ trait ValidatesAttributes
      */
     public function validateRequiredArrayKeys($attribute, $value, $parameters)
     {
-        if (! is_array($value)) {
+        if (!is_array($value)) {
             return false;
         }
 
         foreach ($parameters as $param) {
-            if (! Arr::exists($value, $param)) {
+            if (!Arr::exists($value, $param)) {
                 return false;
             }
         }
@@ -482,7 +482,7 @@ trait ValidatesAttributes
      */
     public function validateConfirmed($attribute, $value)
     {
-        return $this->validateSame($attribute, $value, [$attribute.'_confirmation']);
+        return $this->validateSame($attribute, $value, [$attribute . '_confirmation']);
     }
 
     /**
@@ -521,7 +521,7 @@ trait ValidatesAttributes
         }
 
         try {
-            if ((! is_string($value) && ! is_numeric($value)) || strtotime($value) === false) {
+            if ((!is_string($value) && !is_numeric($value)) || strtotime($value) === false) {
                 return false;
             }
         } catch (Exception) {
@@ -545,12 +545,12 @@ trait ValidatesAttributes
     {
         $this->requireParameterCount(1, $parameters, 'date_format');
 
-        if (! is_string($value) && ! is_numeric($value)) {
+        if (!is_string($value) && !is_numeric($value)) {
             return false;
         }
 
         foreach ($parameters as $format) {
-            $date = DateTime::createFromFormat('!'.$format, $value);
+            $date = DateTime::createFromFormat('!' . $format, $value);
 
             if ($date && $date->format($format) == $value) {
                 return true;
@@ -585,7 +585,7 @@ trait ValidatesAttributes
      */
     public function validateDecimal($attribute, $value, $parameters)
     {
-        if (! $this->validateNumeric($attribute, $value)) {
+        if (!$this->validateNumeric($attribute, $value)) {
             return false;
         }
 
@@ -597,12 +597,12 @@ trait ValidatesAttributes
 
         $decimals = strlen(end($matches));
 
-        if (! isset($parameters[1])) {
+        if (!isset($parameters[1])) {
             return $decimals == $parameters[0];
         }
 
         return $decimals >= $parameters[0] &&
-               $decimals <= $parameters[1];
+            $decimals <= $parameters[1];
     }
 
     /**
@@ -642,8 +642,8 @@ trait ValidatesAttributes
     {
         $this->requireParameterCount(1, $parameters, 'digits');
 
-        return ! preg_match('/[^0-9]/', $value)
-                    && strlen((string) $value) == $parameters[0];
+        return !preg_match('/[^0-9]/', $value)
+            && strlen((string) $value) == $parameters[0];
     }
 
     /**
@@ -660,8 +660,8 @@ trait ValidatesAttributes
 
         $length = strlen((string) $value);
 
-        return ! preg_match('/[^0-9]/', $value)
-                    && $length >= $parameters[0] && $length <= $parameters[1];
+        return !preg_match('/[^0-9]/', $value)
+            && $length >= $parameters[0] && $length <= $parameters[1];
     }
 
     /**
@@ -678,7 +678,7 @@ trait ValidatesAttributes
             return true;
         }
 
-        if (! $this->isValidFileInstance($value) || ! $sizeDetails = @getimagesize($value->getRealPath())) {
+        if (!$this->isValidFileInstance($value) || !$sizeDetails = @getimagesize($value->getRealPath())) {
             return false;
         }
 
@@ -688,8 +688,10 @@ trait ValidatesAttributes
 
         $parameters = $this->parseNamedParameters($parameters);
 
-        if ($this->failsBasicDimensionChecks($parameters, $width, $height) ||
-            $this->failsRatioCheck($parameters, $width, $height)) {
+        if (
+            $this->failsBasicDimensionChecks($parameters, $width, $height) ||
+            $this->failsRatioCheck($parameters, $width, $height)
+        ) {
             return false;
         }
 
@@ -707,11 +709,11 @@ trait ValidatesAttributes
     protected function failsBasicDimensionChecks($parameters, $width, $height)
     {
         return (isset($parameters['width']) && $parameters['width'] != $width) ||
-               (isset($parameters['min_width']) && $parameters['min_width'] > $width) ||
-               (isset($parameters['max_width']) && $parameters['max_width'] < $width) ||
-               (isset($parameters['height']) && $parameters['height'] != $height) ||
-               (isset($parameters['min_height']) && $parameters['min_height'] > $height) ||
-               (isset($parameters['max_height']) && $parameters['max_height'] < $height);
+            (isset($parameters['min_width']) && $parameters['min_width'] > $width) ||
+            (isset($parameters['max_width']) && $parameters['max_width'] < $width) ||
+            (isset($parameters['height']) && $parameters['height'] != $height) ||
+            (isset($parameters['min_height']) && $parameters['min_height'] > $height) ||
+            (isset($parameters['max_height']) && $parameters['max_height'] < $height);
     }
 
     /**
@@ -724,12 +726,13 @@ trait ValidatesAttributes
      */
     protected function failsRatioCheck($parameters, $width, $height)
     {
-        if (! isset($parameters['ratio'])) {
+        if (!isset($parameters['ratio'])) {
             return false;
         }
 
         [$numerator, $denominator] = array_replace(
-            [1, 1], array_filter(sscanf($parameters['ratio'], '%f/%d'))
+            [1, 1],
+            array_filter(sscanf($parameters['ratio'], '%f/%d'))
         );
 
         $precision = 1 / (max($width, $height) + 1);
@@ -750,10 +753,10 @@ trait ValidatesAttributes
         $data = Arr::except($this->getDistinctValues($attribute), $attribute);
 
         if (in_array('ignore_case', $parameters)) {
-            return empty(preg_grep('/^'.preg_quote($value, '/').'$/iu', $data));
+            return empty(preg_grep('/^' . preg_quote($value, '/') . '$/iu', $data));
         }
 
-        return ! in_array($value, array_values($data), in_array('strict', $parameters));
+        return !in_array($value, array_values($data), in_array('strict', $parameters));
     }
 
     /**
@@ -766,11 +769,11 @@ trait ValidatesAttributes
     {
         $attributeName = $this->getPrimaryAttribute($attribute);
 
-        if (! property_exists($this, 'distinctValues')) {
+        if (!property_exists($this, 'distinctValues')) {
             return $this->extractDistinctValues($attributeName);
         }
 
-        if (! array_key_exists($attributeName, $this->distinctValues)) {
+        if (!array_key_exists($attributeName, $this->distinctValues)) {
             $this->distinctValues[$attributeName] = $this->extractDistinctValues($attributeName);
         }
 
@@ -786,13 +789,14 @@ trait ValidatesAttributes
     protected function extractDistinctValues($attribute)
     {
         $attributeData = ValidationData::extractDataFromPath(
-            ValidationData::getLeadingExplicitAttributePath($attribute), $this->data
+            ValidationData::getLeadingExplicitAttributePath($attribute),
+            $this->data
         );
 
         $pattern = str_replace('\*', '[^.]+', preg_quote($attribute, '#'));
 
         return Arr::where(Arr::dot($attributeData), function ($value, $key) use ($pattern) {
-            return (bool) preg_match('#^'.$pattern.'\z#u', $key);
+            return (bool) preg_match('#^' . $pattern . '\z#u', $key);
         });
     }
 
@@ -806,7 +810,7 @@ trait ValidatesAttributes
      */
     public function validateEmail($attribute, $value, $parameters)
     {
-        if (! is_string($value) && ! (is_object($value) && method_exists($value, '__toString'))) {
+        if (!is_string($value) && !(is_object($value) && method_exists($value, '__toString'))) {
             return false;
         }
 
@@ -849,7 +853,11 @@ trait ValidatesAttributes
         $expected = is_array($value) ? count(array_unique($value)) : 1;
 
         return $this->getExistCount(
-            $connection, $table, $column, $value, $parameters
+            $connection,
+            $table,
+            $column,
+            $value,
+            $parameters
         ) >= $expected;
     }
 
@@ -876,8 +884,8 @@ trait ValidatesAttributes
         }
 
         return is_array($value)
-                ? $verifier->getMultiCount($table, $column, $value, $extra)
-                : $verifier->getCount($table, $column, $value, null, null, $extra);
+            ? $verifier->getMultiCount($table, $column, $value, $extra)
+            : $verifier->getCount($table, $column, $value, null, null, $extra);
     }
 
     /**
@@ -906,7 +914,7 @@ trait ValidatesAttributes
         if (isset($parameters[2])) {
             [$idColumn, $id] = $this->getUniqueIds($idColumn, $parameters);
 
-            if (! is_null($id)) {
+            if (!is_null($id)) {
                 $id = stripslashes($id);
             }
         }
@@ -923,7 +931,12 @@ trait ValidatesAttributes
         }
 
         return $verifier->getCount(
-            $table, $column, $value, $id, $idColumn, $extra
+            $table,
+            $column,
+            $value,
+            $id,
+            $idColumn,
+            $extra
         ) == 0;
     }
 
@@ -1015,7 +1028,7 @@ trait ValidatesAttributes
     public function getQueryColumn($parameters, $attribute)
     {
         return isset($parameters[1]) && $parameters[1] !== 'NULL'
-                    ? $parameters[1] : $this->guessColumnForQuery($attribute);
+            ? $parameters[1] : $this->guessColumnForQuery($attribute);
     }
 
     /**
@@ -1026,8 +1039,10 @@ trait ValidatesAttributes
      */
     public function guessColumnForQuery($attribute)
     {
-        if (in_array($attribute, Arr::collapse($this->implicitAttributes))
-                && ! is_numeric($last = last(explode('.', $attribute)))) {
+        if (
+            in_array($attribute, Arr::collapse($this->implicitAttributes))
+            && !is_numeric($last = last(explode('.', $attribute)))
+        ) {
             return $last;
         }
 
@@ -1109,7 +1124,7 @@ trait ValidatesAttributes
             return BigNumber::of($this->trim($value))->isGreaterThan($this->trim($comparedToValue));
         }
 
-        if (! $this->isSameType($value, $comparedToValue)) {
+        if (!$this->isSameType($value, $comparedToValue)) {
             return false;
         }
 
@@ -1144,7 +1159,7 @@ trait ValidatesAttributes
             return BigNumber::of($this->trim($value))->isLessThan($this->trim($comparedToValue));
         }
 
-        if (! $this->isSameType($value, $comparedToValue)) {
+        if (!$this->isSameType($value, $comparedToValue)) {
             return false;
         }
 
@@ -1179,7 +1194,7 @@ trait ValidatesAttributes
             return BigNumber::of($this->trim($value))->isGreaterThanOrEqualTo($this->trim($comparedToValue));
         }
 
-        if (! $this->isSameType($value, $comparedToValue)) {
+        if (!$this->isSameType($value, $comparedToValue)) {
             return false;
         }
 
@@ -1214,7 +1229,7 @@ trait ValidatesAttributes
             return BigNumber::of($this->trim($value))->isLessThanOrEqualTo($this->trim($comparedToValue));
         }
 
-        if (! $this->isSameType($value, $comparedToValue)) {
+        if (!$this->isSameType($value, $comparedToValue)) {
             return false;
         }
 
@@ -1260,6 +1275,18 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate the MIME type of a file is an csv MIME type.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validateCsv($attribute, $value)
+    {
+        return $this->validateMimes($attribute, $value, ['text/csv', 'application/csv', 'text/x-comma-separated-values', 'text/x-csv']);
+    }
+
+    /**
      * Validate an attribute is contained within a list of values.
      *
      * @param  string  $attribute
@@ -1279,7 +1306,7 @@ trait ValidatesAttributes
             return count(array_diff($value, $parameters)) === 0;
         }
 
-        return ! is_array($value) && in_array((string) $value, $parameters);
+        return !is_array($value) && in_array((string) $value, $parameters);
     }
 
     /**
@@ -1378,7 +1405,7 @@ trait ValidatesAttributes
             return false;
         }
 
-        if (! is_scalar($value) && ! is_null($value) && ! method_exists($value, '__toString')) {
+        if (!is_scalar($value) && !is_null($value) && !method_exists($value, '__toString')) {
             return false;
         }
 
@@ -1399,7 +1426,7 @@ trait ValidatesAttributes
     {
         $this->requireParameterCount(1, $parameters, 'max');
 
-        if ($value instanceof UploadedFile && ! $value->isValid()) {
+        if ($value instanceof UploadedFile && !$value->isValid()) {
             return false;
         }
 
@@ -1420,7 +1447,7 @@ trait ValidatesAttributes
 
         $length = strlen((string) $value);
 
-        return ! preg_match('/[^0-9]/', $value) && $length <= $parameters[0];
+        return !preg_match('/[^0-9]/', $value) && $length <= $parameters[0];
     }
 
     /**
@@ -1433,7 +1460,7 @@ trait ValidatesAttributes
      */
     public function validateMimes($attribute, $value, $parameters)
     {
-        if (! $this->isValidFileInstance($value)) {
+        if (!$this->isValidFileInstance($value)) {
             return false;
         }
 
@@ -1458,7 +1485,7 @@ trait ValidatesAttributes
      */
     public function validateMimetypes($attribute, $value, $parameters)
     {
-        if (! $this->isValidFileInstance($value)) {
+        if (!$this->isValidFileInstance($value)) {
             return false;
         }
 
@@ -1467,8 +1494,8 @@ trait ValidatesAttributes
         }
 
         return $value->getPath() !== '' &&
-                (in_array($value->getMimeType(), $parameters) ||
-                 in_array(explode('/', $value->getMimeType())[0].'/*', $parameters));
+            (in_array($value->getMimeType(), $parameters) ||
+                in_array(explode('/', $value->getMimeType())[0] . '/*', $parameters));
     }
 
     /**
@@ -1489,8 +1516,8 @@ trait ValidatesAttributes
         ];
 
         return ($value instanceof UploadedFile)
-           ? in_array(trim(strtolower($value->getClientOriginalExtension())), $phpExtensions)
-           : in_array(trim(strtolower($value->getExtension())), $phpExtensions);
+            ? in_array(trim(strtolower($value->getClientOriginalExtension())), $phpExtensions)
+            : in_array(trim(strtolower($value->getExtension())), $phpExtensions);
     }
 
     /**
@@ -1522,7 +1549,7 @@ trait ValidatesAttributes
 
         $length = strlen((string) $value);
 
-        return ! preg_match('/[^0-9]/', $value) && $length >= $parameters[0];
+        return !preg_match('/[^0-9]/', $value) && $length >= $parameters[0];
     }
 
     /**
@@ -1535,7 +1562,7 @@ trait ValidatesAttributes
      */
     public function validateMissing($attribute, $value, $parameters)
     {
-        return ! Arr::has($this->data, $attribute);
+        return !Arr::has($this->data, $attribute);
     }
 
     /**
@@ -1573,7 +1600,7 @@ trait ValidatesAttributes
 
         [$values, $other] = $this->parseDependentRuleParameters($parameters);
 
-        if (! in_array($other, $values, is_bool($other) || is_null($other))) {
+        if (!in_array($other, $values, is_bool($other) || is_null($other))) {
             return $this->validateMissing($attribute, $value, $parameters);
         }
 
@@ -1630,7 +1657,7 @@ trait ValidatesAttributes
     {
         $this->requireParameterCount(1, $parameters, 'multiple_of');
 
-        if (! $this->validateNumeric($attribute, $value) || ! $this->validateNumeric($attribute, $parameters[0])) {
+        if (!$this->validateNumeric($attribute, $value) || !$this->validateNumeric($attribute, $parameters[0])) {
             return false;
         }
 
@@ -1678,7 +1705,7 @@ trait ValidatesAttributes
      */
     public function validateNotIn($attribute, $value, $parameters)
     {
-        return ! $this->validateIn($attribute, $value, $parameters);
+        return !$this->validateIn($attribute, $value, $parameters);
     }
 
     /**
@@ -1715,7 +1742,7 @@ trait ValidatesAttributes
      */
     public function validateRegex($attribute, $value, $parameters)
     {
-        if (! is_string($value) && ! is_numeric($value)) {
+        if (!is_string($value) && !is_numeric($value)) {
             return false;
         }
 
@@ -1734,7 +1761,7 @@ trait ValidatesAttributes
      */
     public function validateNotRegex($attribute, $value, $parameters)
     {
-        if (! is_string($value) && ! is_numeric($value)) {
+        if (!is_string($value) && !is_numeric($value)) {
             return false;
         }
 
@@ -1777,7 +1804,7 @@ trait ValidatesAttributes
     {
         $this->requireParameterCount(2, $parameters, 'required_if');
 
-        if (! Arr::has($this->data, $parameters[0])) {
+        if (!Arr::has($this->data, $parameters[0])) {
             return true;
         }
 
@@ -1818,7 +1845,7 @@ trait ValidatesAttributes
      */
     public function validateProhibited($attribute, $value)
     {
-        return ! $this->validateRequired($attribute, $value);
+        return !$this->validateRequired($attribute, $value);
     }
 
     /**
@@ -1836,7 +1863,7 @@ trait ValidatesAttributes
         [$values, $other] = $this->parseDependentRuleParameters($parameters);
 
         if (in_array($other, $values, is_bool($other) || is_null($other))) {
-            return ! $this->validateRequired($attribute, $value);
+            return !$this->validateRequired($attribute, $value);
         }
 
         return true;
@@ -1856,8 +1883,8 @@ trait ValidatesAttributes
 
         [$values, $other] = $this->parseDependentRuleParameters($parameters);
 
-        if (! in_array($other, $values, is_bool($other) || is_null($other))) {
-            return ! $this->validateRequired($attribute, $value);
+        if (!in_array($other, $values, is_bool($other) || is_null($other))) {
+            return !$this->validateRequired($attribute, $value);
         }
 
         return true;
@@ -1906,13 +1933,13 @@ trait ValidatesAttributes
     {
         $this->requireParameterCount(2, $parameters, 'exclude_if');
 
-        if (! Arr::has($this->data, $parameters[0])) {
+        if (!Arr::has($this->data, $parameters[0])) {
             return true;
         }
 
         [$values, $other] = $this->parseDependentRuleParameters($parameters);
 
-        return ! in_array($other, $values, is_bool($other) || is_null($other));
+        return !in_array($other, $values, is_bool($other) || is_null($other));
     }
 
     /**
@@ -1946,7 +1973,7 @@ trait ValidatesAttributes
 
         [$values, $other] = $this->parseDependentRuleParameters($parameters);
 
-        if (! in_array($other, $values, is_bool($other) || is_null($other))) {
+        if (!in_array($other, $values, is_bool($other) || is_null($other))) {
             return $this->validateRequired($attribute, $value);
         }
 
@@ -1965,7 +1992,7 @@ trait ValidatesAttributes
     {
         $this->requireParameterCount(1, $parameters, 'exclude_with');
 
-        if (! Arr::has($this->data, $parameters[0])) {
+        if (!Arr::has($this->data, $parameters[0])) {
             return true;
         }
 
@@ -2067,7 +2094,7 @@ trait ValidatesAttributes
      */
     public function validateRequiredWith($attribute, $value, $parameters)
     {
-        if (! $this->allFailingRequired($parameters)) {
+        if (!$this->allFailingRequired($parameters)) {
             return $this->validateRequired($attribute, $value);
         }
 
@@ -2084,7 +2111,7 @@ trait ValidatesAttributes
      */
     public function validateRequiredWithAll($attribute, $value, $parameters)
     {
-        if (! $this->anyFailingRequired($parameters)) {
+        if (!$this->anyFailingRequired($parameters)) {
             return $this->validateRequired($attribute, $value);
         }
 
@@ -2134,7 +2161,7 @@ trait ValidatesAttributes
     protected function anyFailingRequired(array $attributes)
     {
         foreach ($attributes as $key) {
-            if (! $this->validateRequired($key, $this->getValue($key))) {
+            if (!$this->validateRequired($key, $this->getValue($key))) {
                 return true;
             }
         }
@@ -2226,7 +2253,7 @@ trait ValidatesAttributes
      */
     public function validateDoesntStartWith($attribute, $value, $parameters)
     {
-        return ! Str::startsWith($value, $parameters);
+        return !Str::startsWith($value, $parameters);
     }
 
     /**
@@ -2252,7 +2279,7 @@ trait ValidatesAttributes
      */
     public function validateDoesntEndWith($attribute, $value, $parameters)
     {
-        return ! Str::endsWith($value, $parameters);
+        return !Str::endsWith($value, $parameters);
     }
 
     /**
@@ -2288,7 +2315,7 @@ trait ValidatesAttributes
      */
     public function validateUrl($attribute, $value)
     {
-        if (! is_string($value)) {
+        if (!is_string($value)) {
             return false;
         }
 
@@ -2376,7 +2403,7 @@ trait ValidatesAttributes
      */
     public function isValidFileInstance($value)
     {
-        if ($value instanceof UploadedFile && ! $value->isValid()) {
+        if ($value instanceof UploadedFile && !$value->isValid()) {
             return false;
         }
 
