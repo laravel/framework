@@ -2,8 +2,9 @@
 
 namespace Illuminate\Console;
 
-use function Laravel\Prompts\confirm;
 use Laravel\Prompts\ConfirmPrompt;
+
+use function Laravel\Prompts\confirm;
 
 trait ConfirmableTrait
 {
