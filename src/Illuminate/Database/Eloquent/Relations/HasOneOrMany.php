@@ -486,4 +486,34 @@ abstract class HasOneOrMany extends Relation
     {
         return $this->localKey;
     }
+
+    /**
+     * Get the foreign attributes.
+     *
+     * @return array
+     */
+    public function getForeignAttributes()
+    {
+        return [$this->getForeignKeyName() => $this->getParentKey()];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function insert(array $values)
+    {
+        if (empty($values)) {
+            return true;
+        }
+
+        if (! is_array(reset($values))) {
+            $values = [$values];
+        }
+
+        foreach ($values as $key => $value) {
+            $values[$key] = array_merge($value, $this->getForeignAttributes());
+        }
+
+        return parent::insert($values);
+    }
 }
