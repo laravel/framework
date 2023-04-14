@@ -3,10 +3,10 @@
 namespace Illuminate\Queue\Connectors;
 
 use Aws\Sqs\SqsClient;
-use Illuminate\Queue\SqsQueue;
+use Illuminate\Queue\SqsFifoQueue;
 use Illuminate\Support\Arr;
 
-class SqsConnector implements ConnectorInterface
+class SqsFifoConnector implements ConnectorInterface
 {
     /**
      * Establish a queue connection.
@@ -22,14 +22,17 @@ class SqsConnector implements ConnectorInterface
             $config['credentials'] = Arr::only($config, ['key', 'secret', 'token']);
         }
 
-        return new SqsQueue(
+        return new SqsFifoQueue(
             new SqsClient(
                 Arr::except($config, ['token'])
             ),
             $config['queue'],
             $config['prefix'] ?? '',
             $config['suffix'] ?? '',
-            $config['after_commit'] ?? null
+            $config['after_commit'] ?? null,
+            $config['message_group_id'] ?? null,
+            $config['message_deduplication_id'] ?? null,
+            $config['allow_delay'] ?? false
         );
     }
 

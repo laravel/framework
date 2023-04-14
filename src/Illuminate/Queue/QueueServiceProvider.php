@@ -10,6 +10,7 @@ use Illuminate\Queue\Connectors\DatabaseConnector;
 use Illuminate\Queue\Connectors\NullConnector;
 use Illuminate\Queue\Connectors\RedisConnector;
 use Illuminate\Queue\Connectors\SqsConnector;
+use Illuminate\Queue\Connectors\SqsFifoConnector;
 use Illuminate\Queue\Connectors\SyncConnector;
 use Illuminate\Queue\Failed\DatabaseFailedJobProvider;
 use Illuminate\Queue\Failed\DatabaseUuidFailedJobProvider;
@@ -101,7 +102,7 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
      */
     public function registerConnectors($manager)
     {
-        foreach (['Null', 'Sync', 'Database', 'Redis', 'Beanstalkd', 'Sqs'] as $connector) {
+        foreach (['Null', 'Sync', 'Database', 'Redis', 'Beanstalkd', 'Sqs', 'SqsFifo'] as $connector) {
             $this->{"register{$connector}Connector"}($manager);
         }
     }
@@ -181,6 +182,19 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
     {
         $manager->addConnector('sqs', function () {
             return new SqsConnector;
+        });
+    }
+
+    /**
+     * Register the Amazon SQS FIFO queue connector.
+     *
+     * @param  \Illuminate\Queue\QueueManager  $manager
+     * @return void
+     */
+    protected function registerSqsFifoConnector($manager)
+    {
+        $manager->addConnector('sqsfifo', function () {
+            return new SqsFifoConnector;
         });
     }
 

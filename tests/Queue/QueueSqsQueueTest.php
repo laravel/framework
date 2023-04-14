@@ -19,20 +19,16 @@ class QueueSqsQueueTest extends TestCase
     protected $baseUrl;
     protected $prefix;
     protected $queueUrl;
-    protected $allowDelay;
     protected $mockedJob;
     protected $mockedData;
     protected $mockedPayload;
     protected $mockedDelay;
     protected $mockedMessageId;
-    protected $mockedMessageDeduplicationId;
-    protected $mockedMessageGroupId;
     protected $mockedReceiptHandle;
     protected $mockedSendMessageResponseModel;
     protected $mockedReceiveMessageResponseModel;
     protected $mockedReceiveEmptyMessageResponseModel;
     protected $mockedQueueAttributesResponseModel;
-    protected const FIFO_POSTFIX = '.fifo';
 
     protected function tearDown(): void
     {
@@ -51,14 +47,12 @@ class QueueSqsQueueTest extends TestCase
         // This is how the modified getQueue builds the queueUrl
         $this->prefix = $this->baseUrl.'/'.$this->account.'/';
         $this->queueUrl = $this->prefix.$this->queueName;
-        $this->allowDelay = true;
+
         $this->mockedJob = 'foo';
         $this->mockedData = ['data'];
         $this->mockedPayload = json_encode(['job' => $this->mockedJob, 'data' => $this->mockedData]);
         $this->mockedDelay = 10;
         $this->mockedMessageId = 'e3cd03ee-59a3-4ad8-b0aa-ee2e3808ac81';
-        $this->mockedMessageDeduplicationId = '710cd3f2-e3a5-b94e-f614-da0a2cc53c7d';
-        $this->mockedMessageGroupId = 'high';
         $this->mockedReceiptHandle = '0NNAq8PwvXuWv5gMtS9DJ8qEdyiUwbAjpp45w2m6M4SJ1Y+PxCh7R930NRB8ylSacEmoSnW18bgd4nK\/O6ctE+VFVul4eD23mA07vVoSnPI4F\/voI1eNCp6Iax0ktGmhlNVzBwaZHEr91BRtqTRM3QKd2ASF8u+IQaSwyl\/DGK+P1+dqUOodvOVtExJwdyDLy1glZVgm85Yw9Jf5yZEEErqRwzYz\/qSigdvW4sm2l7e4phRol\/+IjMtovOyH\/ukueYdlVbQ4OshQLENhUKe7RNN5i6bE\/e5x9bnPhfj2gbM';
 
         $this->mockedSendMessageResponseModel = new Result([
@@ -138,18 +132,6 @@ class QueueSqsQueueTest extends TestCase
         $container->shouldHaveReceived('bound')->with('events')->once();
     }
 
-    public function testDelayedPushFifoProperlyPushesJobOntoSqs()
-    {
-        $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['createPayload', 'secondsUntil', 'getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account, null, false, 'fifo', $this->mockedMessageGroupId, $this->mockedMessageDeduplicationId, $this->allowDelay])->getMock();
-        $queue->setContainer($container = m::spy(Container::class));
-        $queue->expects($this->once())->method('createPayload')->with($this->mockedJob, $this->queueName, $this->mockedData)->willReturn($this->mockedPayload);
-        $queue->expects($this->once())->method('getQueue')->with($this->queueName)->willReturn($this->queueUrl);
-        $this->sqs->shouldReceive('sendMessage')->once()->with(['QueueUrl' => $this->queueUrl, 'MessageBody' => $this->mockedPayload, 'MessageGroupId' => $this->mockedMessageGroupId, 'MessageDeduplicationId' => $this->mockedMessageDeduplicationId])->andReturn($this->mockedSendMessageResponseModel);
-        $id = $queue->later($this->mockedDelay, $this->mockedJob, $this->mockedData, $this->queueName);
-        $this->assertEquals($this->mockedMessageId, $id);
-        $container->shouldHaveReceived('bound')->with('events')->once();
-    }
-
     public function testPushProperlyPushesJobOntoSqs()
     {
         $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['createPayload', 'getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
@@ -157,18 +139,6 @@ class QueueSqsQueueTest extends TestCase
         $queue->expects($this->once())->method('createPayload')->with($this->mockedJob, $this->queueName, $this->mockedData)->willReturn($this->mockedPayload);
         $queue->expects($this->once())->method('getQueue')->with($this->queueName)->willReturn($this->queueUrl);
         $this->sqs->shouldReceive('sendMessage')->once()->with(['QueueUrl' => $this->queueUrl, 'MessageBody' => $this->mockedPayload])->andReturn($this->mockedSendMessageResponseModel);
-        $id = $queue->push($this->mockedJob, $this->mockedData, $this->queueName);
-        $this->assertEquals($this->mockedMessageId, $id);
-        $container->shouldHaveReceived('bound')->with('events')->once();
-    }
-
-    public function testPushFifoProperlyPushesJobOntoSqs()
-    {
-        $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['createPayload', 'getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account, null, false, 'fifo', $this->mockedMessageGroupId, $this->mockedMessageDeduplicationId])->getMock();
-        $queue->setContainer($container = m::spy(Container::class));
-        $queue->expects($this->once())->method('createPayload')->with($this->mockedJob, $this->queueName, $this->mockedData)->willReturn($this->mockedPayload);
-        $queue->expects($this->once())->method('getQueue')->with($this->queueName)->willReturn($this->queueUrl);
-        $this->sqs->shouldReceive('sendMessage')->once()->with(['QueueUrl' => $this->queueUrl, 'MessageBody' => $this->mockedPayload, 'MessageGroupId' => $this->mockedMessageGroupId, 'MessageDeduplicationId' => $this->mockedMessageDeduplicationId])->andReturn($this->mockedSendMessageResponseModel);
         $id = $queue->push($this->mockedJob, $this->mockedData, $this->queueName);
         $this->assertEquals($this->mockedMessageId, $id);
         $container->shouldHaveReceived('bound')->with('events')->once();
@@ -193,12 +163,12 @@ class QueueSqsQueueTest extends TestCase
 
     public function testGetQueueProperlyResolvesFifoUrlWithPrefix()
     {
-        $this->queueName = 'emails';
+        $this->queueName = 'emails.fifo';
         $this->queueUrl = $this->prefix.$this->queueName;
-        $queue = new SqsQueue($this->sqs, $this->queueName, $this->prefix, null, false, 'fifo', $this->mockedMessageGroupId, $this->mockedMessageDeduplicationId);
-        $this->assertEquals($this->queueUrl.$this::FIFO_POSTFIX, $queue->getQueue(null));
-        $queueUrl = $this->baseUrl.'/'.$this->account.'/test';
-        $this->assertEquals($queueUrl.$this::FIFO_POSTFIX, $queue->getQueue('test'));
+        $queue = new SqsQueue($this->sqs, $this->queueName, $this->prefix);
+        $this->assertEquals($this->queueUrl, $queue->getQueue(null));
+        $queueUrl = $this->baseUrl.'/'.$this->account.'/test.fifo';
+        $this->assertEquals($queueUrl, $queue->getQueue('test.fifo'));
     }
 
     public function testGetQueueProperlyResolvesUrlWithoutPrefix()
@@ -211,12 +181,12 @@ class QueueSqsQueueTest extends TestCase
 
     public function testGetQueueProperlyResolvesFifoUrlWithoutPrefix()
     {
-        $this->queueName = 'emails';
+        $this->queueName = 'emails.fifo';
         $this->queueUrl = $this->prefix.$this->queueName;
-        $queue = new SqsQueue($this->sqs, $this->queueUrl, null, null, false, 'fifo', $this->mockedMessageGroupId, $this->mockedMessageDeduplicationId);
-        $this->assertEquals($this->queueUrl.$this::FIFO_POSTFIX, $queue->getQueue(null));
-        $fifoQueueUrl = $this->baseUrl.'/'.$this->account.'/test';
-        $this->assertEquals($fifoQueueUrl.$this::FIFO_POSTFIX, $queue->getQueue($fifoQueueUrl));
+        $queue = new SqsQueue($this->sqs, $this->queueUrl);
+        $this->assertEquals($this->queueUrl, $queue->getQueue(null));
+        $fifoQueueUrl = $this->baseUrl.'/'.$this->account.'/test.fifo';
+        $this->assertEquals($fifoQueueUrl, $queue->getQueue($fifoQueueUrl));
     }
 
     public function testGetQueueProperlyResolvesUrlWithSuffix()
@@ -229,11 +199,11 @@ class QueueSqsQueueTest extends TestCase
 
     public function testGetQueueProperlyResolvesFifoUrlWithSuffix()
     {
-        $this->queueName = 'emails';
-        $queue = new SqsQueue($this->sqs, $this->queueName, $this->prefix, $suffix = '-staging', false, 'fifo', $this->mockedMessageGroupId, $this->mockedMessageDeduplicationId);
-        $this->assertEquals("{$this->prefix}emails-staging".$this::FIFO_POSTFIX, $queue->getQueue(null));
-        $queueUrl = $this->baseUrl.'/'.$this->account.'/test'.$suffix;
-        $this->assertEquals($queueUrl.$this::FIFO_POSTFIX, $queue->getQueue('test'));
+        $this->queueName = 'emails.fifo';
+        $queue = new SqsQueue($this->sqs, $this->queueName, $this->prefix, $suffix = '-staging');
+        $this->assertEquals("{$this->prefix}emails-staging.fifo", $queue->getQueue(null));
+        $queueUrl = $this->baseUrl.'/'.$this->account.'/test'.$suffix.'.fifo';
+        $this->assertEquals($queueUrl, $queue->getQueue('test.fifo'));
     }
 
     public function testGetQueueEnsuresTheQueueIsOnlySuffixedOnce()
@@ -246,9 +216,9 @@ class QueueSqsQueueTest extends TestCase
 
     public function testGetFifoQueueEnsuresTheQueueIsOnlySuffixedOnce()
     {
-        $queue = new SqsQueue($this->sqs, "{$this->queueName}-staging", $this->prefix, $suffix = '-staging', false, 'fifo', $this->mockedMessageGroupId, $this->mockedMessageDeduplicationId);
-        $this->assertEquals("{$this->prefix}{$this->queueName}{$suffix}".$this::FIFO_POSTFIX, $queue->getQueue(null));
-        $queueUrl = $this->baseUrl.'/'.$this->account.'/test'.$suffix;
-        $this->assertEquals($queueUrl.$this::FIFO_POSTFIX, $queue->getQueue('test-staging'));
+        $queue = new SqsQueue($this->sqs, "{$this->queueName}-staging.fifo", $this->prefix, $suffix = '-staging');
+        $this->assertEquals("{$this->prefix}{$this->queueName}{$suffix}.fifo", $queue->getQueue(null));
+        $queueUrl = $this->baseUrl.'/'.$this->account.'/test'.$suffix.'.fifo';
+        $this->assertEquals($queueUrl, $queue->getQueue('test-staging.fifo'));
     }
 }
