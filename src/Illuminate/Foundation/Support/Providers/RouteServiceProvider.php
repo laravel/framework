@@ -65,31 +65,12 @@ class RouteServiceProvider extends ServiceProvider
     /**
      * Register the callback that will be used to load the application's routes.
      *
-     * @param  \Closure|null  $routesCallback
-     * @param  string|null  $web
-     * @param  string|null  $api
+     * @param  \Closure  $routesCallback
      * @return $this
      */
-    protected function routes(?Closure $routesCallback = null, ?string $web = null, ?string $api = null)
+    protected function routes(Closure $routesCallback)
     {
-        if (is_null($web) && is_null($api)) {
-            $this->loadRoutesUsing = $routesCallback;
-        } else {
-            $this->loadRoutesUsing = function () use ($web, $api) {
-                if ($api) {
-                    $this->app[Router::class]
-                        ->middleware('api')
-                        ->prefix('api')
-                        ->group($api);
-                }
-
-                if ($web) {
-                    $this->app[Router::class]
-                        ->middleware('web')
-                        ->group($web);
-                }
-            };
-        }
+        $this->loadRoutesUsing = $routesCallback;
 
         return $this;
     }
