@@ -3,6 +3,7 @@
 namespace Illuminate\Console;
 
 use function Laravel\Prompts\confirm;
+use Laravel\Prompts\ConfirmPrompt;
 
 trait ConfirmableTrait
 {
@@ -36,6 +37,8 @@ trait ConfirmableTrait
                 $this->components->warn('Command cancelled.');
 
                 return false;
+            } elseif (! ConfirmPrompt::shouldFallback()) {
+                $this->newLine();
             }
         }
 
