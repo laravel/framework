@@ -241,12 +241,12 @@ class ModelMakeCommand extends GeneratorCommand
         }
 
         collect(multiselect('Would you like any of the following?', [
-            'migration' => 'Migration',
             'seed' => 'Database Seeder',
             'factory' => 'Factory',
-            'resource' => 'Resource Controller',
             'requests' => 'Form Requests',
+            'migration' => 'Migration',
             'policy' => 'Policy',
+            'resource' => 'Resource Controller',
         ]))->each(fn ($option) => $input->setOption($option, true));
     }
 }

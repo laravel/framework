@@ -128,10 +128,10 @@ class TestMakeCommand extends GeneratorCommand
         }
 
         $type = select('Which type of test would you like?', [
-            'feature' => 'Feature',
-            'unit' => 'Unit',
-            'pest-feature' => 'Pest Feature',
-            'pest-unit' => 'Pest Unit',
+            'feature' => 'Feature (PHPUnit)',
+            'unit' => 'Unit (PHPUnit)',
+            'pest-feature' => 'Feature (Pest)',
+            'pest-unit' => 'Unit (Pest)',
         ]);
 
         match ($type) {
