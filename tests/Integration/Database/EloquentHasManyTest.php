@@ -51,6 +51,17 @@ class EloquentHasManyTest extends DatabaseTestCase
         $this->assertEquals($oldestLogin->id, $user->oldestLogin->id);
         $this->assertEquals($latestLogin->id, $user->latestLogin->id);
     }
+
+    public function testInsertWithForeignKeyOnHasMany()
+    {
+        $user = EloquentHasManyTestUser::create();
+
+        $user->logins()->insert(['login_time' => '2010-01-01']);
+
+        $login = $user->logins()->first();
+
+        $this->assertEquals($user->id, $login->eloquent_has_many_test_user_id);
+    }
 }
 
 class EloquentHasManyTestUser extends Model

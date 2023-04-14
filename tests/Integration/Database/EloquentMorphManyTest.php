@@ -69,6 +69,18 @@ class EloquentMorphManyTest extends DatabaseTestCase
         $this->assertEquals($latestComment->id, $post->latestComment->id);
         $this->assertEquals($oldestComment->id, $post->oldestComment->id);
     }
+
+    public function testInsertWithForeignKeyOnMorphMany()
+    {
+        $post = Post::create(['title' => 'foo']);
+
+        $post->comments()->insert(['name' => 'bar']);
+
+        $comment = $post->comments()->first();
+
+        $this->assertEquals($post->id, $comment->commentable_id);
+        $this->assertEquals(Post::class, $comment->commentable_type);
+    }
 }
 
 class Post extends Model
