@@ -124,4 +124,17 @@ abstract class MorphOneOrMany extends HasOneOrMany
     {
         return $this->morphClass;
     }
+
+    /**
+     * Get the foreign attributes.
+     *
+     * @return array
+     */
+    public function getForeignAttributes()
+    {
+        return [
+            $this->getForeignKeyName() => $this->getParentKey(),
+            $this->getMorphType() => $this->getMorphClass(),
+        ];
+    }
 }
