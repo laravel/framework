@@ -1258,6 +1258,18 @@ trait ValidatesAttributes
     {
         return $this->validateMimes($attribute, $value, ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp']);
     }
+    
+    /**
+     * Validate the MIME type of a file is an csv MIME type.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validateCsv($attribute, $value)
+    {
+        return $this->validateMimes($attribute, $value, ['text/csv', 'application/csv', 'text/x-comma-separated-values', 'text/x-csv']);
+    }
 
     /**
      * Validate an attribute is contained within a list of values.
