@@ -413,6 +413,174 @@ class ValidationInvokableRuleTest extends TestCase
         $this->assertSame($rule, $invokableValidationRule->invokable());
     }
 
+    public function testItCanChooseToFailInvokableRule()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $rule = new class() implements ValidationRule
+        {
+            public function validate($attribute, $value, $fail): void
+            {
+                $fail('error 1')->when(true);
+            }
+        };
+
+        $validator = new Validator($trans, ['foo' => 'bar'], ['foo' => $rule]);
+
+        $this->assertTrue($validator->fails());
+        $this->assertSame(['foo' => ['error 1']], $validator->messages()->messages());
+
+        $rule = new class() implements ValidationRule
+        {
+            public function validate($attribute, $value, $fail): void
+            {
+                $fail('error 1')->when(false);
+            }
+        };
+
+        $validator = new Validator($trans, ['foo' => 'bar'], ['foo' => $rule]);
+
+        $this->assertTrue($validator->passes());
+
+        $rule = new class() implements ValidationRule
+        {
+            public function validate($attribute, $value, $fail): void
+            {
+                $fail('error 1');
+            }
+        };
+
+        $validator = new Validator($trans, ['foo' => 'bar'], ['foo' => $rule]);
+
+        $this->assertTrue($validator->fails());
+        $this->assertSame(['foo' => ['error 1']], $validator->messages()->messages());
+
+        $rule = new class() implements ValidationRule
+        {
+            public function validate($attribute, $value, $fail): void
+            {
+                $fail('error 1')->when(true);
+                $fail('error 2')->when(false);
+            }
+        };
+
+        $validator = new Validator($trans, ['foo' => 'bar'], ['foo' => $rule]);
+
+        $this->assertTrue($validator->fails());
+        $this->assertSame(['foo' => ['error 1']], $validator->messages()->messages());
+
+        $rule = new class() implements ValidationRule
+        {
+            public function validate($attribute, $value, $fail): void
+            {
+                $fail('error 1')->when(false);
+                $fail('error 2')->when(true);
+            }
+        };
+
+        $validator = new Validator($trans, ['foo' => 'bar'], ['foo' => $rule]);
+
+        $this->assertTrue($validator->fails());
+        $this->assertSame(['foo' => ['error 2']], $validator->messages()->messages());
+
+        $rule = new class() implements ValidationRule
+        {
+            public function validate($attribute, $value, $fail): void
+            {
+                $fail('error 1')->unless(true);
+                $fail('error 2')->unless(false);
+            }
+        };
+
+        $validator = new Validator($trans, ['foo' => 'bar'], ['foo' => $rule]);
+
+        $this->assertTrue($validator->fails());
+        $this->assertSame(['foo' => ['error 2']], $validator->messages()->messages());
+
+        $rule = new class() implements ValidationRule
+        {
+            public function validate($attribute, $value, $fail): void
+            {
+                $fail('error 1')->unless(false);
+                $fail('error 2')->unless(true);
+            }
+        };
+
+        $validator = new Validator($trans, ['foo' => 'bar'], ['foo' => $rule]);
+
+        $this->assertTrue($validator->fails());
+        $this->assertSame(['foo' => ['error 1']], $validator->messages()->messages());
+    }
+
+    public function testItCanChooseToFailClosureValidationRule()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $rule = function ($attribute, $value, $fail) {
+            $fail('error 1')->when(true);
+        };
+
+        $validator = new Validator($trans, ['foo' => 'bar'], ['foo' => $rule]);
+
+        $this->assertTrue($validator->fails());
+        $this->assertSame(['foo' => ['error 1']], $validator->messages()->messages());
+
+        $rule = function ($attribute, $value, $fail) {
+            $fail('error 1')->when(false);
+        };
+
+        $validator = new Validator($trans, ['foo' => 'bar'], ['foo' => $rule]);
+
+        $this->assertTrue($validator->passes());
+
+        $rule = function ($attribute, $value, $fail) {
+            $fail('error 1');
+        };
+
+        $validator = new Validator($trans, ['foo' => 'bar'], ['foo' => $rule]);
+
+        $this->assertTrue($validator->fails());
+        $this->assertSame(['foo' => ['error 1']], $validator->messages()->messages());
+
+        $rule = function ($attribute, $value, $fail) {
+            $fail('error 1')->when(true);
+            $fail('error 2')->when(false);
+        };
+
+        $validator = new Validator($trans, ['foo' => 'bar'], ['foo' => $rule]);
+
+        $this->assertTrue($validator->fails());
+        $this->assertSame(['foo' => ['error 1']], $validator->messages()->messages());
+
+        $rule = function ($attribute, $value, $fail) {
+            $fail('error 1')->when(false);
+            $fail('error 2')->when(true);
+        };
+
+        $validator = new Validator($trans, ['foo' => 'bar'], ['foo' => $rule]);
+
+        $this->assertTrue($validator->fails());
+        $this->assertSame(['foo' => ['error 2']], $validator->messages()->messages());
+
+        $rule = function ($attribute, $value, $fail) {
+            $fail('error 1')->unless(true);
+            $fail('error 2')->unless(false);
+        };
+
+        $validator = new Validator($trans, ['foo' => 'bar'], ['foo' => $rule]);
+
+        $this->assertTrue($validator->fails());
+        $this->assertSame(['foo' => ['error 2']], $validator->messages()->messages());
+
+        $rule = function ($attribute, $value, $fail) {
+            $fail('error 1')->unless(false);
+            $fail('error 2')->unless(true);
+        };
+
+        $validator = new Validator($trans, ['foo' => 'bar'], ['foo' => $rule]);
+
+        $this->assertTrue($validator->fails());
+        $this->assertSame(['foo' => ['error 1']], $validator->messages()->messages());
+    }
+
     private function getIlluminateArrayTranslator()
     {
         return new Translator(

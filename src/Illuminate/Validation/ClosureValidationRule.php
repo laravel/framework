@@ -59,8 +59,6 @@ class ClosureValidationRule implements RuleContract, ValidatorAwareRule
         $this->failed = false;
 
         $this->callback->__invoke($attribute, $value, function ($attribute, $message = null) {
-            $this->failed = true;
-
             return $this->pendingPotentiallyTranslatedString($attribute, $message);
         });
 
@@ -103,7 +101,9 @@ class ClosureValidationRule implements RuleContract, ValidatorAwareRule
             ? fn ($message) => $this->messages[] = $message
             : fn ($message) => $this->messages[$attribute] = $message;
 
-        return new class($message ?? $attribute, $this->validator->getTranslator(), $destructor) extends PotentiallyTranslatedString
+        $fail = fn () => $this->failed = true;
+
+        return new class($message ?? $attribute, $this->validator->getTranslator(), $destructor, $fail) extends PotentiallyTranslatedString
         {
             /**
              * The callback to call when the object destructs.
@@ -113,17 +113,56 @@ class ClosureValidationRule implements RuleContract, ValidatorAwareRule
             protected $destructor;
 
             /**
+             * The callback to call when rule should fail.
+             *
+             * @var \Closure
+             */
+            protected $fail;
+
+            /**
+             * Indicates if the validation callback failed.
+             *
+             * @var bool
+             */
+            public $failed = true;
+
+            /**
              * Create a new pending potentially translated string.
              *
              * @param  string  $message
              * @param  \Illuminate\Contracts\Translation\Translator  $translator
              * @param  \Closure  $destructor
              */
-            public function __construct($message, $translator, $destructor)
+            public function __construct($message, $translator, $destructor, $fail)
             {
                 parent::__construct($message, $translator);
 
                 $this->destructor = $destructor;
+                $this->fail = $fail;
+            }
+
+            /**
+             * Fail the rule and add message to errors if the given "value" is (or resolves to) truthy.
+             *
+             * @var self
+             */
+            public function when($failed)
+            {
+                $this->failed = value($failed);
+
+                return $this;
+            }
+
+            /**
+             * Fail the rule and add message to errors if the given "value" is (or resolves to) false.
+             *
+             * @var self
+             */
+            public function unless($failed)
+            {
+                $this->failed = ! value($failed);
+
+                return $this;
             }
 
             /**
@@ -133,6 +172,12 @@ class ClosureValidationRule implements RuleContract, ValidatorAwareRule
              */
             public function __destruct()
             {
+                if (! $this->failed) {
+                    return;
+                }
+
+                ($this->fail)();
+
                 ($this->destructor)($this->toString());
             }
         };
