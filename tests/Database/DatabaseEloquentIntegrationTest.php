@@ -79,6 +79,16 @@ class DatabaseEloquentIntegrationTest extends TestCase
             $table->timestamps();
         });
 
+        $this->schema('default')->create('users_without_updated_at', function ($table) {
+            $table->increments('id');
+            $table->timestamp('created_at');
+        });
+
+        $this->schema('default')->create('users_without_created_at', function ($table) {
+            $table->increments('id');
+            $table->timestamp('updated_at');
+        });
+
         foreach (['default', 'second_connection'] as $connection) {
             $this->schema($connection)->create('users', function ($table) {
                 $table->increments('id');
@@ -2101,7 +2111,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('primary', $pivot->taxonomy);
     }
 
-    public function testInsertSetsTimestampColumns()
+    public function testInsertSetsTimestampColumnsWhereApplicable()
     {
         $this->assertTrue(EloquentTestItem::insert([
             ['id' => 199], ['id' => 2007],
@@ -2111,11 +2121,38 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $this->assertCount(2, $testItems);
 
-        $this->assertNotNull($testItems[0]->created_at);
-        $this->assertNotNull($testItems[1]->created_at);
-        $this->assertNotNull($testItems[0]->updated_at);
-        $this->assertNotNull($testItems[1]->updated_at);
+        foreach($testItems as $testItem) {
+            $this->assertInstanceOf(\DateTime::class, $testItem->created_at);
+            $this->assertInstanceOf(\DateTime::class, $testItem->updated_at);
+        }
+
+        $this->assertTrue(EloquentTestWithJSON::insert([['json' => json_encode(['x' => 0])]]));
+
+        $this->assertCount(1, EloquentTestWithJSON::get());
     }
+
+    public function testInsertSetsOnlyCreatedAtColumn()
+    {
+        $this->assertTrue(EloquentUserWithoutUpdatedAt::insert([
+            ['id' => 19]
+        ]));
+
+        $this->assertCount(1, $users = EloquentUserWithoutUpdatedAt::get());
+        $this->assertInstanceOf(\DateTime::class, $users[0]->created_at);
+    }
+
+    public function testInsertSetsOnlyUpdatedAtColumn()
+    {
+        $this->assertTrue(EloquentUserWithoutCreatedAt::insert([
+            ['id' => 19]
+        ]));
+
+        $this->assertCount(1, $users = EloquentUserWithoutCreatedAt::get());
+        $this->assertInstanceOf(\DateTime::class, $users[0]->updated_at);
+    }
+
+
+
 
     /**
      * Helpers...
@@ -2413,4 +2450,18 @@ class EloquentTouchingComment extends Eloquent
     {
         return $this->belongsTo(EloquentTouchingPost::class, 'post_id');
     }
+}
+
+class EloquentUserWithoutUpdatedAt extends Eloquent
+{
+    protected $table = 'users_without_updated_at';
+    protected $guarded = [];
+    public const UPDATED_AT = null;
+}
+
+class EloquentUserWithoutCreatedAt extends Eloquent
+{
+    protected $table = 'users_without_created_at';
+    protected $guarded = [];
+    public const CREATED_AT =  null;
 }
