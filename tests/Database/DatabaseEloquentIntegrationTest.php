@@ -2101,6 +2101,22 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('primary', $pivot->taxonomy);
     }
 
+    public function testInsertSetsTimestampColumns()
+    {
+        $this->assertTrue(EloquentTestItem::insert([
+            ['id' => 199], ['id' => 2007],
+        ]));
+
+        $testItems = EloquentTestItem::query()->get();
+
+        $this->assertCount(2, $testItems);
+
+        $this->assertNotNull($testItems[0]->created_at);
+        $this->assertNotNull($testItems[1]->created_at);
+        $this->assertNotNull($testItems[0]->updated_at);
+        $this->assertNotNull($testItems[1]->updated_at);
+    }
+
     /**
      * Helpers...
      */
