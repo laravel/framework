@@ -2121,7 +2121,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $this->assertCount(2, $testItems);
 
-        foreach($testItems as $testItem) {
+        foreach ($testItems as $testItem) {
             $this->assertInstanceOf(\DateTime::class, $testItem->created_at);
             $this->assertInstanceOf(\DateTime::class, $testItem->updated_at);
         }
@@ -2134,7 +2134,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
     public function testInsertSetsOnlyCreatedAtColumn()
     {
         $this->assertTrue(EloquentUserWithoutUpdatedAt::insert([
-            ['id' => 19]
+            ['id' => 19],
         ]));
 
         $this->assertCount(1, $users = EloquentUserWithoutUpdatedAt::get());
@@ -2144,15 +2144,12 @@ class DatabaseEloquentIntegrationTest extends TestCase
     public function testInsertSetsOnlyUpdatedAtColumn()
     {
         $this->assertTrue(EloquentUserWithoutCreatedAt::insert([
-            ['id' => 19]
+            ['id' => 19],
         ]));
 
         $this->assertCount(1, $users = EloquentUserWithoutCreatedAt::get());
         $this->assertInstanceOf(\DateTime::class, $users[0]->updated_at);
     }
-
-
-
 
     /**
      * Helpers...
@@ -2463,5 +2460,5 @@ class EloquentUserWithoutCreatedAt extends Eloquent
 {
     protected $table = 'users_without_created_at';
     protected $guarded = [];
-    public const CREATED_AT =  null;
+    public const CREATED_AT = null;
 }
