@@ -106,7 +106,6 @@ class Builder implements BuilderContract
         'getConnection',
         'getGrammar',
         'implode',
-        'insert',
         'insertGetId',
         'insertOrIgnore',
         'insertUsing',
@@ -493,6 +492,40 @@ class Builder implements BuilderContract
         }
 
         return $result;
+    }
+
+    /**
+     * Insert new records into the database.
+     *
+     * @param  array  $values
+     * @return bool
+     */
+    public function insert(array $values) {
+        if (empty($values)) {
+            return true;
+        }
+
+        if (! is_array(reset($values))) {
+            $values = [$values];
+        }
+
+
+        if (($modelInstance = $this->newModelInstance())->usesTimestamps()) {
+            $now = $modelInstance->freshTimestamp();
+            $timestampColumns = [];
+            if ($createdAtColumn = $modelInstance->getCreatedAtColumn()) {
+                $timestampColumns[$createdAtColumn] = $now;
+            }
+            if ($updatedAtColumn = $modelInstance->getUpdatedAtColumn()) {
+                $timestampColumns[$updatedAtColumn] = $now;
+            }
+
+            foreach($values as $key => $value) {
+                $values[$key] = array_merge($timestampColumns, $value);
+            }
+        }
+
+        return $this->toBase()->insert($values);
     }
 
     /**
