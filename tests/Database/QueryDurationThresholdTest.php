@@ -49,7 +49,7 @@ class QueryDurationThresholdTest extends TestCase
         $connection = new Connection(new PDO('sqlite::memory:'));
         $connection->setEventDispatcher(new Dispatcher());
         $called = 0;
-        $connection->whenQueryingForLongerThan(now()->addMilliseconds(1), function () use (&$called) {
+        $connection->whenQueryingForLongerThan(now()->addMilliseconds(2), function () use (&$called) {
             $called++;
         });
 
