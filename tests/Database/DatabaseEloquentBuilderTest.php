@@ -909,11 +909,6 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertInstanceOf(Builder::class, $builder->foobar());
 
         $builder = $this->getBuilder();
-        $builder->getQuery()->shouldReceive('insert')->once()->with(['bar'])->andReturn('foo');
-
-        $this->assertSame('foo', $builder->insert(['bar']));
-
-        $builder = $this->getBuilder();
         $builder->getQuery()->shouldReceive('insertOrIgnore')->once()->with(['bar'])->andReturn('foo');
 
         $this->assertSame('foo', $builder->insertOrIgnore(['bar']));

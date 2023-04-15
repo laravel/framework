@@ -2107,7 +2107,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
             ['id' => 199], ['id' => 2007],
         ]));
 
-        $testItems = EloquentTestItem::query()->get();
+        $testItems = EloquentTestItem::get();
 
         $this->assertCount(2, $testItems);
 
@@ -2361,6 +2361,7 @@ class EloquentTestFriendPivot extends Pivot
 {
     protected $table = 'friends';
     protected $guarded = [];
+    public $timestamps = false;
 
     public function user()
     {
