@@ -495,12 +495,13 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Insert new records into the database.
+     * Insert new records into the database, setting the appropriate timestamps if necessary.
      *
      * @param  array  $values
      * @return bool
      */
-    public function insert(array $values) {
+    public function insert(array $values)
+    {
         if (empty($values)) {
             return true;
         }
@@ -508,7 +509,6 @@ class Builder implements BuilderContract
         if (! is_array(reset($values))) {
             $values = [$values];
         }
-
 
         if (($modelInstance = $this->newModelInstance())->usesTimestamps()) {
             $now = $modelInstance->freshTimestamp();
@@ -520,7 +520,7 @@ class Builder implements BuilderContract
                 $timestampColumns[$updatedAtColumn] = $now;
             }
 
-            foreach($values as $key => $value) {
+            foreach ($values as $key => $value) {
                 $values[$key] = array_merge($timestampColumns, $value);
             }
         }
