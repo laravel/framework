@@ -96,6 +96,17 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
     }
 
     /**
+     * Create a new Collection instance.
+     *
+     * @param  array  $instances
+     * @return \Illuminate\Support\Collection<TKey, TValue>
+     */
+    public function newCollection(array $instances = [])
+    {
+        return new Collection($instances);
+    }
+
+    /**
      * Determine if the given offset exists.
      *
      * @param  TKey  $offset

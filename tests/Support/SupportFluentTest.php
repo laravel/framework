@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Support;
 
 use ArrayIterator;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
 use IteratorAggregate;
 use PHPUnit\Framework\TestCase;
@@ -112,6 +113,16 @@ class SupportFluentTest extends TestCase
         $results = $fluent->toJson();
 
         $this->assertJsonStringEqualsJsonString(json_encode(['foo']), $results);
+    }
+
+    public function testNewCollectionReturnsResultAsCollection()
+    {
+        $array = ['name' => 'Taylor', 'age' => 25];
+        $fluent = new Fluent();
+        $collection = $fluent->newCollection($array);
+
+        $this->assertInstanceOf(Collection::class, $collection);
+        $this->assertEquals($array, $collection->all());
     }
 }
 

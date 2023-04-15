@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Fluent;
 use Illuminate\Tests\Database\Fixtures\Models\Money\Price;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -128,6 +129,27 @@ class DatabaseEloquentFactoryTest extends TestCase
 
         $users = FactoryTestUserFactory::times(10)->create();
         $this->assertCount(10, $users);
+    }
+
+    public function test_basic_fluent_instance_can_be_made()
+    {
+        $fluent = FactoryTestFluentFactory::new()->make();
+        $this->assertInstanceOf(Fluent::class, $fluent);
+
+        $fluent = FactoryTestFluentFactory::new()->makeOne();
+        $this->assertInstanceOf(Fluent::class, $fluent);
+
+        $fluent = FactoryTestFluentFactory::new()->make(['name' => 'Taylor Otwell']);
+        $this->assertInstanceOf(Fluent::class, $fluent);
+        $this->assertSame('Taylor Otwell', $fluent->name);
+
+        $fluent = FactoryTestFluentFactory::new()->set('name', 'Taylor Otwell')->make();
+        $this->assertInstanceOf(Fluent::class, $fluent);
+        $this->assertSame('Taylor Otwell', $fluent->name);
+
+        $fluentCollection = FactoryTestFluentFactory::times(10)->make();
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $fluentCollection);
+        $this->assertCount(10, $fluentCollection);
     }
 
     public function test_expanded_closure_attributes_are_resolved_and_passed_to_closures()
@@ -846,6 +868,19 @@ class FactoryTestUser extends Eloquent
     public function factoryTestRoles()
     {
         return $this->belongsToMany(FactoryTestRole::class, 'role_user', 'user_id', 'role_id')->withPivot('admin');
+    }
+}
+
+class FactoryTestFluentFactory extends Factory
+{
+    protected $model = Fluent::class;
+
+    public function definition()
+    {
+        return [
+            'name' => $this->faker->name(),
+            'options' => null,
+        ];
     }
 }
 
