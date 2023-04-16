@@ -171,6 +171,8 @@ class CustomPivotCastTestProject extends Model
 
 class CustomPivotCastTestCollaborator extends Pivot
 {
+    public $timestamps = false;
+
     protected $attributes = [
         'permissions' => '["create", "update"]',
     ];
