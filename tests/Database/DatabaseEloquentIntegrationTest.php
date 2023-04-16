@@ -2106,21 +2106,24 @@ class DatabaseEloquentIntegrationTest extends TestCase
         DB::enableQueryLog();
 
         $this->assertTrue(EloquentTestUser::insertWithCasts([
-            ['email' => 'someperson@fake.com', 'birthday' => '1980-01-01'],
-            ['email' => 'adifferentpersonbutequally@fake.com', 'birthday' => null],
+            ['email' => 'taylorotwell@gmail.com', 'birthday' => null],
+            ['email' => 'someperson@fake.com', 'birthday' => new Carbon('1980-01-01')],
+            ['email' => 'adifferentpersonbutequally@fake.com', 'birthday' => '2001-12-29'],
         ]));
 
         $this->assertCount(1, DB::getQueryLog());
 
-        $this->assertCount(2, $users = EloquentTestUser::get());
+        $this->assertCount(3, $users = EloquentTestUser::get());
 
         $users->each(function(EloquentTestUser $user) {
             $this->assertInstanceOf(\DateTime::class, $user->created_at);
             $this->assertInstanceOf(\DateTime::class, $user->updated_at);
         });
 
-        $this->assertInstanceOf(\DateTime::class, $users->first()->birthday);
-        $this->assertNull($users->firstWhere('id', 2)->birthday);
+        $this->assertNull($users[0]->birthday);
+        $this->assertInstanceOf(\DateTime::class, $users[1]->birthday);
+        $this->assertInstanceOf(\DateTime::class, $users[2]->birthday);
+        $this->assertEquals('2001-12-29', $users[2]->birthday->format('Y-m-d'));
 
         DB::flushQueryLog();
 
