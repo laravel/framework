@@ -998,6 +998,43 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Insert new records into the database, casting properties and setting timestamps where applicable.
+     *
+     * @param  iterable  $values
+     * @return bool
+     */
+    public function insertWithCasts(iterable $values): bool
+    {
+        if (empty($values)) {
+            return true;
+        }
+
+        if (!is_array(reset($values))) {
+            $values = [$values];
+        }
+
+        $modelInstance = $this->newModelInstance();
+        $timestampColumns = [];
+
+        if ($modelInstance->usesTimestamps()) {
+            $now = $modelInstance->freshTimestamp();
+
+            if ($createdAtColumn = $modelInstance->getCreatedAtColumn()) {
+                $timestampColumns[$createdAtColumn] = $now;
+            }
+            if ($updatedAtColumn = $modelInstance->getUpdatedAtColumn()) {
+                $timestampColumns[$updatedAtColumn] = $now;
+            }
+        }
+
+        foreach ($values as $key => $value) {
+            $values[$key] = $this->newModelInstance(array_merge($timestampColumns, $value))->getAttributes();
+        }
+
+        return $this->toBase()->insert($values);
+    }
+
+    /**
      * Save a new model and return the instance. Allow mass-assignment.
      *
      * @param  array  $attributes

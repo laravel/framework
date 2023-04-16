@@ -2101,6 +2101,44 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('primary', $pivot->taxonomy);
     }
 
+    public function testCanCreateMany()
+    {
+        DB::enableQueryLog();
+
+        $this->assertTrue(EloquentTestUser::insertWithCasts([
+            ['email' => 'someperson@fake.com', 'birthday' => '1980-01-01'],
+            ['email' => 'adifferentpersonbutequally@fake.com', 'birthday' => null],
+        ]));
+
+        $this->assertCount(1, DB::getQueryLog());
+
+        $this->assertCount(2, $users = EloquentTestUser::get());
+
+        $users->each(function(EloquentTestUser $user) {
+            $this->assertInstanceOf(\DateTime::class, $user->created_at);
+            $this->assertInstanceOf(\DateTime::class, $user->updated_at);
+        });
+
+        $this->assertInstanceOf(\DateTime::class, $users->first()->birthday);
+        $this->assertNull($users->firstWhere('id', 2)->birthday);
+
+        DB::flushQueryLog();
+
+        $this->assertTrue(EloquentTestWithJSON::insertWithCasts([
+            ['id' => 1, 'json' => ['album' => 'Keep It Like a Secret', 'release_date' => '1999-02-02']],
+            ['id' => 2, 'json' => (object) ['album' => 'You In Reverse', 'release_date' => '2006-04-11']],
+        ]));
+
+        $this->assertCount(1, DB::getQueryLog());
+
+        $this->assertCount(2, $testsWithJson = EloquentTestWithJSON::get());
+
+        $testsWithJson->each(function(EloquentTestWithJSON $testWithJson) {
+            $this->assertIsArray($testWithJson->json);
+            $this->assertArrayHasKey('album', $testWithJson->json);
+        });
+    }
+
     /**
      * Helpers...
      */
