@@ -1027,9 +1027,11 @@ class Builder implements BuilderContract
             }
         }
 
-        foreach ($values as $key => $value) {
-            $values[$key] = $this->newModelInstance(array_merge($timestampColumns, $value))->getAttributes();
-        }
+        $this->model->unguarded(function() use (&$values, $timestampColumns) {
+            foreach ($values as $key => $value) {
+                $values[$key] = $this->newModelInstance(array_merge($timestampColumns, $value))->getAttributes();
+            }
+        });
 
         return $this->toBase()->insert($values);
     }
