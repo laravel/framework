@@ -2115,7 +2115,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $this->assertCount(3, $users = EloquentTestUser::get());
 
-        $users->each(function(EloquentTestUser $user) {
+        $users->each(function (EloquentTestUser $user) {
             $this->assertInstanceOf(\DateTime::class, $user->created_at);
             $this->assertInstanceOf(\DateTime::class, $user->updated_at);
         });
@@ -2136,7 +2136,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $this->assertCount(2, $testsWithJson = EloquentTestWithJSON::get());
 
-        $testsWithJson->each(function(EloquentTestWithJSON $testWithJson) {
+        $testsWithJson->each(function (EloquentTestWithJSON $testWithJson) {
             $this->assertIsArray($testWithJson->json);
             $this->assertArrayHasKey('album', $testWithJson->json);
         });

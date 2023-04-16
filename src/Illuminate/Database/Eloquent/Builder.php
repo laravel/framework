@@ -1009,7 +1009,7 @@ class Builder implements BuilderContract
             return true;
         }
 
-        if (!is_array(reset($values))) {
+        if (! is_array(reset($values))) {
             $values = [$values];
         }
 
@@ -1027,7 +1027,7 @@ class Builder implements BuilderContract
             }
         }
 
-        $this->model->unguarded(function() use (&$values, $timestampColumns) {
+        $this->model->unguarded(function () use (&$values, $timestampColumns) {
             foreach ($values as $key => $value) {
                 $values[$key] = $this->newModelInstance(array_merge($timestampColumns, $value))->getAttributes();
             }
