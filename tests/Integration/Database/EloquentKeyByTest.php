@@ -186,7 +186,7 @@ class User extends BaseModel
         $cast = match (DB::connection()->getDriverName()) {
             'mysql', 'sqlite' => 'SUBSTR(created_at, 1, 10)',
             'pgsql' => 'SUBSTR(CAST(created_at AS varchar), 1, 10)',
-            'sqlsrv' => 'SUBSTRING(CAST(created_at AS varchar), 1, 10)'
+            'sqlsrv' => 'CONVERT(date, created_at)'
         };
         return $this->hasMany(Post::class)->keyBy(DB::raw($cast));
     }
