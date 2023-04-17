@@ -72,7 +72,7 @@ class EloquentKeyByTest extends DatabaseTestCase
         ]);
 
         DB::table('comments')->insert([
-            ['post_id' => 2, 'content' => 'This is a comment']
+            ['post_id' => 2, 'content' => 'This is a comment'],
         ]);
     }
 

@@ -2742,7 +2742,7 @@ class Builder implements BuilderContract
     protected function getKeyed($key, $columns = ['*'])
     {
         return collect($this->onceWithColumns(Arr::wrap($columns), function () use ($key) {
-            if (is_string($key) && !str_contains($key, '.')) {
+            if (is_string($key) && ! str_contains($key, '.')) {
                 $key = $this->from.'.'.$key;
             }
             $this->columns = Arr::prepend($this->qualifyStarColumns($this->columns), $key);
