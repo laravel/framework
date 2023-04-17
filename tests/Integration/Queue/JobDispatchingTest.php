@@ -81,7 +81,7 @@ class JobDispatchingTest extends TestCase
         $terminatingCallbacksReflectionProperty->setAccessible(true);
         $startTerminatingCallbacks = $terminatingCallbacksReflectionProperty->getValue($this->app);
 
-        UniqueJob::dispatch('test')->afterResponse();
+        UniqueJob::dispatchAfterResponse('test');
         $this->assertFalse(
             $this->getJobLock(UniqueJob::class, 'test')
         );
@@ -103,6 +103,11 @@ class JobDispatchingTest extends TestCase
         $terminatingCallbacksReflectionProperty->setValue($this->app, $startTerminatingCallbacks);
         UniqueJob::$ran = false;
         UniqueJob::dispatch('test')->afterResponse();
+        $this->app->terminate();
+        $this->assertFalse(UniqueJob::$ran);
+
+        // confirm that dispatchAfterResponse also does not run
+        UniqueJob::dispatchAfterResponse('test');
         $this->app->terminate();
         $this->assertFalse(UniqueJob::$ran);
     }
