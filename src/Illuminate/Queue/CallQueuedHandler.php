@@ -63,20 +63,6 @@ class CallQueuedHandler
             return $this->handleModelNotFound($job, $e);
         }
 
-        $this->handle($command, $job);
-    }
-
-    /**
-     * Handle job locks, dispatching the job through middleware, and releasing the job.
-     *
-     * @param  mixed  $command
-     * @param  Job|null  $job
-     * @return void
-     */
-    public function handle($command, ?Job $job = null)
-    {
-        $job ??= $command->job;
-
         if ($command instanceof ShouldBeUniqueUntilProcessing) {
             $this->ensureUniqueJobLockIsReleased($command);
         }
