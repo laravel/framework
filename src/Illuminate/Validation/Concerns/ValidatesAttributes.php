@@ -585,11 +585,11 @@ trait ValidatesAttributes
      */
     public function validateDecimal($attribute, $value, $parameters)
     {
+        $this->requireParameterCount(1, $parameters, 'decimal');
+
         if (! $this->validateNumeric($attribute, $value)) {
             return false;
         }
-
-        $this->requireParameterCount(1, $parameters, 'decimal');
 
         $matches = [];
 
