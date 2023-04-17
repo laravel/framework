@@ -110,8 +110,9 @@ class JobDispatchingTest extends TestCase
     /**
      * Helpers.
      */
-    private function getJobLock($job, $value = null) {
-        return $this->app->get(Repository::class)->lock('laravel_unique_job:' . $job . $value, 10)->get();
+    private function getJobLock($job, $value = null)
+    {
+        return $this->app->get(Repository::class)->lock('laravel_unique_job:'.$job.$value, 10)->get();
     }
 }
 
@@ -144,7 +145,8 @@ class UniqueJob extends Job implements ShouldBeUnique
 {
     use InteractsWithQueue;
 
-    public function uniqueId() {
+    public function uniqueId()
+    {
         return self::$value;
     }
 }
