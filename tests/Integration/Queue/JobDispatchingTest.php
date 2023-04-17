@@ -3,8 +3,12 @@
 namespace Illuminate\Tests\Integration\Queue;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Reflector;
 use Orchestra\Testbench\TestCase;
 
 class JobDispatchingTest extends TestCase
@@ -70,6 +74,41 @@ class JobDispatchingTest extends TestCase
 
         $this->assertTrue(Job::$ran);
     }
+
+    public function testUniqueJobLockIsReleasedForJobDispatchedAfterResponse()
+    {
+        // get initial terminatingCallbacks
+        $terminatingCallbacksReflectionProperty = (new \ReflectionObject($this->app))->getProperty('terminatingCallbacks');
+        $terminatingCallbacksReflectionProperty->setAccessible(true);
+        $startTerminatingCallbacks = $terminatingCallbacksReflectionProperty->getValue($this->app);
+
+        UniqueJob::dispatch('test')->afterResponse();
+        $this->assertFalse(
+            $this->getJobLock(UniqueJob::class, 'test')
+        );
+
+        $this->app->terminate();
+        $this->assertTrue(UniqueJob::$ran);
+        // reset terminating callbacks
+        $terminatingCallbacksReflectionProperty->setValue($this->app, $startTerminatingCallbacks);
+
+        UniqueJob::$ran = false;
+        UniqueJob::dispatch('test')->afterResponse();
+        $this->app->terminate();
+        $this->assertTrue(UniqueJob::$ran);
+    }
+
+    /**
+     * Helpers
+     */
+    protected function getLockKey($job, $value = null)
+    {
+        return ;
+    }
+
+    private function getJobLock($job, $value = null) {
+        return $this->app->get(\Illuminate\Contracts\Cache\Repository::class)->lock('laravel_unique_job:' . $job . $value, 10)->get();
+    }
 }
 
 class Job implements ShouldQueue
@@ -94,5 +133,12 @@ class Job implements ShouldQueue
     public function replaceValue($value)
     {
         static::$value = $value;
+    }
+}
+
+class UniqueJob extends Job implements ShouldBeUnique
+{
+    public function uniqueId() {
+        return self::$value;
     }
 }
