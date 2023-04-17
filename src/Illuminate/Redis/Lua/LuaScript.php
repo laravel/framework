@@ -51,7 +51,7 @@ class LuaScript
     }
 
     /**
-     * Create a new instance from a hash of the script
+     * Create a new instance from a hash of the script.
      *
      * @param  string  $sha1  The sha1 hash of the script.
      * @return self

@@ -29,7 +29,7 @@ class PredisExecutor extends LuaScriptExecutor
      */
     protected function handleRedisResponse($result)
     {
-        if ($result instanceof PredisError::class) {
+        if ($result instanceof PredisError) {
             $this->handleRedisError($result);
         }
 

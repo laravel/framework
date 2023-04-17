@@ -13,14 +13,14 @@ class LuaScriptArguments
     /**
      * An array of keys to be passed to the Lua script.
      *
-     * @var string[] $keys
+     * @var string[]
      */
     private $keys;
 
     /**
      * An array of arguments to be passed to the Lua script.
      *
-     * @var string[] $arguments
+     * @var string[]
      */
     private $arguments;
 
@@ -105,7 +105,8 @@ class LuaScriptArguments
     }
 
     /**
-     * Collapse keys and argument to single array
+     * Collapse keys and argument to single array.
+     *
      * @return string[] The array ready to pass to redis
      */
     public function toArray()

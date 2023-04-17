@@ -32,7 +32,6 @@ abstract class LuaScriptExecutor
      * Get executor based on client.
      *
      * @param  \Illuminate\Redis\Connections\Connection  $connection  The Redis connection instance.
-     *
      * @return \Illuminate\Redis\Lua\LuaScriptExecutor The executor instance.
      */
     private static function getExecutor($connection)
@@ -44,7 +43,6 @@ abstract class LuaScriptExecutor
      * Create new instance.
      *
      * @param  \Illuminate\Redis\Connections\Connection  $connection  The Redis connection instance.
-     *
      * @return \Illuminate\Redis\Lua\LuaScriptExecutor The executor instance.
      */
     public static function create($connection)
@@ -56,25 +54,23 @@ abstract class LuaScriptExecutor
      * Throw an exception based on the Redis error message.
      *
      * @param  string|\Predis\Response\ServerException|\Predis\Response\Error  $error  The Redis error.
-     *
      * @return never
      *
      * @throws \Illuminate\Contracts\Redis\LuaScriptExecuteException If the Redis response indicates a script execution error.
      * @throws \Illuminate\Contracts\Redis\LuaScriptNoMatchingException If the Redis response indicates that the specified script was not found.
      */
-    protected abstract function handleRedisError($error);
+    abstract protected function handleRedisError($error);
 
     /**
      * Handle the result of Redis script execution and throw exception if needed.
      *
      * @param  mixed  $result  The result of Redis script execution.
-     *
      * @return mixed The result of Redis script execution.
      *
      * @throws \Illuminate\Contracts\Redis\LuaScriptExecuteException If the Redis response indicates a script execution error.
      * @throws \Illuminate\Contracts\Redis\LuaScriptNoMatchingException If the Redis response indicates that the specified script was not found.
      */
-    protected abstract function handleRedisResponse($result);
+    abstract protected function handleRedisResponse($result);
 
     /**
      * Execute a Redis Lua script as plain text.
@@ -82,24 +78,22 @@ abstract class LuaScriptExecutor
      * @param  string  $script  The Lua script to execute.
      * @param  \Illuminate\Redis\Lua\LuaScriptArguments  $arguments  The arguments to pass to the script.
      * @param  bool  $isCachingEnabled  Indicates whether the script can be cached.
-     *
      * @return mixed The result of Redis script execution.
      *
      * @throws \Illuminate\Contracts\Redis\LuaScriptExecuteException If the Redis response indicates a script execution error.
      */
-    protected abstract function executeWithPlainScript($script, $arguments, $isCachingEnabled);
+    abstract protected function executeWithPlainScript($script, $arguments, $isCachingEnabled);
 
     /**
      * Execute a Redis Lua script identified by its SHA-1 hash.
      *
      * @param  string  $sha1  The SHA-1 hash of the Lua script to execute.
      * @param  \Illuminate\Redis\Lua\LuaScriptArguments  $arguments  The arguments to pass to the script.
-     *
      * @return mixed The result of Redis script execution.
      *
      * @throws \Illuminate\Contracts\Redis\LuaScriptNoMatchingException If the Redis response indicates that the specified script was not found.
      */
-    protected abstract function executeWithHash($sha1, $arguments);
+    abstract protected function executeWithHash($sha1, $arguments);
 
     /**
      * Executes a Redis Lua script with the given arguments.
@@ -107,7 +101,6 @@ abstract class LuaScriptExecutor
      * @param  \Illuminate\Redis\Lua\LuaScript  $script  The Lua script to execute.
      * @param  \Illuminate\Redis\Lua\LuaScriptArguments  $arguments  The arguments to pass to the script.
      * @param  bool  $isCachingEnabled  Whether to enable caching for the script. Defaults to false.
-     *
      * @return mixed The result of Redis script execution.
      *
      * @throws \Illuminate\Contracts\Redis\LuaScriptExecuteException If the Redis response indicates a script execution error.

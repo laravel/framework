@@ -13,7 +13,7 @@ use RedisException;
 class PhpRedisExecutor extends LuaScriptExecutor
 {
     /**
-     * Returns the last Redis error message or null if there is no error
+     * Returns the last Redis error message or null if there is no error.
      *
      * @return string|null The error message or null
      *
@@ -29,7 +29,7 @@ class PhpRedisExecutor extends LuaScriptExecutor
 
             return $error;
         } catch (RedisException $e) {
-            throw new LuaScriptExecuteException("Failed to retrieve Redis error. " . $e->getMessage(), 0, $e);
+            throw new LuaScriptExecuteException('Failed to retrieve Redis error. '.$e->getMessage(), 0, $e);
         }
     }
 
@@ -39,7 +39,7 @@ class PhpRedisExecutor extends LuaScriptExecutor
     protected function handleRedisError($error)
     {
         throw match (explode(' ', $error, 2)[1]) {
-            "NOSCRIPT" => new LuaScriptNoMatchingException($error),
+            'NOSCRIPT' => new LuaScriptNoMatchingException($error),
             default => new LuaScriptExecuteException($error),
         };
     }
@@ -64,7 +64,6 @@ class PhpRedisExecutor extends LuaScriptExecutor
      * Load a Lua script into the Redis server.
      *
      * @param  string  $script  The Lua script to load
-     *
      * @return string|false Returns the SHA1 hash of the script if successful, or false on failure.
      */
     private function loadScript($script)
