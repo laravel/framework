@@ -7,6 +7,8 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
+use Illuminate\Queue\CallQueuedHandler;
+use Illuminate\Queue\InteractsWithQueue;
 
 class PendingDispatch
 {
@@ -188,7 +190,12 @@ class PendingDispatch
         if (! $this->shouldDispatch()) {
             return;
         } elseif ($this->afterResponse) {
-            app(Dispatcher::class)->dispatchAfterResponse($this->job);
+            app(Dispatcher::class)->dispatchAfterResponse(
+                $this->job,
+                in_array(InteractsWithQueue::class, class_uses_recursive($this->job))
+                    ? app(CallQueuedHandler::class)
+                    : null
+            );
         } else {
             app(Dispatcher::class)->dispatch($this->job);
         }
