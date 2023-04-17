@@ -19,7 +19,7 @@ class PredisExecutor extends LuaScriptExecutor
     protected function handleRedisError($error)
     {
         throw match ($error->getErrorType()) {
-            "NOSCRIPT" => new LuaScriptNoMatchingException($error),
+            'NOSCRIPT' => new LuaScriptNoMatchingException($error),
             default => new LuaScriptExecuteException($error),
         };
     }
@@ -40,7 +40,6 @@ class PredisExecutor extends LuaScriptExecutor
      * Load the given Lua script into Redis and return its SHA-1 hash.
      *
      * @param  string  $script  The Lua script to load.
-     *
      * @return string The SHA-1 hash of the loaded script.
      *
      * @throws \Illuminate\Contracts\Redis\LuaScriptExecuteException If there was an error executing the script in Redis.
