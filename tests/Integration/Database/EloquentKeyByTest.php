@@ -46,6 +46,7 @@ class EloquentKeyByTest extends DatabaseTestCase
 
         DB::table('users')->insert([
             ['name' => 'Taylor Otwell', 'email' => 'taylor@laravel.com', 'address' => '5th Avenue'],
+            ['name' => 'Taylor Otwell', 'email' => 'other_taylor@laravel.com', 'address' => '7th Avenue'],
             ['name' => 'Lortay Wellot', 'email' => 'lortay@laravel.com', 'address' => '4th Street'],
         ]);
 
@@ -86,9 +87,9 @@ class EloquentKeyByTest extends DatabaseTestCase
     public static function keyByDataProvider()
     {
         return [
-            'Key by name with all columns' => ['name', ['*'], 'Lortay Wellot', '{"id":2,"name":"Lortay Wellot","email":"lortay@laravel.com","address":"4th Street"}'],
-            'Key by name with selected columns not including key' => ['name', ['email', 'address'], 'Taylor Otwell', '{"email":"taylor@laravel.com","address":"5th Avenue"}'],
-            'Key by name with selected columns including key' => ['name', ['name', 'email', 'address'], 'Taylor Otwell', '{"name":"Taylor Otwell","email":"taylor@laravel.com","address":"5th Avenue"}'],
+            'Key by name with all columns' => ['name', ['*'], 'Lortay Wellot', '{"id":3,"name":"Lortay Wellot","email":"lortay@laravel.com","address":"4th Street"}'],
+            'Key by name with selected columns not including key' => ['name', ['email', 'address'], 'Taylor Otwell', '{"email":"other_taylor@laravel.com","address":"7th Avenue"}'],
+            'Key by name with selected columns including key' => ['name', ['name', 'email', 'address'], 'Taylor Otwell', '{"name":"Taylor Otwell","email":"other_taylor@laravel.com","address":"7th Avenue"}'],
             'Key by street with selected dot-columns not including key' => ['address', ['users.email'], '5th Avenue', '{"email":"taylor@laravel.com"}'],
             'Key by street with selected dot-columns including key' => ['address', ['users.address', 'email'], '5th Avenue', '{"address":"5th Avenue","email":"taylor@laravel.com"}'],
         ];
@@ -107,9 +108,27 @@ class EloquentKeyByTest extends DatabaseTestCase
     public static function keyByWithSelectDataProvider()
     {
         return [
-            'keyBy column does not become part of the result if not SELECTed' => ['name', ['address'], 'Taylor Otwell', ['address' => '5th Avenue']],
-            'keyBy column becomes part of the result if SELECTed' => ['name', ['name', 'address'], 'Taylor Otwell', ['name' => 'Taylor Otwell', 'address' => '5th Avenue']],
+            'keyBy column does not become part of the result if not SELECTed' => ['name', ['address'], 'Taylor Otwell', ['address' => '7th Avenue']],
+            'keyBy column becomes part of the result if SELECTed' => ['name', ['name', 'address'], 'Taylor Otwell', ['name' => 'Taylor Otwell', 'address' => '7th Avenue']],
         ];
+    }
+
+    public function testGroupBySimilarity()
+    {
+        $this->assertSame(
+            Post::query()->groupBy('title')->select(['title', DB::raw('MIN(id) as id')])
+                ->keyBy('title')->get()->toArray(),
+            Post::query()->groupBy('title')->select(['title', DB::raw('MIN(id) as id')])
+                ->get()->keyBy('title')->toArray()
+        );
+    }
+
+    public function testCollectionKeyBySimilarity()
+    {
+        $this->assertSame(
+            User::query()->keyBy('name')->get()->toArray(),
+            User::query()->get()->keyBy('name')->toArray()
+        );
     }
 
     public function testHasManyRelation()
