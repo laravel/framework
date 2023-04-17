@@ -780,7 +780,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      * @template TMapToDictionaryValue
      *
      * @param  callable(TValue, TKey): array<TMapToDictionaryKey, TMapToDictionaryValue>  $callback
-     * @param  bool $keepKeys
+     * @param  bool  $keepKeys
      * @return static<TMapToDictionaryKey, array<int, TMapToDictionaryValue>>
      */
     public function mapToDictionary(callable $callback, $keepKeys = false)
