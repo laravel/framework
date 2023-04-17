@@ -36,6 +36,11 @@ class FileStore implements Store, LockProvider
     protected $filePermission;
 
     /**
+     * The path to the lock directory
+     */
+    protected ?string $lockPath = null;
+
+    /**
      * Create a new file cache store instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
@@ -210,7 +215,14 @@ class FileStore implements Store, LockProvider
      */
     public function lock($name, $seconds = 0, $owner = null)
     {
-        return new FileLock($this, $name, $seconds, $owner);
+        $this->ensureCacheDirectoryExists($this->lockPath ?? $this->directory);
+
+        return new FileLock(
+            new self($this->files, $this->lockPath ?? $this->directory, $this->filePermission),
+            $name,
+            $seconds,
+            $owner
+        );
     }
 
     /**
@@ -372,5 +384,12 @@ class FileStore implements Store, LockProvider
     public function getPrefix()
     {
         return '';
+    }
+
+    public function setLockPath(string $lockPath): self
+    {
+        $this->lockPath = $lockPath;
+
+        return $this;
     }
 }
