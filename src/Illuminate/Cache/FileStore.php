@@ -386,7 +386,7 @@ class FileStore implements Store, LockProvider
         return '';
     }
 
-    public function setLockPath(string $lockPath): self
+    public function setLockPath(?string $lockPath): self
     {
         $this->lockPath = $lockPath;
 
