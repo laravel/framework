@@ -458,12 +458,12 @@ class Builder implements BuilderContract
     /**
      * Force query results to be keyed by the given column.
      *
-     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $keyBy
      * @return $this
      */
-    public function keyBy($column)
+    public function keyBy($keyBy)
     {
-        $this->keyBy = $column;
+        $this->keyBy = $keyBy;
 
         return $this;
     }
