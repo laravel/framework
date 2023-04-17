@@ -188,6 +188,7 @@ class User extends BaseModel
             'pgsql' => 'SUBSTR(CAST(created_at AS varchar), 1, 10)',
             'sqlsrv' => 'CONVERT(date, created_at)'
         };
+
         return $this->hasMany(Post::class)->keyBy(DB::raw($cast));
     }
 }
