@@ -29,18 +29,18 @@ class FileStore implements Store, LockProvider
     protected $directory;
 
     /**
+     * The file cache lock directory.
+     *
+     * @var string|null
+     */
+    protected $lockDirectory;
+
+    /**
      * Octal representation of the cache file permissions.
      *
      * @var int|null
      */
     protected $filePermission;
-
-    /**
-     * The path to the lock directory.
-     *
-     * @var string|null
-     */
-    protected $lockPath;
 
     /**
      * Create a new file cache store instance.
@@ -217,10 +217,10 @@ class FileStore implements Store, LockProvider
      */
     public function lock($name, $seconds = 0, $owner = null)
     {
-        $this->ensureCacheDirectoryExists($this->lockPath ?? $this->directory);
+        $this->ensureCacheDirectoryExists($this->lockDirectory ?? $this->directory);
 
         return new FileLock(
-            new self($this->files, $this->lockPath ?? $this->directory, $this->filePermission),
+            new static($this->files, $this->lockDirectory ?? $this->directory, $this->filePermission),
             $name,
             $seconds,
             $owner
@@ -379,6 +379,19 @@ class FileStore implements Store, LockProvider
     }
 
     /**
+     * Set the cache directory where locks should be stored.
+     *
+     * @param  string|null  $lockDirectory
+     * @return $this
+     */
+    public function setLockDirectory($lockDirectory)
+    {
+        $this->lockDirectory = $lockDirectory;
+
+        return $this;
+    }
+
+    /**
      * Get the cache key prefix.
      *
      * @return string
@@ -386,12 +399,5 @@ class FileStore implements Store, LockProvider
     public function getPrefix()
     {
         return '';
-    }
-
-    public function setLockPath(?string $lockPath): self
-    {
-        $this->lockPath = $lockPath;
-
-        return $this;
     }
 }
