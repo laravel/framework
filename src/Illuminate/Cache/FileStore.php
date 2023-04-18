@@ -38,7 +38,7 @@ class FileStore implements Store, LockProvider
     /**
      * The path to the lock directory.
      *
-     * @var string|null $lockPath
+     * @var string|null
      */
     protected $lockPath;
 
