@@ -456,10 +456,10 @@ trait QueriesRelationships
         if (is_string($relation)) {
             $relation = $this->getRelationWithoutConstraints($relation);
         }
-        
+
         if (is_null($model)) {
-			return $this->whereNull($relation->getMorphType());
-		}
+            return $this->whereNull($relation->getMorphType());
+        }
 
         if (is_string($model)) {
             $morphMap = Relation::morphMap();
