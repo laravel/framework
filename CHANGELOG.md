@@ -1,6 +1,18 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.52.5...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.52.6...9.x)
+
+
+## [v9.52.6](https://github.com/laravel/framework/compare/v9.52.5...v9.52.6) - 2023-04-18
+
+### Fixed
+- Fixed Cache::spy incompatibility with Cache::get ([#46689](https://github.com/laravel/framework/pull/46689))
+
+### Changed
+- Remove unnecessary parameters in creatable() and destroyable() methods in  Illuminate/Routing/PendingSingletonResourceRegistration class ([#46677](https://github.com/laravel/framework/pull/46677))
+- Allow Event::assertListening to check for invokable event listeners ([#46683](https://github.com/laravel/framework/pull/46683))
+- Return non-zero exit code for uncaught exceptions ([#46541](https://github.com/laravel/framework/pull/46541))
+- Release lock for job implementing ShouldBeUnique that is dispatched afterResponse() ([#46806](https://github.com/laravel/framework/pull/46806))
 
 
 ## [v9.52.5](https://github.com/laravel/framework/compare/v9.52.4...v9.52.5) - 2023-02-25
