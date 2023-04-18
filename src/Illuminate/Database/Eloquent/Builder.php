@@ -755,7 +755,8 @@ class Builder implements BuilderContract
         // of models which have been eagerly hydrated and are readied for return.
         return $relation->match(
             $relation->initRelation($models, $name),
-            $relation->getEager(), $name
+            $relation->getEager($name),
+            $name
         );
     }
 
