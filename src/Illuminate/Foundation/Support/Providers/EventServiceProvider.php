@@ -2,7 +2,10 @@
 
 namespace Illuminate\Foundation\Support\Providers;
 
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Events\DiscoverEvents;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 
@@ -52,6 +55,10 @@ class EventServiceProvider extends ServiceProvider
             foreach ($this->observers as $model => $observers) {
                 $model::observe($observers);
             }
+        });
+
+        $this->booted(function () {
+            $this->configureEmailVerification();
         });
     }
 
@@ -155,5 +162,18 @@ class EventServiceProvider extends ServiceProvider
     protected function eventDiscoveryBasePath()
     {
         return base_path();
+    }
+
+    /**
+     * Configure the proper event listeners for email verification.
+     *
+     * @return void
+     */
+    protected function configureEmailVerification()
+    {
+        if (! isset($this->listen[Registered::class]) ||
+            ! in_array(SendEmailVerificationNotification::class, Arr::wrap($this->listen[Registered::class]))) {
+            Event::listen(Registered::class, SendEmailVerificationNotification::class);
+        }
     }
 }
