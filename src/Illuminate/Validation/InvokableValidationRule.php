@@ -162,10 +162,17 @@ class InvokableValidationRule implements Rule, ValidatorAwareRule
             ? fn ($message) => $this->messages[] = $message
             : fn ($message) => $this->messages[$attribute] = $message;
 
-        $fail = fn () => $this->failed = true;
+        $onFailure = fn () => $this->failed = true;
 
-        return new class($message ?? $attribute, $this->validator->getTranslator(), $destructor, $fail) extends PotentiallyTranslatedString
+        return new class($message ?? $attribute, $this->validator->getTranslator(), $destructor, $onFailure) extends PotentiallyTranslatedString
         {
+            /**
+             * Indicates if the validation callback failed.
+             *
+             * @var bool
+             */
+            public $failed = true;
+
             /**
              * The callback to call when the object destructs.
              *
@@ -178,14 +185,7 @@ class InvokableValidationRule implements Rule, ValidatorAwareRule
              *
              * @var \Closure
              */
-            protected $fail;
-
-            /**
-             * Indicates if the validation callback failed.
-             *
-             * @var bool
-             */
-            public $failed = true;
+            protected $onFailure;
 
             /**
              * Create a new pending potentially translated string.
@@ -193,13 +193,14 @@ class InvokableValidationRule implements Rule, ValidatorAwareRule
              * @param  string  $message
              * @param  \Illuminate\Contracts\Translation\Translator  $translator
              * @param  \Closure  $destructor
+             * @return void
              */
-            public function __construct($message, $translator, $destructor, $fail)
+            public function __construct($message, $translator, $destructor, $onFailure)
             {
                 parent::__construct($message, $translator);
 
                 $this->destructor = $destructor;
-                $this->fail = $fail;
+                $this->onFailure = $onFailure;
             }
 
             /**
@@ -237,7 +238,7 @@ class InvokableValidationRule implements Rule, ValidatorAwareRule
                     return;
                 }
 
-                ($this->fail)();
+                ($this->onFailure)();
 
                 ($this->destructor)($this->toString());
             }
