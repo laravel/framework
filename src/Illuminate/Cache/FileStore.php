@@ -37,8 +37,10 @@ class FileStore implements Store, LockProvider
 
     /**
      * The path to the lock directory.
+     *
+     * @var string|null $lockPath
      */
-    protected ?string $lockPath = null;
+    protected $lockPath;
 
     /**
      * Create a new file cache store instance.
