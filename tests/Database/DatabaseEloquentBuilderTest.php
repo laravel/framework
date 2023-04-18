@@ -1666,7 +1666,6 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->mockConnectionForModel($model, '');
 
         $builder = $model->whereMorphedTo('morph', null);
-
         $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where "morph_type" is null', $builder->toSql());
     }
 
