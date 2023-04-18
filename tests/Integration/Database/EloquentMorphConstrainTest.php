@@ -35,20 +35,18 @@ class EloquentMorphConstrainTest extends DatabaseTestCase
             $table->integer('commentable_id');
         });
 
-        Schema::create('images', function(Blueprint $table) {
+        Schema::create('images', function (Blueprint $table) {
             $table->id();
             $table->string('url');
             $table->nullableMorphs('imageable');
         });
 
-        Schema::create('morphable_posts', function(Blueprint $table) {
+        Schema::create('morphable_posts', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->string('description');
             $table->string('other_field');
         });
-
-
 
         $post1 = Post::create(['post_visible' => true]);
         (new Comment)->commentable()->associate($post1)->save();
@@ -84,7 +82,8 @@ class EloquentMorphConstrainTest extends DatabaseTestCase
         $this->assertNull($comments[3]->commentable);
     }
 
-    public function testLazyLoadingException() {
+    public function testLazyLoadingException()
+    {
         Model::shouldBeStrict();
 
         $post = MorphablePost::create([
@@ -99,7 +98,7 @@ class EloquentMorphConstrainTest extends DatabaseTestCase
         $query->with(['simplified_imageable']);
         $images = $query->get();
         $this->assertCount(2, $images);
-        foreach($images as $image) {
+        foreach ($images as $image) {
             $this->assertSame('Laravel', $image->simplified_imageable->name);
             $this->expectException(LazyLoadingViolationException::class);
             $itemName = $image->imageable->name;
@@ -137,8 +136,9 @@ class Image extends Model
     protected $fillable = [
         'url',
         'imageable_id',
-        'imageable_type'
+        'imageable_type',
     ];
+
     public function imageable()
     {
         return $this->morphTo();
@@ -148,7 +148,9 @@ class Image extends Model
     {
         return $this->morphTo('imageable')
             ->constrain([
-                MorphablePost::class => function ($query) { $query->select(['id', 'name']); },
+                MorphablePost::class => function ($query) {
+                    $query->select(['id', 'name']);
+                },
             ]);
     }
 }
@@ -161,6 +163,7 @@ class MorphablePost extends Model
         'description',
         'other_field',
     ];
+
     public function image()
     {
         return $this->morphOne(Image::class, 'imageable');
