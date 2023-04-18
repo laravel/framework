@@ -448,7 +448,7 @@ trait QueriesRelationships
      * Add a morph-to relationship condition to the query.
      *
      * @param  \Illuminate\Database\Eloquent\Relations\MorphTo|string  $relation
-     * @param  \Illuminate\Database\Eloquent\Model|string  $model
+     * @param  \Illuminate\Database\Eloquent\Model|string|null  $model
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
     public function whereMorphedTo($relation, $model, $boolean = 'and')
@@ -456,6 +456,10 @@ trait QueriesRelationships
         if (is_string($relation)) {
             $relation = $this->getRelationWithoutConstraints($relation);
         }
+        
+        if (is_null($model)) {
+			return $this->whereNull($relation->getMorphType());
+		}
 
         if (is_string($model)) {
             $morphMap = Relation::morphMap();
@@ -506,7 +510,7 @@ trait QueriesRelationships
      * Add a morph-to relationship condition to the query with an "or where" clause.
      *
      * @param  \Illuminate\Database\Eloquent\Relations\MorphTo|string  $relation
-     * @param  \Illuminate\Database\Eloquent\Model|string  $model
+     * @param  \Illuminate\Database\Eloquent\Model|string|null  $model
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
     public function orWhereMorphedTo($relation, $model)
