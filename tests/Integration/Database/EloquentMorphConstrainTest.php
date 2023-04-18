@@ -4,19 +4,12 @@ namespace Illuminate\Tests\Integration\Database\EloquentMorphConstrainTest;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Database\LazyLoadingViolationException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentMorphConstrainTest extends DatabaseTestCase
 {
-    public function tearDown(): void
-    {
-        parent::tearDown();
-        Model::shouldBeStrict(false);
-    }
-
     protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
         Schema::create('posts', function (Blueprint $table) {
@@ -40,14 +33,10 @@ class EloquentMorphConstrainTest extends DatabaseTestCase
             $table->string('url');
             $table->nullableMorphs('imageable');
         });
+    }
 
-        Schema::create('morphable_posts', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('description');
-            $table->string('other_field');
-        });
-
+    public function testMorphConstraints()
+    {
         $post1 = Post::create(['post_visible' => true]);
         (new Comment)->commentable()->associate($post1)->save();
 
@@ -59,10 +48,7 @@ class EloquentMorphConstrainTest extends DatabaseTestCase
 
         $video2 = Video::create(['video_visible' => false]);
         (new Comment)->commentable()->associate($video2)->save();
-    }
 
-    public function testMorphConstraints()
-    {
         $comments = Comment::query()
             ->with(['commentable' => function (MorphTo $morphTo) {
                 $morphTo->constrain([
@@ -82,14 +68,10 @@ class EloquentMorphConstrainTest extends DatabaseTestCase
         $this->assertNull($comments[3]->commentable);
     }
 
-    public function testLazyLoadingException()
+    public function testChildMorphIsEagerLoadedWhileParentRelationIsUnset()
     {
-        Model::shouldBeStrict();
-
-        $post = MorphablePost::create([
-            'name' => 'Laravel',
-            'description' => 'For artisans',
-            'other_field' => 'n/a',
+        $post = Post::create([
+            'post_visible' => true,
         ]);
         $post->image()->create(['url' => 'https://laravel.com']);
         $post->image()->create(['url' => 'https://forge.laravel.com']);
@@ -99,9 +81,8 @@ class EloquentMorphConstrainTest extends DatabaseTestCase
         $images = $query->get();
         $this->assertCount(2, $images);
         foreach ($images as $image) {
-            $this->assertSame('Laravel', $image->simplified_imageable->name);
-            $this->expectException(LazyLoadingViolationException::class);
-            $itemName = $image->imageable->name;
+            $this->assertTrue($image->relationLoaded('simplified_imageable'));
+            $this->assertFalse($image->relationLoaded('imageable'));
         }
     }
 }
@@ -121,6 +102,11 @@ class Post extends Model
     public $timestamps = false;
     protected $fillable = ['post_visible'];
     protected $casts = ['post_visible' => 'boolean'];
+
+    public function image()
+    {
+        return $this->morphOne(Image::class, 'imageable');
+    }
 }
 
 class Video extends Model
@@ -148,24 +134,9 @@ class Image extends Model
     {
         return $this->morphTo('imageable')
             ->constrain([
-                MorphablePost::class => function ($query) {
-                    $query->select(['id', 'name']);
+                Post::class => function ($query) {
+                    $query->select(['id', 'post_visible']);
                 },
             ]);
-    }
-}
-
-class MorphablePost extends Model
-{
-    public $timestamps = false;
-    protected $fillable = [
-        'name',
-        'description',
-        'other_field',
-    ];
-
-    public function image()
-    {
-        return $this->morphOne(Image::class, 'imageable');
     }
 }
