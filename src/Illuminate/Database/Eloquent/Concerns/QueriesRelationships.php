@@ -458,7 +458,7 @@ trait QueriesRelationships
         }
 
         if (is_null($model)) {
-            return $this->whereNull($relation->getMorphType());
+            return $this->whereNull($relation->getMorphType(), $boolean);
         }
 
         if (is_string($model)) {
