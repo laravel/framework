@@ -204,9 +204,10 @@ class InvokableValidationRule implements Rule, ValidatorAwareRule
             }
 
             /**
-             * Fail the rule and add message to errors if the given "value" is (or resolves to) truthy.
+             * Raise the error message if the given condition is true.
              *
-             * @var self
+             * @param  mixed  $failed
+             * @return $this
              */
             public function when($failed)
             {
@@ -216,9 +217,10 @@ class InvokableValidationRule implements Rule, ValidatorAwareRule
             }
 
             /**
-             * Fail the rule and add message to errors if the given "value" is (or resolves to) false.
+             * Raise the error message unless the given condition is true.
              *
-             * @var self
+             * @param  mixed  $failed
+             * @return $this
              */
             public function unless($failed)
             {
