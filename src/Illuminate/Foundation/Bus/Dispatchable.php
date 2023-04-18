@@ -96,7 +96,7 @@ trait Dispatchable
      */
     public static function dispatchAfterResponse(...$arguments)
     {
-        return app(Dispatcher::class)->dispatchAfterResponse(new static(...$arguments));
+        return self::dispatch(...$arguments)->afterResponse();
     }
 
     /**
