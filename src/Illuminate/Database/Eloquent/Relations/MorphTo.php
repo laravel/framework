@@ -113,12 +113,13 @@ class MorphTo extends BelongsTo
      *
      * Called via eager load method of Eloquent query builder.
      *
+     * @param  string|null  $relationName
      * @return mixed
      */
-    public function getEager()
+    public function getEager(?string $relationName = null)
     {
         foreach (array_keys($this->dictionary) as $type) {
-            $this->matchToMorphParents($type, $this->getResultsByType($type));
+            $this->matchToMorphParents($type, $this->getResultsByType($type), $relationName);
         }
 
         return $this->models;
@@ -208,16 +209,19 @@ class MorphTo extends BelongsTo
      *
      * @param  string  $type
      * @param  \Illuminate\Database\Eloquent\Collection  $results
+     * @param  string|null  $relationName
      * @return void
      */
-    protected function matchToMorphParents($type, Collection $results)
+    protected function matchToMorphParents($type, Collection $results, ?string $relationName = null)
     {
+        $relationName ??= $this->relationName;
+
         foreach ($results as $result) {
             $ownerKey = ! is_null($this->ownerKey) ? $this->getDictionaryKey($result->{$this->ownerKey}) : $result->getKey();
 
             if (isset($this->dictionary[$type][$ownerKey])) {
                 foreach ($this->dictionary[$type][$ownerKey] as $model) {
-                    $model->setRelation($this->relationName, $result);
+                    $model->setRelation($relationName, $result);
                 }
             }
         }
