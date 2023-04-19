@@ -2,8 +2,6 @@
 
 namespace Illuminate\Console;
 
-use Laravel\Prompts\ConfirmPrompt;
-
 use function Laravel\Prompts\confirm;
 
 trait ConfirmableTrait
@@ -33,13 +31,9 @@ trait ConfirmableTrait
             $confirmed = confirm('Are you sure you want to run this command?', default: false);
 
             if (! $confirmed) {
-                $this->newLine();
-
                 $this->components->warn('Command cancelled.');
 
                 return false;
-            } elseif (! ConfirmPrompt::shouldFallback()) {
-                $this->newLine();
             }
         }
 
