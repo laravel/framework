@@ -60,6 +60,23 @@ class EloquentPivotTest extends DatabaseTestCase
             $this->assertSame('project_id', $pivot->getForeignKey());
         });
     }
+
+    public function testPivotWithCount()
+    {
+        $user = PivotTestUser::forceCreate(['email' => 'taylor@laravel.com']);
+        $user2 = PivotTestUser::forceCreate(['email' => 'ralph@ralphschindler.com']);
+        $project = PivotTestProject::forceCreate(['name' => 'Test Project']);
+
+        $project->contributors()->attach($user);
+        $project->collaborators()->attach($user2, ['permissions' => ['hello']]);
+
+        $query = PivotTestProject::query()->withCount([
+            'collaborators' => fn($query) => $query->wherePivotNotNull('permissions')
+        ]);
+
+        $this->assertCount(1, $results = $query->get());
+        $this->assertEquals(1, $results[0]->collaborators_count);
+    }
 }
 
 class PivotTestUser extends Model
