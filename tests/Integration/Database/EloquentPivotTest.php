@@ -71,7 +71,7 @@ class EloquentPivotTest extends DatabaseTestCase
         $project->collaborators()->attach($user2, ['permissions' => ['hello']]);
 
         $query = PivotTestProject::query()->withCount([
-            'collaborators' => fn($query) => $query->wherePivotNotNull('permissions')
+            'collaborators' => fn ($query) => $query->wherePivotNotNull('permissions'),
         ]);
 
         $this->assertCount(1, $results = $query->get());
