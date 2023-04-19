@@ -11,7 +11,7 @@ use Laravel\Prompts\SuggestPrompt;
 use Laravel\Prompts\TextPrompt;
 use Symfony\Component\Console\Input\InputInterface;
 
-trait ConfiguresPromptFallbacks
+trait ConfiguresPrompts
 {
     /**
      * Configure the prompt fallbacks.
@@ -19,8 +19,10 @@ trait ConfiguresPromptFallbacks
      * @param  \Symfony\Component\Console\Input\InputInterface  $input
      * @return void
      */
-    protected function configurePromptFallbacks(InputInterface $input)
+    protected function configurePrompts(InputInterface $input)
     {
+        Prompt::setOutput($this->output);
+
         Prompt::fallbackWhen(! $input->isInteractive() || windows_os() || app()->runningUnitTests());
 
         TextPrompt::fallbackUsing(fn (TextPrompt $prompt) => $this->promptUntilValid(
