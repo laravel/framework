@@ -1445,4 +1445,89 @@ class Str
         static::$camelCache = [];
         static::$studlyCache = [];
     }
+
+    /**
+     * Extract the integer numbers from the given string.
+     *
+     * @param  string  $string
+     * @return array
+     */
+    public static function getIntegerNumbers($string)
+    {
+        preg_match_all('/(?<!\.)\b\d+\b(?!\.)/', $string, $matches);
+
+        return array_map('intval', $matches[0]);
+    }
+
+    /**
+     * Extract the float numbers from the given string.
+     *
+     * @param  string  $string
+     * @return array
+     */
+    public static function getFloatNumbers($string)
+    {
+        preg_match_all('/\b\d+\.\d+\b/', $string, $matches);
+
+        return array_map('floatval', $matches[0]);
+    }
+
+    /**
+     * Extract numbers from the given string.
+     *
+     * @param  string  $string
+     * @param  bool  $justInteger
+     * @param  bool  $justFloat
+     * @return array
+     */
+    public static function getNumbers($string, $justInteger = false, $justFloat = false)
+    {
+        if ($justFloat === $justInteger) {
+            preg_match_all('!\d+(?:\.\d+)?!', $string, $matches);
+
+            foreach ($matches[0] as $number) {
+                $numbers[] = str_contains($number, '.') ? floatval($number) : intval($number);
+            }
+
+            return $numbers ?? [];
+        }
+
+        if ($justInteger) {
+            return static::getIntegerNumbers($string);
+        }
+
+        if ($justFloat) {
+            return static::getFloatNumbers($string);
+        }
+    }
+
+    /**
+     * Extract the first number from the given string.
+     *
+     * @param  string  $string
+     * @param  bool  $integer
+     * @param  bool  $float
+     * @return int|float|null
+     */
+    public static function getFirstNumber($string, $integer = false, $float = false)
+    {
+        $numbers = static::getNumbers($string, $integer, $float);
+
+        return $numbers[0] ?? null;
+    }
+
+    /**
+     * Extract the last number from the given string.
+     *
+     * @param  string  $string
+     * @param  bool  $integer
+     * @param  bool  $float
+     * @return int|float|null
+     */
+    public static function getLastNumber($string, $integer = false, $float = false)
+    {
+        $numbers = static::getNumbers($string, $integer, $float);
+
+        return $numbers[count($numbers) - 1] ?? null;
+    }
 }
