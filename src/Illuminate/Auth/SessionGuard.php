@@ -95,7 +95,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * @var \Illuminate\Contracts\Auth\UserProvider
      */
     protected $provider;
-    
+
     /**
      * The timebox instance.
      *
