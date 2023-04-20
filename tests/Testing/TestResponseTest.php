@@ -791,6 +791,24 @@ class TestResponseTest extends TestCase
         $response->assertServerError();
     }
 
+    public function testAssertInternalServerError()
+    {
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR)
+        );
+
+        $response->assertInternalServerError();
+
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_OK)
+        );
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("Expected response status code [500] but received 200.\nFailed asserting that 500 is identical to 200.");
+
+        $response->assertInternalServerError();
+    }
+
     public function testAssertServiceUnavailable()
     {
         $response = TestResponse::fromBaseResponse(

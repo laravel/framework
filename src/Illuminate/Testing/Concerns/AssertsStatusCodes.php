@@ -182,6 +182,16 @@ trait AssertsStatusCodes
     }
 
     /**
+     * Assert that the response has a 500 "Internal Server Error" status code.
+     *
+     * @return $this
+     */
+    public function assertInternalServerError()
+    {
+        return $this->assertStatus(500);
+    }
+
+    /**
      * Assert that the response has a 503 "Service Unavailable" status code.
      *
      * @return $this
