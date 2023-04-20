@@ -1437,9 +1437,8 @@ class Str
     /**
      * Convert a list of strings into a sentence, with commas and a conjunction.
      *
-     * @param iterable<string> $items
-     * @param string           $conjunction
-     *
+     * @param  iterable<string>  $items
+     * @param  string  $conjunction
      * @return string The generated sentence.
      */
     public static function toSentence($items, $conjunction = 'and')
@@ -1451,7 +1450,7 @@ class Str
         $last = array_pop($items);
 
         if ($items) {
-            return implode(', ', $items) . " {$conjunction} " . $last;
+            return implode(', ', $items)." {$conjunction} ".$last;
         }
 
         return $last;
