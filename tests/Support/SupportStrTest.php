@@ -1119,6 +1119,13 @@ class SupportStrTest extends TestCase
     {
         $this->assertTrue(strlen(Str::password()) === 32);
     }
+
+    public function testToSentence()
+    {
+        $this->assertSame('taylor, caleb and adam', Str::toSentence(['taylor','caleb','adam']));
+        $this->assertSame('taylor and caleb', Str::toSentence(['taylor', 'caleb']));
+        $this->assertSame('taylor', Str::toSentence(['taylor']));
+    }
 }
 
 class StringableObjectStub

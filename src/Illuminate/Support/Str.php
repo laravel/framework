@@ -1435,6 +1435,29 @@ class Str
     }
 
     /**
+     * Convert an array or a Collection of strings into a sentence, with commas and a conjunction.
+     *
+     * @param array<int,string>|Collection<int,string> $items      The input array or Collection of strings.
+     * @param string|null      $conjunction The conjunction to use (default: translated 'and').
+     *
+     * @return string The generated sentence.
+     */
+    public static function toSentence($items, $conjunction = 'and')
+    {
+        if ($items instanceof Collection) {
+            $items = $items->toArray();
+        }
+
+        $last = array_pop($items);
+
+        if ($items) {
+            return implode(', ', $items) . " {$conjunction} " . $last;
+        }
+
+        return $last;
+    }
+
+    /**
      * Remove all strings from the casing caches.
      *
      * @return void
