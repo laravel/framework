@@ -1119,6 +1119,55 @@ class SupportStrTest extends TestCase
     {
         $this->assertTrue(strlen(Str::password()) === 32);
     }
+
+    public function testGetIntegerNumbers()
+    {
+        $string = 'I had 7$ and bought 3 books for 4.5$ and 1 pen for 0.5$. I have 2$ now.';
+
+        $this->assertSame([7, 3, 1, 2], Str::getIntegerNumbers($string));
+        $this->assertSame([], Str::getIntegerNumbers('There is one float number 1.5 and no integer number.'));
+        $this->assertSame([], Str::getIntegerNumbers('There is no number.'));
+    }
+
+    public function testGetFloatNumbers()
+    {
+        $string = 'I had 7$ and bought 3 books for 4.5$ and 1 pen for 0.5$. I have 2$ now.';
+
+        $this->assertSame([4.5, 0.5], Str::getFloatNumbers($string));
+        $this->assertSame([], Str::getFloatNumbers('There is 1 integer and no float number.'));
+        $this->assertSame([], Str::getFloatNumbers('There is no number.'));
+    }
+
+    public function testGetNumbers()
+    {
+        $string = 'I had 7$ and bought 3 books for 4.5$ and 1 pen for 0.5$. I have 2$ now.';
+
+        $this->assertSame([7, 3, 4.5, 1, 0.5, 2], Str::getNumbers($string));
+        $this->assertSame([7, 3, 1, 2], Str::getNumbers($string, justInteger: true));
+        $this->assertSame([4.5, 0.5], Str::getNumbers($string, justFloat: true));
+        $this->assertSame([7, 3, 4.5, 1, 0.5, 2], Str::getNumbers($string, justInteger: true, justFloat: true));
+        $this->assertSame([], Str::getNumbers('There is no number.'));
+    }
+
+    public function testGetFirstNumber()
+    {
+        $string = 'I had 7$ and bought 3 books for 4.5$ and 1 pen for 0.5$. I have 2$ now.';
+
+        $this->assertSame(7, Str::getFirstNumber($string));
+        $this->assertSame(7, Str::getFirstNumber($string, integer: true));
+        $this->assertSame(4.5, Str::getFirstNumber($string, float: true));
+        $this->assertNull(Str::getFirstNumber('There is no number.'));
+    }
+
+    public function testGetLastNumber()
+    {
+        $string = 'I had 7$ and bought 3 books for 4.5$ and 1 pen for 0.5$. I have 2$ now.';
+
+        $this->assertSame(2, Str::getLastNumber($string));
+        $this->assertSame(2, Str::getLastNumber($string, integer: true));
+        $this->assertSame(0.5, Str::getLastNumber($string, float: true));
+        $this->assertNull(Str::getLastNumber('There is no number.'));
+    }
 }
 
 class StringableObjectStub
