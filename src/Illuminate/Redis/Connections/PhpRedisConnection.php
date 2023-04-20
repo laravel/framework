@@ -528,7 +528,18 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     public function command($method, array $parameters = [])
     {
         try {
-            return parent::command($method, $parameters);
+            $isScripting = in_array($method, ['expire', 'pexpire', 'expireAt', 'pexpireAt', 'eval', 'evalSha', 'script']);
+            if ($isScripting) {
+                $this->client->clearLastError();
+            }
+
+            $result = parent::command($method, $parameters);
+
+            if ($result === false && $isScripting && ($error = $this->client->getLastError())) {
+                throw new RedisException($error);
+            }
+
+            return $result;
         } catch (RedisException $e) {
             foreach (['went away', 'socket', 'read error on connection'] as $errorMessage) {
                 if (str_contains($e->getMessage(), $errorMessage)) {
