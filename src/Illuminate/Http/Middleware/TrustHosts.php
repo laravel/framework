@@ -5,7 +5,7 @@ namespace Illuminate\Http\Middleware;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\Request;
 
-abstract class TrustHosts
+class TrustHosts
 {
     /**
      * The application instance.
@@ -30,7 +30,12 @@ abstract class TrustHosts
      *
      * @return array
      */
-    abstract public function hosts();
+    public function hosts()
+    {
+        return [
+            $this->allSubdomainsOfApplicationUrl(),
+        ];
+    }
 
     /**
      * Handle the incoming request.
