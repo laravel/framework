@@ -1123,6 +1123,7 @@ class SupportStrTest extends TestCase
     public function testToSentence()
     {
         $this->assertSame('taylor, caleb and adam', Str::toSentence(['taylor','caleb','adam']));
+        $this->assertSame('taylor, caleb and adam', Str::toSentence(collect(['taylor','caleb','adam'])));
         $this->assertSame('taylor and caleb', Str::toSentence(['taylor', 'caleb']));
         $this->assertSame('taylor', Str::toSentence(['taylor']));
     }
