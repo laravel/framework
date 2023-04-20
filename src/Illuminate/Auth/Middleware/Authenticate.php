@@ -93,7 +93,9 @@ class Authenticate implements AuthenticatesRequests
     protected function unauthenticated($request, array $guards)
     {
         throw new AuthenticationException(
-            'Unauthenticated.', $guards, $this->redirectTo($request)
+            'Unauthenticated.',
+            $guards,
+            $request->expectsJson() ? null : $this->redirectTo($request),
         );
     }
 
