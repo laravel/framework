@@ -633,7 +633,8 @@ trait QueriesRelationships
                 $expression = $column;
             }
 
-            // Apply constraints to the relation.
+            // Apply constraints to the relation so the user can rely on the
+            // scopes/helpers of the relation rather than the Builder.
             $constraints($relation);
 
             // Here, we will grab the relationship sub-query and prepare to add it to the main query
