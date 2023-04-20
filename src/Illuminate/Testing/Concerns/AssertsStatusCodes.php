@@ -180,4 +180,14 @@ trait AssertsStatusCodes
     {
         return $this->assertStatus(429);
     }
+
+    /**
+     * Assert that the response has a 503 "Service Unavailable" status code.
+     *
+     * @return $this
+     */
+    public function assertServiceUnavailable()
+    {
+        return $this->assertStatus(503);
+    }
 }

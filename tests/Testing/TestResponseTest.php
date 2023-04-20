@@ -791,6 +791,24 @@ class TestResponseTest extends TestCase
         $response->assertServerError();
     }
 
+    public function testAssertServiceUnavailable()
+    {
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_SERVICE_UNAVAILABLE)
+        );
+
+        $response->assertServiceUnavailable();
+
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_OK)
+        );
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("Expected response status code [503] but received 200.\nFailed asserting that 503 is identical to 200.");
+
+        $response->assertServiceUnavailable();
+    }
+
     public function testAssertNoContentAsserts204StatusCodeByDefault()
     {
         $statusCode = 500;
