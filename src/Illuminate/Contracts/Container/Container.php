@@ -82,7 +82,7 @@ interface Container extends ContainerInterface
      * @return void
      */
     public function bindWhen($condition, $abstract, $concrete = null, $shared = false);
-    
+
     /**
      * Register a shared binding in the container.
      *
