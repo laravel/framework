@@ -75,6 +75,13 @@ class Kernel implements KernelContract
     protected $commandsLoaded = false;
 
     /**
+     * The commands paths that have been "loaded".
+     *
+     * @var array
+     */
+    protected $loadedPaths = [];
+
+    /**
      * All of the registered command duration handlers.
      *
      * @var array
@@ -338,6 +345,10 @@ class Kernel implements KernelContract
             return;
         }
 
+        $this->loadedPaths = array_values(
+            array_unique(array_merge($this->loadedPaths, $paths))
+        );
+
         $namespace = $this->app->getNamespace();
 
         foreach ((new Finder)->in($paths)->files() as $file) {
@@ -452,6 +463,10 @@ class Kernel implements KernelContract
         if (! $this->commandsLoaded) {
             $this->commands();
 
+            if (! in_array($defaultCommandPath = $this->defaultCommandPath(), $this->loadedPaths)) {
+                $this->load($defaultCommandPath);
+            }
+
             $this->commandsLoaded = true;
         }
     }
@@ -468,6 +483,16 @@ class Kernel implements KernelContract
                 return $bootstrapper === \Illuminate\Foundation\Bootstrap\BootProviders::class;
             })->all()
         );
+    }
+
+    /**
+     * Get the default command path for the kernel.
+     *
+     * @return string
+     */
+    protected function defaultCommandPath()
+    {
+        return dirname((new ReflectionClass($this))->getFileName()).'/Commands';
     }
 
     /**
