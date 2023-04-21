@@ -326,4 +326,14 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
 
         return $this;
     }
+    
+    /**
+     * Convert the rule to a validation string.
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return implode('|', $this->buildValidationRules());
+    }
 }
