@@ -73,17 +73,6 @@ interface Container extends ContainerInterface
     public function bindIf($abstract, $concrete = null, $shared = false);
 
     /**
-     * Register a binding when condition is true.
-     *
-     * @param  bool  $condition
-     * @param  string  $abstract
-     * @param  \Closure|string|null  $concrete
-     * @param  bool  $shared
-     * @return void
-     */
-    public function bindWhen($condition, $abstract, $concrete = null, $shared = false);
-
-    /**
      * Register a shared binding in the container.
      *
      * @param  string  $abstract
