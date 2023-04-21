@@ -7,20 +7,22 @@ use Closure;
 class TrimStrings extends TransformsRequest
 {
     /**
-     * All of the registered skip callbacks.
-     *
-     * @var array
-     */
-    protected static $skipCallbacks = [];
-
-    /**
      * The attributes that should not be trimmed.
      *
      * @var array<int, string>
      */
     protected $except = [
-        //
+        'current_password',
+        'password',
+        'password_confirmation',
     ];
+
+    /**
+     * All of the registered skip callbacks.
+     *
+     * @var array
+     */
+    protected static $skipCallbacks = [];
 
     /**
      * Handle an incoming request.
