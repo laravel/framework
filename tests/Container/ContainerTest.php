@@ -69,9 +69,6 @@ class ContainerTest extends TestCase
     public function testBindWhenIfConditionIsTrue()
     {
         $container = new Container;
-        $container->bind('surname', function () {
-            return 'Taylor';
-        });
         $container->bindWhen(true, 'name', function () {
             return 'Dayle';
         });
