@@ -79,6 +79,16 @@ class ContainerTest extends TestCase
         $this->assertSame('Dayle', $container->make('name'));
     }
 
+    public function testBindWhenIfConditionIsFalse()
+    {
+        $container = new Container;
+        $container->bindWhen(false, 'name', function () {
+            return 'Dayle';
+        });
+
+        $this->assertFalse($container->bound('name'));
+    }
+
     public function testSingletonIfDoesntRegisterIfBindingAlreadyRegistered()
     {
         $container = new Container;
