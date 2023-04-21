@@ -444,7 +444,8 @@ class Kernel implements KernelContract
         if (! $this->commandsLoaded) {
             $this->commands();
 
-            if (! in_array($defaultCommandPath = $this->defaultCommandPath(), $this->loadedPaths)) {
+            if ($this->shouldDiscoverCommands() &&
+                ! in_array($defaultCommandPath = $this->defaultCommandPath(), $this->loadedPaths)) {
                 $this->load($defaultCommandPath);
             }
 
@@ -474,6 +475,16 @@ class Kernel implements KernelContract
     protected function defaultCommandPath()
     {
         return dirname((new ReflectionClass($this))->getFileName()).'/Commands';
+    }
+
+    /**
+     * Determine if the kernel should discover commands.
+     *
+     * @return bool
+     */
+    protected function shouldDiscoverCommands()
+    {
+        return true;
     }
 
     /**
