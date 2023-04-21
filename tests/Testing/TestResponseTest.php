@@ -609,7 +609,6 @@ class TestResponseTest extends TestCase
         $this->expectExceptionMessage("Expected response status code [400] but received 200.\nFailed asserting that 400 is identical to 200.");
 
         $response->assertBadRequest();
-        $this->fail();
     }
 
     public function testAssertRequestTimeout()
@@ -628,7 +627,6 @@ class TestResponseTest extends TestCase
         $this->expectExceptionMessage("Expected response status code [408] but received 200.\nFailed asserting that 408 is identical to 200.");
 
         $response->assertRequestTimeout();
-        $this->fail();
     }
 
     public function testAssertPaymentRequired()
@@ -647,7 +645,6 @@ class TestResponseTest extends TestCase
         $this->expectExceptionMessage("Expected response status code [402] but received 200.\nFailed asserting that 402 is identical to 200.");
 
         $response->assertPaymentRequired();
-        $this->fail();
     }
 
     public function testAssertMovedPermanently()
@@ -666,7 +663,6 @@ class TestResponseTest extends TestCase
         $this->expectExceptionMessage("Expected response status code [301] but received 200.\nFailed asserting that 301 is identical to 200.");
 
         $response->assertMovedPermanently();
-        $this->fail();
     }
 
     public function testAssertFound()
@@ -685,7 +681,6 @@ class TestResponseTest extends TestCase
         $this->expectExceptionMessage("Expected response status code [302] but received 200.\nFailed asserting that 302 is identical to 200.");
 
         $response->assertFound();
-        $this->fail();
     }
 
     public function testAssertConflict()
@@ -704,7 +699,6 @@ class TestResponseTest extends TestCase
         $this->expectExceptionMessage("Expected response status code [409] but received 200.\nFailed asserting that 409 is identical to 200.");
 
         $response->assertConflict();
-        $this->fail();
     }
 
     public function testAssertGone()
@@ -741,7 +735,6 @@ class TestResponseTest extends TestCase
         $this->expectExceptionMessage("Expected response status code [429] but received 200.\nFailed asserting that 429 is identical to 200.");
 
         $response->assertTooManyRequests();
-        $this->fail();
     }
 
     public function testAssertAccepted()
@@ -760,7 +753,6 @@ class TestResponseTest extends TestCase
         $this->expectExceptionMessage("Expected response status code [202] but received 200.\nFailed asserting that 202 is identical to 200.");
 
         $response->assertAccepted();
-        $this->fail();
     }
 
     public function testAssertUnprocessable()
