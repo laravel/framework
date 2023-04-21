@@ -149,6 +149,15 @@ class FoundationFormRequestTest extends TestCase
         $this->assertSame('bar', $request->validated('nested.foo'));
     }
 
+    public function testRequestCanPassWithoutRulesMethod()
+    {
+        $request = $this->createRequest([], FoundationTestFormRequestWithoutRulesMethod::class);
+
+        $request->validateResolved();
+
+        $this->assertEquals([], $request->all());
+    }
+
     /**
      * Catch the given exception thrown from the executor, and return it.
      *
@@ -375,5 +384,13 @@ class FoundationTestFormRequestPassesWithResponseStub extends FormRequest
     public function authorize()
     {
         return Response::allow('baz');
+    }
+}
+
+class FoundationTestFormRequestWithoutRulesMethod extends FormRequest
+{
+    public function authorize()
+    {
+        return true;
     }
 }
