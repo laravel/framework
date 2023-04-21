@@ -109,7 +109,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
      */
     protected function createDefaultValidator(ValidationFactory $factory)
     {
-        $rules = $this->container->call([$this, 'rules']);
+        $rules = method_exists($this, 'rules') ? $this->container->call([$this, 'rules']) : [];
 
         $validator = $factory->make(
             $this->validationData(), $rules,
