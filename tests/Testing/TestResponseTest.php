@@ -725,6 +725,25 @@ class TestResponseTest extends TestCase
         $response->assertGone();
     }
 
+    public function testAssertUriTooLong()
+    {
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_REQUEST_URI_TOO_LONG)
+        );
+
+        $response->assertUriTooLong();
+
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_OK)
+        );
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("Expected response status code [414] but received 200.\nFailed asserting that 414 is identical to 200.");
+
+        $response->assertUriTooLong();
+        $this->fail();
+    }
+
     public function testAssertTooManyRequests()
     {
         $response = TestResponse::fromBaseResponse(
