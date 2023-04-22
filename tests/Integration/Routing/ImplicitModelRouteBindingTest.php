@@ -363,17 +363,17 @@ PHP);
 
         $response = $this->getJson("/post/{$post->id}/tag/{$tag->slug}");
         $response->assertJsonFragment(['slug' => $tag->slug]);
-        $response->assertJsonPath('1', (string)$post->id);
+        $response->assertJsonPath('1', (string) $post->id);
         $response->assertJsonPath('2', "/post/{$post->id}/tag/{$tag->slug}");
 
         $response = $this->getJson("/post/{$post->id}/tag-id/{$tag->id}");
         $response->assertJsonFragment(['slug' => $tag->slug]);
-        $response->assertJsonPath('1', (string)$post->id);
+        $response->assertJsonPath('1', (string) $post->id);
         $response->assertJsonPath('2', "/post/{$post->id}/tag-id/{$tag->id}");
 
         $response = $this->getJson("/post/{$post->id}/tag-slug/{$tag->slug}");
         $response->assertJsonFragment(['slug' => $tag->slug]);
-        $response->assertJsonPath('1', (string)$post->id);
+        $response->assertJsonPath('1', (string) $post->id);
         $response->assertJsonPath('2', "/post/{$post->id}/tag-slug/{$tag->slug}");
     }
 }

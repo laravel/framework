@@ -57,12 +57,12 @@ trait ResolvesRouteDependencies
                       $parameter->isDefaultValueAvailable()) {
                 $this->spliceIntoParameters($parameters, $key, $parameter->getDefaultValue());
             } elseif (array_key_exists($matchingName = $parameter->getName(), $parameters) 
-                      && $parameter->hasType() 
+                      && $parameter->hasType()
                       && $parameter->getType()->isBuiltin() === false) {
                 $instanceCount++;
 
                 $this->spliceIntoParameters($parameters, $key, $parameters[$matchingName]);
-                
+
                 unset($parameters[$matchingName]);
             }
         }
