@@ -56,7 +56,7 @@ trait ResolvesRouteDependencies
             } elseif (! isset($values[$key - $instanceCount]) &&
                       $parameter->isDefaultValueAvailable()) {
                 $this->spliceIntoParameters($parameters, $key, $parameter->getDefaultValue());
-            } elseif (array_key_exists($matchingName = $parameter->getName(), $parameters) 
+            } elseif (array_key_exists($matchingName = $parameter->getName(), $parameters)
                       && $parameter->hasType()
                       && $parameter->getType()->isBuiltin() === false) {
                 $instanceCount++;
