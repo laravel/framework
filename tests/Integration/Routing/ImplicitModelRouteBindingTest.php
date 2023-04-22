@@ -339,7 +339,6 @@ PHP);
         $response->assertJsonFragment(['slug' => $tag->slug]);
     }
 
-
     public function testImplicitRouteBindingResolvesShuffledDependencies()
     {
         $user = ImplicitBindingUser::create(['name' => 'Michael Nabil']);
