@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\Concerns\InteractsWithPublishedFiles;
@@ -305,6 +306,75 @@ PHP);
 
         $response = $this->getJson("/post/{$post->id}/tag-slug/{$tag->slug}");
         $response->assertJsonFragment(['id' => $tag->id]);
+    }
+
+    public function testImplicitRouteBindingResolvesOnlyRequestedTypeHints()
+    {
+        $user = ImplicitBindingUser::create(['name' => 'Michael Nabil']);
+        $post = ImplicitBindingPost::create(['user_id' => $user->id]);
+        $tag = ImplicitBindingTag::create([
+            'slug' => 'slug',
+            'post_id' => $post->id,
+        ]);
+
+        config(['app.key' => str_repeat('a', 32)]);
+
+        $function = function (ImplicitBindingTag $tag) {
+            return [$tag];
+        };
+
+        Route::middleware(['web'])->group(function () use ($function) {
+            Route::get('/post/{post}/tag/{tag}', $function);
+            Route::get('/post/{post}/tag-id/{tag:id}', $function);
+            Route::get('/post/{post}/tag-slug/{tag:slug}', $function);
+        });
+
+        $response = $this->getJson("/post/{$post->id}/tag/{$tag->slug}");
+        $response->assertJsonFragment(['slug' => $tag->slug]);
+
+        $response = $this->getJson("/post/{$post->id}/tag-id/{$tag->id}");
+        $response->assertJsonFragment(['slug' => $tag->slug]);
+
+        $response = $this->getJson("/post/{$post->id}/tag-slug/{$tag->slug}");
+        $response->assertJsonFragment(['slug' => $tag->slug]);
+    }
+
+
+    public function testImplicitRouteBindingResolvesShuffledDependencies()
+    {
+        $user = ImplicitBindingUser::create(['name' => 'Michael Nabil']);
+        $post = ImplicitBindingPost::create(['user_id' => $user->id]);
+        $tag = ImplicitBindingTag::create([
+            'slug' => 'slug',
+            'post_id' => $post->id,
+        ]);
+
+        config(['app.key' => str_repeat('a', 32)]);
+
+        $function = function (ImplicitBindingTag $tag, Request $request, $postId) {
+            return [$tag, $postId, $request->getRequestUri()];
+        };
+
+        Route::middleware(['web'])->group(function () use ($function) {
+            Route::get('/post/{post}/tag/{tag}', $function);
+            Route::get('/post/{post}/tag-id/{tag:id}', $function);
+            Route::get('/post/{post}/tag-slug/{tag:slug}', $function);
+        });
+
+        $response = $this->getJson("/post/{$post->id}/tag/{$tag->slug}");
+        $response->assertJsonFragment(['slug' => $tag->slug]);
+        $response->assertJsonPath('1', (string)$post->id);
+        $response->assertJsonPath('2', "/post/{$post->id}/tag/{$tag->slug}");
+
+        $response = $this->getJson("/post/{$post->id}/tag-id/{$tag->id}");
+        $response->assertJsonFragment(['slug' => $tag->slug]);
+        $response->assertJsonPath('1', (string)$post->id);
+        $response->assertJsonPath('2', "/post/{$post->id}/tag-id/{$tag->id}");
+
+        $response = $this->getJson("/post/{$post->id}/tag-slug/{$tag->slug}");
+        $response->assertJsonFragment(['slug' => $tag->slug]);
+        $response->assertJsonPath('1', (string)$post->id);
+        $response->assertJsonPath('2', "/post/{$post->id}/tag-slug/{$tag->slug}");
     }
 }
 
