@@ -72,7 +72,7 @@ class FileFactory
     protected function generateImage($width, $height, $extension)
     {
         if (! function_exists('imagecreatetruecolor')) {
-            throw new \LogicException("GD extension is not installed");
+            throw new \LogicException('GD extension is not installed');
         }
 
         return tap(tmpfile(), function ($temp) use ($width, $height, $extension) {
