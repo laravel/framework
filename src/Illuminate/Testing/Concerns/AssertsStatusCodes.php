@@ -172,6 +172,16 @@ trait AssertsStatusCodes
     }
 
     /**
+     * Assert that the response has a 417 "Expectation Failed" status code.
+     *
+     * @return $this
+     */
+    public function assertExpectationFailed()
+    {
+        return $this->assertStatus(417);
+    }
+
+    /**
      * Assert that the response has a 422 "Unprocessable Entity" status code.
      *
      * @return $this
