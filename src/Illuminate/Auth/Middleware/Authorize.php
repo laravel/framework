@@ -33,7 +33,7 @@ class Authorize
      * @param  string  ...$models
      * @return string
      */
-    public static function can($ability, ...$models)
+    public static function using($ability, ...$models)
     {
         return static::class.':'.implode(',', [$ability, ...$models]);
     }

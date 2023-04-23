@@ -57,13 +57,13 @@ class AuthorizeMiddlewareTest extends TestCase
 
     public function testItCanGenerateDefinitionViaStaticMethod()
     {
-        $signature = (string) Authorize::can('ability');
+        $signature = (string) Authorize::using('ability');
         $this->assertSame('Illuminate\Auth\Middleware\Authorize:ability', $signature);
 
-        $signature = (string) Authorize::can('ability', 'model');
+        $signature = (string) Authorize::using('ability', 'model');
         $this->assertSame('Illuminate\Auth\Middleware\Authorize:ability,model', $signature);
 
-        $signature = (string) Authorize::can('ability', 'model', \App\Models\Comment::class);
+        $signature = (string) Authorize::using('ability', 'model', \App\Models\Comment::class);
         $this->assertSame('Illuminate\Auth\Middleware\Authorize:ability,model,App\Models\Comment', $signature);
     }
 
