@@ -49,6 +49,8 @@ class FileFactory
      * @param  int  $width
      * @param  int  $height
      * @return \Illuminate\Http\Testing\File
+     *
+     * @throws \LogicException
      */
     public function image($name, $width = 10, $height = 10)
     {
@@ -64,9 +66,15 @@ class FileFactory
      * @param  int  $height
      * @param  string  $extension
      * @return resource
+     *
+     * @throws \LogicException
      */
     protected function generateImage($width, $height, $extension)
     {
+        if (! function_exists('imagecreatetruecolor')) {
+            throw new \LogicException("GD extension is not installed");
+        }
+
         return tap(tmpfile(), function ($temp) use ($width, $height, $extension) {
             ob_start();
 
@@ -75,6 +83,11 @@ class FileFactory
                 : 'jpeg';
 
             $image = imagecreatetruecolor($width, $height);
+
+            if (! function_exists($functionName = "image{$extension}")) {
+                ob_get_clean();
+                throw new \LogicException("{$functionName} does not exist and image cannot be generated");
+            }
 
             call_user_func("image{$extension}", $image);
 
