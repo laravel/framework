@@ -725,6 +725,24 @@ class TestResponseTest extends TestCase
         $response->assertGone();
     }
 
+    public function testAssertRequestEntityTooLarge()
+    {
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_REQUEST_ENTITY_TOO_LARGE)
+        );
+
+        $response->assertRequestEntityTooLarge();
+
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_OK)
+        );
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("Expected response status code [413] but received 200.\nFailed asserting that 413 is identical to 200.");
+
+        $response->assertRequestEntityTooLarge();
+    }
+
     public function testAssertTooManyRequests()
     {
         $response = TestResponse::fromBaseResponse(
