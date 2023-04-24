@@ -2,6 +2,8 @@
 
 namespace Illuminate\Http\Testing;
 
+use LogicException;
+
 class FileFactory
 {
     /**
@@ -72,7 +74,7 @@ class FileFactory
     protected function generateImage($width, $height, $extension)
     {
         if (! function_exists('imagecreatetruecolor')) {
-            throw new \LogicException('GD extension is not installed');
+            throw new LogicException('GD extension is not installed.');
         }
 
         return tap(tmpfile(), function ($temp) use ($width, $height, $extension) {
@@ -86,7 +88,8 @@ class FileFactory
 
             if (! function_exists($functionName = "image{$extension}")) {
                 ob_get_clean();
-                throw new \LogicException("{$functionName} does not exist and image cannot be generated");
+
+                throw new LogicException("{$functionName} function is not defined and image cannot be generated.");
             }
 
             call_user_func("image{$extension}", $image);
