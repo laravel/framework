@@ -27,6 +27,18 @@ class Authorize
     }
 
     /**
+     * Specify the ability and models for the middleware.
+     *
+     * @param  string  $ability
+     * @param  string  ...$models
+     * @return string
+     */
+    public static function using($ability, ...$models)
+    {
+        return static::class.':'.implode(',', [$ability, ...$models]);
+    }
+
+    /**
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
