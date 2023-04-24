@@ -29,6 +29,8 @@ class DatabaseServiceProvider extends ServiceProvider
         Model::setConnectionResolver($this->app['db']);
 
         Model::setEventDispatcher($this->app['events']);
+
+        Model::setEloquentScopes($this->app['eloquent.scopes']);
     }
 
     /**
@@ -41,6 +43,7 @@ class DatabaseServiceProvider extends ServiceProvider
         Model::clearBootedModels();
 
         $this->registerConnectionServices();
+        $this->registerEloquentScopes();
         $this->registerEloquentFactory();
         $this->registerQueueableEntityResolver();
     }
@@ -76,6 +79,18 @@ class DatabaseServiceProvider extends ServiceProvider
 
         $this->app->singleton('db.transactions', function ($app) {
             return new DatabaseTransactionsManager;
+        });
+    }
+
+    /**
+     * Register the Eloquent Model Global Scopes hub.
+     *
+     * @return void
+     */
+    protected function registerEloquentScopes()
+    {
+        $this->app->singleton('eloquent.scopes', function () {
+            return new Eloquent\Scopes;
         });
     }
 

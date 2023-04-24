@@ -148,11 +148,11 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected static $traitInitializers = [];
 
     /**
-     * The array of global scopes on the model.
+     * The Global Scopes hub.
      *
-     * @var array
+     * @var \Illuminate\Database\Eloquent\Scopes|null
      */
-    protected static $globalScopes = [];
+    protected static $globalScopes;
 
     /**
      * The list of models classes that should not be affected with touch.
@@ -344,7 +344,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     {
         static::$booted = [];
 
-        static::$globalScopes = [];
+        static::$globalScopes?->flushGlobalScopesForModel(static::class);
     }
 
     /**

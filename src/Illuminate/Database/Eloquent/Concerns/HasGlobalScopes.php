@@ -2,13 +2,29 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
-use Closure;
-use Illuminate\Database\Eloquent\Scope;
-use Illuminate\Support\Arr;
-use InvalidArgumentException;
-
 trait HasGlobalScopes
 {
+    /**
+     * Sets the Eloquent Scopes hub for models.
+     *
+     * @param  \Illuminate\Database\Eloquent\Scopes  $eloquentScopes
+     * @return void
+     */
+    public static function setEloquentScopes($eloquentScopes)
+    {
+        static::$globalScopes = $eloquentScopes;
+    }
+
+    /**
+     * Unset the Eloquent Scopes hub for models.
+     *
+     * @return void
+     */
+    public static function unsetEloquentScopes()
+    {
+        static::$globalScopes = null;
+    }
+
     /**
      * Register a new global scope on the model.
      *
@@ -20,15 +36,7 @@ trait HasGlobalScopes
      */
     public static function addGlobalScope($scope, $implementation = null)
     {
-        if (is_string($scope) && ($implementation instanceof Closure || $implementation instanceof Scope)) {
-            return static::$globalScopes[static::class][$scope] = $implementation;
-        } elseif ($scope instanceof Closure) {
-            return static::$globalScopes[static::class][spl_object_hash($scope)] = $scope;
-        } elseif ($scope instanceof Scope) {
-            return static::$globalScopes[static::class][get_class($scope)] = $scope;
-        }
-
-        throw new InvalidArgumentException('Global scope must be an instance of Closure or Scope.');
+        return static::$globalScopes->addGlobalScope(static::class, $scope, $implementation);
     }
 
     /**
@@ -39,7 +47,7 @@ trait HasGlobalScopes
      */
     public static function hasGlobalScope($scope)
     {
-        return ! is_null(static::getGlobalScope($scope));
+        return static::$globalScopes->hasGlobalScope(static::class, $scope);
     }
 
     /**
@@ -50,22 +58,16 @@ trait HasGlobalScopes
      */
     public static function getGlobalScope($scope)
     {
-        if (is_string($scope)) {
-            return Arr::get(static::$globalScopes, static::class.'.'.$scope);
-        }
-
-        return Arr::get(
-            static::$globalScopes, static::class.'.'.get_class($scope)
-        );
+        return static::$globalScopes->getGlobalScope(static::class, $scope);
     }
 
     /**
      * Get the global scopes for this class instance.
      *
-     * @return array
+     * @return array<string, array<\Illuminate\Database\Eloquent\Scope|string|callable>>
      */
     public function getGlobalScopes()
     {
-        return Arr::get(static::$globalScopes, static::class, []);
+        return static::$globalScopes->getGlobalScopesForModel(static::class);
     }
 }

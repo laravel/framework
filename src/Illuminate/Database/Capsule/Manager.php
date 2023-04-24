@@ -7,6 +7,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connectors\ConnectionFactory;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Database\Eloquent\Scopes;
 use Illuminate\Support\Traits\CapsuleManagerTrait;
 use PDO;
 
@@ -133,6 +134,8 @@ class Manager
     public function bootEloquent()
     {
         Eloquent::setConnectionResolver($this->manager);
+
+        Eloquent::setEloquentScopes(new Scopes());
 
         // If we have an event dispatcher instance, we will go ahead and register it
         // with the Eloquent ORM, allowing for model callbacks while creating and
