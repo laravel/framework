@@ -24,6 +24,17 @@ class ThrottleRequests
     protected $limiter;
 
     /**
+     * Create a new request throttler.
+     *
+     * @param  \Illuminate\Cache\RateLimiter  $limiter
+     * @return void
+     */
+    public function __construct(RateLimiter $limiter)
+    {
+        $this->limiter = $limiter;
+    }
+
+    /**
      * Specify the named rate limiter to use for the middleware.
      *
      * @param  string  $name
@@ -47,17 +58,6 @@ class ThrottleRequests
     public static function with($maxAttempts = 60, $decayMinutes = 1, $prefix = '')
     {
         return static::class.':'.implode(',', func_get_args());
-    }
-
-    /**
-     * Create a new request throttler.
-     *
-     * @param  \Illuminate\Cache\RateLimiter  $limiter
-     * @return void
-     */
-    public function __construct(RateLimiter $limiter)
-    {
-        $this->limiter = $limiter;
     }
 
     /**
