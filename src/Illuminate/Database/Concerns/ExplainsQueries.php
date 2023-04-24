@@ -21,4 +21,20 @@ trait ExplainsQueries
 
         return new Collection($explanation);
     }
+
+    /**
+     * Explain Analyze the query.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function explainAnalyze()
+    {
+        $sql = $this->toSql();
+
+        $bindings = $this->getBindings();
+
+        $explanation = $this->getConnection()->select('EXPLAIN ANALYZE '.$sql, $bindings);
+
+        return new Collection($explanation);
+    }
 }

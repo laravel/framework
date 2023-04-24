@@ -102,6 +102,7 @@ class Builder implements BuilderContract
         'exists',
         'existsOr',
         'explain',
+        'explainAnalyze',
         'getBindings',
         'getConnection',
         'getGrammar',
