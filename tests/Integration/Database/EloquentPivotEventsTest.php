@@ -59,6 +59,8 @@ class EloquentPivotEventsTest extends DatabaseTestCase
         PivotEventsTestCollaborator::$eventsCalled = [];
         $project->collaborators()->detach($user);
         $this->assertEquals(['deleting', 'deleted'], PivotEventsTestCollaborator::$eventsCalled);
+        $this->assertEquals('owner', PivotEventsTestCollaborator::$lastModelDeleting->role);
+        $this->assertEquals('owner', PivotEventsTestCollaborator::$lastModelDeleted->role);
     }
 
     public function testPivotWithPivotCriteriaTriggerEventsToBeFiredOnCreateUpdateNoneOnDetach()
@@ -158,6 +160,9 @@ class PivotEventsTestCollaborator extends Pivot
 
     public static $eventsCalled = [];
 
+    public static $lastModelDeleting = null;
+    public static $lastModelDeleted = null;
+
     public static function boot()
     {
         parent::boot();
@@ -190,10 +195,12 @@ class PivotEventsTestCollaborator extends Pivot
 
         static::deleting(function ($model) {
             static::$eventsCalled[] = 'deleting';
+            static::$lastModelDeleting = $model;
         });
 
         static::deleted(function ($model) {
             static::$eventsCalled[] = 'deleted';
+            static::$lastModelDeleted = $model;
         });
     }
 }
