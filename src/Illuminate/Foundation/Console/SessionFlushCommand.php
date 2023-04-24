@@ -4,12 +4,13 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Console\ConfirmableTrait;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'session:flush')]
 class SessionFlushCommand extends Command
 {
+    use ConfirmableTrait;
     /**
      * The console command name.
      *
@@ -31,12 +32,10 @@ class SessionFlushCommand extends Command
      */
     public function handle()
     {
-        $isConfirmed =  $this->confirm('Do you really wish to run this command?',false);
-
-        if($isConfirmed){
+        if ($this->confirmToProceed('Do you really wish to run this command?')) {
             $driver = config('session.driver');
-            $method_name = 'clean'.ucfirst($driver);
-            if ( method_exists($this, $method_name) ) {
+            $method_name = 'clean' . ucfirst($driver);
+            if (method_exists($this, $method_name)) {
                 try {
                     $this->$method_name();
                     $this->components->info('Session Data Flushed Successfully.');
@@ -47,27 +46,23 @@ class SessionFlushCommand extends Command
                 $this->components->error("Unable to clean the sessions of the driver '{$driver}'.");
             }
         }
-        else{
-            $this->components->warn('Command Canceled');
-        }
-
     }
     //file
-    protected function cleanFile ()
+    protected function cleanFile()
     {
         $directory = config('session.files');
         $ignoreFiles = ['.gitignore', '.', '..'];
 
         $files = scandir($directory);
 
-        foreach ( $files as $file ) {
-            if( !in_array($file,$ignoreFiles) ) {
+        foreach ($files as $file) {
+            if (!in_array($file, $ignoreFiles)) {
                 unlink($directory . '/' . $file);
             }
         }
     }
     //database
-    protected function cleanDatabase ()
+    protected function cleanDatabase()
     {
         $table = config('session.table');
         DB::table($table)->truncate();
@@ -80,11 +75,9 @@ class SessionFlushCommand extends Command
     //Redis
     protected function cleanRedis()
     {
-        Cache::store("redis")->flush();
     }
     //Memcached
     protected function cleanMemcached()
     {
-        Cache::store("memcached")->flush();
     }
 }
