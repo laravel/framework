@@ -16,7 +16,8 @@ use Traversable;
 
 /**
  * @template TKey of array-key
- * @template TValue
+ *
+ * @template-covariant TValue
  *
  * @implements \Illuminate\Support\Enumerable<TKey, TValue>
  */
