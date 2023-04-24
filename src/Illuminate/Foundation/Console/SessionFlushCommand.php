@@ -3,9 +3,9 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
-use Symfony\Component\Console\Attribute\AsCommand;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
+use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'session:flush')]
 class SessionFlushCommand extends Command
@@ -31,21 +31,30 @@ class SessionFlushCommand extends Command
      */
     public function handle()
     {
-        $driver = config('session.driver');
-        $method_name = 'clean' . ucfirst($driver);
-        if ( method_exists($this, $method_name) ) {
-            try {
-                $this->$method_name();
-                $this->components->info('Session data cleaned.');
-            } catch (\Exception $e) {
-                $this->components->error($e->getMessage());
+        $isConfirmed =  $this->confirm('Do you really wish to run this command?',false);
+
+        if($isConfirmed){
+            $driver = config('session.driver');
+            $method_name = 'clean'.ucfirst($driver);
+            if ( method_exists($this, $method_name) ) {
+                try {
+                    $this->$method_name();
+                    $this->components->info('Session Data Flushed Successfully.');
+                } catch (\Exception $e) {
+                    $this->components->error($e->getMessage());
+                }
+            } else {
+                $this->components->error("Unable to clean the sessions of the driver '{$driver}'.");
             }
-        } else {
-            $this->components->error("Unable to clean the sessions of the driver '{$driver}'.");
         }
+        else{
+            $this->components->warn('Command Canceled');
+        }
+
     }
     //file
-    protected function cleanFile () {
+    protected function cleanFile ()
+    {
         $directory = config('session.files');
         $ignoreFiles = ['.gitignore', '.', '..'];
 
@@ -58,20 +67,24 @@ class SessionFlushCommand extends Command
         }
     }
     //database
-    protected function cleanDatabase () {
+    protected function cleanDatabase ()
+    {
         $table = config('session.table');
         DB::table($table)->truncate();
     }
     //cookie
-    protected function cleanCookie(){
+    protected function cleanCookie()
+    {
         throw new \Exception("Session driver 'cookie' cant be flushed");
     }
     //Redis
-    protected function cleanRedis(){
+    protected function cleanRedis()
+    {
         Cache::store("redis")->flush();
     }
     //Memcached
-    protected function cleanMemcached(){
+    protected function cleanMemcached()
+    {
         Cache::store("memcached")->flush();
     }
 }
