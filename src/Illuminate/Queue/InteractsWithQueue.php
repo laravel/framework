@@ -71,7 +71,7 @@ trait InteractsWithQueue
     public function release($delay = 0)
     {
         $delay = $delay instanceof DateTimeInterface
-            ? $this->secondsUntil($delay) 
+            ? $this->secondsUntil($delay)
             : $delay;
 
         if ($this->job) {
