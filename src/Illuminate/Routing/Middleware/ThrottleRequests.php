@@ -24,7 +24,7 @@ class ThrottleRequests
     protected $limiter;
 
     /**
-     * Specify the name rate limitr to use for the middleware.
+     * Specify the named rate limiter to use for the middleware.
      *
      * @param  string  $name
      * @return string
@@ -35,7 +35,7 @@ class ThrottleRequests
     }
 
     /**
-     * Specify the rate limit configuration for the middleware.
+     * Specify the rate limiter configuration for the middleware.
      *
      * @param  int  $maxAttempts
      * @param  int  $decayMinutes
