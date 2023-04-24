@@ -473,32 +473,35 @@ trait InteractsWithPivotTable
      */
     protected function detachUsingCustomClass($ids)
     {
-        $results = 0;
-
-        foreach ($this->parseIds($ids) as $id) {
-            $results += $this->newPivot([
-                $this->foreignPivotKey => $this->parent->{$this->parentKey},
-                $this->relatedPivotKey => $id,
-            ], true)->delete();
-        }
-
-        return $results;
+        return $this->getCurrentlyAttachedPivots($ids)->reduce(
+            fn($value, $pivot) => $value + $pivot->delete(),
+            0
+        );
     }
 
     /**
      * Get the pivot models that are currently attached.
-     *
+     * @param  mixed|null  $ids
      * @return \Illuminate\Support\Collection
      */
-    protected function getCurrentlyAttachedPivots()
+    protected function getCurrentlyAttachedPivots($ids = null)
     {
-        return $this->newPivotQuery()->get()->map(function ($record) {
-            $class = $this->using ?: Pivot::class;
+        $methodName = is_null($ids) ? 'newPivotQuery' :  'newPivotStatementForId';
 
-            $pivot = $class::fromRawAttributes($this->parent, (array) $record, $this->getTable(), true);
+        return $this->{$methodName}($ids)->get()->map($this->mapIntoPivot(...));
+    }
 
-            return $pivot->setPivotKeys($this->foreignPivotKey, $this->relatedPivotKey);
-        });
+    /**
+     * @param \stdClass $record
+     * @return Pivot
+     */
+    protected function mapIntoPivot($record)
+    {
+        $class = $this->using ?: Pivot::class;
+
+        $pivot = $class::fromRawAttributes($this->parent, (array) $record, $this->getTable(), true);
+
+        return $pivot->setPivotKeys($this->foreignPivotKey, $this->relatedPivotKey);
     }
 
     /**
