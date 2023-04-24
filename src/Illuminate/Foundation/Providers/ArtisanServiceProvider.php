@@ -197,7 +197,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'ScopeMake' => ScopeMakeCommand::class,
         'SeederMake' => SeederMakeCommand::class,
         'SessionTable' => SessionTableCommand::class,
-        'SessionFlush' =>SessionFlushCommand::class,
+        'SessionFlush' => SessionFlushCommand::class,
         'Serve' => ServeCommand::class,
         'StubPublish' => StubPublishCommand::class,
         'TestMake' => TestMakeCommand::class,
