@@ -5,7 +5,7 @@ namespace Illuminate\Contracts\Support;
 /**
  * @template TKey of array-key
  *
- * @template-covariant TValue
+ * @template TValue
  */
 interface Arrayable
 {
