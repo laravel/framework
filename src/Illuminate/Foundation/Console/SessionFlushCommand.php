@@ -4,6 +4,8 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 #[AsCommand(name: 'session:flush')]
 class SessionFlushCommand extends Command
@@ -66,10 +68,10 @@ class SessionFlushCommand extends Command
     }
     //Redis
     protected function cleanRedis(){
-        \Cache::store("redis")->flush();
+        Cache::store("redis")->flush();
     }
     //Memcached
     protected function cleanMemcached(){
-        \Cache::store("memcached")->flush();
+        Cache::store("memcached")->flush();
     }
 }
