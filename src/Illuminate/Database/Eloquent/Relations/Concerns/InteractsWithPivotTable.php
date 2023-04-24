@@ -474,25 +474,26 @@ trait InteractsWithPivotTable
     protected function detachUsingCustomClass($ids)
     {
         return $this->getCurrentlyAttachedPivots($ids)->reduce(
-            fn($value, $pivot) => $value + $pivot->delete(),
+            fn ($value, $pivot) => $value + $pivot->delete(),
             0
         );
     }
 
     /**
      * Get the pivot models that are currently attached.
+     *
      * @param  mixed|null  $ids
      * @return \Illuminate\Support\Collection
      */
     protected function getCurrentlyAttachedPivots($ids = null)
     {
-        $methodName = is_null($ids) ? 'newPivotQuery' :  'newPivotStatementForId';
+        $methodName = is_null($ids) ? 'newPivotQuery' : 'newPivotStatementForId';
 
         return $this->{$methodName}($ids)->get()->map($this->mapIntoPivot(...));
     }
 
     /**
-     * @param \stdClass $record
+     * @param  \stdClass  $record
      * @return Pivot
      */
     protected function mapIntoPivot($record)
