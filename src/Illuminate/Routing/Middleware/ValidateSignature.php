@@ -17,7 +17,7 @@ class ValidateSignature
     ];
 
     /**
-     * Specify the url signature is for a relative URL.
+     * Specify that the URL signature is for a relative URL.
      *
      * @return string
      */
@@ -27,7 +27,7 @@ class ValidateSignature
     }
 
     /**
-     * Specify the url signature is for a absolute URL.
+     * Specify that the URL signature is for an absolute URL.
      *
      * @return class-string
      */
