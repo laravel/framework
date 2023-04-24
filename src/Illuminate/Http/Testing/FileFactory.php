@@ -92,7 +92,7 @@ class FileFactory
                 throw new LogicException("{$functionName} function is not defined and image cannot be generated.");
             }
 
-            call_user_func("image{$extension}", $image);
+            call_user_func($functionName, $image);
 
             fwrite($temp, ob_get_clean());
         });
