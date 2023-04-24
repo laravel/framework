@@ -549,7 +549,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Concatenate values of a given key as a string.
      *
-     * @param  string  $value
+     * @param  callable|string  $value
      * @param  string|null  $glue
      * @return string
      */
