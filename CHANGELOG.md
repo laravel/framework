@@ -1,6 +1,27 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.8.0...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v10.9.0...10.x)
+
+
+## [v10.9.0 (2023-04-25)](https://github.com/laravel/framework/compare/v10.8.0...v10.9.0)
+
+### Added
+- Add new HTTP status assertions ([#46841](https://github.com/laravel/framework/pull/46841))
+- Allow pruning all cancelled and unfinished queue batches ([#46833](https://github.com/laravel/framework/pull/46833))
+- Added `IGNITION_LOCAL_SITES_PATH` to `$passthroughVariables` in `ServeCommand.php` ([#46857](https://github.com/laravel/framework/pull/46857))
+- Added named static methods for middleware ([#46362](https://github.com/laravel/framework/pull/46362))
+
+### Fixed
+- Fix date_format rule throw ValueError ([#46824](https://github.com/laravel/framework/pull/46824))
+
+### Changed
+- Allow separate directory for locks on filestore ([#46811](https://github.com/laravel/framework/pull/46811))
+- Allow to whereMorphedTo work with null model ([#46821](https://github.com/laravel/framework/pull/46821))
+- Use pivot model fromDateTime instead of assuming Carbon in `Illuminate/Database/Eloquent/Relations/Concerns/InteractsWithPivotTable::addTimestampsToAttachment()` ([#46822](https://github.com/laravel/framework/pull/46822))
+- Make rules method in FormRequest optional ([#46846](https://github.com/laravel/framework/pull/46846))
+- Throw LogicException when calling FileFactory@image() if mimetype is not supported ([#46859](https://github.com/laravel/framework/pull/46859))
+- Improve job release method to accept date instance ([#46854](https://github.com/laravel/framework/pull/46854))
+- Use foreignUlid if model uses HasUlids trait when call foreignIdFor ([#46876](https://github.com/laravel/framework/pull/46876))
 
 
 ## [v10.8.0 (2023-04-18)](https://github.com/laravel/framework/compare/v10.7.1...v10.8.0)
