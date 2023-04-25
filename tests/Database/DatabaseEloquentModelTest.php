@@ -2248,6 +2248,20 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertArrayHasKey('foo', $model->getCasts());
     }
 
+    public function testMergeCastsMergesCastsWithArraySyntax()
+    {
+        $model = new EloquentModelCastingStub;
+
+        $castCount = count($model->getCasts());
+        $this->assertArrayNotHasKey('foo', $model->getCasts());
+
+        $model->mergeCasts(['foo' => [AsEnumArrayObject::class, StringStatus::class]]);
+        $this->assertCount($castCount + 1, $model->getCasts());
+        $this->assertArrayHasKey('foo', $model->getCasts());
+        $this->assertEquals($model->getCasts()['foo'], AsEnumArrayObject::class.':'.StringStatus::class);
+    }
+
+
     public function testUpdatingNonExistentModelFails()
     {
         $model = new EloquentModelStub;

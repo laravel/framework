@@ -187,13 +187,31 @@ trait HasAttributes
      */
     protected function initializeHasAttributes()
     {
-        foreach ($this->casts as $attribute => $cast) {
+        $this->casts = $this->convertArrayCasts($this->casts);
+    }
+
+    /**
+     * Convert array casts to string casts.
+     *
+     * @param array<string|array<string,string>>  $casts
+     *
+     * @return void
+     */
+    protected function convertArrayCasts($casts)
+    {
+        $normalizedCasts = [];
+
+        foreach ($casts as $attribute => $cast) {
             if (is_array($cast)) {
                 [$cast, $arguments] = [array_shift($cast), $cast];
 
-                $this->casts[$attribute] = $cast.':'.implode(',', $arguments);
+                $cast = $cast.':'.implode(',', $arguments);
             }
+
+            $normalizedCasts[$attribute] = $cast;
         }
+
+        return $normalizedCasts;
     }
 
     /**
@@ -733,7 +751,7 @@ trait HasAttributes
      */
     public function mergeCasts($casts)
     {
-        $this->casts = array_merge($this->casts, $casts);
+        $this->casts = array_merge($this->casts, $this->convertArrayCasts($casts));
 
         return $this;
     }
