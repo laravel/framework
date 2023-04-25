@@ -292,10 +292,10 @@ class FormRequest extends Request implements ValidatesWhenResolved
     /**
      * Configure the validator instance.
      *
-     * @param  \Illuminate\Contracts\Validation\Validator  $validator
+     * @param  \Illuminate\Validation\Validator  $validator
      * @return void
      */
-    public function withValidator(Validator $validator)
+    public function withValidator(\Illuminate\Validation\Validator $validator)
     {
         //
     }
