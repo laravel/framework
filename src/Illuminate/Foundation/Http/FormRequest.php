@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Validation\ValidatesWhenResolvedTrait;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Validation\Validator;
 
 class FormRequest extends Request implements ValidatesWhenResolved
 {
@@ -295,7 +296,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
      * @param  \Illuminate\Validation\Validator  $validator
      * @return void
      */
-    public function withValidator(\Illuminate\Validation\Validator $validator)
+    public function withValidator(Validator $validator)
     {
         //
     }
