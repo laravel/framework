@@ -1674,6 +1674,23 @@ class Blueprint
     }
 
     /**
+     * Add a check constraint to the table.
+     *
+     * @param $checkName
+     * @param $constraint
+     * @return Fluent
+     */
+    public function check($checkName, $constraint)
+    {
+        return $this->addCommand('check', compact('checkName', 'constraint'));
+    }
+
+    public function dropCheck($checkName)
+    {
+        return $this->addCommand('dropCheck', compact('checkName'));
+    }
+
+    /**
      * Add a new column to the blueprint.
      *
      * @param  string  $type

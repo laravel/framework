@@ -579,6 +579,34 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Compile a table level check command.
+     *
+     * @param Blueprint $blueprint
+     * @param Fluent $command
+     * @return string
+     */
+    public function compileCheck(Blueprint $blueprint, Fluent $command)
+    {
+        $table = $this->wrapTable($blueprint);
+
+        return sprintf('alter table %s add constraint %s check (%s)',
+            $table,
+            $this->wrap($command->checkName),
+            $command->constraint
+        );
+    }
+
+    public function compileDropCheck(Blueprint $blueprint, Fluent $command)
+    {
+        $table = $this->wrapTable($blueprint);
+
+        return sprintf('alter table %s drop constraint %s',
+            $table,
+            $this->wrap($command->checkName)
+        );
+    }
+
+    /**
      * Quote-escape the given tables, views, or types.
      *
      * @param  array  $names
