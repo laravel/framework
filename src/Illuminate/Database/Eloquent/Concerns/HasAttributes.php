@@ -179,6 +179,23 @@ trait HasAttributes
      */
     public static $encrypter;
 
+    
+    /**
+     * Initialize the trait.
+     *
+     * @return void
+     */
+    protected function initializeHasAttributes()
+    {
+        foreach ($this->casts as $attribute => $cast) {
+            if (is_array($cast)) {
+                [$cast, $arguments] = [array_shift($cast), $cast];
+
+                $this->casts[$attribute] = $cast.':'.implode(',', $arguments);
+            }
+        }
+    }
+
     /**
      * Convert the model's attributes to an array.
      *
@@ -1495,23 +1512,11 @@ trait HasAttributes
      */
     public function getCasts()
     {
-        $casts = [];
-
-        foreach ($this->casts as $attribute => $cast) {
-            if (is_array($cast)) {
-                [$cast, $arguments] = [array_shift($cast), $cast];
-
-                $cast = $cast.':'.implode(',', $arguments);
-            }
-
-            $casts[$attribute] = $cast;
-        }
-
         if ($this->getIncrementing()) {
-            return array_merge([$this->getKeyName() => $this->getKeyType()], $casts);
+            return array_merge([$this->getKeyName() => $this->getKeyType()], $this->casts);
         }
 
-        return $casts;
+        return $this->casts;
     }
 
     /**
