@@ -383,9 +383,16 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $connection = m::mock(Connection::class);
 
         $blueprint = clone $base;
+
         $this->assertEquals([
             'alter table "posts" add column "eloquent_model_ulid_stub_id" char(26) not null',
         ], $blueprint->toSql($connection, new PostgresGrammar));
+
+        $blueprint = clone $base;
+
+        $this->assertEquals([
+            'alter table `posts` add `eloquent_model_ulid_stub_id` char(26) not null',
+        ], $blueprint->toSql($connection, new MySqlGrammar()));
     }
 
     public function testDropRelationshipColumnWithIncrementalModel()
