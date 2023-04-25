@@ -2261,7 +2261,6 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals($model->getCasts()['foo'], AsEnumArrayObject::class.':'.StringStatus::class);
     }
 
-
     public function testUpdatingNonExistentModelFails()
     {
         $model = new EloquentModelStub;

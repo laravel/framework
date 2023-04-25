@@ -179,7 +179,6 @@ trait HasAttributes
      */
     public static $encrypter;
 
-    
     /**
      * Initialize the trait.
      *
@@ -193,8 +192,7 @@ trait HasAttributes
     /**
      * Convert array casts to string casts.
      *
-     * @param array<string|array<string,string>>  $casts
-     *
+     * @param  array<string|array<string,string>>  $casts
      * @return void
      */
     protected function convertArrayCasts($casts)
