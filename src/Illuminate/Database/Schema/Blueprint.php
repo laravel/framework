@@ -5,6 +5,7 @@ namespace Illuminate\Database\Schema;
 use BadMethodCallException;
 use Closure;
 use Illuminate\Database\Connection;
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Grammars\Grammar;
 use Illuminate\Database\SQLiteConnection;
@@ -946,11 +947,11 @@ class Blueprint
 
         $modelTraits = class_uses_recursive($model);
 
-        if (in_array('Illuminate\Database\Eloquent\Concerns\HasUlids', $modelTraits, true)) {
+        if (in_array(HasUlids::class, $modelTraits, true)) {
             return $this->foreignUlid($column);
         }
 
-        return  $this->foreignUuid($column);
+        return $this->foreignUuid($column);
     }
 
     /**
