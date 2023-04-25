@@ -493,6 +493,8 @@ trait InteractsWithPivotTable
     }
 
     /**
+     * Convert a raw database record into a Pivot object.
+     *
      * @param  \stdClass  $record
      * @return Pivot
      */
