@@ -7,7 +7,7 @@ use Illuminate\Auth\Access\Response;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Contracts\Validation\ValidatesWhenResolved;
-use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Validation\ValidatesWhenResolvedTrait;
@@ -148,7 +148,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    protected function failedValidation(Validator $validator)
+    protected function failedValidation(ValidatorContract $validator)
     {
         throw (new ValidationException($validator))
                     ->errorBag($this->errorBag)
@@ -256,7 +256,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
      * @param  \Illuminate\Contracts\Validation\Validator  $validator
      * @return $this
      */
-    public function setValidator(Validator $validator)
+    public function setValidator(ValidatorContract $validator)
     {
         $this->validator = $validator;
 
