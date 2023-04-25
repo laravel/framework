@@ -359,6 +359,13 @@ class SupportStrTest extends TestCase
         $this->assertSame('abcbbc', Str::finish('abcbbcbc', 'bc'));
     }
 
+    public function testFlat()
+    {
+        $this->assertSame('foobar', Str::flat('Foo BAR'));
+        $this->assertSame('foobar', Str::flat('foo_bar'));
+        $this->assertSame('foobar', Str::flat('foobar'));
+    }
+
     public function testWrap()
     {
         $this->assertEquals('"value"', Str::wrap('value', '"'));

@@ -292,6 +292,16 @@ class Stringable implements JsonSerializable, ArrayAccess
     }
 
     /**
+     * Convert a value to flat case.
+     *
+     * @return static
+     */
+    public function flat()
+    {
+        return new static(Str::flat($this->value));
+    }
+
+    /**
      * Determine if a given string matches a given pattern.
      *
      * @param  string|iterable<string>  $pattern

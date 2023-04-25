@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Support;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use PHPUnit\Framework\TestCase;
 
@@ -743,6 +744,13 @@ class SupportStringableTest extends TestCase
         $this->assertSame('abbc', (string) $this->stringable('ab')->finish('bc'));
         $this->assertSame('abbc', (string) $this->stringable('abbcbc')->finish('bc'));
         $this->assertSame('abcbbc', (string) $this->stringable('abcbbcbc')->finish('bc'));
+    }
+
+    public function testFlat()
+    {
+        $this->assertSame('foobar', (string) $this->stringable('Foo BAR')->flat());
+        $this->assertSame('foobar', (string) $this->stringable('foo_bar')->flat());
+        $this->assertSame('foobar', (string) $this->stringable('foobar')->flat());
     }
 
     public function testIs()

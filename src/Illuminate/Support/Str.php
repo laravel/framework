@@ -357,6 +357,19 @@ class Str
     }
 
     /**
+     * Convert a value to flat case.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public static function flat($value)
+    {
+        $string = static::replace(['-', '_', ' '], '', $value);
+
+        return static::lower($string);
+    }
+
+    /**
      * Wrap the string with the given strings.
      *
      * @param  string  $value
