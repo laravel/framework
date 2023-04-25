@@ -1,6 +1,12 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.52.6...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.52.7...9.x)
+
+
+## [v9.52.7](https://github.com/laravel/framework/compare/v9.52.6...v9.52.7) - 2023-04-25
+
+### Changed
+- Make rules method in FormRequest optional ([#46846](https://github.com/laravel/framework/pull/46846))
 
 
 ## [v9.52.6](https://github.com/laravel/framework/compare/v9.52.5...v9.52.6) - 2023-04-18
