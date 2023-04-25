@@ -478,7 +478,7 @@ class SupportStrTest extends TestCase
     public function testLimit()
     {
         $this->assertSame('Laravel is...', Str::limit('Laravel is a free, open source PHP web application framework.', 10));
-        $this->assertSame('这是一...', Str::limit('这是一段中文', 6));
+        $this->assertSame('这是一...', Str::limit('这是一段中文', 3));
 
         $string = 'The PHP framework for web artisans.';
         $this->assertSame('The PHP...', Str::limit($string, 7));
@@ -486,8 +486,12 @@ class SupportStrTest extends TestCase
         $this->assertSame('The PHP framework for web artisans.', Str::limit($string, 100));
 
         $nonAsciiString = '这是一段中文';
-        $this->assertSame('这是一...', Str::limit($nonAsciiString, 6));
-        $this->assertSame('这是一', Str::limit($nonAsciiString, 6, ''));
+        $this->assertSame('这是一...', Str::limit($nonAsciiString, 3));
+        $this->assertSame('这是一', Str::limit($nonAsciiString, 3, ''));
+
+        $hasEmojiString = "臺灣的珍珠奶茶很好喝🧋！Taiwan's pearl milk tea is delicious. 🧋";
+        $this->assertSame("臺灣的珍珠奶茶很好喝🧋...", Str::limit($hasEmojiString, 11));
+        $this->assertSame("臺灣的珍珠奶茶很好喝🧋", Str::limit($hasEmojiString, 11 , ''));
     }
 
     public function testLength()
