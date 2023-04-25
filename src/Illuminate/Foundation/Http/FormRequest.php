@@ -92,9 +92,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
             $validator = $this->createDefaultValidator($factory);
         }
 
-        if (method_exists($this, 'withValidator')) {
-            $this->withValidator($validator);
-        }
+        $this->withValidator($validator);
 
         if (method_exists($this, 'after')) {
             $validator->after($this->container->call(
@@ -289,5 +287,16 @@ class FormRequest extends Request implements ValidatesWhenResolved
         $this->container = $container;
 
         return $this;
+    }
+
+    /**
+     * Configure the validator instance.
+     *
+     * @param  \Illuminate\Validation\Validator  $validator
+     * @return void
+     */
+    public function withValidator(Validator $validator)
+    {
+        //
     }
 }
