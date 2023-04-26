@@ -114,11 +114,11 @@ class Kernel implements KernelContract
     ];
 
     /**
-     * Stores instances of middleware to be used when terminating the request.
+     * Stores middleware to be used when terminating the request.
      *
-     * @var array<int, callable>
+     * @var array<int, class-string|string>
      */
-    protected $terminatingMiddlewareInstances = [];
+    protected $terminatingMiddleware = [];
 
     /**
      * Create a new HTTP kernel instance.
@@ -177,12 +177,12 @@ class Kernel implements KernelContract
         $this->bootstrap();
 
         $middlewareList = [];
-        foreach ($this->app->shouldSkipMiddleware() ? [] : $this->middleware as $middlewareInstance) {
-            $middlewareInstance = $this->app->make($middlewareInstance);
+        foreach ($this->app->shouldSkipMiddleware() ? [] : $this->middleware as $middlewareClass) {
+            $middlewareInstance = $this->app->make($middlewareClass);
             $middlewareList[] = $middlewareInstance;
 
             if (method_exists($middlewareInstance, 'terminate')) {
-                $this->pushTerminatingMiddlewareInstance($middlewareInstance);
+                $this->pushTerminatingMiddleware($middlewareClass);
             }
         }
 
@@ -255,17 +255,18 @@ class Kernel implements KernelContract
     {
         $middlewares = $this->app->shouldSkipMiddleware() ? [] : array_merge(
             $this->gatherRouteMiddleware($request),
-            $this->terminatingMiddlewareInstances
+            $this->terminatingMiddleware
         );
 
         foreach ($middlewares as $middleware) {
-            if (is_string($middleware)) {
-                [$name] = $this->parseMiddleware($middleware);
-
-                $instance = $this->app->make($name);
-            } else {
-                $instance = $middleware;
+            if (! is_string($middleware)) {
+                return;
             }
+
+            [$name] = $this->parseMiddleware($middleware);
+
+            $instance = $this->app->make($name);
+
             if (method_exists($instance, 'terminate')) {
                 $instance->terminate($request, $response);
             }
@@ -387,18 +388,18 @@ class Kernel implements KernelContract
      */
     protected function resetTerminatingMiddlewareInstances()
     {
-        $this->terminatingMiddlewareInstances = [];
+        $this->terminatingMiddleware = [];
     }
 
     /**
-     * Add a new middleware instance to the end of the terminatingMiddleInstances stack.
+     * Add a new middleware class to the end of the
      *
      * @param  callable  $middleware
      * @return void
      */
-    public function pushTerminatingMiddlewareInstance($middleware)
+    public function pushTerminatingMiddleware($middleware)
     {
-        $this->terminatingMiddlewareInstances[] = $middleware;
+        $this->terminatingMiddleware[] = $middleware;
     }
 
     /**

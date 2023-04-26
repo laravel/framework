@@ -21,8 +21,9 @@ class KernelTest extends TestCase
 
         $this->getJson('/');
 
-        $this->assertEquals(1, IntegrationTerminatingMiddleware::$terminateCalled);
-        $this->assertEquals(1, IntegrationTerminatingMiddleware::$timesInstantiated);
+        $this->assertEquals(1, IntegrationTerminatingMiddleware::$timesTerminateCalled);
+        $this->assertEquals(2, IntegrationTerminatingMiddleware::$timesInstantiated);
+        $this->assertEquals(1, IntegrationMiddleware::$timesInstantiated);
     }
 }
 
@@ -32,27 +33,42 @@ class IntegrationKernelTest extends HttpKernel
     {
         parent::__construct($app, $router);
         $this->pushMiddleware(IntegrationTerminatingMiddleware::class);
+        $this->pushMiddleware(IntegrationMiddleware::class);
     }
 }
 
-class IntegrationTerminatingMiddleware
+class IntegrationMiddleware
 {
     public static $timesInstantiated = 0;
 
-    public static $terminateCalled = 0;
-
     public function __construct()
     {
-        self::$timesInstantiated++;
+        static::$timesInstantiated++;
     }
 
     public function handle($request, $next)
     {
         return $next($request);
     }
+}
+class IntegrationTerminatingMiddleware
+{
+    public static $timesInstantiated = 0;
 
+    public static $timesTerminateCalled = 0;
+
+    public function __construct()
+    {
+        static::$timesInstantiated++;
+    }
+
+    public function handle($request, $next)
+    {
+        return $next($request);
+    }
     public function terminate()
     {
-        self::$terminateCalled++;
+        static::$timesTerminateCalled++;
     }
 }
+
