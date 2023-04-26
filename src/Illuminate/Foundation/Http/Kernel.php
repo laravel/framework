@@ -116,7 +116,7 @@ class Kernel implements KernelContract
     /**
      * Stores instances of middleware to be used when terminating the request.
      *
-     * @var array<int, class-string>
+     * @var array<int, callable>
      */
     protected $terminatingMiddlewareInstances = [];
 
@@ -177,7 +177,7 @@ class Kernel implements KernelContract
         $this->bootstrap();
 
         $middlewareList = [];
-        foreach($this->app->shouldSkipMiddleware() ? [] : $this->middleware as $middlewareInstance) {
+        foreach ($this->app->shouldSkipMiddleware() ? [] : $this->middleware as $middlewareInstance) {
             $middlewareInstance = $this->app->make($middlewareInstance);
             $middlewareList[] = $middlewareInstance;
 
@@ -199,7 +199,7 @@ class Kernel implements KernelContract
      */
     public function bootstrap()
     {
-        $this->terminatingMiddlewareInstances = [];
+        $this->resetTerminatingMiddlewareInstances();
 
         if (! $this->app->hasBeenBootstrapped()) {
             $this->app->bootstrapWith($this->bootstrappers());
@@ -271,7 +271,7 @@ class Kernel implements KernelContract
             }
         }
 
-        $this->terminatingMiddlewareInstances = [];
+        $this->resetTerminatingMiddlewareInstances();
     }
 
     /**
@@ -378,6 +378,16 @@ class Kernel implements KernelContract
         }
 
         return $this;
+    }
+
+    /**
+     * Clear the list of terminating middleware instances.
+     *
+     * @return void
+     */
+    protected function resetTerminatingMiddlewareInstances()
+    {
+        $this->terminatingMiddlewareInstances = [];
     }
 
     /**
