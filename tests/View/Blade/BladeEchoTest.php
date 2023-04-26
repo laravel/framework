@@ -63,4 +63,23 @@ class BladeEchoTest extends AbstractBladeTestCase
             $this->compiler->compileString('@{{ $name }}
             '));
     }
+
+    public function testEWithArray()
+    {
+        $array = ['a', 'b', 'c'];
+        $result = e($array);
+        $this->assertEquals(json_encode($array), $result);
+
+        $emptyArray = [];
+        $emptyResult = e($emptyArray);
+        $this->assertEquals(json_encode($emptyArray), $emptyResult);
+
+        $associativeArray = ['name' => 'John', 'age' => 30];
+        $associativeResult = e($associativeArray);
+        $this->assertEquals(json_encode($associativeArray), $associativeResult);
+
+        $nestedArray = [['a', 'b'], ['c', 'd']];
+        $nestedResult = e($nestedArray);
+        $this->assertEquals(json_encode($nestedArray), $nestedResult);
+    }
 }
