@@ -364,9 +364,7 @@ class Str
      */
     public static function flat($value)
     {
-        $string = static::replace(['-', '_', ' '], '', $value);
-
-        return static::lower($string);
+        return Str::slug($value, '');
     }
 
     /**

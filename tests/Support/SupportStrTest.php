@@ -361,7 +361,7 @@ class SupportStrTest extends TestCase
 
     public function testFlat()
     {
-        $this->assertSame('foobar', Str::flat('Foo BAR'));
+        $this->assertSame('foobar', Str::flat('Foo,BAR!'));
         $this->assertSame('foobar', Str::flat('foo_bar'));
         $this->assertSame('foobar', Str::flat('foobar'));
     }

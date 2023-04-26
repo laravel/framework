@@ -747,7 +747,7 @@ class SupportStringableTest extends TestCase
 
     public function testFlat()
     {
-        $this->assertSame('foobar', (string) $this->stringable('Foo BAR')->flat());
+        $this->assertSame('foobar', (string) $this->stringable('Foo,BAR!')->flat());
         $this->assertSame('foobar', (string) $this->stringable('foo_bar')->flat());
         $this->assertSame('foobar', (string) $this->stringable('foobar')->flat());
     }
