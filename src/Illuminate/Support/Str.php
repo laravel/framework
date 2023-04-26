@@ -519,7 +519,7 @@ class Str
      */
     public static function lower($value)
     {
-        return mb_strtolower($value, 'UTF-8');
+        return mb_strtolower((string) $value, 'UTF-8');
     }
 
     /**
