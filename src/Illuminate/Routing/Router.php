@@ -322,11 +322,7 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function resource($name, $controller, array $options = [])
     {
-        if ($this->container && $this->container->bound(ResourceRegistrar::class)) {
-            $registrar = $this->container->make(ResourceRegistrar::class);
-        } else {
-            $registrar = new ResourceRegistrar($this);
-        }
+        $registrar = $this->getResourceRegistrar();
 
         return new PendingResourceRegistration(
             $registrar, $name, $controller, $options
@@ -392,11 +388,7 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function singleton($name, $controller, array $options = [])
     {
-        if ($this->container && $this->container->bound(ResourceRegistrar::class)) {
-            $registrar = $this->container->make(ResourceRegistrar::class);
-        } else {
-            $registrar = new ResourceRegistrar($this);
-        }
+        $registrar = $this->getResourceRegistrar();
 
         return new PendingSingletonResourceRegistration(
             $registrar, $name, $controller, $options
@@ -437,6 +429,22 @@ class Router implements BindingRegistrar, RegistrarContract
             'only' => $only,
             'apiSingleton' => true,
         ], $options));
+    }
+
+    /**
+     * Get the ResourceRegistrar instance.
+     *
+     * @return \Illuminate\Routing\ResourceRegistrar
+     */
+    protected function getResourceRegistrar()
+    {
+        if ($this->container && $this->container->bound(ResourceRegistrar::class)) {
+            $registrar = $this->container->make(ResourceRegistrar::class);
+        } else {
+            $registrar = new ResourceRegistrar($this);
+        }
+
+        return $registrar;
     }
 
     /**
