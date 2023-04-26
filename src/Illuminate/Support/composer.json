@@ -21,6 +21,7 @@
         "doctrine/inflector": "^2.0",
         "illuminate/collections": "^10.0",
         "illuminate/conditionable": "^10.0",
+        "illuminate/container": "^10.0",
         "illuminate/contracts": "^10.0",
         "illuminate/macroable": "^10.0",
         "nesbot/carbon": "^2.62.1",
