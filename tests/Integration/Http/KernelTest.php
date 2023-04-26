@@ -5,8 +5,9 @@ namespace Illuminate\Tests\Integration\Http;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
-use Orchestra\Testbench\TestCase;
 use Orchestra\Testbench\Foundation\Http\Kernel as HttpKernel;
+use Orchestra\Testbench\TestCase;
+
 class KernelTest extends TestCase
 {
     protected function resolveApplicationHttpKernel($app)
@@ -34,7 +35,8 @@ class IntegrationKernelTest extends HttpKernel
     }
 }
 
-class IntegrationTerminatingMiddleware {
+class IntegrationTerminatingMiddleware
+{
     public static $timesInstantiated = 0;
 
     public static $terminateCalled = 0;
