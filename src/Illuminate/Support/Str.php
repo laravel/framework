@@ -364,7 +364,7 @@ class Str
      */
     public static function flat($value)
     {
-        return Str::slug($value, '');
+        return static::slug($value, '');
     }
 
     /**
