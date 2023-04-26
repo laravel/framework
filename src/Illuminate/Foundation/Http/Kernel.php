@@ -114,6 +114,13 @@ class Kernel implements KernelContract
     ];
 
     /**
+     * Stores instances of middleware to be used when terminating the request.
+     *
+     * @var array<int, class-string>
+     */
+    protected $terminatingMiddlewareInstances = [];
+
+    /**
      * Create a new HTTP kernel instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
@@ -169,9 +176,19 @@ class Kernel implements KernelContract
 
         $this->bootstrap();
 
+        $middlewareList = [];
+        foreach($this->app->shouldSkipMiddleware() ? [] : $this->middleware as $middlewareInstance) {
+            $middlewareInstance = $this->app->make($middlewareInstance);
+            $middlewareList[] = $middlewareInstance;
+
+            if (method_exists($middlewareInstance, 'terminate')) {
+                $this->pushTerminatingMiddlewareInstance($middlewareInstance);
+            }
+        }
+
         return (new Pipeline($this->app))
                     ->send($request)
-                    ->through($this->app->shouldSkipMiddleware() ? [] : $this->middleware)
+                    ->through($middlewareList)
                     ->then($this->dispatchToRouter());
     }
 
@@ -182,6 +199,8 @@ class Kernel implements KernelContract
      */
     public function bootstrap()
     {
+        $this->terminatingMiddlewareInstances = [];
+
         if (! $this->app->hasBeenBootstrapped()) {
             $this->app->bootstrapWith($this->bootstrappers());
         }
@@ -236,22 +255,23 @@ class Kernel implements KernelContract
     {
         $middlewares = $this->app->shouldSkipMiddleware() ? [] : array_merge(
             $this->gatherRouteMiddleware($request),
-            $this->middleware
+            $this->terminatingMiddlewareInstances
         );
 
         foreach ($middlewares as $middleware) {
-            if (! is_string($middleware)) {
-                continue;
+            if (is_string($middleware)) {
+                [$name] = $this->parseMiddleware($middleware);
+
+                $instance = $this->app->make($name);
+            } else {
+                $instance = $middleware;
             }
-
-            [$name] = $this->parseMiddleware($middleware);
-
-            $instance = $this->app->make($name);
-
             if (method_exists($instance, 'terminate')) {
                 $instance->terminate($request, $response);
             }
         }
+
+        $this->terminatingMiddlewareInstances = [];
     }
 
     /**
@@ -358,6 +378,17 @@ class Kernel implements KernelContract
         }
 
         return $this;
+    }
+
+    /**
+     * Add a new middleware instance to the end of the terminatingMiddleInstances stack.
+     *
+     * @param  callable  $middleware
+     * @return void
+     */
+    public function pushTerminatingMiddlewareInstance($middleware)
+    {
+        $this->terminatingMiddlewareInstances[] = $middleware;
     }
 
     /**
