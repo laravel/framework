@@ -71,4 +71,3 @@ class IntegrationTerminatingMiddleware
         static::$timesTerminateCalled++;
     }
 }
-

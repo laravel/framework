@@ -199,7 +199,7 @@ class Kernel implements KernelContract
      */
     public function bootstrap()
     {
-        $this->resetTerminatingMiddlewareInstances();
+        $this->resetTerminatingMiddleware();
 
         if (! $this->app->hasBeenBootstrapped()) {
             $this->app->bootstrapWith($this->bootstrappers());
@@ -272,7 +272,7 @@ class Kernel implements KernelContract
             }
         }
 
-        $this->resetTerminatingMiddlewareInstances();
+        $this->resetTerminatingMiddleware();
     }
 
     /**
@@ -382,17 +382,17 @@ class Kernel implements KernelContract
     }
 
     /**
-     * Clear the list of terminating middleware instances.
+     * Clear the list of terminating middleware classes.
      *
      * @return void
      */
-    protected function resetTerminatingMiddlewareInstances()
+    protected function resetTerminatingMiddleware()
     {
         $this->terminatingMiddleware = [];
     }
 
     /**
-     * Add a new middleware class to the end of the
+     * Add a new middleware class to the end of the terminating middleware stack.
      *
      * @param  callable  $middleware
      * @return void
