@@ -101,15 +101,11 @@ class CallQueuedListener implements ShouldQueue
     {
         $this->prepareData();
 
-        $handler = $this->setJobInstanceIfNecessary(
+        $handler = $this->setQueueVariables($this->setJobInstanceIfNecessary(
             $this->job, $container->make($this->class)
-        );
+        ));
 
-        try {
-            $handler->{$this->method}(...array_values($this->data));
-        } catch (Throwable $exception) {
-            $this->fail($exception);
-        }
+        $handler->{$this->method}(...array_values($this->data));
     }
 
     /**
@@ -126,6 +122,35 @@ class CallQueuedListener implements ShouldQueue
         }
 
         return $instance;
+    }
+
+    /**
+     * @param  object $handler
+     * @return  object
+     */
+    protected function setQueueVariables($handler)
+    {
+        if (isset($handler->tries)) {
+            $this->tries = $handler->tries;
+        }
+
+        if (isset($handler->maxExceptions)) {
+            $this->maxExceptions = $handler->maxExceptions;
+        }
+
+        if (isset($handler->backoff)) {
+            $this->backoff = $handler->backoff;
+        }
+
+        if (isset($handler->retryUntil)) {
+            $this->retryUntil = $handler->retryUntil;
+        }
+
+        if (isset($handler->timeout)) {
+            $this->timeout = $handler->timeout;
+        }
+
+        return $handler;
     }
 
     /**
