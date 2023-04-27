@@ -4,24 +4,24 @@ namespace Illuminate\Tests\Support;
 
 use Carbon\CarbonInterval;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Pause;
+use Illuminate\Support\Siesta;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
-class PauseTest extends TestCase
+class SiestaTest extends TestCase
 {
     protected function setUp(): void
     {
         parent::setUp();
 
-        Pause::fake(false);
+        Siesta::fake(false);
     }
 
     public function testItSleepForSeconds()
     {
         $start = Carbon::now();
-        Pause::for(1)->seconds();
+        Siesta::for(1)->seconds();
         $end = Carbon::now();
 
         $this->assertTrue($start->toImmutable()->addSecond()->isBefore($end));
@@ -31,7 +31,7 @@ class PauseTest extends TestCase
     public function testItSleepsForSecondsWithMilliseconds()
     {
         $start = Carbon::now();
-        Pause::for(1.5)->seconds();
+        Siesta::for(1.5)->seconds();
         $end = Carbon::now();
 
         $this->assertTrue($start->toImmutable()->addSecond()->addMilliseconds(500)->isBefore($end));
@@ -40,7 +40,7 @@ class PauseTest extends TestCase
 
     public function testItCanSpecifyMinutes()
     {
-        $pause = Pause::for(1.5)->minutes();
+        $pause = Siesta::for(1.5)->minutes();
 
         $this->assertSame($pause->duration->totalSeconds, 90);
 
@@ -49,7 +49,7 @@ class PauseTest extends TestCase
 
     public function testItCanSpecifySeconds()
     {
-        $pause = Pause::for(5)->seconds();
+        $pause = Siesta::for(5)->seconds();
 
         $this->assertSame($pause->duration->totalSeconds, 5);
 
@@ -58,7 +58,7 @@ class PauseTest extends TestCase
 
     public function testItCanSpecifySecond()
     {
-        $pause = Pause::for(1)->second();
+        $pause = Siesta::for(1)->second();
 
         $this->assertSame($pause->duration->totalSeconds, 1);
 
@@ -67,7 +67,7 @@ class PauseTest extends TestCase
 
     public function testItCanSpecifyMilliseconds()
     {
-        $pause = Pause::for(5)->milliseconds();
+        $pause = Siesta::for(5)->milliseconds();
 
         $this->assertSame($pause->duration->totalMilliseconds, 5);
 
@@ -76,7 +76,7 @@ class PauseTest extends TestCase
 
     public function testItCanSpecifyMillisecond()
     {
-        $pause = Pause::for(1)->milliseconds();
+        $pause = Siesta::for(1)->milliseconds();
 
         $this->assertSame($pause->duration->totalMilliseconds, 1);
 
@@ -85,7 +85,7 @@ class PauseTest extends TestCase
 
     public function testItCanSpecifyMicroseconds()
     {
-        $pause = Pause::for(5)->microseconds();
+        $pause = Siesta::for(5)->microseconds();
 
         $this->assertSame($pause->duration->totalMicroseconds, 5);
 
@@ -94,7 +94,7 @@ class PauseTest extends TestCase
 
     public function testItCanSpecifyMicrosecond()
     {
-        $pause = Pause::for(1)->millisecond();
+        $pause = Siesta::for(1)->millisecond();
 
         $this->assertSame($pause->duration->totalMilliseconds, 1);
 
@@ -103,7 +103,7 @@ class PauseTest extends TestCase
 
     public function testItCanChainDurations()
     {
-        $pause = Pause::for(1)->second()->and(500)->microseconds();
+        $pause = Siesta::for(1)->second()->and(500)->microseconds();
 
         $this->assertSame($pause->duration->totalMicroseconds, 1000500);
 
@@ -112,7 +112,7 @@ class PauseTest extends TestCase
 
     public function testItCanPassDateInterval()
     {
-        $pause = Pause::for(CarbonInterval::seconds(3));
+        $pause = Siesta::for(CarbonInterval::seconds(3));
 
         $this->assertSame($pause->duration->totalSeconds, 3);
 
@@ -122,7 +122,7 @@ class PauseTest extends TestCase
     public function testItThrowsOnUnknownTimeUnit()
     {
         try {
-            Pause::for(5);
+            Siesta::for(5);
             $this->fail();
         } catch (RuntimeException $e) {
             $this->assertSame('Unknown pause time unit.', $e->getMessage());
@@ -131,10 +131,10 @@ class PauseTest extends TestCase
 
     public function testItCanFakeSleep()
     {
-        Pause::fake();
+        Siesta::fake();
 
         $start = Carbon::now();
-        Pause::for(5)->seconds();
+        Siesta::for(5)->seconds();
         $end = Carbon::now();
 
         $this->assertTrue($start->toImmutable()->addMilliseconds(20)->isAfter($end));
@@ -142,28 +142,28 @@ class PauseTest extends TestCase
 
     public function testItCanAssertPauseSequences()
     {
-        Pause::fake();
+        Siesta::fake();
 
-        Pause::for(5)->seconds();
-        Pause::for(1)->seconds()->and(5)->microsecond();
+        Siesta::for(5)->seconds();
+        Siesta::for(1)->seconds()->and(5)->microsecond();
 
-        Pause::assertSequence([
-            Pause::for(5)->seconds(),
-            Pause::for(1)->seconds()->and(5)->microsecond(),
+        Siesta::assertSequence([
+            Siesta::for(5)->seconds(),
+            Siesta::for(1)->seconds()->and(5)->microsecond(),
         ]);
     }
 
     public function testItCanFailAssertions()
     {
-        Pause::fake();
+        Siesta::fake();
 
-        Pause::for(5)->seconds();
-        Pause::for(1)->seconds()->and(5)->microsecond();
+        Siesta::for(5)->seconds();
+        Siesta::for(1)->seconds()->and(5)->microsecond();
 
         try {
-            Pause::assertSequence([
-                Pause::for(5)->seconds(),
-                Pause::for(5)->seconds(),
+            Siesta::assertSequence([
+                Siesta::for(5)->seconds(),
+                Siesta::for(5)->seconds(),
             ]);
             $this->fail();
         } catch (AssertionFailedError $e) {
@@ -173,59 +173,59 @@ class PauseTest extends TestCase
 
     public function testItCanCallSleepDirectly()
     {
-        Pause::fake();
+        Siesta::fake();
 
-        Pause::sleep(3);
+        Siesta::sleep(3);
 
-        Pause::assertSequence([
-            Pause::for(3)->seconds(),
+        Siesta::assertSequence([
+            Siesta::for(3)->seconds(),
         ]);
     }
 
     public function testItCanCallUSleepDirectly()
     {
-        Pause::fake();
+        Siesta::fake();
 
-        Pause::usleep(3);
+        Siesta::usleep(3);
 
-        Pause::assertSequence([
-            Pause::for(3)->microseconds(),
+        Siesta::assertSequence([
+            Siesta::for(3)->microseconds(),
         ]);
     }
 
     public function testItCanSleepTillGivenTime()
     {
         Carbon::setTestNow(now()->startOfDay());
-        Pause::fake();
+        Siesta::fake();
 
-        Pause::until(now()->addMinute());
+        Siesta::until(now()->addMinute());
 
-        Pause::assertSequence([
-            Pause::for(60)->seconds()
+        Siesta::assertSequence([
+            Siesta::for(60)->seconds()
         ]);
     }
 
-    public function testItSilentlyDoesntSleepIfTimeHasAlreadyPast()
+    public function testItSleepsForZeroTimeIfTimeHasAlreadyPast()
     {
-        Pause::fake();
+        Siesta::fake();
         Carbon::setTestNow(now()->startOfDay());
 
-        Pause::until(now()->subMinute());
+        Siesta::until(now()->subMinute());
 
-        Pause::assertSequence([
-            Pause::for(0)->seconds()
+        Siesta::assertSequence([
+            Siesta::for(0)->seconds()
         ]);
     }
 
     public function testEmptyDiff()
     {
-        Pause::fake();
+        Siesta::fake();
 
-        Pause::for(0)->seconds();
+        Siesta::for(0)->seconds();
 
         try {
-            Pause::assertSequence([
-                Pause::for(1)->seconds(),
+            Siesta::assertSequence([
+                Siesta::for(1)->seconds(),
             ]);
             $this->fail();
         } catch (AssertionFailedError $e) {
@@ -235,14 +235,14 @@ class PauseTest extends TestCase
 
     public function testMoreAssertionsThanPauses()
     {
-        Pause::fake();
+        Siesta::fake();
 
-        Pause::for(1)->seconds();
+        Siesta::for(1)->seconds();
 
         try {
-            Pause::assertSequence([
-                Pause::for(1)->seconds(),
-                Pause::for(1)->seconds(),
+            Siesta::assertSequence([
+                Siesta::for(1)->seconds(),
+                Siesta::for(1)->seconds(),
             ]);
             $this->fail();
         } catch (AssertionFailedError $e) {
@@ -252,14 +252,56 @@ class PauseTest extends TestCase
 
     public function testMorePausesThanAssertions()
     {
-        Pause::fake();
+        Siesta::fake();
 
-        Pause::for(1)->seconds();
-        Pause::for(2)->seconds();
+        Siesta::for(1)->seconds();
+        Siesta::for(2)->seconds();
 
-        Pause::assertSequence([
-            Pause::for(1)->seconds(),
+        Siesta::assertSequence([
+            Siesta::for(1)->seconds(),
         ]);
     }
-}
 
+    public function testItDoesntSleepForNegativeDurations()
+    {
+        Siesta::fake();
+
+        Siesta::for(-1)->seconds();
+
+        Siesta::assertSequence([
+            Siesta::for(0)->seconds(),
+        ]);
+    }
+
+    public function testItDoesSleepWhenNegativeValuesAreChainedToPositive()
+    {
+        Siesta::fake();
+
+        Siesta::for(-1)->seconds()->and(5)->seconds();
+
+        Siesta::assertSequence([
+            Siesta::for(4)->seconds(),
+        ]);
+    }
+
+    public function testItDoesntCaptureAssertionInstances()
+    {
+        Siesta::fake();
+
+        Siesta::for(1)->second();
+
+        Siesta::assertSequence([
+            Siesta::for(1)->second(),
+        ]);
+
+        try {
+            Siesta::assertSequence([
+                Siesta::for(1)->second(),
+                Siesta::for(1)->second(),
+            ]);
+            $this->fail();
+        } catch (AssertionFailedError $e) {
+            $this->assertSame("Expected [2] pauses but only found [1].\nFailed asserting that false is true.", $e->getMessage());
+        }
+    }
+}

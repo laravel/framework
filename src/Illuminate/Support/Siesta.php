@@ -9,7 +9,7 @@ use DateTimeInterface;
 use PHPUnit\Framework\Assert as PHPUnit;
 use RuntimeException;
 
-class Pause
+class Siesta
 {
     /**
      * The total duration to pause execution.
@@ -26,18 +26,25 @@ class Pause
     protected $pending;
 
     /**
-     * Indicate that all sleeping should be faked.
+     * Indicates that all sleeping should be faked.
      *
      * @var bool
      */
     protected static $fake = false;
 
     /**
-     * The sequence of pauses while faking.
+     * The sequence of sleep durations encountered while faking.
      *
      * @var array
      */
     protected static $pauseSequence = [];
+
+    /**
+     * The instance should be "captured" when faking.
+     *
+     * @var bool
+     */
+    protected $capture = true;
 
     /**
      * Create a new Pause instance.
@@ -56,6 +63,28 @@ class Pause
 
             $this->pending = $duration;
         }
+    }
+
+    /**
+     * Pause execution for the given duration in microseconds.
+     *
+     * @param  int  $duration
+     * @return $this
+     */
+    public static function usleep($duration)
+    {
+        return static::for($duration)->microseconds();
+    }
+
+    /**
+     * Pause execution for the given duration in seconds.
+     *
+     * @param  int  $duration
+     * @return $this
+     */
+    public static function sleep($duration)
+    {
+        return static::for($duration)->seconds();
     }
 
     /**
@@ -81,10 +110,9 @@ class Pause
             $timestamp = Carbon::createFromTimestamp($timestamp);
         }
 
-        $duration = Carbon::now()->diff($timestamp);
-
-        static::for($duration);
+        static::for(Carbon::now()->diff($timestamp));
     }
+
 
     /**
      * Pause execution for the given number of minutes.
@@ -204,14 +232,14 @@ class Pause
             throw new RuntimeException('Unknown pause time unit.');
         }
 
-        if ($this->duration->invert) {
+        if ($this->duration->totalMicroseconds <= 0) {
             $this->duration = CarbonInterval::seconds(0);
         }
 
         if (static::$fake) {
-            // if ($this->capture) {
+            if ($this->capture) {
                 static::$pauseSequence[] = $this->duration;
-            // }
+            }
 
             return;
         }
@@ -228,28 +256,6 @@ class Pause
         if ($remaining->totalMicroseconds > 0) {
             usleep($remaining->totalMicroseconds);
         }
-    }
-
-    /**
-     * Pause execution for the given duration in microseconds.
-     *
-     * @param  int  $duration
-     * @return $this
-     */
-    public static function usleep($duration)
-    {
-        return static::for($duration)->microseconds();
-    }
-
-    /**
-     * Pause execution for the given duration in seconds.
-     *
-     * @param  int  $duration
-     * @return $this
-     */
-    public static function sleep($duration)
-    {
-        return static::for($duration)->seconds();
     }
 
     /**
@@ -279,10 +285,12 @@ class Pause
 
         collect($sequence)
             ->zip(static::$pauseSequence)
-            ->eachSpread(function (?Pause $expected, CarbonInterval $actual) {
+            ->eachSpread(function (?Siesta $expected, CarbonInterval $actual) {
                 if ($expected === null) {
-                    return false;
+                    return;
                 }
+
+                $expected->capture = false;
 
                 PHPUnit::assertTrue(
                     $expected->duration->equalTo($actual),
