@@ -278,7 +278,6 @@ class Pause
         );
 
         collect($sequence)
-            ->take($actualCount)
             ->zip(static::$pauseSequence)
             ->eachSpread(function (?Pause $expected, CarbonInterval $actual) {
                 if ($expected === null) {
