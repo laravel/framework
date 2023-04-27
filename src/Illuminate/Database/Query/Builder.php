@@ -516,9 +516,9 @@ class Builder implements BuilderContract
      * @param  bool  $where
      * @return $this
      */
-    public function join($table, $first, $operator = null, $second = null, $type = 'inner', $where = false)
+    public function join($table, $first, $operator = null, $second = null, $type = 'inner', $where = false, $softDeleteField = null)
     {
-        $join = $this->newJoinClause($this, $type, $table);
+        $join = $this->newJoinClause($this, $type, $table, $softDeleteField);
 
         // If the first "column" of the join is really a Closure instance the developer
         // is trying to build a join with a complex "on" clause containing more than
@@ -586,6 +586,23 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a join clause to the query, considering soft deleted records.
+     *
+     * @param  string  $table
+     * @param  \Closure|string  $first
+     * @param  string|null  $operator
+     * @param  string|null  $second
+     * @param  string  $type
+     * @param  bool  $where
+     * @param  string  $softDeleteField
+     * @return $this
+     */
+    public function joinSoft($table, $first, $operator = null, $second = null, $type = 'inner', $where = false, $softDeleteField = 'deleted_at')
+    {
+        return $this->join($table, $first, $operator, $second, $type, $where, $softDeleteField);
+    }
+
+    /**
      * Add a left join to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $table
@@ -626,6 +643,21 @@ class Builder implements BuilderContract
     public function leftJoinSub($query, $as, $first, $operator = null, $second = null)
     {
         return $this->joinSub($query, $as, $first, $operator, $second, 'left');
+    }
+
+    /**
+     * Add a left join to the query, considering soft deleted records.
+     *
+     * @param  string  $table
+     * @param  \Closure|string  $first
+     * @param  string|null  $operator
+     * @param  string|null  $second
+     * @param  string  $softDeleteField
+     * @return $this
+     */
+    public function leftJoinSoft($table, $first, $operator = null, $second = null, $softDeleteField = 'deleted_at')
+    {
+        return $this->join($table, $first, $operator, $second, 'left', false, $softDeleteField);
     }
 
     /**
@@ -672,6 +704,21 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a right join to the query, considering soft deleted records.
+     *
+     * @param  string  $table
+     * @param  \Closure|string  $first
+     * @param  string|null  $operator
+     * @param  string|null  $second
+     * @param  string  $softDeleteField
+     * @return $this
+     */
+    public function rightJoinSoft($table, $first, $operator = null, $second = null, $softDeleteField = 'deleted_at')
+    {
+        return $this->join($table, $first, $operator, $second, 'right', false, $softDeleteField);
+    }
+
+    /**
      * Add a "cross join" clause to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $table
@@ -712,6 +759,27 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a "cross join" clause to the query, considering soft deleted records.
+     *
+     * @param  string  $table
+     * @param  \Closure|string|null  $first
+     * @param  string|null  $operator
+     * @param  string|null  $second
+     * @param  string  $softDeleteField
+     * @return $this
+     */
+    public function crossJoinSoft($table, $first = null, $operator = null, $second = null, $softDeleteField = 'deleted_at')
+    {
+        if ($first) {
+            return $this->join($table, $first, $operator, $second, 'cross', false, $softDeleteField);
+        }
+
+        $this->joins[] = $this->newJoinClause($this, 'cross', $table);
+
+        return $this;
+    }
+
+    /**
      * Get a new join clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $parentQuery
@@ -719,9 +787,9 @@ class Builder implements BuilderContract
      * @param  string  $table
      * @return \Illuminate\Database\Query\JoinClause
      */
-    protected function newJoinClause(self $parentQuery, $type, $table)
+    protected function newJoinClause(self $parentQuery, $type, $table, $softDeleteField = null)
     {
-        return new JoinClause($parentQuery, $type, $table);
+        return new JoinClause($parentQuery, $type, $table, $softDeleteField);
     }
 
     /**

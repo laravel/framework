@@ -7,6 +7,13 @@ use Closure;
 class JoinClause extends Builder
 {
     /**
+     * The soft delete field of second table.
+     *
+     * @var string
+     */
+    protected $softDeleteField;
+
+    /**
      * The type of join being performed.
      *
      * @var string
@@ -56,8 +63,9 @@ class JoinClause extends Builder
      * @param  string  $table
      * @return void
      */
-    public function __construct(Builder $parentQuery, $type, $table)
+    public function __construct(Builder $parentQuery, $type, $table, $softDeleteField = null)
     {
+        $this->softDeleteField = $softDeleteField;
         $this->type = $type;
         $this->table = $table;
         $this->parentClass = get_class($parentQuery);
@@ -94,6 +102,11 @@ class JoinClause extends Builder
     {
         if ($first instanceof Closure) {
             return $this->whereNested($first, $boolean);
+        }
+
+        //Excluding any soft-deleted records in joinSoft
+        if ($this->softDeleteField) {
+            $this->whereNull($this->stripTableForPluck("$this->table.{$this->softDeleteField}"));
         }
 
         return $this->whereColumn($first, $operator, $second, $boolean);
