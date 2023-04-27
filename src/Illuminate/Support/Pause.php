@@ -190,7 +190,9 @@ class Pause
         }
 
         if (static::$fake) {
-            static::$pauseSequence = $this->duration;
+            if ($this->capture) {
+                static::$pauseSequence[] = $this->duration;
+            }
 
             return;
         }
@@ -244,6 +246,7 @@ class Pause
 
     public static function assertSequence($sequence)
     {
+        // set all to no capture.
         //
     }
 }
