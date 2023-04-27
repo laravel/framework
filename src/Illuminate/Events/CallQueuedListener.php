@@ -125,6 +125,8 @@ class CallQueuedListener implements ShouldQueue
     }
 
     /**
+     * If set, copy queue related variables from the listener class.
+     *
      * @param  object $handler
      * @return  object
      */
