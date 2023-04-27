@@ -2324,23 +2324,23 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['foo' => 'yes', 'bar' => '2'], ['foo' => 'missing_unless:bar,1']);
         $this->assertFalse($v->passes());
-        $this->assertSame('The foo field must be missing unless bar is 2.', $v->errors()->first('foo'));
+        $this->assertSame('The foo field must be missing unless bar is 1.', $v->errors()->first('foo'));
 
         $v = new Validator($trans, ['foo' => '', 'bar' => '2'], ['foo' => 'missing_unless:bar,1']);
         $this->assertFalse($v->passes());
-        $this->assertSame('The foo field must be missing unless bar is 2.', $v->errors()->first('foo'));
+        $this->assertSame('The foo field must be missing unless bar is 1.', $v->errors()->first('foo'));
 
         $v = new Validator($trans, ['foo' => ' ', 'bar' => '2'], ['foo' => 'missing_unless:bar,1']);
         $this->assertFalse($v->passes());
-        $this->assertSame('The foo field must be missing unless bar is 2.', $v->errors()->first('foo'));
+        $this->assertSame('The foo field must be missing unless bar is 1.', $v->errors()->first('foo'));
 
         $v = new Validator($trans, ['foo' => null, 'bar' => '2'], ['foo' => 'missing_unless:bar,1']);
         $this->assertFalse($v->passes());
-        $this->assertSame('The foo field must be missing unless bar is 2.', $v->errors()->first('foo'));
+        $this->assertSame('The foo field must be missing unless bar is 1.', $v->errors()->first('foo'));
 
         $v = new Validator($trans, ['foo' => [], 'bar' => '2'], ['foo' => 'missing_unless:bar,1']);
         $this->assertFalse($v->passes());
-        $this->assertSame('The foo field must be missing unless bar is 2.', $v->errors()->first('foo'));
+        $this->assertSame('The foo field must be missing unless bar is 1.', $v->errors()->first('foo'));
 
         $v = new Validator($trans, ['foo' => new class implements Countable
         {
@@ -2350,7 +2350,7 @@ class ValidationValidatorTest extends TestCase
             }
         }, 'bar' => '2', ], ['foo' => 'missing_unless:bar,1']);
         $this->assertFalse($v->passes());
-        $this->assertSame('The foo field must be missing unless bar is 2.', $v->errors()->first('foo'));
+        $this->assertSame('The foo field must be missing unless bar is 1.', $v->errors()->first('foo'));
 
         $v = new Validator($trans, ['foo' => 'foo', 'bar' => '1'], ['foo' => 'missing_unless:bar,1']);
         $this->assertTrue($v->passes());
