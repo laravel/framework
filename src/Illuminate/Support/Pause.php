@@ -2,8 +2,10 @@
 
 namespace Illuminate\Support;
 
+use Illuminate\Support\Carbon;
 use Carbon\CarbonInterval;
 use DateInterval;
+use DateTimeInterface;
 use PHPUnit\Framework\Assert as PHPUnit;
 use RuntimeException;
 
@@ -33,14 +35,14 @@ class Pause
     /**
      * The sequence of pauses while faking.
      *
-     * @var bool
+     * @var array
      */
     protected static $pauseSequence = [];
 
     /**
      * Create a new Pause instance.
      *
-     * @param  int|float  $duration
+     * @param  int|float|\DateInterval  $duration
      * @return void
      */
     public function __construct($duration)
@@ -67,9 +69,21 @@ class Pause
         return new static($duration);
     }
 
+    /**
+     * Sleep until the given timestamp.
+     *
+     * @param  int|\DateTimeInterface  $timestamp
+     * @return void
+     */
     public static function until($timestamp)
     {
-        //
+        if (is_int($timestamp)) {
+            $timestamp = Carbon::createFromTimestamp($timestamp);
+        }
+
+        $duration = Carbon::now()->diff($timestamp);
+
+        static::for($duration);
     }
 
     /**
@@ -190,6 +204,10 @@ class Pause
             throw new RuntimeException('Unknown pause time unit.');
         }
 
+        if ($this->duration->invert) {
+            $this->duration = CarbonInterval::seconds(0);
+        }
+
         if (static::$fake) {
             // if ($this->capture) {
                 static::$pauseSequence[] = $this->duration;
@@ -201,14 +219,14 @@ class Pause
         $remaining = $this->duration->copy();
 
         if ((int) $remaining->totalSeconds > 0) {
-            static::sleep((int) $remaining->totalSeconds);
+            sleep((int) $remaining->totalSeconds);
 
             $remaining = $remaining->subSeconds((int) $remaining->totalSeconds);
         }
 
 
         if ($remaining->totalMicroseconds > 0) {
-            static::usleep($remaining->totalMicroseconds);
+            usleep($remaining->totalMicroseconds);
         }
     }
 
@@ -216,22 +234,22 @@ class Pause
      * Pause execution for the given duration in microseconds.
      *
      * @param  int  $duration
-     * @return void
+     * @return $this
      */
     public static function usleep($duration)
     {
-        usleep($duration);
+        return static::for($duration)->microseconds();
     }
 
     /**
      * Pause execution for the given duration in seconds.
      *
      * @param  int  $duration
-     * @return void
+     * @return $this
      */
     public static function sleep($duration)
     {
-        sleep($duration);
+        return static::for($duration)->seconds();
     }
 
     /**
@@ -247,22 +265,29 @@ class Pause
         static::$pauseSequence = [];
     }
 
+    /**
+     * Assert the given pause sequence was encountered.
+     *
+     * @param  array  $sequence
+     * @return void
+     */
     public static function assertSequence($sequence)
     {
+        PHPUnit::assertTrue(($expectedCount = count($sequence)) <= ($actualCount = count(static::$pauseSequence)),
+            "Expected [{$expectedCount}] pauses but only found [{$actualCount}]."
+        );
+
         collect($sequence)
+            ->take($actualCount)
             ->zip(static::$pauseSequence)
-            ->eachSpread(function (?Pause $expected, ?CarbonInterval $actual) {
+            ->eachSpread(function (?Pause $expected, CarbonInterval $actual) {
                 if ($expected === null) {
                     return false;
                 }
 
-                if ($actual === null) {
-                    // PHPUnit::fail('Expected ');
-                }
-
                 PHPUnit::assertTrue(
                     $expected->duration->equalTo($actual),
-                    "Expected pause of [{$expected->duration->forHumans()}] but instead found pause of [{$actual->forHumans()}]."
+                    "Expected pause of [{$expected->duration->forHumans(['options' => 0])}] but instead found pause of [{$actual->forHumans(['options' => 0])}]."
                 );
             });
     }

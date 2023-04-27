@@ -170,5 +170,96 @@ class PauseTest extends TestCase
             $this->assertSame("Expected pause of [5 seconds] but instead found pause of [1 second].\nFailed asserting that false is true.", $e->getMessage());
         }
     }
+
+    public function testItCanCallSleepDirectly()
+    {
+        Pause::fake();
+
+        Pause::sleep(3);
+
+        Pause::assertSequence([
+            Pause::for(3)->seconds(),
+        ]);
+    }
+
+    public function testItCanCallUSleepDirectly()
+    {
+        Pause::fake();
+
+        Pause::usleep(3);
+
+        Pause::assertSequence([
+            Pause::for(3)->microseconds(),
+        ]);
+    }
+
+    public function testItCanSleepTillGivenTime()
+    {
+        Carbon::setTestNow(now()->startOfDay());
+        Pause::fake();
+
+        Pause::until(now()->addMinute());
+
+        Pause::assertSequence([
+            Pause::for(60)->seconds()
+        ]);
+    }
+
+    public function testItSilentlyDoesntSleepIfTimeHasAlreadyPast()
+    {
+        Pause::fake();
+        Carbon::setTestNow(now()->startOfDay());
+
+        Pause::until(now()->subMinute());
+
+        Pause::assertSequence([
+            Pause::for(0)->seconds()
+        ]);
+    }
+
+    public function testEmptyDiff()
+    {
+        Pause::fake();
+
+        Pause::for(0)->seconds();
+
+        try {
+            Pause::assertSequence([
+                Pause::for(1)->seconds(),
+            ]);
+            $this->fail();
+        } catch (AssertionFailedError $e) {
+            $this->assertSame("Expected pause of [1 second] but instead found pause of [0 seconds].\nFailed asserting that false is true.", $e->getMessage());
+        }
+    }
+
+    public function testMoreAssertionsThanPauses()
+    {
+        Pause::fake();
+
+        Pause::for(1)->seconds();
+
+        try {
+            Pause::assertSequence([
+                Pause::for(1)->seconds(),
+                Pause::for(1)->seconds(),
+            ]);
+            $this->fail();
+        } catch (AssertionFailedError $e) {
+            $this->assertSame("Expected [2] pauses but only found [1].\nFailed asserting that false is true.", $e->getMessage());
+        }
+    }
+
+    public function testMorePausesThanAssertions()
+    {
+        Pause::fake();
+
+        Pause::for(1)->seconds();
+        Pause::for(2)->seconds();
+
+        Pause::assertSequence([
+            Pause::for(1)->seconds(),
+        ]);
+    }
 }
 
