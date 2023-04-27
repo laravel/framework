@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseJoinSoftTest extends TestCase
@@ -97,7 +98,7 @@ class DatabaseJoinSoftTest extends TestCase
         $this->seedData();
 
         // Use joinSoft to join users with posts, exclude soft-deleted posts
-        $items = User::joinSoft('posts', 'users.id', 'posts.user_id')->get();
+        $items = User::join(Post::class, 'users.id', 'posts.user_id')->get();
 
         // Ensure that only the posts from the non-deleted user are returned
         $this->assertCount(2, $items);
@@ -112,7 +113,7 @@ class DatabaseJoinSoftTest extends TestCase
 
         // Use joinSoft to join users with posts, exclude soft-deleted posts
         $query = DB::table('users')
-            ->joinSoft('posts', 'users.id', '=', 'posts.user_id')
+            ->join(Post::class, 'users.id', '=', 'posts.user_id')
             ->select('users.name', 'posts.title')
             ->get();
 
@@ -126,4 +127,9 @@ class DatabaseJoinSoftTest extends TestCase
 
 class User extends Eloquent
 {
+}
+
+class Post extends Eloquent
+{
+    use SoftDeletes;
 }

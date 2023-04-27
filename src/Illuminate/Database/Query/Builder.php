@@ -13,6 +13,7 @@ use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Concerns\ExplainsQueries;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
@@ -508,7 +509,7 @@ class Builder implements BuilderContract
     /**
      * Add a join clause to the query.
      *
-     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $table
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string|Model  $table
      * @param  \Closure|string  $first
      * @param  string|null  $operator
      * @param  string|null  $second
@@ -516,8 +517,17 @@ class Builder implements BuilderContract
      * @param  bool  $where
      * @return $this
      */
-    public function join($table, $first, $operator = null, $second = null, $type = 'inner', $where = false, $softDeleteField = null)
+    public function join($table, $first, $operator = null, $second = null, $type = 'inner', $where = false)
     {
+        //If the provided table is actually an eloquent model, get the table name and soft-delete field from the corresponding model.
+        if (is_string($table) && class_exists($table)) {
+            $model = new $table;
+            $table = $model->getTable();
+            $softDeleteField = $model->getQualifiedDeletedAtColumn();
+        } else {
+            $softDeleteField = null;
+        }
+
         $join = $this->newJoinClause($this, $type, $table, $softDeleteField);
 
         // If the first "column" of the join is really a Closure instance the developer
@@ -586,23 +596,6 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Add a join clause to the query, considering soft deleted records.
-     *
-     * @param  string  $table
-     * @param  \Closure|string  $first
-     * @param  string|null  $operator
-     * @param  string|null  $second
-     * @param  string  $type
-     * @param  bool  $where
-     * @param  string  $softDeleteField
-     * @return $this
-     */
-    public function joinSoft($table, $first, $operator = null, $second = null, $type = 'inner', $where = false, $softDeleteField = 'deleted_at')
-    {
-        return $this->join($table, $first, $operator, $second, $type, $where, $softDeleteField);
-    }
-
-    /**
      * Add a left join to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $table
@@ -643,21 +636,6 @@ class Builder implements BuilderContract
     public function leftJoinSub($query, $as, $first, $operator = null, $second = null)
     {
         return $this->joinSub($query, $as, $first, $operator, $second, 'left');
-    }
-
-    /**
-     * Add a left join to the query, considering soft deleted records.
-     *
-     * @param  string  $table
-     * @param  \Closure|string  $first
-     * @param  string|null  $operator
-     * @param  string|null  $second
-     * @param  string  $softDeleteField
-     * @return $this
-     */
-    public function leftJoinSoft($table, $first, $operator = null, $second = null, $softDeleteField = 'deleted_at')
-    {
-        return $this->join($table, $first, $operator, $second, 'left', false, $softDeleteField);
     }
 
     /**
@@ -704,21 +682,6 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Add a right join to the query, considering soft deleted records.
-     *
-     * @param  string  $table
-     * @param  \Closure|string  $first
-     * @param  string|null  $operator
-     * @param  string|null  $second
-     * @param  string  $softDeleteField
-     * @return $this
-     */
-    public function rightJoinSoft($table, $first, $operator = null, $second = null, $softDeleteField = 'deleted_at')
-    {
-        return $this->join($table, $first, $operator, $second, 'right', false, $softDeleteField);
-    }
-
-    /**
      * Add a "cross join" clause to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $table
@@ -754,27 +717,6 @@ class Builder implements BuilderContract
         $this->addBinding($bindings, 'join');
 
         $this->joins[] = $this->newJoinClause($this, 'cross', new Expression($expression));
-
-        return $this;
-    }
-
-    /**
-     * Add a "cross join" clause to the query, considering soft deleted records.
-     *
-     * @param  string  $table
-     * @param  \Closure|string|null  $first
-     * @param  string|null  $operator
-     * @param  string|null  $second
-     * @param  string  $softDeleteField
-     * @return $this
-     */
-    public function crossJoinSoft($table, $first = null, $operator = null, $second = null, $softDeleteField = 'deleted_at')
-    {
-        if ($first) {
-            return $this->join($table, $first, $operator, $second, 'cross', false, $softDeleteField);
-        }
-
-        $this->joins[] = $this->newJoinClause($this, 'cross', $table);
 
         return $this;
     }
