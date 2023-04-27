@@ -1293,6 +1293,29 @@ class Str
     }
 
     /**
+     * Generates an acronym from a given text and combines it with an optional delimiter.
+     *
+     * @param  string $string
+     * @param  string $delimiter
+     * @return string
+     */
+    public static function acronym($string, $delimiter = '')
+    {
+        if (empty($string)) {
+            return '';
+        }
+
+        $acronym = '';
+        $words = preg_split('/[^\p{L}]+/u', $string);
+
+        foreach ($words as $word) {
+            $acronym .= mb_substr($word, 0, 1) . $delimiter;
+        }
+
+        return $acronym;
+    }
+
+    /**
      * Get the number of words a string contains.
      *
      * @param  string  $string

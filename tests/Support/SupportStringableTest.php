@@ -217,6 +217,14 @@ class SupportStringableTest extends TestCase
         $this->assertSame(['He_llo_', 'World'], $this->stringable('He_llo_World')->ucsplit()->toArray());
     }
 
+    public function testAcronymOnStringable()
+    {
+        $this->assertSame('LF', (string) $this->stringable('Laravel Framework')->acronym());
+        $this->assertSame('lf', (string) $this->stringable('laravel.framework')->acronym());
+        $this->assertSame('İbPk', (string) $this->stringable('İşte bir PHP kodu')->acronym());
+        $this->assertSame('H.W.', (string) $this->stringable('Hello World')->acronym('.'));
+    }
+
     public function testWhenEndsWith()
     {
         $this->assertSame('Tony Stark', (string) $this->stringable('tony stark')->whenEndsWith('ark', function ($stringable) {

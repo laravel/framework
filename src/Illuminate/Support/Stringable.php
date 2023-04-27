@@ -917,6 +917,17 @@ class Stringable implements JsonSerializable, ArrayAccess
     }
 
     /**
+     * Generates an acronym and combines it with an optional delimiter.
+     *
+     * @param  string $delimiter
+     * @return static
+     */
+    public function acronym($delimiter = '')
+    {
+        return new static(Str::acronym($this->value, $delimiter));
+    }
+
+    /**
      * Execute the given callback if the string contains a given substring.
      *
      * @param  string|iterable<string>  $needles
