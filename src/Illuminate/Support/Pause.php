@@ -4,6 +4,7 @@ namespace Illuminate\Support;
 
 use Carbon\CarbonInterval;
 use DateInterval;
+use PHPUnit\Framework\Assert as PHPUnit;
 use RuntimeException;
 
 class Pause
@@ -190,9 +191,9 @@ class Pause
         }
 
         if (static::$fake) {
-            if ($this->capture) {
+            // if ($this->capture) {
                 static::$pauseSequence[] = $this->duration;
-            }
+            // }
 
             return;
         }
@@ -242,11 +243,27 @@ class Pause
     public static function fake($value = true)
     {
         static::$fake = $value;
+
+        static::$pauseSequence = [];
     }
 
     public static function assertSequence($sequence)
     {
-        // set all to no capture.
-        //
+        collect($sequence)
+            ->zip(static::$pauseSequence)
+            ->eachSpread(function (?Pause $expected, ?CarbonInterval $actual) {
+                if ($expected === null) {
+                    return false;
+                }
+
+                if ($actual === null) {
+                    // PHPUnit::fail('Expected ');
+                }
+
+                PHPUnit::assertTrue(
+                    $expected->duration->equalTo($actual),
+                    "Expected pause of [{$expected->duration->forHumans()}] but instead found pause of [{$actual->forHumans()}]."
+                );
+            });
     }
 }

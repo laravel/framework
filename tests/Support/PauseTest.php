@@ -5,12 +5,18 @@ namespace Illuminate\Tests\Support;
 use Carbon\CarbonInterval;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Pause;
+use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
 class PauseTest extends TestCase
 {
-    // all tests have a 20 milliseconds leeway.
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Pause::fake(false);
+    }
 
     public function testItSleepForSeconds()
     {
@@ -132,9 +138,37 @@ class PauseTest extends TestCase
         $end = Carbon::now();
 
         $this->assertTrue($start->toImmutable()->addMilliseconds(20)->isAfter($end));
+    }
+
+    public function testItCanAssertPauseSequences()
+    {
+        Pause::fake();
+
+        Pause::for(5)->seconds();
+        Pause::for(1)->seconds()->and(5)->microsecond();
 
         Pause::assertSequence([
-            Pause::for(5)->seconds()
+            Pause::for(5)->seconds(),
+            Pause::for(1)->seconds()->and(5)->microsecond(),
         ]);
     }
+
+    public function testItCanFailAssertions()
+    {
+        Pause::fake();
+
+        Pause::for(5)->seconds();
+        Pause::for(1)->seconds()->and(5)->microsecond();
+
+        try {
+            Pause::assertSequence([
+                Pause::for(5)->seconds(),
+                Pause::for(5)->seconds(),
+            ]);
+            $this->fail();
+        } catch (AssertionFailedError $e) {
+            $this->assertSame("Expected pause of [5 seconds] but instead found pause of [1 second].\nFailed asserting that false is true.", $e->getMessage());
+        }
+    }
 }
+
