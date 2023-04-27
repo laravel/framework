@@ -7,6 +7,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
+use Throwable;
 
 class CallQueuedListener implements ShouldQueue
 {
@@ -104,7 +105,11 @@ class CallQueuedListener implements ShouldQueue
             $this->job, $container->make($this->class)
         );
 
-        $handler->{$this->method}(...array_values($this->data));
+        try {
+            $handler->{$this->method}(...array_values($this->data));
+        } catch (Throwable $exception) {
+            $this->fail($exception);
+        }
     }
 
     /**
@@ -128,7 +133,7 @@ class CallQueuedListener implements ShouldQueue
      *
      * The event instance and the exception will be passed.
      *
-     * @param  \Throwable  $e
+     * @param  Throwable  $e
      * @return void
      */
     public function failed($e)
