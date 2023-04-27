@@ -4,6 +4,7 @@ namespace Illuminate\Support;
 
 use Carbon\CarbonInterval;
 use DateInterval;
+use RuntimeException;
 
 class Pause
 {
@@ -20,6 +21,20 @@ class Pause
      * @var int|float
      */
     protected $pending;
+
+    /**
+     * Indicate that all sleeping should be faked.
+     *
+     * @var bool
+     */
+    protected static $fake = false;
+
+    /**
+     * The sequence of pauses while faking.
+     *
+     * @var bool
+     */
+    protected static $pauseSequence = [];
 
     /**
      * Create a new Pause instance.
@@ -170,6 +185,16 @@ class Pause
      */
     public function __destruct()
     {
+        if ($this->pending !== 0) {
+            throw new RuntimeException('Unknown pause time unit.');
+        }
+
+        if (static::$fake) {
+            static::$pauseSequence = $this->duration;
+
+            return;
+        }
+
         $remaining = $this->duration->copy();
 
         if ((int) $remaining->totalSeconds > 0) {
@@ -204,5 +229,21 @@ class Pause
     public static function sleep($duration)
     {
         sleep($duration);
+    }
+
+    /**
+     * Capture all pauses for testing.
+     *
+     * @param  bool  $value
+     * @return void
+     */
+    public static function fake($value = true)
+    {
+        static::$fake = $value;
+    }
+
+    public static function assertSequence($sequence)
+    {
+        //
     }
 }

@@ -6,6 +6,7 @@ use Carbon\CarbonInterval;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Pause;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class PauseTest extends TestCase
 {
@@ -110,5 +111,30 @@ class PauseTest extends TestCase
         $this->assertSame($pause->duration->totalSeconds, 3);
 
         $pause->duration = CarbonInterval::seconds(0);
+    }
+
+    public function testItThrowsOnUnknownTimeUnit()
+    {
+        try {
+            Pause::for(5);
+            $this->fail();
+        } catch (RuntimeException $e) {
+            $this->assertSame('Unknown pause time unit.', $e->getMessage());
+        }
+    }
+
+    public function testItCanFakeSleep()
+    {
+        Pause::fake();
+
+        $start = Carbon::now();
+        Pause::for(5)->seconds();
+        $end = Carbon::now();
+
+        $this->assertTrue($start->toImmutable()->addMilliseconds(20)->isAfter($end));
+
+        Pause::assertSequence([
+            Pause::for(5)->seconds()
+        ]);
     }
 }
