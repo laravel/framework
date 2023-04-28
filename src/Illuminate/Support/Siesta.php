@@ -33,7 +33,7 @@ class Siesta
     /**
      * The sequence of sleep durations encountered while faking.
      *
-     * @var array
+     * @var array<int, \Illuminate\Support\Siesta>
      */
     protected static $sequence = [];
 
