@@ -18,7 +18,7 @@ class SiestaTest extends TestCase
         Siesta::fake(false);
     }
 
-    public function testItSleepForSeconds()
+    public function testItSleepsForSeconds()
     {
         $start = Carbon::now();
         Siesta::for(1)->seconds();
