@@ -2,10 +2,8 @@
 
 namespace Illuminate\Support;
 
-use Illuminate\Support\Carbon;
 use Carbon\CarbonInterval;
 use DateInterval;
-use DateTimeInterface;
 use PHPUnit\Framework\Assert as PHPUnit;
 use RuntimeException;
 
@@ -250,7 +248,6 @@ class Siesta
 
             $remaining = $remaining->subSeconds((int) $remaining->totalSeconds);
         }
-
 
         if ($remaining->totalMicroseconds > 0) {
             usleep($remaining->totalMicroseconds);

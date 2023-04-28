@@ -201,7 +201,7 @@ class SiestaTest extends TestCase
         Siesta::until(now()->addMinute());
 
         Siesta::assertSequence([
-            Siesta::for(60)->seconds()
+            Siesta::for(60)->seconds(),
         ]);
     }
 
@@ -213,7 +213,7 @@ class SiestaTest extends TestCase
         Siesta::until(now()->subMinute());
 
         Siesta::assertSequence([
-            Siesta::for(0)->seconds()
+            Siesta::for(0)->seconds(),
         ]);
     }
 
