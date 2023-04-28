@@ -2109,6 +2109,10 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('select * from "posts" where "posts"."user_id" = ?', $user->posts()->toSql());
         HasOneOrMany::shouldAddForeignKeyCheck(true);
         $this->assertSame('select * from "posts" where "posts"."user_id" = ? and "posts"."user_id" is not null', $user->posts()->toSql());
+        $this->assertSame(
+            'select * from "posts" where "posts"."user_id" = ?',
+            HasOneOrMany::withoutForeignKeyCheck(fn() => $user->posts()->toSql())
+        );
     }
 
     /**
