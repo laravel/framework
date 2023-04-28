@@ -33,7 +33,7 @@ class Siesta
     /**
      * The sequence of sleep durations encountered while faking.
      *
-     * @var array<int, \Illuminate\Support\Siesta>
+     * @var array<int, \Carbon\CarbonInterval>
      */
     protected static $sequence = [];
 
@@ -237,7 +237,7 @@ class Siesta
 
         if (static::$fake) {
             if ($this->capture) {
-                static::$sequence[] = $this;
+                static::$sequence[] = $this->duration;
             }
 
             return;
@@ -283,7 +283,7 @@ class Siesta
 
         collect($sequence)
             ->zip(static::$sequence)
-            ->eachSpread(function (?Siesta $expected, Siesta $actual) {
+            ->eachSpread(function (?Siesta $expected, CarbonInterval $actual) {
                 if ($expected === null) {
                     return;
                 }
@@ -291,8 +291,8 @@ class Siesta
                 $expected->capture = false;
 
                 PHPUnit::assertTrue(
-                    $expected->duration->equalTo($actual->duration),
-                    "Expected pause of [{$expected->duration->forHumans(['options' => 0])}] but instead found pause of [{$actual->duration->forHumans(['options' => 0])}]."
+                    $expected->duration->equalTo($actual),
+                    "Expected pause of [{$expected->duration->forHumans(['options' => 0])}] but instead found pause of [{$actual->forHumans(['options' => 0])}]."
                 );
             });
     }
