@@ -66,28 +66,6 @@ class Siesta
     }
 
     /**
-     * Pause execution for the given duration in microseconds.
-     *
-     * @param  int  $duration
-     * @return $this
-     */
-    public static function usleep($duration)
-    {
-        return static::for($duration)->microseconds();
-    }
-
-    /**
-     * Pause execution for the given duration in seconds.
-     *
-     * @param  int  $duration
-     * @return $this
-     */
-    public static function sleep($duration)
-    {
-        return static::for($duration)->seconds();
-    }
-
-    /**
      * Pause for the given duration.
      *
      * @param  int|float|DateInterval  $duration
@@ -113,6 +91,27 @@ class Siesta
         static::for(Carbon::now()->diff($timestamp));
     }
 
+    /**
+     * Pause execution for the given duration in microseconds.
+     *
+     * @param  int  $duration
+     * @return $this
+     */
+    public static function usleep($duration)
+    {
+        return static::for($duration)->microseconds();
+    }
+
+    /**
+     * Pause execution for the given duration in seconds.
+     *
+     * @param  int|float  $duration
+     * @return $this
+     */
+    public static function sleep($duration)
+    {
+        return static::for($duration)->seconds();
+    }
 
     /**
      * Pause execution for the given number of minutes.
@@ -238,7 +237,7 @@ class Siesta
 
         if (static::$fake) {
             if ($this->capture) {
-                static::$pauseSequence[] = $this->duration;
+                static::$pauseSequence[] = $this;
             }
 
             return;
@@ -285,7 +284,7 @@ class Siesta
 
         collect($sequence)
             ->zip(static::$pauseSequence)
-            ->eachSpread(function (?Siesta $expected, CarbonInterval $actual) {
+            ->eachSpread(function (?Siesta $expected, Siesta $actual) {
                 if ($expected === null) {
                     return;
                 }
@@ -293,7 +292,7 @@ class Siesta
                 $expected->capture = false;
 
                 PHPUnit::assertTrue(
-                    $expected->duration->equalTo($actual),
+                    $expected->duration->equalTo($actual->duration),
                     "Expected pause of [{$expected->duration->forHumans(['options' => 0])}] but instead found pause of [{$actual->forHumans(['options' => 0])}]."
                 );
             });
