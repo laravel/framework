@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
+use Closure;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -26,6 +27,53 @@ abstract class HasOneOrMany extends Relation
     protected $localKey;
 
     /**
+     * Whether to check if the foreign key is null.
+     *
+     * @var bool
+     */
+    protected $applyForeignKeyCheck = true;
+
+    /**
+     * Indicates if a foreign key is not null check should be applied to the relationship.
+     *
+     * @var bool
+     */
+    protected static $shouldAddForeignKeyCheck = true;
+
+    /**
+     * Prevent foreign key check from being added to relationship.
+     *
+     * @param  bool  $value
+     * @return  void
+     */
+    public static function shouldAddForeignKeyCheck($value)
+    {
+        self::$shouldAddForeignKeyCheck = $value;
+    }
+
+    /**
+     * Run a callback with foreign key check disabled on the relation.
+     *
+     * @param  \Closure  $callback
+     * @return mixed
+     */
+    public static function withoutForeignKeyCheck(Closure $callback)
+    {
+        $previous = static::$shouldAddForeignKeyCheck;
+
+        static::$shouldAddForeignKeyCheck = false;
+
+        // When resetting the relation where clause, we want to shift the first element
+        // off of the bindings, leaving only the constraints that the developers put
+        // as "extra" on the relationships, and not original relation constraints.
+        try {
+            return $callback();
+        } finally {
+            static::$shouldAddForeignKeyCheck = $previous;
+        }
+    }
+
+    /**
      * Create a new has one or many relationship instance.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
@@ -38,6 +86,8 @@ abstract class HasOneOrMany extends Relation
     {
         $this->localKey = $localKey;
         $this->foreignKey = $foreignKey;
+
+        $this->applyForeignKeyCheck = static::$shouldAddForeignKeyCheck;
 
         parent::__construct($query, $parent);
     }
@@ -84,7 +134,7 @@ abstract class HasOneOrMany extends Relation
 
             $query->where($this->foreignKey, '=', $this->getParentKey());
 
-            $query->whereNotNull($this->foreignKey);
+            $this->applyForeignKeyCheck ? $query->whereNotNull($this->foreignKey) : null;
         }
     }
 

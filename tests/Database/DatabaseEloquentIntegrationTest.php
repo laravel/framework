@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
 use Illuminate\Database\Eloquent\Relations\MorphPivot;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -2099,6 +2100,15 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $this->assertSame($pivot, $pivot->refresh());
         $this->assertSame('primary', $pivot->taxonomy);
+    }
+
+    public function testWithoutForeignKeyCheck()
+    {
+        HasOneOrMany::shouldAddForeignKeyCheck(false);
+        $user = EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        $this->assertSame('select * from "posts" where "posts"."user_id" = ?', $user->posts()->toSql());
+        HasOneOrMany::shouldAddForeignKeyCheck(true);
+        $this->assertSame('select * from "posts" where "posts"."user_id" = ? and "posts"."user_id" is not null', $user->posts()->toSql());
     }
 
     /**
