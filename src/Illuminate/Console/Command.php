@@ -62,6 +62,13 @@ class Command extends SymfonyCommand
     protected $hidden = false;
 
     /**
+     * Indicates whether only one instance of the command can run at any given time.
+     *
+     * @var bool
+     */
+    protected $isolated = false;
+
+    /**
      * The console command name aliases.
      *
      * @var array
@@ -140,7 +147,7 @@ class Command extends SymfonyCommand
             null,
             InputOption::VALUE_OPTIONAL,
             'Do not run the command if another instance of the command is already running',
-            false
+            $this->isolated
         ));
     }
 
