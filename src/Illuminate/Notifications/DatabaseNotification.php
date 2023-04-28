@@ -3,10 +3,13 @@
 namespace Illuminate\Notifications;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class DatabaseNotification extends Model
 {
+    use HasFactory;
+
     /**
      * The "type" of the primary key ID.
      *
