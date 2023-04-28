@@ -663,6 +663,17 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
+     * Parse the arguments from the given expression.
+     *
+     * @param  string  $expression
+     * @return array
+     */
+    protected function parseArguments($expression)
+    {
+        return preg_split('/,(?=(?:[^"\'\[(]*"[^"\'\])]*")*[^"\'\])]*$)/', $this->stripParentheses($expression));
+    }
+
+    /**
      * Register a custom Blade compiler.
      *
      * @param  callable  $compiler

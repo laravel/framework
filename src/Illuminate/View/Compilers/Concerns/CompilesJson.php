@@ -19,7 +19,7 @@ trait CompilesJson
      */
     protected function compileJson($expression)
     {
-        $parts = explode(',', $this->stripParentheses($expression));
+        $parts = $this->parseArguments($expression);
 
         $options = isset($parts[1]) ? trim($parts[1]) : $this->encodingOptions;
 
