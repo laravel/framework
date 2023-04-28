@@ -310,7 +310,7 @@ class Siesta
     /**
      * Assert sleeping occurred the given times.
      *
-     * @param  int  $times
+     * @param  int  $expected
      * @return void
      */
     public static function assertSleptTimes($expected)
