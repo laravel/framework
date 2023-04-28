@@ -251,8 +251,8 @@ class Siesta
             $remaining = $remaining->subSeconds((int) $remaining->totalSeconds);
         }
 
-        if ($remaining->totalMicroseconds > 0) {
-            usleep($remaining->totalMicroseconds);
+        if ((int) $remaining->totalMicroseconds > 0) {
+            usleep((int) $remaining->totalMicroseconds);
         }
     }
 
