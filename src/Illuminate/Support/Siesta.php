@@ -137,6 +137,8 @@ class Siesta
 
     /**
      * Sleep for the duration in seconds.
+     *
+     * @return $this
      */
     public function seconds()
     {
