@@ -25,8 +25,8 @@ class BladeJsonTest extends AbstractBladeTestCase
      */
     public function testStatementIsCompiledCorrectlyWhenArgumentContainsComma($expression)
     {
-        $string = 'var foo = @json(' . $expression . ');';
-        $expected = 'var foo = <?php echo json_encode(' . $expression . ', 15, 512) ?>;';
+        $string = 'var foo = @json('.$expression.');';
+        $expected = 'var foo = <?php echo json_encode('.$expression.', 15, 512) ?>;';
 
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
