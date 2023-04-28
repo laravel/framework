@@ -326,6 +326,7 @@ class DatabaseEloquentHasOneTest extends TestCase
         $this->builder = m::mock(Builder::class);
         $this->builder->shouldReceive('whereNotNull')->with('table.foreign_key');
         $this->builder->shouldReceive('where')->with('table.foreign_key', '=', 1);
+        $this->builder->shouldReceive('beforeQuery');
         $this->related = m::mock(Model::class);
         $this->builder->shouldReceive('getModel')->andReturn($this->related);
         $this->parent = m::mock(Model::class);

@@ -46,6 +46,7 @@ class DatabaseEloquentRelationTest extends TestCase
         $related = m::mock(EloquentNoTouchingModelStub::class)->makePartial();
         $builder->shouldReceive('getModel')->andReturn($related);
         $builder->shouldReceive('whereNotNull');
+        $builder->shouldReceive('beforeQuery');
         $builder->shouldReceive('where');
         $builder->shouldReceive('withoutGlobalScopes')->andReturn($builder);
         $relation = new HasOne($builder, $parent, 'foreign_key', 'id');
@@ -76,6 +77,7 @@ class DatabaseEloquentRelationTest extends TestCase
             $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
             $builder->shouldReceive('getModel')->andReturn($related);
             $builder->shouldReceive('whereNotNull');
+            $builder->shouldReceive('beforeQuery');
             $builder->shouldReceive('where');
             $builder->shouldReceive('withoutGlobalScopes')->andReturn($builder);
             $relation = new HasOne($builder, $parent, 'foreign_key', 'id');
@@ -107,7 +109,7 @@ class DatabaseEloquentRelationTest extends TestCase
 
             $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
             $builder->shouldReceive('getModel')->andReturn($related);
-            $builder->shouldReceive('whereNotNull');
+            $builder->shouldReceive('beforeQuery');
             $builder->shouldReceive('where');
             $builder->shouldReceive('withoutGlobalScopes')->andReturnSelf();
             $relation = new HasOne($builder, $parent, 'foreign_key', 'id');
@@ -120,7 +122,7 @@ class DatabaseEloquentRelationTest extends TestCase
 
             $anotherParent->shouldReceive('getAttribute')->with('id')->andReturn(2);
             $anotherBuilder->shouldReceive('getModel')->andReturn($anotherRelated);
-            $anotherBuilder->shouldReceive('whereNotNull');
+            $anotherBuilder->shouldReceive('beforeQuery');
             $anotherBuilder->shouldReceive('where');
             $anotherBuilder->shouldReceive('withoutGlobalScopes')->andReturnSelf();
             $anotherRelation = new HasOne($anotherBuilder, $anotherParent, 'foreign_key', 'id');
@@ -157,7 +159,7 @@ class DatabaseEloquentRelationTest extends TestCase
 
             $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
             $builder->shouldReceive('getModel')->andReturn($related);
-            $builder->shouldReceive('whereNotNull');
+            $builder->shouldReceive('beforeQuery')->once();
             $builder->shouldReceive('where');
             $builder->shouldReceive('withoutGlobalScopes')->andReturnSelf();
             $relation = new HasOne($builder, $parent, 'foreign_key', 'id');
@@ -170,7 +172,7 @@ class DatabaseEloquentRelationTest extends TestCase
 
             $anotherParent->shouldReceive('getAttribute')->with('id')->andReturn(2);
             $anotherBuilder->shouldReceive('getModel')->andReturn($relatedChild);
-            $anotherBuilder->shouldReceive('whereNotNull');
+            $anotherBuilder->shouldReceive('beforeQuery')->once();
             $anotherBuilder->shouldReceive('where');
             $anotherBuilder->shouldReceive('withoutGlobalScopes')->andReturnSelf();
             $anotherRelation = new HasOne($anotherBuilder, $anotherParent, 'foreign_key', 'id');

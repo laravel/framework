@@ -356,8 +356,8 @@ class DatabaseEloquentMorphTest extends TestCase
     protected function getOneRelation()
     {
         $builder = m::mock(Builder::class);
-        $builder->shouldReceive('whereNotNull')->once()->with('table.morph_id');
         $builder->shouldReceive('where')->once()->with('table.morph_id', '=', 1);
+        $builder->shouldReceive('beforeQuery')->once();
         $related = m::mock(Model::class);
         $builder->shouldReceive('getModel')->andReturn($related);
         $parent = m::mock(Model::class);
@@ -371,8 +371,8 @@ class DatabaseEloquentMorphTest extends TestCase
     protected function getManyRelation()
     {
         $builder = m::mock(Builder::class);
-        $builder->shouldReceive('whereNotNull')->once()->with('table.morph_id');
         $builder->shouldReceive('where')->once()->with('table.morph_id', '=', 1);
+        $builder->shouldReceive('beforeQuery')->once();
         $related = m::mock(Model::class);
         $builder->shouldReceive('getModel')->andReturn($related);
         $parent = m::mock(Model::class);
@@ -392,8 +392,8 @@ class DatabaseEloquentMorphTest extends TestCase
         ]);
 
         $builder = m::mock(Builder::class);
-        $builder->shouldReceive('whereNotNull')->once()->with('table.morph_id');
         $builder->shouldReceive('where')->once()->with('table.morph_id', '=', 1);
+        $builder->shouldReceive('beforeQuery')->once();
         $related = m::mock(Model::class);
         $builder->shouldReceive('getModel')->andReturn($related);
         $parent = m::mock(EloquentModelNamespacedStub::class);
