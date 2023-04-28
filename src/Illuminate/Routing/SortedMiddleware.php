@@ -74,10 +74,10 @@ class SortedMiddleware extends Collection
     protected function priorityMapIndex($priorityMap, $middleware)
     {
         foreach ($this->middlewareNames($middleware) as $name) {
-            $priorityIndex = array_search($name, $priorityMap);
-
-            if ($priorityIndex !== false) {
-                return $priorityIndex;
+            foreach ($priorityMap as $index => $className) {
+                if (is_a($name, $className, true)) {
+                    return $index;
+                }
             }
         }
     }
