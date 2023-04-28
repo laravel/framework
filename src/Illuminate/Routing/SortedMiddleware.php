@@ -75,7 +75,7 @@ class SortedMiddleware extends Collection
     {
         foreach ($this->middlewareNames($middleware) as $name) {
             foreach ($priorityMap as $index => $className) {
-                if (is_a($name, $className, true)) {
+                if ($middlewareName === $className || is_a($name, $className, true)) {
                     return $index;
                 }
             }
