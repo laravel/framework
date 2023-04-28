@@ -12,14 +12,14 @@ use RuntimeException;
 class Siesta
 {
     /**
-     * The total duration to pause execution.
+     * The total duration to sleep.
      *
      * @var \Carbon\CarbonInterval
      */
     public $duration;
 
     /**
-     * The pending duration to pause execution.
+     * The pending duration to sleep.
      *
      * @var int|float
      */
@@ -37,7 +37,7 @@ class Siesta
      *
      * @var array
      */
-    protected static $pauseSequence = [];
+    protected static $sequence = [];
 
     /**
      * The instance should be "captured" when faking.
@@ -47,7 +47,7 @@ class Siesta
     protected $capture = true;
 
     /**
-     * Create a new Pause instance.
+     * Create a new Siesta instance.
      *
      * @param  int|float|\DateInterval  $duration
      * @return void
@@ -66,7 +66,7 @@ class Siesta
     }
 
     /**
-     * Pause for the given duration.
+     * Sleep for the given duration.
      *
      * @param  int|float|DateInterval  $duration
      * @return static
@@ -92,7 +92,7 @@ class Siesta
     }
 
     /**
-     * Pause execution for the given duration in microseconds.
+     * Sleep for the duration in microseconds.
      *
      * @param  int  $duration
      * @return $this
@@ -103,7 +103,7 @@ class Siesta
     }
 
     /**
-     * Pause execution for the given duration in seconds.
+     * Sleep for the duration in seconds.
      *
      * @param  int|float  $duration
      * @return $this
@@ -114,7 +114,7 @@ class Siesta
     }
 
     /**
-     * Pause execution for the given number of minutes.
+     * Sleep for the duration in minutes.
      *
      * @return $this
      */
@@ -128,7 +128,7 @@ class Siesta
     }
 
     /**
-     * Pause execution for the given number of minutes.
+     * Sleep for the duration in minutes.
      *
      * @return $this
      */
@@ -138,7 +138,7 @@ class Siesta
     }
 
     /**
-     * Pause execution for the given number of seconds.
+     * Sleep for the duration in seconds.
      */
     public function seconds()
     {
@@ -150,7 +150,7 @@ class Siesta
     }
 
     /**
-     * Pause execution for the given number of seconds.
+     * Sleep for the duration in seconds.
      *
      * @return $this
      */
@@ -160,7 +160,7 @@ class Siesta
     }
 
     /**
-     * Pause execution for the given number of milliseconds.
+     * Sleep for the duration in milliseconds.
      *
      * @return $this
      */
@@ -174,7 +174,7 @@ class Siesta
     }
 
     /**
-     * Pause execution for the given number of milliseconds.
+     * Sleep for the duration in milliseconds.
      *
      * @return $this
      */
@@ -184,7 +184,7 @@ class Siesta
     }
 
     /**
-     * Pause execution for the given number of microseconds.
+     * Sleep for the duration in microseconds.
      *
      * @return $this
      */
@@ -198,7 +198,7 @@ class Siesta
     }
 
     /**
-     * Pause execution for the given number of microseconds.
+     * Sleep for the duration in microseconds.
      *
      * @return $this
      */
@@ -208,7 +208,7 @@ class Siesta
     }
 
     /**
-     * Add additional time to the execution pause.
+     * Add additional time to sleep for.
      *
      * @param  int|float  $duration
      * @return $this
@@ -228,7 +228,7 @@ class Siesta
     public function __destruct()
     {
         if ($this->pending !== 0) {
-            throw new RuntimeException('Unknown pause time unit.');
+            throw new RuntimeException('Unknown Siesta duration unit.');
         }
 
         if ($this->duration->totalMicroseconds <= 0) {
@@ -237,7 +237,7 @@ class Siesta
 
         if (static::$fake) {
             if ($this->capture) {
-                static::$pauseSequence[] = $this;
+                static::$sequence[] = $this;
             }
 
             return;
@@ -258,7 +258,7 @@ class Siesta
     }
 
     /**
-     * Capture all pauses for testing.
+     * Stay awake and captured any attempts to sleep.
      *
      * @param  bool  $value
      * @return void
@@ -267,23 +267,23 @@ class Siesta
     {
         static::$fake = $value;
 
-        static::$pauseSequence = [];
+        static::$sequence = [];
     }
 
     /**
-     * Assert the given pause sequence was encountered.
+     * Assert the given sleep sequence was encountered.
      *
      * @param  array  $sequence
      * @return void
      */
     public static function assertSequence($sequence)
     {
-        PHPUnit::assertTrue(($expectedCount = count($sequence)) <= ($actualCount = count(static::$pauseSequence)),
+        PHPUnit::assertTrue(($expectedCount = count($sequence)) <= ($actualCount = count(static::$sequence)),
             "Expected [{$expectedCount}] pauses but only found [{$actualCount}]."
         );
 
         collect($sequence)
-            ->zip(static::$pauseSequence)
+            ->zip(static::$sequence)
             ->eachSpread(function (?Siesta $expected, Siesta $actual) {
                 if ($expected === null) {
                     return;
@@ -293,8 +293,29 @@ class Siesta
 
                 PHPUnit::assertTrue(
                     $expected->duration->equalTo($actual->duration),
-                    "Expected pause of [{$expected->duration->forHumans(['options' => 0])}] but instead found pause of [{$actual->forHumans(['options' => 0])}]."
+                    "Expected pause of [{$expected->duration->forHumans(['options' => 0])}] but instead found pause of [{$actual->duration->forHumans(['options' => 0])}]."
                 );
             });
+    }
+
+    /**
+     * Assert that no sleeping occurred.
+     *
+     * @return void
+     */
+    public static function assertInsomniac()
+    {
+        PHPUnit::assertSame(0, $count = count(static::$sequence), "Expected [0] pauses but found [{$count}].");
+    }
+
+    /**
+     * Assert sleeping occurred the given times.
+     *
+     * @param  int  $times
+     * @return void
+     */
+    public static function assertSleptTimes($expected)
+    {
+        PHPUnit::assertSame($expected, $count = count(static::$sequence), "Expected [{$expected}] pauses but found [{$count}].");
     }
 }
