@@ -683,7 +683,13 @@ trait ValidatesAttributes
             return true;
         }
 
-        if (! $this->isValidFileInstance($value) || ! $sizeDetails = @getimagesize($value->getRealPath())) {
+        if (! $this->isValidFileInstance($value)) {
+            return false;
+        }
+
+        $sizeDetails = method_exists($value, 'imageSize') ? $value->imageSize() : @getimagesize($value->getRealPath());
+
+        if (! $sizeDetails) {
             return false;
         }
 

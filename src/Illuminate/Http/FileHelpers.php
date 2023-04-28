@@ -34,6 +34,16 @@ trait FileHelpers
     }
 
     /**
+     * Get the file's image size details.
+     *
+     * @return array|null
+     */
+    public function imageSize()
+    {
+        return @getimagesize($this->getRealPath());
+    }
+
+    /**
      * Get a filename for the file.
      *
      * @param  string|null  $path
