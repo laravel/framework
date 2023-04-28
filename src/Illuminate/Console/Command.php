@@ -69,6 +69,13 @@ class Command extends SymfonyCommand
     protected $isolated = false;
 
     /**
+     * The default exit code for isolated commands.
+     *
+     * @var int
+     */
+    protected $isolatedCommandExitCode = self::SUCCESS;
+
+    /**
      * The console command name aliases.
      *
      * @var array
@@ -192,7 +199,7 @@ class Command extends SymfonyCommand
 
             return (int) (is_numeric($this->option('isolated'))
                         ? $this->option('isolated')
-                        : self::SUCCESS);
+                        : $this->isolatedCommandExitCode);
         }
 
         $method = method_exists($this, 'handle') ? 'handle' : '__invoke';
