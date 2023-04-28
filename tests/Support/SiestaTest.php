@@ -11,9 +11,9 @@ use RuntimeException;
 
 class SiestaTest extends TestCase
 {
-    protected function setUp(): void
+    protected function tearDown(): void
     {
-        parent::setUp();
+        parent::tearDown();
 
         Siesta::fake(false);
     }
