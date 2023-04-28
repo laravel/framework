@@ -26,6 +26,13 @@ abstract class HasOneOrMany extends Relation
     protected $localKey;
 
     /**
+     * Whether to check if the foreign key is null.
+     *
+     * @var bool
+     */
+    protected $applyForeignKeyCheck = true;
+
+    /**
      * Create a new has one or many relationship instance.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
@@ -84,8 +91,24 @@ abstract class HasOneOrMany extends Relation
 
             $query->where($this->foreignKey, '=', $this->getParentKey());
 
-            $query->whereNotNull($this->foreignKey);
+            $query->beforeQuery(function ($query) {
+                if ($this->applyForeignKeyCheck) {
+                    $query->whereNotNull($this->foreignKey);
+                }
+            });
         }
+    }
+
+    /**
+     * Disable applying the foreign key null check on the relationship.
+     *
+     * @return $this
+     */
+    public function withoutForeignKeyNullCheck()
+    {
+        $this->applyForeignKeyCheck = false;
+
+        return $this;
     }
 
     /**

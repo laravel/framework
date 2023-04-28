@@ -2101,6 +2101,20 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('primary', $pivot->taxonomy);
     }
 
+    public function testWithoutForeignKeyNullCheckOnHasMany()
+    {
+        $user = EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        $user->posts()->createMany([
+            ['name' => 'test 1'],
+            ['name' => 'test 2'],
+        ]);
+
+        $this->assertCount(2, $user->posts);
+
+        $this->assertSame('select * from "posts" where "posts"."user_id" = ? and "posts"."user_id" is not null', $user->posts()->toSql());
+        $this->assertSame('select * from "posts" where "posts"."user_id" = ?', $user->posts()->withoutForeignKeyNullCheck()->toSql());
+
+    }
     /**
      * Helpers...
      */
