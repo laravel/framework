@@ -245,14 +245,18 @@ class Siesta
 
         $remaining = $this->duration->copy();
 
-        if ((int) $remaining->totalSeconds > 0) {
-            sleep((int) $remaining->totalSeconds);
+        $seconds = (int) $remaining->totalSeconds;
 
-            $remaining = $remaining->subSeconds((int) $remaining->totalSeconds);
+        if ($seconds > 0) {
+            sleep($seconds);
+
+            $remaining = $remaining->subSeconds($seconds);
         }
 
-        if ((int) $remaining->totalMicroseconds > 0) {
-            usleep((int) $remaining->totalMicroseconds);
+        $microseconds = (int) $remaining->totalMicroseconds;
+
+        if ($microseconds > 0) {
+            usleep($microseconds);
         }
     }
 
