@@ -603,6 +603,16 @@ abstract class AbstractPaginator implements Htmlable
     }
 
     /**
+     * Indicate that Flowbite styling should be used for generated links.
+     *
+     * @return void
+     */
+    public static function useFlowbite()
+    {
+        static::defaultView('pagination::flowbite');
+    }
+
+    /**
      * Indicate that Bootstrap 4 styling should be used for generated links.
      *
      * @return void
