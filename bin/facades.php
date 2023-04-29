@@ -3,6 +3,8 @@
 require __DIR__.'/../vendor/autoload.php';
 
 use Illuminate\Cache\Repository;
+use Illuminate\Container\Container;
+use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
@@ -377,6 +379,13 @@ function handleUnknownIdentifierType($method, $typeNode)
         $method->getDeclaringClass()->getName() === Request::class
     ) {
         return 'object';
+    }
+
+    if (
+        $typeNode->name === 'TClassString' &&
+        in_array($method->getDeclaringClass()->getName(), [Application::class, Container::class])
+    ) {
+        return 'mixed';
     }
 
     echo 'Found unknown type: '.$typeNode->name;

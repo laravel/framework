@@ -4,9 +4,9 @@ use Illuminate\Contracts\Cache\Repository;
 
 use function PHPStan\Testing\assertType;
 
-/** @var Repository $cache */
 $cache = resolve(Repository::class);
 
+assertType(Repository::class, $cache);
 assertType('mixed', $cache->get('key'));
 assertType('mixed', $cache->get('cache', 27));
 assertType('mixed', $cache->get('cache', function (): int {

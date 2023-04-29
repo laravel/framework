@@ -107,9 +107,14 @@ if (! function_exists('app')) {
     /**
      * Get the available container instance.
      *
-     * @param  string|null  $abstract
+     * @template TClassString
+     *
+     * @phpstan-param class-string<TClassString>  $abstract
+     * @phpstan-return TClassString
+     *
+     * @param  class-string<TClassString>|string|null  $abstract
      * @param  array  $parameters
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Foundation\Application|mixed
+     * @return TClassString|\Illuminate\Contracts\Foundation\Application|\Illuminate\Foundation\Application|mixed
      */
     function app($abstract = null, array $parameters = [])
     {
@@ -752,9 +757,14 @@ if (! function_exists('resolve')) {
     /**
      * Resolve a service from the container.
      *
-     * @param  string  $name
+     * @template TClassString
+     *
+     * @phpstan-param class-string<TClassString>  $name
+     * @phpstan-return TClassString
+     *
+     * @param  class-string<TClassString>|string  $name
      * @param  array  $parameters
-     * @return mixed
+     * @return TClassString|mixed
      */
     function resolve($name, array $parameters = [])
     {

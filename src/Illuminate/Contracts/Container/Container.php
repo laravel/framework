@@ -164,9 +164,14 @@ interface Container extends ContainerInterface
     /**
      * Resolve the given type from the container.
      *
-     * @param  string  $abstract
+     * @template TClassString
+     *
+     * @phpstan-param class-string<TClassString>  $abstract
+     * @phpstan-return TClassString
+     *
+     * @param  class-string<TClassString>|string  $abstract
      * @param  array  $parameters
-     * @return mixed
+     * @return TClassString|mixed
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */

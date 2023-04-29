@@ -706,9 +706,14 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * An alias function name for make().
      *
-     * @param  string|callable  $abstract
+     * @template TClassString
+     *
+     * @phpstan-param class-string<TClassString>  $abstract
+     * @phpstan-return TClassString
+     *
+     * @param  class-string<TClassString>|string|callable  $abstract
      * @param  array  $parameters
-     * @return mixed
+     * @return TClassString|mixed
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
@@ -720,9 +725,14 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Resolve the given type from the container.
      *
-     * @param  string|callable  $abstract
+     * @template TClassString
+     *
+     * @phpstan-param class-string<TClassString>  $abstract
+     * @phpstan-return TClassString
+     *
+     * @param  class-string<TClassString>|string|callable  $abstract
      * @param  array  $parameters
-     * @return mixed
+     * @return TClassString|mixed
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
