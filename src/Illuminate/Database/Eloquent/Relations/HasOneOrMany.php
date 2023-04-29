@@ -44,11 +44,11 @@ abstract class HasOneOrMany extends Relation
      * Prevent foreign key check from being added to relationship.
      *
      * @param  bool  $value
-     * @return  void
+     * @return void
      */
     public static function shouldAddForeignKeyCheck($value)
     {
-        self::$shouldAddForeignKeyCheck = $value;
+        static::$shouldAddForeignKeyCheck = $value;
     }
 
     /**
@@ -86,7 +86,6 @@ abstract class HasOneOrMany extends Relation
     {
         $this->localKey = $localKey;
         $this->foreignKey = $foreignKey;
-
         $this->applyForeignKeyCheck = static::$shouldAddForeignKeyCheck;
 
         parent::__construct($query, $parent);
