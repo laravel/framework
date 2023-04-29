@@ -167,6 +167,7 @@ interface Container extends ContainerInterface
      * @template TClassString
      *
      * @phpstan-param class-string<TClassString>  $abstract
+     *
      * @phpstan-return TClassString
      *
      * @param  class-string<TClassString>|string  $abstract

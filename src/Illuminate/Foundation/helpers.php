@@ -110,6 +110,7 @@ if (! function_exists('app')) {
      * @template TClassString
      *
      * @phpstan-param class-string<TClassString>  $abstract
+     *
      * @phpstan-return TClassString
      *
      * @param  class-string<TClassString>|string|null  $abstract
@@ -760,6 +761,7 @@ if (! function_exists('resolve')) {
      * @template TClassString
      *
      * @phpstan-param class-string<TClassString>  $name
+     *
      * @phpstan-return TClassString
      *
      * @param  class-string<TClassString>|string  $name
