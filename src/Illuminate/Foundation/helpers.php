@@ -2,6 +2,7 @@
 
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastFactory;
 use Illuminate\Contracts\Bus\Dispatcher;
@@ -21,7 +22,6 @@ use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\HtmlString;
 use Symfony\Component\HttpFoundation\Response;
-use Illuminate\Contracts\Auth\Authenticatable;
 
 if (! function_exists('abort')) {
     /**
