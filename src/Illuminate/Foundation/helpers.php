@@ -169,10 +169,12 @@ if (! function_exists('auth')) {
 if (! function_exists('user')) {
     /**
      * Get the currently authenticated user.
+     *
+     * @param  string|null  $guard
      */
-    function user(): ?Authenticatable
+    function user($guard = null): ?Authenticatable
     {
-        return auth()->user();
+        return auth($guard)->user();
     }
 }
 
