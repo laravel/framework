@@ -23,6 +23,13 @@ class Manager
     protected $manager;
 
     /**
+     * The Eloquent Scopes instance
+     *
+     * @var \Illuminate\Database\Eloquent\Scopes
+     */
+    protected $scopes;
+
+    /**
      * Create a new database capsule manager.
      *
      * @param  \Illuminate\Container\Container|null  $container
@@ -38,6 +45,8 @@ class Manager
         $this->setupDefaultConfiguration();
 
         $this->setupManager();
+
+        $this->setupScopes();
     }
 
     /**
@@ -62,6 +71,16 @@ class Manager
         $factory = new ConnectionFactory($this->container);
 
         $this->manager = new DatabaseManager($this->container, $factory);
+    }
+
+    /**
+     * Build the Eloquent Scopes instance.
+     *
+     * @return void
+     */
+    protected function setupScopes()
+    {
+        $this->scopes = new Scopes();
     }
 
     /**
@@ -135,7 +154,9 @@ class Manager
     {
         Eloquent::setConnectionResolver($this->manager);
 
-        Eloquent::setEloquentScopes(new Scopes());
+        if (! Eloquent::getEloquentScopes()) {
+            Eloquent::setEloquentScopes($this->scopes);
+        }
 
         // If we have an event dispatcher instance, we will go ahead and register it
         // with the Eloquent ORM, allowing for model callbacks while creating and

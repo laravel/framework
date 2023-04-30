@@ -5,7 +5,6 @@ namespace Illuminate\Database\Eloquent;
 use Closure;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
-use function is_object;
 
 class Scopes
 {
