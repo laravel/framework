@@ -60,6 +60,27 @@ trait HasGlobalScopes
     }
 
     /**
+     * Get all the global scopes registered.
+     *
+     * @return array
+     */
+    public static function getAllGlobalScopes()
+    {
+        return static::$globalScopes;
+    }
+
+    /**
+     * Set all the global scopes.
+     *
+     * @params  array  $scopes
+     * @return void
+     */
+    public static function setAllGlobalScopes($scopes)
+    {
+        static::$globalScopes = $scopes;
+    }
+
+    /**
      * Get the global scopes for this class instance.
      *
      * @return array
