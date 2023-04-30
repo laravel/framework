@@ -34,15 +34,38 @@ class BladeJsonTest extends AbstractBladeTestCase
     public static function jsonArgumentsProvider()
     {
         return [
-            'single quoted string' => ['\'foo, bar, baz\''],
-            'double quoted string' => ['"foo, bar, baz"'],
-            'method call with variable arguments' => ['$var->method($foo, $bar, $baz)'],
-            'method call with array argument' => ['$var->method([$foo, $bar, $baz])'],
-            'array single quote string values' => ['[\'foo\', \'bar\', \'baz\']'],
-            'array double quote string values' => ['["foo", "bar", "baz"]'],
-            'array with method call' => ['[$var->method([$foo, $bar, $baz])]'],
-            'closure' => ['function () { return ["foo", "bar", "baz"]; }'],
-            'closure short' => ['fn () => ["foo", "bar", "baz"]'],
+            ['123'],
+            ['1.23'],
+            ['\'foo\''],
+            ['"foo"'],
+            ['<<<TEXT
+foo, bar, baz
+TEXT'],
+            ['<<<\'TEXT\'
+foo, bar, baz
+TEXT'],
+            ['\'foo, bar, baz\''],
+            ['"foo, bar, baz"'],
+            ['$var->method($foo, $bar, $baz)'],
+            ['$var->method([$foo, $bar, $baz])'],
+            ['[\'foo\', \'bar\', \'baz\']'],
+            ['["foo", "bar", "baz"]'],
+            ['[$var->method([$foo, $bar, $baz])]'],
+            ['function () { return ["foo", "bar", "baz"]; }'],
+            ['fn () => ["foo", "bar", "baz"]'],
+            ['[[\'foo\', \'bar\', \'baz\']]'],
+            ['[["foo", "bar", "baz"]]'],
+            ['$var?->foo?->method($foo, $bar, $baz)'],
+            ['new Dummy($foo, $bar, $baz)'],
+            ['new class($foo, $bar, $baz) {
+    public function __construct(
+        public readonly string $foo,
+        public readonly string $bar,
+        public readonly string $baz,
+    )
+    {
+    }
+}'],
         ];
     }
 }
