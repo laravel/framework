@@ -11,6 +11,9 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ReflectsClosures;
 use Illuminate\View\Component;
 use InvalidArgumentException;
+use PhpParser\Lexer;
+use PhpParser\Node\Arg;
+use PhpParser\ParserFactory;
 
 class BladeCompiler extends Compiler implements CompilerInterface
 {
@@ -158,6 +161,13 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * @var bool
      */
     protected $compilesComponentTags = true;
+
+    /**
+     * The cached PHP parser instance.
+     *
+     * @var \PhpParser\Parser
+     */
+    protected $parser;
 
     /**
      * Compile the view at the given path.
@@ -670,7 +680,33 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function parseArguments($expression)
     {
-        return preg_split('/,(?=(?:[^"\'\[(]*"[^"\'\])]*")*[^"\'\])]*$)/', $this->stripParentheses($expression));
+        $code = '<?php dummy'.$expression.';';
+
+        try {
+            $ast = $this->parser()->parse($code);
+
+            return array_map(
+                fn (Arg $arg) => substr($code, $arg->getStartFilePos(), $arg->getEndFilePos() - $arg->getStartFilePos() + 1),
+                $ast[0]->expr->args,
+            );
+        } catch (\Throwable $e) {
+            return explode(',', $this->stripParentheses($expression));
+        }
+    }
+
+    /**
+     * Resolve an instance of the PHP parser.
+     *
+     * @return \PhpParser\Parser
+     */
+    private function parser()
+    {
+        return $this->parser ??= (new ParserFactory)->create(ParserFactory::PREFER_PHP7, new Lexer([
+            'usedAttributes' => [
+                'startFilePos',
+                'endFilePos',
+            ],
+        ]));
     }
 
     /**
