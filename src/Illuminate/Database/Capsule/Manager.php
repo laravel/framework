@@ -23,7 +23,7 @@ class Manager
     protected $manager;
 
     /**
-     * The Eloquent Scopes instance
+     * The Eloquent Scopes instance.
      *
      * @var \Illuminate\Database\Eloquent\Scopes
      */

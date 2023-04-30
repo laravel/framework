@@ -24,7 +24,7 @@ class Scopes
      */
     public function hasGlobalScope($model, $scope)
     {
-        return !is_null($this->getGlobalScope($model, $scope));
+        return ! is_null($this->getGlobalScope($model, $scope));
     }
 
     /**
@@ -35,7 +35,7 @@ class Scopes
      */
     public function hasScopes($model)
     {
-        return !empty($this->getGlobalScope($model, '*'));
+        return ! empty($this->getGlobalScope($model, '*'));
     }
 
     /**
@@ -139,7 +139,7 @@ class Scopes
     /**
      * Merges the global scopes on top of the already set global scopes.
      *
-     * @param array $scopes
+     * @param  array  $scopes
      * @return void
      */
     public function mergeGlobalScopes(array $scopes)

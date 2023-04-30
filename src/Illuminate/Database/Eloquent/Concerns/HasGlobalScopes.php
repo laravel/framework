@@ -5,7 +5,7 @@ namespace Illuminate\Database\Eloquent\Concerns;
 trait HasGlobalScopes
 {
     /**
-     * Returns the Eloquent Scopes hub for models
+     * Returns the Eloquent Scopes hub for models.
      *
      * @return \Illuminate\Database\Eloquent\Scopes|null
      */
@@ -13,6 +13,7 @@ trait HasGlobalScopes
     {
         return static::$globalScopes;
     }
+
     /**
      * Sets the Eloquent Scopes hub for models.
      *
