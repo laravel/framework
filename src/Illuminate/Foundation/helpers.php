@@ -21,6 +21,7 @@ use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\HtmlString;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Contracts\Auth\Authenticatable;
 
 if (! function_exists('abort')) {
     /**
@@ -162,6 +163,16 @@ if (! function_exists('auth')) {
         }
 
         return app(AuthFactory::class)->guard($guard);
+    }
+}
+
+if (! function_exists('user')) {
+    /**
+     * Get the currently authenticated user.
+     */
+    function user(): ?Authenticatable
+    {
+        return auth()->user();
     }
 }
 
