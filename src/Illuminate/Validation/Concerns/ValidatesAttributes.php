@@ -687,7 +687,9 @@ trait ValidatesAttributes
             return false;
         }
 
-        $sizeDetails = method_exists($value, 'imageSize') ? $value->imageSize() : @getimagesize($value->getRealPath());
+        $sizeDetails = method_exists($value, 'dimensions')
+                ? $value->dimensions()
+                : @getimagesize($value->getRealPath());
 
         if (! $sizeDetails) {
             return false;

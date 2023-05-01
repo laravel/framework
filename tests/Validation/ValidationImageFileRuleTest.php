@@ -111,7 +111,7 @@ class UploadedFileWithCustomImageSizeMethod extends UploadedFile
         return 'png';
     }
 
-    public function imageSize()
+    public function dimensions()
     {
         return [200, 200];
     }
