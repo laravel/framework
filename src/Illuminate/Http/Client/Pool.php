@@ -10,18 +10,11 @@ use GuzzleHttp\Utils;
 class Pool
 {
     /**
-     * The pending request that is cloned for each async request.
+     * The PendingRequest that is a basis for each pooled request.
      *
      * @var \Illuminate\Http\Client\PendingRequest
      */
     protected $pendingRequest;
-
-    /**
-     * The handler function for the Guzzle client.
-     *
-     * @var callable
-     */
-    protected $handler;
 
     /**
      * The pool of requests.
@@ -47,6 +40,11 @@ class Pool
         $this->pendingRequest = $pendingRequest;
     }
 
+    /**
+     * Create a default handler for the Factory.
+     *
+     * @return callable
+     */
     protected function getDefaultHandler(): callable
     {
         if (method_exists(Utils::class, 'chooseHandler')) {
