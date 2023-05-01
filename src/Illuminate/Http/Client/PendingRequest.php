@@ -781,7 +781,8 @@ class PendingRequest
     {
         $results = [];
 
-        $requests = tap(new Pool($this->factory, $this->buildHandlerStack()), $callback)->getRequests();
+        $handlerStack = $this->buildHandlerStack();
+        $requests = tap(new Pool($this->factory, $handlerStack), $callback)->getRequests();
 
         foreach ($requests as $key => $item) {
             $results[$key] = $item instanceof static ? $item->getPromise()->wait() : $item->wait();
