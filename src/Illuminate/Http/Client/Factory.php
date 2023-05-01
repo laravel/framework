@@ -352,7 +352,7 @@ class Factory
      *
      * @return \Illuminate\Http\Client\PendingRequest
      */
-    protected function newPendingRequest()
+    public function newPendingRequest()
     {
         return new PendingRequest($this);
     }

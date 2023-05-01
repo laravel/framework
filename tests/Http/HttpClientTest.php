@@ -2241,16 +2241,65 @@ class HttpClientTest extends TestCase
         $this->assertTrue($onStatsFunctionCalled);
     }
 
-    public function testMiddlewareIsPoolable()
+    public function testPoolRespectsMiddleware()
     {
         $history = [];
 
         $middleware = Middleware::history($history);
 
-        $this->factory->withMiddleware($middleware)->pool(fn (Pool $pool) => [
+        $this->factory->fake()->withMiddleware($middleware)->pool(fn (Pool $pool) => [
             $pool->post('https://example.com', ['hyped-for' => 'laravel-movie']),
         ]);
 
         $this->assertCount(1, $history);
+    }
+
+    public function testPoolRespectsWithOptions()
+    {
+        $onStatsFunctionCalled = false;
+
+        $this->factory
+            ->fake()
+            ->withOptions([
+                'on_stats' => function (TransferStats $stats) use (&$onStatsFunctionCalled) {
+                    $onStatsFunctionCalled = true;
+                },
+            ])
+            ->pool(fn (Pool $pool) => [
+                $pool->get('https://example.com')
+            ]);
+
+        $this->assertTrue($onStatsFunctionCalled);
+    }
+
+    public function testPoolRespectsBaseUrl()
+    {
+        $this->factory->fake();
+
+        $this->factory->baseUrl('http://foo.com/')->pool(fn(Pool $pool) => $pool->get('get'));
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/get';
+        });
+    }
+
+    public function testWithHeaders()
+    {
+        $this->factory->fake();
+
+        $this->factory->withHeaders([
+            'X-Test-Header' => 'foo',
+            'X-Test-ArrayHeader' => ['bar', 'baz'],
+        ])->pool(fn (Pool $pool) => [
+            $pool->post('http://foo.com/json', ['name' => 'Taylor'])
+        ]);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/json' &&
+                $request->hasHeader('Content-Type', 'application/json') &&
+                $request->hasHeader('X-Test-Header', 'foo') &&
+                $request->hasHeader('X-Test-ArrayHeader', ['bar', 'baz']) &&
+                $request['name'] === 'Taylor';
+        });
     }
 }

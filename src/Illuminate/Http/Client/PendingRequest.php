@@ -16,6 +16,7 @@ use Illuminate\Http\Client\Events\ConnectionFailed;
 use Illuminate\Http\Client\Events\RequestSending;
 use Illuminate\Http\Client\Events\ResponseReceived;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
@@ -220,7 +221,7 @@ class PendingRequest
     public function __construct(Factory $factory = null)
     {
         $this->factory = $factory;
-        $this->middleware = collect();
+        $this->middleware = new Collection;
 
         $this->asJson();
 
@@ -781,8 +782,7 @@ class PendingRequest
     {
         $results = [];
 
-        $handlerStack = $this->buildHandlerStack();
-        $requests = tap(new Pool($this->factory, $handlerStack), $callback)->getRequests();
+        $requests = tap(new Pool(pendingRequest: $this), $callback)->getRequests();
 
         foreach ($requests as $key => $item) {
             $results[$key] = $item instanceof static ? $item->getPromise()->wait() : $item->wait();
