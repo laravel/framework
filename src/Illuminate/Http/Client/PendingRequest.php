@@ -220,7 +220,7 @@ class PendingRequest
     public function __construct(Factory $factory = null)
     {
         $this->factory = $factory;
-        $this->middleware = $factory->getMiddleware();
+        $this->middleware = collect();
 
         $this->asJson();
 
@@ -781,7 +781,7 @@ class PendingRequest
     {
         $results = [];
 
-        $requests = tap(new Pool($this->factory), $callback)->getRequests();
+        $requests = tap(new Pool($this->factory, $this->buildHandlerStack()), $callback)->getRequests();
 
         foreach ($requests as $key => $item) {
             $results[$key] = $item instanceof static ? $item->getPromise()->wait() : $item->wait();
