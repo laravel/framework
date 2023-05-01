@@ -309,6 +309,10 @@ abstract class Grammar extends BaseGrammar
             return $this->getValue($value);
         }
 
+        if ($value instanceof \BackedEnum) {
+            return "'" . (string) $value->value . "'";
+        }
+
         return is_bool($value)
                     ? "'".(int) $value."'"
                     : "'".(string) $value."'";
