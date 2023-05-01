@@ -461,6 +461,90 @@ if (! function_exists('fake') && class_exists(\Faker\Factory::class)) {
     }
 }
 
+if (! function_exists('emergency')) {
+    /**
+     * Write a emergency level message to the log.
+     *
+     * @param  string  $message
+     * @param  array  $context
+     * @return void
+     */
+    function emergency($message, $context = [])
+    {
+        app('log')->emergency($message, $context);
+    }
+}
+
+if (! function_exists('alert')) {
+    /**
+     * Write a alert level message to the log.
+     *
+     * @param  string  $message
+     * @param  array  $context
+     * @return void
+     */
+    function alert($message, $context = [])
+    {
+        app('log')->alert($message, $context);
+    }
+}
+
+if (! function_exists('critical')) {
+    /**
+     * Write a critical level message to the log.
+     *
+     * @param  string  $message
+     * @param  array  $context
+     * @return void
+     */
+    function critical($message, $context = [])
+    {
+        app('log')->critical($message, $context);
+    }
+}
+
+if (! function_exists('error')) {
+    /**
+     * Write a error level message to the log.
+     *
+     * @param  string  $message
+     * @param  array  $context
+     * @return void
+     */
+    function error($message, $context = [])
+    {
+        app('log')->error($message, $context);
+    }
+}
+
+if (! function_exists('warning')) {
+    /**
+     * Write a warning level message to the log.
+     *
+     * @param  string  $message
+     * @param  array  $context
+     * @return void
+     */
+    function warning($message, $context = [])
+    {
+        app('log')->warning($message, $context);
+    }
+}
+
+if (! function_exists('notice')) {
+    /**
+     * Write a notice level message to the log.
+     *
+     * @param  string  $message
+     * @param  array  $context
+     * @return void
+     */
+    function notice($message, $context = [])
+    {
+        app('log')->notice($message, $context);
+    }
+}
+
 if (! function_exists('info')) {
     /**
      * Write some information to the log.
@@ -472,6 +556,20 @@ if (! function_exists('info')) {
     function info($message, $context = [])
     {
         app('log')->info($message, $context);
+    }
+}
+
+if (! function_exists('debug')) {
+    /**
+     * Write a debug level message to the log.
+     *
+     * @param  string  $message
+     * @param  array  $context
+     * @return void
+     */
+    function debug($message, $context = [])
+    {
+        app('log')->debug($message, $context);
     }
 }
 
