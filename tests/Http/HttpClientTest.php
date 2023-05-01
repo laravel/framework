@@ -2266,7 +2266,7 @@ class HttpClientTest extends TestCase
                 },
             ])
             ->pool(fn (Pool $pool) => [
-                $pool->get('https://example.com')
+                $pool->get('https://example.com'),
             ]);
 
         $this->assertTrue($onStatsFunctionCalled);
@@ -2276,7 +2276,7 @@ class HttpClientTest extends TestCase
     {
         $this->factory->fake();
 
-        $this->factory->baseUrl('http://foo.com/')->pool(fn(Pool $pool) => $pool->get('get'));
+        $this->factory->baseUrl('http://foo.com/')->pool(fn (Pool $pool) => $pool->get('get'));
 
         $this->factory->assertSent(function (Request $request) {
             return $request->url() === 'http://foo.com/get';
@@ -2291,7 +2291,7 @@ class HttpClientTest extends TestCase
             'X-Test-Header' => 'foo',
             'X-Test-ArrayHeader' => ['bar', 'baz'],
         ])->pool(fn (Pool $pool) => [
-            $pool->post('http://foo.com/json', ['name' => 'Taylor'])
+            $pool->post('http://foo.com/json', ['name' => 'Taylor']),
         ]);
 
         $this->factory->assertSent(function (Request $request) {
