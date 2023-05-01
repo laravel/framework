@@ -687,17 +687,17 @@ trait ValidatesAttributes
             return false;
         }
 
-        $sizeDetails = method_exists($value, 'dimensions')
+        $dimensions = method_exists($value, 'dimensions')
                 ? $value->dimensions()
                 : @getimagesize($value->getRealPath());
 
-        if (! $sizeDetails) {
+        if (! $dimensions) {
             return false;
         }
 
         $this->requireParameterCount(1, $parameters, 'dimensions');
 
-        [$width, $height] = $sizeDetails;
+        [$width, $height] = $dimensions;
 
         $parameters = $this->parseNamedParameters($parameters);
 
