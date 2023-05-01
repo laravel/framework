@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support;
 
+use Carbon\Carbon;
 use Carbon\CarbonInterval;
 use DateInterval;
 use PHPUnit\Framework\Assert as PHPUnit;
@@ -19,9 +20,9 @@ class Siesta
     /**
      * The pending duration to sleep.
      *
-     * @var int|float
+     * @var int|float|null
      */
-    protected $pending;
+    protected $pending = null;
 
     /**
      * Indicates that all sleeping should be faked.
@@ -38,11 +39,11 @@ class Siesta
     protected static $sequence = [];
 
     /**
-     * The instance should be "captured" when faking.
+     * Indicates if the instance should sleep.
      *
      * @var bool
      */
-    protected $capture = true;
+    protected $shouldSleep = true;
 
     /**
      * Create a new Siesta instance.
@@ -52,14 +53,18 @@ class Siesta
      */
     public function __construct($duration)
     {
-        if ($duration instanceof DateInterval) {
-            $this->duration = CarbonInterval::instance($duration);
-
-            $this->pending = 0;
-        } else {
-            $this->duration = CarbonInterval::seconds(0);
+        if (! $duration instanceof DateInterval) {
+            $this->duration = CarbonInterval::microsecond(0);
 
             $this->pending = $duration;
+        } else {
+            $duration = CarbonInterval::instance($duration);
+
+            if ($duration->totalMicroseconds < 0) {
+                $duration = CarbonInterval::seconds(0);
+            }
+
+            $this->duration = $duration;
         }
     }
 
@@ -78,7 +83,7 @@ class Siesta
      * Sleep until the given timestamp.
      *
      * @param  int|\DateTimeInterface  $timestamp
-     * @return void
+     * @return static
      */
     public static function until($timestamp)
     {
@@ -86,29 +91,29 @@ class Siesta
             $timestamp = Carbon::createFromTimestamp($timestamp);
         }
 
-        static::for(Carbon::now()->diff($timestamp));
+        return new static(Carbon::now()->diff($timestamp));
     }
 
     /**
      * Sleep for the duration in microseconds.
      *
      * @param  int  $duration
-     * @return $this
+     * @return static
      */
     public static function usleep($duration)
     {
-        return static::for($duration)->microseconds();
+        return (new static($duration))->microseconds();
     }
 
     /**
      * Sleep for the duration in seconds.
      *
      * @param  int|float  $duration
-     * @return $this
+     * @return static
      */
     public static function sleep($duration)
     {
-        return static::for($duration)->seconds();
+        return (new static($duration))->seconds();
     }
 
     /**
@@ -118,9 +123,7 @@ class Siesta
      */
     public function minutes()
     {
-        $this->duration->addMinutes($this->pending);
-
-        $this->pending = 0;
+        $this->duration->add('minutes', $this->pullPending());
 
         return $this;
     }
@@ -142,9 +145,7 @@ class Siesta
      */
     public function seconds()
     {
-        $this->duration->addSeconds($this->pending);
-
-        $this->pending = 0;
+        $this->duration->add('seconds', $this->pullPending());
 
         return $this;
     }
@@ -166,9 +167,7 @@ class Siesta
      */
     public function milliseconds()
     {
-        $this->duration->addMilliseconds($this->pending);
-
-        $this->pending = 0;
+        $this->duration->add('milliseconds', $this->pullPending());
 
         return $this;
     }
@@ -190,9 +189,7 @@ class Siesta
      */
     public function microseconds()
     {
-        $this->duration->addMicroseconds($this->pending);
-
-        $this->pending = 0;
+        $this->duration->add('microseconds', $this->pullPending());
 
         return $this;
     }
@@ -227,18 +224,16 @@ class Siesta
      */
     public function __destruct()
     {
-        if ($this->pending !== 0) {
-            throw new RuntimeException('Unknown Siesta duration unit.');
+        if (! $this->shouldSleep) {
+            return;
         }
 
-        if ($this->duration->totalMicroseconds <= 0) {
-            $this->duration = CarbonInterval::seconds(0);
+        if ($this->pending !== null) {
+            throw new RuntimeException('Unknown duration unit.');
         }
 
         if (static::$fake) {
-            if ($this->capture) {
-                static::$sequence[] = $this->duration;
-            }
+            static::$sequence[] = $this->duration;
 
             return;
         }
@@ -261,6 +256,28 @@ class Siesta
     }
 
     /**
+     * Resolve the pending duration.
+     *
+     * @return int|float
+     */
+    protected function pullPending()
+    {
+        if ($this->pending === null) {
+            $this->shouldNotSleep();
+
+            throw new RuntimeException('No duration specified.');
+        }
+
+        if ($this->pending < 0) {
+            $this->pending = 0;
+        }
+
+        return tap($this->pending, function () {
+            $this->pending = null;
+        });
+    }
+
+    /**
      * Stay awake and captured any attempts to sleep.
      *
      * @param  bool  $value
@@ -274,6 +291,28 @@ class Siesta
     }
 
     /**
+     * Assert the given sleeping occurred the a specific number of times.
+     *
+     * @param  \Closure|static  $expected
+     * @param  int  $times
+     * @return void
+     */
+    public static function assertSlept($expected, $times = 1)
+    {
+        $callback = $expected instanceof static
+            ? fn (Siesta $actual) => $actual->duration->equalTo($expected->shouldNotSleep()->duration)
+            : $expected;
+
+        $count = collect(static::$sequence)->filter($expected)->count();
+
+        PHPUnit::assertSame(
+            $times,
+            $count,
+            "The expected siesta was found [{$count}] times instead of [{$times}]."
+        );
+    }
+
+    /**
      * Assert the given sleep sequence was encountered.
      *
      * @param  array  $sequence
@@ -281,9 +320,7 @@ class Siesta
      */
     public static function assertSequence($sequence)
     {
-        PHPUnit::assertTrue(($expectedCount = count($sequence)) <= ($actualCount = count(static::$sequence)),
-            "Expected [{$expectedCount}] pauses but only found [{$actualCount}]."
-        );
+        static::assertSleptTimes(count($sequence));
 
         collect($sequence)
             ->zip(static::$sequence)
@@ -292,11 +329,18 @@ class Siesta
                     return;
                 }
 
-                $expected->capture = false;
-
                 PHPUnit::assertTrue(
-                    $expected->duration->equalTo($actual),
-                    "Expected pause of [{$expected->duration->forHumans(['options' => 0])}] but instead found pause of [{$actual->forHumans(['options' => 0])}]."
+                    $expected->shouldNotSleep()->duration->equalTo($actual),
+                    vsprintf("Expected siesta duration of [%s] but instead found duration of [%s].", [
+                        $expected->duration->cascade()->forHumans([
+                            'options' => 0,
+                            'minimumUnit' => 'microsecond',
+                        ]),
+                        $actual->cascade()->forHumans([
+                            'options' => 0,
+                            'minimumUnit' => 'microsecond',
+                        ]),
+                    ])
                 );
             });
     }
@@ -308,7 +352,14 @@ class Siesta
      */
     public static function assertInsomniac()
     {
-        PHPUnit::assertSame(0, $count = count(static::$sequence), "Expected [0] pauses but found [{$count}].");
+        foreach (static::$sequence as $duration) {
+            PHPUnit::assertSame(0, $duration->totalMicroseconds, vsprintf('Unexpected siesta duration of [%s] found.', [
+                $duration->cascade()->forHumans([
+                    'options' => 0,
+                    'minimumUnit' => 'microsecond',
+                ]),
+            ]));
+        }
     }
 
     /**
@@ -319,6 +370,18 @@ class Siesta
      */
     public static function assertSleptTimes($expected)
     {
-        PHPUnit::assertSame($expected, $count = count(static::$sequence), "Expected [{$expected}] pauses but found [{$count}].");
+        PHPUnit::assertSame($expected, $count = count(static::$sequence), "Expected [{$expected}] siestas but found [{$count}].");
+    }
+
+    /**
+     * Indicate that the instance should not sleep.
+     *
+     * @return $this
+     */
+    protected function shouldNotSleep()
+    {
+        $this->shouldSleep = false;
+
+        return $this;
     }
 }

@@ -253,7 +253,7 @@ class SiestaTest extends TestCase
             ]);
             $this->fail();
         } catch (AssertionFailedError $e) {
-            $this->assertSame("Expected siesta duration of [1 second] but instead found duration of [0 microseconds].\nFailed asserting that false is true.", $e->getMessage());
+            $this->assertSame("Expected siesta duration of [1 second] but instead found duration of [0 seconds].\nFailed asserting that false is true.", $e->getMessage());
         }
     }
 
@@ -274,15 +274,26 @@ class SiestaTest extends TestCase
         }
     }
 
-    public function testSilentlySetsDurationToZeroForNegativeValues()
+    public function testMorePausesThanAssertions()
     {
         Siesta::fake();
 
-        Siesta::for(-1)->seconds();
+        Siesta::for(1)->seconds();
+        Siesta::for(2)->seconds();
 
         Siesta::assertSequence([
-            Siesta::for(0)->seconds(),
+            Siesta::for(1)->seconds(),
         ]);
+    }
+
+    public function testThrowsExceptionForNegativeValues()
+    {
+        try {
+            Siesta::for(-1)->seconds();
+            $this->fail();
+        } catch (RuntimeException $e) {
+            $this->assertSame('Duration must be greater than or equal to 0.', $e->getMessage());
+        }
     }
 
     public function testItDoesntCaptureAssertionInstances()
@@ -302,7 +313,7 @@ class SiestaTest extends TestCase
             ]);
             $this->fail();
         } catch (AssertionFailedError $e) {
-            $this->assertSame("Expected [2] siestas but found [1].\nFailed asserting that 1 is identical to 2.", $e->getMessage());
+            $this->assertSame("Expected [2] pauses but found [1].\nFailed asserting that false is true.", $e->getMessage());
         }
     }
 
@@ -312,18 +323,13 @@ class SiestaTest extends TestCase
 
         Siesta::assertInsomniac();
 
-        Siesta::for(0)->second();
-
-        // we still have not slept...
-        Siesta::assertInsomniac();
-
         Siesta::for(1)->second();
 
         try {
             Siesta::assertInsomniac();
             $this->fail();
         } catch (AssertionFailedError $e) {
-            $this->assertSame("Unexpected siesta duration of [1 second] found.\nFailed asserting that 1000000 is identical to 0.", $e->getMessage());
+            $this->assertSame("Expected [0] pauses but found [1].\nFailed asserting that 1 is identical to 0.", $e->getMessage());
         }
     }
 
@@ -336,19 +342,11 @@ class SiestaTest extends TestCase
         Siesta::for(1)->second();
 
         Siesta::assertSleptTimes(1);
-
-        try {
-            Siesta::assertSleptTimes(0);
-            $this->fail();
-        } catch (AssertionFailedError $e) {
-            $this->assertSame("Expected [0] siestas but found [1].\nFailed asserting that 1 is identical to 0.", $e->getMessage());
-        }
-
         try {
             Siesta::assertSleptTimes(2);
             $this->fail();
         } catch (AssertionFailedError $e) {
-            $this->assertSame("Expected [2] siestas but found [1].\nFailed asserting that 1 is identical to 2.", $e->getMessage());
+            $this->assertSame("Expected [2] pauses but found [1].\nFailed asserting that 1 is identical to 2.", $e->getMessage());
         }
     }
 }
