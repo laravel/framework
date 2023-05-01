@@ -131,24 +131,10 @@ class CallQueuedListener implements ShouldQueue
      */
     protected function setQueueVariables($handler)
     {
-        if (isset($handler->tries)) {
-            $this->tries = $handler->tries;
-        }
-
-        if (isset($handler->maxExceptions)) {
-            $this->maxExceptions = $handler->maxExceptions;
-        }
-
-        if (isset($handler->backoff)) {
-            $this->backoff = $handler->backoff;
-        }
-
-        if (isset($handler->retryUntil)) {
-            $this->retryUntil = $handler->retryUntil;
-        }
-
-        if (isset($handler->timeout)) {
-            $this->timeout = $handler->timeout;
+        foreach(['tries', 'maxExceptions', 'backoff', 'retryUntil', 'timeout'] as $key) {
+            if (isset($handler->{$key})) {
+                $this->{$key} = $handler->{$key};
+            }
         }
 
         return $handler;
