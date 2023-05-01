@@ -85,7 +85,7 @@ class Response implements ArrayAccess
     /**
      * Get the JSON decoded body of the response as an object.
      *
-     * @return object|array
+     * @return object|null
      */
     public function object()
     {
