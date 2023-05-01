@@ -293,16 +293,12 @@ class Siesta
     /**
      * Assert the given sleeping occurred the a specific number of times.
      *
-     * @param  \Closure|static  $expected
+     * @param  \Closure  $expected
      * @param  int  $times
      * @return void
      */
     public static function assertSlept($expected, $times = 1)
     {
-        $callback = $expected instanceof static
-            ? fn (Siesta $actual) => $actual->duration->equalTo($expected->shouldNotSleep()->duration)
-            : $expected;
-
         $count = collect(static::$sequence)->filter($expected)->count();
 
         PHPUnit::assertSame(

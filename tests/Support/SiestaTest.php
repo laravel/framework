@@ -152,7 +152,6 @@ class SiestaTest extends TestCase
         }
     }
 
-
     public function testItCanAssertSequence()
     {
         Siesta::fake();
