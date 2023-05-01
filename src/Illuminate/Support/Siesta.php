@@ -313,6 +313,17 @@ class Siesta
     }
 
     /**
+     * Assert sleeping occurred the given times.
+     *
+     * @param  int  $expected
+     * @return void
+     */
+    public static function assertSleptTimes($expected)
+    {
+        PHPUnit::assertSame($expected, $count = count(static::$sequence), "Expected [{$expected}] siestas but found [{$count}].");
+    }
+
+    /**
      * Assert the given sleep sequence was encountered.
      *
      * @param  array  $sequence
@@ -360,17 +371,6 @@ class Siesta
                 ]),
             ]));
         }
-    }
-
-    /**
-     * Assert sleeping occurred the given times.
-     *
-     * @param  int  $expected
-     * @return void
-     */
-    public static function assertSleptTimes($expected)
-    {
-        PHPUnit::assertSame($expected, $count = count(static::$sequence), "Expected [{$expected}] siestas but found [{$count}].");
     }
 
     /**

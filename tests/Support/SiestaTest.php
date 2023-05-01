@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Support;
 use Carbon\CarbonInterval;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Siesta;
+use PHPUnit\Event\Test\AssertionFailed;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -349,6 +350,38 @@ class SiestaTest extends TestCase
             $this->fail();
         } catch (AssertionFailedError $e) {
             $this->assertSame("Expected [2] siestas but found [1].\nFailed asserting that 1 is identical to 2.", $e->getMessage());
+        }
+    }
+
+    public function testAssertSlept()
+    {
+        Siesta::fake();
+
+        Siesta::assertSlept(fn () => true, 0);
+
+        try {
+            Siesta::assertSlept(fn () => true);
+            $this->fail();
+        } catch (AssertionFailedError $e) {
+            $this->assertSame("The expected siesta was found [0] times instead of [1].\nFailed asserting that 0 is identical to 1.", $e->getMessage());
+        }
+
+        Siesta::for(5)->seconds();
+
+        Siesta::assertSlept(fn (CarbonInterval $duration) => $duration->totalSeconds === 5);
+
+        try {
+            Siesta::assertSlept(fn (CarbonInterval $duration) => $duration->totalSeconds === 5, 2);
+            $this->fail();
+        } catch (AssertionFailedError $e) {
+            $this->assertSame("The expected siesta was found [1] times instead of [2].\nFailed asserting that 1 is identical to 2.", $e->getMessage());
+        }
+
+        try {
+            Siesta::assertSlept(fn (CarbonInterval $duration) => $duration->totalSeconds === 6);
+            $this->fail();
+        } catch (AssertionFailedError $e) {
+            $this->assertSame("The expected siesta was found [0] times instead of [1].\nFailed asserting that 0 is identical to 1.", $e->getMessage());
         }
     }
 }
