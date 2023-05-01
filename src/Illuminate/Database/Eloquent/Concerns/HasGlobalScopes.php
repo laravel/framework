@@ -73,6 +73,7 @@ trait HasGlobalScopes
      * Set the current global scopes.
      *
      * @params array  $scopes
+     *
      * @return void
      */
     public static function setAllGlobalScopes($scopes)
