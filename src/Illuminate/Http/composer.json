@@ -19,6 +19,7 @@
         "fruitcake/php-cors": "^1.2",
         "guzzlehttp/uri-template": "^1.0",
         "illuminate/collections": "^11.0",
+        "illuminate/facades": "^11.0",
         "illuminate/macroable": "^11.0",
         "illuminate/session": "^11.0",
         "illuminate/support": "^11.0",

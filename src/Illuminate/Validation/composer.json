@@ -22,6 +22,7 @@
         "illuminate/collections": "^11.0",
         "illuminate/container": "^11.0",
         "illuminate/contracts": "^11.0",
+        "illuminate/facades": "^11.0",
         "illuminate/macroable": "^11.0",
         "illuminate/support": "^11.0",
         "illuminate/translation": "^11.0",

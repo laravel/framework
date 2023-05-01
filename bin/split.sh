@@ -32,6 +32,7 @@ remote cookie git@github.com:illuminate/cookie.git
 remote database git@github.com:illuminate/database.git
 remote encryption git@github.com:illuminate/encryption.git
 remote events git@github.com:illuminate/events.git
+remote facades git@github.com:illuminate/facades.git
 remote filesystem git@github.com:illuminate/filesystem.git
 remote hashing git@github.com:illuminate/hashing.git
 remote http git@github.com:illuminate/http.git
@@ -66,6 +67,7 @@ split 'src/Illuminate/Cookie' cookie
 split 'src/Illuminate/Database' database
 split 'src/Illuminate/Encryption' encryption
 split 'src/Illuminate/Events' events
+split 'src/Illuminate/Facades' facades
 split 'src/Illuminate/Filesystem' filesystem
 split 'src/Illuminate/Hashing' hashing
 split 'src/Illuminate/Http' http

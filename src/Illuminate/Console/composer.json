@@ -19,6 +19,7 @@
         "illuminate/collections": "^11.0",
         "illuminate/contracts": "^11.0",
         "illuminate/macroable": "^11.0",
+        "illuminate/facades": "^11.0",
         "illuminate/support": "^11.0",
         "illuminate/view": "^11.0",
         "nunomaduro/termwind": "^1.13",

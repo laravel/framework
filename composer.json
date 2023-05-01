@@ -70,6 +70,7 @@
         "illuminate/database": "self.version",
         "illuminate/encryption": "self.version",
         "illuminate/events": "self.version",
+        "illuminate/facades": "self.version",
         "illuminate/filesystem": "self.version",
         "illuminate/hashing": "self.version",
         "illuminate/http": "self.version",
@@ -131,7 +132,8 @@
             "Illuminate\\Support\\": [
                 "src/Illuminate/Macroable/",
                 "src/Illuminate/Collections/",
-                "src/Illuminate/Conditionable/"
+                "src/Illuminate/Conditionable/",
+                "src/Illuminate/Facades/"
             ]
         }
     },

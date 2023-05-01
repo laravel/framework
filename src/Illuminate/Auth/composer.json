@@ -18,6 +18,7 @@
         "ext-hash": "*",
         "illuminate/collections": "^11.0",
         "illuminate/contracts": "^11.0",
+        "illuminate/facades": "^11.0",
         "illuminate/http": "^11.0",
         "illuminate/macroable": "^11.0",
         "illuminate/queue": "^11.0",
