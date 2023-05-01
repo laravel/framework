@@ -60,7 +60,7 @@ trait HasGlobalScopes
     }
 
     /**
-     * Get all the global scopes registered.
+     * Get all of the global scopes that are currently registered.
      *
      * @return array
      */
@@ -70,9 +70,9 @@ trait HasGlobalScopes
     }
 
     /**
-     * Set all the global scopes.
+     * Set the current global scopes.
      *
-     * @params  array  $scopes
+     * @params array  $scopes
      * @return void
      */
     public static function setAllGlobalScopes($scopes)
