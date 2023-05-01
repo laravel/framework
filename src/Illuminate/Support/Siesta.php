@@ -338,7 +338,7 @@ class Siesta
 
                 PHPUnit::assertTrue(
                     $expected->shouldNotSleep()->duration->equalTo($actual),
-                    vsprintf("Expected siesta duration of [%s] but instead found duration of [%s].", [
+                    vsprintf('Expected siesta duration of [%s] but instead found duration of [%s].', [
                         $expected->duration->cascade()->forHumans([
                             'options' => 0,
                             'minimumUnit' => 'microsecond',

@@ -5,7 +5,6 @@ namespace Illuminate\Tests\Support;
 use Carbon\CarbonInterval;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Siesta;
-use PHPUnit\Event\Test\AssertionFailed;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
