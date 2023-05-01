@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Http;
 
+use Closure;
 use Exception;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Promise\PromiseInterface;
@@ -28,6 +29,7 @@ use Mockery as m;
 use OutOfBoundsException;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\RequestInterface;
 use RuntimeException;
 use Symfony\Component\VarDumper\VarDumper;
 
@@ -2239,5 +2241,18 @@ class HttpClientTest extends TestCase
             ->handlerStats();
 
         $this->assertTrue($onStatsFunctionCalled);
+    }
+
+    public function testMiddlewareIsPoolable()
+    {
+        $history = [];
+
+        $middleware = Middleware::history($history);
+
+        $responses = $this->factory->withMiddleware($middleware)->pool(fn (Pool $pool) => [
+            $pool->post('https://example.com', ['hyped-for' => 'laravel-movie']),
+        ]);
+
+        $this->assertCount(1, $history);
     }
 }
