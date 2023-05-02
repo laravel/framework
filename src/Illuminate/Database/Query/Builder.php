@@ -3705,7 +3705,11 @@ class Builder implements BuilderContract
      */
     public function castBinding($value)
     {
-        return $value instanceof BackedEnum ? $value->value : $value;
+        return match (true) {
+            $value instanceof BackedEnum => $value->value,
+            is_array($value) => json_encode($value),
+            default => $value
+        };
     }
 
     /**
