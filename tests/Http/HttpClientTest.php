@@ -2283,7 +2283,7 @@ class HttpClientTest extends TestCase
         });
     }
 
-    public function testWithHeaders()
+    public function testPoolRespectsWithHeaders()
     {
         $this->factory->fake();
 
