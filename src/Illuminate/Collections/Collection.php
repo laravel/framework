@@ -1733,7 +1733,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function offsetGet($key): mixed
     {
-        return $this->items[$key];
+        return $this->offsetExists($key) ? $this->items[$key] : null;
     }
 
     /**
