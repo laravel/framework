@@ -16,7 +16,21 @@ trait Dispatchable
      */
     public static function dispatch(...$arguments)
     {
-        return new PendingDispatch(new static(...$arguments));
+        return static::makeNewPendingDispatch(new static(...$arguments));
+    }
+
+    /**
+     * Create a new pending dispatch from the container.
+     *
+     * @param  static  $job
+     * @return \Illuminate\Foundation\Bus\PendingDispatch
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     */
+    protected static function makeNewPendingDispatch($job)
+    {
+        return app()->make(PendingDispatch::class, [
+            'job' => $job,
+        ]);
     }
 
     /**
@@ -32,12 +46,12 @@ trait Dispatchable
             $dispatchable = new static(...$arguments);
 
             return value($boolean, $dispatchable)
-                ? new PendingDispatch($dispatchable)
+                ? static::makeNewPendingDispatch($dispatchable)
                 : new Fluent;
         }
 
         return value($boolean)
-            ? new PendingDispatch(new static(...$arguments))
+            ? static::makeNewPendingDispatch(new static(...$arguments))
             : new Fluent;
     }
 
@@ -54,12 +68,12 @@ trait Dispatchable
             $dispatchable = new static(...$arguments);
 
             return ! value($boolean, $dispatchable)
-                ? new PendingDispatch($dispatchable)
+                ? static::makeNewPendingDispatch($dispatchable)
                 : new Fluent;
         }
 
         return ! value($boolean)
-            ? new PendingDispatch(new static(...$arguments))
+            ? static::makeNewPendingDispatch(new static(...$arguments))
             : new Fluent;
     }
 
