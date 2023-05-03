@@ -7,6 +7,7 @@ use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Foundation\Bus\PendingDispatch;
 use Illuminate\Queue\InteractsWithQueue;
 use Orchestra\Testbench\TestCase;
 
@@ -16,6 +17,7 @@ class JobDispatchingTest extends TestCase
     {
         Job::$ran = false;
         Job::$value = null;
+        JobDispatchingPendingDispatch::$timesCalled = 0;
     }
 
     public function testJobCanUseCustomMethodsAfterDispatch()
@@ -112,6 +114,16 @@ class JobDispatchingTest extends TestCase
         $this->assertFalse(UniqueJob::$ran);
     }
 
+    public function testPendingDispatchIsBuiltFromTheContainer()
+    {
+        $this->app->bind(PendingDispatch::class, JobDispatchingPendingDispatch::class);
+
+        Job::dispatch('test');
+
+        $this->assertTrue(Job::$ran);
+        $this->assertEquals(1, JobDispatchingPendingDispatch::$timesCalled);
+    }
+
     /**
      * Helpers.
      */
@@ -153,5 +165,15 @@ class UniqueJob extends Job implements ShouldBeUnique
     public function uniqueId()
     {
         return self::$value;
+    }
+}
+
+class JobDispatchingPendingDispatch extends PendingDispatch
+{
+    public static $timesCalled = 0;
+    public function __construct($job)
+    {
+        parent::__construct($job);
+        static::$timesCalled++;
     }
 }
