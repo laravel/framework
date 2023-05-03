@@ -1308,7 +1308,7 @@ trait HasAttributes
      */
     protected function castAttributeAsHashedString($key, $value)
     {
-        return Hash::needsRehash($value) ? Hash::make($value) : $value;;
+        return Hash::needsRehash($value) ? Hash::make($value) : $value;
     }
 
     /**

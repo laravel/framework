@@ -2,19 +2,11 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Hashing\Hasher;
-use Illuminate\Database\Eloquent\Casts\ArrayObject;
-use Illuminate\Database\Eloquent\Casts\AsEncryptedArrayObject;
-use Illuminate\Database\Eloquent\Casts\AsEncryptedCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Hashing\AbstractHasher;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
-use stdClass;
 
 class EloquentModelHashedCastingTest extends DatabaseTestCase
 {
