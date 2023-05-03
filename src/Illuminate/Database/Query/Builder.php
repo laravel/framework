@@ -931,10 +931,6 @@ class Builder implements BuilderContract
      */
     public function orWhere($column, $operator = null, $value = null)
     {
-        [$value, $operator] = $this->prepareValueAndOperator(
-            $value, $operator, func_num_args() === 2
-        );
-
         return $this->where($column, $operator, $value, 'or');
     }
 
@@ -1400,10 +1396,6 @@ class Builder implements BuilderContract
      */
     public function orWhereDate($column, $operator, $value = null)
     {
-        [$value, $operator] = $this->prepareValueAndOperator(
-            $value, $operator, func_num_args() === 2
-        );
-
         return $this->whereDate($column, $operator, $value, 'or');
     }
 
@@ -1441,10 +1433,6 @@ class Builder implements BuilderContract
      */
     public function orWhereTime($column, $operator, $value = null)
     {
-        [$value, $operator] = $this->prepareValueAndOperator(
-            $value, $operator, func_num_args() === 2
-        );
-
         return $this->whereTime($column, $operator, $value, 'or');
     }
 
@@ -1486,10 +1474,6 @@ class Builder implements BuilderContract
      */
     public function orWhereDay($column, $operator, $value = null)
     {
-        [$value, $operator] = $this->prepareValueAndOperator(
-            $value, $operator, func_num_args() === 2
-        );
-
         return $this->whereDay($column, $operator, $value, 'or');
     }
 
@@ -1531,10 +1515,6 @@ class Builder implements BuilderContract
      */
     public function orWhereMonth($column, $operator, $value = null)
     {
-        [$value, $operator] = $this->prepareValueAndOperator(
-            $value, $operator, func_num_args() === 2
-        );
-
         return $this->whereMonth($column, $operator, $value, 'or');
     }
 
@@ -1572,10 +1552,6 @@ class Builder implements BuilderContract
      */
     public function orWhereYear($column, $operator, $value = null)
     {
-        [$value, $operator] = $this->prepareValueAndOperator(
-            $value, $operator, func_num_args() === 2
-        );
-
         return $this->whereYear($column, $operator, $value, 'or');
     }
 
@@ -1934,10 +1910,6 @@ class Builder implements BuilderContract
      */
     public function orWhereJsonLength($column, $operator, $value = null)
     {
-        [$value, $operator] = $this->prepareValueAndOperator(
-            $value, $operator, func_num_args() === 2
-        );
-
         return $this->whereJsonLength($column, $operator, $value, 'or');
     }
 
@@ -2124,10 +2096,6 @@ class Builder implements BuilderContract
      */
     public function orHaving($column, $operator = null, $value = null)
     {
-        [$value, $operator] = $this->prepareValueAndOperator(
-            $value, $operator, func_num_args() === 2
-        );
-
         return $this->having($column, $operator, $value, 'or');
     }
 
