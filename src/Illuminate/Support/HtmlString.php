@@ -8,10 +8,8 @@ class HtmlString implements Htmlable
 {
     /**
      * The HTML string.
-     *
-     * @var string
      */
-    protected $html;
+    protected string $html;
 
     /**
      * Create a new HTML string instance.
@@ -19,7 +17,7 @@ class HtmlString implements Htmlable
      * @param  string  $html
      * @return void
      */
-    public function __construct($html = '')
+    public function __construct(string $html = '')
     {
         $this->html = $html;
     }
