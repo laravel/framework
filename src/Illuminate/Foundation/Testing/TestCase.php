@@ -10,7 +10,7 @@ use Illuminate\Queue\Queue;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\ParallelTesting;
-use Illuminate\Support\Siesta;
+use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
 use Illuminate\View\Component;
 use Mockery;
@@ -246,7 +246,7 @@ abstract class TestCase extends BaseTestCase
         Component::forgetFactory();
         Queue::createPayloadUsing(null);
         HandleExceptions::forgetApp();
-        Siesta::fake(false);
+        Sleep::fake(false);
 
         if ($this->callbackException) {
             throw $this->callbackException;

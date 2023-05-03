@@ -8,7 +8,7 @@ use DateInterval;
 use PHPUnit\Framework\Assert as PHPUnit;
 use RuntimeException;
 
-class Siesta
+class Sleep
 {
     /**
      * The total duration to sleep.
@@ -46,7 +46,7 @@ class Siesta
     protected $shouldSleep = true;
 
     /**
-     * Create a new Siesta instance.
+     * Create a new class instance.
      *
      * @param  int|float|\DateInterval  $duration
      * @return void
@@ -71,7 +71,7 @@ class Siesta
     /**
      * Sleep for the given duration.
      *
-     * @param  int|float|DateInterval  $duration
+     * @param  \DateInterval|int|float  $duration
      * @return static
      */
     public static function for($duration)
@@ -82,7 +82,7 @@ class Siesta
     /**
      * Sleep until the given timestamp.
      *
-     * @param  int|\DateTimeInterface  $timestamp
+     * @param  \DateTimeInterface|int  $timestamp
      * @return static
      */
     public static function until($timestamp)
@@ -95,7 +95,7 @@ class Siesta
     }
 
     /**
-     * Sleep for the duration in microseconds.
+     * Sleep for the given number of microseconds.
      *
      * @param  int  $duration
      * @return static
@@ -106,7 +106,7 @@ class Siesta
     }
 
     /**
-     * Sleep for the duration in seconds.
+     * Sleep for the given number of seconds.
      *
      * @param  int|float  $duration
      * @return static
@@ -117,7 +117,7 @@ class Siesta
     }
 
     /**
-     * Sleep for the duration in minutes.
+     * Sleep for the given number of minutes.
      *
      * @return $this
      */
@@ -129,7 +129,7 @@ class Siesta
     }
 
     /**
-     * Sleep for the duration in minutes.
+     * Sleep for one minute.
      *
      * @return $this
      */
@@ -139,7 +139,7 @@ class Siesta
     }
 
     /**
-     * Sleep for the duration in seconds.
+     * Sleep for the given number of seconds.
      *
      * @return $this
      */
@@ -151,7 +151,7 @@ class Siesta
     }
 
     /**
-     * Sleep for the duration in seconds.
+     * Sleep for one second.
      *
      * @return $this
      */
@@ -161,7 +161,7 @@ class Siesta
     }
 
     /**
-     * Sleep for the duration in milliseconds.
+     * Sleep for the given number of milliseconds.
      *
      * @return $this
      */
@@ -173,7 +173,7 @@ class Siesta
     }
 
     /**
-     * Sleep for the duration in milliseconds.
+     * Sleep for one millisecond.
      *
      * @return $this
      */
@@ -183,7 +183,7 @@ class Siesta
     }
 
     /**
-     * Sleep for the duration in microseconds.
+     * Sleep for the given number of microseconds.
      *
      * @return $this
      */
@@ -195,7 +195,7 @@ class Siesta
     }
 
     /**
-     * Sleep for the duration in microseconds.
+     * Sleep for on microsecond.
      *
      * @return $this
      */
@@ -278,7 +278,7 @@ class Siesta
     }
 
     /**
-     * Stay awake and captured any attempts to sleep.
+     * Stay awake and capture any attempts to sleep.
      *
      * @param  bool  $value
      * @return void
@@ -291,7 +291,7 @@ class Siesta
     }
 
     /**
-     * Assert the given sleeping occurred the a specific number of times.
+     * Assert a given amount of sleeping occurred a specific number of times.
      *
      * @param  \Closure  $expected
      * @param  int  $times
@@ -304,19 +304,19 @@ class Siesta
         PHPUnit::assertSame(
             $times,
             $count,
-            "The expected siesta was found [{$count}] times instead of [{$times}]."
+            "The expected sleep was found [{$count}] times instead of [{$times}]."
         );
     }
 
     /**
-     * Assert sleeping occurred the given times.
+     * Assert sleeping occurred a given number of times.
      *
      * @param  int  $expected
      * @return void
      */
     public static function assertSleptTimes($expected)
     {
-        PHPUnit::assertSame($expected, $count = count(static::$sequence), "Expected [{$expected}] siestas but found [{$count}].");
+        PHPUnit::assertSame($expected, $count = count(static::$sequence), "Expected [{$expected}] sleeps but found [{$count}].");
     }
 
     /**
@@ -331,14 +331,14 @@ class Siesta
 
         collect($sequence)
             ->zip(static::$sequence)
-            ->eachSpread(function (?Siesta $expected, CarbonInterval $actual) {
+            ->eachSpread(function (?Sleep $expected, CarbonInterval $actual) {
                 if ($expected === null) {
                     return;
                 }
 
                 PHPUnit::assertTrue(
                     $expected->shouldNotSleep()->duration->equalTo($actual),
-                    vsprintf('Expected siesta duration of [%s] but instead found duration of [%s].', [
+                    vsprintf('Expected sleep duration of [%s] but actually slept for [%s].', [
                         $expected->duration->cascade()->forHumans([
                             'options' => 0,
                             'minimumUnit' => 'microsecond',
@@ -357,10 +357,20 @@ class Siesta
      *
      * @return void
      */
+    public static function assertNeverSlept()
+    {
+        return static::assertInsomniac();
+    }
+
+    /**
+     * Assert that no sleeping occurred.
+     *
+     * @return void
+     */
     public static function assertInsomniac()
     {
         foreach (static::$sequence as $duration) {
-            PHPUnit::assertSame(0, $duration->totalMicroseconds, vsprintf('Unexpected siesta duration of [%s] found.', [
+            PHPUnit::assertSame(0, $duration->totalMicroseconds, vsprintf('Unexpected sleep duration of [%s] found.', [
                 $duration->cascade()->forHumans([
                     'options' => 0,
                     'minimumUnit' => 'microsecond',

@@ -5,7 +5,7 @@ namespace Illuminate\Cache;
 use Illuminate\Contracts\Cache\Lock as LockContract;
 use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Support\InteractsWithTime;
-use Illuminate\Support\Siesta;
+use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
 
 abstract class Lock implements LockContract
@@ -115,7 +115,7 @@ abstract class Lock implements LockContract
         $starting = $this->currentTime();
 
         while (! $this->acquire()) {
-            Siesta::usleep($this->sleepMilliseconds * 1000);
+            Sleep::usleep($this->sleepMilliseconds * 1000);
 
             if ($this->currentTime() - $seconds >= $starting) {
                 throw new LockTimeoutException;

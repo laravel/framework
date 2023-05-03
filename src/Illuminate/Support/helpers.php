@@ -6,7 +6,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Env;
 use Illuminate\Support\HigherOrderTapProxy;
 use Illuminate\Support\Optional;
-use Illuminate\Support\Siesta;
+use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
 
 if (! function_exists('append_config')) {
@@ -254,7 +254,7 @@ if (! function_exists('retry')) {
             $sleepMilliseconds = $backoff[$attempts - 1] ?? $sleepMilliseconds;
 
             if ($sleepMilliseconds) {
-                Siesta::usleep(value($sleepMilliseconds, $attempts, $e) * 1000);
+                Sleep::usleep(value($sleepMilliseconds, $attempts, $e) * 1000);
             }
 
             goto beginning;

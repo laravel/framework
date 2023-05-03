@@ -3,7 +3,7 @@
 namespace Illuminate\Redis\Limiters;
 
 use Illuminate\Contracts\Redis\LimiterTimeoutException;
-use Illuminate\Support\Siesta;
+use Illuminate\Support\Sleep;
 
 class DurationLimiter
 {
@@ -85,7 +85,7 @@ class DurationLimiter
                 throw new LimiterTimeoutException;
             }
 
-            Siesta::usleep($sleep * 1000);
+            Sleep::usleep($sleep * 1000);
         }
 
         if (is_callable($callback)) {
