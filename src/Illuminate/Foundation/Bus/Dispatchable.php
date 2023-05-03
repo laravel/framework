@@ -24,6 +24,7 @@ trait Dispatchable
      *
      * @param  static  $job
      * @return \Illuminate\Foundation\Bus\PendingDispatch
+     *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected static function makeNewPendingDispatch($job)

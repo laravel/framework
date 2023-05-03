@@ -171,6 +171,7 @@ class UniqueJob extends Job implements ShouldBeUnique
 class JobDispatchingPendingDispatch extends PendingDispatch
 {
     public static $timesCalled = 0;
+
     public function __construct($job)
     {
         parent::__construct($job);
