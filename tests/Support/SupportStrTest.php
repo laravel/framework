@@ -470,6 +470,8 @@ class SupportStrTest extends TestCase
         $nonAsciiString = '这是一段中文';
         $this->assertSame('这是一...', Str::limit($nonAsciiString, 6));
         $this->assertSame('这是一', Str::limit($nonAsciiString, 6, ''));
+
+        $this->assertSame(null, Str::limit(null));
     }
 
     public function testLength()
