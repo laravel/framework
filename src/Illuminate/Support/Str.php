@@ -490,7 +490,7 @@ class Str
      */
     public static function limit($value, $limit = 100, $end = '...')
     {
-        if (mb_strwidth($value, 'UTF-8') <= $limit) {
+        if (mb_strwidth($value ?? '', 'UTF-8') <= $limit) {
             return $value;
         }
 
