@@ -356,6 +356,25 @@ class DatabaseEloquentFactoryTest extends TestCase
         unset($_SERVER['__test.role.creating-role'], $_SERVER['__test.role.creating-user']);
     }
 
+    public function test_belongs_to_many_relationship_with_relationship_name_in_pivot_parameter()
+    {
+        FactoryTestUserFactory::times(3)
+            ->hasAttached(
+                FactoryTestRoleFactory::times(3)->afterCreating(function ($role, $user) {
+                    $_SERVER['__test.role.creating-role'] = $role;
+                    $_SERVER['__test.role.creating-user'] = $user;
+                }),
+                'roles'
+            )
+            ->create();
+
+        $this->assertCount(9, FactoryTestRole::all());
+
+        $user = FactoryTestUser::latest()->first();
+
+        $this->assertCount(3, $user->roles);
+    }
+
     public function test_belongs_to_many_relationship_related_models_set_on_instance_when_touching_owner()
     {
         $user = FactoryTestUserFactory::new()->create();

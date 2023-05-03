@@ -588,12 +588,17 @@ abstract class Factory
      * Define an attached relationship for the model.
      *
      * @param  \Illuminate\Database\Eloquent\Factories\Factory|\Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model|array  $factory
-     * @param  (callable(): array<string, mixed>)|array<string, mixed>  $pivot
+     * @param  (callable(): array<string, mixed>)|array<string, mixed>|string  $pivot
      * @param  string|null  $relationship
      * @return static
      */
     public function hasAttached($factory, $pivot = [], $relationship = null)
     {
+        if ($relationship === null && is_string($pivot)) {
+            $relationship = $pivot;
+            $pivot = [];
+        }
+
         return $this->newInstance([
             'has' => $this->has->concat([new BelongsToManyRelationship(
                 $factory,
