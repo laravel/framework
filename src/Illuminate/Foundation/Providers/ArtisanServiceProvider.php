@@ -74,6 +74,7 @@ use Illuminate\Foundation\Console\UpCommand;
 use Illuminate\Foundation\Console\VendorPublishCommand;
 use Illuminate\Foundation\Console\ViewCacheCommand;
 use Illuminate\Foundation\Console\ViewClearCommand;
+use Illuminate\Foundation\Console\ViewComposerMakeCommand;
 use Illuminate\Notifications\Console\NotificationTableCommand;
 use Illuminate\Queue\Console\BatchesTableCommand;
 use Illuminate\Queue\Console\ClearCommand as QueueClearCommand;
@@ -191,6 +192,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'QueueTable' => TableCommand::class,
         'QueueBatchesTable' => BatchesTableCommand::class,
         'RequestMake' => RequestMakeCommand::class,
+        'ViewComposerMake' => ViewComposerMakeCommand::class,
         'ResourceMake' => ResourceMakeCommand::class,
         'RuleMake' => RuleMakeCommand::class,
         'ScopeMake' => ScopeMakeCommand::class,
@@ -669,6 +671,18 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     {
         $this->app->singleton(RequestMakeCommand::class, function ($app) {
             return new RequestMakeCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerViewComposerMakeCommand()
+    {
+        $this->app->singleton(ViewComposerMakeCommand::class, function ($app) {
+            return new ViewComposerMakeCommand($app['files']);
         });
     }
 

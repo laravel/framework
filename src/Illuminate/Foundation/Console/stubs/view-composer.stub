@@ -1,0 +1,13 @@
+<?php
+
+namespace {{ namespace }};
+
+use Illuminate\View\View;
+
+class {{ class }}
+{
+    public function compose(View $view): void
+    {
+        // $view->with('foo', 'bar');
+    }
+}
