@@ -11,6 +11,8 @@ class TimestampType extends Type implements PhpDateTimeMappingType
 {
     /**
      * {@inheritdoc}
+     *
+     * @return string
      */
     public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform)
     {
@@ -87,6 +89,8 @@ class TimestampType extends Type implements PhpDateTimeMappingType
 
     /**
      * {@inheritdoc}
+     *
+     * @return string
      */
     public function getName()
     {
