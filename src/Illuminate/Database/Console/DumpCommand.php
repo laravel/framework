@@ -102,7 +102,7 @@ class DumpCommand extends Command
     }
 
     /**
-     * Get the path to the to be stored schema for the given connection.
+     * Get the path to the stored schema for the given connection.
      *
      * @param  \Illuminate\Database\Connection  $connection
      * @return string
