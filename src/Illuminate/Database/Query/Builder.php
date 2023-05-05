@@ -25,6 +25,7 @@ use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use LogicException;
+use PDO;
 use RuntimeException;
 
 class Builder implements BuilderContract
@@ -2747,7 +2748,7 @@ class Builder implements BuilderContract
             }
             $this->columns = Arr::prepend($this->qualifyStarColumns($this->columns), $key);
 
-            return $this->onceWithFetchAllMode(\PDO::FETCH_UNIQUE, function () {
+            return $this->onceWithFetchAllMode(PDO::FETCH_UNIQUE, function () {
                 return $this->processor->processSelect($this, $this->runSelect());
             });
         }));
@@ -3005,9 +3006,11 @@ class Builder implements BuilderContract
         $queryResult = $this->onceWithColumns(
             is_null($key) ? [$column] : [$column, $key],
             function () {
-                return $this->processor->processSelect(
-                    $this, $this->runSelect()
-                );
+                return $this->onceWithFetchAllMode(PDO::FETCH_UNIQUE, function () {
+                    return $this->processor->processSelect(
+                        $this, $this->runSelect()
+                    );
+                });
             }
         );
 
@@ -3015,87 +3018,7 @@ class Builder implements BuilderContract
             return collect();
         }
 
-        // If the columns are qualified with a table or have an alias, we cannot use
-        // those directly in the "pluck" operations since the results from the DB
-        // are only keyed by the column itself. We'll strip the table out here.
-        $column = $this->stripTableForPluck($column);
-
-        $key = $this->stripTableForPluck($key);
-
-        return is_array($queryResult[0])
-                    ? $this->pluckFromArrayColumn($queryResult, $column, $key)
-                    : $this->pluckFromObjectColumn($queryResult, $column, $key);
-    }
-
-    /**
-     * Strip off the table name or alias from a column identifier.
-     *
-     * @param  string  $column
-     * @return string|null
-     */
-    protected function stripTableForPluck($column)
-    {
-        if (is_null($column)) {
-            return $column;
-        }
-
-        $columnString = $column instanceof ExpressionContract
-            ? $this->grammar->getValue($column)
-            : $column;
-
-        $separator = str_contains(strtolower($columnString), ' as ') ? ' as ' : '\.';
-
-        return last(preg_split('~'.$separator.'~i', $columnString));
-    }
-
-    /**
-     * Retrieve column values from rows represented as objects.
-     *
-     * @param  array  $queryResult
-     * @param  string  $column
-     * @param  string  $key
-     * @return \Illuminate\Support\Collection
-     */
-    protected function pluckFromObjectColumn($queryResult, $column, $key)
-    {
-        $results = [];
-
-        if (is_null($key)) {
-            foreach ($queryResult as $row) {
-                $results[] = $row->$column;
-            }
-        } else {
-            foreach ($queryResult as $row) {
-                $results[$row->$key] = $row->$column;
-            }
-        }
-
-        return collect($results);
-    }
-
-    /**
-     * Retrieve column values from rows represented as arrays.
-     *
-     * @param  array  $queryResult
-     * @param  string  $column
-     * @param  string  $key
-     * @return \Illuminate\Support\Collection
-     */
-    protected function pluckFromArrayColumn($queryResult, $column, $key)
-    {
-        $results = [];
-
-        if (is_null($key)) {
-            foreach ($queryResult as $row) {
-                $results[] = $row[$column];
-            }
-        } else {
-            foreach ($queryResult as $row) {
-                $results[$row[$key]] = $row[$column];
-            }
-        }
-
-        return collect($results);
+        return collect(is_null($key) ? array_keys($queryResult) : array_flip($queryResult));
     }
 
     /**
