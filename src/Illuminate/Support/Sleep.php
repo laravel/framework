@@ -359,7 +359,7 @@ class Sleep
      */
     public static function assertNeverSlept()
     {
-        return static::assertInsomniac();
+        return static::assertSleptTimes(0);
     }
 
     /**
@@ -369,6 +369,10 @@ class Sleep
      */
     public static function assertInsomniac()
     {
+        if (static::$sequence === []) {
+            PHPUnit::assertTrue(true);
+        }
+
         foreach (static::$sequence as $duration) {
             PHPUnit::assertSame(0, $duration->totalMicroseconds, vsprintf('Unexpected sleep duration of [%s] found.', [
                 $duration->cascade()->forHumans([

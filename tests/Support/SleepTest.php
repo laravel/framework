@@ -305,6 +305,38 @@ class SleepTest extends TestCase
         }
     }
 
+    public function testAssertNeverSlept()
+    {
+        Sleep::fake();
+
+        Sleep::assertNeverSlept();
+
+        Sleep::for(1)->seconds();
+
+        try {
+            Sleep::assertNeverSlept();
+            $this->fail();
+        } catch (AssertionFailedError $e) {
+            $this->assertSame("Expected [0] sleeps but found [1].\nFailed asserting that 1 is identical to 0.", $e->getMessage());
+        }
+    }
+
+    public function testAssertNeverAgainstZeroSecondSleep()
+    {
+        Sleep::fake();
+
+        Sleep::assertNeverSlept();
+
+        Sleep::for(0)->seconds();
+
+        try {
+            Sleep::assertNeverSlept();
+            $this->fail();
+        } catch (AssertionFailedError $e) {
+            $this->assertSame("Expected [0] sleeps but found [1].\nFailed asserting that 1 is identical to 0.", $e->getMessage());
+        }
+    }
+
     public function testItCanAssertNoSleepingOccurred()
     {
         Sleep::fake();
