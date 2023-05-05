@@ -452,9 +452,9 @@ class MailManager implements FactoryContract
             : $this->app['config']["mail.mailers.{$name}"];
 
         if (isset($config['url'])) {
-            $config = (new ConfigurationUrlParser)->parseConfiguration($config);
-            $config['transport'] = $config['driver'];
-            unset($config['driver']);
+            $config = array_merge($config, (new ConfigurationUrlParser)->parseConfiguration($config));
+
+            $config['transport'] = Arr::pull($config, 'driver');
         }
 
         return $config;
