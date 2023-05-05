@@ -2761,11 +2761,12 @@ class Builder implements BuilderContract
      *
      * @param  int  $mode
      * @param  Closure  $callback
+     * @param  bool  $prepend
      * @return \Illuminate\Support\HigherOrderTapProxy|mixed
      */
-    protected function onceWithFetchAllMode($mode, Closure $callback)
+    protected function onceWithFetchAllMode($mode, Closure $callback, $prepend = true)
     {
-        $this->connection->setFetchAllMode($mode);
+        $this->connection->setFetchAllMode($mode, $prepend);
 
         return tap($callback(), fn () => $this->connection->resetFetchAllMode());
     }
@@ -3000,13 +3001,14 @@ class Builder implements BuilderContract
      */
     public function pluck($column, $key = null)
     {
-        // First, we will need to select the results of the query accounting for the
-        // given columns / key. Once we have the results, we will be able to take
-        // the results and get the exact data that was requested for the query.
+        // When the key is null, we only need to fetch one unique column. If a key is given,
+        // a combination with PDO:FETCH_COLUMN will result in a neat key/value response.
+        $mode = is_null($key) ? PDO::FETCH_UNIQUE : PDO::FETCH_UNIQUE|PDO::FETCH_COLUMN;
+
         $queryResult = $this->onceWithColumns(
             is_null($key) ? [$column] : [$column, $key],
-            function () {
-                return $this->onceWithFetchAllMode(PDO::FETCH_UNIQUE, function () {
+            function () use ($mode) {
+                return $this->onceWithFetchAllMode($mode, function () {
                     return $this->processor->processSelect(
                         $this, $this->runSelect()
                     );
