@@ -205,6 +205,21 @@ class Application extends Container implements ApplicationContract, CachesConfig
     }
 
     /**
+     * Create a new Laravel application instance.
+     *
+     * @param  string|null  $baseDirectory
+     * @return static
+     */
+    public static function create(string $baseDirectory = null)
+    {
+        $baseDirectory = $baseDirectory ?: dirname(dirname(
+            debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file']
+        ));
+
+        return (new static($_ENV['APP_BASE_PATH'] ?? $baseDirectory))->withKernels();
+    }
+
+    /**
      * Get the version number of the application.
      *
      * @return string
@@ -243,6 +258,41 @@ class Application extends Container implements ApplicationContract, CachesConfig
         $this->register(new EventServiceProvider($this));
         $this->register(new LogServiceProvider($this));
         $this->register(new RoutingServiceProvider($this));
+    }
+
+    /**
+     * Register the standard kernel classes for the application.
+     *
+     * @return $this
+     */
+    protected function withKernels()
+    {
+        $this->singleton(
+            \Illuminate\Contracts\Http\Kernel::class,
+            \App\Http\Kernel::class
+        );
+
+        $this->singleton(
+            \Illuminate\Contracts\Console\Kernel::class,
+            \App\Console\Kernel::class
+        );
+
+        return $this;
+    }
+
+    /**
+     * Register the standard exception handler for the application.
+     *
+     * @return $this
+     */
+    public function withExceptionHandling()
+    {
+        $this->singleton(
+            \Illuminate\Contracts\Debug\ExceptionHandler::class,
+            \Illuminate\Foundation\Exceptions\Handler::class
+        );
+
+        return $this;
     }
 
     /**
