@@ -204,6 +204,15 @@ class FoundationFormRequestTest extends TestCase
         ], $messages);
     }
 
+    public function testRequestCanPassWithoutRulesMethod()
+    {
+        $request = $this->createRequest([], FoundationTestFormRequestWithoutRulesMethod::class);
+
+        $request->validateResolved();
+
+        $this->assertEquals([], $request->all());
+    }
+
     /**
      * Catch the given exception thrown from the executor, and return it.
      *
@@ -463,5 +472,13 @@ class InjectedDependency
     public function __construct(public $value)
     {
         //
+    }
+}
+
+class FoundationTestFormRequestWithoutRulesMethod extends FormRequest
+{
+    public function authorize()
+    {
+        return true;
     }
 }

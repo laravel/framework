@@ -25,7 +25,7 @@ class EventServiceProvider extends ServiceProvider
     /**
      * The model observers to register.
      *
-     * @var array
+     * @var array<string, array<int, string>>
      */
     protected $observers = [];
 

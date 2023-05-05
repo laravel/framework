@@ -707,6 +707,24 @@ class TestResponseTest extends TestCase
         $this->fail();
     }
 
+    public function testAssertGone()
+    {
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_GONE)
+        );
+
+        $response->assertGone();
+
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_OK)
+        );
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("Expected response status code [410] but received 200.\nFailed asserting that 410 is identical to 200.");
+
+        $response->assertGone();
+    }
+
     public function testAssertTooManyRequests()
     {
         $response = TestResponse::fromBaseResponse(
@@ -771,6 +789,42 @@ class TestResponseTest extends TestCase
 
         $response = TestResponse::fromBaseResponse($baseResponse);
         $response->assertServerError();
+    }
+
+    public function testAssertInternalServerError()
+    {
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR)
+        );
+
+        $response->assertInternalServerError();
+
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_OK)
+        );
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("Expected response status code [500] but received 200.\nFailed asserting that 500 is identical to 200.");
+
+        $response->assertInternalServerError();
+    }
+
+    public function testAssertServiceUnavailable()
+    {
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_SERVICE_UNAVAILABLE)
+        );
+
+        $response->assertServiceUnavailable();
+
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_OK)
+        );
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("Expected response status code [503] but received 200.\nFailed asserting that 503 is identical to 200.");
+
+        $response->assertServiceUnavailable();
     }
 
     public function testAssertNoContentAsserts204StatusCodeByDefault()

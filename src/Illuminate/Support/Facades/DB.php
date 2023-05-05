@@ -27,7 +27,7 @@ namespace Illuminate\Support\Facades;
  * @method static void useDefaultSchemaGrammar()
  * @method static void useDefaultPostProcessor()
  * @method static \Illuminate\Database\Schema\Builder getSchemaBuilder()
- * @method static \Illuminate\Database\Query\Builder table(\Closure|\Illuminate\Database\Query\Builder|string $table, string|null $as = null)
+ * @method static \Illuminate\Database\Query\Builder table(\Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Query\Expression|string $table, string|null $as = null)
  * @method static \Illuminate\Database\Query\Builder query()
  * @method static mixed selectOne(string $query, array $bindings = [], bool $useReadPdo = true)
  * @method static mixed scalar(string $query, array $bindings = [], bool $useReadPdo = true)

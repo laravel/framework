@@ -276,6 +276,15 @@ class UrlSigningTest extends TestCase
         }
     }
 
+    public function testItCanGenerateMiddlewareDefinitionViaStaticMethod()
+    {
+        $signature = (string) ValidateSignature::relative();
+        $this->assertSame('Illuminate\Routing\Middleware\ValidateSignature:relative', $signature);
+
+        $signature = (string) ValidateSignature::absolute();
+        $this->assertSame('Illuminate\Routing\Middleware\ValidateSignature', $signature);
+    }
+
     protected function createValidateSignatureMiddleware(array $ignore)
     {
         return new class($ignore) extends ValidateSignature

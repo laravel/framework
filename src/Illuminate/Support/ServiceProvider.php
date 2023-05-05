@@ -434,4 +434,14 @@ abstract class ServiceProvider
     {
         return $this instanceof DeferrableProvider;
     }
+
+    /**
+     * Get the default providers for a Laravel application.
+     *
+     * @return \Illuminate\Support\DefaultProviders
+     */
+    public static function defaultProviders()
+    {
+        return new DefaultProviders;
+    }
 }
