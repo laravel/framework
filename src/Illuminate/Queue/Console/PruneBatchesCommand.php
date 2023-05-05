@@ -46,7 +46,7 @@ class PruneBatchesCommand extends Command
 
         $this->components->info("{$count} entries deleted.");
 
-        if ($this->option('unfinished') !== null) {
+        if ($this->option('unfinished')) {
             $count = 0;
 
             if ($repository instanceof DatabaseBatchRepository) {
@@ -56,7 +56,7 @@ class PruneBatchesCommand extends Command
             $this->components->info("{$count} unfinished entries deleted.");
         }
 
-        if ($this->option('cancelled') !== null) {
+        if ($this->option('cancelled')) {
             $count = 0;
 
             if ($repository instanceof DatabaseBatchRepository) {

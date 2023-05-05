@@ -29,13 +29,6 @@ class FileStore implements Store, LockProvider
     protected $directory;
 
     /**
-     * The file cache lock directory.
-     *
-     * @var string|null
-     */
-    protected $lockDirectory;
-
-    /**
      * Octal representation of the cache file permissions.
      *
      * @var int|null
@@ -217,14 +210,7 @@ class FileStore implements Store, LockProvider
      */
     public function lock($name, $seconds = 0, $owner = null)
     {
-        $this->ensureCacheDirectoryExists($this->lockDirectory ?? $this->directory);
-
-        return new FileLock(
-            new static($this->files, $this->lockDirectory ?? $this->directory, $this->filePermission),
-            $name,
-            $seconds,
-            $owner
-        );
+        return new FileLock($this, $name, $seconds, $owner);
     }
 
     /**
@@ -376,19 +362,6 @@ class FileStore implements Store, LockProvider
     public function getDirectory()
     {
         return $this->directory;
-    }
-
-    /**
-     * Set the cache directory where locks should be stored.
-     *
-     * @param  string|null  $lockDirectory
-     * @return $this
-     */
-    public function setLockDirectory($lockDirectory)
-    {
-        $this->lockDirectory = $lockDirectory;
-
-        return $this;
     }
 
     /**

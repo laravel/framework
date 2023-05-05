@@ -275,7 +275,7 @@ class Factory
      * Start defining a series of piped processes.
      *
      * @param  callable|array  $callback
-     * @return \Illuminate\Contracts\Process\ProcessResult
+     * @return \Illuminate\Process\Pipe
      */
     public function pipe(callable|array $callback, ?callable $output = null)
     {

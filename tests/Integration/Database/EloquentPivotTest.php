@@ -129,8 +129,6 @@ class PivotTestCollaborator extends Pivot
 {
     public $table = 'collaborators';
 
-    public $timestamps = false;
-
     protected $casts = [
         'permissions' => 'json',
     ];
@@ -139,8 +137,6 @@ class PivotTestCollaborator extends Pivot
 class PivotTestContributor extends Pivot
 {
     public $table = 'contributors';
-
-    public $timestamps = false;
 
     public $incrementing = true;
 
@@ -152,8 +148,6 @@ class PivotTestContributor extends Pivot
 class PivotTestSubscription extends Pivot
 {
     public $table = 'subscriptions';
-
-    public $timestamps = false;
 
     protected $attributes = [
         'status' => 'active',
