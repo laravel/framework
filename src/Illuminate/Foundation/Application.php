@@ -283,13 +283,19 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Register the standard exception handler for the application.
      *
+     * @param  callable|null  $afterResolving
      * @return $this
      */
-    public function withExceptionHandling()
+    public function withExceptionHandling($afterResolving = null)
     {
         $this->singleton(
             \Illuminate\Contracts\Debug\ExceptionHandler::class,
             \Illuminate\Foundation\Exceptions\Handler::class
+        );
+
+        $this->afterResolving(
+            \Illuminate\Contracts\Debug\ExceptionHandler::class,
+            $afterResolving ?: fn ($handler) => $handler
         );
 
         return $this;
