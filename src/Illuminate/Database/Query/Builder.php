@@ -230,6 +230,13 @@ class Builder implements BuilderContract
     public $useWritePdo = false;
 
     /**
+     * When set, the query result array is keyed by the given column.
+     *
+     * @var string|null|\Illuminate\Contracts\Database\Query\Expression
+     */
+    public $keyBy;
+
+    /**
      * Create a new query builder instance.
      *
      * @param  \Illuminate\Database\ConnectionInterface  $connection
@@ -444,6 +451,19 @@ class Builder implements BuilderContract
         } else {
             $this->distinct = true;
         }
+
+        return $this;
+    }
+
+    /**
+     * Force query results to be keyed by the given column.
+     *
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $keyBy
+     * @return $this
+     */
+    public function keyBy($keyBy)
+    {
+        $this->keyBy = $keyBy;
 
         return $this;
     }
@@ -2703,9 +2723,64 @@ class Builder implements BuilderContract
      */
     public function get($columns = ['*'])
     {
+        if (! is_null($keyBy = $this->keyBy)) {
+            return $this->getKeyed($keyBy, $columns);
+        }
+
         return collect($this->onceWithColumns(Arr::wrap($columns), function () {
             return $this->processor->processSelect($this, $this->runSelect());
         }));
+    }
+
+    /**
+     * Execute the query as a "select" statement where the resulting array is keyed by the given column.
+     *
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $key
+     * @param  array|string  $columns
+     * @return \Illuminate\Support\Collection
+     */
+    protected function getKeyed($key, $columns = ['*'])
+    {
+        return collect($this->onceWithColumns(Arr::wrap($columns), function () use ($key) {
+            if (is_string($key) && ! str_contains($key, '.')) {
+                $key = $this->from.'.'.$key;
+            }
+            $this->columns = Arr::prepend($this->qualifyStarColumns($this->columns), $key);
+
+            return $this->onceWithFetchAllMode(\PDO::FETCH_UNIQUE, function () {
+                return $this->processor->processSelect($this, $this->runSelect());
+            });
+        }));
+    }
+
+    /**
+     * Execute the given callback while setting a specific PDO fetch mode.
+     *
+     * After running the callback, the fetch mode is reverted.
+     *
+     * @param  int  $mode
+     * @param  Closure  $callback
+     * @return \Illuminate\Support\HigherOrderTapProxy|mixed
+     */
+    protected function onceWithFetchAllMode($mode, Closure $callback)
+    {
+        $this->connection->setFetchAllMode($mode);
+
+        return tap($callback(), fn () => $this->connection->resetFetchAllMode());
+    }
+
+    /**
+     * Qualify star columns with their table name if they have not been prefixed.
+     *
+     * @param  array|string  $columns
+     * @return array
+     */
+    protected function qualifyStarColumns($columns)
+    {
+        return array_map(
+            fn ($column) => $column === '*' ? $this->from.'.'.$column : $column,
+            Arr::wrap($columns)
+        );
     }
 
     /**

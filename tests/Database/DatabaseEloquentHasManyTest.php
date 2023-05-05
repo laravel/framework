@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Query\Builder as BaseBuilder;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -289,6 +290,7 @@ class DatabaseEloquentHasManyTest extends TestCase
         $builder->shouldReceive('where')->with('table.foreign_key', '=', 1);
         $related = m::mock(Model::class);
         $builder->shouldReceive('getModel')->andReturn($related);
+        $builder->shouldReceive('getQuery')->andReturn(m::mock(BaseBuilder::class));
         $parent = m::mock(Model::class);
         $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
         $parent->shouldReceive('getCreatedAtColumn')->andReturn('created_at');

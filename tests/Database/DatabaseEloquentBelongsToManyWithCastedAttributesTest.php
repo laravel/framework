@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Contracts\Database\Query\Builder as BaseBuilder;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -59,6 +60,7 @@ class DatabaseEloquentBelongsToManyWithCastedAttributesTest extends TestCase
         $related = m::mock(Model::class);
         $related->shouldReceive('newCollection')->passthru();
         $builder->shouldReceive('getModel')->andReturn($related);
+        $builder->shouldReceive('getQuery')->andReturn(m::mock(BaseBuilder::class));
         $related->shouldReceive('qualifyColumn');
         $builder->shouldReceive('join', 'where');
 
