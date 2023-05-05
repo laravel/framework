@@ -212,11 +212,11 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public static function create(string $baseDirectory = null)
     {
-        $baseDirectory = $baseDirectory ?: dirname(dirname(
+        $baseDirectory = $ENV['APP_BASE_PATH'] ?? ($baseDirectory ?: dirname(dirname(
             debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file']
-        ));
+        )));
 
-        return (new static($_ENV['APP_BASE_PATH'] ?? $baseDirectory))->withKernels();
+        return (new static($baseDirectory))->withKernels();
     }
 
     /**
