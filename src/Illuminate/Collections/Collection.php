@@ -1100,6 +1100,17 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Search the collection for a given value using strict comparison and return the corresponding key if found.
+     *
+     * @param  TValue|(callable(TValue,TKey): bool)  $value
+     * @return TKey|bool
+     */
+    public function searchStrict($value)
+    {
+        return $this->search($value, true);
+    }
+
+    /**
      * Get and remove the first N items from the collection.
      *
      * @param  int  $count
