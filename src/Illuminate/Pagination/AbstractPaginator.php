@@ -319,7 +319,7 @@ abstract class AbstractPaginator implements Htmlable
     /**
      * Get the number of the first item in the slice.
      *
-     * @return int|null
+     * @return int
      */
     public function firstItem()
     {
@@ -329,7 +329,7 @@ abstract class AbstractPaginator implements Htmlable
     /**
      * Get the number of the last item in the slice.
      *
-     * @return int|null
+     * @return int
      */
     public function lastItem()
     {

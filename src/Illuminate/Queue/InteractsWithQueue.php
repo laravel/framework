@@ -2,16 +2,12 @@
 
 namespace Illuminate\Queue;
 
-use DateTimeInterface;
 use Illuminate\Contracts\Queue\Job as JobContract;
-use Illuminate\Support\InteractsWithTime;
 use InvalidArgumentException;
 use Throwable;
 
 trait InteractsWithQueue
 {
-    use InteractsWithTime;
-
     /**
      * The underlying queue job instance.
      *
@@ -65,15 +61,11 @@ trait InteractsWithQueue
     /**
      * Release the job back into the queue after (n) seconds.
      *
-     * @param  \DateTimeInterface|\DateInterval|int  $delay
+     * @param  int  $delay
      * @return void
      */
     public function release($delay = 0)
     {
-        $delay = $delay instanceof DateTimeInterface
-            ? $this->secondsUntil($delay)
-            : $delay;
-
         if ($this->job) {
             return $this->job->release($delay);
         }

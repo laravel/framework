@@ -217,10 +217,7 @@ trait ReplacesAttributes
      */
     protected function replaceMissingUnless($message, $attribute, $rule, $parameters)
     {
-        return str_replace([':other', ':value'], [
-            $this->getDisplayableAttribute($parameters[0]),
-            $this->getDisplayableValue($parameters[0], $parameters[1]),
-        ], $message);
+        return $this->replaceMissingIf($message, $attribute, $rule, $parameters);
     }
 
     /**
