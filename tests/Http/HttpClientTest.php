@@ -2240,4 +2240,48 @@ class HttpClientTest extends TestCase
 
         $this->assertTrue($onStatsFunctionCalled);
     }
+
+    public function testPoolRequestsInheritMiddleware()
+    {
+        $history = [];
+
+        $middleware = Middleware::history($history);
+
+        $this->factory->fake()->withMiddleware($middleware)->pool(fn (Pool $pool) => [
+            $pool->post('https://example.com'),
+        ]);
+
+        $this->assertCount(1, $history);
+    }
+
+    public function testPoolRequestsInheritOptions()
+    {
+        $responses = $this->factory->fake()->withOptions(['headers' => ['X-First' => 'foo']])->pool(fn (Pool $pool) => [
+            $pool->get('https://example.com'),
+        ]);
+
+        $request = $responses[0]->transferStats->getRequest();
+
+        $this->assertTrue($request->hasHeader('X-First'));
+    }
+
+    public function testPoolRequestsInheritHeaders()
+    {
+        $responses = $this->factory->fake()->withHeaders(['X-Second' => 'bar'])->pool(fn (Pool $pool) => [
+            $pool->get('http://foo.com/'),
+        ]);
+
+        $request = $responses[0]->transferStats->getRequest();
+
+        $this->assertTrue($request->hasHeader('X-Second'));
+    }
+
+    public function testPoolRequestsInheritBaseUrl()
+    {
+        $responses = $this->factory->fake()->baseUrl('http://foo.com/')->pool(fn (Pool $pool) => [
+            $pool->get('get')
+        ]);
+
+        $this->assertEquals('http://foo.com/get', $responses[0]->effectiveUri());
+    }
 }

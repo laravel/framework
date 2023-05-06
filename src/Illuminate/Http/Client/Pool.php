@@ -2,19 +2,17 @@
 
 namespace Illuminate\Http\Client;
 
-use GuzzleHttp\Utils;
-
 /**
  * @mixin \Illuminate\Http\Client\Factory
  */
 class Pool
 {
     /**
-     * The factory instance.
+     * The pending request instance.
      *
-     * @var \Illuminate\Http\Client\Factory
+     * @var \Illuminate\Http\Client\PendingRequest
      */
-    protected $factory;
+    protected $pendingRequest;
 
     /**
      * The handler function for the Guzzle client.
@@ -33,18 +31,12 @@ class Pool
     /**
      * Create a new requests pool.
      *
-     * @param  \Illuminate\Http\Client\Factory|null  $factory
+     * @param  \Illuminate\Http\Client\PendingRequest  $pendingRequest
      * @return void
      */
-    public function __construct(Factory $factory = null)
+    public function __construct(PendingRequest $pendingRequest)
     {
-        $this->factory = $factory ?: new Factory();
-
-        if (method_exists(Utils::class, 'chooseHandler')) {
-            $this->handler = Utils::chooseHandler();
-        } else {
-            $this->handler = \GuzzleHttp\choose_handler();
-        }
+        $this->pendingRequest = $pendingRequest;
     }
 
     /**
@@ -65,7 +57,7 @@ class Pool
      */
     protected function asyncRequest()
     {
-        return $this->factory->setHandler($this->handler)->async();
+        return clone $this->pendingRequest->async();
     }
 
     /**
