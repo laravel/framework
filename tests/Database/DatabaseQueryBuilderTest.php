@@ -2574,8 +2574,8 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         // Test without glue.
         $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('select')->once()->andReturn(['bar' => [], 'baz' => []]);
-        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, ['bar' => [], 'baz' => []])->andReturnUsing(function ($query, $results) {
+        $builder->getConnection()->shouldReceive('select')->once()->andReturn(['bar', 'baz']);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, ['bar', 'baz'])->andReturnUsing(function ($query, $results) {
             return $results;
         });
         $results = $builder->from('users')->where('id', '=', 1)->implode('foo');
@@ -2583,8 +2583,8 @@ class DatabaseQueryBuilderTest extends TestCase
 
         // Test with glue.
         $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('select')->once()->andReturn(['bar' => [], 'baz' => []]);
-        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, ['bar' => [], 'baz' => []])->andReturnUsing(function ($query, $results) {
+        $builder->getConnection()->shouldReceive('select')->once()->andReturn(['bar', 'baz']);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, ['bar', 'baz'])->andReturnUsing(function ($query, $results) {
             return $results;
         });
         $results = $builder->from('users')->where('id', '=', 1)->implode('foo', ',');
