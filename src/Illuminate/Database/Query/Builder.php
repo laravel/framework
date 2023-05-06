@@ -3001,8 +3001,9 @@ class Builder implements BuilderContract
      */
     public function pluck($column, $key = null)
     {
-        // When the key is null, we only need to fetch one unique column. If a key is given,
-        // a combination with PDO:FETCH_COLUMN will result in a neat key/value response.
+        // When the key is null, we only need to fetch one unique column. If a key
+        // is given, a combination of PDO::FETCH_UNIQUE | PDO::FETCH_COLUMN will
+        // result in a neat key/value response.
         $mode = is_null($key) ? PDO::FETCH_COLUMN : PDO::FETCH_UNIQUE | PDO::FETCH_COLUMN;
 
         $queryResult = $this->onceWithColumns(
