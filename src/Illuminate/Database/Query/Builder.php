@@ -3003,7 +3003,7 @@ class Builder implements BuilderContract
     {
         // When the key is null, we only need to fetch one unique column. If a key is given,
         // a combination with PDO:FETCH_COLUMN will result in a neat key/value response.
-        $mode = is_null($key) ? PDO::FETCH_UNIQUE : PDO::FETCH_UNIQUE | PDO::FETCH_COLUMN;
+        $mode = is_null($key) ? PDO::FETCH_COLUMN : PDO::FETCH_UNIQUE | PDO::FETCH_COLUMN;
 
         $queryResult = $this->onceWithColumns(
             is_null($key) ? [$column] : [$key, $column],
@@ -3016,11 +3016,7 @@ class Builder implements BuilderContract
             }
         );
 
-        if (empty($queryResult)) {
-            return collect();
-        }
-
-        return collect(is_null($key) ? array_keys($queryResult) : $queryResult);
+        return collect($queryResult);
     }
 
     /**
