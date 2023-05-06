@@ -2562,8 +2562,8 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['bar', 'baz'], $results->all());
 
         $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('select')->once()->andReturn(['bar' => 1, 'baz' => 10]);
-        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, ['bar' => 1, 'baz' => 10])->andReturnUsing(function ($query, $results) {
+        $builder->getConnection()->shouldReceive('select')->once()->andReturn([1 => 'bar', 10 => 'baz']);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [1 => 'bar', 10 => 'baz'])->andReturnUsing(function ($query, $results) {
             return $results;
         });
         $results = $builder->from('users')->where('id', '=', 1)->pluck('foo', 'id');

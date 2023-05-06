@@ -3006,7 +3006,7 @@ class Builder implements BuilderContract
         $mode = is_null($key) ? PDO::FETCH_UNIQUE : PDO::FETCH_UNIQUE | PDO::FETCH_COLUMN;
 
         $queryResult = $this->onceWithColumns(
-            is_null($key) ? [$column] : [$column, $key],
+            is_null($key) ? [$column] : [$key, $column],
             function () use ($mode) {
                 return $this->onceWithFetchAllMode($mode, function () {
                     return $this->processor->processSelect(
@@ -3020,7 +3020,7 @@ class Builder implements BuilderContract
             return collect();
         }
 
-        return collect(is_null($key) ? array_keys($queryResult) : array_flip($queryResult));
+        return collect(is_null($key) ? array_keys($queryResult) : $queryResult);
     }
 
     /**
