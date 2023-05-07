@@ -60,15 +60,15 @@ class ArgonHasher extends AbstractHasher implements HasherContract
      */
     public function make($value, array $options = [])
     {
+        if (! defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13')) {
+            throw new RuntimeException('Argon2 hashing not supported.');
+        }
+
         $hash = @password_hash($value, $this->algorithm(), [
             'memory_cost' => $this->memory($options),
             'time_cost' => $this->time($options),
             'threads' => $this->threads($options),
         ]);
-
-        if (! is_string($hash)) {
-            throw new RuntimeException('Argon2 hashing not supported.');
-        }
 
         return $hash;
     }

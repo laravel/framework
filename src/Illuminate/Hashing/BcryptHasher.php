@@ -44,13 +44,13 @@ class BcryptHasher extends AbstractHasher implements HasherContract
      */
     public function make($value, array $options = [])
     {
+        if (! defined('PASSWORD_BCRYPT')) {
+            throw new RuntimeException('Bcrypt hashing not supported.');
+        }
+        
         $hash = password_hash($value, PASSWORD_BCRYPT, [
             'cost' => $this->cost($options),
         ]);
-
-        if ($hash === false) {
-            throw new RuntimeException('Bcrypt hashing not supported.');
-        }
 
         return $hash;
     }
