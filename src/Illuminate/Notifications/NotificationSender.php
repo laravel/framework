@@ -137,7 +137,7 @@ class NotificationSender
      */
     protected function sendToNotifiable($notifiable, $id, $notification, $channel)
     {
-        if (! $notification->id) {
+        if (! $notification->id ?? null) {
             $notification->id = $id;
         }
 
