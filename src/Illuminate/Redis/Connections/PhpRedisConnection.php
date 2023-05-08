@@ -530,7 +530,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
         try {
             return parent::command($method, $parameters);
         } catch (RedisException $e) {
-            foreach (['went away', 'socket', 'read error on connection'] as $errorMessage) {
+            foreach (['went away', 'socket', 'read error on connection', 'Connection lost'] as $errorMessage) {
                 if (str_contains($e->getMessage(), $errorMessage)) {
                     $this->client = $this->connector ? call_user_func($this->connector) : $this->client;
 
