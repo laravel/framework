@@ -791,7 +791,7 @@ class Worker
     protected function timoutExceededException($job)
     {
         return new TimeoutExceededException(
-            $job->resolveName().' has timed out and was terminated.'
+            $job->resolveName().' has timed out.'
         );
     }
 
