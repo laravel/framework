@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Http\Middleware;
 
 use Closure;
+use Illuminate\Support\Arr;
 
 class TrimStrings extends TransformsRequest
 {
@@ -16,6 +17,13 @@ class TrimStrings extends TransformsRequest
         'password',
         'password_confirmation',
     ];
+
+    /**
+     * The globally ignored attributes that should not be trimmed.
+     *
+     * @var array
+     */
+    protected static $neverTrim = [];
 
     /**
      * All of the registered skip callbacks.
@@ -51,11 +59,26 @@ class TrimStrings extends TransformsRequest
      */
     protected function transform($key, $value)
     {
-        if (in_array($key, $this->except, true) || ! is_string($value)) {
+        $except = array_merge($this->except, static::$neverTrim);
+
+        if (in_array($key, $except, true) || ! is_string($value)) {
             return $value;
         }
 
         return preg_replace('~^[\s\x{FEFF}\x{200B}]+|[\s\x{FEFF}\x{200B}]+$~u', '', $value) ?? trim($value);
+    }
+
+    /**
+     * Indicate that the given attributes should never be trimmed.
+     *
+     * @param  array|string  $attributes
+     * @return void
+     */
+    public static function except($attributes)
+    {
+        static::$neverTrim = array_values(array_unique(
+            array_merge(static::$neverTrim, Arr::wrap($attributes))
+        ));
     }
 
     /**

@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 use Illuminate\Cookie\CookieValuePrefix;
+use Illuminate\Support\Arr;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,6 +28,13 @@ class EncryptCookies
     protected $except = [];
 
     /**
+     * The globally ignored cookies that should not be encrypted.
+     *
+     * @var array
+     */
+    protected static $neverEncrypt = [];
+
+    /**
      * Indicates if cookies should be serialized.
      *
      * @var bool
@@ -42,6 +50,19 @@ class EncryptCookies
     public function __construct(EncrypterContract $encrypter)
     {
         $this->encrypter = $encrypter;
+    }
+
+    /**
+     * Indicate that the given cookies should never be encrypted.
+     *
+     * @param  array|string  $cookies
+     * @return void
+     */
+    public static function except($cookies)
+    {
+        static::$neverEncrypt = array_values(array_unique(
+            array_merge(static::$neverEncrypt, Arr::wrap($cookies))
+        ));
     }
 
     /**
@@ -210,7 +231,7 @@ class EncryptCookies
      */
     public function isDisabled($name)
     {
-        return in_array($name, $this->except);
+        return in_array($name, array_merge($this->except, static::$neverEncrypt));
     }
 
     /**
