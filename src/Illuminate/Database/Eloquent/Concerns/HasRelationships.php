@@ -263,9 +263,10 @@ trait HasRelationships
      * @param  string|null  $type
      * @param  string|null  $id
      * @param  string|null  $ownerKey
+     * @param  array|null  $mappings
      * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
-    public function morphTo($name = null, $type = null, $id = null, $ownerKey = null)
+    public function morphTo($name = null, $type = null, $id = null, $ownerKey = null, $mappings = null)
     {
         // If no name is provided, we will use the backtrace to get the function name
         // since that is most likely the name of the polymorphic interface. We can
@@ -280,8 +281,8 @@ trait HasRelationships
         // the relationship. In this case we'll just pass in a dummy query where we
         // need to remove any eager loads that may already be defined on a model.
         return is_null($class = $this->getAttributeFromArray($type)) || $class === ''
-                    ? $this->morphEagerTo($name, $type, $id, $ownerKey)
-                    : $this->morphInstanceTo($class, $name, $type, $id, $ownerKey);
+                    ? $this->morphEagerTo($name, $type, $id, $ownerKey, $mappings)
+                    : $this->morphInstanceTo($class, $name, $type, $id, $ownerKey, $mappings);
     }
 
     /**
@@ -291,12 +292,13 @@ trait HasRelationships
      * @param  string  $type
      * @param  string  $id
      * @param  string  $ownerKey
+     * @param  array|null  $mappings
      * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
-    protected function morphEagerTo($name, $type, $id, $ownerKey)
+    protected function morphEagerTo($name, $type, $id, $ownerKey, $mappings)
     {
         return $this->newMorphTo(
-            $this->newQuery()->setEagerLoads([]), $this, $id, $ownerKey, $type, $name
+            $this->newQuery()->setEagerLoads([]), $this, $id, $ownerKey, $type, $name, $mappings
         );
     }
 
@@ -308,16 +310,17 @@ trait HasRelationships
      * @param  string  $type
      * @param  string  $id
      * @param  string  $ownerKey
+     * @param  array|null  $mappings
      * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
-    protected function morphInstanceTo($target, $name, $type, $id, $ownerKey)
+    protected function morphInstanceTo($target, $name, $type, $id, $ownerKey, $mappings)
     {
         $instance = $this->newRelatedInstance(
-            static::getActualClassNameForMorph($target)
+            static::getActualClassNameForMorph($target, $mappings)
         );
 
         return $this->newMorphTo(
-            $instance->newQuery(), $this, $id, $ownerKey ?? $instance->getKeyName(), $type, $name
+            $instance->newQuery(), $this, $id, $ownerKey ?? $instance->getKeyName(), $type, $name, $mappings
         );
     }
 
@@ -330,22 +333,27 @@ trait HasRelationships
      * @param  string  $ownerKey
      * @param  string  $type
      * @param  string  $relation
+     * @param  array|null  $mappings
      * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
-    protected function newMorphTo(Builder $query, Model $parent, $foreignKey, $ownerKey, $type, $relation)
+    protected function newMorphTo(Builder $query, Model $parent, $foreignKey, $ownerKey, $type, $relation, $mappings)
     {
-        return new MorphTo($query, $parent, $foreignKey, $ownerKey, $type, $relation);
+        return new MorphTo($query, $parent, $foreignKey, $ownerKey, $type, $relation, $mappings);
     }
 
     /**
      * Retrieve the actual class name for a given morph class.
      *
+     * If mapping are not passed in manually, this function will use the global
+     * mappings provided by Relation::morphMap()
+     *
      * @param  string  $class
+     * @param  array|null  $mappings
      * @return string
      */
-    public static function getActualClassNameForMorph($class)
+    public static function getActualClassNameForMorph($class, $mappings = null)
     {
-        return Arr::get(Relation::morphMap() ?: [], $class, $class);
+        return Arr::get($mappings ?: Relation::morphMap() ?: [], $class, $class);
     }
 
     /**

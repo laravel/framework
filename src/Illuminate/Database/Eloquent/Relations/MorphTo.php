@@ -20,6 +20,14 @@ class MorphTo extends BelongsTo
     protected $morphType;
 
     /**
+     * Custom mappings for this polymorphic relationship.
+     * Use of this will override the global morph mappings.
+     *
+     * @var array
+     */
+    protected $mappings;
+
+    /**
      * The models whose relations are being eager loaded.
      *
      * @var \Illuminate\Database\Eloquent\Collection
@@ -72,9 +80,10 @@ class MorphTo extends BelongsTo
      * @param  string  $relation
      * @return void
      */
-    public function __construct(Builder $query, Model $parent, $foreignKey, $ownerKey, $type, $relation)
+    public function __construct(Builder $query, Model $parent, $foreignKey, $ownerKey, $type, $relation, $mappings = null)
     {
         $this->morphType = $type;
+        $this->mappings = $mappings;
 
         parent::__construct($query, $parent, $foreignKey, $ownerKey, $relation);
     }
@@ -181,7 +190,7 @@ class MorphTo extends BelongsTo
      */
     public function createModelByType($type)
     {
-        $class = Model::getActualClassNameForMorph($type);
+        $class = Model::getActualClassNameForMorph($type, $this->mappings);
 
         return tap(new $class, function ($instance) {
             if (! $instance->getConnectionName()) {
