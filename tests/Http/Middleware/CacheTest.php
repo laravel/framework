@@ -57,6 +57,30 @@ class CacheTest extends TestCase
         $this->assertNull($response->getEtag());
     }
 
+    public function testDoNotSetHeaderWhenBypassAndRequestCacheControlNoCache()
+    {
+        $request = new Request;
+        $request->headers->set('Cache-Control', 'no-cache');
+
+        $response = (new Cache)->handle($request, function () {
+            return new Response('Hello Laravel');
+        }, 'max_age=120;s_maxage=60;bypass=no-cache');
+
+        $this->assertNull($response->getMaxAge());
+    }
+
+    public function testDoNotSetHeaderWhenBypassAndRequestPragmaNoCache()
+    {
+        $request = new Request;
+        $request->headers->set('Pragma', 'no-cache');
+
+        $response = (new Cache)->handle($request, function () {
+            return new Response('Hello Laravel');
+        }, 'max_age=120;s_maxage=60;bypass=no-cache');
+
+        $this->assertNull($response->getMaxAge());
+    }
+
     public function testSetHeaderToFileEvenWithNoContent()
     {
         $response = (new Cache)->handle(new Request, function () {
@@ -158,5 +182,38 @@ class CacheTest extends TestCase
         }, "last_modified=$time;");
 
         $this->assertSame($time, $response->getLastModified()->getTimestamp());
+    }
+
+    public function testAddHeadersWhenRequestCacheControlNoCacheWithoutBypass()
+    {
+        $request = new Request;
+        $request->headers->set('Cache-Control', 'no-cache');
+
+        $response = (new Cache)->handle($request, function () {
+            return new Response('Hello Laravel');
+        }, 'max_age=120;s_maxage=60');
+
+        $this->assertNotNull($response->getMaxAge());
+    }
+
+    public function testAddHeadersWhenRequestPragmaNoCacheWithoutBypass()
+    {
+        $request = new Request;
+        $request->headers->set('Pragma', 'no-cache');
+
+        $response = (new Cache)->handle($request, function () {
+            return new Response('Hello Laravel');
+        }, 'max_age=120;s_maxage=60');
+
+        $this->assertNotNull($response->getMaxAge());
+    }
+
+    public function testAddHeadersWhenBypassWithoutRequestNoCache()
+    {
+        $response = (new Cache)->handle(new Request, function () {
+            return new Response('Hello Laravel');
+        }, 'max_age=120;s_maxage=60;bypass=no-cache');
+
+        $this->assertNotNull($response->getMaxAge());
     }
 }

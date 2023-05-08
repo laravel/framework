@@ -49,6 +49,13 @@ class SetCacheHeaders
             $options = $this->parseOptions($options);
         }
 
+        if (isset($options['bypass'])) {
+            if ($request->isNoCache() && $options['bypass'] === 'no-cache') {
+                return $response;
+            }
+            unset($options['bypass']);
+        }
+
         if (isset($options['etag']) && $options['etag'] === true) {
             $options['etag'] = $response->getEtag() ?? md5($response->getContent());
         }
