@@ -25,7 +25,7 @@ class MorphTo extends BelongsTo
      *
      * @var array
      */
-    protected $mappings;
+    private $mappings;
 
     /**
      * The models whose relations are being eager loaded.
@@ -80,10 +80,9 @@ class MorphTo extends BelongsTo
      * @param  string  $relation
      * @return void
      */
-    public function __construct(Builder $query, Model $parent, $foreignKey, $ownerKey, $type, $relation, $mappings = null)
+    public function __construct(Builder $query, Model $parent, $foreignKey, $ownerKey, $type, $relation)
     {
         $this->morphType = $type;
-        $this->mappings = $mappings;
 
         parent::__construct($query, $parent, $foreignKey, $ownerKey, $relation);
     }
@@ -97,6 +96,15 @@ class MorphTo extends BelongsTo
     public function addEagerConstraints(array $models)
     {
         $this->buildDictionary($this->models = Collection::make($models));
+    }
+
+    /**
+     * Set custom mappings. When set these replace the global morph mappings.
+     *
+     * @return void
+     */
+    public function setMappings(array|null $mappings) {
+        $this->mappings = $mappings;
     }
 
     /**

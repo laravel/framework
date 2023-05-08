@@ -352,9 +352,9 @@ class CustomPost extends Post
             $relationName, $inverse);
     }
 
-    protected function newMorphTo(Builder $query, Model $parent, $foreignKey, $ownerKey, $type, $relation, $mappings)
+    protected function newMorphTo(Builder $query, Model $parent, $foreignKey, $ownerKey, $type, $relation)
     {
-        return new CustomMorphTo($query, $parent, $foreignKey, $ownerKey, $type, $relation, $mappings);
+        return new CustomMorphTo($query, $parent, $foreignKey, $ownerKey, $type, $relation);
     }
 }
 

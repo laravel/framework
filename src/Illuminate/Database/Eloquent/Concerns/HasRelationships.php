@@ -297,9 +297,9 @@ trait HasRelationships
      */
     protected function morphEagerTo($name, $type, $id, $ownerKey, $mappings)
     {
-        return $this->newMorphTo(
-            $this->newQuery()->setEagerLoads([]), $this, $id, $ownerKey, $type, $name, $mappings
-        );
+        return tap($this->newMorphTo(
+            $this->newQuery()->setEagerLoads([]), $this, $id, $ownerKey, $type, $name
+        ), fn($it) => $it->setMappings($mappings));
     }
 
     /**
@@ -319,9 +319,9 @@ trait HasRelationships
             static::getActualClassNameForMorph($target, $mappings)
         );
 
-        return $this->newMorphTo(
-            $instance->newQuery(), $this, $id, $ownerKey ?? $instance->getKeyName(), $type, $name, $mappings
-        );
+        return tap($this->newMorphTo(
+            $instance->newQuery(), $this, $id, $ownerKey ?? $instance->getKeyName(), $type, $name
+        ), fn($it) => $it->setMappings($mappings));
     }
 
     /**
@@ -336,9 +336,9 @@ trait HasRelationships
      * @param  array|null  $mappings
      * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
-    protected function newMorphTo(Builder $query, Model $parent, $foreignKey, $ownerKey, $type, $relation, $mappings)
+    protected function newMorphTo(Builder $query, Model $parent, $foreignKey, $ownerKey, $type, $relation)
     {
-        return new MorphTo($query, $parent, $foreignKey, $ownerKey, $type, $relation, $mappings);
+        return new MorphTo($query, $parent, $foreignKey, $ownerKey, $type, $relation);
     }
 
     /**
