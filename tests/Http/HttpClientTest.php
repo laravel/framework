@@ -2279,7 +2279,7 @@ class HttpClientTest extends TestCase
     public function testPoolRequestsInheritBaseUrl()
     {
         $responses = $this->factory->fake()->baseUrl('http://foo.com/')->pool(fn (Pool $pool) => [
-            $pool->get('get')
+            $pool->get('get'),
         ]);
 
         $this->assertEquals('http://foo.com/get', $responses[0]->effectiveUri());
