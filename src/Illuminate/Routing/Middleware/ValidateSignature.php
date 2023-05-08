@@ -41,19 +41,34 @@ class ValidateSignature
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
-     * @param  string|null  $relative
+     * @param  array|null  $args
      * @return \Illuminate\Http\Response
      *
      * @throws \Illuminate\Routing\Exceptions\InvalidSignatureException
      */
-    public function handle($request, Closure $next, $relative = null)
+    public function handle($request, Closure $next, ...$args)
     {
-        $ignore = property_exists($this, 'except') ? $this->except : $this->ignore;
+        [$isRelative, $ignore] = $this->parseArguments($args);
 
-        if ($request->hasValidSignatureWhileIgnoring($ignore, $relative !== 'relative')) {
+        if ($request->hasValidSignatureWhileIgnoring($ignore, !$isRelative)) {
             return $next($request);
         }
 
         throw new InvalidSignatureException;
+    }
+
+    protected function parseArguments(array $args): array
+    {
+        $isRelative = ! empty($args) && $args[0] === 'relative';
+
+        if ($isRelative) {
+            array_shift($args);
+        }
+
+        $ignore = empty($args)
+            ? property_exists($this, 'except') ? $this->except : $this->ignore
+            : $args;
+
+        return [$isRelative, $ignore];
     }
 }
