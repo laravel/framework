@@ -50,7 +50,7 @@ class ValidateSignature
     {
         [$isRelative, $ignore] = $this->parseArguments($args);
 
-        if ($request->hasValidSignatureWhileIgnoring($ignore, !$isRelative)) {
+        if ($request->hasValidSignatureWhileIgnoring($ignore, ! $isRelative)) {
             return $next($request);
         }
 
