@@ -218,6 +218,21 @@ class Handler implements ExceptionHandlerContract
     }
 
     /**
+     * Indicate that the given attributes should never be flashed to the session on validation errors.
+     *
+     * @param  array|string  $attributes
+     * @return $this
+     */
+    public function dontFlash($attributes)
+    {
+        $this->dontFlash = array_values(array_unique(
+            array_merge($this->dontFlash, Arr::wrap($attributes))
+        ));
+
+        return $this;
+    }
+
+    /**
      * Set the log level for the given exception type.
      *
      * @param  class-string<\Throwable>  $type
