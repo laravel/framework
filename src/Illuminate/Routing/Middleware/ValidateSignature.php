@@ -19,21 +19,29 @@ class ValidateSignature
     /**
      * Specify that the URL signature is for a relative URL.
      *
+     * @param  array|null  $ignore
+     *
      * @return string
      */
-    public static function relative()
+    public static function relative(...$ignore)
     {
-        return static::class.':relative';
+        $args = empty($ignore) ? ['relative'] : ['relative',  ...$ignore];
+
+        return static::class.':'.implode(',', $args);
     }
 
     /**
      * Specify that the URL signature is for an absolute URL.
      *
+     * @param  array|null  $ignore
+     *
      * @return class-string
      */
-    public static function absolute()
+    public static function absolute(...$ignore)
     {
-        return static::class;
+        return empty($ignore)
+            ? static::class
+            : static::class.':'.implode(',', $ignore);
     }
 
     /**

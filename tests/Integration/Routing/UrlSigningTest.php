@@ -305,6 +305,12 @@ class UrlSigningTest extends TestCase
 
         $signature = (string) ValidateSignature::absolute();
         $this->assertSame('Illuminate\Routing\Middleware\ValidateSignature', $signature);
+
+        $signature = (string) ValidateSignature::relative('foo', 'bar');
+        $this->assertSame('Illuminate\Routing\Middleware\ValidateSignature:relative,foo,bar', $signature);
+
+        $signature = (string) ValidateSignature::absolute('foo', 'bar');
+        $this->assertSame('Illuminate\Routing\Middleware\ValidateSignature:foo,bar', $signature);
     }
 
     protected function createValidateSignatureMiddleware(array $ignore)
