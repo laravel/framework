@@ -20,7 +20,6 @@ class ValidateSignature
      * Specify that the URL signature is for a relative URL.
      *
      * @param  array|null  $ignore
-     *
      * @return string
      */
     public static function relative(...$ignore)
@@ -34,7 +33,6 @@ class ValidateSignature
      * Specify that the URL signature is for an absolute URL.
      *
      * @param  array|null  $ignore
-     *
      * @return class-string
      */
     public static function absolute(...$ignore)
