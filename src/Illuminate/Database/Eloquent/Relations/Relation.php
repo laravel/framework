@@ -496,9 +496,9 @@ abstract class Relation implements BuilderContract
      * @param  string  $alias
      * @return string|null
      */
-    public static function getMorphedModel($alias)
+    public static function getMorphedModel($alias, $mapping = null)
     {
-        return static::$morphMap[$alias] ?? null;
+        return ($mapping??static::$morphMap)[$alias] ?? null;
     }
 
     /**

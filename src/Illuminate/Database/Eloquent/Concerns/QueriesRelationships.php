@@ -218,8 +218,16 @@ trait QueriesRelationships
      * @param  \Closure|null  $callback
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
-    public function hasMorph($relation, $types, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null)
+    public function hasMorph($relation, $types, $mappings = null, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null)
     {
+        if (is_string($mappings)) {
+            if($boolean != 'and') $callback = $boolean;
+            if($count != 1) $boolean = $count;
+            if($operator != '>=') $count = $operator;
+            $operator = $mappings;
+            $mappings = null;
+        }
+
         if (is_string($relation)) {
             $relation = $this->getRelationWithoutConstraints($relation);
         }
@@ -231,7 +239,7 @@ trait QueriesRelationships
         }
 
         foreach ($types as &$type) {
-            $type = Relation::getMorphedModel($type) ?? $type;
+            $type = Relation::getMorphedModel($type, $mappings) ?? $type;
         }
 
         return $this->where(function ($query) use ($relation, $callback, $operator, $count, $types) {
@@ -283,9 +291,14 @@ trait QueriesRelationships
      * @param  int  $count
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
-    public function orHasMorph($relation, $types, $operator = '>=', $count = 1)
+    public function orHasMorph($relation, $types, $mappings = null, $operator = '>=', $count = 1)
     {
-        return $this->hasMorph($relation, $types, $operator, $count, 'or');
+        if (is_string($mappings)) {
+            if($operator != '>=') $count = $operator;
+            $operator = $mappings;
+            $mappings = null;
+        }
+        return $this->hasMorph($relation, $types, $mappings, $operator, $count, 'or');
     }
 
     /**
@@ -297,9 +310,14 @@ trait QueriesRelationships
      * @param  \Closure|null  $callback
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
-    public function doesntHaveMorph($relation, $types, $boolean = 'and', Closure $callback = null)
+    public function doesntHaveMorph($relation, $types, $mappings = null, $boolean = 'and', Closure $callback = null)
     {
-        return $this->hasMorph($relation, $types, '<', 1, $boolean, $callback);
+        if(is_string($mappings)) {
+            if($boolean != 'and') $callback = $boolean;
+            $boolean = $mappings;
+            $mappings = null;
+        }
+        return $this->hasMorph($relation, $types, $mappings, '<', 1, $boolean, $callback);
     }
 
     /**
@@ -309,9 +327,9 @@ trait QueriesRelationships
      * @param  string|array  $types
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
-    public function orDoesntHaveMorph($relation, $types)
+    public function orDoesntHaveMorph($relation, $types, $mappings = null)
     {
-        return $this->doesntHaveMorph($relation, $types, 'or');
+        return $this->doesntHaveMorph($relation, $types, $mappings, 'or');
     }
 
     /**
@@ -324,9 +342,15 @@ trait QueriesRelationships
      * @param  int  $count
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
-    public function whereHasMorph($relation, $types, Closure $callback = null, $operator = '>=', $count = 1)
+    public function whereHasMorph($relation, $types, $mappings = null, Closure $callback = null, $operator = '>=', $count = 1)
     {
-        return $this->hasMorph($relation, $types, $operator, $count, 'and', $callback);
+        if($mappings instanceof Closure) {
+            if($operator != ">=") $count = $operator;
+            if($callback != null) $operator = $callback;
+            $callback = $mappings;
+            $mappings = null;
+        }
+        return $this->hasMorph($relation, $types, $mappings, $operator, $count,'and', $callback);
     }
 
     /**
@@ -339,9 +363,15 @@ trait QueriesRelationships
      * @param  int  $count
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
-    public function orWhereHasMorph($relation, $types, Closure $callback = null, $operator = '>=', $count = 1)
+    public function orWhereHasMorph($relation, $types, $mappings, Closure $callback = null, $operator = '>=', $count = 1)
     {
-        return $this->hasMorph($relation, $types, $operator, $count, 'or', $callback);
+        if($mappings instanceof Closure) {
+            if($operator != ">=") $count = $operator;
+            if($callback != null) $operator = $callback;
+            $callback = $mappings;
+            $mappings = null;
+        }
+        return $this->hasMorph($relation, $types, $mappings, $operator, $count, 'or', $callback);
     }
 
     /**
@@ -352,9 +382,13 @@ trait QueriesRelationships
      * @param  \Closure|null  $callback
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
-    public function whereDoesntHaveMorph($relation, $types, Closure $callback = null)
+    public function whereDoesntHaveMorph($relation, $types, $mappings, Closure $callback = null)
     {
-        return $this->doesntHaveMorph($relation, $types, 'and', $callback);
+        if ($mappings instanceof Closure) {
+            $callback = $mappings;
+            $mappings = null;
+        }
+        return $this->doesntHaveMorph($relation, $types, $mappings, 'and', $callback);
     }
 
     /**
@@ -365,9 +399,13 @@ trait QueriesRelationships
      * @param  \Closure|null  $callback
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
-    public function orWhereDoesntHaveMorph($relation, $types, Closure $callback = null)
+    public function orWhereDoesntHaveMorph($relation, $types, $mappings, Closure $callback = null)
     {
-        return $this->doesntHaveMorph($relation, $types, 'or', $callback);
+        if ($mappings instanceof Closure) {
+            $callback = $mappings;
+            $mappings = null;
+        }
+        return $this->doesntHaveMorph($relation, $types, $mappings, 'or', $callback);
     }
 
     /**
@@ -451,8 +489,14 @@ trait QueriesRelationships
      * @param  \Illuminate\Database\Eloquent\Model|string|null  $model
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
-    public function whereMorphedTo($relation, $model, $boolean = 'and')
+    public function whereMorphedTo($relation, $model, $mappings = null, $boolean = 'and')
     {
+        // migrate old usages of boolean to support custom mappings
+        if (is_string($mappings)) {
+            $boolean = $mappings;
+            $mappings = null;
+        }
+
         if (is_string($relation)) {
             $relation = $this->getRelationWithoutConstraints($relation);
         }
@@ -462,7 +506,7 @@ trait QueriesRelationships
         }
 
         if (is_string($model)) {
-            $morphMap = Relation::morphMap();
+            $morphMap = $mappings ?: Relation::morphMap();
 
             if (! empty($morphMap) && in_array($model, $morphMap)) {
                 $model = array_search($model, $morphMap, true);
@@ -484,14 +528,20 @@ trait QueriesRelationships
      * @param  \Illuminate\Database\Eloquent\Model|string  $model
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
-    public function whereNotMorphedTo($relation, $model, $boolean = 'and')
+    public function whereNotMorphedTo($relation, $model, $mappings = null, $boolean = 'and')
     {
+        // migrate old usages of boolean to support custom mappings
+        if (is_string($mappings)) {
+            $boolean = $mappings;
+            $mappings = null;
+        }
+
         if (is_string($relation)) {
             $relation = $this->getRelationWithoutConstraints($relation);
         }
 
         if (is_string($model)) {
-            $morphMap = Relation::morphMap();
+            $morphMap = $mappings ?: Relation::morphMap();
 
             if (! empty($morphMap) && in_array($model, $morphMap)) {
                 $model = array_search($model, $morphMap, true);
@@ -513,9 +563,9 @@ trait QueriesRelationships
      * @param  \Illuminate\Database\Eloquent\Model|string|null  $model
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
-    public function orWhereMorphedTo($relation, $model)
+    public function orWhereMorphedTo($relation, $model, $mappings = null)
     {
-        return $this->whereMorphedTo($relation, $model, 'or');
+        return $this->whereMorphedTo($relation, $model, $mappings, 'or');
     }
 
     /**
@@ -525,9 +575,9 @@ trait QueriesRelationships
      * @param  \Illuminate\Database\Eloquent\Model|string  $model
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
-    public function orWhereNotMorphedTo($relation, $model)
+    public function orWhereNotMorphedTo($relation, $model, $mappings = null)
     {
-        return $this->whereNotMorphedTo($relation, $model, 'or');
+        return $this->whereNotMorphedTo($relation, $model, $mappings, 'or');
     }
 
     /**
