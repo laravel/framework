@@ -103,7 +103,8 @@ class MorphTo extends BelongsTo
      *
      * @return void
      */
-    public function setMappings(array|null $mappings) {
+    public function setMappings(array|null $mappings)
+    {
         $this->mappings = $mappings;
     }
 

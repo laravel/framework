@@ -299,7 +299,7 @@ trait HasRelationships
     {
         return tap($this->newMorphTo(
             $this->newQuery()->setEagerLoads([]), $this, $id, $ownerKey, $type, $name
-        ), fn($it) => $it->setMappings($mappings));
+        ), fn ($it) => $it->setMappings($mappings));
     }
 
     /**
@@ -321,7 +321,7 @@ trait HasRelationships
 
         return tap($this->newMorphTo(
             $instance->newQuery(), $this, $id, $ownerKey ?? $instance->getKeyName(), $type, $name
-        ), fn($it) => $it->setMappings($mappings));
+        ), fn ($it) => $it->setMappings($mappings));
     }
 
     /**
@@ -333,7 +333,6 @@ trait HasRelationships
      * @param  string  $ownerKey
      * @param  string  $type
      * @param  string  $relation
-     * @param  array|null  $mappings
      * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
     protected function newMorphTo(Builder $query, Model $parent, $foreignKey, $ownerKey, $type, $relation)

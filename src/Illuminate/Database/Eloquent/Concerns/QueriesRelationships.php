@@ -221,9 +221,15 @@ trait QueriesRelationships
     public function hasMorph($relation, $types, $mappings = null, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null)
     {
         if (is_string($mappings)) {
-            if($boolean != 'and') $callback = $boolean;
-            if($count != 1) $boolean = $count;
-            if($operator != '>=') $count = $operator;
+            if ($boolean != 'and') {
+                $callback = $boolean;
+            }
+            if ($count != 1) {
+                $boolean = $count;
+            }
+            if ($operator != '>=') {
+                $count = $operator;
+            }
             $operator = $mappings;
             $mappings = null;
         }
@@ -294,7 +300,9 @@ trait QueriesRelationships
     public function orHasMorph($relation, $types, $mappings = null, $operator = '>=', $count = 1)
     {
         if (is_string($mappings)) {
-            if($operator != '>=') $count = $operator;
+            if ($operator != '>=') {
+                $count = $operator;
+            }
             $operator = $mappings;
             $mappings = null;
         }
@@ -313,7 +321,9 @@ trait QueriesRelationships
     public function doesntHaveMorph($relation, $types, $mappings = null, $boolean = 'and', Closure $callback = null)
     {
         if(is_string($mappings)) {
-            if($boolean != 'and') $callback = $boolean;
+            if ($boolean != 'and') {
+                $callback = $boolean;
+            }
             $boolean = $mappings;
             $mappings = null;
         }
@@ -345,12 +355,16 @@ trait QueriesRelationships
     public function whereHasMorph($relation, $types, $mappings = null, Closure $callback = null, $operator = '>=', $count = 1)
     {
         if($mappings instanceof Closure) {
-            if($operator != ">=") $count = $operator;
-            if($callback != null) $operator = $callback;
+            if ($operator != ">=") {
+                $count = $operator;
+            }
+            if ($callback != null) {
+                $operator = $callback;
+            }
             $callback = $mappings;
             $mappings = null;
         }
-        return $this->hasMorph($relation, $types, $mappings, $operator, $count,'and', $callback);
+        return $this->hasMorph($relation, $types, $mappings, $operator, $count, 'and', $callback);
     }
 
     /**
@@ -366,11 +380,16 @@ trait QueriesRelationships
     public function orWhereHasMorph($relation, $types, $mappings, Closure $callback = null, $operator = '>=', $count = 1)
     {
         if($mappings instanceof Closure) {
-            if($operator != ">=") $count = $operator;
-            if($callback != null) $operator = $callback;
+            if ($operator != ">=") {
+                $count = $operator;
+            }
+            if ($callback != null) {
+                $operator = $callback;
+            }
             $callback = $mappings;
             $mappings = null;
         }
+
         return $this->hasMorph($relation, $types, $mappings, $operator, $count, 'or', $callback);
     }
 
@@ -388,6 +407,7 @@ trait QueriesRelationships
             $callback = $mappings;
             $mappings = null;
         }
+
         return $this->doesntHaveMorph($relation, $types, $mappings, 'and', $callback);
     }
 
@@ -405,6 +425,7 @@ trait QueriesRelationships
             $callback = $mappings;
             $mappings = null;
         }
+
         return $this->doesntHaveMorph($relation, $types, $mappings, 'or', $callback);
     }
 

@@ -493,12 +493,16 @@ abstract class Relation implements BuilderContract
     /**
      * Get the model associated with a custom polymorphic type.
      *
+     * If mapping are not passed in manually, this function will use the global
+     * mappings provided by Relation::morphMap()
+     *
      * @param  string  $alias
+     * @param  array  $mapping
      * @return string|null
      */
     public static function getMorphedModel($alias, $mapping = null)
     {
-        return ($mapping??static::$morphMap)[$alias] ?? null;
+        return ($mapping ?? static::$morphMap)[$alias] ?? null;
     }
 
     /**
