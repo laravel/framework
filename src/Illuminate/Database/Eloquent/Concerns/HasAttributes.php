@@ -864,6 +864,8 @@ trait HasAttributes
             $convertedCastType = 'immutable_custom_datetime';
         } elseif ($this->isDecimalCast($castType)) {
             $convertedCastType = 'decimal';
+        } elseif (class_exists($castType)) {
+            $convertedCastType = $castType;
         } else {
             $convertedCastType = trim(strtolower($castType));
         }
