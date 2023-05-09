@@ -3,9 +3,11 @@
 namespace Illuminate\Translation;
 
 use Closure;
+use Doctrine\DBAL\Platforms\Keywords\DB2Keywords;
 use Illuminate\Contracts\Translation\Loader;
 use Illuminate\Contracts\Translation\Translator as TranslatorContract;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\NamespacedItemResolver;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
@@ -64,6 +66,13 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      * @var array
      */
     protected $stringableHandlers = [];
+	
+	/**
+	 * All of the registered missing translation handlers.
+	 *
+	 * @var array
+	 */
+	protected $missingTranslationHandlers = [];
 
     /**
      * Create a new translator instance.
@@ -101,7 +110,13 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      */
     public function has($key, $locale = null, $fallback = true)
     {
-        return $this->get($key, [], $locale, $fallback) !== $key;
+		if ($missingTranslationHandlers = $this->missingTranslationHandlers) {
+			$this->missingTranslationHandlers = [];
+		}
+		
+        return tap($this->get($key, [], $locale, $fallback) !== $key, function() use ($missingTranslationHandlers) {
+			$this->missingTranslationHandlers = $missingTranslationHandlers;
+        });
     }
 
     /**
@@ -147,7 +162,13 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         // If the line doesn't exist, we will return back the key which was requested as
         // that will be quick to spot in the UI if language keys are wrong or missing
         // from the application's language files. Otherwise we can return the line.
-        return $this->makeReplacements($line ?: $key, $replace);
+        $line = $this->makeReplacements($line ?: $key, $replace);
+
+		foreach($this->missingTranslationHandlers as $missingTranslationHandler) {
+			$missingTranslationHandler($key);
+		}
+		
+		return $line;
     }
 
     /**
@@ -483,4 +504,9 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
 
         $this->stringableHandlers[$class] = $handler;
     }
+	
+	public function whenMissingTranslation($handler)
+	{
+		$this->missingTranslationHandlers[] = $handler;
+	}
 }

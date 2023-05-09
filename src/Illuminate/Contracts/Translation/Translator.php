@@ -39,4 +39,12 @@ interface Translator
      * @return void
      */
     public function setLocale($locale);
+	
+	/**
+	 * Register a callback to be invoked when the translator detects a missing translation.
+	 *
+	 * @param  callable  $handler
+	 * @return void
+	 */
+	public function whenMissingTranslation($handler);
 }
