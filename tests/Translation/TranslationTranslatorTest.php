@@ -5,7 +5,6 @@ namespace Illuminate\Tests\Translation;
 use Illuminate\Contracts\Translation\Loader;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Lang;
 use Illuminate\Translation\MessageSelector;
 use Illuminate\Translation\Translator;
 use Mockery as m;
@@ -76,18 +75,18 @@ class TranslationTranslatorTest extends TestCase
         $this->assertSame('foo::unknown', $t->get('foo::unknown', ['foo' => 'bar'], 'en'));
         $this->assertSame('foo::bar.unknown', $t->get('foo::bar.unknown', ['foo' => 'bar'], 'en'));
         $this->assertSame('foo::unknown.bar', $t->get('foo::unknown.bar'));
-	    
-		$callbackKey = null;
-		
-	    $t->whenMissingTranslation(function(string $key) use (&$callbackKey) {
-			$callbackKey = $key;
-	    });
-	    
-	    $this->assertSame('foo::unknown.bar', $t->get('foo::unknown.bar'));
-		
-		$this->assertSame('foo::unknown.bar', $callbackKey);
-		
-		$this->assertSame('foo', $t->get('foo::bar.foo'));
+
+        $callbackKey = null;
+
+        $t->whenMissingTranslation(function (string $key) use (&$callbackKey) {
+            $callbackKey = $key;
+        });
+
+        $this->assertSame('foo::unknown.bar', $t->get('foo::unknown.bar'));
+
+        $this->assertSame('foo::unknown.bar', $callbackKey);
+
+        $this->assertSame('foo', $t->get('foo::bar.foo'));
     }
 
     public function testTransMethodProperlyLoadsAndRetrievesItemWithHTMLInTheMessage()
