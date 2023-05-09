@@ -457,6 +457,61 @@ class Str
     }
 
     /**
+     * Insert a substring at a given position in the string.
+     *
+     * @param string $subject
+     * @param string $insert
+     * @param int $position
+     * @return string
+     */
+    public static function insert($subject, $insert, $position)
+    {
+        $start = static::substr($subject, 0, $position);
+        $end = static::substr($subject, $position, static::length($subject));
+
+        return $start.$insert.$end;
+    }
+
+    /**
+     * Insert a substring after the first occurrence of a given value in the string.
+     *
+     * @param string $subject
+     * @param string $pattern
+     * @param string $insert
+     * @return string
+     */
+    public static function insertAfterMatch($subject, $pattern, $insert)
+    {
+        $match = static::match($pattern, $subject);
+
+        if (empty($match)) {
+            return $subject;
+        }
+
+        return static::insert($subject, $insert, strlen($match));
+    }
+
+    /**
+     * Insert a substring after the first occurrence of a given substring in a string.
+     *
+     * @param string $subject
+     * @param string $find
+     * @param string $insert
+     * @return string
+     */
+    public static function insertAfter($subject, $find, $insert)
+    {
+        if (!static::contains($subject, $find)) {
+            return $subject;
+        }
+
+        $before = static::before($subject, $find);
+        $after = static::after($subject, $find);
+
+        return $before.$find.$insert.$after;
+    }
+
+    /**
      * Determine if a given string is a valid ULID.
      *
      * @param  string  $value
