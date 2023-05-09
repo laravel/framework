@@ -60,7 +60,7 @@ class BroadcastEvent implements ShouldQueue
         $this->event = $event;
         $this->tries = property_exists($event, 'tries') ? $event->tries : null;
         $this->timeout = property_exists($event, 'timeout') ? $event->timeout : null;
-        $this->backoff = property_exists($event, 'backoff') ? $event->backoff : null;
+        $this->backoff = method_exists($event, 'backoff') ? $event->backoff() : ($event->backoff ?? null);
         $this->afterCommit = property_exists($event, 'afterCommit') ? $event->afterCommit : null;
         $this->maxExceptions = property_exists($event, 'maxExceptions') ? $event->maxExceptions : null;
     }
