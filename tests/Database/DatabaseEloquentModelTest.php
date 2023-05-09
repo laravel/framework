@@ -343,9 +343,6 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertTrue($model->isDirty('asEnumArrayObjectAttribute'));
     }
 
-    /**
-     * @requires PHP >= 8.1
-     */
     public function testHasCastsOnEnumAttribute()
     {
         $model = new EloquentModelEnumCastingStub();
