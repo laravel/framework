@@ -355,7 +355,7 @@ class DatabaseEloquentModelTest extends TestCase
     public function testHasCastsOnEnumAttribute()
     {
         $model = new EloquentModelEnumCastingStub();
-        $this->assertTrue($model->hasCast('enumAttribute' , StringStatus::class));
+        $this->assertTrue($model->hasCast('enumAttribute', StringStatus::class));
     }
 
     public function testCleanAttributes()
