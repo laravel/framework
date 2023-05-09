@@ -816,7 +816,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function mapWithKeys(callable $callback)
     {
-	    return new static(Arr::mapWithKeys($this->items, $callback));
+        return new static(Arr::mapWithKeys($this->items, $callback));
     }
 
     /**
