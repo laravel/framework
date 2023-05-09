@@ -15,6 +15,10 @@ class TranslationTranslatorTest extends TestCase
     protected function tearDown(): void
     {
         m::close();
+	    
+Translator::handleMissingTranslationViolationUsing(function (string $key): void {
+    report("Missing translation detected for key [{$key}].");
+});
     }
 
     public function testHasMethodReturnsFalseWhenReturnedTranslationIsNull()
@@ -75,32 +79,32 @@ class TranslationTranslatorTest extends TestCase
         $this->assertSame('foo::unknown', $t->get('foo::unknown', ['foo' => 'bar'], 'en'));
         $this->assertSame('foo::bar.unknown', $t->get('foo::bar.unknown', ['foo' => 'bar'], 'en'));
         $this->assertSame('foo::unknown.bar', $t->get('foo::unknown.bar'));
-	    
-	    Translator::preventMissingTranslations(true);
-	    
-	    try {
-		    $this->assertSame('foo::unknown.bar', $t->get('foo::unknown.bar'));
-		    
-		    $this->fail('Expected exception was not thrown');
-	    } catch (MissingTranslationViolationException $e) {
-		    $this->assertSame('Attempted to retrieve missing translation [foo::unknown.bar].', $e->getMessage());
-	    }
-	    
-	    Translator::preventMissingTranslations(false);
-	    
-	    $this->assertSame('foo::unknown.bar', $t->get('foo::unknown.bar'));
-	    
-	    $callbackKey = null;
-	    
-	    Translator::preventMissingTranslations();
-	    
-	    Translator::handleMissingTranslationViolationUsing(function (string $key) use (&$callbackKey) {
-		    $callbackKey = $key;
-	    });
-	    
-	    $this->assertSame('foo::unknown.bar', $t->get('foo::unknown.bar'));
-	    
-	    $this->assertSame('foo::unknown.bar', $callbackKey);
+
+        Translator::preventMissingTranslations(true);
+
+        try {
+            $this->assertSame('foo::unknown.bar', $t->get('foo::unknown.bar'));
+
+            $this->fail('Expected exception was not thrown');
+        } catch (MissingTranslationViolationException $e) {
+            $this->assertSame('Attempted to retrieve missing translation [foo::unknown.bar].', $e->getMessage());
+        }
+
+        Translator::preventMissingTranslations(false);
+
+        $this->assertSame('foo::unknown.bar', $t->get('foo::unknown.bar'));
+
+        $callbackKey = null;
+
+        Translator::preventMissingTranslations();
+
+        Translator::handleMissingTranslationViolationUsing(function (string $key) use (&$callbackKey) {
+            $callbackKey = $key;
+        });
+
+        $this->assertSame('foo::unknown.bar', $t->get('foo::unknown.bar'));
+
+        $this->assertSame('foo::unknown.bar', $callbackKey);
     }
 
     public function testTransMethodProperlyLoadsAndRetrievesItemWithHTMLInTheMessage()
