@@ -4,6 +4,7 @@ namespace Illuminate\Routing\Middleware;
 
 use Closure;
 use Illuminate\Routing\Exceptions\InvalidSignatureException;
+use Illuminate\Support\Arr;
 
 class ValidateSignature
 {
@@ -19,24 +20,26 @@ class ValidateSignature
     /**
      * Specify that the URL signature is for a relative URL.
      *
-     * @param  array|null  $ignore
+     * @param  array|string  $ignore
      * @return string
      */
-    public static function relative(...$ignore)
+    public static function relative($ignore = [])
     {
-        $args = empty($ignore) ? ['relative'] : ['relative',  ...$ignore];
+        $ignore = Arr::wrap($ignore);
 
-        return static::class.':'.implode(',', $args);
+        return static::class.':'.implode(',', empty($ignore) ? ['relative'] : ['relative',  ...$ignore]);
     }
 
     /**
      * Specify that the URL signature is for an absolute URL.
      *
-     * @param  array|null  $ignore
+     * @param  array|string  $ignore
      * @return class-string
      */
-    public static function absolute(...$ignore)
+    public static function absolute($ignore = [])
     {
+        $ignore = Arr::wrap($ignore);
+
         return empty($ignore)
             ? static::class
             : static::class.':'.implode(',', $ignore);
@@ -54,20 +57,26 @@ class ValidateSignature
      */
     public function handle($request, Closure $next, ...$args)
     {
-        [$isRelative, $ignore] = $this->parseArguments($args);
+        [$relative, $ignore] = $this->parseArguments($args);
 
-        if ($request->hasValidSignatureWhileIgnoring($ignore, ! $isRelative)) {
+        if ($request->hasValidSignatureWhileIgnoring($ignore, ! $relative)) {
             return $next($request);
         }
 
         throw new InvalidSignatureException;
     }
 
-    protected function parseArguments(array $args): array
+    /**
+     * Parse the additional arguments given to the middleware.
+     *
+     * @param  array  $args
+     * @return array
+     */
+    protected function parseArguments(array $args)
     {
-        $isRelative = ! empty($args) && $args[0] === 'relative';
+        $relative = ! empty($args) && $args[0] === 'relative';
 
-        if ($isRelative) {
+        if ($relative) {
             array_shift($args);
         }
 
@@ -75,6 +84,6 @@ class ValidateSignature
             ? property_exists($this, 'except') ? $this->except : $this->ignore
             : $args;
 
-        return [$isRelative, $ignore];
+        return [$relative, $ignore];
     }
 }
