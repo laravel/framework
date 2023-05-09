@@ -3117,7 +3117,7 @@ class SupportCollectionTest extends TestCase
      */
     public function testMapWithKeys($collection)
     {
-		$data = new $collection([
+        $data = new $collection([
             ['name' => 'Blastoise', 'type' => 'Water', 'idx' => 9],
             ['name' => 'Charmander', 'type' => 'Fire', 'idx' => 4],
             ['name' => 'Dragonair', 'type' => 'Dragon', 'idx' => 148],
