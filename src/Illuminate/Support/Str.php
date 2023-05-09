@@ -459,9 +459,9 @@ class Str
     /**
      * Insert a substring at a given position in the string.
      *
-     * @param string $subject
-     * @param string $insert
-     * @param int $position
+     * @param  string  $subject
+     * @param  string  $insert
+     * @param  int  $position
      * @return string
      */
     public static function insert($subject, $insert, $position)
@@ -475,9 +475,9 @@ class Str
     /**
      * Insert a substring after the first occurrence of a given value in the string.
      *
-     * @param string $subject
-     * @param string $pattern
-     * @param string $insert
+     * @param  string  $subject
+     * @param  string  $pattern
+     * @param  string  $insert
      * @return string
      */
     public static function insertAfterMatch($subject, $pattern, $insert)
@@ -494,14 +494,14 @@ class Str
     /**
      * Insert a substring after the first occurrence of a given substring in a string.
      *
-     * @param string $subject
-     * @param string $find
-     * @param string $insert
+     * @param  string  $subject
+     * @param  string  $find
+     * @param  string  $insert
      * @return string
      */
     public static function insertAfter($subject, $find, $insert)
     {
-        if (!static::contains($subject, $find)) {
+        if (! static::contains($subject, $find)) {
             return $subject;
         }
 
