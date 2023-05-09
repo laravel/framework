@@ -1119,6 +1119,32 @@ class SupportStrTest extends TestCase
     {
         $this->assertTrue(strlen(Str::password()) === 32);
     }
+
+    public function testItCanInsertStrings()
+    {
+        $initial = 'HelloWorld';
+        $this->assertSame('HelloWorld', Str::insert($initial, '', 0));
+        $this->assertSame('Hello World', Str::insert($initial, ' ', 5));
+        $this->assertSame('Hello--World', Str::insert($initial, '--', 5));
+    }
+
+    public function testItCanInsertStringsAfterMatch()
+    {
+        $initial = 'HelloWorld';
+        $this->assertSame('HelloWorld', Str::insertAfterMatch($initial, '/(Missing)/', '@@'));
+        $this->assertSame('Hello World', Str::insertAfterMatch($initial, '/(Hello)/', ' '));
+        $this->assertSame('H-elloWorld', Str::insertAfterMatch($initial, '/^(H)/', '-'));
+        $this->assertSame('HelloWorld--', Str::insertAfterMatch($initial, '/(.+World)$/', '--'));
+    }
+
+    public function testItCanInsertStringsAfterASubstring()
+    {
+        $initial = 'HelloWorld';
+        $this->assertSame('HelloWorld', Str::insertAfter($initial, 'Missing', '@@@'));
+        $this->assertSame('Hello World', Str::insertAfter($initial, 'Hello', ' '));
+        $this->assertSame('H-elloWorld', Str::insertAfter($initial, 'H', '-'));
+        $this->assertSame('HelloWorld--', Str::insertAfter($initial, 'World', '--'));
+    }
 }
 
 class StringableObjectStub
