@@ -4692,8 +4692,6 @@ class SupportCollectionTest extends TestCase
 
     /**
      * @dataProvider collectionClassProvider
-     *
-     * @requires PHP >= 8.1
      */
     public function testCollectionFromEnum($collection)
     {
@@ -4703,8 +4701,6 @@ class SupportCollectionTest extends TestCase
 
     /**
      * @dataProvider collectionClassProvider
-     *
-     * @requires PHP >= 8.1
      */
     public function testCollectionFromBackedEnum($collection)
     {
