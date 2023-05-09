@@ -115,6 +115,13 @@ class PendingRequest
     protected $throwCallback;
 
     /**
+     * A callback to run when throwing if connection timeout error occurs.
+     *
+     * @var \Closure
+     */
+    protected $connectionTimeoutCallback;
+
+    /**
      * A callback to check if an exception should be thrown when a server or client error occurs.
      *
      * @var \Closure
@@ -631,7 +638,6 @@ class PendingRequest
      * Throw an exception if a server or client error occurred and the given condition evaluates to true.
      *
      * @param  callable|bool  $condition
-     * @param  callable|null  $throwCallback
      * @return $this
      */
     public function throwIf($condition)
@@ -652,6 +658,19 @@ class PendingRequest
     public function throwUnless($condition)
     {
         return $this->throwIf(! $condition);
+    }
+
+    /**
+     * Register callback if connection timeout error occurs.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function onConnectionTimeout(callable $callback)
+    {
+        $this->connectionTimeoutCallback = $callback;
+
+        return $this;
     }
 
     /**
@@ -853,7 +872,13 @@ class PendingRequest
             } catch (ConnectException $e) {
                 $this->dispatchConnectionFailedEvent();
 
-                throw new ConnectionException($e->getMessage(), 0, $e);
+                $exception = new ConnectionException($e->getMessage(), 0, $e);
+
+                if (is_callable($this->connectionTimeoutCallback)) {
+                    call_user_func($this->connectionTimeoutCallback, $this->request, $exception);
+                }
+
+                throw $exception;
             }
         }, $this->retryDelay ?? 100, function ($exception) use (&$shouldRetry) {
             $result = $shouldRetry ?? ($this->retryWhenCallback ? call_user_func($this->retryWhenCallback, $exception, $this) : true);
