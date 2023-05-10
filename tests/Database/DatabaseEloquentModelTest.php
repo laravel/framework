@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Casts\AsEncryptedCollection;
 use Illuminate\Database\Eloquent\Casts\AsEnumArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsEnumCollection;
 use Illuminate\Database\Eloquent\Casts\AsStringable;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Database\Eloquent\MassAssignmentException;
@@ -347,6 +348,30 @@ class DatabaseEloquentModelTest extends TestCase
     {
         $model = new EloquentModelEnumCastingStub();
         $this->assertTrue($model->hasCast('enumAttribute', StringStatus::class));
+    }
+
+    public function testAttributesToArrayWithCastsOnEnumAttribute()
+    {
+        $model = new EloquentModelAccessorWithEnumCastingStub([
+            'status' => 'draft',
+            'status_object' => 'draft',
+            'status_attribute' => 'draft',
+            'status_attribute_object' => 'draft',
+        ]);
+
+        $attributes = $model->attributesToArray();
+
+        $this->assertArrayHasKey('status', $attributes);
+        $this->assertEquals('pending', $attributes['status']);
+
+        $this->assertArrayHasKey('status_object', $attributes);
+        $this->assertEquals('pending', $attributes['status_object']);
+
+        $this->assertArrayHasKey('status_attribute', $attributes);
+        $this->assertEquals('pending', $attributes['status_attribute']);
+
+        $this->assertArrayHasKey('status_attribute_object', $attributes);
+        $this->assertEquals('pending', $attributes['status_attribute_object']);
     }
 
     public function testCleanAttributes()
@@ -3056,6 +3081,38 @@ class EloquentModelCastingStub extends Model
 class EloquentModelEnumCastingStub extends Model
 {
     protected $casts = ['enumAttribute' => StringStatus::class];
+}
+
+class EloquentModelAccessorWithEnumCastingStub extends Model
+{
+    protected $guarded = [];
+
+    protected $casts = [
+        'status' => StringStatus::class,
+        'status_object' => StringStatus::class,
+        'status_attribute' => StringStatus::class,
+        'status_attribute_object' => StringStatus::class,
+    ];
+
+    public function getStatusAttribute($value)
+    {
+        return 'pending';
+    }
+
+    public function getStatusObjectAttribute($value)
+    {
+        return StringStatus::pending;
+    }
+
+    public function statusAttribute(): Attribute
+    {
+        return Attribute::get(fn ($value) => 'pending');
+    }
+
+    public function statusAttributeObject(): Attribute
+    {
+        return Attribute::get(fn ($value) => $this->castAttribute('status_attribute_object', 'pending'));
+    }
 }
 
 class EloquentModelDynamicHiddenStub extends Model
