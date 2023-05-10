@@ -76,7 +76,6 @@ class TranslationTranslatorTest extends TestCase
             $callbackKeys[] = $key;
         });
 
-
         $this->assertFalse($t->has('foo::unknown.bar'));
         $this->assertFalse($t->has('foo::unknown.bar'));
         $this->assertFalse($t->has('foo::unknown.zyo'));
