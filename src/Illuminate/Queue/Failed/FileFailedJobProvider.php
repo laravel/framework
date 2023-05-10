@@ -130,11 +130,11 @@ class FileFailedJobProvider implements FailedJobProviderInterface, PrunableFaile
      */
     protected function read()
     {
-        if (! file_exists($this->path.'/failed-jobs.json')) {
+        if (! file_exists($this->path)) {
             return [];
         }
 
-        $content = file_get_contents($this->path.'/failed-jobs.json');
+        $content = file_get_contents($this->path);
 
         if (empty(trim($content))) {
             return [];
@@ -154,7 +154,7 @@ class FileFailedJobProvider implements FailedJobProviderInterface, PrunableFaile
     protected function write(array $jobs)
     {
         file_put_contents(
-            $this->path.'/failed-jobs.json',
+            $this->path,
             json_encode($jobs, JSON_PRETTY_PRINT)
         );
     }
