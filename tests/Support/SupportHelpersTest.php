@@ -121,6 +121,8 @@ class SupportHelpersTest extends TestCase
         $object = new SupportTestCountable();
         $this->assertFalse(filled([$object]));
 
+        $this->assertFalse(filled([]));
+        $this->assertFalse(filled([[]]));
         $this->assertFalse(filled([null, '', '  ']));
         $this->assertTrue(filled([10, true, false, 0, 0.0]));
         $this->assertFalse(filled([10, true, false, 0, 0.0, null, '', '  ']));

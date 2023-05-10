@@ -150,6 +150,10 @@ if (! function_exists('filled')) {
     {
         $values = is_array($value) ? $value : func_get_args();
 
+        if (empty($values)) {
+            return false;
+        }
+
         foreach ($values as $value) {
             if (blank($value)) {
                 return false;
