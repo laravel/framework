@@ -2,8 +2,8 @@
 
 namespace Illuminate\Cache;
 
-use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\LazyCollection;
 
 class RedisTagSet extends TagSet
 {
