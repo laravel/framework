@@ -148,7 +148,15 @@ if (! function_exists('filled')) {
      */
     function filled($value)
     {
-        return ! blank($value);
+        $values = is_array($value) ? $value : func_get_args();
+
+        foreach ($values as $value) {
+            if (blank($value)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
 
