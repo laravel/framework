@@ -8,21 +8,30 @@ use Illuminate\Support\Facades\Date;
 class FileFailedJobProvider implements FailedJobProviderInterface, PrunableFailedJobProvider
 {
     /**
-     * The path at which the failed job file should be stored.
+     * The file path where the failed job file should be stored.
      *
      * @var string
      */
     protected $path;
 
     /**
+     * The maximum number of failed jobs to retain.
+     *
+     * @var int
+     */
+    protected $limit;
+
+    /**
      * Create a new database failed job provider.
      *
      * @param  string  $path
+     * @param  int  $limit
      * @return void
      */
-    public function __construct($path)
+    public function __construct($path, $limit = 100)
     {
         $this->path = $path;
+        $this->limit = $limit;
     }
 
     /**
@@ -42,7 +51,7 @@ class FileFailedJobProvider implements FailedJobProviderInterface, PrunableFaile
 
         $failedAt = Date::now();
 
-        $jobs[] = [
+        array_unshift($jobs, [
             'id' => $id,
             'connection' => $connection,
             'queue' => $queue,
@@ -50,9 +59,9 @@ class FileFailedJobProvider implements FailedJobProviderInterface, PrunableFaile
             'exception' => (string) mb_convert_encoding($exception, 'UTF-8'),
             'failed_at' => $failedAt->format('Y-m-d H:i:s'),
             'failed_at_timestamp' => $failedAt->getTimestamp(),
-        ];
+        ]);
 
-        $this->write($jobs);
+        $this->write(array_slice($jobs, 0, $this->limit));
     }
 
     /**
