@@ -148,7 +148,7 @@ if (! function_exists('filled')) {
      */
     function filled($value)
     {
-        $values = is_array($value) ? $value : func_get_args();
+        $values = Arr::wrap($value);
 
         if (empty($values)) {
             return false;
