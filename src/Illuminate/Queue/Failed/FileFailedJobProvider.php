@@ -3,7 +3,6 @@
 namespace Illuminate\Queue\Failed;
 
 use DateTimeInterface;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Date;
 
 class FileFailedJobProvider implements FailedJobProviderInterface, PrunableFailedJobProvider
@@ -41,13 +40,16 @@ class FileFailedJobProvider implements FailedJobProviderInterface, PrunableFaile
 
         $jobs = $this->read();
 
+        $failedAt = Date::now();
+
         $jobs[] = [
             'id' => $id,
             'connection' => $connection,
             'queue' => $queue,
             'payload' => $payload,
             'exception' => (string) mb_convert_encoding($exception, 'UTF-8'),
-            'failed_at' => Date::now()->getTimestamp(),
+            'failed_at' => $failedAt->format('Y-m-d H:i:s'),
+            'failed_at_timestamp' => $failedAt->getTimestamp(),
         ];
 
         $this->write($jobs);
@@ -83,7 +85,12 @@ class FileFailedJobProvider implements FailedJobProviderInterface, PrunableFaile
      */
     public function forget($id)
     {
-        $this->write(collect($this->read())->reject(fn ($job) => $job->id === $id)->values()->all());
+        $this->write($pruned = collect($jobs = $this->read())
+            ->reject(fn ($job) => $job->id === $id)
+            ->values()
+            ->all());
+
+        return count($jobs) !== count($pruned);
     }
 
     /**
@@ -109,16 +116,19 @@ class FileFailedJobProvider implements FailedJobProviderInterface, PrunableFaile
 
         $deleted = 0;
 
-        $prunedJobs = collect($jobs)->reject(function ($job) use (&$deleted) {
-            return $job->failed_at <= $before->getTimestamp();
-        })->values()->all();
-
-        $this->write($prunedJobs);
+        $this->write($prunedJobs = collect($jobs)->reject(function ($job) use ($before, &$deleted) {
+            return $job->failed_at_timestamp <= $before->getTimestamp();
+        })->values()->all());
 
         return count($jobs) - count($prunedJobs);
     }
 
-    public function read()
+    /**
+     * Read the failed jobs file.
+     *
+     * @return array
+     */
+    protected function read()
     {
         if (! file_exists($this->path.'/failed-jobs.json')) {
             return [];
@@ -135,7 +145,13 @@ class FileFailedJobProvider implements FailedJobProviderInterface, PrunableFaile
         return is_array($content) ? $content : [];
     }
 
-    public function write(array $jobs)
+    /**
+     * Write the given array of jobs to the failed jobs file.
+     *
+     * @param  array  $jobs
+     * @return void
+     */
+    protected function write(array $jobs)
     {
         file_put_contents(
             $this->path.'/failed-jobs.json',
