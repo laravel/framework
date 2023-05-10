@@ -44,6 +44,25 @@ class TrimStringsTest extends TestCase
         });
     }
 
+    public function test_trim_strings_can_globally_ignore_certain_inputs()
+    {
+        $request = new Request;
+
+        $request->merge([
+            'title' => ' test title ',
+        ]);
+
+        TrimStrings::except(['title']);
+
+        $middleware = new TrimStrings;
+
+        $middleware->handle($request, function ($req) {
+            $this->assertEquals(' test title ', $req->title);
+        });
+
+        TrimStrings::$neverTrim = [];
+    }
+
     /**
      * Test trailing zero-width space character is trimmed [ZWSP].
      */
