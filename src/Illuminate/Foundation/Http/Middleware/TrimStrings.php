@@ -23,7 +23,7 @@ class TrimStrings extends TransformsRequest
      *
      * @var array
      */
-    public static $neverTrim = [];
+    protected static $neverTrim = [];
 
     /**
      * All of the registered skip callbacks.
