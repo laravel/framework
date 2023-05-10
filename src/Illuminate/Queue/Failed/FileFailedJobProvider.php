@@ -4,7 +4,6 @@ namespace Illuminate\Queue\Failed;
 
 use Closure;
 use DateTimeInterface;
-use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Support\Facades\Date;
 
 class FileFailedJobProvider implements FailedJobProviderInterface, PrunableFailedJobProvider
