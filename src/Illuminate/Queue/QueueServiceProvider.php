@@ -252,7 +252,9 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
             }
 
             if (isset($config['driver']) && $config['driver'] === 'file') {
-                return new FileFailedJobProvider($config['path']);
+                return new FileFailedJobProvider(
+                    $config['path'] ?? $this->app->storagePath('framework/failed-jobs.json')
+                );
             } elseif (isset($config['driver']) && $config['driver'] === 'dynamodb') {
                 return $this->dynamoFailedJobProvider($config);
             } elseif (isset($config['driver']) && $config['driver'] === 'database-uuids') {
