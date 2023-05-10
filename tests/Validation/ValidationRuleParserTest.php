@@ -96,7 +96,7 @@ class ValidationRuleParserTest extends TestCase
         ], $rules);
     }
 
-    public function testExplodeFailsParsingSingleRegexRuleContainingPipe()
+    public function testExplodeProperlyParsesSingleRegexRuleContainingPipe()
     {
         $data = ['items' => [['type' => 'foo']]];
 
@@ -104,8 +104,7 @@ class ValidationRuleParserTest extends TestCase
             ['items.*.type' => 'regex:/^(foo|bar)$/i']
         );
 
-        $this->assertSame('regex:/^(foo', $exploded->rules['items.0.type'][0]);
-        $this->assertSame('bar)$/i', $exploded->rules['items.0.type'][1]);
+        $this->assertSame('regex:/^(foo|bar)$/i', $exploded->rules['items.0.type'][0]);
     }
 
     public function testExplodeProperlyParsesSingleRegexRuleNotContainingPipe()
@@ -144,7 +143,7 @@ class ValidationRuleParserTest extends TestCase
         $this->assertSame('regex:/^(bar)$/i', $exploded->rules['items.0.type'][1]);
     }
 
-    public function testExplodeFailsParsingRegexWithOtherRulesInSingleString()
+    public function testExplodeProperlyParsesRegexWithOtherRulesInSingleString()
     {
         $data = ['items' => [['type' => 'foo']]];
 
@@ -153,8 +152,7 @@ class ValidationRuleParserTest extends TestCase
         );
 
         $this->assertSame('in:foo', $exploded->rules['items.0.type'][0]);
-        $this->assertSame('regex:/^(foo', $exploded->rules['items.0.type'][1]);
-        $this->assertSame('bar)$/i', $exploded->rules['items.0.type'][2]);
+        $this->assertSame('regex:/^(foo|bar)$/i', $exploded->rules['items.0.type'][1]);
     }
 
     public function testExplodeGeneratesNestedRules()
