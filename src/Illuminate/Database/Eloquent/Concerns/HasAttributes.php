@@ -1137,7 +1137,7 @@ trait HasAttributes
         if ($caster instanceof CastsInboundAttributes || ! is_object($value)) {
             unset($this->classCastCache[$key]);
         } else {
-            $this->classCastCache[$key] = $value;
+            $this->classCastCache[$key] = $this->normalizeCacheableClassCastableAttribute($key, $value, $caster);
         }
     }
 
@@ -1750,6 +1750,23 @@ trait HasAttributes
                 )
             );
         }
+    }
+
+    /**
+     * Normalize the cacheable class cast value.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @param  mixed  $caster
+     * @return array
+     */
+    protected function normalizeCacheableClassCastableAttribute($key, $value, $caster)
+    {
+        $casted = $caster->get(
+            $this, $key, $value, $this->attributes
+        );
+
+        return $value == $casted ? $value : $casted;
     }
 
     /**

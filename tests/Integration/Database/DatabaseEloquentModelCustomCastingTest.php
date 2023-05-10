@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\InvalidCastException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Schema;
 
 class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
@@ -253,6 +254,27 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
         $this->assertInstanceOf(ValueObject::class, $model->value_object_caster_with_caster_instance);
     }
 
+    public function testCachedObjectIsActuallyCasted()
+    {
+        $model = new TestEloquentModelWithCustomCast;
+
+        $model->value_object_collection = ['taylor', 'dries'];
+
+        $this->assertInstanceOf(Collection::class, $model->value_object_collection);
+        $this->assertEquals(Collection::make([
+            new ValueObject('taylor'),
+            new ValueObject('dries'),
+        ]), $model->value_object_collection);
+
+        $model->value_object_collection = (new Collection(['taylor', 'dries']));
+
+        $this->assertInstanceOf(Collection::class, $model->value_object_collection);
+        $this->assertEquals((new Collection([
+            new ValueObject('taylor'),
+            new ValueObject('dries'),
+        ])), $model->value_object_collection);
+    }
+
     public function testGetFromUndefinedCast()
     {
         $this->expectException(InvalidCastException::class);
@@ -297,6 +319,7 @@ class TestEloquentModelWithCustomCast extends Model
         'value_object_with_caster' => ValueObject::class,
         'value_object_caster_with_argument' => ValueObject::class.':argument',
         'value_object_caster_with_caster_instance' => ValueObjectWithCasterInstance::class,
+        'value_object_collection' => ValueObjectCollectionCaster::class,
         'undefined_cast_column' => UndefinedCast::class,
         'birthday_at' => DateObjectCaster::class,
     ];
@@ -501,6 +524,23 @@ class ValueObjectWithCasterInstance extends ValueObject
     public static function castUsing(array $arguments)
     {
         return new ValueObjectCaster;
+    }
+}
+
+class ValueObjectCollectionCaster implements CastsAttributes
+{
+    public function get($model, $key, $value, $attributes)
+    {
+        $data = json_decode($attributes[$key], true);
+
+        return (new Collection($data))->map(function ($item) {
+            return new ValueObject($item);
+        });
+    }
+
+    public function set($model, $key, $value, $attributes)
+    {
+        return json_encode($value);
     }
 }
 
