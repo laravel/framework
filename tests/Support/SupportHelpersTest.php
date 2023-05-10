@@ -107,6 +107,25 @@ class SupportHelpersTest extends TestCase
         $this->assertFalse(filled($object));
     }
 
+    public function testFilledMultiple()
+    {
+        $this->assertFalse(filled([null]));
+        $this->assertFalse(filled(['']));
+        $this->assertFalse(filled(['  ']));
+        $this->assertTrue(filled([10]));
+        $this->assertTrue(filled([true]));
+        $this->assertTrue(filled([false]));
+        $this->assertTrue(filled([0]));
+        $this->assertTrue(filled([0.0]));
+
+        $object = new SupportTestCountable();
+        $this->assertFalse(filled([$object]));
+
+        $this->assertFalse(filled([null, '', '  ']));
+        $this->assertTrue(filled([10, true, false, 0, 0.0]));
+        $this->assertFalse(filled([10, true, false, 0, 0.0, null, '', '  ']));
+    }
+
     public function testValue()
     {
         $callable = new class
