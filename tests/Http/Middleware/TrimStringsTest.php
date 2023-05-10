@@ -49,18 +49,16 @@ class TrimStringsTest extends TestCase
         $request = new Request;
 
         $request->merge([
-            'title' => ' test title ',
+            'globally_ignored_title' => ' test title ',
         ]);
 
-        TrimStrings::except(['title']);
+        TrimStrings::except(['globally_ignored_title']);
 
         $middleware = new TrimStrings;
 
         $middleware->handle($request, function ($req) {
-            $this->assertEquals(' test title ', $req->title);
+            $this->assertEquals(' test title ', $req->globally_ignored_title);
         });
-
-        TrimStrings::$neverTrim = [];
     }
 
     /**
