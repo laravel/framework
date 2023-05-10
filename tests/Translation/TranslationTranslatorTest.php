@@ -41,25 +41,57 @@ class TranslationTranslatorTest extends TestCase
         $this->assertTrue($t->hasForLocale('foo'));
     }
 
+    public function testGetMethodMayCallMissingTranslationHandlers()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'bar', 'foo')->andReturn(['foo' => 'foo', 'baz' => 'breeze :foo', 'qux' => ['tree :foo', 'breeze :foo']]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'unknown', 'foo')->andReturn([]);
+
+        $callbackKeys = [];
+        $t->whenMissingTranslation(function (string $key) use (&$callbackKeys) {
+            $callbackKeys[] = $key;
+        });
+
+        $this->assertSame('foo::unknown.bar', $t->get('foo::unknown.bar'));
+        $this->assertSame('foo::unknown.bar', $t->get('foo::unknown.bar'));
+        $this->assertSame('foo::unknown.zyo', $t->get('foo::unknown.zyo'));
+        $this->assertSame(['foo::unknown.bar', 'foo::unknown.bar', 'foo::unknown.zyo'], $callbackKeys);
+
+        $this->assertSame('foo', $t->get('foo::bar.foo'));
+        $this->assertSame('foo', $t->get('foo::bar.foo'));
+        $this->assertSame('foo', $t->get('foo::bar.foo'));
+        $this->assertSame(['foo::unknown.bar', 'foo::unknown.bar', 'foo::unknown.zyo'], $callbackKeys);
+    }
+
     public function testHasMethodDoesNotCallMissingTranslationHandlers()
     {
         $t = new Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'bar', 'foo')->andReturn(['foo' => 'foo', 'baz' => 'breeze :foo', 'qux' => ['tree :foo', 'breeze :foo']]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'unknown', 'foo')->andReturn([]);
 
-        $callbackKey = null;
-
-        $t->whenMissingTranslation(function (string $key) use (&$callbackKey) {
-            $callbackKey = $key;
+        $callbackKeys = [];
+        $t->whenMissingTranslation(function (string $key) use (&$callbackKeys) {
+            $callbackKeys[] = $key;
         });
 
-        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
-        $t->getLoader()->shouldReceive('load')->once()->with('en', 'foo', '*')->andReturn([]);
-        $this->assertFalse($t->has('foo'));
 
-        $this->assertNull($callbackKey);
+        $this->assertFalse($t->has('foo::unknown.bar'));
+        $this->assertFalse($t->has('foo::unknown.bar'));
+        $this->assertFalse($t->has('foo::unknown.zyo'));
+        $this->assertTrue($t->has('foo::bar.foo'));
+        $this->assertTrue($t->has('foo::bar.foo'));
+        $this->assertTrue($t->has('foo::bar.foo'));
+        $this->assertEmpty($callbackKeys);
 
-        $this->assertSame('foo', $t->get('foo'));
-
-        $this->assertSame('foo', $callbackKey);
+        $this->assertSame('foo::unknown.bar', $t->get('foo::unknown.bar'));
+        $this->assertSame('foo::unknown.bar', $t->get('foo::unknown.bar'));
+        $this->assertSame('foo::unknown.zyo', $t->get('foo::unknown.zyo'));
+        $this->assertSame('foo', $t->get('foo::bar.foo'));
+        $this->assertSame('foo', $t->get('foo::bar.foo'));
+        $this->assertSame('foo', $t->get('foo::bar.foo'));
+        $this->assertSame(['foo::unknown.bar', 'foo::unknown.bar', 'foo::unknown.zyo'], $callbackKeys);
     }
 
     public function testGetMethodProperlyLoadsAndRetrievesItem()
@@ -91,18 +123,6 @@ class TranslationTranslatorTest extends TestCase
         $this->assertSame('foo::unknown', $t->get('foo::unknown', ['foo' => 'bar'], 'en'));
         $this->assertSame('foo::bar.unknown', $t->get('foo::bar.unknown', ['foo' => 'bar'], 'en'));
         $this->assertSame('foo::unknown.bar', $t->get('foo::unknown.bar'));
-
-        $callbackKey = null;
-
-        $t->whenMissingTranslation(function (string $key) use (&$callbackKey) {
-            $callbackKey = $key;
-        });
-
-        $this->assertSame('foo::unknown.bar', $t->get('foo::unknown.bar'));
-
-        $this->assertSame('foo::unknown.bar', $callbackKey);
-
-        $this->assertSame('foo', $t->get('foo::bar.foo'));
     }
 
     public function testTransMethodProperlyLoadsAndRetrievesItemWithHTMLInTheMessage()
