@@ -108,15 +108,15 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      */
     public function has($key, $locale = null, $fallback = true)
     {
-		// Reset missing translation handlers, so that they are not invoked when using
-	    // the `get()` method. They are restored after the `get()` method is called.
+        // Reset missing translation handlers, so that they are not invoked when using
+        // the `get()` method. They are restored after the `get()` method is called.
         if ($missingTranslationHandlers = $this->missingTranslationHandlers) {
             $this->missingTranslationHandlers = [];
         }
-	    
-	    $translated = $this->get($key, [], $locale, $fallback);
-		
-	    return tap($translated !== $key, fn () => $this->missingTranslationHandlers = $missingTranslationHandlers);
+
+        $translated = $this->get($key, [], $locale, $fallback);
+
+        return tap($translated !== $key, fn () => $this->missingTranslationHandlers = $missingTranslationHandlers);
     }
 
     /**
@@ -504,13 +504,13 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
 
         $this->stringableHandlers[$class] = $handler;
     }
-	
-	/**
-	 * Register a callback to be invoked when the translator detects a missing translation.
-	 *
-	 * @param  callable  $handler
-	 * @return void
-	 */
+
+    /**
+     * Register a callback to be invoked when the translator detects a missing translation.
+     *
+     * @param  callable  $handler
+     * @return void
+     */
     public function whenMissingTranslation($handler)
     {
         $this->missingTranslationHandlers[] = $handler;

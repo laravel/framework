@@ -40,27 +40,27 @@ class TranslationTranslatorTest extends TestCase
         $t->getLoader()->shouldReceive('load')->once()->with('en', 'foo', '*')->andReturn(['foo' => 'bar']);
         $this->assertTrue($t->hasForLocale('foo'));
     }
-	
-	public function testMissingTranslationHandlersAreNotCalledOnHasMethod()
-	{
-		$t = new Translator($this->getLoader(), 'en');
-		
-		$callbackKey = null;
-		
-		$t->whenMissingTranslation(function (string $key) use (&$callbackKey) {
-			$callbackKey = $key;
-		});
-		
-		$t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
-		$t->getLoader()->shouldReceive('load')->once()->with('en', 'foo', '*')->andReturn([]);
-		$this->assertFalse($t->has('foo'));
-		
-		$this->assertNull($callbackKey);
-		
-		$this->assertSame('foo', $t->get('foo'));
-		
-		$this->assertSame('foo', $callbackKey);
-	}
+
+    public function testMissingTranslationHandlersAreNotCalledOnHasMethod()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+
+        $callbackKey = null;
+
+        $t->whenMissingTranslation(function (string $key) use (&$callbackKey) {
+            $callbackKey = $key;
+        });
+
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'foo', '*')->andReturn([]);
+        $this->assertFalse($t->has('foo'));
+
+        $this->assertNull($callbackKey);
+
+        $this->assertSame('foo', $t->get('foo'));
+
+        $this->assertSame('foo', $callbackKey);
+    }
 
     public function testGetMethodProperlyLoadsAndRetrievesItem()
     {
