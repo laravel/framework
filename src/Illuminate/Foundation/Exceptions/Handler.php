@@ -207,6 +207,19 @@ class Handler implements ExceptionHandlerContract
     /**
      * Indicate that the given exception type should not be reported.
      *
+     * Alias of "ignore".
+     *
+     * @param  string  $class
+     * @return $this
+     */
+    public function dontReport(string $class)
+    {
+        return $this->ignore($class);
+    }
+
+    /**
+     * Indicate that the given exception type should not be reported.
+     *
      * @param  string  $class
      * @return $this
      */
