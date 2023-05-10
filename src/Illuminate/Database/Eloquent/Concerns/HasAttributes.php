@@ -706,7 +706,7 @@ trait HasAttributes
         } else {
             $value = $this->mutateAttribute($key, $value);
         }
-        
+
         if ($this->isEnumCastable($key)) {
             $value = $this->getEnumCastableAttributeValue($key, $value);
 
@@ -1593,7 +1593,7 @@ trait HasAttributes
         if (in_array($castType, static::$primitiveCastTypes)) {
             return false;
         }
-        
+
         if (enum_exists($castType)) {
             return false;
         }
