@@ -58,6 +58,7 @@ trait ManagesLoops
             'odd' => ! $loop['odd'],
             'even' => ! $loop['even'],
             'remaining' => isset($loop['count']) ? $loop['remaining'] - 1 : null,
+            'countdown' => isset($loop['count']) ? $loop['remaining'] : null,
             'last' => isset($loop['count']) ? $loop['iteration'] == $loop['count'] - 1 : null,
         ]);
     }
