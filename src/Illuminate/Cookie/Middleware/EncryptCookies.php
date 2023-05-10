@@ -32,7 +32,7 @@ class EncryptCookies
      *
      * @var array
      */
-    protected static $neverEncrypt = [];
+    public static $neverEncrypt = [];
 
     /**
      * Indicates if cookies should be serialized.
