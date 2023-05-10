@@ -114,9 +114,7 @@ class FileFailedJobProvider implements FailedJobProviderInterface, PrunableFaile
     {
         $jobs = $this->read();
 
-        $deleted = 0;
-
-        $this->write($prunedJobs = collect($jobs)->reject(function ($job) use ($before, &$deleted) {
+        $this->write($prunedJobs = collect($jobs)->reject(function ($job) use ($before) {
             return $job->failed_at_timestamp <= $before->getTimestamp();
         })->values()->all());
 
