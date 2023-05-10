@@ -99,14 +99,14 @@ class ValidationRuleParser
                     $nextSlash = strpos($rulePart, '/', $nextSlash + 1);
                 } while (substr($rulePart, $nextSlash - 1, 1) === '\\');
 
-                array_push($array, substr($rulePart, 0, $nextSlash + 1));
-
                 $nextPipePos = strpos($rulePart, $seperator, $nextSlash);
-                $rulePart = substr($rulePart, $nextPipePos === false ? null : $nextPipePos + 1);
+                array_push($array, $nextPipePos === false ? substr($rulePart, 0) : substr($rulePart, 0, $nextPipePos));
+
+                $rulePart = $nextPipePos === false ? null : substr($rulePart, $nextPipePos + 1);
             } else {
                 $nextPipePos = strpos($rulePart, $seperator);
                 array_push($array, substr($rulePart, 0, $nextPipePos === false ? null : $nextPipePos));
-                $rulePart = substr($rulePart, $nextPipePos === false ? null : $nextPipePos + 1);
+                $rulePart = $nextPipePos === false ? null : substr($rulePart, $nextPipePos + 1);
             }
         } while ($nextPipePos !== false);
 
