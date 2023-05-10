@@ -44,7 +44,7 @@ class VerifyCsrfToken
      *
      * @var array
      */
-    protected static $neverVerify = [];
+    public static $neverVerify = [];
 
     /**
      * Indicates whether the XSRF-TOKEN cookie should be set on the response.
