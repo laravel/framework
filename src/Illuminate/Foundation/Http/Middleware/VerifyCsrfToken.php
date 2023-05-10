@@ -10,6 +10,7 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Cookie\CookieValuePrefix;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Session\TokenMismatchException;
+use Illuminate\Support\Arr;
 use Illuminate\Support\InteractsWithTime;
 use Symfony\Component\HttpFoundation\Cookie;
 
@@ -37,6 +38,13 @@ class VerifyCsrfToken
      * @var array<int, string>
      */
     protected $except = [];
+
+    /**
+     * The globally ignored URIs that should be excluded from CSRF verification.
+     *
+     * @var array
+     */
+    protected static $neverVerify = [];
 
     /**
      * Indicates whether the XSRF-TOKEN cookie should be set on the response.
@@ -114,7 +122,7 @@ class VerifyCsrfToken
      */
     protected function inExceptArray($request)
     {
-        foreach ($this->except as $except) {
+        foreach (array_merge($this->except, static::$neverVerify) as $except) {
             if ($except !== '/') {
                 $except = trim($except, '/');
             }
@@ -213,6 +221,19 @@ class VerifyCsrfToken
             false,
             $config['same_site'] ?? null
         );
+    }
+
+    /**
+     * Indicate that the given URIs should be excluded from CSRF verification.
+     *
+     * @param  array|string  $paths
+     * @return void
+     */
+    public static function except($paths)
+    {
+        static::$neverVerify = array_values(array_unique(
+            array_merge(static::$neverVerify, Arr::wrap($paths))
+        ));
     }
 
     /**
