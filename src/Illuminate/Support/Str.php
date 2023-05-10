@@ -1134,11 +1134,18 @@ class Str
             return static::$snakeCache[$key][$delimiter];
         }
 
-        if (! ctype_lower($value)) {
-            $value = preg_replace('/\s+/u', '', ucwords($value));
+//        if (! ctype_lower($value)) {
+//            $value = preg_replace('/\s+/u', '', ucwords($value));
+//
+//            $value = static::lower(preg_replace('/(.)(?=[A-Z])/u', '$1'.$delimiter, $value));
+//        }
 
-            $value = static::lower(preg_replace('/(.)(?=[A-Z])/u', '$1'.$delimiter, $value));
-        }
+        $value = preg_replace('/(?<!^)[A-Z][a-z]/', $delimiter . '$0', $value);
+        $value = preg_replace_callback('/([A-Z]{2,})([A-Z][a-z])/', function ($matches) use($delimiter) {
+            return $matches[1] . $delimiter . $matches[2];
+        }, $value);
+        $value = preg_replace('/([a-z])([A-Z])/', '$1' . $delimiter . '$2', $value);
+        $value = static::lower($value);
 
         return static::$snakeCache[$key][$delimiter] = $value;
     }
