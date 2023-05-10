@@ -41,7 +41,7 @@ class TranslationTranslatorTest extends TestCase
         $this->assertTrue($t->hasForLocale('foo'));
     }
 
-    public function testMissingTranslationHandlersAreNotCalledOnHasMethod()
+    public function testHasMethodDoesNotCallMissingTranslationHandlers()
     {
         $t = new Translator($this->getLoader(), 'en');
 
