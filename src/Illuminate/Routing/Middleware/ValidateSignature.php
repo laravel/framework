@@ -71,9 +71,10 @@ class ValidateSignature
             array_shift($args);
         }
 
-        $ignore = empty($args)
-            ? property_exists($this, 'except') ? $this->except : $this->ignore
-            : $args;
+        $ignore = array_merge(
+            property_exists($this, 'except') ? $this->except : $this->ignore,
+            $args
+        );
 
         return [$isRelative, $ignore];
     }
