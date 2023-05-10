@@ -108,8 +108,6 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      */
     public function has($key, $locale = null, $fallback = true)
     {
-        // Reset missing translation handlers, so that they are not invoked when using
-        // the `get()` method. They are restored after the `get()` method is called.
         if ($missingTranslationHandlers = $this->missingTranslationHandlers) {
             $this->missingTranslationHandlers = [];
         }
