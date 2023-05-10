@@ -4,14 +4,24 @@ namespace Illuminate\Foundation\Testing;
 
 use Carbon\CarbonImmutable;
 use Illuminate\Console\Application as Artisan;
+use Illuminate\Console\Signals;
+use Illuminate\Console\View\Components\Line;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Bootstrap\HandleExceptions;
 use Illuminate\Queue\Queue;
+use Illuminate\Routing\ResourceRegistrar;
+use Illuminate\Routing\Route;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\DateFactory;
+use Illuminate\Support\Env;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\ParallelTesting;
+use Illuminate\Support\Lottery;
+use Illuminate\Support\Pluralizer;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\File;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\View\Component;
 use Mockery;
 use Mockery\Exception\InvalidCountException;
@@ -65,6 +75,13 @@ abstract class TestCase extends BaseTestCase
      * @var bool
      */
     protected $setUpHasRun = false;
+
+    /**
+     * Flush any static testing helpers.
+     *
+     * @var bool
+     */
+    protected $flushStatics = false;
 
     /**
      * Creates the application.
@@ -247,6 +264,19 @@ abstract class TestCase extends BaseTestCase
         Queue::createPayloadUsing(null);
         HandleExceptions::forgetApp();
         Sleep::fake(false);
+
+        if ($this->flushStatics) {
+            Str::createUuidsNormally();
+            Str::createRandomStringsNormally();
+            Lottery::determineResultNormally();
+            File::$defaultCallback = null;
+            Password::$defaultCallback = null;
+            ResourceRegistrar::setParameters([]);
+            ResourceRegistrar::singularParameters();
+            DateFactory::useDefault();
+            Pluralizer::useLanguage('english');
+            Env::enablePutenv();
+        }
 
         if ($this->callbackException) {
             throw $this->callbackException;
