@@ -108,11 +108,15 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      */
     public function has($key, $locale = null, $fallback = true)
     {
-        if ($missingTranslationHandlers = $this->missingTranslationHandlers) {
-            $this->missingTranslationHandlers = [];
-        }
+        $originalMissingTranslationHandlers = $this->missingTranslationHandlers;
 
-        return tap($this->get($key, [], $locale, $fallback) !== $key, fn () => $this->missingTranslationHandlers = $missingTranslationHandlers);
+        $this->missingTranslationHandlers = [];
+
+        try {
+            return $this->get($key, [], $locale, $fallback) !== $key;
+        } finally {
+            $this->missingTranslationHandlers = $originalMissingTranslationHandlers;
+        }
     }
 
     /**
