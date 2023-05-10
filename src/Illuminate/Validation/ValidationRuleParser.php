@@ -78,6 +78,43 @@ class ValidationRuleParser
     }
 
     /**
+     * Explode into an Array while keeping Regex intact.
+     *
+     * @param  string  $seperator
+     * @param  string  $rule
+     * @return array
+     */
+    protected function regexSafeExplode($seperator, $rule)
+    {
+      $array = array();
+      $nextPipePos = 0;
+      $rulePart = $rule;
+    
+      do {
+        if (str_starts_with($rulePart, 'regex:'))
+        {
+          $firstRegexStart = strpos($rulePart, '/');
+          $nextSlash = $firstRegexStart;
+          
+          do {
+            $nextSlash = strpos($rulePart, '/', $nextSlash + 1);
+          } while (substr($rulePart, $nextSlash - 1, 1) === "\\");
+      
+          array_push($array, substr($rulePart, 0, $nextSlash + 1));
+      
+          $nextPipePos = strpos($rulePart, $seperator, $nextSlash);
+          $rulePart = substr($rulePart, $nextPipePos === false ? null : $nextPipePos + 1);
+        } else {
+          $nextPipePos = strpos($rulePart, $seperator);
+          array_push($array, substr($rulePart, 0, $nextPipePos === false ? null : $nextPipePos));
+          $rulePart = substr($rulePart, $nextPipePos === false ? null : $nextPipePos + 1);
+        }
+      } while ($nextPipePos !== false);
+    
+      return $array;
+    }
+
+    /**
      * Explode the explicit rule into an array if necessary.
      *
      * @param  mixed  $rule
@@ -87,7 +124,7 @@ class ValidationRuleParser
     protected function explodeExplicitRule($rule, $attribute)
     {
         if (is_string($rule)) {
-            return explode('|', $rule);
+            return $this->regexSafeExplode('|', $rule);
         }
 
         if (is_object($rule)) {
