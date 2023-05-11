@@ -53,19 +53,6 @@ class EncryptCookies
     }
 
     /**
-     * Indicate that the given cookies should never be encrypted.
-     *
-     * @param  array|string  $cookies
-     * @return void
-     */
-    public static function except($cookies)
-    {
-        static::$neverEncrypt = array_values(array_unique(
-            array_merge(static::$neverEncrypt, Arr::wrap($cookies))
-        ));
-    }
-
-    /**
      * Disable encryption for the given cookie name(s).
      *
      * @param  string|array  $name
@@ -232,6 +219,19 @@ class EncryptCookies
     public function isDisabled($name)
     {
         return in_array($name, array_merge($this->except, static::$neverEncrypt));
+    }
+
+    /**
+     * Indicate that the given cookies should never be encrypted.
+     *
+     * @param  array|string  $cookies
+     * @return void
+     */
+    public static function except($cookies)
+    {
+        static::$neverEncrypt = array_values(array_unique(
+            array_merge(static::$neverEncrypt, Arr::wrap($cookies))
+        ));
     }
 
     /**
