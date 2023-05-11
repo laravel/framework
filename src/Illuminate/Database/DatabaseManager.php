@@ -265,6 +265,8 @@ class DatabaseManager implements ConnectionResolverInterface
 
         if (! Type::hasType($name)) {
             Type::addType($name, $class);
+        } else {
+            Type::overrideType($name, $class);
         }
 
         $this->doctrineTypes[$name] = [$type, $class];
