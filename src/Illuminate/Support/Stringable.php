@@ -1019,6 +1019,19 @@ class Stringable implements JsonSerializable, ArrayAccess
     }
 
     /**
+     * Execute the given callback if the string matches a given pattern.
+     *
+     * @param  string|iterable<string>  $pattern
+     * @param  callable  $callback
+     * @param  callable|null  $default
+     * @return static
+     */
+    public function whenIsMatch($pattern, $callback, $default = null)
+    {
+        return $this->when($this->isMatch($pattern), $callback, $default);
+    }
+
+    /**
      * Execute the given callback if the string is 7 bit ASCII.
      *
      * @param  callable  $callback
