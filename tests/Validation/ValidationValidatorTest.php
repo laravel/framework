@@ -16,11 +16,9 @@ use Illuminate\Contracts\Validation\ImplicitRule;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Translation\ArrayLoader;
-use Illuminate\Translation\FileLoader;
 use Illuminate\Translation\Translator;
 use Illuminate\Validation\DatabasePresenceVerifierInterface;
 use Illuminate\Validation\Rules\Exists;
@@ -105,12 +103,67 @@ class ValidationValidatorTest extends TestCase
     }
 
 
-    public function testNestedErrorMessagesAreRetrievedFromJsonFile()
+    public function testNestedErrorMessagesAreRetrievedFromJsonFileOrderDetailedFirst()
     {
-        $loader = new FileLoader(new Filesystem(), __DIR__."/fixtures");
-        $trans = new Translator(
-            $loader, 'en'
-        );
+        $localeFileContent = '
+        {
+            "validation.custom": {
+                "users.*.posts.*.name": {
+                    "required": "post name is required"
+                },
+                "users.*.name": {
+                    "required": "user name is required"
+                }
+            }
+        }
+        ';
+        $messages = json_decode($localeFileContent, true);
+
+        $loader = new ArrayLoader();
+        $loader->addMessages('en','*',$messages,'*');
+
+        $trans = new Translator($loader, 'en');
+
+        $v = new Validator($trans, [
+            'users' => [
+                [
+                    'name' => 'Taylor Otwell',
+                    'posts' => [
+                        [
+                            'name' => '',
+                        ],
+                    ],
+                ],
+            ],
+        ], [
+            'users.*.name' => ['required'],
+            'users.*.posts.*.name' => ['required'],
+        ]);
+
+        $this->assertFalse($v->passes());
+        $this->assertSame('post name is required', $v->errors()->all()[0]);
+    }
+
+    public function testNestedErrorMessagesAreRetrievedFromJsonFileOrderDetailedLast()
+    {
+        $localeFileContent = '
+        {
+            "validation.custom": {
+                "users.*.name": {
+                    "required": "user name is required"
+                },
+                "users.*.posts.*.name": {
+                    "required": "post name is required"
+                }
+            }
+        }
+        ';
+        $messages = json_decode($localeFileContent, true);
+
+        $loader = new ArrayLoader();
+        $loader->addMessages('en','*',$messages,'*');
+
+        $trans = new Translator($loader, 'en');
 
         $v = new Validator($trans, [
             'users' => [
