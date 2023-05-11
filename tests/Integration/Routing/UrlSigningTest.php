@@ -346,7 +346,8 @@ class UrlSigningTest extends TestCase
 
     protected function createValidateSignatureMiddleware(array $ignore)
     {
-        return new class($ignore) extends ValidateSignature {
+        return new class($ignore) extends ValidateSignature
+        {
             public function __construct(array $ignore)
             {
                 $this->ignore = $ignore;
