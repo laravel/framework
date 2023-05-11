@@ -1,0 +1,11 @@
+{
+    "validation.custom": {
+        "users.*.name": {
+            "required": "user name is required"
+        },
+        "users.*.posts.*.name": {
+            "required": "post name is required"
+        }
+    }
+   
+}
