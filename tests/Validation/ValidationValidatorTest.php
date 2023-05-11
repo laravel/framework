@@ -102,7 +102,6 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame('post name is required', $v->errors()->all()[0]);
     }
 
-
     public function testNestedErrorMessagesAreRetrievedFromJsonFileOrderDetailedFirst()
     {
         $localeFileContent = '
@@ -120,7 +119,7 @@ class ValidationValidatorTest extends TestCase
         $messages = json_decode($localeFileContent, true);
 
         $loader = new ArrayLoader();
-        $loader->addMessages('en','*',$messages,'*');
+        $loader->addMessages('en', '*', $messages, '*');
 
         $trans = new Translator($loader, 'en');
 
@@ -161,7 +160,7 @@ class ValidationValidatorTest extends TestCase
         $messages = json_decode($localeFileContent, true);
 
         $loader = new ArrayLoader();
-        $loader->addMessages('en','*',$messages,'*');
+        $loader->addMessages('en', '*', $messages, '*');
 
         $trans = new Translator($loader, 'en');
 
