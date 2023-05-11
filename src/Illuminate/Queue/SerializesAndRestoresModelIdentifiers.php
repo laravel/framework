@@ -8,6 +8,7 @@ use Illuminate\Contracts\Queue\QueueableEntity;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Support\Collection;
 
 trait SerializesAndRestoresModelIdentifiers
 {
@@ -32,6 +33,15 @@ trait SerializesAndRestoresModelIdentifiers
             );
         }
 
+        if (is_array($value) || ($value instanceof Collection)) {
+            $value = $value instanceof Collection ? clone $value : $value;
+            foreach($value as $key => $item) {
+                $value[$key] = $this->getSerializedPropertyValue($item);
+            }
+
+            return $value;
+        }
+
         if ($value instanceof QueueableEntity) {
             return new ModelIdentifier(
                 get_class($value),
@@ -52,6 +62,16 @@ trait SerializesAndRestoresModelIdentifiers
      */
     protected function getRestoredPropertyValue($value)
     {
+        if (is_array($value) || ($value instanceof Collection)) {
+            foreach($value as $key => &$item) {
+                $value[$key] = $this->getRestoredPropertyValue($item);
+            }
+
+            ! is_array($value) ?: reset($value);
+
+            return $value;
+        }
+
         if (! $value instanceof ModelIdentifier) {
             return $value;
         }
