@@ -260,7 +260,7 @@ class UrlSigningTest extends TestCase
 
     public function testSignedMiddlewareIgnoringParameter()
     {
-        Route::get('/foo/{id}}', function (Request $request, $id) {
+        Route::get('/foo/{id}', function (Request $request, $id) {
         })->name('foo')->middleware('signed:relative');
 
         $this->assertIsString($url = URL::signedRoute('foo', ['id' => 1]).'&ignore=me');
@@ -285,6 +285,26 @@ class UrlSigningTest extends TestCase
 
         $response = $this->get('/foo/1');
         $response->assertStatus(403);
+    }
+
+    public function testSignedMiddlewareCanGloballyIgnoreParameters()
+    {
+        ValidateSignature::except(['globally_ignore']);
+
+        Route::get('/foo/{id}', function (Request $request, $id) {
+        })->name('foo')->middleware('signed:relative');
+
+        $this->assertIsString($url = URL::signedRoute('foo', ['id' => 1]).'&globally_ignore=me');
+        $request = Request::create($url);
+        $middleware = $this->createValidateSignatureMiddleware(['ignore']);
+
+        try {
+            $middleware->handle($request, function ($request) {
+                $this->assertTrue($request->hasValidSignatureWhileIgnoring(['globally_ignore']));
+            });
+        } catch (InvalidSignatureException $exception) {
+            $this->fail($exception->getMessage());
+        }
     }
 
     public function testSignedMiddlewareIgnoringParameterViaArgumentsWithoutRelative()
@@ -326,8 +346,7 @@ class UrlSigningTest extends TestCase
 
     protected function createValidateSignatureMiddleware(array $ignore)
     {
-        return new class($ignore) extends ValidateSignature
-        {
+        return new class($ignore) extends ValidateSignature {
             public function __construct(array $ignore)
             {
                 $this->ignore = $ignore;
