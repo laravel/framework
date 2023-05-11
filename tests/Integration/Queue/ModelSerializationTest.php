@@ -329,6 +329,46 @@ class ModelSerializationTest extends TestCase
 
         $this->assertTrue(true);
     }
+
+    public function test_serializes_array_with_model_identifiers()
+    {
+        $user1 = tap(ModelSerializationTestUser::create([
+            'email' => 'taylor@laravel.com',
+        ]), fn($user) => $user->wasRecentlyCreated = false);
+        $user2 = tap(ModelSerializationTestUser::create([
+            'email' => 'dries@laravel.com',
+        ]), fn($user) => $user->wasRecentlyCreated = false);
+
+        // test list
+        $arrayOfUsers = [$user1, $user2];
+        $testCollectionFromArray = new CollectionSerializationTestClass($arrayOfUsers);
+
+        $serialized = serialize($testCollectionFromArray);
+        $this->assertSame(
+            'O:67:"Illuminate\Tests\Integration\Queue\CollectionSerializationTestClass":1:{s:5:"users";a:2:{i:0;O:45:"Illuminate\Contracts\Database\ModelIdentifier":5:{s:5:"class";s:61:"Illuminate\Tests\Integration\Queue\ModelSerializationTestUser";s:2:"id";i:1;s:9:"relations";a:0:{}s:10:"connection";s:7:"testing";s:15:"collectionClass";N;}i:1;O:45:"Illuminate\Contracts\Database\ModelIdentifier":5:{s:5:"class";s:61:"Illuminate\Tests\Integration\Queue\ModelSerializationTestUser";s:2:"id";i:2;s:9:"relations";a:0:{}s:10:"connection";s:7:"testing";s:15:"collectionClass";N;}}}',
+            $serialized
+        );
+        $this->assertEquals($testCollectionFromArray, unserialize($serialized));
+
+        // test associative array
+        $testCollectionFromAssociativeArray = new CollectionSerializationTestClass(['user_1' => $user1, 'second_user' => $user2]);
+        $this->assertSame(
+            'O:67:"Illuminate\Tests\Integration\Queue\CollectionSerializationTestClass":1:{s:5:"users";a:2:{s:6:"user_1";O:45:"Illuminate\Contracts\Database\ModelIdentifier":5:{s:5:"class";s:61:"Illuminate\Tests\Integration\Queue\ModelSerializationTestUser";s:2:"id";i:1;s:9:"relations";a:0:{}s:10:"connection";s:7:"testing";s:15:"collectionClass";N;}s:11:"second_user";O:45:"Illuminate\Contracts\Database\ModelIdentifier":5:{s:5:"class";s:61:"Illuminate\Tests\Integration\Queue\ModelSerializationTestUser";s:2:"id";i:2;s:9:"relations";a:0:{}s:10:"connection";s:7:"testing";s:15:"collectionClass";N;}}}',
+            $serialized = serialize($testCollectionFromAssociativeArray)
+        );
+        $this->assertEquals($testCollectionFromAssociativeArray, unserialize($serialized));
+
+
+        // test \Illuminate\Support\Collection
+        $testCollectionFromCollection = new CollectionSerializationTestClass(collect($arrayOfUsers));
+
+        $this->assertSame(
+            'O:67:"Illuminate\Tests\Integration\Queue\CollectionSerializationTestClass":1:{s:5:"users";O:29:"Illuminate\Support\Collection":2:{s:8:" * items";a:2:{i:0;O:45:"Illuminate\Contracts\Database\ModelIdentifier":5:{s:5:"class";s:61:"Illuminate\Tests\Integration\Queue\ModelSerializationTestUser";s:2:"id";i:1;s:9:"relations";a:0:{}s:10:"connection";s:7:"testing";s:15:"collectionClass";N;}i:1;O:45:"Illuminate\Contracts\Database\ModelIdentifier":5:{s:5:"class";s:61:"Illuminate\Tests\Integration\Queue\ModelSerializationTestUser";s:2:"id";i:2;s:9:"relations";a:0:{}s:10:"connection";s:7:"testing";s:15:"collectionClass";N;}}s:28:" * escapeWhenCastingToString";b:0;}}',
+            $serialized = serialize($testCollectionFromCollection)
+        );
+
+        $this->assertEquals($testCollectionFromCollection, unserialize($serialized));
+    }
 }
 
 trait TraitBootsAndInitializersTest
