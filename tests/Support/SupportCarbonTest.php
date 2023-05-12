@@ -123,4 +123,22 @@ class SupportCarbonTest extends TestCase
         $this->assertTrue(Carbon::now()->when(null, fn (Carbon $carbon) => $carbon->addDays(1))->isToday());
         $this->assertTrue(Carbon::now()->when(true, fn (Carbon $carbon) => $carbon->addDays(1))->isTomorrow());
     }
+
+    public function testCreateFromUid()
+    {
+        $ulid = Carbon::createFromId('01DXH9C4P0ED4AGJJP9CRKQ55C');
+        $this->assertEquals('2020-01-01 19:30:00.000000', $ulid->toDateTimeString('microsecond'));
+
+        $uuidv1 = Carbon::createFromId('71513cb4-f071-11ed-a0cf-325096b39f47');
+        $this->assertEquals('2023-05-12 03:02:34.147346', $uuidv1->toDateTimeString('microsecond'));
+
+        $uuidv2 = Carbon::createFromId('000003e8-f072-21ed-9200-325096b39f47');
+        $this->assertEquals('2023-05-12 03:06:33.529139', $uuidv2->toDateTimeString('microsecond'));
+
+        $uuidv6 = Carbon::createFromId('1edf0746-5d1c-6ce8-88ad-e0cb4effa035');
+        $this->assertEquals('2023-05-12 03:23:43.347428', $uuidv6->toDateTimeString('microsecond'));
+
+        $uuidv7 = Carbon::createFromId('01880dfa-2825-72e4-acbb-b1e4981cf8af');
+        $this->assertEquals('2023-05-12 03:21:18.117000', $uuidv7->toDateTimeString('microsecond'));
+    }
 }

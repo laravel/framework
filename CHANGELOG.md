@@ -1,6 +1,29 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.9.0...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v10.10.0...10.x)
+
+
+## [v10.10.0 (2023-05-09)](https://github.com/laravel/framework/compare/v10.9.0...v10.10.0)
+
+### Added
+- Added `$isolated` and `isolatedExitCode` properties to `Illuminate/Console/Command` ([#46925](https://github.com/laravel/framework/pull/46925))
+- Added ability to restore/set Global Scopes ([#46922](https://github.com/laravel/framework/pull/46922))
+- Added `Illuminate/Collections/Arr::sortRecursiveDesc()` ([#46945](https://github.com/laravel/framework/pull/46945))
+- Added `Illuminate/Support/Sleep` ([#46904](https://github.com/laravel/framework/pull/46904), [#46963](https://github.com/laravel/framework/pull/46963))
+- Added `Illuminate/Database/Eloquent/Concerns/HasAttributes::castAttributeAsHashedString()` ([#46947]https://github.com/laravel/framework/pull/46947)
+- Added url support for mail config ([#46964](https://github.com/laravel/framework/pull/46964))
+
+### Fixed
+- Fixed replace missing_unless ([89ac58a](https://github.com/laravel/framework/commit/89ac58aa9b4fb7ef9f3b2290921488da1454ed30))
+- Gracefully handle invalid code points in e() ([#46914](https://github.com/laravel/framework/pull/46914))
+- HasCasts returning false instead of true ([#46992](https://github.com/laravel/framework/pull/46992))
+
+### Changed
+- Use method on UploadedFile to validate image dimensions ([#46912](https://github.com/laravel/framework/pull/46912))
+- Expose Js::json() helper ([#46935](https://github.com/laravel/framework/pull/46935))
+- Respect parents on middleware priority ([#46972](https://github.com/laravel/framework/pull/46972))
+- Do reconnect when redis throws connection lost error ([#46989](https://github.com/laravel/framework/pull/46989))
+- Throw timeoutException instead of maxAttemptsExceededException when a job times out ([#46968](https://github.com/laravel/framework/pull/46968))
 
 
 ## [v10.9.0 (2023-04-25)](https://github.com/laravel/framework/compare/v10.8.0...v10.9.0)

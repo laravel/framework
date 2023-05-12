@@ -37,9 +37,12 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals($str, e($html));
     }
 
-    /**
-     * @requires PHP >= 8.1
-     */
+    public function testEWithInvalidCodePoints()
+    {
+        $str = mb_convert_encoding('føø bar', 'ISO-8859-1', 'UTF-8');
+        $this->assertEquals('f�� bar', e($str));
+    }
+
     public function testEWithEnums()
     {
         $enumValue = StringBackedEnum::ADMIN_LABEL;

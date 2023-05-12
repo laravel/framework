@@ -30,6 +30,20 @@ class ValidationImageFileRuleTest extends TestCase
         );
     }
 
+    public function testDimensionsWithCustomImageSizeMethod()
+    {
+        $this->fails(
+            File::image()->dimensions(Rule::dimensions()->width(100)->height(100)),
+            new UploadedFileWithCustomImageSizeMethod(stream_get_meta_data($tmpFile = tmpfile())['uri'], 'foo.png'),
+            ['validation.dimensions'],
+        );
+
+        $this->passes(
+            File::image()->dimensions(Rule::dimensions()->width(200)->height(200)),
+            new UploadedFileWithCustomImageSizeMethod(stream_get_meta_data($tmpFile = tmpfile())['uri'], 'foo.png'),
+        );
+    }
+
     protected function fails($rule, $values, $messages)
     {
         $this->assertValidationRules($rule, $values, false, $messages);
@@ -82,5 +96,23 @@ class ValidationImageFileRuleTest extends TestCase
         Facade::clearResolvedInstances();
 
         Facade::setFacadeApplication(null);
+    }
+}
+
+class UploadedFileWithCustomImageSizeMethod extends UploadedFile
+{
+    public function isValid(): bool
+    {
+        return true;
+    }
+
+    public function guessExtension(): string
+    {
+        return 'png';
+    }
+
+    public function dimensions()
+    {
+        return [200, 200];
     }
 }

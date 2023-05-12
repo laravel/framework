@@ -276,6 +276,39 @@ class UrlSigningTest extends TestCase
         }
     }
 
+    public function testSignedMiddlewareIgnoringParameterViaArgumentsWithRelative()
+    {
+        Route::get('/foo/{id}', function (Request $request, $id) {
+        })->name('foo')->middleware('signed:relative,ignore');
+
+        $this->assertIsString('https://fake.test'.URL::signedRoute('foo', ['id' => 1, 'ignore' => 'me'], null, false));
+
+        $response = $this->get('/foo/1');
+        $response->assertStatus(403);
+    }
+
+    public function testSignedMiddlewareIgnoringParameterViaArgumentsWithoutRelative()
+    {
+        Route::get('/foo/{id}', function (Request $request, $id) {
+        })->name('foo')->middleware('signed:ignore');
+
+        $this->assertIsString($url = 'https://fake.test'.URL::signedRoute('foo', ['id' => 1, 'ignore' => 'me'], null, false));
+
+        $response = $this->get('/foo/1');
+        $response->assertStatus(403);
+    }
+
+    public function testSignedMiddlewareIgnoringParameterViaClassAndArguments()
+    {
+        Route::get('/foo/{id}', function (Request $request, $id) {
+        })->name('foo')->middleware(IgnoreParameterMiddleware::relative('test'));
+
+        $this->assertIsString($url = 'https://fake.test'.URL::signedRoute('foo', ['id' => 1, 'ignore' => 'me', 'test' => 'bar'], null, false));
+
+        $response = $this->get('/foo/1');
+        $response->assertStatus(403);
+    }
+
     public function testItCanGenerateMiddlewareDefinitionViaStaticMethod()
     {
         $signature = (string) ValidateSignature::relative();
@@ -283,6 +316,12 @@ class UrlSigningTest extends TestCase
 
         $signature = (string) ValidateSignature::absolute();
         $this->assertSame('Illuminate\Routing\Middleware\ValidateSignature', $signature);
+
+        $signature = (string) ValidateSignature::relative(['foo', 'bar']);
+        $this->assertSame('Illuminate\Routing\Middleware\ValidateSignature:relative,foo,bar', $signature);
+
+        $signature = (string) ValidateSignature::absolute(['foo', 'bar']);
+        $this->assertSame('Illuminate\Routing\Middleware\ValidateSignature:foo,bar', $signature);
     }
 
     protected function createValidateSignatureMiddleware(array $ignore)
@@ -322,4 +361,9 @@ class RoutableInterfaceStub implements UrlRoutable
     {
         //
     }
+}
+
+class IgnoreParameterMiddleware extends ValidateSignature
+{
+    protected $ignore = ['ignore'];
 }
