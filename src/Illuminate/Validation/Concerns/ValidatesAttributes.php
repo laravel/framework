@@ -23,8 +23,10 @@ use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
 use Illuminate\Validation\ValidationData;
 use InvalidArgumentException;
+use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Throwable;
 use ValueError;
 
 trait ValidatesAttributes
@@ -2344,15 +2346,28 @@ trait ValidatesAttributes
     }
 
     /**
-     * Validate that an attribute is a valid UUID.
+     * Validate that an attribute is a valid UUID, or UUID versions.
      *
      * @param  string  $attribute
      * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
      * @return bool
      */
-    public function validateUuid($attribute, $value)
+    public function validateUuid($attribute, $value, $parameters)
     {
-        return Str::isUuid($value);
+        if (! Str::isUuid($value)) {
+            return false;
+        }
+
+        if (empty($parameters)) {
+            return true;
+        }
+
+        try {
+            return in_array(Uuid::fromString($value)->getFields()->getVersion(), $parameters);
+        } catch (Throwable) {
+            return false;
+        }
     }
 
     /**

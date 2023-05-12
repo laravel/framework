@@ -7290,6 +7290,32 @@ class ValidationValidatorTest extends TestCase
         ];
     }
 
+    public function testValidateUuidWithVersion()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, ['v4' => '7292af02-6804-4d46-86ca-479ce7d59347'], ['v1' => 'uuid:4']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['v4' => '7292af02-6804-4d46-86ca-479ce7d59347'], ['v4' => 'uuid:4']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['v4' => '7292af02-6804-4d46-86ca-479ce7d59347'], ['v4' => 'uuid:1,4,2']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['v4' => '7292af02-6804-4d46-86ca-479ce7d59347'], ['v4' => 'uuid:1,2']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['invalid' => '7292af02-6804-4d46-86ca-479ce7d59347'], ['invalid' => 'uuid:0']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['invalid' => '7292af02-6804-0d46-86ca-479ce7d59347'], ['invalid' => 'uuid:0']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['invalid' => '7292af02-6804-0d46-86ca-479ce7d59347'], ['invalid' => 'uuid:null']);
+        $this->assertFalse($v->passes());
+    }
+
     public function testValidateWithValidAscii()
     {
         $trans = $this->getIlluminateArrayTranslator();
