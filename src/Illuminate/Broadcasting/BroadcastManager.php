@@ -202,7 +202,7 @@ class BroadcastManager implements FactoryContract
      * Get a driver instance.
      *
      * @param  string|null  $driver
-     * @return mixed
+     * @return \Illuminate\Contracts\Broadcasting\Broadcaster
      */
     public function connection($driver = null)
     {
@@ -213,7 +213,7 @@ class BroadcastManager implements FactoryContract
      * Get a driver instance.
      *
      * @param  string|null  $name
-     * @return mixed
+     * @return \Illuminate\Contracts\Broadcasting\Broadcaster
      */
     public function driver($name = null)
     {
@@ -435,7 +435,7 @@ class BroadcastManager implements FactoryContract
     /**
      * Get the application instance used by the manager.
      *
-     * @return \Illuminate\Contracts\Foundation\Application
+     * @return \Illuminate\Contracts\Container\Container
      */
     public function getApplication()
     {
