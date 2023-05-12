@@ -505,8 +505,8 @@ class ComponentTagCompiler
                 \s*
                 x[\-\:]slot
                 (?:\:(?<inlineName>\w+(?:-\w+)*))?
-                (?:\s+\:name=(?<boundName>(\"[^\"]+\"|\\\'[^\\\']+\\\'|[^\s>]+)))?
                 (?:\s+name=(?<name>(\"[^\"]+\"|\\\'[^\\\']+\\\'|[^\s>]+)))?
+                (?:\s+\:name=(?<boundName>(\"[^\"]+\"|\\\'[^\\\']+\\\'|[^\s>]+)))?
                 (?<attributes>
                     (?:
                         \s+

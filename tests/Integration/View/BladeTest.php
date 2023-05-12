@@ -155,6 +155,17 @@ class BladeTest extends TestCase
 </div>', trim($content));
     }
 
+    public function test_bound_name_attribute_can_be_used_if_using_short_slot_names_and_not_first_attribute()
+    {
+        $content = Blade::render('<x-input-with-slot>
+    <x-slot:input class="text-input-lg" :name="\'my_form_field\'" data-test="data">Test</x-slot:input>
+</x-input-with-slot>');
+
+        $this->assertSame('<div>
+    <input type="text" class="input text-input-lg" name="my_form_field" data-test="data" />
+</div>', trim($content));
+    }
+
     protected function getEnvironmentSetUp($app)
     {
         $app['config']->set('view.paths', [__DIR__.'/templates']);
