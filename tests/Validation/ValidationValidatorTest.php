@@ -102,6 +102,88 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame('post name is required', $v->errors()->all()[0]);
     }
 
+    public function testNestedErrorMessagesAreRetrievedFromJsonFileOrderDetailedFirst()
+    {
+        $localeFileContent = '
+        {
+            "validation.custom": {
+                "users.*.posts.*.name": {
+                    "required": "post name is required"
+                },
+                "users.*.name": {
+                    "required": "user name is required"
+                }
+            }
+        }
+        ';
+        $messages = json_decode($localeFileContent, true);
+
+        $loader = new ArrayLoader();
+        $loader->addMessages('en', '*', $messages, '*');
+
+        $trans = new Translator($loader, 'en');
+
+        $v = new Validator($trans, [
+            'users' => [
+                [
+                    'name' => 'Taylor Otwell',
+                    'posts' => [
+                        [
+                            'name' => '',
+                        ],
+                    ],
+                ],
+            ],
+        ], [
+            'users.*.name' => ['required'],
+            'users.*.posts.*.name' => ['required'],
+        ]);
+
+        $this->assertFalse($v->passes());
+        $this->assertSame('post name is required', $v->errors()->all()[0]);
+    }
+
+    public function testNestedErrorMessagesAreRetrievedFromJsonFileOrderDetailedLast()
+    {
+        $localeFileContent = '
+        {
+            "validation.custom": {
+                "users.*.name": {
+                    "required": "user name is required"
+                },
+                "users.*.posts.*.name": {
+                    "required": "post name is required"
+                }
+            }
+        }
+        ';
+        $messages = json_decode($localeFileContent, true);
+
+        $loader = new ArrayLoader();
+        $loader->addMessages('en', '*', $messages, '*');
+
+        $trans = new Translator($loader, 'en');
+
+        $v = new Validator($trans, [
+            'users' => [
+                [
+                    'name' => 'Taylor Otwell',
+                    'posts' => [
+                        [
+                            'name' => '',
+                        ],
+                    ],
+                ],
+            ],
+        ], [
+            'users.*.name' => ['required'],
+            'users.*.posts.*.name' => ['required'],
+        ]);
+
+        $this->assertFalse($v->passes());
+        $this->assertSame('post name is required', $v->errors()->all()[0]);
+    }
+
     public function testSometimesWorksOnNestedArrays()
     {
         $trans = $this->getIlluminateArrayTranslator();
