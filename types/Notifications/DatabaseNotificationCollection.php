@@ -7,13 +7,7 @@ use function PHPStan\Testing\assertType;
 
 class CustomNotification extends DatabaseNotification
 {
-    /**
-     * @param  array<int, CustomNotification>  $models
-     */
-    public function newCollection(array $models = []): CustomNotificationCollection
-    {
-        return new CustomNotificationCollection($models);
-    }
+    //
 }
 
 /**
@@ -21,6 +15,7 @@ class CustomNotification extends DatabaseNotification
  */
 class CustomNotificationCollection extends DatabaseNotificationCollection
 {
+    //
 }
 
 $databaseNotificationsCollection = DatabaseNotification::all();
