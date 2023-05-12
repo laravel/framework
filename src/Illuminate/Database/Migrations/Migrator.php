@@ -332,7 +332,7 @@ class Migrator
             return [];
         }
 
-        return tap($this->resetMigrations($migrations, $paths, $pretend), function () {
+        return tap($this->resetMigrations($migrations, Arr::wrap($paths), $pretend), function () {
             if ($this->output) {
                 $this->output->writeln('');
             }
