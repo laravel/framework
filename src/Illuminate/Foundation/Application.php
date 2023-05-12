@@ -19,6 +19,7 @@ use Illuminate\Routing\RoutingServiceProvider;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Env;
+use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
@@ -297,6 +298,24 @@ class Application extends Container implements ApplicationContract, CachesConfig
             \Illuminate\Contracts\Debug\ExceptionHandler::class,
             $afterResolving ?: fn ($handler) => $handler
         );
+
+        return $this;
+    }
+
+    /**
+     * Register the braodcasting services for the application.
+     *
+     * @return $this
+     */
+    public function withBroadcasting()
+    {
+        $this->booted(function () {
+            Broadcast::routes();
+
+            if (file_exists($channels = $this->basePath('routes/channels.php'))) {
+                require $channels;
+            }
+        });
 
         return $this;
     }
