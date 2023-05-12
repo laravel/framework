@@ -77,7 +77,6 @@ class RoutingSortedMiddlewareTest extends TestCase
             'Something',
             'Something',
             'Something',
-            'Something',
             SecondChildStub::class,
             'Otherthing',
             FirstStub::class.':api',
