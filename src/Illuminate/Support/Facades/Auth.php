@@ -28,7 +28,7 @@ use RuntimeException;
  * @method static int|string|null id()
  * @method static bool validate(array $credentials = [])
  * @method static bool hasUser()
- * @method static void setUser(\Illuminate\Contracts\Auth\Authenticatable $user)
+ * @method static \Illuminate\Contracts\Auth\Guard setUser(\Illuminate\Contracts\Auth\Authenticatable $user)
  * @method static bool attempt(array $credentials = [], bool $remember = false)
  * @method static bool once(array $credentials = [])
  * @method static void login(\Illuminate\Contracts\Auth\Authenticatable $user, bool $remember = false)
