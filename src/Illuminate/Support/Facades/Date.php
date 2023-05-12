@@ -21,7 +21,6 @@ use Illuminate\Support\DateFactory;
  * @method static \Illuminate\Support\Carbon createFromTimestamp($timestamp, $tz = null)
  * @method static \Illuminate\Support\Carbon createFromTimestampMs($timestamp, $tz = null)
  * @method static \Illuminate\Support\Carbon createFromTimestampUTC($timestamp)
- * @method static \Illuminate\Support\Carbon createFromId($id)
  * @method static \Illuminate\Support\Carbon createMidnightDate($year = null, $month = null, $day = null, $tz = null)
  * @method static \Illuminate\Support\Carbon|false createSafe($year = null, $month = null, $day = null, $hour = null, $minute = null, $second = null, $tz = null)
  * @method static void disableHumanDiffOption($humanDiffOption)
