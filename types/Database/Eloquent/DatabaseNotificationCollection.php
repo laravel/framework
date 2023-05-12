@@ -26,6 +26,5 @@ class CustomNotificationCollection extends DatabaseNotificationCollection
 $databaseNotificationsCollection = DatabaseNotification::all();
 assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Notifications\DatabaseNotification>', $databaseNotificationsCollection);
 
-
 $customNotificationsCollection = CustomNotification::all();
 assertType('Illuminate\Database\Eloquent\Collection<int, CustomNotification>', $customNotificationsCollection);
