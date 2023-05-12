@@ -1727,6 +1727,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             $this->getUpdatedAtColumn(),
         ]));
 
+        if ($this->usesUniqueIds()) {
+            array_push($defaults, ...$this->uniqueIds());
+        }
+
         $attributes = Arr::except(
             $this->getAttributes(), $except ? array_unique(array_merge($except, $defaults)) : $defaults
         );
