@@ -4,7 +4,7 @@ namespace Illuminate\Queue\Events;
 
 class JobTimeoutOccurred
 {
-     /**
+    /**
      * The connection name.
      *
      * @var string
