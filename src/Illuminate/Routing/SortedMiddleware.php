@@ -74,10 +74,10 @@ class SortedMiddleware extends Collection
     protected function priorityMapIndex($priorityMap, $middleware)
     {
         foreach ($this->middlewareNames($middleware) as $name) {
-            foreach ($priorityMap as $index => $className) {
-                if ($name === $className || is_a($name, $className, true)) {
-                    return $index;
-                }
+            $priorityIndex = array_search($name, $priorityMap);
+            
+            if ($priorityIndex !== false) {
+                return $priorityIndex;
             }
         }
     }
@@ -99,6 +99,14 @@ class SortedMiddleware extends Collection
         if ($interfaces !== false) {
             foreach ($interfaces as $interface) {
                 yield $interface;
+            }
+        }
+        
+        $parents = @class_parents($stripped);
+
+        if ($parents !== false) {
+            foreach ($parents as $parent) {
+                yield $parent;
             }
         }
     }
