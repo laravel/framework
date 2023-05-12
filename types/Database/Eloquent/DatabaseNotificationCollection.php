@@ -1,13 +1,14 @@
 <?php
 
-use function PHPStan\Testing\assertType;
 use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Notifications\DatabaseNotificationCollection;
+
+use function PHPStan\Testing\assertType;
 
 class CustomNotification extends DatabaseNotification
 {
     /**
-     * @param array<int, CustomNotification> $models
+     * @param  array<int, CustomNotification>  $models
      */
     public function newCollection(array $models = []): CustomNotificationCollection
     {
