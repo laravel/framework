@@ -126,39 +126,19 @@ class SupportCarbonTest extends TestCase
 
     public function testCreateFromUid()
     {
-        $ulid = Carbon::createFromUid('01DXH9C4P0ED4AGJJP9CRKQ55C');
+        $ulid = Carbon::createFromId('01DXH9C4P0ED4AGJJP9CRKQ55C');
         $this->assertEquals('2020-01-01 19:30:00.000000', $ulid->toDateTimeString('microsecond'));
 
-        $uuidv1 = Carbon::createFromUid('71513cb4-f071-11ed-a0cf-325096b39f47');
+        $uuidv1 = Carbon::createFromId('71513cb4-f071-11ed-a0cf-325096b39f47');
         $this->assertEquals('2023-05-12 03:02:34.147346', $uuidv1->toDateTimeString('microsecond'));
 
-        $uuidv2 = Carbon::createFromUid('000003e8-f072-21ed-9200-325096b39f47');
+        $uuidv2 = Carbon::createFromId('000003e8-f072-21ed-9200-325096b39f47');
         $this->assertEquals('2023-05-12 03:06:33.529139', $uuidv2->toDateTimeString('microsecond'));
 
-        // NS: af3aca1d-a6aa-33ec-abe5-88dfb02ed276
-        // Name: Laravel
-        $this->assertNull(Carbon::createFromUid('44d5a9b3-f302-35b3-bc7c-94c9f3e57053'));
-
-        $this->assertNull(Carbon::createFromUid('2732c3ce-43c7-4f33-9008-44828906c3f3'));
-
-        // NS: af3aca1d-a6aa-33ec-abe5-88dfb02ed276
-        // Name: Laravel
-        $this->assertNull(Carbon::createFromUid('c75e7122-25af-5f33-b8a0-6c1ba7848f94'));
-
-        $uuidv6 = Carbon::createFromUid('1edf0746-5d1c-6ce8-88ad-e0cb4effa035');
+        $uuidv6 = Carbon::createFromId('1edf0746-5d1c-6ce8-88ad-e0cb4effa035');
         $this->assertEquals('2023-05-12 03:23:43.347428', $uuidv6->toDateTimeString('microsecond'));
 
-        $uuidv7 = Carbon::createFromUid('01880dfa-2825-72e4-acbb-b1e4981cf8af');
+        $uuidv7 = Carbon::createFromId('01880dfa-2825-72e4-acbb-b1e4981cf8af');
         $this->assertEquals('2023-05-12 03:21:18.117000', $uuidv7->toDateTimeString('microsecond'));
-
-        $this->assertNull(Carbon::createFromUid('d036e1a9-81a7-8dff-8eed-acfd28116c84'));
-
-        $this->assertFalse(Carbon::createFromUid(''));
-
-        $this->assertNull(Carbon::createFromUid('00000000-0000-0000-0000-000000000000'));
-
-        $this->assertNull(Carbon::createFromUid('ffffffff-ffff-ffff-ffff-ffffffffffff'));
-
-        $this->assertFalse(Carbon::createFromUid('invalid'));
     }
 }

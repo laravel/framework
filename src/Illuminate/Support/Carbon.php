@@ -5,8 +5,6 @@ namespace Illuminate\Support;
 use Carbon\Carbon as BaseCarbon;
 use Carbon\CarbonImmutable as BaseCarbonImmutable;
 use Illuminate\Support\Traits\Conditionable;
-use Ramsey\Uuid\Exception\InvalidUuidStringException;
-use Ramsey\Uuid\Exception\UnsupportedOperationException;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Uid\Ulid;
 
@@ -24,28 +22,16 @@ class Carbon extends BaseCarbon
     }
 
     /**
-     * Creates a Carbon instance from the ULID or UUID.
+     * Create a Carbon instance from a given ordered UUID or ULID.
      *
-     * Returns "null" if there is no timestamp, or "false" if the UID is invalid.
-     *
-     * @param  \Ramsey\Uuid\Uuid|\Symfony\Component\Uid\Ulid|string  $uid
-     * @return \Illuminate\Support\Carbon|null|false
+     * @param  \Ramsey\Uuid\Uuid|\Symfony\Component\Uid\Ulid|string  $id
+     * @return \Illuminate\Support\Carbon
      */
-    public static function createFromUid($uid)
+    public static function createFromId($id)
     {
-        if (Ulid::isValid($uid)) {
-            return static::createFromInterface(Ulid::fromString($uid)->getDateTime());
-        }
-
-        try {
-            $date = Uuid::fromString($uid)->getDateTime();
-        } catch (InvalidUuidStringException) {
-            return false;
-        } catch (UnsupportedOperationException) {
-            return null;
-        }
-
-        return static::createFromInterface($date);
+        return Ulid::isValid($id)
+            ? static::createFromInterface(Ulid::fromString($id)->getDateTime())
+            : static::createFromInterface(Uuid::fromString($id)->getDateTime());
     }
 
     /**
