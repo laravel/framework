@@ -156,7 +156,20 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $this->assertTrue(str_contains($rolledBack[1], 'users'));
     }
 
-    public function testMigrationsCanBeReset()
+    public function testMigrationsCanBeResetUsingAnString()
+    {
+        $this->migrator->run([__DIR__.'/migrations/one']);
+        $this->assertTrue($this->db->schema()->hasTable('users'));
+        $this->assertTrue($this->db->schema()->hasTable('password_resets'));
+        $rolledBack = $this->migrator->reset(__DIR__.'/migrations/one');
+        $this->assertFalse($this->db->schema()->hasTable('users'));
+        $this->assertFalse($this->db->schema()->hasTable('password_resets'));
+
+        $this->assertTrue(str_contains($rolledBack[0], 'password_resets'));
+        $this->assertTrue(str_contains($rolledBack[1], 'users'));
+    }
+
+    public function testMigrationsCanBeResetUsingAnArray()
     {
         $this->migrator->run([__DIR__.'/migrations/one']);
         $this->assertTrue($this->db->schema()->hasTable('users'));
