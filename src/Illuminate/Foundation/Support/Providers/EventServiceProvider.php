@@ -120,7 +120,7 @@ class EventServiceProvider extends ServiceProvider
      */
     public function shouldDiscoverEvents()
     {
-        return false;
+        return get_class($this) === __CLASS__;
     }
 
     /**
