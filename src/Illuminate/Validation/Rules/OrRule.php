@@ -5,13 +5,11 @@ namespace Illuminate\Validation\Rules;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-use TypeError;
 
 class OrRule implements Rule
 {
     public function __construct(protected $rules)
     {
-        $this->rules = $rules;
     }
 
     public function passes($attribute, $value)
