@@ -177,7 +177,7 @@ class Rule
     /**
      * Get an orRule constraint builder instance.
      *
-     * @param  array  $constraints
+     * @param  array  $rules
      * @return \Illuminate\Validation\Rules\OrRule
      */
     public static function orRule(array $rules)
