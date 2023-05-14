@@ -942,7 +942,7 @@ trait EnumeratesValues
      */
     public static function proxy($method)
     {
-        static::$proxies[] = $method;
+        static::$proxies = array_unique([...static::$proxies, $method]);
     }
 
     /**
