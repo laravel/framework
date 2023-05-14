@@ -4,6 +4,7 @@ namespace Illuminate\Validation;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Validation\Rules\AnyOf;
 use Illuminate\Validation\Rules\Dimensions;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Rules\ExcludeIf;
@@ -177,11 +178,23 @@ class Rule
     /**
      * Get an orRule constraint builder instance.
      *
-     * @param  array  $rules
+     * @param $rule
+     * @param $orRule
      * @return \Illuminate\Validation\Rules\OrRule
      */
-    public static function orRule(array $rules)
+    public static function orRule($rule, $orRule)
     {
-        return new OrRule($rules);
+        return new OrRule($rule, $orRule);
+    }
+
+    /**
+     * Get an anyOf constraint builder instance.
+     *
+     * @param  array  $rules
+     * @return \Illuminate\Validation\Rules\AnyOf
+     */
+    public static function anyOf(array $rules)
+    {
+        return new AnyOf($rules);
     }
 }

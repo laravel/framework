@@ -8,7 +8,7 @@ use Illuminate\Support\Str;
 
 class OrRule implements Rule
 {
-    public function __construct(protected $rules)
+    public function __construct(protected $rule, protected $orRule)
     {
     }
 
@@ -16,20 +16,18 @@ class OrRule implements Rule
     {
         $attribute = str_replace('.', Str::random(), $attribute);
 
-        foreach ($this->rules as $rule) {
-            $data = [
-                $attribute => $value,
-            ];
-            $rules = [
-                $attribute => $rule,
-            ];
+        $data = [
+            $attribute => $value,
+        ];
+        $rules = [
+            $attribute => $this->rule,
+        ];
+        $orRules = [
+            $attribute => $this->orRule,
+        ];
 
-            if (Validator::make($data, $rules)->passes()) {
-                return true;
-            }
-        }
-
-        return false;
+        return Validator::make($data, $rules)->passes()
+            || Validator::make($data, $orRules)->passes();
     }
 
     public function message()
