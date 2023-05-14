@@ -815,7 +815,7 @@ class Str
                 $string .= substr(str_replace(['/', '+', '='], '', base64_encode($bytes)), 0, $size);
             }
 
-            return $prefix . $string . $suffix;
+            return $prefix.$string.$suffix;
         })($length, $prefix, $suffix);
     }
 
