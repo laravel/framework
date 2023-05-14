@@ -59,7 +59,7 @@ class FoundationHelpersTest extends TestCase
             }, [
                 Exception::class => function () {
                     return 'rescued!';
-                }
+                },
             ])
         );
 
@@ -73,7 +73,7 @@ class FoundationHelpersTest extends TestCase
                 },
                 function () {
                     return 'last resort!';
-                }
+                },
             ])
         );
     }
