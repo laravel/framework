@@ -7,6 +7,7 @@ use Illuminate\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
+use LogicException;
 use Orchestra\Testbench\TestCase;
 
 class FoundationHelpersTest extends TestCase
@@ -49,6 +50,31 @@ class FoundationHelpersTest extends TestCase
             rescue(function () use ($testClass) {
                 $testClass->test([]);
             }, 'rescued!')
+        );
+
+        $this->assertEquals(
+            'rescued!',
+            rescue(function () {
+                throw new Exception();
+            }, [
+                Exception::class => function () {
+                    return 'rescued!';
+                }
+            ])
+        );
+
+        $this->assertEquals(
+            'last resort!',
+            rescue(function () {
+                throw new LogicException();
+            }, [
+                Exception::class => function () {
+                    return 'rescued!';
+                },
+                function () {
+                    return 'last resort!';
+                }
+            ])
         );
     }
 
