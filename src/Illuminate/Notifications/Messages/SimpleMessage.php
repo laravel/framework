@@ -258,6 +258,24 @@ class SimpleMessage
     }
 
     /**
+     * Configure the "call to action" button if the given condition is true.
+     *
+     * @param  bool  $condition
+     * @param  string  $text
+     * @param  string  $url
+     * @return $this
+     */
+    public function actionIf($condition, $text, $url)
+    {
+        if ($condition) {
+            $this->actionText = $text;
+            $this->actionUrl = $url;
+        }
+
+        return $this;
+    }
+
+    /**
      * Set the name of the mailer that should send the notification.
      *
      * @param  string  $mailer
