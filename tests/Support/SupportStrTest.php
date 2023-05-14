@@ -502,6 +502,7 @@ class SupportStrTest extends TestCase
         $randomInteger = random_int(1, 100);
         $this->assertEquals($randomInteger, strlen(Str::random($randomInteger)));
         $this->assertIsString(Str::random());
+        $this->assertEquals($randomInteger + 8, strlen(Str::random($randomInteger, 'foo_', '_bar')));
     }
 
     /** @test */

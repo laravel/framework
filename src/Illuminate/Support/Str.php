@@ -800,9 +800,9 @@ class Str
      * @param  int  $length
      * @return string
      */
-    public static function random($length = 16)
+    public static function random($length = 16, $prefix = '', $suffix = '')
     {
-        return (static::$randomStringFactory ?? function ($length) {
+        return (static::$randomStringFactory ?? function ($length, $prefix, $suffix) {
             $string = '';
 
             while (($len = strlen($string)) < $length) {
@@ -815,8 +815,8 @@ class Str
                 $string .= substr(str_replace(['/', '+', '='], '', base64_encode($bytes)), 0, $size);
             }
 
-            return $string;
-        })($length);
+            return $prefix . $string . $suffix;
+        })($length, $prefix, $suffix);
     }
 
     /**
