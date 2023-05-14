@@ -743,6 +743,10 @@ if (! function_exists('rescue')) {
                 report($e);
             }
 
+            if (is_array($rescue)) {
+                $rescue = $rescue[get_class($e)] ?? $rescue[0] ?? null;
+            }
+
             return value($rescue, $e);
         }
     }
