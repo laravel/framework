@@ -8,6 +8,7 @@ use Illuminate\Console\Signals;
 use Illuminate\Console\View\Components\Line;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Bootstrap\HandleExceptions;
+use Illuminate\Http\Testing\MimeType;
 use Illuminate\Queue\Queue;
 use Illuminate\Routing\ResourceRegistrar;
 use Illuminate\Routing\Route;
@@ -77,7 +78,7 @@ abstract class TestCase extends BaseTestCase
     protected $setUpHasRun = false;
 
     /**
-     * Flush any static testing helpers.
+     * Flush framework static values.
      *
      * @var bool
      */
@@ -266,16 +267,17 @@ abstract class TestCase extends BaseTestCase
         Sleep::fake(false);
 
         if ($this->flushStatics) {
-            Str::createUuidsNormally();
-            Str::createRandomStringsNormally();
-            Lottery::determineResultNormally();
+            DateFactory::useDefault();
+            Env::enablePutenv();
             File::$defaultCallback = null;
+            Lottery::determineResultNormally();
+            MimeType::flush();
             Password::$defaultCallback = null;
+            Pluralizer::useLanguage('english');
             ResourceRegistrar::setParameters([]);
             ResourceRegistrar::singularParameters();
-            DateFactory::useDefault();
-            Pluralizer::useLanguage('english');
-            Env::enablePutenv();
+            Str::createRandomStringsNormally();
+            Str::createUuidsNormally();
         }
 
         if ($this->callbackException) {

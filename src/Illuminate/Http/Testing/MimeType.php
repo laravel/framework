@@ -62,4 +62,14 @@ class MimeType
     {
         return Arr::first(self::getMimeTypes()->getExtensions($mimeType));
     }
+
+    /**
+     * Flush the cached instance.
+     *
+     * @return void
+     */
+    public static function flush()
+    {
+        self::$mime = null;
+    }
 }
