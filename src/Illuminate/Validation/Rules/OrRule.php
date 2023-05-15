@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 class OrRule implements Rule
 {
     /**
-     * Create a new or validation rule based on two rules
+     * Create a new or validation rule based on two rules.
      *
      * @return void
      */

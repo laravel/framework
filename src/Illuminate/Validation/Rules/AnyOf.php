@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 class AnyOf implements Rule
 {
     /**
-     * Create a new any_of validation rule that returns true if any of the rules is true
+     * Create a new any_of validation rule that returns true if any of the rules is true.
      *
      * @return void
      */
