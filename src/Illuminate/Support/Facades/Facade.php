@@ -316,9 +316,9 @@ abstract class Facade
     /**
      * Get the application default providers.
      */
-    public static function defaultProviders()
+    public static function defaultProviders(?array $providers = null)
     {
-        return new DefaultProviders;
+        return new DefaultProviders($providers);
     }
 
     /**
