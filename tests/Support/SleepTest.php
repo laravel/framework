@@ -414,4 +414,54 @@ class SleepTest extends TestCase
             $this->assertSame("The expected sleep was found [0] times instead of [1].\nFailed asserting that 0 is identical to 1.", $e->getMessage());
         }
     }
+
+    public function testItCanCreateMacrosViaMacroable()
+    {
+        Sleep::fake();
+
+        Sleep::macro('orSomeConfiguredAmountOfTime', function (): Sleep {
+            /** @var Sleep $this */
+            return $this->for(1.234)->seconds();
+        });
+
+        Sleep::macro('andSomeConfiguredAmountOfTime', function (): Sleep {
+            /** @var Sleep $this */
+            return $this->and(567)->microseconds();
+        });
+
+        // Sanity check (1 second default)
+        $sleep = Sleep::for(1)->second();
+        $this->assertSame($sleep->duration->totalMicroseconds, 1000000);
+
+        // A macro can specify a new duration
+        $sleep = $sleep->orSomeConfiguredAmountOfTime();
+        $this->assertSame($sleep->duration->totalMicroseconds, 1234000);
+
+        // A macro can supplement an existing duration
+        $sleep = $sleep->andSomeConfiguredAmountOfTime();
+        $this->assertSame($sleep->duration->totalMicroseconds, 1234567);
+    }
+
+    public function testItCanCreateConditionallyDefineSleepsViaConditionable()
+    {
+        Sleep::fake();
+
+        $sleep = Sleep::for(1)
+            ->second()
+            ->when(
+                true,
+                fn (Sleep $sleep) => $sleep->and(2)->milliseconds(),
+                fn (Sleep $sleep) => $sleep->and(3)->milliseconds(),
+        );
+        $this->assertSame($sleep->duration->totalMicroseconds, 1002000);
+
+        $sleep = Sleep::for(1)
+            ->second()
+            ->when(
+                false,
+                fn (Sleep $sleep) => $sleep->and(2)->milliseconds(),
+                fn (Sleep $sleep) => $sleep->and(3)->milliseconds(),
+        );
+        $this->assertSame($sleep->duration->totalMicroseconds, 1003000);
+    }
 }
