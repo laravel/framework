@@ -249,13 +249,17 @@ class ResourceRegistrar
             $methods = array_diff($methods, (array) $options['except']);
         }
 
+        if (isset($options['apiSingleton'])) {
+            $methods = array_diff($methods, ['create', 'edit']);
+        }
+
         if (isset($options['creatable'])) {
             $methods = isset($options['apiSingleton'])
                             ? array_merge(['store', 'destroy'], $methods)
                             : array_merge(['create', 'store', 'destroy'], $methods);
 
             return $this->getResourceMethods(
-                $methods, array_values(Arr::except($options, ['creatable']))
+                $methods, Arr::except($options, ['creatable'])
             );
         }
 
@@ -263,11 +267,11 @@ class ResourceRegistrar
             $methods = array_merge(['destroy'], $methods);
 
             return $this->getResourceMethods(
-                $methods, array_values(Arr::except($options, ['destroyable']))
+                $methods, Arr::except($options, ['destroyable'])
             );
         }
 
-        return $methods;
+        return array_values($methods);
     }
 
     /**

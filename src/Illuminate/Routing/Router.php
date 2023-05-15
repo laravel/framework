@@ -427,16 +427,17 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function apiSingleton($name, $controller, array $options = [])
     {
-        $only = ['show', 'update', 'destroy'];
-
-        if (isset($options['except'])) {
-            $only = array_diff($only, (array) $options['except']);
+        if ($this->container && $this->container->bound(ResourceRegistrar::class)) {
+            $registrar = $this->container->make(ResourceRegistrar::class);
+        } else {
+            $registrar = new ResourceRegistrar($this);
         }
 
-        return $this->singleton($name, $controller, array_merge([
-            'only' => $only,
-            'apiSingleton' => true,
-        ], $options));
+        return new PendingSingletonResourceRegistration(
+            $registrar, $name, $controller, array_merge([
+                'apiSingleton' => true,
+            ], $options),
+        );
     }
 
     /**
