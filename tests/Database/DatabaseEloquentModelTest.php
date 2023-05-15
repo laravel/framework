@@ -1275,8 +1275,13 @@ class DatabaseEloquentModelTest extends TestCase
 
         $model = new EloquentModelStub;
         $model->fillable(['name', 'age']);
-        $model->fill(['name' => 'foo', 'age' => 'bar', 'except' => 'baz'], 'except');
-        $model->fill(['name' => 'foo', 'age' => 'bar', 'except' => 'baz', 'except2' => 'baz'], ['except', 'except2']);
+        $model->fill(['name' => 'foo', 'age' => 'bar', 'address' => 'baz']);
+        $this->expectException(MassAssignmentException::class);
+
+        $model = new EloquentModelStub;
+        $model->fillable(['name', 'age']);
+        $model->fill(['name' => 'foo', 'age' => 'bar', 'address' => 'baz'], 'address');
+        $model->fill(['name' => 'foo', 'age' => 'bar', 'address' => 'baz', 'number' => 123], ['address', 'number']);
         $this->assertSame('foo', $model->name);
         $this->assertSame('bar', $model->age);
     }
