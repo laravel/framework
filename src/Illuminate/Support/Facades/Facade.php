@@ -318,7 +318,7 @@ abstract class Facade
      */
     public static function defaultProviders()
     {
-        return new DefaultProviders();
+        return new DefaultProviders;
     }
 
     /**
