@@ -456,7 +456,7 @@ class SleepTest extends TestCase
                 true,
                 fn (Sleep $sleep) => $sleep->and(2)->milliseconds(),
                 fn (Sleep $sleep) => $sleep->and(3)->milliseconds(),
-        );
+            );
         $this->assertSame($sleep->duration->totalMicroseconds, 1002000);
 
         $sleep = Sleep::for(1)
@@ -465,7 +465,7 @@ class SleepTest extends TestCase
                 false,
                 fn (Sleep $sleep) => $sleep->and(2)->milliseconds(),
                 fn (Sleep $sleep) => $sleep->and(3)->milliseconds(),
-        );
+            );
         $this->assertSame($sleep->duration->totalMicroseconds, 1003000);
     }
 
