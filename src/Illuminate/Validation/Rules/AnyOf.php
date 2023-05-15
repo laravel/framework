@@ -45,7 +45,7 @@ class AnyOf implements ValidationRule
             }
         }
 
-        if(!$passes) {
+        if (! $passes) {
             $fail($this->message());
         }
     }
