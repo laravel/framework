@@ -3641,6 +3641,16 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Remove the "where" bindings from the current query.
+     *
+     * @return void
+     */
+    public function removeWhereBindings()
+    {
+        unset($this->bindings['where'], $this->wheres);
+    }
+
+    /**
      * Get the raw array of bindings.
      *
      * @return array
