@@ -2,6 +2,9 @@
 
 namespace Illuminate\Queue;
 
+use Illuminate\Database\Eloquent\Concerns\HasRelationships;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Queue\Attributes\WithoutRelations;
 use ReflectionClass;
 use ReflectionProperty;
 
@@ -37,6 +40,21 @@ trait SerializesModels
 
             if ($property->hasDefaultValue() && $value === $property->getDefaultValue()) {
                 continue;
+            }
+
+            $attributes = $property->getAttributes(WithoutRelations::class);
+
+            if ($attributes && in_array(HasRelationships::class, class_uses_recursive($value))) {
+                $without = $attributes[0]->newInstance()->exclude;
+                if ($without === ['*']) {
+                    $value = $value->withoutRelations();
+                }
+                else {
+                    $value = clone $value;
+                    foreach($without as $relationName) {
+                        $value->unsetRelation($relationName);
+                    }
+                }
             }
 
             $name = $property->getName();

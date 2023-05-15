@@ -6,7 +6,9 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Queue\Attributes\WithoutRelations;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Arr;
 use LogicException;
 use Orchestra\Testbench\TestCase;
 use Schema;
@@ -329,6 +331,48 @@ class ModelSerializationTest extends TestCase
 
         $this->assertTrue(true);
     }
+
+    public function test_serialize_without_relations()
+    {
+        $order = tap(Order::create(), function (Order $order) {
+            $order->wasRecentlyCreated = false;
+        });
+
+        $product1 = Product::create();
+        $product2 = Product::create();
+
+        Line::create(['order_id' => $order->id, 'product_id' => $product1->id]);
+        Line::create(['order_id' => $order->id, 'product_id' => $product2->id]);
+
+        $order->load('line.product', 'lines', 'lines.product', 'products');
+
+        $nestedSerialized = serialize(new WithoutAnyRelationsJobTestClass($order));
+        $nestedUnSerialized = unserialize($nestedSerialized);
+
+        $this->assertEquals([], $nestedUnSerialized->someModel->getRelations());
+    }
+
+    public function test_serialize_without_particular_relations()
+    {
+        $order = tap(Order::create(), function (Order $order) {
+            $order->wasRecentlyCreated = false;
+        });
+
+        $product1 = Product::create();
+        $product2 = Product::create();
+
+        Line::create(['order_id' => $order->id, 'product_id' => $product1->id]);
+        Line::create(['order_id' => $order->id, 'product_id' => $product2->id]);
+
+        $order->load('line.product', 'lines', 'lines.product', 'products');
+
+        $nestedSerialized = serialize(new ExcludeOnlyParticularRelationsJobTestClass($order));
+        $nestedUnSerialized = unserialize($nestedSerialized);
+
+        $withoutLines = $order->getRelations();
+        unset($withoutLines['lines']);
+        $this->assertEquals($withoutLines, $nestedUnSerialized->someModel->getRelations());
+    }
 }
 
 trait TraitBootsAndInitializersTest
@@ -520,5 +564,28 @@ class CollectionSerializationTestClass
     public function __construct($users)
     {
         $this->users = $users;
+    }
+}
+
+class WithoutAnyRelationsJobTestClass
+{
+    use SerializesModels;
+
+    public function __construct(
+        #[WithoutRelations]
+        public $someModel
+    ) {}
+}
+
+class ExcludeOnlyParticularRelationsJobTestClass
+{
+    use SerializesModels;
+
+    #[WithoutRelations(['lines'])]
+    public Model $someModel;
+
+    public function __construct($someModel)
+    {
+        $this->someModel = $someModel;
     }
 }
