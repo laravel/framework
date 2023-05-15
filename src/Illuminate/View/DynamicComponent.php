@@ -169,4 +169,24 @@ EOF;
 
         return static::$compiler;
     }
+
+    /**
+     * Forget the cached compiler.
+     *
+     * @return void
+     */
+    public static function forgetCompiler()
+    {
+        static::$compiler = null;
+    }
+
+    /**
+     * Forget the cached component classes.
+     *
+     * @return void
+     */
+    public static function forgetComponentClasses()
+    {
+        static::$componentClasses = [];
+    }
 }

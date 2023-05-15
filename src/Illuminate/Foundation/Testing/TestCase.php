@@ -28,6 +28,7 @@ use Illuminate\Validation\Rules\File;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\View\Compilers\BladeCompiler;
 use Illuminate\View\Component;
+use Illuminate\View\DynamicComponent;
 use Mockery;
 use Mockery\Exception\InvalidCountException;
 use PHPUnit\Framework\TestCase as BaseTestCase;
@@ -266,8 +267,8 @@ abstract class TestCase extends BaseTestCase
         Component::flushCache();
         Component::forgetComponentsResolver();
         Component::forgetFactory();
-        Queue::createPayloadUsing(null);
         HandleExceptions::forgetApp();
+        Queue::createPayloadUsing(null);
         Sleep::fake(false);
 
         if ($this->flushStatics) {
@@ -279,6 +280,8 @@ abstract class TestCase extends BaseTestCase
             MimeType::flush();
             Password::$defaultCallback = null;
             Pluralizer::useLanguage('english');
+            DynamicComponent::forgetCompiler();
+            DynamicComponent::forgetComponentClasses();
             QueueCapsuleManager::flushGlobal();
             ResourceRegistrar::setParameters([]);
             ResourceRegistrar::singularParameters();
