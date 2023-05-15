@@ -29,7 +29,6 @@ class OrRule implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         $attribute = str_replace('.', Str::random(), $attribute);
-
         $data = [
             $attribute => $value,
         ];
