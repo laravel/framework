@@ -21,9 +21,9 @@ class AnyOf implements ValidationRule
     /**
      * Determine if the validation rule passes.
      *
-     * @param string $attribute
-     * @param mixed $value
-     * @param Closure $fail
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  Closure  $fail
      * @return void
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
