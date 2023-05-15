@@ -162,9 +162,10 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
 
         $path = $this->getPath($name);
 
-        // Next, We will check to see if the class already exists. If it does, we don't want
-        // to create the class and overwrite the user's code. So, we will bail out so the
-        // code is untouched. Otherwise, we will continue generating this class' files.
+        // Next, We will check to see if the class already exists. If it does and is not supplementable,
+        // we don't want to create the class and overwrite the user's code. So, we will bail out so the
+        // code is untouched. If the class is supplementable, we don`t touch one but keep processing options.
+        // Otherwise, we will continue generating this class' files.
         if ((! $this->hasOption('force') ||
              ! $this->option('force')) &&
              $this->alreadyExists($this->getNameInput())) {
