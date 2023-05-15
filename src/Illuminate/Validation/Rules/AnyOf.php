@@ -55,6 +55,6 @@ class AnyOf implements Rule
 
         return $message === 'validation.any_of'
             ? ['None of the specified field rules is true.']
-            : $message;
+            : [$message];
     }
 }

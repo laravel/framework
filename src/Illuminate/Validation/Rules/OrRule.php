@@ -53,6 +53,6 @@ class OrRule implements Rule
 
         return $message === 'validation.or_rule'
             ? ['None of the specified field rules is true.']
-            : $message;
+            : [$message];
     }
 }
