@@ -12,7 +12,6 @@ parameters:
     - "#Class [a-zA-Z0-9\\\\_]+ not found.#"
     - "#has invalid type#"
     - "#should always throw an exception or terminate script execution#"
-    - "#Function GuzzleHttp\\\\Psr7#"
     - "#Instantiated class [a-zA-Z0-9\\\\_]+ not found.#"
     - "#Unsafe usage of new static#"
   excludePaths:
