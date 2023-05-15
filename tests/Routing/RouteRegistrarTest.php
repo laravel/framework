@@ -592,6 +592,19 @@ class RouteRegistrarTest extends TestCase
         $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.destroy'));
     }
 
+    public function testCanLimitAndExcludeMethodsOnRegisteredResource()
+    {
+        $this->router->resource('users', RouteRegistrarControllerStub::class)
+                     ->only('index', 'show', 'destroy')
+                     ->except('destroy');
+
+        $this->assertCount(2, $this->router->getRoutes());
+
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.index'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.show'));
+        $this->assertFalse($this->router->getRoutes()->hasNamedRoute('users.destroy'));
+    }
+
     public function testCanSetShallowOptionOnRegisteredResource()
     {
         $this->router->resource('users.tasks', RouteRegistrarControllerStub::class)->shallow();
