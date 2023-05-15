@@ -178,11 +178,11 @@ class Rule
     /**
      * Get an orRule constraint builder instance.
      *
-     * @param $rule
-     * @param $orRule
+     * @param mixed $rule
+     * @param mixed $orRule
      * @return \Illuminate\Validation\Rules\OrRule
      */
-    public static function orRule($rule, $orRule)
+    public static function orRule(mixed $rule, mixed $orRule)
     {
         return new OrRule($rule, $orRule);
     }

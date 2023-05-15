@@ -8,11 +8,24 @@ use Illuminate\Support\Str;
 
 class OrRule implements Rule
 {
-    public function __construct(protected $rule, protected $orRule)
+    /**
+     * Create a new or validation rule based on two rules
+     *
+     * @return void
+     */
+    public function __construct(protected mixed $rule, protected mixed $orRule)
     {
     }
 
-    public function passes($attribute, $value)
+    /**
+     * Determine if the validation rule passes.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     *
+     * @return bool
+     */
+    public function passes($attribute, $value): bool
     {
         $attribute = str_replace('.', Str::random(), $attribute);
 
@@ -30,8 +43,17 @@ class OrRule implements Rule
             || Validator::make($data, $orRules)->passes();
     }
 
+    /**
+     * Get the validation error message.
+     *
+     * @return array
+     */
     public function message()
     {
-        return 'None of the specified field rules is applicable.';
+        $message = trans('validation.or_rule');
+
+        return $message === 'validation.or_rule'
+            ? ['None of the specified field rules is true.']
+            : $message;
     }
 }

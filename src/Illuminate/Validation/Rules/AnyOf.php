@@ -8,11 +8,24 @@ use Illuminate\Support\Str;
 
 class AnyOf implements Rule
 {
+    /**
+     * Create a new any_of validation rule that returns true if any of the rules is true
+     *
+     * @return void
+     */
     public function __construct(protected $rules)
     {
     }
 
-    public function passes($attribute, $value)
+    /**
+     * Determine if the validation rule passes.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     *
+     * @return bool
+     */
+    public function passes($attribute, $value): bool
     {
         $attribute = str_replace('.', Str::random(), $attribute);
 
@@ -32,8 +45,17 @@ class AnyOf implements Rule
         return false;
     }
 
+    /**
+     * Get the validation error message.
+     *
+     * @return array
+     */
     public function message()
     {
-        return 'None of the specified field rules is applicable.';
+        $message = trans('validation.any_of');
+
+        return $message === 'validation.any_of'
+            ? ['None of the specified field rules is true.']
+            : $message;
     }
 }
