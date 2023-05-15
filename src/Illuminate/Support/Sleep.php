@@ -4,7 +4,6 @@ namespace Illuminate\Support;
 
 use Carbon\Carbon;
 use Carbon\CarbonInterval;
-use Carbon\Exceptions\InvalidCastException;
 use DateInterval;
 use Illuminate\Support\Traits\Macroable;
 use PHPUnit\Framework\Assert as PHPUnit;
