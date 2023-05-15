@@ -116,7 +116,7 @@ class RouteSingletonTest extends TestCase
 
     public function testDestroyableSingleton()
     {
-        Route::singleton('avatar', SingletonTestController::class)->destroyable();
+        Route::singleton('avatar', CreatableSingletonTestController::class)->destroyable();
 
         $this->assertSame('http://localhost/avatar', route('avatar.show'));
         $response = $this->get('/avatar');
