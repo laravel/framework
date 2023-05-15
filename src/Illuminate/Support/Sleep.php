@@ -113,7 +113,7 @@ class Sleep
      * @param  \DateInterval|int|float  $duration
      * @return $this
      */
-    public function duration($duration)
+    protected function duration($duration)
     {
         if (! $duration instanceof DateInterval) {
             $this->duration = CarbonInterval::microsecond(0);
