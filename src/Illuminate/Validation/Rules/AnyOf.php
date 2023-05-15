@@ -2,11 +2,12 @@
 
 namespace Illuminate\Validation\Rules;
 
-use Illuminate\Contracts\Validation\Rule;
+use Closure;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
-class AnyOf implements Rule
+class AnyOf implements ValidationRule
 {
     /**
      * Create a new any_of validation rule that returns true if any of the rules is true.
@@ -20,13 +21,14 @@ class AnyOf implements Rule
     /**
      * Determine if the validation rule passes.
      *
-     * @param  string  $attribute
+     * @param string $attribute
      * @param  mixed  $value
      * @return bool
      */
-    public function passes($attribute, $value): bool
+    public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         $attribute = str_replace('.', Str::random(), $attribute);
+        $passes = false;
 
         foreach ($this->rules as $rule) {
             $data = [
@@ -37,11 +39,14 @@ class AnyOf implements Rule
             ];
 
             if (Validator::make($data, $rules)->passes()) {
-                return true;
+                $passes = true;
+                break;
             }
         }
 
-        return false;
+        if (!$passes) {
+            $fail($this->message());
+        }
     }
 
     /**

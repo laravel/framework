@@ -2,11 +2,12 @@
 
 namespace Illuminate\Validation\Rules;
 
-use Illuminate\Contracts\Validation\Rule;
+use Closure;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
-class OrRule implements Rule
+class OrRule implements ValidationRule
 {
     /**
      * Create a new or validation rule based on two rules.
@@ -20,11 +21,12 @@ class OrRule implements Rule
     /**
      * Determine if the validation rule passes.
      *
-     * @param  string  $attribute
-     * @param  mixed  $value
-     * @return bool
+     * @param string $attribute
+     * @param mixed $value
+     * @param Closure $fail
+     * @return void
      */
-    public function passes($attribute, $value): bool
+    public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         $attribute = str_replace('.', Str::random(), $attribute);
 
@@ -38,8 +40,9 @@ class OrRule implements Rule
             $attribute => $this->orRule,
         ];
 
-        return Validator::make($data, $rules)->passes()
-            || Validator::make($data, $orRules)->passes();
+        if(Validator::make($data, $rules)->fails() && Validator::make($data, $orRules)->fails()) {
+            $fail($this->message());
+        }
     }
 
     /**
