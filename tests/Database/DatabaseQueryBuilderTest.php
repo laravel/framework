@@ -5008,7 +5008,7 @@ SQL;
 
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results, $ts) {
             $this->assertEquals(
-                '(select "id", "start_time" as "created_at", \'video\' as type from "videos" where ("start_time" < ?)) union (select "id", "created_at", \'news\' as type from "news" where ("start_time" < ?)) order by "created_at" asc limit 17',
+                '(select "id", "start_time" as "created_at", \'video\' as type from "videos" where ("start_time" < ?)) union (select "id", "created_at", \'news\' as type from "news" where ("start_time" < ?)) order by "created_at" desc limit 17',
                 $builder->toSql());
             $this->assertEquals([$ts], $builder->bindings['where']);
             $this->assertEquals([$ts], $builder->bindings['union']);
