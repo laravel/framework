@@ -33,6 +33,7 @@ class PrecognitionTest extends TestCase
         $response = $this->get('test-route', ['Precognition' => 'true']);
 
         $response->assertNoContent();
+        $response->assertHeader('Precognition-Success', 'true');
         $this->assertTrue($this->app['ClassWasInstantiated']);
     }
 
@@ -45,6 +46,7 @@ class PrecognitionTest extends TestCase
         $response = $this->get('test-route', ['Precognition' => 'true']);
 
         $response->assertNoContent();
+        $response->assertHeader('Precognition-Success', 'true');
         $this->assertTrue($this->app['ClassWasInstantiated']);
     }
 
@@ -75,6 +77,7 @@ class PrecognitionTest extends TestCase
         $response = $this->get('test-route', ['Precognition' => 'true']);
 
         $response->assertNoContent();
+        $response->assertHeader('Precognition-Success', 'true');
         $response->assertHeader('Precognition', 'true');
         $response->assertHeader('Vary', 'Precognition');
     }
@@ -94,6 +97,7 @@ class PrecognitionTest extends TestCase
         $response->assertOk();
         $response->assertJson(['expected' => 'response']);
         $response->assertHeader('Precognition', 'true');
+        $response->assertHeaderMissing('Precognition-Success');
     }
 
     public function testItCanExcludeValidationRulesWhenPrecognitiveWithFormRequest()
@@ -109,6 +113,7 @@ class PrecognitionTest extends TestCase
         ]);
 
         $response->assertStatus(422);
+        $response->assertHeaderMissing('Precognition-Success');
         $response->assertJsonPath('errors', [
             'required_integer' => [
                 'The required integer field must be an integer.',
@@ -127,6 +132,7 @@ class PrecognitionTest extends TestCase
         ]);
 
         $response->assertStatus(422);
+        $response->assertHeaderMissing('Precognition-Success');
         $response->assertJsonPath('errors', [
             'required_integer' => [
                 'The required integer field must be an integer.',
@@ -152,6 +158,7 @@ class PrecognitionTest extends TestCase
         ]);
 
         $response->assertStatus(422);
+        $response->assertHeaderMissing('Precognition-Success');
         $response->assertJsonPath('errors', [
             'optional_integer_1' => [
                 'The optional integer 1 field must be an integer.',
@@ -178,6 +185,7 @@ class PrecognitionTest extends TestCase
         ]);
 
         $response->assertNoContent();
+        $response->assertHeader('Precognition-Success', 'true');
     }
 
     public function testItAppliesHeadersWhenExceptionThrownInPrecognition()
@@ -194,6 +202,7 @@ class PrecognitionTest extends TestCase
         $response->assertNotFound();
         $response->assertHeader('Precognition', 'true');
         $response->assertHeader('Vary', 'Precognition');
+        $response->assertHeaderMissing('Precognition-Success');
     }
 
     public function testItAppliesHeadersWhenFlowControlExceptionIsThrown()
@@ -208,6 +217,7 @@ class PrecognitionTest extends TestCase
         $response->assertForbidden();
         $response->assertHeader('Precognition', 'true');
         $response->assertHeader('Vary', 'Precognition');
+        $response->assertHeaderMissing('Precognition-Success');
 
         // Check with Authorize middleware last...
         Route::get('test-route-after', fn () => fail())
@@ -218,6 +228,7 @@ class PrecognitionTest extends TestCase
         $response->assertForbidden();
         $response->assertHeader('Precognition', 'true');
         $response->assertHeader('Vary', 'Precognition');
+        $response->assertHeaderMissing('Precognition-Success');
     }
 
     public function testItCanReturnValuesFromPrecognitionClosure()
@@ -237,6 +248,7 @@ class PrecognitionTest extends TestCase
         $response = $this->get('test-route');
 
         $response->assertOk();
+        $response->assertHeaderMissing('Precognition-Success');
         $response->assertExactJson([
             'first' => 'expected',
             'second' => 'values',
@@ -261,6 +273,7 @@ class PrecognitionTest extends TestCase
         $response->assertOk();
         $response->assertJson(['expected' => 'response']);
         $response->assertHeaderMissing('Precognition');
+        $response->assertHeaderMissing('Precognition-Success');
     }
 
     public function testArbitraryBailResponseIsParsedToResponse()
@@ -282,6 +295,7 @@ class PrecognitionTest extends TestCase
         $response->assertJson(['expected' => 'response']);
         $response->assertHeader('Precognition', 'true');
         $response->assertHeader('Vary', 'Precognition');
+        $response->assertHeaderMissing('Precognition-Success');
     }
 
     public function testClientCanSpecifyInputsToValidateWhenUsingControllerValidate()
@@ -300,6 +314,7 @@ class PrecognitionTest extends TestCase
         ]);
 
         $response->assertStatus(422);
+        $response->assertHeaderMissing('Precognition-Success');
         $response->assertJsonPath('errors', [
             'optional_integer_1' => [
                 'The optional integer 1 field must be an integer.',
@@ -326,6 +341,7 @@ class PrecognitionTest extends TestCase
         ]);
 
         $response->assertStatus(422);
+        $response->assertHeaderMissing('Precognition-Success');
         $response->assertJsonPath('errors', [
             'optional_integer_1' => [
                 'The optional integer 1 field must be an integer.',
@@ -363,6 +379,7 @@ class PrecognitionTest extends TestCase
         ]);
 
         $response->assertStatus(422);
+        $response->assertHeaderMissing('Precognition-Success');
         $response->assertJsonPath('errors', [
             'optional_integer_1' => [
                 'The optional integer 1 field must be an integer.',
@@ -401,6 +418,7 @@ class PrecognitionTest extends TestCase
         ]);
 
         $response->assertStatus(422);
+        $response->assertHeaderMissing('Precognition-Success');
         $response->assertJsonPath('errors', [
             'optional_integer_1' => [
                 'The optional integer 1 field must be an integer.',
@@ -427,6 +445,7 @@ class PrecognitionTest extends TestCase
         ]);
 
         $response->assertStatus(422);
+        $response->assertHeaderMissing('Precognition-Success');
         $response->assertJsonPath('errors', [
             'optional_integer_1' => [
                 'The optional integer 1 field must be an integer.',
@@ -450,6 +469,7 @@ class PrecognitionTest extends TestCase
         $response = $this->get('test-route', ['Precognition' => 'true']);
 
         $response->assertHeader('Vary', 'Foo, Precognition');
+        $response->assertHeaderMissing('Precognition-Success');
     }
 
     public function testSpacesAreImportantInValidationFilterLogicForJsonRequests()
@@ -465,6 +485,7 @@ class PrecognitionTest extends TestCase
         ]);
 
         $response->assertStatus(422);
+        $response->assertHeaderMissing('Precognition-Success');
         $response->assertJsonPath('errors', [
             ' input with spaces ' => [
                 'The input with spaces field must be an integer.',
@@ -482,6 +503,7 @@ class PrecognitionTest extends TestCase
         $response->assertOk();
         $this->assertSame('ok', $response->content());
         $response->assertHeader('Vary', 'Precognition');
+        $response->assertHeaderMissing('Precognition-Success');
     }
 
     public function testItStopsExecutionAfterSuccessfulValidationWithValidationFilteringAndFormRequest()
@@ -502,6 +524,7 @@ class PrecognitionTest extends TestCase
         $this->assertFalse($this->app['ClassWasInstantiated']);
         $response->assertNoContent();
         $response->assertHeader('Precognition', 'true');
+        $response->assertHeader('Precognition-Success', 'true');
     }
 
     public function testItStopsExecutionAfterFailedValidationWithNestedValidationFilteringUsingFormRequest()
@@ -533,6 +556,7 @@ class PrecognitionTest extends TestCase
             ],
         ]);
         $response->assertHeader('Precognition', 'true');
+        $response->assertHeaderMissing('Precognition-Success');
     }
 
     public function testItStopsExecutionAfterFailedValidationWithNestedValidationFilteringUsingRequestValidate()
@@ -568,6 +592,7 @@ class PrecognitionTest extends TestCase
             ],
         ]);
         $response->assertHeader('Precognition', 'true');
+        $response->assertHeaderMissing('Precognition-Success');
     }
 
     public function testItStopsExecutionAfterFailedValidationWithNestedValidationFilteringUsingControllerValidate()
@@ -598,6 +623,7 @@ class PrecognitionTest extends TestCase
             ],
         ]);
         $response->assertHeader('Precognition', 'true');
+        $response->assertHeaderMissing('Precognition-Success');
     }
 
     public function testItStopsExecutionAfterFailedValidationWithNestedValidationFilteringUsingControllerValidateWith()
@@ -628,6 +654,7 @@ class PrecognitionTest extends TestCase
             ],
         ]);
         $response->assertHeader('Precognition', 'true');
+        $response->assertHeaderMissing('Precognition-Success');
     }
 
     public function testItCanPassValidationForEscapedDotsAfterFilteringWithPrecognition()
@@ -645,6 +672,7 @@ class PrecognitionTest extends TestCase
 
         $response->assertNoContent();
         $response->assertHeader('Precognition', 'true');
+        $response->assertHeader('Precognition-Success', 'true');
     }
 
     public function testItCanFilterRulesWithEscapedDotsUsingFormRequest()
@@ -670,6 +698,7 @@ class PrecognitionTest extends TestCase
             ],
         ]);
         $response->assertHeader('Precognition', 'true');
+        $response->assertHeaderMissing('Precognition-Success');
     }
 
     public function testItCanFilterRulesWithEscapedDotsWhenUsingRequestValidate()
@@ -699,6 +728,7 @@ class PrecognitionTest extends TestCase
             ],
         ]);
         $response->assertHeader('Precognition', 'true');
+        $response->assertHeaderMissing('Precognition-Success');
     }
 
     public function testItCanFilterRulesWithEscapedDotsWhenUsingControllerValidate()
@@ -723,6 +753,7 @@ class PrecognitionTest extends TestCase
             ],
         ]);
         $response->assertHeader('Precognition', 'true');
+        $response->assertHeaderMissing('Precognition-Success');
     }
 
     public function testItCanFilterRulesWithEscapedDotsWhenUsingControllerValidateWith()
@@ -770,6 +801,7 @@ class PrecognitionTest extends TestCase
         $response->assertOk();
         $this->assertSame('expected response', $response->content());
         $response->assertHeader('Precognition', 'true');
+        $response->assertHeaderMissing('Precognition-Success');
     }
 
     public function testItStopsExecutionAfterSuccessfulValidationWithValidationFilteringAndControllerValidate()
@@ -787,6 +819,7 @@ class PrecognitionTest extends TestCase
 
         $response->assertNoContent();
         $response->assertHeader('Precognition', 'true');
+        $response->assertHeader('Precognition-Success', 'true');
     }
 
     public function testItContinuesExecutionAfterSuccessfulValidationWithoutValidationFilteringAndControllerValidate()
@@ -803,6 +836,7 @@ class PrecognitionTest extends TestCase
         $response->assertOk();
         $this->assertSame('Post-validation code was executed.', $response->content());
         $response->assertHeader('Precognition', 'true');
+        $response->assertHeaderMissing('Precognition-Success');
     }
 
     public function testItStopsExecutionAfterSuccessfulValidationWithValidationFilteringAndControllerValidateWithBag()
@@ -820,6 +854,7 @@ class PrecognitionTest extends TestCase
 
         $response->assertNoContent();
         $response->assertHeader('Precognition', 'true');
+        $response->assertHeader('Precognition-Success', 'true');
     }
 
     public function testItContinuesExecutionAfterSuccessfulValidationWithoutValidationFilteringAndControllerValidateWithBag()
@@ -836,6 +871,7 @@ class PrecognitionTest extends TestCase
         $response->assertOk();
         $this->assertSame('Post-validation code was executed.', $response->content());
         $response->assertHeader('Precognition', 'true');
+        $response->assertHeaderMissing('Precognition-Success');
     }
 
     public function testItStopsExecutionAfterSuccessfulValidationWithValidationFilteringAndControllerValidateWith()
@@ -853,6 +889,7 @@ class PrecognitionTest extends TestCase
 
         $response->assertNoContent();
         $response->assertHeader('Precognition', 'true');
+        $response->assertHeader('Precognition-Success', 'true');
     }
 
     public function testItContinuesExecutionAfterSuccessfulValidationWithoutValidationFilteringAndControllerValidateWithXXXX()
@@ -869,6 +906,7 @@ class PrecognitionTest extends TestCase
         $response->assertOk();
         $this->assertSame('Post-validation code was executed.', $response->content());
         $response->assertHeader('Precognition', 'true');
+        $response->assertHeaderMissing('Precognition-Success');
     }
 
     public function testItStopsExecutionAfterSuccessfulValidationWithValidationFilteringAndControllerValidateWithPassingValidator()
@@ -886,6 +924,7 @@ class PrecognitionTest extends TestCase
 
         $response->assertNoContent();
         $response->assertHeader('Precognition', 'true');
+        $response->assertHeader('Precognition-Success', 'true');
     }
 
     public function testItContinuesExecutionAfterSuccessfulValidationWithoutValidationFilteringAndControllerValidateWithPassingValidator()
@@ -902,6 +941,7 @@ class PrecognitionTest extends TestCase
         $response->assertOk();
         $this->assertSame('Post-validation code was executed.', $response->content());
         $response->assertHeader('Precognition', 'true');
+        $response->assertHeaderMissing('Precognition-Success');
     }
 
     public function testItStopsExecutionAfterSuccessfulValidationWithValidationFilteringAndRequestValidate()
@@ -933,6 +973,7 @@ class PrecognitionTest extends TestCase
 
         $response->assertNoContent();
         $response->assertHeader('Precognition', 'true');
+        $response->assertHeader('Precognition-Success', 'true');
     }
 
     public function testItContinuesExecutionAfterSuccessfulValidationWithoutValidationFilteringAndRequestValidate()
@@ -962,6 +1003,7 @@ class PrecognitionTest extends TestCase
         $response->assertOk();
         $this->assertSame('Post-validation code was executed.', $response->content());
         $response->assertHeader('Precognition', 'true');
+        $response->assertHeaderMissing('Precognition-Success');
     }
 
     public function testItDoesNotSetLastUrl()
@@ -1000,6 +1042,7 @@ class PrecognitionTest extends TestCase
         $response = $this->get('test-route');
         $response->assertOk();
         $response->assertHeader('Expected', 'Header');
+        $response->assertHeaderMissing('Precognition-Success');
     }
 
     public function testItAppendsPrecognitionHeaderToSymfonyResponse()
@@ -1015,6 +1058,18 @@ class PrecognitionTest extends TestCase
         $response->assertOk();
         $response->assertHeader('Expected', 'Header');
         $response->assertHeader('Precognition', 'true');
+    }
+
+    public function testItCanNoContentWhileAlsoNotBeingPrecognitive()
+    {
+        Route::get('test-route', function () {
+            //
+        })->middleware([HandlePrecognitiveRequests::class, MiddlewareThatReturnsNoContent::class]);
+
+        $response = $this->get('test-route', ['Precognition' => 'true']);
+        $response->assertNoContent();
+        $response->assertHeader('Precognition', 'true');
+        $response->assertHeaderMissing('Precognition-Success', 'true');
     }
 }
 
@@ -1264,5 +1319,13 @@ class MiddlewareReturningSymfonyResponse
         return response()->streamDownload(function () {
             //
         }, null, ['Expected' => 'Header']);
+    }
+}
+
+class MiddlewareThatReturnsNoContent
+{
+    public function handle()
+    {
+        return response()->noContent();
     }
 }
