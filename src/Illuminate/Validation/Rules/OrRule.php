@@ -48,14 +48,14 @@ class OrRule implements ValidationRule
     /**
      * Get the validation error message.
      *
-     * @return array
+     * @return string
      */
-    public function message(): array
+    public function message(): string
     {
         $message = trans('validation.or_rule');
 
         return $message === 'validation.or_rule'
-            ? ['None of the specified field rules is true.']
-            : [$message];
+            ? 'None of the specified field rules is true.'
+            : $message;
     }
 }

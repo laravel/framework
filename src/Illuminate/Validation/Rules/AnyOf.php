@@ -21,9 +21,10 @@ class AnyOf implements ValidationRule
     /**
      * Determine if the validation rule passes.
      *
-     * @param  string  $attribute
-     * @param  mixed  $value
-     * @return bool
+     * @param string $attribute
+     * @param mixed $value
+     * @param Closure $fail
+     * @return void
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
@@ -52,14 +53,14 @@ class AnyOf implements ValidationRule
     /**
      * Get the validation error message.
      *
-     * @return array
+     * @return string
      */
-    public function message(): array
+    public function message(): string
     {
         $message = trans('validation.any_of');
 
         return $message === 'validation.any_of'
-            ? ['None of the specified field rules is true.']
-            : [$message];
+            ? 'None of the specified field rules is true.'
+            : $message;
     }
 }
