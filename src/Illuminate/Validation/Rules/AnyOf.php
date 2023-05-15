@@ -21,7 +21,7 @@ class AnyOf implements ValidationRule
     /**
      * Determine if the validation rule passes.
      *
-     * @param string $attribute
+     * @param  string  $attribute
      * @param  mixed  $value
      * @return bool
      */
@@ -44,7 +44,7 @@ class AnyOf implements ValidationRule
             }
         }
 
-        if (!$passes) {
+        if (! $passes) {
             $fail($this->message());
         }
     }

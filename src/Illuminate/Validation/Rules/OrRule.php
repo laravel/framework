@@ -21,9 +21,9 @@ class OrRule implements ValidationRule
     /**
      * Determine if the validation rule passes.
      *
-     * @param string $attribute
-     * @param mixed $value
-     * @param Closure $fail
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  Closure  $fail
      * @return void
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
@@ -40,7 +40,7 @@ class OrRule implements ValidationRule
             $attribute => $this->orRule,
         ];
 
-        if(Validator::make($data, $rules)->fails() && Validator::make($data, $orRules)->fails()) {
+        if (Validator::make($data, $rules)->fails() && Validator::make($data, $orRules)->fails()) {
             $fail($this->message());
         }
     }
