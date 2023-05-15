@@ -4,11 +4,14 @@ namespace Illuminate\Foundation\Testing;
 
 use Carbon\CarbonImmutable;
 use Illuminate\Console\Application as Artisan;
+use Illuminate\Console\Scheduling\ScheduleListCommand;
 use Illuminate\Console\Signals;
 use Illuminate\Console\View\Components\Line;
+use Illuminate\Database\Capsule\Manager as DatabaseCapsuleManager;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Bootstrap\HandleExceptions;
 use Illuminate\Http\Testing\MimeType;
+use Illuminate\Queue\Capsule\Manager as QueueCapsuleManager;
 use Illuminate\Queue\Queue;
 use Illuminate\Routing\ResourceRegistrar;
 use Illuminate\Routing\Route;
@@ -23,6 +26,7 @@ use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\File;
 use Illuminate\Validation\Rules\Password;
+use Illuminate\View\Compilers\BladeCompiler;
 use Illuminate\View\Component;
 use Mockery;
 use Mockery\Exception\InvalidCountException;
@@ -267,6 +271,8 @@ abstract class TestCase extends BaseTestCase
         Sleep::fake(false);
 
         if ($this->flushStatics) {
+            BladeCompiler::flushComponentHashStack();
+            DatabaseCapsuleManager::flushGlobal();
             DateFactory::useDefault();
             Env::enablePutenv();
             File::$defaultCallback = null;
@@ -274,10 +280,18 @@ abstract class TestCase extends BaseTestCase
             MimeType::flush();
             Password::$defaultCallback = null;
             Pluralizer::useLanguage('english');
+            QueueCapsuleManager::flushGlobal();
             ResourceRegistrar::setParameters([]);
             ResourceRegistrar::singularParameters();
+            ScheduleListCommand::resolveTerminalWidthUsing(null);
+            Signals::resolveAvailabilityUsing(null);
             Str::createRandomStringsNormally();
             Str::createUuidsNormally();
+            Str::flushCache();
+
+            // already done in setUp
+            static::$latestResponse = null;
+            Facade::clearResolvedInstances();
         }
 
         if ($this->callbackException) {

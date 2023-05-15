@@ -66,4 +66,14 @@ trait CapsuleManagerTrait
     {
         $this->container = $container;
     }
+
+    /**
+     * Flush the global instance.
+     *
+     * @return void
+     */
+    public static function flushGlobal()
+    {
+        static::$instance = null;
+    }
 }
