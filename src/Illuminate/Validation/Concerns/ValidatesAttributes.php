@@ -25,6 +25,7 @@ use Illuminate\Validation\ValidationData;
 use InvalidArgumentException;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use ValueError;
 
 trait ValidatesAttributes
 {
@@ -550,10 +551,14 @@ trait ValidatesAttributes
         }
 
         foreach ($parameters as $format) {
-            $date = DateTime::createFromFormat('!'.$format, $value);
+            try {
+                $date = DateTime::createFromFormat('!'.$format, $value);
 
-            if ($date && $date->format($format) == $value) {
-                return true;
+                if ($date && $date->format($format) == $value) {
+                    return true;
+                }
+            } catch (ValueError) {
+                return false;
             }
         }
 
@@ -678,13 +683,21 @@ trait ValidatesAttributes
             return true;
         }
 
-        if (! $this->isValidFileInstance($value) || ! $sizeDetails = @getimagesize($value->getRealPath())) {
+        if (! $this->isValidFileInstance($value)) {
+            return false;
+        }
+
+        $dimensions = method_exists($value, 'dimensions')
+                ? $value->dimensions()
+                : @getimagesize($value->getRealPath());
+
+        if (! $dimensions) {
             return false;
         }
 
         $this->requireParameterCount(1, $parameters, 'dimensions');
 
-        [$width, $height] = $sizeDetails;
+        [$width, $height] = $dimensions;
 
         $parameters = $this->parseNamedParameters($parameters);
 

@@ -95,4 +95,25 @@ class ThrottleRequestsTest extends TestCase
             $this->assertEquals(Carbon::now()->addSeconds(2)->getTimestamp(), $e->getHeaders()['X-RateLimit-Reset']);
         }
     }
+
+    public function testItCanGenerateDefinitionViaStaticMethod()
+    {
+        $signature = (string) ThrottleRequests::using('gold-tier');
+        $this->assertSame('Illuminate\Routing\Middleware\ThrottleRequests:gold-tier', $signature);
+
+        $signature = (string) ThrottleRequests::with(25);
+        $this->assertSame('Illuminate\Routing\Middleware\ThrottleRequests:25', $signature);
+
+        $signature = (string) ThrottleRequests::with(25, 2);
+        $this->assertSame('Illuminate\Routing\Middleware\ThrottleRequests:25,2', $signature);
+
+        $signature = (string) ThrottleRequests::with(25, 2, 'foo');
+        $this->assertSame('Illuminate\Routing\Middleware\ThrottleRequests:25,2,foo', $signature);
+
+        $signature = (string) ThrottleRequests::with(maxAttempts: 25, decayMinutes: 2, prefix: 'foo');
+        $this->assertSame('Illuminate\Routing\Middleware\ThrottleRequests:25,2,foo', $signature);
+
+        $signature = (string) ThrottleRequests::with(prefix: 'foo');
+        $this->assertSame('Illuminate\Routing\Middleware\ThrottleRequests:60,1,foo', $signature);
+    }
 }
