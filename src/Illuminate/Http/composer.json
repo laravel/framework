@@ -33,7 +33,7 @@
     },
     "suggest": {
         "ext-gd": "Required to use Illuminate\\Http\\Testing\\FileFactory::image().",
-        "guzzlehttp/guzzle": "Required to use the HTTP Client (^7.5)."
+        "guzzlehttp/guzzle": "Required to use the HTTP Client (^7.6)."
     },
     "extra": {
         "branch-alias": {
