@@ -1272,6 +1272,13 @@ class DatabaseEloquentModelTest extends TestCase
         $model->fill(['name' => 'foo', 'age' => 'bar']);
         $this->assertSame('foo', $model->name);
         $this->assertSame('bar', $model->age);
+
+        $model = new EloquentModelStub;
+        $model->fillable(['name', 'age']);
+        $model->fill(['name' => 'foo', 'age' => 'bar', 'except' => 'baz'], 'except');
+        $model->fill(['name' => 'foo', 'age' => 'bar', 'except' => 'baz', 'except2' => 'baz'], ['except', 'except2']);
+        $this->assertSame('foo', $model->name);
+        $this->assertSame('bar', $model->age);
     }
 
     public function testQualifyColumn()
