@@ -1274,16 +1274,19 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame('bar', $model->age);
 
         $model = new EloquentModelStub;
-        $model->fillable(['name', 'age']);
-        $model->fill(['name' => 'foo', 'age' => 'bar', 'address' => 'baz']);
-        $this->expectException(MassAssignmentException::class);
-
-        $model = new EloquentModelStub;
-        $model->fillable(['name', 'age']);
+        $model->guard([]);
         $model->fill(['name' => 'foo', 'age' => 'bar', 'address' => 'baz'], 'address');
-        $model->fill(['name' => 'foo', 'age' => 'bar', 'address' => 'baz', 'number' => 123], ['address', 'number']);
         $this->assertSame('foo', $model->name);
         $this->assertSame('bar', $model->age);
+        $this->assertNull($model->address);
+
+        $model = new EloquentModelStub;
+        $model->guard([]);
+        $model->fill(['name' => 'foo', 'age' => 'bar', 'address' => 'baz', 'phone' => 123], ['address', 'phone']);
+        $this->assertSame('foo', $model->name);
+        $this->assertSame('bar', $model->age);
+        $this->assertNull($model->address);
+        $this->assertNull($model->phone);
     }
 
     public function testQualifyColumn()
