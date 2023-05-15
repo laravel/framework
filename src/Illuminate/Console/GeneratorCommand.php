@@ -4,6 +4,7 @@ namespace Illuminate\Console;
 
 use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Contracts\Console\PromptsForMissingInput;
+use Illuminate\Contracts\Console\Supplementable;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputArgument;
@@ -167,6 +168,15 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
         if ((! $this->hasOption('force') ||
              ! $this->option('force')) &&
              $this->alreadyExists($this->getNameInput())) {
+            if (
+                $this instanceof Supplementable
+                && $this->didReceiveOptions($this->input)
+            ) {
+                $this->components->info($this->type.' has been supplemented.');
+
+                return null;
+            }
+
             $this->components->error($this->type.' already exists.');
 
             return false;
