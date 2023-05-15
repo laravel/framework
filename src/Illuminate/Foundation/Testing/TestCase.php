@@ -271,7 +271,6 @@ abstract class TestCase extends BaseTestCase
         Sleep::fake(false);
 
         if ($this->flushStatics) {
-            BladeCompiler::flushComponentHashStack();
             DatabaseCapsuleManager::flushGlobal();
             DateFactory::useDefault();
             Env::enablePutenv();
