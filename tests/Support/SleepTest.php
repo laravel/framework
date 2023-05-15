@@ -446,7 +446,7 @@ class SleepTest extends TestCase
         $this->assertSame($sleep->duration->totalMicroseconds, 1234567);
     }
 
-    public function testItCanCreateConditionallyDefineSleepsViaConditionable()
+    public function testItCanCreateConditionallyDefinedDurationsViaConditionable()
     {
         Sleep::fake();
 
@@ -467,5 +467,19 @@ class SleepTest extends TestCase
                 fn (Sleep $sleep) => $sleep->and(3)->milliseconds(),
         );
         $this->assertSame($sleep->duration->totalMicroseconds, 1003000);
+    }
+
+    public function testItCanReplacePreviouslyDefinedDurations()
+    {
+        Sleep::fake();
+
+        $sleep = Sleep::for(1)->second();
+        $this->assertSame($sleep->duration->totalMicroseconds, 1000000);
+
+        $sleep->duration(2)->second();
+        $this->assertSame($sleep->duration->totalMicroseconds, 2000000);
+
+        $sleep->duration(500)->milliseconds();
+        $this->assertSame($sleep->duration->totalMicroseconds, 500000);
     }
 }
