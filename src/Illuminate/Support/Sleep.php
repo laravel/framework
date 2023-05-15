@@ -58,19 +58,7 @@ class Sleep
      */
     public function __construct($duration)
     {
-        if (! $duration instanceof DateInterval) {
-            $this->duration = CarbonInterval::microsecond(0);
-
-            $this->pending = $duration;
-        } else {
-            $duration = CarbonInterval::instance($duration);
-
-            if ($duration->totalMicroseconds < 0) {
-                $duration = CarbonInterval::seconds(0);
-            }
-
-            $this->duration = $duration;
-        }
+        $this->duration($duration);
     }
 
     /**
@@ -119,6 +107,32 @@ class Sleep
     public static function sleep($duration)
     {
         return (new static($duration))->seconds();
+    }
+
+    /**
+     * Sleep for the given duration. Replaces any previously defined durations.
+     *
+     * @param  \DateInterval|int|float  $duration
+     * @return $this
+     */
+    public function duration($duration)
+    {
+        if (! $duration instanceof DateInterval) {
+            $this->duration = CarbonInterval::microsecond(0);
+
+            $this->pending = $duration;
+        } else {
+            $duration = CarbonInterval::instance($duration);
+
+            if ($duration->totalMicroseconds < 0) {
+                $duration = CarbonInterval::seconds(0);
+            }
+
+            $this->duration = $duration;
+            $this->pending = null;
+        }
+
+        return $this;
     }
 
     /**

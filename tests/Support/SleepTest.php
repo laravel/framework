@@ -419,26 +419,30 @@ class SleepTest extends TestCase
     {
         Sleep::fake();
 
-        Sleep::macro('orSomeConfiguredAmountOfTime', function (): Sleep {
-            /** @var Sleep $this */
-            return $this->for(1.234)->seconds();
+        Sleep::macro('forSomeConfiguredAmountOfTime', static function () {
+            return Sleep::for(3)->seconds();
         });
 
-        Sleep::macro('andSomeConfiguredAmountOfTime', function (): Sleep {
+        Sleep::macro('useSomeOtherAmountOfTime', function () {
+            /** @var Sleep $this */
+            return $this->duration(1.234)->seconds();
+        });
+
+        Sleep::macro('andSomeMoreGranularControl', function () {
             /** @var Sleep $this */
             return $this->and(567)->microseconds();
         });
 
-        // Sanity check (1 second default)
-        $sleep = Sleep::for(1)->second();
-        $this->assertSame($sleep->duration->totalMicroseconds, 1000000);
+        // A static macro can be referenced
+        $sleep = Sleep::forSomeConfiguredAmountOfTime();
+        $this->assertSame($sleep->duration->totalMicroseconds, 3000000);
 
         // A macro can specify a new duration
-        $sleep = $sleep->orSomeConfiguredAmountOfTime();
+        $sleep = $sleep->useSomeOtherAmountOfTime();
         $this->assertSame($sleep->duration->totalMicroseconds, 1234000);
 
         // A macro can supplement an existing duration
-        $sleep = $sleep->andSomeConfiguredAmountOfTime();
+        $sleep = $sleep->andSomeMoreGranularControl();
         $this->assertSame($sleep->duration->totalMicroseconds, 1234567);
     }
 
