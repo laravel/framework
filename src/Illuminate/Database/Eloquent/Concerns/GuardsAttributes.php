@@ -247,12 +247,12 @@ trait GuardsAttributes
      */
     protected function fillableFromArray(array $attributes, array|string $except = [])
     {
-        $except = !is_array($except) ? [$except] : $except;
+        $except = ! is_array($except) ? [$except] : $except;
 
-        if(!empty($except)){
+        if (! empty($except)) {
             $attributes = array_filter(
                 $attributes,
-                static fn ($key) => !in_array($key, $except, true),
+                static fn ($key) => ! in_array($key, $except, true),
                 ARRAY_FILTER_USE_KEY
             );
         }
