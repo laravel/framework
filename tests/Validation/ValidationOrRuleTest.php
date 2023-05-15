@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
 
 class ValidationOrRuleTest extends TestCase
 {
-    public function testValidationPassesWithCorrectOrRule()
+    public function testValidationPassesWithCorrectOrRuleValue()
     {
         $validator = new Validator(
             resolve('translator'),
@@ -28,7 +28,7 @@ class ValidationOrRuleTest extends TestCase
         $this->assertTrue($validator->passes());
     }
 
-    public function testValidationFailsWithWrongOrRule()
+    public function testValidationFailsWithWrongOrRuleValue()
     {
         $validator = new Validator(
             resolve('translator'),

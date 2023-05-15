@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
 
 class ValidationAnyOfRuleTest extends TestCase
 {
-    public function testValidationPassesWithCorrectAnyOfRule()
+    public function testValidationPassesWithCorrectAnyOfRuleValue()
     {
         $validator = new Validator(
             resolve('translator'),
@@ -28,7 +28,7 @@ class ValidationAnyOfRuleTest extends TestCase
         $this->assertTrue($validator->passes());
     }
 
-    public function testValidationFailsWithWrongAnyOfRule()
+    public function testValidationFailsWithWrongAnyOfRuleValue()
     {
         $validator = new Validator(
             resolve('translator'),
