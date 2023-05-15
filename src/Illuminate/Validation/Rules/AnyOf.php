@@ -13,7 +13,7 @@ class AnyOf implements Rule
      *
      * @return void
      */
-    public function __construct(protected $rules)
+    public function __construct(protected array $rules)
     {
     }
 
@@ -49,7 +49,7 @@ class AnyOf implements Rule
      *
      * @return array
      */
-    public function message()
+    public function message(): array
     {
         $message = trans('validation.any_of');
 

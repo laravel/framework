@@ -47,7 +47,7 @@ class OrRule implements Rule
      *
      * @return array
      */
-    public function message()
+    public function message(): array
     {
         $message = trans('validation.or_rule');
 
