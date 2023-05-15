@@ -612,7 +612,7 @@ if (! function_exists('precognitive')) {
         });
 
         if (request()->isPrecognitive()) {
-            abort(204);
+            abort(204, headers: ['Precognition-Success' => 'true']);
         }
 
         return $payload;
