@@ -242,10 +242,21 @@ trait GuardsAttributes
      * Get the fillable attributes of a given array.
      *
      * @param  array  $attributes
+     * @param  array|string  $except
      * @return array
      */
-    protected function fillableFromArray(array $attributes)
+    protected function fillableFromArray(array $attributes, array|string $except = [])
     {
+        $except = !is_array($except) ? [$except] : $except;
+
+        if(!empty($except)){
+            $attributes = array_filter(
+                $attributes,
+                static fn ($key) => !in_array($key, $except, true),
+                ARRAY_FILTER_USE_KEY
+            );
+        }
+
         if (count($this->getFillable()) > 0 && ! static::$unguarded) {
             return array_intersect_key($attributes, array_flip($this->getFillable()));
         }

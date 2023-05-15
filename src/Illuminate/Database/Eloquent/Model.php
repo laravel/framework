@@ -501,15 +501,16 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * Fill the model with an array of attributes.
      *
      * @param  array  $attributes
+     * @param  array|string  $except
      * @return $this
      *
      * @throws \Illuminate\Database\Eloquent\MassAssignmentException
      */
-    public function fill(array $attributes)
+    public function fill(array $attributes, array|string $except = [])
     {
         $totallyGuarded = $this->totallyGuarded();
 
-        $fillable = $this->fillableFromArray($attributes);
+        $fillable = $this->fillableFromArray($attributes, $except);
 
         foreach ($fillable as $key => $value) {
             // The developers may choose to place some attributes in the "fillable" array
