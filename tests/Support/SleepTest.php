@@ -450,13 +450,17 @@ class SleepTest extends TestCase
     {
         Sleep::fake();
 
+        Sleep::macro('setDuration', function ($duration) {
+            return $this->duration($duration);
+        });
+
         $sleep = Sleep::for(1)->second();
         $this->assertSame($sleep->duration->totalMicroseconds, 1000000);
 
-        $sleep->duration(2)->second();
+        $sleep->setDuration(2)->second();
         $this->assertSame($sleep->duration->totalMicroseconds, 2000000);
 
-        $sleep->duration(500)->milliseconds();
+        $sleep->setDuration(500)->milliseconds();
         $this->assertSame($sleep->duration->totalMicroseconds, 500000);
     }
 }
