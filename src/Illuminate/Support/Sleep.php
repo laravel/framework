@@ -5,11 +5,14 @@ namespace Illuminate\Support;
 use Carbon\Carbon;
 use Carbon\CarbonInterval;
 use DateInterval;
+use Illuminate\Support\Traits\Conditionable;
 use PHPUnit\Framework\Assert as PHPUnit;
 use RuntimeException;
 
 class Sleep
 {
+    use Conditionable;
+
     /**
      * The total duration to sleep.
      *

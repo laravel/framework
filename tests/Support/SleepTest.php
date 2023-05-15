@@ -414,4 +414,27 @@ class SleepTest extends TestCase
             $this->assertSame("The expected sleep was found [0] times instead of [1].\nFailed asserting that 0 is identical to 1.", $e->getMessage());
         }
     }
+
+    public function testItCanCreateConditionallyDefinedDurationsViaConditionable()
+    {
+        Sleep::fake();
+
+        $sleep = Sleep::for(1)
+            ->second()
+            ->when(
+                true,
+                fn (Sleep $sleep) => $sleep->and(2)->milliseconds(),
+                fn (Sleep $sleep) => $sleep->and(3)->milliseconds(),
+            );
+        $this->assertSame($sleep->duration->totalMicroseconds, 1002000);
+
+        $sleep = Sleep::for(1)
+            ->second()
+            ->when(
+                false,
+                fn (Sleep $sleep) => $sleep->and(2)->milliseconds(),
+                fn (Sleep $sleep) => $sleep->and(3)->milliseconds(),
+            );
+        $this->assertSame($sleep->duration->totalMicroseconds, 1003000);
+    }
 }
