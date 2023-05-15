@@ -5,6 +5,7 @@ namespace Illuminate\Support\Facades;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
+use Illuminate\Support\DefaultProviders;
 use Illuminate\Support\Js;
 use Illuminate\Support\Str;
 use Illuminate\Support\Testing\Fakes\Fake;
@@ -310,6 +311,14 @@ abstract class Facade
             'View' => View::class,
             'Vite' => Vite::class,
         ]);
+    }
+
+    /**
+     * Get the application default providers.
+     */
+    public static function defaultProviders()
+    {
+        return new DefaultProviders();
     }
 
     /**
