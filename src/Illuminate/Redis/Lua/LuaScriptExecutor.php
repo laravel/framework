@@ -51,26 +51,22 @@ abstract class LuaScriptExecutor
     }
 
     /**
-     * Throw an exception based on the Redis error message.
+     * Load a Lua script into the Redis server.
      *
-     * @param  string|\Predis\Response\ServerException|\Predis\Response\Error  $error  The Redis error.
-     * @return never
-     *
-     * @throws \Illuminate\Contracts\Redis\LuaScriptExecuteException If the Redis response indicates a script execution error.
-     * @throws \Illuminate\Contracts\Redis\LuaScriptNoMatchingException If the Redis response indicates that the specified script was not found.
+     * @param  string  $script  The Lua script to load
+     * @return string Returns the SHA1 hash of the script if successful, or throw on failure.
      */
-    abstract protected function handleRedisError($error);
+    protected function loadScript($script) {
+        return $this->handleResponse($this->connection->script('load',$script))->getResult();
+    }
 
     /**
-     * Handle the result of Redis script execution and throw exception if needed.
+     * Handles the response from a script execution.
      *
-     * @param  mixed  $result  The result of Redis script execution.
-     * @return mixed The result of Redis script execution.
-     *
-     * @throws \Illuminate\Contracts\Redis\LuaScriptExecuteException If the Redis response indicates a script execution error.
-     * @throws \Illuminate\Contracts\Redis\LuaScriptNoMatchingException If the Redis response indicates that the specified script was not found.
+     * @param  mixed  $result  The result of the script execution.
+     * @return \Illuminate\Redis\Lua\ScriptExecutionResult The result of Redis script execution.
      */
-    abstract protected function handleRedisResponse($result);
+    abstract protected function handleResponse($result);
 
     /**
      * Execute a Redis Lua script as plain text.
@@ -78,9 +74,7 @@ abstract class LuaScriptExecutor
      * @param  string  $script  The Lua script to execute.
      * @param  \Illuminate\Redis\Lua\LuaScriptArguments  $arguments  The arguments to pass to the script.
      * @param  bool  $isCachingEnabled  Indicates whether the script can be cached.
-     * @return mixed The result of Redis script execution.
-     *
-     * @throws \Illuminate\Contracts\Redis\LuaScriptExecuteException If the Redis response indicates a script execution error.
+     * @return \Illuminate\Redis\Lua\ScriptExecutionResult The result of Redis script execution.
      */
     abstract protected function executeWithPlainScript($script, $arguments, $isCachingEnabled);
 
@@ -89,9 +83,7 @@ abstract class LuaScriptExecutor
      *
      * @param  string  $sha1  The SHA-1 hash of the Lua script to execute.
      * @param  \Illuminate\Redis\Lua\LuaScriptArguments  $arguments  The arguments to pass to the script.
-     * @return mixed The result of Redis script execution.
-     *
-     * @throws \Illuminate\Contracts\Redis\LuaScriptNoMatchingException If the Redis response indicates that the specified script was not found.
+     * @return \Illuminate\Redis\Lua\ScriptExecutionResult The result of Redis script execution.
      */
     abstract protected function executeWithHash($sha1, $arguments);
 
@@ -101,10 +93,7 @@ abstract class LuaScriptExecutor
      * @param  \Illuminate\Redis\Lua\LuaScript  $script  The Lua script to execute.
      * @param  \Illuminate\Redis\Lua\LuaScriptArguments  $arguments  The arguments to pass to the script.
      * @param  bool  $isCachingEnabled  Whether to enable caching for the script. Defaults to false.
-     * @return mixed The result of Redis script execution.
-     *
-     * @throws \Illuminate\Contracts\Redis\LuaScriptExecuteException If the Redis response indicates a script execution error.
-     * @throws \Illuminate\Contracts\Redis\LuaScriptNoMatchingException If the Redis response indicates that the specified script was not found.
+     * @return \Illuminate\Redis\Lua\ScriptExecutionResult The result of Redis script execution.
      */
     public function execute($script, $arguments, $isCachingEnabled = false)
     {

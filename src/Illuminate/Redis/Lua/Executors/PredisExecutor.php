@@ -2,56 +2,43 @@
 
 namespace Illuminate\Redis\Lua\Executors;
 
-use Illuminate\Contracts\Redis\LuaScriptExecuteException;
-use Illuminate\Contracts\Redis\LuaScriptNoMatchingException;
 use Illuminate\Redis\Lua\LuaScriptExecutor;
+use Illuminate\Redis\Lua\ScriptExecutionResult;
 use Predis\Response\Error as PredisError;
 use Predis\Response\ServerException;
 
 /**
- * Lua scripts executor using `Predis` client library for Redis.
+ * Lua script executor using the `Predis` client library for Redis.
  */
 class PredisExecutor extends LuaScriptExecutor
 {
     /**
      * @inheritDoc
      */
-    protected function handleRedisError($error)
-    {
-        throw match ($error->getErrorType()) {
-            'NOSCRIPT' => new LuaScriptNoMatchingException($error),
-            default => new LuaScriptExecuteException($error),
-        };
-    }
-
-    /**
-     * @inheritDoc
-     */
-    protected function handleRedisResponse($result)
+    protected function handleResponse($result)
     {
         if ($result instanceof PredisError) {
-            $this->handleRedisError($result);
+            return ScriptExecutionResult::error($result);
         }
 
-        return $result;
+        return ScriptExecutionResult::success($result);
     }
 
     /**
-     * Load the given Lua script into Redis and return its SHA-1 hash.
+     * Executes the given callback function with a try-catch block and handles any exceptions thrown.
      *
-     * @param  string  $script  The Lua script to load.
-     * @return string The SHA-1 hash of the loaded script.
-     *
-     * @throws \Illuminate\Contracts\Redis\LuaScriptExecuteException If there was an error executing the script in Redis.
+     * @param  callable  $callback  The callback function to execute.
+     * @return ScriptExecutionResult The result of handling the response.
      */
-    private function loadScript($script)
+    private function executeWithTryCatch($callback)
     {
         try {
-            return $this->connection->script('load', $script);
+            return $this->handleResponse($callback());
         } catch (ServerException $e) {
-            throw new LuaScriptExecuteException($e->getMessage(), 0, $e);
+            return ScriptExecutionResult::error($e);
         }
     }
+
 
     /**
      * @inheritDoc
@@ -59,17 +46,15 @@ class PredisExecutor extends LuaScriptExecutor
     protected function executeWithPlainScript($script, $arguments, $isCachingEnabled)
     {
         if ($isCachingEnabled) {
-            try {
-                return $this->executeWithHash(sha1($script), $arguments);
-            } catch (LuaScriptNoMatchingException) {
+            $result = $this->executeWithHash(sha1($script), $arguments);
+
+            if ($result->isError() && $result->isNoScriptError()) {
                 return $this->executeWithHash($this->loadScript($script), $arguments);
+            } else {
+                return $result;
             }
         } else {
-            try {
-                return $this->handleRedisResponse($this->connection->eval($script, $arguments->getNumberOfKeys(), ...$arguments->toArray()));
-            } catch (ServerException $e) {
-                $this->handleRedisError($e);
-            }
+            return $this->executeWithTryCatch(fn() => $this->connection->eval($script, $arguments->getNumberOfKeys(), ...$arguments->toArray()));
         }
     }
 
@@ -78,10 +63,6 @@ class PredisExecutor extends LuaScriptExecutor
      */
     protected function executeWithHash($sha1, $arguments)
     {
-        try {
-            return $this->handleRedisResponse($this->connection->evalsha($sha1, $arguments->getNumberOfKeys(), ...$arguments->toArray()));
-        } catch (ServerException $e) {
-            $this->handleRedisError($e);
-        }
+        return $this->executeWithTryCatch(fn() => $this->connection->evalsha($sha1, $arguments->getNumberOfKeys(), ...$arguments->toArray()));
     }
 }

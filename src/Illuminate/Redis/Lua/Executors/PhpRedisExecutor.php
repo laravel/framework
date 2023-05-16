@@ -3,72 +3,65 @@
 namespace Illuminate\Redis\Lua\Executors;
 
 use Illuminate\Contracts\Redis\LuaScriptExecuteException;
-use Illuminate\Contracts\Redis\LuaScriptNoMatchingException;
 use Illuminate\Redis\Lua\LuaScriptExecutor;
-use RedisException;
+use Illuminate\Redis\Lua\ScriptExecutionResult;
 
 /**
- * Lua scripts executor using `PHPRedis` client library for Redis.
+ * Lua script executor using the `PHPRedis` client library for Redis.
  */
 class PhpRedisExecutor extends LuaScriptExecutor
 {
     /**
-     * Returns the last Redis error message or null if there is no error.
+     * Prepares the Redis client for script execution by clearing the last error.
      *
-     * @return string|null The error message or null
+     * @return void
      *
-     * @throws \Illuminate\Contracts\Redis\LuaScriptExecuteException If the Redis response indicates a script execution error.
+     * @throws \RedisException
+     */
+    private function prepareClient()
+    {
+        $this->connection->client()->clearLastError();
+    }
+
+    /**
+     * Retrieves the last Redis error message or null if there is no error.
+     *
+     * @return \Illuminate\Contracts\Redis\LuaScriptExecuteException|null The error exception or null.
+     *
+     * @throws \RedisException
      */
     private function getRedisError()
     {
-        try {
-            $error = $this->connection->client()->getLastError();
-            if ($error !== null) {
-                $this->connection->client()->clearLastError();
-            }
+        $error = $this->connection->client()->getLastError();
 
-            return $error;
-        } catch (RedisException $e) {
-            throw new LuaScriptExecuteException('Failed to retrieve Redis error. '.$e->getMessage(), 0, $e);
+        if ($error !== null) {
+            $this->connection->client()->clearLastError();
+            return new LuaScriptExecuteException($error);
         }
+
+        return null;
     }
 
     /**
-     * @inheritDoc
+     * Handles the response from a script execution.
+     *
+     * @param  mixed  $result  The result of the script execution.
+     * @return \Illuminate\Redis\Lua\ScriptExecutionResult The result of Redis script execution.
+     *
+     * @throws \RedisException
      */
-    protected function handleRedisError($error)
-    {
-        throw match (explode(' ', $error, 2)[1]) {
-            'NOSCRIPT' => new LuaScriptNoMatchingException($error),
-            default => new LuaScriptExecuteException($error),
-        };
-    }
-
-    /**
-     * @inheritDoc
-     */
-    protected function handleRedisResponse($result)
+    protected function handleResponse($result)
     {
         if ($result !== false) {
-            return $result;
-        } else {
-            if ($error = $this->getRedisError()) {
-                $this->handleRedisError($error);
-            } else {
-                return false;
-            }
+            return ScriptExecutionResult::success($result);
         }
-    }
 
-    /**
-     * Load a Lua script into the Redis server.
-     *
-     * @param  string  $script  The Lua script to load
-     * @return string|false Returns the SHA1 hash of the script if successful, or false on failure.
-     */
-    private function loadScript($script)
-    {
-        return $this->connection->script('load', $script);
+        $error = $this->getRedisError();
+        if ($error !== null) {
+            return ScriptExecutionResult::error($error);
+        }
+
+        return ScriptExecutionResult::success(false);
     }
 
     /**
@@ -77,14 +70,17 @@ class PhpRedisExecutor extends LuaScriptExecutor
     protected function executeWithPlainScript($script, $arguments, $isCachingEnabled)
     {
         if ($isCachingEnabled) {
-            try {
-                return $this->executeWithHash(sha1($script), $arguments);
-            } catch (LuaScriptNoMatchingException) {
-                return $this->executeWithHash($this->handleRedisResponse($this->loadScript($script)), $arguments);
+            $executionResult = $this->executeWithHash(sha1($script), $arguments);
+            if ($executionResult->isError() && $executionResult->isNoScriptError()) {
+                return $this->executeWithHash($this->loadScript($script), $arguments);
             }
+
+            return $executionResult;
         } else {
-            return $this->handleRedisResponse(
-                $this->connection->eval($script, count($arguments->getKeys()), ...$arguments->toArray())
+            $this->prepareClient();
+
+            return $this->handleResponse(
+                $this->connection->eval($script, $arguments->getNumberOfKeys(), ...$arguments->toArray())
             );
         }
     }
@@ -94,7 +90,9 @@ class PhpRedisExecutor extends LuaScriptExecutor
      */
     protected function executeWithHash($sha1, $arguments)
     {
-        return $this->handleRedisResponse(
+        $this->prepareClient();
+
+        return $this->handleResponse(
             $this->connection->command('evalsha', [$sha1, $arguments->toArray(), count($arguments->getKeys())])
         );
     }

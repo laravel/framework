@@ -9,5 +9,13 @@ use Exception;
  */
 class LuaScriptExecuteException extends Exception
 {
-    //
+    /**
+     * Gets the type of the error returned by Redis.
+     *
+     * @return string
+     */
+    public function getErrorType()
+    {
+        return explode(' ', $this->getMessage(), 2)[0];
+    }
 }
