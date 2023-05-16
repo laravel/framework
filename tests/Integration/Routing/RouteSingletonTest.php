@@ -259,7 +259,7 @@ class RouteSingletonTest extends TestCase
         $this->assertEquals(405, $response->getStatusCode());
 
         $response = $this->get('/avatar/create');
-        $this->assertEquals(404, $response->getStatusCode());
+        $this->assertEquals(200, $response->getStatusCode());
 
         $response = $this->post('/avatar');
         $this->assertEquals(200, $response->getStatusCode());

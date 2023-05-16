@@ -2,7 +2,6 @@
 
 namespace Illuminate\Routing;
 
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 class ResourceRegistrar
@@ -149,6 +148,12 @@ class ResourceRegistrar
 
         $defaults = $this->singletonResourceDefaults;
 
+        if (isset($options['creatable'])) {
+            $defaults = array_merge($defaults, ['create', 'store', 'destroy']);
+        } elseif (isset($options['destroyable'])) {
+            $defaults = array_merge($defaults, ['destroy']);
+        }
+
         $collection = new RouteCollection;
 
         $resourceMethods = $this->getResourceMethods($defaults, $options);
@@ -247,28 +252,6 @@ class ResourceRegistrar
 
         if (isset($options['except'])) {
             $methods = array_diff($methods, (array) $options['except']);
-        }
-
-        if (isset($options['apiSingleton'])) {
-            $methods = array_diff($methods, ['create', 'edit']);
-        }
-
-        if (isset($options['creatable'])) {
-            $methods = isset($options['apiSingleton'])
-                            ? array_merge(['store', 'destroy'], $methods)
-                            : array_merge(['create', 'store', 'destroy'], $methods);
-
-            return $this->getResourceMethods(
-                $methods, Arr::except($options, ['creatable'])
-            );
-        }
-
-        if (isset($options['destroyable'])) {
-            $methods = array_merge(['destroy'], $methods);
-
-            return $this->getResourceMethods(
-                $methods, Arr::except($options, ['destroyable'])
-            );
         }
 
         return array_values($methods);
