@@ -56,7 +56,7 @@ abstract class LuaScriptExecutor
      * @param  string  $script  The Lua script to load
      * @return string Returns the SHA1 hash of the script if successful, or throw on failure.
      */
-    protected function loadScript($script)
+    public function loadScript($script)
     {
         return $this->handleResponse($this->connection->script('load', $script))->getResult();
     }

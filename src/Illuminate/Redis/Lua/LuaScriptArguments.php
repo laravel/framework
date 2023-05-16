@@ -76,7 +76,7 @@ class LuaScriptArguments
             throw new \InvalidArgumentException('The parameter $keys cannot be null or empty.');
         }
 
-        return new self($keys, null);
+        return new self($keys);
     }
 
     /**
@@ -93,7 +93,7 @@ class LuaScriptArguments
             throw new \InvalidArgumentException('The parameter $arguments cannot be null or empty.');
         }
 
-        return new self(null, $arguments);
+        return new self([], $arguments);
     }
 
     /**
@@ -117,7 +117,7 @@ class LuaScriptArguments
     /**
      * Get the array of keys to be passed to the Lua script.
      *
-     * @return string[]|null An array of keys to be passed to the Lua script.
+     * @return string[] An array of keys to be passed to the Lua script.
      */
     public function getKeys()
     {
@@ -127,7 +127,7 @@ class LuaScriptArguments
     /**
      * Set the array of keys to be passed to the Lua script.
      *
-     * @param  string[]|null  $keys  An array of keys to be passed to the Lua script.
+     * @param  string[]  $keys  An array of keys to be passed to the Lua script.
      * @return self
      *
      * @throws \InvalidArgumentException if $keys is empty or null.
@@ -146,7 +146,7 @@ class LuaScriptArguments
     /**
      * Get the array of arguments to be passed to the Lua script.
      *
-     * @return string[]|null An array of arguments to be passed to the Lua script.
+     * @return string[] An array of arguments to be passed to the Lua script.
      */
     public function getArguments()
     {
@@ -156,7 +156,7 @@ class LuaScriptArguments
     /**
      * Set the array of arguments to be passed to the Lua script.
      *
-     * @param  string[]|null  $arguments  An array of arguments to be passed to the Lua script.
+     * @param  string[]  $arguments  An array of arguments to be passed to the Lua script.
      * @return self
      *
      * @throws \InvalidArgumentException if $arguments is empty or null.

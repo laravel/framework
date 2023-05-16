@@ -14,7 +14,7 @@ class ScriptExecutionResult
     private $result;
 
     /**
-     * @var mixed|null
+     * @var \Illuminate\Contracts\Redis\LuaScriptExecuteException|null
      */
     private $exception;
 
@@ -32,11 +32,15 @@ class ScriptExecutionResult
     /**
      * Create a new ScriptExecutionResult instance for an error during execution.
      *
-     * @param  LuaScriptExecuteException|PredisError|ServerException  $exception  The exception thrown or error during script execution.
+     * @param  \Illuminate\Contracts\Redis\LuaScriptExecuteException|\Predis\Response\Error|\Predis\Response\ServerException  $exception  The exception thrown or error during script execution.
      * @return self
      */
     public static function error($exception)
     {
+        if ($exception instanceof PredisError || $exception instanceof ServerException) {
+            $exception = new LuaScriptExecuteException($exception->getMessage());
+        }
+
         return new self(null, $exception);
     }
 
@@ -44,7 +48,7 @@ class ScriptExecutionResult
      * ScriptExecutionResult constructor.
      *
      * @param  mixed|null  $result  The result of the script execution.
-     * @param  \Throwable|null  $exception  The exception thrown during script execution.
+     * @param  \Illuminate\Contracts\Redis\LuaScriptExecuteException|null  $exception  The exception thrown during script execution.
      */
     private function __construct($result = null, $exception = null)
     {
@@ -55,7 +59,7 @@ class ScriptExecutionResult
     /**
      * Get the exception thrown during script execution.
      *
-     * @return \Throwable|null The exception instance or null if no exception occurred.
+     * @return \Illuminate\Contracts\Redis\LuaScriptExecuteException|null The exception instance or null if no exception occurred.
      */
     public function getException()
     {
@@ -79,7 +83,7 @@ class ScriptExecutionResult
      */
     public function getErrorType()
     {
-        return $this->exception->getErrorType();
+        return $this->isError() ? $this->exception->getErrorType() : null;
     }
 
     /**
@@ -97,7 +101,7 @@ class ScriptExecutionResult
      *
      * @return mixed The result of the script execution.
      *
-     * @throws \Throwable If an error occurred during script execution, the exception is thrown.
+     * @throws \Illuminate\Contracts\Redis\LuaScriptExecuteException If an error occurred during script execution, the exception is thrown.
      */
     public function getResult()
     {
