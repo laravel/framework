@@ -223,6 +223,8 @@ class Worker
                 $this->markJobAsFailedIfItShouldFailOnTimeout(
                     $job->getConnectionName(), $job, $e
                 );
+
+                $this->exceptions->report($e);
             }
 
             $this->kill(static::EXIT_ERROR, $options);
