@@ -1,6 +1,28 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.10.1...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v10.11.0...10.x)
+
+## [v10.11.0](https://github.com/laravel/framework/compare/v10.10.1...v10.11.0) - 2023-05-16
+
+### Added
+
+- Added the ability to extend the generic types for DatabaseNotificationCollection ([#47048](https://github.com/laravel/framework/pull/47048))
+- Added `/Illuminate/Support/Carbon::createFromId()` ([#47046](https://github.com/laravel/framework/pull/47046))
+- Added Name attributes on slots ([#47065](https://github.com/laravel/framework/pull/47065))
+- Added Precognition-Success header ([#47081](https://github.com/laravel/framework/pull/47081))
+- Added Macroable trait to Sleep class ([#47099](https://github.com/laravel/framework/pull/47099))
+
+### Fixed
+
+- Fixed `Illuminate/Database/Console/ShowModelCommand::getPolicy()` ([#47043](https://github.com/laravel/framework/pull/47043))
+
+### Changed
+
+- Remove return from channelRoutes method ([#47059](https://github.com/laravel/framework/pull/47059))
+- Bug in `Illuminate/Database/Migrations/Migrator::reset()` with string path ([#47047](https://github.com/laravel/framework/pull/47047))
+- Unify logic around cursor paginate ([#47094](https://github.com/laravel/framework/pull/47094))
+- Clears resolved instance of Vite when using withoutVite ([#47091](https://github.com/laravel/framework/pull/47091))
+- Remove workarounds for old Guzzle versions ([#47084](https://github.com/laravel/framework/pull/47084))
 
 ## [v10.10.1](https://github.com/laravel/framework/compare/v10.10.0...v10.10.1) - 2023-05-11
 
