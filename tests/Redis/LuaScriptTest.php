@@ -10,7 +10,7 @@ class LuaScriptTest extends TestCase
 {
     public function testInstanceWithPlainScript()
     {
-        $script = "return 1 + 1;";
+        $script = 'return 1 + 1;';
 
         $instance = LuaScript::fromPlainScript($script);
 
@@ -22,7 +22,7 @@ class LuaScriptTest extends TestCase
 
     public function testInstanceWithSHA1Hash()
     {
-        $sha1 = "some_sha1_hash";
+        $sha1 = 'some_sha1_hash';
 
         $instance = LuaScript::fromSHA1Hash($sha1);
 

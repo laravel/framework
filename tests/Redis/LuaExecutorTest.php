@@ -35,7 +35,7 @@ class LuaExecutorTest extends TestCase
     {
         return [
             new PhpRedisExecutor($this->redis['phpredis']->connection()),
-            new PredisExecutor($this->redis['predis']->connection())
+            new PredisExecutor($this->redis['predis']->connection()),
         ];
     }
 
@@ -45,17 +45,17 @@ class LuaExecutorTest extends TestCase
             $result = $executor->execute(LuaScript::fromPlainScript('return "OK"'), LuaScriptArguments::empty());
 
             self::assertFalse($result->isError());
-            self::assertSame("OK", $result->getResult());
+            self::assertSame('OK', $result->getResult());
         }
     }
 
     public function testExecuteWithPlainScriptWithError()
     {
         foreach ($this->getExecutors() as $executor) {
-            $result = $executor->execute(LuaScript::fromPlainScript("bad_syntax"), LuaScriptArguments::empty());
+            $result = $executor->execute(LuaScript::fromPlainScript('bad_syntax'), LuaScriptArguments::empty());
 
             $this->assertTrue($result->isError());
-            $this->assertSame("ERR", $result->getErrorType());
+            $this->assertSame('ERR', $result->getErrorType());
             $this->assertFalse($result->isNoScriptError());
 
             $this->expectException(LuaScriptExecuteException::class);
@@ -69,7 +69,7 @@ class LuaExecutorTest extends TestCase
             $result = $executor->execute(LuaScript::fromPlainScript('return "OK"'), LuaScriptArguments::empty(), true);
 
             self::assertFalse($result->isError());
-            self::assertSame("OK", $result->getResult());
+            self::assertSame('OK', $result->getResult());
         }
     }
 
@@ -79,14 +79,14 @@ class LuaExecutorTest extends TestCase
             // Should rise exception in when try to load the script into redis
 
             $this->expectException(LuaScriptExecuteException::class);
-            $executor->execute(LuaScript::fromPlainScript("bad_syntax"), LuaScriptArguments::empty(), true);
+            $executor->execute(LuaScript::fromPlainScript('bad_syntax'), LuaScriptArguments::empty(), true);
         }
     }
 
     public function testExecuteWithHashWhenScriptNotLoaded()
     {
         foreach ($this->getExecutors() as $executor) {
-            $result = $executor->execute(LuaScript::fromSHA1Hash("some_sha1_hash"), LuaScriptArguments::empty());
+            $result = $executor->execute(LuaScript::fromSHA1Hash('some_sha1_hash'), LuaScriptArguments::empty());
 
             $this->assertTrue($result->isError());
             $this->assertTrue($result->isNoScriptError());
