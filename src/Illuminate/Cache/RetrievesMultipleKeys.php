@@ -2,6 +2,8 @@
 
 namespace Illuminate\Cache;
 
+use Illuminate\Support\Arr;
+
 trait RetrievesMultipleKeys
 {
     /**
@@ -16,9 +18,9 @@ trait RetrievesMultipleKeys
     {
         $return = [];
 
-        $keys = collect($keys)->mapWithKeys(function ($value, $key) {
+        $keys = Arr::mapWithKeys($keys, function ($value, $key) {
             return [is_string($key) ? $key : $value => is_string($key) ? $value : null];
-        })->all();
+        });
 
         foreach ($keys as $key => $default) {
             $return[$key] = $this->get($key, $default);

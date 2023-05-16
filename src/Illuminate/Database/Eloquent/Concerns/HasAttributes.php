@@ -1836,9 +1836,9 @@ trait HasAttributes
             );
         }
 
-        return collect($this->original)->mapWithKeys(function ($value, $key) {
+        return Arr::mapWithKeys($this->original, function ($value, $key) {
             return [$key => $this->transformModelValue($key, $value)];
-        })->all();
+        });
     }
 
     /**

@@ -1123,11 +1123,9 @@ class Validator implements ValidatorContract
      */
     public function getRulesWithoutPlaceholders()
     {
-        return collect($this->rules)
-            ->mapWithKeys(fn ($value, $key) => [
-                str_replace($this->dotPlaceholder, '\\.', $key) => $value,
-            ])
-            ->all();
+        return Arr::mapWithKeys($this->rules, fn ($value, $key) => [
+            str_replace($this->dotPlaceholder, '\\.', $key) => $value,
+        ]);
     }
 
     /**
