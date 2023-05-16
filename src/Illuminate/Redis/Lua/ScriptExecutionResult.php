@@ -21,7 +21,7 @@ class ScriptExecutionResult
     /**
      * Create a new ScriptExecutionResult instance for a successful execution.
      *
-     * @param mixed $result The result of the script execution.
+     * @param  mixed  $result  The result of the script execution.
      * @return self
      */
     public static function success($result)
@@ -32,7 +32,7 @@ class ScriptExecutionResult
     /**
      * Create a new ScriptExecutionResult instance for an error during execution.
      *
-     * @param LuaScriptExecuteException|PredisError|ServerException $exception The exception thrown or error during script execution.
+     * @param  LuaScriptExecuteException|PredisError|ServerException  $exception  The exception thrown or error during script execution.
      * @return self
      */
     public static function error($exception)
@@ -43,8 +43,8 @@ class ScriptExecutionResult
     /**
      * ScriptExecutionResult constructor.
      *
-     * @param mixed|null $result The result of the script execution.
-     * @param \Throwable|null $exception The exception thrown during script execution.
+     * @param  mixed|null  $result  The result of the script execution.
+     * @param  \Throwable|null  $exception  The exception thrown during script execution.
      */
     private function __construct($result = null, $exception = null)
     {
@@ -57,7 +57,8 @@ class ScriptExecutionResult
      *
      * @return \Throwable|null The exception instance or null if no exception occurred.
      */
-    public function getException() {
+    public function getException()
+    {
         return $this->exception;
     }
 
@@ -66,7 +67,8 @@ class ScriptExecutionResult
      *
      * @return bool True if an error occurred, false otherwise.
      */
-    public function isError() {
+    public function isError()
+    {
         return $this->exception !== null;
     }
 
@@ -75,7 +77,8 @@ class ScriptExecutionResult
      *
      * @return string|null The error type or null if no error occurred.
      */
-    public function getErrorType() {
+    public function getErrorType()
+    {
         return $this->exception->getErrorType();
     }
 
@@ -84,7 +87,8 @@ class ScriptExecutionResult
      *
      * @return bool True if the error type is "NOSCRIPT", false otherwise.
      */
-    public function isNoScriptError() {
+    public function isNoScriptError()
+    {
         return $this->getErrorType() === 'NOSCRIPT';
     }
 
@@ -92,9 +96,11 @@ class ScriptExecutionResult
      * Get the result of the script execution.
      *
      * @return mixed The result of the script execution.
+     *
      * @throws \Throwable If an error occurred during script execution, the exception is thrown.
      */
-    public function getResult() {
-        return !$this->isError() ? $this->result : throw $this->exception;
+    public function getResult()
+    {
+        return ! $this->isError() ? $this->result : throw $this->exception;
     }
 }

@@ -39,7 +39,6 @@ class PredisExecutor extends LuaScriptExecutor
         }
     }
 
-
     /**
      * @inheritDoc
      */
@@ -54,7 +53,7 @@ class PredisExecutor extends LuaScriptExecutor
                 return $result;
             }
         } else {
-            return $this->executeWithTryCatch(fn() => $this->connection->eval($script, $arguments->getNumberOfKeys(), ...$arguments->toArray()));
+            return $this->executeWithTryCatch(fn () => $this->connection->eval($script, $arguments->getNumberOfKeys(), ...$arguments->toArray()));
         }
     }
 
@@ -63,6 +62,6 @@ class PredisExecutor extends LuaScriptExecutor
      */
     protected function executeWithHash($sha1, $arguments)
     {
-        return $this->executeWithTryCatch(fn() => $this->connection->evalsha($sha1, $arguments->getNumberOfKeys(), ...$arguments->toArray()));
+        return $this->executeWithTryCatch(fn () => $this->connection->evalsha($sha1, $arguments->getNumberOfKeys(), ...$arguments->toArray()));
     }
 }

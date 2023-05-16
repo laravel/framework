@@ -36,6 +36,7 @@ class PhpRedisExecutor extends LuaScriptExecutor
 
         if ($error !== null) {
             $this->connection->client()->clearLastError();
+
             return new LuaScriptExecuteException($error);
         }
 
