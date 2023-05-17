@@ -11,6 +11,7 @@ use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\ViewErrorBag;
 use SessionHandlerInterface;
 use stdClass;
+use Symfony\Component\VarDumper\VarDumper;
 
 class Store implements Session
 {
@@ -767,5 +768,33 @@ class Store implements Session
         if ($this->handlerNeedsRequest()) {
             $this->handler->setRequest($request);
         }
+    }
+
+    /**
+     * Dump the request items and end the script.
+     *
+     * @param  mixed  $keys
+     * @return void
+     */
+    public function dd(...$keys)
+    {
+        $this->dump(...$keys);
+
+        exit(1);
+    }
+
+    /**
+     * Dump the items.
+     *
+     * @param  mixed  $keys
+     * @return $this
+     */
+    public function dump($keys = [])
+    {
+        $keys = is_array($keys) ? $keys : func_get_args();
+
+        VarDumper::dump(count($keys) > 0 ? $this->only($keys) : $this->all());
+
+        return $this;
     }
 }
