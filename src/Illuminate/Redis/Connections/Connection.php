@@ -7,6 +7,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Redis\Events\CommandExecuted;
 use Illuminate\Redis\Limiters\ConcurrencyLimiterBuilder;
 use Illuminate\Redis\Limiters\DurationLimiterBuilder;
+use Illuminate\Redis\Lua\LuaScriptExecutor;
 use Illuminate\Support\Traits\Macroable;
 
 abstract class Connection
@@ -66,6 +67,16 @@ abstract class Connection
     public function throttle($name)
     {
         return new DurationLimiterBuilder($this, $name);
+    }
+
+    /**
+     * Get an instance of LuaScriptExecutor for executing Redis Lua scripts.
+     *
+     * @return \Illuminate\Redis\Lua\LuaScriptExecutor The LuaScriptExecutor instance.
+     */
+    public function lua()
+    {
+        return LuaScriptExecutor::create($this);
     }
 
     /**
