@@ -14,6 +14,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables;
 use Illuminate\Foundation\Events\LocaleUpdated;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as AppEventServiceProvider;
+use Illuminate\Foundation\Support\Providers\RouteServiceProvider as AppRouteServiceProvider;
 use Illuminate\Http\Request;
 use Illuminate\Log\LogServiceProvider;
 use Illuminate\Routing\RoutingServiceProvider;
@@ -21,6 +22,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Env;
 use Illuminate\Support\Facades\Broadcast;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
@@ -293,6 +295,32 @@ class Application extends Container implements ApplicationContract, CachesConfig
     {
         $this->booting(function () {
             $this->register(AppEventServiceProvider::class);
+        });
+
+        return $this;
+    }
+
+    /**
+     * Invoke the given callback
+     */
+    public function withRouting(?Closure $callback = null, ?string $web = null, ?string $api = null)
+    {
+        if (is_null($callback) && (is_string($web) || is_string($api))) {
+            $callback = function () use ($web, $api) {
+                if (is_string($api)) {
+                    Route::middleware('api')->prefix('api')->group($api);
+                }
+
+                if (is_string($web)) {
+                    Route::middleware('web')->group($web);
+                }
+            };
+        }
+
+        AppRouteServiceProvider::loadRoutesUsing($callback);
+
+        $this->booting(function () {
+            $this->register(AppRouteServiceProvider::class);
         });
 
         return $this;
