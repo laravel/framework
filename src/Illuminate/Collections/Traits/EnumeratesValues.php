@@ -11,6 +11,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
 use Illuminate\Support\HigherOrderCollectionProxy;
+use Symfony\Component\VarDumper\VarDumper;
 use JsonSerializable;
 use Traversable;
 use UnexpectedValueException;
@@ -201,11 +202,7 @@ trait EnumeratesValues
      */
     public function dump()
     {
-        dump($this->all());
-
-        foreach (func_get_args() as $value) {
-            dump($value);
-        }
+        dump($this->all(), ...func_get_args());
 
         return $this;
     }
