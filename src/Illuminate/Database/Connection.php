@@ -317,7 +317,7 @@ class Connection implements ConnectionInterface
     /**
      * Begin a fluent query against a database table.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|string  $table
+     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Contracts\Database\Query\Expression|string  $table
      * @param  string|null  $as
      * @return \Illuminate\Database\Query\Builder
      */
@@ -419,6 +419,39 @@ class Connection implements ConnectionInterface
             $statement->execute();
 
             return $statement->fetchAll();
+        });
+    }
+
+    /**
+     * Run a select statement against the database and returns all of the result sets.
+     *
+     * @param  string  $query
+     * @param  array  $bindings
+     * @param  bool  $useReadPdo
+     * @return array
+     */
+    public function selectResultSets($query, $bindings = [], $useReadPdo = true)
+    {
+        return $this->run($query, $bindings, function ($query, $bindings) use ($useReadPdo) {
+            if ($this->pretending()) {
+                return [];
+            }
+
+            $statement = $this->prepared(
+                $this->getPdoForSelect($useReadPdo)->prepare($query)
+            );
+
+            $this->bindValues($statement, $this->prepareBindings($bindings));
+
+            $statement->execute();
+
+            $sets = [];
+
+            do {
+                $sets[] = $statement->fetchAll();
+            } while ($statement->nextRowset());
+
+            return $sets;
         });
     }
 

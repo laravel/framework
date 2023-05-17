@@ -17,7 +17,10 @@ use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsCollection;
 use Illuminate\Database\Eloquent\Casts\AsEncryptedArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsEncryptedCollection;
+use Illuminate\Database\Eloquent\Casts\AsEnumArrayObject;
+use Illuminate\Database\Eloquent\Casts\AsEnumCollection;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Casts\Json;
 use Illuminate\Database\Eloquent\InvalidCastException;
 use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Database\Eloquent\MissingAttributeException;
@@ -29,6 +32,7 @@ use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Exceptions\MathException;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use LogicException;
@@ -101,6 +105,7 @@ trait HasAttributes
         'encrypted:json',
         'encrypted:object',
         'float',
+        'hashed',
         'immutable_date',
         'immutable_datetime',
         'immutable_custom_datetime',
@@ -859,6 +864,8 @@ trait HasAttributes
             $convertedCastType = 'immutable_custom_datetime';
         } elseif ($this->isDecimalCast($castType)) {
             $convertedCastType = 'decimal';
+        } elseif (class_exists($castType)) {
+            $convertedCastType = $castType;
         } else {
             $convertedCastType = trim(strtolower($castType));
         }
@@ -980,6 +987,10 @@ trait HasAttributes
 
         if (! is_null($value) && $this->isEncryptedCastable($key)) {
             $value = $this->castAttributeAsEncryptedString($key, $value);
+        }
+
+        if (! is_null($value) && $this->hasCast($key, 'hashed')) {
+            $value = $this->castAttributeAsHashedString($key, $value);
         }
 
         $this->attributes[$key] = $value;
@@ -1241,7 +1252,7 @@ trait HasAttributes
      */
     protected function asJson($value)
     {
-        return json_encode($value);
+        return Json::encode($value);
     }
 
     /**
@@ -1253,7 +1264,7 @@ trait HasAttributes
      */
     public function fromJson($value, $asObject = false)
     {
-        return json_decode($value ?? '', ! $asObject);
+        return Json::decode($value ?? '', ! $asObject);
     }
 
     /**
@@ -1288,6 +1299,18 @@ trait HasAttributes
     public static function encryptUsing($encrypter)
     {
         static::$encrypter = $encrypter;
+    }
+
+    /**
+     * Cast the given attribute to a hashed string.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return string
+     */
+    protected function castAttributeAsHashedString($key, $value)
+    {
+        return $value !== null && password_get_info($value)['algo'] === null ? Hash::make($value) : $value;
     }
 
     /**
@@ -2041,6 +2064,8 @@ trait HasAttributes
             return $this->castAttribute($key, $attribute) ===
                 $this->castAttribute($key, $original);
         } elseif ($this->isClassCastable($key) && in_array($this->getCasts()[$key], [AsArrayObject::class, AsCollection::class])) {
+            return $this->fromJson($attribute) === $this->fromJson($original);
+        } elseif ($this->isClassCastable($key) && Str::startsWith($this->getCasts()[$key], [AsEnumArrayObject::class, AsEnumCollection::class])) {
             return $this->fromJson($attribute) === $this->fromJson($original);
         } elseif ($this->isClassCastable($key) && $original !== null && in_array($this->getCasts()[$key], [AsEncryptedArrayObject::class, AsEncryptedCollection::class])) {
             return $this->fromEncryptedString($attribute) === $this->fromEncryptedString($original);

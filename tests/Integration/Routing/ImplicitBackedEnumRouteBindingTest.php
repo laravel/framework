@@ -9,6 +9,11 @@ include 'Enums.php';
 
 class ImplicitBackedEnumRouteBindingTest extends TestCase
 {
+    protected function defineEnvironment($app): void
+    {
+        $app['config']->set(['app.key' => 'AckfSECXIvnK5r28GVIWUAxmbBSjTsmF']);
+    }
+
     public function testWithRouteCachingEnabled()
     {
         $this->defineCacheRoutes(<<<PHP

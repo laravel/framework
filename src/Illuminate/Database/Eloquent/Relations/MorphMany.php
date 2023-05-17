@@ -7,6 +7,22 @@ use Illuminate\Database\Eloquent\Collection;
 class MorphMany extends MorphOneOrMany
 {
     /**
+     * Convert the relationship to a "morph one" relationship.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\MorphOne
+     */
+    public function one()
+    {
+        return MorphOne::noConstraints(fn () => new MorphOne(
+            $this->getQuery(),
+            $this->getParent(),
+            $this->morphType,
+            $this->foreignKey,
+            $this->localKey
+        ));
+    }
+
+    /**
      * Get the results of the relationship.
      *
      * @return mixed

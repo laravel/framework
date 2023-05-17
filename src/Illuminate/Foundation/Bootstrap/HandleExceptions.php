@@ -181,11 +181,15 @@ class HandleExceptions
         try {
             $this->getExceptionHandler()->report($e);
         } catch (Exception) {
-            //
+            $exceptionHandlerFailed = true;
         }
 
         if (static::$app->runningInConsole()) {
             $this->renderForConsole($e);
+
+            if ($exceptionHandlerFailed ?? false) {
+                exit(1);
+            }
         } else {
             $this->renderHttpResponse($e);
         }

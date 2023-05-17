@@ -112,4 +112,29 @@ class SchemaBuilderTest extends DatabaseTestCase
             $this->assertEquals($expected, $queries);
         }
     }
+
+    public function testChangeTextColumnToTextColumn()
+    {
+        if ($this->driver !== 'mysql') {
+            $this->markTestSkipped('Test requires a MySQL connection.');
+        }
+
+        Schema::create('test', static function (Blueprint $table) {
+            $table->text('test_column');
+        });
+
+        foreach (['tinyText', 'mediumText', 'longText'] as $type) {
+            $blueprint = new Blueprint('test', function ($table) use ($type) {
+                $table->$type('test_column')->change();
+            });
+
+            $queries = $blueprint->toSql($this->getConnection(), $this->getConnection()->getSchemaGrammar());
+
+            $uppercase = strtoupper($type);
+
+            $expected = ["ALTER TABLE test CHANGE test_column test_column $uppercase NOT NULL"];
+
+            $this->assertEquals($expected, $queries);
+        }
+    }
 }

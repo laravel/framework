@@ -1253,7 +1253,7 @@ class Builder implements BuilderContract
         $type = 'between';
 
         if ($values instanceof CarbonPeriod) {
-            $values = $values->toArray();
+            $values = [$values->start, $values->end];
         }
 
         $this->wheres[] = compact('type', 'column', 'values', 'boolean', 'not');
@@ -1689,7 +1689,7 @@ class Builder implements BuilderContract
             // compile the whole thing in the grammar and insert it into the SQL.
             $callback($query);
         } else {
-            $query = $callback;
+            $query = $callback instanceof EloquentBuilder ? $callback->toBase() : $callback;
         }
 
         return $this->addWhereExistsQuery($query, $boolean, $not);
@@ -2232,7 +2232,7 @@ class Builder implements BuilderContract
         $type = 'between';
 
         if ($values instanceof CarbonPeriod) {
-            $values = $values->toArray();
+            $values = [$values->start, $values->end];
         }
 
         $this->havings[] = compact('type', 'column', 'values', 'boolean', 'not');
@@ -2793,17 +2793,30 @@ class Builder implements BuilderContract
      */
     protected function ensureOrderForCursorPagination($shouldReverse = false)
     {
-        $this->enforceOrderBy();
+        if (empty($this->orders) && empty($this->unionOrders)) {
+            $this->enforceOrderBy();
+        }
 
-        return collect($this->orders ?? $this->unionOrders ?? [])->filter(function ($order) {
-            return Arr::has($order, 'direction');
-        })->when($shouldReverse, function (Collection $orders) {
-            return $orders->map(function ($order) {
-                $order['direction'] = $order['direction'] === 'asc' ? 'desc' : 'asc';
-
+        $reverseDirection = function ($order) {
+            if (! isset($order['direction'])) {
                 return $order;
-            });
-        })->values();
+            }
+
+            $order['direction'] = $order['direction'] === 'asc' ? 'desc' : 'asc';
+
+            return $order;
+        };
+
+        if ($shouldReverse) {
+            $this->orders = collect($this->orders)->map($reverseDirection)->toArray();
+            $this->unionOrders = collect($this->unionOrders)->map($reverseDirection)->toArray();
+        }
+
+        $orders = ! empty($this->unionOrders) ? $this->unionOrders : $this->orders;
+
+        return collect($orders)
+            ->filter(fn ($order) => Arr::has($order, 'direction'))
+            ->values();
     }
 
     /**
@@ -3310,6 +3323,7 @@ class Builder implements BuilderContract
         } else {
             foreach ($values as $key => $value) {
                 ksort($value);
+
                 $values[$key] = $value;
             }
         }
@@ -3885,7 +3899,7 @@ class Builder implements BuilderContract
      *
      * @throws \BadMethodCallException
      */
-    public function __call($method, array $parameters)
+    public function __call($method, $parameters)
     {
         if (static::hasMacro($method)) {
             return $this->macroCall($method, $parameters);

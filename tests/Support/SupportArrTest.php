@@ -642,6 +642,24 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['first' => 'taylor', 'last' => 'otwell'], $data);
     }
 
+    public function testMapWithKeys()
+    {
+        $data = [
+            ['name' => 'Blastoise', 'type' => 'Water', 'idx' => 9],
+            ['name' => 'Charmander', 'type' => 'Fire', 'idx' => 4],
+            ['name' => 'Dragonair', 'type' => 'Dragon', 'idx' => 148],
+        ];
+
+        $data = Arr::mapWithKeys($data, function ($pokemon) {
+            return [$pokemon['name'] => $pokemon['type']];
+        });
+
+        $this->assertEquals(
+            ['Blastoise' => 'Water', 'Charmander' => 'Fire', 'Dragonair' => 'Dragon'],
+            $data
+        );
+    }
+
     public function testMapByReference()
     {
         $data = ['first' => 'taylor', 'last' => 'otwell'];

@@ -53,14 +53,14 @@ interface Paginator
     /**
      * Get the "index" of the first item being paginated.
      *
-     * @return int
+     * @return int|null
      */
     public function firstItem();
 
     /**
      * Get the "index" of the last item being paginated.
      *
-     * @return int
+     * @return int|null
      */
     public function lastItem();
 

@@ -31,22 +31,24 @@ class ForeignIdColumnDefinition extends ColumnDefinition
      * Create a foreign key constraint on this column referencing the "id" column of the conventionally related table.
      *
      * @param  string|null  $table
-     * @param  string  $column
+     * @param  string|null  $column
+     * @param  string|null  $indexName
      * @return \Illuminate\Database\Schema\ForeignKeyDefinition
      */
-    public function constrained($table = null, $column = 'id')
+    public function constrained($table = null, $column = 'id', $indexName = null)
     {
-        return $this->references($column)->on($table ?? Str::of($this->name)->beforeLast('_'.$column)->plural());
+        return $this->references($column, $indexName)->on($table ?? Str::of($this->name)->beforeLast('_'.$column)->plural());
     }
 
     /**
      * Specify which column this foreign ID references on another table.
      *
      * @param  string  $column
+     * @param  string  $indexName
      * @return \Illuminate\Database\Schema\ForeignKeyDefinition
      */
-    public function references($column)
+    public function references($column, $indexName = null)
     {
-        return $this->blueprint->foreign($this->name)->references($column);
+        return $this->blueprint->foreign($this->name, $indexName)->references($column);
     }
 }

@@ -35,6 +35,32 @@ class ThrottleRequests
     }
 
     /**
+     * Specify the named rate limiter to use for the middleware.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    public static function using($name)
+    {
+        return static::class.':'.$name;
+    }
+
+    /**
+     * Specify the rate limiter configuration for the middleware.
+     *
+     * @param  int  $maxAttempts
+     * @param  int  $decayMinutes
+     * @param  string  $prefix
+     * @return string
+     *
+     * @named-arguments-supported
+     */
+    public static function with($maxAttempts = 60, $decayMinutes = 1, $prefix = '')
+    {
+        return static::class.':'.implode(',', func_get_args());
+    }
+
+    /**
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request

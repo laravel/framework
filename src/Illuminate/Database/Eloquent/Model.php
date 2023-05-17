@@ -1276,6 +1276,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     protected function performInsert(Builder $query)
     {
+        if ($this->usesUniqueIds()) {
+            $this->setUniqueIds();
+        }
+
         if ($this->fireModelEvent('creating') === false) {
             return false;
         }
@@ -1285,10 +1289,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         // convenience. After, we will just continue saving these model instances.
         if ($this->usesTimestamps()) {
             $this->updateTimestamps();
-        }
-
-        if ($this->usesUniqueIds()) {
-            $this->setUniqueIds();
         }
 
         // If the model has an incrementing key, we can use the "insertGetId" method on

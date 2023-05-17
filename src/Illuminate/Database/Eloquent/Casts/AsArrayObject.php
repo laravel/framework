@@ -23,14 +23,14 @@ class AsArrayObject implements Castable
                     return;
                 }
 
-                $data = json_decode($attributes[$key], true);
+                $data = Json::decode($attributes[$key]);
 
                 return is_array($data) ? new ArrayObject($data) : null;
             }
 
             public function set($model, $key, $value, $attributes)
             {
-                return [$key => json_encode($value)];
+                return [$key => Json::encode($value)];
             }
 
             public function serialize($model, string $key, $value, array $attributes)

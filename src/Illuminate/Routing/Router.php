@@ -223,7 +223,7 @@ class Router implements BindingRegistrar, RegistrarContract
     }
 
     /**
-     * Register a new Fallback route with the router.
+     * Register a new fallback route with the router.
      *
      * @param  array|string|callable|null  $action
      * @return \Illuminate\Routing\Route

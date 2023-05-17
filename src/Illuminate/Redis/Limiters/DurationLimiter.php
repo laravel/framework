@@ -5,6 +5,7 @@ namespace Illuminate\Redis\Limiters;
 use Illuminate\Contracts\Redis\LimiterTimeoutException;
 use Illuminate\Redis\Lua\LuaScript;
 use Illuminate\Redis\Lua\LuaScriptArguments;
+use Illuminate\Support\Sleep;
 
 class DurationLimiter
 {
@@ -86,7 +87,7 @@ class DurationLimiter
                 throw new LimiterTimeoutException;
             }
 
-            usleep($sleep * 1000);
+            Sleep::usleep($sleep * 1000);
         }
 
         if (is_callable($callback)) {

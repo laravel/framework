@@ -825,9 +825,11 @@ class SupportStringableTest extends TestCase
     public function testReplace()
     {
         $this->assertSame('foo/foo/foo', (string) $this->stringable('?/?/?')->replace('?', 'foo'));
+        $this->assertSame('foo/foo/foo', (string) $this->stringable('x/x/x')->replace('X', 'foo', false));
         $this->assertSame('bar/bar', (string) $this->stringable('?/?')->replace('?', 'bar'));
         $this->assertSame('?/?/?', (string) $this->stringable('? ? ?')->replace(' ', '/'));
         $this->assertSame('foo/bar/baz/bam', (string) $this->stringable('?1/?2/?3/?4')->replace(['?1', '?2', '?3', '?4'], ['foo', 'bar', 'baz', 'bam']));
+        $this->assertSame('?1/?2/?3/?4', (string) $this->stringable('foo/bar/baz/bam')->replace(['Foo', 'BaR', 'BAZ', 'bAm'], ['?1', '?2', '?3', '?4'], false));
         $this->assertSame('foo/bar/baz/bam', (string) $this->stringable('?1/?2/?3/?4')->replace(collect(['?1', '?2', '?3', '?4']), collect(['foo', 'bar', 'baz', 'bam'])));
     }
 
