@@ -1424,8 +1424,6 @@ class TestResponse implements ArrayAccess
         return $session;
     }
 
-
-
     /**
      * Dump the headers from the response and end the script.
      *
