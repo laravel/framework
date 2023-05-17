@@ -27,9 +27,7 @@ trait Dumpable
      */
     public function dump(...$args)
     {
-        foreach ($args as $value) {
-            VarDumper::dump($value);
-        }
+        dump($this, ...$args);
 
         return $this;
     }
