@@ -5,11 +5,14 @@ namespace Illuminate\Support;
 use Carbon\Carbon;
 use Carbon\CarbonInterval;
 use DateInterval;
+use Illuminate\Support\Traits\Macroable;
 use PHPUnit\Framework\Assert as PHPUnit;
 use RuntimeException;
 
 class Sleep
 {
+    use Macroable;
+
     /**
      * The total duration to sleep.
      *
@@ -53,19 +56,7 @@ class Sleep
      */
     public function __construct($duration)
     {
-        if (! $duration instanceof DateInterval) {
-            $this->duration = CarbonInterval::microsecond(0);
-
-            $this->pending = $duration;
-        } else {
-            $duration = CarbonInterval::instance($duration);
-
-            if ($duration->totalMicroseconds < 0) {
-                $duration = CarbonInterval::seconds(0);
-            }
-
-            $this->duration = $duration;
-        }
+        $this->duration($duration);
     }
 
     /**
@@ -114,6 +105,32 @@ class Sleep
     public static function sleep($duration)
     {
         return (new static($duration))->seconds();
+    }
+
+    /**
+     * Sleep for the given duration. Replaces any previously defined duration.
+     *
+     * @param  \DateInterval|int|float  $duration
+     * @return $this
+     */
+    protected function duration($duration)
+    {
+        if (! $duration instanceof DateInterval) {
+            $this->duration = CarbonInterval::microsecond(0);
+
+            $this->pending = $duration;
+        } else {
+            $duration = CarbonInterval::instance($duration);
+
+            if ($duration->totalMicroseconds < 0) {
+                $duration = CarbonInterval::seconds(0);
+            }
+
+            $this->duration = $duration;
+            $this->pending = null;
+        }
+
+        return $this;
     }
 
     /**
@@ -393,5 +410,29 @@ class Sleep
         $this->shouldSleep = false;
 
         return $this;
+    }
+
+    /**
+     * Only sleep when the given condition is true.
+     *
+     * @param  (\Closure($this): bool)|bool $condition
+     * @return $this
+     */
+    public function when($condition)
+    {
+        $this->shouldSleep = (bool) value($condition, $this);
+
+        return $this;
+    }
+
+    /**
+     * Don't sleep when the given condition is true.
+     *
+     * @param  (\Closure($this): bool)|bool $condition
+     * @return $this
+     */
+    public function unless($condition)
+    {
+        return $this->when(! value($condition, $this));
     }
 }
