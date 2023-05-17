@@ -96,6 +96,17 @@ trait HidesAttributes
     }
 
     /**
+     * Indicates if the given attribute is visible.
+     *
+     * @param  string  $attribute
+     * @return bool
+     */
+    public function isVisible($attribute)
+    {
+        return ! $this->isHidden($attribute);
+    }
+
+    /**
      * Make the given, typically visible, attributes hidden.
      *
      * @param  array<string>|string|null  $attributes
@@ -120,5 +131,16 @@ trait HidesAttributes
     public function makeHiddenIf($condition, $attributes)
     {
         return value($condition, $this) ? $this->makeHidden($attributes) : $this;
+    }
+
+    /**
+     * Indicates if the given attribute is hidden.
+     *
+     * @param  string  $attribute
+     * @return bool
+     */
+    public function isHidden($attribute)
+    {
+        return in_array($attribute, $this->hidden);
     }
 }
