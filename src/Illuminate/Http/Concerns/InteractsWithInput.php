@@ -4,8 +4,8 @@ namespace Illuminate\Http\Concerns;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Traits\Dumpable;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Traits\Dumpable;
 use SplFileInfo;
 use stdClass;
 use Symfony\Component\HttpFoundation\InputBag;
