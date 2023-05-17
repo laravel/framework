@@ -4,6 +4,7 @@ namespace Illuminate\Http\Concerns;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Traits\Dumpable;
 use Illuminate\Support\Facades\Date;
 use SplFileInfo;
 use stdClass;
@@ -11,6 +12,8 @@ use Symfony\Component\HttpFoundation\InputBag;
 
 trait InteractsWithInput
 {
+    use Dumpable;
+
     /**
      * Retrieve a server variable from the request.
      *
@@ -603,19 +606,6 @@ trait InteractsWithInput
         }
 
         return $this->$source->get($key, $default);
-    }
-
-    /**
-     * Dump the request items and end the script.
-     *
-     * @param  mixed  ...$keys
-     * @return never
-     */
-    public function dd(...$keys)
-    {
-        $this->dump(...$keys);
-
-        exit(1);
     }
 
     /**
