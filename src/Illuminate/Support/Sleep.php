@@ -426,7 +426,7 @@ class Sleep
     }
 
     /**
-     * Always sleep unless the condition is true.
+     * Don't sleep when the condition is true.
      *
      * @param  (\Closure($this): bool)|bool $condition
      * @return $this
