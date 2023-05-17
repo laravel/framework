@@ -2,8 +2,6 @@
 
 namespace Illuminate\Support\Traits;
 
-use Symfony\Component\VarDumper\VarDumper;
-
 trait Dumpable
 {
     /**
