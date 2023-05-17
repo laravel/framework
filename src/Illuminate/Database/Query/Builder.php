@@ -3874,12 +3874,12 @@ class Builder implements BuilderContract
      *
      * @return $this
      */
-    public function dump(...$args)
+    public function dump()
     {
         dump(
             $this->toSql(),
             $this->getBindings(),
-            ...$args,
+            ...func_get_args(),
         );
 
         return $this;
