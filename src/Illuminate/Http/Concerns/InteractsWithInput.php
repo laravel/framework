@@ -629,7 +629,7 @@ trait InteractsWithInput
     {
         $keys = is_array($keys) ? $keys : func_get_args();
 
-        VarDumper::dump(count($keys) > 0 ? $this->only($keys) : $this->all());
+        dump(count($keys) > 0 ? $this->only($keys) : $this->all());
 
         return $this;
     }
