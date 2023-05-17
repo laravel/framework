@@ -30,7 +30,7 @@ class SetAuthenticationGuard
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
-     * @param  string $guard
+     * @param  string  $guard
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function handle($request, Closure $next, string $guard)
