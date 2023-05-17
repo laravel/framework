@@ -197,11 +197,12 @@ trait EnumeratesValues
     /**
      * Dump the items.
      *
+     * @param  mixed  ...$args
      * @return $this
      */
-    public function dump()
+    public function dump(...$args)
     {
-        dump($this->all(), ...func_get_args());
+        dump($this->all(), ...$args);
 
         return $this;
     }
