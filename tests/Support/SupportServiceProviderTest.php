@@ -105,6 +105,32 @@ class SupportServiceProviderTest extends TestCase
         ];
         $this->assertEquals($expected, $toPublish, 'Service provider does not return expected set of published tagged paths.');
     }
+
+    public function testServiceProvidersCanBeAddedToConfigurationFile()
+    {
+        copy(
+            __DIR__.'/Fixtures/service-provider-configuration-file.php',
+            $workingPath = __DIR__.'/Fixtures/working-service-provider-configuration-file.php',
+        );
+
+        ServiceProvider::addToConfiguration('SomeProvider', path: $workingPath);
+        ServiceProvider::addToConfiguration('AnotherProvider', path: $workingPath);
+
+        $content = file_get_contents($workingPath);
+
+        $this->assertTrue(str_contains($content, 'SomeProvider::class'));
+        $this->assertTrue(str_contains($content, 'AnotherProvider::class'));
+
+        ServiceProvider::addToConfigurationAfter('SomeProvider', 'ThirdProvider', path: $workingPath);
+        ServiceProvider::addToConfigurationAfter('MissingProvider', 'FourthProvider', path: $workingPath);
+
+        $content = file_get_contents($workingPath);
+
+        $this->assertTrue(str_contains($content, 'ThirdProvider::class'));
+        $this->assertFalse(str_contains($content, 'FourthProvider::class'));
+
+        unlink($workingPath);
+    }
 }
 
 class ServiceProviderForTestingOne extends ServiceProvider
