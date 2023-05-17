@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Date;
 use SplFileInfo;
 use stdClass;
 use Symfony\Component\HttpFoundation\InputBag;
-use Symfony\Component\VarDumper\VarDumper;
 
 trait InteractsWithInput
 {
