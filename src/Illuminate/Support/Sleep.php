@@ -414,7 +414,7 @@ class Sleep
     }
 
     /**
-     * Only sleep when the condition is true
+     * Only sleep when the condition is true.
      *
      * @param (\Closure($this): bool)|bool $condition
      * @return $this
@@ -429,7 +429,7 @@ class Sleep
     }
 
     /**
-     * Always sleep unless the condition is true
+     * Always sleep unless the condition is true.
      *
      * @param (\Closure($this): bool)|bool $condition
      * @return $this
