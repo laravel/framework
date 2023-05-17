@@ -30,6 +30,13 @@ class RouteServiceProvider extends ServiceProvider
     protected $loadRoutesUsing;
 
     /**
+     * The global callback that should be used to load the application's routes.
+     *
+     * @var \Closure|null
+     */
+    protected static $alwaysLoadRoutesUsing;
+
+    /**
      * Register any application services.
      *
      * @return void
@@ -76,6 +83,17 @@ class RouteServiceProvider extends ServiceProvider
     }
 
     /**
+     * Register the callback that will be used to load the application's routes.
+     *
+     * @param  \Closure  $routesCallback
+     * @return void
+     */
+    public static function loadRoutesUsing(Closure $routesCallback)
+    {
+        static::$alwaysLoadRoutesUsing = $routesCallback;
+    }
+
+    /**
      * Set the root controller namespace for the application.
      *
      * @return void
@@ -116,7 +134,9 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function loadRoutes()
     {
-        if (! is_null($this->loadRoutesUsing)) {
+        if (! is_null(static::$alwaysLoadRoutesUsing)) {
+            $this->app->call(static::$alwaysLoadRoutesUsing);
+        } elseif (! is_null($this->loadRoutesUsing)) {
             $this->app->call($this->loadRoutesUsing);
         } elseif (method_exists($this, 'map')) {
             $this->app->call([$this, 'map']);
