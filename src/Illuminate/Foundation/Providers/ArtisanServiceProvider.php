@@ -7,6 +7,7 @@ use Illuminate\Cache\Console\CacheTableCommand;
 use Illuminate\Cache\Console\ClearCommand as CacheClearCommand;
 use Illuminate\Cache\Console\ForgetCommand as CacheForgetCommand;
 use Illuminate\Cache\Console\PruneStaleTagsCommand;
+use Illuminate\Console\Command;
 use Illuminate\Console\Scheduling\ScheduleClearCacheCommand;
 use Illuminate\Console\Scheduling\ScheduleFinishCommand;
 use Illuminate\Console\Scheduling\ScheduleListCommand;
@@ -236,6 +237,12 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
                 $this->{$method}();
             } else {
                 $this->app->singleton($command);
+            }
+
+            if ($this->app->environment('production') && array_key_exists($commandName, $this->devCommands)) {
+                $this->app->afterResolving($command, function (Command $command) {
+                    $command->setHidden();
+                });
             }
         }
 
