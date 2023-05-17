@@ -4,9 +4,10 @@ namespace Illuminate\Broadcasting\Broadcasters;
 
 use Illuminate\Broadcasting\BroadcastException;
 use Illuminate\Contracts\Redis\Factory as Redis;
+use Illuminate\Contracts\Redis\LuaScriptExecuteException;
+use Illuminate\Redis\Lua\LuaScript;
+use Illuminate\Redis\Lua\LuaScriptArguments;
 use Illuminate\Support\Arr;
-use Predis\Connection\ConnectionException;
-use RedisException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class RedisBroadcaster extends Broadcaster
@@ -126,11 +127,10 @@ class RedisBroadcaster extends Broadcaster
         ]);
 
         try {
-            $connection->eval(
-                $this->broadcastMultipleChannelsScript(),
-                0, $payload, ...$this->formatChannels($channels)
-            );
-        } catch (ConnectionException|RedisException $e) {
+            $connection->lua()
+                ->execute($this->broadcastMultipleChannelsScript(),LuaScriptArguments::withArguments($payload, ...$this->formatChannels($channels)))
+                ->throwIfError();
+        } catch (LuaScriptExecuteException $e) {
             throw new BroadcastException(
                 sprintf('Redis error: %s.', $e->getMessage())
             );
@@ -143,15 +143,15 @@ class RedisBroadcaster extends Broadcaster
      * ARGV[1] - The payload
      * ARGV[2...] - The channels
      *
-     * @return string
+     * @return \Illuminate\Redis\Lua\LuaScript
      */
     protected function broadcastMultipleChannelsScript()
     {
-        return <<<'LUA'
+        return LuaScript::fromPlainScript(<<<'LUA'
 for i = 2, #ARGV do
   redis.call('publish', ARGV[i], ARGV[1])
 end
-LUA;
+LUA);
     }
 
     /**

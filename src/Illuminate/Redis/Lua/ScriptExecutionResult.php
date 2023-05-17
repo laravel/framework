@@ -107,4 +107,18 @@ class ScriptExecutionResult
     {
         return ! $this->isError() ? $this->result : throw $this->exception;
     }
+
+    /**
+     * Throws an exception if an error occurred during script execution.
+     *
+     * @return void
+     *
+     * @throws \Illuminate\Contracts\Redis\LuaScriptExecuteException If an error occurred during script execution, the exception is thrown.
+     */
+    public function throwIfError()
+    {
+        if ($this->isError()) {
+            throw $this->exception;
+        }
+    }
 }

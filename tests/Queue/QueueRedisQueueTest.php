@@ -7,6 +7,9 @@ use Illuminate\Contracts\Redis\Factory;
 use Illuminate\Queue\LuaScripts;
 use Illuminate\Queue\Queue;
 use Illuminate\Queue\RedisQueue;
+use Illuminate\Redis\Lua\Executors\PhpRedisExecutor;
+use Illuminate\Redis\Lua\LuaScriptArguments;
+use Illuminate\Redis\Lua\ScriptExecutionResult;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Mockery as m;
@@ -30,8 +33,19 @@ class QueueRedisQueueTest extends TestCase
         $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['getRandomId'])->setConstructorArgs([$redis = m::mock(Factory::class), 'default'])->getMock();
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
         $queue->setContainer($container = m::spy(Container::class));
+
+        $executor = $this->getMockBuilder(PhpRedisExecutor::class)
+            ->setConstructorArgs([$redis])
+            ->onlyMethods(['execute'])
+            ->getMock();
+
+        $executor->expects($this->once())
+            ->method('execute')
+            ->with(LuaScripts::push(), LuaScriptArguments::with(['queues:default', 'queues:default:notify'], [json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'id' => 'foo', 'attempts' => 0])]))
+            ->willReturn(ScriptExecutionResult::success(null));
+
+        $redis->shouldReceive('lua')->once()->andReturn($executor);
         $redis->shouldReceive('connection')->once()->andReturn($redis);
-        $redis->shouldReceive('eval')->once()->with(LuaScripts::push(), 2, 'queues:default', 'queues:default:notify', json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'id' => 'foo', 'attempts' => 0]));
 
         $id = $queue->push('foo', ['data']);
         $this->assertSame('foo', $id);
@@ -51,8 +65,19 @@ class QueueRedisQueueTest extends TestCase
         $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['getRandomId'])->setConstructorArgs([$redis = m::mock(Factory::class), 'default'])->getMock();
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
         $queue->setContainer($container = m::spy(Container::class));
+
+        $executor = $this->getMockBuilder(PhpRedisExecutor::class)
+            ->setConstructorArgs([$redis])
+            ->onlyMethods(['execute'])
+            ->getMock();
+
+        $executor->expects($this->once())
+            ->method('execute')
+            ->with(LuaScripts::push(), LuaScriptArguments::with(['queues:default', 'queues:default:notify'], [json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'custom' => 'taylor', 'id' => 'foo', 'attempts' => 0])]))
+            ->willReturn(ScriptExecutionResult::success(null));
+
+        $redis->shouldReceive('lua')->once()->andReturn($executor);
         $redis->shouldReceive('connection')->once()->andReturn($redis);
-        $redis->shouldReceive('eval')->once()->with(LuaScripts::push(), 2, 'queues:default', 'queues:default:notify', json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'custom' => 'taylor', 'id' => 'foo', 'attempts' => 0]));
 
         Queue::createPayloadUsing(function ($connection, $queue, $payload) {
             return ['custom' => 'taylor'];
@@ -78,8 +103,19 @@ class QueueRedisQueueTest extends TestCase
         $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['getRandomId'])->setConstructorArgs([$redis = m::mock(Factory::class), 'default'])->getMock();
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
         $queue->setContainer($container = m::spy(Container::class));
+
+        $executor = $this->getMockBuilder(PhpRedisExecutor::class)
+            ->setConstructorArgs([$redis])
+            ->onlyMethods(['execute'])
+            ->getMock();
+
+        $executor->expects($this->once())
+            ->method('execute')
+            ->with(LuaScripts::push(), LuaScriptArguments::with(['queues:default', 'queues:default:notify'], [json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'custom' => 'taylor', 'bar' => 'foo', 'id' => 'foo', 'attempts' => 0])]))
+            ->willReturn(ScriptExecutionResult::success(null));
+
+        $redis->shouldReceive('lua')->once()->andReturn($executor);
         $redis->shouldReceive('connection')->once()->andReturn($redis);
-        $redis->shouldReceive('eval')->once()->with(LuaScripts::push(), 2, 'queues:default', 'queues:default:notify', json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'custom' => 'taylor', 'bar' => 'foo', 'id' => 'foo', 'attempts' => 0]));
 
         Queue::createPayloadUsing(function ($connection, $queue, $payload) {
             return ['custom' => 'taylor'];

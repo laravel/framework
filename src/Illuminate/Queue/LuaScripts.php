@@ -2,6 +2,8 @@
 
 namespace Illuminate\Queue;
 
+use Illuminate\Redis\Lua\LuaScript;
+
 class LuaScripts
 {
     /**
@@ -11,13 +13,13 @@ class LuaScripts
      * KEYS[2] - The name of the "delayed" queue
      * KEYS[3] - The name of the "reserved" queue
      *
-     * @return string
+     * @return \Illuminate\Redis\Lua\LuaScript
      */
     public static function size()
     {
-        return <<<'LUA'
+        return LuaScript::fromPlainScript(<<<'LUA'
 return redis.call('llen', KEYS[1]) + redis.call('zcard', KEYS[2]) + redis.call('zcard', KEYS[3])
-LUA;
+LUA);
     }
 
     /**
@@ -27,16 +29,16 @@ LUA;
      * KEYS[2] - The notification list for the queue we are pushing jobs onto, for example: queues:foo:notify
      * ARGV[1] - The job payload
      *
-     * @return string
+     * @return \Illuminate\Redis\Lua\LuaScript
      */
     public static function push()
     {
-        return <<<'LUA'
+        return LuaScript::fromPlainScript(<<<'LUA'
 -- Push the job onto the queue...
 redis.call('rpush', KEYS[1], ARGV[1])
 -- Push a notification onto the "notify" queue...
 redis.call('rpush', KEYS[2], 1)
-LUA;
+LUA);
     }
 
     /**
@@ -47,11 +49,11 @@ LUA;
      * KEYS[3] - The notify queue
      * ARGV[1] - The time at which the reserved job will expire
      *
-     * @return string
+     * @return \Illuminate\Redis\Lua\LuaScript
      */
     public static function pop()
     {
-        return <<<'LUA'
+        return LuaScript::fromPlainScript(<<<'LUA'
 -- Pop the first job off of the queue...
 local job = redis.call('lpop', KEYS[1])
 local reserved = false
@@ -66,7 +68,7 @@ if(job ~= false) then
 end
 
 return {job, reserved}
-LUA;
+LUA);
     }
 
     /**
@@ -77,11 +79,11 @@ LUA;
      * ARGV[1] - The raw payload of the job to add to the "delayed" queue
      * ARGV[2] - The UNIX timestamp at which the job should become available
      *
-     * @return string
+     * @return \Illuminate\Redis\Lua\LuaScript
      */
     public static function release()
     {
-        return <<<'LUA'
+        return LuaScript::fromPlainScript(<<<'LUA'
 -- Remove the job from the current queue...
 redis.call('zrem', KEYS[2], ARGV[1])
 
@@ -89,7 +91,7 @@ redis.call('zrem', KEYS[2], ARGV[1])
 redis.call('zadd', KEYS[1], ARGV[2], ARGV[1])
 
 return true
-LUA;
+LUA);
     }
 
     /**
@@ -100,11 +102,11 @@ LUA;
      * KEYS[3] - The notification list for the queue we are moving jobs to, for example queues:foo:notify
      * ARGV[1] - The current UNIX timestamp
      *
-     * @return string
+     * @return \Illuminate\Redis\Lua\LuaScript
      */
     public static function migrateExpiredJobs()
     {
-        return <<<'LUA'
+        return LuaScript::fromPlainScript(<<<'LUA'
 -- Get all of the jobs with an expired "score"...
 local val = redis.call('zrangebyscore', KEYS[1], '-inf', ARGV[1], 'limit', 0, ARGV[2])
 
@@ -124,7 +126,7 @@ if(next(val) ~= nil) then
 end
 
 return val
-LUA;
+LUA);
     }
 
     /**
@@ -135,14 +137,14 @@ LUA;
      * KEYS[3] - The name of the "reserved" queue
      * KEYS[4] - The name of the "notify" queue
      *
-     * @return string
+     * @return \Illuminate\Redis\Lua\LuaScript
      */
     public static function clear()
     {
-        return <<<'LUA'
+        return LuaScript::fromPlainScript(<<<'LUA'
 local size = redis.call('llen', KEYS[1]) + redis.call('zcard', KEYS[2]) + redis.call('zcard', KEYS[3])
 redis.call('del', KEYS[1], KEYS[2], KEYS[3], KEYS[4])
 return size
-LUA;
+LUA);
     }
 }

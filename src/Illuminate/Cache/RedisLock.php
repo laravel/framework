@@ -2,6 +2,8 @@
 
 namespace Illuminate\Cache;
 
+use Illuminate\Redis\Lua\LuaScriptArguments;
+
 class RedisLock extends Lock
 {
     /**
@@ -45,10 +47,14 @@ class RedisLock extends Lock
      * Release the lock.
      *
      * @return bool
+     *
+     * @throws \Illuminate\Contracts\Redis\LuaScriptExecuteException
      */
     public function release()
     {
-        return (bool) $this->redis->eval(LuaScripts::releaseLock(), 1, $this->name, $this->owner);
+        return (bool) $this->redis->lua()
+            ->execute(LuaScripts::releaseLock(),LuaScriptArguments::with([$this->name],[$this->owner]))
+            ->getResult();
     }
 
     /**

@@ -6,6 +6,8 @@ use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Redis\Factory as Redis;
 use Illuminate\Redis\Connections\PhpRedisConnection;
 use Illuminate\Redis\Connections\PredisConnection;
+use Illuminate\Redis\Lua\LuaScript;
+use Illuminate\Redis\Lua\LuaScriptArguments;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
 
@@ -136,14 +138,17 @@ class RedisStore extends TaggableStore implements LockProvider
      * @param  mixed  $value
      * @param  int  $seconds
      * @return bool
+     *
+     * @throws \Illuminate\Contracts\Redis\LuaScriptExecuteException
      */
     public function add($key, $value, $seconds)
     {
-        $lua = "return redis.call('exists',KEYS[1])<1 and redis.call('setex',KEYS[1],ARGV[2],ARGV[1])";
+        $lua = LuaScript::fromPlainScript("return redis.call('exists',KEYS[1])<1 and redis.call('setex',KEYS[1],ARGV[2],ARGV[1])");
 
-        return (bool) $this->connection()->eval(
-            $lua, 1, $this->prefix.$key, $this->serialize($value), (int) max(1, $seconds)
-        );
+        return (bool) $this->connection()
+            ->lua()
+            ->execute($lua, LuaScriptArguments::with([$this->prefix.$key], [$this->serialize($value), (int) max(1, $seconds)]))
+            ->getResult();
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace Illuminate\Cache;
 
 use Illuminate\Redis\Connections\PhpRedisConnection;
+use Illuminate\Redis\Lua\LuaScriptArguments;
 
 class PhpRedisLock extends RedisLock
 {
@@ -25,11 +26,8 @@ class PhpRedisLock extends RedisLock
      */
     public function release()
     {
-        return (bool) $this->redis->eval(
-            LuaScripts::releaseLock(),
-            1,
-            $this->name,
-            ...$this->redis->pack([$this->owner])
-        );
+        return (bool) $this->redis->lua()
+            ->execute(LuaScripts::releaseLock(),LuaScriptArguments::with([$this->name],$this->redis->pack([$this->owner])))
+            ->getResult();
     }
 }
