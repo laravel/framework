@@ -24,7 +24,8 @@
         "illuminate/contracts": "^11.0",
         "illuminate/macroable": "^11.0",
         "nesbot/carbon": "^2.62.1",
-        "voku/portable-ascii": "^2.0"
+        "voku/portable-ascii": "^2.0",
+        "symfony/var-dumper": "^6.3"
     },
     "conflict": {
         "tightenco/collect": "<5.5.33"
