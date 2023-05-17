@@ -4,7 +4,6 @@ namespace Illuminate\Support;
 
 use Carbon\Carbon;
 use Carbon\CarbonInterval;
-use Closure;
 use DateInterval;
 use Illuminate\Support\Traits\Macroable;
 use PHPUnit\Framework\Assert as PHPUnit;
@@ -416,14 +415,12 @@ class Sleep
     /**
      * Only sleep when the condition is true.
      *
-     * @param (\Closure($this): bool)|bool $condition
+     * @param  (\Closure($this): bool)|bool $condition
      * @return $this
      */
     public function when($condition)
     {
-        $condition = $condition instanceof Closure ? $condition($this) : $condition;
-
-        $this->shouldSleep = (bool) $condition;
+        $this->shouldSleep = (bool) value($condition, $this);
 
         return $this;
     }
@@ -431,13 +428,11 @@ class Sleep
     /**
      * Always sleep unless the condition is true.
      *
-     * @param (\Closure($this): bool)|bool $condition
+     * @param  (\Closure($this): bool)|bool $condition
      * @return $this
      */
     public function unless($condition)
     {
-        $condition = $condition instanceof Closure ? $condition($this) : $condition;
-
-        return $this->when(! $condition);
+        return $this->when(! value($condition, $this));
     }
 }
