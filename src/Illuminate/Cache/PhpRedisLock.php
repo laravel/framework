@@ -27,7 +27,7 @@ class PhpRedisLock extends RedisLock
     public function release()
     {
         return (bool) $this->redis->lua()
-            ->execute(LuaScripts::releaseLock(),LuaScriptArguments::with([$this->name],$this->redis->pack([$this->owner])))
+            ->execute(LuaScripts::releaseLock(), LuaScriptArguments::with([$this->name], $this->redis->pack([$this->owner])))
             ->getResult();
     }
 }

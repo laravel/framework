@@ -139,8 +139,8 @@ LUA);
     /**
      * Release the lock.
      *
-     * @param string $key
-     * @param string $id
+     * @param  string  $key
+     * @param  string  $id
      * @return void
      *
      * @throws \Illuminate\Contracts\Redis\LuaScriptExecuteException
@@ -148,7 +148,7 @@ LUA);
     protected function release($key, $id)
     {
         $this->redis->lua()
-            ->execute($this->releaseScript(),LuaScriptArguments::with([$key],[$id]))
+            ->execute($this->releaseScript(), LuaScriptArguments::with([$key], [$id]))
             ->throwIfError();
     }
 

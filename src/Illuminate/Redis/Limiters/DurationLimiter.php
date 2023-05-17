@@ -113,7 +113,7 @@ class DurationLimiter
 
         $this->remaining = max(0, $results[2]);
 
-        return (bool)$results[0];
+        return (bool) $results[0];
     }
 
     /**

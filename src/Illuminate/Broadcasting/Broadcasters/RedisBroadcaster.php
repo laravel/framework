@@ -128,7 +128,7 @@ class RedisBroadcaster extends Broadcaster
 
         try {
             $connection->lua()
-                ->execute($this->broadcastMultipleChannelsScript(),LuaScriptArguments::withArguments($payload, ...$this->formatChannels($channels)))
+                ->execute($this->broadcastMultipleChannelsScript(), LuaScriptArguments::withArguments($payload, ...$this->formatChannels($channels)))
                 ->throwIfError();
         } catch (LuaScriptExecuteException $e) {
             throw new BroadcastException(
