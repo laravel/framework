@@ -11,6 +11,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
 use Illuminate\Support\HigherOrderCollectionProxy;
+use Illuminate\Support\Traits\Dumpable;
 use JsonSerializable;
 use Symfony\Component\VarDumper\VarDumper;
 use Traversable;
@@ -53,7 +54,7 @@ use UnitEnum;
  */
 trait EnumeratesValues
 {
-    use Conditionable;
+    use Conditionable, Dumpable;
 
     /**
      * Indicates that the object's string representation should be escaped when __toString is invoked.
@@ -196,30 +197,17 @@ trait EnumeratesValues
     }
 
     /**
-     * Dump the items and end the script.
-     *
-     * @param  mixed  ...$args
-     * @return never
-     */
-    public function dd(...$args)
-    {
-        $this->dump(...$args);
-
-        exit(1);
-    }
-
-    /**
      * Dump the items.
      *
      * @return $this
      */
     public function dump()
     {
-        (new Collection(func_get_args()))
-            ->push($this->all())
-            ->each(function ($item) {
-                VarDumper::dump($item);
-            });
+        dump($this->all());
+
+        foreach (func_get_args() as $value) {
+            dump($value);
+        }
 
         return $this;
     }
