@@ -463,4 +463,42 @@ class SleepTest extends TestCase
         $sleep->setDuration(500)->milliseconds();
         $this->assertSame($sleep->duration->totalMicroseconds, 500000);
     }
+
+    public function testItCanSleepConditionallyWhen()
+    {
+        Sleep::fake();
+
+        // Control test
+        Sleep::assertSlept(fn () => true, 0);
+        Sleep::for(1)->second();
+        Sleep::assertSlept(fn () => true, 1);
+        Sleep::fake();
+        Sleep::assertSlept(fn () => true, 0);
+
+        // Reset
+        Sleep::fake();
+
+        // Will not sleep if `when()` yields `false`
+        Sleep::for(1)->second()->when(false);
+        Sleep::for(1)->second()->when(fn () => false);
+
+        // Will not sleep if `unless()` yields `true`
+        Sleep::for(1)->second()->unless(true);
+        Sleep::for(1)->second()->unless(fn () => true);
+
+        // Finish 'do not sleep' tests - assert no sleeping occurred
+        Sleep::assertSlept(fn () => true, 0);
+
+        // Will sleep if `when()` yields `true`
+        Sleep::for(1)->second()->when(true);
+        Sleep::assertSlept(fn () => true, 1);
+        Sleep::for(1)->second()->when(fn () => true);
+        Sleep::assertSlept(fn () => true, 2);
+
+        // Will sleep if `unless()` yields `false`
+        Sleep::for(1)->second()->unless(false);
+        Sleep::assertSlept(fn () => true, 3);
+        Sleep::for(1)->second()->unless(fn () => false);
+        Sleep::assertSlept(fn () => true, 4);
+    }
 }

@@ -411,4 +411,28 @@ class Sleep
 
         return $this;
     }
+
+    /**
+     * Only sleep when the given condition is true.
+     *
+     * @param  (\Closure($this): bool)|bool $condition
+     * @return $this
+     */
+    public function when($condition)
+    {
+        $this->shouldSleep = (bool) value($condition, $this);
+
+        return $this;
+    }
+
+    /**
+     * Don't sleep when the given condition is true.
+     *
+     * @param  (\Closure($this): bool)|bool $condition
+     * @return $this
+     */
+    public function unless($condition)
+    {
+        return $this->when(! value($condition, $this));
+    }
 }
