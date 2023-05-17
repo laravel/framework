@@ -2,8 +2,6 @@
 
 namespace Illuminate\Support\Traits;
 
-use Symfony\Component\VarDumper\VarDumper;
-
 trait Dumpable
 {
     /**
@@ -27,7 +25,7 @@ trait Dumpable
      */
     public function dump(...$args)
     {
-        VarDumper::dump($this, ...$args);
+        dump($this, ...$args);
 
         return $this;
     }
