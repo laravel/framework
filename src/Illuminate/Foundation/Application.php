@@ -13,6 +13,7 @@ use Illuminate\Events\EventServiceProvider;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables;
 use Illuminate\Foundation\Events\LocaleUpdated;
+use Illuminate\Foundation\Support\Providers\EventServiceProvider as AppEventServiceProvider;
 use Illuminate\Http\Request;
 use Illuminate\Log\LogServiceProvider;
 use Illuminate\Routing\RoutingServiceProvider;
@@ -217,7 +218,9 @@ class Application extends Container implements ApplicationContract, CachesConfig
             debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file']
         )));
 
-        return (new static($baseDirectory))->withKernels();
+        return (new static($baseDirectory))
+            ->withKernels()
+            ->withEvents();
     }
 
     /**
@@ -277,6 +280,20 @@ class Application extends Container implements ApplicationContract, CachesConfig
             \Illuminate\Contracts\Console\Kernel::class,
             \App\Console\Kernel::class
         );
+
+        return $this;
+    }
+
+    /**
+     * Register the core event service provider for the application.
+     *
+     * @return $this
+     */
+    protected function withEvents()
+    {
+        $this->booting(function () {
+            $this->register(AppEventServiceProvider::class);
+        });
 
         return $this;
     }
