@@ -184,9 +184,10 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Dump the collection.
      *
+     * @param  mixed  ...$args
      * @return $this
      */
-    public function dump();
+    public function dump(...$args);
 
     /**
      * Get the items that are not present in the given items.

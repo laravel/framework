@@ -21,6 +21,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
+use Illuminate\Support\Traits\Dumpable;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
@@ -29,7 +30,7 @@ use RuntimeException;
 
 class Builder implements BuilderContract
 {
-    use BuildsQueries, ExplainsQueries, ForwardsCalls, Macroable {
+    use BuildsQueries, Dumpable, ExplainsQueries, ForwardsCalls, Macroable {
         __call as macroCall;
     }
 
@@ -3871,23 +3872,18 @@ class Builder implements BuilderContract
     /**
      * Dump the current SQL and bindings.
      *
+     * @param  mixed  ...$args
      * @return $this
      */
-    public function dump()
+    public function dump(...$args)
     {
-        dump($this->toSql(), $this->getBindings());
+        dump(
+            $this->toSql(),
+            $this->getBindings(),
+            ...$args,
+        );
 
         return $this;
-    }
-
-    /**
-     * Die and dump the current SQL and bindings.
-     *
-     * @return never
-     */
-    public function dd()
-    {
-        dd($this->toSql(), $this->getBindings());
     }
 
     /**

@@ -6,14 +6,14 @@ use ArrayAccess;
 use Closure;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Traits\Conditionable;
+use Illuminate\Support\Traits\Dumpable;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\Tappable;
 use JsonSerializable;
-use Symfony\Component\VarDumper\VarDumper;
 
 class Stringable implements JsonSerializable, ArrayAccess
 {
-    use Conditionable, Macroable, Tappable;
+    use Conditionable, Dumpable, Macroable, Tappable;
 
     /**
      * The underlying string value.
@@ -1128,25 +1128,14 @@ class Stringable implements JsonSerializable, ArrayAccess
     /**
      * Dump the string.
      *
+     * @param  mixed  ...$args
      * @return $this
      */
-    public function dump()
+    public function dump(...$args)
     {
-        VarDumper::dump($this->value);
+        dump($this->value, ...$args);
 
         return $this;
-    }
-
-    /**
-     * Dump the string and end the script.
-     *
-     * @return never
-     */
-    public function dd()
-    {
-        $this->dump();
-
-        exit(1);
     }
 
     /**

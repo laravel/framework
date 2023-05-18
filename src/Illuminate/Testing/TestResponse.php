@@ -15,6 +15,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Illuminate\Support\Traits\Dumpable;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\Tappable;
 use Illuminate\Support\ViewErrorBag;
@@ -32,7 +33,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  */
 class TestResponse implements ArrayAccess
 {
-    use Concerns\AssertsStatusCodes, Tappable, Macroable {
+    use Concerns\AssertsStatusCodes, Dumpable, Tappable, Macroable {
         __call as macroCall;
     }
 
@@ -1421,18 +1422,6 @@ class TestResponse implements ArrayAccess
         }
 
         return $session;
-    }
-
-    /**
-     * Dump the content from the response and end the script.
-     *
-     * @return never
-     */
-    public function dd()
-    {
-        $this->dump();
-
-        exit(1);
     }
 
     /**
