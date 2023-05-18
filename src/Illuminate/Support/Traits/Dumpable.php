@@ -5,7 +5,7 @@ namespace Illuminate\Support\Traits;
 trait Dumpable
 {
     /**
-     * Dump the instance and end the script.
+     * Dump the given arguments and terminate execution.
      *
      * @param  mixed  ...$args
      * @return never
@@ -18,7 +18,7 @@ trait Dumpable
     }
 
     /**
-     * Dump the instance.
+     * Dump the given arguments.
      *
      * @param  mixed  ...$args
      * @return $this
