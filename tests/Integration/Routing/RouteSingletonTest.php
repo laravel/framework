@@ -62,6 +62,58 @@ class RouteSingletonTest extends TestCase
         $this->assertSame('singleton destroy', $response->getContent());
     }
 
+    public function testCreatableSingletonOnly()
+    {
+        Route::singleton('avatar', CreatableSingletonTestController::class)->creatable()->only('show');
+
+        $response = $this->get('/avatar');
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $response = $this->get('/avatar/create');
+        $this->assertEquals(404, $response->getStatusCode());
+
+        $response = $this->post('/avatar');
+        $this->assertEquals(405, $response->getStatusCode());
+
+        $response = $this->get('/avatar/edit');
+        $this->assertEquals(404, $response->getStatusCode());
+
+        $response = $this->put('/avatar');
+        $this->assertEquals(405, $response->getStatusCode());
+
+        $response = $this->patch('/avatar');
+        $this->assertEquals(405, $response->getStatusCode());
+
+        $response = $this->delete('/avatar');
+        $this->assertEquals(405, $response->getStatusCode());
+    }
+
+    public function testCreatableSingletonExcept()
+    {
+        Route::singleton('avatar', CreatableSingletonTestController::class)->creatable()->except('show');
+
+        $response = $this->get('/avatar');
+        $this->assertEquals(405, $response->getStatusCode());
+
+        $response = $this->get('/avatar/create');
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $response = $this->post('/avatar');
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $response = $this->get('/avatar/edit');
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $response = $this->put('/avatar');
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $response = $this->patch('/avatar');
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $response = $this->delete('/avatar');
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
     public function testDestroyableSingleton()
     {
         Route::singleton('avatar', CreatableSingletonTestController::class)->destroyable();
@@ -87,6 +139,84 @@ class RouteSingletonTest extends TestCase
         $this->assertSame('singleton destroy', $response->getContent());
     }
 
+    public function testDestroyableSingletonOnly()
+    {
+        Route::singleton('avatar', SingletonTestController::class)->destroyable()->only('destroy');
+
+        $response = $this->get('/avatar');
+        $this->assertEquals(405, $response->getStatusCode());
+
+        $response = $this->get('/avatar/create');
+        $this->assertEquals(404, $response->getStatusCode());
+
+        $response = $this->post('/avatar');
+        $this->assertEquals(405, $response->getStatusCode());
+
+        $response = $this->get('/avatar/edit');
+        $this->assertEquals(404, $response->getStatusCode());
+
+        $response = $this->put('/avatar');
+        $this->assertEquals(405, $response->getStatusCode());
+
+        $response = $this->patch('/avatar');
+        $this->assertEquals(405, $response->getStatusCode());
+
+        $response = $this->delete('/avatar');
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    public function testDestroyableSingletonExcept()
+    {
+        Route::singleton('avatar', SingletonTestController::class)->destroyable()->except('destroy');
+
+        $response = $this->get('/avatar');
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $response = $this->get('/avatar/create');
+        $this->assertEquals(404, $response->getStatusCode());
+
+        $response = $this->post('/avatar');
+        $this->assertEquals(405, $response->getStatusCode());
+
+        $response = $this->get('/avatar/edit');
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $response = $this->put('/avatar');
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $response = $this->patch('/avatar');
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $response = $this->delete('/avatar');
+        $this->assertEquals(405, $response->getStatusCode());
+    }
+
+    public function testCreatableDestroyableSingletonOnlyExceptTest()
+    {
+        Route::singleton('avatar', SingletonTestController::class)->creatable()->destroyable()->only(['show'])->except(['destroy']);
+
+        $response = $this->get('/avatar');
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $response = $this->get('/avatar/create');
+        $this->assertEquals(404, $response->getStatusCode());
+
+        $response = $this->post('/avatar');
+        $this->assertEquals(405, $response->getStatusCode());
+
+        $response = $this->get('/avatar/edit');
+        $this->assertEquals(404, $response->getStatusCode());
+
+        $response = $this->put('/avatar');
+        $this->assertEquals(405, $response->getStatusCode());
+
+        $response = $this->patch('/avatar');
+        $this->assertEquals(405, $response->getStatusCode());
+
+        $response = $this->delete('/avatar');
+        $this->assertEquals(405, $response->getStatusCode());
+    }
+
     public function testApiSingleton()
     {
         Route::apiSingleton('avatar', SingletonTestController::class);
@@ -94,8 +224,8 @@ class RouteSingletonTest extends TestCase
         $response = $this->get('/avatar/create');
         $this->assertEquals(404, $response->getStatusCode());
 
-        $response = $this->post('/avatar/store');
-        $this->assertEquals(404, $response->getStatusCode());
+        $response = $this->post('/avatar');
+        $this->assertEquals(405, $response->getStatusCode());
 
         $this->assertSame('http://localhost/avatar', route('avatar.update'));
         $response = $this->put('/avatar');
@@ -121,6 +251,58 @@ class RouteSingletonTest extends TestCase
         $this->assertSame('singleton update', $response->getContent());
     }
 
+    public function testCreatableApiSingletonOnly()
+    {
+        Route::apiSingleton('avatar', CreatableSingletonTestController::class)->creatable()->only(['create', 'store']);
+
+        $response = $this->get('/avatar');
+        $this->assertEquals(405, $response->getStatusCode());
+
+        $response = $this->get('/avatar/create');
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $response = $this->post('/avatar');
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $response = $this->get('/avatar/edit');
+        $this->assertEquals(404, $response->getStatusCode());
+
+        $response = $this->put('/avatar');
+        $this->assertEquals(405, $response->getStatusCode());
+
+        $response = $this->patch('/avatar');
+        $this->assertEquals(405, $response->getStatusCode());
+
+        $response = $this->delete('/avatar');
+        $this->assertEquals(405, $response->getStatusCode());
+    }
+
+    public function testCreatableApiSingletonExcept()
+    {
+        Route::apiSingleton('avatar', CreatableSingletonTestController::class)->creatable()->except(['create', 'store']);
+
+        $response = $this->get('/avatar');
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $response = $this->get('/avatar/create');
+        $this->assertEquals(404, $response->getStatusCode());
+
+        $response = $this->post('/avatar');
+        $this->assertEquals(405, $response->getStatusCode());
+
+        $response = $this->get('/avatar/edit');
+        $this->assertEquals(404, $response->getStatusCode());
+
+        $response = $this->put('/avatar');
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $response = $this->patch('/avatar');
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $response = $this->delete('/avatar');
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
     public function testDestroyableApiSingleton()
     {
         Route::apiSingleton('avatar', CreatableSingletonTestController::class)->destroyable();
@@ -139,6 +321,84 @@ class RouteSingletonTest extends TestCase
         $response = $this->delete('/avatar');
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertSame('singleton destroy', $response->getContent());
+    }
+
+    public function testDestroyableApiSingletonOnly()
+    {
+        Route::apiSingleton('avatar', CreatableSingletonTestController::class)->destroyable()->only(['destroy']);
+
+        $response = $this->get('/avatar');
+        $this->assertEquals(405, $response->getStatusCode());
+
+        $response = $this->get('/avatar/create');
+        $this->assertEquals(404, $response->getStatusCode());
+
+        $response = $this->post('/avatar');
+        $this->assertEquals(405, $response->getStatusCode());
+
+        $response = $this->get('/avatar/edit');
+        $this->assertEquals(404, $response->getStatusCode());
+
+        $response = $this->put('/avatar');
+        $this->assertEquals(405, $response->getStatusCode());
+
+        $response = $this->patch('/avatar');
+        $this->assertEquals(405, $response->getStatusCode());
+
+        $response = $this->delete('/avatar');
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    public function testDestroyableApiSingletonExcept()
+    {
+        Route::apiSingleton('avatar', CreatableSingletonTestController::class)->destroyable()->except(['destroy', 'show']);
+
+        $response = $this->get('/avatar');
+        $this->assertEquals(405, $response->getStatusCode());
+
+        $response = $this->get('/avatar/create');
+        $this->assertEquals(404, $response->getStatusCode());
+
+        $response = $this->post('/avatar');
+        $this->assertEquals(405, $response->getStatusCode());
+
+        $response = $this->get('/avatar/edit');
+        $this->assertEquals(404, $response->getStatusCode());
+
+        $response = $this->put('/avatar');
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $response = $this->patch('/avatar');
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $response = $this->delete('/avatar');
+        $this->assertEquals(405, $response->getStatusCode());
+    }
+
+    public function testCreatableDestroyableApiSingletonOnlyExceptTest()
+    {
+        Route::apiSingleton('avatar', CreatableSingletonTestController::class)->creatable()->destroyable()->only(['show'])->except(['destroy']);
+
+        $response = $this->get('/avatar');
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $response = $this->get('/avatar/create');
+        $this->assertEquals(404, $response->getStatusCode());
+
+        $response = $this->post('/avatar');
+        $this->assertEquals(405, $response->getStatusCode());
+
+        $response = $this->get('/avatar/edit');
+        $this->assertEquals(404, $response->getStatusCode());
+
+        $response = $this->put('/avatar');
+        $this->assertEquals(405, $response->getStatusCode());
+
+        $response = $this->patch('/avatar');
+        $this->assertEquals(405, $response->getStatusCode());
+
+        $response = $this->delete('/avatar');
+        $this->assertEquals(405, $response->getStatusCode());
     }
 
     public function testSingletonOnly()
