@@ -784,7 +784,7 @@ class Store implements Session
     }
 
     /**
-     * Dump the items.
+     * Dump the session items.
      *
      * @param  mixed  $keys
      * @return $this
