@@ -93,10 +93,10 @@ abstract class LuaScriptExecutor
      *
      * @param  \Illuminate\Redis\Lua\LuaScript  $script  The Lua script to execute.
      * @param  \Illuminate\Redis\Lua\LuaScriptArguments  $arguments  The arguments to pass to the script.
-     * @param  bool  $isCachingEnabled  Whether to enable caching for the script. Defaults to false.
+     * @param  bool  $isCachingEnabled  Whether to enable caching for the script. Defaults to true.
      * @return \Illuminate\Redis\Lua\ScriptExecutionResult The result of Redis script execution.
      */
-    public function execute($script, $arguments, $isCachingEnabled = false)
+    public function execute($script, $arguments, $isCachingEnabled = true)
     {
         if ($script->isPlainScript()) {
             return $this->executeWithPlainScript($script->getScript(), $arguments, $isCachingEnabled);
