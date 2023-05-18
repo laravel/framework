@@ -10,9 +10,7 @@ use Illuminate\Support\Traits\Macroable;
  * @property-read static $next
  * @property-read static $prev
  * @property-read static $previous
- *
  * @property-read static $startOf
- *
  * @property-read \Illuminate\Support\Carbon|\DateTimeInterface $second
  * @property-read \Illuminate\Support\Carbon|\DateTimeInterface $seconds
  * @property-read \Illuminate\Support\Carbon|\DateTimeInterface $minute
@@ -27,7 +25,6 @@ use Illuminate\Support\Traits\Macroable;
  * @property-read \Illuminate\Support\Carbon|\DateTimeInterface $months
  * @property-read \Illuminate\Support\Carbon|\DateTimeInterface $year
  * @property-read \Illuminate\Support\Carbon|\DateTimeInterface $years
- *
  * @property-read \Illuminate\Support\Carbon|\DateTimeInterface $monday
  * @property-read \Illuminate\Support\Carbon|\DateTimeInterface $tuesday
  * @property-read \Illuminate\Support\Carbon|\DateTimeInterface $wednesday
@@ -80,9 +77,9 @@ class At
      */
     public function next($amount = 1)
     {
-         $this->amount = $amount;
+        $this->amount = $amount;
 
-         return $this;
+        return $this;
     }
 
     /**
@@ -93,7 +90,7 @@ class At
      */
     public function prev($amount = 1)
     {
-         return $this->next(abs($amount) * -1);
+        return $this->next(abs($amount) * -1);
     }
 
     /**
@@ -144,7 +141,7 @@ class At
      * Dynamically get a moment.
      *
      * @param  string  $name
-     * @return  $this
+     * @return $this
      *
      * @throws \Exception
      */
