@@ -187,6 +187,17 @@ class DateFactory
     }
 
     /**
+     * Finds the next or previous moment in time.
+     *
+     * @param  \DateTimeZone|string|null  $tz
+     * @return \Illuminate\Support\At
+     */
+    public static function at($tz = null)
+    {
+        return new At($tz);
+    }
+
+    /**
      * Handle dynamic calls to generate dates.
      *
      * @param  string  $method

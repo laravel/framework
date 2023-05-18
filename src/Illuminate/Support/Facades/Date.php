@@ -84,6 +84,7 @@ use Illuminate\Support\DateFactory;
  * @method static void useStrictMode($strictModeEnabled = true)
  * @method static void useYearsOverflow($yearsOverflow = true)
  * @method static \Illuminate\Support\Carbon yesterday($tz = null)
+ * @method static \Illuminate\Support\At at($tz = null)
  *
  * @see \Illuminate\Support\DateFactory
  */
