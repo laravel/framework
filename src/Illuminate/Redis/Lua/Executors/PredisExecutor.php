@@ -62,6 +62,6 @@ class PredisExecutor extends LuaScriptExecutor
      */
     protected function executeWithHash($sha1, $arguments)
     {
-        return $this->executeWithTryCatch(fn () => $this->connection->evalsha($sha1, $arguments->getNumberOfKeys(), ...$arguments->toArray()));
+        return $this->executeWithTryCatch(fn () => $this->connection->command('evalsha', [$sha1, $arguments->toArray(), count($arguments->getKeys())]));
     }
 }

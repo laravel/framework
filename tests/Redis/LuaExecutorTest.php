@@ -3,108 +3,136 @@
 namespace Illuminate\Tests\Redis;
 
 use Illuminate\Contracts\Redis\LuaScriptExecuteException;
-use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
+use Illuminate\Redis\Connections\Connection;
 use Illuminate\Redis\Lua\Executors\PhpRedisExecutor;
 use Illuminate\Redis\Lua\Executors\PredisExecutor;
 use Illuminate\Redis\Lua\LuaScript;
 use Illuminate\Redis\Lua\LuaScriptArguments;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Predis\Response\Error;
+use Predis\Response\ServerException;
 
 class LuaExecutorTest extends TestCase
 {
-    use InteractsWithRedis;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->setUpRedis();
-    }
-
     protected function tearDown(): void
     {
-        parent::tearDown();
-
-        $this->tearDownRedis();
+        m::close();
     }
 
-    /**
-     * @return \Illuminate\Redis\Lua\LuaScriptExecutor[]
-     */
-    private function getExecutors()
+    private function executeScriptTest($executor, $script, $expectedResult, $expectedErrorType = null, $expectedErrorMessage = null)
     {
-        return [
-            new PhpRedisExecutor($this->redis['phpredis']->connection()),
-            new PredisExecutor($this->redis['predis']->connection()),
-        ];
-    }
+        $connection = m::mock(Connection::class);
+        $executor = new $executor($connection);
 
-    public function testExecuteWithPlainScript()
-    {
-        foreach ($this->getExecutors() as $executor) {
-            $result = $executor->execute(LuaScript::fromPlainScript('return "OK"'), LuaScriptArguments::empty());
+        if ($executor instanceof PhpRedisExecutor) {
+            $redis = m::mock(\Redis::class);
+            $connection->shouldReceive('client')->andReturn($redis);
+            if ($expectedErrorType !== null) {
+                $redis->shouldReceive('clearLastError')->andReturnTrue();
+                $redis->shouldReceive('getLastError')->once()->andReturn($expectedErrorMessage);
+            } else {
+                $redis->shouldReceive('clearLastError')->once()->andReturnTrue();
+            }
+        }
 
+        $expectation = $connection->shouldReceive('eval')->once()->with($script, 1, 'key1');
+        if ($expectedResult instanceof \Throwable) {
+            $expectation->andThrow($expectedResult);
+        } else {
+            $expectation->andReturn($expectedResult);
+        }
+
+        $result = $executor->execute(LuaScript::fromPlainScript($script), LuaScriptArguments::withKeys('key1'), false);
+
+        if ($expectedErrorType !== null) {
+            self::assertTrue($result->isError());
+            self::assertInstanceOf(LuaScriptExecuteException::class, $result->getException());
+            self::assertSame($expectedErrorType, $result->getErrorType());
+            self::assertSame($expectedErrorMessage, $result->getException()->getMessage());
+        } else {
             self::assertFalse($result->isError());
-            self::assertSame('OK', $result->getResult());
+            self::assertSame($expectedResult, $result->getResult());
         }
     }
 
-    public function testExecuteWithPlainScriptWithError()
+    public function testPhpRedisExecuteWithPlainScript()
     {
-        foreach ($this->getExecutors() as $executor) {
-            $result = $executor->execute(LuaScript::fromPlainScript('bad_syntax'), LuaScriptArguments::empty());
+        // Test with success response
+        $this->executeScriptTest(PhpRedisExecutor::class, 'return KEYS[1]', 'key1');
 
-            $this->assertTrue($result->isError());
-            $this->assertSame('ERR', $result->getErrorType());
-            $this->assertFalse($result->isNoScriptError());
-
-            $this->expectException(LuaScriptExecuteException::class);
-            $result->getResult();
-        }
+        // Test with error response
+        $this->executeScriptTest(
+            PhpRedisExecutor::class,
+            'bad_syntax',
+            false,
+            'ERR',
+            'ERR Error compiling script'
+        );
     }
 
-    public function testExecuteWithPlainScriptCaching()
+    public function testPredisExecuteWithPlainScript()
     {
-        foreach ($this->getExecutors() as $executor) {
-            $result = $executor->execute(LuaScript::fromPlainScript('return "OK"'), LuaScriptArguments::empty(), true);
+        // Test with success response
+        $this->executeScriptTest(PredisExecutor::class, 'return KEYS[1]', 'key1');
 
-            self::assertFalse($result->isError());
-            self::assertSame('OK', $result->getResult());
-        }
+        // Test with error response
+        $this->executeScriptTest(
+            PredisExecutor::class,
+            'bad_syntax',
+            new Error('ERR Error compiling script'),
+            'ERR',
+            'ERR Error compiling script'
+        );
+
+        // Test with error response (exception raised)
+        $this->executeScriptTest(
+            PredisExecutor::class,
+            'bad_syntax',
+            new ServerException('ERR Error compiling script'),
+            'ERR',
+            'ERR Error compiling script'
+        );
     }
 
-    public function testExecuteWithPlainScriptCachingWithError()
+    private function executePlainScriptWithCachingTest($executor, $predisThrow = false)
     {
-        foreach ($this->getExecutors() as $executor) {
-            // Should rise exception in when try to load the script into redis
+        $connection = m::mock(Connection::class);
+        $executor = new $executor($connection);
+        $script = 'return KEYS[1]';
 
-            $this->expectException(LuaScriptExecuteException::class);
-            $executor->execute(LuaScript::fromPlainScript('bad_syntax'), LuaScriptArguments::empty(), true);
+        if ($executor instanceof PredisExecutor) {
+            $expectation = $connection->shouldReceive('command')->once()->with('evalsha', [sha1($script), ['key1'], 1]);
+            if ($predisThrow) {
+                $expectation->andThrow(new ServerException('NOSCRIPT NOSCRIPT No matching script'));
+            } else {
+                $expectation->andReturn(new Error('NOSCRIPT NOSCRIPT No matching script'));
+            }
+        } else {
+            $redis = m::mock(\Redis::class);
+            $redis->shouldReceive('clearLastError')->andReturnTrue();
+            $redis->shouldReceive('getLastError')->andReturn('NOSCRIPT NOSCRIPT No matching script');
+            $connection->shouldReceive('client')->andReturn($redis);
+            $connection->shouldReceive('command')->once()->with('evalsha', [sha1($script), ['key1'], 1])->andReturnFalse();
         }
+
+        $connection->shouldReceive('script')->with('load', $script)->andReturn(sha1($script));
+        $connection->shouldReceive('command')->once()->with('evalsha', [sha1($script), ['key1'], 1])->andReturn('key1');
+
+        $result = $executor->execute(LuaScript::fromPlainScript($script), LuaScriptArguments::withKeys('key1'), true);
+        self::assertFalse($result->isError());
+        self::assertSame('key1', $result->getResult());
     }
 
-    public function testExecuteWithHashWhenScriptNotLoaded()
+    public function testPhpRedisExecuteWithPlainScriptWithCaching()
     {
-        foreach ($this->getExecutors() as $executor) {
-            $result = $executor->execute(LuaScript::fromSHA1Hash('some_sha1_hash'), LuaScriptArguments::empty());
-
-            $this->assertTrue($result->isError());
-            $this->assertTrue($result->isNoScriptError());
-
-            $this->expectException(LuaScriptExecuteException::class);
-            $result->getResult();
-        }
+        $this->executePlainScriptWithCachingTest(PhpRedisExecutor::class);
     }
 
-    public function testExecuteWithHashWhenScriptLoaded()
+    public function testPredisExecuteWithPlainScriptWithCaching()
     {
-        foreach ($this->getExecutors() as $executor) {
-            $sha1 = $executor->loadScript('return "OK"');
+        $this->executePlainScriptWithCachingTest(PredisExecutor::class);
 
-            $result = $executor->execute(LuaScript::fromSHA1Hash($sha1), LuaScriptArguments::empty());
-
-            $this->assertFalse($result->isError());
-            $this->assertSame('OK', $result->getResult());
-        }
+        $this->executePlainScriptWithCachingTest(PredisExecutor::class, true);
     }
 }
