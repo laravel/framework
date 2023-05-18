@@ -102,22 +102,23 @@ class LuaExecutorTest extends TestCase
         $script = 'return KEYS[1]';
 
         if ($executor instanceof PredisExecutor) {
-            $expectation = $connection->shouldReceive('command')->once()->with('evalsha', [sha1($script), ['key1'], 1]);
+            $expectation = $connection->shouldReceive('command')->once()->with('evalsha', [sha1($script), 1, ...['key1']]);
             if ($predisThrow) {
                 $expectation->andThrow(new ServerException('NOSCRIPT NOSCRIPT No matching script'));
             } else {
                 $expectation->andReturn(new Error('NOSCRIPT NOSCRIPT No matching script'));
             }
+            $connection->shouldReceive('command')->once()->with('evalsha', [sha1($script), 1, ...['key1']])->andReturn('key1');
         } else {
             $redis = m::mock(\Redis::class);
             $redis->shouldReceive('clearLastError')->andReturnTrue();
             $redis->shouldReceive('getLastError')->andReturn('NOSCRIPT NOSCRIPT No matching script');
             $connection->shouldReceive('client')->andReturn($redis);
             $connection->shouldReceive('command')->once()->with('evalsha', [sha1($script), ['key1'], 1])->andReturnFalse();
+            $connection->shouldReceive('command')->once()->with('evalsha', [sha1($script), ['key1'], 1])->andReturn('key1');
         }
 
         $connection->shouldReceive('script')->with('load', $script)->andReturn(sha1($script));
-        $connection->shouldReceive('command')->once()->with('evalsha', [sha1($script), ['key1'], 1])->andReturn('key1');
 
         $result = $executor->execute(LuaScript::fromPlainScript($script), LuaScriptArguments::withKeys('key1'), true);
         self::assertFalse($result->isError());
