@@ -464,7 +464,7 @@ class Kernel implements KernelContract
                 $this->load($defaultCommandPath);
             }
 
-            if (get_class($this) === __CLASS__ &&
+            if ($this->shouldDiscoverCommands() &&
                 file_exists($this->app->basePath('routes/console.php'))) {
                 require $this->app->basePath('routes/console.php');
             }
@@ -504,7 +504,7 @@ class Kernel implements KernelContract
      */
     protected function shouldDiscoverCommands()
     {
-        return true;
+        return get_class($this) === __CLASS__;
     }
 
     /**
