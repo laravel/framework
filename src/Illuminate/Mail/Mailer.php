@@ -394,7 +394,7 @@ class Mailer implements MailerContract, MailQueueContract
      */
     protected function renderView($view, $data)
     {
-        $view = value($view, ...$data);
+        $view = value($view, $data);
 
         return $view instanceof Htmlable
                         ? $view->toHtml()
