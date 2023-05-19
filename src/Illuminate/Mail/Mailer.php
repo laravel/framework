@@ -389,7 +389,7 @@ class Mailer implements MailerContract, MailQueueContract
     /**
      * Render the given view.
      *
-     * @param  callable|string  $view
+     * @param  \Closure|string  $view
      * @param  array  $data
      * @return string
      */
