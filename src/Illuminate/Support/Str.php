@@ -288,7 +288,7 @@ class Str
      * Determine if a given string ends with a given substring.
      *
      * @param  string  $haystack
-     * @param  string|iterable<mixed>  $needles
+     * @param  string|iterable<string>  $needles
      * @return bool
      */
     public static function endsWith($haystack, $needles)
@@ -309,8 +309,8 @@ class Str
     /**
      * Extracts an excerpt from text that matches the first instance of a phrase.
      *
-     * @param  mixed  $text
-     * @param  mixed  $phrase
+     * @param  string  $text
+     * @param  string  $phrase
      * @param  array  $options
      * @return string|null
      */
@@ -1158,7 +1158,7 @@ class Str
      * Determine if a given string starts with a given substring.
      *
      * @param  string  $haystack
-     * @param  string|iterable<mixed>  $needles
+     * @param  string|iterable<string>  $needles
      * @return bool
      */
     public static function startsWith($haystack, $needles)
