@@ -423,7 +423,7 @@ class Str
     /**
      * Determine if a given string is valid JSON.
      *
-     * @param  string  $value
+     * @param  mixed  $value
      * @return bool
      */
     public static function isJson($value)
@@ -444,7 +444,7 @@ class Str
     /**
      * Determine if a given string is a valid UUID.
      *
-     * @param  string  $value
+     * @param  mixed  $value
      * @return bool
      */
     public static function isUuid($value)
@@ -459,7 +459,7 @@ class Str
     /**
      * Determine if a given string is a valid ULID.
      *
-     * @param  string  $value
+     * @param  mixed  $value
      * @return bool
      */
     public static function isUlid($value)
@@ -632,7 +632,7 @@ class Str
      * Determine if a given string matches a given pattern.
      *
      * @param  string|iterable<string>  $pattern
-     * @param  string  $value
+     * @param  mixed  $value
      * @return bool
      */
     public static function isMatch($pattern, $value)
