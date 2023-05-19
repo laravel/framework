@@ -377,10 +377,15 @@ class Mailable implements MailableContract, Renderable
      */
     protected function buildMarkdownText($viewData)
     {
-        return fn ($data) => $this->textView ?? $this->markdownRenderer()->renderText(
-            $this->markdown,
-            array_merge($data, $viewData),
-        );
+        return function ($data) use ($viewData) {
+            if (isset($data['message'])) {
+                $data = array_merge($data, [
+                    'message' => new TextMessage($data['message']),
+                ]);
+            }
+
+            return $this->markdownRenderer()->renderText($this->markdown, array($data, $viewData));
+        };
     }
 
     /**
