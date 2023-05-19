@@ -262,6 +262,9 @@ class AuthGuardTest extends TestCase
         $this->expectExceptionMessage('Unauthenticated.');
 
         $guard = $this->getGuard();
+        $guard->setCookieJar($cookies = m::mock(CookieJar::class));
+        $cookies->shouldReceive('unqueue')->once();
+        $guard->getSession()->shouldReceive('remove')->once();
         $guard->getSession()->shouldReceive('get')->once()->andReturn(null);
 
         $guard->authenticate();
@@ -313,6 +316,9 @@ class AuthGuardTest extends TestCase
     public function testNullIsReturnedForUserIfNoUserFound()
     {
         $mock = $this->getGuard();
+        $mock->setCookieJar($cookies = m::mock(CookieJar::class));
+        $cookies->shouldReceive('unqueue')->once();
+        $mock->getSession()->shouldReceive('remove')->once();
         $mock->getSession()->shouldReceive('get')->once()->andReturn(null);
         $this->assertNull($mock->user());
     }
