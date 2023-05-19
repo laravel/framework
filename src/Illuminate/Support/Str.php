@@ -105,7 +105,7 @@ class Str
     /**
      * Transliterate a UTF-8 value to ASCII.
      *
-     * @param  string  $value
+     * @param  mixed  $value
      * @param  string  $language
      * @return string
      */
@@ -131,7 +131,7 @@ class Str
      * Get the portion of a string before the first occurrence of a given value.
      *
      * @param  string  $subject
-     * @param  string  $search
+     * @param  mixed  $search
      * @return string
      */
     public static function before($subject, $search)
@@ -288,7 +288,7 @@ class Str
      * Determine if a given string ends with a given substring.
      *
      * @param  string  $haystack
-     * @param  string|iterable<string>  $needles
+     * @param  string|iterable<mixed>  $needles
      * @return bool
      */
     public static function endsWith($haystack, $needles)
@@ -309,8 +309,8 @@ class Str
     /**
      * Extracts an excerpt from text that matches the first instance of a phrase.
      *
-     * @param  string  $text
-     * @param  string  $phrase
+     * @param  mixed  $text
+     * @param  mixed  $phrase
      * @param  array  $options
      * @return string|null
      */
@@ -372,8 +372,8 @@ class Str
     /**
      * Determine if a given string matches a given pattern.
      *
-     * @param  string|iterable<string>  $pattern
-     * @param  string  $value
+     * @param  string|iterable<mixed>  $pattern
+     * @param  mixed  $value
      * @return bool
      */
     public static function is($pattern, $value)
@@ -412,7 +412,7 @@ class Str
     /**
      * Determine if a given string is 7 bit ASCII.
      *
-     * @param  string  $value
+     * @param  mixed  $value
      * @return bool
      */
     public static function isAscii($value)
@@ -942,7 +942,7 @@ class Str
     /**
      * Replace the first occurrence of a given value in the string.
      *
-     * @param  string  $search
+     * @param  mixed  $search
      * @param  string  $replace
      * @param  string  $subject
      * @return string
@@ -1158,7 +1158,7 @@ class Str
      * Determine if a given string starts with a given substring.
      *
      * @param  string  $haystack
-     * @param  string|iterable<string>  $needles
+     * @param  string|iterable<mixed>  $needles
      * @return bool
      */
     public static function startsWith($haystack, $needles)
