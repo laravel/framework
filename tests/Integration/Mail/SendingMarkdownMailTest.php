@@ -67,6 +67,15 @@ class SendingMarkdownMailTest extends TestCase
         $this->assertStringContainsString('Content-Disposition: inline; name=foo.jpg; filename=foo.jpg', $email);
     }
 
+    public function testMessageMayBeDefinedAsViewData()
+    {
+        Mail::to('test@mail.com')->send(new MessageMailable());
+
+        $email = app('mailer')->getSymfonyTransport()->messages()[0]->getOriginalMessage()->toString();
+
+        $this->assertStringContainsString('My message is: My message.', $email);
+    }
+
     public function testTheme()
     {
         Mail::to('test@mail.com')->send(new BasicMailable());
@@ -118,8 +127,6 @@ class BasicMailableWithTheme extends Mailable
 
 class EmbedMailable extends Mailable
 {
-    public $theme = 'taylor';
-
     public function envelope()
     {
         return new Envelope(
@@ -137,8 +144,6 @@ class EmbedMailable extends Mailable
 
 class EmbedDataMailable extends Mailable
 {
-    public $theme = 'taylor';
-
     public function envelope()
     {
         return new Envelope(
@@ -150,6 +155,25 @@ class EmbedDataMailable extends Mailable
     {
         return new Content(
             markdown: 'embed-data',
+        );
+    }
+}
+
+class MessageMailable extends Mailable
+{
+    public $message = 'My message';
+
+    public function envelope()
+    {
+        return new Envelope(
+            subject: 'My basic title',
+        );
+    }
+
+    public function content()
+    {
+        return new Content(
+            markdown: 'message',
         );
     }
 }
