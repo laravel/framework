@@ -494,8 +494,7 @@ class Kernel implements KernelContract
      */
     protected function defaultCommandPath()
     {
-        return dirname((new ReflectionClass($this))->getFileName());
-        return dirname((new ReflectionClass($this))->getFileName()).'/Commands';
+        return $this->app->path('Console');
     }
 
     /**
