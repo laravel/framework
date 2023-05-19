@@ -130,8 +130,6 @@ class Kernel implements KernelContract
             if (! $this->app->runningUnitTests()) {
                 $this->rerouteSymfonyCommandEvents();
             }
-
-            $this->defineConsoleSchedule();
         });
     }
 
@@ -164,16 +162,14 @@ class Kernel implements KernelContract
     }
 
     /**
-     * Define the application's command schedule.
+     * Resolve a console schedule instance.
      *
-     * @return void
+     * @return \Illuminate\Console\Scheduling\Schedule
      */
-    protected function defineConsoleSchedule()
+    public function resolveConsoleSchedule()
     {
-        $this->app->singleton(Schedule::class, function ($app) {
-            return tap(new Schedule($this->scheduleTimezone()), function ($schedule) {
-                $this->schedule($schedule->useCache($this->scheduleCache()));
-            });
+        return tap(new Schedule($this->scheduleTimezone()), function ($schedule) {
+            $this->schedule($schedule->useCache($this->scheduleCache()));
         });
     }
 
