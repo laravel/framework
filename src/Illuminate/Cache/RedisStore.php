@@ -391,7 +391,7 @@ class RedisStore extends TaggableStore implements LockProvider
      * Serialize the value.
      *
      * @param  mixed  $value
-     * @return mixed
+     * @return float|int|string
      */
     protected function serialize($value)
     {
