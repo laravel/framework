@@ -71,15 +71,24 @@ class FoundationServiceProvider extends AggregateServiceProvider
     {
         parent::register();
 
-        $this->app->singleton(Schedule::class, function ($app) {
-            return $app->make(ConsoleKernel::class)->resolveConsoleSchedule();
-        });
-
+        $this->registerConsoleSchedule();
         $this->registerDumper();
         $this->registerRequestValidation();
         $this->registerRequestSignatureValidation();
         $this->registerExceptionTracking();
         $this->registerMaintenanceModeManager();
+    }
+
+    /**
+     * Register the console schedule implementation.
+     *
+     * @return void
+     */
+    public function registerConsoleSchedule()
+    {
+        $this->app->singleton(Schedule::class, function ($app) {
+            return $app->make(ConsoleKernel::class)->resolveConsoleSchedule();
+        });
     }
 
     /**
