@@ -363,14 +363,10 @@ class Mailable implements MailableContract, Renderable
      */
     protected function buildMarkdownHtml($viewData)
     {
-        return function ($data) use ($viewData) {
-            $markdown = Container::getInstance()->make(Markdown::class);
-            $this->ensureMarkdownTheme($markdown);
-
-            $data = array_merge($data, $viewData);
-
-            return $markdown->render($this->markdown, $data);
-        };
+        return fn ($data) =>  $this->markdownRenderer()->render(
+            $this->markdown,
+            array_merge($data, $viewData),
+        );
     }
 
     /**
@@ -381,27 +377,24 @@ class Mailable implements MailableContract, Renderable
      */
     protected function buildMarkdownText($viewData)
     {
-        return function ($data) use ($viewData) {
-            $markdown = Container::getInstance()->make(Markdown::class);
-            $this->ensureMarkdownTheme($markdown);
-
-            $data = array_merge($data, $viewData);
-
-            return $this->textView ?? $markdown->renderText($this->markdown, $data);
-        };
+        return fn ($data) => $this->textView ?? $this->markdownRenderer()->renderText(
+            $this->markdown,
+            array_merge($data, $viewData),
+        );
     }
 
     /**
-     * Ensures the current markdown theme is set, if any.
+     * Resolves a Markdown instance with the mail's theme.
      *
-     * @param  \Illuminate\Mail\Markdown  $markdown
-     * @return void
+     * @return \Illuminate\Mail\Markdown
      */
-    protected function ensureMarkdownTheme($markdown)
+    protected function markdownRenderer()
     {
-        $markdown->theme($this->theme ?: Container::getInstance()->get(ConfigRepository::class)->get(
-            'mail.markdown.theme', 'default')
-        );
+        return tap(Container::getInstance()->make(Markdown::class), function ($markdown) {
+            $markdown->theme($this->theme ?: Container::getInstance()->get(ConfigRepository::class)->get(
+                'mail.markdown.theme', 'default')
+            );
+        });
     }
 
     /**
