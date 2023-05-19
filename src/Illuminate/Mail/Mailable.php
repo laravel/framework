@@ -363,7 +363,7 @@ class Mailable implements MailableContract, Renderable
      */
     protected function buildMarkdownHtml($viewData)
     {
-        return fn ($data) =>  $this->markdownRenderer()->render(
+        return fn ($data) => $this->markdownRenderer()->render(
             $this->markdown,
             array_merge($data, $viewData),
         );
