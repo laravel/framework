@@ -280,7 +280,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
 
         $this->singleton(
             \Illuminate\Contracts\Console\Kernel::class,
-            \App\Console\Kernel::class
+            \Illuminate\Foundation\Console\Kernel::class,
         );
 
         return $this;
