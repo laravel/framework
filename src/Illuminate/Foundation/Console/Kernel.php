@@ -162,28 +162,6 @@ class Kernel implements KernelContract
     }
 
     /**
-     * Resolve a console schedule instance.
-     *
-     * @return \Illuminate\Console\Scheduling\Schedule
-     */
-    public function resolveConsoleSchedule()
-    {
-        return tap(new Schedule($this->scheduleTimezone()), function ($schedule) {
-            $this->schedule($schedule->useCache($this->scheduleCache()));
-        });
-    }
-
-    /**
-     * Get the name of the cache store that should manage scheduling mutexes.
-     *
-     * @return string
-     */
-    protected function scheduleCache()
-    {
-        return $this->app['config']->get('cache.schedule_store', Env::get('SCHEDULE_CACHE_DRIVER'));
-    }
-
-    /**
      * Run the console application.
      *
      * @param  \Symfony\Component\Console\Input\InputInterface  $input
@@ -284,6 +262,18 @@ class Kernel implements KernelContract
     }
 
     /**
+     * Resolve a console schedule instance.
+     *
+     * @return \Illuminate\Console\Scheduling\Schedule
+     */
+    public function resolveConsoleSchedule()
+    {
+        return tap(new Schedule($this->scheduleTimezone()), function ($schedule) {
+            $this->schedule($schedule->useCache($this->scheduleCache()));
+        });
+    }
+
+    /**
      * Get the timezone that should be used by default for scheduled events.
      *
      * @return \DateTimeZone|string|null
@@ -293,6 +283,16 @@ class Kernel implements KernelContract
         $config = $this->app['config'];
 
         return $config->get('app.schedule_timezone', $config->get('app.timezone'));
+    }
+
+    /**
+     * Get the name of the cache store that should manage scheduling mutexes.
+     *
+     * @return string
+     */
+    protected function scheduleCache()
+    {
+        return $this->app['config']->get('cache.schedule_store', Env::get('SCHEDULE_CACHE_DRIVER'));
     }
 
     /**
@@ -464,6 +464,11 @@ class Kernel implements KernelContract
                 $this->load($defaultCommandPath);
             }
 
+            if (get_class($this) === __CLASS__ &&
+                file_exists($this->app->basePath('routes/console.php'))) {
+                require $this->app->basePath('routes/console.php');
+            }
+
             $this->commandsLoaded = true;
         }
     }
@@ -489,6 +494,7 @@ class Kernel implements KernelContract
      */
     protected function defaultCommandPath()
     {
+        return dirname((new ReflectionClass($this))->getFileName());
         return dirname((new ReflectionClass($this))->getFileName()).'/Commands';
     }
 
