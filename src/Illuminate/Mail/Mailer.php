@@ -335,7 +335,7 @@ class Mailer implements MailerContract, MailQueueContract
      */
     protected function parseView($view)
     {
-        if (is_string($view)) {
+        if (is_string($view) || is_callable($view)) {
             return [$view, null, null];
         }
 
