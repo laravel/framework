@@ -369,7 +369,7 @@ class Mailable implements MailableContract, Renderable
 
             $data = array_merge($data, $viewData);
 
-            return $markdown->render($this->markdown, array_merge($data, $viewData));
+            return $markdown->render($this->markdown, $data);
         };
     }
 
