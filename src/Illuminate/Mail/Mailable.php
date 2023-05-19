@@ -323,13 +323,12 @@ class Mailable implements MailableContract, Renderable
      */
     protected function buildMarkdownView()
     {
-        $markdown = Container::getInstance()->make(Markdown::class);
-
         $data = $this->buildViewData();
+        $theme = $this->theme ?? null;
 
         return [
-            'html' => $this->buildMarkdownHtml($markdown, $data, $this->theme ?? null),
-            'text' => $this->buildMarkdownText($markdown, $data, $this->theme ?? null),
+            'html' => $this->buildMarkdownHtml($data, $theme),
+            'text' => $this->buildMarkdownText($data, $theme),
         ];
     }
 
@@ -360,14 +359,14 @@ class Mailable implements MailableContract, Renderable
     /**
      * Build the html view for a Markdown message.
      *
-     * @param  \Illuminate\Mail\Markdown  $markdown
      * @param  array  $viewData
      * @param  string|null  $theme
      * @return \Closure
      */
-    protected function buildMarkdownHtml($markdown, $viewData, $theme)
+    protected function buildMarkdownHtml($viewData, $theme)
     {
-        return function ($data) use ($markdown, $viewData, $theme) {
+        return function ($data) use ($viewData, $theme) {
+            $markdown = Container::getInstance()->make(Markdown::class);
             $this->ensureMarkdownTheme($markdown, $theme);
 
             $data = array_merge($data, $viewData);
@@ -379,14 +378,14 @@ class Mailable implements MailableContract, Renderable
     /**
      * Build the text view for a Markdown message.
      *
-     * @param  \Illuminate\Mail\Markdown  $markdown
      * @param  array  $viewData
      * @param  string  $theme
      * @return \Closure
      */
-    protected function buildMarkdownText($markdown, $viewData, $theme)
+    protected function buildMarkdownText($viewData, $theme)
     {
-        return function ($data) use ($markdown, $viewData, $theme) {
+        return function ($data) use ($viewData, $theme) {
+            $markdown = Container::getInstance()->make(Markdown::class);
             $this->ensureMarkdownTheme($markdown, $theme);
 
             $data = array_merge($data, $viewData);
