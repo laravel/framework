@@ -199,6 +199,18 @@ class Builder
     }
 
     /**
+     * Determine if the given table is missing a given column.
+     *
+     * @param  string  $table
+     * @param  string  $column
+     * @return bool
+     */
+    public function missingColumn($table, $column)
+    {
+        return ! $this->hasColumn($table, $column);
+    }
+
+    /**
      * Execute a table builder callback if the given table has a given column.
      *
      * @param  string  $table

@@ -67,6 +67,18 @@ class DatabaseSchemaBuilderTest extends TestCase
         $this->assertFalse($builder->hasColumns('users', ['id', 'address']));
     }
 
+    public function testTableMissingColumn()
+    {
+        $connection = m::mock(Connection::class);
+        $grammar = m::mock(stdClass::class);
+        $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
+        $builder = m::mock(Builder::class.'[getColumnListing]', [$connection]);
+        $builder->shouldReceive('getColumnListing')->with('users')->twice()->andReturn(['id']);
+
+        $this->assertTrue($builder->missingColumn('users', 'firstname'));
+        $this->assertFalse($builder->missingColumn('users', 'id'));
+    }
+
     public function testGetColumnTypeAddsPrefix()
     {
         $connection = m::mock(Connection::class);
