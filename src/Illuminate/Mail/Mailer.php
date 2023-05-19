@@ -388,12 +388,14 @@ class Mailer implements MailerContract, MailQueueContract
     /**
      * Render the given view.
      *
-     * @param  string  $view
+     * @param  callable|string  $view
      * @param  array  $data
      * @return string
      */
     protected function renderView($view, $data)
     {
+        $view = value($view, ...$data);
+
         return $view instanceof Htmlable
                         ? $view->toHtml()
                         : $this->views->make($view, $data)->render();
