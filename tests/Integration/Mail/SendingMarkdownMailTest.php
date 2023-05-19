@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Mail;
 
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Markdown;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Support\Facades\Mail;
@@ -15,12 +16,13 @@ class SendingMarkdownMailTest extends TestCase
     {
         $app['config']->set('mail.driver', 'array');
 
+        View::addNamespace('mail', __DIR__.'/Fixtures');
         View::addLocation(__DIR__.'/Fixtures');
     }
 
     public function testMailIsSent()
     {
-        $mailable = new Markdown();
+        $mailable = new MarkdownMailable();
 
         $mailable
             ->assertHasSubject('My title')
@@ -29,16 +31,47 @@ class SendingMarkdownMailTest extends TestCase
 
     public function testEmbeddedData()
     {
-        Mail::to('test@mail.com')->locale('ar')->send(new Markdown());
+        Mail::to('test@mail.com')->send(new MarkdownMailable());
 
         $email = app('mailer')->getSymfonyTransport()->messages()[0]->getOriginalMessage()->toString();
 
         $this->assertStringContainsString('Content-Disposition: inline; name=logo.svg; filename=logo.svg', $email);
     }
+
+    public function testTheme()
+    {
+        Mail::to('test@mail.com')->send(new MarkdownMailable());
+        $this->assertSame('default', app(Markdown::class)->getTheme());
+
+        Mail::to('test@mail.com')->send(new MarkdownMailableWithTheme());
+        $this->assertSame('taylor', app(Markdown::class)->getTheme());
+
+        Mail::to('test@mail.com')->send(new MarkdownMailable());
+        $this->assertSame('default', app(Markdown::class)->getTheme());
+    }
 }
 
-class Markdown extends Mailable
+class MarkdownMailable extends Mailable
 {
+    public function envelope()
+    {
+        return new Envelope(
+            subject: 'My title',
+        );
+    }
+
+    public function content()
+    {
+        return new Content(
+            markdown: 'markdown',
+        );
+    }
+}
+
+class MarkdownMailableWithTheme extends Mailable
+{
+    public $theme = 'taylor';
+
     public function envelope()
     {
         return new Envelope(

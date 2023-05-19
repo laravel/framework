@@ -324,11 +324,10 @@ class Mailable implements MailableContract, Renderable
     protected function buildMarkdownView()
     {
         $data = $this->buildViewData();
-        $theme = $this->theme ?? null;
 
         return [
-            'html' => $this->buildMarkdownHtml($data, $theme),
-            'text' => $this->buildMarkdownText($data, $theme),
+            'html' => $this->buildMarkdownHtml($data),
+            'text' => $this->buildMarkdownText($data),
         ];
     }
 
@@ -360,14 +359,13 @@ class Mailable implements MailableContract, Renderable
      * Build the html view for a Markdown message.
      *
      * @param  array  $viewData
-     * @param  string|null  $theme
      * @return \Closure
      */
-    protected function buildMarkdownHtml($viewData, $theme)
+    protected function buildMarkdownHtml($viewData)
     {
-        return function ($data) use ($viewData, $theme) {
+        return function ($data) use ($viewData) {
             $markdown = Container::getInstance()->make(Markdown::class);
-            $this->ensureMarkdownTheme($markdown, $theme);
+            $this->ensureMarkdownTheme($markdown);
 
             $data = array_merge($data, $viewData);
 
@@ -379,14 +377,13 @@ class Mailable implements MailableContract, Renderable
      * Build the text view for a Markdown message.
      *
      * @param  array  $viewData
-     * @param  string  $theme
      * @return \Closure
      */
-    protected function buildMarkdownText($viewData, $theme)
+    protected function buildMarkdownText($viewData)
     {
-        return function ($data) use ($viewData, $theme) {
+        return function ($data) use ($viewData) {
             $markdown = Container::getInstance()->make(Markdown::class);
-            $this->ensureMarkdownTheme($markdown, $theme);
+            $this->ensureMarkdownTheme($markdown);
 
             $data = array_merge($data, $viewData);
 
@@ -398,19 +395,13 @@ class Mailable implements MailableContract, Renderable
      * Ensures the current markdown theme is set, if any.
      *
      * @param  \Illuminate\Mail\Markdown  $markdown
-     * @param  string|null  $theme
      * @return void
      */
-    protected function ensureMarkdownTheme($markdown, $theme)
+    protected function ensureMarkdownTheme($markdown)
     {
-        if (! is_null($theme)) {
-            $markdown->theme(
-                $this->theme,
-                Container::getInstance()
-                    ->get(ConfigRepository::class)
-                    ->get('mail.markdown.theme', 'default')
-            );
-        }
+        $markdown->theme($this->theme ?: Container::getInstance()->get(ConfigRepository::class)->get(
+            'mail.markdown.theme', 'default')
+        );
     }
 
     /**
