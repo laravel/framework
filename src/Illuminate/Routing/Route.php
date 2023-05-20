@@ -615,9 +615,17 @@ class Route
      * @param  string  $key
      * @param  mixed  $value
      * @return $this
+     *
+     * @throws \InvalidArgumentException
      */
     public function defaults($key, $value)
     {
+        if(!in_array($key, $this->parameterNames())) {
+            throw new InvalidArgumentException(
+                \sprintf('The given [%s] argument key is invalid', $key)
+            );
+        }
+
         $this->defaults[$key] = $value;
 
         return $this;
