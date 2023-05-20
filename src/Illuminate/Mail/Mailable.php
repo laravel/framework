@@ -384,7 +384,10 @@ class Mailable implements MailableContract, Renderable
                 ]);
             }
 
-            return $this->markdownRenderer()->renderText($this->markdown, array_merge($data, $viewData));
+            return $this->textView ?? $this->markdownRenderer()->renderText(
+                $this->markdown,
+                array_merge($data, $viewData)
+            );
         };
     }
 

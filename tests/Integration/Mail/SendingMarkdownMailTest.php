@@ -30,6 +30,17 @@ class SendingMarkdownMailTest extends TestCase
             ->assertSeeInHtml('My basic content');
     }
 
+    public function testMailMayHaveSpecificTextView()
+    {
+        $mailable = new BasicMailableWithTextView();
+
+        $mailable
+            ->assertHasSubject('My basic title')
+            ->assertSeeInHtml('My basic content')
+            ->assertSeeInText('My basic text view')
+            ->assertDontSeeInText('My basic content');
+    }
+
     public function testEmbed()
     {
         Mail::to('test@mail.com')->send($mailable = new EmbedMailable());
@@ -110,6 +121,25 @@ class BasicMailable extends Mailable
 class BasicMailableWithTheme extends Mailable
 {
     public $theme = 'taylor';
+
+    public function envelope()
+    {
+        return new Envelope(
+            subject: 'My basic title',
+        );
+    }
+
+    public function content()
+    {
+        return new Content(
+            markdown: 'basic',
+        );
+    }
+}
+
+class BasicMailableWithTextView extends Mailable
+{
+    public $textView = 'text';
 
     public function envelope()
     {
