@@ -79,9 +79,26 @@ class SendingMarkdownMailTest extends TestCase
         EOT, $email);
     }
 
-    public function testMessageMayBeDefinedAsViewData()
+    public function testMessageAsPublicPropertyMayBeDefinedAsViewData()
     {
-        Mail::to('test@mail.com')->send(new MessageMailable());
+        Mail::to('test@mail.com')->send($mailable = new MessageAsPublicPropertyMailable());
+
+        $mailable
+            ->assertSeeInText('My message is: My message.')
+            ->assertSeeInHtml('My message is: My message.');
+
+        $email = app('mailer')->getSymfonyTransport()->messages()[0]->getOriginalMessage()->toString();
+
+        $this->assertStringContainsString('My message is: My message.', $email);
+    }
+
+    public function testMessageAsWithNamedParameterMayBeDefinedAsViewData()
+    {
+        Mail::to('test@mail.com')->send($mailable = new MessageAsWithNamedParameterMailable());
+
+        $mailable
+            ->assertSeeInText('My message is: My message.')
+            ->assertSeeInHtml('My message is: My message.');
 
         $email = app('mailer')->getSymfonyTransport()->messages()[0]->getOriginalMessage()->toString();
 
@@ -190,7 +207,7 @@ class EmbedDataMailable extends Mailable
     }
 }
 
-class MessageMailable extends Mailable
+class MessageAsPublicPropertyMailable extends Mailable
 {
     public $message = 'My message';
 
@@ -205,6 +222,26 @@ class MessageMailable extends Mailable
     {
         return new Content(
             markdown: 'message',
+        );
+    }
+}
+
+class MessageAsWithNamedParameterMailable extends Mailable
+{
+    public function envelope()
+    {
+        return new Envelope(
+            subject: 'My basic title',
+        );
+    }
+
+    public function content()
+    {
+        return new Content(
+            markdown: 'message',
+            with: [
+                'message' => 'My message',
+            ]
         );
     }
 }
