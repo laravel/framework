@@ -3,7 +3,6 @@
 namespace Illuminate\Mail;
 
 use Illuminate\Support\Traits\ForwardsCalls;
-use Symfony\Component\Mime\Part\File;
 
 /**
  * @mixin \Illuminate\Mail\Message
