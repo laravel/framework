@@ -117,7 +117,7 @@ class JobDispatchingTest extends TestCase
      */
     private function getJobLock($job, $value = null)
     {
-        return $this->app->get(Repository::class)->lock('laravel_unique_job:'.$job.$value, 10)->get();
+        return $this->app->get(Repository::class)->lock('laravel_unique_job:'.$job.':'.$value, 10)->get();
     }
 }
 
