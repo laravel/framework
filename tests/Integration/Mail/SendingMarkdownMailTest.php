@@ -40,16 +40,15 @@ class SendingMarkdownMailTest extends TestCase
 
         $email = app('mailer')->getSymfonyTransport()->messages()[0]->getOriginalMessage()->toString();
 
-        $cid = explode('cid:', str($email)->explode("\r\n")
-            ->filter(fn ($line) => str_starts_with($line, '<html><body><p>Embed content: cid:'))
-
+        $cid = explode(' cid:', str($email)->explode("\r\n")
+            ->filter(fn ($line) => str_contains($line, 'Embed content: cid:'))
             ->first())[1];
 
-        $cid = substr($cid, 0, -1);
-
-        $this->assertStringContainsString("Content-Type: application/x-php; name=$cid", $email);
-        $this->assertStringContainsString('Content-Transfer-Encoding: base64', $email);
-        $this->assertStringContainsString("Content-Disposition: inline; name=$cid", $email);
+        $this->assertStringContainsString(<<<EOT
+        Content-Type: application/x-php; name=$cid\r
+        Content-Transfer-Encoding: base64\r
+        Content-Disposition: inline; name=$cid; filename=$cid\r
+        EOT, $email);
     }
 
     public function testEmbedData()
@@ -62,9 +61,11 @@ class SendingMarkdownMailTest extends TestCase
 
         $email = app('mailer')->getSymfonyTransport()->messages()[0]->getOriginalMessage()->toString();
 
-        $this->assertStringContainsString('Content-Type: image/png; name=foo.jpg', $email);
-        $this->assertStringContainsString('Content-Transfer-Encoding: base64', $email);
-        $this->assertStringContainsString('Content-Disposition: inline; name=foo.jpg; filename=foo.jpg', $email);
+        $this->assertStringContainsString(<<<EOT
+        Content-Type: image/png; name=foo.jpg\r
+        Content-Transfer-Encoding: base64\r
+        Content-Disposition: inline; name=foo.jpg; filename=foo.jpg\r
+        EOT, $email);
     }
 
     public function testMessageMayBeDefinedAsViewData()
