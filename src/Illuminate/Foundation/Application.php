@@ -13,16 +13,12 @@ use Illuminate\Events\EventServiceProvider;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables;
 use Illuminate\Foundation\Events\LocaleUpdated;
-use Illuminate\Foundation\Support\Providers\EventServiceProvider as AppEventServiceProvider;
-use Illuminate\Foundation\Support\Providers\RouteServiceProvider as AppRouteServiceProvider;
 use Illuminate\Http\Request;
 use Illuminate\Log\LogServiceProvider;
 use Illuminate\Routing\RoutingServiceProvider;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Env;
-use Illuminate\Support\Facades\Broadcast;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
@@ -209,18 +205,18 @@ class Application extends Container implements ApplicationContract, CachesConfig
     }
 
     /**
-     * Create a new Laravel application instance.
+     * Begin configuring a new Laravel application instance.
      *
      * @param  string|null  $baseDirectory
-     * @return static
+     * @return \Illuminate\Foundation\ApplicationBuilder
      */
-    public static function create(string $baseDirectory = null)
+    public static function configure(string $baseDirectory = null)
     {
         $baseDirectory = $ENV['APP_BASE_PATH'] ?? ($baseDirectory ?: dirname(dirname(
             debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file']
         )));
 
-        return (new static($baseDirectory))
+        return (new ApplicationBuilder(new static($baseDirectory)))
             ->withKernels()
             ->withEvents();
     }
@@ -264,105 +260,6 @@ class Application extends Container implements ApplicationContract, CachesConfig
         $this->register(new EventServiceProvider($this));
         $this->register(new LogServiceProvider($this));
         $this->register(new RoutingServiceProvider($this));
-    }
-
-    /**
-     * Register the standard kernel classes for the application.
-     *
-     * @return $this
-     */
-    protected function withKernels()
-    {
-        $this->singleton(
-            \Illuminate\Contracts\Http\Kernel::class,
-            \App\Http\Kernel::class
-        );
-
-        $this->singleton(
-            \Illuminate\Contracts\Console\Kernel::class,
-            \Illuminate\Foundation\Console\Kernel::class,
-        );
-
-        return $this;
-    }
-
-    /**
-     * Register the core event service provider for the application.
-     *
-     * @return $this
-     */
-    protected function withEvents()
-    {
-        $this->booting(function () {
-            $this->register(AppEventServiceProvider::class);
-        });
-
-        return $this;
-    }
-
-    /**
-     * Invoke the given callback
-     */
-    public function withRouting(?Closure $callback = null, ?string $web = null, ?string $api = null)
-    {
-        if (is_null($callback) && (is_string($web) || is_string($api))) {
-            $callback = function () use ($web, $api) {
-                if (is_string($api)) {
-                    Route::middleware('api')->prefix('api')->group($api);
-                }
-
-                if (is_string($web)) {
-                    Route::middleware('web')->group($web);
-                }
-            };
-        }
-
-        AppRouteServiceProvider::loadRoutesUsing($callback);
-
-        $this->booting(function () {
-            $this->register(AppRouteServiceProvider::class);
-        });
-
-        return $this;
-    }
-
-    /**
-     * Register the standard exception handler for the application.
-     *
-     * @param  callable|null  $afterResolving
-     * @return $this
-     */
-    public function withExceptionHandling($afterResolving = null)
-    {
-        $this->singleton(
-            \Illuminate\Contracts\Debug\ExceptionHandler::class,
-            \Illuminate\Foundation\Exceptions\Handler::class
-        );
-
-        $this->afterResolving(
-            \Illuminate\Contracts\Debug\ExceptionHandler::class,
-            $afterResolving ?: fn ($handler) => $handler
-        );
-
-        return $this;
-    }
-
-    /**
-     * Register the braodcasting services for the application.
-     *
-     * @return $this
-     */
-    public function withBroadcasting()
-    {
-        $this->booted(function () {
-            Broadcast::routes();
-
-            if (file_exists($channels = $this->basePath('routes/channels.php'))) {
-                require $channels;
-            }
-        });
-
-        return $this;
     }
 
     /**
