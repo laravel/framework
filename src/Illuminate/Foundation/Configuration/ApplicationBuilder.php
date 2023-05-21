@@ -1,8 +1,10 @@
 <?php
 
-namespace Illuminate\Foundation;
+namespace Illuminate\Foundation\Configuration;
 
 use Closure;
+use Illuminate\Contracts\Http\Kernel as HttpKernel;
+use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as AppEventServiceProvider;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as AppRouteServiceProvider;
 use Illuminate\Support\Facades\Broadcast;
@@ -26,7 +28,7 @@ class ApplicationBuilder
     {
         $this->app->singleton(
             \Illuminate\Contracts\Http\Kernel::class,
-            \App\Http\Kernel::class
+            \Illuminate\Foundation\Http\Kernel::class,
         );
 
         $this->app->singleton(
@@ -105,6 +107,25 @@ class ApplicationBuilder
 
         $this->app->booting(function () {
             $this->app->register(AppRouteServiceProvider::class);
+        });
+
+        return $this;
+    }
+
+    /**
+     * Register the global middleware, middleware groups, and middleware aliases for the application.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function withMiddleware(callable $callback)
+    {
+        $this->app->afterResolving(HttpKernel::class, function ($kernel) use ($callback) {
+            $callback($middleware = new Middleware);
+
+            $kernel->setGlobalMiddleware($middleware->getGlobalMiddleware());
+            $kernel->setMiddlewareGroups($middleware->getMiddlewareGroups());
+            $kernel->setMiddlewareAliases($middleware->getMiddlewareAliases());
         });
 
         return $this;
