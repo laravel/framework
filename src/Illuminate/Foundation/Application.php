@@ -216,7 +216,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
             debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file']
         )));
 
-        return (new ApplicationBuilder(new static($baseDirectory)))
+        return (new Configuration\ApplicationBuilder(new static($baseDirectory)))
             ->withKernels()
             ->withEvents();
     }
