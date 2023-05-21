@@ -76,18 +76,27 @@ class ApplicationBuilder
      * @param  string|null  $web
      * @param  string|null  $api
      * @param  string|null  $apiPrefix
+     * @param  callable|null  $then
      * @return $this
      */
-    public function withRouting(?Closure $callback = null, ?string $web = null, ?string $api = null, string $apiPrefix = 'api')
+    public function withRouting(?Closure $callback = null,
+        ?string $web = null,
+        ?string $api = null,
+        string $apiPrefix = 'api',
+        ?callable $then = null)
     {
         if (is_null($callback) && (is_string($web) || is_string($api))) {
-            $callback = function () use ($web, $api, $apiPrefix) {
+            $callback = function () use ($web, $api, $apiPrefix, $then) {
                 if (is_string($api)) {
                     Route::middleware('api')->prefix($apiPrefix)->group($api);
                 }
 
                 if (is_string($web)) {
                     Route::middleware('web')->group($web);
+                }
+
+                if (is_callable($then)) {
+                    $then();
                 }
             };
         }
