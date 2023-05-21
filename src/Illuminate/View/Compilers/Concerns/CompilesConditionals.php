@@ -171,6 +171,17 @@ trait CompilesConditionals
     }
 
     /**
+     * Compile the else-unless statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileElseunless($expression)
+    {
+        return "<?php elseif (! {$expression}): ?>";
+    }
+
+    /**
      * Compile the else-if statements into valid PHP.
      *
      * @param  string  $expression
