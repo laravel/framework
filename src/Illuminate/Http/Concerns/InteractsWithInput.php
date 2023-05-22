@@ -3,7 +3,6 @@
 namespace Illuminate\Http\Concerns;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Date;
@@ -427,8 +426,9 @@ trait InteractsWithInput
      * Retrieve input from the request as a model if it is present.
      *
      * @param  string|null  $key
-     * @param  string       $class
+     * @param  string $className
      * @return \Illuminate\Database\Eloquent\Model|null
+     *
      * @throws \InvalidArgumentException
      */
     public function model($key, $className)

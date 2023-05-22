@@ -318,18 +318,18 @@ PHP);
             })->middleware(['web']);
         });
 
-        $response = $this->getJson("/user?user={$user->id}");
+        $response = $this->getJson('/user?user={$user->id}');
         $response->assertOk();
         $response->assertJson([
             [
                 'id' => $user->id,
                 'name' => $user->name,
-            ]
+            ],
         ]);
 
-        $response = $this->getJson("/user?user=foobar");
+        $response = $this->getJson('/user?user=foobar');
         $response->assertOk();
-        $response->assertJson([ null ]);
+        $response->assertJson([null]);
     }
 }
 
