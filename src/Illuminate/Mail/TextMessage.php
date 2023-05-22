@@ -12,7 +12,7 @@ class TextMessage
     use ForwardsCalls;
 
     /**
-     * The Message instance.
+     * The underlying message instance.
      *
      * @var \Illuminate\Mail\Message
      */
@@ -54,7 +54,7 @@ class TextMessage
     }
 
     /**
-     * Dynamically pass missing methods to the Message instance.
+     * Dynamically pass missing methods to the underlying message instance.
      *
      * @param  string  $method
      * @param  array  $parameters

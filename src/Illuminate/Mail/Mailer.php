@@ -329,7 +329,7 @@ class Mailer implements MailerContract, MailQueueContract
     /**
      * Parse the given view name or array.
      *
-     * @param  array|\Closure|string  $view
+     * @param  \Closure|array|string  $view
      * @return array
      *
      * @throws \InvalidArgumentException

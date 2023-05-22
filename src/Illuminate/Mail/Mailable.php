@@ -356,7 +356,7 @@ class Mailable implements MailableContract, Renderable
     }
 
     /**
-     * Build the html view for a Markdown message.
+     * Build the HTML view for a Markdown message.
      *
      * @param  array  $viewData
      * @return \Closure
