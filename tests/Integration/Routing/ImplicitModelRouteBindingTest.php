@@ -165,6 +165,25 @@ PHP);
         $response->assertNotFound();
     }
 
+    public function testImplicitRouteBindingsViaQueryParameter()
+    {
+        $user = ImplicitBindingUser::create(['name' => 'Dries']);
+        $post = ImplicitBindingPost::create(['user_id' => 2]);
+        $this->assertEmpty($user->posts);
+
+        config(['app.key' => str_repeat('a', 32)]);
+
+        Route::scopeBindings()->group(function () {
+            Route::get('/user/{user}/post/{post}', function (ImplicitBindingUser $user, ImplicitBindingPost $post) {
+                return [$user, $post];
+            })->middleware(['web']);
+        });
+
+        $response = $this->getJson("/user/{$user->id}/post/{$post->id}");
+
+        $response->assertNotFound();
+    }
+
     public function testEnforceScopingImplicitRouteBindingsWithTrashedAndChildWithNoSoftDeleteTrait()
     {
         $user = ImplicitBindingUser::create(['name' => 'Dries']);
@@ -305,6 +324,30 @@ PHP);
 
         $response = $this->getJson("/post/{$post->id}/tag-slug/{$tag->slug}");
         $response->assertJsonFragment(['id' => $tag->id]);
+    }
+
+    public function testRequestMethodFunction()
+    {
+        $user = ImplicitBindingUser::create(['name' => 'Foo']);
+
+        config(['app.key' => str_repeat('a', 32)]);
+        Route::scopeBindings()->group(function () {
+            Route::get('/user', function (\Illuminate\Http\Request $request) {
+                return [$request->model('user', ImplicitBindingUser::class)];
+            })->middleware(['web']);
+        });
+
+        $response = $this->getJson("/user?user={$user->id}");
+        $response->assertOk();
+        $response->assertJson([
+            [
+                'id' => $user->id,
+                'name' => $user->name,
+            ]
+        ]);
+
+        $response = $this->getJson("/user?user=foobar");
+        $response->assertNotFound();
     }
 }
 

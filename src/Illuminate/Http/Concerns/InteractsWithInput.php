@@ -2,6 +2,8 @@
 
 namespace Illuminate\Http\Concerns;
 
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Date;
@@ -419,6 +421,17 @@ trait InteractsWithInput
     public function collect($key = null)
     {
         return collect(is_array($key) ? $this->only($key) : $this->input($key));
+    }
+
+    public function model($key, $class) {
+        throw_if(
+            ! is_subclass_of($class, Model::class),
+            new \InvalidArgumentException("{$class} must be an instance of ".Model::class)
+        );
+        
+        $value = $this->input($key);
+
+        return app($class)->resolveRouteBinding($value) ?? throw (new ModelNotFoundException)->setModel($class, $value);
     }
 
     /**
