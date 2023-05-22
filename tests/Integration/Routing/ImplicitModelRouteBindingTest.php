@@ -307,7 +307,7 @@ PHP);
         $response->assertJsonFragment(['id' => $tag->id]);
     }
 
-    public function testRequestMethodFunction()
+    public function testRequestModelFunction()
     {
         $user = ImplicitBindingUser::create(['name' => 'Foo']);
 
