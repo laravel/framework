@@ -130,7 +130,7 @@ class OutputStyle extends SymfonyStyle implements NewLineAware
      * @param  string|iterable  $messages
      * @return int
      */
-    private function trailingNewLineCount($messages)
+    protected function trailingNewLineCount($messages)
     {
         if (is_iterable($messages)) {
             $string = '';
