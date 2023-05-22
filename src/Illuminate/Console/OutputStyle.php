@@ -134,6 +134,7 @@ class OutputStyle extends SymfonyStyle implements NewLineAware
     {
         if (is_iterable($messages)) {
             $string = '';
+
             foreach ($messages as $message) {
                 $string .= $message.PHP_EOL;
             }
