@@ -525,9 +525,9 @@ class UrlGenerator implements UrlGeneratorContract
 
         if ($this->rootNamespace && ! str_starts_with($action, '\\')) {
             return $this->rootNamespace.'\\'.$action;
-        } else {
-            return trim($action, '\\');
         }
+
+        return trim($action, '\\');
     }
 
     /**
