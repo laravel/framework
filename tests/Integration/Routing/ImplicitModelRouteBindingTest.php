@@ -318,7 +318,7 @@ PHP);
             })->middleware(['web']);
         });
 
-        $response = $this->getJson('/user?user={$user->id}');
+        $response = $this->getJson("/user?user={$user->id}");
         $response->assertOk();
         $response->assertJson([
             [
