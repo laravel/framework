@@ -423,15 +423,29 @@ trait InteractsWithInput
         return collect(is_array($key) ? $this->only($key) : $this->input($key));
     }
 
-    public function model($key, $class) {
+    /**
+     * Retrieve input from the request as a model if it is present.
+     *
+     * @param  string|null  $key
+     * @param  string       $class
+     * @return \Illuminate\Database\Eloquent\Model|null
+     * @throws \InvalidArgumentException
+     */
+    public function model($key, $className)
+    {
         throw_if(
-            ! is_subclass_of($class, Model::class),
-            new \InvalidArgumentException("{$class} must be an instance of ".Model::class)
+            ! is_subclass_of($className, Model::class),
+            new \InvalidArgumentException("{$className} must be an instance of ".Model::class)
         );
-        
+        if ($this->isNotFilled($key)) {
+            return null;
+        }
+
         $value = $this->input($key);
 
-        return app($class)->resolveRouteBinding($value) ?? throw (new ModelNotFoundException)->setModel($class, $value);
+        return $value
+            ? (new $className)->resolveRouteBinding($value)
+            : null;
     }
 
     /**

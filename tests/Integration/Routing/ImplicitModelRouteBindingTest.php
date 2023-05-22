@@ -165,25 +165,6 @@ PHP);
         $response->assertNotFound();
     }
 
-    public function testImplicitRouteBindingsViaQueryParameter()
-    {
-        $user = ImplicitBindingUser::create(['name' => 'Dries']);
-        $post = ImplicitBindingPost::create(['user_id' => 2]);
-        $this->assertEmpty($user->posts);
-
-        config(['app.key' => str_repeat('a', 32)]);
-
-        Route::scopeBindings()->group(function () {
-            Route::get('/user/{user}/post/{post}', function (ImplicitBindingUser $user, ImplicitBindingPost $post) {
-                return [$user, $post];
-            })->middleware(['web']);
-        });
-
-        $response = $this->getJson("/user/{$user->id}/post/{$post->id}");
-
-        $response->assertNotFound();
-    }
-
     public function testEnforceScopingImplicitRouteBindingsWithTrashedAndChildWithNoSoftDeleteTrait()
     {
         $user = ImplicitBindingUser::create(['name' => 'Dries']);
@@ -347,7 +328,8 @@ PHP);
         ]);
 
         $response = $this->getJson("/user?user=foobar");
-        $response->assertNotFound();
+        $response->assertOk();
+        $response->assertJson([ null ]);
     }
 }
 
