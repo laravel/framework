@@ -356,7 +356,7 @@ abstract class HasOneOrMany extends Relation
      * @param  array  $attributes
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function forceCreateQuietly(array $attributes)
+    public function forceCreateQuietly(array $attributes = [])
     {
         return Model::withoutEvents(fn () => $this->forceCreate($attributes));
     }

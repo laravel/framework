@@ -1023,7 +1023,7 @@ class Builder implements BuilderContract
      * @param  array  $attributes
      * @return \Illuminate\Database\Eloquent\Model|$this
      */
-    public function forceCreateQuietly(array $attributes)
+    public function forceCreateQuietly(array $attributes = [])
     {
         return Model::withoutEvents(fn () => $this->forceCreate($attributes));
     }
