@@ -426,7 +426,7 @@ trait InteractsWithInput
      * Retrieve input from the request as a model if it is present.
      *
      * @param  string|null  $key
-     * @param  string $className
+     * @param  string  $className
      * @return \Illuminate\Database\Eloquent\Model|null
      *
      * @throws \InvalidArgumentException
