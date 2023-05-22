@@ -1650,7 +1650,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     {
         $json = json_encode($this->jsonSerialize(), $options);
 
-        if (json_last_error() !== JSON_ERROR_NONE) {
+        if (! ($options & JSON_THROW_ON_ERROR) && json_last_error() !== JSON_ERROR_NONE) {
             throw JsonEncodingException::forModel($this, json_last_error_msg());
         }
 
