@@ -2,6 +2,7 @@
 
 namespace Illuminate\Mail;
 
+use Closure;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Mail\Mailable as MailableContract;
 use Illuminate\Contracts\Mail\Mailer as MailerContract;
@@ -328,14 +329,14 @@ class Mailer implements MailerContract, MailQueueContract
     /**
      * Parse the given view name or array.
      *
-     * @param  string|array  $view
+     * @param  \Closure|array|string  $view
      * @return array
      *
      * @throws \InvalidArgumentException
      */
     protected function parseView($view)
     {
-        if (is_string($view)) {
+        if (is_string($view) || $view instanceof Closure) {
             return [$view, null, null];
         }
 
@@ -388,12 +389,14 @@ class Mailer implements MailerContract, MailQueueContract
     /**
      * Render the given view.
      *
-     * @param  string  $view
+     * @param  \Closure|string  $view
      * @param  array  $data
      * @return string
      */
     protected function renderView($view, $data)
     {
+        $view = value($view, $data);
+
         return $view instanceof Htmlable
                         ? $view->toHtml()
                         : $this->views->make($view, $data)->render();

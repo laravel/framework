@@ -57,4 +57,16 @@ test
 
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
+
+    public function testPushIfIsCompiled()
+    {
+        $string = '@pushIf(true, \'foo\')
+test
+@endPushIf';
+        $expected = '<?php if(true): $__env->startPush( \'foo\'); ?>
+test
+<?php $__env->stopPush(); endif; ?>';
+
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
 }
