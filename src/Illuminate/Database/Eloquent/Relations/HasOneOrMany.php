@@ -351,7 +351,7 @@ abstract class HasOneOrMany extends Relation
     }
 
     /**
-     * Create a new instance of the related model with mass assignment, without raising model events.
+     * Create a new instance of the related model with mass assignment without raising model events.
      *
      * @param  array  $attributes
      * @return \Illuminate\Database\Eloquent\Model
