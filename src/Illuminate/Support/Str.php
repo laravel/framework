@@ -1001,11 +1001,9 @@ class Str
             $search = collect($search)->all();
         }
 
-        $subject = $caseSensitive
+        return $caseSensitive
                     ? str_replace($search, '', $subject)
                     : str_ireplace($search, '', $subject);
-
-        return $subject;
     }
 
     /**
