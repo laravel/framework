@@ -351,6 +351,23 @@ class CacheRepositoryTest extends TestCase
         $this->assertFalse($repo->deleteMultiple(['a-key', 'a-second-key']));
     }
 
+    public function testPullingMultipleKeys()
+    {
+        $repo = $this->getRepository();
+        $cacheData = [
+            'the-first-key' => 'the-first-value',
+            'the-second-key' => 'the-second-value',
+        ];
+
+        foreach ($cacheData as $key => $value) {
+            $repo->getStore()->shouldReceive('forget')->with($key)->andReturn(true);
+        }
+        $cacheKeys = array_keys($cacheData);
+        $repo->getStore()->shouldReceive('many')->once()->with($cacheKeys)->andReturn($cacheData);
+
+        $this->assertEquals($cacheData, $repo->pull($cacheKeys, []));
+    }
+
     public function testAllTagsArePassedToTaggableStore()
     {
         $store = m::mock(ArrayStore::class);

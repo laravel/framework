@@ -186,7 +186,7 @@ class Repository implements ArrayAccess, CacheContract
     public function pull($key, $default = null)
     {
         return tap($this->get($key, $default), function () use ($key) {
-            $this->forget($key);
+            is_iterable($key) ? $this->deleteMultiple($key) : $this->delete($key);
         });
     }
 
