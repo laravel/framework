@@ -2289,7 +2289,7 @@ trait ValidatesAttributes
      * @param  array<string, null|string>  $parameters
      * @return bool
      */
-    public function validateTimezone($attribute, $value, $parameters)
+    public function validateTimezone($attribute, $value, $parameters = [])
     {
         return in_array($value, timezone_identifiers_list(
             constant(DateTimeZone::class.'::'.Str::upper($parameters[0] ?? 'all')),
