@@ -142,10 +142,6 @@ abstract class TestCase extends BaseTestCase
             $this->disableMiddlewareForAllTests();
         }
 
-        if (isset($uses[WithoutEvents::class])) {
-            $this->disableEventsForAllTests();
-        }
-
         if (isset($uses[WithFaker::class])) {
             $this->setUpFaker();
         }
