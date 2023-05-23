@@ -93,7 +93,7 @@ class OutputStyle extends SymfonyStyle implements NewLineAware
     public function newLine(int $count = 1)
     {
         $this->newLinesWritten += $count;
-        $this->newLineWritten = $count > 0;
+        $this->newLineWritten = $this->newLinesWritten > 0;
 
         parent::newLine($count);
     }
