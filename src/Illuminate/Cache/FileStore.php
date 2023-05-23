@@ -291,7 +291,7 @@ class FileStore implements Store, LockProvider
         // the expiration UNIX timestamps from the start of the file's contents.
         try {
             $expire = substr(
-                $contents = (string) $this->files->get($path, true), 0, 10
+                $contents = $this->files->get($path, true), 0, 10
             );
         } catch (Exception) {
             return $this->emptyPayload();
