@@ -351,6 +351,38 @@ class CacheRepositoryTest extends TestCase
         $this->assertFalse($repo->deleteMultiple(['a-key', 'a-second-key']));
     }
 
+    public function testPullingMultipleKeys()
+    {
+        $repo = $this->getRepository();
+        $cacheData = [
+            'the-first-key' => 'the-first-value',
+            'the-second-key' => 'the-second-value',
+        ];
+
+        foreach ($cacheData as $key => $value) {
+            $repo->getStore()->shouldReceive('get')->once()->with($key)->andReturn($value);
+            $repo->getStore()->shouldReceive('forget')->once()->with($key)->andReturn(true);
+        }
+
+        $this->assertEquals($cacheData, $repo->pull(array_keys($cacheData)));
+    }
+
+    public function testPullManyMethodWithArrayOfKeys()
+    {
+        $repo = $this->getRepository();
+        $cacheData = [
+            'the-first-key' => 'the-first-value',
+            'the-second-key' => 'the-second-value',
+        ];
+
+        foreach ($cacheData as $key => $value) {
+            $repo->getStore()->shouldReceive('get')->once()->with($key)->andReturn($value);
+            $repo->getStore()->shouldReceive('forget')->once()->with($key)->andReturn(true);
+        }
+
+        $this->assertEquals($cacheData, $repo->pullMany(array_keys($cacheData)));
+    }
+
     public function testAllTagsArePassedToTaggableStore()
     {
         $store = m::mock(ArrayStore::class);

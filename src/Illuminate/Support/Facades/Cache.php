@@ -20,6 +20,7 @@ namespace Illuminate\Support\Facades;
  * @method static array many(array $keys)
  * @method static iterable getMultiple(iterable $keys, mixed $default = null)
  * @method static mixed pull(array|string $key, mixed|\Closure $default = null)
+ * @method static array pullMany(array $keys, mixed|\Closure $default = null)
  * @method static bool put(array|string $key, mixed $value, \DateTimeInterface|\DateInterval|int|null $ttl = null)
  * @method static bool set(string $key, mixed $value, null|int|\DateInterval $ttl = null)
  * @method static bool putMany(array $values, \DateTimeInterface|\DateInterval|int|null $ttl = null)

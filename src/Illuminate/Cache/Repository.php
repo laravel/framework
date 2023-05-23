@@ -185,9 +185,32 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function pull($key, $default = null)
     {
+        if (is_array($key)) {
+            return $this->pullMany($key,$default);
+        }
+
         return tap($this->get($key, $default), function () use ($key) {
             $this->forget($key);
         });
+    }
+
+    /**
+     * Retrieve multiple items from the cache and delete them.
+     *
+     * @template TCacheValue
+     *
+     * @param  list<string>  $keys
+     * @param  TCacheValue|(\Closure(): TCacheValue)  $default
+     * @return array<string, (TCacheValue is null ? mixed : TCacheValue)>
+     */
+    public function pullMany(array $keys, $default = null): array
+    {
+        $values = [];
+        foreach ($keys as $key) {
+            $values[$key] = $this->pull($key,$default);
+        }
+
+        return $values;
     }
 
     /**
