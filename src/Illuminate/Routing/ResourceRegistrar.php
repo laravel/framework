@@ -708,8 +708,8 @@ class ResourceRegistrar
     {
         if (empty($verbs)) {
             return static::$verbs;
-        } else {
-            static::$verbs = array_merge(static::$verbs, $verbs);
         }
+
+        static::$verbs = array_merge(static::$verbs, $verbs);
     }
 }
