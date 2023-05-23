@@ -1018,6 +1018,17 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Save a new model instance with mass assignment without raising model events.
+     *
+     * @param  array  $attributes
+     * @return \Illuminate\Database\Eloquent\Model|$this
+     */
+    public function forceCreateQuietly(array $attributes = [])
+    {
+        return Model::withoutEvents(fn () => $this->forceCreate($attributes));
+    }
+
+    /**
      * Update records in the database.
      *
      * @param  array  $values

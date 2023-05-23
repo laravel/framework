@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Eloquent\Relations;
 
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 
 class MorphMany extends MorphOneOrMany
 {
@@ -74,5 +75,16 @@ class MorphMany extends MorphOneOrMany
         $attributes[$this->getMorphType()] = $this->morphClass;
 
         return parent::forceCreate($attributes);
+    }
+
+    /**
+     * Create a new instance of the related model with mass assignment without raising model events.
+     *
+     * @param  array  $attributes
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function forceCreateQuietly(array $attributes = [])
+    {
+        return Model::withoutEvents(fn () => $this->forceCreate($attributes));
     }
 }
