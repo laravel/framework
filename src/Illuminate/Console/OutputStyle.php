@@ -112,6 +112,8 @@ class OutputStyle extends SymfonyStyle implements NewLineAware
 
     /**
      * {@inheritdoc}
+     *
+     * @deprecated use newLinesWritten
      */
     public function newLineWritten()
     {
