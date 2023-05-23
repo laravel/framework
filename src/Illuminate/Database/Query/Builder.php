@@ -2618,6 +2618,17 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Get the SQL representation of the query with bindings
+     */
+    public function toBoundSql(): string
+    {
+        $bindings = collect($this->getBindings())
+            ->map(fn(string|float|int|null $binding) => is_string($binding) ? "'" . $binding . "'" : $binding)->all();
+
+        return Str::replaceArray('?' , $bindings, $this->toSql());
+    }
+
+    /**
      * Execute a query for a single record by ID.
      *
      * @param  int|string  $id

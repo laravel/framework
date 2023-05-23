@@ -5607,6 +5607,13 @@ SQL;
         $this->assertSame('select * from "users" where "email" = ?', $clone->toSql());
     }
 
+    public function testToBoundSql()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('email', 'foo');
+        $this->assertSame('select * from "users" where "email" = \'foo\'', $builder->toBoundSql());
+    }
+
     public function testCloneWithout()
     {
         $builder = $this->getBuilder();
