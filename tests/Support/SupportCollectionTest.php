@@ -4383,7 +4383,7 @@ class SupportCollectionTest extends TestCase
 
         (new $collection([1, 2, 3]))->dump('one', 'two');
 
-        $this->assertSame(['one', 'two', [1, 2, 3]], $log->all());
+        $this->assertSame([[1, 2, 3], 'one', 'two'], $log->all());
 
         VarDumper::setHandler(null);
     }
