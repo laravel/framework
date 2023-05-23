@@ -1018,7 +1018,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Save a new model instance with mass assignment, without raising model events.
+     * Save a new model instance with mass assignment without raising model events.
      *
      * @param  array  $attributes
      * @return \Illuminate\Database\Eloquent\Model|$this
