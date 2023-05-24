@@ -136,7 +136,7 @@ class At
      */
     protected function edgeTime($time, $unit)
     {
-        return match($this->start) {
+        return match ($this->start) {
             1 => $time->startOf($unit),
             -1 => $time->endOf($unit),
             default => $time
@@ -159,7 +159,7 @@ class At
             ->addUnit('month', $this->amount)
             ->setUnitNoOverflow('day', abs($day), 'month')
             ->setTimeFrom($now)
-            ->when($this->start !== 0, fn($time) => $this->edgeTime($time, 'day'));
+            ->when($this->start !== 0, fn ($time) => $this->edgeTime($time, 'day'));
     }
 
     /**
@@ -177,7 +177,7 @@ class At
             ->addUnit('month', $this->amount)
             ->setUnitNoOverflow('day', $now->day, 'month')
             ->setTimeFrom($now)
-            ->when($this->start !== 0, fn($time) => $this->edgeTime($time, 'month'));
+            ->when($this->start !== 0, fn ($time) => $this->edgeTime($time, 'month'));
     }
 
     /**
@@ -195,7 +195,7 @@ class At
             1 => $now->next($dayOfWeek),
         };
 
-        return $now->setTimeFrom()->when($this->start !== 0, fn($time) => $this->edgeTime($time, 'day'));
+        return $now->setTimeFrom()->when($this->start !== 0, fn ($time) => $this->edgeTime($time, 'day'));
     }
 
     /**
@@ -215,19 +215,19 @@ class At
             'prev',
             'previous' => $this->prev(),
             'second',
-            'seconds' => $this->now()->addUnit('second', $this->amount)->when($this->start !== 0, fn($time) => $this->edgeTime($time, 'second')),
+            'seconds' => $this->now()->addUnit('second', $this->amount)->when($this->start !== 0, fn ($time) => $this->edgeTime($time, 'second')),
             'minute',
-            'minutes' => $this->now()->addUnit('minute', $this->amount)->when($this->start !== 0, fn($time) => $this->edgeTime($time, 'minute')),
+            'minutes' => $this->now()->addUnit('minute', $this->amount)->when($this->start !== 0, fn ($time) => $this->edgeTime($time, 'minute')),
             'hour',
-            'hours' => $this->now()->addUnit('hour', $this->amount)->when($this->start !== 0, fn($time) => $this->edgeTime($time, 'hour')),
+            'hours' => $this->now()->addUnit('hour', $this->amount)->when($this->start !== 0, fn ($time) => $this->edgeTime($time, 'hour')),
             'day',
-            'days' => $this->now()->addUnit('day', $this->amount)->when($this->start !== 0, fn($time) => $this->edgeTime($time, 'day')),
+            'days' => $this->now()->addUnit('day', $this->amount)->when($this->start !== 0, fn ($time) => $this->edgeTime($time, 'day')),
             'week',
-            'weeks' => $this->now()->addUnit('week', $this->amount)->when($this->start !== 0, fn($time) => $this->edgeTime($time, 'week')),
+            'weeks' => $this->now()->addUnit('week', $this->amount)->when($this->start !== 0, fn ($time) => $this->edgeTime($time, 'week')),
             'month',
             'months' => $this->addMonth(),
             'year',
-            'years' => $this->now()->addUnit('year', $this->amount)->when($this->start !== 0, fn($time) => $this->edgeTime($time, 'year')),
+            'years' => $this->now()->addUnit('year', $this->amount)->when($this->start !== 0, fn ($time) => $this->edgeTime($time, 'year')),
             'monday' => $this->modifyDayOfWeek(Carbon::MONDAY),
             'tuesday' => $this->modifyDayOfWeek(Carbon::TUESDAY),
             'wednesday' => $this->modifyDayOfWeek(Carbon::WEDNESDAY),
