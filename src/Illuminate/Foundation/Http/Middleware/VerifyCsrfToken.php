@@ -34,13 +34,6 @@ class VerifyCsrfToken
     protected $encrypter;
 
     /**
-     * The URIs that should be excluded from CSRF verification.
-     *
-     * @var array<int, string>
-     */
-    protected $except = [];
-
-    /**
      * Indicates whether the XSRF-TOKEN cookie should be set on the response.
      *
      * @var bool

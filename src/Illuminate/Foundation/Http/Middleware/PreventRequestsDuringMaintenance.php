@@ -20,13 +20,6 @@ class PreventRequestsDuringMaintenance
     protected $app;
 
     /**
-     * The URIs that should be accessible while maintenance mode is enabled.
-     *
-     * @var array<int, string>
-     */
-    protected $except = [];
-
-    /**
      * Create a new middleware instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app

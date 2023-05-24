@@ -5,7 +5,14 @@ namespace Illuminate\Foundation\Http\Middleware\Concerns;
 trait ExcludesPaths
 {
     /**
-     * Get the URIs that should be accessible even when maintenance mode is enabled.
+     * The URIs that should be excluded.
+     *
+     * @var array<int, string>
+     */
+    protected $except = [];
+
+    /**
+     * Get the URIs that should be excluded.
      *
      * @return array
      */
@@ -15,7 +22,7 @@ trait ExcludesPaths
     }
 
     /**
-     * Determine if the request has a URI that should be accessible in maintenance mode.
+     * Determine if the request has a URI that should be exclued.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return bool
