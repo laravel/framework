@@ -116,4 +116,9 @@ class HasherTest extends TestCase
         $bcryptHashed = $bcryptHasher->make('password');
         (new Argon2IdHasher(['verify' => true]))->check('password', $bcryptHashed);
     }
+
+    public function testIsHashedWithNonHashedValue()
+    {
+        $this->assertFalse($this->hashManager->isHashed('foo'));
+    }
 }
