@@ -41,9 +41,9 @@ class Psr6RedisTest extends TestCase
         $item->set(new Unserializable());
         $item->expiresAfter(60);
 
+
         $this->expectException(Exception::class);
         $this->expectExceptionMessage('Not serializable');
-
         $cache->save($item);
 
         Cache::store('redis')->get('foo');
