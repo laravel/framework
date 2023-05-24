@@ -119,6 +119,7 @@ class RedisStore extends TaggableStore implements LockProvider
     public function putMany(array $values, $seconds)
     {
         $serializedValues = [];
+
         foreach ($values as $key => $value) {
             $serializedValues[$this->prefix.$key] = $this->serialize($value);
         }
