@@ -15,7 +15,7 @@ abstract class Grammar
      *
      * @var \Illuminate\Database\Connection
      */
-    protected $connection = null;
+    protected $connection;
 
     /**
      * The grammar table prefix.
@@ -204,6 +204,22 @@ abstract class Grammar
     }
 
     /**
+     * Escapes a value for safe SQL embedding.
+     *
+     * @param  string|float|int|bool|null  $value
+     * @param  bool  $binary
+     * @return string
+     */
+    public function escape($value, $binary = false)
+    {
+        if (is_null($this->connection)) {
+            throw new RuntimeException("The database driver's grammar implementation does not support escaping values.");
+        }
+
+        return $this->connection->escape($value, $binary);
+    }
+
+    /**
      * Determine if the given value is a raw expression.
      *
      * @param  mixed  $value
@@ -273,21 +289,5 @@ abstract class Grammar
         $this->connection = $connection;
 
         return $this;
-    }
-
-    /**
-     * Escapes a value for safe SQL embedding.
-     *
-     * @param  string|float|int|bool|null  $value
-     * @param  bool  $binary
-     * @return string
-     */
-    public function escape($value, $binary = false)
-    {
-        if (null === $this->connection) {
-            throw new RuntimeException("The database driver's grammar implementation does not support escaping values.");
-        }
-
-        return $this->connection->escape($value, $binary);
     }
 }

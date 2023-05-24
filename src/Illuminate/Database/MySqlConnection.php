@@ -14,6 +14,19 @@ use PDO;
 class MySqlConnection extends Connection
 {
     /**
+     * Escape a binary value for safe SQL embedding.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function escapeBinary($value)
+    {
+        $hex = bin2hex($value);
+
+        return "x'{$hex}'";
+    }
+
+    /**
      * Determine if the connected database is a MariaDB database.
      *
      * @return bool
@@ -30,8 +43,7 @@ class MySqlConnection extends Connection
      */
     protected function getDefaultQueryGrammar()
     {
-        $grammar = new QueryGrammar();
-        $grammar->setConnection($this);
+        ($grammar = new QueryGrammar)->setConnection($this);
 
         return $this->withTablePrefix($grammar);
     }
@@ -57,8 +69,7 @@ class MySqlConnection extends Connection
      */
     protected function getDefaultSchemaGrammar()
     {
-        $grammar = new SchemaGrammar();
-        $grammar->setConnection($this);
+        ($grammar = new SchemaGrammar)->setConnection($this);
 
         return $this->withTablePrefix($grammar);
     }
@@ -93,18 +104,5 @@ class MySqlConnection extends Connection
     protected function getDoctrineDriver()
     {
         return new MySqlDriver;
-    }
-
-    /**
-     * Escapes a binary value for safe SQL embedding.
-     *
-     * @param  string  $value
-     * @return string
-     */
-    protected function escapeBinary($value)
-    {
-        $hex = bin2hex($value);
-
-        return "x'{$hex}'";
     }
 }

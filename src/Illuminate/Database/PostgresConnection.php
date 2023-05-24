@@ -13,14 +13,37 @@ use Illuminate\Filesystem\Filesystem;
 class PostgresConnection extends Connection
 {
     /**
+     * Escape a binary value for safe SQL embedding.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function escapeBinary($value)
+    {
+        $hex = bin2hex($value);
+
+        return "'\x{$hex}'::bytea";
+    }
+
+    /**
+     * Escape a bool value for safe SQL embedding.
+     *
+     * @param  bool  $value
+     * @return string
+     */
+    protected function escapeBool($value)
+    {
+        return $value ? 'true' : 'false';
+    }
+
+    /**
      * Get the default query grammar instance.
      *
      * @return \Illuminate\Database\Query\Grammars\PostgresGrammar
      */
     protected function getDefaultQueryGrammar()
     {
-        $grammar = new QueryGrammar();
-        $grammar->setConnection($this);
+        ($grammar = new QueryGrammar)->setConnection($this);
 
         return $this->withTablePrefix($grammar);
     }
@@ -46,8 +69,7 @@ class PostgresConnection extends Connection
      */
     protected function getDefaultSchemaGrammar()
     {
-        $grammar = new SchemaGrammar();
-        $grammar->setConnection($this);
+        ($grammar = new SchemaGrammar)->setConnection($this);
 
         return $this->withTablePrefix($grammar);
     }
@@ -82,29 +104,5 @@ class PostgresConnection extends Connection
     protected function getDoctrineDriver()
     {
         return new PostgresDriver;
-    }
-
-    /**
-     * Escapes a binary value for safe SQL embedding.
-     *
-     * @param  string  $value
-     * @return string
-     */
-    protected function escapeBinary($value)
-    {
-        $hex = bin2hex($value);
-
-        return "'\x{$hex}'::bytea";
-    }
-
-    /**
-     * Escapes a bool value for safe SQL embedding.
-     *
-     * @param  bool  $value
-     * @return string
-     */
-    protected function escapeBool($value)
-    {
-        return $value ? 'true' : 'false';
     }
 }

@@ -257,8 +257,7 @@ class Connection implements ConnectionInterface
      */
     protected function getDefaultQueryGrammar()
     {
-        $grammar = new QueryGrammar();
-        $grammar->setConnection($this);
+        ($grammar = new QueryGrammar)->setConnection($this);
 
         return $grammar;
     }
@@ -1044,6 +1043,69 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * Escape a value for safe SQL embedding.
+     *
+     * @param  string|float|int|bool|null  $value
+     * @param  bool  $binary
+     * @return string
+     */
+    public function escape($value, $binary = false)
+    {
+        if ($value === null) {
+            return 'null';
+        } elseif ($binary) {
+            return $this->escapeBinary($value);
+        } elseif (is_int($value) || is_float($value)) {
+            return (string) $value;
+        } elseif (is_bool($value)) {
+            return $this->escapeBool($value);
+        } else {
+            if (str_contains($value, "\00")) {
+                throw new RuntimeException('Strings with null bytes cannot be escaped. Use the binary escape option.');
+            }
+
+            if (preg_match('//u', $value) === false) {
+                throw new RuntimeException('Strings with invalid UTF-8 byte sequences cannot be escaped.');
+            }
+
+            return $this->escapeString($value);
+        }
+    }
+
+    /**
+     * Escape a string value for safe SQL embedding.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function escapeString($value)
+    {
+        return $this->getPdo()->quote($value);
+    }
+
+    /**
+     * Escape a boolean value for safe SQL embedding.
+     *
+     * @param  bool  $value
+     * @return string
+     */
+    protected function escapeBool($value)
+    {
+        return $value ? '1' : '0';
+    }
+
+    /**
+     * Escape a binary value for safe SQL embedding.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function escapeBinary($value)
+    {
+        throw new RuntimeException('The database connection does not support escaping binary values.');
+    }
+
+    /**
      * Determine if the database connection has modified any database records.
      *
      * @return bool
@@ -1621,82 +1683,5 @@ class Connection implements ConnectionInterface
     public static function getResolver($driver)
     {
         return static::$resolvers[$driver] ?? null;
-    }
-
-    /**
-     * Escapes a value for safe SQL embedding.
-     *
-     * @param  string|float|int|bool|null  $value
-     * @param  bool  $binary
-     * @return string
-     */
-    public function escape($value, $binary = false)
-    {
-        if ($value === null) {
-            return 'null';
-        } elseif ($binary) {
-            return $this->escapeBinary($value);
-        } elseif (is_int($value) || is_float($value)) {
-            return (string) $value;
-        } elseif (is_bool($value)) {
-            return $this->escapeBool($value);
-        } else {
-            // As many desktop tools and other programming languages still have problems with null bytes, they are
-            // forbidden for textual strings to align the support of the different databases: MySQL is the only database
-            // supporting null bytes within a SQL string in an escaped human-readable format. While PostgreSQL doesn't
-            // support null bytes, all the other ones use the invisible byte that would be hard to spot when viewing or
-            // copying SQL queries.
-            if (str_contains($value, "\00")) {
-                throw new RuntimeException('Strings with null bytes cannot be escaped. Use the binary escape option.');
-            }
-
-            // The documentation of PDO::quote states that it should be theoretically safe to use a quoted string within
-            // a SQL query. While only being "theoretically" safe this behaviour is used within the PHP MySQL driver all
-            // the time as no real prepared statements are used because it is emulating prepares by default. So even the
-            // PHP core developers believes it to be secure. However, Laravel forces the PDO driver to use real prepared
-            // statements so the default mode is not active for Laravel applications.
-            // All SQL injections remaining when quoting values are always some strange charset conversion tricks that
-            // start by using invalid UTF-8 sequences. But those attacks are fixed by setting the proper connection
-            // charset which is done by the standard Laravel configuration. To further secure the implementation we can
-            // scrub the value by checking for invalid UTF-8 sequences.
-            if (false === preg_match('//u', $value)) {
-                throw new RuntimeException('Strings with invalid UTF-8 byte sequences cannot be escaped.');
-            }
-
-            return $this->escapeString($value);
-        }
-    }
-
-    /**
-     * Escapes a string value for safe SQL embedding.
-     *
-     * @param  string  $value
-     * @return string
-     */
-    protected function escapeString($value)
-    {
-        return $this->getPdo()->quote($value);
-    }
-
-    /**
-     * Escapes a bool value for safe SQL embedding.
-     *
-     * @param  bool  $value
-     * @return string
-     */
-    protected function escapeBool($value)
-    {
-        return $value ? '1' : '0';
-    }
-
-    /**
-     * Escapes a binary value for safe SQL embedding.
-     *
-     * @param  string  $value
-     * @return string
-     */
-    protected function escapeBinary($value)
-    {
-        throw new RuntimeException('The database connection has no implementation to escape binary values.');
     }
 }

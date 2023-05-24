@@ -37,14 +37,26 @@ class SQLiteConnection extends Connection
     }
 
     /**
+     * Escape a binary value for safe SQL embedding.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function escapeBinary($value)
+    {
+        $hex = bin2hex($value);
+
+        return "x'{$hex}'";
+    }
+
+    /**
      * Get the default query grammar instance.
      *
      * @return \Illuminate\Database\Query\Grammars\SQLiteGrammar
      */
     protected function getDefaultQueryGrammar()
     {
-        $grammar = new QueryGrammar();
-        $grammar->setConnection($this);
+        ($grammar = new QueryGrammar)->setConnection($this);
 
         return $this->withTablePrefix($grammar);
     }
@@ -70,8 +82,7 @@ class SQLiteConnection extends Connection
      */
     protected function getDefaultSchemaGrammar()
     {
-        $grammar = new SchemaGrammar();
-        $grammar->setConnection($this);
+        ($grammar = new SchemaGrammar)->setConnection($this);
 
         return $this->withTablePrefix($grammar);
     }
@@ -117,18 +128,5 @@ class SQLiteConnection extends Connection
     protected function getForeignKeyConstraintsConfigurationValue()
     {
         return $this->getConfig('foreign_key_constraints');
-    }
-
-    /**
-     * Escapes a binary value for safe SQL embedding.
-     *
-     * @param  string  $value
-     * @return string
-     */
-    protected function escapeBinary($value)
-    {
-        $hex = bin2hex($value);
-
-        return "x'{$hex}'";
     }
 }
