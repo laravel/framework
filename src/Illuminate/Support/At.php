@@ -3,7 +3,6 @@
 namespace Illuminate\Support;
 
 use Exception;
-use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Traits\Macroable;
 
 /**
@@ -11,6 +10,7 @@ use Illuminate\Support\Traits\Macroable;
  * @property-read static $prev
  * @property-read static $previous
  * @property-read static $startOf
+ * @property-read static $endOf
  * @property-read \Illuminate\Support\Carbon|\DateTimeInterface $second
  * @property-read \Illuminate\Support\Carbon|\DateTimeInterface $seconds
  * @property-read \Illuminate\Support\Carbon|\DateTimeInterface $minute
@@ -54,18 +54,20 @@ class At
     /**
      * If it should rewind to the start of the given unit.
      *
-     * @var bool
+     * @var int
      */
-    protected $start = false;
+    protected $start = 0;
 
     /**
      * Create a new At instance.
      *
+     * @param  int  $amount
      * @param  \DateTimeZone|string|null  $tz
      * @return void
      */
-    public function __construct($tz = null)
+    public function __construct($amount, $tz = null)
     {
+        $this->amount = $amount;
         $this->tz = $tz;
     }
 
@@ -75,11 +77,9 @@ class At
      * @param  int  $amount
      * @return $this
      */
-    public function next($amount = 1)
+    public static function next($amount = 1, $tz = null)
     {
-        $this->amount = $amount;
-
-        return $this;
+        return new static($amount, $tz);
     }
 
     /**
@@ -88,19 +88,59 @@ class At
      * @param  int  $amount
      * @return $this
      */
-    public function prev($amount = 1)
+    public static function prev($amount = 1, $tz = null)
     {
-        return $this->next(abs($amount) * -1);
+        return static::next(abs($amount) * -1, $tz);
     }
 
     /**
      * Return the current moment.
      *
-     * @return Carbon
+     * @return \Illuminate\Support\Carbon|\DateTimeInterface
      */
-    public function now()
+    protected function now()
     {
-        return Date::now($this->tz);
+        return new Carbon(null, $this->tz);
+    }
+
+    /**
+     * Set the start of the next time unit.
+     *
+     * @return $this
+     */
+    public function startOf()
+    {
+        $this->start = 1;
+
+        return $this;
+    }
+
+    /**
+     * Set the end of the next time unit.
+     *
+     * @return $this
+     */
+    public function endOf()
+    {
+        $this->start = -1;
+
+        return $this;
+    }
+
+    /**
+     * Modifies the time to the start of end of a given unit.
+     *
+     * @param  \Illuminate\Support\Carbon  $time
+     * @param  string  $unit
+     * @return \Illuminate\Support\Carbon
+     */
+    protected function edgeTime($time, $unit)
+    {
+        return match($this->start) {
+            1 => $time->startOf($unit),
+            -1 => $time->endOf($unit),
+            default => $time
+        };
     }
 
     /**
@@ -111,12 +151,33 @@ class At
      */
     public function nthOfMonth($day)
     {
-        return $this->now()
+        $now = $this->now();
+
+        return $now
+            ->clone()
             ->startOfMonth()
             ->addUnit('month', $this->amount)
             ->setUnitNoOverflow('day', abs($day), 'month')
-            ->setTimeFrom()
-            ->when($this->start)->startOfDay();
+            ->setTimeFrom($now)
+            ->when($this->start !== 0, fn($time) => $this->edgeTime($time, 'day'));
+    }
+
+    /**
+     * Adds a month without overflowing.
+     *
+     * @return \Illuminate\Support\Carbon|\DateTimeInterface
+     */
+    protected function addMonth()
+    {
+        $now = $this->now();
+
+        return $now
+            ->clone()
+            ->setUnit('day', 1)
+            ->addUnit('month', $this->amount)
+            ->setUnitNoOverflow('day', $now->day, 'month')
+            ->setTimeFrom($now)
+            ->when($this->start !== 0, fn($time) => $this->edgeTime($time, 'month'));
     }
 
     /**
@@ -127,14 +188,14 @@ class At
      */
     protected function modifyDayOfWeek($dayOfWeek)
     {
-        $moment = $this->now();
+        $now = $this->now();
 
         match ($this->amount <=> 0) {
-            -1 => $moment->previous($dayOfWeek),
-            1 => $moment->next($dayOfWeek),
+            -1 => $now->previous($dayOfWeek),
+            1 => $now->next($dayOfWeek),
         };
 
-        return $moment->setTimeFrom()->when($this->start)->startOfDay();
+        return $now->setTimeFrom()->when($this->start !== 0, fn($time) => $this->edgeTime($time, 'day'));
     }
 
     /**
@@ -147,30 +208,26 @@ class At
      */
     public function __get(string $name)
     {
-        if ($name === 'startOf') {
-            $this->start = true;
-
-            return $this;
-        }
-
         return match ($name) {
+            'startOf' => $this->startOf(),
+            'endOf' => $this->endOf(),
             'next' => $this->next(),
             'prev',
             'previous' => $this->prev(),
             'second',
-            'seconds' => $this->now()->addUnit('second', $this->amount)->when($this->start)->startOfSecond(),
+            'seconds' => $this->now()->addUnit('second', $this->amount)->when($this->start !== 0, fn($time) => $this->edgeTime($time, 'second')),
             'minute',
-            'minutes' => $this->now()->addUnit('minute', $this->amount)->when($this->start)->startOfMinute(),
+            'minutes' => $this->now()->addUnit('minute', $this->amount)->when($this->start !== 0, fn($time) => $this->edgeTime($time, 'minute')),
             'hour',
-            'hours' => $this->now()->addUnit('hour', $this->amount)->when($this->start)->startOfHour(),
+            'hours' => $this->now()->addUnit('hour', $this->amount)->when($this->start !== 0, fn($time) => $this->edgeTime($time, 'hour')),
             'day',
-            'days' => $this->now()->addUnit('day', $this->amount)->when($this->start)->startOfDay(),
+            'days' => $this->now()->addUnit('day', $this->amount)->when($this->start !== 0, fn($time) => $this->edgeTime($time, 'day')),
             'week',
-            'weeks' => $this->now()->addUnit('week', $this->amount)->when($this->start)->startOfWeek(),
+            'weeks' => $this->now()->addUnit('week', $this->amount)->when($this->start !== 0, fn($time) => $this->edgeTime($time, 'week')),
             'month',
-            'months' => $this->now()->addUnit('month', $this->amount)->when($this->start)->startOfMonth(),
+            'months' => $this->addMonth(),
             'year',
-            'years' => $this->now()->addUnit('year', $this->amount)->when($this->start)->startOfYear(),
+            'years' => $this->now()->addUnit('year', $this->amount)->when($this->start !== 0, fn($time) => $this->edgeTime($time, 'year')),
             'monday' => $this->modifyDayOfWeek(Carbon::MONDAY),
             'tuesday' => $this->modifyDayOfWeek(Carbon::TUESDAY),
             'wednesday' => $this->modifyDayOfWeek(Carbon::WEDNESDAY),

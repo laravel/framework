@@ -8,14 +8,9 @@ use PHPUnit\Framework\TestCase;
 
 class SupportAtTest extends TestCase
 {
-    /** @var \Illuminate\Support\At */
-    protected $at;
-
     protected function setUp(): void
     {
         Carbon::setTestNow('2020-01-01 19:30:05.168');
-
-        $this->at = new At();
     }
 
     protected function tearDown(): void
@@ -25,40 +20,40 @@ class SupportAtTest extends TestCase
 
     public function testUnits(): void
     {
-        $this->assertEquals('2020-01-01 19:30:06', $this->at->next->second);
-        $this->assertEquals('2020-01-01 19:30:15', $this->at->next(10)->seconds);
-        $this->assertEquals('2020-01-01 19:30:04', $this->at->prev->second);
-        $this->assertEquals('2020-01-01 19:29:55', $this->at->prev(10)->seconds);
+        $this->assertEquals('2020-01-01 19:30:06', At::next()->second);
+        $this->assertEquals('2020-01-01 19:30:15', At::next(10)->seconds);
+        $this->assertEquals('2020-01-01 19:30:04', At::prev()->second);
+        $this->assertEquals('2020-01-01 19:29:55', At::prev(10)->seconds);
 
-        $this->assertEquals('2020-01-01 19:31:05', $this->at->next->minute);
-        $this->assertEquals('2020-01-01 19:40:05', $this->at->next(10)->minutes);
-        $this->assertEquals('2020-01-01 19:29:05', $this->at->prev->minute);
-        $this->assertEquals('2020-01-01 19:20:05', $this->at->prev(10)->minutes);
+        $this->assertEquals('2020-01-01 19:31:05', At::next()->minute);
+        $this->assertEquals('2020-01-01 19:40:05', At::next(10)->minutes);
+        $this->assertEquals('2020-01-01 19:29:05', At::prev()->minute);
+        $this->assertEquals('2020-01-01 19:20:05', At::prev(10)->minutes);
 
-        $this->assertEquals('2020-01-01 20:30:05', $this->at->next->hour);
-        $this->assertEquals('2020-01-02 05:30:05', $this->at->next(10)->hours);
-        $this->assertEquals('2020-01-01 18:30:05', $this->at->prev->hour);
-        $this->assertEquals('2020-01-01 09:30:05', $this->at->prev(10)->hours);
+        $this->assertEquals('2020-01-01 20:30:05', At::next()->hour);
+        $this->assertEquals('2020-01-02 05:30:05', At::next(10)->hours);
+        $this->assertEquals('2020-01-01 18:30:05', At::prev()->hour);
+        $this->assertEquals('2020-01-01 09:30:05', At::prev(10)->hours);
 
-        $this->assertEquals('2020-01-02 19:30:05', $this->at->next->day);
-        $this->assertEquals('2020-01-11 19:30:05', $this->at->next(10)->days);
-        $this->assertEquals('2019-12-31 19:30:05', $this->at->prev->day);
-        $this->assertEquals('2019-12-22 19:30:05', $this->at->prev(10)->days);
+        $this->assertEquals('2020-01-02 19:30:05', At::next()->day);
+        $this->assertEquals('2020-01-11 19:30:05', At::next(10)->days);
+        $this->assertEquals('2019-12-31 19:30:05', At::prev()->day);
+        $this->assertEquals('2019-12-22 19:30:05', At::prev(10)->days);
 
-        $this->assertEquals('2020-01-08 19:30:05', $this->at->next->week);
-        $this->assertEquals('2020-03-11 19:30:05', $this->at->next(10)->weeks);
-        $this->assertEquals('2019-12-25 19:30:05', $this->at->prev->week);
-        $this->assertEquals('2019-10-23 19:30:05', $this->at->prev(10)->weeks);
+        $this->assertEquals('2020-01-08 19:30:05', At::next()->week);
+        $this->assertEquals('2020-03-11 19:30:05', At::next(10)->weeks);
+        $this->assertEquals('2019-12-25 19:30:05', At::prev()->week);
+        $this->assertEquals('2019-10-23 19:30:05', At::prev(10)->weeks);
 
-        $this->assertEquals('2020-02-01 19:30:05', $this->at->next->month);
-        $this->assertEquals('2020-11-01 19:30:05', $this->at->next(10)->months);
-        $this->assertEquals('2019-12-01 19:30:05', $this->at->prev->month);
-        $this->assertEquals('2019-03-01 19:30:05', $this->at->prev(10)->months);
+        $this->assertEquals('2020-02-01 19:30:05', At::next()->month);
+        $this->assertEquals('2020-11-01 19:30:05', At::next(10)->months);
+        $this->assertEquals('2019-12-01 19:30:05', At::prev()->month);
+        $this->assertEquals('2019-03-01 19:30:05', At::prev(10)->months);
 
-        $this->assertEquals('2021-01-01 19:30:05', $this->at->next->year);
-        $this->assertEquals('2030-01-01 19:30:05', $this->at->next(10)->years);
-        $this->assertEquals('2019-01-01 19:30:05', $this->at->prev->year);
-        $this->assertEquals('2010-01-01 19:30:05', $this->at->prev(10)->years);
+        $this->assertEquals('2021-01-01 19:30:05', At::next()->year);
+        $this->assertEquals('2030-01-01 19:30:05', At::next(10)->years);
+        $this->assertEquals('2019-01-01 19:30:05', At::prev()->year);
+        $this->assertEquals('2010-01-01 19:30:05', At::prev(10)->years);
     }
 
     /**
@@ -66,8 +61,8 @@ class SupportAtTest extends TestCase
      */
     public function testDayOfWeek($name, $next, $prev)
     {
-        $this->assertEquals($next, $this->at->next->{$name}, "The day $name is not the next.");
-        $this->assertEquals($prev, $this->at->prev->{$name}, "The day $name is not the previous.");
+        $this->assertEquals($next, At::next()->{$name}, "The day $name is not the next.");
+        $this->assertEquals($prev, At::prev()->{$name}, "The day $name is not the previous.");
     }
 
     public static function dayOfWeeks()
@@ -85,36 +80,69 @@ class SupportAtTest extends TestCase
 
     public function testNthOfMonth()
     {
-        $this->assertEquals('2020-02-01 19:30:05', $this->at->next->nthOfMonth(1));
-        $this->assertEquals('2019-12-01 19:30:05', $this->at->prev->nthOfMonth(1));
+        $this->assertEquals('2020-02-01 19:30:05', At::next()->nthOfMonth(1));
+        $this->assertEquals('2019-12-01 19:30:05', At::prev()->nthOfMonth(1));
 
-        $this->assertEquals('2021-01-30 19:30:05', $this->at->next(12)->nthOfMonth(30));
-        $this->assertEquals('2021-02-28 19:30:05', $this->at->next(13)->nthOfMonth(30));
-        $this->assertEquals('2019-01-30 19:30:05', $this->at->prev(12)->nthOfMonth(30));
-        $this->assertEquals('2018-12-30 19:30:05', $this->at->prev(13)->nthOfMonth(30));
+        $this->assertEquals('2021-01-30 19:30:05', At::next(12)->nthOfMonth(30));
+        $this->assertEquals('2021-02-28 19:30:05', At::next(13)->nthOfMonth(30));
+        $this->assertEquals('2019-01-30 19:30:05', At::prev(12)->nthOfMonth(30));
+        $this->assertEquals('2018-12-30 19:30:05', At::prev(13)->nthOfMonth(30));
+        $this->assertEquals('2018-12-31 19:30:05', At::prev(13)->nthOfMonth(99));
 
-        // This test if it can find the last day of february when the date overflows.
+        $this->assertEquals('2020-02-01 19:30:05', At::next()->nthOfMonth(1));
+        $this->assertEquals('2019-12-01 19:30:05', At::prev()->nthOfMonth(1));
+
+        $this->assertEquals('2021-01-30 19:30:05', At::next(12)->nthOfMonth(30));
+        $this->assertEquals('2021-02-28 19:30:05', At::next(13)->nthOfMonth(30));
+        $this->assertEquals('2019-01-30 19:30:05', At::prev(12)->nthOfMonth(30));
+        $this->assertEquals('2018-12-30 19:30:05', At::prev(13)->nthOfMonth(30));
+        $this->assertEquals('2018-12-31 19:30:05', At::prev(13)->nthOfMonth(99));
+    }
+
+    public function testNthOfMonthDoesNotOverflowInFebruary()
+    {
+        Carbon::setTestNow('2019-10-31 19:30:05');
+
+        $this->assertEquals('2020-02-29 19:30:05', At::next(4)->month);
+
         Carbon::setTestNow('2020-01-30 19:30:05');
 
-        $this->assertEquals('2020-02-01 19:30:05', $this->at->next->nthOfMonth(1));
-        $this->assertEquals('2019-12-01 19:30:05', $this->at->prev->nthOfMonth(1));
+        $this->assertEquals('2020-02-29 19:30:05', At::next()->month);
 
-        $this->assertEquals('2021-01-30 19:30:05', $this->at->next(12)->nthOfMonth(30));
-        $this->assertEquals('2021-02-28 19:30:05', $this->at->next(13)->nthOfMonth(30));
-        $this->assertEquals('2019-01-30 19:30:05', $this->at->prev(12)->nthOfMonth(30));
-        $this->assertEquals('2018-12-30 19:30:05', $this->at->prev(13)->nthOfMonth(30));
+        $this->assertEquals('2020-02-29 19:30:05', At::next()->nthOfMonth(30));
+        $this->assertEquals('2020-02-29 19:30:05', At::next()->nthOfMonth(99));
+
+        Carbon::setTestNow('2020-03-31 19:30:05');
+
+        $this->assertEquals('2020-02-29 19:30:05', At::prev()->month);
+
+        $this->assertEquals('2020-02-29 19:30:05', At::prev()->nthOfMonth(30));
+        $this->assertEquals('2020-02-29 19:30:05', At::prev()->nthOfMonth(99));
+
+        Carbon::setTestNow('2020-06-30 19:30:05');
+
+        $this->assertEquals('2020-02-29 19:30:05', At::prev(4)->month);
     }
 
     public function testStartOf()
     {
-        $this->at->startOf;
+        $this->assertEquals('2020-01-01 19:30:06', At::next()->startOf->second);
+        $this->assertEquals('2020-01-01 19:31:00', At::next()->startOf->minute);
+        $this->assertEquals('2020-01-01 20:00:00', At::next()->startOf->hour);
+        $this->assertEquals('2020-01-02 00:00:00', At::next()->startOf->day);
+        $this->assertEquals('2020-01-06 00:00:00', At::next()->startOf->week);
+        $this->assertEquals('2020-02-01 00:00:00', At::next()->startOf->month);
+        $this->assertEquals('2021-01-01 00:00:00', At::next()->startOf->year);
+    }
 
-        $this->assertEquals('2020-01-01 19:30:06', $this->at->next->second);
-        $this->assertEquals('2020-01-01 19:31:00', $this->at->next->minute);
-        $this->assertEquals('2020-01-01 20:00:00', $this->at->next->hour);
-        $this->assertEquals('2020-01-02 00:00:00', $this->at->next->day);
-        $this->assertEquals('2020-01-06 00:00:00', $this->at->next->week);
-        $this->assertEquals('2020-02-01 00:00:00', $this->at->next->month);
-        $this->assertEquals('2021-01-01 00:00:00', $this->at->next->year);
+    public function testEndOf()
+    {
+        $this->assertEquals('2020-01-01T19:30:06.999999Z', At::next()->endOf->second->toJSON());
+        $this->assertEquals('2020-01-01T19:31:59.999999Z', At::next()->endOf->minute->toJSON());
+        $this->assertEquals('2020-01-01T20:59:59.999999Z', At::next()->endOf->hour->toJSON());
+        $this->assertEquals('2020-01-02T23:59:59.999999Z', At::next()->endOf->day->toJSON());
+        $this->assertEquals('2020-01-12T23:59:59.999999Z', At::next()->endOf->week->toJSON());
+        $this->assertEquals('2020-02-29T23:59:59.999999Z', At::next()->endOf->month->toJSON());
+        $this->assertEquals('2021-12-31T23:59:59.999999Z', At::next()->endOf->year->toJSON());
     }
 }
