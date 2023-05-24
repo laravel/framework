@@ -5,10 +5,13 @@ namespace Illuminate\Foundation\Http\Middleware;
 use Closure;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Foundation\Http\MaintenanceModeBypassCookie;
+use Illuminate\Foundation\Http\Middleware\Concerns\ExcludesPaths;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class PreventRequestsDuringMaintenance
 {
+    use ExcludesPaths;
+
     /**
      * The application implementation.
      *
@@ -104,27 +107,6 @@ class PreventRequestsDuringMaintenance
     }
 
     /**
-     * Determine if the request has a URI that should be accessible in maintenance mode.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return bool
-     */
-    protected function inExceptArray($request)
-    {
-        foreach ($this->getExcludedPaths() as $except) {
-            if ($except !== '/') {
-                $except = trim($except, '/');
-            }
-
-            if ($request->fullUrlIs($except) || $request->is($except)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * Redirect the user back to the root of the application with a maintenance mode bypass cookie.
      *
      * @param  string  $secret
@@ -152,15 +134,5 @@ class PreventRequestsDuringMaintenance
         }
 
         return $headers;
-    }
-
-    /**
-     * Get the URIs that should be accessible even when maintenance mode is enabled.
-     *
-     * @return array
-     */
-    public function getExcludedPaths()
-    {
-        return $this->except;
     }
 }
