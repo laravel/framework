@@ -98,6 +98,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Database\Grammar withTablePrefix(\Illuminate\Database\Grammar $grammar)
  * @method static void resolverFor(string $driver, \Closure $callback)
  * @method static mixed getResolver(string $driver)
+ * @method static string escape(string|float|int|bool|null $value, bool $binary = false)
  * @method static mixed transaction(\Closure $callback, int $attempts = 1)
  * @method static void beginTransaction()
  * @method static void commit()
