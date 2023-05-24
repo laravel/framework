@@ -94,7 +94,7 @@ class RateLimiter
     public function tooManyAttempts($key, $maxAttempts)
     {
         if ($this->attempts($key) >= $maxAttempts) {
-            if ($this->cache->has($this->cleanRateLimiterKey($key).':timer')) {
+            if ($this->cache->has($this->getKey($key).':timer')) {
                 return true;
             }
 
@@ -113,7 +113,7 @@ class RateLimiter
      */
     public function hit($key, $decaySeconds = 60)
     {
-        $key = $this->cleanRateLimiterKey($key);
+        $key = $this->getKey($key);
 
         $this->cache->add(
             $key.':timer', $this->availableAt($decaySeconds), $decaySeconds
@@ -138,7 +138,7 @@ class RateLimiter
      */
     public function attempts($key)
     {
-        $key = $this->cleanRateLimiterKey($key);
+        $key = $this->getKey($key);
 
         return $this->cache->get($key, 0);
     }
@@ -151,7 +151,7 @@ class RateLimiter
      */
     public function resetAttempts($key)
     {
-        $key = $this->cleanRateLimiterKey($key);
+        $key = $this->getKey($key);
 
         return $this->cache->forget($key);
     }
@@ -165,8 +165,6 @@ class RateLimiter
      */
     public function remaining($key, $maxAttempts)
     {
-        $key = $this->cleanRateLimiterKey($key);
-
         $attempts = $this->attempts($key);
 
         return $maxAttempts - $attempts;
@@ -192,11 +190,9 @@ class RateLimiter
      */
     public function clear($key)
     {
-        $key = $this->cleanRateLimiterKey($key);
-
         $this->resetAttempts($key);
 
-        $this->cache->forget($key.':timer');
+        $this->cache->forget($this->getKey($key).':timer');
     }
 
     /**
@@ -207,7 +203,7 @@ class RateLimiter
      */
     public function availableIn($key)
     {
-        $key = $this->cleanRateLimiterKey($key);
+        $key = $this->getKey($key);
 
         return max(0, $this->cache->get($key.':timer') - $this->currentTime());
     }
@@ -221,5 +217,16 @@ class RateLimiter
     public function cleanRateLimiterKey($key)
     {
         return preg_replace('/&([a-z])[a-z]+;/i', '$1', htmlentities($key));
+    }
+
+    /**
+     * Generate a rate limiter key.
+     *
+     * @param  string  $key
+     * @return string
+     */
+    public function getKey($key)
+    {
+        return 'laravel_rate_limiter:'.$this->cleanRateLimiterKey($key);
     }
 }

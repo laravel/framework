@@ -15,6 +15,7 @@ namespace Illuminate\Support\Facades;
  * @method static void clear(string $key)
  * @method static int availableIn(string $key)
  * @method static string cleanRateLimiterKey(string $key)
+ * @method static string getKey(string $key)
  *
  * @see \Illuminate\Cache\RateLimiter
  */
