@@ -1310,7 +1310,7 @@ trait HasAttributes
      */
     protected function castAttributeAsHashedString($key, $value)
     {
-        return $value !== null && password_get_info($value)['algo'] === null ? Hash::make($value) : $value;
+        return $value !== null && ! Hash::isHashed($value) ? Hash::make($value) : $value;
     }
 
     /**
