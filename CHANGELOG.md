@@ -1,6 +1,28 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.11.0...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v10.12.0...10.x)
+
+
+## [v10.12.0 (2023-05-23)](https://github.com/laravel/framework/compare/v10.11.0...v10.12.0)
+
+### Added
+- Added `Illuminate/Queue/Events/JobTimedOut.php` ([#47068](https://github.com/laravel/framework/pull/47068))
+- Added `when()` and `unless()` methods to `Illuminate/Support/Sleep` ([#47114](https://github.com/laravel/framework/pull/47114))
+- Adds inline attachments support for markdown mailables ([#47140](https://github.com/laravel/framework/pull/47140))
+- Added `Illuminate/Testing/Concerns/AssertsStatusCodes::assertMethodNotAllowed()` ([#47169](https://github.com/laravel/framework/pull/47169))
+- Added `forceCreateQuietly` method ([#47162](https://github.com/laravel/framework/pull/47162))
+- Added parameters to timezone validation rule ([#47171](https://github.com/laravel/framework/pull/47171))
+
+### Fixed
+- Fixes singleton and api singletons creatable|destryoable|only|except combinations ([#47098](https://github.com/laravel/framework/pull/47098))
+- Don't use empty key or secret for DynamoDBClient ([#47144](https://github.com/laravel/framework/pull/47144))
+
+### Changed
+- Remove session on authenticatable deletion ([#47141](https://github.com/laravel/framework/pull/47141))
+- Added error handling and ensure re-enabling of foreign key constraints in `Illuminate/Database/Schema/Builder::withoutForeignKeyConstraints()` ([#47182](https://github.com/laravel/framework/pull/47182))
+
+### Refactoring
+- Remove useless else statements ([#47161](https://github.com/laravel/framework/pull/47161))
 
 
 ## [v10.11.0 (2023-05-16)](https://github.com/laravel/framework/compare/v10.10.1...v10.11.0)
