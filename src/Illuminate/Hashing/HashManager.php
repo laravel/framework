@@ -89,7 +89,7 @@ class HashManager extends Manager implements Hasher
     }
 
     /**
-     * Check if a value is already hashed.
+     * Determine if a given string is already hashed.
      *
      * @param  string  $value
      * @return bool
