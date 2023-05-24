@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Hashing;
 
-use Illuminate\Container\Container;
 use Illuminate\Config\Repository as Config;
+use Illuminate\Container\Container;
 use Illuminate\Hashing\Argon2IdHasher;
 use Illuminate\Hashing\ArgonHasher;
 use Illuminate\Hashing\BcryptHasher;
@@ -15,7 +15,7 @@ class HasherTest extends TestCase
 {
     public $hashManager;
 
-    public function setUp() : void
+    public function setUp(): void
     {
         parent::setUp();
 
