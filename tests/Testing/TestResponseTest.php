@@ -579,6 +579,25 @@ class TestResponseTest extends TestCase
         $response->assertMethodNotAllowed();
     }
 
+    public function testAssertNotAcceptable()
+    {
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_NOT_ACCEPTABLE)
+        );
+
+        $response->assertNotAcceptable();
+
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_OK)
+        );
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("Expected response status code [406] but received 200.\nFailed asserting that 406 is identical to 200.");
+
+        $response->assertNotAcceptable();
+        $this->fail();
+    }
+
     public function testAssertForbidden()
     {
         $statusCode = 500;

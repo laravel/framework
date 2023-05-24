@@ -132,6 +132,16 @@ trait AssertsStatusCodes
     }
 
     /**
+     * Assert that the response has a 406 "Not Acceptable" status code.
+     *
+     * @return $this
+     */
+    public function assertNotAcceptable()
+    {
+        return $this->assertStatus(406);
+    }
+
+    /**
      * Assert that the response has a 408 "Request Timeout" status code.
      *
      * @return $this
