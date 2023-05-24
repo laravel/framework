@@ -1,6 +1,26 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.11.0...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v10.12.0...10.x)
+
+
+## [v10.12.0 (2023-05-23)](https://github.com/laravel/framework/compare/v10.11.0...v10.12.0)
+
+### Added
+- Add job timeout occurred event ([#47068](https://github.com/laravel/framework/pull/47068))
+- Add Conditional Sleeps ([#47114](https://github.com/laravel/framework/pull/47114))
+- Adds inline attachments support for markdown mailables ([#47140](https://github.com/laravel/framework/pull/47140))
+- Add error handling and ensure re-enabling of foreign key constraints ([#47182](https://github.com/laravel/framework/pull/47182))
+- Add a method `assertMethodNotAllowed` to `AssertsStatusCodes` ([#47169](https://github.com/laravel/framework/pull/47169))
+- Add `forceCreateQuietly` method ([#47162](https://github.com/laravel/framework/pull/47162))
+- Added parameters to timezone validation rule ([#47171](https://github.com/laravel/framework/pull/47171))
+
+### Fixed
+- Fixes singleton and api singletons creatable|destryoable|only|except combinations ([#47098](https://github.com/laravel/framework/pull/47098))
+- Remove session on authenticatable deletion ([#47141](https://github.com/laravel/framework/pull/47141))
+
+### Changed
+- Don't use empty key or secret for DynamoDBClient ([#47144](https://github.com/laravel/framework/pull/47144))
+
 
 
 ## [v10.11.0 (2023-05-16)](https://github.com/laravel/framework/compare/v10.10.1...v10.11.0)
