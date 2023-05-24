@@ -241,11 +241,11 @@ class Batch implements Arrayable, JsonSerializable
     {
         $counts = $this->decrementPendingJobs($jobId);
 
-        if ($counts->pendingJobs === 0) {
+        if ($counts->pendingJobs <= 0) {
             $this->repository->markAsFinished($this->id);
         }
 
-        if ($counts->pendingJobs === 0 && $this->hasThenCallbacks()) {
+        if ($counts->pendingJobs <= 0 && $this->hasThenCallbacks()) {
             $batch = $this->fresh();
 
             collect($this->options['then'])->each(function ($handler) use ($batch) {
