@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Cache;
 
+use Exception;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Tests\Integration\Cache\Fixtures\Unserializable;
@@ -28,7 +29,7 @@ class Psr6RedisTest extends TestCase
     /**
      * @dataProvider redisClientDataProvider
      */
-    public function testTransctionIsClosedOnException($redisClient)
+    public function testTransactionIsNotOpenedWhenSerializationFails($redisClient): void
     {
         $this->app['config']['cache.default'] = 'redis';
         $this->app['config']['database.redis.client'] = $redisClient;
@@ -40,6 +41,9 @@ class Psr6RedisTest extends TestCase
         $item->set(new Unserializable());
         $item->expiresAfter(60);
 
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Not serializable');
+
         $cache->save($item);
 
         Cache::store('redis')->get('foo');
@@ -48,7 +52,7 @@ class Psr6RedisTest extends TestCase
     /**
      * @return array
      */
-    public static function redisClientDataProvider()
+    public static function redisClientDataProvider(): array
     {
         return [
             ['predis'],
