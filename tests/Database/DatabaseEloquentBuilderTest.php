@@ -1141,6 +1141,9 @@ class DatabaseEloquentBuilderTest extends TestCase
         $result = $builder->whereBelongsTo($parent);
         $this->assertEquals($result, $builder);
 
+        $resultById = $builder->whereBelongsToById($parent->id, 'parent');
+        $this->assertEquals($resultById, $builder);
+
         $builder = $this->getBuilder();
         $builder->shouldReceive('from')->with('eloquent_builder_test_where_belongs_to_stubs');
         $builder->setModel($related);
@@ -1172,6 +1175,9 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $result = $builder->whereBelongsTo($parents, 'parent');
         $this->assertEquals($result, $builder);
+
+        $resultById = $builder->whereBelongsToById($parents->pluck('id'), 'parent');
+        $this->assertEquals($resultById, $builder);
     }
 
     public function testDeleteOverride()

@@ -527,6 +527,84 @@ trait QueriesRelationships
     }
 
     /**
+     * Add a "BelongsToById" relationship where clause to the query.
+     *
+     * @param int|\Illuminate\Database\Eloquent\Collection<int>  $related
+     * @param string $relationshipName
+     * @param string $boolean
+     * @param bool $not
+     * @return $this
+     */
+    public function whereBelongsToById($related, $relationshipName, $boolean = 'and', $not = false)
+    {
+        if (!$related instanceof \Illuminate\Support\Collection) {
+            $relatedCollection = $related->newCollection([$related]);
+        } else {
+            $relatedCollection = $related;
+        }
+
+        if ($relatedCollection->isEmpty()) {
+            throw new InvalidArgumentException('Collection given to whereBelongsTo method may not be empty.');
+        }
+
+        try {
+            $relationship = $this->model->{$relationshipName}();
+        } catch (BadMethodCallException $exception) {
+            throw RelationNotFoundException::make($this->model, $relationshipName);
+        }
+
+        if (!$relationship instanceof BelongsTo) {
+            throw RelationNotFoundException::make($this->model, $relationshipName, BelongsTo::class);
+        }
+
+        $this->whereIn(
+            $relationship->getQualifiedForeignKeyName(),
+            $relatedCollection->toArray(),
+            $boolean,
+            $not
+        );
+
+        return $this;
+    }
+
+    /**
+     * Add an "BelongsToById" relationship with an "or where" clause to the query.
+     *
+     * @param int|\Illuminate\Database\Eloquent\Collection<int>  $related
+     * @param string $relationshipName
+     * @return $this
+     */
+    public function orWhereBelongsToById($related, $relationshipName)
+    {
+        return $this->whereBelongsToById($related, $relationshipName, 'or');
+    }
+
+    /**
+     * Add a "BelongsToById" relationship with an "where not" clause to the query.
+     *
+     * @param int|\Illuminate\Database\Eloquent\Collection<int>  $related
+     * @param string $relationshipName
+     * @param string $boolean
+     * @return $this
+     */
+    public function whereNotBelongsToById($related, $relationshipName, $boolean = 'and')
+    {
+        return $this->whereBelongsToById($related, $relationshipName, $boolean, true);
+    }
+
+    /**
+     * Add a "BelongsToById" relationship with an "or where not" clause to the query.
+     *
+     * @param int|\Illuminate\Database\Eloquent\Collection<int>  $related
+     * @param string $relationshipName
+     * @return $this
+     */
+    public function orWhereNotBelongsToById($related, $relationshipName)
+    {
+        return $this->whereBelongsToById($related, $relationshipName, 'or', true);
+    }
+
+    /**
      * Add a "belongs to" relationship where clause to the query.
      *
      * @param  \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>  $related
