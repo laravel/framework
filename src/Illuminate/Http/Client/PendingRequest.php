@@ -2,6 +2,7 @@
 
 namespace Illuminate\Http\Client;
 
+use Closure;
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
@@ -109,14 +110,14 @@ class PendingRequest
     /**
      * A callback to run when throwing if a server or client error occurs.
      *
-     * @var \Closure
+     * @var Closure
      */
     protected $throwCallback;
 
     /**
      * A callback to check if an exception should be thrown when a server or client error occurs.
      *
-     * @var \Closure
+     * @var Closure
      */
     protected $throwIfCallback;
 
@@ -1093,7 +1094,7 @@ class PendingRequest
     /**
      * Build the before sending handler.
      *
-     * @return \Closure
+     * @return Closure
      */
     public function buildBeforeSendingHandler()
     {
@@ -1107,7 +1108,7 @@ class PendingRequest
     /**
      * Build the recorder handler.
      *
-     * @return \Closure
+     * @return Closure
      */
     public function buildRecorderHandler()
     {
@@ -1130,7 +1131,7 @@ class PendingRequest
     /**
      * Build the stub handler.
      *
-     * @return \Closure
+     * @return Closure
      */
     public function buildStubHandler()
     {
@@ -1167,7 +1168,7 @@ class PendingRequest
      * Get the sink stub handler callback.
      *
      * @param  string  $sink
-     * @return \Closure
+     * @return Closure
      */
     protected function sinkStubHandler($sink)
     {
