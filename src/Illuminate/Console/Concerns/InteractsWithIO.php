@@ -280,6 +280,38 @@ trait InteractsWithIO
     }
 
     /**
+     * Execute a given callback while advancing a progress bar.
+     *
+     * @param  iterable|int  $totalSteps
+     * @param  \Closure  $callback
+     * @return mixed|void
+     */
+    public function withProgressBarWithKeys($totalSteps, Closure $callback)
+    {
+        $bar = $this->output->createProgressBar(
+            is_iterable($totalSteps) ? count($totalSteps) : $totalSteps
+        );
+
+        $bar->start();
+
+        if (is_iterable($totalSteps)) {
+            foreach ($totalSteps as $key => $value) {
+                $callback($key, $value, $bar);
+
+                $bar->advance();
+            }
+        } else {
+            $callback($bar);
+        }
+
+        $bar->finish();
+
+        if (is_iterable($totalSteps)) {
+            return $totalSteps;
+        }
+    }
+
+    /**
      * Write a string as information output.
      *
      * @param  string  $string
