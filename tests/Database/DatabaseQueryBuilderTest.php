@@ -1838,7 +1838,8 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->having(
-            new class() implements ConditionExpression {
+            new class() implements ConditionExpression
+            {
                 public function getValue(\Illuminate\Database\Grammar $grammar)
                 {
                     return '1 = 1';
@@ -1847,7 +1848,7 @@ class DatabaseQueryBuilderTest extends TestCase
         );
         $this->assertSame('select * from "users" having 1 = 1', $builder->toSql());
         $this->assertSame([], $builder->getBindings());
-   }
+    }
 
     public function testHavingShortcut()
     {
@@ -5096,7 +5097,8 @@ SQL;
     {
         $builder = $this->getBuilder();
         $builder->select('*')->from('orders')->where(
-            new class() implements ConditionExpression {
+            new class() implements ConditionExpression
+            {
                 public function getValue(\Illuminate\Database\Grammar $grammar)
                 {
                     return '1 = 1';
