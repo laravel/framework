@@ -45,16 +45,14 @@ class EloquentPrunableTest extends DatabaseTestCase
     {
         Event::fake();
 
-        collect(range(1, 5000))->map(function ($id) {
+        PrunableTestModel::insert(collect(range(1, 50))->map(function ($id) {
             return ['name' => 'foo'];
-        })->chunk(200)->each(function ($chunk) {
-            PrunableTestModel::insert($chunk->all());
-        });
+        })->all());
 
-        $count = (new PrunableTestModel)->pruneAll();
+        $count = (new PrunableTestModel)->pruneAll(10);
 
-        $this->assertEquals(1500, $count);
-        $this->assertEquals(3500, PrunableTestModel::count());
+        $this->assertEquals(15, $count);
+        $this->assertEquals(35, PrunableTestModel::count());
 
         Event::assertDispatched(ModelsPruned::class, 2);
     }
@@ -63,17 +61,15 @@ class EloquentPrunableTest extends DatabaseTestCase
     {
         Event::fake();
 
-        collect(range(1, 5000))->map(function ($id) {
+        PrunableSoftDeleteTestModel::insert(collect(range(1, 50))->map(function ($id) {
             return ['deleted_at' => now()];
-        })->chunk(200)->each(function ($chunk) {
-            PrunableSoftDeleteTestModel::insert($chunk->all());
-        });
+        })->all());
 
-        $count = (new PrunableSoftDeleteTestModel)->pruneAll();
+        $count = (new PrunableSoftDeleteTestModel)->pruneAll(10);
 
-        $this->assertEquals(3000, $count);
+        $this->assertEquals(30, $count);
         $this->assertEquals(0, PrunableSoftDeleteTestModel::count());
-        $this->assertEquals(2000, PrunableSoftDeleteTestModel::withTrashed()->count());
+        $this->assertEquals(20, PrunableSoftDeleteTestModel::withTrashed()->count());
 
         Event::assertDispatched(ModelsPruned::class, 3);
     }
@@ -82,18 +78,16 @@ class EloquentPrunableTest extends DatabaseTestCase
     {
         Event::fake();
 
-        collect(range(1, 5000))->map(function ($id) {
+        PrunableWithCustomPruneMethodTestModel::insert(collect(range(1, 50))->map(function ($id) {
             return ['name' => 'foo'];
-        })->chunk(200)->each(function ($chunk) {
-            PrunableWithCustomPruneMethodTestModel::insert($chunk->all());
-        });
+        })->all());
 
-        $count = (new PrunableWithCustomPruneMethodTestModel)->pruneAll();
+        $count = (new PrunableWithCustomPruneMethodTestModel)->pruneAll(10);
 
-        $this->assertEquals(1000, $count);
+        $this->assertEquals(10, $count);
         $this->assertTrue((bool) PrunableWithCustomPruneMethodTestModel::first()->pruned);
         $this->assertFalse((bool) PrunableWithCustomPruneMethodTestModel::orderBy('id', 'desc')->first()->pruned);
-        $this->assertEquals(5000, PrunableWithCustomPruneMethodTestModel::count());
+        $this->assertEquals(50, PrunableWithCustomPruneMethodTestModel::count());
 
         Event::assertDispatched(ModelsPruned::class, 1);
     }
@@ -105,7 +99,7 @@ class PrunableTestModel extends Model
 
     public function prunable()
     {
-        return $this->where('id', '<=', 1500);
+        return $this->where('id', '<=', 15);
     }
 }
 
@@ -115,7 +109,7 @@ class PrunableSoftDeleteTestModel extends Model
 
     public function prunable()
     {
-        return $this->where('id', '<=', 3000);
+        return $this->where('id', '<=', 30);
     }
 }
 
@@ -125,7 +119,7 @@ class PrunableWithCustomPruneMethodTestModel extends Model
 
     public function prunable()
     {
-        return $this->where('id', '<=', 1000);
+        return $this->where('id', '<=', 10);
     }
 
     public function prune()

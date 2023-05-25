@@ -1380,7 +1380,7 @@ class HttpClientTest extends TestCase
             '*' => $factory->response(['error'], 403),
         ]);
 
-        $response = $factory->retry(2, 1000, null, false)->get('http://foo.com/get');
+        $response = $factory->retry(2, 10, null, false)->get('http://foo.com/get');
 
         $this->assertTrue($response->failed());
 
