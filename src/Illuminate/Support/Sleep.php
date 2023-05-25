@@ -134,6 +134,28 @@ class Sleep
     }
 
     /**
+     * Sleep for the given number of hours.
+     *
+     * @return $this
+     */
+    public function hours()
+    {
+        $this->duration->add('hours', $this->pullPending());
+
+        return $this;
+    }
+
+    /**
+     * Sleep for one hour.
+     *
+     * @return $this
+     */
+    public function hour()
+    {
+        return $this->hours();
+    }
+
+    /**
      * Sleep for the given number of minutes.
      *
      * @return $this

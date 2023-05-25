@@ -49,6 +49,24 @@ class SleepTest extends TestCase
         $this->assertEqualsWithDelta(0, $end - $start, 0.03);
     }
 
+    public function testItCanSpecifyHours()
+    {
+        Sleep::fake();
+
+        $sleep = Sleep::for(1.5)->hours();
+
+        $this->assertSame($sleep->duration->totalMicroseconds, 5_400_000_000);
+    }
+
+    public function testItCanSpecifyHour()
+    {
+        Sleep::fake();
+
+        $sleep = Sleep::for(1)->hour();
+
+        $this->assertSame($sleep->duration->totalMicroseconds, 3_600_000_000);
+    }
+
     public function testItCanSpecifyMinutes()
     {
         Sleep::fake();
