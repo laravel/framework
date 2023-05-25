@@ -85,7 +85,7 @@ class EloquentPrunableTest extends DatabaseTestCase
         $count = (new PrunableWithCustomPruneMethodTestModel)->pruneAll(10);
 
         $this->assertEquals(10, $count);
-        $this->assertTrue((bool) PrunableWithCustomPruneMethodTestModel::first()->pruned);
+        $this->assertTrue((bool) PrunableWithCustomPruneMethodTestModel::orderBy('id')->first()->pruned);
         $this->assertFalse((bool) PrunableWithCustomPruneMethodTestModel::orderBy('id', 'desc')->first()->pruned);
         $this->assertEquals(50, PrunableWithCustomPruneMethodTestModel::count());
 
