@@ -537,7 +537,7 @@ trait QueriesRelationships
      */
     public function whereBelongsToById($related, $relationshipName, $boolean = 'and', $not = false)
     {
-        if (!$related instanceof \Illuminate\Support\Collection) {
+        if (! $related instanceof \Illuminate\Support\Collection) {
             $relatedCollection = collect([$related]);
         } else {
             $relatedCollection = $related;
@@ -553,7 +553,7 @@ trait QueriesRelationships
             throw RelationNotFoundException::make($this->model, $relationshipName);
         }
 
-        if (!$relationship instanceof BelongsTo) {
+        if (! $relationship instanceof BelongsTo) {
             throw RelationNotFoundException::make($this->model, $relationshipName, BelongsTo::class);
         }
 
