@@ -258,6 +258,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
      * Cast nested resources to an array.
      *
      * @return array
+     *
      * @throws \JsonException
      */
     public function castToArray(): array
