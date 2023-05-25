@@ -527,7 +527,7 @@ trait QueriesRelationships
     }
 
     /**
-     * Add a "belongs to" relationship "where id" clause to the query.
+     * Add a "belongs to" relationship with "where id" clause to the query.
      *
      * @param  int|\Illuminate\Database\Eloquent\Collection  $related
      * @param  string  $relationshipName
@@ -568,7 +568,7 @@ trait QueriesRelationships
     }
 
     /**
-     * Add a "belongs to" relationship "or where id" clause to the query.
+     * Add a "belongs to" relationship with "or where id" clause to the query.
      *
      * @param  int|\Illuminate\Database\Eloquent\Collection  $related
      * @param  string  $relationshipName
@@ -580,7 +580,7 @@ trait QueriesRelationships
     }
 
     /**
-     * Add a "belongs to" relationship "where not id" clause to the query.
+     * Add a "belongs to" relationship with "where not id" clause to the query.
      *
      * @param  int|\Illuminate\Database\Eloquent\Collection  $related
      * @param  string  $relationshipName
@@ -593,7 +593,7 @@ trait QueriesRelationships
     }
 
     /**
-     * Add a "belongs to" relationship "or where not id" clause to the query.
+     * Add a "belongs to" relationship with "or where not id" clause to the query.
      *
      * @param  int|\Illuminate\Database\Eloquent\Collection  $related
      * @param  string  $relationshipName
@@ -605,7 +605,7 @@ trait QueriesRelationships
     }
 
     /**
-     * Add a "belongs to" relationship "where" clause to the query.
+     * Add a "belongs to" relationship with "where" clause to the query.
      *
      * @param  \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>  $related
      * @param  string|null  $relationshipName
@@ -632,7 +632,7 @@ trait QueriesRelationships
     }
 
     /**
-     * Add a "belongs to" relationship "or where" clause to the query.
+     * Add a "belongs to" relationship with "or where" clause to the query.
      *
      * @param  \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>  $related
      * @param  string|null  $relationshipName
@@ -646,7 +646,7 @@ trait QueriesRelationships
     }
 
     /**
-     * Add a "belongs to" relationship "where not" clause to the query.
+     * Add a "belongs to" relationship with "where not" clause to the query.
      *
      * @param  int|\Illuminate\Database\Eloquent\Collection  $related
      * @param  string  $relationshipName
@@ -659,7 +659,7 @@ trait QueriesRelationships
     }
 
     /**
-     * Add a "belongs to" relationship "or where not" clause to the query.
+     * Add a "belongs to" relationship with "or where not" clause to the query.
      *
      * @param  int|\Illuminate\Database\Eloquent\Collection  $related
      * @param  string  $relationshipName
