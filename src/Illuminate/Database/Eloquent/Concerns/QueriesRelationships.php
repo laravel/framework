@@ -617,9 +617,9 @@ trait QueriesRelationships
     public function whereBelongsTo($related, $relationshipName = null, $boolean = 'and', $not = false)
     {
         if (! $related instanceof Collection) {
-            $relatedCollectionOfIds = $related->newCollection([$related])->pluck('id');
+            $relatedCollectionOfIds = $related->newCollection([$related->id]);
         } else {
-            $relatedCollectionOfIds = $related->id;
+            $relatedCollectionOfIds = $related->pluck('id');
 
             $related = $related->first();
         }
