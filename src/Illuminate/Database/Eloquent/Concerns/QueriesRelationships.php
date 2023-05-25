@@ -529,7 +529,7 @@ trait QueriesRelationships
     /**
      * Add a "BelongsToById" relationship where clause to the query.
      *
-     * @param int|\Illuminate\Database\Eloquent\Collection<int> $related
+     * @param int|\Illuminate\Database\Eloquent\Collection $related
      * @param string $relationshipName
      * @param string $boolean
      * @param bool $not
@@ -570,7 +570,7 @@ trait QueriesRelationships
     /**
      * Add an "BelongsToById" relationship with an "or where" clause to the query.
      *
-     * @param int|\Illuminate\Database\Eloquent\Collection<int> $related
+     * @param int|\Illuminate\Database\Eloquent\Collection $related
      * @param string $relationshipName
      * @return $this
      */
@@ -582,7 +582,7 @@ trait QueriesRelationships
     /**
      * Add a "BelongsToById" relationship with an "where not" clause to the query.
      *
-     * @param int|\Illuminate\Database\Eloquent\Collection<int> $related
+     * @param int|\Illuminate\Database\Eloquent\Collection $related
      * @param string $relationshipName
      * @param string $boolean
      * @return $this
@@ -595,7 +595,7 @@ trait QueriesRelationships
     /**
      * Add a "BelongsToById" relationship with an "or where not" clause to the query.
      *
-     * @param int|\Illuminate\Database\Eloquent\Collection<int> $related
+     * @param int|\Illuminate\Database\Eloquent\Collection $related
      * @param string $relationshipName
      * @return $this
      */
