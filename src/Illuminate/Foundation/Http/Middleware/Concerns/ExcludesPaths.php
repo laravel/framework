@@ -22,7 +22,7 @@ trait ExcludesPaths
     }
 
     /**
-     * Determine if the request has a URI that should be exclued.
+     * Determine if the request has a URI that should be excluded.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return bool
