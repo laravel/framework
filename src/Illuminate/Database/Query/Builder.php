@@ -7,6 +7,7 @@ use Carbon\CarbonPeriod;
 use Closure;
 use DateTimeInterface;
 use Illuminate\Contracts\Database\Query\Builder as BuilderContract;
+use Illuminate\Contracts\Database\Query\ConditionExpression;
 use Illuminate\Contracts\Database\Query\Expression as ExpressionContract;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Concerns\BuildsQueries;
@@ -753,6 +754,16 @@ class Builder implements BuilderContract
      */
     public function where($column, $operator = null, $value = null, $boolean = 'and')
     {
+		// If the column is a condition expression, we can skip the normal handling
+		// of parameters. Such a value indicates that the column contains a where
+		// condition that can be directly embedded into the query.
+		if ($column instanceof ConditionExpression) {
+			$type = 'Expression';
+			$this->wheres[] = compact('type', 'column', 'boolean');
+
+			return $this;
+		}
+
         // If the column is an array, we will assume it is an array of key-value pairs
         // and can add them each as a where clause. We will maintain the boolean we
         // received when the method was called and pass it into the nested where.
@@ -2082,6 +2093,16 @@ class Builder implements BuilderContract
     public function having($column, $operator = null, $value = null, $boolean = 'and')
     {
         $type = 'Basic';
+
+		// If the column is a condition expression, we can skip the normal handling
+		// of parameters. Such a value indicates that the column contains a having
+		// condition that can be directly embedded into the query.
+		if ($column instanceof ConditionExpression) {
+			$type = 'Expression';
+			$this->havings[] = compact('type', 'column', 'boolean');
+
+			return $this;
+		}
 
         // Here we will make some assumptions about the operator. If only 2 values are
         // passed to the method, we will assume that the operator is an equals sign
