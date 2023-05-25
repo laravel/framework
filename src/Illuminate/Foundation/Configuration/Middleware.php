@@ -35,6 +35,27 @@ class Middleware
     protected $groupAppends = [];
 
     /**
+     * Indicates if the "trust hosts" middleware is enabled.
+     *
+     * @var bool
+     */
+    protected $trustHosts = false;
+
+    /**
+     * Indicates if Sanctum's frontend state middleware is enabled.
+     *
+     * @var bool
+     */
+    protected $ensureFrontendRequestsAreStateful = false;
+
+    /**
+     * Indicates the API middleware group's rate limiter.
+     *
+     * @var string
+     */
+    protected $apiLimiter;
+
+    /**
      * The default middleware aliases.
      *
      * @var array
@@ -145,15 +166,15 @@ class Middleware
      */
     public function getGlobalMiddleware()
     {
-        $middleware = [
-            // \Illuminate\Http\Middleware\TrustHosts::class,
+        $middleware = array_values(array_filter([
+            $this->trustHosts ? \Illuminate\Http\Middleware\TrustHosts::class : null,
             \Illuminate\Http\Middleware\TrustProxies::class,
             \Illuminate\Http\Middleware\HandleCors::class,
             \Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance::class,
             \Illuminate\Http\Middleware\ValidatePostSize::class,
             \Illuminate\Foundation\Http\Middleware\TrimStrings::class,
             \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
-        ];
+        ]));
 
         return array_values(array_filter(
             array_unique(array_merge($this->prepends, $middleware, $this->appends))
@@ -177,11 +198,11 @@ class Middleware
                 \Illuminate\Routing\Middleware\SubstituteBindings::class,
             ],
 
-            'api' => [
-                // \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
-                // \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
+            'api' => array_values(array_filter([
+                $this->ensureFrontendRequestsAreStateful ? \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class : null,
+                $this->apiLimiter ? \Illuminate\Routing\Middleware\ThrottleRequests::class.':'.$this->apiLimiter : null,
                 \Illuminate\Routing\Middleware\SubstituteBindings::class,
-            ],
+            ])),
         ];
 
         foreach ($this->groupPrepends as $group => $prepends) {
@@ -197,6 +218,43 @@ class Middleware
         }
 
         return $middleware;
+    }
+
+    /**
+     * Indicate that the trusted host middleware should be enabled.
+     *
+     * @return $this
+     */
+    public function ensureHostsAreTrusted()
+    {
+        $this->trustHosts = true;
+
+        return $this;
+    }
+
+    /**
+     * Indicate that Sanctum's frontend state middleware should be enabled.
+     *
+     * @return $this
+     */
+    public function ensureFrontendRequestsAreStateful()
+    {
+        $this->ensureFrontendRequestsAreStateful = true;
+
+        return $this;
+    }
+
+    /**
+     * Indicate that the API middleware group's throttling middleware should be enabled.
+     *
+     * @param  string  $limiter
+     * @return $this
+     */
+    public function ensureApiIsThrottled($limiter = 'api')
+    {
+        $this->apiLimiter = $limiter;
+
+        return $this;
     }
 
     /**
