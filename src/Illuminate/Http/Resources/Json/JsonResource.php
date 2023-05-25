@@ -253,4 +253,15 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     {
         return $this->resolve(Container::getInstance()->make('request'));
     }
+
+    /**
+     * Cast nested resources to an array.
+     *
+     * @return array
+     * @throws \JsonException
+     */
+    public function castToArray(): array
+    {
+        return json_decode($this->toJson(), true, 512, JSON_THROW_ON_ERROR);
+    }
 }
