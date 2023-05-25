@@ -2,6 +2,7 @@
 
 namespace Illuminate\Queue\Console;
 
+use Carbon\CarbonInterval;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Queue\Job;
@@ -216,7 +217,7 @@ class WorkCommand extends Command
             return $this->output->writeln(' <fg=yellow;options=bold>RUNNING</>');
         }
 
-        $runTime = number_format((microtime(true) - $this->latestStartedAt) * 1000, 2).'ms';
+        $runTime = $this->resolveRunTime();
 
         $dots = max(terminal()->width() - mb_strlen($job->resolveName()) - (
             $this->output->isVerbose() ? (mb_strlen($job->getJobId()) + 1) : 0
@@ -286,5 +287,21 @@ class WorkCommand extends Command
     protected function downForMaintenance()
     {
         return $this->option('force') ? false : $this->laravel->isDownForMaintenance();
+    }
+
+    /**
+     * Format the worked runtime for human readability.
+     *
+     * @return string
+     */
+    protected function resolveRunTime()
+    {
+        $runTime = number_format((microtime(true) - $this->latestStartedAt) * 1000, 2);
+
+        if ($runTime > 1) {
+            return CarbonInterval::milliseconds($runTime)->cascade()->forHumans(short: true);
+        }
+
+        return $runTime.'ms';
     }
 }
