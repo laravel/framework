@@ -10,7 +10,7 @@ use Illuminate\Support\Collection;
 class AsEnumArrayObject implements Castable
 {
     /**
-     * Specify the collection for the cast.
+     * Specify the enum for the cast.
      *
      * @param  class-string  $class
      * @return string
