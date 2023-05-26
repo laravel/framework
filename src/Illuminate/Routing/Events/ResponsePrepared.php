@@ -32,6 +32,3 @@ class ResponsePrepared
         $this->response = $response;
     }
 }
-
-
-
