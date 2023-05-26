@@ -1601,6 +1601,27 @@ class HttpClientTest extends TestCase
         $this->assertEqualsWithDelta(0.3, microtime(true) - $startTime, 0.03);
     }
 
+    public function testRequestImplementRetryAndBackoffWithTheTimesParameter()
+    {
+        $startTime = microtime(true);
+
+        $this->factory->fake([
+            '*' => $this->factory->sequence()
+                ->push(['error'], 500)
+                ->push(['error'], 500)
+                ->push(['ok']),
+        ]);
+
+        $this->factory
+            ->retry([100, 200, 300])
+            ->get('http://foo.com/get');
+
+        $this->factory->assertSentCount(3);
+
+        // Make sure was waited 300ms for the first two attempts
+        $this->assertEqualsWithDelta(0.3, microtime(true) - $startTime, 0.03);
+    }
+
     public function testMiddlewareRunsWhenFaked()
     {
         $this->factory->fake(function (Request $request) {
