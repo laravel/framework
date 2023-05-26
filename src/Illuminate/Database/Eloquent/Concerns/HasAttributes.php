@@ -734,6 +734,10 @@ trait HasAttributes
         foreach ($casts as $attribute => $cast) {
             $casts[$attribute] = match (true) {
                 is_array($cast) => value(function () use ($cast) {
+                    if (count($cast) === 1) {
+                        return $cast[0];
+                    }
+
                     [$cast, $arguments] = [array_shift($cast), $cast];
 
                     return $cast.':'.implode(',', $arguments);
