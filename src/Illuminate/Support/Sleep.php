@@ -316,7 +316,6 @@ class Sleep
         static::$fake = $value;
 
         static::$sequence = [];
-
         static::$fakeSleepCallbacks = [];
     }
 
