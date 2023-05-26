@@ -182,7 +182,7 @@ trait HasAttributes
      */
     public static $encrypter;
 
-   /**
+    /**
      * Initialize the trait.
      *
      * @return void
@@ -779,7 +779,6 @@ trait HasAttributes
 
         return $this;
     }
-
 
     /**
      * Cast an attribute to a native PHP type.
