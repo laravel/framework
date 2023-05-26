@@ -2831,6 +2831,19 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(1, $model->getAttribute('duplicatedAttribute'));
     }
 
+    public function testsCastOnArrayFormatWithOneElement()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->setRawAttributes([
+            'singleElementInArrayAttribute' => '{"bar": "foo"}',
+        ]);
+        $model->syncOriginal();
+
+        $this->assertInstanceOf(BaseCollection::class, $model->singleElementInArrayAttribute);
+        $this->assertEquals(['bar' => 'foo'], $model->singleElementInArrayAttribute->toArray());
+        $this->assertEquals(['bar' => 'foo'], $model->getAttribute('singleElementInArrayAttribute')->toArray());
+    }
+
     public function testUnsavedModel()
     {
         $user = new UnsavedModel;
@@ -3268,6 +3281,7 @@ class EloquentModelCastingStub extends Model
             'asEncryptedCustomCollectionAsArrayAttribute' => [AsEncryptedCollection::class, CustomCollection::class],
             'asCustomEnumCollectionAttribute' => AsEnumCollection::using(StringStatus::class),
             'asCustomEnumArrayObjectAttribute' => AsEnumArrayObject::using(StringStatus::class),
+            'singleElementInArrayAttribute' => [AsCollection::class],
             'duplicatedAttribute' => 'int',
         ];
     }
