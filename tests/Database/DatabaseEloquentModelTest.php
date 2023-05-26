@@ -190,17 +190,24 @@ class DatabaseEloquentModelTest extends TestCase
         $model = new EloquentModelCastingStub;
         $model->setRawAttributes([
             'ascollectionAttribute' => '{"foo": "bar"}',
+            'ascollectionusingAttribute' => '{"bar": "foo"}',
         ]);
         $model->syncOriginal();
 
         $this->assertInstanceOf(BaseCollection::class, $model->ascollectionAttribute);
         $this->assertFalse($model->isDirty('ascollectionAttribute'));
+        $this->assertInstanceOf(CustomCollection::class, $model->ascollectionusingAttribute);
+        $this->assertFalse($model->isDirty('ascollectionusingAttribute'));
 
         $model->ascollectionAttribute = ['foo' => 'bar'];
         $this->assertFalse($model->isDirty('ascollectionAttribute'));
+        $model->ascollectionusingAttribute = ['bar' => 'foo'];
+        $this->assertFalse($model->isDirty('ascollectionusingAttribute'));
 
         $model->ascollectionAttribute = ['foo' => 'baz'];
         $this->assertTrue($model->isDirty('ascollectionAttribute'));
+        $model->ascollectionusingAttribute = ['baz' => 'foo'];
+        $this->assertTrue($model->isDirty('ascollectionusingAttribute'));
     }
 
     public function testDirtyOnCastedCustomCollection()
@@ -2140,6 +2147,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->datetimeAttribute = '1969-07-20 22:56:00';
         $model->timestampAttribute = '1969-07-20 22:56:00';
         $model->collectionAttribute = new BaseCollection;
+        $model->ascollectionusingAttribute = new CustomCollection;
 
         $this->assertIsInt($model->intAttribute);
         $this->assertIsFloat($model->floatAttribute);
@@ -2158,6 +2166,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertInstanceOf(Carbon::class, $model->dateAttribute);
         $this->assertInstanceOf(Carbon::class, $model->datetimeAttribute);
         $this->assertInstanceOf(BaseCollection::class, $model->collectionAttribute);
+        $this->assertInstanceOf(CustomCollection::class, $model->ascollectionusingAttribute);
         $this->assertSame('1969-07-20', $model->dateAttribute->toDateString());
         $this->assertSame('1969-07-20 22:56:00', $model->datetimeAttribute->toDateTimeString());
         $this->assertEquals(-14173440, $model->timestampAttribute);
@@ -3133,6 +3142,7 @@ class EloquentModelCastingStub extends Model
             'datetimeAttribute' => 'datetime',
             'asarrayobjectAttribute' => AsArrayObject::class,
             'asStringableAttribute' => AsStringable::class,
+            'ascollectionusingAttribute' => AsCollection::using(CustomCollection::class),
             'asEncryptedArrayObjectAttribute' => AsEncryptedArrayObject::class,
             'asEnumArrayObjectAttribute' => [AsEnumArrayObject::class, StringStatus::class],
         ];
