@@ -22,11 +22,7 @@ class Argon2IdHasher extends ArgonHasher
             throw new RuntimeException('This password does not use the Argon2id algorithm.');
         }
 
-        if (is_null($hashedValue) || strlen($hashedValue) === 0) {
-            return false;
-        }
-
-        return password_verify($value, $hashedValue);
+        return parent::check($value, $hashedValue, $options);
     }
 
     /**
