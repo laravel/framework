@@ -449,7 +449,7 @@ class Sleep
     }
 
     /**
-     * Run a callback when faking sleep within a test.
+     * Specify a callback that should be invoked when faking sleep within a test.
      *
      * @param  callable  $callback
      * @return void
