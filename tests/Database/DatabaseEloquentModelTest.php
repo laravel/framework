@@ -404,6 +404,24 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertTrue($model->isDirty('asEnumCollectionAttribute'));
     }
 
+    public function testDirtyOnCustomEnumCollectionObject()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->setRawAttributes([
+            'asCustomEnumCollectionAttribute' => '["draft", "pending"]',
+        ]);
+        $model->syncOriginal();
+
+        $this->assertInstanceOf(BaseCollection::class, $model->asCustomEnumCollectionAttribute);
+        $this->assertFalse($model->isDirty('asCustomEnumCollectionAttribute'));
+
+        $model->asCustomEnumCollectionAttribute = ['draft', 'pending'];
+        $this->assertFalse($model->isDirty('asCustomEnumCollectionAttribute'));
+
+        $model->asCustomEnumCollectionAttribute = ['draft', 'done'];
+        $this->assertTrue($model->isDirty('asCustomEnumCollectionAttribute'));
+    }
+
     public function testDirtyOnEnumArrayObject()
     {
         $model = new EloquentModelCastingStub;
@@ -426,18 +444,18 @@ class DatabaseEloquentModelTest extends TestCase
     {
         $model = new EloquentModelCastingStub;
         $model->setRawAttributes([
-            'asEnumCustomArrayObjectAttribute' => '["draft", "pending"]',
+            'asCustomEnumArrayObjectAttribute' => '["draft", "pending"]',
         ]);
         $model->syncOriginal();
 
-        $this->assertInstanceOf(ArrayObject::class, $model->asEnumCustomArrayObjectAttribute);
-        $this->assertFalse($model->isDirty('asEnumCustomArrayObjectAttribute'));
+        $this->assertInstanceOf(ArrayObject::class, $model->asCustomEnumArrayObjectAttribute);
+        $this->assertFalse($model->isDirty('asCustomEnumArrayObjectAttribute'));
 
-        $model->asEnumCustomArrayObjectAttribute = ['draft', 'pending'];
-        $this->assertFalse($model->isDirty('asEnumCustomArrayObjectAttribute'));
+        $model->asCustomEnumArrayObjectAttribute = ['draft', 'pending'];
+        $this->assertFalse($model->isDirty('asCustomEnumArrayObjectAttribute'));
 
-        $model->asEnumCustomArrayObjectAttribute = ['draft', 'done'];
-        $this->assertTrue($model->isDirty('asEnumCustomArrayObjectAttribute'));
+        $model->asCustomEnumArrayObjectAttribute = ['draft', 'done'];
+        $this->assertTrue($model->isDirty('asCustomEnumArrayObjectAttribute'));
     }
 
     public function testHasCastsOnEnumAttribute()
@@ -3175,7 +3193,8 @@ class EloquentModelCastingStub extends Model
             'asCustomCollectionAttribute' => AsCollection::using(CustomCollection::class),
             'asEncryptedArrayObjectAttribute' => AsEncryptedArrayObject::class,
             'asEncryptedCustomCollectionAttribute' => AsEncryptedCollection::using(CustomCollection::class),
-            'asEnumCustomArrayObjectAttribute' => AsEnumArrayObject::using(StringStatus::class),
+            'asCustomEnumCollectionAttribute' => AsEnumCollection::using(StringStatus::class),
+            'asCustomEnumArrayObjectAttribute' => AsEnumArrayObject::using(StringStatus::class),
         ];
     }
 
