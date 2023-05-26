@@ -2426,6 +2426,7 @@ class DatabaseEloquentModelTest extends TestCase
             'foo' => ['MyClass', 'myArgumentA'],
             'bar' => ['MyClass', 'myArgumentA', 'myArgumentB'],
         ]);
+
         $this->assertCount($castCount + 2, $model->getCasts());
         $this->assertArrayHasKey('foo', $model->getCasts());
         $this->assertEquals($model->getCasts()['foo'], 'MyClass:myArgumentA');
@@ -2804,12 +2805,26 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(['foo' => 'bar2'], $model->getAttribute('collectionAttribute')->toArray());
     }
 
-    public function testCastMethodHasPriorityOverProperty()
+    public function testCastsMethodHasPriorityOverCastsProperty()
     {
         $model = new EloquentModelCastingStub;
         $model->setRawAttributes([
             'duplicatedAttribute' => '1',
         ], true);
+
+        $this->assertIsInt($model->duplicatedAttribute);
+        $this->assertEquals(1, $model->duplicatedAttribute);
+        $this->assertEquals(1, $model->getAttribute('duplicatedAttribute'));
+    }
+
+    public function testCastsMethodIsTakenInConsiderationOnSerialization()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->setRawAttributes([
+            'duplicatedAttribute' => '1',
+        ], true);
+
+        $model = unserialize(serialize($model));
 
         $this->assertIsInt($model->duplicatedAttribute);
         $this->assertEquals(1, $model->duplicatedAttribute);
