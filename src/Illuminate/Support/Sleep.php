@@ -14,6 +14,13 @@ class Sleep
     use Macroable;
 
     /**
+     * The fake sleep callbacks.
+     *
+     * @var array
+     */
+    public static $fakeSleepCallbacks = [];
+
+    /**
      * The total duration to sleep.
      *
      * @var \Carbon\CarbonInterval
@@ -252,6 +259,10 @@ class Sleep
         if (static::$fake) {
             static::$sequence[] = $this->duration;
 
+            foreach (static::$fakeSleepCallbacks as $callback) {
+                $callback($this->duration);
+            }
+
             return;
         }
 
@@ -305,6 +316,8 @@ class Sleep
         static::$fake = $value;
 
         static::$sequence = [];
+
+        static::$fakeSleepCallbacks = [];
     }
 
     /**
@@ -434,5 +447,16 @@ class Sleep
     public function unless($condition)
     {
         return $this->when(! value($condition, $this));
+    }
+
+    /**
+     * Run a callback when faking sleep within a test.
+     *
+     * @param  callable  $callback
+     * @return void
+     */
+    public static function whenFakingSleep($callback)
+    {
+        static::$fakeSleepCallbacks[] = $callback;
     }
 }
