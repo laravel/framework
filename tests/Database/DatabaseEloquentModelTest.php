@@ -2219,7 +2219,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->touchOwners();
     }
 
-    public function testModelAttributesAreCastedWhenPresentInCastsPropertyOrClass()
+    public function testModelAttributesAreCastedWhenPresentInCastsPropertyOrCastsMethod()
     {
         $model = new EloquentModelCastingStub;
         $model->setDateFormat('Y-m-d H:i:s');
