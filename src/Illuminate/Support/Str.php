@@ -495,6 +495,22 @@ class Str
     }
 
     /**
+     * Returns if the string length is equal to a value.  Optional parameter to
+     * remove leading and trailing whitespace.
+     *
+     * @param  string  $value
+     * @param  int  $length
+     * @param  boolean $trimWhitespace
+     * @return boolean
+     */
+    public static function lengthEqualTo($value, $length, $trimWhitespace)
+    {
+        return $trimWhitespace ?
+            Str::of($value)->trim()->length() == $length :
+            Str::of($value)->length() == $length;
+    }
+
+    /**
      * Limit the number of characters in a string.
      *
      * @param  string  $value
@@ -509,6 +525,22 @@ class Str
         }
 
         return rtrim(mb_strimwidth($value, 0, $limit, '', 'UTF-8')).$end;
+    }
+
+    /**
+     * Check if a string is longer than a given length.  Optional parameter to
+     * trim leading and trailing white space.
+     *
+     * @param  string  $value
+     * @param  int  $length
+     * @param  boolean  $trimWhitespace
+     * @return boolean
+     */
+    public static function longerThan($value, $length, $trimWhitespace = false)
+    {
+        return $trimWhitespace ?
+            Str::of($value)->trim()->length() > $length :
+            Str::of($value)->length() > $length;
     }
 
     /**
@@ -759,6 +791,31 @@ class Str
         $lastWord = array_pop($parts);
 
         return implode('', $parts).self::plural($lastWord, $count);
+    }
+
+    /**
+     * Replace the given value in the given string.
+     *
+     * @param  string|iterable<string>  $search
+     * @param  string|iterable<string>  $pattern
+     * @param  string|iterable<string>  $replace
+     * @return string
+     */
+    public static function pregReplace($search, $pattern, $replace)
+    {
+        if ($search instanceof Traversable) {
+            $search = collect($search)->all();
+        }
+
+        if ($pattern instanceof Traversable) {
+            $pattern = collect($pattern)->all();
+        }
+
+        if ($replace instanceof Traversable) {
+            $replace = collect($replace)->all();
+        }
+
+        return preg_replace($pattern, $replace, $search);
     }
 
     /**
@@ -1070,6 +1127,22 @@ class Str
         $collapsed = static::replace(['-', '_', ' '], '_', implode('_', $parts));
 
         return implode(' ', array_filter(explode('_', $collapsed)));
+    }
+
+    /**
+     * Check if a string is shorter than a given length.  Optional parameter to
+     * trim leading and trailing white space.
+     *
+     * @param  string  $value
+     * @param  int  $length
+     * @param  boolean  $trimWhitespace
+     * @return  boolean
+     */
+    public static function shorterThan($value, $length, $trimWhitespace = false)
+    {
+        return $trimWhitespace ?
+            Str::of($value)->trim()->length() < $length :
+            Str::of($value)->length() < $length;
     }
 
     /**

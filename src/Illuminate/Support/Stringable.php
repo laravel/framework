@@ -396,6 +396,21 @@ class Stringable implements JsonSerializable, ArrayAccess
     }
 
     /**
+     * Check if a string is longer than a given length.  Optional parameter to
+     * trim leading and trailing white space.
+     *
+     * @param  int  $length
+     * @param  boolean  $trimWhitespace
+     * @return boolean
+     */
+    public function longerThan($length, $trimWhitespace = false)
+    {
+        return $trimWhitespace ?
+            Str::of($this->value)->trim()->length() > $length :
+            Str::of($this->value)->length() > $length;
+    }
+
+    /**
      * Convert the given string to lower-case.
      *
      * @return static
@@ -563,6 +578,18 @@ class Stringable implements JsonSerializable, ArrayAccess
     public function pluralStudly($count = 2)
     {
         return new static(Str::pluralStudly($this->value, $count));
+    }
+
+    /**
+     * Replace the given value in the given string.
+     *
+     * @param  string|iterable<string>  $pattern
+     * @param  string|iterable<string>  $replace
+     * @return string
+     */
+    public function pregReplace($pattern, $replace)
+    {
+        return new static(preg_replace($pattern, $replace, $this->value));
     }
 
     /**
@@ -746,6 +773,21 @@ class Stringable implements JsonSerializable, ArrayAccess
     public function headline()
     {
         return new static(Str::headline($this->value));
+    }
+
+    /**
+     * Check if a string is shorter than a given length.  Optional parameter to
+     * trim leading and trailing white space.
+     *
+     * @param  int  $length
+     * @param  boolean  $trimWhitespace
+     * @return  boolean
+     */
+    public function shorterThan($length, $trimWhitespace = false)
+    {
+        return $trimWhitespace ?
+            Str::of($this->value)->trim()->length() < $length :
+            Str::of($this->value)->length() < $length;
     }
 
     /**

@@ -8,6 +8,8 @@ use Illuminate\Support\HtmlString;
 use Illuminate\Support\Stringable;
 use PHPUnit\Framework\TestCase;
 
+use Illuminate\Tests\Support\StringableObjectStub;
+
 class SupportStringableTest extends TestCase
 {
     /**
@@ -267,7 +269,8 @@ class SupportStringableTest extends TestCase
             'Iron Man',
             (string) $this->stringable('Tony')->whenNotExactly('Tony Stark', function ($stringable) {
                 return 'Iron Man';
-            }));
+            })
+        );
 
         $this->assertSame(
             'Swing and a miss...!',
@@ -275,7 +278,8 @@ class SupportStringableTest extends TestCase
                 return 'Iron Man';
             }, function ($stringable) {
                 return 'Swing and a miss...!';
-            }));
+            })
+        );
     }
 
     public function testWhenIs()
@@ -468,12 +472,14 @@ class SupportStringableTest extends TestCase
             return $stringable->append($value)->append('true');
         }));
 
-        $this->assertSame('unless true fallbacks to default with value 1',
+        $this->assertSame(
+            'unless true fallbacks to default with value 1',
             (string) $this->stringable('unless true ')->unless(1, function ($stringable, $value) {
                 return $stringable->append($value);
             }, function ($stringable, $value) {
                 return $stringable->append('fallbacks to default with value ')->append($value);
-            }));
+            })
+        );
     }
 
     public function testUnlessFalsy()
@@ -482,12 +488,14 @@ class SupportStringableTest extends TestCase
             return $stringable->append($value);
         }));
 
-        $this->assertSame('gets the value 0',
+        $this->assertSame(
+            'gets the value 0',
             (string) $this->stringable('gets the value ')->unless(0, function ($stringable, $value) {
                 return $stringable->append($value);
             }, function ($stringable) {
                 return $stringable->append('fallbacks to default');
-            }));
+            })
+        );
     }
 
     public function testTrimmedOnlyWhereNecessary()
@@ -787,6 +795,30 @@ class SupportStringableTest extends TestCase
         $this->assertSame('laravel-php-framework', (string) $this->stringable('LaravelPhpFramework')->kebab());
     }
 
+    public function testLongerThan()
+    {
+        $this->assertTrue($this->stringable("Laravel")->longerThan(3));
+        $this->assertTrue($this->stringable("    Laravel    ")->longerThan(3, true));
+        $this->assertFalse($this->stringable("Laravel")->longerThan(30));
+        $this->assertFalse($this->stringable("    Laravel    ")->longerThan(30, true));
+    }
+
+    public function testShorterThan()
+    {
+        $this->assertTrue($this->stringable("Laravel")->shorterThan(30));
+        $this->assertTrue($this->stringable("    Laravel    ")->shorterThan(30, true));
+        $this->assertFalse($this->stringable("Laravel")->shorterThan(3));
+        $this->assertFalse($this->stringable("    Laravel    ")->shorterThan(3, true));
+    }
+
+    public function testPregReplace()
+    {
+        $this->assertEquals("1234", $this->stringable("1234abc")->pregReplace("/[a-zA-Z]/", ""));
+        $this->assertEquals("abc", $this->stringable("1234abc")->pregReplace("/[0-9]/", ""));
+        $this->assertNotEquals("1234", $this->stringable("1234abc")->pregReplace("/[0-9]/", ""));
+        $this->assertNotEquals("abc", $this->stringable("1234abc")->pregReplace("/[a-zA-Z]/", ""));
+    }
+
     public function testLower()
     {
         $this->assertSame('foo bar baz', (string) $this->stringable('FOO BAR BAZ')->lower());
@@ -801,7 +833,8 @@ class SupportStringableTest extends TestCase
 
     public function testLimit()
     {
-        $this->assertSame('Laravel is...',
+        $this->assertSame(
+            'Laravel is...',
             (string) $this->stringable('Laravel is a free, open source PHP web application framework.')->limit(10)
         );
         $this->assertSame('这是一...', (string) $this->stringable('这是一段中文')->limit(6));

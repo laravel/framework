@@ -8,6 +8,8 @@ use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\UuidInterface;
 use ReflectionClass;
 
+use Illuminate\Tests\Support\StringableObjectStub;
+
 class SupportStrTest extends TestCase
 {
     public function testStringCanBeLimitedByWords()
@@ -173,9 +175,12 @@ class SupportStrTest extends TestCase
         $this->assertSame('[...]is a beautiful morn[...]', Str::excerpt('This is a beautiful morning', 'beautiful', ['omission' => '[...]', 'radius' => 5]));
         $this->assertSame(
             'This is the ultimate supercalifragilisticexpialidoceous very looooooooooooooooooong looooooooooooong beautiful morning with amazing sunshine and awesome tempera[...]',
-            Str::excerpt('This is the ultimate supercalifragilisticexpialidoceous very looooooooooooooooooong looooooooooooong beautiful morning with amazing sunshine and awesome temperatures. So what are you gonna do about it?', 'very',
+            Str::excerpt(
+                'This is the ultimate supercalifragilisticexpialidoceous very looooooooooooooooooong looooooooooooong beautiful morning with amazing sunshine and awesome temperatures. So what are you gonna do about it?',
+                'very',
                 ['omission' => '[...]'],
-            ));
+            )
+        );
 
         $this->assertSame('...y...', Str::excerpt('taylor', 'y', ['radius' => 0]));
         $this->assertSame('...ayl...', Str::excerpt('taylor', 'Y', ['radius' => 1]));
@@ -494,6 +499,30 @@ class SupportStrTest extends TestCase
     {
         $this->assertEquals(11, Str::length('foo bar baz'));
         $this->assertEquals(11, Str::length('foo bar baz', 'UTF-8'));
+    }
+
+    public function testLongerThan()
+    {
+        $this->assertTrue(Str::longerThan("Laravel", 3));
+        $this->assertTrue(Str::longerThan("    Laravel    ", 3, true));
+        $this->assertFalse(Str::longerThan("Laravel", 30));
+        $this->assertFalse(Str::longerThan("    Laravel    ", 30, true));
+    }
+
+    public function testShorterThan()
+    {
+        $this->assertTrue(Str::shorterThan("Laravel", 30));
+        $this->assertTrue(Str::shorterThan("    Laravel    ", 30, true));
+        $this->assertFalse(Str::shorterThan("Laravel", 3));
+        $this->assertFalse(Str::shorterThan("    Laravel    ", 3, true));
+    }
+
+    public function testPregReplace()
+    {
+        $this->assertEquals("1234", Str::pregReplace("1234abc", "/[a-zA-Z]/", ""));
+        $this->assertEquals("abc", Str::pregReplace("1234abc", "/[0-9]/", ""));
+        $this->assertNotEquals("1234", Str::pregReplace("1234abc", "/[0-9]/", ""));
+        $this->assertNotEquals("abc", Str::pregReplace("1234abc", "/[a-zA-Z]/", ""));
     }
 
     public function testRandom()
@@ -1118,20 +1147,5 @@ class SupportStrTest extends TestCase
     public function testPasswordCreation()
     {
         $this->assertTrue(strlen(Str::password()) === 32);
-    }
-}
-
-class StringableObjectStub
-{
-    private $value;
-
-    public function __construct($value)
-    {
-        $this->value = $value;
-    }
-
-    public function __toString()
-    {
-        return $this->value;
     }
 }
