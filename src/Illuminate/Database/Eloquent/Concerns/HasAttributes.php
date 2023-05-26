@@ -189,7 +189,9 @@ trait HasAttributes
      */
     protected function initializeHasAttributes()
     {
-        $this->mergeCastsFromClassCastsMethod();
+        $this->casts = $this->ensureCastsAreStringValues(
+            array_merge($this->casts, $this->casts()),
+        );
     }
 
     /**
@@ -764,18 +766,6 @@ trait HasAttributes
         $casts = $this->ensureCastsAreStringValues($casts);
 
         $this->casts = array_merge($this->casts, $casts);
-
-        return $this;
-    }
-
-    /**
-     * Merge model's casts method with the casts property.
-     *
-     * @return $this
-     */
-    protected function mergeCastsFromClassCastsMethod()
-    {
-        $this->casts = array_merge($this->casts, $this->ensureCastsAreStringValues($this->casts()));
 
         return $this;
     }
