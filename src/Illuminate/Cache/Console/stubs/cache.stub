@@ -17,7 +17,7 @@ return new class extends Migration
             $table->integer('expiration');
         });
 
-        DB::unprepared(" CREATE EVENT IF NOT EXISTS cache_refresh 
+        DB::unprepared("CREATE EVENT IF NOT EXISTS cache_refresh 
             ON SCHEDULE 
                 EVERY 1 MINUTE
                 STARTS CURRENT_TIMESTAMP + INTERVAL 1 MINUTE
@@ -29,7 +29,7 @@ return new class extends Migration
             $table->integer('expiration');
         });
 
-       DB::unprepared(" CREATE EVENT IF NOT EXISTS cache_locks_refresh 
+       DB::unprepared("CREATE EVENT IF NOT EXISTS cache_locks_refresh 
             ON SCHEDULE 
                 EVERY 1 MINUTE
                 STARTS CURRENT_TIMESTAMP + INTERVAL 1 MINUTE
