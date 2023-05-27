@@ -100,9 +100,9 @@ trait ManagesComponents
                 return $view->with($data)->render();
             } elseif ($view instanceof Htmlable) {
                 return $view->toHtml();
-            } else {
-                return $this->make($view, $data)->render();
             }
+
+            return $this->make($view, $data)->render();
         } finally {
             $this->currentComponentData = $previousComponentData;
         }

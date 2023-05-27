@@ -165,9 +165,9 @@ class ShowModelCommand extends DatabaseInspectionCommand
                     return [Str::snake($matches[1]) => 'accessor'];
                 } elseif ($model->hasAttributeMutator($method->getName())) {
                     return [Str::snake($method->getName()) => 'attribute'];
-                } else {
-                    return [];
                 }
+
+                return [];
             })
             ->reject(fn ($cast, $name) => collect($columns)->has($name))
             ->map(fn ($cast, $name) => [
