@@ -55,5 +55,6 @@ return new class extends Migration
             DB::statement('DROP EVENT IF EXISTS `cache_refresh`;');
             DB::statement('DROP EVENT IF EXISTS `cache_locks_refresh`;');
         }
+        
     }
 };
