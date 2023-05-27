@@ -123,6 +123,10 @@ class FormRequest extends Request implements ValidatesWhenResolved
             $this->messages(), $this->attributes()
         )->stopOnFirstFailure($this->stopOnFirstFailure);
 
+        if (method_exists($validator, 'addCustomValues')) {
+            $validator->addCustomValues($this->customValues());
+        }
+
         if ($this->isPrecognitive()) {
             $validator->setRules(
                 $this->filterPrecognitiveRules($validator->getRulesWithoutPlaceholders())
@@ -248,6 +252,16 @@ class FormRequest extends Request implements ValidatesWhenResolved
      * @return array
      */
     public function attributes()
+    {
+        return [];
+    }
+
+    /**
+     * Get custom values for validator errors.
+     *
+     * @return array
+     */
+    public function customValues()
     {
         return [];
     }

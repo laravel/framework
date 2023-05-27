@@ -213,6 +213,22 @@ class FoundationFormRequestTest extends TestCase
         $this->assertEquals([], $request->all());
     }
 
+    public function testCustomValuesCanBeUsed()
+    {
+        $request = FoundationTestFormRequestWithCustomValues::create('/', 'GET', ['property_1' => '1']);
+
+        $translator = new \Illuminate\Translation\Translator(new \Illuminate\Translation\ArrayLoader(), 'en');
+        $translator->addLines(['validation.required_if' => ':value'], 'en');
+
+        $container = new Container;
+        $container->instance(\Illuminate\Contracts\Validation\Factory::class, (new \Illuminate\Validation\Factory($translator)));
+        $request->setContainer($container)->setRedirector($this->createMockRedirector($request));
+
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('Custom Property A');
+        $request->validateResolved();
+    }
+
     /**
      * Catch the given exception thrown from the executor, and return it.
      *
@@ -480,5 +496,26 @@ class FoundationTestFormRequestWithoutRulesMethod extends FormRequest
     public function authorize()
     {
         return true;
+    }
+}
+
+class FoundationTestFormRequestWithCustomValues extends FormRequest
+{
+    public function authorize()
+    {
+        return true;
+    }
+
+    public function rules()
+    {
+        return [
+            'property_1' => ['required'],
+            'property_2' => ['required_if:property_1,1'],
+        ];
+    }
+
+    public function customValues()
+    {
+        return ['property_1' => [1 => 'Custom Property A']];
     }
 }
