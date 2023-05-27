@@ -221,7 +221,7 @@ class FoundationFormRequestTest extends TestCase
         $translator->addLines(['validation.required_if' => ':value'], 'en');
 
         $container = new Container;
-        $container->instance(\Illuminate\Contracts\Validation\Factory::class, (new \Illuminate\Validation\Factory($translator)));
+        $container->instance(\Illuminate\Contracts\Validation\Factory::class, new \Illuminate\Validation\Factory($translator));
         $request->setContainer($container)->setRedirector($this->createMockRedirector($request));
 
         $this->expectException(ValidationException::class);
