@@ -147,18 +147,18 @@ class Js implements Htmlable
     {
         return $this->toHtml();
     }
-    
+
     /**
      * Restores a class instance from cached data.
      *
      * @param  array  $state
-     *
      * @return static
      */
     public static function __set_state($state)
     {
         $instance = new static(null);
         $instance->js = $state['js'];
+
         return $instance;
     }
 }
