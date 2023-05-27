@@ -298,7 +298,7 @@ class WorkCommand extends Command
     {
         $runTime = number_format((microtime(true) - $this->latestStartedAt) * 1000, 2);
 
-        if ($runTime > 1) {
+        if ($runTime > 1000) {
             return CarbonInterval::milliseconds($runTime)->cascade()->forHumans(short: true);
         }
 
