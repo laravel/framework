@@ -130,4 +130,12 @@ class SupportJsTest extends TestCase
         $this->assertSame('2', (string) Js::from(IntBackedEnum::TWO));
         $this->assertSame("'Hello world'", (string) Js::from(StringBackedEnum::HELLO_WORLD));
     }
+    
+    public function testSetState()
+    {
+        $this->assertEquals(
+            "JSON.parse('[1,2,3]')",
+            (string) Js::__set_state(['js' => "JSON.parse('[1,2,3]')"])
+        );
+    }
 }
