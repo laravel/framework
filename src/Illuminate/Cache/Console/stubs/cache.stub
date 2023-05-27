@@ -29,13 +29,15 @@ return new class extends Migration
                 ON SCHEDULE 
                     EVERY 1 MINUTE
                     STARTS CURRENT_TIMESTAMP + INTERVAL 1 MINUTE
-                DO DELETE FROM `cache` WHERE `expiration` < UNIX_TIMESTAMP();");
+                DO 
+                DELETE FROM `cache` WHERE `expiration` < UNIX_TIMESTAMP();");
 
            DB::statement("CREATE EVENT IF NOT EXISTS cache_locks_refresh 
                 ON SCHEDULE 
                     EVERY 1 MINUTE
                     STARTS CURRENT_TIMESTAMP + INTERVAL 1 MINUTE
-                DO DELETE FROM `cache_locks` WHERE `expiration` < UNIX_TIMESTAMP();");
+                DO 
+                DELETE FROM `cache_locks` WHERE `expiration` < UNIX_TIMESTAMP();");
        }
 
     }
