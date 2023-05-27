@@ -56,7 +56,7 @@ trait CompilesHelpers
      */
     protected function compileReturn()
     {
-        return "<?php return; ?>";
+        return '<?php return; ?>';
     }
 
     /**
