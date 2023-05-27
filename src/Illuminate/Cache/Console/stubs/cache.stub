@@ -17,23 +17,27 @@ return new class extends Migration
             $table->integer('expiration');
         });
 
-        DB::statement("CREATE EVENT IF NOT EXISTS cache_refresh 
-            ON SCHEDULE 
-                EVERY 1 MINUTE
-                STARTS CURRENT_TIMESTAMP + INTERVAL 1 MINUTE
-            DO DELETE FROM `cache` WHERE `expiration` < UNIX_TIMESTAMP();");
-
         Schema::create('cache_locks', function (Blueprint $table) {
             $table->string('key')->primary();
             $table->string('owner');
             $table->integer('expiration');
         });
 
-       DB::statement("CREATE EVENT IF NOT EXISTS cache_locks_refresh 
-            ON SCHEDULE 
-                EVERY 1 MINUTE
-                STARTS CURRENT_TIMESTAMP + INTERVAL 1 MINUTE
-            DO DELETE FROM `cache_locks` WHERE `expiration` < UNIX_TIMESTAMP();");
+        $databaseType = config('database.default');
+        if($databaseType == 'mysql'){
+            DB::statement("CREATE EVENT IF NOT EXISTS cache_refresh 
+                ON SCHEDULE 
+                    EVERY 1 MINUTE
+                    STARTS CURRENT_TIMESTAMP + INTERVAL 1 MINUTE
+                DO DELETE FROM `cache` WHERE `expiration` < UNIX_TIMESTAMP();");
+
+           DB::statement("CREATE EVENT IF NOT EXISTS cache_locks_refresh 
+                ON SCHEDULE 
+                    EVERY 1 MINUTE
+                    STARTS CURRENT_TIMESTAMP + INTERVAL 1 MINUTE
+                DO DELETE FROM `cache_locks` WHERE `expiration` < UNIX_TIMESTAMP();");
+       }
+
     }
 
     /**
@@ -42,8 +46,12 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('cache');
-        DB::statement('DROP EVENT IF EXISTS `cache_refresh`;');
         Schema::dropIfExists('cache_locks');
-        DB::statement('DROP EVENT IF EXISTS `cache_locks_refresh`;');
+
+        $databaseType = config('database.default');
+        if($databaseType == 'mysql'){
+            DB::statement('DROP EVENT IF EXISTS `cache_refresh`;');
+            DB::statement('DROP EVENT IF EXISTS `cache_locks_refresh`;');
+        }
     }
 };
