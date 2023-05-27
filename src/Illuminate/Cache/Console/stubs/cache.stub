@@ -21,7 +21,7 @@ return new class extends Migration
             ON SCHEDULE 
                 EVERY 1 MINUTE
                 STARTS CURRENT_TIMESTAMP + INTERVAL 1 MINUTE
-            DO DELETE FROM `cache` WHERE `expiration` < CURRENT_TIMESTAMP();");
+            DO DELETE FROM `cache` WHERE `expiration` < UNIX_TIMESTAMP(now());");
 
         Schema::create('cache_locks', function (Blueprint $table) {
             $table->string('key')->primary();
@@ -33,7 +33,7 @@ return new class extends Migration
             ON SCHEDULE 
                 EVERY 1 MINUTE
                 STARTS CURRENT_TIMESTAMP + INTERVAL 1 MINUTE
-            DO DELETE FROM `cache_locks` WHERE `expiration` < CURRENT_TIMESTAMP();");
+            DO DELETE FROM `cache_locks` WHERE `expiration` < UNIX_TIMESTAMP(now());");
     }
 
     /**
