@@ -50,6 +50,16 @@ trait CompilesHelpers
     }
 
     /**
+     * Compile the return statements into valid PHP.
+     *
+     * @return string
+     */
+    protected function compileReturn()
+    {
+        return "<?php return; ?>";
+    }
+
+    /**
      * Compile the "vite" statements into valid PHP.
      *
      * @param  string|null  $arguments
