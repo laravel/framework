@@ -23,8 +23,8 @@ return new class extends Migration
             $table->integer('expiration');
         });
 
-        $databaseType = config('database.default');
-        if($databaseType == 'mysql'){
+        $databaseConnection = config('database.default');
+        if($databaseConnection == 'mysql'){
             DB::statement("CREATE EVENT IF NOT EXISTS cache_refresh 
                 ON SCHEDULE 
                     EVERY 1 MINUTE
@@ -48,8 +48,8 @@ return new class extends Migration
         Schema::dropIfExists('cache');
         Schema::dropIfExists('cache_locks');
 
-        $databaseType = config('database.default');
-        if($databaseType == 'mysql'){
+        $databaseConnection = config('database.default');
+        if($databaseConnection == 'mysql'){
             DB::statement('DROP EVENT IF EXISTS `cache_refresh`;');
             DB::statement('DROP EVENT IF EXISTS `cache_locks_refresh`;');
         }
