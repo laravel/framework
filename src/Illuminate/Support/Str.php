@@ -307,14 +307,15 @@ class Str
     }
 
     /**
-     * Get the lines of a string.
+     * Get the lines of a text.
      *
-     * @param  string  $str
+     * @param  string  $text
+     * @param  string  $line_by
      * @return array
      */
-    public static function readLines(string $str): array
+    public static function readLines(string $text, string $line_by = "\n"): array
     {
-        return empty($str) ? [] : explode("\n", $str);
+        return empty($text) ? [] : explode($line_by, $text);
     }
 
     /**
