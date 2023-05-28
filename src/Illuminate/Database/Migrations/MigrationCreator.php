@@ -56,7 +56,7 @@ class MigrationCreator
      */
     public function create($name, $path, $table = null, $create = false)
     {
-        $this->ensureMigrationDoesntAlreadyExist($name, $path);
+        $this->ensureMigrationDoesntAlreadyExist($table, $path);
 
         // First we will get the stub file for the migration, which serves as a type
         // of template for the migration. Once we have those we will populate the
@@ -82,24 +82,49 @@ class MigrationCreator
     /**
      * Ensure that a migration with the given name doesn't already exist.
      *
-     * @param  string  $name
-     * @param  string  $migrationPath
+     * @param string $table
+     * @param string $migrationPath
      * @return void
      *
      * @throws \InvalidArgumentException
+     * @throws \ReflectionException
      */
-    protected function ensureMigrationDoesntAlreadyExist($name, $migrationPath = null)
+    protected function ensureMigrationDoesntAlreadyExist($table, $migrationPath = null)
     {
         if (! empty($migrationPath)) {
             $migrationFiles = $this->files->glob($migrationPath.'/*.php');
 
             foreach ($migrationFiles as $migrationFile) {
-                $this->files->requireOnce($migrationFile);
+                $this->throwAnExceptionIfExists($table, $migrationFile);
             }
         }
+    }
 
-        if (class_exists($className = $this->getClassName($name))) {
-            throw new InvalidArgumentException("A {$className} class already exists.");
+    /**
+     * @param  string  $table
+     * @param  string  $migrationPath
+     * @return void
+     *
+     * @throws \ReflectionException
+     */
+    protected function throwAnExceptionIfExists($table, $migrationPath)
+    {
+        $migrationClass = (new \ReflectionClass($this->files->requireOnce($migrationPath)));
+        $upMethod =    $migrationClass->getMethod('up');
+
+        $fileLines = file($upMethod->getFileName());
+        $functionLines = array_slice($fileLines, $upMethod->getStartLine() - 1, $upMethod->getEndLine() - $upMethod->getStartLine() + 1);
+        $functionCode = implode('', $functionLines);
+
+        preg_match_all("/create\('([^']+)/", $functionCode, $matches);
+
+        if (!empty($matches[1])) {
+            foreach ($matches[1] as $match) {
+                if($match == $table) {
+                    $baseName = basename($migrationPath, '.php');
+                    throw new InvalidArgumentException("A {$baseName} class already exists.");
+                }
+            }
         }
     }
 
