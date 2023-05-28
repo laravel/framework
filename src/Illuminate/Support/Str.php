@@ -307,6 +307,17 @@ class Str
     }
 
     /**
+     * Get the lines of a string.
+     *
+     * @param  string  $str
+     * @return array
+     */
+    public static function readLines(string $str): array
+    {
+        return empty($str) ? [] : explode("\n", $str);
+    }
+
+    /**
      * Extracts an excerpt from text that matches the first instance of a phrase.
      *
      * @param  string  $text
