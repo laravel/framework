@@ -909,13 +909,14 @@ class Application extends Container implements ApplicationContract, CachesConfig
      *
      * @param  string  $abstract
      * @param  array  $parameters
+     * @param  array  $abstractDependencies
      * @return mixed
      */
-    public function make($abstract, array $parameters = [])
+    public function make($abstract, array $parameters = [], array $abstractDependencies = [])
     {
         $this->loadDeferredProviderIfNeeded($abstract = $this->getAlias($abstract));
 
-        return parent::make($abstract, $parameters);
+        return parent::make($abstract, $parameters, $abstractDependencies);
     }
 
     /**
@@ -924,13 +925,14 @@ class Application extends Container implements ApplicationContract, CachesConfig
      * @param  string  $abstract
      * @param  array  $parameters
      * @param  bool  $raiseEvents
+     * @param  array  $abstractDependencies
      * @return mixed
      */
-    protected function resolve($abstract, $parameters = [], $raiseEvents = true)
+    protected function resolve($abstract, $parameters = [], $raiseEvents = true, array $abstractDependencies = [])
     {
         $this->loadDeferredProviderIfNeeded($abstract = $this->getAlias($abstract));
 
-        return parent::resolve($abstract, $parameters, $raiseEvents);
+        return parent::resolve($abstract, $parameters, $raiseEvents, $abstractDependencies);
     }
 
     /**

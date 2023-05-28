@@ -722,13 +722,14 @@ class Container implements ArrayAccess, ContainerContract
      *
      * @param  string|callable  $abstract
      * @param  array  $parameters
+     * @param  array  $abstractDependencies
      * @return mixed
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
-    public function make($abstract, array $parameters = [])
+    public function make($abstract, array $parameters = [], array $abstractDependencies = [])
     {
-        return $this->resolve($abstract, $parameters);
+        return $this->resolve($abstract, $parameters, true, $abstractDependencies);
     }
 
     /**
@@ -755,12 +756,13 @@ class Container implements ArrayAccess, ContainerContract
      * @param  string|callable  $abstract
      * @param  array  $parameters
      * @param  bool  $raiseEvents
+     * @param  array  $abstractDependencies
      * @return mixed
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      * @throws \Illuminate\Contracts\Container\CircularDependencyException
      */
-    protected function resolve($abstract, $parameters = [], $raiseEvents = true)
+    protected function resolve($abstract, $parameters = [], $raiseEvents = true, array $abstractDependencies = [])
     {
         $abstract = $this->getAlias($abstract);
 
@@ -792,7 +794,7 @@ class Container implements ArrayAccess, ContainerContract
         // the binding. This will instantiate the types, as well as resolve any of
         // its "nested" dependencies recursively until all have gotten resolved.
         if ($this->isBuildable($concrete, $abstract)) {
-            $object = $this->build($concrete);
+            $object = $this->build($concrete, $abstractDependencies);
         } else {
             $object = $this->make($concrete);
         }
@@ -896,12 +898,13 @@ class Container implements ArrayAccess, ContainerContract
      * Instantiate a concrete instance of the given type.
      *
      * @param  \Closure|string  $concrete
+     * @param  array  $existingDependencies
      * @return mixed
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      * @throws \Illuminate\Contracts\Container\CircularDependencyException
      */
-    public function build($concrete)
+    public function build($concrete, array $existingDependencies = [])
     {
         // If the concrete type is actually a Closure, we will just execute it and
         // hand back the results of the functions, which allows functions to be
@@ -942,7 +945,7 @@ class Container implements ArrayAccess, ContainerContract
         // dependency instances and then use the reflection instances to make a
         // new instance of this class, injecting the created dependencies in.
         try {
-            $instances = $this->resolveDependencies($dependencies);
+            $instances = $this->resolveDependencies($dependencies, $existingDependencies);
         } catch (BindingResolutionException $e) {
             array_pop($this->buildStack);
 
@@ -958,35 +961,46 @@ class Container implements ArrayAccess, ContainerContract
      * Resolve all of the dependencies from the ReflectionParameters.
      *
      * @param  \ReflectionParameter[]  $dependencies
+     * @param  array  $existingDependencies
      * @return array
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws \Illuminate\Contracts\Container\CircularDependencyException
      */
-    protected function resolveDependencies(array $dependencies)
+    protected function resolveDependencies(array $dependencies, array $existingDependencies = [])
     {
         $results = [];
 
         foreach ($dependencies as $dependency) {
-            // If the dependency has an override for this particular build we will use
-            // that instead as the value. Otherwise, we will continue with this run
-            // of resolutions and let reflection attempt to determine the result.
-            if ($this->hasParameterOverride($dependency)) {
-                $results[] = $this->getParameterOverride($dependency);
-
-                continue;
-            }
-
-            // If the class is null, it means the dependency is a string or some other
-            // primitive type which we can not resolve since it is not a class and
-            // we will just bomb out with an error since we have no-where to go.
-            $result = is_null(Util::getParameterClassName($dependency))
-                            ? $this->resolvePrimitive($dependency)
-                            : $this->resolveClass($dependency);
-
-            if ($dependency->isVariadic()) {
-                $results = array_merge($results, $result);
+            $dependencyName = $dependency->getName();
+            // Check if the dependency has already been injected
+            if (in_array($dependencyName, $existingDependencies)) {
+                $className = $dependency->getDeclaringClass()->getName();
+                $fileName = $dependency->getDeclaringClass()->getFileName();
+                throw new CircularDependencyException(sprintf('Circular dependency detected in class  %s defined in file %s', $className, $fileName));
             } else {
-                $results[] = $result;
+                $existingDependencies[] = $dependencyName;
+                // If the dependency has an override for this particular build we will use
+                // that instead as the value. Otherwise, we will continue with this run
+                // of resolutions and let reflection attempt to determine the result.
+                if ($this->hasParameterOverride($dependency)) {
+                    $results[] = $this->getParameterOverride($dependency);
+
+                    continue;
+                }
+
+                // If the class is null, it means the dependency is a string or some other
+                // primitive type which we can not resolve since it is not a class and
+                // we will just bomb out with an error since we have no-where to go.
+                $result = is_null(Util::getParameterClassName($dependency))
+                                ? $this->resolvePrimitive($dependency)
+                                : $this->resolveClass($dependency, $existingDependencies);
+
+                if ($dependency->isVariadic()) {
+                    $results = array_merge($results, $result);
+                } else {
+                    $results[] = $result;
+                }
             }
         }
 
@@ -1056,16 +1070,17 @@ class Container implements ArrayAccess, ContainerContract
      * Resolve a class based dependency from the container.
      *
      * @param  \ReflectionParameter  $parameter
+     * @param  array  $existingDependencies
      * @return mixed
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
-    protected function resolveClass(ReflectionParameter $parameter)
+    protected function resolveClass(ReflectionParameter $parameter, array $existingDependencies = [])
     {
         try {
             return $parameter->isVariadic()
                         ? $this->resolveVariadicClass($parameter)
-                        : $this->make(Util::getParameterClassName($parameter));
+                        : $this->make(Util::getParameterClassName($parameter), [], $existingDependencies);
         }
 
         // If we can not resolve the class instance, we will check to see if the value
