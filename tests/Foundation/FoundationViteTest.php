@@ -640,6 +640,24 @@ class FoundationViteTest extends TestCase
         $this->cleanViteManifest('custom-build');
     }
 
+    public function testViteCanOverrideBuildDirectoryUsingConfig()
+    {
+        $this->app['config']->set('vite.buildDirectory', 'custom-build');
+
+        $this->makeViteManifest(null, 'custom-build');
+
+        $vite = app(Vite::class);
+
+        $vite->withEntryPoints(['resources/js/app.js']);
+
+        $this->assertStringEndsWith(
+            '<script type="module" src="https://example.com/custom-build/assets/app.versioned.js"></script>',
+            $vite->toHtml()
+        );
+
+        $this->cleanViteManifest('custom-build');
+    }
+
     public function testViteCanOverrideHotFilePath()
     {
         $this->makeViteHotFile('cold');
@@ -647,6 +665,25 @@ class FoundationViteTest extends TestCase
         $vite = app(Vite::class);
 
         $vite->withEntryPoints(['resources/js/app.js'])->useHotFile('cold');
+
+        $this->assertSame(
+            '<script type="module" src="http://localhost:3000/@vite/client"></script>'
+            .'<script type="module" src="http://localhost:3000/resources/js/app.js"></script>',
+            $vite->toHtml()
+        );
+
+        $this->cleanViteHotFile('cold');
+    }
+
+    public function testViteCanOverrideHotFilePathUsingConfig()
+    {
+        $this->app['config']->set('vite.hotFile', 'cold');
+
+        $this->makeViteHotFile('cold');
+
+        $vite = app(Vite::class);
+
+        $vite->withEntryPoints(['resources/js/app.js']);
 
         $this->assertSame(
             '<script type="module" src="http://localhost:3000/@vite/client"></script>'
@@ -1121,6 +1158,34 @@ class FoundationViteTest extends TestCase
         file_put_contents(public_path("{$buildDir}/custom-manifest.json"), $contents);
 
         ViteFacade::useManifestFilename('custom-manifest.json');
+
+        $result = app(Vite::class)(['resources/js/app.js'], $buildDir);
+
+        $this->assertSame(
+            '<link rel="modulepreload" href="https://example.com/'.$buildDir.'/assets/app-from-custom-manifest.versioned.js" />'
+            .'<script type="module" src="https://example.com/'.$buildDir.'/assets/app-from-custom-manifest.versioned.js"></script>',
+            $result->toHtml());
+
+        unlink(public_path("{$buildDir}/custom-manifest.json"));
+        rmdir(public_path($buildDir));
+    }
+
+    public function testItCanConfigureTheManifestFilenameUsingConfig()
+    {
+        $this->app['config']->set('vite.manifestFilename', 'custom-manifest.json');
+
+        $buildDir = Str::random();
+        app()->usePublicPath(__DIR__);
+        if (! file_exists(public_path($buildDir))) {
+            mkdir(public_path($buildDir));
+        }
+        $contents = json_encode([
+            'resources/js/app.js' => [
+                'src' => 'resources/js/app-from-custom-manifest.js',
+                'file' => 'assets/app-from-custom-manifest.versioned.js',
+            ],
+        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        file_put_contents(public_path("{$buildDir}/custom-manifest.json"), $contents);
 
         $result = app(Vite::class)(['resources/js/app.js'], $buildDir);
 

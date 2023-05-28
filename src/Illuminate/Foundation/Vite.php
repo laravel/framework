@@ -90,6 +90,13 @@ class Vite implements Htmlable
      */
     protected static $manifests = [];
 
+    public function __construct()
+    {
+        $this->hotFile = config('vite.hotFile');
+        $this->buildDirectory = config('vite.buildDirectory', $this->buildDirectory);
+        $this->manifestFilename = config('vite.manifestFilename', $this->manifestFilename);
+    }
+
     /**
      * Get the preloaded assets.
      *
