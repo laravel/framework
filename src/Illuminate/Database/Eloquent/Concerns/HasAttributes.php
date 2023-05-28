@@ -464,14 +464,15 @@ trait HasAttributes
      */
     protected function throwMissingAttributeExceptionIfApplicable($key)
     {
-        if ($this->exists &&
-            ! $this->wasRecentlyCreated &&
-            static::preventsAccessingMissingAttributes()) {
+        if (static::preventsAccessingMissingAttributes()) {
+
             if (isset(static::$missingAttributeViolationCallback)) {
                 return call_user_func(static::$missingAttributeViolationCallback, $this, $key);
             }
 
-            throw new MissingAttributeException($this, $key);
+            if ($this->exists && ! $this->wasRecentlyCreated) {
+                throw new MissingAttributeException($this, $key);
+            }
         }
 
         return null;
