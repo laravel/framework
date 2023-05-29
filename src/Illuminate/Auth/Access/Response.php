@@ -182,16 +182,6 @@ class Response implements Arrayable
     }
 
     /**
-     * Set the HTTP response status code to 404.
-     *
-     * @return $this
-     */
-    public function asNotFound()
-    {
-        return $this->withStatus(404);
-    }
-
-    /**
      * Set the HTTP response status code to 402.
      *
      * @return $this
@@ -199,6 +189,16 @@ class Response implements Arrayable
     public function asPaymentRequired()
     {
         return $this->withStatus(402);
+    }
+
+    /**
+     * Set the HTTP response status code to 404.
+     *
+     * @return $this
+     */
+    public function asNotFound()
+    {
+        return $this->withStatus(404);
     }
 
     /**
