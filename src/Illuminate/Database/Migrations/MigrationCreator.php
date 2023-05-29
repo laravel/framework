@@ -56,7 +56,7 @@ class MigrationCreator
      */
     public function create($name, $path, $table = null, $create = false)
     {
-        $this->ensureMigrationDoesntAlreadyExist($table, $path);
+        $this->ensureMigrationDoesntAlreadyExist($name, $path);
 
         // First we will get the stub file for the migration, which serves as a type
         // of template for the migration. Once we have those we will populate the
@@ -82,49 +82,28 @@ class MigrationCreator
     /**
      * Ensure that a migration with the given name doesn't already exist.
      *
-     * @param string $table
-     * @param string $migrationPath
+     * @param  string  $name
+     * @param  string  $migrationPath
      * @return void
      *
      * @throws \InvalidArgumentException
-     * @throws \ReflectionException
      */
-    protected function ensureMigrationDoesntAlreadyExist($table, $migrationPath = null)
+    protected function ensureMigrationDoesntAlreadyExist($name, $migrationPath = null)
     {
         if (! empty($migrationPath)) {
             $migrationFiles = $this->files->glob($migrationPath.'/*.php');
 
             foreach ($migrationFiles as $migrationFile) {
-                $this->throwAnExceptionIfExists($table, $migrationFile);
-            }
-        }
-    }
+                $basename = basename($migrationFile, '.php');
 
-    /**
-     * @param  string  $table
-     * @param  string  $migrationPath
-     * @return void
-     *
-     * @throws \ReflectionException
-     */
-    protected function throwAnExceptionIfExists($table, $migrationPath)
-    {
-        $migrationClass = (new \ReflectionClass($this->files->requireOnce($migrationPath)));
-        $upMethod =    $migrationClass->getMethod('up');
-
-        $fileLines = file($upMethod->getFileName());
-        $functionLines = array_slice($fileLines, $upMethod->getStartLine() - 1, $upMethod->getEndLine() - $upMethod->getStartLine() + 1);
-        $functionCode = implode('', $functionLines);
-
-        preg_match_all("/create\('([^']+)/", $functionCode, $matches);
-
-        if (!empty($matches[1])) {
-            foreach ($matches[1] as $match) {
-                if($match == $table) {
-                    $baseName = basename($migrationPath, '.php');
-                    throw new InvalidArgumentException("A {$baseName} class already exists.");
+                if ($this->getClassName(substr($basename, 18)) == $this->getClassName($name)) {
+                    throw new InvalidArgumentException("A {$this->getClassName($name)} class already exists.");
                 }
             }
+        }
+
+        if (class_exists($className = $this->getClassName($name))) {
+            throw new InvalidArgumentException("A {$className} class already exists.");
         }
     }
 
@@ -139,16 +118,16 @@ class MigrationCreator
     {
         if (is_null($table)) {
             $stub = $this->files->exists($customPath = $this->customStubPath.'/migration.stub')
-                            ? $customPath
-                            : $this->stubPath().'/migration.stub';
+                ? $customPath
+                : $this->stubPath().'/migration.stub';
         } elseif ($create) {
             $stub = $this->files->exists($customPath = $this->customStubPath.'/migration.create.stub')
-                            ? $customPath
-                            : $this->stubPath().'/migration.create.stub';
+                ? $customPath
+                : $this->stubPath().'/migration.create.stub';
         } else {
             $stub = $this->files->exists($customPath = $this->customStubPath.'/migration.update.stub')
-                            ? $customPath
-                            : $this->stubPath().'/migration.update.stub';
+                ? $customPath
+                : $this->stubPath().'/migration.update.stub';
         }
 
         return $this->files->get($stub);
