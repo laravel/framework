@@ -5,7 +5,7 @@ namespace Illuminate\Database\Events;
 class ModelPruning
 {
     /**
-     * The model that was pruned.
+     * The model being pruned.
      *
      * @var string
      */
