@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent;
 
+use Illuminate\Database\Events\ModelPruning;
 use Illuminate\Database\Events\ModelsPruned;
 use LogicException;
 
@@ -48,6 +49,8 @@ trait Prunable
      */
     public function prune()
     {
+        event(new ModelPruning($this));
+
         $this->pruning();
 
         return in_array(SoftDeletes::class, class_uses_recursive(get_class($this)))
