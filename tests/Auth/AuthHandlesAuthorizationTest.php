@@ -123,7 +123,7 @@ class AuthHandlesAuthorizationTest extends TestCase
 
             public function __invoke()
             {
-                return $this->denyAsNotFound('foo', 3);
+                return $this->denyAsPaymentRequired('foo', 3);
             }
         };
 
