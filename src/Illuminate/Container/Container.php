@@ -960,8 +960,8 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Resolve all of the dependencies from the ReflectionParameters.
      *
-     * @param  \ReflectionParameter[] $dependencies
-     * @param  array $existingDependencies
+     * @param  \ReflectionParameter[]  $dependencies
+     * @param  array  $existingDependencies
      * @return array
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
@@ -972,13 +972,14 @@ class Container implements ArrayAccess, ContainerContract
         $results = [];
 
         foreach ($dependencies as $dependency) {
-            $dependencyName = Util::getParameterClassName($dependency);
+            $dependencyClassName = Util::getParameterClassName($dependency);
+            $dependencyName = $dependency->getName();
             // Check if the dependency has already been injected
-            if (in_array($dependencyName, $existingDependencies)) {
-                throw new CircularDependencyException(sprintf('Circular dependency detected in class %s', end($existingDependencies)));
+            if (isset($existingDependencies[$dependencyClassName])) {
+                throw new CircularDependencyException(sprintf('Circular dependency detected in class %s', $dependencyClassName));
             } else {
-                if (! is_null($dependencyName)) {
-                    $existingDependencies[] = $dependencyName;
+                if (! is_null($dependencyClassName)) {
+                    $existingDependencies[$dependencyClassName] = $dependencyName;
                 }
                 // If the dependency has an override for this particular build we will use
                 // that instead as the value. Otherwise, we will continue with this run

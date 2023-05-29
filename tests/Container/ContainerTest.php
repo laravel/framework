@@ -692,7 +692,7 @@ class ContainerTest extends TestCase
     public function testCircularDependencyExceptionMessage()
     {
         $this->expectException(CircularDependencyException::class);
-        $this->expectExceptionMessage('Circular dependency detected in class Illuminate\Tests\Container\CircularCStub');
+        $this->expectExceptionMessage('Circular dependency detected in class Illuminate\Tests\Container\CircularAStub');
 
         $container = new Container;
         $container->make(CircularCStub::class);
