@@ -71,6 +71,14 @@ class ValidationExceptionTest extends TestCase
 
         $this->assertEquals('milwad', $exception->errorBag);
     }
+
+    public function testExceptionRedirectToOneError()
+    {
+        $exception = $this->getException([], ['foo' => 'required']);
+        $exception->redirectTo('https://google.com');
+
+        $this->assertEquals('https://google.com', $exception->redirectTo);
+    }
     
     protected function getException($data = [], $rules = [])
     {
