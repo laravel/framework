@@ -56,6 +56,14 @@ class ValidationExceptionTest extends TestCase
         $this->assertSame(['foo' => ['validation.required']], $exception->errors());
     }
 
+    public function testExceptionStatusOneError()
+    {
+        $exception = $this->getException([], ['foo' => 'required']);
+        $exception->status(500);
+
+        $this->assertEquals(500, $exception->status);
+    }
+
     protected function getException($data = [], $rules = [])
     {
         $translator = new Translator(new ArrayLoader, 'en');
