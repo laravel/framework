@@ -73,6 +73,16 @@ class AuthorizationException extends Exception
     }
 
     /**
+     * Set the HTTP response status code to 402.
+     *
+     * @return $this
+     */
+    public function asPaymentRequired()
+    {
+        return $this->withStatus(402);
+    }
+
+    /**
      * Set the HTTP response status code to 404.
      *
      * @return $this

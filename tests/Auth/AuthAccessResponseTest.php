@@ -63,6 +63,17 @@ class AuthAccessResponseTest extends TestCase
         }
 
         try {
+            Response::deny('foo', 3)->asPaymentRequired()->authorize();
+            $this->fail();
+        } catch (AuthorizationException $e) {
+            $this->assertSame(402, $e->status());
+            $this->assertTrue($e->hasStatus());
+            $this->assertSame('foo', $e->response()->message());
+            $this->assertSame('foo', $e->getMessage());
+            $this->assertSame(3, $e->getCode());
+        }
+
+        try {
             Response::deny('foo', 3)->asNotFound()->authorize();
             $this->fail();
         } catch (AuthorizationException $e) {
@@ -111,6 +122,28 @@ class AuthAccessResponseTest extends TestCase
             $this->fail();
         } catch (AuthorizationException $e) {
             $this->assertSame(404, $e->status());
+            $this->assertTrue($e->hasStatus());
+            $this->assertSame('foo', $e->response()->message());
+            $this->assertSame('foo', $e->getMessage());
+            $this->assertSame(3, $e->getCode());
+        }
+
+        try {
+            Response::denyAsPaymentRequired()->authorize();
+            $this->fail();
+        } catch (AuthorizationException $e) {
+            $this->assertSame(402, $e->status());
+            $this->assertTrue($e->hasStatus());
+            $this->assertNull($e->response()->message());
+            $this->assertSame('This action is unauthorized.', $e->getMessage());
+            $this->assertSame(0, $e->getCode());
+        }
+
+        try {
+            Response::denyAsNotFound('foo', 3)->authorize();
+            $this->fail();
+        } catch (AuthorizationException $e) {
+            $this->assertSame(402, $e->status());
             $this->assertTrue($e->hasStatus());
             $this->assertSame('foo', $e->response()->message());
             $this->assertSame('foo', $e->getMessage());

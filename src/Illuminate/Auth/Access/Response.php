@@ -87,6 +87,18 @@ class Response implements Arrayable
     }
 
     /**
+     * Create a new "deny" Response with a 402 HTTP status code.
+     *
+     * @param  string|null  $message
+     * @param  mixed  $code
+     * @return \Illuminate\Auth\Access\Response
+     */
+    public static function denyAsPaymentRequired($message = null, $code = null)
+    {
+        return static::denyWithStatus(402, $message, $code);
+    }
+
+    /**
      * Create a new "deny" Response with a 404 HTTP status code.
      *
      * @param  string|null  $message
@@ -177,6 +189,16 @@ class Response implements Arrayable
     public function asNotFound()
     {
         return $this->withStatus(404);
+    }
+
+    /**
+     * Set the HTTP response status code to 402.
+     *
+     * @return $this
+     */
+    public function asPaymentRequired()
+    {
+        return $this->withStatus(402);
     }
 
     /**

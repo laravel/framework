@@ -42,6 +42,18 @@ trait HandlesAuthorization
     }
 
     /**
+     * Deny with a 402 HTTP status code.
+     *
+     * @param  string|null  $message
+     * @param  int|null  $code
+     * @return \Illuminate\Auth\Access\Response
+     */
+    public function denyAsPaymentRequired($message = null, $code = null)
+    {
+        return Response::denyWithStatus(402, $message, $code);
+    }
+
+    /**
      * Deny with a 404 HTTP status code.
      *
      * @param  string|null  $message
