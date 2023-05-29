@@ -94,7 +94,6 @@ class AuthHandlesAuthorizationTest extends TestCase
         }
     }
 
-
     public function testItCanDenyAsPaymentRequired()
     {
         $class = new class()
