@@ -79,7 +79,14 @@ class ValidationExceptionTest extends TestCase
 
         $this->assertEquals('https://google.com', $exception->redirectTo);
     }
-    
+
+    public function testExceptionGetResponseOneError()
+    {
+        $exception = $this->getException([], ['foo' => 'required']);
+
+        $this->assertNull($exception->getResponse());
+    }
+
     protected function getException($data = [], $rules = [])
     {
         $translator = new Translator(new ArrayLoader, 'en');
