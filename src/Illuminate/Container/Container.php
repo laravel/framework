@@ -972,14 +972,14 @@ class Container implements ArrayAccess, ContainerContract
         $results = [];
 
         foreach ($dependencies as $dependency) {
-            $dependencyName = $dependency->getName();
+            $dependencyName = Util::getParameterClassName($dependency);
             // Check if the dependency has already been injected
             if (in_array($dependencyName, $existingDependencies)) {
-                $className = $dependency->getDeclaringClass()->getName();
-                $fileName = $dependency->getDeclaringClass()->getFileName();
-                throw new CircularDependencyException(sprintf('Circular dependency detected in class  %s defined in file %s', $className, $fileName));
+                throw new CircularDependencyException(sprintf('Circular dependency detected in class %s', end($existingDependencies)));
             } else {
-                $existingDependencies[] = $dependencyName;
+                if (! is_null($dependencyName)) {
+                    $existingDependencies[] = $dependencyName;
+                }
                 // If the dependency has an override for this particular build we will use
                 // that instead as the value. Otherwise, we will continue with this run
                 // of resolutions and let reflection attempt to determine the result.
