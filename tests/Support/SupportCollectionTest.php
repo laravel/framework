@@ -12,6 +12,7 @@ use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\ItemNotFoundException;
+use Illuminate\Support\ItemNotNumericException;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\MultipleItemsFoundException;
 use Illuminate\Support\Str;
@@ -5563,6 +5564,48 @@ class SupportCollectionTest extends TestCase
             'foo.1' => 'baz',
             'foo.baz' => 'boom',
         ], $data->all());
+    }
+
+    public function testIncrement()
+    {
+        $c = new Collection([
+            'total' => 0,
+            'is_test' => true,
+        ]);
+
+        $c->increment('total');
+        $this->assertSame(1, $c->get('total'));
+
+        $c->increment('total', 10);
+        $this->assertSame(11, $c->get('total'));
+
+        // It's also possible to introduce a new item...
+        $c->increment('overall', 1);
+        $this->assertSame(1, $c->get('overall'));
+
+        $this->expectException(ItemNotNumericException::class);
+        $c->increment('is_test', 10);
+    }
+
+    public function testDecrement()
+    {
+        $c = new Collection([
+            'total' => 0,
+            'is_test' => true,
+        ]);
+
+        $c->decrement('total');
+        $this->assertSame(-1, $c->get('total'));
+
+        $c->decrement('total', 10);
+        $this->assertSame(-11, $c->get('total'));
+
+        // It's also possible to introduce a new item...
+        $c->decrement('overall', 1);
+        $this->assertSame(-1, $c->get('overall'));
+
+        $this->expectException(ItemNotNumericException::class);
+        $c->decrement('is_test', 10);
     }
 
     /**

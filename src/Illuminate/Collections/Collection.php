@@ -1752,4 +1752,36 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     {
         unset($this->items[$key]);
     }
+
+    /**
+     * Increases the value of a given key.
+     *
+     * @return void
+     *
+     * @throws ItemNotNumericException
+     */
+    public function increment(string $key, int $amount = 1)
+    {
+        if ($this->has($key) && !is_numeric($this->get($key))) {
+            throw ItemNotNumericException::forIncrement($key);
+        }
+
+        $this->put($key, $this->get($key) + $amount);
+    }
+
+    /**
+     * Decreases the value of a given key.
+     *
+     * @return void
+     *
+     * @throws ItemNotNumericException
+     */
+    public function decrement(string $key, int $amount = 1)
+    {
+        if ($this->has($key) && !is_numeric($this->get($key))) {
+            throw ItemNotNumericException::forDecrement($key);
+        }
+
+        $this->put($key, $this->get($key) - $amount);
+    }
 }
