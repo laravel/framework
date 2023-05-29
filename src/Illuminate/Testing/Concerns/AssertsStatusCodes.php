@@ -122,6 +122,16 @@ trait AssertsStatusCodes
     }
 
     /**
+     * Assert that the response has a 405 "Method Not Allowed" status code.
+     *
+     * @return $this
+     */
+    public function assertMethodNotAllowed()
+    {
+        return $this->assertStatus(405);
+    }
+
+    /**
      * Assert that the response has a 408 "Request Timeout" status code.
      *
      * @return $this

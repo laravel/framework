@@ -53,6 +53,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Database\Connection beforeExecuting(\Closure $callback)
  * @method static void listen(\Closure $callback)
  * @method static \Illuminate\Contracts\Database\Query\Expression raw(mixed $value)
+ * @method static string escape(string|float|int|bool|null $value, bool $binary = false)
  * @method static bool hasModifiedRecords()
  * @method static void recordsHaveBeenModified(bool $value = true)
  * @method static \Illuminate\Database\Connection setRecordModificationState(bool $value)

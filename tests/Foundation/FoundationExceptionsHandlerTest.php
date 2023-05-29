@@ -195,6 +195,17 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->assertSame('{"response":"My responsable exception response"}', $response);
     }
 
+    public function testReturnsCustomResponseFromMappedException()
+    {
+        $this->handler->map(function (RuntimeException $e) {
+            return new ResponsableException();
+        });
+
+        $response = $this->handler->render($this->request, new RuntimeException)->getContent();
+
+        $this->assertSame('{"response":"My responsable exception response"}', $response);
+    }
+
     public function testReturnsJsonWithoutStackTraceWhenAjaxRequestAndDebugFalseAndExceptionMessageIsMasked()
     {
         $this->config->shouldReceive('get')->with('app.debug', null)->once()->andReturn(false);
