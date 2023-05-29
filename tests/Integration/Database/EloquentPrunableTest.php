@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Database;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Prunable;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Events\ModelPruning;
 use Illuminate\Database\Events\ModelsPruned;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Event;
@@ -57,6 +58,7 @@ class EloquentPrunableTest extends DatabaseTestCase
         $this->assertEquals(3500, PrunableTestModel::count());
 
         Event::assertDispatched(ModelsPruned::class, 2);
+        Event::assertDispatched(ModelPruning::class, 1500);
     }
 
     public function testPrunesSoftDeletedRecords()
@@ -76,6 +78,7 @@ class EloquentPrunableTest extends DatabaseTestCase
         $this->assertEquals(2000, PrunableSoftDeleteTestModel::withTrashed()->count());
 
         Event::assertDispatched(ModelsPruned::class, 3);
+        Event::assertDispatched(ModelPruning::class, 3000);
     }
 
     public function testPruneWithCustomPruneMethod()
@@ -96,6 +99,7 @@ class EloquentPrunableTest extends DatabaseTestCase
         $this->assertEquals(5000, PrunableWithCustomPruneMethodTestModel::count());
 
         Event::assertDispatched(ModelsPruned::class, 1);
+        Event::assertDispatched(ModelPruning::class, 1000);
     }
 }
 

@@ -22,7 +22,11 @@ trait Prunable
             ->when(in_array(SoftDeletes::class, class_uses_recursive(get_class($this))), function ($query) {
                 $query->withTrashed();
             })->chunkById($chunkSize, function ($models) use (&$total) {
-                $models->each->prune();
+                $models->each(function ($model) {
+                    event(new ModelPruning($model));
+
+                    $model->prune();
+                });
 
                 $total += $models->count();
 
@@ -49,8 +53,6 @@ trait Prunable
      */
     public function prune()
     {
-        event(new ModelPruning($this));
-
         $this->pruning();
 
         return in_array(SoftDeletes::class, class_uses_recursive(get_class($this)))
