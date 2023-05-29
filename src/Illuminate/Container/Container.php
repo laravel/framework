@@ -960,8 +960,8 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Resolve all of the dependencies from the ReflectionParameters.
      *
-     * @param \ReflectionParameter[] $dependencies
-     * @param array $existingDependencies
+     * @param  \ReflectionParameter[] $dependencies
+     * @param  array $existingDependencies
      * @return array
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
@@ -977,7 +977,7 @@ class Container implements ArrayAccess, ContainerContract
             if (in_array($dependencyName, $existingDependencies)) {
                 throw new CircularDependencyException(sprintf('Circular dependency detected in class %s', end($existingDependencies)));
             } else {
-                if (!is_null($dependencyName)) {
+                if (! is_null($dependencyName)) {
                     $existingDependencies[] = $dependencyName;
                 }
                 // If the dependency has an override for this particular build we will use
