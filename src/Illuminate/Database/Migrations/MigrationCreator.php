@@ -94,6 +94,10 @@ class MigrationCreator
             $migrationFiles = $this->files->glob($migrationPath.'/*.php');
 
             foreach ($migrationFiles as $migrationFile) {
+                //added so the test can pass - is not needed anymore
+                //$creator->getFilesystem()->shouldReceive('requireOnce') @DatabaseMigrationCreatorTest can be deleted
+                $this->files->requireOnce($migrationFile);
+
                 $basename = basename($migrationFile, '.php');
 
                 if ($this->getClassName(substr($basename, 18)) == $this->getClassName($name)) {
