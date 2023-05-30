@@ -754,11 +754,9 @@ class Builder implements BuilderContract
      */
     public function where($column, $operator = null, $value = null, $boolean = 'and')
     {
-        // If the column is a condition expression, we can skip the normal handling
-        // of parameters. Such a value indicates that the column contains a where
-        // condition that can be directly embedded into the query.
         if ($column instanceof ConditionExpression) {
             $type = 'Expression';
+
             $this->wheres[] = compact('type', 'column', 'boolean');
 
             return $this;
@@ -2094,11 +2092,9 @@ class Builder implements BuilderContract
     {
         $type = 'Basic';
 
-        // If the column is a condition expression, we can skip the normal handling
-        // of parameters. Such a value indicates that the column contains a having
-        // condition that can be directly embedded into the query.
         if ($column instanceof ConditionExpression) {
             $type = 'Expression';
+
             $this->havings[] = compact('type', 'column', 'boolean');
 
             return $this;
