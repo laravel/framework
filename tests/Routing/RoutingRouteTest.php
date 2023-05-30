@@ -1592,6 +1592,17 @@ class RoutingRouteTest extends TestCase
         $this->assertTrue($router->getRoutes()->hasNamedRoute('bar.destroy'));
     }
 
+    public function testGetActionName()
+    {
+        $router = $this->getRouter();
+
+        $route = $router->get('milwad', function () {})->getActionName();
+        $this->assertEquals("Closure", $route);
+
+        $route = $router->get('milwad', ['FooController', 'index'])->getActionName();
+        $this->assertEquals("FooController@index", $route);
+    }
+
     public function testRouterFiresRoutedEvent()
     {
         $container = new Container;
