@@ -424,17 +424,129 @@ class ProcessTest extends TestCase
         $this->assertEquals("Hello World\n", $result->errorOutput());
     }
 
-    public function testRealProcessesCanThrow()
+    public function testFakeProcessesCanThrowWithoutOutput()
+    {
+        $this->expectException(ProcessFailedException::class);
+        $this->expectExceptionMessage(<<<'EOT'
+            The command "exit 1;" failed.
+
+            Exit Code: 1
+            EOT
+        );
+
+        $factory = new Factory;
+        $factory->fake(fn () => $factory->result(exitCode: 1));
+        $result = $factory->path(__DIR__)->run('exit 1;');
+
+        $result->throw();
+    }
+
+    public function testRealProcessesCanThrowWithoutOutput()
     {
         if (windows_os()) {
             $this->markTestSkipped('Requires Linux.');
         }
 
         $this->expectException(ProcessFailedException::class);
-        $this->expectExceptionMessage('The process "echo "Hello World" >&2; exit 1;" failed.');
+        $this->expectExceptionMessage(<<<'EOT'
+            The command "exit 1;" failed.
+
+            Exit Code: 1
+            EOT
+        );
+
+        $factory = new Factory;
+        $result = $factory->path(__DIR__)->run('exit 1;');
+
+        $result->throw();
+    }
+
+    public function testFakeProcessesCanThrowWithErrorOutput()
+    {
+        $this->expectException(ProcessFailedException::class);
+        $this->expectExceptionMessage(<<<'EOT'
+            The command "echo "Hello World" >&2; exit 1;" failed.
+
+            Exit Code: 1
+
+            Error Output:
+            ================
+            Hello World
+            EOT
+        );
+
+        $factory = new Factory;
+        $factory->fake(fn () => $factory->result(errorOutput: 'Hello World', exitCode: 1));
+        $result = $factory->path(__DIR__)->run('echo "Hello World" >&2; exit 1;');
+
+        $result->throw();
+    }
+
+    public function testRealProcessesCanThrowWithErrorOutput()
+    {
+        if (windows_os()) {
+            $this->markTestSkipped('Requires Linux.');
+        }
+
+        $this->expectException(ProcessFailedException::class);
+        $this->expectExceptionMessage(<<<'EOT'
+            The command "echo "Hello World" >&2; exit 1;" failed.
+
+            Exit Code: 1
+
+            Error Output:
+            ================
+            Hello World
+            EOT
+        );
 
         $factory = new Factory;
         $result = $factory->path(__DIR__)->run('echo "Hello World" >&2; exit 1;');
+
+        $result->throw();
+    }
+
+    public function testFakeProcessesCanThrowWithOutput()
+    {
+        $this->expectException(ProcessFailedException::class);
+        $this->expectExceptionMessage(<<<'EOT'
+            The command "echo "Hello World" >&1; exit 1;" failed.
+
+            Exit Code: 1
+
+            Output:
+            ================
+            Hello World
+            EOT
+        );
+
+        $factory = new Factory;
+        $factory->fake(fn () => $factory->result(output: 'Hello World', exitCode: 1));
+        $result = $factory->path(__DIR__)->run('echo "Hello World" >&1; exit 1;');
+
+        $result->throw();
+    }
+
+    public function testRealProcessesCanThrowWithOutput()
+    {
+        if (windows_os()) {
+            $this->markTestSkipped('Requires Linux.');
+        }
+
+        $this->expectException(ProcessFailedException::class);
+        $this->expectExceptionMessage(<<<'EOT'
+            The command "echo "Hello World" >&1; exit 1;" failed.
+
+            Exit Code: 1
+
+            Output:
+            ================
+            Hello World
+            EOT
+        );
+
+        $factory = new Factory;
+        $result = $factory->path(__DIR__)->run('echo "Hello World" >&1; exit 1;');
 
         $result->throw();
     }
