@@ -122,12 +122,12 @@ class BladePhpStatementsTest extends AbstractBladeTestCase
     public function testUnclosedParenthesisForBladeTags()
     {
         $string = "<span @class(['(']></span>";
-        $expected = "<span class=\"<?php echo \Illuminate\Support\Arr::toCssClasses([]) ?>\"(['(']></span>";
+        $expected = "<span class=\"<?php echo \Illuminate\Support\Arr::toCssClasses([]); ?>\"(['(']></span>";
 
         $this->assertEquals($expected, $this->compiler->compileString($string));
 
         $string = "<span @class(['']></span>";
-        $expected = "<span class=\"<?php echo \Illuminate\Support\Arr::toCssClasses([]) ?>\"(['']></span>";
+        $expected = "<span class=\"<?php echo \Illuminate\Support\Arr::toCssClasses([]); ?>\"(['']></span>";
 
         $this->assertEquals($expected, $this->compiler->compileString($string));
 
