@@ -284,9 +284,7 @@ abstract class Broadcaster implements BroadcasterContract
      */
     protected function formatChannels(array $channels)
     {
-        return array_map(function ($channel) {
-            return (string) $channel;
-        }, $channels);
+        return array_map(fn ($channel) => (string) $channel, $channels);
     }
 
     /**
