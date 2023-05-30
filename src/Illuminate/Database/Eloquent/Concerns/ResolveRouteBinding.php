@@ -1,6 +1,7 @@
 <?php
 
 namespace Illuminate\Database\Eloquent\Concerns;
+
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Str;
 
