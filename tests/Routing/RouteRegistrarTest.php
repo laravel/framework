@@ -138,7 +138,7 @@ class RouteRegistrarTest extends TestCase
             ->only(['index', 'destroy'])
             ->withTrashed([
                 'index',
-                'destroy'
+                'destroy',
             ]);
 
         /** @var \Illuminate\Routing\Route $route */
