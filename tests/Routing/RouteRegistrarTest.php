@@ -136,6 +136,28 @@ class RouteRegistrarTest extends TestCase
         $this->assertEquals(['one'], $this->getRoute()->excludedMiddleware());
     }
 
+    public function testGetRouteWithTrashed()
+    {
+        $route = $this->router->get('users', [RouteRegistrarControllerStub::class, 'index'])->withTrashed();
+
+        $this->assertTrue($route->allowsTrashedBindings());
+    }
+
+    public function testResourceWithTrashed()
+    {
+        $this->router->resource('users', RouteRegistrarControllerStub::class)
+            ->only(['index', 'destroy'])
+            ->withTrashed([
+                'index',
+                'destroy',
+            ]);
+
+        /** @var \Illuminate\Routing\Route $route */
+        foreach ($this->router->getRoutes() as $route) {
+            $this->assertTrue($route->allowsTrashedBindings());
+        }
+    }
+
     public function testCanRegisterGetRouteWithClosureAction()
     {
         $this->router->middleware('get-middleware')->get('users', function () {
