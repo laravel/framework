@@ -1596,11 +1596,12 @@ class RoutingRouteTest extends TestCase
     {
         $router = $this->getRouter();
 
-        $route = $router->get('milwad', function () {})->getActionName();
-        $this->assertEquals("Closure", $route);
+        $route = $router->get('milwad', function () {
+        })->getActionName();
+        $this->assertEquals('Closure', $route);
 
         $route = $router->get('milwad', ['FooController', 'index'])->getActionName();
-        $this->assertEquals("FooController@index", $route);
+        $this->assertEquals('FooController@index', $route);
     }
 
     public function testRouterFiresRoutedEvent()
