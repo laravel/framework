@@ -1,6 +1,31 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.12.0...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v10.13.0...10.x)
+
+
+## [v10.13.0 (2023-05-30)](https://github.com/laravel/framework/compare/v10.12.0...v10.13.0)
+
+### Added
+- Added `Illuminate/Hashing/HashManager::isHashed()` ([#47197](https://github.com/laravel/framework/pull/47197))
+- Escaping functionality within the Grammar ([#46558](https://github.com/laravel/framework/pull/46558))
+- Provide testing hooks in `Illuminate/Support/Sleep.php` ([#47228](https://github.com/laravel/framework/pull/47228))
+- Added missing methods to AssertsStatusCodes ([#47277](https://github.com/laravel/framework/pull/47277))
+- Wrap response preparation in events ([#47229](https://github.com/laravel/framework/pull/47229))
+
+### Fixed
+- Fixed bug when function wrapped around definition of related factory ([#47168](https://github.com/laravel/framework/pull/47168))
+- Fixed inconsistentcy between report and render methods ([#47201](https://github.com/laravel/framework/pull/47201))
+- Fixes Model::isDirty() when AsCollection or AsEncryptedCollection have arguments ([#47235](https://github.com/laravel/framework/pull/47235))
+- Fixed escaped String for JSON_CONTAINS ([#47244](https://github.com/laravel/framework/pull/47244))
+- Fixes missing output on ProcessFailedException exception ([#47285](https://github.com/laravel/framework/pull/47285))
+
+### Changed
+- Remove useless else statements ([#47186](https://github.com/laravel/framework/pull/47186))
+- RedisStore improvement - don't open transaction unless all values are serialaizable ([#47193](https://github.com/laravel/framework/pull/47193))
+- Use carbon::now() to get current timestamp in takeUntilTimeout lazycollection-method ([#47200](https://github.com/laravel/framework/pull/47200))
+- Avoid duplicates in visible/hidden on merge ([#47264](https://github.com/laravel/framework/pull/47264))
+- Add a missing semicolon to CompilesClasses ([#47280](https://github.com/laravel/framework/pull/47280))
+- Send along value to InvalidPayloadException ([#47223](https://github.com/laravel/framework/pull/47223))
 
 
 ## [v10.12.0 (2023-05-23)](https://github.com/laravel/framework/compare/v10.11.0...v10.12.0)
