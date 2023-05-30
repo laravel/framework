@@ -184,9 +184,7 @@ trait Queueable
      */
     public function chain($chain)
     {
-        $this->chained = collect($chain)->map(function ($job) {
-            return $this->serializeJob($job);
-        })->all();
+        $this->chained = collect($chain)->map(fn ($job) => $this->serializeJob($job))->all();
 
         return $this;
     }

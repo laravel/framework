@@ -62,9 +62,7 @@ class DatabaseBatchRepository implements PrunableBatchRepository
                             ->take($limit)
                             ->when($before, fn ($q) => $q->where('id', '<', $before))
                             ->get()
-                            ->map(function ($batch) {
-                                return $this->toBatch($batch);
-                            })
+                            ->map(fn ($batch) => $this->toBatch($batch))
                             ->all();
     }
 
