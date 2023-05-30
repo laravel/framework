@@ -38,6 +38,13 @@ class Event
     public $expression = '* * * * *';
 
     /**
+     * How often to repeat the event during a minute.
+     *
+     * @var int|null
+     */
+    public $repeatSeconds = null;
+
+    /**
      * The timezone the date should be evaluated on.
      *
      * @var \DateTimeZone|string
@@ -157,6 +164,13 @@ class Event
     public $mutexNameResolver;
 
     /**
+     * The start time of the last event run.
+     *
+     * @var \Illuminate\Support\Carbon|null
+     */
+    public $lastRun;
+
+    /**
      * The exit status code of the command.
      *
      * @var int|null
@@ -204,6 +218,8 @@ class Event
             return;
         }
 
+        $this->lastRun = Date::now();
+
         $exitCode = $this->start($container);
 
         if (! $this->runInBackground) {
@@ -219,6 +235,28 @@ class Event
     public function shouldSkipDueToOverlapping()
     {
         return $this->withoutOverlapping && ! $this->mutex->create($this);
+    }
+
+    /**
+     * Determine if the event should repeat.
+     *
+     * @return bool
+     */
+    public function shouldRepeat()
+    {
+        return ! is_null($this->repeatSeconds);
+    }
+
+    /**
+     * Determine if the event is ready to repeat.
+     *
+     * @return bool
+     */
+    public function shouldRepeatNow()
+    {
+        return $this->shouldRepeat()
+            && $this->lastRun
+            && Date::now()->diffInSeconds($this->lastRun) >= $this->repeatSeconds;
     }
 
     /**

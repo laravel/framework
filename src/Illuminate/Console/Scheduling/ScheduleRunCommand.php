@@ -8,6 +8,7 @@ use Illuminate\Console\Events\ScheduledTaskFailed;
 use Illuminate\Console\Events\ScheduledTaskFinished;
 use Illuminate\Console\Events\ScheduledTaskSkipped;
 use Illuminate\Console\Events\ScheduledTaskStarting;
+use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Carbon;
@@ -68,6 +69,13 @@ class ScheduleRunCommand extends Command
     protected $handler;
 
     /**
+     * The cache store implementation.
+     *
+     * @var \Illuminate\Contracts\Cache\Repository
+     */
+    protected $cache;
+
+    /**
      * The PHP binary used by the command.
      *
      * @var string
@@ -92,18 +100,24 @@ class ScheduleRunCommand extends Command
      * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
      * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
      * @param  \Illuminate\Contracts\Debug\ExceptionHandler  $handler
+     * @param  \Illuminate\Contracts\Cache\Repository  $cache
      * @return void
      */
-    public function handle(Schedule $schedule, Dispatcher $dispatcher, ExceptionHandler $handler)
+    public function handle(Schedule $schedule, Dispatcher $dispatcher, ExceptionHandler $handler, Cache $cache)
     {
         $this->schedule = $schedule;
         $this->dispatcher = $dispatcher;
         $this->handler = $handler;
+        $this->cache = $cache;
         $this->phpBinary = Application::phpBinary();
+
+        $this->clearInterruptSignal();
 
         $this->newLine();
 
-        foreach ($this->schedule->dueEvents($this->laravel) as $event) {
+        $events = $this->schedule->dueEvents($this->laravel);
+
+        foreach ($events as $event) {
             if (! $event->filtersPass($this->laravel)) {
                 $this->dispatcher->dispatch(new ScheduledTaskSkipped($event));
 
@@ -117,6 +131,10 @@ class ScheduleRunCommand extends Command
             }
 
             $this->eventsRan = true;
+        }
+
+        if ($events->contains->shouldRepeat()) {
+            $this->repeatEvents($events->filter->shouldRepeat());
         }
 
         if (! $this->eventsRan) {
@@ -192,5 +210,48 @@ class ScheduleRunCommand extends Command
                 $event->getSummaryForDisplay(),
             ]);
         }
+    }
+
+    /**
+     * Run the given repeating events.
+     *
+     * @param  \Illuminate\Console\Scheduling\Event[]  $events
+     * @return void
+     */
+    protected function repeatEvents($events)
+    {
+        while (Date::now()->lte($this->startedAt->endOfMinute())) {
+            if ($this->shouldInterrupt()) {
+                return;
+            }
+
+            foreach ($events as $event) {
+                if ($event->shouldRepeatNow()) {
+                    $this->runEvent($event);
+                }
+            }
+
+            usleep(100000);
+        }
+    }
+
+    /**
+     * Determine if the schedule run should be interrupted.
+     *
+     * @return bool
+     */
+    protected function shouldInterrupt()
+    {
+        return $this->cache->get('illuminate:schedule:interrupt', false);
+    }
+
+    /**
+     * Ensure the interrupt signal is cleared.
+     *
+     * @return bool
+     */
+    protected function clearInterruptSignal()
+    {
+        $this->cache->forget('illuminate:schedule:interrupt');
     }
 }
