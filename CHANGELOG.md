@@ -1,6 +1,15 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.52.7...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.52.8...9.x)
+
+
+## [v9.52.8](https://github.com/laravel/framework/compare/v9.52.7...v9.52.8) - 2023-05-30
+
+### Fixed
+- Fixed escaped String for JSON_CONTAINS ([#47244](https://github.com/laravel/framework/pull/47244))
+
+### Changed
+- Send along value to InvalidPayloadException ([#47223](https://github.com/laravel/framework/pull/47223))
 
 
 ## [v9.52.7](https://github.com/laravel/framework/compare/v9.52.6...v9.52.7) - 2023-04-25
