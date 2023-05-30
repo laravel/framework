@@ -7,7 +7,7 @@ use InvalidArgumentException;
 class InvalidPayloadException extends InvalidArgumentException
 {
     /**
-     * The attempted value being encoded.
+     * The value that failed to decode.
      *
      * @var mixed
      */
