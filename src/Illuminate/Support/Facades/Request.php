@@ -106,6 +106,7 @@ namespace Illuminate\Support\Facades;
  * @method static bool isMethodCacheable()
  * @method static string|null getProtocolVersion()
  * @method static string|resource getContent(bool $asResource = false)
+ * @method static \Symfony\Component\HttpFoundation\InputBag getPayload()
  * @method static array getETags()
  * @method static bool isNoCache()
  * @method static string|null getPreferredFormat(string|null $default = 'html')
