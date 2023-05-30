@@ -70,9 +70,9 @@ class Authorize
             return [];
         }
 
-        return collect($models)->map(function ($model) use ($request) {
-            return $model instanceof Model ? $model : $this->getModel($request, $model);
-        })->all();
+        return collect($models)
+            ->map(fn ($model) => $model instanceof Model ? $model : $this->getModel($request, $model))
+            ->all();
     }
 
     /**

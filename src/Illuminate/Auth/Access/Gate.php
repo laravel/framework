@@ -685,9 +685,7 @@ class Gate implements GateContract
             $classDirname = implode('\\', array_slice($classDirnameSegments, 0, $index));
 
             return $classDirname.'\\Policies\\'.class_basename($class).'Policy';
-        })->reverse()->values()->first(function ($class) {
-            return class_exists($class);
-        }) ?: [$classDirname.'\\Policies\\'.class_basename($class).'Policy']);
+        })->reverse()->values()->first(fn ($class) => class_exists($class)) ?: [$classDirname.'\\Policies\\'.class_basename($class).'Policy']);
     }
 
     /**

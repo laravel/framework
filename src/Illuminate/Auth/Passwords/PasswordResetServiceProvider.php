@@ -24,13 +24,9 @@ class PasswordResetServiceProvider extends ServiceProvider implements Deferrable
      */
     protected function registerPasswordBroker()
     {
-        $this->app->singleton('auth.password', function ($app) {
-            return new PasswordBrokerManager($app);
-        });
+        $this->app->singleton('auth.password', fn ($app) => new PasswordBrokerManager($app));
 
-        $this->app->bind('auth.password.broker', function ($app) {
-            return $app->make('auth.password')->broker();
-        });
+        $this->app->bind('auth.password.broker', fn ($app) => $app->make('auth.password')->broker());
     }
 
     /**
