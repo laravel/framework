@@ -125,6 +125,13 @@ class RouteRegistrarTest extends TestCase
         $this->assertSame(['one', 'two'], $this->getRoute()->middleware());
     }
 
+    public function testResourceWithTrashed()
+    {
+        $route = $this->router->get('users', [RouteRegistrarControllerStub::class, 'index'])->withTrashed();
+
+        $this->assertTrue($route->allowsTrashedBindings());
+    }
+
     public function testWithoutMiddlewareRegistration()
     {
         $this->router->middleware(['one', 'two'])->get('users', function () {
