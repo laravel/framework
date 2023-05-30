@@ -167,6 +167,20 @@ class RouteRegistrarTest extends TestCase
         $this->assertTrue($route->isFallback);
     }
 
+    public function testSetFallbackRoute()
+    {
+        $route = $this->router->fallback(function () {
+            return 'milwad';
+        });
+        $route->setFallback(false);
+
+        $this->assertFalse($route->isFallback);
+
+        $route->setFallback(true);
+
+        $this->assertTrue($route->isFallback);
+    }
+
     public function testCanRegisterGetRouteWithClosureAction()
     {
         $this->router->middleware('get-middleware')->get('users', function () {
