@@ -162,7 +162,7 @@ class CacheRepositoryTest extends TestCase
         $this->assertSame('bar', $result);
     }
 
-    public function testRememberForeverIfMethodCallsPutIfTrueOtherwiseNot()
+    public function testRememberForeverIfMethodCallsForeverIfTrueOtherwiseNot()
     {
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('get')->once()->andReturn(null);
