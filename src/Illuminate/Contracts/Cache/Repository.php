@@ -79,7 +79,7 @@ interface Repository extends CacheInterface
 
     /**
      * If condition is true, get an item from the cache, or execute the given Closure and store the result,
-     * Otherwise just execute the Closure and not store the result
+     * Otherwise just execute the Closure and not store the result.
      *
      * @template TCacheValue
      *
@@ -115,7 +115,7 @@ interface Repository extends CacheInterface
 
     /**
      * If condition is true, get an item from the cache, or execute the given Closure and store the result forever,
-     * Otherwise just execute the Closure and not store the result
+     * Otherwise just execute the Closure and not store the result.
      *
      * @template TCacheValue
      *
