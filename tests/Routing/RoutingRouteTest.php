@@ -944,7 +944,6 @@ class RoutingRouteTest extends TestCase
 
     public function testSetWheresRoute()
     {
-        $request = Request::create('foo/milwad/12', 'GET');
         $route = new Route('GET', 'foo/{name?}/{id?}', function () {
             //
         });
@@ -952,7 +951,12 @@ class RoutingRouteTest extends TestCase
             'name' => '[A-Za-z]+',
             'id' => '[0-9]+',
         ]);
+
+        $request = Request::create('foo/milwad/12', 'GET');
         $this->assertTrue($route->matches($request));
+
+        $request = Request::create('foo/12/milwad', 'GET');
+        $this->assertFalse($route->matches($request));
     }
 
     public function testRoutePrefixParameterParsing()
