@@ -1602,6 +1602,9 @@ class RoutingRouteTest extends TestCase
 
         $route = $router->get('milwad', ['FooController', 'index'])->getActionName();
         $this->assertEquals('FooController@index', $route);
+
+        $route = $router->get('milwad', ['FooController', 'destroy'])->getActionName();
+        $this->assertEquals('FooController@destroy', $route);
     }
 
     public function testRouterFiresRoutedEvent()
