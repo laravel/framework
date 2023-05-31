@@ -402,6 +402,27 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
+     * If condition is true, get an item from the cache, or execute the given Closure and store the result,
+     * Otherwise just execute the Closure and not store the result.
+     *
+     * @template TCacheValue
+     *
+     * @param  bool  $condition
+     * @param  string  $key
+     * @param  \Closure|\DateTimeInterface|\DateInterval|int|null  $ttl
+     * @param  \Closure(): TCacheValue  $callback
+     * @return TCacheValue
+     */
+    public function rememberIf(bool $condition, $key, $ttl, Closure $callback)
+    {
+        if ($condition) {
+            return $this->remember($key, $ttl, $callback);
+        }
+
+        return $callback();
+    }
+
+    /**
      * Get an item from the cache, or execute the given Closure and store the result forever.
      *
      * @template TCacheValue
@@ -438,6 +459,26 @@ class Repository implements ArrayAccess, CacheContract
         $this->forever($key, $value = $callback());
 
         return $value;
+    }
+
+    /**
+     * If condition is true, get an item from the cache, or execute the given Closure and store the result forever,
+     * Otherwise just execute the Closure and not store the result.
+     *
+     * @template TCacheValue
+     *
+     * @param  bool  $condition
+     * @param  string  $key
+     * @param  \Closure(): TCacheValue  $callback
+     * @return TCacheValue
+     */
+    public function rememberForeverIf(bool $condition, $key, Closure $callback)
+    {
+        if ($condition) {
+            $this->rememberForever($key, $callback);
+        }
+
+        return $callback();
     }
 
     /**
