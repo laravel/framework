@@ -24,6 +24,12 @@ assertType('int', $cache->sear('cache', function (): int {
 assertType('int', $cache->remember('cache', now(), function (): int {
     return 36;
 }));
+assertType('int', $cache->rememberIf(true, 'cache', now(), function (): int {
+    return 36;
+}));
 assertType('int', $cache->rememberForever('cache', function (): int {
+    return 36;
+}));
+assertType('int', $cache->rememberForeverIf(true, 'cache', function (): int {
     return 36;
 }));
