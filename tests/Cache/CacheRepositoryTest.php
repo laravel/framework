@@ -134,6 +134,23 @@ class CacheRepositoryTest extends TestCase
         $this->assertSame('bar', $result);
     }
 
+    public function testRememberIfMethodCallsPutIfTrueOtherwiseNot()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->once()->andReturn(null);
+        $repo->getStore()->shouldReceive('put')->once()->with('foo', 'baz', 10);
+
+        $result = $repo->rememberIf(false, 'foo', 10, function () {
+            return 'bar';
+        });
+        $this->assertSame('bar', $result);
+
+        $result = $repo->rememberIf(true, 'foo', 10, function () {
+            return 'baz';
+        });
+        $this->assertSame('baz', $result);
+    }
+
     public function testRememberForeverMethodCallsForeverAndReturnsDefault()
     {
         $repo = $this->getRepository();
@@ -143,6 +160,23 @@ class CacheRepositoryTest extends TestCase
             return 'bar';
         });
         $this->assertSame('bar', $result);
+    }
+
+    public function testRememberForeverIfMethodCallsPutIfTrueOtherwiseNot()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->once()->andReturn(null);
+        $repo->getStore()->shouldReceive('forever')->once()->with('foo', 'baz');
+
+        $result = $repo->rememberForeverIf(false, 'foo', function () {
+            return 'bar';
+        });
+        $this->assertSame('bar', $result);
+
+        $result = $repo->rememberForeverIf(true, 'foo', function () {
+            return 'baz';
+        });
+        $this->assertSame('baz', $result);
     }
 
     public function testPuttingMultipleItemsInCache()
