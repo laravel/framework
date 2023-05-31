@@ -78,6 +78,20 @@ interface Repository extends CacheInterface
     public function remember($key, $ttl, Closure $callback);
 
     /**
+     * If condition is true, get an item from the cache, or execute the given Closure and store the result,
+     * Otherwise just execute the Closure and not store the result
+     *
+     * @template TCacheValue
+     *
+     * @param  bool  $condition
+     * @param  string  $key
+     * @param  \Closure|\DateTimeInterface|\DateInterval|int|null  $ttl
+     * @param  \Closure(): TCacheValue  $callback
+     * @return TCacheValue
+     */
+    public function rememberIf(bool $condition, $key, $ttl, Closure $callback);
+
+    /**
      * Get an item from the cache, or execute the given Closure and store the result forever.
      *
      * @template TCacheValue
@@ -98,6 +112,19 @@ interface Repository extends CacheInterface
      * @return TCacheValue
      */
     public function rememberForever($key, Closure $callback);
+
+    /**
+     * If condition is true, get an item from the cache, or execute the given Closure and store the result forever,
+     * Otherwise just execute the Closure and not store the result
+     *
+     * @template TCacheValue
+     *
+     * @param  bool  $condition
+     * @param  string  $key
+     * @param  \Closure(): TCacheValue  $callback
+     * @return TCacheValue
+     */
+    public function rememberForeverIf(bool $condition, $key, Closure $callback);
 
     /**
      * Remove an item from the cache.
