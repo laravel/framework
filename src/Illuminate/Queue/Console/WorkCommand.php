@@ -296,12 +296,12 @@ class WorkCommand extends Command
      */
     protected function resolveRunTime()
     {
-        $runTime = number_format((microtime(true) - $this->latestStartedAt) * 1000, 2);
+        $runTime = (microtime(true) - $this->latestStartedAt) * 1000;
 
         if ($runTime > 1000) {
             return CarbonInterval::milliseconds($runTime)->cascade()->forHumans(short: true);
         }
 
-        return $runTime.'ms';
+        return number_format($runTime, 2).'ms';
     }
 }
