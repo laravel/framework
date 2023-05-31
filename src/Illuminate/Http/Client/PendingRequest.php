@@ -478,6 +478,21 @@ class PendingRequest
     }
 
     /**
+     * Set the given query parameters in the request URI.
+     *
+     * @param  array  $parameters
+     * @return $this
+     */
+    public function withQueryParameters(array $parameters)
+    {
+        return tap($this, function () use ($parameters) {
+            $this->options = array_merge_recursive($this->options, [
+                'query' => $parameters,
+            ]);
+        });
+    }
+
+    /**
      * Specify the maximum number of redirects to allow.
      *
      * @param  int  $max

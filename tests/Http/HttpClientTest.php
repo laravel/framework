@@ -722,6 +722,34 @@ class HttpClientTest extends TestCase
         $this->assertSame('https://laravel.com', $responseCookie['Domain']);
     }
 
+    public function testWithQueryParameters()
+    {
+        $this->factory->fake();
+
+        $this->factory->withQueryParameters(
+            ['foo' => 'bar']
+        )->get('https://laravel.com');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'https://laravel.com?foo=bar';
+        });
+    }
+
+    public function testWithQueryParametersAllowsAddingMoreOnRequest()
+    {
+        $this->factory->fake();
+
+        $this->factory->withQueryParameters(
+            ['foo' => 'bar']
+        )->get('https://laravel.com', [
+            'baz' => 'qux',
+        ]);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'https://laravel.com?foo=bar&baz=qux';
+        });
+    }
+
     public function testGetWithArrayQueryParam()
     {
         $this->factory->fake();
