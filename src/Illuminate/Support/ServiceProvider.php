@@ -8,6 +8,7 @@ use Illuminate\Contracts\Foundation\CachesConfiguration;
 use Illuminate\Contracts\Foundation\CachesRoutes;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Database\Eloquent\Factory as ModelFactory;
+use Illuminate\Database\Seeder;
 use Illuminate\View\Compilers\BladeCompiler;
 
 abstract class ServiceProvider
@@ -230,6 +231,21 @@ abstract class ServiceProvider
         $this->callAfterResolving('migrator', function ($migrator) use ($paths) {
             foreach ((array) $paths as $path) {
                 $migrator->path($path);
+            }
+        });
+    }
+
+    /**
+     * Register database Seeder paths.
+     *
+     * @param  array|string  $paths
+     * @return void
+     */
+    protected function loadSeedersFrom($paths)
+    {
+        $this->callAfterResolving(Seeder::class, function ($seeder) use ($paths) {
+            foreach ((array) $paths as $path) {
+                $seeder->path($path);
             }
         });
     }
