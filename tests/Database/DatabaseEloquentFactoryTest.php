@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 use Illuminate\Tests\Database\Fixtures\Models\Money\Price;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -631,6 +632,18 @@ class DatabaseEloquentFactoryTest extends TestCase
     public function test_factory_can_conditionally_execute_code()
     {
         FactoryTestUserFactory::new()
+            ->when(Str::of('a'), function () {
+                $this->assertTrue(true);
+            })
+            ->when(Str::of('0'), function () {
+                $this->assertTrue(true);
+            })
+            ->when(Str::of('1'), function () {
+                $this->assertTrue(true);
+            })
+            ->when(Str::of(''), function () {
+                $this->fail('Unreachable code that has somehow been reached.');
+            })
             ->when(true, function () {
                 $this->assertTrue(true);
             })

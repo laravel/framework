@@ -23,6 +23,7 @@ use Illuminate\Pagination\AbstractPaginator as Paginator;
 use Illuminate\Pagination\Cursor;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -182,7 +183,23 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select * from "users" where "id" = ? and "email" = ?', $builder->toSql());
 
         $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->when(Str::of('a'), $callback)->where('email', 'foo');
+        $this->assertSame('select * from "users" where "id" = ? and "email" = ?', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->when(Str::of('0'), $callback)->where('email', 'foo');
+        $this->assertSame('select * from "users" where "id" = ? and "email" = ?', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->when(Str::of('1'), $callback)->where('email', 'foo');
+        $this->assertSame('select * from "users" where "id" = ? and "email" = ?', $builder->toSql());
+
+        $builder = $this->getBuilder();
         $builder->select('*')->from('users')->when(false, $callback)->where('email', 'foo');
+        $this->assertSame('select * from "users" where "email" = ?', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->when(Str::of(''), $callback)->where('email', 'foo');
         $this->assertSame('select * from "users" where "email" = ?', $builder->toSql());
     }
 
@@ -199,7 +216,23 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select * from "users" where "id" = ? and "email" = ?', $builder->toSql());
 
         $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->when(Str::of('a'), $callback)->where('email', 'foo');
+        $this->assertSame('select * from "users" where "id" = ? and "email" = ?', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->when(Str::of('0'), $callback)->where('email', 'foo');
+        $this->assertSame('select * from "users" where "id" = ? and "email" = ?', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->when(Str::of('1'), $callback)->where('email', 'foo');
+        $this->assertSame('select * from "users" where "id" = ? and "email" = ?', $builder->toSql());
+
+        $builder = $this->getBuilder();
         $builder->select('*')->from('users')->when(false, $callback)->where('email', 'foo');
+        $this->assertSame('select * from "users" where "email" = ?', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->when(Str::of(''), $callback)->where('email', 'foo');
         $this->assertSame('select * from "users" where "email" = ?', $builder->toSql());
     }
 
@@ -223,7 +256,27 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 1, 1 => 'foo'], $builder->getBindings());
 
         $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->when(Str::of('a'), $callback, $default)->where('email', 'foo');
+        $this->assertSame('select * from "users" where "id" = ? and "email" = ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 'foo'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->when(Str::of('0'), $callback, $default)->where('email', 'foo');
+        $this->assertSame('select * from "users" where "id" = ? and "email" = ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 'foo'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->when(Str::of('1'), $callback, $default)->where('email', 'foo');
+        $this->assertSame('select * from "users" where "id" = ? and "email" = ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 'foo'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
         $builder->select('*')->from('users')->when(0, $callback, $default)->where('email', 'foo');
+        $this->assertSame('select * from "users" where "id" = ? and "email" = ?', $builder->toSql());
+        $this->assertEquals([0 => 2, 1 => 'foo'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->when(Str::of(''), $callback, $default)->where('email', 'foo');
         $this->assertSame('select * from "users" where "id" = ? and "email" = ?', $builder->toSql());
         $this->assertEquals([0 => 2, 1 => 'foo'], $builder->getBindings());
     }
