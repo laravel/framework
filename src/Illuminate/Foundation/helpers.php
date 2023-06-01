@@ -251,6 +251,20 @@ if (! function_exists('cache')) {
     }
 }
 
+if (! function_exists('carbon')) {
+    /**
+     * Create a new Carbon instance.
+     *
+     * @param  string|DateTimeInterface|null  $time
+     * @param  \DateTimeZone|string|null  $tz
+     * @return \Illuminate\Support\Carbon
+     */
+    function carbon($time = null, $tz = null)
+    {
+        return Date::parse($time, $tz);
+    }
+}
+
 if (! function_exists('config')) {
     /**
      * Get / set the specified configuration value.
