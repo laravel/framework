@@ -4,6 +4,7 @@ namespace Illuminate\Support\Traits;
 
 use Closure;
 use Illuminate\Support\HigherOrderWhenProxy;
+use Illuminate\Support\Stringable;
 
 trait Conditionable
 {
@@ -30,7 +31,13 @@ trait Conditionable
             return (new HigherOrderWhenProxy($this))->condition($value);
         }
 
-        if ($value) {
+        if (
+            (
+                $value instanceof Stringable
+                && $value->isNotEmpty()
+            )
+            || $value
+        ) {
             return $callback($this, $value) ?? $this;
         } elseif ($default) {
             return $default($this, $value) ?? $this;
