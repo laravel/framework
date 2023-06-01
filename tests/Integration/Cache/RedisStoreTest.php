@@ -45,4 +45,24 @@ class RedisStoreTest extends TestCase
         $this->assertTrue($result);
         $this->assertNan(Cache::store('redis')->get('foo'));
     }
+
+    public function testItMultipleItemsCanBeSetAndRetrieved()
+    {
+        $store = Cache::store('redis');
+        $result = $store->put('foo', 'bar', 10);
+        $resultMany = $store->putMany([
+            'fizz' => 'buz',
+            'quz' => 'baz',
+        ], 10);
+        $this->assertTrue($result);
+        $this->assertTrue($resultMany);
+        $this->assertEquals([
+            'foo' => 'bar',
+            'fizz' => 'buz',
+            'quz' => 'baz',
+            'norf' => null,
+        ], $store->many(['foo', 'fizz', 'quz', 'norf']));
+
+        $this->assertEquals([], $store->many([]));
+    }
 }
