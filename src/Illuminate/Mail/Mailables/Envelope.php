@@ -139,7 +139,7 @@ class Envelope
     public function to(Address|array|string $address, $name = null)
     {
         $this->to = array_merge($this->to, $this->normalizeAddresses(
-            is_string($name) ? [new Address($address, $name)] : Arr::wrap($address),
+            is_string($name) ? [new Address($address, $name)] : $address,
         ));
 
         return $this;
@@ -155,7 +155,7 @@ class Envelope
     public function cc(Address|array|string $address, $name = null)
     {
         $this->cc = array_merge($this->cc, $this->normalizeAddresses(
-            is_string($name) ? [new Address($address, $name)] : Arr::wrap($address),
+            is_string($name) ? [new Address($address, $name)] : $address,
         ));
 
         return $this;
@@ -171,7 +171,7 @@ class Envelope
     public function bcc(Address|array|string $address, $name = null)
     {
         $this->bcc = array_merge($this->bcc, $this->normalizeAddresses(
-            is_string($name) ? [new Address($address, $name)] : Arr::wrap($address),
+            is_string($name) ? [new Address($address, $name)] : $address,
         ));
 
         return $this;
@@ -187,7 +187,7 @@ class Envelope
     public function replyTo(Address|array|string $address, $name = null)
     {
         $this->replyTo = array_merge($this->replyTo, $this->normalizeAddresses(
-            is_string($name) ? [new Address($address, $name)] : Arr::wrap($address),
+            is_string($name) ? [new Address($address, $name)] : $address,
         ));
 
         return $this;
