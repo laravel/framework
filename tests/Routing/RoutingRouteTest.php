@@ -23,6 +23,8 @@ use Illuminate\Routing\Contracts\CallableDispatcher as CallableDispatcherContrac
 use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
 use Illuminate\Routing\Controller;
 use Illuminate\Routing\ControllerDispatcher;
+use Illuminate\Routing\Events\PreparingResponse;
+use Illuminate\Routing\Events\ResponsePrepared;
 use Illuminate\Routing\Events\Routing;
 use Illuminate\Routing\Exceptions\UrlGenerationException;
 use Illuminate\Routing\Middleware\SubstituteBindings;
@@ -2169,11 +2171,45 @@ class RoutingRouteTest extends TestCase
         ], $route->middleware());
     }
 
-    protected function getRouter()
+    public function testItDispatchesEventsWhilePreparingRequest()
     {
+        $events = new Dispatcher;
+        $preparing = [];
+        $prepared = [];
+        $events->listen(PreparingResponse::class, function ($event) use (&$preparing) {
+            $preparing[] = $event;
+        });
+        $events->listen(ResponsePrepared::class, function ($event) use (&$prepared) {
+            $prepared[] = $event;
+        });
         $container = new Container;
+        $container->instance(Dispatcher::class, $events);
+        $router = $this->getRouter($container);
+        $router->get('foo/bar', function () {
+            return 'hello';
+        });
+        $request = Request::create('foo/bar', 'GET');
 
-        $router = new Router(new Dispatcher, $container);
+        $response = $router->dispatch($request);
+
+        $this->assertSame('hello', $response->getContent());
+        $this->assertCount(2, $preparing);
+        $this->assertSame($request, $preparing[0]->request);
+        $this->assertSame('hello', $preparing[0]->response);
+        $this->assertSame($request, $preparing[1]->request);
+        $this->assertSame($response, $preparing[1]->response);
+        $this->assertCount(2, $prepared);
+        $this->assertSame($request, $prepared[0]->request);
+        $this->assertSame($response, $prepared[0]->response);
+        $this->assertSame($request, $prepared[1]->request);
+        $this->assertSame($response, $prepared[1]->response);
+    }
+
+    protected function getRouter($container = null)
+    {
+        $container ??= new Container;
+
+        $router = new Router($container->make(Dispatcher::class), $container);
 
         $container->singleton(Registrar::class, function () use ($router) {
             return $router;

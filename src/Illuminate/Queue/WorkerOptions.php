@@ -7,7 +7,7 @@ class WorkerOptions
     /**
      * The name of the worker.
      *
-     * @var int
+     * @var string
      */
     public $name;
 

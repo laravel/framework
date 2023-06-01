@@ -72,6 +72,36 @@ trait AssertsStatusCodes
     }
 
     /**
+     * Assert that the response has a 304 "Not Modified" status code.
+     *
+     * @return $this
+     */
+    public function assertNotModified()
+    {
+        return $this->assertStatus(304);
+    }
+
+    /**
+     * Assert that the response has a 307 "Temporary Redirect" status code.
+     *
+     * @return $this
+     */
+    public function assertTemporaryRedirect()
+    {
+        return $this->assertStatus(307);
+    }
+
+    /**
+     * Assert that the response has a 308 "Permanent Redirect" status code.
+     *
+     * @return $this
+     */
+    public function assertPermanentRedirect()
+    {
+        return $this->assertStatus(308);
+    }
+
+    /**
      * Assert that the response has a 400 "Bad Request" status code.
      *
      * @return $this
@@ -129,6 +159,16 @@ trait AssertsStatusCodes
     public function assertMethodNotAllowed()
     {
         return $this->assertStatus(405);
+    }
+
+    /**
+     * Assert that the response has a 406 "Not Acceptable" status code.
+     *
+     * @return $this
+     */
+    public function assertNotAcceptable()
+    {
+        return $this->assertStatus(406);
     }
 
     /**

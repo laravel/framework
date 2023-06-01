@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Database;
 use BadMethodCallException;
 use Closure;
 use DateTime;
+use Illuminate\Contracts\Database\Query\ConditionExpression;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Query\Builder;
@@ -1831,6 +1832,22 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->select(['category', new Raw('count(*) as "total"')])->from('item')->where('department', '=', 'popular')->groupBy('category')->havingNotNull('total');
         $this->assertSame('select "category", count(*) as "total" from "item" where "department" = ? group by "category" having "total" is not null', $builder->toSql());
+    }
+
+    public function testHavingExpression()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->having(
+            new class() implements ConditionExpression
+            {
+                public function getValue(\Illuminate\Database\Grammar $grammar)
+                {
+                    return '1 = 1';
+                }
+            }
+        );
+        $this->assertSame('select * from "users" having 1 = 1', $builder->toSql());
+        $this->assertSame([], $builder->getBindings());
     }
 
     public function testHavingShortcut()
@@ -5074,6 +5091,22 @@ SQL;
             'cursorName' => $cursorName,
             'parameters' => ['created_at', 'id'],
         ]), $result);
+    }
+
+    public function testWhereExpression()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('orders')->where(
+            new class() implements ConditionExpression
+            {
+                public function getValue(\Illuminate\Database\Grammar $grammar)
+                {
+                    return '1 = 1';
+                }
+            }
+        );
+        $this->assertSame('select * from "orders" where 1 = 1', $builder->toSql());
+        $this->assertSame([], $builder->getBindings());
     }
 
     public function testWhereRowValues()
