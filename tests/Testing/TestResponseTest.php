@@ -819,6 +819,24 @@ class TestResponseTest extends TestCase
         $response->assertGone();
     }
 
+    public function testAssertUnsupportedMediaType()
+    {
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_UNSUPPORTED_MEDIA_TYPE)
+        );
+
+        $response->assertUnsupportedMediaType();
+
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_OK)
+        );
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("Expected response status code [415] but received 200.\nFailed asserting that 415 is identical to 200.");
+
+        $response->assertUnsupportedMediaType();
+    }
+
     public function testAssertTooManyRequests()
     {
         $response = TestResponse::fromBaseResponse(
