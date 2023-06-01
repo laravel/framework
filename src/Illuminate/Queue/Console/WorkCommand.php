@@ -251,7 +251,7 @@ class WorkCommand extends Command
     }
 
     /**
-     * Given a start time, Format the total run time for human readability.
+     * Given a start time, format the total run time for human readability.
      *
      * @param  float  $startTime
      * @return string
