@@ -77,10 +77,10 @@ class Envelope
      * Create a new message envelope instance.
      *
      * @param  \Illuminate\Mail\Mailables\Address|string|null  $from
-     * @param  array  $to
-     * @param  array  $cc
-     * @param  array  $bcc
-     * @param  array  $replyTo
+     * @param  \Illuminate\Mail\Mailables\Address|string|array  $to
+     * @param  \Illuminate\Mail\Mailables\Address|string|array  $cc
+     * @param  \Illuminate\Mail\Mailables\Address|string|array  $bcc
+     * @param  \Illuminate\Mail\Mailables\Address|string|array  $replyTo
      * @param  string|null  $subject
      * @param  array  $tags
      * @param  array  $metadata
@@ -103,9 +103,9 @@ class Envelope
     }
 
     /**
-     * Normalize the given array of addresses.
+     * Normalize the given address(es).
      *
-     * @param  array  $addresses
+     * @param  \Illuminate\Mail\Mailables\Address|string|array  $addresses
      * @return array
      */
     protected function normalizeAddresses($addresses)
