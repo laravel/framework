@@ -74,7 +74,7 @@ class RedisStore extends TaggableStore implements LockProvider
      */
     public function many(array $keys)
     {
-       if (count($keys) === 0) {
+        if (count($keys) === 0) {
             return [];
         }
 
