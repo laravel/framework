@@ -2,10 +2,11 @@
 
 namespace Illuminate\Validation\Rules;
 
-use Illuminate\Contracts\Validation\Rule;
+use Closure;
+use Illuminate\Contracts\Validation\ValidationRule;
 use TypeError;
 
-class Enum implements Rule
+class Enum implements ValidationRule
 {
     /**
      * The type of the enum.
@@ -26,40 +27,28 @@ class Enum implements Rule
     }
 
     /**
-     * Determine if the validation rule passes.
+     * Run the validation rule.
      *
-     * @param  string  $attribute
-     * @param  mixed  $value
-     * @return bool
+     * @param  \Closure(string): \Illuminate\Translation\PotentiallyTranslatedString  $fail
      */
-    public function passes($attribute, $value)
+    public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if ($value instanceof $this->type) {
-            return true;
-        }
-
-        if (is_null($value) || ! enum_exists($this->type) || ! method_exists($this->type, 'tryFrom')) {
-            return false;
+            return;
         }
 
         try {
-            return ! is_null($this->type::tryFrom($value));
+            $enum = enum_exists($this->type) ? $this->type : null;
+
+            if ($enum === null || ! method_exists($enum, 'tryFrom') || is_null($enum::tryFrom($value))) {
+                $fail('validation.enum')->translate([
+                    'value' => $value,
+                ]);
+            }
         } catch (TypeError) {
-            return false;
+            $fail('validation.enum')->translate([
+                'value' => $value,
+            ]);
         }
-    }
-
-    /**
-     * Get the validation error message.
-     *
-     * @return array
-     */
-    public function message()
-    {
-        $message = trans('validation.enum');
-
-        return $message === 'validation.enum'
-            ? ['The selected :attribute is invalid.']
-            : $message;
     }
 }
