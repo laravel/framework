@@ -217,7 +217,7 @@ class WorkCommand extends Command
             return $this->output->writeln(' <fg=yellow;options=bold>RUNNING</>');
         }
 
-        $runTime = $this->resolveRunTime();
+        $runTime = $this->formatRunTime($this->latestStartedAt);
 
         $dots = max(terminal()->width() - mb_strlen($job->resolveName()) - (
             $this->output->isVerbose() ? (mb_strlen($job->getJobId()) + 1) : 0
@@ -248,6 +248,21 @@ class WorkCommand extends Command
         }
 
         return Carbon::now();
+    }
+
+    /**
+     * Given a start time, Format the total run time for human readability.
+     *
+     * @param  float  $startTime
+     * @return string
+     */
+    protected function formatRunTime($startTime)
+    {
+        $runTime = (microtime(true) - $startTime) * 1000;
+
+        return $runTime > 1000
+            ? CarbonInterval::milliseconds($runTime)->cascade()->forHumans(short: true)
+            : number_format($runTime, 2).'ms';
     }
 
     /**
@@ -287,21 +302,5 @@ class WorkCommand extends Command
     protected function downForMaintenance()
     {
         return $this->option('force') ? false : $this->laravel->isDownForMaintenance();
-    }
-
-    /**
-     * Format the worked runtime for human readability.
-     *
-     * @return string
-     */
-    protected function resolveRunTime()
-    {
-        $runTime = (microtime(true) - $this->latestStartedAt) * 1000;
-
-        if ($runTime > 1000) {
-            return CarbonInterval::milliseconds($runTime)->cascade()->forHumans(short: true);
-        }
-
-        return number_format($runTime, 2).'ms';
     }
 }
