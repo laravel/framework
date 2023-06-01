@@ -4,6 +4,7 @@ namespace Illuminate\Validation\Rules;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
+use TypeError;
 
 class Enum implements ValidationRule
 {
@@ -36,17 +37,15 @@ class Enum implements ValidationRule
             return;
         }
 
-        $enum = enum_exists($this->type) ? $this->type : null;
+        try {
+            $enum = enum_exists($this->type) ? $this->type : null;
 
-        if ($enum === null || ! method_exists($enum, 'tryFrom')) {
-            $fail('validation.enum')->translate([
-                'value' => $value,
-            ]);
-        }
-
-        $result = $enum::tryFrom($value);
-
-        if ($result === null) {
+            if ($enum === null || ! method_exists($enum, 'tryFrom') || is_null($enum::tryFrom($value))) {
+                $fail('validation.enum')->translate([
+                    'value' => $value,
+                ]);
+            }
+        } catch (TypeError) {
             $fail('validation.enum')->translate([
                 'value' => $value,
             ]);
