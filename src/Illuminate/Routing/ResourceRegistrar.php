@@ -2,6 +2,7 @@
 
 namespace Illuminate\Routing;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 class ResourceRegistrar
@@ -620,6 +621,12 @@ class ResourceRegistrar
             $action['middleware'] = $options['middleware'];
         }
 
+        if (isset($options['abilities'])) {
+            foreach ($this->getAbilityMiddleware($resource, $method, $options['abilities']) as $abilityMiddleware) {
+                $action['middleware'][] = $abilityMiddleware;
+            }
+        }
+
         if (isset($options['excluded_middleware'])) {
             $action['excluded_middleware'] = $options['excluded_middleware'];
         }
@@ -633,6 +640,33 @@ class ResourceRegistrar
         }
 
         return $action;
+    }
+
+    /**
+     * Compose the ability middleware for a resource route.
+     *
+     * @param  string  $resource
+     * @param  string  $method
+     * @param  array  $abilities
+     * @return array
+     */
+    protected function getAbilityMiddleware($resource, $method, $abilities = [])
+    {
+        if (! isset($abilities[$method])) {
+            return [];
+        }
+
+        $middleware = [];
+
+        foreach (Arr::wrap($abilities[$method]) as $ability) {
+            if (! str_starts_with($ability, 'can:')) {
+                $ability = "can:$ability,$resource";
+            }
+
+            $middleware[] = $ability;
+        }
+
+        return $middleware;
     }
 
     /**

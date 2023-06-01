@@ -8,6 +8,10 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
+use Illuminate\Tests\Routing\fixtures\Models\FooModel;
+use Illuminate\Tests\Routing\fixtures\Models\PartialFooModel;
+use Illuminate\Tests\Routing\fixtures\Policies\FooModelPolicy;
+use Illuminate\Tests\Routing\fixtures\Policies\PartialFooModelPolicy;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Stringable;
@@ -156,6 +160,256 @@ class RouteRegistrarTest extends TestCase
         foreach ($this->router->getRoutes() as $route) {
             $this->assertTrue($route->allowsTrashedBindings());
         }
+    }
+
+    public function testResourceAuthorized()
+    {
+        $this->router->resource('users', RouteRegistrarControllerStub::class)
+            ->authorize();
+
+        $this->assertEquals([
+            'can:viewAny,users',
+        ], $this->router->getRoutes()->getByName('users.index')->middleware());
+
+        $this->assertEquals([
+            'can:view,users',
+        ], $this->router->getRoutes()->getByName('users.show')->middleware());
+
+        $this->assertEquals([
+            'can:create,users',
+        ], $this->router->getRoutes()->getByName('users.create')->middleware());
+
+        $this->assertEquals([
+            'can:create,users',
+        ], $this->router->getRoutes()->getByName('users.store')->middleware());
+
+        $this->assertEquals([
+            'can:update,users',
+        ], $this->router->getRoutes()->getByName('users.edit')->middleware());
+
+        $this->assertEquals([
+            'can:update,users',
+        ], $this->router->getRoutes()->getByName('users.update')->middleware());
+
+        $this->assertEquals([
+            'can:delete,users',
+        ], $this->router->getRoutes()->getByName('users.destroy')->middleware());
+    }
+
+    public function testResourceAuthorizedUsingMethods()
+    {
+        $this->router->resource('users', RouteRegistrarControllerStub::class)
+            ->authorize(['show', 'edit', 'destroy']);
+
+        $this->assertEquals([
+            'can:view,users',
+        ], $this->router->getRoutes()->getByName('users.show')->middleware());
+
+        $this->assertEquals([
+            'can:update,users',
+        ], $this->router->getRoutes()->getByName('users.edit')->middleware());
+
+        $this->assertEquals([
+            'can:delete,users',
+        ], $this->router->getRoutes()->getByName('users.destroy')->middleware());
+
+        $this->assertEmpty($this->router->getRoutes()->getByName('users.index')->middleware());
+        $this->assertEmpty($this->router->getRoutes()->getByName('users.create')->middleware());
+        $this->assertEmpty($this->router->getRoutes()->getByName('users.update')->middleware());
+    }
+
+    public function testResourceAuthorizedUsingMethodsAsArray()
+    {
+        $this->router->resource('users', RouteRegistrarControllerStub::class)
+            ->authorize(['show', 'edit', 'destroy']);
+
+        $this->assertEquals([
+            'can:view,users',
+        ], $this->router->getRoutes()->getByName('users.show')->middleware());
+
+        $this->assertEquals([
+            'can:update,users',
+        ], $this->router->getRoutes()->getByName('users.edit')->middleware());
+
+        $this->assertEquals([
+            'can:delete,users',
+        ], $this->router->getRoutes()->getByName('users.destroy')->middleware());
+
+        $this->assertEmpty($this->router->getRoutes()->getByName('users.index')->middleware());
+        $this->assertEmpty($this->router->getRoutes()->getByName('users.create')->middleware());
+        $this->assertEmpty($this->router->getRoutes()->getByName('users.update')->middleware());
+    }
+
+    public function testResourceAuthorizedUsingAbilities()
+    {
+        $this->router->resource('users', RouteRegistrarControllerStub::class)
+            ->authorize('view', 'create', 'delete');
+
+        $this->assertEquals([
+            'can:view,users',
+        ], $this->router->getRoutes()->getByName('users.show')->middleware());
+
+        $this->assertEquals([
+            'can:create,users',
+        ], $this->router->getRoutes()->getByName('users.create')->middleware());
+
+        $this->assertEquals([
+            'can:create,users',
+        ], $this->router->getRoutes()->getByName('users.store')->middleware());
+
+        $this->assertEquals([
+            'can:delete,users',
+        ], $this->router->getRoutes()->getByName('users.destroy')->middleware());
+
+        $this->assertEmpty($this->router->getRoutes()->getByName('users.index')->middleware());
+        $this->assertEmpty($this->router->getRoutes()->getByName('users.edit')->middleware());
+        $this->assertEmpty($this->router->getRoutes()->getByName('users.update')->middleware());
+    }
+
+    public function testResourceAuthorizedUsingAbilitiesAsArray()
+    {
+        $this->router->resource('users', RouteRegistrarControllerStub::class)
+            ->authorize(['view', 'create', 'delete']);
+
+        $this->assertEquals([
+            'can:view,users',
+        ], $this->router->getRoutes()->getByName('users.show')->middleware());
+
+        $this->assertEquals([
+            'can:create,users',
+        ], $this->router->getRoutes()->getByName('users.create')->middleware());
+
+        $this->assertEquals([
+            'can:create,users',
+        ], $this->router->getRoutes()->getByName('users.store')->middleware());
+
+        $this->assertEquals([
+            'can:delete,users',
+        ], $this->router->getRoutes()->getByName('users.destroy')->middleware());
+
+        $this->assertEmpty($this->router->getRoutes()->getByName('users.index')->middleware());
+        $this->assertEmpty($this->router->getRoutes()->getByName('users.edit')->middleware());
+        $this->assertEmpty($this->router->getRoutes()->getByName('users.update')->middleware());
+    }
+
+    public function testResourceAuthorizedUsingModelWithFullPolicy()
+    {
+        $this->router->resource('users', RouteRegistrarControllerStub::class)
+            ->authorize(FooModel::class);
+
+        $this->assertEquals([
+            'can:viewAny,users',
+        ], $this->router->getRoutes()->getByName('users.index')->middleware());
+
+        $this->assertEquals([
+            'can:view,users',
+        ], $this->router->getRoutes()->getByName('users.show')->middleware());
+
+        $this->assertEquals([
+            'can:create,users',
+        ], $this->router->getRoutes()->getByName('users.create')->middleware());
+
+        $this->assertEquals([
+            'can:create,users',
+        ], $this->router->getRoutes()->getByName('users.store')->middleware());
+
+        $this->assertEquals([
+            'can:update,users',
+        ], $this->router->getRoutes()->getByName('users.edit')->middleware());
+
+        $this->assertEquals([
+            'can:update,users',
+        ], $this->router->getRoutes()->getByName('users.update')->middleware());
+
+        $this->assertEquals([
+            'can:delete,users',
+        ], $this->router->getRoutes()->getByName('users.destroy')->middleware());
+    }
+
+    public function testResourceAuthorizedUsingFullPolicy()
+    {
+        $this->router->resource('users', RouteRegistrarControllerStub::class)
+            ->authorize(FooModelPolicy::class);
+
+        $this->assertEquals([
+            'can:viewAny,users',
+        ], $this->router->getRoutes()->getByName('users.index')->middleware());
+
+        $this->assertEquals([
+            'can:view,users',
+        ], $this->router->getRoutes()->getByName('users.show')->middleware());
+
+        $this->assertEquals([
+            'can:create,users',
+        ], $this->router->getRoutes()->getByName('users.create')->middleware());
+
+        $this->assertEquals([
+            'can:create,users',
+        ], $this->router->getRoutes()->getByName('users.store')->middleware());
+
+        $this->assertEquals([
+            'can:update,users',
+        ], $this->router->getRoutes()->getByName('users.edit')->middleware());
+
+        $this->assertEquals([
+            'can:update,users',
+        ], $this->router->getRoutes()->getByName('users.update')->middleware());
+
+        $this->assertEquals([
+            'can:delete,users',
+        ], $this->router->getRoutes()->getByName('users.destroy')->middleware());
+    }
+
+    public function testResourceAuthorizedUsingModelWithPartialPolicy()
+    {
+        $this->router->resource('users', RouteRegistrarControllerStub::class)
+            ->authorize(PartialFooModel::class);
+
+        $this->assertEquals([
+            'can:view,users',
+        ], $this->router->getRoutes()->getByName('users.show')->middleware());
+
+        $this->assertEquals([
+            'can:create,users',
+        ], $this->router->getRoutes()->getByName('users.create')->middleware());
+
+        $this->assertEquals([
+            'can:create,users',
+        ], $this->router->getRoutes()->getByName('users.store')->middleware());
+
+        $this->assertEquals([
+            'can:delete,users',
+        ], $this->router->getRoutes()->getByName('users.destroy')->middleware());
+
+        $this->assertEmpty($this->router->getRoutes()->getByName('users.index')->middleware());
+        $this->assertEmpty($this->router->getRoutes()->getByName('users.edit')->middleware());
+        $this->assertEmpty($this->router->getRoutes()->getByName('users.update')->middleware());
+    }
+
+    public function testResourceAuthorizedUsingPartialPolicy()
+    {
+        $this->router->resource('users', RouteRegistrarControllerStub::class)
+            ->authorize(PartialFooModelPolicy::class);
+
+        $this->assertEquals([
+            'can:view,users',
+        ], $this->router->getRoutes()->getByName('users.show')->middleware());
+
+        $this->assertEquals([
+            'can:create,users',
+        ], $this->router->getRoutes()->getByName('users.create')->middleware());
+
+        $this->assertEquals([
+            'can:create,users',
+        ], $this->router->getRoutes()->getByName('users.store')->middleware());
+
+        $this->assertEquals([
+            'can:delete,users',
+        ], $this->router->getRoutes()->getByName('users.destroy')->middleware());
+
+        $this->assertEmpty($this->router->getRoutes()->getByName('users.index')->middleware());
+        $this->assertEmpty($this->router->getRoutes()->getByName('users.edit')->middleware());
+        $this->assertEmpty($this->router->getRoutes()->getByName('users.update')->middleware());
     }
 
     public function testFallbackRoute()

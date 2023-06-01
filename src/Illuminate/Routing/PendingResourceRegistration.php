@@ -2,8 +2,12 @@
 
 namespace Illuminate\Routing;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Macroable;
+use ReflectionClass;
+use ReflectionMethod;
 
 class PendingResourceRegistration
 {
@@ -241,6 +245,31 @@ class PendingResourceRegistration
     }
 
     /**
+     * Specify the policy to be used for authorizing requests.
+     *
+     * @param  class-string|string|array<string>  $classOrAbilities
+     * @return \Illuminate\Routing\PendingResourceRegistration
+     */
+    public function authorize($classOrAbilities = [])
+    {
+        if (empty($classOrAbilities)) {
+            $this->options['abilities'] = $this->resourceAbilityMap();
+
+            return $this;
+        }
+
+        $abilities = is_string($classOrAbilities) && $this->isClassName($classOrAbilities)
+                ? $this->resolveAbilitiesFor($classOrAbilities)
+                : $this->resolveAbilities(
+                    is_array($classOrAbilities) ? $classOrAbilities : func_get_args()
+                );
+
+        $this->options['abilities'] = $abilities;
+
+        return $this;
+    }
+
+    /**
      * Register the resource route.
      *
      * @return \Illuminate\Routing\RouteCollection
@@ -252,6 +281,137 @@ class PendingResourceRegistration
         return $this->registrar->register(
             $this->name, $this->controller, $this->options
         );
+    }
+
+    /**
+     * Get the abilities that are available for the given class.
+     *
+     * @param  class-string  $class
+     * @return array
+     */
+    protected function resolveAbilitiesFor($class)
+    {
+        $policy = $this->getPolicyFor($class)[0];
+
+        if (! class_exists($policy)) {
+            return [];
+        }
+
+        $abilities = [];
+
+        $reflectionMethods = (new ReflectionClass($policy))
+            ->getMethods(ReflectionMethod::IS_PUBLIC);
+
+        $policyMethods = collect($reflectionMethods)
+            ->reject(fn ($method) => str_starts_with($method->name, '__'))
+            ->map(fn ($method) => $method->name)
+            ->all();
+
+        foreach ($this->resourceAbilityMap() as $method => $ability) {
+            if (! in_array($ability, $policyMethods)) {
+                continue;
+            }
+
+            $abilities[$method] = $ability;
+        }
+
+        return $abilities;
+    }
+
+    /**
+     * Resolves the abilities for the given input.
+     *
+     * @param  array<string>  $input
+     * @return array
+     */
+    protected function resolveAbilities($input)
+    {
+        $abilities = [];
+
+        foreach ($this->resourceAbilityMap() as $method => $ability) {
+            if (in_array($method, $input)) {
+                $abilities[$method] = $ability;
+
+                continue;
+            }
+
+            if (! in_array($ability, $input)) {
+                continue;
+            }
+
+            $abilities[$method] = $ability;
+        }
+
+        return $abilities;
+    }
+
+    /**
+     * Get a policy instance for a given class.
+     *
+     * @param  string  $class
+     * @return mixed
+     */
+    protected function getPolicyFor($class)
+    {
+        if (strpos($class, 'Policy')) {
+            return Arr::wrap($class);
+        }
+
+        return $this->guessPolicyName($class) ?: [];
+    }
+
+    /**
+     * Guess the policy name for the given class.
+     *
+     * @param  string  $class
+     * @return array
+     */
+    protected function guessPolicyName($class)
+    {
+        $classDirname = str_replace('/', '\\', dirname(str_replace('\\', '/', $class)));
+
+        $classDirnameSegments = explode('\\', $classDirname);
+
+        if (Arr::last($classDirnameSegments) === 'Models') {
+            array_pop($classDirnameSegments);
+        }
+
+        return Arr::wrap(Collection::times(count($classDirnameSegments), function ($index) use ($class, $classDirnameSegments) {
+            $classDirname = implode('\\', array_slice($classDirnameSegments, 0, $index));
+
+            return $classDirname.'\\Policies\\'.class_basename($class).'Policy';
+        })->reverse()->values()->first(function ($class) {
+            return class_exists($class);
+        }) ?: [$classDirname.'\\Policies\\'.class_basename($class).'Policy']);
+    }
+
+    /**
+     * Get the map of resource methods to ability names.
+     *
+     * @return array
+     */
+    protected function resourceAbilityMap()
+    {
+        return [
+            'index' => 'viewAny',
+            'show' => 'view',
+            'create' => 'create',
+            'store' => 'create',
+            'edit' => 'update',
+            'update' => 'update',
+            'destroy' => 'delete',
+        ];
+    }
+
+    /**
+     * Checks if the given string looks like a fully qualified class name.
+     *
+     * @param  string  $value
+     * @return bool
+     */
+    protected function isClassName($value)
+    {
+        return str_contains($value, '\\');
     }
 
     /**
