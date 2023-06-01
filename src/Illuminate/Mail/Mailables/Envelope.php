@@ -110,7 +110,7 @@ class Envelope
      */
     protected function normalizeAddresses($addresses)
     {
-        return collect($addresses)->map(function ($address) {
+        return collect(Arr::wrap($addresses))->map(function ($address) {
             return is_string($address) ? new Address($address) : $address;
         })->all();
     }
