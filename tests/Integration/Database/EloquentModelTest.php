@@ -94,6 +94,26 @@ class EloquentModelTest extends DatabaseTestCase
         $user->save();
         $this->assertFalse($user->wasChanged());
     }
+
+    public function testIsNotDirtyOnSaved()
+    {
+        $user = TestModel2::create([
+            'name' => 'Soren Kierkegaard', 'title' => 'Either/Or',
+        ]);
+
+        TestModel1::saving(function(TestModel2 $model) {
+            $this->assertTrue($model->isDirty('title'));
+            $this->assertFalse($model->wasChanged('title'));
+        });
+        TestModel1::saved(function(TestModel2 $model) {
+            $this->assertFalse($model->isDirty('title'));
+            $this->assertTrue($model->wasChanged('title'));
+        });
+
+        $user->title = 'Fear And Trembling';
+
+        $user->save();
+    }
 }
 
 class TestModel1 extends Model
