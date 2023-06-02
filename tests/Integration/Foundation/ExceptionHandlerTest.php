@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Foundation;
 
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\Access\Response;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Support\Facades\Route;
 use Orchestra\Testbench\TestCase;
 use Symfony\Component\Process\PhpProcess;
@@ -150,5 +151,40 @@ EOF, __DIR__.'/../../../', ['APP_RUNNING_IN_CONSOLE' => true]);
     {
         yield 'Throw exception' => [[Fixtures\Providers\ThrowUncaughtExceptionServiceProvider::class], false];
         yield 'Do not throw exception' => [[Fixtures\Providers\ThrowExceptionServiceProvider::class], true];
+    }
+
+    public function testUnauthenticatedWebUsersAreRedirectedToLogin()
+    {
+        Route::get('test-route', fn () => throw new AuthenticationException);
+        Route::get('login', fn() => ':)')->name('login');
+
+        $this->get('test-route')
+            ->assertStatus(302)
+            ->assertRedirect('login');
+    }
+
+    public function testUnauthenticatedUsersAreNotRedirectedIfLoginDoesntExist()
+    {
+        Route::get('test-route', fn () => throw new AuthenticationException);
+
+        $this->assertFalse(Route::has('login'));
+
+        $this->get('test-route')
+            ->assertStatus(401)
+            ->assertSeeText('Unauthenticated.');
+    }
+
+    public function testUnauthenticatedJsonUsersReceiveError()
+    {
+        Route::get('test-route', fn () => throw new AuthenticationException);
+
+        // They should receive JSON even if redirect to `login` is possible.
+        Route::get('login', fn() => ':)')->name('login');
+
+        $this->getJson('test-route')
+            ->assertStatus(401)
+            ->assertExactJson([
+                'message' => 'Unauthenticated.',
+            ]);
     }
 }
