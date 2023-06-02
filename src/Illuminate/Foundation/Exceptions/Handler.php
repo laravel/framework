@@ -486,9 +486,11 @@ class Handler implements ExceptionHandlerContract
      */
     protected function unauthenticated($request, AuthenticationException $exception)
     {
-        return $this->shouldReturnJson($request, $exception)
+        $redirectTo = $exception->redirectTo() ?? (Router::has('login') ? route('login') : null);
+
+        return $this->shouldReturnJson($request, $exception) || !$redirectTo;
                     ? response()->json(['message' => $exception->getMessage()], 401)
-                    : redirect()->guest($exception->redirectTo() ?? route('login'));
+                    : redirect()->guest($redirectTo);
     }
 
     /**
