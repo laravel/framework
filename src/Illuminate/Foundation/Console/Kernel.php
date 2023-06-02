@@ -332,12 +332,15 @@ class Kernel implements KernelContract
         }
 
         $namespace = $this->app->getNamespace();
+        $basePath = $this->app->basePath();
 
-        foreach ((new Finder)->in($paths)->files() as $command) {
-            $command = $namespace.str_replace(
-                ['/', '.php'],
-                ['\\', ''],
-                Str::after($command->getRealPath(), realpath(app_path()).DIRECTORY_SEPARATOR)
+        foreach ((new Finder())->in($paths)->files() as $file) {
+            $class = trim(Str::replaceFirst($basePath, '', $file->getRealPath()), DIRECTORY_SEPARATOR);
+
+            $command = str_replace(
+                [DIRECTORY_SEPARATOR, ucfirst(basename($this->app->path())).'\\'],
+                ['\\', $namespace],
+                ucfirst(Str::replaceLast('.php', '', $class)),
             );
 
             if (is_subclass_of($command, Command::class) &&
