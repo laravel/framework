@@ -185,7 +185,7 @@ class UrlGenerator implements UrlGeneratorContract
      *
      * @return string|null
      */
-    protected function getPreviousUrlFromSession()
+    public function getPreviousUrlFromSession()
     {
         $session = $this->getSession();
 
