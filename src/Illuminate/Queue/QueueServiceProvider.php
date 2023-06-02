@@ -257,15 +257,21 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
                     $config['limit'] ?? 100,
                     fn () => $app['cache']->store('file'),
                 );
-            } elseif (isset($config['driver']) && $config['driver'] === 'dynamodb') {
-                return $this->dynamoFailedJobProvider($config);
-            } elseif (isset($config['driver']) && $config['driver'] === 'database-uuids') {
-                return $this->databaseUuidFailedJobProvider($config);
-            } elseif (isset($config['table'])) {
-                return $this->databaseFailedJobProvider($config);
-            } else {
-                return new NullFailedJobProvider;
             }
+
+            if (isset($config['driver']) && $config['driver'] === 'dynamodb') {
+                return $this->dynamoFailedJobProvider($config);
+            }
+
+            if (isset($config['driver']) && $config['driver'] === 'database-uuids') {
+                return $this->databaseUuidFailedJobProvider($config);
+            }
+
+            if (isset($config['table'])) {
+                return $this->databaseFailedJobProvider($config);
+            }
+
+            return new NullFailedJobProvider;
         });
     }
 
