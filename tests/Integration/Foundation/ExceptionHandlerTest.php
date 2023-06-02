@@ -158,7 +158,7 @@ EOF, __DIR__.'/../../../', ['APP_RUNNING_IN_CONSOLE' => true]);
     public function testUnauthenticatedWebUsersAreRedirectedToLogin()
     {
         Route::get('test-route', fn () => throw new AuthenticationException);
-        Route::get('login', fn() => ':)')->name('login');
+        Route::get('login', fn () => ':)')->name('login');
 
         $this->get('test-route')
             ->assertStatus(302)
@@ -181,7 +181,7 @@ EOF, __DIR__.'/../../../', ['APP_RUNNING_IN_CONSOLE' => true]);
         Route::get('test-route', fn () => throw new AuthenticationException);
 
         // They should receive JSON even if redirect to `login` is possible.
-        Route::get('login', fn() => ':)')->name('login');
+        Route::get('login', fn () => ':)')->name('login');
 
         $this->getJson('test-route')
             ->assertStatus(401)
