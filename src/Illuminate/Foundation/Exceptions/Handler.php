@@ -517,7 +517,7 @@ class Handler implements ExceptionHandlerContract
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Illuminate\Validation\ValidationException  $exception
-     * @return \Illuminate\Http\Response
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function invalid($request, ValidationException $exception)
     {
@@ -531,7 +531,7 @@ class Handler implements ExceptionHandlerContract
     /**
      * Convert a validation exception into a redirect response.
      */
-    protected function invalidRedirect(Request $request, ValidationException $exception, string $redirectTo): Response
+    protected function invalidRedirect(Request $request, ValidationException $exception, string $redirectTo): RedirectResponse
     {
         return redirect($redirectTo)
                 ->withInput(Arr::except($request->input(), $this->dontFlash))
