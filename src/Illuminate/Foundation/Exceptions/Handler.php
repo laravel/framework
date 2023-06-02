@@ -18,6 +18,7 @@ use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Exceptions\BackedEnumCaseNotFoundException;
 use Illuminate\Routing\Router;
@@ -523,10 +524,18 @@ class Handler implements ExceptionHandlerContract
         $redirectTo = $exception->redirectTo ?? url()->getPreviousUrlFromSession();
 
         return $redirectTo
-            ? redirect($redirectTo)
-                ->withInput(Arr::except($request->input(), $this->dontFlash))
-                ->withErrors($exception->errors(), $request->input('_error_bag', $exception->errorBag))
+            ? $this->invalidRedirect($request, $exception, $redirectTo)
             : $this->invalidJson($request, $e);
+    }
+
+    /**
+     * Convert a validation exception into a redirect response.
+     */
+    protected function invalidRedirect(Request $request, ValidationException $exception, string $redirectTo): Response
+    {
+        return redirect($redirectTo)
+                ->withInput(Arr::except($request->input(), $this->dontFlash))
+                ->withErrors($exception->errors(), $request->input('_error_bag', $exception->errorBag));
     }
 
     /**
