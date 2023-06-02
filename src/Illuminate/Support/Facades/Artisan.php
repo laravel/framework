@@ -9,6 +9,7 @@ use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
  * @method static void terminate(\Symfony\Component\Console\Input\InputInterface $input, int $status)
  * @method static void whenCommandLifecycleIsLongerThan(\DateTimeInterface|\Carbon\CarbonInterval|float|int $threshold, callable $handler)
  * @method static \Illuminate\Support\Carbon|null commandStartedAt()
+ * @method static \Illuminate\Console\Scheduling\Schedule resolveConsoleSchedule()
  * @method static \Illuminate\Foundation\Console\ClosureCommand command(string $signature, \Closure $callback)
  * @method static void registerCommand(\Symfony\Component\Console\Command\Command $command)
  * @method static int call(string $command, array $parameters = [], \Symfony\Component\Console\Output\OutputInterface|null $outputBuffer = null)
