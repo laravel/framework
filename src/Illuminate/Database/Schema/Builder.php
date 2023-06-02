@@ -165,6 +165,22 @@ class Builder
     }
 
     /**
+     * Determine if the given table has a given constraint.
+     *
+     * @param $table
+     * @param $constraint
+     * @return bool
+     */
+    public function hasConstraint($table, $constraint)
+    {
+        $table = $this->connection->getTablePrefix().$table;
+
+        return in_array(
+            strtolower($constraint), $this->getConstraintListing($table)
+        );
+    }
+
+    /**
      * Determine if the given table has a given column.
      *
      * @param  string  $table
@@ -255,6 +271,21 @@ class Builder
         ));
 
         return $this->connection->getPostProcessor()->processColumnListing($results);
+    }
+
+    /**
+     * Get the constraint listing for a given table.
+     *
+     * @param  string  $table
+     * @return array
+     */
+    public function getConstraintListing($table)
+    {
+        $results = $this->connection->selectFromWriteConnection($this->grammar->compileConstraintListing(
+            $this->connection->getTablePrefix().$table
+        ));
+
+        return $this->connection->getPostProcessor()->processConstraintListing($results);
     }
 
     /**
@@ -449,8 +480,8 @@ class Builder
     protected function createBlueprint($table, Closure $callback = null)
     {
         $prefix = $this->connection->getConfig('prefix_indexes')
-                    ? $this->connection->getConfig('prefix')
-                    : '';
+            ? $this->connection->getConfig('prefix')
+            : '';
 
         if (isset($this->resolver)) {
             return call_user_func($this->resolver, $table, $callback, $prefix);

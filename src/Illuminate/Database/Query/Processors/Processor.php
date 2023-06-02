@@ -46,4 +46,15 @@ class Processor
     {
         return $results;
     }
+
+    /**
+     * Process the results of a constraint listing query.
+     *
+     * @param  array  $results
+     * @return array
+     */
+    public function processConstraintListing($results)
+    {
+        return $results;
+    }
 }

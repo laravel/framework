@@ -76,6 +76,16 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Compile the query to determine the list of constraints.
+     *
+     * @return string
+     */
+    public function compileConstraintListing()
+    {
+        return 'select constraint_name from information_schema.key_column_usage where table_name = ?';
+    }
+
+    /**
      * Compile the query to determine the list of columns.
      *
      * @return string

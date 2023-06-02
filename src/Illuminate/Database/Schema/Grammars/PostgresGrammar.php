@@ -79,6 +79,16 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Compile the query to determine the list of constraints.
+     *
+     * @return string
+     */
+    public function compileConstraintListing($table)
+    {
+        return "select conname from pg_catalog.pg_constraint cons join pg_catalog.pg_class t ON t.oid = cons.conrelid WHERE t.relname = {$table}";
+    }
+
+    /**
      * Compile the query to determine the list of columns.
      *
      * @return string

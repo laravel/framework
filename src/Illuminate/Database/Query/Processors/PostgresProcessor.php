@@ -42,4 +42,17 @@ class PostgresProcessor extends Processor
             return ((object) $result)->column_name;
         }, $results);
     }
+
+    /**
+     * Process the results of a constraint listing query.
+     *
+     * @param  array  $results
+     * @return array
+     */
+    public function processConstraintListing($results)
+    {
+        return array_map(function ($result) {
+            return ((object) $result)->conname;
+        }, $results);
+    }
 }

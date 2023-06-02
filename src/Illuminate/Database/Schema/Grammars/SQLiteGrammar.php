@@ -37,6 +37,16 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
+     * Compile the query to determine the list of constraints.
+     *
+     * @throws RuntimeException
+     */
+    public function compileConstraintListing()
+    {
+        throw new RuntimeException('The database driver in use does not support constraints list.');
+    }
+
+    /**
      * Compile the query to determine the list of columns.
      *
      * @param  string  $table
