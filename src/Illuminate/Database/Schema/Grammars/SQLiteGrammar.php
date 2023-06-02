@@ -37,6 +37,16 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
+     * Compile the query to determine the list of constraints.
+     *
+     * @return string
+     */
+    public function compileConstraintListing()
+    {
+        return "select sql from sqlite_master where type = 'table' and name = ?";
+    }
+
+    /**
      * Compile the query to determine the list of columns.
      *
      * @param  string  $table

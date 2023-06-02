@@ -77,6 +77,16 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile the query to determine the list of constraints.
+     *
+     * @return string
+     */
+    public function compileConstraintListing()
+    {
+        return 'select constraint_name from information_schema.table_contraints where table_name = ?;';
+    }
+
+    /**
      * Compile the query to determine the list of columns.
      *
      * @param  string  $table
