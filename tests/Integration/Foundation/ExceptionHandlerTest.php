@@ -6,6 +6,8 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 use Orchestra\Testbench\TestCase;
 use Symfony\Component\Process\PhpProcess;
 
@@ -185,6 +187,44 @@ EOF, __DIR__.'/../../../', ['APP_RUNNING_IN_CONSOLE' => true]);
             ->assertStatus(401)
             ->assertExactJson([
                 'message' => 'Unauthenticated.',
+            ]);
+    }
+
+    public function testInvalidRequestsAreReturnedBackWhenPossible()
+    {
+        $validator = Validator::make([], []);
+        Route::get('test-route', fn () => throw new ValidationException($validator));
+
+        $prevUrl = 'form-page';
+        session()->setPreviousUrl($prevUrl);
+
+        $this->get('test-route')
+            ->assertStatus(302)
+            ->assertRedirect($prevUrl);
+    }
+
+    public function testInvalidRequestsAreReportedIfRedirectImpossible()
+    {
+        $validator = Validator::make([], []);
+        Route::get('test-route', fn () => throw new ValidationException($validator));
+
+        session()->setPreviousUrl(null);
+
+        $this->get('test-route')
+            ->assertStatus(422)
+            ->assertSeeText('invalid');
+    }
+
+    public function testInvalidRequestsAreReportedIfJsonExpected()
+    {
+        $validator = Validator::make([], []);
+        Route::get('test-route', fn () => throw new ValidationException($validator));
+
+        $this->getJson('test-route')
+            ->assertStatus(422)
+            ->assertExactJson([
+                'message' => 'The given data was invalid.',
+                'errors' => [],
             ]);
     }
 }
