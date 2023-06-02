@@ -1,7 +1,9 @@
 <?php
 
+namespace Illuminate\Enums;
+
 /**
- * Enum for all available Http status codes for use in API responses.
+ * Enum for all available http status codes for use in API responses.
  */
 enum HttpStatus: int
 {
