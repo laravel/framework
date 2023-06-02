@@ -490,7 +490,7 @@ class Handler implements ExceptionHandlerContract
     {
         $redirectTo = $exception->redirectTo() ?? (Route::has('login') ? route('login') : null);
 
-        return $this->shouldReturnJson($request, $exception) || !$redirectTo
+        return $this->shouldReturnJson($request, $exception) || ! $redirectTo
                     ? response()->json(['message' => $exception->getMessage()], 401)
                     : redirect()->guest($redirectTo);
     }
