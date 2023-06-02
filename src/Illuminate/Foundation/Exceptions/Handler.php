@@ -373,8 +373,6 @@ class Handler implements ExceptionHandlerContract
      */
     public function render($request, Throwable $e)
     {
-        $e = $this->prepareException($this->mapException($e));
-
         if (method_exists($e, 'render') && $response = $e->render($request)) {
             return Router::toResponse($request, $response);
         }
@@ -382,6 +380,8 @@ class Handler implements ExceptionHandlerContract
         if ($e instanceof Responsable) {
             return $e->toResponse($request);
         }
+
+        $e = $this->prepareException($this->mapException($e));
 
         if ($response = $this->renderViaCallbacks($request, $e)) {
             return $response;
