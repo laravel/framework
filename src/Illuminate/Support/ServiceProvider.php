@@ -8,7 +8,6 @@ use Illuminate\Contracts\Foundation\CachesConfiguration;
 use Illuminate\Contracts\Foundation\CachesRoutes;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Database\Eloquent\Factory as ModelFactory;
-use Illuminate\Support\Str;
 use Illuminate\View\Compilers\BladeCompiler;
 
 abstract class ServiceProvider
