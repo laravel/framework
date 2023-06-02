@@ -338,7 +338,7 @@ class Kernel implements KernelContract
             $class = trim(Str::replaceFirst($basePath, '', $file->getRealPath()), DIRECTORY_SEPARATOR);
 
             $command = str_replace(
-                [DIRECTORY_SEPARATOR, ucfirst(basename(app()->path())).'\\'],
+                [DIRECTORY_SEPARATOR, ucfirst(basename($this->app->path())).'\\'],
                 ['\\', $namespace],
                 ucfirst(Str::replaceLast('.php', '', $class)),
             );
