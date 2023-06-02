@@ -861,6 +861,54 @@ class HttpClientTest extends TestCase
         });
     }
 
+    public function testItMergesMultipleHeaders()
+    {
+        $this->factory->fake();
+
+        $this->factory->withHeaders([
+            'X-Test-Header' => 'foo',
+        ])->withHeaders([
+            'X-Test-Header' => 'bar',
+        ])->withHeaders([
+            'X-Test-Header' => ['baz', 'qux'],
+        ])->post('http://foo.com/json');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/json' &&
+                   $request->hasHeaders(['X-Test-Header' => ['foo', 'bar', 'baz', 'qux']]);
+        });
+    }
+
+    public function testItCanReplaceHeaders()
+    {
+        $this->factory->fake();
+
+        $this->factory->withHeaders([
+            'X-Test-Header' => 'foo',
+        ])->replaceHeaders([
+            'X-Test-Header' => 'baz',
+        ])->post('http://foo.com/json');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/json' &&
+                   $request->hasHeaders(['X-Test-Header' => ['baz']]);
+        });
+    }
+
+    public function testItCanReplaceHeadersWhenNoHeadersYetSet()
+    {
+        $this->factory->fake();
+
+        $this->factory->replaceHeaders([
+            'X-Test-Header' => 'baz',
+        ])->post('http://foo.com/json');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/json' &&
+                   $request->hasHeaders(['X-Test-Header' => ['baz']]);
+        });
+    }
+
     public function testExceptionAccessorOnSuccess()
     {
         $resp = new Response(new Psr7Response());
