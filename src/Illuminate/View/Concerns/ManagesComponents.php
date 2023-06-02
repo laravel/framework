@@ -98,11 +98,13 @@ trait ManagesComponents
 
             if ($view instanceof View) {
                 return $view->with($data)->render();
-            } elseif ($view instanceof Htmlable) {
-                return $view->toHtml();
-            } else {
-                return $this->make($view, $data)->render();
             }
+
+            if ($view instanceof Htmlable) {
+                return $view->toHtml();
+            }
+
+            return $this->make($view, $data)->render();
         } finally {
             $this->currentComponentData = $previousComponentData;
         }
