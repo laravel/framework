@@ -25,6 +25,7 @@ use Illuminate\Routing\Router;
 use Illuminate\Session\TokenMismatchException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Reflector;
 use Illuminate\Support\Traits\ReflectsClosures;
 use Illuminate\Support\ViewErrorBag;
@@ -487,7 +488,7 @@ class Handler implements ExceptionHandlerContract
      */
     protected function unauthenticated($request, AuthenticationException $exception)
     {
-        $redirectTo = $exception->redirectTo() ?? (Router::has('login') ? route('login') : null);
+        $redirectTo = $exception->redirectTo() ?? (Route::has('login') ? route('login') : null);
 
         return $this->shouldReturnJson($request, $exception) || !$redirectTo
                     ? response()->json(['message' => $exception->getMessage()], 401)
