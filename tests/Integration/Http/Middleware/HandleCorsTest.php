@@ -248,7 +248,7 @@ class HandleCorsTest extends TestCase
             'HTTP_ACCESS_CONTROL_REQUEST_METHOD' => 'POST',
         ]);
         $this->assertSame('http://localhost', $crawler->headers->get('Access-Control-Allow-Origin'));
-        $this->assertEquals(302, $crawler->getStatusCode());
+        $this->assertEquals(422, $crawler->getStatusCode());
     }
 
     protected function addWebRoutes(Router $router)
