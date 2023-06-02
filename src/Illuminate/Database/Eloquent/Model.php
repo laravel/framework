@@ -1175,13 +1175,15 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     protected function finishSave(array $options)
     {
-        $this->fireModelEvent('saved', false);
-
-        if ($this->isDirty() && ($options['touch'] ?? true)) {
-            $this->touchOwners();
-        }
+        $wasDirty = $this->isDirty();
 
         $this->syncOriginal();
+
+        $this->fireModelEvent('saved', false);
+
+        if ($wasDirty && ($options['touch'] ?? true)) {
+            $this->touchOwners();
+        }
     }
 
     /**

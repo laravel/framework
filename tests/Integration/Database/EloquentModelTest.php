@@ -101,11 +101,11 @@ class EloquentModelTest extends DatabaseTestCase
             'name' => 'Soren Kierkegaard', 'title' => 'Either/Or',
         ]);
 
-        TestModel1::saving(function(TestModel2 $model) {
+        TestModel1::saving(function (TestModel2 $model) {
             $this->assertTrue($model->isDirty('title'));
             $this->assertFalse($model->wasChanged('title'));
         });
-        TestModel1::saved(function(TestModel2 $model) {
+        TestModel1::saved(function (TestModel2 $model) {
             $this->assertFalse($model->isDirty('title'));
             $this->assertTrue($model->wasChanged('title'));
         });
