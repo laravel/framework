@@ -401,9 +401,9 @@ class PendingRequest
      */
     public function replaceHeaders(array $headers)
     {
-        return tap($this, function () use ($headers) {
-            $this->options['headers'] = array_merge($this->options['headers'] ?? [], $headers);
-        });
+        $this->options['headers'] = array_merge($this->options['headers'] ?? [], $headers);
+
+        return $this;
     }
 
     /**
