@@ -394,6 +394,19 @@ class PendingRequest
     }
 
     /**
+     * Replace the given headers on the request.
+     *
+     * @param  array  $headers
+     * @return $this
+     */
+    public function replaceHeaders(array $headers)
+    {
+        $this->options['headers'] = array_merge($this->options['headers'] ?? [], $headers);
+
+        return $this;
+    }
+
+    /**
      * Specify the basic authentication username and password for the request.
      *
      * @param  string  $username
