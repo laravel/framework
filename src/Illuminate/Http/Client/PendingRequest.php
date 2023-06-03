@@ -394,7 +394,7 @@ class PendingRequest
     }
 
     /**
-     * Replace the given headers for the request.
+     * Replace the given headers on the request.
      *
      * @param  array  $headers
      * @return $this
