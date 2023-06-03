@@ -6,7 +6,6 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
 use Illuminate\Validation\Concerns\ValidatesUsingExceptions;
-use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 use PHPUnit\Framework\TestCase;
 
@@ -14,7 +13,7 @@ class ValidationUsingExceptionsTest extends TestCase
 {
     public function testCanPassEarly()
     {
-        $rule = new class () implements ValidationRule
+        $rule = new class() implements ValidationRule
         {
             public static $reached = [];
 
@@ -37,7 +36,7 @@ class ValidationUsingExceptionsTest extends TestCase
 
     public function testCanFailEarly()
     {
-        $rule = new class () implements ValidationRule
+        $rule = new class() implements ValidationRule
         {
             public static $reached = [];
 

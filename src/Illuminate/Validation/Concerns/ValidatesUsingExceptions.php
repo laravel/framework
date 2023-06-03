@@ -30,7 +30,7 @@ trait ValidatesUsingExceptions
     /**
      * Pass this validation rule. Stop validating and abort immediately.
      *
-     * @throws ValidationRulePassException 
+     * @throws ValidationRulePassException
      */
     public function pass(): never
     {
@@ -40,7 +40,7 @@ trait ValidatesUsingExceptions
     /**
      * Fail this validation rule. Stop validating and abort immediately.
      *
-     * @throws ValidationRuleFailException 
+     * @throws ValidationRuleFailException
      */
     public function fail(string $message): never
     {
