@@ -284,15 +284,15 @@ class Builder implements BuilderContract
      * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  mixed  $operator
      * @param  mixed  $value
-     * @param  string  $boolean
+     * @param  string  $logicalOperator
      * @return $this
      */
-    public function where($column, $operator = null, $value = null, $boolean = 'and')
+    public function where($column, $operator = null, $value = null, $logicalOperator = 'and')
     {
         if ($column instanceof Closure && is_null($operator)) {
             $column($query = $this->model->newQueryWithoutRelationships());
 
-            $this->query->addNestedWhereQuery($query->getQuery(), $boolean);
+            $this->query->addNestedWhereQuery($query->getQuery(), $logicalOperator);
         } else {
             $this->query->where(...func_get_args());
         }
