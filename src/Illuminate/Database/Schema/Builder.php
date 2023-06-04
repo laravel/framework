@@ -362,6 +362,18 @@ class Builder
     }
 
     /**
+     * Drop all stored procedures from the database.
+     *
+     * @return void
+     *
+     * @throws \LogicException
+     */
+    public function dropAllProcedures()
+    {
+        throw new LogicException('This database driver does not support dropping all procedures.');
+    }
+
+    /**
      * Get all of the table names for the database.
      *
      * @return array

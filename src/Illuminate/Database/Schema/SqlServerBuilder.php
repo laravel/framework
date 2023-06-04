@@ -53,6 +53,30 @@ class SqlServerBuilder extends Builder
     }
 
     /**
+     * Drop all procedures from the database.
+     *
+     * @return void
+     */
+    public function dropAllProcedures()
+    {
+        $procedures = [];
+
+        foreach ($this->getAllProcedures() as $row) {
+            $row = (array) $row;
+
+            $procedures[] = $row['routine_name'];
+        }
+
+        if (empty($procedures)) {
+            return;
+        }
+
+        $this->connection->statement(
+            $this->grammar->compileDropAllProcedures($procedures)
+        );
+    }
+
+    /**
      * Drop all tables from the database.
      *
      * @return array
@@ -74,5 +98,27 @@ class SqlServerBuilder extends Builder
         return $this->connection->select(
             $this->grammar->compileGetAllViews()
         );
+    }
+
+    /**
+     * Get all of the procedures names for the database.
+     *
+     * @return array
+     */
+    public function getAllProcedures()
+    {
+        return $this->connection->select(
+            $this->grammar->compileGetAllProcedures($this->getSchema())
+        );
+    }
+
+    /**
+     * Get database schema
+     *
+     * @return string
+     */
+    protected function getSchema()
+    {
+        return $this->connection->getConfig('schema') ?: 'dbo';
     }
 }

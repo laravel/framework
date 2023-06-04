@@ -115,6 +115,27 @@ class MySqlBuilder extends Builder
     }
 
     /**
+     * Drop all procedures from the database.
+     *
+     * @return void
+     */
+    public function dropAllProcedures()
+    {
+        $procedures = $this->getAllProcedures();
+
+        if (empty($procedures)) {
+            return;
+        }
+
+        foreach ($procedures as $row) {
+            $row = (array) $row;
+            $this->connection->statement(
+                $this->grammar->compileDropProcedure($row['ROUTINE_NAME'])
+            );
+        }
+    }
+
+    /**
      * Get all of the table names for the database.
      *
      * @return array
@@ -135,6 +156,18 @@ class MySqlBuilder extends Builder
     {
         return $this->connection->select(
             $this->grammar->compileGetAllViews()
+        );
+    }
+
+    /**
+     * Get all of the procedures names for the database.
+     *
+     * @return array
+     */
+    public function getAllProcedures()
+    {
+        return $this->connection->select(
+            $this->grammar->compileGetAllProcedures($this->connection->getDatabaseName())
         );
     }
 }

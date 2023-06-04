@@ -132,6 +132,30 @@ class PostgresBuilder extends Builder
     }
 
     /**
+     * Drop all stored procedures from the database.
+     *
+     * @return void
+     */
+    public function dropAllProcedures()
+    {
+        $procedures = [];
+
+        foreach ($this->getAllProcedures() as $row) {
+            $row = (array) $row;
+
+            $procedures[] = $row['routine_name'];
+        }
+
+        if (empty($procedures)) {
+            return;
+        }
+
+        $this->connection->statement(
+            $this->grammar->compileDropAllProcedures($procedures)
+        );
+    }
+
+    /**
      * Get all of the table names for the database.
      *
      * @return array
@@ -176,6 +200,18 @@ class PostgresBuilder extends Builder
     }
 
     /**
+     * Get all of the procedures names for the database.
+     *
+     * @return array
+     */
+    public function getAllProcedures()
+    {
+        return $this->connection->select(
+            $this->grammar->compileGetAllProcedures($this->getSchema())
+        );
+    }
+
+    /**
      * Get the column listing for a given table.
      *
      * @param  string  $table
@@ -203,7 +239,7 @@ class PostgresBuilder extends Builder
     protected function parseSchemaAndTable($reference)
     {
         $searchPath = $this->parseSearchPath(
-            $this->connection->getConfig('search_path') ?: $this->connection->getConfig('schema') ?: 'public'
+            $this->connection->getConfig('search_path') ?: $this->getSchema()
         );
 
         $parts = explode('.', $reference);
@@ -244,5 +280,15 @@ class PostgresBuilder extends Builder
                 ? $this->connection->getConfig('username')
                 : $schema;
         }, $this->baseParseSearchPath($searchPath));
+    }
+
+    /**
+     * Get database schema
+     *
+     * @return string
+     */
+    protected function getSchema()
+    {
+        return $this->connection->getConfig('schema') ?: 'public';
     }
 }
