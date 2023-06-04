@@ -195,6 +195,15 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->assertSame('{"response":"My renderable exception response"}', $response);
     }
 
+    public function testReturnsResponseFromMappedRenderableException()
+    {
+        $this->handler->map(RuntimeException::class, RenderableException::class);
+
+        $response = $this->handler->render($this->request, new RuntimeException)->getContent();
+
+        $this->assertSame('{"response":"My renderable exception response"}', $response);
+    }
+
     public function testReturnsCustomResponseWhenExceptionImplementsResponsable()
     {
         $response = $this->handler->render($this->request, new ResponsableException)->getContent();
