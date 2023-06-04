@@ -257,19 +257,18 @@ class ValidationForEachTest extends TestCase
         ], $v->getMessageBag()->toArray());
     }
 
-    public function testConditionalRulesCanBeAddedToForEach()
+    public function testConditionalRulesCanBeAddedToForEachWithAssociativeArray()
     {
-        // as associative array
         $v = new Validator(
-            $translator = $this->getIlluminateArrayTranslator(),
-            $data = [
+            $this->getIlluminateArrayTranslator(),
+            [
                 'foo' => [
                     ['bar' => true],
                     ['bar' => false],
                 ],
             ],
             [
-                'foo.*' => Rule::forEach(fn (mixed $value, string $attribute) => [
+                'foo.*' => Rule::forEach(fn(mixed $value, string $attribute) => [
                     'bar' => Rule::when(true, ['accepted'], ['declined']),
                 ]),
             ]
@@ -278,17 +277,48 @@ class ValidationForEachTest extends TestCase
         $this->assertEquals([
             'foo.1.bar' => ['validation.accepted'],
         ], $v->getMessageBag()->toArray());
+    }
+    public function testConditionalRulesCanBeAddedToForEachWithList()
+    {
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            [
+                'foo' => [
+                    ['bar' => true],
+                    ['bar' => false],
+                ],
+            ],
+            [
+                'foo.*.bar' => Rule::forEach(fn(mixed $value, string $attribute) => [
+                    Rule::when(true, ['accepted'], ['declined']),
+                ]),
+            ]);
 
-        // as list
-        $v2 = new Validator($translator, $data, [
-            'foo.*.bar' => Rule::forEach(fn (mixed $value, string $attribute) => [
+        $this->assertEquals([
+            'foo.1.bar' => ['validation.accepted'],
+        ], $v->getMessageBag()->toArray());
+
+    }
+
+    public function testConditionalRulesCanBeAddedToForEachWithObject()
+    {
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            [
+                'foo' => [
+                    ['bar' => true],
+                    ['bar' => false],
+                ],
+            ],
+            [
+            'foo.*.bar' => Rule::forEach(fn (mixed $value, string $attribute) =>
                 Rule::when(true, ['accepted'], ['declined']),
-            ]),
+            ),
         ]);
 
         $this->assertEquals([
             'foo.1.bar' => ['validation.accepted'],
-        ], $v2->getMessageBag()->toArray());
+        ], $v->getMessageBag()->toArray());
     }
 
     protected function getTranslator()
