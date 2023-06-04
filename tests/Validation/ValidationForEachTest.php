@@ -257,6 +257,28 @@ class ValidationForEachTest extends TestCase
         ], $v->getMessageBag()->toArray());
     }
 
+    public function testConditionalRulesCanBeAddedToForEach()
+    {
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            [
+                'foo' => [
+                    ['bar' => true],
+                    ['bar' => false]
+                ],
+            ],
+            [
+                'foo.*' => Rule::forEach(fn (mixed $value, string $attribute) => [
+                    'bar' => Rule::when(true, ['accepted'], ['declined'])
+                ])
+            ]
+        );
+
+        $this->assertEquals([
+            'foo.1.bar' => ['validation.accepted'],
+        ], $v->getMessageBag()->toArray());
+    }
+
     protected function getTranslator()
     {
         return m::mock(TranslatorContract::class);
