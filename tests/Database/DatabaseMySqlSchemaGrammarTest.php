@@ -1411,6 +1411,13 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame('drop view `alpha`,`beta`,`gamma`', $statement);
     }
 
+    public function testDropProceduresEscapesTableNames()
+    {
+        $statement = $this->getGrammar()->compileDropProcedure('alpha');
+
+        $this->assertSame('drop procedure `alpha`', $statement);
+    }
+
     public function testGrammarsAreMacroable()
     {
         // compileReplace macro.

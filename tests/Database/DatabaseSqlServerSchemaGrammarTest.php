@@ -971,6 +971,13 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         );
     }
 
+    public function testDropAllProceduresEscapesTableNames()
+    {
+        $statement = $this->getGrammar()->compileDropAllProcedures(['alpha', 'beta', 'gamma']);
+
+        $this->assertSame('drop procedure "alpha","beta","gamma"', $statement);
+    }
+
     protected function getConnection()
     {
         return m::mock(Connection::class);
