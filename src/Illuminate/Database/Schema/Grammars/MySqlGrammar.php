@@ -511,6 +511,17 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Compile the SQL needed to drop stored procedure.
+     *
+     * @param  string  $procedure
+     * @return string
+     */
+    public function compileDropProcedure($procedure)
+    {
+        return 'drop procedure '.$this->wrapValue($procedure);
+    }
+
+    /**
      * Compile the SQL needed to retrieve all table names.
      *
      * @return string

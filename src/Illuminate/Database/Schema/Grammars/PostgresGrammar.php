@@ -373,6 +373,17 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Compile the SQL needed to drop all stored procedures.
+     *
+     * @param  array  $procedures
+     * @return string
+     */
+    public function compileDropAllProcedures($procedures)
+    {
+        return 'drop procedure '.implode(',', $this->escapeNames($procedures)).' cascade';
+    }
+
+    /**
      * Compile the SQL needed to retrieve all table names.
      *
      * @param  string|array  $searchPath

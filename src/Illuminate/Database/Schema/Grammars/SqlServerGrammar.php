@@ -478,6 +478,17 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile the SQL needed to drop all stored procedures.
+     *
+     * @param  array  $procedures
+     * @return string
+     */
+    public function compileDropAllProcedures($procedures)
+    {
+        return 'drop procedure '.implode(',', $this->wrapArray($procedures));
+    }
+
+    /**
      * Compile the SQL needed to retrieve all table names.
      *
      * @return string

@@ -162,6 +162,17 @@ abstract class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile the SQL needed to retrieve all stored procedure names.
+     *
+     * @return string
+     */
+    public function compileGetAllProcedures($schemaName)
+    {
+        return "SELECT routine_schema, routine_name FROM information_schema.routines WHERE routine_type = 'PROCEDURE'
+         and routine_schema = '$schemaName'";
+    }
+
+    /**
      * Compile the blueprint's added column definitions.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
