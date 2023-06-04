@@ -911,15 +911,16 @@ class Blueprint
     }
 
     /**
-     * Create a new unsigned big integer (8-byte) column on the table.
+     * Create a new unsigned integer column on the table.
      *
      * @param  string  $column
+     * @param  string  $type
      * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
      */
-    public function foreignId($column)
+    public function foreignId($column, $type = 'bigInteger')
     {
         return $this->addColumnDefinition(new ForeignIdColumnDefinition($this, [
-            'type' => 'bigInteger',
+            'type' => $type,
             'name' => $column,
             'autoIncrement' => false,
             'unsigned' => true,
@@ -931,9 +932,10 @@ class Blueprint
      *
      * @param  \Illuminate\Database\Eloquent\Model|string  $model
      * @param  string|null  $column
+     * @param  string  $integerType
      * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
      */
-    public function foreignIdFor($model, $column = null)
+    public function foreignIdFor($model, $column = null, $integerType = 'bigInteger')
     {
         if (is_string($model)) {
             $model = new $model;
@@ -942,7 +944,7 @@ class Blueprint
         $column = $column ?: $model->getForeignKey();
 
         if ($model->getKeyType() === 'int' && $model->getIncrementing()) {
-            return $this->foreignId($column);
+            return $this->foreignId($column, $integerType);
         }
 
         $modelTraits = class_uses_recursive($model);
