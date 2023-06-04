@@ -283,7 +283,7 @@ class PostgresBuilder extends Builder
     }
 
     /**
-     * Get database schema
+     * Get database schema.
      *
      * @return string
      */
