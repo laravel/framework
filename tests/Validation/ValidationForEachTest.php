@@ -264,13 +264,13 @@ class ValidationForEachTest extends TestCase
             [
                 'foo' => [
                     ['bar' => true],
-                    ['bar' => false]
+                    ['bar' => false],
                 ],
             ],
             [
                 'foo.*' => Rule::forEach(fn (mixed $value, string $attribute) => [
-                    'bar' => Rule::when(true, ['accepted'], ['declined'])
-                ])
+                    'bar' => Rule::when(true, ['accepted'], ['declined']),
+                ]),
             ]
         );
 
