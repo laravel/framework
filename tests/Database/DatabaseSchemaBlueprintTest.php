@@ -355,6 +355,29 @@ class DatabaseSchemaBlueprintTest extends TestCase
         ], $blueprint->toSql($connection, new MySqlGrammar));
     }
 
+    public function testGenerateRelationshipColumnSpecifyingType()
+    {
+        $map = [
+            'tinyInteger' => 'tinyint',
+            'smallInteger' => 'smallint',
+            'integer' => 'int',
+        ];
+
+        foreach ($map as $eloquentColumnType => $databaseColumnType) {
+            $base = new Blueprint('posts', function ($table) use ($eloquentColumnType) {
+                $table->foreignIdFor('Illuminate\Foundation\Auth\User', null, $eloquentColumnType);
+            });
+
+            $connection = m::mock(Connection::class);
+
+            $blueprint = clone $base;
+
+            $this->assertEquals([
+                "alter table `posts` add `user_id` {$databaseColumnType} unsigned not null",
+            ], $blueprint->toSql($connection, new MySqlGrammar));
+        }
+    }
+
     public function testGenerateRelationshipColumnWithUuidModel()
     {
         require_once __DIR__.'/stubs/EloquentModelUuidStub.php';
