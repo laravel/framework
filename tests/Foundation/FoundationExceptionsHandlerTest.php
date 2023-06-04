@@ -188,6 +188,13 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->assertSame('{"response":"The CustomRenderer response"}', $response);
     }
 
+    public function testReturnsResponseFromRenderableException()
+    {
+        $response = $this->handler->render($this->request, new RenderableException)->getContent();
+
+        $this->assertSame('{"response":"My renderable exception response"}', $response);
+    }
+
     public function testReturnsCustomResponseWhenExceptionImplementsResponsable()
     {
         $response = $this->handler->render($this->request, new ResponsableException)->getContent();
@@ -447,6 +454,14 @@ class UnReportableException extends Exception
     public function report()
     {
         return false;
+    }
+}
+
+class RenderableException extends Exception
+{
+    public function render($request)
+    {
+        return response()->json(['response' => 'My renderable exception response']);
     }
 }
 
