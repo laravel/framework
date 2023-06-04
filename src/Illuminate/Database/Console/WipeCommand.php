@@ -45,6 +45,12 @@ class WipeCommand extends Command
             $this->components->info('Dropped all views successfully.');
         }
 
+        if ($this->option('drop-procedures')) {
+            $this->dropAllProcedures($database);
+
+            $this->components->info('Dropped all procedures successfully.');
+        }
+
         $this->dropAllTables($database);
 
         $this->components->info('Dropped all tables successfully.');
@@ -98,6 +104,19 @@ class WipeCommand extends Command
     }
 
     /**
+     * Drop all of the database procedures.
+     *
+     * @param  string  $database
+     * @return void
+     */
+    protected function dropAllProcedures($database)
+    {
+        $this->laravel['db']->connection($database)
+            ->getSchemaBuilder()
+            ->dropAllProcedures();
+    }
+
+    /**
      * Get the console command options.
      *
      * @return array
@@ -108,6 +127,7 @@ class WipeCommand extends Command
             ['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use'],
             ['drop-views', null, InputOption::VALUE_NONE, 'Drop all tables and views'],
             ['drop-types', null, InputOption::VALUE_NONE, 'Drop all tables and types (Postgres only)'],
+            ['drop-procedures', null, InputOption::VALUE_NONE, 'Drop all tables and procedures'],
             ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production'],
         ];
     }

@@ -45,6 +45,7 @@ class FreshCommand extends Command
             '--database' => $database,
             '--drop-views' => $this->option('drop-views'),
             '--drop-types' => $this->option('drop-types'),
+            '--drop-procedures' => $this->option('drop-procedures'),
             '--force' => true,
         ])) == 0);
 
@@ -108,6 +109,7 @@ class FreshCommand extends Command
             ['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use'],
             ['drop-views', null, InputOption::VALUE_NONE, 'Drop all tables and views'],
             ['drop-types', null, InputOption::VALUE_NONE, 'Drop all tables and types (Postgres only)'],
+            ['drop-procedures', null, InputOption::VALUE_NONE, 'Drop all tables and procedures'],
             ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production'],
             ['path', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'The path(s) to the migrations files to be executed'],
             ['realpath', null, InputOption::VALUE_NONE, 'Indicate any provided migration file paths are pre-resolved absolute paths'],
