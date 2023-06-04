@@ -259,9 +259,10 @@ class ValidationForEachTest extends TestCase
 
     public function testConditionalRulesCanBeAddedToForEach()
     {
+        // as associative array
         $v = new Validator(
-            $this->getIlluminateArrayTranslator(),
-            [
+            $translator = $this->getIlluminateArrayTranslator(),
+            $data = [
                 'foo' => [
                     ['bar' => true],
                     ['bar' => false],
@@ -277,6 +278,17 @@ class ValidationForEachTest extends TestCase
         $this->assertEquals([
             'foo.1.bar' => ['validation.accepted'],
         ], $v->getMessageBag()->toArray());
+
+        // as list
+        $v2 = new Validator($translator, $data, [
+            'foo.*.bar' => Rule::forEach(fn (mixed $value, string $attribute) => [
+                Rule::when(true, ['accepted'], ['declined']),
+            ]),
+        ]);
+
+        $this->assertEquals([
+            'foo.1.bar' => ['validation.accepted'],
+        ], $v2->getMessageBag()->toArray());
     }
 
     protected function getTranslator()
