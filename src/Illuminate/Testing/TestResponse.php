@@ -1657,8 +1657,6 @@ class TestResponse implements ArrayAccess
     {
         $property = new ReflectionProperty($exception, 'message');
 
-        $property->setAccessible(true);
-
         $property->setValue(
             $exception,
             $exception->getMessage().PHP_EOL.PHP_EOL.$message.PHP_EOL
