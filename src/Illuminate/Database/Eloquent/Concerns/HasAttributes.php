@@ -2227,7 +2227,6 @@ trait HasAttributes
 
             if ($returnType instanceof ReflectionNamedType &&
                 $returnType->getName() === Attribute::class) {
-
                 if (is_callable($method->invoke($instance)->get)) {
                     return true;
                 }
