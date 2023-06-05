@@ -153,6 +153,40 @@ class ApplicationBuilder
     }
 
     /**
+     * Register an array of container bindings to be bound when the application is booting.
+     *
+     * @param  array  $bindings
+     * @return $this
+     */
+    public function withBindings(array $bindings)
+    {
+        return $this->booting(function ($app) use ($bindings) {
+            foreach ($bindings as $abstract => $concrete) {
+                $app->bind($abstract, $concrete);
+            }
+        });
+    }
+
+    /**
+     * Register an array of singleton container bindings to be bound when the application is booting.
+     *
+     * @param  array  $singletons
+     * @return $this
+     */
+    public function withSingletons(array $singletons)
+    {
+        return $this->booting(function ($app) use ($singletons) {
+            foreach ($singletons as $abstract => $concrete) {
+                if (is_string($abstract)) {
+                    $app->singleton($abstract, $concrete);
+                } else {
+                    $app->singleton($concrete);
+                }
+            }
+        });
+    }
+
+    /**
      * Register a callback to be invoked when the application is "booting".
      *
      * @param  callable  $callback
