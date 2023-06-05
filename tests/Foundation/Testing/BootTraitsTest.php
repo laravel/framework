@@ -36,12 +36,12 @@ class BootTraitsTest extends TestCase
         $testCase = new TestCaseWithTrait('foo');
 
         $method = new ReflectionMethod($testCase, 'setUpTraits');
-        tap($method)->setAccessible(true)->invoke($testCase);
+        $method->invoke($testCase);
 
         $this->assertTrue($testCase->setUp);
 
         $method = new ReflectionMethod($testCase, 'callBeforeApplicationDestroyedCallbacks');
-        tap($method)->setAccessible(true)->invoke($testCase);
+        $method->invoke($testCase);
 
         $this->assertTrue($testCase->tearDown);
     }

@@ -103,7 +103,6 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $class = new ReflectionClass(Queue::class);
 
         $createPayload = $class->getMethod('createPayload');
-        $createPayload->setAccessible(true);
         $createPayload->invokeArgs($queue, [
             $job,
             'queue-name',
@@ -118,7 +117,6 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $class = new ReflectionClass(Queue::class);
 
         $createPayload = $class->getMethod('createPayload');
-        $createPayload->setAccessible(true);
         $createPayload->invokeArgs($queue, [
             ["\xc3\x28"],
             'queue-name',

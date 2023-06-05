@@ -17,7 +17,6 @@ class SupportFluentTest extends TestCase
 
         $refl = new ReflectionObject($fluent);
         $attributes = $refl->getProperty('attributes');
-        $attributes->setAccessible(true);
 
         $this->assertEquals($array, $attributes->getValue($fluent));
         $this->assertEquals($array, $fluent->getAttributes());
@@ -30,7 +29,6 @@ class SupportFluentTest extends TestCase
 
         $refl = new ReflectionObject($fluent);
         $attributes = $refl->getProperty('attributes');
-        $attributes->setAccessible(true);
 
         $this->assertEquals($array, $attributes->getValue($fluent));
         $this->assertEquals($array, $fluent->getAttributes());
@@ -43,7 +41,6 @@ class SupportFluentTest extends TestCase
 
         $refl = new ReflectionObject($fluent);
         $attributes = $refl->getProperty('attributes');
-        $attributes->setAccessible(true);
 
         $this->assertEquals($array, $attributes->getValue($fluent));
         $this->assertEquals($array, $fluent->getAttributes());

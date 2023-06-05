@@ -22,8 +22,6 @@ class CanConfigureMigrationCommandsTest extends TestCase
             $methodName
         );
 
-        $migrateFreshUsingReflection->setAccessible(true);
-
         return $migrateFreshUsingReflection;
     }
 
