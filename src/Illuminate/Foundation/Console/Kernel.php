@@ -540,6 +540,19 @@ class Kernel implements KernelContract
     }
 
     /**
+     * Set the Artisan commands provided by the application.
+     *
+     * @param  array  $commands
+     * @return $this
+     */
+    public function setCommands(array $commands)
+    {
+        $this->commands = $commands;
+
+        return $this;
+    }
+
+    /**
      * Get the bootstrap classes for the application.
      *
      * @return array

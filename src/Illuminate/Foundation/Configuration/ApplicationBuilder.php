@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Configuration;
 
 use Closure;
+use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
 use Illuminate\Contracts\Http\Kernel as HttpKernel;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as AppEventServiceProvider;
@@ -126,6 +127,21 @@ class ApplicationBuilder
             $kernel->setGlobalMiddleware($middleware->getGlobalMiddleware());
             $kernel->setMiddlewareGroups($middleware->getMiddlewareGroups());
             $kernel->setMiddlewareAliases($middleware->getMiddlewareAliases());
+        });
+
+        return $this;
+    }
+
+    /**
+     * Register additional Artisan commands with the application.
+     *
+     * @param  array  $commands
+     * @return $this
+     */
+    public function withCommands(array $commands)
+    {
+        $this->app->afterResolving(ConsoleKernel::class, function ($kernel) use ($commands) {
+            $kernel->setCommands($commands);
         });
 
         return $this;
