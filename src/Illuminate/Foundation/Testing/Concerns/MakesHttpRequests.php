@@ -43,7 +43,7 @@ trait MakesHttpRequests
     /**
      * Indicates whether redirects should be followed.
      *
-     * @var int
+     * @var int|null
      */
     protected $followRedirects = null;
 
@@ -263,7 +263,7 @@ trait MakesHttpRequests
     /**
      * Automatically follow any redirects returned from the response.
      *
-     * @param  int  $max
+     * @param  int|null  $max
      * @return $this
      */
     public function followingRedirects($max = null)
