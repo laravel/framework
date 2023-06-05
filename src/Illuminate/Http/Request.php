@@ -380,6 +380,24 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
+     * Combine the values of the given keys into a single string.
+     *
+     * @param  array  $keys
+     * @param  string  $delimiter
+     * @return string
+     */
+    public function combine(array $keys, $delimiter = '')
+    {
+        $values = [];
+
+        foreach ($keys as $key) {
+            $values[] = $this->get($key);
+        }
+
+        return implode($delimiter, $values);
+    }
+
+    /**
      * This method belongs to Symfony HttpFoundation and is not usually needed when using Laravel.
      *
      * Instead, you may use the "input" method.
