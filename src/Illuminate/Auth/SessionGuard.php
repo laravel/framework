@@ -173,10 +173,6 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
             }
         }
 
-        if (is_null($this->user)) {
-            $this->clearUserDataFromStorage();
-        }
-
         return $this->user;
     }
 
