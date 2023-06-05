@@ -3279,8 +3279,8 @@ class EloquentModelCastingStub extends Model
             'asEncryptedArrayObjectAttribute' => AsEncryptedArrayObject::class,
             'asEncryptedCustomCollectionAttribute' => AsEncryptedCollection::using(CustomCollection::class),
             'asEncryptedCustomCollectionAsArrayAttribute' => [AsEncryptedCollection::class, CustomCollection::class],
-            'asCustomEnumCollectionAttribute' => AsEnumCollection::using(StringStatus::class),
-            'asCustomEnumArrayObjectAttribute' => AsEnumArrayObject::using(StringStatus::class),
+            'asCustomEnumCollectionAttribute' => AsEnumCollection::of(StringStatus::class),
+            'asCustomEnumArrayObjectAttribute' => AsEnumArrayObject::of(StringStatus::class),
             'singleElementInArrayAttribute' => [AsCollection::class],
             'duplicatedAttribute' => 'int',
         ];

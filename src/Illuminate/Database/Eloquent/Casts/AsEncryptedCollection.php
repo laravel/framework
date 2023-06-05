@@ -11,17 +11,6 @@ use InvalidArgumentException;
 class AsEncryptedCollection implements Castable
 {
     /**
-     * Specify the collection for the cast.
-     *
-     * @param  class-string  $class
-     * @return string
-     */
-    public static function using($class)
-    {
-        return static::class.':'.$class;
-    }
-
-    /**
      * Get the caster class to use when casting from / to this cast target.
      *
      * @param  array  $arguments
@@ -59,5 +48,16 @@ class AsEncryptedCollection implements Castable
                 return null;
             }
         };
+    }
+
+    /**
+     * Specify the collection for the cast.
+     *
+     * @param  class-string  $class
+     * @return string
+     */
+    public static function using($class)
+    {
+        return static::class.':'.$class;
     }
 }

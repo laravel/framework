@@ -10,17 +10,6 @@ use Illuminate\Support\Collection;
 class AsEnumCollection implements Castable
 {
     /**
-     * Specify the enum for the cast.
-     *
-     * @param  class-string  $class
-     * @return string
-     */
-    public static function using($class)
-    {
-        return static::class.':'.$class;
-    }
-
-    /**
      * Get the caster class to use when casting from / to this cast target.
      *
      * @template TEnum of \UnitEnum|\BackedEnum
@@ -87,5 +76,16 @@ class AsEnumCollection implements Castable
                 return $enum instanceof BackedEnum ? $enum->value : $enum->name;
             }
         };
+    }
+
+    /**
+     * Specify the Enum for the cast.
+     *
+     * @param  class-string  $class
+     * @return string
+     */
+    public static function of($class)
+    {
+        return static::class.':'.$class;
     }
 }
