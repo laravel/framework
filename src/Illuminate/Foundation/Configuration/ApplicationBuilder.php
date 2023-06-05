@@ -76,22 +76,23 @@ class ApplicationBuilder
     /**
      * Register the routing services for the application.
      *
-     * @param  \Closure|null  $callback
+     * @param  \Closure|null  $using
      * @param  string|null  $web
      * @param  string|null  $api
      * @param  string|null  $apiPrefix
      * @param  callable|null  $then
      * @return $this
      */
-    public function withRouting(?Closure $callback = null,
+    public function withRouting(?Closure $using = null,
         ?string $web = null,
         ?string $api = null,
+        ?string $commands = null,
         ?string $channels = null,
         string $apiPrefix = 'api',
         ?callable $then = null)
     {
-        if (is_null($callback) && (is_string($web) || is_string($api))) {
-            $callback = function () use ($web, $api, $apiPrefix, $then) {
+        if (is_null($using) && (is_string($web) || is_string($api))) {
+            $using = function () use ($web, $api, $apiPrefix, $then) {
                 if (is_string($api)) {
                     Route::middleware('api')->prefix($apiPrefix)->group($api);
                 }
@@ -106,11 +107,15 @@ class ApplicationBuilder
             };
         }
 
-        AppRouteServiceProvider::loadRoutesUsing($callback);
+        AppRouteServiceProvider::loadRoutesUsing($using);
 
         $this->app->booting(function () {
             $this->app->register(AppRouteServiceProvider::class);
         });
+
+        if (! is_null($commands)) {
+            $this->withCommandRouting([$commands]);
+        }
 
         if (! is_null($channels)) {
             $this->withBroadcasting($channels);
@@ -166,6 +171,19 @@ class ApplicationBuilder
         });
 
         return $this;
+    }
+
+    /**
+     * Register additional Artisan route paths.
+     *
+     * @param  array  $paths
+     * @return $this
+     */
+    protected function withCommandRouting(array $paths)
+    {
+        $this->app->afterResolving(ConsoleKernel::class, function ($kernel) use ($paths) {
+            $kernel->setCommandRoutePaths($paths);
+        });
     }
 
     /**
