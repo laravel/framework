@@ -164,6 +164,28 @@ class MakesHttpRequestsTest extends TestCase
             ->assertSee('OK');
     }
 
+    public function testFollowingRedirectsWithMax()
+    {
+        $router = $this->app->make(Registrar::class);
+        $url = $this->app->make(UrlGenerator::class);
+
+        $router->get('from', function () use ($url) {
+            return new RedirectResponse($url->to('via'));
+        });
+
+        $router->get('via', function () use ($url) {
+            return new RedirectResponse($url->to('to'));
+        });
+
+        $router->get('to', function () {
+            return 'OK';
+        });
+
+        $this->followingRedirects(1)
+            ->get('from')
+            ->assertRedirect('to');
+    }
+
     public function testFollowingRedirectsTerminatesInExpectedOrder()
     {
         $router = $this->app->make(Registrar::class);

@@ -43,9 +43,9 @@ trait MakesHttpRequests
     /**
      * Indicates whether redirects should be followed.
      *
-     * @var bool
+     * @var int
      */
-    protected $followRedirects = false;
+    protected $followRedirects = null;
 
     /**
      * Indicates whether cookies should be encrypted.
@@ -263,11 +263,12 @@ trait MakesHttpRequests
     /**
      * Automatically follow any redirects returned from the response.
      *
+     * @param  int  $max
      * @return $this
      */
-    public function followingRedirects()
+    public function followingRedirects($max = null)
     {
-        $this->followRedirects = true;
+        $this->followRedirects = is_null($max) ? 999 : $max;
 
         return $this;
     }
@@ -567,7 +568,7 @@ trait MakesHttpRequests
         $kernel->terminate($request, $response);
 
         if ($this->followRedirects) {
-            $response = $this->followRedirects($response);
+            $response = $this->followRedirects($response, $this->followRedirects);
         }
 
         return static::$latestResponse = $this->createTestResponse($response);
@@ -672,17 +673,23 @@ trait MakesHttpRequests
     }
 
     /**
-     * Follow a redirect chain until a non-redirect is received.
+     * Follow a redirect chain until a non-redirect is received,
+     * or until the given maximum amount of redirects has
+     * been reached.
      *
      * @param  \Illuminate\Http\Response  $response
+     * @param  int|null  $max
      * @return \Illuminate\Http\Response|\Illuminate\Testing\TestResponse
      */
-    protected function followRedirects($response)
+    protected function followRedirects($response, $max = null)
     {
-        $this->followRedirects = false;
+        $this->followRedirects = null;
 
-        while ($response->isRedirect()) {
+        $remaining = is_null($max) ? 999 : $max;
+
+        while ($response->isRedirect() && $remaining > 0) {
             $response = $this->get($response->headers->get('Location'));
+            $remaining = $remaining - 1;
         }
 
         return $response;
