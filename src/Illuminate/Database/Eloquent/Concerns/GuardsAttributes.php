@@ -63,7 +63,7 @@ trait GuardsAttributes
      */
     public function mergeFillable(array $fillable)
     {
-        $this->fillable = array_merge($this->fillable, $fillable);
+        $this->fillable = array_values(array_unique(array_merge($this->fillable, $fillable)));
 
         return $this;
     }
@@ -101,7 +101,7 @@ trait GuardsAttributes
      */
     public function mergeGuarded(array $guarded)
     {
-        $this->guarded = array_merge($this->guarded, $guarded);
+        $this->guarded = array_values(array_unique(array_merge($this->guarded, $guarded)));
 
         return $this;
     }
