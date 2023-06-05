@@ -148,6 +148,21 @@ class ApplicationBuilder
     }
 
     /**
+     * Register additional directories to be scanned for Artisan commands.
+     *
+     * @param  array  $paths
+     * @return $this
+     */
+    public function withCommandsIn(array $paths)
+    {
+        $this->app->afterResolving(ConsoleKernel::class, function ($kernel) use ($paths) {
+            $kernel->setCommandPaths($paths);
+        });
+
+        return $this;
+    }
+
+    /**
      * Register the standard exception handler for the application.
      *
      * @param  callable|null  $afterResolving
