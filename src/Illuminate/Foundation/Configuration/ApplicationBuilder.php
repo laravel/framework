@@ -57,14 +57,15 @@ class ApplicationBuilder
     /**
      * Register the braodcasting services for the application.
      *
+     * @param  string  $channels
      * @return $this
      */
-    public function withBroadcasting()
+    public function withBroadcasting(string $channels)
     {
-        $this->app->booted(function () {
+        $this->app->booted(function () use ($channels) {
             Broadcast::routes();
 
-            if (file_exists($channels = $this->app->basePath('routes/channels.php'))) {
+            if (file_exists($channels)) {
                 require $channels;
             }
         });
@@ -85,6 +86,7 @@ class ApplicationBuilder
     public function withRouting(?Closure $callback = null,
         ?string $web = null,
         ?string $api = null,
+        ?string $channels = null,
         string $apiPrefix = 'api',
         ?callable $then = null)
     {
@@ -109,6 +111,10 @@ class ApplicationBuilder
         $this->app->booting(function () {
             $this->app->register(AppRouteServiceProvider::class);
         });
+
+        if (! is_null($channels)) {
+            $this->withBroadcasting($channels);
+        }
 
         return $this;
     }
