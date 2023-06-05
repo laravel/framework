@@ -28,6 +28,13 @@ class Middleware
     protected $removals = [];
 
     /**
+     * The middleware that should be replaced in the global middleware stack.
+     *
+     * @var array
+     */
+    protected $replacements = [];
+
+    /**
      * The middleware that should be prepended to the specified groups.
      *
      * @var array
@@ -47,6 +54,13 @@ class Middleware
      * @var array
      */
     protected $groupRemovals = [];
+
+    /**
+     * The middleware that should be replaced in the specified groups.
+     *
+     * @var array
+     */
+    protected $groupReplacements = [];
 
     /**
      * Indicates if the "trust hosts" middleware is enabled.
@@ -143,6 +157,20 @@ class Middleware
     }
 
     /**
+     * Specify a middleware that should be replaced with another middleware.
+     *
+     * @param  string  $search
+     * @param  string  $replace
+     * @return $this
+     */
+    public function replace(string $search, string $replace)
+    {
+        $this->replacements[$search] = $replace;
+
+        return $this;
+    }
+
+    /**
      * Prepend the given middleware to the specified group.
      *
      * @param  string  $group
@@ -194,6 +222,21 @@ class Middleware
     }
 
     /**
+     * Replace the given middleware in the specified group with another middleware.
+     *
+     * @param  string  $group
+     * @param  string  $search
+     * @param  string  $replace
+     * @return $this
+     */
+    public function replaceInGroup(string $group, string $search, string $replace)
+    {
+        $this->groupReplacements[$group][$search] = $replace;
+
+        return $this;
+    }
+
+    /**
      * Register additional middleware aliases.
      *
      * @param  array  $aliases
@@ -222,6 +265,12 @@ class Middleware
             \Illuminate\Foundation\Http\Middleware\TrimStrings::class,
             \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
         ]));
+
+        $middleware = array_map(function ($middleware) {
+            return isset($this->replacements[$middleware])
+                ? $this->replacements[$middleware]
+                : $middleware;
+        }, $middleware);
 
         return array_values(array_filter(
             array_diff(
@@ -254,6 +303,14 @@ class Middleware
                 \Illuminate\Routing\Middleware\SubstituteBindings::class,
             ])),
         ];
+
+        foreach ($middleware as $group => $groupedMiddleware) {
+            foreach ($groupedMiddleware as $index => $groupMiddleware) {
+                if (isset($this->groupReplacements[$group][$groupMiddleware])) {
+                    $middleware[$group][$index] = $this->groupReplacements[$group][$groupMiddleware];
+                }
+            }
+        }
 
         foreach ($this->groupRemovals as $group => $removals) {
             $middleware[$group] = array_values(array_filter(
