@@ -21,6 +21,7 @@ use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
  * @method static void setArtisan(\Illuminate\Console\Application|null $artisan)
  * @method static \Illuminate\Foundation\Console\Kernel setCommands(array $commands)
  * @method static \Illuminate\Foundation\Console\Kernel setCommandPaths(array $paths)
+ * @method static \Illuminate\Foundation\Console\Kernel setCommandRoutePaths(array $paths)
  *
  * @see \Illuminate\Foundation\Console\Kernel
  */
