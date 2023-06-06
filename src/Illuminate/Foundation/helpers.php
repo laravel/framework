@@ -107,9 +107,10 @@ if (! function_exists('app')) {
     /**
      * Get the available container instance.
      *
-     * @param  string|null  $abstract
+     * @template T
+     * @param  string|null|class-string<T>  $abstract
      * @param  array  $parameters
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Foundation\Application|mixed
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Foundation\Application|mixed|T
      */
     function app($abstract = null, array $parameters = [])
     {
