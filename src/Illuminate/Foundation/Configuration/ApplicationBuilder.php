@@ -86,7 +86,6 @@ class ApplicationBuilder
     public function withRouting(?Closure $using = null,
         ?string $web = null,
         ?string $api = null,
-        ?string $commands = null,
         ?string $channels = null,
         string $apiPrefix = 'api',
         ?callable $then = null)
@@ -112,10 +111,6 @@ class ApplicationBuilder
         $this->app->booting(function () {
             $this->app->register(AppRouteServiceProvider::class);
         });
-
-        if (! is_null($commands)) {
-            $this->withCommandRouting([$commands]);
-        }
 
         if (! is_null($channels)) {
             $this->withBroadcasting($channels);
@@ -153,9 +148,11 @@ class ApplicationBuilder
     {
         $this->app->afterResolving(ConsoleKernel::class, function ($kernel) use ($commands) {
             [$commands, $paths] = collect($commands)->partition(fn ($command) => class_exists($command));
+            [$routes, $paths] = $paths->partition(fn ($path) => is_file($path));
 
             $kernel->setCommands($commands->all());
             $kernel->setCommandPaths($paths->all());
+            $kernel->setCommandRoutePaths($routes->all());
         });
 
         return $this;
