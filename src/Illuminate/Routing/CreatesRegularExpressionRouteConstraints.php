@@ -2,6 +2,7 @@
 
 namespace Illuminate\Routing;
 
+use BackedEnum;
 use Illuminate\Support\Arr;
 
 trait CreatesRegularExpressionRouteConstraints
@@ -65,11 +66,23 @@ trait CreatesRegularExpressionRouteConstraints
      * Specify that the given route parameters must be one of the given values.
      *
      * @param  array|string  $parameters
-     * @param  array  $values
+     * @param  array|string  $values
      * @return $this
+     * @throws \InvalidArgumentException
      */
-    public function whereIn($parameters, array $values)
+    public function whereIn($parameters, array|string $values)
     {
+        if (is_string($values)) {
+            if (! enum_exists($values)) {
+                throw new \InvalidArgumentException("Enum could not be found to create route constraints.");
+            }
+
+            $values = array_map(
+                fn($case) => $case instanceof BackedEnum ? $case->value : $case->name,
+                [$values, 'cases']()
+            );
+        }
+
         return $this->assignExpressionToParameters($parameters, implode('|', $values));
     }
 

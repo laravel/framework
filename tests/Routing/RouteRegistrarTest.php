@@ -942,6 +942,42 @@ class RouteRegistrarTest extends TestCase
         }
     }
 
+    public function testWhereInRegistrationWithStringBackedEnum()
+    {
+        $wheres = [
+            'foo' => 'forge|vapor',
+        ];
+
+        $this->router->get('/{foo}')->whereIn(['foo'], RouteRegistrarStringBackedEnum::class);
+        foreach ($this->router->getRoutes() as $route) {
+            $this->assertEquals($wheres, $route->wheres);
+        }
+    }
+
+    public function testWhereInRegistrationWithIntBackedEnum()
+    {
+        $wheres = [
+            'foo' => '2013|2020',
+        ];
+
+        $this->router->get('/{foo}')->whereIn('foo', RouteRegistrarIntBackedEnum::class);
+        foreach ($this->router->getRoutes() as $route) {
+            $this->assertEquals($wheres, $route->wheres);
+        }
+    }
+
+    public function testWhereInRegistrationWithUnitEnum()
+    {
+        $wheres = [
+            'foo' => 'FORGE|VAPOR',
+        ];
+
+        $this->router->get('/{foo}')->whereIn('foo', RouteRegistrarUnitEnum::class);
+        foreach ($this->router->getRoutes() as $route) {
+            $this->assertEquals($wheres, $route->wheres);
+        }
+    }
+
     public function testGroupWhereNumberRegistrationOnRouteRegistrar()
     {
         $wheres = ['foo' => '[0-9]+', 'bar' => '[0-9]+'];
@@ -1357,4 +1393,22 @@ class InvokableRouteRegistrarControllerStub
 class RouteRegistrarMiddlewareStub
 {
     //
+}
+
+enum RouteRegistrarStringBackedEnum: string
+{
+    case FORGE = 'forge';
+    case VAPOR = 'vapor';
+}
+
+enum RouteRegistrarIntBackedEnum: int
+{
+    case FORGE = 2013;
+    case VAPOR = 2020;
+}
+
+enum RouteRegistrarUnitEnum
+{
+    case FORGE;
+    case VAPOR;
 }
