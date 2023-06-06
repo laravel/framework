@@ -81,6 +81,13 @@ class Handler implements ExceptionHandlerContract
     protected $levels = [];
 
     /**
+     * The callbacks that should be used to build exception context data.
+     *
+     * @var array
+     */
+    protected $contextCallbacks = [];
+
+    /**
      * The callbacks that should be used during rendering.
      *
      * @var \Closure[]
@@ -444,11 +451,17 @@ class Handler implements ExceptionHandlerContract
      */
     protected function exceptionContext(Throwable $e)
     {
+        $context = [];
+
         if (method_exists($e, 'context')) {
-            return $e->context();
+            $context = $e->context();
         }
 
-        return [];
+        foreach ($this->contextCallbacks as $callback) {
+            $context = array_merge($context, $callback($e, $context));
+        }
+
+        return $context;
     }
 
     /**
@@ -465,6 +478,19 @@ class Handler implements ExceptionHandlerContract
         } catch (Throwable) {
             return [];
         }
+    }
+
+    /**
+     * Register a closure that should be used to build exception context data.
+     *
+     * @param  \Closure  $contextCallback
+     * @return $this
+     */
+    public function buildContextUsing(Closure $contextCallback)
+    {
+        $this->contextCallbacks[] = $contextCallback;
+
+        return $this;
     }
 
     /**
