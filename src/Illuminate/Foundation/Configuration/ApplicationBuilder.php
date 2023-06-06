@@ -181,24 +181,24 @@ class ApplicationBuilder
     }
 
     /**
-     * Register the standard exception handler for the application.
+     * Register and configure the application's exception handler.
      *
-     * @param  callable|null  $afterResolving
+     * @param  callable|null  $using
      * @return $this
      */
-    public function withExceptionHandling($afterResolving = null)
+    public function withExceptions($using = null)
     {
         $this->app->singleton(
             \Illuminate\Contracts\Debug\ExceptionHandler::class,
             \Illuminate\Foundation\Exceptions\Handler::class
         );
 
-        $afterResolving ??= fn () => true;
+        $using ??= fn () => true;
 
         $this->app->afterResolving(
             \Illuminate\Foundation\Exceptions\Handler::class,
-            function ($handler) use ($afterResolving) {
-                $afterResolving(new Exceptions($handler));
+            function ($handler) use ($using) {
+                $using(new Exceptions($handler));
             },
         );
 
