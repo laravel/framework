@@ -186,7 +186,7 @@ class ApplicationBuilder
      * @param  callable|null  $using
      * @return $this
      */
-    public function withExceptions($using = null)
+    public function withExceptions(?callable $using = null)
     {
         $this->app->singleton(
             \Illuminate\Contracts\Debug\ExceptionHandler::class,
@@ -197,9 +197,7 @@ class ApplicationBuilder
 
         $this->app->afterResolving(
             \Illuminate\Foundation\Exceptions\Handler::class,
-            function ($handler) use ($using) {
-                $using(new Exceptions($handler));
-            },
+            fn ($handler) => $using(new Exceptions($handler)),
         );
 
         return $this;
@@ -245,7 +243,7 @@ class ApplicationBuilder
      * @param  callable  $callback
      * @return $this
      */
-    public function booting($callback)
+    public function booting(callable $callback)
     {
         $this->app->booting($callback);
 
@@ -258,7 +256,7 @@ class ApplicationBuilder
      * @param  callable  $callback
      * @return $this
      */
-    public function booted($callback)
+    public function booted(callable $callback)
     {
         $this->app->booted($callback);
 
