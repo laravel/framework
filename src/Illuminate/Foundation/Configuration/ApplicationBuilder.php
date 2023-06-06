@@ -152,22 +152,10 @@ class ApplicationBuilder
     public function withCommands(array $commands)
     {
         $this->app->afterResolving(ConsoleKernel::class, function ($kernel) use ($commands) {
-            $kernel->setCommands($commands);
-        });
+            [$commands, $paths] = collect($commands)->partition(fn ($command) => class_exists($command));
 
-        return $this;
-    }
-
-    /**
-     * Register additional directories to be scanned for Artisan commands.
-     *
-     * @param  array  $paths
-     * @return $this
-     */
-    public function withCommandsIn(array $paths)
-    {
-        $this->app->afterResolving(ConsoleKernel::class, function ($kernel) use ($paths) {
-            $kernel->setCommandPaths($paths);
+            $kernel->setCommands($commands->all());
+            $kernel->setCommandPaths($paths->all());
         });
 
         return $this;
