@@ -190,7 +190,7 @@ class ApplicationBuilder
         $afterResolving ??= fn () => true;
 
         $this->app->afterResolving(
-            \Illuminate\Contracts\Debug\ExceptionHandler::class,
+            \Illuminate\Foundation\Exceptions\Handler::class,
             function ($handler) use ($afterResolving) {
                 $afterResolving(new Exceptions($handler));
             },
