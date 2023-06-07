@@ -11,6 +11,13 @@ use Illuminate\Support\Arr;
 class Middleware
 {
     /**
+     * The user defined global middleware stack.
+     *
+     * @var array
+     */
+    protected $global;
+
+    /**
      * The middleware that should be prepended to the global middleware stack.
      *
      * @var array
@@ -37,6 +44,13 @@ class Middleware
      * @var array
      */
     protected $replacements = [];
+
+    /**
+     * The user defined middleware groups.
+     *
+     * @var array
+     */
+    protected $groups = [];
 
     /**
      * The middleware that should be prepended to the specified groups.
@@ -179,6 +193,33 @@ class Middleware
     public function replace(string $search, string $replace)
     {
         $this->replacements[$search] = $replace;
+
+        return $this;
+    }
+
+    /**
+     * Define the global middleware for the application.
+     *
+     * @param  array  $middleware
+     * @return $this
+     */
+    public function global(array $middleware)
+    {
+        $this->global = $middleware;
+
+        return $this;
+    }
+
+    /**
+     * Define a middleware group.
+     *
+     * @param  string  $group
+     * @param  array  $middleware
+     * @return $this
+     */
+    public function group(string $group, array $middleware)
+    {
+        $this->groups[$group] = $middleware;
 
         return $this;
     }
@@ -332,7 +373,7 @@ class Middleware
      */
     public function getGlobalMiddleware()
     {
-        $middleware = array_values(array_filter([
+        $middleware = $this->global ?: array_values(array_filter([
             $this->trustHosts ? \Illuminate\Http\Middleware\TrustHosts::class : null,
             \Illuminate\Http\Middleware\TrustProxies::class,
             \Illuminate\Http\Middleware\HandleCors::class,
@@ -379,6 +420,8 @@ class Middleware
                 \Illuminate\Routing\Middleware\SubstituteBindings::class,
             ])),
         ];
+
+        $middleware = array_merge($middleware, $this->groups);
 
         foreach ($middleware as $group => $groupedMiddleware) {
             foreach ($groupedMiddleware as $index => $groupMiddleware) {
