@@ -993,6 +993,10 @@ trait HasAttributes
             $value = $this->castAttributeAsHashedString($key, $value);
         }
 
+        if (! is_null($value) && $value instanceof \Closure) {
+            $value = $value($this->getAttribute($key));
+        }
+
         $this->attributes[$key] = $value;
 
         return $this;

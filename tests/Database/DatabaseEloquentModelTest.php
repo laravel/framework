@@ -90,6 +90,14 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals([0 => 'value'], $model->getAttributes());
     }
 
+    public function testSetAttributeWithClosure()
+    {
+        $model = new EloquentModelStub(['foo' => 1]);
+        $model->setAttribute('foo', fn($prev) => $prev + 1);
+
+        $this->assertEquals(['foo' => 2], $model->getAttributes());
+    }
+
     public function testDirtyAttributes()
     {
         $model = new EloquentModelStub(['foo' => '1', 'bar' => 2, 'baz' => 3]);
