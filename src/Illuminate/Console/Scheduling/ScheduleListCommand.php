@@ -81,11 +81,10 @@ class ScheduleListCommand extends Command
             }
 
             if ($event instanceof CallbackEvent) {
-                if (class_exists($description)) {
-                    $command = $description;
-                    $description = '';
-                } else {
-                    $command = 'Closure at: '.$this->getClosureLocation($event);
+                $command = $event->getSummaryForDisplay();
+
+                if ($command === 'Closure' || $command === 'Callback') {
+                    $command = 'Closure at: ' . $this->getClosureLocation($event);
                 }
             }
 
