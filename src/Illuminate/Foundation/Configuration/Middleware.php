@@ -102,6 +102,7 @@ class Middleware
         'password.confirm' => \Illuminate\Auth\Middleware\RequirePassword::class,
         'precognitive' => \Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests::class,
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
+        'subscribed' => \Spark\Http\Middleware\VerifyBillableIsSubscribed::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
     ];
@@ -237,6 +238,69 @@ class Middleware
     public function replaceInGroup(string $group, string $search, string $replace)
     {
         $this->groupReplacements[$group][$search] = $replace;
+
+        return $this;
+    }
+
+    /**
+     * Modify the middleware in the "web" group.
+     *
+     * @param  string  $group
+     * @param  array|string  $append
+     * @param  array|string  $prepend
+     * @param  array|string  $remove
+     * @param  array|string  $replace
+     * @return $this
+     */
+    public function web(array|string $append = [], array|string $prepend = [], array|string $remove = [], array $replace = [])
+    {
+        return $this->modifyGroup('web', $append, $prepend, $remove, $replace);
+    }
+
+    /**
+     * Modify the middleware in the "api" group.
+     *
+     * @param  string  $group
+     * @param  array|string  $append
+     * @param  array|string  $prepend
+     * @param  array|string  $remove
+     * @param  array|string  $replace
+     * @return $this
+     */
+    public function api(array|string $append = [], array|string $prepend = [], array|string $remove = [], array $replace = [])
+    {
+        return $this->modifyGroup('api', $append, $prepend, $remove, $replace);
+    }
+
+    /**
+     * Modify the middleware in the given group.
+     *
+     * @param  string  $group
+     * @param  array|string  $append
+     * @param  array|string  $prepend
+     * @param  array|string  $remove
+     * @param  array|string  $replace
+     * @return $this
+     */
+    protected function modifyGroup(string $group, array|string $append, array|string $prepend, array|string $remove, array $replace)
+    {
+        if (! empty($append)) {
+            $this->appendToGroup($group, $append);
+        }
+
+        if (! empty($prepend)) {
+            $this->prependToGroup($group, $prepend);
+        }
+
+        if (! empty($remove)) {
+            $this->removeFromGroup($group, $remove);
+        }
+
+        if (! empty($replace)) {
+            foreach ($replace as $search => $replace) {
+                $this->replaceInGroup($group, $search, $replace);
+            }
+        }
 
         return $this;
     }
