@@ -59,7 +59,7 @@ class Can implements Rule
         $message = trans('validation.can');
 
         return $message === 'validation.can'
-            ? ['The :attribute field contains a unauthorized value.']
+            ? ['The :attribute field contains an unauthorized value.']
             : $message;
     }
 }
