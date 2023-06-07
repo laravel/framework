@@ -25,7 +25,7 @@ class Can implements Rule
      * Constructor.
      *
      * @param  string  $ability
-     * @param  mixed  $arguments
+     * @param  array  $arguments
      */
     public function __construct($ability, array $arguments = [])
     {
