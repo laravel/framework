@@ -28,7 +28,7 @@ class ThrottleRequests
      *
      * @var bool
      */
-    protected static bool $shouldHashKeys = false;
+    protected static bool $shouldHashKeys = true;
 
     /**
      * Create a new request throttler.
