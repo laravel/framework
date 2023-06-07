@@ -24,7 +24,7 @@ class ThrottleRequests
     protected $limiter;
 
     /**
-     * Key hash preference
+     * Key hash preference.
      *
      * @var bool
      */
@@ -68,7 +68,7 @@ class ThrottleRequests
     }
 
     /**
-     * Specify whether rate limiter keys should be hashed
+     * Specify whether rate limiter keys should be hashed.
      *
      * @param  bool  $shouldHashKeys
      */
@@ -213,6 +213,7 @@ class ThrottleRequests
             return $this->getIdentifier($user->getAuthIdentifier());
         } elseif ($route = $request->route()) {
             $identifier = $route->getDomain().'|'.$request->ip();
+
             return $this->getIdentifier($identifier);
         }
 
@@ -319,7 +320,7 @@ class ThrottleRequests
     }
 
     /**
-     * Returns identifier based on $shouldHashKeys
+     * Returns identifier based on $shouldHashKeys.
      *
      * @param $value
      * @return mixed|string
@@ -328,5 +329,4 @@ class ThrottleRequests
     {
         return self::$shouldHashKeys ? sha1($value) : $value;
     }
-
 }
