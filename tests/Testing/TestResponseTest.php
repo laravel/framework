@@ -206,7 +206,7 @@ class TestResponseTest extends TestCase
         ]);
 
         $response->assertViewHasAll([
-            'foo' => 'bar'
+            'foo' => 'bar',
         ]);
     }
 
