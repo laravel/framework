@@ -24,6 +24,13 @@ class ThrottleRequests
     protected $limiter;
 
     /**
+     * Key hash preference
+     *
+     * @var bool
+     */
+    protected static bool $shouldHashKeys = false;
+
+    /**
      * Create a new request throttler.
      *
      * @param  \Illuminate\Cache\RateLimiter  $limiter
@@ -58,6 +65,16 @@ class ThrottleRequests
     public static function with($maxAttempts = 60, $decayMinutes = 1, $prefix = '')
     {
         return static::class.':'.implode(',', func_get_args());
+    }
+
+    /**
+     * Specify whether rate limiter keys should be hashed
+     *
+     * @param  bool  $shouldHashKeys
+     */
+    public static function shouldHashKeys(bool $shouldHashKeys): void
+    {
+        self::$shouldHashKeys = $shouldHashKeys;
     }
 
     /**
@@ -120,7 +137,7 @@ class ThrottleRequests
             $next,
             collect(Arr::wrap($limiterResponse))->map(function ($limit) use ($limiterName) {
                 return (object) [
-                    'key' => md5($limiterName.$limit->key),
+                    'key' => self::$shouldHashKeys ? md5($limiterName.$limit->key) : $limiterName.$limit->key,
                     'maxAttempts' => $limit->maxAttempts,
                     'decayMinutes' => $limit->decayMinutes,
                     'responseCallback' => $limit->responseCallback,
@@ -193,9 +210,10 @@ class ThrottleRequests
     protected function resolveRequestSignature($request)
     {
         if ($user = $request->user()) {
-            return sha1($user->getAuthIdentifier());
+            return $this->getIdentifier($user->getAuthIdentifier());
         } elseif ($route = $request->route()) {
-            return sha1($route->getDomain().'|'.$request->ip());
+            $identifier = $route->getDomain().'|'.$request->ip();
+            return $this->getIdentifier($identifier);
         }
 
         throw new RuntimeException('Unable to generate the request signature. Route unavailable.');
@@ -299,4 +317,16 @@ class ThrottleRequests
     {
         return is_null($retryAfter) ? $this->limiter->retriesLeft($key, $maxAttempts) : 0;
     }
+
+    /**
+     * Returns identifier based on $shouldHashKeys
+     *
+     * @param $value
+     * @return mixed|string
+     */
+    private function getIdentifier($value)
+    {
+        return self::$shouldHashKeys ? sha1($value) : $value;
+    }
+
 }
