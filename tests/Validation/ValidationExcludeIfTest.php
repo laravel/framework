@@ -10,7 +10,7 @@ use stdClass;
 
 class ValidationExcludeIfTest extends TestCase
 {
-    public function testItClousureReturnsFormatsAStringVersionOfTheRule()
+    public function testItReturnsStringVersionOfRuleWhenCast()
     {
         $rule = new ExcludeIf(function () {
             return true;
@@ -33,7 +33,7 @@ class ValidationExcludeIfTest extends TestCase
         $this->assertSame('', (string) $rule);
     }
 
-    public function testItOnlyCallableAndBooleanAreAcceptableArgumentsOfTheRule()
+    public function testItValidatesCallableAndBooleanAreAcceptableArguments()
     {
         new ExcludeIf(false);
         new ExcludeIf(true);
@@ -49,11 +49,11 @@ class ValidationExcludeIfTest extends TestCase
         }
     }
 
-    public function testItReturnedRuleIsNotSerializable()
+    public function testItThrowsExceptionIfRuleIsNotSerializable()
     {
         $this->expectException(Exception::class);
 
-        $rule = serialize(new ExcludeIf(function () {
+        serialize(new ExcludeIf(function () {
             return true;
         }));
     }

@@ -6,7 +6,6 @@ use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
-use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
 class ValidationForEachTest extends TestCase
@@ -318,11 +317,6 @@ class ValidationForEachTest extends TestCase
         $this->assertEquals([
             'foo.1.bar' => ['validation.accepted'],
         ], $v->getMessageBag()->toArray());
-    }
-
-    protected function getTranslator()
-    {
-        return m::mock(TranslatorContract::class);
     }
 
     public function getIlluminateArrayTranslator()
