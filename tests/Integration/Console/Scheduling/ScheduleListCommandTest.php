@@ -37,9 +37,9 @@ class ScheduleListCommandTest extends TestCase
         $this->schedule->command('inspire')->twiceDaily(14, 18);
         $this->schedule->command('foobar', ['a' => 'b'])->everyMinute();
         $this->schedule->job(FooJob::class)->everyMinute();
-        $this->schedule->job(new FooInstanceJob)->everyMinute();
+        $this->schedule->job(new FooParamJob('test'))->everyMinute();
         $this->schedule->job(FooJob::class)->name('foo-named-job')->everyMinute();
-        $this->schedule->job(new FooInstanceJob)->name('foo-named-instance-job')->everyMinute();
+        $this->schedule->job(new FooParamJob('test'))->name('foo-named-param-job')->everyMinute();
         $this->schedule->command('inspire')->cron('0 9,17 * * *');
         $this->schedule->command('inspire')->cron("0 10\t* * *");
         $this->schedule->call(FooCall::class)->everyMinute();
@@ -55,9 +55,9 @@ class ScheduleListCommandTest extends TestCase
             ->expectsOutput('  0 14,18 * *      *  php artisan inspire ........ Next Due: 14 hours from now')
             ->expectsOutput('  * *     * *      *  php artisan foobar a='.ProcessUtils::escapeArgument('b').' ... Next Due: 1 minute from now')
             ->expectsOutput('  * *     * *      *  Illuminate\Tests\Integration\Console\Scheduling\FooJob  Next Due: 1 minute from now')
-            ->expectsOutput('  * *     * *      *  Illuminate\Tests\Integration\Console\Scheduling\FooInstanceJob  Next Due: 1 minute from now')
+            ->expectsOutput('  * *     * *      *  Illuminate\Tests\Integration\Console\Scheduling\FooParamJob  Next Due: 1 minute from now')
             ->expectsOutput('  * *     * *      *  foo-named-job .............. Next Due: 1 minute from now')
-            ->expectsOutput('  * *     * *      *  foo-named-instance-job ..... Next Due: 1 minute from now')
+            ->expectsOutput('  * *     * *      *  foo-named-param-job ........ Next Due: 1 minute from now')
             ->expectsOutput('  0 9,17  * *      *  php artisan inspire ......... Next Due: 9 hours from now')
             ->expectsOutput('  0 10    * *      *  php artisan inspire ........ Next Due: 10 hours from now')
             ->expectsOutput('  * *     * *      *  Illuminate\Tests\Integration\Console\Scheduling\FooCall  Next Due: 1 minute from now')
@@ -71,9 +71,9 @@ class ScheduleListCommandTest extends TestCase
         $this->schedule->command('inspire')->twiceDaily(14, 18);
         $this->schedule->command('foobar', ['a' => 'b'])->everyMinute();
         $this->schedule->job(FooJob::class)->everyMinute();
-        $this->schedule->job(new FooInstanceJob)->everyMinute();
+        $this->schedule->job(new FooParamJob('test'))->everyMinute();
         $this->schedule->job(FooJob::class)->name('foo-named-job')->everyMinute();
-        $this->schedule->job(new FooInstanceJob)->name('foo-named-instance-job')->everyMinute();
+        $this->schedule->job(new FooParamJob('test'))->name('foo-named-param-job')->everyMinute();
         $this->schedule->command('inspire')->cron('0 9,17 * * *');
         $this->schedule->command('inspire')->cron("0 10\t* * *");
         $this->schedule->call(FooCall::class)->everyMinute();
@@ -87,9 +87,9 @@ class ScheduleListCommandTest extends TestCase
             ->assertSuccessful()
             ->expectsOutput('  * *     * *      *  php artisan foobar a='.ProcessUtils::escapeArgument('b').' ... Next Due: 1 minute from now')
             ->expectsOutput('  * *     * *      *  Illuminate\Tests\Integration\Console\Scheduling\FooJob  Next Due: 1 minute from now')
-            ->expectsOutput('  * *     * *      *  Illuminate\Tests\Integration\Console\Scheduling\FooInstanceJob  Next Due: 1 minute from now')
+            ->expectsOutput('  * *     * *      *  Illuminate\Tests\Integration\Console\Scheduling\FooParamJob  Next Due: 1 minute from now')
             ->expectsOutput('  * *     * *      *  foo-named-job .............. Next Due: 1 minute from now')
-            ->expectsOutput('  * *     * *      *  foo-named-instance-job ..... Next Due: 1 minute from now')
+            ->expectsOutput('  * *     * *      *  foo-named-param-job ........ Next Due: 1 minute from now')
             ->expectsOutput('  * *     * *      *  Illuminate\Tests\Integration\Console\Scheduling\FooCall  Next Due: 1 minute from now')
             ->expectsOutput('  * *     * *      *  Closure at: Illuminate\Tests\Integration\Console\Scheduling\FooCall::fooFunction  Next Due: 1 minute from now')
             ->expectsOutput('  * *     * *      *  Closure at: '.$closureFilePath.':'.$closureLineNumber.'  Next Due: 1 minute from now')
@@ -130,8 +130,11 @@ class FooJob
 {
 }
 
-class FooInstanceJob
+class FooParamJob
 {
+    public function __construct($param) {
+
+    }
 }
 
 class FooCall
