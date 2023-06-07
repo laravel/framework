@@ -339,7 +339,7 @@ class Middleware
      *
      * @return $this
      */
-    public function ensureHostsAreTrusted()
+    public function withTrustedHosts()
     {
         $this->trustHosts = true;
 
@@ -351,7 +351,7 @@ class Middleware
      *
      * @return $this
      */
-    public function ensureFrontendRequestsAreStateful()
+    public function withStatefulApi()
     {
         $this->ensureFrontendRequestsAreStateful = true;
 
@@ -364,7 +364,7 @@ class Middleware
      * @param  string  $limiter
      * @return $this
      */
-    public function ensureApiIsThrottled($limiter = 'api')
+    public function withThrottledApi($limiter = 'api')
     {
         $this->apiLimiter = $limiter;
 
