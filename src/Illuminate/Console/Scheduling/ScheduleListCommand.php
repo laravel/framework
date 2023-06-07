@@ -83,7 +83,7 @@ class ScheduleListCommand extends Command
             if ($event instanceof CallbackEvent) {
                 $command = $event->getSummaryForDisplay();
 
-                if ($command === 'Closure' || $command === 'Callback') {
+                if (in_array($command, ['Closure', 'Callback'])) {
                     $command = 'Closure at: ' . $this->getClosureLocation($event);
                 }
             }
