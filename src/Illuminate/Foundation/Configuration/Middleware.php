@@ -203,7 +203,7 @@ class Middleware
      * @param  array  $middleware
      * @return $this
      */
-    public function global(array $middleware)
+    public function use(array $middleware)
     {
         $this->global = $middleware;
 
@@ -359,7 +359,7 @@ class Middleware
      * @param  array  $aliases
      * @return $this
      */
-    public function withAliases(array $aliases)
+    public function alias(array $aliases)
     {
         $this->customAliases = $aliases;
 
