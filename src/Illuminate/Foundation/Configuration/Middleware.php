@@ -88,6 +88,13 @@ class Middleware
     protected $apiLimiter;
 
     /**
+     * Indicates if Redis throttling should be applied.
+     *
+     * @var array
+     */
+    protected $throttleWithRedis = false;
+
+    /**
      * The default middleware aliases.
      *
      * @var array
@@ -249,7 +256,7 @@ class Middleware
      * @param  array|string  $append
      * @param  array|string  $prepend
      * @param  array|string  $remove
-     * @param  array|string  $replace
+     * @param  array  $replace
      * @return $this
      */
     public function web(array|string $append = [], array|string $prepend = [], array|string $remove = [], array $replace = [])
@@ -264,7 +271,7 @@ class Middleware
      * @param  array|string  $append
      * @param  array|string  $prepend
      * @param  array|string  $remove
-     * @param  array|string  $replace
+     * @param  array  $replace
      * @return $this
      */
     public function api(array|string $append = [], array|string $prepend = [], array|string $remove = [], array $replace = [])
@@ -279,7 +286,7 @@ class Middleware
      * @param  array|string  $append
      * @param  array|string  $prepend
      * @param  array|string  $remove
-     * @param  array|string  $replace
+     * @param  array  $replace
      * @return $this
      */
     protected function modifyGroup(string $group, array|string $append, array|string $prepend, array|string $remove, array $replace)
@@ -368,7 +375,7 @@ class Middleware
 
             'api' => array_values(array_filter([
                 $this->ensureFrontendRequestsAreStateful ? \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class : null,
-                $this->apiLimiter ? \Illuminate\Routing\Middleware\ThrottleRequests::class.':'.$this->apiLimiter : null,
+                $this->apiLimiter ? 'throttle:'.$this->apiLimiter : null,
                 \Illuminate\Routing\Middleware\SubstituteBindings::class,
             ])),
         ];
@@ -458,11 +465,28 @@ class Middleware
      * Indicate that the API middleware group's throttling middleware should be enabled.
      *
      * @param  string  $limiter
+     * @param  bool  $redis
      * @return $this
      */
-    public function withThrottledApi($limiter = 'api')
+    public function withThrottledApi($limiter = 'api', $redis = false)
     {
         $this->apiLimiter = $limiter;
+
+        if ($redis) {
+            $this->throttleWithRedis();
+        }
+
+        return $this;
+    }
+
+    /**
+     * Indicate that Laravel's throttling middleware should use Redis.
+     *
+     * @return $this
+     */
+    public function throttleWithRedis()
+    {
+        $this->throttleWithRedis = true;
 
         return $this;
     }
@@ -474,6 +498,31 @@ class Middleware
      */
     public function getMiddlewareAliases()
     {
-        return array_merge($this->aliases, $this->customAliases);
+        return array_merge($this->defaultAliases(), $this->customAliases);
+    }
+
+    /**
+     * Get the default middleware aliases.
+     *
+     * @return array
+     */
+    protected function defaultAliases()
+    {
+        return [
+            'auth' => \Illuminate\Auth\Middleware\Authenticate::class,
+            'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
+            'auth.session' => \Illuminate\Session\Middleware\AuthenticateSession::class,
+            'cache.headers' => \Illuminate\Http\Middleware\SetCacheHeaders::class,
+            'can' => \Illuminate\Auth\Middleware\Authorize::class,
+            'guest' => \Illuminate\Auth\Middleware\RedirectIfAuthenticated::class,
+            'password.confirm' => \Illuminate\Auth\Middleware\RequirePassword::class,
+            'precognitive' => \Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests::class,
+            'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
+            'subscribed' => \Spark\Http\Middleware\VerifyBillableIsSubscribed::class,
+            'throttle' => $this->throttleWithRedis
+                ? \Illuminate\Routing\Middleware\ThrottleRequestsWithRedis::class
+                : \Illuminate\Routing\Middleware\ThrottleRequests::class,
+            'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
+        ];
     }
 }
