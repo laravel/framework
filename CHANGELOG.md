@@ -1,6 +1,25 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.13.1...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v10.13.2...10.x)
+
+
+## [v10.13.2 (2023-06-05)](https://github.com/laravel/framework/compare/v10.13.1...v10.13.2)
+
+### Added
+- Added `Illuminate/Http/Client/PendingRequest::replaceHeaders()` ([#47335](https://github.com/laravel/framework/pull/47335))
+- Added `Illuminate/Notifications/Messages/MailMessage::attachMany()` ([#47345](https://github.com/laravel/framework/pull/47345))
+
+### Reverted
+- Revert "[10.x] Remove session on authenticatable deletion v2" ([#47354](https://github.com/laravel/framework/pull/47354))
+
+### Fixed
+- Fixes usage of Redis::many() with empty array ([#47307](https://github.com/laravel/framework/pull/47307))
+- Fix mapped renderable exception handling ([#47347](https://github.com/laravel/framework/pull/47347))
+- Avoid duplicates in fillable/guarded on merge in Illuminate/Database/Eloquent/Concerns/GuardsAttributes.php ([#47351](https://github.com/laravel/framework/pull/47351))
+
+### Changed
+- Update Kernel::load() to use same classFromFile logic as events ([#47327](https://github.com/laravel/framework/pull/47327))
+- Remove redundant 'setAccessible' methods ([#47348](https://github.com/laravel/framework/pull/47348))
 
 
 ## [v10.13.1 (2023-06-02)](https://github.com/laravel/framework/compare/v10.13.0...v10.13.1)
