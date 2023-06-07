@@ -133,7 +133,6 @@ class FooParamJob
 {
     public function __construct($param)
     {
-
     }
 }
 
