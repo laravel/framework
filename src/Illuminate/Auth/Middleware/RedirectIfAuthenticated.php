@@ -10,6 +10,13 @@ use Symfony\Component\HttpFoundation\Response;
 class RedirectIfAuthenticated
 {
     /**
+     * The callback that should be used to generate the authentication redirect path.
+     *
+     * @var callable
+     */
+    protected static $redirectToCallback;
+
+    /**
      * Handle an incoming request.
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
@@ -32,6 +39,19 @@ class RedirectIfAuthenticated
      */
     protected function redirectTo(Request $request): ?string
     {
-        return '/home';
+        return static::$redirectToCallback
+            ? call_user_func(static::$redirectToCallback, $request)
+            : '/dashboard';
+    }
+
+    /**
+     * Specify the callback that should be used to generate the redirect path.
+     *
+     * @param  callable  $redirectToCallback
+     * @return void
+     */
+    public static function redirectUsing(callable $redirectToCallback)
+    {
+        static::$redirectToCallback = $redirectToCallback;
     }
 }

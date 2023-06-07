@@ -2,6 +2,10 @@
 
 namespace Illuminate\Foundation\Configuration;
 
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Auth\Middleware\Authenticate;
+use Illuminate\Auth\Middleware\RedirectIfAuthenticated;
+use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Support\Arr;
 
 class Middleware
@@ -89,12 +93,12 @@ class Middleware
      * @var array
      */
     protected $aliases = [
-        'auth' => \App\Http\Middleware\Authenticate::class,
+        'auth' => \Illuminate\Auth\Middleware\Authenticate::class,
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
         'auth.session' => \Illuminate\Session\Middleware\AuthenticateSession::class,
         'cache.headers' => \Illuminate\Http\Middleware\SetCacheHeaders::class,
         'can' => \Illuminate\Auth\Middleware\Authorize::class,
-        'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
+        'guest' => \Illuminate\Auth\Middleware\RedirectIfAuthenticated::class,
         'password.confirm' => \Illuminate\Auth\Middleware\RequirePassword::class,
         'precognitive' => \Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests::class,
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
@@ -332,6 +336,34 @@ class Middleware
         }
 
         return $middleware;
+    }
+
+    /**
+     * Configure the behavior of the authentication middleware.
+     *
+     * @param  callable  $redirectTo
+     * @return $this
+     */
+    public function auth(callable $redirectTo)
+    {
+        Authenticate::redirectUsing($redirectTo);
+        AuthenticateSession::redirectUsing($redirectTo);
+        AuthenticationException::redirectUsing($redirectTo);
+
+        return $this;
+    }
+
+    /**
+     * Configure the behavior of the "guest" middleware.
+     *
+     * @param  callable  $redirectTo
+     * @return $this
+     */
+    public function guest(callable $redirectTo)
+    {
+        RedirectIfAuthenticated::redirectUsing($redirectTo);
+
+        return $this;
     }
 
     /**
