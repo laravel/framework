@@ -92,7 +92,7 @@ class Middleware
      *
      * @var bool
      */
-    protected $ensureFrontendRequestsAreStateful = false;
+    protected $statefulApi = false;
 
     /**
      * Indicates the API middleware group's rate limiter.
@@ -415,7 +415,7 @@ class Middleware
             ],
 
             'api' => array_values(array_filter([
-                $this->ensureFrontendRequestsAreStateful ? \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class : null,
+                $this->statefulApi ? \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class : null,
                 $this->apiLimiter ? 'throttle:'.$this->apiLimiter : null,
                 \Illuminate\Routing\Middleware\SubstituteBindings::class,
             ])),
@@ -499,7 +499,7 @@ class Middleware
      */
     public function withStatefulApi()
     {
-        $this->ensureFrontendRequestsAreStateful = true;
+        $this->statefulApi = true;
 
         return $this;
     }
