@@ -1,6 +1,19 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.13.0...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v10.13.1...10.x)
+
+
+## [v10.13.1 (2023-06-02)](https://github.com/laravel/framework/compare/v10.13.0...v10.13.1)
+
+### Added
+- Added `Illuminate\Contracts\Database\Query\ConditionExpression` interface and functional for this ([#47210](https://github.com/laravel/framework/pull/47210))
+- Added return type for `Illuminate/Notifications/Channels/MailChannel::send()` ([#47310](https://github.com/laravel/framework/pull/47310))
+
+### Reverted
+- Revert "[10.x] Fix inconsistentcy between report and render methods" ([#47326](https://github.com/laravel/framework/pull/47326))
+
+### Changed
+- Display queue runtime in human readable format ([#47227](https://github.com/laravel/framework/pull/47227))
 
 
 ## [v10.13.0 (2023-05-30)](https://github.com/laravel/framework/compare/v10.12.0...v10.13.0)
