@@ -6,7 +6,6 @@ use Illuminate\Console\Command;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Scheduling\ScheduleListCommand;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\ProcessUtils;
 use Orchestra\Testbench\TestCase;
 
@@ -132,7 +131,8 @@ class FooJob
 
 class FooParamJob
 {
-    public function __construct($param) {
+    public function __construct($param)
+    {
 
     }
 }
