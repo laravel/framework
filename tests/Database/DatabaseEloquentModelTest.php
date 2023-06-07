@@ -93,7 +93,7 @@ class DatabaseEloquentModelTest extends TestCase
     public function testSetAttributeWithClosure()
     {
         $model = new EloquentModelStub(['foo' => 1]);
-        $model->setAttribute('foo', fn($prev) => $prev + 1);
+        $model->setAttribute('foo', fn ($prev) => $prev + 1);
 
         $this->assertEquals(['foo' => 2], $model->getAttributes());
     }
