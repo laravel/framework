@@ -3,13 +3,13 @@
 namespace Illuminate\View;
 
 use Closure;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Contracts\View\View as ViewContract;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionProperty;
 use Illuminate\Support\Str;
-use Illuminate\Container\Container;
-use Illuminate\Contracts\Support\Htmlable;
-use Illuminate\Contracts\View\View as ViewContract;
 
 abstract class Component
 {
