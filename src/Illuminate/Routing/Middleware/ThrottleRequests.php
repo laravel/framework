@@ -24,7 +24,7 @@ class ThrottleRequests
     protected $limiter;
 
     /**
-     * Key hash preference.
+     * Indicates if the rate limiter keys should be hashed.
      *
      * @var bool
      */
@@ -65,16 +65,6 @@ class ThrottleRequests
     public static function with($maxAttempts = 60, $decayMinutes = 1, $prefix = '')
     {
         return static::class.':'.implode(',', func_get_args());
-    }
-
-    /**
-     * Specify whether rate limiter keys should be hashed.
-     *
-     * @param  bool  $shouldHashKeys
-     */
-    public static function shouldHashKeys(bool $shouldHashKeys): void
-    {
-        self::$shouldHashKeys = $shouldHashKeys;
     }
 
     /**
@@ -212,9 +202,7 @@ class ThrottleRequests
         if ($user = $request->user()) {
             return $this->getIdentifier($user->getAuthIdentifier());
         } elseif ($route = $request->route()) {
-            $identifier = $route->getDomain().'|'.$request->ip();
-
-            return $this->getIdentifier($identifier);
+            return $this->getIdentifier($route->getDomain().'|'.$request->ip());
         }
 
         throw new RuntimeException('Unable to generate the request signature. Route unavailable.');
@@ -328,5 +316,15 @@ class ThrottleRequests
     private function getIdentifier($value)
     {
         return self::$shouldHashKeys ? sha1($value) : $value;
+    }
+
+    /**
+     * Specify whether rate limiter keys should be hashed.
+     *
+     * @param  bool  $shouldHashKeys
+     */
+    public static function shouldHashKeys(bool $shouldHashKeys = true)
+    {
+        self::$shouldHashKeys = $shouldHashKeys;
     }
 }
