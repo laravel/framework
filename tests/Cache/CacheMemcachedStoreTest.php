@@ -26,7 +26,7 @@ class CacheMemcachedStoreTest extends TestCase
         $memcache = $this->getMockBuilder(stdClass::class)->addMethods(['get', 'getResultCode'])->getMock();
         $memcache->expects($this->once())->method('get')->with($this->equalTo('foo:bar'))->willReturn(null);
         $memcache->expects($this->once())->method('getResultCode')->willReturn(1);
-        $store = new MemcachedStore($memcache, 'foo');
+        $store = new MemcachedStore($memcache, 'foo:');
         $this->assertNull($store->get('bar'));
     }
 
@@ -48,7 +48,7 @@ class CacheMemcachedStoreTest extends TestCase
             'fizz', 'buzz', 'norf',
         ]);
         $memcache->expects($this->once())->method('getResultCode')->willReturn(0);
-        $store = new MemcachedStore($memcache, 'foo');
+        $store = new MemcachedStore($memcache, 'foo:');
         $this->assertEquals([
             'foo' => 'fizz',
             'bar' => 'buzz',
@@ -116,9 +116,9 @@ class CacheMemcachedStoreTest extends TestCase
     public function testGetAndSetPrefix()
     {
         $store = new MemcachedStore(new Memcached, 'bar');
-        $this->assertSame('bar:', $store->getPrefix());
+        $this->assertSame('bar', $store->getPrefix());
         $store->setPrefix('foo');
-        $this->assertSame('foo:', $store->getPrefix());
+        $this->assertSame('foo', $store->getPrefix());
         $store->setPrefix(null);
         $this->assertEmpty($store->getPrefix());
     }
