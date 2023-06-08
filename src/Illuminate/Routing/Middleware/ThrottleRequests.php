@@ -200,9 +200,9 @@ class ThrottleRequests
     protected function resolveRequestSignature($request)
     {
         if ($user = $request->user()) {
-            return $this->getIdentifier($user->getAuthIdentifier());
+            return $this->formatIdentifier($user->getAuthIdentifier());
         } elseif ($route = $request->route()) {
-            return $this->getIdentifier($route->getDomain().'|'.$request->ip());
+            return $this->formatIdentifier($route->getDomain().'|'.$request->ip());
         }
 
         throw new RuntimeException('Unable to generate the request signature. Route unavailable.');
@@ -308,12 +308,12 @@ class ThrottleRequests
     }
 
     /**
-     * Returns identifier based on $shouldHashKeys.
+     * Format the given identifier based on the configured hashing settings.
      *
-     * @param $value
-     * @return mixed|string
+     * @param  string  $value
+     * @return string
      */
-    private function getIdentifier($value)
+    private function formatIdentifier($value)
     {
         return self::$shouldHashKeys ? sha1($value) : $value;
     }
@@ -322,6 +322,7 @@ class ThrottleRequests
      * Specify whether rate limiter keys should be hashed.
      *
      * @param  bool  $shouldHashKeys
+     * @return void
      */
     public static function shouldHashKeys(bool $shouldHashKeys = true)
     {
