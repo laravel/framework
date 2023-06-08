@@ -411,7 +411,6 @@ class TestHtmlableReturningViewComponent extends Component
     }
 }
 
-
 class TestMissingRenderComponent extends Component
 {
     public $title;
