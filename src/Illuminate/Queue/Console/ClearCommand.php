@@ -53,9 +53,8 @@ class ClearCommand extends Command
 
         if ($queue instanceof ClearableQueue) {
             $count = $queue->clear($queueName);
-            $jobLabel = Str::plural('job', $count);
 
-            $this->components->info('Cleared '.$count.' '.$jobLabel.' from the ['.$queueName.'] queue');
+            $this->components->info('Cleared '.Str::plural('job', $count).' '.$jobLabel.' from the ['.$queueName.'] queue');
         } else {
             $this->components->error('Clearing queues is not supported on ['.(new ReflectionClass($queue))->getShortName().']');
         }
