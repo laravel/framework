@@ -606,7 +606,6 @@ class SupportCollectionTest extends TestCase
 
         $class = new ReflectionClass($collection);
         $method = $class->getMethod('getArrayableItems');
-        $method->setAccessible(true);
 
         $items = new TestArrayableObject;
         $array = $method->invokeArgs($data, [$items]);

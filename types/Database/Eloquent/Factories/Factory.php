@@ -113,8 +113,8 @@ assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Elo
 // assertType('Closure(): Illuminate\Database\Eloquent\Collection<int, User>|User', $factory->lazy([
 //     'string' => 'string',
 // ]));
-assertType('Closure(): Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model>|Illuminate\Database\Eloquent\Model', $factory->lazy());
-assertType('Closure(): Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model>|Illuminate\Database\Eloquent\Model', $factory->lazy([
+assertType('Closure(): (Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model>|Illuminate\Database\Eloquent\Model)', $factory->lazy());
+assertType('Closure(): (Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model>|Illuminate\Database\Eloquent\Model)', $factory->lazy([
     'string' => 'string',
 ]));
 

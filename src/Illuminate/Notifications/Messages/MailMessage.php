@@ -263,6 +263,25 @@ class MailMessage extends SimpleMessage implements Renderable
     }
 
     /**
+     * Attach multiple files to the message.
+     *
+     * @param  array<string|\Illuminate\Contracts\Mail\Attachable|\Illuminate\Mail\Attachment|array>  $files
+     * @return $this
+     */
+    public function attachMany($files)
+    {
+        foreach ($files as $file => $options) {
+            if (is_int($file)) {
+                $this->attach($options);
+            } else {
+                $this->attach($file, $options);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Attach in-memory data as an attachment.
      *
      * @param  string  $data
