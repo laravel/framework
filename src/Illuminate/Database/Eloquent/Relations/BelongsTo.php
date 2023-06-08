@@ -74,7 +74,7 @@ class BelongsTo extends Relation
      */
     public function getResults()
     {
-        if (is_null($this->child->{$this->foreignKey})) {
+        if (is_null($this->getForeignKeyFrom($this->child))) {
             return $this->getDefaultFor($this->parent);
         }
 
@@ -94,7 +94,7 @@ class BelongsTo extends Relation
             // of the related models matching on the foreign key that's on a parent.
             $table = $this->related->getTable();
 
-            $this->query->where($table.'.'.$this->ownerKey, '=', $this->child->{$this->foreignKey});
+            $this->query->where($table.'.'.$this->ownerKey, '=', $this->getForeignKeyFrom($this->child));
         }
     }
 
@@ -130,7 +130,7 @@ class BelongsTo extends Relation
         // to query for via the eager loading query. We will add them to an array then
         // execute a "where in" statement to gather up all of those related records.
         foreach ($models as $model) {
-            if (! is_null($value = $model->{$this->foreignKey})) {
+            if (! is_null($value = $this->getForeignKeyFrom($model))) {
                 $keys[] = $value;
             }
         }
@@ -337,7 +337,7 @@ class BelongsTo extends Relation
      */
     public function getParentKey()
     {
-        return $this->child->{$this->foreignKey};
+        return $this->getForeignKeyFrom($this->child);
     }
 
     /**
@@ -369,6 +369,17 @@ class BelongsTo extends Relation
     protected function getRelatedKeyFrom(Model $model)
     {
         return $model->{$this->ownerKey};
+    }
+
+    /**
+     * Get the value of the model's foreign key.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return mixed
+     */
+    protected function getForeignKeyFrom(Model $model)
+    {
+        return $model->{$this->foreignKey};
     }
 
     /**
