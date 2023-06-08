@@ -75,7 +75,7 @@ class SentMessage
      */
     public function __unserialize(array $data)
     {
-        $hasAttachments = (isset($data['hasAttachments']) && $data['hasAttachments'] === true);
+        $hasAttachments = ($data['hasAttachments'] ?? false) === true;
 
         $this->sentMessage = $hasAttachments ? unserialize(base64_decode($data['sentMessage'])) : $data['sentMessage'];
     }
