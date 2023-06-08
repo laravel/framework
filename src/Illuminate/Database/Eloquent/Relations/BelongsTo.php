@@ -372,7 +372,7 @@ class BelongsTo extends Relation
     }
 
     /**
-     * Get the value of the model's associated key.
+     * Get the value of the model's foreign key.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return mixed
