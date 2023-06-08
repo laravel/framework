@@ -268,6 +268,16 @@ class ComponentTest extends TestCase
         Component::forgetFactory();
         $this->assertNotSame($this->viewFactory, $getFactory($inline));
     }
+
+    public function testViewWithMissingRenderMethodGetReturned()
+    {
+        $view = m::mock(View::class);
+        $this->viewFactory->shouldReceive('make')->once()->with('components.test-missing-render-component', [], [])->andReturn($view);
+
+        $component = new TestMissingRenderComponent();
+
+        $this->assertSame($view, $component->resolveView());
+    }
 }
 
 class TestInlineViewComponent extends Component
@@ -398,5 +408,16 @@ class TestHtmlableReturningViewComponent extends Component
     public function render()
     {
         return new HtmlString("<p>Hello {$this->title}</p>");
+    }
+}
+
+
+class TestMissingRenderComponent extends Component
+{
+    public $title;
+
+    public function __construct($title = 'foo')
+    {
+        $this->title = $title;
     }
 }

@@ -3,12 +3,13 @@
 namespace Illuminate\View;
 
 use Closure;
-use Illuminate\Container\Container;
-use Illuminate\Contracts\Support\Htmlable;
-use Illuminate\Contracts\View\View as ViewContract;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionProperty;
+use Illuminate\Support\Str;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Contracts\View\View as ViewContract;
 
 abstract class Component
 {
@@ -80,7 +81,20 @@ abstract class Component
      *
      * @return \Illuminate\Contracts\View\View|\Illuminate\Contracts\Support\Htmlable|\Closure|string
      */
-    abstract public function render();
+    public function render()
+    {
+        return view('components.'.$this->resolveViewName());
+    }
+
+    /**
+     * Resolve the Blade view that should be used when rendering the component.
+     *
+     * @return string
+     */
+    protected function resolveViewName()
+    {
+        return $this->componentName ?: Str::kebab(class_basename(get_class($this)));
+    }
 
     /**
      * Resolve the component instance with the given data.
