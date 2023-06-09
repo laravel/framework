@@ -6,7 +6,6 @@ use Carbon\CarbonInterval;
 use Closure;
 use DateTimeInterface;
 use Illuminate\Console\Application as Artisan;
-use Illuminate\Console\Command;
 use Illuminate\Console\Events\CommandFinished;
 use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Console\Scheduling\Schedule;
@@ -18,13 +17,10 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Env;
 use Illuminate\Support\InteractsWithTime;
-use Illuminate\Support\Str;
-use ReflectionClass;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\Finder\Finder;
 use Throwable;
 
 class Kernel implements KernelContract
@@ -321,31 +317,10 @@ class Kernel implements KernelContract
      */
     protected function load($paths)
     {
-        $paths = array_unique(Arr::wrap($paths));
-
-        $paths = array_filter($paths, function ($path) {
-            return is_dir($path);
-        });
-
-        if (empty($paths)) {
-            return;
-        }
-
-        $namespace = $this->app->getNamespace();
-
-        foreach ((new Finder)->in($paths)->files() as $command) {
-            $command = $namespace.str_replace(
-                ['/', '.php'],
-                ['\\', ''],
-                Str::after($command->getRealPath(), realpath(app_path()).DIRECTORY_SEPARATOR)
-            );
-
-            if (is_subclass_of($command, Command::class) &&
-                ! (new ReflectionClass($command))->isAbstract()) {
-                Artisan::starting(function ($artisan) use ($command) {
-                    $artisan->resolve($command);
-                });
-            }
+        foreach ($this->discoverCommands($paths) as $command) {
+            Artisan::starting(function ($artisan) use ($command) {
+                $artisan->resolve($command);
+            });
         }
     }
 
@@ -490,6 +465,22 @@ class Kernel implements KernelContract
     protected function bootstrappers()
     {
         return $this->bootstrappers;
+    }
+
+    /**
+     * Discover the commands for the application.
+     *
+     * @param  array|string  $paths
+     * @return array
+     */
+    public function discoverCommands($paths)
+    {
+        return collect(array_unique(Arr::wrap($paths)))
+            ->reject(fn ($directory) => ! is_dir($directory))
+            ->reduce(fn ($discovered, $directory) => array_merge_recursive(
+                $discovered,
+                DiscoverCommands::within($directory)
+            ), []);
     }
 
     /**

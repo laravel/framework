@@ -2,27 +2,24 @@
 
 namespace Illuminate\Foundation\Events;
 
+use Illuminate\Foundation\Support\DiscoversClasses;
 use Illuminate\Support\Reflector;
 use Illuminate\Support\Str;
-use ReflectionClass;
-use ReflectionException;
 use ReflectionMethod;
-use SplFileInfo;
 use Symfony\Component\Finder\Finder;
 
-class DiscoverEvents
+class DiscoverEvents extends DiscoversClasses
 {
     /**
      * Get all of the events and listeners by searching the given listener directory.
      *
-     * @param  string  $listenerPath
-     * @param  string  $basePath
+     * @param  string  $path
      * @return array
      */
-    public static function within($listenerPath, $basePath)
+    public static function within($path)
     {
         $listeners = collect(static::getListenerEvents(
-            (new Finder)->files()->in($listenerPath), $basePath
+            (new Finder)->files()->in($path)
         ));
 
         $discoveredEvents = [];
@@ -44,26 +41,13 @@ class DiscoverEvents
      * Get all of the listeners and their corresponding events.
      *
      * @param  iterable  $listeners
-     * @param  string  $basePath
      * @return array
      */
-    protected static function getListenerEvents($listeners, $basePath)
+    protected static function getListenerEvents($listeners)
     {
         $listenerEvents = [];
 
-        foreach ($listeners as $listener) {
-            try {
-                $listener = new ReflectionClass(
-                    static::classFromFile($listener, $basePath)
-                );
-            } catch (ReflectionException) {
-                continue;
-            }
-
-            if (! $listener->isInstantiable()) {
-                continue;
-            }
-
+        foreach (self::discoverClasses($listeners) as $listener) {
             foreach ($listener->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
                 if ((! Str::is('handle*', $method->name) && ! Str::is('__invoke', $method->name)) ||
                     ! isset($method->getParameters()[0])) {
@@ -76,23 +60,5 @@ class DiscoverEvents
         }
 
         return array_filter($listenerEvents);
-    }
-
-    /**
-     * Extract the class name from the given file path.
-     *
-     * @param  \SplFileInfo  $file
-     * @param  string  $basePath
-     * @return string
-     */
-    protected static function classFromFile(SplFileInfo $file, $basePath)
-    {
-        $class = trim(Str::replaceFirst($basePath, '', $file->getRealPath()), DIRECTORY_SEPARATOR);
-
-        return str_replace(
-            [DIRECTORY_SEPARATOR, ucfirst(basename(app()->path())).'\\'],
-            ['\\', app()->getNamespace()],
-            ucfirst(Str::replaceLast('.php', '', $class))
-        );
     }
 }
