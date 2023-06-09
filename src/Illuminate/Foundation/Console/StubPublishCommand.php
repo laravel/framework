@@ -17,7 +17,10 @@ class StubPublishCommand extends Command
      */
     protected $signature = 'stub:publish
                     {--existing : Publish and overwrite only the files that have already been published}
-                    {--force : Overwrite any existing files}';
+                    {--force : Overwrite any existing files}
+                    {--final : Publish files with all classes made final}
+                    {--strict : Publish files with strict_types enabled}
+                    {--no-comment : Publish files without DocBlocks}';
 
     /**
      * The console command description.
@@ -90,10 +93,46 @@ class StubPublishCommand extends Command
 
             if ((! $this->option('existing') && (! file_exists($to) || $this->option('force')))
                 || ($this->option('existing') && file_exists($to))) {
-                file_put_contents($to, file_get_contents($from));
+                file_put_contents(
+                    $to,
+                    $this->replaceContent(file_get_contents($from))
+                );
             }
         }
 
         $this->components->info('Stubs published successfully.');
+    }
+
+    protected function replaceContent($stub)
+    {
+        $replacements = [];
+
+        if ($this->option('final')) {
+            $replacements[] = [
+                'find' => '/^class {{/m',
+                'replace' => 'final class {{'
+            ];
+        }
+
+        if ($this->option('strict')) {
+            $replacements[] = [
+                'find' => '/^<\?php/m',
+                'replace' => "<?php\n\ndeclare(strict_types=1);"
+            ];
+        }
+
+        if ($this->option('no-comment')) {
+            $replacements[] = [
+                'find' => [
+                    '/^[\t| ]*((?:\/\*\*|\*\/)|(?:\*.*))$\n/m',
+                    '/^[\t| ]*\/\*\*.*\*\/\n/m',
+                ],
+                'replace' => ''
+            ];
+        }
+
+        return array_reduce($replacements, static function ($result, $current) {
+            return preg_replace($current['find'], $current['replace'], $result);
+        }, $stub);
     }
 }
