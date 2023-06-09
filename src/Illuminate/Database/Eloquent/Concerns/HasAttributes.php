@@ -296,7 +296,7 @@ trait HasAttributes
 
             if (isset($attributes[$key]) && ($this->isCustomDateTimeCast($value) ||
                 $this->isImmutableCustomDateTimeCast($value))) {
-                $attributes[$key] = $attributes[$key]->format(explode(':', $value, 2)[1]);
+                $attributes[$key] = $attributes[$key]->translatedFormat(explode(':', $value, 2)[1]);
             }
 
             if ($attributes[$key] instanceof DateTimeInterface &&
