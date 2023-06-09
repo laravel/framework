@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Events;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Reflector;
 use Illuminate\Support\Str;
 use ReflectionClass;
@@ -12,6 +13,8 @@ use Symfony\Component\Finder\Finder;
 
 class DiscoverEvents
 {
+    protected static array $namespaces;
+
     /**
      * Get all of the events and listeners by searching the given listener directory.
      *
@@ -87,12 +90,17 @@ class DiscoverEvents
      */
     protected static function classFromFile(SplFileInfo $file, $basePath)
     {
-        $class = trim(Str::replaceFirst($basePath, '', $file->getRealPath()), DIRECTORY_SEPARATOR);
+        if (! isset(static::$namespaces)) {
+            static::$namespaces = Arr::get(
+                json_decode(file_get_contents(base_path('composer.json')), true),
+                'autoload.psr-4',
+            );
+        }
 
         return str_replace(
-            [DIRECTORY_SEPARATOR, ucfirst(basename(app()->path())).'\\'],
-            ['\\', app()->getNamespace()],
-            ucfirst(Str::replaceLast('.php', '', $class))
+            [...array_values(static::$namespaces), '/', '.php'],
+            [...array_keys(static::$namespaces), '\\', ''],
+            Str::after($file->getRealPath(), $basePath.DIRECTORY_SEPARATOR)
         );
     }
 }

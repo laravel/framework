@@ -331,13 +331,16 @@ class Kernel implements KernelContract
             return;
         }
 
-        $namespace = $this->app->getNamespace();
+        $namespaces = Arr::get(
+            json_decode(file_get_contents($this->app->basePath('composer.json')), true),
+            'autoload.psr-4',
+        );
 
         foreach ((new Finder)->in($paths)->files() as $command) {
-            $command = $namespace.str_replace(
-                ['/', '.php'],
-                ['\\', ''],
-                Str::after($command->getRealPath(), realpath(app_path()).DIRECTORY_SEPARATOR)
+            $command = str_replace(
+                [...array_values($namespaces), '/', '.php'],
+                [...array_keys($namespaces), '\\', ''],
+                Str::after($command->getRealPath(), realpath(base_path()).DIRECTORY_SEPARATOR)
             );
 
             if (is_subclass_of($command, Command::class) &&
