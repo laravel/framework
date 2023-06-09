@@ -29,6 +29,7 @@ abstract class TestCase extends BaseTestCase
         Concerns\InteractsWithExceptionHandling,
         Concerns\InteractsWithSession,
         Concerns\InteractsWithTime,
+        Concerns\InteractsWithModelEvents,
         Concerns\InteractsWithViews;
 
     /**
