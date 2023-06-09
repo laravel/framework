@@ -858,6 +858,30 @@ class Arr
     }
 
     /**
+     * Convert a string of comma separated values into an array.
+     *
+     * @param  string  $string
+     * @param  string  $delimiter
+     * @return array
+     */
+    public static function fromCsv(string $string, string $delimiter = ',')
+    {
+        return array_map('trim', explode($delimiter, $string));
+    }
+
+    /**
+     * Convert an array into a string of comma separated values.
+     *
+     * @param  array  $array
+     * @param  string  $delimiter
+     * @return string
+     */
+    public static function toCsv(array $array, string $delimiter = ',')
+    {
+        return implode($delimiter, $array);
+    }
+
+    /**
      * Filter the array using the given callback.
      *
      * @param  array  $array
