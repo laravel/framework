@@ -82,7 +82,7 @@ class StatusCommand extends BaseCommand
 
                 $this->newLine();
 
-                if($this->option('non-zero-when-pending') && $this->pendingMigrationCount > 0) {
+                if ($this->option('non-zero-when-pending') && $this->pendingMigrationCount > 0) {
                     return 117;
                 }
 
