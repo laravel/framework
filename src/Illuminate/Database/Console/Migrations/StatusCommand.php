@@ -85,7 +85,6 @@ class StatusCommand extends BaseCommand
                 if ($this->option('non-zero-when-pending') && $this->pendingMigrationCount > 0) {
                     return 117;
                 }
-
             } else {
                 $this->components->info('No migrations found');
             }
