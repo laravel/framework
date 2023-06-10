@@ -30,6 +30,13 @@ class StatusCommand extends BaseCommand
     protected $migrator;
 
     /**
+     * The pending migrations count.
+     *
+     * @var int
+     */
+    protected $pendingMigrationCount = 0;
+
+    /**
      * Create a new migration rollback command instance.
      *
      * @param  \Illuminate\Database\Migrations\Migrator  $migrator
@@ -74,6 +81,11 @@ class StatusCommand extends BaseCommand
                     );
 
                 $this->newLine();
+
+                if($this->option('non-zero-when-pending') && $this->pendingMigrationCount > 0) {
+                    return 117;
+                }
+
             } else {
                 $this->components->info('No migrations found');
             }
@@ -93,12 +105,11 @@ class StatusCommand extends BaseCommand
                     ->map(function ($migration) use ($ran, $batches) {
                         $migrationName = $this->migrator->getMigrationName($migration);
 
-                        $status = in_array($migrationName, $ran)
-                            ? '<fg=green;options=bold>Ran</>'
-                            : '<fg=yellow;options=bold>Pending</>';
-
                         if (in_array($migrationName, $ran)) {
-                            $status = '['.$batches[$migrationName].'] '.$status;
+                            $status = '['.$batches[$migrationName].'] <fg=green;options=bold>Ran</>';
+                        } else {
+                            $status = '<fg=yellow;options=bold>Pending</>';
+                            $this->pendingMigrationCount += 1;
                         }
 
                         return [$migrationName, $status];
@@ -127,6 +138,7 @@ class StatusCommand extends BaseCommand
             ['pending', null, InputOption::VALUE_NONE, 'Only list pending migrations'],
             ['path', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'The path(s) to the migrations files to use'],
             ['realpath', null, InputOption::VALUE_NONE, 'Indicate any provided migration file paths are pre-resolved absolute paths'],
+            ['non-zero-when-pending', null, InputOption::VALUE_NONE, 'Exits with status 117 if migrations are pending.'],
         ];
     }
 }
