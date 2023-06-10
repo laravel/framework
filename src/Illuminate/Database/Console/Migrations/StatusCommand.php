@@ -96,7 +96,7 @@ class StatusCommand extends BaseCommand
                         if (in_array($migrationName, $ran)) {
                             $status = '['.$batches[$migrationName].'] <fg=green;options=bold>Ran</>';
                         } else {
-                            $status =  '<fg=yellow;options=bold>Pending</>';
+                            $status = '<fg=yellow;options=bold>Pending</>';
                         }
 
                         return [$migrationName, $status];
