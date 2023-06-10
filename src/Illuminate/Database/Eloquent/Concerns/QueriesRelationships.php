@@ -712,6 +712,21 @@ trait QueriesRelationships
     }
 
     /**
+     * Add subselect queries to count the relations if they are not null.
+     *
+     * @param $relation
+     * @param Closure|null $callback
+     * @param string $operator
+     * @param int $count
+     * @return Builder
+     */
+    public  function  withCountWhereHas($relation, Closure $callback = null, $operator = '>=', $count = 1): Builder
+    {
+        return $this->whereHas(Str::before($relation, ':'), $callback, $operator, $count)
+            ->withCount($callback ? [$relation => fn ($query) => $callback($query)] : $relation);
+    }
+
+    /**
      * Add subselect queries to include the max of the relation's column.
      *
      * @param  string|array  $relation
