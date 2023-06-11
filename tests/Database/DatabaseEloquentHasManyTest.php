@@ -316,12 +316,16 @@ class DatabaseEloquentHasManyTest extends TestCase
 
     protected function expectForceCreatedModel($relation, $attributes)
     {
-        $attributes[$relation->getForeignKeyName()] = $relation->getParentKey();
-
         $model = m::mock(Model::class);
         $model->shouldReceive('getAttribute')->with($relation->getForeignKeyName())->andReturn($relation->getParentKey());
 
-        $relation->getRelated()->shouldReceive('forceCreate')->once()->with($attributes)->andReturn($model);
+        $relation->getRelated()->shouldReceive('unguarded')->once()->andReturnUsing(function ($callback) {
+            return $callback();
+        });
+
+        $relation->getRelated()->shouldReceive('newInstance')->once()->with($attributes)->andReturn($model);
+        $model->shouldReceive('setAttribute')->once()->with($relation->getForeignKeyName(), $relation->getParentKey());
+        $model->shouldReceive('save')->once()->andReturn(true);
 
         return $model;
     }
