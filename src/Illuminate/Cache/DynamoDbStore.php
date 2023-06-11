@@ -305,7 +305,7 @@ class DynamoDbStore implements LockProvider, Store
      *
      * @param  string  $key
      * @param  mixed  $value
-     * @return int|bool
+     * @return int|false
      */
     public function increment($key, $value = 1)
     {
@@ -317,10 +317,9 @@ class DynamoDbStore implements LockProvider, Store
                         'S' => $this->prefix.$key,
                     ],
                 ],
-                'ConditionExpression' => 'attribute_exists(#key) AND #expires_at > :now',
-                'UpdateExpression' => 'SET #value = #value + :amount',
+                'ConditionExpression' => 'attribute_exists(#expires_at) AND #expires_at > :now',
+                'UpdateExpression' => 'SET #expires_at = if_not_exists(#expires_at, :forever) ADD #value :amount',
                 'ExpressionAttributeNames' => [
-                    '#key' => $this->keyAttribute,
                     '#value' => $this->valueAttribute,
                     '#expires_at' => $this->expirationAttribute,
                 ],
@@ -331,11 +330,12 @@ class DynamoDbStore implements LockProvider, Store
                     ':amount' => [
                         'N' => (string) $value,
                     ],
+                    ':forever' => [
+                        'N' => (string) Carbon::now()->addYears(5)->getTimestamp(),
+                    ],
                 ],
                 'ReturnValues' => 'UPDATED_NEW',
             ]);
-
-            return (int) $response['Attributes'][$this->valueAttribute]['N'];
         } catch (DynamoDbException $e) {
             if (str_contains($e->getMessage(), 'ConditionalCheckFailed')) {
                 return false;
@@ -343,6 +343,8 @@ class DynamoDbStore implements LockProvider, Store
 
             throw $e;
         }
+
+        return (int) $response['Attributes'][$this->valueAttribute]['N'];
     }
 
     /**
@@ -350,44 +352,11 @@ class DynamoDbStore implements LockProvider, Store
      *
      * @param  string  $key
      * @param  mixed  $value
-     * @return int|bool
+     * @return int|false
      */
     public function decrement($key, $value = 1)
     {
-        try {
-            $response = $this->dynamo->updateItem([
-                'TableName' => $this->table,
-                'Key' => [
-                    $this->keyAttribute => [
-                        'S' => $this->prefix.$key,
-                    ],
-                ],
-                'ConditionExpression' => 'attribute_exists(#key) AND #expires_at > :now',
-                'UpdateExpression' => 'SET #value = #value - :amount',
-                'ExpressionAttributeNames' => [
-                    '#key' => $this->keyAttribute,
-                    '#value' => $this->valueAttribute,
-                    '#expires_at' => $this->expirationAttribute,
-                ],
-                'ExpressionAttributeValues' => [
-                    ':now' => [
-                        'N' => (string) Carbon::now()->getTimestamp(),
-                    ],
-                    ':amount' => [
-                        'N' => (string) $value,
-                    ],
-                ],
-                'ReturnValues' => 'UPDATED_NEW',
-            ]);
-
-            return (int) $response['Attributes'][$this->valueAttribute]['N'];
-        } catch (DynamoDbException $e) {
-            if (str_contains($e->getMessage(), 'ConditionalCheckFailed')) {
-                return false;
-            }
-
-            throw $e;
-        }
+        return $this->increment(-1 * $value);
     }
 
     /**
