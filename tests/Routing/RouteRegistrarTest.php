@@ -7,7 +7,6 @@ use FooController;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
