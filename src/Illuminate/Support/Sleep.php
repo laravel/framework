@@ -427,7 +427,7 @@ class Sleep
     /**
      * Only sleep when the given condition is true.
      *
-     * @param  (\Closure($this): bool)|bool $condition
+     * @param  (\Closure($this): bool)|bool  $condition
      * @return $this
      */
     public function when($condition)
@@ -440,7 +440,7 @@ class Sleep
     /**
      * Don't sleep when the given condition is true.
      *
-     * @param  (\Closure($this): bool)|bool $condition
+     * @param  (\Closure($this): bool)|bool  $condition
      * @return $this
      */
     public function unless($condition)
