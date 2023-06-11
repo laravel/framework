@@ -345,9 +345,9 @@ abstract class HasOneOrMany extends Relation
      */
     public function forceCreate(array $attributes = [])
     {
-        $attributes[$this->getForeignKeyName()] = $this->getParentKey();
-
-        return $this->related->forceCreate($attributes);
+        return $this->related->unguarded(function () use ($attributes) {
+            return $this->create($attributes);
+        });
     }
 
     /**
