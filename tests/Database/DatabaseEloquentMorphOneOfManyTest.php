@@ -103,6 +103,8 @@ class DatabaseEloquentMorphOneOfManyTest extends TestCase
 
         $this->assertNotNull($state);
         $this->assertSame(MorphOneOfManyTestProduct::class, $product->current_state->stateful_type);
+        $this->assertSame($state->stateful_type, $product->getMorphClass());
+        $this->assertSame($state->stateful_id, $product->getKey());
     }
 
     public function testExists()
