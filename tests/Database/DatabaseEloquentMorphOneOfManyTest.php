@@ -211,7 +211,7 @@ class MorphOneOfManyTestProduct extends Eloquent
 
     public function states()
     {
-        return $this->morphMany(MorphOneOfManyTestState::class, 'stateful');
+        return $this->morphOne(MorphOneOfManyTestState::class, 'stateful');
     }
 
     public function current_state()
