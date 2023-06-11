@@ -23,7 +23,7 @@ class Json
      */
     public static function encode(mixed $value): mixed
     {
-        return isset(static::$encoder) ? (static::$encoder)($value) : json_encode($value);
+        return isset(static::$encoder) ? (static::$encoder)($value) : json_encode($value, JSON_UNESCAPED_UNICODE);
     }
 
     /**
