@@ -55,7 +55,7 @@ class Middleware
     /**
      * Specify the controller methods the middleware should not apply to.
      *
-     * @param  array|string  $only
+     * @param  array|string  $except
      * @return $this
      */
     public function except(array|string $except)
