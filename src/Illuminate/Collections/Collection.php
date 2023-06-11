@@ -373,7 +373,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Run a filter over each of the items.
      *
-     * @param (callable(TValue, TKey): bool)|null  $callback
+     * @param  (callable(TValue, TKey): bool)|null  $callback
      * @return static
      */
     public function filter(callable $callback = null)

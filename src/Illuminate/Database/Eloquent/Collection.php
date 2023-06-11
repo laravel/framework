@@ -250,7 +250,7 @@ class Collection extends BaseCollection implements QueueableCollection
      * Load a set of relationships onto the mixed relationship collection.
      *
      * @param  string  $relation
-     * @param  array<array-key, (callable(\Illuminate\Database\Eloquent\Builder): mixed)|string> $relations
+     * @param  array<array-key, (callable(\Illuminate\Database\Eloquent\Builder): mixed)|string>  $relations
      * @return $this
      */
     public function loadMorph($relation, $relations)
@@ -267,7 +267,7 @@ class Collection extends BaseCollection implements QueueableCollection
      * Load a set of relationship counts onto the mixed relationship collection.
      *
      * @param  string  $relation
-     * @param  array<array-key, (callable(\Illuminate\Database\Eloquent\Builder): mixed)|string> $relations
+     * @param  array<array-key, (callable(\Illuminate\Database\Eloquent\Builder): mixed)|string>  $relations
      * @return $this
      */
     public function loadMorphCount($relation, $relations)
