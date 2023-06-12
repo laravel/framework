@@ -657,11 +657,12 @@ class TestResponse implements ArrayAccess
      *
      * @param  string  $path
      * @param  mixed  $expect
+     * @param  string  $message
      * @return $this
      */
-    public function assertJsonPath($path, $expect)
+    public function assertJsonPath($path, $expect, string $message = '')
     {
-        $this->decodeResponseJson()->assertPath($path, $expect);
+        $this->decodeResponseJson()->assertPath($path, $expect, $message);
 
         return $this;
     }
@@ -670,11 +671,12 @@ class TestResponse implements ArrayAccess
      * Assert that the response has the exact given JSON.
      *
      * @param  array  $data
+     * @param  string $message
      * @return $this
      */
-    public function assertExactJson(array $data)
+    public function assertExactJson(array $data, string $message = '')
     {
-        $this->decodeResponseJson()->assertExact($data);
+        $this->decodeResponseJson()->assertExact($data, $message);
 
         return $this;
     }
@@ -683,11 +685,12 @@ class TestResponse implements ArrayAccess
      * Assert that the response has the similar JSON as given.
      *
      * @param  array  $data
+     * @param  string $message
      * @return $this
      */
-    public function assertSimilarJson(array $data)
+    public function assertSimilarJson(array $data, string $message = '')
     {
-        $this->decodeResponseJson()->assertSimilar($data);
+        $this->decodeResponseJson()->assertSimilar($data, $message);
 
         return $this;
     }
@@ -736,11 +739,12 @@ class TestResponse implements ArrayAccess
      * Assert that the response does not contain the given path.
      *
      * @param  string  $path
+     * @param  string  $message
      * @return $this
      */
-    public function assertJsonMissingPath(string $path)
+    public function assertJsonMissingPath(string $path, string $message = '')
     {
-        $this->decodeResponseJson()->assertMissingPath($path);
+        $this->decodeResponseJson()->assertMissingPath($path, $message);
 
         return $this;
     }
@@ -764,11 +768,12 @@ class TestResponse implements ArrayAccess
      *
      * @param  int  $count
      * @param  string|null  $key
+     * @param  string  $message
      * @return $this
      */
-    public function assertJsonCount(int $count, $key = null)
+    public function assertJsonCount(int $count, $key = null, string $message = '')
     {
-        $this->decodeResponseJson()->assertCount($count, $key);
+        $this->decodeResponseJson()->assertCount($count, $key, $message);
 
         return $this;
     }

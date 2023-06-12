@@ -64,14 +64,18 @@ class AssertableJsonString implements ArrayAccess, Countable
      *
      * @param  int  $count
      * @param  string|null  $key
+     * @param  string  $message
      * @return $this
      */
-    public function assertCount(int $count, $key = null)
+    public function assertCount(int $count, $key = null, string $message = '')
     {
+        if ($message === '') {
+            $message = 'Failed to assert that the response count matched the expected ' . $count;
+        }
         if (! is_null($key)) {
             PHPUnit::assertCount(
                 $count, data_get($this->decoded, $key),
-                "Failed to assert that the response count matched the expected {$count}"
+                $message
             );
 
             return $this;
@@ -79,7 +83,7 @@ class AssertableJsonString implements ArrayAccess, Countable
 
         PHPUnit::assertCount($count,
             $this->decoded,
-            "Failed to assert that the response count matched the expected {$count}"
+            $message
         );
 
         return $this;
@@ -89,9 +93,10 @@ class AssertableJsonString implements ArrayAccess, Countable
      * Assert that the response has the exact given JSON.
      *
      * @param  array  $data
+     * @param  string $message
      * @return $this
      */
-    public function assertExact(array $data)
+    public function assertExact(array $data, string $message = '')
     {
         $actual = $this->reorderAssocKeys((array) $this->decoded);
 
@@ -99,7 +104,8 @@ class AssertableJsonString implements ArrayAccess, Countable
 
         PHPUnit::assertEquals(
             json_encode($expected, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES),
-            json_encode($actual, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+            json_encode($actual, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES),
+            $message
         );
 
         return $this;
@@ -109,16 +115,17 @@ class AssertableJsonString implements ArrayAccess, Countable
      * Assert that the response has the similar JSON as given.
      *
      * @param  array  $data
+     * @param  string $message
      * @return $this
      */
-    public function assertSimilar(array $data)
+    public function assertSimilar(array $data, string $message = '')
     {
         $actual = json_encode(
             Arr::sortRecursive((array) $this->decoded),
             JSON_UNESCAPED_UNICODE
         );
 
-        PHPUnit::assertEquals(json_encode(Arr::sortRecursive($data), JSON_UNESCAPED_UNICODE), $actual);
+        PHPUnit::assertEquals(json_encode(Arr::sortRecursive($data), JSON_UNESCAPED_UNICODE), $actual, $message);
 
         return $this;
     }
@@ -219,11 +226,12 @@ class AssertableJsonString implements ArrayAccess, Countable
      * Assert that the response does not contain the given path.
      *
      * @param  string  $path
+     * @param  string $message
      * @return $this
      */
-    public function assertMissingPath($path)
+    public function assertMissingPath($path, string $message = '')
     {
-        PHPUnit::assertFalse(Arr::has($this->json(), $path));
+        PHPUnit::assertFalse(Arr::has($this->json(), $path), $message);
 
         return $this;
     }
@@ -233,14 +241,15 @@ class AssertableJsonString implements ArrayAccess, Countable
      *
      * @param  string  $path
      * @param  mixed  $expect
+     * @param  string $message
      * @return $this
      */
-    public function assertPath($path, $expect)
+    public function assertPath($path, $expect, string $message = '')
     {
         if ($expect instanceof Closure) {
-            PHPUnit::assertTrue($expect($this->json($path)));
+            PHPUnit::assertTrue($expect($this->json($path)), $message);
         } else {
-            PHPUnit::assertSame($expect, $this->json($path));
+            PHPUnit::assertSame($expect, $this->json($path), $message);
         }
 
         return $this;
@@ -260,7 +269,7 @@ class AssertableJsonString implements ArrayAccess, Countable
         }
 
         if (! is_null($responseData)) {
-            return (new static($responseData))->assertStructure($structure);
+            return (new static($responseData))->assertStructure($structure, null);
         }
 
         foreach ($structure as $key => $value) {
@@ -287,12 +296,16 @@ class AssertableJsonString implements ArrayAccess, Countable
      *
      * @param  array  $data
      * @param  bool  $strict
+     * @param  string $message
      * @return $this
      */
-    public function assertSubset(array $data, $strict = false)
+    public function assertSubset(array $data, $strict = false, string $message = '')
     {
+        if ($message === '') {
+            $message = $this->assertJsonMessage($data);
+        }
         PHPUnit::assertArraySubset(
-            $data, $this->decoded, $strict, $this->assertJsonMessage($data)
+            $data, $this->decoded, $strict, $message
         );
 
         return $this;
