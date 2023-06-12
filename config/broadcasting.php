@@ -55,7 +55,7 @@ return [
 
         'redis' => [
             'driver' => 'redis',
-            'connection' => 'default',
+            'connection' => env('REDIS_BROADCASTING_CONNECTION', 'default'),
         ],
 
         'log' => [
