@@ -72,7 +72,7 @@ class LoadConfiguration
             $config = require $path;
 
             if (isset($base[$key])) {
-                $config = array_replace_recursive($config, $base[$key]);
+                $config = array_merge($config, $base[$key]);
 
                 unset($base[$key]);
             }
