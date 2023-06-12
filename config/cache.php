@@ -44,9 +44,9 @@ return [
 
         'database' => [
             'driver' => 'database',
-            'table' => 'cache',
-            'connection' => null,
-            'lock_connection' => null,
+            'table' => env('DATABASE_CACHE_TABLE', 'cache'),
+            'connection' => env('DATABASE_CACHE_CONNECTION', null),
+            'lock_connection' => env('DATABASE_CACHE_LOCK_CONNECTION', null),
         ],
 
         'file' => [
@@ -76,8 +76,8 @@ return [
 
         'redis' => [
             'driver' => 'redis',
-            'connection' => 'cache',
-            'lock_connection' => 'default',
+            'connection' => env('REDIS_CACHE_CONNECTION', 'cache'),
+            'lock_connection' => env('REDIS_CACHE_LOCK_CONNECTION', 'default'),
         ],
 
         'dynamodb' => [
