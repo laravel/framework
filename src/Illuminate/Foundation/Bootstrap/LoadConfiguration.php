@@ -66,8 +66,22 @@ class LoadConfiguration
             throw new Exception('Unable to load the "app" configuration file.');
         }
 
+        $base = $this->getBaseConfiguration();
+
         foreach ($files as $key => $path) {
-            $repository->set($key, require $path);
+            $config = require $path;
+
+            if (isset($base[$key])) {
+                $config = array_replace_recursive($config, $base[$key]);
+
+                unset($base[$key]);
+            }
+
+            $repository->set($key, $config);
+        }
+
+        foreach ($base as $key => $config) {
+            $repository->set($key, $config);
         }
     }
 
@@ -110,5 +124,21 @@ class LoadConfiguration
         }
 
         return $nested;
+    }
+
+    /**
+     * Get the base configuration files.
+     *
+     * @return array
+     */
+    protected function getBaseConfiguration()
+    {
+        $config = [];
+
+        foreach (Finder::create()->files()->name('*.php')->in(__DIR__.'/../../../../config') as $file) {
+            $config[basename($file->getRealPath(), '.php')] = require $file->getRealPath();
+        }
+
+        return $config;
     }
 }
