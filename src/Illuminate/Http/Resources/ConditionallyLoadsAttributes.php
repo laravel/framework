@@ -301,6 +301,34 @@ trait ConditionallyLoadsAttributes
     }
 
     /**
+     * Retrieve a relationship with average value if it exists.
+     *
+     * @param  string  $relationship
+     * @param  string  $column
+     * @param  mixed  $value
+     * @param  mixed  $default
+     * @return \Illuminate\Http\Resources\MissingValue|mixed
+     */
+    public function whenAveraged($relationship, $column, $value = null, $default = null)
+    {
+        $attribute = (string) Str::of($relationship)->snake()->append('_avg_')->finish($column);
+
+        if (! isset($this->resource->getAttributes()[$attribute])) {
+            return value($default);
+        }
+
+        if (func_num_args() === 2) {
+            return $this->resource->{$attribute};
+        }
+
+        if ($this->resource->{$attribute} === null) {
+            return;
+        }
+
+        return value($value, $this->resource->{$attribute});
+    }
+
+    /**
      * Execute a callback if the given pivot table has been loaded.
      *
      * @param  string  $table
