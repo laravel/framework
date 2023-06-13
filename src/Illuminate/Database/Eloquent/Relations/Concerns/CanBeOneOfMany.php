@@ -207,7 +207,7 @@ trait CanBeOneOfMany
                 if ($key === 0) {
                     $aggregatedColumn = "{$aggregate}({$aggregatedColumn})";
                 } else {
-                    $aggregatedColumn = "MIN({$aggregatedColumn})";
+                    $aggregatedColumn = "min({$aggregatedColumn})";
                 }
 
                 $subQuery->selectRaw($aggregatedColumn.' as '.$subQuery->getQuery()->grammar->wrap($column.'_aggregate'));
