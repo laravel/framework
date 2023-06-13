@@ -62,6 +62,9 @@ trait DetectsLostConnections
             'SSL: Operation timed out',
             'Reason: Server is in script upgrade mode. Only administrator can connect at this time.',
             'Unknown $curl_error_code: 77',
+            'SSL: Handshake timed out',
+            'SQLSTATE[08006] [7] SSL error: sslv3 alert unexpected message',
+            'SQLSTATE[08006] [7] unrecognized SSL error code:',
         ]);
     }
 }
