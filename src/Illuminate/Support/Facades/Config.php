@@ -9,6 +9,7 @@ namespace Illuminate\Support\Facades;
  * @method static void set(array|string $key, mixed $value = null)
  * @method static void prepend(string $key, mixed $value)
  * @method static void push(string $key, mixed $value)
+ * @method static void merge(string $key, array $value)
  * @method static array all()
  * @method static void macro(string $name, object|callable $macro)
  * @method static void mixin(object $mixin, bool $replace = true)

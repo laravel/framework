@@ -126,6 +126,20 @@ class Repository implements ArrayAccess, ConfigContract
     }
 
     /**
+     * Merges a given array with an existing array configuration value.
+     *
+     * @param  string  $key
+     * @param  array  $value
+     * @return void
+     */
+    public function merge($key, array $value)
+    {
+        $array = $this->get($key, []);
+
+        $this->set($key, array_merge($array, $value));
+    }
+
+    /**
      * Get all of the configuration items for the application.
      *
      * @return array
