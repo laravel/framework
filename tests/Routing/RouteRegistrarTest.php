@@ -136,6 +136,51 @@ class RouteRegistrarTest extends TestCase
         $this->assertEquals(['one'], $this->getRoute()->excludedMiddleware());
     }
 
+    public function testGetRouteWithTrashed()
+    {
+        $route = $this->router->get('users', [RouteRegistrarControllerStub::class, 'index'])->withTrashed();
+
+        $this->assertTrue($route->allowsTrashedBindings());
+    }
+
+    public function testResourceWithTrashed()
+    {
+        $this->router->resource('users', RouteRegistrarControllerStub::class)
+            ->only(['index', 'destroy'])
+            ->withTrashed([
+                'index',
+                'destroy',
+            ]);
+
+        /** @var \Illuminate\Routing\Route $route */
+        foreach ($this->router->getRoutes() as $route) {
+            $this->assertTrue($route->allowsTrashedBindings());
+        }
+    }
+
+    public function testFallbackRoute()
+    {
+        $route = $this->router->fallback(function () {
+            return 'milwad';
+        });
+
+        $this->assertTrue($route->isFallback);
+    }
+
+    public function testSetFallbackRoute()
+    {
+        $route = $this->router->fallback(function () {
+            return 'milwad';
+        });
+        $route->setFallback(false);
+
+        $this->assertFalse($route->isFallback);
+
+        $route->setFallback(true);
+
+        $this->assertTrue($route->isFallback);
+    }
+
     public function testCanRegisterGetRouteWithClosureAction()
     {
         $this->router->middleware('get-middleware')->get('users', function () {
@@ -590,6 +635,19 @@ class RouteRegistrarTest extends TestCase
 
         $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.update'));
         $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.destroy'));
+    }
+
+    public function testCanLimitAndExcludeMethodsOnRegisteredResource()
+    {
+        $this->router->resource('users', RouteRegistrarControllerStub::class)
+                     ->only('index', 'show', 'destroy')
+                     ->except('destroy');
+
+        $this->assertCount(2, $this->router->getRoutes());
+
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.index'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.show'));
+        $this->assertFalse($this->router->getRoutes()->hasNamedRoute('users.destroy'));
     }
 
     public function testCanSetShallowOptionOnRegisteredResource()
@@ -1086,6 +1144,155 @@ class RouteRegistrarTest extends TestCase
         $this->router->removeMiddlewareFromGroup('web', ['test-middleware']);
 
         $this->assertEquals([], $this->router->getMiddlewareGroups());
+    }
+
+    public function testCanRegisterSingleton()
+    {
+        $this->router->singleton('user', RouteRegistrarControllerStub::class);
+
+        $this->assertCount(3, $this->router->getRoutes());
+
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('user.show'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('user.edit'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('user.update'));
+    }
+
+    public function testCanRegisterApiSingleton()
+    {
+        $this->router->apiSingleton('user', RouteRegistrarControllerStub::class);
+
+        $this->assertCount(2, $this->router->getRoutes());
+
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('user.show'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('user.update'));
+    }
+
+    public function testCanRegisterCreatableSingleton()
+    {
+        $this->router->singleton('user', RouteRegistrarControllerStub::class)->creatable();
+
+        $this->assertCount(6, $this->router->getRoutes());
+
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('user.create'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('user.store'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('user.show'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('user.edit'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('user.update'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('user.destroy'));
+    }
+
+    public function testCanRegisterCreatableApiSingleton()
+    {
+        $this->router->apiSingleton('user', RouteRegistrarControllerStub::class)->creatable();
+
+        $this->assertCount(4, $this->router->getRoutes());
+
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('user.store'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('user.show'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('user.update'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('user.destroy'));
+    }
+
+    public function testSingletonCreatableNotDestroyable()
+    {
+        $this->router->singleton('user', RouteRegistrarControllerStub::class)
+            ->creatable()
+            ->except('destroy');
+
+        $this->assertCount(5, $this->router->getRoutes());
+
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('user.create'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('user.store'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('user.show'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('user.edit'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('user.update'));
+        $this->assertFalse($this->router->getRoutes()->hasNamedRoute('user.destroy'));
+    }
+
+    public function testApiSingletonCreatableNotDestroyable()
+    {
+        $this->router->apiSingleton('user', RouteRegistrarControllerStub::class)
+            ->creatable()
+            ->except('destroy');
+
+        $this->assertCount(3, $this->router->getRoutes());
+
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('user.store'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('user.show'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('user.update'));
+        $this->assertFalse($this->router->getRoutes()->hasNamedRoute('user.destroy'));
+    }
+
+    public function testSingletonCanBeDestroyable()
+    {
+        $this->router->singleton('user', RouteRegistrarControllerStub::class)
+            ->destroyable();
+
+        $this->assertCount(4, $this->router->getRoutes());
+
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('user.show'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('user.edit'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('user.update'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('user.destroy'));
+    }
+
+    public function testApiSingletonCanBeDestroyable()
+    {
+        $this->router->apiSingleton('user', RouteRegistrarControllerStub::class)
+            ->destroyable();
+
+        $this->assertCount(3, $this->router->getRoutes());
+
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('user.show'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('user.update'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('user.destroy'));
+    }
+
+    public function testSingletonCanBeOnlyCreatable()
+    {
+        $this->router->singleton('user', RouteRegistrarControllerStub::class)
+            ->creatable()
+            ->only('create', 'store');
+
+        $this->assertCount(2, $this->router->getRoutes());
+
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('user.create'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('user.store'));
+    }
+
+    public function testApiSingletonCanBeOnlyCreatable()
+    {
+        $this->router->apiSingleton('user', RouteRegistrarControllerStub::class)
+            ->creatable()
+            ->only('store');
+
+        $this->assertCount(1, $this->router->getRoutes());
+
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('user.store'));
+    }
+
+    public function testSingletonDoesntAllowIncludingUnsupportedMethods()
+    {
+        $this->router->singleton('post', RouteRegistrarControllerStub::class)
+            ->only('index', 'store', 'create', 'destroy');
+
+        $this->assertCount(0, $this->router->getRoutes());
+
+        $this->router->apiSingleton('user', RouteRegistrarControllerStub::class)
+            ->only('index', 'store', 'create', 'destroy');
+
+        $this->assertCount(0, $this->router->getRoutes());
+    }
+
+    public function testApiSingletonCanIncludeAnySingletonMethods()
+    {
+        // This matches the behavior of the apiResource method.
+        $this->router->apiSingleton('user', RouteRegistrarControllerStub::class)
+            ->only('edit');
+
+        $this->assertCount(1, $this->router->getRoutes());
+
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('user.edit'));
     }
 
     /**

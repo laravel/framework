@@ -81,6 +81,36 @@ class MailMailerTest extends TestCase
         $this->assertStringContainsString('Hello World', $sentMessage->toString());
     }
 
+    public function testMailerSendSendsMessageWithProperViewContentUsingStringCallbacks()
+    {
+        $view = m::mock(Factory::class);
+        $view->shouldReceive('render')->never();
+
+        $mailer = new Mailer('array', $view, new ArrayTransport);
+
+        $sentMessage = $mailer->send(
+            [
+                'html' => function ($data) {
+                    $this->assertInstanceOf(Message::class, $data['message']);
+
+                    return new HtmlString('<p>Hello Laravel</p>');
+                },
+                'text' => function ($data) {
+                    $this->assertInstanceOf(Message::class, $data['message']);
+
+                    return new HtmlString('Hello World');
+                },
+            ],
+            [],
+            function (Message $message) {
+                $message->to('taylor@laravel.com')->from('hello@laravel.com');
+            }
+        );
+
+        $this->assertStringContainsString('<p>Hello Laravel</p>', $sentMessage->toString());
+        $this->assertStringContainsString('Hello World', $sentMessage->toString());
+    }
+
     public function testMailerSendSendsMessageWithProperViewContentUsingHtmlMethod()
     {
         $view = m::mock(Factory::class);

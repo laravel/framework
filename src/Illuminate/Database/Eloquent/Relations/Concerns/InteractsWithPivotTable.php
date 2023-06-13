@@ -396,7 +396,7 @@ trait InteractsWithPivotTable
         if ($this->using) {
             $pivotModel = new $this->using;
 
-            $fresh = $fresh->format($pivotModel->getDateFormat());
+            $fresh = $pivotModel->fromDateTime($fresh);
         }
 
         if (! $exists && $this->hasPivotColumn($this->createdAt())) {
@@ -510,6 +510,8 @@ trait InteractsWithPivotTable
      */
     public function newPivot(array $attributes = [], $exists = false)
     {
+        $attributes = array_merge(array_column($this->pivotValues, 'value', 'column'), $attributes);
+
         $pivot = $this->related->newPivot(
             $this->parent, $attributes, $this->table, $exists, $this->using
         );

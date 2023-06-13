@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Cache\Repository;
+
 use function PHPStan\Testing\assertType;
 
 /** @var Repository $cache */

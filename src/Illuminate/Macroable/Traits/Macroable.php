@@ -45,7 +45,6 @@ trait Macroable
 
         foreach ($methods as $method) {
             if ($replace || ! static::hasMacro($method->name)) {
-                $method->setAccessible(true);
                 static::macro($method->name, $method->invoke($mixin));
             }
         }
@@ -107,7 +106,7 @@ trait Macroable
      *
      * @throws \BadMethodCallException
      */
-    public function __call($method, array $parameters)
+    public function __call($method, $parameters)
     {
         if (! static::hasMacro($method)) {
             throw new BadMethodCallException(sprintf(

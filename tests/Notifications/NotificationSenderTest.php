@@ -102,7 +102,7 @@ class NotificationSenderTest extends TestCase
 
         $sender = new NotificationSender($manager, $bus, $events);
 
-        $sender->send($notifiable, new DummyMultiChannelNotificationWithConditionalMiddlware);
+        $sender->send($notifiable, new DummyMultiChannelNotificationWithConditionalMiddleware);
     }
 
     public function testItCanSendQueuedWithViaConnectionsNotifications()
@@ -211,7 +211,7 @@ class DummyNotificationWithMiddleware extends Notification implements ShouldQueu
     }
 }
 
-class DummyMultiChannelNotificationWithConditionalMiddlware extends Notification implements ShouldQueue
+class DummyMultiChannelNotificationWithConditionalMiddleware extends Notification implements ShouldQueue
 {
     use Queueable;
 

@@ -116,6 +116,29 @@ class HttpTestingFileFactoryTest extends TestCase
         );
     }
 
+    /** @dataProvider generateImageDataProvider */
+    public function testCallingCreateWithoutGDLoadedThrowsAnException(string $fileExtension, string $driver)
+    {
+        if ($this->isGDSupported($driver)) {
+            $this->markTestSkipped("Requires no {$driver}");
+        }
+
+        $this->expectException(\LogicException::class);
+        (new FileFactory)->image("test.{$fileExtension}");
+    }
+
+    public static function generateImageDataProvider(): array
+    {
+        return [
+            'jpeg' => ['jpeg', 'JPEG Support'],
+            'png' => ['png', 'PNG Support'],
+            'gif' => ['gif', 'GIF Create Support'],
+            'webp' => ['webp', 'WebP Support'],
+            'wbmp' => ['wbmp', 'WBMP Support'],
+            'bmp' => ['bmp', 'BMP Support'],
+        ];
+    }
+
     /**
      * @param  string  $driver
      * @return bool

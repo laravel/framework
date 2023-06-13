@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Testing\Concerns;
 use Closure;
 use Illuminate\Foundation\Mix;
 use Illuminate\Foundation\Vite;
+use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\HtmlString;
 use Mockery;
 
@@ -109,6 +110,8 @@ trait InteractsWithContainer
         if ($this->originalVite == null) {
             $this->originalVite = app(Vite::class);
         }
+
+        Facade::clearResolvedInstance(Vite::class);
 
         $this->swap(Vite::class, new class
         {

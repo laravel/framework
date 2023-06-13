@@ -14,6 +14,7 @@ class EloquentCollectionFreshTest extends DatabaseTestCase
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('email');
+            $table->timestamps();
         });
     }
 

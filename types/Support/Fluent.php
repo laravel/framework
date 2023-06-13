@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Fluent;
+
 use function PHPStan\Testing\assertType;
 
 $fluent = new Fluent(['name' => 'Taylor', 'age' => 25, 'user' => new User]);

@@ -67,10 +67,7 @@ class InvokableValidationRule implements Rule, ValidatorAwareRule
     public static function make($invokable)
     {
         if ($invokable->implicit ?? false) {
-            return new class($invokable) extends InvokableValidationRule implements ImplicitRule
-            {
-                //
-            };
+            return new class($invokable) extends InvokableValidationRule implements ImplicitRule {};
         }
 
         return new InvokableValidationRule($invokable);

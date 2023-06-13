@@ -2,6 +2,7 @@
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
+
 use function PHPStan\Testing\assertType;
 
 $collection = collect([new User]);
@@ -1054,3 +1055,45 @@ foreach ($collection as $int => $user) {
     assertType('int', $int);
     assertType('User', $user);
 }
+
+class Animal
+{
+}
+class Tiger extends Animal
+{
+}
+class Lion extends Animal
+{
+}
+class Zebra extends Animal
+{
+}
+
+class Zoo
+{
+    /**
+     * @var \Illuminate\Support\Collection<int, Animal>
+     */
+    private Collection $animals;
+
+    public function __construct()
+    {
+        $this->animals = collect([
+            new Tiger,
+            new Lion,
+            new Zebra,
+        ]);
+    }
+
+    /**
+     * @return \Illuminate\Support\Collection<int, Animal>
+     */
+    public function getWithoutZebras(): Collection
+    {
+        return $this->animals->filter(fn (Animal $animal) => ! $animal instanceof Zebra);
+    }
+}
+
+$zoo = new Zoo();
+
+assertType('Illuminate\Support\Collection<int, Animal>', $zoo->getWithoutZebras());

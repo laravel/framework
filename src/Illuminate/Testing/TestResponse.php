@@ -894,7 +894,7 @@ class TestResponse implements ArrayAccess
     /**
      * Assert that the given key is a JSON array.
      *
-     * @param $key
+     * @param  string|null  $key
      * @return $this
      */
     public function assertJsonIsArray($key = null)
@@ -915,7 +915,7 @@ class TestResponse implements ArrayAccess
     /**
      * Assert that the given key is a JSON object.
      *
-     * @param $key
+     * @param  string|null  $key
      * @return $this
      */
     public function assertJsonIsObject($key = null)
@@ -1656,8 +1656,6 @@ class TestResponse implements ArrayAccess
     protected function appendMessageToException($message, $exception)
     {
         $property = new ReflectionProperty($exception, 'message');
-
-        $property->setAccessible(true);
 
         $property->setValue(
             $exception,

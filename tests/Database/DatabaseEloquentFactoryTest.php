@@ -497,7 +497,6 @@ class DatabaseEloquentFactoryTest extends TestCase
 
         $class = new ReflectionClass($factory);
         $prop = $class->getProperty('count');
-        $prop->setAccessible(true);
         $value = $prop->getValue($factory);
 
         $this->assertSame(3, $value);
@@ -821,7 +820,7 @@ class FactoryTestUserFactory extends Factory
     public function definition()
     {
         return [
-            'name' => $this->faker->name,
+            'name' => $this->faker->name(),
             'options' => null,
         ];
     }
@@ -857,7 +856,7 @@ class FactoryTestPostFactory extends Factory
     {
         return [
             'user_id' => FactoryTestUserFactory::new(),
-            'title' => $this->faker->name,
+            'title' => $this->faker->name(),
         ];
     }
 }
@@ -898,8 +897,8 @@ class FactoryTestCommentFactory extends Factory
         return [
             'commentable_id' => FactoryTestPostFactory::new(),
             'commentable_type' => FactoryTestPost::class,
-            'user_id' => FactoryTestUserFactory::new(),
-            'body' => $this->faker->name,
+            'user_id' => fn () => FactoryTestUserFactory::new(),
+            'body' => $this->faker->name(),
         ];
     }
 
@@ -930,7 +929,7 @@ class FactoryTestRoleFactory extends Factory
     public function definition()
     {
         return [
-            'name' => $this->faker->name,
+            'name' => $this->faker->name(),
         ];
     }
 }

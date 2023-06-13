@@ -3,7 +3,6 @@
 namespace Illuminate\Process;
 
 use Illuminate\Contracts\Process\InvokedProcess as InvokedProcessContract;
-use Symfony\Component\Process\Process;
 
 class FakeInvokedProcess implements InvokedProcessContract
 {

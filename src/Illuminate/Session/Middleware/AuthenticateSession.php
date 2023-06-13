@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Illuminate\Contracts\Session\Middleware\AuthenticatesSessions;
+use Illuminate\Http\Request;
 
 class AuthenticateSession implements AuthenticatesSessions
 {
@@ -94,7 +95,9 @@ class AuthenticateSession implements AuthenticatesSessions
 
         $request->session()->flush();
 
-        throw new AuthenticationException('Unauthenticated.', [$this->auth->getDefaultDriver()]);
+        throw new AuthenticationException(
+            'Unauthenticated.', [$this->auth->getDefaultDriver()], $this->redirectTo($request)
+        );
     }
 
     /**
@@ -105,5 +108,16 @@ class AuthenticateSession implements AuthenticatesSessions
     protected function guard()
     {
         return $this->auth;
+    }
+
+    /**
+     * Get the path the user should be redirected to when their session is not autheneticated.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return string|null
+     */
+    protected function redirectTo(Request $request)
+    {
+        //
     }
 }

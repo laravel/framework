@@ -150,6 +150,8 @@ class PivotEventsTestCollaborator extends Pivot
 {
     public $table = 'project_users';
 
+    public $timestamps = false;
+
     protected $casts = [
         'permissions' => 'json',
     ];

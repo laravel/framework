@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+
 use function PHPStan\Testing\assertType;
 
 /** @var ModelNotFoundException<User> $exception */

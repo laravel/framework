@@ -31,7 +31,7 @@ class HandleExceptionsTest extends TestCase
         $this->handleExceptions = new HandleExceptions();
 
         with(new ReflectionClass($this->handleExceptions), function ($reflection) {
-            $property = tap($reflection->getProperty('app'))->setAccessible(true);
+            $property = $reflection->getProperty('app');
 
             $property->setValue(
                 $this->handleExceptions,
@@ -324,7 +324,7 @@ class HandleExceptionsTest extends TestCase
     public function testForgetApp()
     {
         $appResolver = fn () => with(new ReflectionClass($this->handleExceptions), function ($reflection) {
-            $property = tap($reflection->getProperty('app'))->setAccessible(true);
+            $property = $reflection->getProperty('app');
 
             return $property->getValue($this->handleExceptions);
         });
@@ -339,7 +339,7 @@ class HandleExceptionsTest extends TestCase
     public function testHandlerForgetsPreviousApp()
     {
         $appResolver = fn () => with(new ReflectionClass($this->handleExceptions), function ($reflection) {
-            $property = tap($reflection->getProperty('app'))->setAccessible(true);
+            $property = $reflection->getProperty('app');
 
             return $property->getValue($this->handleExceptions);
         });

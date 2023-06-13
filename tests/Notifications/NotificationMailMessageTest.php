@@ -314,4 +314,49 @@ class NotificationMailMessageTest extends TestCase
             ],
         ], $mailMessage->rawAttachments[0]);
     }
+
+    public function testItAttachesManyFiles()
+    {
+        $mailMessage = new MailMessage();
+        $attachable = new class() implements Attachable
+        {
+            public function toMailAttachment()
+            {
+                return Attachment::fromData(fn () => 'bar', 'foo.jpg')->withMime('image/png');
+            }
+        };
+
+        $mailMessage->attachMany([
+            $attachable,
+            '/path/to/forge.svg',
+            '/path/to/vapor.svg' => [
+                'as' => 'Logo.svg',
+                'mime' => 'image/svg+xml',
+            ],
+        ]);
+
+        $this->assertSame([
+            [
+                'data' => 'bar',
+                'name' => 'foo.jpg',
+                'options' => [
+                    'mime' => 'image/png',
+                ],
+            ],
+        ], $mailMessage->rawAttachments);
+
+        $this->assertSame([
+            [
+                'file' => '/path/to/forge.svg',
+                'options' => [],
+            ],
+            [
+                'file' => '/path/to/vapor.svg',
+                'options' => [
+                    'as' => 'Logo.svg',
+                    'mime' => 'image/svg+xml',
+                ],
+            ],
+        ], $mailMessage->attachments);
+    }
 }

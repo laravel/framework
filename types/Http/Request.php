@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+
 use function PHPStan\Testing\assertType;
 
 class TestEnum

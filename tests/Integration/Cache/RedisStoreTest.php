@@ -143,4 +143,24 @@ class RedisStoreTest extends TestCase
         $keyCount = Cache::store('redis')->connection()->keys('*');
         $this->assertEquals(4, count($keyCount)); // Sets for people, authors, and artists + individual entry for Jennifer
     }
+
+    public function testMultipleItemsCanBeSetAndRetrieved()
+    {
+        $store = Cache::store('redis');
+        $result = $store->put('foo', 'bar', 10);
+        $resultMany = $store->putMany([
+            'fizz' => 'buz',
+            'quz' => 'baz',
+        ], 10);
+        $this->assertTrue($result);
+        $this->assertTrue($resultMany);
+        $this->assertEquals([
+            'foo' => 'bar',
+            'fizz' => 'buz',
+            'quz' => 'baz',
+            'norf' => null,
+        ], $store->many(['foo', 'fizz', 'quz', 'norf']));
+
+        $this->assertEquals([], $store->many([]));
+    }
 }

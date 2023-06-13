@@ -2,7 +2,6 @@
 
 namespace Illuminate\Routing;
 
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 class ResourceRegistrar
@@ -149,6 +148,12 @@ class ResourceRegistrar
 
         $defaults = $this->singletonResourceDefaults;
 
+        if (isset($options['creatable'])) {
+            $defaults = array_merge($defaults, ['create', 'store', 'destroy']);
+        } elseif (isset($options['destroyable'])) {
+            $defaults = array_merge($defaults, ['destroy']);
+        }
+
         $collection = new RouteCollection;
 
         $resourceMethods = $this->getResourceMethods($defaults, $options);
@@ -249,25 +254,7 @@ class ResourceRegistrar
             $methods = array_diff($methods, (array) $options['except']);
         }
 
-        if (isset($options['creatable'])) {
-            $methods = isset($options['apiSingleton'])
-                            ? array_merge(['store', 'destroy'], $methods)
-                            : array_merge(['create', 'store', 'destroy'], $methods);
-
-            return $this->getResourceMethods(
-                $methods, array_values(Arr::except($options, ['creatable']))
-            );
-        }
-
-        if (isset($options['destroyable'])) {
-            $methods = array_merge(['destroy'], $methods);
-
-            return $this->getResourceMethods(
-                $methods, array_values(Arr::except($options, ['destroyable']))
-            );
-        }
-
-        return $methods;
+        return array_values($methods);
     }
 
     /**
@@ -721,8 +708,8 @@ class ResourceRegistrar
     {
         if (empty($verbs)) {
             return static::$verbs;
-        } else {
-            static::$verbs = array_merge(static::$verbs, $verbs);
         }
+
+        static::$verbs = array_merge(static::$verbs, $verbs);
     }
 }

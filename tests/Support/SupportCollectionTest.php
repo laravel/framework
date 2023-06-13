@@ -606,7 +606,6 @@ class SupportCollectionTest extends TestCase
 
         $class = new ReflectionClass($collection);
         $method = $class->getMethod('getArrayableItems');
-        $method->setAccessible(true);
 
         $items = new TestArrayableObject;
         $array = $method->invokeArgs($data, [$items]);
@@ -4692,7 +4691,6 @@ class SupportCollectionTest extends TestCase
 
     /**
      * @dataProvider collectionClassProvider
-     * @requires PHP >= 8.1
      */
     public function testCollectionFromEnum($collection)
     {
@@ -4702,7 +4700,6 @@ class SupportCollectionTest extends TestCase
 
     /**
      * @dataProvider collectionClassProvider
-     * @requires PHP >= 8.1
      */
     public function testCollectionFromBackedEnum($collection)
     {
