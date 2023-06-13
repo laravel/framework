@@ -31,7 +31,7 @@ class SentMessageMailTest extends TestCase
 
         Event::listen(
             NotificationSent::class,
-            function(NotificationSent $notification) use (&$notificationWasSent, $user) {
+            function (NotificationSent $notification) use (&$notificationWasSent, $user) {
                 $notificationWasSent = true;
                 /**
                  * Confirm that NotificationSent can be serialized/unserialized as
@@ -43,7 +43,7 @@ class SentMessageMailTest extends TestCase
                 $this->assertTrue($user->is($afterSerialization->notifiable));
 
                 $this->assertEqualsCanonicalizing($notification->notification, $afterSerialization->notification);
-        });
+            });
 
         $user->notify(new SentMessageMailNotification());
 
@@ -58,7 +58,6 @@ class SentMessageUser extends Model
     public $timestamps = false;
 }
 
-
 class SentMessageMailNotification extends Notification
 {
     public function via(): array
@@ -70,7 +69,7 @@ class SentMessageMailNotification extends Notification
     {
         return (new MailMessage)
             ->line('Example notification with attachment.')
-            ->attach(__DIR__ . '/Fixtures/blank_document.pdf', [
+            ->attach(__DIR__.'/Fixtures/blank_document.pdf', [
                 'as' => 'blank_document.pdf',
                 'mime' => 'application/pdf',
             ]);
