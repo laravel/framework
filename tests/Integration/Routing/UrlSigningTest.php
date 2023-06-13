@@ -52,7 +52,6 @@ class UrlSigningTest extends TestCase
 
         $this->assertIsString($url = URL::signedRoute('foo', ['post' => $model]));
 
-
         tap($this->get($url), function ($response) {
             $this->assertSame('valid', $response->original['valid']);
             $this->assertSame('routable-slug', $response->original['slug']);
