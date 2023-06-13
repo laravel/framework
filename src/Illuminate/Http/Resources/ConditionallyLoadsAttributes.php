@@ -301,23 +301,24 @@ trait ConditionallyLoadsAttributes
     }
 
     /**
-     * Retrieve a relationship average value if it exists.
+     * Retrieve a relationship aggregated value if it exists.
      *
      * @param  string  $relationship
      * @param  string  $column
+     * @param  string  $aggregate
      * @param  mixed  $value
      * @param  mixed  $default
      * @return \Illuminate\Http\Resources\MissingValue|mixed
      */
-    public function whenAveraged($relationship, $column, $value = null, $default = null)
+    public function whenAggregated($relationship, $column, $aggregate, $value = null, $default = null)
     {
-        $attribute = (string) Str::of($relationship)->snake()->append('_avg_')->finish($column);
+        $attribute = (string) Str::of($relationship)->snake()->append('_')->append($aggregate)->append('_')->finish($column);
 
         if (! isset($this->resource->getAttributes()[$attribute])) {
             return value($default);
         }
 
-        if (func_num_args() === 2) {
+        if (func_num_args() === 3) {
             return $this->resource->{$attribute};
         }
 
