@@ -62,6 +62,7 @@ class MessageSent
     public function __unserialize(array $data)
     {
         $this->sent = $data['sent'];
+
         $this->data = (($data['hasAttachments'] ?? false) === true)
             ? unserialize(base64_decode($data['data']))
             : $data['data'];
