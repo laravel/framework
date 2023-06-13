@@ -38,7 +38,7 @@ class TestResponse implements ArrayAccess
     }
 
     /**
-     * The request to delegate to.
+     * The original request for the response.
      *
      * @var \Illuminate\Http\Request|null
      */
