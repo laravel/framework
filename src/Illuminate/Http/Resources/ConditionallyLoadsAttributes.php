@@ -301,7 +301,7 @@ trait ConditionallyLoadsAttributes
     }
 
     /**
-     * Retrieve a relationship with average value if it exists.
+     * Retrieve a relationship average value if it exists.
      *
      * @param  string  $relationship
      * @param  string  $column
