@@ -6,6 +6,7 @@ use ArrayAccess;
 use ArrayIterator;
 use Countable;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Env;
 use Illuminate\Support\Optional;
 use Illuminate\Support\Stringable;
@@ -929,6 +930,13 @@ class SupportHelpersTest extends TestCase
             $expectedOutput,
             preg_replace_array($pattern, $replacements, $subject)
         );
+    }
+
+    public function testCollectModelReturnsModelCollection()
+    {
+        $class = new class() extends Model{};
+
+        $this->assertSame($class, collect($class)->first());
     }
 }
 

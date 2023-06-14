@@ -15,6 +15,10 @@ if (! function_exists('collect')) {
      */
     function collect($value = [])
     {
+        if ($value instanceof \Illuminate\Database\Eloquent\Model) {
+            $value = [$value];
+        }
+
         return new Collection($value);
     }
 }
