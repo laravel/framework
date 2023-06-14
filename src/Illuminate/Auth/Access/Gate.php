@@ -69,16 +69,18 @@ class Gate implements GateContract
     protected $stringCallbacks = [];
 
     /**
+     * The default denial response for gates and policies.
+     *
+     * @var Illuminate\Auth\Access\Response|null
+     */
+    protected $defaultDenialResponse = null;
+
+    /**
      * The callback to be used to guess policy names.
      *
      * @var callable|null
      */
     protected $guessPolicyNamesUsingCallback;
-
-    /**
-     * @var Response|null
-     */
-    protected $denialResponse = null;
 
     /**
      * Create a new gate instance.
@@ -90,11 +92,15 @@ class Gate implements GateContract
      * @param  array  $beforeCallbacks
      * @param  array  $afterCallbacks
      * @param  callable|null  $guessPolicyNamesUsingCallback
-     * @param  \Illuminate\Auth\Access\Response|null  $denialResponse
+     * @return void
      */
-    public function __construct(Container $container, callable $userResolver, array $abilities = [],
-                                array $policies = [], array $beforeCallbacks = [], array $afterCallbacks = [],
-                                callable $guessPolicyNamesUsingCallback = null, Response $denialResponse = null)
+    public function __construct(Container $container,
+        callable $userResolver,
+        array $abilities = [],
+        array $policies = [],
+        array $beforeCallbacks = [],
+        array $afterCallbacks = [],
+        callable $guessPolicyNamesUsingCallback = null)
     {
         $this->policies = $policies;
         $this->container = $container;
@@ -103,7 +109,6 @@ class Gate implements GateContract
         $this->afterCallbacks = $afterCallbacks;
         $this->beforeCallbacks = $beforeCallbacks;
         $this->guessPolicyNamesUsingCallback = $guessPolicyNamesUsingCallback;
-        $this->denialResponse = $denialResponse;
     }
 
     /**
@@ -404,7 +409,9 @@ class Gate implements GateContract
                 return $result;
             }
 
-            return $result ? Response::allow() : $this->getDenialResponse();
+            return $result
+                ? Response::allow()
+                : ($this->defaultDenialResponse ?? Response::deny());
         } catch (AuthorizationException $e) {
             return $e->toResponse();
         }
@@ -864,6 +871,19 @@ class Gate implements GateContract
     }
 
     /**
+     * Set the default denial response for gates and policies.
+     *
+     * @param  \Illuminate\Auth\Access\Response  $response
+     * @return $this
+     */
+    public function defaultDenialResponse(Response $response)
+    {
+        $this->defaultDenialResponse = $response;
+
+        return $this;
+    }
+
+    /**
      * Set the container instance used by the gate.
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
@@ -874,24 +894,5 @@ class Gate implements GateContract
         $this->container = $container;
 
         return $this;
-    }
-
-    /**
-     * @param  \Illuminate\Auth\Access\Response|null  $response
-     * @return $this
-     */
-    public function setDenialResponse(Response $response = null)
-    {
-        $this->denialResponse = $response;
-
-        return $this;
-    }
-
-    /**
-     * @return \Illuminate\Auth\Access\Response
-     */
-    protected function getDenialResponse()
-    {
-        return $this->denialResponse ?? Response::deny();
     }
 }

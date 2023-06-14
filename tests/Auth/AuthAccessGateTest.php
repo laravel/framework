@@ -1114,7 +1114,9 @@ class AuthAccessGateTest extends TestCase
     {
         $gate = new Gate(container: new Container, userResolver: function () {
             //
-        }, denialResponse: Response::denyWithStatus(999, 'my_message', 'abc'));
+        });
+
+        $gate->defaultDenialResponse(Response::denyWithStatus(999, 'my_message', 'abc'));
 
         $gate->define('foo', function() { return false; });
 
@@ -1134,7 +1136,7 @@ class AuthAccessGateTest extends TestCase
         });
 
         $gate->define('foo', function() { return false; });
-        $gate->setDenialResponse(Response::denyWithStatus(404, 'not_found', 'xyz'));
+        $gate->defaultDenialResponse(Response::denyWithStatus(404, 'not_found', 'xyz'));
 
         $response = $gate->inspect('foo', new AccessGateTestDummy);
         $this->assertTrue($response->denied());
