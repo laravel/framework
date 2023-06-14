@@ -83,14 +83,14 @@ class Gate implements GateContract
     /**
      * Create a new gate instance.
      *
-     * @param  Container  $container
+     * @param  \Illuminate\Contracts\Container\Container  $container
      * @param  callable  $userResolver
      * @param  array  $abilities
      * @param  array  $policies
      * @param  array  $beforeCallbacks
      * @param  array  $afterCallbacks
      * @param  callable|null  $guessPolicyNamesUsingCallback
-     * @param  Response|null  $denialResponse
+     * @param  \Illuminate\Auth\Access\Response|null  $denialResponse
      */
     public function __construct(Container $container, callable $userResolver, array $abilities = [],
                                 array $policies = [], array $beforeCallbacks = [], array $afterCallbacks = [],
