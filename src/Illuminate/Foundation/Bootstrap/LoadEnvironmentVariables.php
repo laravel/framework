@@ -5,11 +5,12 @@ namespace Illuminate\Foundation\Bootstrap;
 use Dotenv\Dotenv;
 use Dotenv\Exception\InvalidFileException;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Foundation\Bootstrap;
 use Illuminate\Support\Env;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
-class LoadEnvironmentVariables
+class LoadEnvironmentVariables implements Bootstrap
 {
     /**
      * Bootstrap the given application.

@@ -3,9 +3,10 @@
 namespace Illuminate\Foundation\Bootstrap;
 
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Foundation\Bootstrap;
 use Illuminate\Http\Request;
 
-class SetRequestForConsole
+class SetRequestForConsole implements Bootstrap
 {
     /**
      * Bootstrap the given application.
