@@ -60,18 +60,6 @@ interface UrlGenerator
     public function route($name, $parameters = [], $absolute = true);
 
     /**
-     * Get the URL for a given route instance.
-     *
-     * @param  \Illuminate\Routing\Route  $route
-     * @param  mixed  $parameters
-     * @param  bool  $absolute
-     * @return string
-     *
-     * @throws \Illuminate\Routing\Exceptions\UrlGenerationException
-     */
-    public function toRoute($route, $parameters, $absolute);
-
-    /**
      * Create a signed route URL for a named route.
      *
      * @param  string  $name
