@@ -73,7 +73,7 @@ class Gate implements GateContract
      *
      * @var Illuminate\Auth\Access\Response|null
      */
-    protected $defaultDenialResponse = null;
+    protected $defaultDenialResponse;
 
     /**
      * The callback to be used to guess policy names.
