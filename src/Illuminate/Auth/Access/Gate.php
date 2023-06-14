@@ -76,20 +76,25 @@ class Gate implements GateContract
     protected $guessPolicyNamesUsingCallback;
 
     /**
+     * @var Response|null
+     */
+    protected $denialResponse = null;
+
+    /**
      * Create a new gate instance.
      *
-     * @param  \Illuminate\Contracts\Container\Container  $container
+     * @param  Container  $container
      * @param  callable  $userResolver
      * @param  array  $abilities
      * @param  array  $policies
      * @param  array  $beforeCallbacks
      * @param  array  $afterCallbacks
      * @param  callable|null  $guessPolicyNamesUsingCallback
-     * @return void
+     * @param  Response|null  $denialResponse
      */
     public function __construct(Container $container, callable $userResolver, array $abilities = [],
                                 array $policies = [], array $beforeCallbacks = [], array $afterCallbacks = [],
-                                callable $guessPolicyNamesUsingCallback = null)
+                                callable $guessPolicyNamesUsingCallback = null, Response $denialResponse = null)
     {
         $this->policies = $policies;
         $this->container = $container;
@@ -98,6 +103,7 @@ class Gate implements GateContract
         $this->afterCallbacks = $afterCallbacks;
         $this->beforeCallbacks = $beforeCallbacks;
         $this->guessPolicyNamesUsingCallback = $guessPolicyNamesUsingCallback;
+        $this->denialResponse = $denialResponse;
     }
 
     /**
@@ -398,7 +404,7 @@ class Gate implements GateContract
                 return $result;
             }
 
-            return $result ? Response::allow() : Response::deny();
+            return $result ? Response::allow() : $this->getDenialResponse();
         } catch (AuthorizationException $e) {
             return $e->toResponse();
         }
@@ -868,5 +874,24 @@ class Gate implements GateContract
         $this->container = $container;
 
         return $this;
+    }
+
+    /**
+     * @param  \Illuminate\Auth\Access\Response|null  $response
+     * @return $this
+     */
+    public function setDenialResponse(Response $response = null)
+    {
+        $this->denialResponse = $response;
+
+        return $this;
+    }
+
+    /**
+     * @return \Illuminate\Auth\Access\Response
+     */
+    protected function getDenialResponse()
+    {
+        return $this->denialResponse ?? Response::deny();
     }
 }
