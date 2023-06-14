@@ -31,7 +31,7 @@ class CheckCommand extends Command
 
         $isRunning = $this->isProcessRunning($workerName);
 
-        if (!$isRunning) {
+        if (! $isRunning) {
             Log::info('Queue worker process is not running. Starting the worker...');
 
             Artisan::call('queue:work', ['--daemon' => true]);
@@ -41,12 +41,12 @@ class CheckCommand extends Command
     }
 
     /**
-     * @param string $processName
+     * @param  string  $processName
      * @return bool
      */
     private function isProcessRunning(string $processName): bool
     {
-        $processes = shell_exec('ps aux | grep "' . $processName . '" | grep -v grep');
+        $processes = shell_exec('ps aux | grep "'.$processName.'" | grep -v grep');
 
         return (bool) $processes;
     }
