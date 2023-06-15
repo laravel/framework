@@ -42,7 +42,7 @@ class Task extends Component
             throw $e;
         } finally {
             $runTime = $task
-                ? (' '.$this->formatRunTime($startTime))
+                ? (' '.$this->runTimeForHumans($startTime))
                 : '';
 
             $runTimeWidth = mb_strlen($runTime);

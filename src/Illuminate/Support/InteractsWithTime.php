@@ -67,11 +67,14 @@ trait InteractsWithTime
      * Given a start time, format the total run time for human readability.
      *
      * @param  float  $startTime
+     * @param  float  $endTime
      * @return string
      */
-    protected function formatRunTime($startTime)
+    protected function runTimeForHumans($startTime, $endTime = null)
     {
-        $runTime = (microtime(true) - $startTime) * 1000;
+        $endTime ??= microtime(true);
+
+        $runTime = ($endTime - $startTime) * 1000;
 
         return $runTime > 1000
             ? CarbonInterval::milliseconds($runTime)->cascade()->forHumans(short: true)
