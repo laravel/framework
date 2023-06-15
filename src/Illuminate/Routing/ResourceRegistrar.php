@@ -477,7 +477,6 @@ class ResourceRegistrar
      * Add the update method for a singleton route.
      *
      * @param  string  $name
-     * @param  string  $base
      * @param  string  $controller
      * @param  array  $options
      * @return \Illuminate\Routing\Route
