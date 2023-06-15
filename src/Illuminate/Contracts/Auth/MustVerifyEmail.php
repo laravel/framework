@@ -31,11 +31,4 @@ interface MustVerifyEmail
      * @return string
      */
     public function getEmailForVerification();
-
-    /**
-     * Get the name of the "email verified at" column.
-     *
-     * @return string
-     */
-    public function getEmailVerifiedAtColumn(): string;
 }
