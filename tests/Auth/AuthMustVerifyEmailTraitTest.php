@@ -54,6 +54,7 @@ class AuthMustVerifyEmailTraitTest extends TestCase
         $user->makePartial();
         $user->shouldReceive('forceFill')->withAnyArgs()->once()->andReturn(tap($user, function () use ($user) {
             $user->{$user->getEmailVerifiedAtColumn()} = $user->freshTimestamp();
+
             return $user;
         }));
         $user->shouldReceive('save')->once();
