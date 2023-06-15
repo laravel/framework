@@ -2,7 +2,6 @@
 
 namespace Illuminate\Queue\Console;
 
-use Carbon\CarbonInterval;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Queue\Job;
