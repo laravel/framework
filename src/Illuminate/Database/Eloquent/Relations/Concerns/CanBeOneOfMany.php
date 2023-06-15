@@ -141,9 +141,8 @@ trait CanBeOneOfMany
      */
     public function latestOfMany($column = 'id', $relation = null)
     {
-        return $this->ofMany(collect(Arr::wrap($column))->mapWithKeys(function ($column) {
-            return [$column => 'MAX'];
-        })->all(), 'MAX', $relation);
+        return $this->ofMany(collect(Arr::wrap($column))->map(fn ($column) => [$column => 'MAX'])->all(),
+            'MAX', $relation);
     }
 
     /**
@@ -155,9 +154,8 @@ trait CanBeOneOfMany
      */
     public function oldestOfMany($column = 'id', $relation = null)
     {
-        return $this->ofMany(collect(Arr::wrap($column))->mapWithKeys(function ($column) {
-            return [$column => 'MIN'];
-        })->all(), 'MIN', $relation);
+        return $this->ofMany(collect(Arr::wrap($column))->map(fn ($column) => [$column => 'MIN'])->all(),
+            'MIN', $relation);
     }
 
     /**
