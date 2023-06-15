@@ -121,7 +121,7 @@ class EloquentWhereHasTest extends DatabaseTestCase
 
         $this->assertEquals([1], $users->pluck('id')->all());
 
-        $users=User::whereRelation('posts', 'public', [true])->get();
+        $users = User::whereRelation('posts', 'public', [true])->get();
 
         $this->assertEquals([1], $users->pluck('id')->all());
     }
