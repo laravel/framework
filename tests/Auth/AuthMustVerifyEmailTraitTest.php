@@ -31,7 +31,7 @@ class AuthMustVerifyEmailTraitTest extends TestCase
     {
         $user = Mockery::mock(CustomUser::class);
         $user->makePartial();
-        $this->assertEquals(CustomUser::EMAIL_VERIFIED_AT, $user->getEmailVerifiedAtColumn());
+        $this->assertEquals('custom_email_verified_at', $user->getEmailVerifiedAtColumn());
     }
 
     /**
@@ -82,5 +82,8 @@ class CustomUser
 {
     use MustVerifyEmail;
 
-    public const EMAIL_VERIFIED_AT = 'custom_email_verified_at';
+    public function getEmailVerifiedAtColumn(): string
+    {
+        return 'custom_email_verified_at';
+    }
 }

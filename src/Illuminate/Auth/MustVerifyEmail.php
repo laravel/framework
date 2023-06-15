@@ -55,6 +55,6 @@ trait MustVerifyEmail
      */
     public function getEmailVerifiedAtColumn(): string
     {
-        return defined(static::class.'::EMAIL_VERIFIED_AT') ? static::EMAIL_VERIFIED_AT : 'email_verified_at';
+        return 'email_verified_at';
     }
 }
