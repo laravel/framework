@@ -13,6 +13,7 @@ use Illuminate\Queue\Events\JobReleasedAfterException;
 use Illuminate\Queue\Worker;
 use Illuminate\Queue\WorkerOptions;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\InteractsWithTime;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Terminal;
 
@@ -21,6 +22,8 @@ use function Termwind\terminal;
 #[AsCommand(name: 'queue:work')]
 class WorkCommand extends Command
 {
+    use InteractsWithTime;
+
     /**
      * The console command name.
      *
@@ -217,7 +220,7 @@ class WorkCommand extends Command
             return $this->output->writeln(' <fg=yellow;options=bold>RUNNING</>');
         }
 
-        $runTime = $this->formatRunTime($this->latestStartedAt);
+        $runTime = $this->runTimeForHumans($this->latestStartedAt);
 
         $dots = max(terminal()->width() - mb_strlen($job->resolveName()) - (
             $this->output->isVerbose() ? (mb_strlen($job->getJobId()) + 1) : 0
@@ -248,21 +251,6 @@ class WorkCommand extends Command
         }
 
         return Carbon::now();
-    }
-
-    /**
-     * Given a start time, format the total run time for human readability.
-     *
-     * @param  float  $startTime
-     * @return string
-     */
-    protected function formatRunTime($startTime)
-    {
-        $runTime = (microtime(true) - $startTime) * 1000;
-
-        return $runTime > 1000
-            ? CarbonInterval::milliseconds($runTime)->cascade()->forHumans(short: true)
-            : number_format($runTime, 2).'ms';
     }
 
     /**
