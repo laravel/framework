@@ -195,15 +195,16 @@ class Repository implements ArrayAccess, CacheContract
      *
      * @param  string  $key
      * @param  mixed  $value
-     * @return void
+     * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
+     * @return bool
      */
-    public function push($key, $value)
+    public function push($key, $value, $ttl = null)
     {
         $array = $this->get($key, []);
 
         $array[] = $value;
 
-        $this->put($key, $array);
+        return $this->put($key, $array, $ttl);
     }
 
     /**
