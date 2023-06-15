@@ -13,7 +13,7 @@ trait MustVerifyEmail
      */
     public function hasVerifiedEmail()
     {
-        return ! is_null($this->email_verified_at);
+        return ! is_null($this->{$this->getEmailVerifiedAtColumn()});
     }
 
     /**
@@ -24,7 +24,7 @@ trait MustVerifyEmail
     public function markEmailAsVerified()
     {
         return $this->forceFill([
-            'email_verified_at' => $this->freshTimestamp(),
+            $this->getEmailVerifiedAtColumn() => $this->freshTimestamp(),
         ])->save();
     }
 
@@ -46,5 +46,15 @@ trait MustVerifyEmail
     public function getEmailForVerification()
     {
         return $this->email;
+    }
+
+    /**
+     * Get the name of the "email verified at" column.
+     *
+     * @return string
+     */
+    public function getEmailVerifiedAtColumn(): string
+    {
+        return defined(static::class.'::EMAIL_VERIFIED_AT') ? static::EMAIL_VERIFIED_AT : 'email_verified_at';
     }
 }
