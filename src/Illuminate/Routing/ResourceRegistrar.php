@@ -179,7 +179,7 @@ class ResourceRegistrar
      * @param  string  $name
      * @param  string  $controller
      * @param  array  $options
-     * @return void
+     * @return Router
      */
     protected function prefixedResource($name, $controller, array $options)
     {
@@ -201,7 +201,7 @@ class ResourceRegistrar
      * @param  string  $name
      * @param  string  $controller
      * @param  array  $options
-     * @return void
+     * @return Router
      */
     protected function prefixedSingleton($name, $controller, array $options)
     {
