@@ -182,7 +182,6 @@ class EloquentWhereHasTest extends DatabaseTestCase
             ->get();
 
         $this->assertEquals([1, 2], $comments->pluck('id')->all());
-
     }
 
     public function testWithCount()

@@ -450,7 +450,6 @@ trait QueriesRelationships
     public function orWhereMorphRelation($relation, $types, $column, $operator = null, $value = null)
     {
         return $this->orWhereHasMorph($relation, $types, function ($query) use ($column, $operator, $value) {
-
             if ($column instanceof Closure) {
                 $column($query);
             } elseif (is_array($value)) {
