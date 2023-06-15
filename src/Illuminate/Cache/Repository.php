@@ -191,6 +191,22 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
+     * Push a value onto a cached array.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return void
+     */
+    public function push($key, $value)
+    {
+        $array = $this->get($key, []);
+
+        $array[] = $value;
+
+        $this->put($key, $array);
+    }
+
+    /**
      * Store an item in the cache.
      *
      * @param  array|string  $key
