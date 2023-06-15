@@ -120,11 +120,19 @@ class EloquentWhereHasTest extends DatabaseTestCase
         $users = User::whereRelation('posts', 'public', true)->get();
 
         $this->assertEquals([1], $users->pluck('id')->all());
+
+        $users=User::whereRelation('posts', 'public', [true])->get();
+
+        $this->assertEquals([1], $users->pluck('id')->all());
     }
 
     public function testOrWhereRelation()
     {
         $users = User::whereRelation('posts', 'public', true)->orWhereRelation('posts', 'public', false)->get();
+
+        $this->assertEquals([1, 2], $users->pluck('id')->all());
+
+        $users = User::whereRelation('posts', 'public', [true])->orWhereRelation('posts', 'public', [false])->get();
 
         $this->assertEquals([1, 2], $users->pluck('id')->all());
     }
@@ -134,6 +142,10 @@ class EloquentWhereHasTest extends DatabaseTestCase
         $texts = User::whereRelation('posts.texts', 'content', 'test')->get();
 
         $this->assertEquals([1], $texts->pluck('id')->all());
+
+        $texts = User::whereRelation('posts.texts', 'content', ['test'])->get();
+
+        $this->assertEquals([1], $texts->pluck('id')->all());
     }
 
     public function testNestedOrWhereRelation()
@@ -141,11 +153,18 @@ class EloquentWhereHasTest extends DatabaseTestCase
         $texts = User::whereRelation('posts.texts', 'content', 'test')->orWhereRelation('posts.texts', 'content', 'test2')->get();
 
         $this->assertEquals([1, 2], $texts->pluck('id')->all());
+        $texts = User::whereRelation('posts.texts', 'content', ['test'])->orWhereRelation('posts.texts', 'content', ['test2'])->get();
+
+        $this->assertEquals([1, 2], $texts->pluck('id')->all());
     }
 
     public function testWhereMorphRelation()
     {
         $comments = Comment::whereMorphRelation('commentable', '*', 'public', true)->get();
+
+        $this->assertEquals([1], $comments->pluck('id')->all());
+
+        $comments = Comment::whereMorphRelation('commentable', '*', 'public', [true])->get();
 
         $this->assertEquals([1], $comments->pluck('id')->all());
     }
@@ -157,6 +176,13 @@ class EloquentWhereHasTest extends DatabaseTestCase
             ->get();
 
         $this->assertEquals([1, 2], $comments->pluck('id')->all());
+
+        $comments = Comment::whereMorphRelation('commentable', '*', 'public', [true])
+            ->orWhereMorphRelation('commentable', '*', 'public', [false])
+            ->get();
+
+        $this->assertEquals([1, 2], $comments->pluck('id')->all());
+
     }
 
     public function testWithCount()

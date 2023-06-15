@@ -384,6 +384,8 @@ trait QueriesRelationships
         return $this->whereHas($relation, function ($query) use ($column, $operator, $value) {
             if ($column instanceof Closure) {
                 $column($query);
+            } elseif (is_array($value)) {
+                $query->whereIn($column, $value);
             } else {
                 $query->where($column, $operator, $value);
             }
@@ -404,6 +406,8 @@ trait QueriesRelationships
         return $this->orWhereHas($relation, function ($query) use ($column, $operator, $value) {
             if ($column instanceof Closure) {
                 $column($query);
+            } elseif (is_array($value)) {
+                $query->whereIn($column, $value);
             } else {
                 $query->where($column, $operator, $value);
             }
@@ -423,7 +427,19 @@ trait QueriesRelationships
     public function whereMorphRelation($relation, $types, $column, $operator = null, $value = null)
     {
         return $this->whereHasMorph($relation, $types, function ($query) use ($column, $operator, $value) {
-            $query->where($column, $operator, $value);
+            if ($column instanceof Closure) {
+
+                $column($query);
+
+            } elseif (is_array($value)) {
+
+                $query->whereIn($column, $value);
+
+            } else {
+
+                $query->where($column, $operator, $value);
+
+            }
         });
     }
 
@@ -440,7 +456,20 @@ trait QueriesRelationships
     public function orWhereMorphRelation($relation, $types, $column, $operator = null, $value = null)
     {
         return $this->orWhereHasMorph($relation, $types, function ($query) use ($column, $operator, $value) {
-            $query->where($column, $operator, $value);
+
+            if ($column instanceof Closure) {
+
+                $column($query);
+
+            } elseif (is_array($value)) {
+
+                $query->whereIn($column, $value);
+
+            } else {
+
+                $query->where($column, $operator, $value);
+
+            }
         });
     }
 
