@@ -399,14 +399,14 @@ class EuroCaster implements CastsAttributes
 
     public function increment($model, $key, $value, $attributes)
     {
-        $model->$key = new Euro((string) BigNumber::of($model->$key->value)->plus($value)->toScale(2));
+        $model->$key = new Euro((string) BigNumber::of($model->$key->value)->plus($value->value)->toScale(2));
 
         return $model->$key;
     }
 
     public function decrement($model, $key, $value, $attributes)
     {
-        $model->$key = new Euro((string) BigNumber::of($model->$key->value)->subtract($value)->toScale(2));
+        $model->$key = new Euro((string) BigNumber::of($model->$key->value)->subtract($value->value)->toScale(2));
 
         return $model->$key;
     }
