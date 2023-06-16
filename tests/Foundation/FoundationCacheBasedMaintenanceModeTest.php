@@ -34,7 +34,7 @@ class FoundationCacheBasedMaintenanceModeTest extends TestCase
 
         $manager = new CacheBasedMaintenanceMode($cache, 'store-key', 'key');
 
-        $cache->shouldReceive('get')->once()->with('key')->andReturn(['payload']);
+        $cache->shouldReceive('get')->once()->with('key', [])->andReturn(['payload']);
         $this->assertSame(['payload'], $manager->data());
     }
 
