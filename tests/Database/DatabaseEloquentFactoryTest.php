@@ -792,13 +792,6 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertSame(2, FactoryTestUser::count());
     }
 
-    public function test_get_namespace()
-    {
-        Factory::useNamespace('Foo\\Bar\\');
-
-        $this->assertSame('Foo\\Bar\\', Factory::getNamespace());
-    }
-
     /**
      * Get a database connection instance.
      *
