@@ -15,7 +15,7 @@ use RedisCluster;
 class PhpRedisConnector implements Connector
 {
     /**
-     * Create a new clustered PhpRedis connection.
+     * Create a new connection.
      *
      * @param  array  $config
      * @param  array  $options

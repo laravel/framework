@@ -51,4 +51,32 @@ class SentMessage
     {
         return $this->forwardCallTo($this->sentMessage, $method, $parameters);
     }
+
+    /**
+     * Get the serializable representation of the object.
+     *
+     * @return array
+     */
+    public function __serialize()
+    {
+        $hasAttachments = collect($this->sentMessage->getOriginalMessage()->getAttachments())->isNotEmpty();
+
+        return [
+            'hasAttachments' => $hasAttachments,
+            'sentMessage' => $hasAttachments ? base64_encode(serialize($this->sentMessage)) : $this->sentMessage,
+        ];
+    }
+
+    /**
+     * Marshal the object from its serialized data.
+     *
+     * @param  array  $data
+     * @return void
+     */
+    public function __unserialize(array $data)
+    {
+        $hasAttachments = ($data['hasAttachments'] ?? false) === true;
+
+        $this->sentMessage = $hasAttachments ? unserialize(base64_decode($data['sentMessage'])) : $data['sentMessage'];
+    }
 }

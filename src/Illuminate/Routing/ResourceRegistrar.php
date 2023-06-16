@@ -179,7 +179,7 @@ class ResourceRegistrar
      * @param  string  $name
      * @param  string  $controller
      * @param  array  $options
-     * @return void
+     * @return \Illuminate\Routing\Router
      */
     protected function prefixedResource($name, $controller, array $options)
     {
@@ -201,7 +201,7 @@ class ResourceRegistrar
      * @param  string  $name
      * @param  string  $controller
      * @param  array  $options
-     * @return void
+     * @return \Illuminate\Routing\Router
      */
     protected function prefixedSingleton($name, $controller, array $options)
     {
@@ -477,7 +477,6 @@ class ResourceRegistrar
      * Add the update method for a singleton route.
      *
      * @param  string  $name
-     * @param  string  $base
      * @param  string  $controller
      * @param  array  $options
      * @return \Illuminate\Routing\Route
