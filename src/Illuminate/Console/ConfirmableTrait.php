@@ -51,4 +51,40 @@ trait ConfirmableTrait
             return $this->getLaravel()->environment() === 'production';
         };
     }
+
+    /**
+     * Confirm before proceeding with the action.
+     *
+     * This method dispalys list of pending migrations and  asks for confirmation .
+     *
+     * @param  string  $warning
+     * @return bool
+     */
+    public function confirmToProceedSafe($migrations = [], $warning = 'The following migrations will be executed')
+    {
+
+        $this->components->alert($warning);
+
+        $this->newLine();
+
+        $this->line('Total '. count($migrations). ' migrations need to be applied:');
+
+        $this->newLine();
+
+        foreach($migrations as $migration){
+            $this->components->warn($migration);
+        }
+
+        $confirmed = $this->components->confirm('Apply the above migrations?');
+
+        if (! $confirmed) {
+            $this->newLine();
+
+            $this->components->warn('Command canceled.');
+
+            return false;
+        }
+
+        return true;
+    }
 }

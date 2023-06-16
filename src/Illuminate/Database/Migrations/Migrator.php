@@ -775,4 +775,19 @@ class Migrator
             $this->events->dispatch($event);
         }
     }
+
+    /**
+     * Get the migration files that have not yet run.
+     *
+     * @param  array|string  $paths
+     * @return array
+     */
+    public function pendingMigrationsToDisplay($paths = [])
+    {
+        $files = $this->getMigrationFiles($paths);
+
+        return $this->pendingMigrations(
+            $files, $this->repository->getRan()
+        );
+    }
 }
