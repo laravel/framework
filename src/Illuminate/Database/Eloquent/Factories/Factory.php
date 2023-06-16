@@ -798,6 +798,16 @@ abstract class Factory
     }
 
     /**
+     * Return the namespace that contains the application's model factories.
+     *
+     * @return string
+     */
+    public static function getNamespace()
+    {
+        return static::$namespace;
+    }
+
+    /**
      * Specify the default namespace that contains the application's model factories.
      *
      * @param  string  $namespace
