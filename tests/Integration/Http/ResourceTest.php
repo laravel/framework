@@ -35,6 +35,7 @@ use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalHasAttrib
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalMerging;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalPivotRelationship;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationship;
+use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationshipAggregates;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationshipCounts;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithoutWrap;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithUnlessOptionalData;
@@ -445,6 +446,65 @@ class ResourceTest extends TestCase
                 'id' => 5,
                 'author' => ['name' => 'jrrmartin'],
                 'author_name' => 'jrrmartin',
+            ],
+        ]);
+    }
+
+    public function testResourcesMayLoadOptionalRelationshipAggregates()
+    {
+        Route::get('/', function () {
+            $post = new Post([
+                'id' => 5,
+                'title' => 'Test Title',
+                'comments_avg_rating' => 3.8,
+                'comments_min_rating' => 2,
+                'comments_max_rating' => 5
+            ]);
+
+            return new PostResourceWithOptionalRelationshipAggregates($post);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertExactJson([
+            'data' => [
+                'id' => 5,
+                'title' => 'Test Title',
+                'average_rating' => 3.8,
+                'minimum_rating' => 2,
+                'maximum_rating' => "5 ratings",
+            ],
+        ]);
+    }
+
+    public function testResourcesMayHaveOptionalRelationshipAggregates()
+    {
+        Route::get('/', function () {
+            $post = new Post([
+                'id' => 5,
+                'title' => 'Test Title',
+            ]);
+
+            return new PostResourceWithOptionalRelationshipAggregates($post);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertExactJson([
+            'data' => [
+                'id' => 5,
+                'title' => 'Test Title',
+                'average_rating' => null,
+                'minimum_rating' => null,
+                'maximum_rating' => "Default Value",
             ],
         ]);
     }
