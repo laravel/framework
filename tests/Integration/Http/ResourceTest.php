@@ -458,7 +458,7 @@ class ResourceTest extends TestCase
                 'title' => 'Test Title',
                 'comments_avg_rating' => 3.8,
                 'comments_min_rating' => 2,
-                'comments_max_rating' => 5
+                'comments_max_rating' => 5,
             ]);
 
             return new PostResourceWithOptionalRelationshipAggregates($post);
@@ -476,7 +476,7 @@ class ResourceTest extends TestCase
                 'title' => 'Test Title',
                 'average_rating' => 3.8,
                 'minimum_rating' => 2,
-                'maximum_rating' => "5 ratings",
+                'maximum_rating' => '5 ratings',
             ],
         ]);
     }
@@ -504,7 +504,7 @@ class ResourceTest extends TestCase
                 'title' => 'Test Title',
                 'average_rating' => null,
                 'minimum_rating' => null,
-                'maximum_rating' => "Default Value",
+                'maximum_rating' => 'Default Value',
             ],
         ]);
     }
