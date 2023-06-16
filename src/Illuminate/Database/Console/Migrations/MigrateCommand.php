@@ -29,7 +29,8 @@ class MigrateCommand extends BaseCommand implements Isolatable
                 {--pretend : Dump the SQL queries that would be run}
                 {--seed : Indicates if the seed task should be re-run}
                 {--seeder= : The class name of the root seeder}
-                {--step : Force the migrations to be run so they can be rolled back individually}';
+                {--step : Force the migrations to be run so they can be rolled back individually}
+                {--safe : Display list of migrations and prompt the user to confirm whether wants to proceed or not}';
 
     /**
      * The console command description.
@@ -80,6 +81,14 @@ class MigrateCommand extends BaseCommand implements Isolatable
 
         $this->migrator->usingConnection($this->option('database'), function () {
             $this->prepareDatabase();
+
+            // Check If user wants to run migration in safe mode. If yes dispaly list of pending
+            // migrations and prompt the user to confirm whether wants to proceed or not
+            if ($this->option('safe')) {
+                if (! $this->confirmToProceedSafe($this->migrator->pendingMigrationsToDisplay($this->getMigrationPaths()))) {
+                    return 1;
+                }
+            }
 
             // Next, we will check to see if a path option has been defined. If it has
             // we will use the path relative to the root of this installation folder
