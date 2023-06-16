@@ -1858,7 +1858,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function getTable()
     {
-        return $this->table ?? Str::snake(Str::pluralStudly(class_basename($this)));
+        return $this->table ??= Str::snake(Str::pluralStudly(class_basename($this)));
     }
 
     /**
