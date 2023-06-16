@@ -4,10 +4,12 @@ namespace Illuminate\Support;
 
 use ArrayAccess;
 use ArrayIterator;
+use BackedEnum;
 use Illuminate\Contracts\Support\CanBeEscapedWhenCastToString;
 use Illuminate\Support\Traits\EnumeratesValues;
 use Illuminate\Support\Traits\Macroable;
 use stdClass;
+use Stringable;
 use Traversable;
 
 /**
@@ -447,6 +449,8 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function get($key, $default = null)
     {
+        $key = $this->castKey($key);
+
         if (array_key_exists($key, $this->items)) {
             return $this->items[$key];
         }
@@ -465,8 +469,8 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function getOrPut($key, $value)
     {
-        if (array_key_exists($key, $this->items)) {
-            return $this->items[$key];
+        if ($this->has($key)) {
+            return $this->get($key);
         }
 
         $this->offsetSet($key, $value = value($value));
@@ -501,11 +505,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
             }
 
             foreach ($groupKeys as $groupKey) {
-                $groupKey = match (true) {
-                    is_bool($groupKey) => (int) $groupKey,
-                    $groupKey instanceof \Stringable => (string) $groupKey,
-                    default => $groupKey,
-                };
+                $groupKey = $this->castKey($groupKey);
 
                 if (! array_key_exists($groupKey, $results)) {
                     $results[$groupKey] = new static;
@@ -539,9 +539,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         foreach ($this->items as $key => $item) {
             $resolvedKey = $keyBy($item, $key);
 
-            if (is_object($resolvedKey)) {
-                $resolvedKey = (string) $resolvedKey;
-            }
+            $resolvedKey = $this->castKey($resolvedKey);
 
             $results[$resolvedKey] = $item;
         }
@@ -560,6 +558,8 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         $keys = is_array($key) ? $key : func_get_args();
 
         foreach ($keys as $value) {
+            $value = $this->castKey($value);
+
             if (! array_key_exists($value, $this->items)) {
                 return false;
             }
@@ -1712,6 +1712,8 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function offsetExists($key): bool
     {
+        $key = $this->castKey($key);
+
         return isset($this->items[$key]);
     }
 
@@ -1723,6 +1725,8 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function offsetGet($key): mixed
     {
+        $key = $this->castKey($key);
+
         return $this->items[$key];
     }
 
@@ -1735,6 +1739,8 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function offsetSet($key, $value): void
     {
+        $key = $this->castKey($key);
+
         if (is_null($key)) {
             $this->items[] = $value;
         } else {
@@ -1750,6 +1756,21 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function offsetUnset($key): void
     {
+        $key = $this->castKey($key);
+
         unset($this->items[$key]);
+    }
+
+    /**
+     * Cast the given key to a suitable type.
+     */
+    protected function castKey(mixed $key): mixed
+    {
+        return match (true) {
+            is_bool($key) => (int) $key,
+            $key instanceof Stringable => (string) $key,
+            $key instanceof BackedEnum => $key->value,
+            default => $key,
+        };
     }
 }

@@ -2426,6 +2426,13 @@ class SupportCollectionTest extends TestCase
         $this->assertSame('taylor', $data->get('name'));
         $this->assertSame('foo', $data->get('email'));
         $this->assertSame('male', $data->get('gender'));
+
+        $data = new Collection(['name' => 'taylor', TestBackedEnum::A->value => 'foo']);
+
+        $this->assertSame('foo', $data->getOrPut(TestBackedEnum::A, null));
+        $this->assertSame('foo', $data->get(TestBackedEnum::A));
+        $this->assertSame('bar', $data->getOrPut(TestBackedEnum::B, 'bar'));
+        $this->assertSame('bar', $data->get(TestBackedEnum::B));
     }
 
     public function testPut()
@@ -3300,6 +3307,24 @@ class SupportCollectionTest extends TestCase
 
         $result = $data->groupBy('name');
         $this->assertEquals(['Laravel' => [$payload[0], $payload[1]], 'Framework' => [$payload[2]]], $result->toArray());
+
+        $result = $data->groupBy('url');
+        $this->assertEquals(['1' => [$payload[0], $payload[1]], '2' => [$payload[2]]], $result->toArray());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testGroupByAttributeWithEnumKey($collection)
+    {
+        $data = new $collection($payload = [
+            ['name' => TestBackedEnum::A, 'url' => '1'],
+            ['name' => TestBackedEnum::A, 'url' => '1'],
+            ['name' => 'foobar', 'url' => '2'],
+        ]);
+
+        $result = $data->groupBy('name');
+        $this->assertEquals([1 => [$payload[0], $payload[1]], 'foobar' => [$payload[2]]], $result->toArray());
 
         $result = $data->groupBy('url');
         $this->assertEquals(['1' => [$payload[0], $payload[1]], '2' => [$payload[2]]], $result->toArray());
