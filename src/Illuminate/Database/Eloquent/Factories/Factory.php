@@ -104,7 +104,7 @@ abstract class Factory
      *
      * @var string
      */
-    protected static $namespace = 'Database\\Factories\\';
+    public static $namespace = 'Database\\Factories\\';
 
     /**
      * The default model name resolver.
@@ -795,16 +795,6 @@ abstract class Factory
     public static function guessModelNamesUsing(callable $callback)
     {
         static::$modelNameResolver = $callback;
-    }
-
-    /**
-     * Return the namespace that contains the application's model factories.
-     *
-     * @return string
-     */
-    public static function getNamespace()
-    {
-        return static::$namespace;
     }
 
     /**
