@@ -392,7 +392,7 @@ class PendingRequest
             ]);
         });
     }
-	
+
     /**
      * Add the given header to the request.
      *
@@ -402,7 +402,7 @@ class PendingRequest
      */
     public function withHeader(string $name, mixed $value)
     {
-		return $this->withHeaders([$name => $value]);
+        return $this->withHeaders([$name => $value]);
     }
 
     /**
