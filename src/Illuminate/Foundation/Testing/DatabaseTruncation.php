@@ -112,7 +112,7 @@ trait DatabaseTruncation
     {
         if (property_exists($this, 'exceptTables')) {
             return array_merge(
-                $this->exceptTables[$connectionName] ?? [],
+                $this->exceptTables[$connectionName] ?? $this->exceptTables ?: [],
                 [$this->app['config']->get('database.migrations')]
             );
         }
