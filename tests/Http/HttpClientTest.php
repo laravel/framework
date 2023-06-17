@@ -914,12 +914,12 @@ class HttpClientTest extends TestCase
 	{
 		$this->factory->fake();
 		
-		$this->factory->withHeader('X-Test-ArrayHeader', ['bar', 'baz'])->post('http://foo.com/json');
+		$this->factory->withHeader('X-Test-Header', 'foo')->post('http://foo.com/json');
 		
 		$this->factory->assertSent(function (Request $request) {
 			return $request->url() === 'http://foo.com/json' &&
 				$request->hasHeaders([
-					'X-Test-ArrayHeader' => ['bar', 'baz'],
+					'X-Test-Header' => 'foo',
 				]);
 		});
 	}
@@ -928,12 +928,12 @@ class HttpClientTest extends TestCase
 	{
 		$this->factory->fake();
 		
-		$this->factory->withHeader('X-Test-Header', 'foo')->post('http://foo.com/json');
+		$this->factory->withHeader('X-Test-ArrayHeader', ['bar', 'baz'])->post('http://foo.com/json');
 		
 		$this->factory->assertSent(function (Request $request) {
 			return $request->url() === 'http://foo.com/json' &&
 				$request->hasHeaders([
-					'X-Test-Header' => 'foo',
+					'X-Test-ArrayHeader' => ['bar', 'baz'],
 				]);
 		});
 	}
