@@ -908,6 +908,35 @@ class HttpClientTest extends TestCase
                    $request->hasHeaders(['X-Test-Header' => ['baz']]);
         });
     }
+	
+	
+	public function testCanConfirmSingleStringHeader()
+	{
+		$this->factory->fake();
+		
+		$this->factory->withHeader('X-Test-ArrayHeader', ['bar', 'baz'])->post('http://foo.com/json');
+		
+		$this->factory->assertSent(function (Request $request) {
+			return $request->url() === 'http://foo.com/json' &&
+				$request->hasHeaders([
+					'X-Test-ArrayHeader' => ['bar', 'baz'],
+				]);
+		});
+	}
+	
+	public function testCanConfirmSingleArrayHeader()
+	{
+		$this->factory->fake();
+		
+		$this->factory->withHeader('X-Test-Header', 'foo')->post('http://foo.com/json');
+		
+		$this->factory->assertSent(function (Request $request) {
+			return $request->url() === 'http://foo.com/json' &&
+				$request->hasHeaders([
+					'X-Test-Header' => 'foo',
+				]);
+		});
+	}
 
     public function testExceptionAccessorOnSuccess()
     {
