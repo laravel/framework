@@ -392,6 +392,7 @@ class PendingRequest
             ]);
         });
     }
+	
     /**
      * Add the given header to the request.
      *
