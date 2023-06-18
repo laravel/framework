@@ -608,7 +608,7 @@ class Event
     }
 
     /**
-     * Get the Guzzle HTTP Client to use to send pings.
+     * Get the Guzzle HTTP client to use to send pings.
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
      * @return \GuzzleHttp\ClientInterface
