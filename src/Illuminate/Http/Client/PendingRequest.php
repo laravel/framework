@@ -395,6 +395,18 @@ class PendingRequest
     }
 
     /**
+     * Add the given header to the request.
+     *
+     * @param  string  $name
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function withHeader($name, $value)
+    {
+        return $this->withHeaders([$name => $value]);
+    }
+
+    /**
      * Replace the given headers on the request.
      *
      * @param  array  $headers

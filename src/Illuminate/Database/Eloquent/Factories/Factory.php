@@ -104,7 +104,7 @@ abstract class Factory
      *
      * @var string
      */
-    protected static $namespace = 'Database\\Factories\\';
+    public static $namespace = 'Database\\Factories\\';
 
     /**
      * The default model name resolver.

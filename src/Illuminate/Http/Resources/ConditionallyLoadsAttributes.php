@@ -301,6 +301,35 @@ trait ConditionallyLoadsAttributes
     }
 
     /**
+     * Retrieve a relationship aggregated value if it exists.
+     *
+     * @param  string  $relationship
+     * @param  string  $column
+     * @param  string  $aggregate
+     * @param  mixed  $value
+     * @param  mixed  $default
+     * @return \Illuminate\Http\Resources\MissingValue|mixed
+     */
+    public function whenAggregated($relationship, $column, $aggregate, $value = null, $default = null)
+    {
+        $attribute = (string) Str::of($relationship)->snake()->append('_')->append($aggregate)->append('_')->finish($column);
+
+        if (! isset($this->resource->getAttributes()[$attribute])) {
+            return value($default);
+        }
+
+        if (func_num_args() === 3) {
+            return $this->resource->{$attribute};
+        }
+
+        if ($this->resource->{$attribute} === null) {
+            return;
+        }
+
+        return value($value, $this->resource->{$attribute});
+    }
+
+    /**
      * Execute a callback if the given pivot table has been loaded.
      *
      * @param  string  $table

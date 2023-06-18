@@ -1109,6 +1109,46 @@ class AuthAccessGateTest extends TestCase
 
         $this->assertFalse($gate->check('absent_invokable'));
     }
+
+    public function testCanSetDenialResponseInConstructor()
+    {
+        $gate = new Gate(container: new Container, userResolver: function () {
+            //
+        });
+
+        $gate->defaultDenialResponse(Response::denyWithStatus(999, 'my_message', 'abc'));
+
+        $gate->define('foo', function () {
+            return false;
+        });
+
+        $response = $gate->inspect('foo', new AccessGateTestDummy);
+
+        $this->assertTrue($response->denied());
+        $this->assertFalse($response->allowed());
+        $this->assertSame('my_message', $response->message());
+        $this->assertSame('abc', $response->code());
+        $this->assertSame(999, $response->status());
+    }
+
+    public function testCanSetDenialResponse()
+    {
+        $gate = new Gate(container: new Container, userResolver: function () {
+            //
+        });
+
+        $gate->define('foo', function () {
+            return false;
+        });
+        $gate->defaultDenialResponse(Response::denyWithStatus(404, 'not_found', 'xyz'));
+
+        $response = $gate->inspect('foo', new AccessGateTestDummy);
+        $this->assertTrue($response->denied());
+        $this->assertFalse($response->allowed());
+        $this->assertSame('not_found', $response->message());
+        $this->assertSame('xyz', $response->code());
+        $this->assertSame(404, $response->status());
+    }
 }
 
 class AccessGateTestClassForGuest
