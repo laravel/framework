@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use ValueError;
 
 include 'Enums.php';
 
@@ -263,6 +264,39 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
 
         $this->assertEquals(StringStatus::pending, $model->string_status);
         $this->assertEquals(StringStatus::done, $model2->string_status);
+    }
+
+    public function testAttributeCastToAnEnumCanNotBeSetToAnotherEnum(): void
+    {
+        $model = new EloquentModelEnumCastingTestModel;
+
+        $this->expectException(ValueError::class);
+        $this->expectExceptionMessage(
+            sprintf('Value [%s] is not of the expected enum type [%s].', var_export(ArrayableStatus::pending, true), StringStatus::class)
+        );
+
+        $model->string_status = ArrayableStatus::pending;
+    }
+
+    public function testAttributeCastToAnEnumCanNotBeSetToAValueNotDefinedOnTheEnum(): void
+    {
+        $model = new EloquentModelEnumCastingTestModel;
+
+        $this->expectException(ValueError::class);
+        $this->expectExceptionMessage(
+            sprintf('"unexpected_value" is not a valid backing value for enum %s', StringStatus::class)
+        );
+
+        $model->string_status = 'unexpected_value';
+    }
+
+    public function testAnAttributeWithoutACastCanBeSetToAnEnum(): void
+    {
+        $model = new EloquentModelEnumCastingTestModel;
+
+        $model->non_enum_status = StringStatus::pending;
+
+        $this->assertEquals(StringStatus::pending, $model->non_enum_status);
     }
 }
 
