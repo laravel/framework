@@ -814,11 +814,9 @@ trait HasAttributes
                 ? $value
                 : $caster->get($this, $key, $value, $this->attributes);
 
-            if (
-                $caster instanceof CastsInboundAttributes ||
+            if ($caster instanceof CastsInboundAttributes ||
                 ! is_object($value) ||
-                $objectCachingDisabled
-            ) {
+                $objectCachingDisabled) {
                 unset($this->classCastCache[$key]);
             } else {
                 $this->classCastCache[$key] = $value;
@@ -1140,11 +1138,9 @@ trait HasAttributes
             ))
         );
 
-        if (
-            $caster instanceof CastsInboundAttributes ||
+        if ($caster instanceof CastsInboundAttributes ||
             ! is_object($value) ||
-            ($caster->withoutObjectCaching ?? false)
-        ) {
+            ($caster->withoutObjectCaching ?? false)) {
             unset($this->classCastCache[$key]);
         } else {
             $this->classCastCache[$key] = $value;
