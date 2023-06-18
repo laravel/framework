@@ -103,6 +103,15 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
         $model = new TestEloquentModelWithCustomCast;
         $model->birthday_at = now();
         $this->assertIsString($model->toArray()['birthday_at']);
+
+        $model = new TestEloquentModelWithCustomCast;
+        $now = now()->toImmutable();
+        $model->anniversary_on_with_object_caching = $now;
+        $model->anniversary_on_without_object_caching = $now;
+        $this->assertSame($now, $model->anniversary_on_with_object_caching);
+        $this->assertSame('UTC', $model->anniversary_on_with_object_caching->format('e'));
+        $this->assertNotSame($now, $model->anniversary_on_without_object_caching);
+        $this->assertNotSame('UTC', $model->anniversary_on_without_object_caching->format('e'));
     }
 
     public function testGetOriginalWithCastValueObjects()
@@ -299,6 +308,8 @@ class TestEloquentModelWithCustomCast extends Model
         'value_object_caster_with_caster_instance' => ValueObjectWithCasterInstance::class,
         'undefined_cast_column' => UndefinedCast::class,
         'birthday_at' => DateObjectCaster::class,
+        'anniversary_on_with_object_caching' => DateTimezoneCasterWithObjectCaching::class.':America/New_York',
+        'anniversary_on_without_object_caching' => DateTimezoneCasterWithoutObjectCaching::class.':America/New_York',
     ];
 }
 
@@ -583,4 +594,26 @@ class DateObjectCaster implements CastsAttributes
     {
         return $value->format('Y-m-d');
     }
+}
+
+class DateTimezoneCasterWithObjectCaching implements CastsAttributes
+{
+    public function __construct(private string $timezone = 'UTC')
+    {
+    }
+
+    public function get($model, $key, $value, $attributes)
+    {
+        return Carbon::parse($value, $this->timezone);
+    }
+
+    public function set($model, $key, $value, $attributes)
+    {
+        return $value->timezone($this->timezone)->format('Y-m-d');
+    }
+}
+
+class DateTimezoneCasterWithoutObjectCaching extends DateTimezoneCasterWithObjectCaching
+{
+    public bool $withoutObjectCaching = true;
 }

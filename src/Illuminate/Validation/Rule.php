@@ -4,6 +4,7 @@ namespace Illuminate\Validation;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Validation\Rules\Can;
 use Illuminate\Validation\Rules\Dimensions;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Rules\ExcludeIf;
@@ -19,6 +20,18 @@ use Illuminate\Validation\Rules\Unique;
 class Rule
 {
     use Macroable;
+
+    /**
+     * Get a can constraint builder instance.
+     *
+     * @param  string  $ability
+     * @param  mixed  ...$arguments
+     * @return \Illuminate\Validation\Rules\Can
+     */
+    public static function can($ability, ...$arguments)
+    {
+        return new Can($ability, $arguments);
+    }
 
     /**
      * Create a new conditional rule set.

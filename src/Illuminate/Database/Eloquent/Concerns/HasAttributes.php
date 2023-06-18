@@ -803,16 +803,20 @@ trait HasAttributes
      */
     protected function getClassCastableAttributeValue($key, $value)
     {
-        if (isset($this->classCastCache[$key])) {
+        $caster = $this->resolveCasterClass($key);
+
+        $objectCachingDisabled = $caster->withoutObjectCaching ?? false;
+
+        if (isset($this->classCastCache[$key]) && ! $objectCachingDisabled) {
             return $this->classCastCache[$key];
         } else {
-            $caster = $this->resolveCasterClass($key);
-
             $value = $caster instanceof CastsInboundAttributes
                 ? $value
                 : $caster->get($this, $key, $value, $this->attributes);
 
-            if ($caster instanceof CastsInboundAttributes || ! is_object($value)) {
+            if ($caster instanceof CastsInboundAttributes ||
+                ! is_object($value) ||
+                $objectCachingDisabled) {
                 unset($this->classCastCache[$key]);
             } else {
                 $this->classCastCache[$key] = $value;
@@ -1134,7 +1138,9 @@ trait HasAttributes
             ))
         );
 
-        if ($caster instanceof CastsInboundAttributes || ! is_object($value)) {
+        if ($caster instanceof CastsInboundAttributes ||
+            ! is_object($value) ||
+            ($caster->withoutObjectCaching ?? false)) {
             unset($this->classCastCache[$key]);
         } else {
             $this->classCastCache[$key] = $value;
