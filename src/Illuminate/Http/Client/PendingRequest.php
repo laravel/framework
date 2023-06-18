@@ -400,7 +400,7 @@ class PendingRequest
      * @param  mixed  $value
      * @return $this
      */
-    public function withHeader(string $name, mixed $value)
+    public function withHeader($name, $value)
     {
         return $this->withHeaders([$name => $value]);
     }
