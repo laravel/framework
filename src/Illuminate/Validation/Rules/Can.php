@@ -8,14 +8,14 @@ use Illuminate\Support\Facades\Gate;
 class Can implements Rule
 {
     /**
-     * The gate ability.
+     * The ability to check.
      *
      * @var string
      */
     protected $ability;
 
     /**
-     * The gate arguments.
+     * The arguments to pass to the authorization check.
      *
      * @var array
      */
