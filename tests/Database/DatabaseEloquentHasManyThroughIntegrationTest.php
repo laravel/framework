@@ -407,6 +407,26 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         });
     }
 
+    public function testEachByIdReturnsCorrectModels()
+    {
+        $this->seedData();
+        $this->seedDataExtended();
+        $country = HasManyThroughTestCountry::find(2);
+
+        $country->posts()->eachById(function ($post) {
+            $this->assertEquals([
+                'id',
+                'user_id',
+                'title',
+                'body',
+                'email',
+                'created_at',
+                'updated_at',
+                'laravel_through_key',
+            ], array_keys($post->getAttributes()));
+        });
+    }
+
     public function testLazyReturnsCorrectModels()
     {
         $this->seedData();
