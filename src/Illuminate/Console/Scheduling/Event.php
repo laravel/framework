@@ -613,21 +613,17 @@ class Event
      * @param  \Illuminate\Contracts\Container\Container  $container
      * @return \GuzzleHttp\ClientInterface
      */
-    protected function getHttpClient(Container $container): HttpClientInterface
+    protected function getHttpClient(Container $container)
     {
-        if ($container->bound(HttpClientInterface::class)) {
-            return $container->make(HttpClientInterface::class);
-        }
-
-        if ($container->bound(HttpClient::class)) {
-            return $container->make(HttpClient::class);
-        }
-
-        return new HttpClient([
-            'connect_timeout' => 10,
-            'crypto_method' => STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT,
-            'timeout' => 30,
-        ]);
+        return match (true) {
+            $container->bound(HttpClientInterface::class) => $container->make(HttpClientInterface::class),
+            $container->bound(HttpClient::class) => $container->make(HttpClient::class),
+            default => new HttpClient([
+                'connect_timeout' => 10,
+                'crypto_method' => STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT,
+                'timeout' => 30,
+            ]),
+        };
     }
 
     /**
