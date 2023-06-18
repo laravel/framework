@@ -1188,7 +1188,7 @@ trait HasAttributes
     protected function getStorableEnumValue($expectedEnum, $value)
     {
         if (! $value instanceof $expectedEnum) {
-            throw new ValueError(sprintf('Value [%s] is not of the expected enum type [%s]', var_export($value, true), $expectedEnum));
+            throw new ValueError(sprintf('Value [%s] is not of the expected enum type [%s].', var_export($value, true), $expectedEnum));
         }
 
         return $value instanceof BackedEnum
