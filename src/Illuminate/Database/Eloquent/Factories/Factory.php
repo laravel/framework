@@ -708,6 +708,19 @@ abstract class Factory
     }
 
     /**
+     * Clear "after making" and "after creating" callbacks.
+     *
+     * @return static
+     */
+    public function withoutEvents()
+    {
+        return $this->newInstance([
+            'afterCreating' => collect(),
+            'afterMaking' => collect(),
+        ]);
+    }
+
+    /**
      * Specify how many models should be generated.
      *
      * @param  int|null  $count

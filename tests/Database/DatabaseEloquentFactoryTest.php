@@ -228,6 +228,22 @@ class DatabaseEloquentFactoryTest extends TestCase
         unset($_SERVER['__test.user.making'], $_SERVER['__test.user.creating']);
     }
 
+    public function test_after_creating_and_making_callbacks_are_cleared()
+    {
+        FactoryTestUserFactory::new()
+            ->afterMaking(function ($user) {
+                $_SERVER['__test.user.making'] = $user;
+            })
+            ->afterCreating(function ($user) {
+                $_SERVER['__test.user.creating'] = $user;
+            })
+            ->withoutEvents()
+            ->create();
+
+        $this->assertArrayNotHasKey('__test.user.making', $_SERVER);
+        $this->assertArrayNotHasKey('__test.user.creating', $_SERVER);
+    }
+
     public function test_has_many_relationship()
     {
         $users = FactoryTestUserFactory::times(10)
