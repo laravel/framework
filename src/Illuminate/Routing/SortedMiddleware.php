@@ -2,6 +2,7 @@
 
 namespace Illuminate\Routing;
 
+use ErrorException;
 use Illuminate\Support\Collection;
 
 class SortedMiddleware extends Collection
@@ -94,7 +95,15 @@ class SortedMiddleware extends Collection
 
         yield $stripped;
 
-        $interfaces = @class_implements($stripped);
+        $interfaces = false;
+
+        try {
+            $interfaces = class_implements($stripped);
+        } catch (ErrorException $exception) {
+            if ($exception->getMessage() !== "class_implements(): Class {$stripped} does not exist and could not be loaded") {
+                throw $exception;
+            }
+        }
 
         if ($interfaces !== false) {
             foreach ($interfaces as $interface) {
@@ -102,7 +111,15 @@ class SortedMiddleware extends Collection
             }
         }
 
-        $parents = @class_parents($stripped);
+        $parents = false;
+
+        try {
+            $parents = class_parents($stripped);
+        } catch (ErrorException $exception) {
+            if ($exception->getMessage() !== "class_parents(): Class {$stripped} does not exist and could not be loaded") {
+                throw $exception;
+            }
+        }
 
         if ($parents !== false) {
             foreach ($parents as $parent) {

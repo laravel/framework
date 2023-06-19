@@ -99,6 +99,28 @@ class RoutingSortedMiddlewareTest extends TestCase
 
         $this->assertEquals($expected, (new SortedMiddleware($priority, $middleware))->all());
     }
+
+    public function testItIgnoresMissingClasses()
+    {
+        $priority = [
+            'First',
+            'Second',
+            'Third',
+        ];
+
+        $middleware = [
+            'Second',
+            'First',
+            'Missing',
+        ];
+
+        $expected = [
+            'First',
+            'Second',
+        ];
+
+        $this->assertEquals($expected, (new SortedMiddleware($priority, $middleware))->all());
+    }
 }
 
 interface FirstContractStub
