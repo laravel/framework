@@ -111,6 +111,19 @@ class ValidatedInput implements ValidatedData
     }
 
     /**
+     * Merge the validated input with the given array of additional data if missing.
+     *
+     * @param array $items
+     * @return static
+     */
+    public function mergeIfMissing(array $items)
+    {
+        return $this->merge(collect($items)
+            ->reject(fn ($value, $key) => Arr::has($this->input, $key))
+            ->all());
+    }
+
+    /**
      * Get the input as a collection.
      *
      * @return \Illuminate\Support\Collection

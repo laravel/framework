@@ -31,6 +31,22 @@ class ValidatedInputTest extends TestCase
         $this->assertEquals(['name' => 'Taylor', 'votes' => 100], $input->all());
     }
 
+    public function test_merge_if_missing()
+    {
+        $input = new ValidatedInput(['name' => 'Taylor']);
+
+        $input = $input->mergeIfMissing([
+            'name' => 'Jack',
+            'foo' => 'Bar'
+        ]);
+
+        $this->assertEquals('Taylor', $input->name);
+        $this->assertEquals('Taylor', $input['name']);
+        $this->assertEquals('Bar', $input->foo);
+        $this->assertEquals(['name' => 'Taylor'], $input->only(['name']));
+        $this->assertEquals(['name' => 'Taylor', 'foo' => 'Bar'], $input->all());
+    }
+
     public function test_input_existence()
     {
         $inputA = new ValidatedInput(['name' => 'Taylor']);
