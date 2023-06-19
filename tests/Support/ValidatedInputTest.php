@@ -37,7 +37,7 @@ class ValidatedInputTest extends TestCase
 
         $input = $input->mergeIfMissing([
             'name' => 'Jack',
-            'foo' => 'Bar'
+            'foo' => 'Bar',
         ]);
 
         $this->assertEquals('Taylor', $input->name);

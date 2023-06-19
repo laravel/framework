@@ -113,7 +113,7 @@ class ValidatedInput implements ValidatedData
     /**
      * Merge the validated input with the given array of additional data if missing.
      *
-     * @param array $items
+     * @param  array  $items
      * @return static
      */
     public function mergeIfMissing(array $items)
