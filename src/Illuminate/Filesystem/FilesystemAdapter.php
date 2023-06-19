@@ -252,6 +252,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      *
      * @param  string  $path
      * @return string|null
+     * @throws  UnableToReadFile
      */
     public function get($path)
     {
@@ -348,6 +349,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      * @param  \Psr\Http\Message\StreamInterface|\Illuminate\Http\File|\Illuminate\Http\UploadedFile|string|resource  $contents
      * @param  mixed  $options
      * @return string|bool
+     * @throws  UnableToWriteFile|UnableToSetVisibility
      */
     public function put($path, $contents, $options = [])
     {
@@ -453,6 +455,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      * @param  string  $path
      * @param  string  $visibility
      * @return bool
+     * @throws UnableToSetVisibility
      */
     public function setVisibility($path, $visibility)
     {
@@ -506,6 +509,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      *
      * @param  string|array  $paths
      * @return bool
+     * @throws UnableToDeleteFile
      */
     public function delete($paths)
     {
@@ -532,6 +536,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      * @param  string  $from
      * @param  string  $to
      * @return bool
+     * @throws UnableToCopyFile
      */
     public function copy($from, $to)
     {
@@ -552,6 +557,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      * @param  string  $from
      * @param  string  $to
      * @return bool
+     * @throws UnableToMoveFile
      */
     public function move($from, $to)
     {
@@ -600,6 +606,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      *
      * @param  string  $path
      * @return string|false
+     * @throws UnableToRetrieveMetadata
      */
     public function mimeType($path)
     {
@@ -625,6 +632,7 @@ class FilesystemAdapter implements CloudFilesystemContract
 
     /**
      * {@inheritdoc}
+     * @throws UnableToReadFile
      */
     public function readStream($path)
     {
@@ -637,6 +645,7 @@ class FilesystemAdapter implements CloudFilesystemContract
 
     /**
      * {@inheritdoc}
+     * @throws UnableToWriteFile|UnableToSetVisibility
      */
     public function writeStream($path, $resource, array $options = [])
     {
@@ -869,6 +878,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      *
      * @param  string  $path
      * @return bool
+     * @throws UnableToCreateDirectory|UnableToSetVisibility
      */
     public function makeDirectory($path)
     {
@@ -888,6 +898,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      *
      * @param  string  $directory
      * @return bool
+     * @throws UnableToDeleteDirectory
      */
     public function deleteDirectory($directory)
     {
