@@ -216,15 +216,13 @@ class View implements ArrayAccess, Htmlable, ViewContract
     /**
      * Get the sections of the rendered view.
      *
-     * @return array
+     * @return string
      *
      * @throws \Throwable
      */
     public function renderSections()
     {
-        return $this->render(function () {
-            return $this->factory->getSections();
-        });
+        return $this->render(fn () => $this->factory->getSections());
     }
 
     /**
