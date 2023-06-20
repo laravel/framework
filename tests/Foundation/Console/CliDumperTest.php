@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Foundation\Console;
 
 use Illuminate\Foundation\Console\CliDumper;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use stdClass;
@@ -204,6 +205,40 @@ class CliDumperTest extends TestCase
         $output = $this->dump('hey from view');
 
         $expected = "\"hey from view\" // resources/views/welcome.blade.php\n";
+
+        $this->assertSame($expected, $output);
+    }
+
+    public function testSourceContentOnLastLineWhenOutputGreaterThanDisplayHeight()
+    {
+        $output = new BufferedOutput();
+        $mock = m::mock(CliDumper::class.'[getDisplayHeight]', [
+            $output,
+            '/my-work-directory',
+            '/my-work-directory/storage/framework/views',
+        ])->shouldAllowMockingProtectedMethods()
+            ->shouldReceive('getDisplayHeight')->andReturn(5)
+            ->getMock();
+
+        $cloner = tap(new VarCloner())->addCasters(ReflectionCaster::UNSET_CLOSURE_FILE_INFO);
+
+        $mock->dumpWithSource($cloner->cloneVar(['string', 1, 1.1, ['string', 1, 1.1]]));
+
+        $output = $output->fetch();
+
+        $expected = <<<'EOF'
+        array:4 [ // app/routes/console.php:18
+          0 => "string"
+          1 => 1
+          2 => 1.1
+          3 => array:3 [
+            0 => "string"
+            1 => 1
+            2 => 1.1
+          ]
+        ] // app/routes/console.php:18
+
+        EOF;
 
         $this->assertSame($expected, $output);
     }

@@ -94,7 +94,15 @@ class CliDumper extends BaseCliDumper
         $output = (string) $this->dump($data, true);
         $lines = explode("\n", $output);
 
-        $lines[0] .= $this->getDumpSourceContent();
+        $content = $this->getDumpSourceContent();
+        $lines[0] .= $content;
+
+        if (count($lines) > $this->getDisplayHeight()) {
+            // get index of last non-empty line
+            $index = array_key_last(array_filter($lines));
+
+            $lines[$index] .= $content;
+        }
 
         $this->output->write(implode("\n", $lines));
 
@@ -130,5 +138,15 @@ class CliDumper extends BaseCliDumper
     protected function supportsColors(): bool
     {
         return $this->output->isDecorated();
+    }
+
+    /**
+     * Gets the height of the display.
+     */
+    protected function getDisplayHeight(): int
+    {
+        $height = explode(' ', @exec('stty size 2>/dev/null'))[0];
+
+        return (int) ($height ?: 50);
     }
 }
