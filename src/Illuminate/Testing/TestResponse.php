@@ -323,9 +323,7 @@ class TestResponse implements ArrayAccess
 
             $message = "Expected file [{$filename}] is not present in Content-Disposition header.";
 
-            if (! isset($contentDisposition[1])) {
-                PHPUnit::fail($message);
-            } else {
+            if (isset($contentDisposition[1])) {
                 PHPUnit::assertSame(
                     $filename,
                     isset(explode('=', $contentDisposition[1])[1])
@@ -336,6 +334,8 @@ class TestResponse implements ArrayAccess
 
                 return $this;
             }
+
+            PHPUnit::fail($message);
         } else {
             PHPUnit::assertTrue(true);
 
