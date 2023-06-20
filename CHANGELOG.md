@@ -1,6 +1,14 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.13.3...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v10.13.5...10.x)
+
+## [v10.13.5](https://github.com/laravel/framework/compare/v10.13.3...v10.13.5) - 2023-06-08
+
+### What's Changed
+
+- Revert "[10.x] Update Kernel::load() to use same `classFromFile` logic as events" by @taylorotwell in https://github.com/laravel/framework/pull/47382
+
+**Full Changelog**: https://github.com/laravel/framework/compare/v10.13.3...v10.13.5
 
 ## [v10.13.3](https://github.com/laravel/framework/compare/v9.52.9...v10.13.3) - 2023-06-08
 
