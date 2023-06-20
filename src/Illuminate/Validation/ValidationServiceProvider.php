@@ -74,7 +74,7 @@ class ValidationServiceProvider extends ServiceProvider implements DeferrablePro
     public function provides()
     {
         return [
-            'validator', 'validation.presence',
+            'validator', 'validation.presence', UncompromisedVerifier::class
         ];
     }
 }
