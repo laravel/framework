@@ -53,13 +53,11 @@ trait InteractsWithQueue
             $exception = new ManuallyFailedException($exception);
         }
 
-        if ($exception instanceof Throwable || is_null($exception)) {
-            if ($this->job) {
-                return $this->job->fail($exception);
-            }
-        } else {
-            throw new InvalidArgumentException('The fail method requires a string or an instance of Throwable.');
+        if (($exception instanceof Throwable || is_null($exception)) && $this->job) {
+            return $this->job->fail($exception);
         }
+
+        throw new InvalidArgumentException('The fail method requires a string or an instance of Throwable.');
     }
 
     /**
