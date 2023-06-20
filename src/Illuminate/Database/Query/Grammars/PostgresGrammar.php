@@ -698,4 +698,25 @@ class PostgresGrammar extends Grammar
 
         return [$attribute];
     }
+
+    /**
+     * Make raw SQL query.
+     *
+     * @param string $sql
+     * @param array $bindings
+     * @return string
+     */
+    public function makeRawSql($sql, $bindings)
+    {
+        $query = parent::makeRawSql($sql, $bindings);
+        foreach ($this->operators as $operator) {
+            if (!str_contains($operator, '?')) {
+                continue;
+            }
+
+            $query = str_replace(str_replace('?', '??', $operator), $operator, $query);
+        }
+
+        return $query;
+    }
 }

@@ -1376,4 +1376,39 @@ class Grammar extends BaseGrammar
     {
         return $this->bitwiseOperators;
     }
+
+    /**
+     * Make raw SQL query.
+     *
+     * @param string $sql
+     * @param array $bindings
+     * @return string
+     */
+    public function makeRawSql($sql, $bindings)
+    {
+        $bindings = array_map(fn ($value) => $this->escape($value), $bindings);
+        $query = '';
+
+        $isStringLiteral = false;
+        for ($i = 0; $i < strlen($sql); $i++) {
+            $char = $sql[$i];
+            $nextChar = $sql[$i + 1] ?? null;
+
+            // Single quotes can be escaped as '' according to the SQL standard while MySQL uses \'.
+            // PostgreSQL has operators like ?| that have to be encoded in PHP like ??|.
+            if (in_array($char.$nextChar, ["\'", "''", '??'])) {
+                $query .= $char.$nextChar;
+                $i += 1;
+            } else if ($char === "'") {
+                $query .= $char;
+                $isStringLiteral = !$isStringLiteral;
+            } else if ($char === '?' && !$isStringLiteral) {
+                $query .= array_shift($bindings) ?? '?';
+            } else {
+                $query .= $char;
+            }
+        }
+
+        return $query;
+    }
 }
