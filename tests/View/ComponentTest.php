@@ -124,7 +124,7 @@ class ComponentTest extends TestCase
                 $this->content = $a.$b;
             }
 
-            public function render()
+            public function render(): \Illuminate\Contracts\View\View|Htmlable|string|\Closure
             {
                 return $this->content;
             }
@@ -279,7 +279,7 @@ class TestInlineViewComponent extends Component
         $this->title = $title;
     }
 
-    public function render()
+    public function render(): \Illuminate\Contracts\View\View|Htmlable|string|\Closure
     {
         return 'Hello {{ $title }}';
     }
@@ -294,7 +294,7 @@ class TestInlineViewComponentWithContainerDependencies extends Component
         $this->dependency = $dependency;
     }
 
-    public function render()
+    public function render(): \Illuminate\Contracts\View\View|Htmlable|string|\Closure
     {
         return '';
     }
@@ -312,7 +312,7 @@ class TestInlineViewComponentWithContainerDependenciesAndProps extends Component
         $this->dependency = $dependency;
     }
 
-    public function render()
+    public function render(): \Illuminate\Contracts\View\View|Htmlable|string|\Closure
     {
         return $this->content;
     }
@@ -320,7 +320,7 @@ class TestInlineViewComponentWithContainerDependenciesAndProps extends Component
 
 class TestInlineViewComponentWithoutDependencies extends Component
 {
-    public function render()
+    public function render(): \Illuminate\Contracts\View\View|Htmlable|string|\Closure
     {
         return 'alert';
     }
@@ -335,7 +335,7 @@ class TestInlineViewComponentWhereRenderDependsOnProps extends Component
         $this->content = $content;
     }
 
-    public function render()
+    public function render(): \Illuminate\Contracts\View\View|Htmlable|string|\Closure
     {
         return $this->content;
     }
@@ -350,7 +350,7 @@ class TestRegularViewComponentUsingViewHelper extends Component
         $this->title = $title;
     }
 
-    public function render()
+    public function render(): \Illuminate\Contracts\View\View|Htmlable|string|\Closure
     {
         return view('alert');
     }
@@ -365,7 +365,7 @@ class TestRegularViewComponentUsingViewMethod extends Component
         $this->title = $title;
     }
 
-    public function render()
+    public function render(): \Illuminate\Contracts\View\View|Htmlable|string|\Closure
     {
         return $this->view('alert');
     }
@@ -380,7 +380,7 @@ class TestRegularViewNameViewComponent extends Component
         $this->title = $title;
     }
 
-    public function render()
+    public function render(): \Illuminate\Contracts\View\View|Htmlable|string|\Closure
     {
         return 'alert';
     }
@@ -395,7 +395,7 @@ class TestHtmlableReturningViewComponent extends Component
         $this->title = $title;
     }
 
-    public function render()
+    public function render(): \Illuminate\Contracts\View\View|Htmlable|string|\Closure
     {
         return new HtmlString("<p>Hello {$this->title}</p>");
     }

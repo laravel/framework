@@ -90,7 +90,7 @@ class TestViewComponent extends Component
 {
     public $votes = 10;
 
-    public function render()
+    public function render(): \Illuminate\Contracts\View\View|\Illuminate\Contracts\Support\Htmlable|string|\Closure
     {
         return 'test';
     }
@@ -111,7 +111,7 @@ class TestSampleViewComponent extends Component
 
     private $privateCounter = 0;
 
-    public function render()
+    public function render(): \Illuminate\Contracts\View\View|\Illuminate\Contracts\Support\Htmlable|string|\Closure
     {
         return 'test';
     }
@@ -143,7 +143,7 @@ class TestSampleViewComponent extends Component
 
 class TestExceptedViewComponent extends Component
 {
-    protected $except = ['hello', 'hello2', 'taylor'];
+    protected array $except = ['hello', 'hello2', 'taylor'];
 
     public $taylor = 'Otwell';
 
@@ -157,7 +157,7 @@ class TestExceptedViewComponent extends Component
         return $this->taylor = '';
     }
 
-    public function render()
+    public function render(): \Illuminate\Contracts\View\View|\Illuminate\Contracts\Support\Htmlable|string|\Closure
     {
         return 'test';
     }
@@ -165,7 +165,7 @@ class TestExceptedViewComponent extends Component
 
 class TestHelloPropertyHelloMethodComponent extends Component
 {
-    public function render()
+    public function render(): \Illuminate\Contracts\View\View|\Illuminate\Contracts\Support\Htmlable|string|\Closure
     {
         return 'test';
     }
@@ -192,7 +192,7 @@ class TestDefaultAttributesComponent extends Component
         $this->withAttributes(['class' => 'text-red-500']);
     }
 
-    public function render()
+    public function render(): \Illuminate\Contracts\View\View|\Illuminate\Contracts\Support\Htmlable|string|\Closure
     {
         return $this->attributes->get('id');
     }

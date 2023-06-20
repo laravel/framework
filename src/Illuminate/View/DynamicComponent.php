@@ -45,7 +45,7 @@ class DynamicComponent extends Component
      *
      * @return \Illuminate\Contracts\View\View|string
      */
-    public function render()
+    public function render(): \Illuminate\Contracts\View\View|\Illuminate\Contracts\Support\Htmlable|string|\Closure
     {
         $template = <<<'EOF'
 <?php extract(collect($attributes->getAttributes())->mapWithKeys(function ($value, $key) { return [Illuminate\Support\Str::camel(str_replace([':', '.'], ' ', $key)) => $value]; })->all(), EXTR_SKIP); ?>

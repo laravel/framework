@@ -307,7 +307,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
                 $this->template = $template;
             }
 
-            public function render()
+            public function render(): View|Htmlable|string|\Closure
             {
                 return $this->template;
             }

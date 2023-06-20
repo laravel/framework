@@ -28,7 +28,7 @@ class InteractsWithViewsTest extends TestCase
                 return 'hello';
             }
 
-            public function render()
+            public function render(): \Illuminate\Contracts\View\View|\Illuminate\Contracts\Support\Htmlable|string|\Closure
             {
                 return 'rendered content';
             }

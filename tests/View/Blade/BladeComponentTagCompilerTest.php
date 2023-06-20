@@ -760,7 +760,7 @@ class TestAlertComponent extends Component
         $this->title = $title;
     }
 
-    public function render()
+    public function render(): \Illuminate\Contracts\View\View|\Illuminate\Contracts\Support\Htmlable|string|\Closure
     {
         return 'alert';
     }
@@ -775,7 +775,7 @@ class TestProfileComponent extends Component
         $this->userId = $userId;
     }
 
-    public function render()
+    public function render(): \Illuminate\Contracts\View\View|\Illuminate\Contracts\Support\Htmlable|string|\Closure
     {
         return 'profile';
     }
@@ -792,7 +792,7 @@ class TestInputComponent extends Component
         $this->value = $value;
     }
 
-    public function render()
+    public function render(): \Illuminate\Contracts\View\View|\Illuminate\Contracts\Support\Htmlable|string|\Closure
     {
         return 'input';
     }

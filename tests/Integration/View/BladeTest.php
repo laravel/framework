@@ -181,7 +181,7 @@ class HelloComponent extends Component
         $this->name = $name;
     }
 
-    public function render()
+    public function render(): \Illuminate\Contracts\View\View|\Illuminate\Contracts\Support\Htmlable|string|\Closure
     {
         return 'Hello {{ $name }}';
     }

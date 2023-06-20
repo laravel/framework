@@ -17,70 +17,70 @@ abstract class Component
      *
      * @var array
      */
-    protected $except = [];
+    protected array $except = [];
 
     /**
      * The component alias name.
      *
      * @var string
      */
-    public $componentName;
+    public string $componentName;
 
     /**
      * The component attributes.
      *
      * @var \Illuminate\View\ComponentAttributeBag
      */
-    public $attributes;
+    public ComponentAttributeBag $attributes;
 
     /**
      * The view factory instance, if any.
      *
      * @var \Illuminate\Contracts\View\Factory|null
      */
-    protected static $factory;
+    protected static ?\Illuminate\Contracts\View\Factory $factory;
 
     /**
      * The component resolver callback.
      *
      * @var (\Closure(string, array): Component)|null
      */
-    protected static $componentsResolver;
+    protected static ?Closure $componentsResolver;
 
     /**
      * The cache of blade view names, keyed by contents.
      *
      * @var array<string, string>
      */
-    protected static $bladeViewCache = [];
+    protected static array $bladeViewCache = [];
 
     /**
      * The cache of public property names, keyed by class.
      *
      * @var array
      */
-    protected static $propertyCache = [];
+    protected static array $propertyCache = [];
 
     /**
      * The cache of public method names, keyed by class.
      *
      * @var array
      */
-    protected static $methodCache = [];
+    protected static array $methodCache = [];
 
     /**
      * The cache of constructor parameters, keyed by class.
      *
      * @var array<class-string, array<int, string>>
      */
-    protected static $constructorParametersCache = [];
+    protected static array $constructorParametersCache = [];
 
     /**
      * Get the view / view contents that represent the component.
      *
      * @return \Illuminate\Contracts\View\View|\Illuminate\Contracts\Support\Htmlable|\Closure|string
      */
-    abstract public function render();
+    abstract public function render(): ViewContract|Htmlable|string|Closure;
 
     /**
      * Resolve the component instance with the given data.
@@ -88,7 +88,7 @@ abstract class Component
      * @param  array  $data
      * @return static
      */
-    public static function resolve($data)
+    public static function resolve(array $data): static
     {
         if (static::$componentsResolver) {
             return call_user_func(static::$componentsResolver, static::class, $data);
@@ -110,7 +110,7 @@ abstract class Component
      *
      * @return array
      */
-    protected static function extractConstructorParameters()
+    protected static function extractConstructorParameters(): array
     {
         if (! isset(static::$constructorParametersCache[static::class])) {
             $class = new ReflectionClass(static::class);
@@ -130,7 +130,7 @@ abstract class Component
      *
      * @return \Illuminate\Contracts\View\View|\Illuminate\Contracts\Support\Htmlable|\Closure|string
      */
-    public function resolveView()
+    public function resolveView(): ViewContract|Htmlable|string|Closure
     {
         $view = $this->render();
 
@@ -158,7 +158,7 @@ abstract class Component
      * @param  string  $contents
      * @return string
      */
-    protected function extractBladeViewFromString($contents)
+    protected function extractBladeViewFromString(string $contents): string
     {
         $key = sprintf('%s::%s', static::class, $contents);
 
@@ -180,7 +180,7 @@ abstract class Component
      * @param  string  $contents
      * @return string
      */
-    protected function createBladeViewFromString($factory, $contents)
+    protected function createBladeViewFromString(\Illuminate\Contracts\View\Factory $factory, string $contents): string
     {
         $factory->addNamespace(
             '__components',
@@ -206,7 +206,7 @@ abstract class Component
      *
      * @return array
      */
-    public function data()
+    public function data(): array
     {
         $this->attributes = $this->attributes ?: $this->newAttributeBag();
 
@@ -218,7 +218,7 @@ abstract class Component
      *
      * @return array
      */
-    protected function extractPublicProperties()
+    protected function extractPublicProperties(): array
     {
         $class = get_class($this);
 
@@ -251,7 +251,7 @@ abstract class Component
      *
      * @return array
      */
-    protected function extractPublicMethods()
+    protected function extractPublicMethods(): array
     {
         $class = get_class($this);
 
@@ -282,7 +282,7 @@ abstract class Component
      * @param  \ReflectionMethod  $method
      * @return mixed
      */
-    protected function createVariableFromMethod(ReflectionMethod $method)
+    protected function createVariableFromMethod(ReflectionMethod $method): mixed
     {
         return $method->getNumberOfParameters() === 0
                         ? $this->createInvokableVariable($method->getName())
@@ -295,7 +295,7 @@ abstract class Component
      * @param  string  $method
      * @return \Illuminate\View\InvokableComponentVariable
      */
-    protected function createInvokableVariable(string $method)
+    protected function createInvokableVariable(string $method): InvokableComponentVariable
     {
         return new InvokableComponentVariable(function () use ($method) {
             return $this->{$method}();
@@ -308,7 +308,7 @@ abstract class Component
      * @param  string  $name
      * @return bool
      */
-    protected function shouldIgnore($name)
+    protected function shouldIgnore(string $name): bool
     {
         return str_starts_with($name, '__') ||
                in_array($name, $this->ignoredMethods());
@@ -319,7 +319,7 @@ abstract class Component
      *
      * @return array
      */
-    protected function ignoredMethods()
+    protected function ignoredMethods(): array
     {
         return array_merge([
             'data',
@@ -342,7 +342,7 @@ abstract class Component
      * @param  string  $name
      * @return $this
      */
-    public function withName($name)
+    public function withName(string $name): static
     {
         $this->componentName = $name;
 
@@ -355,7 +355,7 @@ abstract class Component
      * @param  array  $attributes
      * @return $this
      */
-    public function withAttributes(array $attributes)
+    public function withAttributes(array $attributes): static
     {
         $this->attributes = $this->attributes ?: $this->newAttributeBag();
 
@@ -370,7 +370,7 @@ abstract class Component
      * @param  array  $attributes
      * @return \Illuminate\View\ComponentAttributeBag
      */
-    protected function newAttributeBag(array $attributes = [])
+    protected function newAttributeBag(array $attributes = []): ComponentAttributeBag
     {
         return new ComponentAttributeBag($attributes);
     }
@@ -380,7 +380,7 @@ abstract class Component
      *
      * @return bool
      */
-    public function shouldRender()
+    public function shouldRender(): bool
     {
         return true;
     }
@@ -393,7 +393,7 @@ abstract class Component
      * @param  array  $mergeData
      * @return \Illuminate\Contracts\View\View
      */
-    public function view($view, $data = [], $mergeData = [])
+    public function view(?string $view, array|\Illuminate\Contracts\Support\Arrayable $data = [], array $mergeData = []): ViewContract
     {
         return $this->factory()->make($view, $data, $mergeData);
     }
@@ -403,7 +403,7 @@ abstract class Component
      *
      * @return \Illuminate\Contracts\View\Factory
      */
-    protected function factory()
+    protected function factory(): \Illuminate\Contracts\View\Factory
     {
         if (is_null(static::$factory)) {
             static::$factory = Container::getInstance()->make('view');
@@ -417,7 +417,7 @@ abstract class Component
      *
      * @return void
      */
-    public static function flushCache()
+    public static function flushCache(): void
     {
         static::$bladeViewCache = [];
         static::$constructorParametersCache = [];
@@ -430,7 +430,7 @@ abstract class Component
      *
      * @return void
      */
-    public static function forgetFactory()
+    public static function forgetFactory(): void
     {
         static::$factory = null;
     }
@@ -442,7 +442,7 @@ abstract class Component
      *
      * @internal
      */
-    public static function forgetComponentsResolver()
+    public static function forgetComponentsResolver(): void
     {
         static::$componentsResolver = null;
     }
@@ -455,7 +455,7 @@ abstract class Component
      *
      * @internal
      */
-    public static function resolveComponentsUsing($resolver)
+    public static function resolveComponentsUsing(Closure $resolver): void
     {
         static::$componentsResolver = $resolver;
     }

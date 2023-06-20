@@ -36,7 +36,7 @@ class AnonymousComponent extends Component
      *
      * @return string
      */
-    public function render()
+    public function render(): \Illuminate\Contracts\View\View|\Illuminate\Contracts\Support\Htmlable|string|\Closure
     {
         return $this->view;
     }
@@ -46,7 +46,7 @@ class AnonymousComponent extends Component
      *
      * @return array
      */
-    public function data()
+    public function data(): array
     {
         $this->attributes = $this->attributes ?: $this->newAttributeBag();
 

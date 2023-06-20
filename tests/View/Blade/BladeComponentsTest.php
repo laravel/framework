@@ -73,7 +73,7 @@ class BladeComponentsTest extends AbstractBladeTestCase
 
 class ComponentStub extends Component
 {
-    public function render()
+    public function render(): \Illuminate\Contracts\View\View|\Illuminate\Contracts\Support\Htmlable|string|\Closure
     {
         return '';
     }
