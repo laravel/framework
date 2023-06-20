@@ -312,35 +312,35 @@ class TestResponse implements ArrayAccess
             );
         }
 
-        if (! is_null($filename)) {
-            if (isset($contentDisposition[1]) &&
-                trim(explode('=', $contentDisposition[1])[0]) !== 'filename') {
-                PHPUnit::fail(
-                    'Unsupported Content-Disposition header provided.'.PHP_EOL.
-                    'Disposition ['.trim(explode('=', $contentDisposition[1])[0]).'] found in header, [filename] expected.'
-                );
-            }
-
-            $message = "Expected file [{$filename}] is not present in Content-Disposition header.";
-
-            if (isset($contentDisposition[1])) {
-                PHPUnit::assertSame(
-                    $filename,
-                    isset(explode('=', $contentDisposition[1])[1])
-                        ? trim(explode('=', $contentDisposition[1])[1], " \"'")
-                        : '',
-                    $message
-                );
-
-                return $this;
-            }
-
-            PHPUnit::fail($message);
-        } else {
+        if (is_null($filename)) {
             PHPUnit::assertTrue(true);
 
             return $this;
         }
+
+        if (isset($contentDisposition[1]) &&
+            trim(explode('=', $contentDisposition[1])[0]) !== 'filename') {
+            PHPUnit::fail(
+                'Unsupported Content-Disposition header provided.'.PHP_EOL.
+                'Disposition ['.trim(explode('=', $contentDisposition[1])[0]).'] found in header, [filename] expected.'
+            );
+        }
+
+        $message = "Expected file [{$filename}] is not present in Content-Disposition header.";
+
+        if (isset($contentDisposition[1])) {
+            PHPUnit::assertSame(
+                $filename,
+                isset(explode('=', $contentDisposition[1])[1])
+                    ? trim(explode('=', $contentDisposition[1])[1], " \"'")
+                    : '',
+                $message
+            );
+
+            return $this;
+        }
+
+        PHPUnit::fail($message);
     }
 
     /**
