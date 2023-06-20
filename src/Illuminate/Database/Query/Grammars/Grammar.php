@@ -1380,8 +1380,8 @@ class Grammar extends BaseGrammar
     /**
      * Make raw SQL query.
      *
-     * @param string $sql
-     * @param array $bindings
+     * @param  string  $sql
+     * @param  array  $bindings
      * @return string
      */
     public function makeRawSql($sql, $bindings)
@@ -1399,10 +1399,10 @@ class Grammar extends BaseGrammar
             if (in_array($char.$nextChar, ["\'", "''", '??'])) {
                 $query .= $char.$nextChar;
                 $i += 1;
-            } else if ($char === "'") {
+            } elseif ($char === "'") {
                 $query .= $char;
-                $isStringLiteral = !$isStringLiteral;
-            } else if ($char === '?' && !$isStringLiteral) {
+                $isStringLiteral = ! $isStringLiteral;
+            } elseif ($char === '?' && ! $isStringLiteral) {
                 $query .= array_shift($bindings) ?? '?';
             } else {
                 $query .= $char;
