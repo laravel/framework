@@ -1,6 +1,26 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.52.9...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v10.13.3...10.x)
+
+## [v10.13.3](https://github.com/laravel/framework/compare/v9.52.9...v10.13.3) - 2023-06-08
+
+### What's Changed
+
+- [10.x] Narrow down array type for `$attributes` in `CastsAttributes` by @devfrey in https://github.com/laravel/framework/pull/47365
+- [10.x] Add test for `assertViewHasAll` method by @milwad-dev in https://github.com/laravel/framework/pull/47366
+- [10.x] Fix `schedule:list` to display named Jobs by @liamkeily in https://github.com/laravel/framework/pull/47367
+- [10.x] Support `ConditionalRules` within `NestedRules` by @cosmastech in https://github.com/laravel/framework/pull/47344
+- [10.x] Small test fixes by @stevebauman in https://github.com/laravel/framework/pull/47369
+- [10.x] Pluralisation typo in queue:clear command output by @sebsobseb in https://github.com/laravel/framework/pull/47376
+- [10.x] Add getForeignKeyFrom method by @iamgergo in https://github.com/laravel/framework/pull/47378
+- [10.x] Add shouldHashKeys to ThrottleRequests middleware by @fosron in https://github.com/laravel/framework/pull/47368
+
+### New Contributors
+
+- @sebsobseb made their first contribution in https://github.com/laravel/framework/pull/47376
+- @fosron made their first contribution in https://github.com/laravel/framework/pull/47368
+
+**Full Changelog**: https://github.com/laravel/framework/compare/v10.13.2...v10.13.3
 
 ## [v9.52.9](https://github.com/laravel/framework/compare/v10.13.2...v9.52.9) - 2023-06-08
 
