@@ -47,21 +47,30 @@ class ConfigPublishCommand extends Command
         }
 
         foreach ($config as $key => $file) {
-            if ($key !== $name && ! is_null($name)) {
-                continue;
+            if ($key === $name || is_null($name)) {
+                $this->publish($key, $file, $this->laravel->configPath().'/'.$key.'.php');
             }
-
-            $destination = $this->laravel->configPath().'/'.$key.'.php';
-
-            if (file_exists($destination) && ! $this->option('force')) {
-                $this->components->error("The '{$key}' configuration file already exists.");
-
-                continue;
-            }
-
-            copy($file, $destination);
-
-            $this->components->info("Published '{$key}' configuration file.");
         }
+    }
+
+    /**
+     * Publish the given file to the given destination.
+     *
+     * @param  string  $name
+     * @param  string  $file
+     * @param  string  $destination
+     * @return void
+     */
+    protected function publish(string $name, string $file, string $destination)
+    {
+        if (file_exists($destination) && ! $this->option('force')) {
+            $this->components->error("The '{$name}' configuration file already exists.");
+
+            return;
+        }
+
+        copy($file, $destination);
+
+        $this->components->info("Published '{$name}' configuration file.");
     }
 }
