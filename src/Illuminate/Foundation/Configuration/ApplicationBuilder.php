@@ -48,7 +48,7 @@ class ApplicationBuilder
      * @param  bool  $loadPackageProviders
      * @return $this
      */
-    public function withProviders(array $providers, bool $loadPackageProviders = true)
+    public function withProviders(array $providers = [], bool $loadPackageProviders = true)
     {
         RegisterProviders::merge(
             $providers,
