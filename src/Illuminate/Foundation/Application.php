@@ -52,6 +52,13 @@ class Application extends Container implements ApplicationContract, CachesConfig
     protected $basePath;
 
     /**
+     * The array of registered callbacks.
+     *
+     * @var callable[]
+     */
+    protected $registeredCallbacks = [];
+
+    /**
      * Indicates if the application has been bootstrapped before.
      *
      * @var bool
@@ -748,6 +755,17 @@ class Application extends Container implements ApplicationContract, CachesConfig
     }
 
     /**
+     * Register a new registered listener.
+     *
+     * @param  callable  $callback
+     * @return void
+     */
+    public function registered($callback)
+    {
+        $this->registeredCallbacks[] = $callback;
+    }
+
+    /**
      * Register all of the configured providers.
      *
      * @return void
@@ -761,6 +779,8 @@ class Application extends Container implements ApplicationContract, CachesConfig
 
         (new ProviderRepository($this, new Filesystem, $this->getCachedServicesPath()))
                     ->load($providers->collapse()->toArray());
+
+        $this->fireAppCallbacks($this->registeredCallbacks);
     }
 
     /**
