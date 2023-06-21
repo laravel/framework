@@ -113,11 +113,11 @@ class ApplicationBuilder
     {
         if (is_null($using) && (is_string($web) || is_string($api))) {
             $using = function () use ($web, $api, $apiPrefix, $then) {
-                if (is_string($api)) {
+                if (is_string($api) && realpath($api) !== false) {
                     Route::middleware('api')->prefix($apiPrefix)->group($api);
                 }
 
-                if (is_string($web)) {
+                if (is_string($web) && realpath($web) !== false) {
                     Route::middleware('web')->group($web);
                 }
 
@@ -133,11 +133,11 @@ class ApplicationBuilder
             $this->app->register(AppRouteServiceProvider::class);
         });
 
-        if (is_string($commands)) {
+        if (is_string($commands) && realpath($commands) !== false) {
             $this->withCommands([$commands]);
         }
 
-        if (is_string($channels)) {
+        if (is_string($channels) && realpath($channels) !== false) {
             $this->withBroadcasting($channels);
         }
 
