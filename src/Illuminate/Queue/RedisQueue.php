@@ -81,6 +81,28 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
         $this->retryAfter = $retryAfter;
         $this->dispatchAfterCommit = $dispatchAfterCommit;
         $this->migrationBatchSize = $migrationBatchSize;
+        $this->unsetCompressionAndSerialization();
+    }
+
+    /**
+     * Unset PhpRedis serialization & compression options, as they're not compatible with Lua scripts
+     *
+     * @link https://github.com/laravel/framework/issues/47356
+     * @return void
+     *
+     * @throws \RedisException
+     */
+    private function unsetCompressionAndSerialization()
+    {
+        $connection = $this->getConnection();
+        if(! $connection instanceof \Illuminate\Redis\Connections\PhpRedisConnection)
+        {
+            return;
+        }
+
+        $client = $this->getConnection()->client();
+        defined('Redis::OPT_SERIALIZER') && $client->setOption(\Redis::OPT_SERIALIZER, null);
+        defined('Redis::OPT_COMPRESSION') && $client->setOption(\Redis::OPT_COMPRESSION, null);
     }
 
     /**
