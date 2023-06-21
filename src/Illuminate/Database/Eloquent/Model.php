@@ -997,7 +997,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      *
      * @param  array  $attributes
      * @param  array  $options
-     * @param int $attempts
+     * @param  int $attempts
      * @return bool
      *
      * @throws \Throwable
@@ -1159,7 +1159,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * Save the model to the database within a transaction.
      *
      * @param  array  $options
-     * @param int $attempts
+     * @param  int $attempts
      * @return bool
      *
      * @throws \Throwable
