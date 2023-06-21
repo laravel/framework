@@ -133,11 +133,11 @@ class ApplicationBuilder
             $this->app->register(AppRouteServiceProvider::class);
         });
 
-        if (! is_null($commands)) {
+        if (is_string($commands)) {
             $this->withCommands([$commands]);
         }
 
-        if (! is_null($channels)) {
+        if (is_string($channels)) {
             $this->withBroadcasting($channels);
         }
 
