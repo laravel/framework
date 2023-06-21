@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
+use Illuminate\Support\ServiceProvider;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -45,38 +46,12 @@ class ProviderMakeCommand extends GeneratorCommand
             return $result;
         }
 
-        if (file_exists($this->laravel->bootstrapPath('providers.php'))) {
-            $this->addProviderToBootstrapFile();
-        }
+        ServiceProvider::addProviderToBootstrapFile(
+            $this->qualifyClass($this->getNameInput()),
+            $this->laravel->getBootstrapProvidersPath(),
+        );
 
         return $result;
-    }
-
-    /**
-     * Add the provider to the bootstrap file containing an array of providers.
-     *
-     * @return void
-     */
-    protected function addProviderToBootstrapFile()
-    {
-        $providers = collect(require $this->laravel->bootstrapPath('providers.php'))
-            ->merge([$this->qualifyClass($this->getNameInput())])
-            ->unique()
-            ->sort()
-            ->values()
-            ->map(fn ($p) => '    '.$p.'::class,')
-            ->implode(PHP_EOL);
-
-        $content = '<?php
-
-return [
-'.$providers.'
-];';
-
-        file_put_contents(
-            $this->laravel->bootstrapPath('providers.php'),
-            $content,
-        );
     }
 
     /**
