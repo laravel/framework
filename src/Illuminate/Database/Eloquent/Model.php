@@ -997,17 +997,18 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      *
      * @param  array  $attributes
      * @param  array  $options
+     * @param int $attempts
      * @return bool
      *
      * @throws \Throwable
      */
-    public function updateOrFail(array $attributes = [], array $options = [])
+    public function updateOrFail(array $attributes = [], array $options = [], int $attempts = 1)
     {
         if (! $this->exists) {
             return false;
         }
 
-        return $this->fill($attributes)->saveOrFail($options);
+        return $this->fill($attributes)->saveOrFail($options, $attempts);
     }
 
     /**
@@ -1158,13 +1159,17 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * Save the model to the database within a transaction.
      *
      * @param  array  $options
+     * @param int $attempts
      * @return bool
      *
      * @throws \Throwable
      */
-    public function saveOrFail(array $options = [])
+    public function saveOrFail(array $options = [], int $attempts = 1)
     {
-        return $this->getConnection()->transaction(fn () => $this->save($options));
+        return $this->getConnection()->transaction(
+            fn () => $this->save($options),
+            $attempts
+        );
     }
 
     /**
