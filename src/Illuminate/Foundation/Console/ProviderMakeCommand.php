@@ -59,15 +59,23 @@ class ProviderMakeCommand extends GeneratorCommand
      */
     protected function addProviderToBootstrapFile()
     {
-        $providers = require $this->laravel->bootstrapPath('providers.php');
+        $providers = collect(require $this->laravel->bootstrapPath('providers.php'))
+            ->merge([$this->qualifyClass($this->getNameInput())])
+            ->unique()
+            ->sort()
+            ->values()
+            ->map(fn ($p) => '    '.$p.'::class,')
+            ->implode(PHP_EOL);
 
-        $providers[] = $this->qualifyClass($this->getNameInput());
+        $content = '<?php
 
-        $providers = array_values(array_unique($providers));
+return [
+'.$providers.'
+];';
 
         file_put_contents(
             $this->laravel->bootstrapPath('providers.php'),
-            '<?php return '.var_export($providers, true).';',
+            $content,
         );
     }
 
