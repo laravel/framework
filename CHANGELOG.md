@@ -4,29 +4,19 @@
 
 ## [v10.13.5](https://github.com/laravel/framework/compare/v10.13.3...v10.13.5) - 2023-06-08
 
-### What's Changed
 - Revert "[10.x] Update Kernel::load() to use same `classFromFile` logic as events" by @taylorotwell in https://github.com/laravel/framework/pull/47382
-
-**Full Changelog**: https://github.com/laravel/framework/compare/v10.13.3...v10.13.5
 
 ## [v10.13.3](https://github.com/laravel/framework/compare/v9.52.9...v10.13.3) - 2023-06-08
 
 ### What's Changed
-- [10.x] Narrow down array type for `$attributes` in `CastsAttributes` by @devfrey in https://github.com/laravel/framework/pull/47365
-- [10.x] Add test for `assertViewHasAll` method by @milwad-dev in https://github.com/laravel/framework/pull/47366
-- [10.x] Fix `schedule:list` to display named Jobs by @liamkeily in https://github.com/laravel/framework/pull/47367
-- [10.x] Support `ConditionalRules` within `NestedRules` by @cosmastech in https://github.com/laravel/framework/pull/47344
-- [10.x] Small test fixes by @stevebauman in https://github.com/laravel/framework/pull/47369
-- [10.x] Pluralisation typo in queue:clear command output by @sebsobseb in https://github.com/laravel/framework/pull/47376
-- [10.x] Add getForeignKeyFrom method by @iamgergo in https://github.com/laravel/framework/pull/47378
-- [10.x] Add shouldHashKeys to ThrottleRequests middleware by @fosron in https://github.com/laravel/framework/pull/47368
-
-### New Contributors
-- @sebsobseb made their first contribution in https://github.com/laravel/framework/pull/47376
-- @fosron made their first contribution in https://github.com/laravel/framework/pull/47368
-
-**Full Changelog**: https://github.com/laravel/framework/compare/v10.13.2...v10.13.3
-
+- Narrow down array type for `$attributes` in `CastsAttributes` by @devfrey in https://github.com/laravel/framework/pull/47365
+- Add test for `assertViewHasAll` method by @milwad-dev in https://github.com/laravel/framework/pull/47366
+- Fix `schedule:list` to display named Jobs by @liamkeily in https://github.com/laravel/framework/pull/47367
+- Support `ConditionalRules` within `NestedRules` by @cosmastech in https://github.com/laravel/framework/pull/47344
+- Small test fixes by @stevebauman in https://github.com/laravel/framework/pull/47369
+- Pluralisation typo in queue:clear command output by @sebsobseb in https://github.com/laravel/framework/pull/47376
+- Add getForeignKeyFrom method by @iamgergo in https://github.com/laravel/framework/pull/47378
+- Add shouldHashKeys to ThrottleRequests middleware by @fosron in https://github.com/laravel/framework/pull/47368
 
 ## [v10.13.2 (2023-06-05)](https://github.com/laravel/framework/compare/v10.13.1...v10.13.2)
 
