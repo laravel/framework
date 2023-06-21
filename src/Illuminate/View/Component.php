@@ -142,13 +142,10 @@ abstract class Component
             return $view;
         }
 
-        $resolver = function ($view) {
-            return $this->extractBladeViewFromString($view);
-        };
+        $resolver = fn ($view) => $this->extractBladeViewFromString($view);
 
-        return $view instanceof Closure ? function (array $data = []) use ($view, $resolver) {
-            return $resolver($view($data));
-        }
+        return $view instanceof Closure
+        ? fn (array $data = []) => $resolver($view($data))
         : $resolver($view);
     }
 
@@ -226,15 +223,10 @@ abstract class Component
             $reflection = new ReflectionClass($this);
 
             static::$propertyCache[$class] = collect($reflection->getProperties(ReflectionProperty::IS_PUBLIC))
-                ->reject(function (ReflectionProperty $property) {
-                    return $property->isStatic();
-                })
-                ->reject(function (ReflectionProperty $property) {
-                    return $this->shouldIgnore($property->getName());
-                })
-                ->map(function (ReflectionProperty $property) {
-                    return $property->getName();
-                })->all();
+                ->reject(fn (ReflectionProperty $property) => $property->isStatic())
+                ->reject(fn (ReflectionProperty $property) => $this->shouldIgnore($property->getName()))
+                ->map(fn (ReflectionProperty $property) => $property->getName())
+                ->all();
         }
 
         $values = [];
@@ -259,12 +251,8 @@ abstract class Component
             $reflection = new ReflectionClass($this);
 
             static::$methodCache[$class] = collect($reflection->getMethods(ReflectionMethod::IS_PUBLIC))
-                ->reject(function (ReflectionMethod $method) {
-                    return $this->shouldIgnore($method->getName());
-                })
-                ->map(function (ReflectionMethod $method) {
-                    return $method->getName();
-                });
+                ->reject(fn (ReflectionMethod $method) => $this->shouldIgnore($method->getName()))
+                ->map(fn (ReflectionMethod $method) => $method->getName());
         }
 
         $values = [];
@@ -297,9 +285,7 @@ abstract class Component
      */
     protected function createInvokableVariable(string $method)
     {
-        return new InvokableComponentVariable(function () use ($method) {
-            return $this->{$method}();
-        });
+        return new InvokableComponentVariable(fn() => $this->{$method}());
     }
 
     /**
