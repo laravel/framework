@@ -27,7 +27,7 @@ class LoadConfiguration
         if (file_exists($cached = $app->getCachedConfigPath())) {
             $items = require $cached;
 
-            $loadedFromCache = true;
+            $app->instance('config_loaded_from_cache', $loadedFromCache = true);
         }
 
         // Next we will spin through all of the configuration files in the configuration
