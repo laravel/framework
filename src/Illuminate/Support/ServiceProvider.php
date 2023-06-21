@@ -444,4 +444,38 @@ abstract class ServiceProvider
     {
         return new DefaultProviders;
     }
+
+    /**
+     * Add the given provider to the application's provider bootstrap file.
+     *
+     * @param  string  $provider
+     * @param  string  $path
+     * @return bool
+     */
+    public static function addProviderToBootstrapFile(string $provider, string $path = null)
+    {
+        $path ??= app()->getBootstrapProvidersPath();
+
+        if (! file_exists($path)) {
+            return false;
+        }
+
+        $providers = collect(require $path)
+            ->merge([$provider])
+            ->unique()
+            ->sort()
+            ->values()
+            ->map(fn ($p) => '    '.$p.'::class,')
+            ->implode(PHP_EOL);
+
+        $content = '<?php
+
+return [
+'.$providers.'
+];';
+
+        file_put_contents($path, $content);
+
+        return true;
+    }
 }
