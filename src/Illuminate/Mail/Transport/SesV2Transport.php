@@ -60,7 +60,7 @@ class SesV2Transport extends AbstractTransport
             $result = $this->ses->sendEmail(
                 array_merge(
                     $options, [
-                        'ReplyToAddresses' => [$message->getEnvelope()->getSender()->toString()],
+                        'Source' => $message->getEnvelope()->getSender()->toString(),
                         'Destination' => [
                             'ToAddresses' => collect($message->getEnvelope()->getRecipients())
                                     ->map
