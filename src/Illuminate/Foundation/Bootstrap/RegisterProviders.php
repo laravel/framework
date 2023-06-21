@@ -47,6 +47,12 @@ class RegisterProviders
         if (static::$packageProviderPath &&
             file_exists(static::$packageProviderPath)) {
             $packageProviders = require static::$packageProviderPath;
+
+            foreach ($packageProviders as $index => $provider) {
+                if (! class_exists($provider)) {
+                    unset($packageProviders[$index]);
+                }
+            }
         }
 
         $app->make('config')->set(
@@ -54,7 +60,7 @@ class RegisterProviders
             array_merge(
                 $app->make('config')->get('app.providers'),
                 static::$merge,
-                $packageProviders ?? [],
+                array_values($packageProviders ?? []),
             ),
         );
     }
