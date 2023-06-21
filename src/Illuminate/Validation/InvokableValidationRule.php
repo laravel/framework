@@ -8,11 +8,11 @@ use Illuminate\Contracts\Validation\InvokableRule;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
-use Illuminate\Translation\HandlesPotentiallyTranslatedString;
+use Illuminate\Translation\CreatesPotentiallyTranslatedStrings;
 
 class InvokableValidationRule implements Rule, ValidatorAwareRule
 {
-    use HandlesPotentiallyTranslatedString;
+    use CreatesPotentiallyTranslatedStrings;
 
     /**
      * The invokable that validates the attribute.
@@ -69,7 +69,8 @@ class InvokableValidationRule implements Rule, ValidatorAwareRule
     public static function make($invokable)
     {
         if ($invokable->implicit ?? false) {
-            return new class($invokable) extends InvokableValidationRule implements ImplicitRule {};
+            return new class($invokable) extends InvokableValidationRule implements ImplicitRule {
+            };
         }
 
         return new InvokableValidationRule($invokable);

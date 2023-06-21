@@ -2,7 +2,7 @@
 
 namespace Illuminate\Translation;
 
-trait HandlesPotentiallyTranslatedString
+trait CreatesPotentiallyTranslatedStrings
 {
     /**
      * Create a pending potentially translated string.

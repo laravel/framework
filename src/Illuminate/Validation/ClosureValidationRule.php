@@ -4,11 +4,11 @@ namespace Illuminate\Validation;
 
 use Illuminate\Contracts\Validation\Rule as RuleContract;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
-use Illuminate\Translation\HandlesPotentiallyTranslatedString;
+use Illuminate\Translation\CreatesPotentiallyTranslatedStrings;
 
 class ClosureValidationRule implements RuleContract, ValidatorAwareRule
 {
-    use HandlesPotentiallyTranslatedString;
+    use CreatesPotentiallyTranslatedStrings;
 
     /**
      * The callback that validates the attribute.
