@@ -32,11 +32,7 @@ class ConfigPublishCommand extends Command
      */
     public function handle()
     {
-        $config = [];
-
-        foreach (Finder::create()->files()->name('*.php')->in(__DIR__.'/../../../../config') as $file) {
-            $config[basename($file->getRealPath(), '.php')] = $file->getRealPath();
-        }
+        $config = $this->getBaseConfigurationFiles();
 
         $name = $this->argument('name');
 
@@ -72,5 +68,21 @@ class ConfigPublishCommand extends Command
         copy($file, $destination);
 
         $this->components->info("Published '{$name}' configuration file.");
+    }
+
+    /**
+     * Get an array containing the base configuration files.
+     *
+     * @return array
+     */
+    protected function getBaseConfigurationFiles()
+    {
+        $config = [];
+
+        foreach (Finder::create()->files()->name('*.php')->in(__DIR__.'/../../../../config') as $file) {
+            $config[basename($file->getRealPath(), '.php')] = $file->getRealPath();
+        }
+
+        return $config;
     }
 }
