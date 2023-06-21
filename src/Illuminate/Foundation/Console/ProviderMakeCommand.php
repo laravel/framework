@@ -31,6 +31,47 @@ class ProviderMakeCommand extends GeneratorCommand
     protected $type = 'Provider';
 
     /**
+     * Execute the console command.
+     *
+     * @return bool|null
+     *
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     */
+    public function handle()
+    {
+        $result = parent::handle();
+
+        if ($result === false) {
+            return $result;
+        }
+
+        if (file_exists($this->laravel->bootstrapPath('providers.php'))) {
+            $this->addProviderToBootstrapFile();
+        }
+
+        return $result;
+    }
+
+    /**
+     * Add the provider to the bootstrap file containing an array of providers.
+     *
+     * @return void
+     */
+    protected function addProviderToBootstrapFile()
+    {
+        $providers = require $this->laravel->bootstrapPath('providers.php');
+
+        $providers[] = $this->qualifyClass($this->getNameInput());
+
+        $providers = array_values(array_unique($providers));
+
+        file_put_contents(
+            $this->laravel->bootstrapPath('providers.php'),
+            '<?php return '.var_export($providers, true).';',
+        );
+    }
+
+    /**
      * Get the stub file for the generator.
      *
      * @return string
