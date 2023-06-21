@@ -29,6 +29,13 @@ class Factory
     protected $dispatcher;
 
     /**
+     * The callbacks that should execute before every request is sent.
+     *
+     * @var array
+     */
+    protected $beforeSendingCallbacks = [];
+
+    /**
      * The stub callables that will handle requests.
      *
      * @var \Illuminate\Support\Collection
@@ -74,6 +81,19 @@ class Factory
         $this->dispatcher = $dispatcher;
 
         $this->stubCallbacks = collect();
+    }
+
+    /**
+     * Add a new "before sending" callback to every request.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function beforeSending($callback)
+    {
+        $this->beforeSendingCallbacks[] = $callback;
+
+        return $this;
     }
 
     /**
@@ -353,7 +373,11 @@ class Factory
      */
     protected function newPendingRequest()
     {
-        return new PendingRequest($this);
+        return tap(new PendingRequest($this), function ($request) {
+            foreach ($this->beforeSendingCallbacks as $callback) {
+                $request->beforeSending($callback);
+            }
+        });
     }
 
     /**

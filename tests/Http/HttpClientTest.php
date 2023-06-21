@@ -2316,4 +2316,25 @@ class HttpClientTest extends TestCase
 
         $this->assertTrue($onStatsFunctionCalled);
     }
+
+    public function testItCanMakeGlobalChangesToNewPendingRequests()
+    {
+        $requests = [];
+        $this->factory->fake(function ($r) use (&$requests) {
+            $requests[] = $r;
+
+            return $this->factory::response('expected content');
+        });
+
+        $this->factory->beforeSending(function (Request $request, array $options, PendingRequest $pending) {
+            return $request->toPsrRequest()->withHeader('User-Agent', 'Laravel Framework/1.0');
+        });
+        $response = $this->factory->post('http://forge.laravel.com');
+        $response = $this->factory->post('http://vapor.laravel.com');
+
+        $this->assertSame('expected content', $response->body());
+        $this->assertCount(2, $requests);
+        $this->assertSame(['Laravel Framework/1.0'], $requests[0]->header('User-Agent'));
+        $this->assertSame(['Laravel Framework/1.0'], $requests[1]->header('User-Agent'));
+    }
 }
