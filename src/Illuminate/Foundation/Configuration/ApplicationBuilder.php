@@ -53,7 +53,7 @@ class ApplicationBuilder
         RegisterProviders::merge(
             $providers,
             $loadPackageProviders
-                ? $this->app->bootstrapPath('providers.php')
+                ? $this->app->getBootstrapProvidersPath()
                 : null
         );
 

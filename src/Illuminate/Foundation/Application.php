@@ -432,6 +432,16 @@ class Application extends Container implements ApplicationContract, CachesConfig
     }
 
     /**
+     * Get the path to the service provider list in the bootstrap directory.
+     *
+     * @return string
+     */
+    public function getBootstrapProvidersPath()
+    {
+        return $this->bootstrapPath('providers.php');
+    }
+
+    /**
      * Set the bootstrap file directory.
      *
      * @param  string  $path
