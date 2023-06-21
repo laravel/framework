@@ -44,7 +44,7 @@ class ListenerMakeCommand extends GeneratorCommand
      */
     protected function buildClass($name)
     {
-        $event = $this->option('event');
+        $event = $this->option('event') ?? '';
 
         if (! Str::startsWith($event, [
             $this->laravel->getNamespace(),
