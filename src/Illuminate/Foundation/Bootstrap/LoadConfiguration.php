@@ -68,23 +68,37 @@ class LoadConfiguration
 
         $base = $this->getBaseConfiguration();
 
-        // Merge base configuration with application configuration...
-        foreach ($files as $key => $path) {
-            $config = require $path;
-
-            if (isset($base[$key])) {
-                $config = array_merge($base[$key], $config);
-
-                unset($base[$key]);
-            }
-
-            $repository->set($key, $config);
+        foreach ($files as $name => $path) {
+            $base = $this->loadConfigurationFile($repository, $name, $path, $base);
         }
 
-        // Set any base configuration that didn't have an application file...
-        foreach ($base as $key => $config) {
-            $repository->set($key, $config);
+        foreach ($base as $name => $config) {
+            $repository->set($name, $config);
         }
+    }
+
+    /**
+     * Load the given configuration file.
+     *
+     * @param  \Illuminate\Contracts\Config\Repository  $repository
+     * @param  string  $name
+     * @param  string  $path
+     * @param  array  $base
+     * @return array
+     */
+    protected function loadConfigurationFile(RepositoryContract $repository, $name, $path, array $base)
+    {
+        $config = require $path;
+
+        if (isset($base[$name])) {
+            $config = array_merge($base[$name], $config);
+
+            unset($base[$name]);
+        }
+
+        $repository->set($name, $config);
+
+        return $base;
     }
 
     /**
