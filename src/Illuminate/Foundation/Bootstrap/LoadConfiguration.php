@@ -68,6 +68,7 @@ class LoadConfiguration
 
         $base = $this->getBaseConfiguration();
 
+        // Merge base configuration with application configuration...
         foreach ($files as $key => $path) {
             $config = require $path;
 
@@ -80,6 +81,7 @@ class LoadConfiguration
             $repository->set($key, $config);
         }
 
+        // Set any base configuration that didn't have an application file...
         foreach ($base as $key => $config) {
             $repository->set($key, $config);
         }
