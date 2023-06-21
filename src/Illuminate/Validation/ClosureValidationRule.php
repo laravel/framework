@@ -4,10 +4,12 @@ namespace Illuminate\Validation;
 
 use Illuminate\Contracts\Validation\Rule as RuleContract;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
-use Illuminate\Translation\PotentiallyTranslatedString;
+use Illuminate\Translation\CreatesPotentiallyTranslatedStrings;
 
 class ClosureValidationRule implements RuleContract, ValidatorAwareRule
 {
+    use CreatesPotentiallyTranslatedStrings;
+
     /**
      * The callback that validates the attribute.
      *
@@ -88,53 +90,5 @@ class ClosureValidationRule implements RuleContract, ValidatorAwareRule
         $this->validator = $validator;
 
         return $this;
-    }
-
-    /**
-     * Create a pending potentially translated string.
-     *
-     * @param  string  $attribute
-     * @param  string|null  $message
-     * @return \Illuminate\Translation\PotentiallyTranslatedString
-     */
-    protected function pendingPotentiallyTranslatedString($attribute, $message)
-    {
-        $destructor = $message === null
-            ? fn ($message) => $this->messages[] = $message
-            : fn ($message) => $this->messages[$attribute] = $message;
-
-        return new class($message ?? $attribute, $this->validator->getTranslator(), $destructor) extends PotentiallyTranslatedString
-        {
-            /**
-             * The callback to call when the object destructs.
-             *
-             * @var \Closure
-             */
-            protected $destructor;
-
-            /**
-             * Create a new pending potentially translated string.
-             *
-             * @param  string  $message
-             * @param  \Illuminate\Contracts\Translation\Translator  $translator
-             * @param  \Closure  $destructor
-             */
-            public function __construct($message, $translator, $destructor)
-            {
-                parent::__construct($message, $translator);
-
-                $this->destructor = $destructor;
-            }
-
-            /**
-             * Handle the object's destruction.
-             *
-             * @return void
-             */
-            public function __destruct()
-            {
-                ($this->destructor)($this->toString());
-            }
-        };
     }
 }
