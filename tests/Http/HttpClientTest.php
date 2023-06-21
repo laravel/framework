@@ -735,6 +735,19 @@ class HttpClientTest extends TestCase
         });
     }
 
+    public function testWithArrayQueryParameters()
+    {
+        $this->factory->fake();
+
+        $this->factory->withQueryParameters(
+            ['foo' => ['bar', 'baz']],
+        )->get('https://laravel.com');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'https://laravel.com?foo%5B0%5D=bar&foo%5B1%5D=baz';
+        });
+    }
+
     public function testWithQueryParametersAllowsAddingMoreOnRequest()
     {
         $this->factory->fake();
@@ -742,6 +755,23 @@ class HttpClientTest extends TestCase
         $this->factory->withQueryParameters(
             ['foo' => 'bar']
         )->get('https://laravel.com', [
+            'baz' => 'qux',
+        ]);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'https://laravel.com?foo=bar&baz=qux';
+        });
+    }
+
+    public function testWithQueryParametersAllowsOverridingParameterOnRequest()
+    {
+        $this->factory->fake();
+
+        $this->factory->withQueryParameters([
+            'foo' => 'bar',
+            'baz' => 'baz',
+        ])->get('https://laravel.com', [
+            // Override the previously set value
             'baz' => 'qux',
         ]);
 
