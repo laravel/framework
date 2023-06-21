@@ -6,7 +6,7 @@
 
 - Revert "[10.x] Update Kernel::load() to use same `classFromFile` logic as events" by @taylorotwell in https://github.com/laravel/framework/pull/47382
 
-## [v10.13.3](https://github.com/laravel/framework/compare/v9.52.9...v10.13.3) - 2023-06-08
+## [v10.13.3](https://github.com/laravel/framework/compare/v10.13.2...v10.13.3) - 2023-06-08
 
 ### What's Changed
 - Narrow down array type for `$attributes` in `CastsAttributes` by @devfrey in https://github.com/laravel/framework/pull/47365
