@@ -2317,7 +2317,7 @@ class HttpClientTest extends TestCase
         $this->assertTrue($onStatsFunctionCalled);
     }
 
-    public function testItCanAddGlobalBeforeSendingCallbacks()
+    public function testItCanAddGlobalHeadersBeforeSending()
     {
         $requests = [];
         $this->factory->fake(function ($r) use (&$requests) {
@@ -2327,14 +2327,22 @@ class HttpClientTest extends TestCase
         });
 
         $this->factory->beforeSending(function (Request $request, array $options, PendingRequest $pending) {
-            return $request->toPsrRequest()->withHeader('User-Agent', 'Laravel Framework/1.0');
+            return $request->replaceHeader('User-Agent', 'Laravel Framework/1.0')
+                ->withHeader('shared', 'global')
+                ->withHeader('list', ['item-1', 'item-2'])
+                ->withHeader('list', ['item-3']);
         });
-        $response = $this->factory->post('http://forge.laravel.com');
-        $response = $this->factory->post('http://vapor.laravel.com');
+        $this->factory->post('http://forge.laravel.com');
+        $this->factory->withHeader('shared', 'local')->post('http://vapor.laravel.com');
 
-        $this->assertSame('expected content', $response->body());
         $this->assertCount(2, $requests);
+
         $this->assertSame(['Laravel Framework/1.0'], $requests[0]->header('User-Agent'));
+        $this->assertSame(['item-1', 'item-2', 'item-3'], $requests[0]->header('list'));
+        $this->assertSame(['global'], $requests[0]->header('shared'));
+
         $this->assertSame(['Laravel Framework/1.0'], $requests[1]->header('User-Agent'));
+        $this->assertSame(['item-1', 'item-2', 'item-3'], $requests[1]->header('list'));
+        $this->assertSame(['local', 'global'], $requests[1]->header('shared'));
     }
 }
