@@ -232,7 +232,7 @@ class View implements ArrayAccess, Htmlable, ViewContract
     /**
      * Add a piece of data to the view.
      *
-     * @param  string|array  $key
+     * @param  string|array|Closure  $key
      * @param  mixed  $value
      * @return $this
      */
@@ -260,7 +260,7 @@ class View implements ArrayAccess, Htmlable, ViewContract
 
             $this->data = array_merge($this->data, $with);
         }
-        if (is_array($key)) {
+        else if (is_array($key)) {
             $this->data = array_merge($this->data, $key);
         } else {
             $this->data[$key] = $value;
