@@ -821,7 +821,7 @@ class Validator implements ValidatorContract
         }
 
         if ($rule instanceof DataAwareRule) {
-            $rule->setData($this->data);
+            $rule->setData($this->getDataWithoutPlaceholders());
         }
 
         if (! $rule->passes($attribute, $value)) {
@@ -1116,6 +1116,15 @@ class Validator implements ValidatorContract
         return $this->rules;
     }
 
+    protected function removePlaceholders(array $data): array
+    {
+        return collect($data)
+            ->mapWithKeys(fn ($value, $key) => [
+                str_replace($this->dotPlaceholder, '\\.', $key) => $value,
+            ])
+            ->all();
+    }
+
     /**
      * Get the validation rules with key placeholders removed.
      *
@@ -1123,11 +1132,17 @@ class Validator implements ValidatorContract
      */
     public function getRulesWithoutPlaceholders()
     {
-        return collect($this->rules)
-            ->mapWithKeys(fn ($value, $key) => [
-                str_replace($this->dotPlaceholder, '\\.', $key) => $value,
-            ])
-            ->all();
+        return $this->removePlaceholders($this->rules);
+    }
+
+    /**
+     * Get the data under validation with key placeholders removed.
+     *
+     * @return array
+     */
+    public function getDataWithoutPlaceholders()
+    {
+        return $this->removePlaceholders($this->data);
     }
 
     /**
