@@ -1695,6 +1695,19 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Ensure the items are associative, using the value for missing keys.
+     *
+     * @param  callable|null  $callback
+     * @return static
+     */
+    public function toAssociative($callback = null)
+    {
+        $callback ??= fn ($value) => (string) $value;
+
+        return new static(Arr::toAssociative($this->items, fn ($value, $key, $original) => $callback($value, $key, $this)));
+    }
+
+    /**
      * Get a base Support collection instance from this collection.
      *
      * @return \Illuminate\Support\Collection<TKey, TValue>

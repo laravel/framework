@@ -812,6 +812,30 @@ class Arr
     }
 
     /**
+     * Ensure the array is associative, using the value for missing keys.
+     *
+     * @param  array  $array
+     * @param  callable|null  $callback
+     * @return array
+     */
+    public static function toAssociative($array, $callback = null)
+    {
+        $callback ??= fn ($value) => (string) $value;
+
+        $result = [];
+
+        foreach ($array as $key => $value) {
+            if (is_string($key)) {
+                $result[$key] = $value;
+            } else {
+                $result[$value] = $callback($value, $key, $array);
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * Conditionally compile classes from an array into a CSS class list.
      *
      * @param  array  $array

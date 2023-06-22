@@ -5564,6 +5564,48 @@ class SupportCollectionTest extends TestCase
         ], $data->all());
     }
 
+    public function testToAssociative()
+    {
+        $original = collect([
+            'value-1',
+            'key-1' => 'value',
+            'value-2',
+            'key-2' => 'value',
+        ]);
+
+        $result = $original->toAssociative();
+
+        $this->assertEquals([
+            'value-1' => 'value-1',
+            'key-1' => 'value',
+            'value-2' => 'value-2',
+            'key-2' => 'value',
+        ], $result->all());
+    }
+
+    public function testToAssociativeWithCallback()
+    {
+        $original = collect([
+            'value-1',
+            'key-1' => 'value',
+            'value-2',
+            'key-2' => 'value',
+        ]);
+
+        $result = $original->toAssociative(function ($value, $key, $collection) use ($original) {
+            $this->assertSame($original, $collection);
+
+            return "{$value}:{$key}";
+        });
+
+        $this->assertEquals([
+            'key-1' => 'value',
+            'key-2' => 'value',
+            'value-1' => 'value-1:0',
+            'value-2' => 'value-2:1',
+        ], $result->all());
+    }
+
     /**
      * Provides each collection class, respectively.
      *

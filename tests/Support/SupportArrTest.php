@@ -1196,4 +1196,46 @@ class SupportArrTest extends TestCase
             ],
         ], Arr::prependKeysWith($array, 'test.'));
     }
+
+    public function testToAssociative()
+    {
+        $original = [
+            'value-1',
+            'key-1' => 'value',
+            'value-2',
+            'key-2' => 'value',
+        ];
+
+        $result = Arr::toAssociative($original);
+
+        $this->assertEquals([
+            'value-1' => 'value-1',
+            'key-1' => 'value',
+            'value-2' => 'value-2',
+            'key-2' => 'value',
+        ], $result);
+    }
+
+    public function testToAssociativeWithCallback()
+    {
+        $original = [
+            'value-1',
+            'key-1' => 'value',
+            'value-2',
+            'key-2' => 'value',
+        ];
+
+        $result = Arr::toAssociative($original, function ($value, $key, $array) use ($original) {
+            $this->assertSame($original, $array);
+
+            return "{$value}:{$key}";
+        });
+
+        $this->assertEquals([
+            'key-1' => 'value',
+            'key-2' => 'value',
+            'value-1' => 'value-1:0',
+            'value-2' => 'value-2:1',
+        ], $result);
+    }
 }
