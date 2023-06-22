@@ -32,13 +32,13 @@ class ViewTest extends TestCase
         $view = $this->getView();
         $view->withFoo('bar')->withBaz('boom');
         $this->assertEquals(['foo' => 'bar', 'baz' => 'boom'], $view->getData());
-        
+
         $foo = 'bar';
         $baz = 'boom';
         $boo = 'ahh!';
         $view = $this->getView();
-        $view->with(fn() => $foo);
-        $view->with(fn() => [$baz, 'scream' => $boo]);
+        $view->with(fn () => $foo);
+        $view->with(fn () => [$baz, 'scream' => $boo]);
         $this->assertEquals(['foo' => 'bar', 'baz' => 'boom', 'scream' => 'ahh!'], $view->getData());
     }
 
