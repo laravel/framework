@@ -65,11 +65,25 @@ class SupportMacroableTest extends TestCase
         $this->assertSame('static', $result);
     }
 
-    public function testClassBasedMacros()
+    public function testClassBasedMacrosPassedAsString()
     {
-        TestMacroable::mixin(new TestMixin);
+        TestMacroable::mixin(TestClassMixin::class);
         $instance = new TestMacroable;
         $this->assertSame('instance-Adam', $instance->methodOne('Adam'));
+    }
+
+    public function testClassBasedMacrosPassedAsObject()
+    {
+        TestMacroable::mixin(new TestClassMixin);
+        $instance = new TestMacroable;
+        $this->assertSame('instance-Adam', $instance->methodOne('Adam'));
+    }
+
+    public function testClassBasedMacrosStaticCalls()
+    {
+        TestMacroable::mixin(TestClassMixin::class);
+        $this->assertSame('static', TestMacroable::tryStatic());
+        $this->assertSame('foo', TestMacroable::methodThree());
     }
 
     public function testClassBasedMacrosNoReplace()
@@ -77,12 +91,73 @@ class SupportMacroableTest extends TestCase
         TestMacroable::macro('methodThree', function () {
             return 'bar';
         });
-        TestMacroable::mixin(new TestMixin, false);
+        TestMacroable::mixin(new TestClassMixin, false);
         $instance = new TestMacroable;
         $this->assertSame('bar', $instance->methodThree());
 
-        TestMacroable::mixin(new TestMixin);
+        TestMacroable::mixin(new TestClassMixin);
         $this->assertSame('foo', $instance->methodThree());
+    }
+
+    public function testTraitBasedMacros()
+    {
+        TestMacroable::mixin(TestTraitMixin::class);
+        $instance = new TestMacroable;
+        $this->assertSame('instance-Adam', $instance->methodOne(value: 'Adam'));
+    }
+
+    public function testTraitBasedMacrosNoReplace()
+    {
+        TestMacroable::macro('methodThree', function () {
+            return 'bar';
+        });
+        TestMacroable::mixin(TestTraitMixin::class, false);
+        $instance = new TestMacroable;
+        $this->assertSame('bar', $instance->methodThree());
+
+        TestMacroable::mixin(TestTraitMixin::class);
+        $this->assertSame('foo', $instance->methodThree());
+    }
+
+    public function testTraitBasedMacrosStaticCalls()
+    {
+        TestMacroable::mixin(TestTraitMixin::class);
+        $this->assertSame('static', TestMacroable::tryStatic());
+        $this->assertSame('foo', TestMacroable::methodThree());
+    }
+
+    public function testTraitWithTraitBasedMacros()
+    {
+        TestMacroable::mixin(TestTraitMixinWithAntherTrait::class);
+        $instance = new TestMacroable;
+        $this->assertSame('instance-Adam', $instance->methodOne(value: 'Adam'));
+        $this->assertSame('instance-Adam', $instance->methodFour(value: 'Adam'));
+    }
+
+    public function testTraitWithTraitBasedMacrosNoReplace()
+    {
+        TestMacroable::macro('methodThree', function () {
+            return 'bar';
+        });
+        TestMacroable::macro('methodFive', function () {
+            return 'bar';
+        });
+
+        TestMacroable::mixin(TestTraitMixinWithAntherTrait::class, false);
+        $instance = new TestMacroable;
+        $this->assertSame('bar', $instance->methodThree());
+        $this->assertSame('bar', $instance->methodFive());
+
+        TestMacroable::mixin(TestTraitMixinWithAntherTrait::class);
+        $this->assertSame('foo', $instance->methodThree());
+        $this->assertSame('foo', $instance->methodFive());
+    }
+
+    public function testTraitWithTraitBasedMacrosStaticCalls()
+    {
+        TestMacroable::mixin(TestTraitMixin::class);
+        $this->assertSame('static', TestMacroable::tryStatic());
+        $this->assertSame('foo', TestMacroable::methodThree());
     }
 
     public function testFlushMacros()
@@ -137,7 +212,7 @@ class TestMacroable
     }
 }
 
-class TestMixin
+class TestClassMixin
 {
     public function methodOne()
     {
@@ -158,5 +233,50 @@ class TestMixin
         return function () {
             return 'foo';
         };
+    }
+
+    public static function tryStatic()
+    {
+        return function () {
+            return static::getProtectedStatic();
+        };
+    }
+}
+
+trait TestTraitMixin
+{
+    public function methodOne($value)
+    {
+        return $this->methodTwo($value);
+    }
+
+    protected function methodTwo($value)
+    {
+        return $this->protectedVariable.'-'.$value;
+    }
+
+    protected function methodThree()
+    {
+        return 'foo';
+    }
+
+    public static function tryStatic()
+    {
+        return static::getProtectedStatic();
+    }
+}
+
+trait TestTraitMixinWithAntherTrait
+{
+    use TestTraitMixin;
+
+    public function methodFour($value)
+    {
+        return $this->methodTwo($value);
+    }
+
+    protected function methodFive()
+    {
+        return $this->methodThree();
     }
 }

@@ -31,7 +31,7 @@ trait Macroable
     /**
      * Mix another object into the class.
      *
-     * @param  object  $mixin
+     * @param  class-string|object  $mixin
      * @param  bool  $replace
      * @return void
      *
@@ -39,15 +39,9 @@ trait Macroable
      */
     public static function mixin($mixin, $replace = true)
     {
-        $methods = (new ReflectionClass($mixin))->getMethods(
-            ReflectionMethod::IS_PUBLIC | ReflectionMethod::IS_PROTECTED
-        );
-
-        foreach ($methods as $method) {
-            if ($replace || ! static::hasMacro($method->name)) {
-                static::macro($method->name, $method->invoke($mixin));
-            }
-        }
+        is_string($mixin) && trait_exists($mixin)
+            ? static::registerTraitMixin($mixin, $replace)
+            : static::registerClassMixin($mixin, $replace);
     }
 
     /**
@@ -121,5 +115,93 @@ trait Macroable
         }
 
         return $macro(...$parameters);
+    }
+
+    /**
+     * Register trait mixins.
+     *
+     * @param  class-string  $mixin
+     *
+     * @throws \ReflectionException
+     */
+    protected static function registerTraitMixin(string $mixin, bool $replace): void
+    {
+        $object = static::resolveTraitObject($mixin);
+        $methods = static::getTraitMethods($object);
+
+        foreach ($methods as $method) {
+            if (! $replace && static::hasMacro($method->name)) {
+                continue;
+            }
+
+            static::macro($method->name, function (...$parameters) use ($object, $method) {
+                $closure = Closure::fromCallable([$object, $method->name]);
+
+                return $closure(...$parameters);
+            });
+        }
+    }
+
+    /**
+     * Register class mixins.
+     *
+     * @param  class-string|object  $mixin
+     *
+     * @throws \ReflectionException
+     */
+    public static function registerClassMixin(string|object $mixin, bool $replace): void
+    {
+        $object = is_string($mixin) ? new $mixin : $mixin;
+        $methods = static::getClassMethods($object);
+
+        foreach ($methods as $method) {
+            if ($replace || ! static::hasMacro($method->name)) {
+                static::macro($method->name, $method->invoke($object));
+            }
+        }
+    }
+
+    /**
+     * Resolves an anonymous class for a trait.
+     *
+     * @param  class-string  $mixin
+     */
+    protected static function resolveTraitObject(string $mixin): object
+    {
+        $anonymousClass = get_class(
+            eval('return new class() extends '.static::class." {use {$mixin};};"),
+        );
+
+        return new $anonymousClass;
+    }
+
+    /**
+     * Get the methods from the trait anonymous class.
+     *
+     * @return ReflectionMethod[]
+     *
+     * @throws \ReflectionException
+     */
+    protected static function getTraitMethods(object $mixin): array
+    {
+        $class = get_class($mixin);
+
+        return collect(static::getClassMethods($mixin))
+            ->filter(fn ($method) => $method->class === $class)
+            ->all();
+    }
+
+    /**
+     * Get the methods from class.
+     *
+     * @return ReflectionMethod[]
+     *
+     * @throws \ReflectionException
+     */
+    protected static function getClassMethods(object $mixin): array
+    {
+        return (new ReflectionClass($mixin))->getMethods(
+            ReflectionMethod::IS_PUBLIC | ReflectionMethod::IS_PROTECTED
+        );
     }
 }
