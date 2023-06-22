@@ -241,8 +241,8 @@ class View implements ArrayAccess, Htmlable, ViewContract
     {
         if ($key instanceof Closure) {
             $with = [];
-            $values = $key();
-            $keys = array_keys(Arr::wrap($values));
+            $values = Arr::wrap($key());
+            $keys = array_keys($values);
 
             $func = new ReflectionFunction($key);
             $originalKeys = array_keys($func->getStaticVariables());
