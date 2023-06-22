@@ -324,11 +324,9 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function resource($name, $controller, array $options = [])
     {
-        if ($this->container && $this->container->bound(ResourceRegistrar::class)) {
-            $registrar = $this->container->make(ResourceRegistrar::class);
-        } else {
-            $registrar = new ResourceRegistrar($this);
-        }
+        $registrar = $this->container && $this->container->bound(ResourceRegistrar::class)
+            ? $this->container->make(ResourceRegistrar::class)
+            : new ResourceRegistrar($this);
 
         return new PendingResourceRegistration(
             $registrar, $name, $controller, $options
@@ -394,11 +392,9 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function singleton($name, $controller, array $options = [])
     {
-        if ($this->container && $this->container->bound(ResourceRegistrar::class)) {
-            $registrar = $this->container->make(ResourceRegistrar::class);
-        } else {
-            $registrar = new ResourceRegistrar($this);
-        }
+        $registrar = $this->container && $this->container->bound(ResourceRegistrar::class)
+            ? $this->container->make(ResourceRegistrar::class)
+            : new ResourceRegistrar($this);
 
         return new PendingSingletonResourceRegistration(
             $registrar, $name, $controller, $options
