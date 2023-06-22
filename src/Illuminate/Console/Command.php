@@ -172,10 +172,10 @@ class Command extends SymfonyCommand
         );
 
         $this->components = $this->laravel->make(Factory::class, ['output' => $this->output]);
-
+        $this->input = clone $input;
         try {
             return parent::run(
-                $this->input = $input, $this->output
+               $input , $this->output
             );
         } finally {
             $this->untrap();
