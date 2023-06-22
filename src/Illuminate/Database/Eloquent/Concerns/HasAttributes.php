@@ -2131,9 +2131,9 @@ trait HasAttributes
      */
     public function append($attributes)
     {
-        $this->appends = array_unique(
+        $this->appends = array_values(array_unique(
             array_merge($this->appends, is_string($attributes) ? func_get_args() : $attributes)
-        );
+        ));
 
         return $this;
     }
