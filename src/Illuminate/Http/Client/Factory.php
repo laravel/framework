@@ -89,7 +89,7 @@ class Factory
      * @param  callable  $callback
      * @return $this
      */
-    public function beforeSending($callback)
+    public function beforeSendingAll($callback)
     {
         $this->beforeSendingCallbacks[] = $callback;
 

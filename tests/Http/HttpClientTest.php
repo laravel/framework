@@ -2317,7 +2317,7 @@ class HttpClientTest extends TestCase
         $this->assertTrue($onStatsFunctionCalled);
     }
 
-    public function testItCanAddGlobalHeadersBeforeSending()
+    public function testItCanAddGlobalHeadersBeforeSendingAll()
     {
         $requests = [];
         $this->factory->fake(function ($r) use (&$requests) {
@@ -2326,7 +2326,7 @@ class HttpClientTest extends TestCase
             return $this->factory::response('expected content');
         });
 
-        $this->factory->beforeSending(function (Request $request, array $options, PendingRequest $pending) {
+        $this->factory->beforeSendingAll(function (Request $request, array $options, PendingRequest $pending) {
             return $request->replaceHeader('User-Agent', 'Laravel Framework/1.0')
                 ->withHeader('shared', 'global')
                 ->withHeader('list', ['item-1', 'item-2'])
