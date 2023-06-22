@@ -11,6 +11,7 @@ use Illuminate\Contracts\Support\MessageProvider;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Contracts\View\Engine;
 use Illuminate\Contracts\View\View as ViewContract;
+use Illuminate\Support\Arr;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
@@ -241,7 +242,7 @@ class View implements ArrayAccess, Htmlable, ViewContract
         if ($key instanceof Closure) {
             $with = [];
             $values = $key();
-            $keys = array_keys($values);
+            $keys = array_keys(Arr::wrap($values));
 
             $func = new ReflectionFunction($key);
             $originalKeys = array_keys($func->getStaticVariables());
