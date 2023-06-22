@@ -367,7 +367,7 @@ class PendingProcess
             $result instanceof ProcessResult => $result,
             $result instanceof FakeProcessResult => $result->withCommand($command),
             $result instanceof FakeProcessDescription => $result->toProcessResult($command),
-            $result instanceof FakeProcessSequence => $this->resolveSynchronousFake($command, fn() => $result()),
+            $result instanceof FakeProcessSequence => $this->resolveSynchronousFake($command, fn () => $result()),
             default => throw new LogicException('Unsupported synchronous process fake result provided.'),
         };
     }
