@@ -16,7 +16,7 @@ class JsonResponse extends BaseJsonResponse
     }
 
     /**
-     * Constructor.
+     * Create a new JSON response instance.
      *
      * @param  mixed  $data
      * @param  int  $status
