@@ -109,6 +109,10 @@ class Migrator
      */
     public function run($paths = [], array $options = [])
     {
+        // Retrieve all subdirectories for the given path(s) and
+        // merge them with the original path(s)
+        $paths = $this->retrieveSubdirectories($paths);
+
         // Once we grab all of the migration files for the path, we will compare them
         // against the migrations that have already been run for this package then
         // run each of the outstanding migrations against a database connection.
@@ -124,6 +128,28 @@ class Migrator
         $this->runPending($migrations, $options);
 
         return $migrations;
+    }
+
+    /**
+     * Recursively returns subdirectories within the given directory path(s),
+     * including child subdirectories.
+     */
+    private function retrieveSubdirectories(array|string $paths): array
+    {
+        $paths = is_string($paths) ? [$paths] : $paths;
+
+        $subdirs = [];
+
+        foreach ($paths as $path) {
+            $subdirs += glob($path . '/*', GLOB_ONLYDIR) ?? [];
+        }
+
+        if (!empty($subdirs)) {
+            $subdirs = $this->retrieveSubdirectories($subdirs);
+            return array_merge($paths, $subdirs);
+        }
+
+        return $paths;
     }
 
     /**
