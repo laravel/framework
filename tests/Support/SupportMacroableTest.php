@@ -75,8 +75,9 @@ class SupportMacroableTest extends TestCase
     public function testClassBasedMacrosPassedAsObject()
     {
         TestMacroable::mixin(new TestClassMixin);
-        $instance = new TestMacroable;
+        $instance = new TestMacroable('dynamic');
         $this->assertSame('instance-Adam', $instance->methodOne('Adam'));
+        $this->assertSame('dynamic', $instance->methodZero());
     }
 
     public function testClassBasedMacrosStaticCalls()
@@ -102,8 +103,9 @@ class SupportMacroableTest extends TestCase
     public function testTraitBasedMacros()
     {
         TestMacroable::mixin(TestTraitMixin::class);
-        $instance = new TestMacroable;
+        $instance = new TestMacroable('dynamic');
         $this->assertSame('instance-Adam', $instance->methodOne(value: 'Adam'));
+        $this->assertSame('dynamic', $instance->methodZero());
     }
 
     public function testTraitBasedMacrosNoReplace()
@@ -129,9 +131,10 @@ class SupportMacroableTest extends TestCase
     public function testTraitWithTraitBasedMacros()
     {
         TestMacroable::mixin(TestTraitMixinWithAntherTrait::class);
-        $instance = new TestMacroable;
+        $instance = new TestMacroable('dynamic');
         $this->assertSame('instance-Adam', $instance->methodOne(value: 'Adam'));
         $this->assertSame('instance-Adam', $instance->methodFour(value: 'Adam'));
+        $this->assertSame('dynamic', $instance->methodZero());
     }
 
     public function testTraitWithTraitBasedMacrosNoReplace()
@@ -206,6 +209,11 @@ class TestMacroable
 
     protected $protectedVariable = 'instance';
 
+    public function __construct(
+        protected $dynamicVariable = null,
+    ) {
+    }
+
     protected static function getProtectedStatic()
     {
         return 'static';
@@ -214,6 +222,13 @@ class TestMacroable
 
 class TestClassMixin
 {
+    public function methodZero()
+    {
+        return function () {
+            return $this->dynamicVariable;
+        };
+    }
+
     public function methodOne()
     {
         return function ($value) {
@@ -245,14 +260,19 @@ class TestClassMixin
 
 trait TestTraitMixin
 {
+    public function methodZero()
+    {
+        return self::this()->dynamicVariable;
+    }
+
     public function methodOne($value)
     {
-        return $this->methodTwo($value);
+        return self::this()->methodTwo($value);
     }
 
     protected function methodTwo($value)
     {
-        return $this->protectedVariable.'-'.$value;
+        return self::this()->protectedVariable.'-'.$value;
     }
 
     protected function methodThree()
@@ -272,11 +292,11 @@ trait TestTraitMixinWithAntherTrait
 
     public function methodFour($value)
     {
-        return $this->methodTwo($value);
+        return self::this()->methodTwo($value);
     }
 
     protected function methodFive()
     {
-        return $this->methodThree();
+        return self::this()->methodThree();
     }
 }
