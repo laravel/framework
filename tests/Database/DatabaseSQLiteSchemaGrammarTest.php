@@ -6,6 +6,7 @@ use Illuminate\Database\Capsule\Manager;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\ForeignIdColumnDefinition;
+use Illuminate\Database\Schema\ForeignUuidColumnDefinition;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -725,20 +726,20 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
     {
         $blueprint = new Blueprint('users');
         $foreignUuid = $blueprint->foreignUuid('foo');
-        $blueprint->foreignUuid('company_id')->constrained();
-        $blueprint->foreignUuid('laravel_idea_id')->constrained();
+        $blueprint->foreignUuid('company_uuid')->constrained();
+        $blueprint->foreignUuid('laravel_idea_uuid')->constrained();
         $blueprint->foreignUuid('team_id')->references('id')->on('teams');
-        $blueprint->foreignUuid('team_column_id')->constrained('teams');
+        $blueprint->foreignUuid('team_column_uuid')->constrained('teams');
 
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertInstanceOf(ForeignIdColumnDefinition::class, $foreignUuid);
+        $this->assertInstanceOf(ForeignUuidColumnDefinition::class, $foreignUuid);
         $this->assertSame([
             'alter table "users" add column "foo" varchar not null',
-            'alter table "users" add column "company_id" varchar not null',
-            'alter table "users" add column "laravel_idea_id" varchar not null',
+            'alter table "users" add column "company_uuid" varchar not null',
+            'alter table "users" add column "laravel_idea_uuid" varchar not null',
             'alter table "users" add column "team_id" varchar not null',
-            'alter table "users" add column "team_column_id" varchar not null',
+            'alter table "users" add column "team_column_uuid" varchar not null',
         ], $statements);
     }
 

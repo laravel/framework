@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\ForeignIdColumnDefinition;
+use Illuminate\Database\Schema\ForeignUuidColumnDefinition;
 use Illuminate\Database\Schema\Grammars\SqlServerGrammar;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -765,20 +766,20 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
     {
         $blueprint = new Blueprint('users');
         $foreignId = $blueprint->foreignUuid('foo');
-        $blueprint->foreignUuid('company_id')->constrained();
-        $blueprint->foreignUuid('laravel_idea_id')->constrained();
+        $blueprint->foreignUuid('company_uuid')->constrained();
+        $blueprint->foreignUuid('laravel_idea_uuid')->constrained();
         $blueprint->foreignUuid('team_id')->references('id')->on('teams');
-        $blueprint->foreignUuid('team_column_id')->constrained('teams');
+        $blueprint->foreignUuid('team_column_uuid')->constrained('teams');
 
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertInstanceOf(ForeignIdColumnDefinition::class, $foreignId);
+        $this->assertInstanceOf(ForeignUuidColumnDefinition::class, $foreignId);
         $this->assertSame([
-            'alter table "users" add "foo" uniqueidentifier not null, "company_id" uniqueidentifier not null, "laravel_idea_id" uniqueidentifier not null, "team_id" uniqueidentifier not null, "team_column_id" uniqueidentifier not null',
-            'alter table "users" add constraint "users_company_id_foreign" foreign key ("company_id") references "companies" ("id")',
-            'alter table "users" add constraint "users_laravel_idea_id_foreign" foreign key ("laravel_idea_id") references "laravel_ideas" ("id")',
+            'alter table "users" add "foo" uniqueidentifier not null, "company_uuid" uniqueidentifier not null, "laravel_idea_uuid" uniqueidentifier not null, "team_id" uniqueidentifier not null, "team_column_uuid" uniqueidentifier not null',
+            'alter table "users" add constraint "users_company_uuid_foreign" foreign key ("company_uuid") references "companies" ("uuid")',
+            'alter table "users" add constraint "users_laravel_idea_uuid_foreign" foreign key ("laravel_idea_uuid") references "laravel_ideas" ("uuid")',
             'alter table "users" add constraint "users_team_id_foreign" foreign key ("team_id") references "teams" ("id")',
-            'alter table "users" add constraint "users_team_column_id_foreign" foreign key ("team_column_id") references "teams" ("id")',
+            'alter table "users" add constraint "users_team_column_uuid_foreign" foreign key ("team_column_uuid") references "teams" ("uuid")',
         ], $statements);
     }
 
