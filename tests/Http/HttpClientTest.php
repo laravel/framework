@@ -2317,7 +2317,7 @@ class HttpClientTest extends TestCase
         $this->assertTrue($onStatsFunctionCalled);
     }
 
-    public function testItCanMakeGlobalChangesToNewPendingRequests()
+    public function testItCanAddGlobalBeforeSendingCallbacks()
     {
         $requests = [];
         $this->factory->fake(function ($r) use (&$requests) {
