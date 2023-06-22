@@ -11,6 +11,7 @@ use Illuminate\View\Factory;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Header\MetadataHeader;
+use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 
 class MailSesV2TransportTest extends TestCase
@@ -56,6 +57,7 @@ class MailSesV2TransportTest extends TestCase
         $message->sender('myself@example.com');
         $message->to('me@example.com');
         $message->bcc('you@example.com');
+        $message->replyTo(new Address('taylor@example.com', 'Taylor Otwell'));
         $message->getHeaders()->add(new MetadataHeader('FooTag', 'TagValue'));
 
         $client = m::mock(SesV2Client::class);
@@ -66,10 +68,10 @@ class MailSesV2TransportTest extends TestCase
             ->andReturn('ses-message-id');
         $client->shouldReceive('sendEmail')->once()
             ->with(m::on(function ($arg) {
-                return count($arg['ReplyToAddresses']) === 1 &&
-                    $arg['ReplyToAddresses'][0] === 'myself@example.com' &&
+                return $arg['Source'] === 'myself@example.com' &&
                     $arg['Destination']['ToAddresses'] === ['me@example.com', 'you@example.com'] &&
-                    $arg['Tags'] === [['Name' => 'FooTag', 'Value' => 'TagValue']];
+                    $arg['Tags'] === [['Name' => 'FooTag', 'Value' => 'TagValue']] &&
+                    strpos($arg['Content']['Raw']['Data'], 'Reply-To: Taylor Otwell <taylor@example.com>') !== false;
             }))
             ->andReturn($sesResult);
 
