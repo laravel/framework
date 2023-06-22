@@ -240,24 +240,24 @@ class View implements ArrayAccess, Htmlable, ViewContract
     {
         if ($key instanceof Closure) {
             $with = [];
-            $values = $closure();
+            $values = $key();
             $keys = array_keys($values);
-            
-            $func = new ReflectionFunction($closure);
+
+            $func = new ReflectionFunction($key);
             $originalKeys = array_keys($func->getStaticVariables());
-            
+
             for ($i = 0; $value = current($values); $i++) {
                 $key = $keys[$i];
-                
+
                 if (is_int($key)) {
                     $key = $originalKeys[$i];
                 }
-                
+
                 $with[$key] = $value;
-                
+
                 next($values);
             }
-            
+
             $this->data = array_merge($this->data, $with);
         }
         if (is_array($key)) {
