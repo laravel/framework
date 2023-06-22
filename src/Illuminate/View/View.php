@@ -4,6 +4,7 @@ namespace Illuminate\View;
 
 use ArrayAccess;
 use BadMethodCallException;
+use Closure;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\Support\MessageProvider;
@@ -14,6 +15,7 @@ use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\ViewErrorBag;
+use ReflectionFunction;
 use Throwable;
 
 class View implements ArrayAccess, Htmlable, ViewContract
@@ -236,6 +238,28 @@ class View implements ArrayAccess, Htmlable, ViewContract
      */
     public function with($key, $value = null)
     {
+        if ($key instanceof Closure) {
+            $with = [];
+            $values = $closure();
+            $keys = array_keys($values);
+            
+            $func = new ReflectionFunction($closure);
+            $originalKeys = array_keys($func->getStaticVariables());
+            
+            for ($i = 0; $value = current($values); $i++) {
+                $key = $keys[$i];
+                
+                if (is_int($key)) {
+                    $key = $originalKeys[$i];
+                }
+                
+                $with[$key] = $value;
+                
+                next($values);
+            }
+            
+            $this->data = array_merge($this->data, $with);
+        }
         if (is_array($key)) {
             $this->data = array_merge($this->data, $key);
         } else {
