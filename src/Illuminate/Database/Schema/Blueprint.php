@@ -1300,11 +1300,11 @@ class Blueprint
      * Create a new UUID column on the table with a foreign key constraint.
      *
      * @param  string  $column
-     * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
+     * @return \Illuminate\Database\Schema\ForeignUuidColumnDefinition
      */
     public function foreignUuid($column)
     {
-        return $this->addColumnDefinition(new ForeignIdColumnDefinition($this, [
+        return $this->addColumnDefinition(new ForeignUuidColumnDefinition($this, [
             'type' => 'uuid',
             'name' => $column,
         ]));
