@@ -285,7 +285,7 @@ abstract class Component
      */
     protected function createInvokableVariable(string $method)
     {
-        return new InvokableComponentVariable(fn() => $this->{$method}());
+        return new InvokableComponentVariable(fn () => $this->{$method}());
     }
 
     /**
