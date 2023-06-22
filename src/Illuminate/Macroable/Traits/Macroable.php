@@ -118,13 +118,13 @@ trait Macroable
     }
 
     /**
-     * Register trait mixins.
+     * Register trait based mixin.
      *
      * @param  class-string  $mixin
      *
      * @throws \ReflectionException
      */
-    protected static function registerTraitMixin(string $mixin, bool $replace): void
+    private static function registerTraitMixin(string $mixin, bool $replace): void
     {
         $object = static::resolveTraitObject($mixin);
         $methods = static::getTraitMethods($object);
@@ -143,13 +143,13 @@ trait Macroable
     }
 
     /**
-     * Register class mixins.
+     * Register class based mixin.
      *
      * @param  class-string|object  $mixin
      *
      * @throws \ReflectionException
      */
-    public static function registerClassMixin(string|object $mixin, bool $replace): void
+    private static function registerClassMixin(string|object $mixin, bool $replace): void
     {
         $object = is_string($mixin) ? new $mixin : $mixin;
         $methods = static::getClassMethods($object);
@@ -166,13 +166,9 @@ trait Macroable
      *
      * @param  class-string  $mixin
      */
-    protected static function resolveTraitObject(string $mixin): object
+    private static function resolveTraitObject(string $mixin): object
     {
-        $anonymousClass = get_class(
-            eval('return new class() extends '.static::class." {use {$mixin};};"),
-        );
-
-        return new $anonymousClass;
+        return eval('return new class() extends '.static::class." {use {$mixin};};");
     }
 
     /**
@@ -182,7 +178,7 @@ trait Macroable
      *
      * @throws \ReflectionException
      */
-    protected static function getTraitMethods(object $mixin): array
+    private static function getTraitMethods(object $mixin): array
     {
         $class = get_class($mixin);
 
@@ -198,7 +194,7 @@ trait Macroable
      *
      * @throws \ReflectionException
      */
-    protected static function getClassMethods(object $mixin): array
+    private static function getClassMethods(object $mixin): array
     {
         return (new ReflectionClass($mixin))->getMethods(
             ReflectionMethod::IS_PUBLIC | ReflectionMethod::IS_PROTECTED
