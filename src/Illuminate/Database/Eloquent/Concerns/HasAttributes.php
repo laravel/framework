@@ -862,17 +862,13 @@ trait HasAttributes
             return static::$castTypeCache[$castType];
         }
 
-        if ($this->isCustomDateTimeCast($castType)) {
-            $convertedCastType = 'custom_datetime';
-        } elseif ($this->isImmutableCustomDateTimeCast($castType)) {
-            $convertedCastType = 'immutable_custom_datetime';
-        } elseif ($this->isDecimalCast($castType)) {
-            $convertedCastType = 'decimal';
-        } elseif (class_exists($castType)) {
-            $convertedCastType = $castType;
-        } else {
-            $convertedCastType = trim(strtolower($castType));
-        }
+        $convertedCastType = match ($castType) {
+            $this->isCustomDateTimeCast($castType) => 'custom_datetime',
+            $this->isImmutableCustomDateTimeCast($castType) => 'immutable_custom_datetime',
+            $this->isDecimalCast($castType) => 'decimal',
+            class_exists($castType) => $castType,
+            default => trim(strtolower($castType)),
+        };
 
         return static::$castTypeCache[$castType] = $convertedCastType;
     }
@@ -1158,15 +1154,13 @@ trait HasAttributes
     {
         $enumClass = $this->getCasts()[$key];
 
-        if (! isset($value)) {
-            $this->attributes[$key] = null;
-        } elseif (is_object($value)) {
-            $this->attributes[$key] = $this->getStorableEnumValue($value);
-        } else {
-            $this->attributes[$key] = $this->getStorableEnumValue(
+        $this->attributes[$key] = match (true) {
+            !isset($value) => null,
+            is_object($value) => $this->getStorableEnumValue($value),
+            default => $this->getStorableEnumValue(
                 $this->getEnumCaseFromValue($enumClass, $value)
-            );
-        }
+            )
+        };
     }
 
     /**
