@@ -754,23 +754,16 @@ class Grammar extends BaseGrammar
         // If the having clause is "raw", we can just return the clause straight away
         // without doing any more processing on it. Otherwise, we will compile the
         // clause into SQL based on the components that make it up from builder.
-        if ($having['type'] === 'Raw') {
-            return $having['sql'];
-        } elseif ($having['type'] === 'between') {
-            return $this->compileHavingBetween($having);
-        } elseif ($having['type'] === 'Null') {
-            return $this->compileHavingNull($having);
-        } elseif ($having['type'] === 'NotNull') {
-            return $this->compileHavingNotNull($having);
-        } elseif ($having['type'] === 'bit') {
-            return $this->compileHavingBit($having);
-        } elseif ($having['type'] === 'Expression') {
-            return $this->compileHavingExpression($having);
-        } elseif ($having['type'] === 'Nested') {
-            return $this->compileNestedHavings($having);
-        }
-
-        return $this->compileBasicHaving($having);
+        return match ($having['type']) {
+            'Raw' => $having['sql'],
+            'between' => $this->compileHavingBetween($having),
+            'Null' => $this->compileHavingNull($having),
+            'NotNull' => $this->compileHavingNotNull($having),
+            'bit' => $this->compileHavingBit($having),
+            'Expression' => $this->compileHavingExpression($having),
+            'Nested' => $this->compileNestedHavings($having),
+            default => $this->compileBasicHaving($having),
+        };
     }
 
     /**
