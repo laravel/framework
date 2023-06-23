@@ -2046,28 +2046,41 @@ trait HasAttributes
 
         if ($attribute === $original) {
             return true;
-        } elseif (is_null($attribute)) {
+        }
+
+        if (is_null($attribute)) {
             return false;
-        } elseif ($this->isDateAttribute($key) || $this->isDateCastableWithCustomFormat($key)) {
-            return $this->fromDateTime($attribute) ===
-                $this->fromDateTime($original);
-        } elseif ($this->hasCast($key, ['object', 'collection'])) {
-            return $this->fromJson($attribute) ===
-                $this->fromJson($original);
-        } elseif ($this->hasCast($key, ['real', 'float', 'double'])) {
+        }
+
+        if ($this->isDateAttribute($key) || $this->isDateCastableWithCustomFormat($key)) {
+            return $this->fromDateTime($attribute) === $this->fromDateTime($original);
+        }
+
+        if ($this->hasCast($key, ['object', 'collection'])) {
+            return $this->fromJson($attribute) === $this->fromJson($original);
+        }
+
+        if ($this->hasCast($key, ['real', 'float', 'double'])) {
             if ($original === null) {
                 return false;
             }
 
             return abs($this->castAttribute($key, $attribute) - $this->castAttribute($key, $original)) < PHP_FLOAT_EPSILON * 4;
-        } elseif ($this->hasCast($key, static::$primitiveCastTypes)) {
-            return $this->castAttribute($key, $attribute) ===
-                $this->castAttribute($key, $original);
-        } elseif ($this->isClassCastable($key) && Str::startsWith($this->getCasts()[$key], [AsArrayObject::class, AsCollection::class])) {
+        }
+
+        if ($this->hasCast($key, static::$primitiveCastTypes)) {
+            return $this->castAttribute($key, $attribute) === $this->castAttribute($key, $original);
+        }
+
+        if ($this->isClassCastable($key) && Str::startsWith($this->getCasts()[$key], [AsArrayObject::class, AsCollection::class])) {
             return $this->fromJson($attribute) === $this->fromJson($original);
-        } elseif ($this->isClassCastable($key) && Str::startsWith($this->getCasts()[$key], [AsEnumArrayObject::class, AsEnumCollection::class])) {
+        }
+
+        if ($this->isClassCastable($key) && Str::startsWith($this->getCasts()[$key], [AsEnumArrayObject::class, AsEnumCollection::class])) {
             return $this->fromJson($attribute) === $this->fromJson($original);
-        } elseif ($this->isClassCastable($key) && $original !== null && Str::startsWith($this->getCasts()[$key], [AsEncryptedArrayObject::class, AsEncryptedCollection::class])) {
+        }
+
+        if ($this->isClassCastable($key) && $original !== null && Str::startsWith($this->getCasts()[$key], [AsEncryptedArrayObject::class, AsEncryptedCollection::class])) {
             return $this->fromEncryptedString($attribute) === $this->fromEncryptedString($original);
         }
 
