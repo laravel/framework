@@ -257,7 +257,8 @@ class Handler implements ExceptionHandlerContract
      * @return void
      * @throws Throwable
      */
-    protected function reportError(Throwable $e): void {
+    protected function reportError(Throwable $e): void 
+    {
         if (Reflector::isCallable($reportCallable = [$e, 'report']) &&
             $this->container->call($reportCallable) !== false) {
             return;
