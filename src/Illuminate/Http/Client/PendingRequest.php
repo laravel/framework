@@ -216,12 +216,13 @@ class PendingRequest
      * Create a new HTTP Client instance.
      *
      * @param  \Illuminate\Http\Client\Factory|null  $factory
+     * @param  array  $middleware
      * @return void
      */
-    public function __construct(Factory $factory = null)
+    public function __construct(Factory $factory = null, $middleware = [])
     {
         $this->factory = $factory;
-        $this->middleware = new Collection;
+        $this->middleware = new Collection($middleware);
 
         $this->asJson();
 

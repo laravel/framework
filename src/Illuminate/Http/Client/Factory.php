@@ -36,6 +36,13 @@ class Factory
     protected $beforeSendingCallbacks = [];
 
     /**
+     * The middleware to apply to every request.
+     *
+     * @var array
+     */
+    protected $globalMiddleware = [];
+
+    /**
      * The stub callables that will handle requests.
      *
      * @var \Illuminate\Support\Collection
@@ -92,6 +99,19 @@ class Factory
     public function beforeSendingAll($callback)
     {
         $this->beforeSendingCallbacks[] = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Add middleware to apply to every request.
+     *
+     * @param  callable  $middleware
+     * @return $this
+     */
+    public function globalMiddleware($middleware)
+    {
+        $this->globalMiddleware[] = $middleware;
 
         return $this;
     }
@@ -373,7 +393,7 @@ class Factory
      */
     protected function newPendingRequest()
     {
-        return tap(new PendingRequest($this), function ($request) {
+        return tap(new PendingRequest($this, $this->globalMiddleware), function ($request) {
             foreach ($this->beforeSendingCallbacks as $callback) {
                 $request->beforeSending($callback);
             }
