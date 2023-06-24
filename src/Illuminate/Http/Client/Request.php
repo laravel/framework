@@ -123,54 +123,6 @@ class Request implements ArrayAccess
     }
 
     /**
-     * Add the given headers to the request.
-     *
-     * @return $this
-     */
-    public function withHeaders($headers)
-    {
-        foreach ($headers as $key => $value) {
-            $this->request = $this->request->withAddedHeader($key, $value);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Add a given header to the request.
-     *
-     * @return $this
-     */
-    public function withHeader($key, $value)
-    {
-        return $this->withHeaders([$key => $value]);
-    }
-
-    /**
-     * Replace the given headers on the request.
-     *
-     * @return $this
-     */
-    public function replaceHeaders($headers)
-    {
-        foreach ($headers as $key => $value) {
-            $this->request = $this->request->withHeader($key, $value);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Replace a given header on the request.
-     *
-     * @return $this
-     */
-    public function replaceHeader($key, $value)
-    {
-        return $this->replaceHeaders([$key => $value]);
-    }
-
-    /**
      * Get the body of the request.
      *
      * @return string
