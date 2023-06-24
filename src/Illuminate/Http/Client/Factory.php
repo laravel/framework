@@ -3,6 +3,7 @@
 namespace Illuminate\Http\Client;
 
 use Closure;
+use GuzzleHttp\Middleware;
 use GuzzleHttp\Promise\Create;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response as Psr7Response;
@@ -92,6 +93,32 @@ class Factory
     public function globalMiddleware($middleware)
     {
         $this->globalMiddleware[] = $middleware;
+
+        return $this;
+    }
+
+    /**
+     * Add request middleware to apply to every request.
+     *
+     * @param  callable  $middleware
+     * @return $this
+     */
+    public function globalRequestMiddleware($middleware)
+    {
+        $this->globalMiddleware[] = Middleware::mapRequest($middleware);
+
+        return $this;
+    }
+
+    /**
+     * Add response middleware to apply to every request.
+     *
+     * @param  callable  $middleware
+     * @return $this
+     */
+    public function globalResponseMiddleware($middleware)
+    {
+        $this->globalMiddleware[] = Middleware::mapResponse($middleware);
 
         return $this;
     }

@@ -2369,4 +2369,74 @@ class HttpClientTest extends TestCase
         $this->assertSame('2', $responses[1]->header('X-Count'));
         $this->assertSame('12 seconds', $responses[1]->header('X-Duration'));
     }
+
+    public function testItCanAddGlobalRequestMiddleware()
+    {
+        $requests = [];
+        $this->factory->fake(function ($r) use (&$requests) {
+            $requests[] = $r;
+
+            return Factory::response('expected content');
+        });
+
+        $this->factory->globalRequestMiddleware(function ($request) {
+            return $request->withHeader('User-Agent', 'Laravel Framework/1.0');
+        });
+        $this->factory->post('http://forge.laravel.com');
+        $this->factory->post('http://laravel.com');
+
+        $this->assertSame(['Laravel Framework/1.0'], $requests[0]->header('User-Agent'));
+        $this->assertSame(['Laravel Framework/1.0'], $requests[1]->header('User-Agent'));
+    }
+
+    public function testItCanAddGlobalResponseMiddleware()
+    {
+        $responses = [];
+        $this->factory->fake(function ($r) use (&$request) {
+            return Factory::response('expected content');
+        });
+
+        $this->factory->globalResponseMiddleware(function ($response) {
+            return $response->withHeader('X-Foo', 'Bar');
+        });
+        $responses[] = $this->factory->post('http://forge.laravel.com');
+        $responses[] = $this->factory->post('http://laravel.com');
+
+        $this->assertSame('Bar', $responses[0]->header('X-Foo'));
+        $this->assertSame('Bar', $responses[1]->header('X-Foo'));
+    }
+
+    public function testItCanAddRequestMiddleware()
+    {
+        $requests = [];
+        $this->factory->fake(function ($r) use (&$requests) {
+            $requests[] = $r;
+
+            return Factory::response('expected content');
+        });
+
+        $this->factory->withRequestMiddleware(function ($request) {
+            return $request->withHeader('User-Agent', 'Laravel Framework/1.0');
+        })->post('http://forge.laravel.com');
+        $this->factory->post('http://laravel.com');
+
+        $this->assertSame(['Laravel Framework/1.0'], $requests[0]->header('User-Agent'));
+        $this->assertSame(['GuzzleHttp/7'], $requests[1]->header('User-Agent'));
+    }
+
+    public function testItCanAddResponseMiddleware()
+    {
+        $responses = [];
+        $this->factory->fake(function ($r) use (&$request) {
+            return Factory::response('expected content');
+        });
+
+        $responses[] = $this->factory->withResponseMiddleware(function ($response) {
+            return $response->withHeader('X-Foo', 'Bar');
+        })->post('http://forge.laravel.com');
+        $responses[] = $this->factory->post('http://laravel.com');
+
+        $this->assertSame('Bar', $responses[0]->header('X-Foo'));
+        $this->assertSame('', $responses[1]->header('X-Foo'));
+    }
 }
