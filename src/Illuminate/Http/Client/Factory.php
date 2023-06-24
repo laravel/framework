@@ -29,13 +29,6 @@ class Factory
     protected $dispatcher;
 
     /**
-     * The callbacks that should execute before every request is sent.
-     *
-     * @var array
-     */
-    protected $beforeSendingCallbacks = [];
-
-    /**
      * The middleware to apply to every request.
      *
      * @var array
@@ -88,19 +81,6 @@ class Factory
         $this->dispatcher = $dispatcher;
 
         $this->stubCallbacks = collect();
-    }
-
-    /**
-     * Add a new "before sending" callback to every request.
-     *
-     * @param  callable  $callback
-     * @return $this
-     */
-    public function beforeSendingAll($callback)
-    {
-        $this->beforeSendingCallbacks[] = $callback;
-
-        return $this;
     }
 
     /**
@@ -393,11 +373,7 @@ class Factory
      */
     protected function newPendingRequest()
     {
-        return tap(new PendingRequest($this, $this->globalMiddleware), function ($request) {
-            foreach ($this->beforeSendingCallbacks as $callback) {
-                $request->beforeSending($callback);
-            }
-        });
+        return new PendingRequest($this, $this->globalMiddleware);
     }
 
     /**

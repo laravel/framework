@@ -2320,45 +2320,15 @@ class HttpClientTest extends TestCase
         $this->assertTrue($onStatsFunctionCalled);
     }
 
-    public function testItCanAddGlobalHeadersBeforeSendingAll()
-    {
-        $requests = [];
-        $this->factory->fake(function ($r) use (&$requests) {
-            $requests[] = $r;
-
-            return $this->factory::response('expected content');
-        });
-
-        $this->factory->beforeSendingAll(function (Request $request, array $options, PendingRequest $pending) {
-            return $request->replaceHeader('User-Agent', 'Laravel Framework/1.0')
-                ->withHeader('shared', 'global')
-                ->withHeader('list', ['item-1', 'item-2'])
-                ->withHeader('list', ['item-3']);
-        });
-        $this->factory->post('http://forge.laravel.com');
-        $this->factory->withHeader('shared', 'local')->post('http://vapor.laravel.com');
-
-        $this->assertCount(2, $requests);
-
-        $this->assertSame(['Laravel Framework/1.0'], $requests[0]->header('User-Agent'));
-        $this->assertSame(['item-1', 'item-2', 'item-3'], $requests[0]->header('list'));
-        $this->assertSame(['global'], $requests[0]->header('shared'));
-
-        $this->assertSame(['Laravel Framework/1.0'], $requests[1]->header('User-Agent'));
-        $this->assertSame(['item-1', 'item-2', 'item-3'], $requests[1]->header('list'));
-        $this->assertSame(['local', 'global'], $requests[1]->header('shared'));
-    }
-
     public function testItCanAddGlobalMiddleware()
     {
         Carbon::setTestNow(now()->startOfDay());
         $requests = [];
         $responses = [];
-        $count = 0;
         $this->factory->fake(function ($r) use (&$requests) {
             $requests[] = $r;
 
-            Carbon::setTestNow(now()->addSeconds(41));
+            Carbon::setTestNow(now()->addSeconds(6 * count($requests)));
 
             return $this->factory::response('expected content');
         });
@@ -2369,16 +2339,16 @@ class HttpClientTest extends TestCase
                 ->withAddedHeader('shared', 'global')
                 ->withHeader('list', ['item-1', 'item-2'])
                 ->withAddedHeader('list', ['item-3']);
-        }))->globalMiddleware(Middleware::mapResponse(function ($response) use (&$count) {
+        }))->globalMiddleware(Middleware::mapResponse(function ($response) use (&$requests) {
             // Test adding headers in incoming response..
-            return $response->withHeader('X-Count', (string) ++$count);
+            return $response->withHeader('X-Count', (string) count($requests));
         }))->globalMiddleware(function ($handler) {
             // Test wrapping request in timing function...
             return function ($request, $options) use ($handler) {
                 $startedAt = now();
 
                 return $handler($request, $options)->then(function (ResponseInterface $response) use ($startedAt) {
-                    return $response->withHeader('X-Duration', $startedAt->diffInSeconds(now()));
+                    return $response->withHeader('X-Duration', "{$startedAt->diffInSeconds(now())} seconds");
                 });
             };
         });
@@ -2392,12 +2362,12 @@ class HttpClientTest extends TestCase
         $this->assertSame(['item-1', 'item-2', 'item-3'], $requests[0]->header('list'));
         $this->assertSame(['global'], $requests[0]->header('shared'));
         $this->assertSame('1', $responses[0]->header('X-Count'));
-        $this->assertSame('41', $responses[0]->header('X-Duration'));
+        $this->assertSame('6 seconds', $responses[0]->header('X-Duration'));
 
         $this->assertSame(['Laravel Framework/1.0'], $requests[1]->header('User-Agent'));
         $this->assertSame(['item-1', 'item-2', 'item-3'], $requests[1]->header('list'));
         $this->assertSame(['local', 'global'], $requests[1]->header('shared'));
         $this->assertSame('2', $responses[1]->header('X-Count'));
-        $this->assertSame('41', $responses[1]->header('X-Duration'));
+        $this->assertSame('12 seconds', $responses[1]->header('X-Duration'));
     }
 }
