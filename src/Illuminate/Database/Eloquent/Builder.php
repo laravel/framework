@@ -232,6 +232,10 @@ class Builder implements BuilderContract
             $id = $id->getKey();
         }
 
+        if ($id instanceof Collection) {
+            $id = $id->modelKeys();
+        }
+
         if (is_array($id) || $id instanceof Arrayable) {
             if (in_array($this->model->getKeyType(), ['int', 'integer'])) {
                 $this->query->whereIntegerInRaw($this->model->getQualifiedKeyName(), $id);
@@ -259,6 +263,10 @@ class Builder implements BuilderContract
     {
         if ($id instanceof Model) {
             $id = $id->getKey();
+        }
+
+        if ($id instanceof Collection) {
+            $id = $id->modelKeys();
         }
 
         if (is_array($id) || $id instanceof Arrayable) {
