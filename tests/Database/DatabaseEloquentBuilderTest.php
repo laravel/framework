@@ -1851,6 +1851,21 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->whereKey($collection);
     }
 
+    public function testWhereKeyMethodWithEloquentCollection()
+    {
+        $model = $this->getMockModel();
+        $model->shouldReceive('getKeyType')->andReturn('int');
+        $model->shouldReceive('getKey')->andReturn(1);
+        $builder = $this->getBuilder()->setModel($model);
+        $keyName = $model->getQualifiedKeyName();
+
+        $collection = new Collection([$model]);
+
+        $builder->getQuery()->shouldReceive('whereIntegerInRaw')->once()->with($keyName, $collection->modelKeys());
+
+        $builder->whereKey($collection);
+    }
+
     public function testWhereKeyMethodWithModel()
     {
         $model = new EloquentBuilderTestStubStringPrimaryKey;
@@ -1931,6 +1946,21 @@ class DatabaseEloquentBuilderTest extends TestCase
         $collection = new BaseCollection([1, 2, 3]);
 
         $builder->getQuery()->shouldReceive('whereIntegerNotInRaw')->once()->with($keyName, $collection);
+
+        $builder->whereKeyNot($collection);
+    }
+
+    public function testWhereKeyNotMethodWithEloquentCollection()
+    {
+        $model = $this->getMockModel();
+        $model->shouldReceive('getKeyType')->andReturn('int');
+        $model->shouldReceive('getKey')->andReturn(1);
+        $builder = $this->getBuilder()->setModel($model);
+        $keyName = $model->getQualifiedKeyName();
+
+        $collection = new Collection([$model]);
+
+        $builder->getQuery()->shouldReceive('whereIntegerNotInRaw')->once()->with($keyName, $collection->modelKeys());
 
         $builder->whereKeyNot($collection);
     }
