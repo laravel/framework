@@ -34,7 +34,7 @@ test
 test
 @endPushOnce';
 
-        $expected = '<?php if (! $__env->hasRenderedOnce(\'bar\')): $__env->markAsRenderedOnce(\'bar\');
+        $expected = '<?php if (! $__env->hasRenderedOnce(\'foo:bar\')): $__env->markAsRenderedOnce(\'foo:bar\');
 $__env->startPush(\'foo\'); ?>
 test
 <?php $__env->stopPush(); endif; ?>';
