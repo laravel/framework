@@ -1844,7 +1844,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder = $this->getBuilder()->setModel($model);
         $keyName = $model->getQualifiedKeyName();
 
-        $collection = new Collection([1, 2, 3]);
+        $collection = new BaseCollection([1, 2, 3]);
 
         $builder->getQuery()->shouldReceive('whereIntegerInRaw')->once()->with($keyName, $collection);
 
@@ -1921,14 +1921,14 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->whereKeyNot($array);
     }
 
-    public function testWhereKeyNotMethodWithCollection()
+    public function testWhereKeyNotMethodWithBaseCollection()
     {
         $model = $this->getMockModel();
         $model->shouldReceive('getKeyType')->andReturn('int');
         $builder = $this->getBuilder()->setModel($model);
         $keyName = $model->getQualifiedKeyName();
 
-        $collection = new Collection([1, 2, 3]);
+        $collection = new BaseCollection([1, 2, 3]);
 
         $builder->getQuery()->shouldReceive('whereIntegerNotInRaw')->once()->with($keyName, $collection);
 
