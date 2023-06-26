@@ -247,18 +247,18 @@ class Handler implements ExceptionHandlerContract
             return;
         }
 
-        $this->reportError($e);
+        $this->reportThrowable($e);
     }
 
     /**
      * Reports error based on report method on exception or to logger.
      *
-     * @param  Throwable  $e
+     * @param  \Throwable  $e
      * @return void
      *
-     * @throws Throwable
+     * @throws \Throwable
      */
-    protected function reportError(Throwable $e): void
+    protected function reportThrowable(Throwable $e): void
     {
         if (Reflector::isCallable($reportCallable = [$e, 'report']) &&
             $this->container->call($reportCallable) !== false) {
