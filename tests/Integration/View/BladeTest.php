@@ -122,6 +122,32 @@ class BladeTest extends TestCase
 <div>Slot: F, Color: yellow, Default: foo</div>', trim($view));
     }
 
+    public function test_optional_slots() {
+        $view = View::make('uses-optional-slots', ['noOptionals' => true, 'optionalAsAttribute' => false])->render();
+
+        $this->assertSame('<div >
+    Slot content
+    <div ></div>
+    <div class="bg-red-500">dummy text</div>
+</div>', trim($view));
+
+        $view = View::make('uses-optional-slots', ['noOptionals' => false, 'optionalAsAttribute' => true])->render();
+
+        $this->assertSame('<div >
+    Slot content
+    <div >Optional content</div>
+    <div class="bg-red-500">Another slot content</div>
+</div>', trim($view));
+
+        $view = View::make('uses-optional-slots', ['noOptionals' => false, 'optionalAsAttribute' => false])->render();
+
+        $this->assertSame('<div >
+    Slot content
+    <div >Optional content</div>
+    <div >Another slot content</div>
+</div>', trim($view));
+    }
+
     public function test_name_attribute_can_be_used_if_using_short_slot_names()
     {
         $content = Blade::render('<x-input-with-slot>
