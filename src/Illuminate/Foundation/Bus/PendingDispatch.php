@@ -185,12 +185,14 @@ class PendingDispatch
      */
     public function __destruct()
     {
-        if (! $this->shouldDispatch()) {
-            return;
-        } elseif ($this->afterResponse) {
-            app(Dispatcher::class)->dispatchAfterResponse($this->job);
-        } else {
-            app(Dispatcher::class)->dispatch($this->job);
+        if ($this->shouldDispatch()) {
+            $dispatcher = app(Dispatcher::class);
+
+            if ($this->afterResponse) {
+                $dispatcher->dispatchAfterResponse($this->job);
+            } else {
+                $dispatcher->dispatch($this->job);
+            }
         }
     }
 }
