@@ -27,5 +27,4 @@ abstract class BaseHelpers
     {
         return new static();
     }
-
 }
