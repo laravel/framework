@@ -81,9 +81,7 @@ class DatabaseBatchRepository implements PrunableBatchRepository
                             ->where('id', $batchId)
                             ->first();
 
-        if ($batch) {
-            return $this->toBatch($batch);
-        }
+        return $batch ? $this->toBatch($batch) : null;
     }
 
     /**
