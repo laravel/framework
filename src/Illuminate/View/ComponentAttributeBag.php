@@ -61,7 +61,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
     /**
      * Determine if a given attribute exists in the attribute array.
      *
-     * @param  TKey|array<array-key, TKey>  $key
+     * @param  array|string  $key
      * @return bool
      */
     public function has($key)
@@ -80,7 +80,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
     /**
      * Determine if any of the keys exist in the attribute array.
      *
-     * @param  mixed  $key
+     * @param  array|string  $key
      * @return bool
      */
     public function hasAny($key)
