@@ -6,6 +6,7 @@ abstract class BaseHelpers
 {
     /**
      * Handle calls to missing methods on the helper.
+     *
      * @param  string  $method
      * @param  array  $parameters
      * @return mixed
@@ -26,7 +27,5 @@ abstract class BaseHelpers
     {
         return new static();
     }
-    
-}
 
-?>
+}
