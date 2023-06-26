@@ -10,6 +10,7 @@ use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
 use GuzzleHttp\UriTemplate\UriTemplate;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Client\Events\ConnectionFailed;
@@ -216,12 +217,13 @@ class PendingRequest
      * Create a new HTTP Client instance.
      *
      * @param  \Illuminate\Http\Client\Factory|null  $factory
+     * @param  array  $middleware
      * @return void
      */
-    public function __construct(Factory $factory = null)
+    public function __construct(Factory $factory = null, $middleware = [])
     {
         $this->factory = $factory;
-        $this->middleware = new Collection;
+        $this->middleware = new Collection($middleware);
 
         $this->asJson();
 
@@ -637,6 +639,32 @@ class PendingRequest
     public function withMiddleware(callable $middleware)
     {
         $this->middleware->push($middleware);
+
+        return $this;
+    }
+
+    /**
+     * Add new request middleware the client handler stack.
+     *
+     * @param  callable  $middleware
+     * @return $this
+     */
+    public function withRequestMiddleware(callable $middleware)
+    {
+        $this->middleware->push(Middleware::mapRequest($middleware));
+
+        return $this;
+    }
+
+    /**
+     * Add new response middleware the client handler stack.
+     *
+     * @param  callable  $middleware
+     * @return $this
+     */
+    public function withResponseMiddleware(callable $middleware)
+    {
+        $this->middleware->push(Middleware::mapResponse($middleware));
 
         return $this;
     }

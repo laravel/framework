@@ -20,6 +20,7 @@ use Illuminate\Http\Client\Response;
 use Illuminate\Http\Client\ResponseSequence;
 use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Str;
@@ -28,6 +29,7 @@ use Mockery as m;
 use OutOfBoundsException;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
 use Symfony\Component\VarDumper\VarDumper;
 
@@ -2373,5 +2375,126 @@ class HttpClientTest extends TestCase
             ->handlerStats();
 
         $this->assertTrue($onStatsFunctionCalled);
+    }
+
+    public function testItCanAddGlobalMiddleware()
+    {
+        Carbon::setTestNow(now()->startOfDay());
+        $requests = [];
+        $responses = [];
+        $this->factory->fake(function ($r) use (&$requests) {
+            $requests[] = $r;
+
+            Carbon::setTestNow(now()->addSeconds(6 * count($requests)));
+
+            return $this->factory::response('expected content');
+        });
+
+        $this->factory->globalMiddleware(Middleware::mapRequest(function ($request) {
+            // Test manipulating headers on outgoing request...
+            return $request->withHeader('User-Agent', 'Laravel Framework/1.0')
+                ->withAddedHeader('shared', 'global')
+                ->withHeader('list', ['item-1', 'item-2'])
+                ->withAddedHeader('list', ['item-3']);
+        }))->globalMiddleware(Middleware::mapResponse(function ($response) use (&$requests) {
+            // Test adding headers in incoming response..
+            return $response->withHeader('X-Count', (string) count($requests));
+        }))->globalMiddleware(function ($handler) {
+            // Test wrapping request in timing function...
+            return function ($request, $options) use ($handler) {
+                $startedAt = now();
+
+                return $handler($request, $options)->then(function (ResponseInterface $response) use ($startedAt) {
+                    return $response->withHeader('X-Duration', "{$startedAt->diffInSeconds(now())} seconds");
+                });
+            };
+        });
+        $responses[] = $this->factory->post('http://forge.laravel.com');
+        $responses[] = $this->factory->withHeader('shared', 'local')->post('http://vapor.laravel.com');
+
+        $this->assertCount(2, $requests);
+        $this->assertCount(2, $responses);
+
+        $this->assertSame(['Laravel Framework/1.0'], $requests[0]->header('User-Agent'));
+        $this->assertSame(['item-1', 'item-2', 'item-3'], $requests[0]->header('list'));
+        $this->assertSame(['global'], $requests[0]->header('shared'));
+        $this->assertSame('1', $responses[0]->header('X-Count'));
+        $this->assertSame('6 seconds', $responses[0]->header('X-Duration'));
+
+        $this->assertSame(['Laravel Framework/1.0'], $requests[1]->header('User-Agent'));
+        $this->assertSame(['item-1', 'item-2', 'item-3'], $requests[1]->header('list'));
+        $this->assertSame(['local', 'global'], $requests[1]->header('shared'));
+        $this->assertSame('2', $responses[1]->header('X-Count'));
+        $this->assertSame('12 seconds', $responses[1]->header('X-Duration'));
+    }
+
+    public function testItCanAddGlobalRequestMiddleware()
+    {
+        $requests = [];
+        $this->factory->fake(function ($r) use (&$requests) {
+            $requests[] = $r;
+
+            return Factory::response('expected content');
+        });
+
+        $this->factory->globalRequestMiddleware(function ($request) {
+            return $request->withHeader('User-Agent', 'Laravel Framework/1.0');
+        });
+        $this->factory->post('http://forge.laravel.com');
+        $this->factory->post('http://laravel.com');
+
+        $this->assertSame(['Laravel Framework/1.0'], $requests[0]->header('User-Agent'));
+        $this->assertSame(['Laravel Framework/1.0'], $requests[1]->header('User-Agent'));
+    }
+
+    public function testItCanAddGlobalResponseMiddleware()
+    {
+        $responses = [];
+        $this->factory->fake(function ($r) use (&$request) {
+            return Factory::response('expected content');
+        });
+
+        $this->factory->globalResponseMiddleware(function ($response) {
+            return $response->withHeader('X-Foo', 'Bar');
+        });
+        $responses[] = $this->factory->post('http://forge.laravel.com');
+        $responses[] = $this->factory->post('http://laravel.com');
+
+        $this->assertSame('Bar', $responses[0]->header('X-Foo'));
+        $this->assertSame('Bar', $responses[1]->header('X-Foo'));
+    }
+
+    public function testItCanAddRequestMiddleware()
+    {
+        $requests = [];
+        $this->factory->fake(function ($r) use (&$requests) {
+            $requests[] = $r;
+
+            return Factory::response('expected content');
+        });
+
+        $this->factory->withRequestMiddleware(function ($request) {
+            return $request->withHeader('User-Agent', 'Laravel Framework/1.0');
+        })->post('http://forge.laravel.com');
+        $this->factory->post('http://laravel.com');
+
+        $this->assertSame(['Laravel Framework/1.0'], $requests[0]->header('User-Agent'));
+        $this->assertSame(['GuzzleHttp/7'], $requests[1]->header('User-Agent'));
+    }
+
+    public function testItCanAddResponseMiddleware()
+    {
+        $responses = [];
+        $this->factory->fake(function ($r) use (&$request) {
+            return Factory::response('expected content');
+        });
+
+        $responses[] = $this->factory->withResponseMiddleware(function ($response) {
+            return $response->withHeader('X-Foo', 'Bar');
+        })->post('http://forge.laravel.com');
+        $responses[] = $this->factory->post('http://laravel.com');
+
+        $this->assertSame('Bar', $responses[0]->header('X-Foo'));
+        $this->assertSame('', $responses[1]->header('X-Foo'));
     }
 }
