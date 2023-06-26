@@ -22,7 +22,8 @@ abstract class BaseHelpers
     /**
      * @return New Instance Class.
      */
-    public static function instance() {
+    public static function instance()
+    {
         return new static();
     }
     
