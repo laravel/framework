@@ -122,7 +122,8 @@ class BladeTest extends TestCase
 <div>Slot: F, Color: yellow, Default: foo</div>', trim($view));
     }
 
-    public function test_optional_slots() {
+    public function test_optional_slots()
+    {
         $view = View::make('uses-optional-slots', ['noOptionals' => true, 'optionalAsAttribute' => false])->render();
 
         $this->assertSame('<div >
