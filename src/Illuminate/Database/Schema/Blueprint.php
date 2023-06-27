@@ -431,7 +431,7 @@ class Blueprint
     public function dropForeignIdFor($model, $column = null)
     {
         if (is_string($model)) {
-            $model = new $model;
+            $model = new $model();
         }
 
         return $this->dropForeign([$column ?: $model->getForeignKey()]);
@@ -447,7 +447,7 @@ class Blueprint
     public function dropConstrainedForeignIdFor($model, $column = null)
     {
         if (is_string($model)) {
-            $model = new $model;
+            $model = new $model();
         }
 
         return $this->dropConstrainedForeignId($column ?: $model->getForeignKey());
@@ -936,7 +936,7 @@ class Blueprint
     public function foreignIdFor($model, $column = null)
     {
         if (is_string($model)) {
-            $model = new $model;
+            $model = new $model();
         }
 
         $column = $column ?: $model->getForeignKey();
@@ -1509,6 +1509,25 @@ class Blueprint
     }
 
     /**
+     * Add the proper columns after some column for a polymorphic table.
+     *
+     * @param  string  $name
+     * @param  string  $after
+     * @param  string|null  $indexName
+     * @return void
+     */
+    public function afterMorphs($name, $after, $indexName = null)
+    {
+        if (Builder::$defaultMorphKeyType === 'uuid') {
+            $this->afterUuidMorphs($name, $after, $indexName);
+        } elseif (Builder::$defaultMorphKeyType === 'ulid') {
+            $this->afterUlidMorphs($name, $after, $indexName);
+        } else {
+            $this->afterNumericMorphs($name, $after, $indexName);
+        }
+    }
+
+    /**
      * Add the proper columns for a polymorphic table using numeric IDs (incremental).
      *
      * @param  string  $name
@@ -1536,6 +1555,23 @@ class Blueprint
         $this->string("{$name}_type")->nullable();
 
         $this->unsignedBigInteger("{$name}_id")->nullable();
+
+        $this->index(["{$name}_type", "{$name}_id"], $indexName);
+    }
+
+    /**
+     * Add the proper columns after some column for a polymorphic table using numeric IDs (incremental).
+     *
+     * @param  string  $name
+     * @param  string  $after
+     * @param  string|null  $indexName
+     * @return void
+     */
+    public function afterNumericMorphs($name, $after, $indexName = null)
+    {
+        $this->string("{$name}_type")->after($after);
+
+        $this->unsignedBigInteger("{$name}_id")->after("{$name}_type");
 
         $this->index(["{$name}_type", "{$name}_id"], $indexName);
     }
@@ -1573,6 +1609,23 @@ class Blueprint
     }
 
     /**
+     * Add the proper columns after some column for a polymorphic table using UUIDs.
+     *
+     * @param  string  $name
+     * @param  string  $after
+     * @param  string|null  $indexName
+     * @return void
+     */
+    public function afterUuidMorphs($name, $after, $indexName = null)
+    {
+        $this->string("{$name}_type")->after($after);
+
+        $this->uuid("{$name}_id")->after("{$name}_type");
+
+        $this->index(["{$name}_type", "{$name}_id"], $indexName);
+    }
+
+    /**
      * Add the proper columns for a polymorphic table using ULIDs.
      *
      * @param  string  $name
@@ -1600,6 +1653,23 @@ class Blueprint
         $this->string("{$name}_type")->nullable();
 
         $this->ulid("{$name}_id")->nullable();
+
+        $this->index(["{$name}_type", "{$name}_id"], $indexName);
+    }
+
+    /**
+     * Add the proper columns after some column for a polymorphic table using ULIDs.
+     *
+     * @param  string  $name
+     * @param  string  $after
+     * @param  string|null  $indexName
+     * @return void
+     */
+    public function afterUlidMorphs($name, $after, $indexName = null)
+    {
+        $this->string("{$name}_type")->after($after);
+
+        $this->ulid("{$name}_id")->after("{$name}_type");
 
         $this->index(["{$name}_type", "{$name}_id"], $indexName);
     }
@@ -1644,7 +1714,8 @@ class Blueprint
         $index = $index ?: $this->createIndexName($type, $columns);
 
         return $this->addCommand(
-            $type, compact('index', 'columns', 'algorithm')
+            $type,
+            compact('index', 'columns', 'algorithm')
         );
     }
 
