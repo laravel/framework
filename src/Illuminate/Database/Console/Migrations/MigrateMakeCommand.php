@@ -103,7 +103,7 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
      * @param  string  $name
      * @param  string  $table
      * @param  bool  $create
-     * @return string
+     * @return void
      */
     protected function writeMigration($name, $table, $create)
     {

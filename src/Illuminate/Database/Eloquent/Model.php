@@ -746,7 +746,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      *
      * @param  array|string  $relations
      * @param  string  $column
-     * @param  string  $function
+     * @param  string|null  $function
      * @return $this
      */
     public function loadAggregate($relations, $column, $function = null)
@@ -834,7 +834,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * @param  string  $relation
      * @param  array  $relations
      * @param  string  $column
-     * @param  string  $function
+     * @param  string|null  $function
      * @return $this
      */
     public function loadMorphAggregate($relation, $relations, $column, $function = null)

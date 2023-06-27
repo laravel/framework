@@ -101,7 +101,18 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      */
     public function has($key, $locale = null, $fallback = true)
     {
-        return $this->get($key, [], $locale, $fallback) !== $key;
+        $locale = $locale ?: $this->locale;
+
+        $line = $this->get($key, [], $locale, $fallback);
+
+        // For JSON translations, the loaded files will contain the correct line.
+        // Otherwise, we must assume we are handling typical translation file
+        // and check if the returned line is not the same as the given key.
+        if (! is_null($this->loaded['*']['*'][$locale][$key] ?? null)) {
+            return true;
+        }
+
+        return $line !== $key;
     }
 
     /**

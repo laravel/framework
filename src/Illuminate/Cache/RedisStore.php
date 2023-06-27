@@ -253,7 +253,7 @@ class RedisStore extends TaggableStore implements LockProvider
     /**
      * Remove all expired tag set entries.
      *
-     * @return bool
+     * @return void
      */
     public function flushStaleTags()
     {

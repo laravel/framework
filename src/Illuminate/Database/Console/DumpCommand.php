@@ -36,7 +36,7 @@ class DumpCommand extends Command
      *
      * @param  \Illuminate\Database\ConnectionResolverInterface  $connections
      * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
-     * @return int
+     * @return void
      */
     public function handle(ConnectionResolverInterface $connections, Dispatcher $dispatcher)
     {
