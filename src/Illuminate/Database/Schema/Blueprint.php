@@ -431,7 +431,7 @@ class Blueprint
     public function dropForeignIdFor($model, $column = null)
     {
         if (is_string($model)) {
-            $model = new $model();
+            $model = new $model;
         }
 
         return $this->dropForeign([$column ?: $model->getForeignKey()]);
@@ -447,7 +447,7 @@ class Blueprint
     public function dropConstrainedForeignIdFor($model, $column = null)
     {
         if (is_string($model)) {
-            $model = new $model();
+            $model = new $model;
         }
 
         return $this->dropConstrainedForeignId($column ?: $model->getForeignKey());
@@ -936,7 +936,7 @@ class Blueprint
     public function foreignIdFor($model, $column = null)
     {
         if (is_string($model)) {
-            $model = new $model();
+            $model = new $model;
         }
 
         $column = $column ?: $model->getForeignKey();
@@ -1714,8 +1714,7 @@ class Blueprint
         $index = $index ?: $this->createIndexName($type, $columns);
 
         return $this->addCommand(
-            $type,
-            compact('index', 'columns', 'algorithm')
+            $type, compact('index', 'columns', 'algorithm')
         );
     }
 
