@@ -21,7 +21,8 @@ class RetryCommand extends Command
     protected $signature = 'queue:retry
                             {id?* : The ID of the failed job or "all" to retry all jobs}
                             {--queue= : Retry all of the failed jobs for the specified queue}
-                            {--range=* : Range of job IDs (numeric) to be retried}';
+                            {--range=* : Range of job IDs (numeric) to be retried}
+                            {--without-job-overlapping : Prevents overlapping of failed queue jobs when running concurrently}';
 
     /**
      * The console command description.
@@ -43,17 +44,25 @@ class RetryCommand extends Command
             $this->components->info('Pushing failed queue jobs back onto the queue.');
         }
 
+        $withoutJobOverlapping = $this->option('without-job-overlapping');
+
         foreach ($ids as $id) {
             $job = $this->laravel['queue.failer']->find($id);
 
             if (is_null($job)) {
                 $this->components->error("Unable to find failed job with ID [{$id}].");
+            } elseif ($withoutJobOverlapping && !$this->laravel['cache']->lock("retry:id:{$id}")->get()) {
+                $this->components->error('The given failed job is already being executed.');
             } else {
                 $this->laravel['events']->dispatch(new JobRetryRequested($job));
 
                 $this->components->task($id, fn () => $this->retryJob($job));
 
                 $this->laravel['queue.failer']->forget($id);
+
+                if ($withoutJobOverlapping) {
+                    $this->laravel['cache']->lock("retry:id:{$id}")->release();
+                }
             }
         }
 
