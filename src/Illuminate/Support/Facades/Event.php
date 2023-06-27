@@ -12,7 +12,7 @@ use Illuminate\Support\Testing\Fakes\EventFake;
  * @method static void push(string $event, object|array $payload = [])
  * @method static void flush(string $event)
  * @method static void subscribe(object|string $subscriber)
- * @method static array|null until(string|object $event, mixed $payload = [])
+ * @method static mixed until(string|object $event, mixed $payload = [])
  * @method static array|null dispatch(string|object $event, mixed $payload = [], bool $halt = false)
  * @method static array getListeners(string $eventName)
  * @method static \Closure makeListener(\Closure|string|array $listener, bool $wildcard = false)
