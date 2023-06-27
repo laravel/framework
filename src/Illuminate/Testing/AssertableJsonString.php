@@ -152,6 +152,41 @@ class AssertableJsonString implements ArrayAccess, Countable
     }
 
     /**
+     * Assert that the response contains the given JSON fragment at the given path in the response.
+     *
+     * @param  string  $path
+     * @param  array  $data
+     * @return $this
+     */
+    public function assertPathFragment(string $path, array $data)
+    {
+        $decodedPath = $this->json($path);
+
+        if (is_null($decodedPath) || $decodedPath === false) {
+            PHPUnit::fail("A null value was returned from the path '$path'.");
+        }
+
+        $actual = json_encode(
+            Arr::sortRecursive($decodedPath),
+            JSON_UNESCAPED_UNICODE
+        );
+
+        foreach (Arr::sortRecursive($data) as $key => $value) {
+            $expected = $this->jsonSearchStrings($key, $value);
+
+            PHPUnit::assertTrue(
+                Str::contains($actual, $expected),
+                'Unable to find JSON fragment: '.PHP_EOL.PHP_EOL.
+                '['.json_encode([$key => $value], JSON_UNESCAPED_UNICODE).']'.PHP_EOL.PHP_EOL.
+                'within'.PHP_EOL.PHP_EOL.
+                "[{$actual}]."
+            );
+        }
+
+        return $this;
+    }
+
+    /**
      * Assert that the response does not contain the given JSON fragment.
      *
      * @param  array  $data

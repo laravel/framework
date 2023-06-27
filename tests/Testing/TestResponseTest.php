@@ -1261,6 +1261,43 @@ class TestResponseTest extends TestCase
         $response->assertJsonFragment(['id' => 1]);
     }
 
+    public function testAssertJsonPathFragment()
+    {
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
+
+        $response->assertJsonPathFragment('0', ['bar' => 'bar 0']);
+
+        $response->assertJsonPathFragment('0', ['bar' => 'bar 0', 'foobar' => 'foobar 0', 'foo' => 'foo 0']);
+
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+
+        $response->assertJsonPathFragment('foobar', ['foobar_foo' => 'foo']);
+
+        $response->assertJsonPathFragment('foobar', ['foobar_bar' => 'bar', 'foobar_foo' => 'foo']);
+
+        $response->assertJsonPathFragment('baz', ['bar' => 'foo 0', 'foo' => 'bar 0']);
+
+        $response->assertJsonPathFragment('barfoo.2.bar', ['foo' => 'bar 0', 'rab' => 'rab 0', 'bar' => 'foo 0']);
+
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
+
+        $response->assertJsonPathFragment('*', ['foo' => 'bar', 'id' => 10]);
+
+        $response->assertJsonPathFragment('0', ['id' => 10]);
+        $response->assertJsonPathFragment('1', ['id' => 20]);
+        $response->assertJsonPathFragment('2', ['id' => 30]);
+    }
+
+    public function testAssertJsonPathFragmentCanFail()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
+
+        $response->assertJsonPathFragment('0', ['id' => 20]);
+        $response->assertJsonPathFragment('*', ['id' => 1]);
+    }
+
     public function testAssertJsonStructure()
     {
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));

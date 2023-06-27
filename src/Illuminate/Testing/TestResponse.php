@@ -706,6 +706,20 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Assert that the response contains the given JSON fragment at the given path in the response.
+     *
+     * @param  string  $path
+     * @param  array  $data
+     * @return $this
+     */
+    public function assertJsonPathFragment(string $path, array $data)
+    {
+        $this->decodeResponseJson()->assertPathFragment($path, $data);
+
+        return $this;
+    }
+
+    /**
      * Assert that the response does not contain the given JSON fragment.
      *
      * @param  array  $data
