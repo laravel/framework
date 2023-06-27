@@ -75,7 +75,7 @@ class FoundationServiceProvider extends AggregateServiceProvider
     }
 
     /**
-     * Register an var dumper (with source) to debug variables.
+     * Register a var dumper (with source) to debug variables.
      *
      * @return void
      */
