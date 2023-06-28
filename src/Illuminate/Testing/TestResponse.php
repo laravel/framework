@@ -38,6 +38,13 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * The original request.
+     *
+     * @var \Illuminate\Http\Request|null
+     */
+    public $baseRequest;
+
+    /**
      * The response to delegate to.
      *
      * @var \Illuminate\Http\Response
@@ -62,11 +69,13 @@ class TestResponse implements ArrayAccess
      * Create a new test response instance.
      *
      * @param  \Illuminate\Http\Response  $response
+     * @param  \Illuminate\Http\Request|null  $request
      * @return void
      */
-    public function __construct($response)
+    public function __construct($response, $request = null)
     {
         $this->baseResponse = $response;
+        $this->baseRequest = $request;
         $this->exceptions = new Collection;
     }
 
@@ -74,11 +83,12 @@ class TestResponse implements ArrayAccess
      * Create a new TestResponse from another response.
      *
      * @param  \Illuminate\Http\Response  $response
+     * @param  \Illuminate\Http\Request|null  $request
      * @return static
      */
-    public static function fromBaseResponse($response)
+    public static function fromBaseResponse($response, $request = null)
     {
-        return new static($response);
+        return new static($response, $request);
     }
 
     /**

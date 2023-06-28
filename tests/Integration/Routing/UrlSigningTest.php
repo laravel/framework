@@ -33,7 +33,12 @@ class UrlSigningTest extends TestCase
         })->name('foo');
 
         $this->assertIsString($url = URL::signedRoute('foo', ['id' => 1]));
-        $this->assertSame('valid', $this->get($url)->original);
+
+        tap($this->get($url), function ($response) {
+            $this->assertSame('valid', $response->original);
+
+            $this->assertIsString($response->baseRequest->query('signature'));
+        });
     }
 
     public function testSigningUrlWithCustomRouteSlug()
@@ -46,8 +51,13 @@ class UrlSigningTest extends TestCase
         $model->routable = 'routable-slug';
 
         $this->assertIsString($url = URL::signedRoute('foo', ['post' => $model]));
-        $this->assertSame('valid', $this->get($url)->original['valid']);
-        $this->assertSame('routable-slug', $this->get($url)->original['slug']);
+
+        tap($this->get($url), function ($response) {
+            $this->assertSame('valid', $response->original['valid']);
+            $this->assertSame('routable-slug', $response->original['slug']);
+
+            $this->assertSame('routable-slug', $response->baseRequest->route('post'));
+        });
     }
 
     public function testTemporarySignedUrls()
