@@ -186,4 +186,12 @@ class RequestDurationThresholdTest extends TestCase
         $kernel->terminate($request, $response);
         $this->assertNull($kernel->requestStartedAt());
     }
+
+    public function testItHandlesCallingTerminateWithoutHandle()
+    {
+        $this->app[Kernel::class]->terminate(Request::create('http://localhost/test-route'), new Response);
+
+        // this is a placeholder just to show that the above did not throw an exception.
+        $this->assertTrue(true);
+    }
 }
