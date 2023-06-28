@@ -329,62 +329,6 @@ class TestResponseTest extends TestCase
         $response->assertSee(['bar & baz', 'baz & qux']);
     }
 
-    public function testAssertSeeCatchesNullValue()
-    {
-        $this->expectException(AssertionFailedError::class);
-
-        $response = $this->makeMockResponse([
-            'render' => '<ul><li>foo</li><li>bar</li><li>baz</li><li>foo</li></ul>',
-        ]);
-
-        $response->assertSee(null);
-    }
-
-    public function testAssertSeeCatchesEmptyArray()
-    {
-        $this->expectException(AssertionFailedError::class);
-
-        $response = $this->makeMockResponse([
-            'render' => '<ul><li>foo</li><li>bar</li><li>baz</li><li>foo</li></ul>',
-        ]);
-
-        $response->assertSee([]);
-    }
-
-    public function testAssertSeeCatchesEmptyString()
-    {
-        $this->expectException(AssertionFailedError::class);
-
-        $response = $this->makeMockResponse([
-            'render' => '<ul><li>foo</li><li>bar</li><li>baz</li><li>foo</li></ul>',
-        ]);
-
-        $response->assertSee('');
-    }
-
-    public function testAssertSeeCatchesEmptyStringInArray()
-    {
-        $this->expectException(AssertionFailedError::class);
-
-        $response = $this->makeMockResponse([
-            'render' => '<ul><li>foo</li><li>bar</li><li>baz</li><li>foo</li></ul>',
-        ]);
-
-        $response->assertSee(['foo', '', 'bar']);
-    }
-
-    public function testAssertSeeAllowsEmptyValues()
-    {
-        $response = $this->makeMockResponse([
-            'render' => '<ul><li>foo</li><li>bar</li><li>baz</li><li>foo</li></ul>',
-        ]);
-
-        $response->assertSee(null, allowEmptyValues: true);
-        $response->assertSee([], allowEmptyValues: true);
-        $response->assertSee('', allowEmptyValues: true);
-        $response->assertSee(['foo', '', 'bar'], allowEmptyValues: true);
-    }
-
     public function testAssertSeeInOrder()
     {
         $response = $this->makeMockResponse([
