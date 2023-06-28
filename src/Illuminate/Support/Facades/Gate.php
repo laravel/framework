@@ -9,6 +9,7 @@ use Illuminate\Contracts\Auth\Access\Gate as GateContract;
  * @method static \Illuminate\Auth\Access\Response allowIf(\Illuminate\Auth\Access\Response|\Closure|bool $condition, string|null $message = null, string|null $code = null)
  * @method static \Illuminate\Auth\Access\Response denyIf(\Illuminate\Auth\Access\Response|\Closure|bool $condition, string|null $message = null, string|null $code = null)
  * @method static \Illuminate\Auth\Access\Gate define(string $ability, callable|array|string $callback)
+ * @method static \Illuminate\Auth\Access\Gate defineWithClass(string $class, string $as = null)
  * @method static \Illuminate\Auth\Access\Gate resource(string $name, string $class, array|null $abilities = null)
  * @method static \Illuminate\Auth\Access\Gate policy(string $class, string $policy)
  * @method static \Illuminate\Auth\Access\Gate before(callable $callback)

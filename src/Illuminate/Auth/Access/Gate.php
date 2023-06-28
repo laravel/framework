@@ -217,6 +217,32 @@ class Gate implements GateContract
     }
 
     /**
+     * Defines multiple abilities based on a class public methods and name.
+     *
+     * @param  string|class-string  $class
+     * @param  string|null  $as
+     * @return $this
+     */
+    public function defineWithClass($class, $as = null)
+    {
+        if (empty($as)) {
+            $as = Str::kebab(class_basename($class));
+        }
+
+        foreach ((new ReflectionClass($class))->getMethods() as $method) {
+            if ($method->isPublic()
+                && !$method->isStatic()
+                && !$method->isInternal()
+                && $method->getName() !== 'before'
+                && !Str::startsWith($method->getName(), '__')) {
+                $this->define(Str::kebab($method->getName()).'-'.$as, [$class, $method->getName()]);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Define abilities for a resource.
      *
      * @param  string  $name

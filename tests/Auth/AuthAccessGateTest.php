@@ -28,6 +28,40 @@ class AuthAccessGateTest extends TestCase
         $this->assertFalse($gate->check('bar'));
     }
 
+    public function testHallClassIsDefinedWithoutHallLastName()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->defineWithClass(CustomGates::class);
+
+        $this->assertTrue($gate->check('allow-custom-gates'));
+        $this->assertFalse($gate->check('deny-custom-gates'));
+        $this->assertFalse($gate->check('internal-custom-gates'));
+        $this->assertFalse($gate->check('construct-custom-gates'));
+        $this->assertTrue($gate->check('something-very-complex-custom-gates'));
+    }
+
+    public function testHallClassDefinedWithCustomName()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->defineWithClass(CustomGates::class, 'dashboard');
+
+        $this->assertTrue($gate->check('allow-dashboard'));
+        $this->assertFalse($gate->check('deny-dashboard'));
+        $this->assertTrue($gate->check('something-very-complex-dashboard'));
+    }
+
+    public function testHallClassUsesBefore()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->defineWithClass(CustomGatesWithBefore::class);
+
+        $this->assertFalse($gate->check('before-custom-gates-with-before'));
+        $this->assertTrue($gate->check('deny-custom-gates-with-before'));
+    }
+
     public function testBeforeCanTakeAnArrayCallbackAsObject()
     {
         $gate = new Gate(new Container, function () {
@@ -1434,5 +1468,46 @@ class AccessGateTestPolicyThrowingAuthorizationException
     public function create()
     {
         throw new AuthorizationException('Not allowed.', 'some_code');
+    }
+}
+
+class CustomGates
+{
+    public function __construct()
+    {
+        //
+    }
+
+    public function allow()
+    {
+        return true;
+    }
+
+    public function deny()
+    {
+        return false;
+    }
+
+    public function somethingVeryComplex()
+    {
+        return true;
+    }
+
+    public function __internal()
+    {
+        return true;
+    }
+}
+
+class CustomGatesWithBefore
+{
+    public function before()
+    {
+        return true;
+    }
+
+    public function deny()
+    {
+        return false;
     }
 }
