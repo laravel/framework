@@ -530,7 +530,7 @@ class TestResponse implements ArrayAccess
 
         foreach ($values as $value) {
             if (! $allowEmptyValues && (string) $value === '') {
-                PHPUnit::fail('An empty string was passed to `assertSee`.');
+                PHPUnit::fail('An empty value was passed to `assertSee`.');
             }
 
             PHPUnit::assertStringContainsString((string) $value, $this->getContent());
