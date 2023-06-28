@@ -518,13 +518,21 @@ class TestResponse implements ArrayAccess
      * @param  bool  $escape
      * @return $this
      */
-    public function assertSee($value, $escape = true)
+    public function assertSee($value, $escape = true, $allowEmptyValues = false)
     {
         $value = Arr::wrap($value);
+
+        if (! $allowEmptyValues && empty($value)) {
+            PHPUnit::fail('An empty value was passed to `assertSee`.');
+        }
 
         $values = $escape ? array_map('e', $value) : $value;
 
         foreach ($values as $value) {
+            if (! $allowEmptyValues && (string) $value === '') {
+                PHPUnit::fail('An empty value was passed to `assertSee`.');
+            }
+
             PHPUnit::assertStringContainsString((string) $value, $this->getContent());
         }
 
