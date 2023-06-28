@@ -198,4 +198,12 @@ class CommandDurationThresholdTest extends TestCase
 
         $this->assertSame('Australia/Melbourne', $startedAt->timezone->getName());
     }
+
+    public function testItHandlesCallingTerminateWithoutHandle()
+    {
+        $this->app[Kernel::class]->terminate(new StringInput('foo'), 21);
+
+        // this is a placeholder just to show that the above did not throw an exception.
+        $this->assertTrue(true);
+    }
 }
