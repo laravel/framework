@@ -1,6 +1,13 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.14.0...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v10.14.1...10.x)
+
+## [v10.14.1](https://github.com/laravel/framework/compare/v10.14.0...v10.14.1) - 2023-06-28
+
+- [10.x] Fix `Dispatcher::until` return type by @Neol3108 in https://github.com/laravel/framework/pull/47585
+- [10.x] Add Collection::wrap to add method on BatchFake by @schonhoff in https://github.com/laravel/framework/pull/47589
+- [10.x] Fixes grammar in FoundationServiceProvider by @adampatterson in https://github.com/laravel/framework/pull/47593
+- [10.x] Ensure duration is present by @timacdonald in https://github.com/laravel/framework/pull/47596
 
 ## [v10.14.0](https://github.com/laravel/framework/compare/v10.13.5...v10.14.0) - 2023-06-27
 
