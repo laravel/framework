@@ -4,12 +4,15 @@ namespace Illuminate\Tests\Integration\Notifications;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Mail\Transport\ArrayTransport;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\View;
 use Orchestra\Testbench\TestCase;
+use Symfony\Component\Mailer\SentMessage;
 
 class SendingMailableNotificationsTest extends TestCase
 {
@@ -38,10 +41,22 @@ class SendingMailableNotificationsTest extends TestCase
     public function testMarkdownNotification()
     {
         $user = MailableNotificationUser::forceCreate([
-            'email' => 'taylor@laravel.com',
+            'email' => 'nuno@laravel.com',
         ]);
 
         $user->notify(new MarkdownNotification());
+
+        $email = app('mailer')->getSymfonyTransport()->messages()[0]->getOriginalMessage()->toString();
+
+        $cid = explode(' cid:', str($email)->explode("\r\n")
+            ->filter(fn ($line) => str_contains($line, 'Embed content: cid:'))
+            ->first())[1];
+
+        $this->assertStringContainsString(<<<EOT
+        Content-Type: application/x-php; name=$cid\r
+        Content-Transfer-Encoding: base64\r
+        Content-Disposition: inline; name=$cid; filename=$cid\r
+        EOT, $email);
     }
 }
 

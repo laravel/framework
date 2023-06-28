@@ -1,1 +1,1 @@
-<img src="{{ $message->embed('image.jpg') }}">
+Embed content: {{ $message->embed(__FILE__) }}
