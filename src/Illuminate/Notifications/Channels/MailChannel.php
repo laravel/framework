@@ -100,8 +100,8 @@ class MailChannel
         }
 
         return [
-            'html' => fn($messageArray) => $this->markdown->render($message->markdown, $messageArray),
-            'text' => fn($messageArray) => $this->markdown->renderText($message->markdown, $messageArray),
+            'html' => fn ($messageArray = []) => $this->markdown->render($message->markdown, $messageArray),
+            'text' => fn ($messageArray = []) => $this->markdown->renderText($message->markdown, $messageArray),
         ];
     }
 

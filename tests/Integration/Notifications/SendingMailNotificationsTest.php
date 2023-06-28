@@ -17,13 +17,14 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
 use Mockery as m;
+use Mockery\MockInterface;
 use Orchestra\Testbench\TestCase;
 
 class SendingMailNotificationsTest extends TestCase
 {
-    public $mailFactory;
-    public $mailer;
-    public $markdown;
+    public MailFactory&MockInterface $mailFactory;
+    public Mailer&MockInterface $mailer;
+    public Markdown&MockInterface $markdown;
 
     protected function tearDown(): void
     {
@@ -77,37 +78,65 @@ class SendingMailNotificationsTest extends TestCase
         $this->markdown->shouldReceive('render')->once()->andReturn('htmlContent');
         $this->markdown->shouldReceive('renderText')->once()->andReturn('textContent');
 
-        $this->mailer->shouldReceive('send')->once()->with(
-            ['html' => 'htmlContent', 'text' => 'textContent'],
-            array_merge($notification->toMail($user)->toArray(), [
+        $this->setMailerSendAssertions($notification, $user, function($closure) {
+            $message = m::mock(Message::class);
+
+            $message->shouldReceive('to')->once()->with(['taylor@laravel.com']);
+
+            $message->shouldReceive('cc')->once()->with('cc@deepblue.com', 'cc');
+
+            $message->shouldReceive('bcc')->once()->with('bcc@deepblue.com', 'bcc');
+
+            $message->shouldReceive('from')->once()->with('jack@deepblue.com', 'Jacques Mayol');
+
+            $message->shouldReceive('replyTo')->once()->with('jack@deepblue.com', 'Jacques Mayol');
+
+            $message->shouldReceive('subject')->once()->with('Test Mail Notification');
+
+            $message->shouldReceive('priority')->once()->with(1);
+
+            $closure($message);
+
+            return true;
+        });
+
+
+        $user->notify($notification);
+    }
+
+    private function setMailerSendAssertions(
+        Notification $notification,
+        NotifiableUser $user,
+        callable $callbackExpectationClosure
+    ) {
+        $this->mailer->shouldReceive('send')->once()->withArgs(function(...$args) use ($notification, $user, $callbackExpectationClosure){
+            $viewArray = $args[0];
+
+            if (!m::on(fn($closure) => $closure() === 'htmlContent')->match($viewArray['html'])) {
+                return false;
+            }
+
+            if (!m::on(fn($closure) => $closure() === 'textContent')->match($viewArray['text'])) {
+                return false;
+            }
+
+            $data = $args[1];
+
+            $expected = array_merge($notification->toMail($user)->toArray(), [
                 '__laravel_notification_id' => $notification->id,
                 '__laravel_notification' => get_class($notification),
                 '__laravel_notification_queued' => false,
-            ]),
-            m::on(function ($closure) {
-                $message = m::mock(Message::class);
+            ]);
 
-                $message->shouldReceive('to')->once()->with(['taylor@laravel.com']);
+            if (array_keys($data) !== array_keys($expected)) {
+                return false;
+            }
+            if (array_values($data) !== array_values($expected)) {
+                return false;
+            }
 
-                $message->shouldReceive('cc')->once()->with('cc@deepblue.com', 'cc');
-
-                $message->shouldReceive('bcc')->once()->with('bcc@deepblue.com', 'bcc');
-
-                $message->shouldReceive('from')->once()->with('jack@deepblue.com', 'Jacques Mayol');
-
-                $message->shouldReceive('replyTo')->once()->with('jack@deepblue.com', 'Jacques Mayol');
-
-                $message->shouldReceive('subject')->once()->with('Test Mail Notification');
-
-                $message->shouldReceive('priority')->once()->with(1);
-
-                $closure($message);
-
-                return true;
-            })
-        );
-
-        $user->notify($notification);
+            return m::on($callbackExpectationClosure)->match($args[2]);
+        });
     }
 
     public function testMailIsSentToNamedAddress()
@@ -123,35 +152,27 @@ class SendingMailNotificationsTest extends TestCase
         $this->markdown->shouldReceive('render')->once()->andReturn('htmlContent');
         $this->markdown->shouldReceive('renderText')->once()->andReturn('textContent');
 
-        $this->mailer->shouldReceive('send')->once()->with(
-            ['html' => 'htmlContent', 'text' => 'textContent'],
-            array_merge($notification->toMail($user)->toArray(), [
-                '__laravel_notification_id' => $notification->id,
-                '__laravel_notification' => get_class($notification),
-                '__laravel_notification_queued' => false,
-            ]),
-            m::on(function ($closure) {
-                $message = m::mock(Message::class);
+        $this->setMailerSendAssertions($notification, $user, function($closure) {
+            $message = m::mock(Message::class);
 
-                $message->shouldReceive('to')->once()->with(['taylor@laravel.com' => 'Taylor Otwell', 'foo_taylor@laravel.com']);
+            $message->shouldReceive('to')->once()->with(['taylor@laravel.com' => 'Taylor Otwell', 'foo_taylor@laravel.com']);
 
-                $message->shouldReceive('cc')->once()->with('cc@deepblue.com', 'cc');
+            $message->shouldReceive('cc')->once()->with('cc@deepblue.com', 'cc');
 
-                $message->shouldReceive('bcc')->once()->with('bcc@deepblue.com', 'bcc');
+            $message->shouldReceive('bcc')->once()->with('bcc@deepblue.com', 'bcc');
 
-                $message->shouldReceive('from')->once()->with('jack@deepblue.com', 'Jacques Mayol');
+            $message->shouldReceive('from')->once()->with('jack@deepblue.com', 'Jacques Mayol');
 
-                $message->shouldReceive('replyTo')->once()->with('jack@deepblue.com', 'Jacques Mayol');
+            $message->shouldReceive('replyTo')->once()->with('jack@deepblue.com', 'Jacques Mayol');
 
-                $message->shouldReceive('subject')->once()->with('Test Mail Notification');
+            $message->shouldReceive('subject')->once()->with('Test Mail Notification');
 
-                $message->shouldReceive('priority')->once()->with(1);
+            $message->shouldReceive('priority')->once()->with(1);
 
-                $closure($message);
+            $closure($message);
 
-                return true;
-            })
-        );
+            return true;
+        });
 
         $user->notify($notification);
     }
@@ -168,25 +189,17 @@ class SendingMailNotificationsTest extends TestCase
         $this->markdown->shouldReceive('render')->once()->andReturn('htmlContent');
         $this->markdown->shouldReceive('renderText')->once()->andReturn('textContent');
 
-        $this->mailer->shouldReceive('send')->once()->with(
-            ['html' => 'htmlContent', 'text' => 'textContent'],
-            array_merge($notification->toMail($user)->toArray(), [
-                '__laravel_notification_id' => $notification->id,
-                '__laravel_notification' => get_class($notification),
-                '__laravel_notification_queued' => false,
-            ]),
-            m::on(function ($closure) {
-                $message = m::mock(Message::class);
+        $this->setMailerSendAssertions($notification, $user, function($closure) {
+            $message = m::mock(Message::class);
 
-                $message->shouldReceive('to')->once()->with(['taylor@laravel.com']);
+            $message->shouldReceive('to')->once()->with(['taylor@laravel.com']);
 
-                $message->shouldReceive('subject')->once()->with('mail custom subject');
+            $message->shouldReceive('subject')->once()->with('mail custom subject');
 
-                $closure($message);
+            $closure($message);
 
-                return true;
-            })
-        );
+            return true;
+        });
 
         $user->notify($notification);
     }
@@ -203,25 +216,18 @@ class SendingMailNotificationsTest extends TestCase
         $this->markdown->shouldReceive('render')->once()->andReturn('htmlContent');
         $this->markdown->shouldReceive('renderText')->once()->andReturn('textContent');
 
-        $this->mailer->shouldReceive('send')->once()->with(
-            ['html' => 'htmlContent', 'text' => 'textContent'],
-            array_merge($notification->toMail($user)->toArray(), [
-                '__laravel_notification_id' => $notification->id,
-                '__laravel_notification' => get_class($notification),
-                '__laravel_notification_queued' => false,
-            ]),
-            m::on(function ($closure) {
-                $message = m::mock(Message::class);
+        $this->setMailerSendAssertions($notification, $user, function($closure) {
+            $message = m::mock(Message::class);
 
-                $message->shouldReceive('to')->once()->with(['foo_taylor@laravel.com', 'bar_taylor@laravel.com']);
+            $message->shouldReceive('to')->once()->with(['foo_taylor@laravel.com', 'bar_taylor@laravel.com']);
 
-                $message->shouldReceive('subject')->once()->with('mail custom subject');
+            $message->shouldReceive('subject')->once()->with('mail custom subject');
 
-                $closure($message);
+            $closure($message);
 
-                return true;
-            })
-        );
+            return true;
+        });
+
 
         $user->notify($notification);
     }
@@ -332,6 +338,8 @@ class SendingMailNotificationsTest extends TestCase
 
         $user->notify($notification);
     }
+
+
 }
 
 class NotifiableUser extends Model
