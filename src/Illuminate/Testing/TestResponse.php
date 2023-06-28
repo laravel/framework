@@ -38,11 +38,11 @@ class TestResponse implements ArrayAccess
     }
 
     /**
-     * The original request for the response.
+     * The original request.
      *
      * @var \Illuminate\Http\Request|null
      */
-    public readonly ?Request $baseRequest;
+    public $baseRequest;
 
     /**
      * The response to delegate to.
