@@ -81,6 +81,7 @@ class Dispatcher implements DispatcherContract
                 ->each(function ($event) use ($events) {
                     $this->listen($event, $events);
                 });
+
             return;
         }
 
@@ -89,6 +90,7 @@ class Dispatcher implements DispatcherContract
                 ->each(function ($event) use ($events) {
                     $this->listen($event, $events->resolve());
                 });
+
             return;
         }
 
