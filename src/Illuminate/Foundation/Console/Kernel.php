@@ -218,6 +218,10 @@ class Kernel implements KernelContract
     {
         $this->app->terminate();
 
+        if ($this->commandStartedAt === null) {
+            return;
+        }
+
         $this->commandStartedAt->setTimezone($this->app['config']->get('app.timezone') ?? 'UTC');
 
         foreach ($this->commandLifecycleDurationHandlers as ['threshold' => $threshold, 'handler' => $handler]) {
