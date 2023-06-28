@@ -183,6 +183,18 @@ trait HasAttributes
     public static $encrypter;
 
     /**
+     * Initialize the trait.
+     *
+     * @return void
+     */
+    protected function initializeHasAttributes()
+    {
+        $this->casts = $this->ensureCastsAreStringValues(
+            array_merge($this->casts, $this->casts()),
+        );
+    }
+
+    /**
      * Convert the model's attributes to an array.
      *
      * @return array
@@ -719,9 +731,37 @@ trait HasAttributes
      */
     public function mergeCasts($casts)
     {
+        $casts = $this->ensureCastsAreStringValues($casts);
+
         $this->casts = array_merge($this->casts, $casts);
 
         return $this;
+    }
+
+    /**
+     * Ensure that the given casts are strings.
+     *
+     * @param  array  $casts
+     * @return array
+     */
+    protected function ensureCastsAreStringValues($casts)
+    {
+        foreach ($casts as $attribute => $cast) {
+            $casts[$attribute] = match (true) {
+                is_array($cast) => value(function () use ($cast) {
+                    if (count($cast) === 1) {
+                        return $cast[0];
+                    }
+
+                    [$cast, $arguments] = [array_shift($cast), $cast];
+
+                    return $cast.':'.implode(',', $arguments);
+                }),
+                default => $cast,
+            };
+        }
+
+        return $casts;
     }
 
     /**
@@ -1521,7 +1561,7 @@ trait HasAttributes
     }
 
     /**
-     * Get the casts array.
+     * Get the attributes that should be cast.
      *
      * @return array
      */
@@ -1532,6 +1572,16 @@ trait HasAttributes
         }
 
         return $this->casts;
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array
+     */
+    protected function casts()
+    {
+        return [];
     }
 
     /**
