@@ -181,7 +181,7 @@ class EloquentModelCustomCastingTest extends TestCase
         $this->assertInstanceOf(Euro::class, $model->amount);
         $this->assertEquals('2', $model->amount->value);
 
-        $model->incrementAmount(new Euro('1'));
+        $model->increment('amount', new Euro('1'));
         $this->assertEquals('3.00', $model->amount->value);
     }
 
@@ -394,19 +394,19 @@ class EuroCaster implements CastsAttributes
 
     public function set($model, $key, $value, $attributes)
     {
-        return $value->value;
+        return $value instanceof Euro ? $value->value : $value;
     }
 
-    public function increment($model, $key, string $value, $attributes)
+    public function increment($model, $key, $value, $attributes)
     {
-        $model->$key = new Euro((string) BigNumber::of($model->$key->value)->plus($value)->toScale(2));
+        $model->$key = new Euro((string) BigNumber::of($model->$key->value)->plus($value->value)->toScale(2));
 
         return $model->$key;
     }
 
-    public function decrement($model, $key, string $value, $attributes)
+    public function decrement($model, $key, $value, $attributes)
     {
-        $model->$key = new Euro((string) BigNumber::of($model->$key->value)->subtract($value)->toScale(2));
+        $model->$key = new Euro((string) BigNumber::of($model->$key->value)->subtract($value->value)->toScale(2));
 
         return $model->$key;
     }
@@ -418,9 +418,4 @@ class Member extends Model
     protected $casts = [
         'amount' => Euro::class,
     ];
-
-    public function incrementAmount(Euro $amount)
-    {
-        $this->increment('amount', $amount->value);
-    }
 }
