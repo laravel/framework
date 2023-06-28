@@ -81,12 +81,18 @@ class Dispatcher implements DispatcherContract
                 ->each(function ($event) use ($events) {
                     $this->listen($event, $events);
                 });
-        } elseif ($events instanceof QueuedClosure) {
+            return;
+        }
+
+        if ($events instanceof QueuedClosure) {
             collect($this->firstClosureParameterTypes($events->closure))
                 ->each(function ($event) use ($events) {
                     $this->listen($event, $events->resolve());
                 });
-        } elseif ($listener instanceof QueuedClosure) {
+            return;
+        }
+
+        if ($listener instanceof QueuedClosure) {
             $listener = $listener->resolve();
         }
 
