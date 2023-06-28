@@ -21,7 +21,7 @@ class DatabasePostgresQueryGrammarTest extends TestCase
         $grammar = new PostgresGrammar;
         $grammar->setConnection($connection);
 
-        $query = $grammar->makeRawSql(
+        $query = $grammar->substituteBindingsIntoRawSql(
             'select * from "users" where \'{}\' ?? \'Hello\\\'\\\'World?\' AND "email" = ?',
             ['foo'],
         );

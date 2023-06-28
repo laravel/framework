@@ -21,7 +21,7 @@ class DatabaseSQLiteQueryGrammarTest extends TestCase
         $grammar = new SQLiteGrammar;
         $grammar->setConnection($connection);
 
-        $query = $grammar->makeRawSql(
+        $query = $grammar->substituteBindingsIntoRawSql(
             'select * from "users" where \'Hello\'\'World?\' IS NOT NULL AND "email" = ?',
             ['foo'],
         );

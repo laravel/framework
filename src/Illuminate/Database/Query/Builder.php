@@ -2635,16 +2635,15 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Get the raw SQL representation of the query.
+     * Get the raw SQL representation of the query with embedded bindings.
      *
      * @return string
      */
     public function toRawSql()
     {
-        $sql = $this->toSql();
-        $bindings = $this->connection->prepareBindings($this->getBindings());
-
-        return $this->grammar->makeRawSql($sql, $bindings);
+        return $this->grammar->substituteBindingsIntoRawSql(
+            $this->toSql(), $this->connection->prepareBindings($this->getBindings())
+        );
     }
 
     /**

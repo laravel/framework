@@ -1358,6 +1358,44 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Substitute the given bindings into the given raw SQL query.
+     *
+     * @param  string  $sql
+     * @param  array  $bindings
+     * @return string
+     */
+    public function substituteBindingsIntoRawSql($sql, $bindings)
+    {
+        $bindings = array_map(fn ($value) => $this->escape($value), $bindings);
+
+        $query = '';
+
+        $isStringLiteral = false;
+
+        for ($i = 0; $i < strlen($sql); $i++) {
+            $char = $sql[$i];
+            $nextChar = $sql[$i + 1] ?? null;
+
+            // Single quotes can be escaped as '' according to the SQL standard while
+            // MySQL uses \'. Postgres has operators like ?| that must get encoded
+            // in PHP like ??|. We should skip over the escaped characters here.
+            if (in_array($char.$nextChar, ["\'", "''", '??'])) {
+                $query .= $char.$nextChar;
+                $i += 1;
+            } elseif ($char === "'") { // Starting / leaving string literal...
+                $query .= $char;
+                $isStringLiteral = ! $isStringLiteral;
+            } elseif ($char === '?' && ! $isStringLiteral) { // Substitutable binding...
+                $query .= array_shift($bindings) ?? '?';
+            } else { // Normal character...
+                $query .= $char;
+            }
+        }
+
+        return $query;
+    }
+
+    /**
      * Get the grammar specific operators.
      *
      * @return array
@@ -1375,40 +1413,5 @@ class Grammar extends BaseGrammar
     public function getBitwiseOperators()
     {
         return $this->bitwiseOperators;
-    }
-
-    /**
-     * Make raw SQL query.
-     *
-     * @param  string  $sql
-     * @param  array  $bindings
-     * @return string
-     */
-    public function makeRawSql($sql, $bindings)
-    {
-        $bindings = array_map(fn ($value) => $this->escape($value), $bindings);
-        $query = '';
-
-        $isStringLiteral = false;
-        for ($i = 0; $i < strlen($sql); $i++) {
-            $char = $sql[$i];
-            $nextChar = $sql[$i + 1] ?? null;
-
-            // Single quotes can be escaped as '' according to the SQL standard while MySQL uses \'.
-            // PostgreSQL has operators like ?| that have to be encoded in PHP like ??|.
-            if (in_array($char.$nextChar, ["\'", "''", '??'])) {
-                $query .= $char.$nextChar;
-                $i += 1;
-            } elseif ($char === "'") {
-                $query .= $char;
-                $isStringLiteral = ! $isStringLiteral;
-            } elseif ($char === '?' && ! $isStringLiteral) {
-                $query .= array_shift($bindings) ?? '?';
-            } else {
-                $query .= $char;
-            }
-        }
-
-        return $query;
     }
 }

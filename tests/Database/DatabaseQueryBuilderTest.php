@@ -5670,7 +5670,7 @@ SQL;
             ->with(['foo'])
             ->andReturn(['foo']);
         $grammar = m::mock(Grammar::class)->makePartial();
-        $grammar->shouldReceive('makeRawSql')
+        $grammar->shouldReceive('substituteBindingsIntoRawSql')
             ->with('select * from "users" where "email" = ?', ['foo'])
             ->andReturn('select * from "users" where "email" = \'foo\'');
         $builder = new Builder($connection, $grammar, m::mock(Processor::class));

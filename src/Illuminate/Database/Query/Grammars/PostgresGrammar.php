@@ -700,15 +700,16 @@ class PostgresGrammar extends Grammar
     }
 
     /**
-     * Make raw SQL query.
+     * Substitute the given bindings into the given raw SQL query.
      *
      * @param  string  $sql
      * @param  array  $bindings
      * @return string
      */
-    public function makeRawSql($sql, $bindings)
+    public function substituteBindingsIntoRawSql($sql, $bindings)
     {
-        $query = parent::makeRawSql($sql, $bindings);
+        $query = parent::substituteBindingsIntoRawSql($sql, $bindings);
+
         foreach ($this->operators as $operator) {
             if (! str_contains($operator, '?')) {
                 continue;
