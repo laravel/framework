@@ -529,7 +529,6 @@ class TestResponse implements ArrayAccess
         $values = $escape ? array_map('e', $value) : $value;
 
         foreach ($values as $value) {
-
             if (! $allowEmptyValues && (string) $value === '') {
                 PHPUnit::fail('An empty string was passed to `assertSee`.');
             }
