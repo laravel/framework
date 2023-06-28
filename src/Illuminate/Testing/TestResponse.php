@@ -522,7 +522,7 @@ class TestResponse implements ArrayAccess
     {
         $value = Arr::wrap($value);
 
-        if (!$allowEmptyValues && empty($value)) {
+        if (! $allowEmptyValues && empty($value)) {
             PHPUnit::fail('An empty value was passed to `assertSee`.');
         }
 
@@ -530,7 +530,7 @@ class TestResponse implements ArrayAccess
 
         foreach ($values as $value) {
 
-            if (!$allowEmptyValues && (string) $value === '') {
+            if (! $allowEmptyValues && (string) $value === '') {
                 PHPUnit::fail('An empty string was passed to `assertSee`.');
             }
 
