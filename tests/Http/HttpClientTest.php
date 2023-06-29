@@ -1767,7 +1767,6 @@ class HttpClientTest extends TestCase
             return $this->factory->response('Fake');
         });
 
-
         $pendingRequest = $this->factory->withMiddleware(
             Middleware::mapRequest(fn (RequestInterface $request) => $request->withHeader('X-Test-Header', 'Test'))
         );
@@ -1779,7 +1778,6 @@ class HttpClientTest extends TestCase
                 $request->url() === 'https://laravel.example' &&
                 $request->hasHeader('X-Test-Header', 'Test');
         });
-
     }
 
     public function testRequestExceptionIsNotThrownIfThePendingRequestIsSetToThrowOnFailureButTheResponseIsSuccessful()
