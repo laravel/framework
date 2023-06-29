@@ -5,6 +5,7 @@ namespace Illuminate\Validation;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Validation\Rules\Can;
+use Illuminate\Validation\Rules\CanNot;
 use Illuminate\Validation\Rules\Dimensions;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Rules\ExcludeIf;
@@ -31,6 +32,18 @@ class Rule
     public static function can($ability, ...$arguments)
     {
         return new Can($ability, $arguments);
+    }
+
+    /**
+     * Get a cannot constraint builder instance.
+     *
+     * @param  string  $ability
+     * @param  mixed  ...$arguments
+     * @return \Illuminate\Validation\Rules\CanNot
+     */
+    public static function cannot($ability, ...$arguments)
+    {
+        return new CanNot($ability, $arguments);
     }
 
     /**
