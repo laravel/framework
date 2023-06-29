@@ -297,6 +297,35 @@ class Arr
         }
     }
 
+
+    /**
+     * Remove one or many array items from a given array recursively without specifying a path to the key
+     *
+     * @param  array  $array
+     * @param  array|string|int  $keys
+     * @return void
+     */
+    public static function forgetRecursive(&$array, $keys)
+    {
+        $keys = (array) $keys;
+
+        if (count($keys) === 0) {
+            return;
+        }
+
+        foreach ($array as $key => &$value) {
+            if (in_array($key, $keys)) {
+                unset($array[$key]);
+
+                continue;
+            }
+
+            if (static::accessible($value)) {
+                self::forgetRecursive($value, $keys);
+            }
+        }
+    }
+
     /**
      * Get an item from an array using "dot" notation.
      *

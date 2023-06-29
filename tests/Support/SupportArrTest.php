@@ -1083,6 +1083,55 @@ class SupportArrTest extends TestCase
         $this->assertEquals([2 => [1 => 'products']], $array);
     }
 
+    public function testForgetRecursive()
+    {
+        $array = ['user' => ['email' => 'joe@example.com', 'password' => 'foo']];
+        Arr::forgetRecursive($array, null);
+        $this->assertEquals(['user' => ['email' => 'joe@example.com', 'password' => 'foo']], $array);
+
+        $array = ['user' => ['email' => 'joe@example.com', 'password' => 'foo']];
+        Arr::forgetRecursive($array, 'password');
+        $this->assertEquals(['user' => ['email' => 'joe@example.com']], $array);
+
+        $array = ['user' => ['email' => 'joe@example.com', 'password' => 'foo'], 'password' => 'bar'];
+        Arr::forgetRecursive($array, 'password');
+        $this->assertEquals(['user' => ['email' => 'joe@example.com']], $array);
+
+        $array = ['payment' => ['amount' => 500, 'account' => ['cvc' => 123, 'credit_card' => '4111 1111 1111 1111']]];
+        Arr::forgetRecursive($array, ['cvc', 'credit_card']);
+        $this->assertEquals(['payment' => ['amount' => 500, 'account' => []]], $array);
+
+        $array = ['name' => 'hAz', '1' => 'test', 2 => 'bAz', ['1' => ['bar', 'bazz']]];
+        Arr::forgetRecursive($array, 1);
+        $this->assertEquals(['name' => 'hAz', 2 => 'bAz', 3 => []], $array);
+
+        $array = [
+            'name' => 'John',
+            'password' => 'pass',
+            'second_level' => [
+                'name' => 'Jane',
+                'password' => 'pass',
+                'third_level' => [
+                    'name' => 'Dave',
+                    'password' => 'pass'
+                ]
+            ]
+        ];
+
+        $expected = [
+            'name' => 'John',
+            'second_level' => [
+                'name' => 'Jane',
+                'third_level' => [
+                    'name' => 'Dave'
+                ]
+            ]
+        ];
+
+        Arr::forgetRecursive($array, 'password');
+        $this->assertEquals($expected, $array);
+    }
+
     public function testWrap()
     {
         $string = 'a';
