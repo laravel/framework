@@ -60,8 +60,8 @@ class SendQueuedMailable
         $this->timeout = property_exists($mailable, 'timeout') ? $mailable->timeout : null;
         $this->maxExceptions = property_exists($mailable, 'maxExceptions') ? $mailable->maxExceptions : null;
         $this->afterCommit = property_exists($mailable, 'afterCommit') ? $mailable->afterCommit : null;
-        $this->queue = property_exists($mailable, 'connection') ? $mailable->connection : null;
-        $this->connection = property_exists($mailable, 'queue') ? $mailable->queue : null;
+        $this->queue = property_exists($mailable, 'queue') ? $mailable->queue : null;
+        $this->connection = property_exists($mailable, 'connection') ? $mailable->connection : null;
         $this->shouldBeEncrypted = $mailable instanceof ShouldBeEncrypted;
     }
 
