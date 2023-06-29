@@ -10,6 +10,7 @@ use Illuminate\Log\Events\MessageLogged;
 use Illuminate\Support\Traits\Conditionable;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
+use Throwable;
 
 class Logger implements LoggerInterface
 {
@@ -181,10 +182,16 @@ class Logger implements LoggerInterface
      */
     protected function writeLog($level, $message, $context): void
     {
-        $this->logger->{$level}(
-            $message = $this->formatMessage($message),
-            $context = array_merge($this->context, $context)
-        );
+        if ($message instanceof Throwable) {
+            $context['exception'] = $message;
+            $message = $message->getMessage();
+        } else {
+            $message = $this->formatMessage($message);
+        }
+
+        $context = array_merge($this->context, $context);
+
+        $this->logger->{$level}($message, $context);
 
         $this->fireLogEvent($level, $message, $context);
     }

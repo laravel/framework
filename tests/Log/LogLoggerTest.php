@@ -10,6 +10,7 @@ use Mockery as m;
 use Monolog\Logger as Monolog;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
+use Throwable;
 
 class LogLoggerTest extends TestCase
 {
@@ -91,5 +92,51 @@ class LogLoggerTest extends TestCase
         $events->shouldReceive('listen')->with(MessageLogged::class, $callback)->once();
 
         $writer->listen($callback);
+    }
+
+    public function testLogThrowableFormat()
+    {
+        $writer = new Logger($monolog = m::mock(Monolog::class));
+
+        $monolog->shouldReceive('error')
+            ->once()
+            ->withArgs(function (string $message, array $context) {
+                $errorMessage = 'Events dispatcher has not been set.';
+
+                return $message === $errorMessage && $context['exception'] instanceof RuntimeException;
+            });
+
+        try {
+            $writerTest = new Logger(m::mock(Monolog::class));
+            $writerTest->listen(function () {
+                //
+            });
+        } catch (Throwable $e) {
+            $writer->error($e);
+        }
+    }
+
+    public function testLogThrowableFormatWithContext()
+    {
+        $writer = new Logger($monolog = m::mock(Monolog::class));
+        $writer->withContext(['bar' => 'baz']);
+
+        $monolog->shouldReceive('error')
+            ->once()
+            ->withArgs(function (string $message, array $context) {
+                return $message === 'Events dispatcher has not been set.'
+                    && $context['exception'] instanceof RuntimeException
+                    && $context['customContext'] === 'test'
+                    && $context['bar'] === 'baz';
+            });
+
+        try {
+            $writerTest = new Logger(m::mock(Monolog::class));
+            $writerTest->listen(function () {
+                //
+            });
+        } catch (Throwable $error) {
+            $writer->error($error, ['customContext' => 'test']);
+        }
     }
 }
