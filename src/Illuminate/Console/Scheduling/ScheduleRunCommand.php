@@ -99,16 +99,16 @@ class ScheduleRunCommand extends Command
      *
      * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
      * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
-     * @param  \Illuminate\Contracts\Debug\ExceptionHandler  $handler
      * @param  \Illuminate\Contracts\Cache\Repository  $cache
+     * @param  \Illuminate\Contracts\Debug\ExceptionHandler  $handler
      * @return void
      */
-    public function handle(Schedule $schedule, Dispatcher $dispatcher, ExceptionHandler $handler, Cache $cache)
+    public function handle(Schedule $schedule, Dispatcher $dispatcher, Cache $cache, ExceptionHandler $handler)
     {
         $this->schedule = $schedule;
         $this->dispatcher = $dispatcher;
-        $this->handler = $handler;
         $this->cache = $cache;
+        $this->handler = $handler;
         $this->phpBinary = Application::phpBinary();
 
         $this->clearInterruptSignal();
@@ -133,8 +133,8 @@ class ScheduleRunCommand extends Command
             $this->eventsRan = true;
         }
 
-        if ($events->contains->shouldRepeat()) {
-            $this->repeatEvents($events->filter->shouldRepeat());
+        if ($events->contains->isRepeatable()) {
+            $this->repeatEvents($events->filter->isRepeatable());
         }
 
         if (! $this->eventsRan) {

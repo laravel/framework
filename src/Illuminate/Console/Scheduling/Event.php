@@ -166,6 +166,8 @@ class Event
     /**
      * The start time of the last event run.
      *
+     * Utilized by sub-minute repeated events.
+     *
      * @var \Illuminate\Support\Carbon|null
      */
     public $lastRun;
@@ -238,11 +240,11 @@ class Event
     }
 
     /**
-     * Determine if the event should repeat.
+     * Determine if the event has been configured to repeat multiple times per minute.
      *
      * @return bool
      */
-    public function shouldRepeat()
+    public function isRepeatable()
     {
         return ! is_null($this->repeatSeconds);
     }
@@ -254,7 +256,7 @@ class Event
      */
     public function shouldRepeatNow()
     {
-        return $this->shouldRepeat()
+        return $this->isRepeatable()
             && $this->lastRun
             && Date::now()->diffInSeconds($this->lastRun) >= $this->repeatSeconds;
     }

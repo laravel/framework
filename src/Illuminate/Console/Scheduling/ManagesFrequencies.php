@@ -146,7 +146,7 @@ trait ManagesFrequencies
      * @param  int  $seconds
      * @return $this
      */
-    public function repeatEvery($seconds)
+    protected function repeatEvery($seconds)
     {
         if (60 % $seconds !== 0) {
             throw new InvalidArgumentException("The seconds [$seconds] are not evenly divisible by 60.");
