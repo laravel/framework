@@ -4,6 +4,7 @@ namespace Illuminate\Console;
 
 use Carbon\CarbonInterval;
 use Illuminate\Contracts\Cache\Factory as Cache;
+use Illuminate\Contracts\Cache\LockProvider;
 
 class CacheCommandMutex implements CommandMutex
 {
@@ -39,26 +40,41 @@ class CacheCommandMutex implements CommandMutex
      */
     public function create($command)
     {
-        return $this->cache->store($this->store)->add(
-            $this->commandMutexName($command),
-            true,
-            method_exists($command, 'isolationLockExpiresAt')
-                    ? $command->isolationLockExpiresAt()
-                    : CarbonInterval::hour(),
-        );
+        $store = $this->cache->store($this->store);
+
+        $expiresAt = method_exists($command, 'isolationLockExpiresAt')
+            ? $command->isolationLockExpiresAt()
+            : CarbonInterval::hour();
+
+        if ($store instanceof LockProvider) {
+            return $store->lock($this->commandMutexName($command), $expiresAt)->get();
+        }
+
+        return $store->add($this->commandMutexName($command), true, $expiresAt);
     }
 
     /**
      * Determine if a command mutex exists for the given command.
+     * warning: Relying on this method can cause race conditions.
+     *
+     * @deprecated Will be removed in a future version.
      *
      * @param  \Illuminate\Console\Command  $command
      * @return bool
      */
     public function exists($command)
     {
-        return $this->cache->store($this->store)->has(
-            $this->commandMutexName($command)
-        );
+        $store = $this->cache->store($this->store);
+
+        if ($store instanceof LockProvider) {
+            $lock = $store->lock($this->commandMutexName($command));
+            $acquired = $lock->get();
+            $lock->release();
+
+            return ! $acquired;
+        }
+
+        return $this->cache->store($this->store)->has($this->commandMutexName($command));
     }
 
     /**
@@ -69,9 +85,13 @@ class CacheCommandMutex implements CommandMutex
      */
     public function forget($command)
     {
-        return $this->cache->store($this->store)->forget(
-            $this->commandMutexName($command)
-        );
+        $store = $this->cache->store($this->store);
+
+        if ($store instanceof LockProvider) {
+            return $store->lock($this->commandMutexName($command))->release();
+        }
+
+        return $this->cache->store($this->store)->forget($this->commandMutexName($command));
     }
 
     /**

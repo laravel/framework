@@ -14,6 +14,9 @@ interface CommandMutex
 
     /**
      * Determine if a command mutex exists for the given command.
+     * warning: Relying on this method can cause race conditions.
+     *
+     * @deprecated Will be removed in a future version.
      *
      * @param  \Illuminate\Console\Command  $command
      * @return bool
