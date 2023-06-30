@@ -229,27 +229,29 @@ class ScheduleRunCommand extends Command
                     return;
                 }
 
-                if ($event->shouldRepeatNow()) {
-                    $hasEnteredMaintenanceMode = $hasEnteredMaintenanceMode || $this->laravel->isDownForMaintenance();
-
-                    if ($hasEnteredMaintenanceMode && ! $event->runsInMaintenanceMode()) {
-                        continue;
-                    }
-
-                    if (! $event->filtersPass($this->laravel)) {
-                        $this->dispatcher->dispatch(new ScheduledTaskSkipped($event));
-
-                        continue;
-                    }
-
-                    if ($event->onOneServer) {
-                        $this->runSingleServerEvent($event);
-                    } else {
-                        $this->runEvent($event);
-                    }
-
-                    $this->eventsRan = true;
+                if (! $event->shouldRepeatNow()) {
+                    continue;
                 }
+
+                $hasEnteredMaintenanceMode = $hasEnteredMaintenanceMode || $this->laravel->isDownForMaintenance();
+
+                if ($hasEnteredMaintenanceMode && ! $event->runsInMaintenanceMode()) {
+                    continue;
+                }
+
+                if (! $event->filtersPass($this->laravel)) {
+                    $this->dispatcher->dispatch(new ScheduledTaskSkipped($event));
+
+                    continue;
+                }
+
+                if ($event->onOneServer) {
+                    $this->runSingleServerEvent($event);
+                } else {
+                    $this->runEvent($event);
+                }
+
+                $this->eventsRan = true;
             }
 
             Sleep::usleep(100000);
