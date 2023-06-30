@@ -18,7 +18,7 @@ use Illuminate\Support\Testing\Fakes\MailFake;
  * @method static void alwaysFrom(string $address, string|null $name = null)
  * @method static void alwaysReplyTo(string $address, string|null $name = null)
  * @method static void alwaysReturnPath(string $address)
- * @method static void alwaysTo(string $address, string|null $name = null)
+ * @method static void alwaysTo(string|array $address, string|array|null $name = null)
  * @method static \Illuminate\Mail\PendingMail to(mixed $users, string|null $name = null)
  * @method static \Illuminate\Mail\PendingMail cc(mixed $users, string|null $name = null)
  * @method static \Illuminate\Mail\PendingMail bcc(mixed $users, string|null $name = null)
