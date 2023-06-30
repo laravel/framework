@@ -454,10 +454,10 @@ class SupportHelpersTest extends TestCase
             'article' => [
                 'title' => 'Foo',
                 'comments' => [
-                    ['comment' => 'foo','name' => 'First'],
-                    ['comment' => 'bar','name' => 'Second'],
-                ]
-            ]
+                    ['comment' => 'foo', 'name' => 'First'],
+                    ['comment' => 'bar', 'name' => 'Second'],
+                ],
+            ],
         ];
 
         $this->assertEquals(
@@ -467,8 +467,8 @@ class SupportHelpersTest extends TestCase
                     'comments' => [
                         ['comment' => 'foo'],
                         ['comment' => 'bar'],
-                    ]
-                ]
+                    ],
+                ],
             ],
             data_remove($data, 'article.comments.*.name')
         );

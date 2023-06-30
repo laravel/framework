@@ -167,7 +167,7 @@ if (! function_exists('data_remove')) {
                     data_remove($inner, $segments);
                 }
             }
-        } elseif (Arr::accessible($target)) {            
+        } elseif (Arr::accessible($target)) {
             if ($segments && Arr::exists($target, $segment)) {
                 data_remove($target[$segment], $segments);
             } else {
