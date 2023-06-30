@@ -104,7 +104,7 @@ class CallQueuedListener implements ShouldQueue
             $this->job, $container->make($this->class)
         );
 
-        $handler->{$this->method}(...array_values($this->data));
+        $container->call([$handler, $this->method], array_combine(array_map('get_class', $this->data), $this->data));
     }
 
     /**
