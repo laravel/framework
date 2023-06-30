@@ -149,9 +149,7 @@ class Mailer implements MailerContract, MailQueueContract
      */
     public function alwaysTo($address, $name = null)
     {
-        if (is_string($address)) {
-            $address = [$address];
-        }
+        $address = Arr::wrap($address);
 
         if (is_string($name)) {
             $name = [$name];
