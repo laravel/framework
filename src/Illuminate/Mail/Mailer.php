@@ -144,13 +144,17 @@ class Mailer implements MailerContract, MailQueueContract
      * Set the global to address and name.
      *
      * @param  string|array  $address
-     * @param  string|null  $name
+     * @param  string|array|null  $name
      * @return void
      */
     public function alwaysTo($address, $name = null)
     {
         if (is_string($address)) {
             $address = [$address];
+        }
+
+        if (is_string($name)) {
+            $name = [$name];
         }
 
         $this->to = compact('address', 'name');
