@@ -242,7 +242,7 @@ class MailMailerTest extends TestCase
         $view->shouldReceive('make')->once()->andReturn($view);
         $view->shouldReceive('render')->once()->andReturn('rendered.view');
         $mailer = new Mailer('array', $view, new ArrayTransport);
-        $mailer->alwaysTo('taylor@laravel.com', 'Taylor Otwell');
+        $mailer->alwaysTo(['taylor@laravel.com', 'jess@laravel.com'], ['Taylor Otwell', 'Jess Archer']);
 
         $sentMessage = $mailer->send('foo', ['data'], function (Message $message) {
             $message->from('hello@laravel.com');
@@ -256,6 +256,7 @@ class MailMailerTest extends TestCase
         });
 
         $this->assertSame('taylor@laravel.com', $sentMessage->getEnvelope()->getRecipients()[0]->getAddress());
+        $this->assertSame('jess@laravel.com', $sentMessage->getEnvelope()->getRecipients()[1]->getAddress());
         $this->assertDoesNotMatchRegularExpression('/^To: nuno@laravel.com/m', $sentMessage->toString());
         $this->assertDoesNotMatchRegularExpression('/^Cc: dries@laravel.com/m', $sentMessage->toString());
         $this->assertMatchesRegularExpression('/^X-To: nuno@laravel.com/m', $sentMessage->toString());
