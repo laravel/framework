@@ -151,9 +151,7 @@ class Mailer implements MailerContract, MailQueueContract
     {
         $address = Arr::wrap($address);
 
-        if (is_string($name)) {
-            $name = [$name];
-        }
+        $name = Arr::wrap($name);
 
         $this->to = compact('address', 'name');
     }
