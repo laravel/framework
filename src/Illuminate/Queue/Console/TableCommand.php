@@ -5,7 +5,7 @@ namespace Illuminate\Queue\Console;
 use Illuminate\Console\MigrationGeneratorCommand;
 use Symfony\Component\Console\Attribute\AsCommand;
 
-#[AsCommand(name: 'queue:table')]
+#[AsCommand(name: 'make:queue-table')]
 class TableCommand extends MigrationGeneratorCommand
 {
     /**
@@ -13,7 +13,14 @@ class TableCommand extends MigrationGeneratorCommand
      *
      * @var string
      */
-    protected $name = 'queue:table';
+    protected $name = 'make:queue-table';
+
+    /**
+     * The console command name aliases.
+     *
+     * @var array
+     */
+    protected $aliases = ['queue:table'];
 
     /**
      * The console command description.
