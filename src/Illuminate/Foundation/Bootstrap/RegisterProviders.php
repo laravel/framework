@@ -40,7 +40,6 @@ class RegisterProviders
      * Merge the additional configured providers into the configuration.
      *
      * @param  \Illuminate\Foundation\Application  $app
-     *
      */
     protected function mergeAdditionalProviders(Application $app)
     {
