@@ -423,7 +423,7 @@ if (! function_exists('event')) {
     /**
      * Dispatch an event and call the listeners.
      *
-     * @param  mixed ...$args
+     * @param  mixed  ...$args
      * @return array|null
      */
     function event(...$args)
