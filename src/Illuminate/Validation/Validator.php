@@ -444,7 +444,6 @@ class Validator implements ValidatorContract
             $this->removeAttribute($attribute);
         }
 
-
         // Here we will spin through all of the "after" hooks on this validator and
         // fire them off. This gives the callbacks a chance to perform all kinds
         // of other validation that needs to get wrapped up in this operation.
