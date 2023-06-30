@@ -13,6 +13,7 @@ use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Sleep;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Throwable;
 
@@ -215,23 +216,43 @@ class ScheduleRunCommand extends Command
     /**
      * Run the given repeating events.
      *
-     * @param  \Illuminate\Console\Scheduling\Event[]  $events
+     * @param  \Illuminate\Support\Collection<\Illuminate\Console\Scheduling\Event>  $events
      * @return void
      */
     protected function repeatEvents($events)
     {
-        while (Date::now()->lte($this->startedAt->endOfMinute())) {
-            if ($this->shouldInterrupt()) {
-                return;
-            }
+        $hasEnteredMaintenanceMode = false;
 
+        while (Date::now()->lte($this->startedAt->endOfMinute())) {
             foreach ($events as $event) {
+                if ($this->shouldInterrupt()) {
+                    return;
+                }
+
                 if ($event->shouldRepeatNow()) {
-                    $this->runEvent($event);
+                    $hasEnteredMaintenanceMode = $hasEnteredMaintenanceMode || $this->laravel->isDownForMaintenance();
+
+                    if ($hasEnteredMaintenanceMode && ! $event->runsInMaintenanceMode()) {
+                        continue;
+                    }
+
+                    if (! $event->filtersPass($this->laravel)) {
+                        $this->dispatcher->dispatch(new ScheduledTaskSkipped($event));
+
+                        continue;
+                    }
+
+                    if ($event->onOneServer) {
+                        $this->runSingleServerEvent($event);
+                    } else {
+                        $this->runEvent($event);
+                    }
+
+                    $this->eventsRan = true;
                 }
             }
 
-            usleep(100000);
+            Sleep::usleep(100000);
         }
     }
 
