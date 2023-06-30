@@ -90,9 +90,9 @@ class SubMinuteSchedulingTest extends TestCase
 
     public function test_sub_minute_scheduling_can_be_interrupted()
     {
-        $everySecondRuns = 0;
-        $this->schedule->call(function () use (&$everySecondRuns) {
-            $everySecondRuns++;
+        $runs = 0;
+        $this->schedule->call(function () use (&$runs) {
+            $runs++;
         })->everySecond();
 
         Carbon::setTestNow(now()->startOfMinute());
@@ -111,15 +111,15 @@ class SubMinuteSchedulingTest extends TestCase
             ->expectsOutputToContain('Running [Callback]');
 
         Sleep::assertSleptTimes(300);
-        $this->assertEquals(30, $everySecondRuns);
+        $this->assertEquals(30, $runs);
         $this->assertEquals(30, $startedAt->diffInSeconds(now()));
     }
 
     public function test_sub_minute_events_stop_for_the_rest_of_the_minute_once_maintenance_mode_is_enabled()
     {
-        $everySecondRuns = 0;
-        $this->schedule->call(function () use (&$everySecondRuns) {
-            $everySecondRuns++;
+        $runs = 0;
+        $this->schedule->call(function () use (&$runs) {
+            $runs++;
         })->everySecond();
 
         Config::set('app.maintenance.driver', 'cache');
@@ -143,14 +143,14 @@ class SubMinuteSchedulingTest extends TestCase
             ->expectsOutputToContain('Running [Callback]');
 
         Sleep::assertSleptTimes(600);
-        $this->assertEquals(30, $everySecondRuns);
+        $this->assertEquals(30, $runs);
     }
 
     public function test_sub_minute_events_can_be_run_in_maintenance_mode()
     {
-        $everySecondRuns = 0;
-        $this->schedule->call(function () use (&$everySecondRuns) {
-            $everySecondRuns++;
+        $runs = 0;
+        $this->schedule->call(function () use (&$runs) {
+            $runs++;
         })->everySecond()->evenInMaintenanceMode();
 
         Config::set('app.maintenance.driver', 'cache');
@@ -170,14 +170,14 @@ class SubMinuteSchedulingTest extends TestCase
             ->expectsOutputToContain('Running [Callback]');
 
         Sleep::assertSleptTimes(600);
-        $this->assertEquals(60, $everySecondRuns);
+        $this->assertEquals(60, $runs);
     }
 
     public function test_sub_minute_scheduling_respects_filters()
     {
-        $everySecondRuns = 0;
-        $this->schedule->call(function () use (&$everySecondRuns) {
-            $everySecondRuns++;
+        $runs = 0;
+        $this->schedule->call(function () use (&$runs) {
+            $runs++;
         })->everySecond()->when(fn () => now()->second % 2 === 0);
 
         Carbon::setTestNow(now()->startOfMinute());
@@ -188,14 +188,14 @@ class SubMinuteSchedulingTest extends TestCase
             ->expectsOutputToContain('Running [Callback]');
 
         Sleep::assertSleptTimes(600);
-        $this->assertEquals(30, $everySecondRuns);
+        $this->assertEquals(30, $runs);
     }
 
     public function test_sub_minute_scheduling_can_run_on_one_server()
     {
-        $everySecondRuns = 0;
-        $this->schedule->call(function () use (&$everySecondRuns) {
-            $everySecondRuns++;
+        $runs = 0;
+        $this->schedule->call(function () use (&$runs) {
+            $runs++;
         })->everySecond()->name('test')->onOneServer();
 
         $startedAt = now()->startOfMinute();
@@ -208,7 +208,7 @@ class SubMinuteSchedulingTest extends TestCase
             ->expectsOutputToContain('Running [test]');
 
         Sleep::assertSleptTimes(600);
-        $this->assertEquals(60, $everySecondRuns);
+        $this->assertEquals(60, $runs);
 
         // Fake a second server running at the same minute.
         Carbon::setTestNow($startedAt);
@@ -218,7 +218,7 @@ class SubMinuteSchedulingTest extends TestCase
             ->expectsOutputToContain('Skipping [test]');
 
         Sleep::assertSleptTimes(1200);
-        $this->assertEquals(60, $everySecondRuns);
+        $this->assertEquals(60, $runs);
     }
 
     public static function frequencyProvider()
