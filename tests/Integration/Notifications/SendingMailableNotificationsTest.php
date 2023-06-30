@@ -4,15 +4,12 @@ namespace Illuminate\Tests\Integration\Notifications;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Mail\Transport\ArrayTransport;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Notifications\Notification;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\View;
 use Orchestra\Testbench\TestCase;
-use Symfony\Component\Mailer\SentMessage;
 
 class SendingMailableNotificationsTest extends TestCase
 {
@@ -23,6 +20,8 @@ class SendingMailableNotificationsTest extends TestCase
         $app['config']->set('mail.driver', 'array');
 
         $app['config']->set('app.locale', 'en');
+
+        $app['config']->set('mail.markdown.theme', 'blank');
 
         View::addLocation(__DIR__.'/Fixtures');
     }
@@ -58,6 +57,32 @@ class SendingMailableNotificationsTest extends TestCase
         Content-Disposition: inline; name=$cid; filename=$cid\r
         EOT, $email);
     }
+
+    public function testCanSetTheme()
+    {
+        $user = MailableNotificationUser::forceCreate([
+            'email' => 'nuno@laravel.com',
+        ]);
+
+        $user->notify(new MarkdownNotification('color-test'));
+        $mailTransport = app('mailer')->getSymfonyTransport();
+        $email = $mailTransport->messages()[0]->getOriginalMessage()->toString();
+
+        $bodyStyleLine =str($email)->explode("\r\n")
+            ->filter(fn ($line) => str_contains($line, '<body style='))
+            ->first();
+
+        $this->assertStringContainsString('color: test', $bodyStyleLine);
+
+        // confirm passing no theme resets to the app's default theme
+        $user->notify(new MarkdownNotification());
+
+        $email = $mailTransport->messages()[1]->getOriginalMessage()->toString();
+
+        $this->assertNull(str($email)->explode("\r\n")
+            ->filter(fn ($line) => str_contains($line, '<body style='))
+            ->first());
+    }
 }
 
 
@@ -72,6 +97,9 @@ class MailableNotificationUser extends Model
 
 class MarkdownNotification extends Notification
 {
+    public function __construct(
+        private readonly ?string $theme = null
+    ){}
     public function via($notifiable): array
     {
         return ['mail'];
@@ -79,6 +107,12 @@ class MarkdownNotification extends Notification
 
     public function toMail($notifiable): MailMessage
     {
-        return (new MailMessage)->markdown('markdown');
+        $message = (new MailMessage)->markdown('markdown');
+
+        if (! is_null($this->theme)) {
+            $message->theme($this->theme);
+        }
+
+        return $message;
     }
 }
