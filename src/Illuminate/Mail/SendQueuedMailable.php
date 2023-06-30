@@ -56,11 +56,14 @@ class SendQueuedMailable
     public function __construct(MailableContract $mailable)
     {
         $this->mailable = $mailable;
-        $this->tries = property_exists($mailable, 'tries') ? $mailable->tries : null;
-        $this->timeout = property_exists($mailable, 'timeout') ? $mailable->timeout : null;
-        $this->maxExceptions = property_exists($mailable, 'maxExceptions') ? $mailable->maxExceptions : null;
+
         $this->afterCommit = property_exists($mailable, 'afterCommit') ? $mailable->afterCommit : null;
+        $this->connection = property_exists($mailable, 'connection') ? $mailable->connection : null;
+        $this->maxExceptions = property_exists($mailable, 'maxExceptions') ? $mailable->maxExceptions : null;
+        $this->queue = property_exists($mailable, 'queue') ? $mailable->queue : null;
         $this->shouldBeEncrypted = $mailable instanceof ShouldBeEncrypted;
+        $this->timeout = property_exists($mailable, 'timeout') ? $mailable->timeout : null;
+        $this->tries = property_exists($mailable, 'tries') ? $mailable->tries : null;
     }
 
     /**
