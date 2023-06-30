@@ -7,7 +7,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Composer;
 use Symfony\Component\Console\Attribute\AsCommand;
 
-#[AsCommand(name: 'cache:table')]
+#[AsCommand(name: 'make:cache-table')]
 class CacheTableCommand extends Command
 {
     /**
@@ -15,7 +15,14 @@ class CacheTableCommand extends Command
      *
      * @var string
      */
-    protected $name = 'cache:table';
+    protected $name = 'make:cache-table';
+
+    /**
+     * The console command name aliases.
+     *
+     * @var array
+     */
+    protected $aliases = ['cache:table'];
 
     /**
      * The console command description.

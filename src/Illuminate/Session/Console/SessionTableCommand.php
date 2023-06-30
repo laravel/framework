@@ -7,7 +7,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Composer;
 use Symfony\Component\Console\Attribute\AsCommand;
 
-#[AsCommand(name: 'session:table')]
+#[AsCommand(name: 'make:session-table')]
 class SessionTableCommand extends Command
 {
     /**
@@ -15,7 +15,14 @@ class SessionTableCommand extends Command
      *
      * @var string
      */
-    protected $name = 'session:table';
+    protected $name = 'make:session-table';
+
+    /**
+     * The console command name aliases.
+     *
+     * @var array
+     */
+    protected $aliases = ['session:table'];
 
     /**
      * The console command description.
