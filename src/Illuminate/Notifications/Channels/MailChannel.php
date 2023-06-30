@@ -2,6 +2,7 @@
 
 namespace Illuminate\Notifications\Channels;
 
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Mail\Factory as MailFactory;
 use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -95,13 +96,19 @@ class MailChannel
             return $message->view;
         }
 
-        if (property_exists($message, 'theme') && ! is_null($message->theme)) {
-            $this->markdown->theme($message->theme);
+        /**
+         * We clone the Markdown instance so that setting a theme doesn't
+         * carry over to subsequent calls to build the view.
+         */
+        $markdown = clone $this->markdown;
+
+        if (! is_null($theme = $message->theme ?? null)) {
+            $markdown->theme($theme);
         }
 
         return [
-            'html' => fn ($messageData = []) => $this->markdown->render($message->markdown, $messageData),
-            'text' => fn ($messageData = []) => $this->markdown->renderText($message->markdown, $messageData),
+            'html' => fn ($messageData = []) => $markdown->render($message->markdown, array_merge($message->data(), $messageData)),
+            'text' => fn ($messageData = []) => $markdown->renderText($message->markdown, array_merge($message->data(), $messageData)),
         ];
     }
 
