@@ -83,6 +83,6 @@ class ConfigPublishCommand extends Command
             $config[basename($file->getRealPath(), '.php')] = $file->getRealPath();
         }
 
-        return $config;
+        return collect($config)->sortKeys()->all();
     }
 }
