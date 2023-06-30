@@ -164,13 +164,13 @@ class Event
     public $mutexNameResolver;
 
     /**
-     * The start time of the last event run.
+     * The last time the event was checked for eligibility to run.
      *
      * Utilized by sub-minute repeated events.
      *
      * @var \Illuminate\Support\Carbon|null
      */
-    public $lastRun;
+    protected $lastChecked;
 
     /**
      * The exit status code of the command.
@@ -220,8 +220,6 @@ class Event
             return;
         }
 
-        $this->lastRun = Date::now();
-
         $exitCode = $this->start($container);
 
         if (! $this->runInBackground) {
@@ -257,8 +255,7 @@ class Event
     public function shouldRepeatNow()
     {
         return $this->isRepeatable()
-            && $this->lastRun
-            && Date::now()->diffInSeconds($this->lastRun) >= $this->repeatSeconds;
+            && $this->lastChecked?->diffInSeconds() >= $this->repeatSeconds;
     }
 
     /**
@@ -410,6 +407,8 @@ class Event
      */
     public function filtersPass($app)
     {
+        $this->lastChecked = Date::now();
+
         foreach ($this->filters as $callback) {
             if (! $app->call($callback)) {
                 return false;
