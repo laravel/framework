@@ -149,6 +149,42 @@ if (! function_exists('data_set')) {
     }
 }
 
+if (! function_exists('data_remove')) {
+    /**
+     * Remove an item from an array or object using "dot" notation.
+     *
+     * @param  mixed  $target
+     * @param  string|array|int|null  $key
+     * @return mixed
+     */
+    function data_remove(&$target, $key)
+    {
+        $segments = is_array($key) ? $key : explode('.', $key);
+
+        if (($segment = array_shift($segments)) === '*' && Arr::accessible($target)) {
+            if ($segments) {
+                foreach ($target as &$inner) {
+                    data_remove($inner, $segments);
+                }
+            }
+        } elseif (Arr::accessible($target)) {            
+            if ($segments && Arr::exists($target, $segment)) {
+                data_remove($target[$segment], $segments);
+            } else {
+                Arr::forget($target, $segment);
+            }
+        } elseif (is_object($target)) {
+            if ($segments && isset($target->{$segment})) {
+                data_remove($target->{$segment}, $segments);
+            } elseif (isset($target->{$segment})) {
+                unset($target->{$segment});
+            }
+        }
+
+        return $target;
+    }
+}
+
 if (! function_exists('head')) {
     /**
      * Get the first element of an array. Useful for method chaining.
