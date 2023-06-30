@@ -3,7 +3,6 @@
 namespace Illuminate\Queue;
 
 use Aws\DynamoDb\DynamoDbClient;
-use Illuminate\Cache\Repository as Cache;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Queue\Connectors\BeanstalkdConnector;
@@ -40,7 +39,6 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
         $this->registerWorker();
         $this->registerListener();
         $this->registerFailedJobServices();
-        $this->registerCache();
     }
 
     /**
@@ -325,18 +323,6 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
     }
 
     /**
-     * Register the cache.
-     *
-     * @return void
-     */
-    protected function registerCache()
-    {
-        $this->app->singleton('cache', function ($app) {
-            return $app->make(Cache::class);
-        });
-    }
-
-    /**
      * Get the services provided by the provider.
      *
      * @return array
@@ -349,7 +335,6 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
             'queue.failer',
             'queue.listener',
             'queue.worker',
-            'cache',
         ];
     }
 }
