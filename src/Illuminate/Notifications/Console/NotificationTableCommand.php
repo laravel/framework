@@ -7,7 +7,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Composer;
 use Symfony\Component\Console\Attribute\AsCommand;
 
-#[AsCommand(name: 'notifications:table')]
+#[AsCommand(name: 'make:notifications-table')]
 class NotificationTableCommand extends Command
 {
     /**
@@ -15,7 +15,14 @@ class NotificationTableCommand extends Command
      *
      * @var string
      */
-    protected $name = 'notifications:table';
+    protected $name = 'make:notifications-table';
+
+    /**
+     * The console command name aliases.
+     *
+     * @var array
+     */
+    protected $aliases = ['notifications:table'];
 
     /**
      * The console command description.

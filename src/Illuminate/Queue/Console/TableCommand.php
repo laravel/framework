@@ -7,7 +7,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Composer;
 use Symfony\Component\Console\Attribute\AsCommand;
 
-#[AsCommand(name: 'queue:table')]
+#[AsCommand(name: 'make:queue-table')]
 class TableCommand extends Command
 {
     /**
@@ -15,7 +15,14 @@ class TableCommand extends Command
      *
      * @var string
      */
-    protected $name = 'queue:table';
+    protected $name = 'make:queue-table';
+
+    /**
+     * The console command name aliases.
+     *
+     * @var array
+     */
+    protected $aliases = ['queue:table'];
 
     /**
      * The console command description.
