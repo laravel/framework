@@ -524,7 +524,7 @@ class DatabaseConnectionTest extends TestCase
 
         $log = $mock->getRawQueryLog();
 
-        $this->assertEquals("select * from tbl where col = 'foo'", $log[0]['row_query']);
+        $this->assertEquals("select * from tbl where col = 'foo'", $log[0]['raw_query']);
         $this->assertEquals(1.23, $log[0]['time']);
     }
 
