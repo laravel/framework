@@ -6,6 +6,8 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\NotIn;
 use PHPUnit\Framework\TestCase;
 
+include 'Enums.php';
+
 class ValidationNotInRuleTest extends TestCase
 {
     public function testItCorrectlyFormatsAStringVersionOfTheRule()
@@ -25,5 +27,13 @@ class ValidationNotInRuleTest extends TestCase
         $rule = Rule::notIn('1', '2', '3', '4');
 
         $this->assertSame('not_in:"1","2","3","4"', (string) $rule);
+
+        $rule = Rule::notIn(StringStatus::pending);
+
+        $this->assertSame('not_in:"'.StringStatus::pending->value.'"', (string) $rule);
+
+        $rule = Rule::notIn([StringStatus::pending, StringStatus::done]);
+
+        $this->assertSame('not_in:"'.StringStatus::pending->value.'","'.StringStatus::done->value.'"', (string) $rule);
     }
 }

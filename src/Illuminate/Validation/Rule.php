@@ -84,7 +84,7 @@ class Rule
     /**
      * Get an in constraint builder instance.
      *
-     * @param  \Illuminate\Contracts\Support\Arrayable|array|string  $values
+     * @param  \Illuminate\Contracts\Support\Arrayable|array|string|\BackedEnum  $values
      * @return \Illuminate\Validation\Rules\In
      */
     public static function in($values)
@@ -99,7 +99,7 @@ class Rule
     /**
      * Get a not_in constraint builder instance.
      *
-     * @param  \Illuminate\Contracts\Support\Arrayable|array|string  $values
+     * @param  \Illuminate\Contracts\Support\Arrayable|array|string|\BackedEnum  $values
      * @return \Illuminate\Validation\Rules\NotIn
      */
     public static function notIn($values)

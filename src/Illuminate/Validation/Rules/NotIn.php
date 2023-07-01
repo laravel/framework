@@ -2,6 +2,8 @@
 
 namespace Illuminate\Validation\Rules;
 
+use BackedEnum;
+
 class NotIn
 {
     /**
@@ -37,6 +39,10 @@ class NotIn
     public function __toString()
     {
         $values = array_map(function ($value) {
+            if ($value instanceof BackedEnum) {
+                $value = $value->value;
+            }
+
             return '"'.str_replace('"', '""', $value).'"';
         }, $this->values);
 
