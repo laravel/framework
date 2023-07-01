@@ -18,7 +18,7 @@ class ApiInstallCommand extends Command
      */
     protected $signature = 'install:api
                     {--composer=global : Absolute path to the Composer binary which should be used to install packages}
-                    {--force : Overwrite any existing API route file}';
+                    {--force : Overwrite any existing API routes file}';
 
     /**
      * The console command description.
