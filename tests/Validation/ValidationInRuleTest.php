@@ -7,7 +7,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\In;
 use PHPUnit\Framework\TestCase;
 
-include 'Enums.php';
+include_once 'Enums.php';
 
 class ValidationInRuleTest extends TestCase
 {
