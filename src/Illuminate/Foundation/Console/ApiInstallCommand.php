@@ -6,8 +6,8 @@ use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Console\Attribute\AsCommand;
 
-#[AsCommand(name: 'make:api')]
-class ApiMakeCommand extends Command
+#[AsCommand(name: 'install:api')]
+class ApiInstallCommand extends Command
 {
     use InteractsWithComposerPackages;
 
@@ -16,7 +16,7 @@ class ApiMakeCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'make:api
+    protected $signature = 'install:api
                     {--composer=global : Absolute path to the Composer binary which should be used to install packages}
                     {--force : Overwrite any existing API route file}';
 
