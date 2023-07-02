@@ -2402,7 +2402,7 @@ class SupportCollectionTest extends TestCase
      */
     public function testGetOrFailReturnsItemInCollection($collection)
     {
-        $data = new $collection([
+        $data = new collection([
             ['name' => 'taylor'],
             ['email' => 'foo'],
         ]);
@@ -2418,7 +2418,7 @@ class SupportCollectionTest extends TestCase
     {
         $this->expectException(ItemNotFoundException::class);
         
-        $collection = new $collection([
+        $collection = new collection([
             ['name' => 'foo'],
             ['name' => 'bar'],
         ]);
