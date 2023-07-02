@@ -535,6 +535,17 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
+     * Get an item from the collection by key but throw an exception if no matching items exist.
+     *
+     * @param  TKey  $key
+     * @return TValue
+     */
+    public function getOrFail($key)
+    {
+        return $this->passthru('getOrFail', func_get_args());
+    }
+
+    /**
      * Group an associative array by a field or using a callback.
      *
      * @param  (callable(TValue, TKey): array-key)|array|string  $groupBy

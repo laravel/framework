@@ -455,6 +455,25 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Get an item from the collection by key but throw an exception if no matching items exist.
+     *
+     * @param  TKey  $key
+     * @return TValue
+     *
+     * @throws \Illuminate\Support\ItemNotFoundException
+     */
+    public function getOrFail($key)
+    {
+        if (array_key_exists($key, $this->items)) {
+            return $this->items[$key];
+        }
+
+        if ($this->items[$key] === null) {
+            throw new ItemNotFoundException;
+        }
+    }
+
+    /**
      * Get an item from the collection by key or add it to collection if it does not exist.
      *
      * @template TGetOrPutValue

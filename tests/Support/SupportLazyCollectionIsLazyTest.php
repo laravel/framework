@@ -449,6 +449,21 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
     }
 
+    public function testGetOrFailIsLazy()
+    {
+        $this->assertEnumerates(5, function ($collection) {
+            $collection->getOrFail(4);
+        });
+    
+        $this->assertEnumerates(100, function ($collection) {
+            try {
+                $collection->getOrFail(101);
+            } catch (ItemNotFoundException) {
+                //
+            }
+        });
+    }
+
     public function testGroupByIsLazy()
     {
         $this->assertDoesNotEnumerate(function ($collection) {

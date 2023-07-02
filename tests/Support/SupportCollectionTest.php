@@ -2397,6 +2397,35 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['taylor', 'dayle'], $data->all());
     }
 
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testGetOrFailReturnsItemInCollection($collection)
+    {
+        $data = new $collection([
+            ['name' => 'taylor'],
+            ['email' => 'foo'],
+        ]);
+
+        $this->assertSame('taylor', $data->getOrFail('name'));
+        $this->assertSame('foo', $data->getOrFail('email'));
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testGetOrFailThrowExceptionIfNoItemsExist($collection)
+    {
+        $this->expectException(ItemNotFoundException::class);
+        
+        $collection = new $collection([
+            ['name' => 'foo'],
+            ['name' => 'bar'],
+        ]);
+
+        $collection->where('name', 'INVALID')->getOrFail('name');
+    }
+
     public function testGetOrPut()
     {
         $data = new Collection(['name' => 'taylor', 'email' => 'foo']);
