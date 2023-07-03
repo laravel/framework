@@ -1,6 +1,11 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.14.1...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.52.10...10.x)
+
+## [v9.52.10](https://github.com/laravel/framework/compare/v10.14.1...v9.52.10) - 2023-06-27
+
+- Fix SES V2 Transport "reply to" addresses by [@jacobmllr95](https://github.com/jacobmllr95) in https://github.com/laravel/framework/pull/47522
+- Fixes unable to use `trans()->has()` on JSON language files by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/47582
 
 ## [v10.14.1](https://github.com/laravel/framework/compare/v10.14.0...v10.14.1) - 2023-06-28
 
