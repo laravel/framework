@@ -112,7 +112,7 @@ class MailChannel
     protected function buildMarkdownHtml($message)
     {
         return fn ($data) => $this->markdownRenderer($message)->render(
-            $message->markdown, array_merge($message->data(), $data)
+            $message->markdown, array_merge($data, $message->data()),
         );
     }
 
@@ -125,7 +125,7 @@ class MailChannel
     protected function buildMarkdownText($message)
     {
         return fn ($data) => $this->markdownRenderer($message)->renderText(
-            $message->markdown, array_merge($message->data(), $data)
+            $message->markdown, array_merge($data, $message->data()),
         );
     }
 
