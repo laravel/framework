@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Console;
 
-use Carbon\CarbonInterval;
 use Illuminate\Console\CacheCommandMutex;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Cache\Factory;
