@@ -68,7 +68,7 @@ class SendingMailableNotificationsTest extends TestCase
         $mailTransport = app('mailer')->getSymfonyTransport();
         $email = $mailTransport->messages()[0]->getOriginalMessage()->toString();
 
-        $bodyStyleLine =str($email)->explode("\r\n")
+        $bodyStyleLine = str($email)->explode("\r\n")
             ->filter(fn ($line) => str_contains($line, '<body style='))
             ->first();
 
@@ -85,7 +85,6 @@ class SendingMailableNotificationsTest extends TestCase
     }
 }
 
-
 class MailableNotificationUser extends Model
 {
     use Notifiable;
@@ -94,12 +93,13 @@ class MailableNotificationUser extends Model
     public $timestamps = false;
 }
 
-
 class MarkdownNotification extends Notification
 {
     public function __construct(
         private readonly ?string $theme = null
-    ){}
+    ) {
+    }
+
     public function via($notifiable): array
     {
         return ['mail'];

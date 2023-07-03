@@ -78,7 +78,7 @@ class SendingMailNotificationsTest extends TestCase
         $this->markdown->shouldReceive('render')->once()->andReturn('htmlContent');
         $this->markdown->shouldReceive('renderText')->once()->andReturn('textContent');
 
-        $this->setMailerSendAssertions($notification, $user, function($closure) {
+        $this->setMailerSendAssertions($notification, $user, function ($closure) {
             $message = m::mock(Message::class);
 
             $message->shouldReceive('to')->once()->with(['taylor@laravel.com']);
@@ -100,7 +100,6 @@ class SendingMailNotificationsTest extends TestCase
             return true;
         });
 
-
         $user->notify($notification);
     }
 
@@ -109,14 +108,14 @@ class SendingMailNotificationsTest extends TestCase
         NotifiableUser $user,
         callable $callbackExpectationClosure
     ) {
-        $this->mailer->shouldReceive('send')->once()->withArgs(function(...$args) use ($notification, $user, $callbackExpectationClosure){
+        $this->mailer->shouldReceive('send')->once()->withArgs(function (...$args) use ($notification, $user, $callbackExpectationClosure) {
             $viewArray = $args[0];
 
-            if (!m::on(fn($closure) => $closure() === 'htmlContent')->match($viewArray['html'])) {
+            if (! m::on(fn ($closure) => $closure() === 'htmlContent')->match($viewArray['html'])) {
                 return false;
             }
 
-            if (!m::on(fn($closure) => $closure() === 'textContent')->match($viewArray['text'])) {
+            if (! m::on(fn ($closure) => $closure() === 'textContent')->match($viewArray['text'])) {
                 return false;
             }
 
@@ -152,7 +151,7 @@ class SendingMailNotificationsTest extends TestCase
         $this->markdown->shouldReceive('render')->once()->andReturn('htmlContent');
         $this->markdown->shouldReceive('renderText')->once()->andReturn('textContent');
 
-        $this->setMailerSendAssertions($notification, $user, function($closure) {
+        $this->setMailerSendAssertions($notification, $user, function ($closure) {
             $message = m::mock(Message::class);
 
             $message->shouldReceive('to')->once()->with(['taylor@laravel.com' => 'Taylor Otwell', 'foo_taylor@laravel.com']);
@@ -189,7 +188,7 @@ class SendingMailNotificationsTest extends TestCase
         $this->markdown->shouldReceive('render')->once()->andReturn('htmlContent');
         $this->markdown->shouldReceive('renderText')->once()->andReturn('textContent');
 
-        $this->setMailerSendAssertions($notification, $user, function($closure) {
+        $this->setMailerSendAssertions($notification, $user, function ($closure) {
             $message = m::mock(Message::class);
 
             $message->shouldReceive('to')->once()->with(['taylor@laravel.com']);
@@ -216,7 +215,7 @@ class SendingMailNotificationsTest extends TestCase
         $this->markdown->shouldReceive('render')->once()->andReturn('htmlContent');
         $this->markdown->shouldReceive('renderText')->once()->andReturn('textContent');
 
-        $this->setMailerSendAssertions($notification, $user, function($closure) {
+        $this->setMailerSendAssertions($notification, $user, function ($closure) {
             $message = m::mock(Message::class);
 
             $message->shouldReceive('to')->once()->with(['foo_taylor@laravel.com', 'bar_taylor@laravel.com']);
@@ -227,7 +226,6 @@ class SendingMailNotificationsTest extends TestCase
 
             return true;
         });
-
 
         $user->notify($notification);
     }
@@ -338,8 +336,6 @@ class SendingMailNotificationsTest extends TestCase
 
         $user->notify($notification);
     }
-
-
 }
 
 class NotifiableUser extends Model
