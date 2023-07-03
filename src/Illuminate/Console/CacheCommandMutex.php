@@ -5,9 +5,12 @@ namespace Illuminate\Console;
 use Carbon\CarbonInterval;
 use Illuminate\Contracts\Cache\Factory as Cache;
 use Illuminate\Contracts\Cache\LockProvider;
+use Illuminate\Support\InteractsWithTime;
 
 class CacheCommandMutex implements CommandMutex
 {
+    use InteractsWithTime;
+
     /**
      * The cache factory implementation.
      *
@@ -42,12 +45,13 @@ class CacheCommandMutex implements CommandMutex
     {
         $store = $this->cache->store($this->store);
 
+        /** @var \DateTimeInterface|\DateInterval $expiresAt */
         $expiresAt = method_exists($command, 'isolationLockExpiresAt')
             ? $command->isolationLockExpiresAt()
             : CarbonInterval::hour();
 
-        if ($store instanceof LockProvider) {
-            return $store->lock($this->commandMutexName($command), $expiresAt)->get();
+        if ($store->getStore() instanceof LockProvider) {
+            return $store->getStore()->lock($this->commandMutexName($command), $this->secondsUntil($expiresAt))->get();
         }
 
         return $store->add($this->commandMutexName($command), true, $expiresAt);
@@ -66,8 +70,8 @@ class CacheCommandMutex implements CommandMutex
     {
         $store = $this->cache->store($this->store);
 
-        if ($store instanceof LockProvider) {
-            $lock = $store->lock($this->commandMutexName($command));
+        if ($store->getStore() instanceof LockProvider) {
+            $lock = $store->getStore()->lock($this->commandMutexName($command));
             $acquired = $lock->get();
             $lock->release();
 
@@ -87,8 +91,8 @@ class CacheCommandMutex implements CommandMutex
     {
         $store = $this->cache->store($this->store);
 
-        if ($store instanceof LockProvider) {
-            return $store->lock($this->commandMutexName($command))->release();
+        if ($store->getStore() instanceof LockProvider) {
+            return $store->getStore()->lock($this->commandMutexName($command))->forceRelease();
         }
 
         return $this->cache->store($this->store)->forget($this->commandMutexName($command));
