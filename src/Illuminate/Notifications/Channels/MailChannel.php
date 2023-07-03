@@ -2,6 +2,7 @@
 
 namespace Illuminate\Notifications\Channels;
 
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Mail\Factory as MailFactory;
 use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -11,6 +12,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
+use Illuminate\Config\Repository as ConfigRepository;
 
 class MailChannel
 {
@@ -95,13 +97,15 @@ class MailChannel
             return $message->view;
         }
 
-        if (property_exists($message, 'theme') && ! is_null($message->theme)) {
-            $this->markdown->theme($message->theme);
-        }
+        $configRepository = Container::getInstance()->get(ConfigRepository::class);
 
         return [
-            'html' => $this->markdown->render($message->markdown, $message->data()),
-            'text' => $this->markdown->renderText($message->markdown, $message->data()),
+            'html' => fn ($messageData = []) => $this->markdown->theme(
+                $message->theme ?: $configRepository->get('mail.markdown.theme', 'default')
+            )->render($message->markdown, array_merge($message->data(), $messageData)),
+            'text' => fn ($messageData = []) => $this->markdown->theme(
+                $message->theme ?: $configRepository->get('mail.markdown.theme', 'default')
+            )->renderText($message->markdown, array_merge($message->data(), $messageData)),
         ];
     }
 
