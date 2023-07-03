@@ -104,6 +104,44 @@ class SendingMailNotificationsTest extends TestCase
         $user->notify($notification);
     }
 
+    public function testMailIsSentWithCustomTheme()
+    {
+        $notification = new TestMailNotificationWithCustomTheme;
+        $notification->id = Str::uuid()->toString();
+
+        $user = NotifiableUser::forceCreate([
+            'email' => 'taylor@laravel.com',
+        ]);
+
+        $this->markdown->shouldReceive('theme')->twice()->with('my-custom-theme')->andReturn($this->markdown);
+        $this->markdown->shouldReceive('render')->once()->andReturn('htmlContent');
+        $this->markdown->shouldReceive('renderText')->once()->andReturn('textContent');
+
+        $this->setMailerSendAssertions($notification, $user, function ($closure) {
+            $message = m::mock(Message::class);
+
+            $message->shouldReceive('to')->once()->with(['taylor@laravel.com']);
+
+            $message->shouldReceive('cc')->once()->with('cc@deepblue.com', 'cc');
+
+            $message->shouldReceive('bcc')->once()->with('bcc@deepblue.com', 'bcc');
+
+            $message->shouldReceive('from')->once()->with('jack@deepblue.com', 'Jacques Mayol');
+
+            $message->shouldReceive('replyTo')->once()->with('jack@deepblue.com', 'Jacques Mayol');
+
+            $message->shouldReceive('subject')->once()->with('Test Mail Notification With Custom Theme');
+
+            $message->shouldReceive('priority')->once()->with(1);
+
+            $closure($message);
+
+            return true;
+        });
+
+        $user->notify($notification);
+    }
+
     private function setMailerSendAssertions(
         Notification $notification,
         NotifiableUser $user,
@@ -463,5 +501,26 @@ class TestMailNotificationWithPlainOnly extends Notification
     {
         return (new MailMessage)
             ->view([null, 'plain']);
+    }
+}
+
+class TestMailNotificationWithCustomTheme extends Notification
+{
+    public function via($notifiable)
+    {
+        return [MailChannel::class];
+    }
+
+    public function toMail($notifiable)
+    {
+        return (new MailMessage)
+            ->priority(1)
+            ->cc('cc@deepblue.com', 'cc')
+            ->bcc('bcc@deepblue.com', 'bcc')
+            ->from('jack@deepblue.com', 'Jacques Mayol')
+            ->replyTo('jack@deepblue.com', 'Jacques Mayol')
+            ->line('The introduction to the notification.')
+            ->theme('my-custom-theme')
+            ->mailer('foo');
     }
 }
