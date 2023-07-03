@@ -66,22 +66,15 @@ class SendingMailableNotificationsTest extends TestCase
 
         $user->notify(new MarkdownNotification('color-test'));
         $mailTransport = app('mailer')->getSymfonyTransport();
-        $email = $mailTransport->messages()[0]->getOriginalMessage()->toString();
 
-        $bodyStyleLine = str($email)->explode("\r\n")
-            ->filter(fn ($line) => str_contains($line, '<body style='))
-            ->first();
-
-        $this->assertStringContainsString('color: test', $bodyStyleLine);
+        $contents = $mailTransport->messages()[0]->getOriginalMessage()->toString();
+        $this->assertStringContainsString('<body style=3D"color: test;">', $contents);
 
         // confirm passing no theme resets to the app's default theme
         $user->notify(new MarkdownNotification());
 
-        $email = $mailTransport->messages()[1]->getOriginalMessage()->toString();
-
-        $this->assertNull(str($email)->explode("\r\n")
-            ->filter(fn ($line) => str_contains($line, '<body style='))
-            ->first());
+        $contents = $mailTransport->messages()[1]->getOriginalMessage()->toString();
+        $this->assertStringNotContainsString('<body style=3D"color: test;">', $contents);
     }
 }
 
