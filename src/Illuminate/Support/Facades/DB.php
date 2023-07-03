@@ -87,7 +87,7 @@ namespace Illuminate\Support\Facades;
  * @method static void unsetTransactionManager()
  * @method static bool pretending()
  * @method static array getQueryLog()
- * @mothod static array getRowQueryLog()
+ * @mothod static array getRawQueryLog()
  * @method static void flushQueryLog()
  * @method static void enableQueryLog()
  * @method static void disableQueryLog()
