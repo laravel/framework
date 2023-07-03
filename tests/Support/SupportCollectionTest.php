@@ -813,7 +813,6 @@ class SupportCollectionTest extends TestCase
         $this->assertTrue(isset($c['name']));
     }
 
-
     /**
      * @dataProvider collectionClassProvider
      */
