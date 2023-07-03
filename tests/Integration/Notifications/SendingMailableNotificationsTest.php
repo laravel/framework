@@ -97,7 +97,8 @@ class MarkdownNotification extends Notification
 {
     public function __construct(
         protected $theme = null
-    ){}
+    ) {
+    }
 
     public function via($notifiable): array
     {

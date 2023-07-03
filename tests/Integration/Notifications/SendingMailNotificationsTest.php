@@ -17,7 +17,6 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
 use Mockery as m;
-use Mockery\MockInterface;
 use Orchestra\Testbench\TestCase;
 
 class SendingMailNotificationsTest extends TestCase
