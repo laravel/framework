@@ -96,9 +96,8 @@ class MailableNotificationUser extends Model
 class MarkdownNotification extends Notification
 {
     public function __construct(
-        private readonly ?string $theme = null
-    ) {
-    }
+        protected $theme = null
+    ){}
 
     public function via($notifiable): array
     {

@@ -22,9 +22,9 @@ use Orchestra\Testbench\TestCase;
 
 class SendingMailNotificationsTest extends TestCase
 {
-    public MailFactory&MockInterface $mailFactory;
-    public Mailer&MockInterface $mailer;
-    public Markdown&MockInterface $markdown;
+    public $mailFactory;
+    public $mailer;
+    public $markdown;
 
     protected function tearDown(): void
     {
@@ -111,11 +111,11 @@ class SendingMailNotificationsTest extends TestCase
         $this->mailer->shouldReceive('send')->once()->withArgs(function (...$args) use ($notification, $user, $callbackExpectationClosure) {
             $viewArray = $args[0];
 
-            if (! m::on(fn ($closure) => $closure() === 'htmlContent')->match($viewArray['html'])) {
+            if (! m::on(fn ($closure) => $closure([]) === 'htmlContent')->match($viewArray['html'])) {
                 return false;
             }
 
-            if (! m::on(fn ($closure) => $closure() === 'textContent')->match($viewArray['text'])) {
+            if (! m::on(fn ($closure) => $closure([]) === 'textContent')->match($viewArray['text'])) {
                 return false;
             }
 
