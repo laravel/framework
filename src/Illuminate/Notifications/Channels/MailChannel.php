@@ -130,7 +130,7 @@ class MailChannel
     }
 
     /**
-     * Gets the markdown instance.
+     * Get the Markdown implementation.
      *
      * @param  \Illuminate\Notifications\Messages\MailMessage  $message
      * @return \Illuminate\Mail\Markdown
