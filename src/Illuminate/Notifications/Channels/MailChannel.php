@@ -139,7 +139,7 @@ class MailChannel
     {
         $config = Container::getInstance()->get(ConfigRepository::class);
 
-        $theme = $message->theme ?: $config->get('mail.markdown.theme', 'default');
+        $theme = $message->theme ?? $config->get('mail.markdown.theme', 'default');
 
         return $this->markdown->theme($theme);
     }
