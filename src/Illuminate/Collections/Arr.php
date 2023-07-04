@@ -298,6 +298,26 @@ class Arr
     }
 
     /**
+     * Remove one or many array items from a given array recursively.
+     *
+     * @param  array  $array
+     * @param  string  $key
+     * @return array
+     */
+    public static function forgetRecursive(&$array, $key)
+    {
+        static::forget($array, $key);
+
+        foreach ($array as &$value) {
+            if (is_array($value)) {
+                $value = static::forgetRecursive($value, $key);
+            }
+        }
+
+        return $array;
+    }
+
+    /**
      * Get an item from an array using "dot" notation.
      *
      * @param  \ArrayAccess|array  $array

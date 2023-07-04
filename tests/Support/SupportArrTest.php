@@ -1083,6 +1083,42 @@ class SupportArrTest extends TestCase
         $this->assertEquals([2 => [1 => 'products']], $array);
     }
 
+    public function testForgetRecursive()
+    {
+        $array = [
+            'keep' => 'this',
+            'remove' => 'this',
+            'look' => [
+                'in' => 'here',
+                'remove' => 'this',
+                'and' => [
+                    'also' => 'in here',
+                    'remove' => 'this',
+                    'but' => [
+                        'wait' => 'there is more',
+                        'remove' => 'this',
+                    ],
+                ],
+            ],
+        ];
+
+        $expect = [
+            'keep' => 'this',
+            'look' => [
+                'in' => 'here',
+                'and' => [
+                    'also' => 'in here',
+                    'but' => [
+                        'wait' => 'there is more',
+                    ],
+                ],
+            ],
+        ];
+
+        Arr::forgetRecursive($array, 'remove');
+        $this->assertEquals($array, $expect);
+    }
+
     public function testWrap()
     {
         $string = 'a';
