@@ -490,7 +490,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
                 match ($this->type) {
                     'Cast' => 'E.g. Json',
                     'Channel' => 'E.g. OrderChannel',
-                    'Command' => 'E.g. SendEmails',
+                    'Console command' => 'E.g. SendEmails',
                     'Component' => 'E.g. Alert',
                     'Controller' => 'E.g. UserController',
                     'Event' => 'E.g. PodcastProcessed',
