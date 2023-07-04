@@ -305,7 +305,7 @@ class MessageSelector
             case 'ur_PK':
             case 'zu':
             case 'zu_ZA':
-                return ($number == 1) ? 0 : 1;
+                return ($number <= 1) ? 0 : 1;
             case 'am':
             case 'am_ET':
             case 'bh':
