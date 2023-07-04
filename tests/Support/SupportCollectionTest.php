@@ -798,6 +798,21 @@ class SupportCollectionTest extends TestCase
         $this->assertTrue(isset($c['name']));
     }
 
+    public function testForgetCollectionOfKeys()
+    {
+        $c = new Collection(['foo', 'bar', 'baz']);
+        $c = $c->forget(collect([0, 2]))->all();
+        $this->assertFalse(isset($c[0]));
+        $this->assertFalse(isset($c[2]));
+        $this->assertTrue(isset($c[1]));
+
+        $c = new Collection(['name' => 'taylor', 'foo' => 'bar', 'baz' => 'qux']);
+        $c = $c->forget(collect(['foo', 'baz']))->all();
+        $this->assertFalse(isset($c['foo']));
+        $this->assertFalse(isset($c['baz']));
+        $this->assertTrue(isset($c['name']));
+    }
+
     /**
      * @dataProvider collectionClassProvider
      */
