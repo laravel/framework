@@ -512,7 +512,7 @@ class DatabaseConnectionTest extends TestCase
                     0 => 'foo',
                 ],
                 'time' => 1.23,
-            ]
+            ],
         ]);
 
         $queryGrammar = $this->createMock(Grammar::class);
