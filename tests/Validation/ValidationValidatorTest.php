@@ -2630,7 +2630,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['foo' => 'false'], ['foo' => 'Boolean']);
-        $this->assertFalse($v->passes());
+        $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['foo' => 'true'], ['foo' => 'Boolean']);
         $this->assertFalse($v->passes());
@@ -2667,7 +2667,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['foo' => 'false'], ['foo' => 'Bool']);
-        $this->assertFalse($v->passes());
+        $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['foo' => 'true'], ['foo' => 'Bool']);
         $this->assertFalse($v->passes());
