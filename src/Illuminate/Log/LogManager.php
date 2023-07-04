@@ -29,6 +29,11 @@ class LogManager implements LoggerInterface
     use ParsesLogConfiguration;
 
     /**
+     * @var class-string<Logger>
+     */
+    protected static string $loggerClass = Logger::class;
+
+    /**
      * The application instance.
      *
      * @var \Illuminate\Contracts\Foundation\Application
@@ -75,6 +80,23 @@ class LogManager implements LoggerInterface
     }
 
     /**
+     * Set custom Logger class.
+     *
+     * @param  class-string<Logger>  $loggerClass
+     * @return void
+     *
+     * @throws InvalidArgumentException
+     */
+    public static function setLoggerClass(string $loggerClass): void
+    {
+        if (! is_a($loggerClass, Logger::class, true)) {
+            throw new InvalidArgumentException(sprintf('Custom logger should extends %s', Logger::class));
+        }
+
+        self::$loggerClass = $loggerClass;
+    }
+
+    /**
      * Build an on-demand log channel.
      *
      * @param  array  $config
@@ -96,7 +118,7 @@ class LogManager implements LoggerInterface
      */
     public function stack(array $channels, $channel = null)
     {
-        return (new Logger(
+        return (new self::$loggerClass(
             $this->createStackDriver(compact('channels', 'channel')),
             $this->app['events']
         ))->withContext($this->sharedContext);
@@ -135,7 +157,8 @@ class LogManager implements LoggerInterface
     {
         try {
             return $this->channels[$name] ?? with($this->resolve($name, $config), function ($logger) use ($name) {
-                return $this->channels[$name] = $this->tap($name, new Logger($logger, $this->app['events']))->withContext($this->sharedContext);
+                return $this->channels[$name] = $this->tap($name, new self::$loggerClass($logger, $this->app['events']))
+                    ->withContext($this->sharedContext);
             });
         } catch (Throwable $e) {
             return tap($this->createEmergencyLogger(), function ($logger) use ($e) {

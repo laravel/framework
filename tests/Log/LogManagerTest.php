@@ -709,6 +709,19 @@ class LogManagerTest extends TestCase
             '[%datetime%] %channel%.%level_name%: %message% %context% %extra%',
             rtrim($format->getValue($formatter)));
     }
+
+    public function testCustomLogger()
+    {
+        LogManager::setLoggerClass(CustomizeLogger::class);
+        $manager = new LogManager($this->app);
+
+        $logger1 = $manager->channel('single')->getLogger();
+        $logger2 = $manager->channel('single')->getLogger();
+
+        $this->assertSame($logger1, $logger2);
+
+        $this->assertSame(true, CustomizeLogger::$called);
+    }
 }
 
 class CustomizeFormatter
@@ -720,5 +733,17 @@ class CustomizeFormatter
                 '[%datetime%] %channel%.%level_name%: %message% %context% %extra%'
             ));
         }
+    }
+}
+
+class CustomizeLogger extends Logger
+{
+    public static bool $called = false;
+
+    public function getLogger()
+    {
+        self::$called = true;
+
+        return $this->logger;
     }
 }
