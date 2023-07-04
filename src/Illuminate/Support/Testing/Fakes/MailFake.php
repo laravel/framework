@@ -101,56 +101,6 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
     }
 
     /**
-     * Assert the total number of mailables were sent.
-     *
-     * @param  int  $count
-     * @return void
-     */
-    public function assertSentCount($count)
-    {
-        $total = collect($this->mailables)->count();
-
-        PHPUnit::assertSame(
-            $count, $total,
-            "The total number of mailables sent was {$total} instead of {$count}."
-        );
-    }
-
-    /**
-     * Assert the total number of mailables were queued.
-     *
-     * @param  int  $count
-     * @return void
-     */
-    public function assertQueuedCount($count)
-    {
-        $total = collect($this->queuedMailables)->count();
-
-        PHPUnit::assertSame(
-            $count, $total,
-            "The total number of mailables queued was {$total} instead of {$count}."
-        );
-    }
-
-    /**
-     * Assert the total number of mailables were sent or queued.
-     *
-     * @param  int  $count
-     * @return void
-     */
-    public function assertOutgoingCount($count)
-    {
-        $total = collect($this->mailables)
-            ->concat($this->queuedMailables)
-            ->count();
-
-        PHPUnit::assertSame(
-            $count, $total,
-            "The total number of outgoing mailables was {$total} instead of {$count}."
-        );
-    }
-
-    /**
      * Determine if a mailable was not sent or queued to be sent based on a truth-test callback.
      *
      * @param  string|\Closure  $mailable
@@ -272,6 +222,56 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
         )->join(', ');
 
         PHPUnit::assertEmpty($this->queuedMailables, 'The following mailables were queued unexpectedly: '.$mailableNames);
+    }
+
+    /**
+     * Assert the total number of mailables that were sent.
+     *
+     * @param  int  $count
+     * @return void
+     */
+    public function assertSentCount($count)
+    {
+        $total = collect($this->mailables)->count();
+
+        PHPUnit::assertSame(
+            $count, $total,
+            "The total number of mailables sent was {$total} instead of {$count}."
+        );
+    }
+
+    /**
+     * Assert the total number of mailables that were queued.
+     *
+     * @param  int  $count
+     * @return void
+     */
+    public function assertQueuedCount($count)
+    {
+        $total = collect($this->queuedMailables)->count();
+
+        PHPUnit::assertSame(
+            $count, $total,
+            "The total number of mailables queued was {$total} instead of {$count}."
+        );
+    }
+
+    /**
+     * Assert the total number of mailables that were sent or queued.
+     *
+     * @param  int  $count
+     * @return void
+     */
+    public function assertOutgoingCount($count)
+    {
+        $total = collect($this->mailables)
+            ->concat($this->queuedMailables)
+            ->count();
+
+        PHPUnit::assertSame(
+            $count, $total,
+            "The total number of outgoing mailables was {$total} instead of {$count}."
+        );
     }
 
     /**
