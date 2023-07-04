@@ -521,9 +521,7 @@ class Container implements ArrayAccess, ContainerContract
                 $this->tags[$tag] = [];
             }
 
-            foreach ((array) $abstracts as $abstract) {
-                $this->tags[$tag][] = $abstract;
-            }
+            $this->tags[$tag] = array_merge($this->tags[$tag], (array) $abstracts);
         }
     }
 
