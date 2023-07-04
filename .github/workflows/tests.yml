@@ -89,8 +89,8 @@ jobs:
           DB_USERNAME: root
           DYNAMODB_CACHE_TABLE: laravel_dynamodb_test
           DYNAMODB_ENDPOINT: "http://localhost:8888"
-          AWS_ACCESS_KEY_ID: random_key
-          AWS_SECRET_ACCESS_KEY: random_secret
+          AWS_ACCESS_KEY_ID: randomKey
+          AWS_SECRET_ACCESS_KEY: randomSecret
 
       - name: Store artifacts
         uses: actions/upload-artifact@v3
