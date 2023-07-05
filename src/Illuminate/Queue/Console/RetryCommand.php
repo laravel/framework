@@ -49,19 +49,26 @@ class RetryCommand extends Command
         foreach ($ids as $id) {
             $job = $this->laravel['queue.failer']->find($id);
 
+            $lock = null;
+            if ($withoutJobOverlapping) {
+                $lock = $this->laravel['cache']->lock("retry:id:{$id}", 0, "retry:id:{$id}");
+            }
+
             if (is_null($job)) {
                 $this->components->error("Unable to find failed job with ID [{$id}].");
-            } elseif ($withoutJobOverlapping && ! $this->laravel['cache']->lock("retry:id:{$id}")->get()) {
+            } elseif ($withoutJobOverlapping && $lock && ! $lock->get()) {
                 $this->components->error('The given failed job is already being executed.');
             } else {
-                $this->laravel['events']->dispatch(new JobRetryRequested($job));
+                try {
+                    $this->laravel['events']->dispatch(new JobRetryRequested($job));
 
-                $this->components->task($id, fn () => $this->retryJob($job));
+                    $this->components->task($id, fn () => $this->retryJob($job));
 
-                $this->laravel['queue.failer']->forget($id);
-
-                if ($withoutJobOverlapping) {
-                    $this->laravel['cache']->lock("retry:id:{$id}")->release();
+                    $this->laravel['queue.failer']->forget($id);
+                } finally {
+                    if ($lock) {
+                        $lock->release();
+                    }
                 }
             }
         }
