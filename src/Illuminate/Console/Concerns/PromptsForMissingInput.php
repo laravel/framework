@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console\Concerns;
 
+use Closure;
 use Illuminate\Contracts\Console\PromptsForMissingInput as PromptsForMissingInputContract;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -41,6 +42,10 @@ trait PromptsForMissingInput
             ->each(function ($argument) use ($input) {
                 $label = $this->promptForMissingArgumentsUsing()[$argument->getName()] ??
                     'What is '.lcfirst($argument->getDescription() ?: ('the '.$argument->getName())).'?';
+
+                if ($label instanceof Closure) {
+                    return $input->setArgument($argument->getName(), $label());
+                }
 
                 if (is_array($label)) {
                     [$label, $placeholder] = $label;
