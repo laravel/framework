@@ -20,6 +20,7 @@ use Illuminate\Support\Env;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
 use ReflectionClass;
+use SplFileInfo;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
@@ -339,12 +340,8 @@ class Kernel implements KernelContract
 
         $namespace = $this->app->getNamespace();
 
-        foreach ((new Finder)->in($paths)->files() as $command) {
-            $command = $namespace.str_replace(
-                ['/', '.php'],
-                ['\\', ''],
-                Str::after($command->getRealPath(), realpath(app_path()).DIRECTORY_SEPARATOR)
-            );
+        foreach ((new Finder)->in($paths)->files() as $file) {
+            $command = $this->classFromFile($file, $namespace);
 
             if (is_subclass_of($command, Command::class) &&
                 ! (new ReflectionClass($command))->isAbstract()) {
@@ -519,5 +516,17 @@ class Kernel implements KernelContract
     protected function renderException($output, Throwable $e)
     {
         $this->app[ExceptionHandler::class]->renderForConsole($output, $e);
+    }
+
+    /**
+     * Extract the class name from the given file path.
+     */
+    protected function classFromFile(SplFileInfo $file, string $namespace): string
+    {
+        return $namespace.str_replace(
+            ['/', '.php'],
+            ['\\', ''],
+            Str::after($file->getRealPath(), realpath(app_path()).DIRECTORY_SEPARATOR)
+        );
     }
 }
