@@ -31,7 +31,7 @@ trait Macroable
     /**
      * Mix another object into the class.
      *
-     * @param  object  $mixin
+     * @param  class-string|object  $mixin
      * @param  bool  $replace
      * @return void
      *
@@ -39,6 +39,8 @@ trait Macroable
      */
     public static function mixin($mixin, $replace = true)
     {
+        $mixin = is_string($mixin) ? new $mixin() : $mixin;
+
         $methods = (new ReflectionClass($mixin))->getMethods(
             ReflectionMethod::IS_PUBLIC | ReflectionMethod::IS_PROTECTED
         );
