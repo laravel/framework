@@ -304,7 +304,6 @@ class MailMailerTest extends TestCase
         $view->shouldReceive('render')->once()->andReturn('rendered.view');
         $mailer = new Mailer('array', $view, new ArrayTransport);
         $mailer->alwaysTo(['taylor@laravel.com' => 'Taylor Otwell', 'jess@laravel.com' => 'Jess Archer']);
-        //        $mailer->alwaysTo(['taylor@laravel.com', 'jess@laravel.com']);
 
         $sentMessage = $mailer->send('foo', ['data'], function (Message $message) {
             $message->from('hello@laravel.com');
