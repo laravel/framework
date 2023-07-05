@@ -71,8 +71,8 @@ class Response implements ArrayAccess
      */
     public function json($key = null, $default = null)
     {
-        if (! $this->decoded) {
-            $this->decoded = json_decode($this->body(), true);
+        if (! isset($this->decoded)) {
+            $this->decoded = (array) json_decode($this->body(), true);
         }
 
         if (is_null($key)) {
