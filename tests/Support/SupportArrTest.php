@@ -1085,38 +1085,15 @@ class SupportArrTest extends TestCase
 
     public function testForgetRecursive()
     {
-        $array = [
-            'keep' => 'this',
-            'remove' => 'this',
-            'look' => [
-                'in' => 'here',
-                'remove' => 'this',
-                'and' => [
-                    'also' => 'in here',
-                    'remove' => 'this',
-                    'but' => [
-                        'wait' => 'there is more',
-                        'remove' => 'this',
-                    ],
-                ],
-            ],
-        ];
-
-        $expect = [
-            'keep' => 'this',
-            'look' => [
-                'in' => 'here',
-                'and' => [
-                    'also' => 'in here',
-                    'but' => [
-                        'wait' => 'there is more',
-                    ],
-                ],
-            ],
-        ];
+        $array = ['keep' => 'this', 'remove' => 'this', 'look' => ['in' => 'here', 'remove' => 'this', 'and' => ['also' => 'in here', 'remove' => 'this', 'but' => ['wait' => 'there is more', 'remove' => 'this']]]];
 
         Arr::forgetRecursive($array, 'remove');
-        $this->assertEquals($array, $expect);
+        $this->assertEquals(['keep' => 'this', 'look' => ['in' => 'here', 'and' => ['also' => 'in here', 'but' => ['wait' => 'there is more']]]], $array);
+
+        $array = ['keep' => 'this', 'remove' => 'this', 'look' => ['in' => 'here', 'remove' => 'this', 'and' => ['also' => 'in here', 'remove' => 'this', 'but' => ['wait' => 'there is more', 'remove' => 'this']]]];
+
+        Arr::forgetRecursive($array, ['remove', 'and']);
+        $this->assertEquals(['keep' => 'this', 'look' => ['in' => 'here']], $array);
     }
 
     public function testWrap()

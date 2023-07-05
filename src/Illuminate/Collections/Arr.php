@@ -301,11 +301,13 @@ class Arr
      * Remove one or many array items from a given array recursively.
      *
      * @param  array  $array
-     * @param  string  $key
+     * @param  array|string  $key
      * @return array
      */
     public static function forgetRecursive(&$array, $key)
     {
+        $key = static::wrap($key);
+
         static::forget($array, $key);
 
         foreach ($array as &$value) {
