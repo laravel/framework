@@ -236,7 +236,7 @@ class MailMailerTest extends TestCase
         $this->assertStringContainsString('Reply-To: Taylor Otwell <taylor@laravel.com>', $sentMessage->toString());
     }
 
-    public function testGlobalToIsRespectedOnAllMessages()
+    public function testGlobalToAsStringIsRespectedOnAllMessages()
     {
         $view = m::mock(Factory::class);
         $view->shouldReceive('make')->once()->andReturn($view);
@@ -256,6 +256,69 @@ class MailMailerTest extends TestCase
         });
 
         $this->assertSame('taylor@laravel.com', $sentMessage->getEnvelope()->getRecipients()[0]->getAddress());
+        $this->assertDoesNotMatchRegularExpression('/^To: nuno@laravel.com/m', $sentMessage->toString());
+        $this->assertDoesNotMatchRegularExpression('/^Cc: dries@laravel.com/m', $sentMessage->toString());
+        $this->assertMatchesRegularExpression('/^X-To: nuno@laravel.com/m', $sentMessage->toString());
+        $this->assertMatchesRegularExpression('/^X-Cc: dries@laravel.com/m', $sentMessage->toString());
+        $this->assertMatchesRegularExpression('/^X-Bcc: james@laravel.com/m', $sentMessage->toString());
+        $this->assertFalse($recipients->contains('nuno@laravel.com'));
+        $this->assertFalse($recipients->contains('dries@laravel.com'));
+        $this->assertFalse($recipients->contains('james@laravel.com'));
+    }
+
+    public function testGlobalToAsOneDimmensionalArrayIsRespectedOnAllMessages()
+    {
+        $view = m::mock(Factory::class);
+        $view->shouldReceive('make')->once()->andReturn($view);
+        $view->shouldReceive('render')->once()->andReturn('rendered.view');
+        $mailer = new Mailer('array', $view, new ArrayTransport);
+        $mailer->alwaysTo(['taylor@laravel.com', 'jess@laravel.com']);
+
+        $sentMessage = $mailer->send('foo', ['data'], function (Message $message) {
+            $message->from('hello@laravel.com');
+            $message->to('nuno@laravel.com');
+            $message->cc('dries@laravel.com');
+            $message->bcc('james@laravel.com');
+        });
+
+        $recipients = collect($sentMessage->getEnvelope()->getRecipients())->map(function ($recipient) {
+            return $recipient->getAddress();
+        });
+
+        $this->assertSame('taylor@laravel.com', $sentMessage->getEnvelope()->getRecipients()[0]->getAddress());
+        $this->assertSame('jess@laravel.com', $sentMessage->getEnvelope()->getRecipients()[1]->getAddress());
+        $this->assertDoesNotMatchRegularExpression('/^To: nuno@laravel.com/m', $sentMessage->toString());
+        $this->assertDoesNotMatchRegularExpression('/^Cc: dries@laravel.com/m', $sentMessage->toString());
+        $this->assertMatchesRegularExpression('/^X-To: nuno@laravel.com/m', $sentMessage->toString());
+        $this->assertMatchesRegularExpression('/^X-Cc: dries@laravel.com/m', $sentMessage->toString());
+        $this->assertMatchesRegularExpression('/^X-Bcc: james@laravel.com/m', $sentMessage->toString());
+        $this->assertFalse($recipients->contains('nuno@laravel.com'));
+        $this->assertFalse($recipients->contains('dries@laravel.com'));
+        $this->assertFalse($recipients->contains('james@laravel.com'));
+    }
+
+    public function testGlobalToAsTwoDimmensionalArrayIsRespectedOnAllMessages()
+    {
+        $view = m::mock(Factory::class);
+        $view->shouldReceive('make')->once()->andReturn($view);
+        $view->shouldReceive('render')->once()->andReturn('rendered.view');
+        $mailer = new Mailer('array', $view, new ArrayTransport);
+        $mailer->alwaysTo(['taylor@laravel.com' => 'Taylor Otwell', 'jess@laravel.com' => 'Jess Archer']);
+        //        $mailer->alwaysTo(['taylor@laravel.com', 'jess@laravel.com']);
+
+        $sentMessage = $mailer->send('foo', ['data'], function (Message $message) {
+            $message->from('hello@laravel.com');
+            $message->to('nuno@laravel.com');
+            $message->cc('dries@laravel.com');
+            $message->bcc('james@laravel.com');
+        });
+
+        $recipients = collect($sentMessage->getEnvelope()->getRecipients())->map(function ($recipient) {
+            return $recipient->getAddress();
+        });
+
+        $this->assertSame('taylor@laravel.com', $sentMessage->getEnvelope()->getRecipients()[0]->getAddress());
+        $this->assertSame('jess@laravel.com', $sentMessage->getEnvelope()->getRecipients()[1]->getAddress());
         $this->assertDoesNotMatchRegularExpression('/^To: nuno@laravel.com/m', $sentMessage->toString());
         $this->assertDoesNotMatchRegularExpression('/^Cc: dries@laravel.com/m', $sentMessage->toString());
         $this->assertMatchesRegularExpression('/^X-To: nuno@laravel.com/m', $sentMessage->toString());
