@@ -93,16 +93,24 @@ class Message
      * Add a recipient to the message.
      *
      * @param  string|array  $address
-     * @param  string|null  $name
+     * @param  string|array|null  $name
      * @param  bool  $override
      * @return $this
      */
     public function to($address, $name = null, $override = false)
     {
         if ($override) {
-            is_array($address)
-                ? $this->message->to(...$address)
-                : $this->message->to(new Address($address, (string) $name));
+            if (is_array($address) && is_array($name)) {
+                $addresses = array_map(function ($address, $name) {
+                    return new Address($address, (string) $name);
+                }, $address, $name);
+
+                $this->message->to(...$addresses);
+            } else {
+                is_array($address)
+                    ? $this->message->to(...$address)
+                    : $this->message->to(new Address($address, (string) $name));
+            }
 
             return $this;
         }
