@@ -28,12 +28,12 @@ class ValidationNotInRuleTest extends TestCase
 
         $this->assertSame('not_in:"1","2","3","4"', (string) $rule);
 
-        $rule = Rule::notIn(StringStatus::pending);
+        $rule = Rule::notIn(StringStatus::pending, 'Laravel');
 
-        $this->assertSame('not_in:"'.StringStatus::pending->value.'"', (string) $rule);
+        $this->assertSame('not_in:"'.StringStatus::pending->value.'","Laravel"', (string) $rule);
 
-        $rule = Rule::notIn([StringStatus::pending, StringStatus::done]);
+        $rule = Rule::notIn([StringStatus::pending, StringStatus::done, 'Laravel']);
 
-        $this->assertSame('not_in:"'.StringStatus::pending->value.'","'.StringStatus::done->value.'"', (string) $rule);
+        $this->assertSame('not_in:"'.StringStatus::pending->value.'","'.StringStatus::done->value.'","Laravel"', (string) $rule);
     }
 }

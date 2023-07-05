@@ -45,8 +45,12 @@ class ValidationInRuleTest extends TestCase
 
         $this->assertSame('in:"'.StringStatus::pending->value.'"', (string) $rule);
 
-        $rule = Rule::in([StringStatus::pending, StringStatus::done]);
+        $rule = Rule::in(StringStatus::pending, 'Laravel');
 
-        $this->assertSame('in:"'.StringStatus::pending->value.'","'.StringStatus::done->value.'"', (string) $rule);
+        $this->assertSame('in:"'.StringStatus::pending->value.'","Laravel"', (string) $rule);
+
+        $rule = Rule::in([StringStatus::pending, StringStatus::done, 'Laravel']);
+
+        $this->assertSame('in:"'.StringStatus::pending->value.'","'.StringStatus::done->value.'","Laravel"', (string) $rule);
     }
 }
