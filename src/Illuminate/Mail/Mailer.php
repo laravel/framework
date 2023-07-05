@@ -14,6 +14,7 @@ use Illuminate\Contracts\View\Factory;
 use Illuminate\Mail\Events\MessageSending;
 use Illuminate\Mail\Events\MessageSent;
 use Illuminate\Mail\Mailables\Address;
+use Illuminate\Support\Arr;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
