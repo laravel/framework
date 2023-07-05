@@ -39,7 +39,7 @@ trait Macroable
      */
     public static function mixin($mixin, $replace = true)
     {
-        $mixin = is_string($mixin) ? new $mixin() : $mixin;
+        $mixin = is_string($mixin) ? resolve($mixin) : $mixin;
 
         $methods = (new ReflectionClass($mixin))->getMethods(
             ReflectionMethod::IS_PUBLIC | ReflectionMethod::IS_PROTECTED
