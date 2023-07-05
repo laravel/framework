@@ -40,7 +40,7 @@ trait PromptsForMissingInput
             ->filter(fn ($argument) => $argument->getName() !== 'command')
             ->each(function ($argument) use ($input) {
                 $label = $this->promptForMissingArgumentsUsing()[$argument->getName()] ??
-                    'What is '.lcfirst($argument->getDescription()).'?';
+                    'What is '.lcfirst($argument->getDescription() ?: ('the '.$argument->getName())).'?';
 
                 if (is_array($label)) {
                     [$label, $placeholder] = $label;
