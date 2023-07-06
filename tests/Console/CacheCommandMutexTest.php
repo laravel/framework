@@ -44,6 +44,12 @@ class CacheCommandMutexTest extends TestCase
         };
     }
 
+    protected function tearDown(): void
+    {
+        m::close();
+        parent::tearDown();
+    }
+
     public function testCanCreateMutex()
     {
         $this->mockUsingCacheStore();
@@ -117,7 +123,7 @@ class CacheCommandMutexTest extends TestCase
     {
         $lock = m::mock(LockProvider::class);
         $this->cacheFactory->expects('store')->once()->with('test')->andReturn($this->cacheRepository);
-        $this->cacheRepository->expects('getStore')->andReturn($lock);
+        $this->cacheRepository->expects('getStore')->twice()->andReturn($lock);
 
         $this->acquireLockExpectations($lock, true);
         $this->mutex->useStore('test');
@@ -138,7 +144,7 @@ class CacheCommandMutexTest extends TestCase
     {
         $lock = m::mock(LockProvider::class);
         $this->cacheFactory->expects('store')->once()->andReturn($this->cacheRepository);
-        $this->cacheRepository->expects('getStore')->andReturn($lock);
+        $this->cacheRepository->expects('getStore')->twice()->andReturn($lock);
 
         return $lock;
     }
