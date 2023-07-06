@@ -530,6 +530,10 @@ trait ValidatesAttributes
             return false;
         }
 
+        if (is_numeric($value)) {
+            return (bool) DateTime::createFromFormat('!U', $value);
+        }
+
         $date = date_parse($value);
 
         return checkdate($date['month'], $date['day'], $date['year']);
