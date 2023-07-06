@@ -5261,7 +5261,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['x' => '1325376000'], ['x' => 'date']);
-        $this->assertTrue($v->fails());
+        $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['x' => 'Not a date'], ['x' => 'date']);
         $this->assertTrue($v->fails());
@@ -5328,6 +5328,9 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->fails());
 
         $v = new Validator($trans, ['x' => '17:43'], ['x' => 'date_format:H:i']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1325376002'], ['foo' => 'date_format:U']);
         $this->assertTrue($v->passes());
     }
 
