@@ -345,7 +345,7 @@ trait HasRelationships
      */
     public static function getActualClassNameForMorph($class)
     {
-        return Arr::get(Relation::morphMap() ?: [], $class, $class);
+        return Relation::getActualClassNameForMorph($class, $class);
     }
 
     /**
@@ -765,10 +765,8 @@ trait HasRelationships
      */
     public function getMorphClass()
     {
-        $morphMap = Relation::morphMap();
-
-        if (! empty($morphMap) && in_array(static::class, $morphMap)) {
-            return array_search(static::class, $morphMap, true);
+        if (! is_null($model = Relation::getMorphAliasFromClass(static::class))) {
+            return $model;
         }
 
         if (static::class === Pivot::class) {

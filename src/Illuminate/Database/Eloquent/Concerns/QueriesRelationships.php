@@ -462,11 +462,7 @@ trait QueriesRelationships
         }
 
         if (is_string($model)) {
-            $morphMap = Relation::morphMap();
-
-            if (! empty($morphMap) && in_array($model, $morphMap)) {
-                $model = array_search($model, $morphMap, true);
-            }
+            $model = Relation::getMorphAliasFromClass($model, $model);
 
             return $this->where($relation->getMorphType(), $model, null, $boolean);
         }
