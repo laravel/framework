@@ -21,7 +21,7 @@ class ArrayRule
     protected $values;
 
     /**
-     * Create a new in rule instance.
+     * Create a new isArray rule instance.
      *
      * @param array|string|null $values
      */
