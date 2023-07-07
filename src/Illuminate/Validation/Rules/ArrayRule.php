@@ -25,7 +25,7 @@ class ArrayRule
      *
      * @param array|string|null $values
      */
-    public function __construct(array|string|null $values = null)
+    public function __construct($values = null)
     {
         if (is_string($values)) {
             if (! enum_exists($values) || ! method_exists($values, 'cases')) {
