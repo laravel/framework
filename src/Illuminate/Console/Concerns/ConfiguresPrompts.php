@@ -43,19 +43,11 @@ trait ConfiguresPrompts
             $prompt->validate
         ));
 
-        SelectPrompt::fallbackUsing(function (SelectPrompt $prompt) {
-            if ($prompt->default === null) {
-                $default = array_key_first($prompt->options);
-            } else {
-                $default = $prompt->default;
-            }
-
-            return $this->promptUntilValid(
-                fn () => $this->components->choice($prompt->label, $prompt->options, $default),
-                false,
-                $prompt->validate
-            );
-        });
+        SelectPrompt::fallbackUsing(fn (SelectPrompt $prompt) => $this->promptUntilValid(
+            fn () => $this->components->choice($prompt->label, $prompt->options, $prompt->default),
+            false,
+            $prompt->validate
+        ));
 
         MultiSelectPrompt::fallbackUsing(function (MultiSelectPrompt $prompt) {
             if ($prompt->default !== []) {
