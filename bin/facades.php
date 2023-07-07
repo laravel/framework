@@ -345,28 +345,12 @@ function handleUnknownIdentifierType($method, $typeNode)
     }
 
     if (
-        $typeNode->name === 'TWhenParameter' &&
-        has_traits($method->getDeclaringClass()->getName(), Conditionable::class)
-    ) {
-        return 'mixed';
-    }
-
-    if (
-        $typeNode->name === 'TWhenReturnType' &&
-        has_traits($method->getDeclaringClass()->getName(), Conditionable::class)
-    ) {
-        return 'mixed';
-    }
-
-    if (
-        $typeNode->name === 'TUnlessParameter' &&
-        has_traits($method->getDeclaringClass()->getName(), Conditionable::class)
-    ) {
-        return 'mixed';
-    }
-
-    if (
-        $typeNode->name === 'TUnlessReturnType' &&
+        in_array($typeNode->name, [
+                'TWhenParameter',
+                'TWhenReturnType',
+                'TUnlessParameter',
+                'TUnlessReturnType',
+        ], strict: true) &&
         has_traits($method->getDeclaringClass()->getName(), Conditionable::class)
     ) {
         return 'mixed';
