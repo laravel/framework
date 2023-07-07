@@ -2114,16 +2114,17 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testIncrementOnExistingModelCallsQueryAndSetsAttribute()
     {
-        $model = m::mock(EloquentModelStub::class.'[newQueryWithoutRelationships]');
+        $model = m::mock(EloquentModelStub::class.'[newQueryWithoutScopes]');
         $model->exists = true;
         $model->id = 1;
         $model->syncOriginalAttribute('id');
         $model->foo = 2;
 
-        $model->shouldReceive('newQueryWithoutRelationships')->andReturn($query = m::mock(stdClass::class));
+        $model->shouldReceive('newQueryWithoutScopes')->andReturn($query = m::mock(stdClass::class));
         $query->shouldReceive('where')->andReturn($query);
         $query->shouldReceive('increment');
 
+        // hmm
         $model->publicIncrement('foo', 1);
         $this->assertFalse($model->isDirty());
 
@@ -2135,13 +2136,13 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testIncrementQuietlyOnExistingModelCallsQueryAndSetsAttributeAndIsQuiet()
     {
-        $model = m::mock(EloquentModelStub::class.'[newQueryWithoutRelationships]');
+        $model = m::mock(EloquentModelStub::class.'[newQueryWithoutScopes]');
         $model->exists = true;
         $model->id = 1;
         $model->syncOriginalAttribute('id');
         $model->foo = 2;
 
-        $model->shouldReceive('newQueryWithoutRelationships')->andReturn($query = m::mock(stdClass::class));
+        $model->shouldReceive('newQueryWithoutScopes')->andReturn($query = m::mock(stdClass::class));
         $query->shouldReceive('where')->andReturn($query);
         $query->shouldReceive('increment');
 
@@ -2162,13 +2163,13 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testDecrementQuietlyOnExistingModelCallsQueryAndSetsAttributeAndIsQuiet()
     {
-        $model = m::mock(EloquentModelStub::class.'[newQueryWithoutRelationships]');
+        $model = m::mock(EloquentModelStub::class.'[newQueryWithoutScopes]');
         $model->exists = true;
         $model->id = 1;
         $model->syncOriginalAttribute('id');
         $model->foo = 4;
 
-        $model->shouldReceive('newQueryWithoutRelationships')->andReturn($query = m::mock(stdClass::class));
+        $model->shouldReceive('newQueryWithoutScopes')->andReturn($query = m::mock(stdClass::class));
         $query->shouldReceive('where')->andReturn($query);
         $query->shouldReceive('decrement');
 

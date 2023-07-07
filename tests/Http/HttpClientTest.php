@@ -29,6 +29,7 @@ use Mockery as m;
 use OutOfBoundsException;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
 use Symfony\Component\VarDumper\VarDumper;
@@ -1758,6 +1759,25 @@ class HttpClientTest extends TestCase
         $this->assertSame('Fake', tap($history[0]['response']->getBody())->rewind()->getContents());
 
         $this->assertSame(['hyped-for' => 'laravel-movie'], json_decode(tap($history[0]['request']->getBody())->rewind()->getContents(), true));
+    }
+
+    public function testMiddlewareRunsAndCanChangeRequestOnAssertSent()
+    {
+        $this->factory->fake(function (Request $request) {
+            return $this->factory->response('Fake');
+        });
+
+        $pendingRequest = $this->factory->withMiddleware(
+            Middleware::mapRequest(fn (RequestInterface $request) => $request->withHeader('X-Test-Header', 'Test'))
+        );
+
+        $pendingRequest->post('https://laravel.example', ['laravel' => 'framework']);
+
+        $this->factory->assertSent(function (Request $request) {
+            return
+                $request->url() === 'https://laravel.example' &&
+                $request->hasHeader('X-Test-Header', 'Test');
+        });
     }
 
     public function testRequestExceptionIsNotThrownIfThePendingRequestIsSetToThrowOnFailureButTheResponseIsSuccessful()
