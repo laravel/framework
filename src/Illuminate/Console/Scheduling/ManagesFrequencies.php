@@ -3,6 +3,7 @@
 namespace Illuminate\Console\Scheduling;
 
 use Illuminate\Support\Carbon;
+use InvalidArgumentException;
 
 trait ManagesFrequencies
 {
@@ -67,6 +68,93 @@ trait ManagesFrequencies
         }
 
         return fn () => $now->between($startTime, $endTime);
+    }
+
+    /**
+     * Schedule the event to run every second.
+     *
+     * @return $this
+     */
+    public function everySecond()
+    {
+        return $this->repeatEvery(1);
+    }
+
+    /**
+     * Schedule the event to run every two seconds.
+     *
+     * @return $this
+     */
+    public function everyTwoSeconds()
+    {
+        return $this->repeatEvery(2);
+    }
+
+    /**
+     * Schedule the event to run every five seconds.
+     *
+     * @return $this
+     */
+    public function everyFiveSeconds()
+    {
+        return $this->repeatEvery(5);
+    }
+
+    /**
+     * Schedule the event to run every ten seconds.
+     *
+     * @return $this
+     */
+    public function everyTenSeconds()
+    {
+        return $this->repeatEvery(10);
+    }
+
+    /**
+     * Schedule the event to run every fifteen seconds.
+     *
+     * @return $this
+     */
+    public function everyFifteenSeconds()
+    {
+        return $this->repeatEvery(15);
+    }
+
+    /**
+     * Schedule the event to run every twenty seconds.
+     *
+     * @return $this
+     */
+    public function everyTwentySeconds()
+    {
+        return $this->repeatEvery(20);
+    }
+
+    /**
+     * Schedule the event to run every thirty seconds.
+     *
+     * @return $this
+     */
+    public function everyThirtySeconds()
+    {
+        return $this->repeatEvery(30);
+    }
+
+    /**
+     * Schedule the event to run multiple times per minute.
+     *
+     * @param  int  $seconds
+     * @return $this
+     */
+    protected function repeatEvery($seconds)
+    {
+        if (60 % $seconds !== 0) {
+            throw new InvalidArgumentException("The seconds [$seconds] are not evenly divisible by 60.");
+        }
+
+        $this->repeatSeconds = $seconds;
+
+        return $this->everyMinute();
     }
 
     /**

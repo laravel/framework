@@ -118,6 +118,24 @@ class EloquentUpdateTest extends DatabaseTestCase
         $this->assertEquals(1, $models[0]->counter);
         $this->assertEquals(0, $models[1]->counter);
     }
+
+    public function testIncrementOrDecrementIgnoresGlobalScopes()
+    {
+        /** @var TestUpdateModel3 $deletedModel */
+        $deletedModel = tap(TestUpdateModel3::create([
+            'counter' => 0,
+        ]), fn ($model) => $model->delete());
+
+        $deletedModel->increment('counter');
+
+        $this->assertEquals(1, $deletedModel->counter);
+
+        $deletedModel->fresh();
+        $this->assertEquals(1, $deletedModel->counter);
+
+        $deletedModel->decrement('counter');
+        $this->assertEquals(0, $deletedModel->fresh()->counter);
+    }
 }
 
 class TestUpdateModel1 extends Model
