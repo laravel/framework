@@ -34,6 +34,14 @@ class ValidationArrayRuleTest extends TestCase
 
         $this->assertSame('array:"1","2","3","4"', (string) $rule);
 
+        $rule = Rule::isArray('1', '2', '3', '4');
+
+        $this->assertSame('array:"1","2","3","4"', (string) $rule);
+
+        $rule = Rule::isArray(1, 2, 3, 4);
+
+        $this->assertSame('array:"1","2","3","4"', (string) $rule);
+
         $rule = Rule::isArray(collect([1, 2, 3, 4]));
 
         $this->assertSame('array:"1","2","3","4"', (string) $rule);

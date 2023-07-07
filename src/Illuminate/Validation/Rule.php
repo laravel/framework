@@ -199,7 +199,11 @@ class Rule
             $values = $values->toArray();
         }
 
-        if (is_string($values) && ! enum_exists($values)) {
+        if (
+            $values !== null
+            && ! is_array($values)
+            && ! enum_exists($values)
+        ) {
             $values = func_get_args();
         }
 
