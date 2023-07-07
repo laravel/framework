@@ -2,13 +2,12 @@
 
 namespace Illuminate\Tests\Validation;
 
+use Illuminate\Tests\Validation\fixtures\StatusEnum;
 use Illuminate\Tests\Validation\fixtures\Values;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\ArrayRule;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-
-include 'Enums.php';
 
 class ValidationArrayRuleTest extends TestCase
 {
@@ -26,9 +25,9 @@ class ValidationArrayRuleTest extends TestCase
 
         $this->assertSame('array', (string) $rule);
 
-        $rule = new ArrayRule(StringStatus::class);
+        $rule = new ArrayRule(StatusEnum::class);
 
-        $this->assertSame('array:"pending","done"', (string) $rule);
+        $this->assertSame('array:"draft","published","archived"', (string) $rule);
 
         $rule = Rule::isArray([1, 2, 3, 4]);
 
@@ -54,9 +53,9 @@ class ValidationArrayRuleTest extends TestCase
 
         $this->assertSame('array:"1","2","3","4"', (string) $rule);
 
-        $rule = Rule::isArray(StringStatus::class);
+        $rule = Rule::isArray(StatusEnum::class);
 
-        $this->assertSame('array:"pending","done"', (string) $rule);
+        $this->assertSame('array:"draft","published","archived"', (string) $rule);
 
         $rule = Rule::isArray();
 
