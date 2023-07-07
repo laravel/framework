@@ -46,10 +46,27 @@ class BroadcastingInstallCommand extends Command
             );
         }
 
-        (new Filesystem)->replaceInFile(
-            "// import './echo';",
-            "import './echo';",
-            $this->laravel->resourcePath('js/bootstrap.js'),
-        );
+        if (! file_exists($echoScriptPath = $this->laravel->resourcePath('js/echo.js'))) {
+            copy(__DIR__.'/stubs/echo-js.stub', $echoScriptPath);
+        }
+
+        if (file_exists($bootstrapScriptPath = $this->laravel->resourcePath('js/bootstrap.js'))) {
+            $bootstrapScript = file_get_contents(
+                $bootstrapScriptPath
+            );
+
+            if (! str_contains($bootstrapScript, 'echo.js')) {
+                file_put_contents(
+                    $bootstrapScriptPath,
+                    $bootstrapScript.PHP_EOL.file_get_contents(__DIR__.'/stubs/echo-bootstrap-js.stub')
+                );
+            }
+        }
+
+        // (new Filesystem)->replaceInFile(
+        //     "// import './echo';",
+        //     "import './echo';",
+        //     $this->laravel->resourcePath('js/bootstrap.js'),
+        // );
     }
 }
