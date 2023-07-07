@@ -902,7 +902,7 @@ if (! function_exists('today')) {
     }
 }
 
-if (!function_exists('yesterday')) {
+if (! function_exists('yesterday')) {
     /**
      * Create a new Carbon instance for yesterday.
      *
@@ -911,11 +911,11 @@ if (!function_exists('yesterday')) {
      */
     function yesterday($tz = null)
     {
-        return today($tz = null)->subDay();
+        return today($tz)->subDay();
     }
 }
 
-if (!function_exists('tomorrow')) {
+if (! function_exists('tomorrow')) {
     /**
      * Create a new Carbon instance for tomorrow.
      *
@@ -924,11 +924,11 @@ if (!function_exists('tomorrow')) {
      */
     function tomorrow($tz = null)
     {
-        return today($tz = null)->addDay();
+        return today($tz)->addDay();
     }
 }
 
-if (!function_exists('trans')) {
+if (! function_exists('trans')) {
     /**
      * Translate the given message.
      *
