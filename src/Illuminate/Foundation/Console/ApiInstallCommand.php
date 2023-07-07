@@ -4,7 +4,9 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\Process;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Process\PhpExecutableFinder;
 
 #[AsCommand(name: 'install:api')]
 class ApiInstallCommand extends Command
@@ -63,6 +65,16 @@ class ApiInstallCommand extends Command
     {
         $this->requireComposerPackages($this->option('composer'), [
             'laravel/sanctum:dev-develop'
+        ]);
+
+        $php = (new PhpExecutableFinder())->find(false) ?: 'php';
+
+        $result = Process::run([
+            $php,
+            defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan',
+            'vendor:publish',
+            '--provider',
+            'Laravel\\Sanctum\\SanctumServiceProvider',
         ]);
     }
 }
