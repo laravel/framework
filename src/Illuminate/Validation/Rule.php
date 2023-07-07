@@ -190,7 +190,7 @@ class Rule
     /**
      * Get an in constraint builder instance.
      *
-     * @param  \Illuminate\Contracts\Support\Arrayable|array|string|null $values
+     * @param \Illuminate\Contracts\Support\Arrayable|array|string|null $values
      * @return \Illuminate\Validation\Rules\ArrayRule
      */
     public static function isArray($values = null)

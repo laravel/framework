@@ -23,7 +23,7 @@ class ArrayRule
     /**
      * Create a new isArray rule instance.
      *
-     * @param array|string|null $values
+     * @param  array|string|null  $values
      */
     public function __construct($values = null)
     {
