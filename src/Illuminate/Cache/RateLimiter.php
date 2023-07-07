@@ -66,7 +66,7 @@ class RateLimiter
      * @param  string  $key
      * @param  int  $maxAttempts
      * @param  \Closure  $callback
-     * @param  int  $decaySeconds
+     * @param  \DateTimeInterface|\DateInterval|int  $decaySeconds
      * @return mixed
      */
     public function attempt($key, $maxAttempts, Closure $callback, $decaySeconds = 60)
