@@ -62,6 +62,7 @@ class ValidationArrayRuleTest extends TestCase
 
         $this->assertSame('array', (string) $rule);
     }
+
     public function testItWillThrowAnExceptionIfAnInvalidEnumIsGiven()
     {
         $this->expectException(InvalidArgumentException::class);
