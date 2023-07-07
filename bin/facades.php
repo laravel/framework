@@ -346,10 +346,10 @@ function handleUnknownIdentifierType($method, $typeNode)
 
     if (
         in_array($typeNode->name, [
-                'TWhenParameter',
-                'TWhenReturnType',
-                'TUnlessParameter',
-                'TUnlessReturnType',
+            'TWhenParameter',
+            'TWhenReturnType',
+            'TUnlessParameter',
+            'TUnlessReturnType',
         ], strict: true) &&
         has_traits($method->getDeclaringClass()->getName(), Conditionable::class)
     ) {

@@ -181,7 +181,7 @@ class CallQueuedHandler
      */
     protected function ensureSuccessfulBatchJobIsRecorded($command)
     {
-        if (! has_traits($command, [Batchable::class, InteractsWithQueue::class], any: true)) {
+        if (! has_traits($command, [Batchable::class, InteractsWithQueue::class])) {
             return;
         }
 
