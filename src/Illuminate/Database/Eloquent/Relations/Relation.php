@@ -486,6 +486,25 @@ abstract class Relation implements BuilderContract
         return Arr::get(Relation::morphMap() ?: [], $class, $default);
     }
 
+
+    /**
+     * Retrieve the morph map alias from the morph class.
+     *
+     * @param  string $class
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public static function getMorphAliasFromClass($class, $default = null)
+    {
+        $morphMap = static::morphMap();
+
+        if (empty($morphMap) || ! in_array($class, $morphMap)) {
+            return $default;
+        }
+
+        return array_search($class, $morphMap, true);
+    }
+
     /**
      * Builds a table-keyed array from model class names.
      *
