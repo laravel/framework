@@ -282,7 +282,7 @@ class FileStore implements Store, LockProvider
      * @param  string  $key
      * @return array
      */
-    protected function getPayload($key)
+    public function getPayload($key)
     {
         $path = $this->path($key);
 
