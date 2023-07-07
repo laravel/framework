@@ -2,48 +2,10 @@
 
 namespace Illuminate\Queue\Failed;
 
-use DateTimeInterface;
-use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Support\Facades\Date;
 
-class DatabaseUuidFailedJobProvider implements FailedJobProviderInterface, PrunableFailedJobProvider
+class DatabaseUuidFailedJobProvider extends DatabaseFailedJobProvider
 {
-    /**
-     * The connection resolver implementation.
-     *
-     * @var \Illuminate\Database\ConnectionResolverInterface
-     */
-    protected $resolver;
-
-    /**
-     * The database connection name.
-     *
-     * @var string
-     */
-    protected $database;
-
-    /**
-     * The database table.
-     *
-     * @var string
-     */
-    protected $table;
-
-    /**
-     * Create a new database failed job provider.
-     *
-     * @param  \Illuminate\Database\ConnectionResolverInterface  $resolver
-     * @param  string  $database
-     * @param  string  $table
-     * @return void
-     */
-    public function __construct(ConnectionResolverInterface $resolver, $database, $table)
-    {
-        $this->table = $table;
-        $this->resolver = $resolver;
-        $this->database = $database;
-    }
-
     /**
      * Log a failed job into storage.
      *
@@ -107,49 +69,5 @@ class DatabaseUuidFailedJobProvider implements FailedJobProviderInterface, Pruna
     public function forget($id)
     {
         return $this->getTable()->where('uuid', $id)->delete() > 0;
-    }
-
-    /**
-     * Flush all of the failed jobs from storage.
-     *
-     * @param  int|null  $hours
-     * @return void
-     */
-    public function flush($hours = null)
-    {
-        $this->getTable()->when($hours, function ($query, $hours) {
-            $query->where('failed_at', '<=', Date::now()->subHours($hours));
-        })->delete();
-    }
-
-    /**
-     * Prune all of the entries older than the given date.
-     *
-     * @param  \DateTimeInterface  $before
-     * @return int
-     */
-    public function prune(DateTimeInterface $before)
-    {
-        $query = $this->getTable()->where('failed_at', '<', $before);
-
-        $totalDeleted = 0;
-
-        do {
-            $deleted = $query->take(1000)->delete();
-
-            $totalDeleted += $deleted;
-        } while ($deleted !== 0);
-
-        return $totalDeleted;
-    }
-
-    /**
-     * Get a new query builder instance for the table.
-     *
-     * @return \Illuminate\Database\Query\Builder
-     */
-    protected function getTable()
-    {
-        return $this->resolver->connection($this->database)->table($this->table);
     }
 }

@@ -122,11 +122,11 @@ class FileFailedJobProvider implements FailedJobProviderInterface, PrunableFaile
      * Flush all of the failed jobs from storage.
      *
      * @param  int|null  $hours
-     * @return void
+     * @return int
      */
     public function flush($hours = null)
     {
-        $this->prune(Date::now()->subHours($hours ?: 0));
+        return $this->prune(Date::now()->subHours($hours ?: 0));
     }
 
     /**

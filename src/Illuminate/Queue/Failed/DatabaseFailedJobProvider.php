@@ -100,13 +100,11 @@ class DatabaseFailedJobProvider implements FailedJobProviderInterface, PrunableF
      * Flush all of the failed jobs from storage.
      *
      * @param  int|null  $hours
-     * @return void
+     * @return int
      */
     public function flush($hours = null)
     {
-        $this->getTable()->when($hours, function ($query, $hours) {
-            $query->where('failed_at', '<=', Date::now()->subHours($hours));
-        })->delete();
+        return $this->prune(Date::now()->subHours($hours ?: 0));
     }
 
     /**
@@ -117,7 +115,7 @@ class DatabaseFailedJobProvider implements FailedJobProviderInterface, PrunableF
      */
     public function prune(DateTimeInterface $before)
     {
-        $query = $this->getTable()->where('failed_at', '<', $before);
+        $query = $this->getTable()->where('failed_at', '<=', $before);
 
         $totalDeleted = 0;
 

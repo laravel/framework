@@ -30,15 +30,18 @@ class DatabaseFailedJobProviderTest extends TestCase
         $provider = new DatabaseFailedJobProvider($db->getDatabaseManager(), 'default', 'failed_jobs');
 
         $db->getConnection()->table('failed_jobs')->insert(['failed_at' => Date::now()->subDays(10)]);
-        $provider->flush();
+        $count = $provider->flush();
+        $this->assertSame(1, $count);
         $this->assertSame(0, $db->getConnection()->table('failed_jobs')->count());
 
         $db->getConnection()->table('failed_jobs')->insert(['failed_at' => Date::now()->subDays(10)]);
-        $provider->flush(15 * 24);
+        $count = $provider->flush(15 * 24);
+        $this->assertSame(0, $count);
         $this->assertSame(1, $db->getConnection()->table('failed_jobs')->count());
 
         $db->getConnection()->table('failed_jobs')->insert(['failed_at' => Date::now()->subDays(10)]);
-        $provider->flush(10 * 24);
+        $count = $provider->flush(10 * 24);
+        $this->assertSame(2, $count);
         $this->assertSame(0, $db->getConnection()->table('failed_jobs')->count());
     }
 
