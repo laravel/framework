@@ -470,6 +470,51 @@ class SupportHelpersTest extends TestCase
         );
     }
 
+    public function testHasTraitsChecksRecursive()
+    {
+        $this->assertFalse(has_traits(
+            SupportTestClassTwo::class,
+            SupportTestTraitTwo::class,
+            recursive: false,
+        ));
+
+        $this->assertTrue(has_traits(
+            SupportTestClassTwo::class,
+            SupportTestTraitTwo::class,
+            recursive: true,
+        ));
+    }
+
+    public function testHasTraitsReturnsTrueIfClassHasAllTraits()
+    {
+        $this->assertTrue(has_traits(SupportTestClassTwo::class, [
+            SupportTestTraitOne::class,
+            SupportTestTraitTwo::class,
+        ]));
+    }
+
+    public function testHasTraitsReturnsTrueIfClassHasAnyTraits()
+    {
+        $this->assertTrue(has_traits(SupportTestClassOne::class, [
+            SupportTestTraitOne::class,
+            SupportTestTraitTwo::class,
+        ], recursive: false, any: true));
+    }
+
+    public function testHasTraitsAcceptsObject()
+    {
+        $this->assertTrue(
+            has_traits(new SupportTestClassOne, SupportTestTraitTwo::class),
+        );
+    }
+
+    public function testHasTraitsAcceptsTraits()
+    {
+        $this->assertTrue(
+            has_traits(SupportTestTraitTwo::class, SupportTestTraitOne::class),
+        );
+    }
+
     public function testTraitUsesRecursive()
     {
         $this->assertSame([

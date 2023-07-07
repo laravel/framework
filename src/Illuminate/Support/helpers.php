@@ -152,6 +152,30 @@ if (! function_exists('filled')) {
     }
 }
 
+if (! function_exists('has_traits')) {
+    /**
+     * Checks if a trait or class uses trait(s) (as well as parent classes
+     * and their traits when recursive).
+     *
+     * @param  object|class-string  $class_or_trait
+     * @param  class-string|array<class-string>  $traits
+     * @param  bool  $recursive  Check parent classes/traits
+     * @param  bool  $any  Return true if class_or_trait has ANY of the trait(s)
+     */
+    function has_traits(
+        string|object $class_or_trait,
+        string|array $traits,
+        bool $recursive = true,
+        bool $any = false,
+    ): bool {
+        $uses = $recursive
+            ? class_uses_recursive($class_or_trait)
+            : class_uses($class_or_trait);
+
+        return $any ? Arr::hasAny($uses, $traits) : Arr::has($uses, $traits);
+    }
+}
+
 if (! function_exists('object_get')) {
     /**
      * Get an item from an object using "dot" notation.
