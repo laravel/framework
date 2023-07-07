@@ -16,7 +16,7 @@ class ArrayRule
     /**
      * The accepted values.
      *
-     * @var array|string
+     * @var array|string|null
      */
     protected $values;
 
