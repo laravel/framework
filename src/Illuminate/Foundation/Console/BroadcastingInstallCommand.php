@@ -31,6 +31,7 @@ class BroadcastingInstallCommand extends Command
      */
     public function handle()
     {
+        // Install channel routes file...
         if (file_exists($broadcastingRoutesPath = $this->laravel->basePath('routes/channels.php')) &&
             ! $this->option('force')) {
             $this->components->error('Broadcasting routes file already exists.');
@@ -46,6 +47,7 @@ class BroadcastingInstallCommand extends Command
             );
         }
 
+        // Install bootstrapping...
         if (! file_exists($echoScriptPath = $this->laravel->resourcePath('js/echo.js'))) {
             copy(__DIR__.'/stubs/echo-js.stub', $echoScriptPath);
         }
