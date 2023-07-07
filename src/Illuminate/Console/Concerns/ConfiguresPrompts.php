@@ -31,7 +31,7 @@ trait ConfiguresPrompts
         ));
 
         PasswordPrompt::fallbackUsing(fn (PasswordPrompt $prompt) => $this->promptUntilValid(
-            fn () => $this->components->secret($prompt->label),
+            fn () => $this->components->secret($prompt->label) ?? '',
             $prompt->validate
         ));
 
