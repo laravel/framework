@@ -80,7 +80,7 @@ trait SerializesAndRestoresModelIdentifiers
         )->useWritePdo()->get();
 
         if (is_a($value->class, Pivot::class, true) ||
-            in_array(AsPivot::class, class_uses($value->class))) {
+            has_traits($value->class, AsPivot::class, recursive: false)) {
             return $collection;
         }
 

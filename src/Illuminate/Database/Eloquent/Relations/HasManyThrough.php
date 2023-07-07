@@ -153,7 +153,7 @@ class HasManyThrough extends Relation
      */
     public function throughParentSoftDeletes()
     {
-        return in_array(SoftDeletes::class, class_uses_recursive($this->throughParent));
+        return has_traits($this->throughParent, SoftDeletes::class);
     }
 
     /**

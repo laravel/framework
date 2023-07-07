@@ -208,7 +208,7 @@ trait InteractsWithDatabase
     protected function isSoftDeletableModel($model)
     {
         return $model instanceof Model
-            && in_array(SoftDeletes::class, class_uses_recursive($model));
+            && has_traits($model, SoftDeletes::class);
     }
 
     /**

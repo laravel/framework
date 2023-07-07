@@ -107,10 +107,7 @@ class Dispatcher implements QueueingDispatcher
      */
     public function dispatchNow($command, $handler = null)
     {
-        $uses = class_uses_recursive($command);
-
-        if (in_array(InteractsWithQueue::class, $uses) &&
-            in_array(Queueable::class, $uses) &&
+        if (has_traits($command, [InteractsWithQueue::class, Queueable::class]) &&
             ! $command->job) {
             $command->setJob(new SyncJob($this->container, json_encode([]), 'sync', 'sync'));
         }

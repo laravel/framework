@@ -42,14 +42,14 @@ class ImplicitRouteBinding
 
             $parent = $route->parentOfParameter($parameterName);
 
-            $routeBindingMethod = $route->allowsTrashedBindings() && in_array(SoftDeletes::class, class_uses_recursive($instance))
+            $routeBindingMethod = $route->allowsTrashedBindings() && has_traits($instance, SoftDeletes::class)
                         ? 'resolveSoftDeletableRouteBinding'
                         : 'resolveRouteBinding';
 
             if ($parent instanceof UrlRoutable &&
                 ! $route->preventsScopedBindings() &&
                 ($route->enforcesScopedBindings() || array_key_exists($parameterName, $route->bindingFields()))) {
-                $childRouteBindingMethod = $route->allowsTrashedBindings() && in_array(SoftDeletes::class, class_uses_recursive($instance))
+                $childRouteBindingMethod = $route->allowsTrashedBindings() && has_traits($instance, SoftDeletes::class)
                             ? 'resolveSoftDeletableChildRouteBinding'
                             : 'resolveChildRouteBinding';
 

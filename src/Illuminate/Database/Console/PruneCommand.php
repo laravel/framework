@@ -157,9 +157,7 @@ class PruneCommand extends Command
      */
     protected function isPrunable($model)
     {
-        $uses = class_uses_recursive($model);
-
-        return in_array(Prunable::class, $uses) || in_array(MassPrunable::class, $uses);
+        return has_traits($model, [Prunable::class, MassPrunable::class], any: true);
     }
 
     /**
@@ -173,7 +171,7 @@ class PruneCommand extends Command
         $instance = new $model;
 
         $count = $instance->prunable()
-            ->when(in_array(SoftDeletes::class, class_uses_recursive(get_class($instance))), function ($query) {
+            ->when(has_traits($instance, SoftDeletes::class), function ($query) {
                 $query->withTrashed();
             })->count();
 

@@ -153,7 +153,7 @@ class CallQueuedHandler
      */
     protected function setJobInstanceIfNecessary(Job $job, $instance)
     {
-        if (in_array(InteractsWithQueue::class, class_uses_recursive($instance))) {
+        if (has_traits($instance, InteractsWithQueue::class)) {
             $instance->setJob($job);
         }
 
@@ -181,10 +181,7 @@ class CallQueuedHandler
      */
     protected function ensureSuccessfulBatchJobIsRecorded($command)
     {
-        $uses = class_uses_recursive($command);
-
-        if (! in_array(Batchable::class, $uses) ||
-            ! in_array(InteractsWithQueue::class, $uses)) {
+        if (! has_traits($command, [Batchable::class, InteractsWithQueue::class], any: true)) {
             return;
         }
 
@@ -271,7 +268,7 @@ class CallQueuedHandler
      */
     protected function ensureFailedBatchJobIsRecorded(string $uuid, $command, $e)
     {
-        if (! in_array(Batchable::class, class_uses_recursive($command))) {
+        if (! has_traits($command, Batchable::class)) {
             return;
         }
 

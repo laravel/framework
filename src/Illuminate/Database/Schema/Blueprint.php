@@ -945,9 +945,7 @@ class Blueprint
             return $this->foreignId($column);
         }
 
-        $modelTraits = class_uses_recursive($model);
-
-        if (in_array(HasUlids::class, $modelTraits, true)) {
+        if (has_traits($model, HasUlids::class)) {
             return $this->foreignUlid($column);
         }
 

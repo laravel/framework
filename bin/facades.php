@@ -346,28 +346,28 @@ function handleUnknownIdentifierType($method, $typeNode)
 
     if (
         $typeNode->name === 'TWhenParameter' &&
-        in_array(Conditionable::class, class_uses_recursive($method->getDeclaringClass()->getName()))
+        has_traits($method->getDeclaringClass()->getName(), Conditionable::class)
     ) {
         return 'mixed';
     }
 
     if (
         $typeNode->name === 'TWhenReturnType' &&
-        in_array(Conditionable::class, class_uses_recursive($method->getDeclaringClass()->getName()))
+        has_traits($method->getDeclaringClass()->getName(), Conditionable::class)
     ) {
         return 'mixed';
     }
 
     if (
         $typeNode->name === 'TUnlessParameter' &&
-        in_array(Conditionable::class, class_uses_recursive($method->getDeclaringClass()->getName()))
+        has_traits($method->getDeclaringClass()->getName(), Conditionable::class)
     ) {
         return 'mixed';
     }
 
     if (
         $typeNode->name === 'TUnlessReturnType' &&
-        in_array(Conditionable::class, class_uses_recursive($method->getDeclaringClass()->getName()))
+        has_traits($method->getDeclaringClass()->getName(), Conditionable::class)
     ) {
         return 'mixed';
     }
