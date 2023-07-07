@@ -27,16 +27,19 @@ trait ConfiguresPrompts
 
         TextPrompt::fallbackUsing(fn (TextPrompt $prompt) => $this->promptUntilValid(
             fn () => $this->components->ask($prompt->label, $prompt->default ?: null) ?? '',
+            $prompt->required,
             $prompt->validate
         ));
 
         PasswordPrompt::fallbackUsing(fn (PasswordPrompt $prompt) => $this->promptUntilValid(
             fn () => $this->components->secret($prompt->label) ?? '',
+            $prompt->required,
             $prompt->validate
         ));
 
         ConfirmPrompt::fallbackUsing(fn (ConfirmPrompt $prompt) => $this->promptUntilValid(
             fn () => $this->components->confirm($prompt->label, $prompt->default),
+            $prompt->required,
             $prompt->validate
         ));
 
@@ -49,6 +52,7 @@ trait ConfiguresPrompts
 
             return $this->promptUntilValid(
                 fn () => $this->components->choice($prompt->label, $prompt->options, $default),
+                false,
                 $prompt->validate
             );
         });
@@ -57,6 +61,7 @@ trait ConfiguresPrompts
             if ($prompt->default !== []) {
                 return $this->promptUntilValid(
                     fn () => $this->components->choice($prompt->label, $prompt->options, implode(',', $prompt->default), multiple: true),
+                    $prompt->required,
                     $prompt->validate
                 );
             }
@@ -65,12 +70,14 @@ trait ConfiguresPrompts
                 fn () => collect($this->components->choice($prompt->label, ['' => 'None', ...$prompt->options], 'None', multiple: true))
                     ->reject('')
                     ->all(),
+                $prompt->required,
                 $prompt->validate
             );
         });
 
         SuggestPrompt::fallbackUsing(fn (SuggestPrompt $prompt) => $this->promptUntilValid(
             fn () => $this->components->askWithCompletion($prompt->label, $prompt->options, $prompt->default ?: null) ?? '',
+            $prompt->required,
             $prompt->validate
         ));
     }
@@ -79,13 +86,20 @@ trait ConfiguresPrompts
      * Prompt the user until the given validation callback passes.
      *
      * @param  \Closure  $prompt
+     * @param  bool|string  $required
      * @param  \Closure|null  $validate
      * @return mixed
      */
-    protected function promptUntilValid($prompt, $validate)
+    protected function promptUntilValid($prompt, $required, $validate)
     {
         while (true) {
             $result = $prompt();
+
+            if ($required && ($result === '' || $result === [] || $result === false)) {
+                $this->components->error(is_string($required) ? $required : 'Required.');
+
+                continue;
+            }
 
             if ($validate) {
                 $error = $validate($result);
