@@ -902,7 +902,33 @@ if (! function_exists('today')) {
     }
 }
 
-if (! function_exists('trans')) {
+if (!function_exists('yesterday')) {
+    /**
+     * Create a new Carbon instance for yesterday.
+     *
+     * @param  \DateTimeZone|string|null  $tz
+     * @return \Illuminate\Support\Carbon
+     */
+    function yesterday($tz = null)
+    {
+        return today($tz = null)->subDay();
+    }
+}
+
+if (!function_exists('tomorrow')) {
+    /**
+     * Create a new Carbon instance for tomorrow.
+     *
+     * @param  \DateTimeZone|string|null  $tz
+     * @return \Illuminate\Support\Carbon
+     */
+    function tomorrow($tz = null)
+    {
+        return today($tz = null)->addDay();
+    }
+}
+
+if (!function_exists('trans')) {
     /**
      * Translate the given message.
      *
