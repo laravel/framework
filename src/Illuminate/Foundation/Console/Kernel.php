@@ -341,7 +341,7 @@ class Kernel implements KernelContract
         $namespace = $this->app->getNamespace();
 
         foreach ((new Finder)->in($paths)->files() as $file) {
-            $command = $this->classFromFile($file, $namespace);
+            $command = $this->commandClassFromFile($file, $namespace);
 
             if (is_subclass_of($command, Command::class) &&
                 ! (new ReflectionClass($command))->isAbstract()) {
@@ -350,6 +350,22 @@ class Kernel implements KernelContract
                 });
             }
         }
+    }
+
+    /**
+     * Extract the command class name from the given file path.
+     *
+     * @param  \SplFileInfo  $file
+     * @param  string  $namespace
+     * @return string
+     */
+    protected function commandClassFromFile(SplFileInfo $file, string $namespace): string
+    {
+        return $namespace.str_replace(
+            ['/', '.php'],
+            ['\\', ''],
+            Str::after($file->getRealPath(), realpath(app_path()).DIRECTORY_SEPARATOR)
+        );
     }
 
     /**
@@ -516,17 +532,5 @@ class Kernel implements KernelContract
     protected function renderException($output, Throwable $e)
     {
         $this->app[ExceptionHandler::class]->renderForConsole($output, $e);
-    }
-
-    /**
-     * Extract the class name from the given file path.
-     */
-    protected function classFromFile(SplFileInfo $file, string $namespace): string
-    {
-        return $namespace.str_replace(
-            ['/', '.php'],
-            ['\\', ''],
-            Str::after($file->getRealPath(), realpath(app_path()).DIRECTORY_SEPARATOR)
-        );
     }
 }
