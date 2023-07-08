@@ -72,13 +72,13 @@ class PruneCommand extends Command
             $this->components->twoColumnDetail($event->model, "{$event->count} records");
         });
 
-        $events->dispatch(new ModelPruningStarting($models->toArray()));
+        $events->dispatch(new ModelPruningStarting($models->all()));
 
         $models->each(function ($model) {
             $this->pruneModel($model);
         });
 
-        $events->dispatch(new ModelPruningFinished($models->toArray()));
+        $events->dispatch(new ModelPruningFinished($models->all()));
 
         $events->forget(ModelsPruned::class);
     }
