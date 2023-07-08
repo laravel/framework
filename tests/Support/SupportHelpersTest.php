@@ -430,21 +430,21 @@ class SupportHelpersTest extends TestCase
 
         $this->assertEquals(
             ['hello' => 'world'],
-            data_remove($data, 'foo')
+            data_forget($data, 'foo')
         );
 
         $data = ['foo' => 'bar', 'hello' => 'world'];
 
         $this->assertEquals(
             ['foo' => 'bar', 'hello' => 'world'],
-            data_remove($data, 'nothing')
+            data_forget($data, 'nothing')
         );
 
         $data = ['one' => ['two' => ['three' => 'hello', 'four' => ['five']]]];
 
         $this->assertEquals(
             ['one' => ['two' => ['four' => ['five']]]],
-            data_remove($data, 'one.two.three')
+            data_forget($data, 'one.two.three')
         );
     }
 
@@ -470,7 +470,7 @@ class SupportHelpersTest extends TestCase
                     ],
                 ],
             ],
-            data_remove($data, 'article.comments.*.name')
+            data_forget($data, 'article.comments.*.name')
         );
     }
 
@@ -493,7 +493,7 @@ class SupportHelpersTest extends TestCase
             ],
         ];
 
-        data_remove($data, 'posts.*.comments.*.name');
+        data_forget($data, 'posts.*.comments.*.name');
 
         $this->assertEquals([
             'posts' => [
