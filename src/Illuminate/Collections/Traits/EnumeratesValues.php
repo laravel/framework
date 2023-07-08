@@ -796,7 +796,7 @@ trait EnumeratesValues
     {
         $useAsCallable = $this->useAsCallable($callback);
 
-        if (! $useAsCallable && func_num_args() !== 1) {
+        if (! $useAsCallable && func_num_args() > 1) {
             return $this->reject($this->operatorForWhere(...func_get_args()));
         }
 
