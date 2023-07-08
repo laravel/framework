@@ -471,9 +471,7 @@ class LogManager implements LoggerInterface
      */
     protected function formatter()
     {
-        return tap(new LineFormatter(null, $this->dateFormat, true, true), function ($formatter) {
-            $formatter->includeStacktraces();
-        });
+        return new LineFormatter(null, $this->dateFormat, true, true, true);
     }
 
     /**
