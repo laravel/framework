@@ -3899,6 +3899,20 @@ class SupportCollectionTest extends TestCase
         $c = new $collection(['foo', 'bar']);
         $this->assertEquals(['foo', 'bar'], $c->reject('baz')->values()->all());
 
+        $c = new $collection([
+            ['name' => 'foo', 'score' => 15],
+            ['name' => 'bar', 'score' => 10],
+            ['name' => 'baz', 'score' => 4],
+        ]);
+        $this->assertEquals([
+            ['name' => 'foo', 'score' => 15],
+            ['name' => 'bar', 'score' => 10],
+        ], $c->reject('score', '<', 5)->values()->all());
+        $this->assertEquals([
+            ['name' => 'bar', 'score' => 10],
+            ['name' => 'baz', 'score' => 4],
+        ], $c->reject('name', 'foo')->values()->all());
+
         $c = new $collection(['foo', 'bar']);
         $this->assertEquals(['foo', 'bar'], $c->reject(function ($v) {
             return $v === 'baz';

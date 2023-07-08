@@ -788,11 +788,17 @@ trait EnumeratesValues
      * Create a collection of all elements that do not pass a given truth test.
      *
      * @param  (callable(TValue, TKey): bool)|bool|TValue  $callback
+     * @param  mixed  $operator
+     * @param  mixed  $value
      * @return static
      */
-    public function reject($callback = true)
+    public function reject($callback = true, $operator = null, $value = null)
     {
         $useAsCallable = $this->useAsCallable($callback);
+
+        if (! $useAsCallable && func_num_args() !== 1) {
+            return $this->reject($this->operatorForWhere(...func_get_args()));
+        }
 
         return $this->filter(function ($value, $key) use ($callback, $useAsCallable) {
             return $useAsCallable
