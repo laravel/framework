@@ -2,7 +2,7 @@
 
 namespace Illuminate\Database\Events;
 
-class ModelsPruningEnded
+class ModelPruningFinished
 {
     /**
      * The class names of the models that were pruned.

@@ -11,9 +11,9 @@ use Illuminate\Database\Eloquent\MassPrunable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Prunable;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Events\ModelPruningFinished;
+use Illuminate\Database\Events\ModelPruningStarting;
 use Illuminate\Database\Events\ModelsPruned;
-use Illuminate\Database\Events\ModelsPruningEnded;
-use Illuminate\Database\Events\ModelsPruningStarted;
 use Illuminate\Events\Dispatcher;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -201,13 +201,13 @@ class PruneCommandTest extends TestCase
         $dispatcher = m::mock(DispatcherContract::class);
 
         $dispatcher->shouldReceive('dispatch')->once()->withArgs(function ($event) {
-            return get_class($event) === ModelsPruningStarted::class &&
+            return get_class($event) === ModelPruningStarting::class &&
                 $event->models === [PrunableTestModelWithPrunableRecords::class];
         });
         $dispatcher->shouldReceive('listen')->once()->with(ModelsPruned::class, m::type(Closure::class));
         $dispatcher->shouldReceive('dispatch')->twice()->with(m::type(ModelsPruned::class));
         $dispatcher->shouldReceive('dispatch')->once()->withArgs(function ($event) {
-            return get_class($event) === ModelsPruningEnded::class &&
+            return get_class($event) === ModelPruningFinished::class &&
                 $event->models === [PrunableTestModelWithPrunableRecords::class];
         });
         $dispatcher->shouldReceive('forget')->once()->with(ModelsPruned::class);
