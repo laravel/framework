@@ -4,7 +4,7 @@ namespace Illuminate\Foundation;
 
 use Exception;
 
-class ManifestNotFoundException extends Exception
+class ViteManifestNotFoundException extends Exception
 {
     //
 }
