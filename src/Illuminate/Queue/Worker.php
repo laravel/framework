@@ -705,7 +705,7 @@ class Worker
 
         if ($this->cache) {
             $lastRestart = $this->cache->get('illuminate:queue:restart');
-            
+
             if ($lastRestart === null) {
                 $lastRestart = now();
                 $this->cache->forever('illuminate:queue:restart', $lastRestart);

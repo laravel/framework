@@ -3,20 +3,15 @@
 namespace Illuminate\Tests\Queue;
 
 use Exception;
-
 use Illuminate\Cache\CacheManager;
 use Illuminate\Cache\Console\ClearCommand;
-use Illuminate\Contracts\Cache\Repository;
-use Illuminate\Filesystem\Filesystem;
-use Illuminate\Foundation\Application;
-use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Output\NullOutput;
-use Illuminate\Support\Facades\Queue;
-
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Queue\Job as QueueJobContract;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Foundation\Application;
 use Illuminate\Queue\Events\JobExceptionOccurred;
 use Illuminate\Queue\Events\JobPopped;
 use Illuminate\Queue\Events\JobPopping;
@@ -30,6 +25,8 @@ use Illuminate\Support\Carbon;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\NullOutput;
 
 class QueueWorkerTest extends TestCase
 {
@@ -137,7 +134,7 @@ class QueueWorkerTest extends TestCase
         $this->command->run(new ArrayInput([]), new NullOutput);
 
         $status = $worker->daemon('default', 'queue', $workerOptions);
-        
+
         $this->assertSame(0, $status);
     }
 
