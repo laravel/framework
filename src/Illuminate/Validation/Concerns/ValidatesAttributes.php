@@ -1388,17 +1388,7 @@ trait ValidatesAttributes
      */
     public function validateJson($attribute, $value)
     {
-        if (is_array($value)) {
-            return false;
-        }
-
-        if (! is_scalar($value) && ! is_null($value) && ! method_exists($value, '__toString')) {
-            return false;
-        }
-
-        json_decode($value);
-
-        return json_last_error() === JSON_ERROR_NONE;
+        return Str::isJson($value);
     }
 
     /**
