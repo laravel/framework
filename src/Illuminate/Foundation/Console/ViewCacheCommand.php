@@ -33,19 +33,38 @@ class ViewCacheCommand extends Command
      */
     public function handle()
     {
-        $this->callSilent('view:clear');
+        $latestCachedTimestamp = $this->latestCachedTimestamp();
 
         $this->paths()->each(function ($path) {
-            $prefix = $this->output->isVeryVerbose() ? '<fg=yellow;options=bold>DIR</> ' : '';
-
-            $this->components->task($prefix.$path, null, OutputInterface::VERBOSITY_VERBOSE);
-
-            $this->compileViews($this->bladeFilesIn([$path]));
+            $this->compileViewsIn($path);
         });
 
         $this->newLine();
 
         $this->components->info('Blade templates cached successfully.');
+
+        $newLatestCachedTimestamp = $this->latestCachedTimestamp();
+
+        if (! is_null($latestCachedTimestamp) &&
+            ! is_null($newLatestCachedTimestamp) &&
+            $latestCachedTimestamp < $newLatestCachedTimestamp) {
+            $this->pruneViewsCachedBefore($newLatestCachedTimestamp);
+        }
+    }
+
+    /**
+     * Compile the view files in the given directory.
+     *
+     * @param  \Illuminate\Support\Collection  $views
+     * @return void
+     */
+    protected function compileViewsIn($path)
+    {
+        $prefix = $this->output->isVeryVerbose() ? '<fg=yellow;options=bold>DIR</> ' : '';
+
+        $this->components->task($prefix.$path, null, OutputInterface::VERBOSITY_VERBOSE);
+
+        $this->compileViews($this->bladeFilesIn([$path]));
     }
 
     /**
@@ -97,6 +116,46 @@ class ViewCacheCommand extends Command
 
         return collect($finder->getPaths())->merge(
             collect($finder->getHints())->flatten()
+        );
+    }
+
+    /**
+     * Prune all views cached before the given timestamp.
+     *
+     * @param  int  $timestamp
+     * @return void
+     */
+    protected function pruneViewsCachedBefore($timestamp)
+    {
+        return $this->cachedViews()->each(function ($file) use ($timestamp) {
+            if ($file->getMTime() < $timestamp) {
+                @unlink($file->getRealPath());
+            }
+        });
+    }
+
+    /**
+     * Get the timestamp of the latest cached view.
+     *
+     * @return int
+     */
+    protected function latestCachedTimestamp()
+    {
+        return $this->cachedViews()->map->getMTime()->max();
+    }
+
+    /**
+     * Get a collection of the currently cached views.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    protected function cachedViews()
+    {
+        return collect(
+            Finder::create()
+                ->in([$this->laravel['config']->get('view.compiled')])
+                ->name('*.php')
+                ->files()
         );
     }
 }
