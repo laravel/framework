@@ -326,6 +326,25 @@ class SupportStringableTest extends TestCase
         }));
     }
 
+    public function testWhenIsUrl()
+    {
+        $this->assertSame('https://laravel.com/docs', (string) $this->stringable('https://laravel.com')->whenIsUrl(function ($stringable) {
+            return $stringable->append('/docs');
+        }, function ($stringable) {
+            return $stringable->append('/not-found');
+        }));
+
+        $this->assertSame('https://laravel.com/docs', (string) $this->stringable('https://laravel.com')->whenIsUrl(function ($stringable) {
+            return $stringable->append('/docs');
+        }));
+
+        $this->assertSame('https://laravel.com/docs', (string) $this->stringable('https://laravel.com')->whenIsUrl(function ($stringable) {
+            return $stringable->append('/docs');
+        }, function ($stringable) {
+            return $stringable->append('/not-found');
+        }));
+    }
+
     public function testWhenIsUuid()
     {
         $this->assertSame('Uuid: 2cdc7039-65a6-4ac7-8e5d-d554a98e7b15', (string) $this->stringable('2cdc7039-65a6-4ac7-8e5d-d554a98e7b15')->whenIsUuid(function ($stringable) {
