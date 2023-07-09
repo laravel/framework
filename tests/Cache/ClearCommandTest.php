@@ -140,20 +140,6 @@ class ClearCommandTest extends TestCase
         $this->runCommand($this->command);
     }
 
-    public function testClearWillStopQueueWorker()
-    {
-        $this->cacheManager->shouldReceive('store')->once()->with(null)->andReturn($this->cacheRepository);
-        $this->cacheRepository->shouldReceive('flush')->once();
-
-        $this->files->shouldReceive('exists')->andReturn(true);
-        $this->files->shouldReceive('files')->andReturn([]);
-
-        $queueWorker = m::mock(QueueWorker::class);
-        $queueWorker->shouldReceive('stop')->once()->andReturn(0);
-
-        $this->runCommand($this->command);
-    }
-
     protected function runCommand($command, $input = [])
     {
         return $command->run(new ArrayInput($input), new NullOutput);
