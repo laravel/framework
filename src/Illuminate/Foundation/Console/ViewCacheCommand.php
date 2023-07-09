@@ -55,7 +55,7 @@ class ViewCacheCommand extends Command
     /**
      * Compile the view files in the given directory.
      *
-     * @param  \Illuminate\Support\Collection  $views
+     * @param  string  $path
      * @return void
      */
     protected function compileViewsIn($path)
