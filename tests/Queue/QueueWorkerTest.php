@@ -3,6 +3,16 @@
 namespace Illuminate\Tests\Queue;
 
 use Exception;
+
+use Illuminate\Cache\CacheManager;
+use Illuminate\Cache\Console\ClearCommand;
+use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Foundation\Application;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\NullOutput;
+use Illuminate\Support\Facades\Queue;
+
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -98,6 +108,37 @@ class QueueWorkerTest extends TestCase
         $this->events->shouldHaveReceived('dispatch')->with(m::type(JobProcessing::class))->once();
 
         $this->events->shouldHaveReceived('dispatch')->with(m::type(JobProcessed::class))->once();
+    }
+
+    public function testWorkerStopsWhenCacheCleared()
+    {
+        $this->cacheManager = m::mock(CacheManager::class);
+        $this->files = m::mock(Filesystem::class);
+        $this->cacheRepository = m::mock(Repository::class);
+        $this->command = new ClearCommand($this->cacheManager, $this->files);
+
+        $this->files->shouldReceive('exists')->andReturn(true);
+        $this->files->shouldReceive('files')->andReturn([]);
+
+        $this->cacheManager->shouldReceive('store')->once()->with(null)->andReturn($this->cacheRepository);
+        $this->cacheRepository->shouldReceive('flush')->once();
+        $this->cacheRepository->shouldReceive('get');
+        $this->cacheRepository->shouldReceive('forever');
+
+        $app = new Application;
+        $app['path.storage'] = __DIR__;
+        $this->command->setLaravel($app);
+
+        $workerOptions = new WorkerOptions;
+
+        $worker = $this->getWorker('default', ['queue' => []]);
+        $worker->setCache($this->cacheRepository);
+
+        $this->command->run(new ArrayInput([]), new NullOutput);
+
+        $status = $worker->daemon('default', 'queue', $workerOptions);
+        
+        $this->assertSame(0, $status);
     }
 
     public function testJobCanBeFiredBasedOnPriority()

@@ -701,9 +701,18 @@ class Worker
      */
     protected function getTimestampOfLastQueueRestart()
     {
+        $lastRestart = null;
+
         if ($this->cache) {
-            return $this->cache->get('illuminate:queue:restart');
+            $lastRestart = $this->cache->get('illuminate:queue:restart');
+            
+            if ($lastRestart === null) {
+                $lastRestart = now();
+                $this->cache->forever('illuminate:queue:restart', $lastRestart);
+            }
         }
+
+        return $lastRestart;
     }
 
     /**
