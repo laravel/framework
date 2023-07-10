@@ -31,6 +31,13 @@ class SqlServerGrammar extends Grammar
     protected $serials = ['tinyInteger', 'smallInteger', 'mediumInteger', 'integer', 'bigInteger'];
 
     /**
+     * The possible serial column keys.
+     *
+     * @var string[]
+     */
+    protected $serialsKeys = ['primary', 'unique'];
+
+    /**
      * The commands to be executed outside of create or alter command.
      *
      * @var string[]
@@ -992,12 +999,15 @@ class SqlServerGrammar extends Grammar
     protected function modifyIncrement(Blueprint $blueprint, Fluent $column)
     {
         if (! $column->change && in_array($column->type, $this->serials) && $column->autoIncrement) {
-            if (!in_array($column->autoIncrement, $this->supportedSerialKeyTypes(), true)) {
-                throw new \InvalidArgumentException(
-                    "Unsupported indentity key type [{$column->autoIncrement}]."
+            $key = is_string($column->autoIncrement) ? $column->autoIncrement : $this->getDefaultSerialKeyType();
+            
+            if (!in_array($key, $this->serialsKeys)) {
+                throw new \RuntimeException(
+                    "Unsupported indentity key type [{$key}]."
                 );
             }
-            return ' identity primary key';
+
+            return " identity {$key} key";
         }
     }
 
@@ -1054,12 +1064,12 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
-     * Get the supported serial key types.
-     *
-     * @return string[]
+     * Get the default key type for the serials.
+     * 
+     * @return string
      */
-    public function supportedSerialKeyTypes(): array
+    protected function getDefaultSerialKeyType(): string
     {
-        return ['primary', 'unique'];
+        return \Illuminate\Support\Arr::first(array: $this->serialsKeys, default: 'primary');
     }
 }

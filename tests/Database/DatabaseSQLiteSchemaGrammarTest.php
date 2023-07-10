@@ -300,6 +300,16 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertSame('alter table "users" add column "foo" integer primary key autoincrement not null', $statements[0]);
     }
 
+    public function testAddingNonPrimaryAutoIncrementColumnThrowsException()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Unsupported autoincrement key type [unique].');
+
+        $blueprint = new Blueprint('users');
+        $blueprint->integer('customer_number', 'unique');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+    }
+
     public function testAddingForeignID()
     {
         $blueprint = new Blueprint('users');

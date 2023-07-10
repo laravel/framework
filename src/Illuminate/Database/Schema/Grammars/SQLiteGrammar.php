@@ -27,6 +27,13 @@ class SQLiteGrammar extends Grammar
     protected $serials = ['bigInteger', 'integer', 'mediumInteger', 'smallInteger', 'tinyInteger'];
 
     /**
+     * The possible serial column keys.
+     *
+     * @var string[]
+     */
+    protected $serialsKeys = ['primary'];
+
+    /**
      * Compile the query to determine if a table exists.
      *
      * @return string
@@ -987,18 +994,20 @@ class SQLiteGrammar extends Grammar
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $column
      * @return string|null
-     * 
+     *
      * @throws \RuntimeException
      */
     protected function modifyIncrement(Blueprint $blueprint, Fluent $column)
     {
         if (in_array($column->type, $this->serials) && $column->autoIncrement) {
-            if (!in_array($column->autoIncrement, $this->supportedSerialKeyTypes(), true)) {
-                throw new \InvalidArgumentException(
-                    "Unsupported autoincrement key type [{$column->autoIncrement}]."
+            $key = is_string($column->autoIncrement) ? $column->autoIncrement : $this->getDefaultSerialKeyType();
+            if (!in_array($key, $this->serialsKeys)) {
+                throw new \RuntimeException(
+                    "Unsupported autoincrement key type [{$key}]."
                 );
             }
-            return ' primary key autoincrement';
+
+            return " {$key} key autoincrement";
         }
     }
 
@@ -1015,8 +1024,13 @@ class SQLiteGrammar extends Grammar
         return 'json_extract('.$field.$path.')';
     }
 
-    public function supportedSerialKeyTypes(): array
+    /**
+     * Get the default key type for the serials.
+     *
+     * @return string
+     */
+    protected function getDefaultSerialKeyType(): string
     {
-        return ['primary'];
+        return \Illuminate\Support\Arr::first(array: $this->serialsKeys, default: 'primary');
     }
 }

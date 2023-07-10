@@ -28,6 +28,13 @@ class MySqlGrammar extends Grammar
     protected $serials = ['bigInteger', 'integer', 'mediumInteger', 'smallInteger', 'tinyInteger'];
 
     /**
+     * The possible serial column keys.
+     *
+     * @var string[]
+     */
+    protected $serialsKeys = ['primary', 'unique'];
+
+    /**
      * The commands to be executed outside of create or alter command.
      *
      * @var string[]
@@ -1192,12 +1199,14 @@ class MySqlGrammar extends Grammar
     protected function modifyIncrement(Blueprint $blueprint, Fluent $column)
     {
         if (in_array($column->type, $this->serials) && $column->autoIncrement) {
-            if (!in_array($column->autoIncrement, $this->supportedAutoIncrementKeyTypes(), true)) {
+            $key = is_string($column->autoIncrement) ? $column->autoIncrement : $this->getDefaultSerialKeyType();
+
+            if (!in_array($key, $this->serialsKeys)) {
                 throw new \RuntimeException(
-                    "Unsupported auto_increment key type [{$column->autoIncrement}]."
+                    "Unsupported auto_increment key type [{$key}]."
                 );
             }
-            return " auto_increment {$column->autoIncrement} key";
+            return " auto_increment {$key} key";
         }
     }
 
@@ -1286,12 +1295,12 @@ class MySqlGrammar extends Grammar
     }
 
     /**
-     * Get the supported auto increment key types.
-     *
-     * @return string[]
+     * Get the default key type for the serials.
+     * 
+     * @return string
      */
-    protected function supportedAutoIncrementKeyTypes(): array
+    protected function getDefaultSerialKeyType(): string
     {
-        return ['primary', 'unique'];
+        return \Illuminate\Support\Arr::first(array: $this->serialsKeys, default: 'primary');
     }
 }

@@ -66,6 +66,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame('alter table `users` auto_increment = 1000', $statements[1]);
     }
 
+
     public function testAddColumnsWithMultipleAutoIncrementStartingValue()
     {
         $blueprint = new Blueprint('users');
@@ -77,6 +78,29 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
             'alter table `users` add `id` bigint unsigned not null auto_increment primary key, add `name` varchar(255) not null',
             'alter table `users` auto_increment = 100',
         ], $statements);
+    }
+
+    public function testAddNonPrimaryAutoIncrementColumn()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->integer('customer_number', 'unique');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals(
+            'alter table `users` add `customer_number` int not null auto_increment unique key',
+            $statements[0]
+        );
+    }
+
+    public function testInvalidKeyForIncrementColumnThrowsException()
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Unsupported auto_increment key type [index].');
+
+        $blueprint = new Blueprint('users');
+        $blueprint->integer('customer_number', 'index');
+        $blueprint->toSql($this->getConnection(), $this->getGrammar());
     }
 
     public function testEngineCreateTable()

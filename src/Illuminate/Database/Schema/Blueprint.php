@@ -793,7 +793,7 @@ class Blueprint
      * @param  bool  $unsigned
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function integer($column, $autoIncrement = false, $unsigned = false)
+    public function integer($column, bool|string $autoIncrement = false, $unsigned = false)
     {
         return $this->addColumn('integer', $column, compact('autoIncrement', 'unsigned'));
     }
@@ -802,7 +802,7 @@ class Blueprint
      * Create a new tiny integer (1-byte) column on the table.
      *
      * @param  string  $column
-     * @param  bool  $autoIncrement
+     * @param  bool|string  $autoIncrement
      * @param  bool  $unsigned
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
@@ -815,7 +815,7 @@ class Blueprint
      * Create a new small integer (2-byte) column on the table.
      *
      * @param  string  $column
-     * @param  bool  $autoIncrement
+     * @param  bool|string  $autoIncrement
      * @param  bool  $unsigned
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
@@ -857,7 +857,7 @@ class Blueprint
      * @param  bool  $autoIncrement
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function unsignedInteger($column, $autoIncrement = false)
+    public function unsignedInteger($column, bool|string $autoIncrement = false)
     {
         return $this->integer($column, $autoIncrement, true);
     }

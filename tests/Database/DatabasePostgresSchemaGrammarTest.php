@@ -67,6 +67,29 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         ], $statements);
     }
 
+    public function testAddNonPrimaryAutoIncrementColumn()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->integer('customer_number', 'unique');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals(
+            'alter table "users" add column "customer_number" serial not null unique key',
+            $statements[0]
+        );
+    }
+
+    public function testInvalidKeyForIncrementColumnThrowsException()
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Unsupported serial key type [index].');
+
+        $blueprint = new Blueprint('users');
+        $blueprint->integer('customer_number', 'index');
+        $blueprint->toSql($this->getConnection(), $this->getGrammar());
+    }
+
     public function testCreateTableAndCommentColumn()
     {
         $blueprint = new Blueprint('users');

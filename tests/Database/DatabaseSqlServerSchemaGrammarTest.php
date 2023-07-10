@@ -345,6 +345,30 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertSame('alter table "users" add "foo" bigint not null identity primary key', $statements[0]);
     }
 
+    public function testAddNonPrimaryAutoIncrementColumn()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->integer('customer_number', 'unique');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals(
+            'alter table "users" add "customer_number" int not null identity unique key',
+            $statements[0]
+        );
+    }
+
+    public function testInvalidKeyForIncrementColumnThrowsException()
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Unsupported indentity key type [index]');
+
+        $blueprint = new Blueprint('users');
+        $blueprint->integer('customer_number', 'index');
+        $blueprint->toSql($this->getConnection(), $this->getGrammar());
+    }
+
+
     public function testAddingForeignID()
     {
         $blueprint = new Blueprint('users');
