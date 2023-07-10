@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 namespace Illuminate\Tests\Integration\Testing;
 
@@ -8,7 +8,8 @@ use Orchestra\Testbench\TestCase;
 
 class TestWithoutDatabaseParallelTest extends TestCase
 {
-    protected function getPackageProviders($app) {
+    protected function getPackageProviders($app)
+    {
         return [ParallelTestingServiceProvider::class];
     }
 
@@ -25,5 +26,4 @@ class TestWithoutDatabaseParallelTest extends TestCase
         // We should not create a database connection to check if it's SQLite or not.
         ParallelTesting::callSetUpProcessCallbacks();
     }
-
 }
