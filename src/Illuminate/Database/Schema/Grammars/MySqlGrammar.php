@@ -1201,11 +1201,12 @@ class MySqlGrammar extends Grammar
         if (in_array($column->type, $this->serials) && $column->autoIncrement) {
             $key = is_string($column->autoIncrement) ? $column->autoIncrement : $this->getDefaultSerialKeyType();
 
-            if (!in_array($key, $this->serialsKeys)) {
+            if (! in_array($key, $this->serialsKeys)) {
                 throw new \RuntimeException(
                     "Unsupported auto_increment key type [{$key}]."
                 );
             }
+
             return " auto_increment {$key} key";
         }
     }
@@ -1296,7 +1297,7 @@ class MySqlGrammar extends Grammar
 
     /**
      * Get the default key type for the serials.
-     * 
+     *
      * @return string
      */
     protected function getDefaultSerialKeyType(): string

@@ -92,6 +92,18 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
             $statements[0]
         );
     }
+    public function testAddNonPrimaryAutoIncrementColumnAsModifier()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->integer('customer_number')->autoIncrement('unique');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals(
+            'alter table `users` add `customer_number` int not null auto_increment unique key',
+            $statements[0]
+        );
+    }
 
     public function testInvalidKeyForIncrementColumnThrowsException()
     {
