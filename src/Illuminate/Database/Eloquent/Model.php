@@ -22,8 +22,9 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use JsonSerializable;
 use LogicException;
+use Stringable;
 
-abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToString, HasBroadcastChannel, Jsonable, JsonSerializable, QueueableEntity, UrlRoutable
+abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToString, HasBroadcastChannel, Jsonable, JsonSerializable, QueueableEntity, Stringable, UrlRoutable
 {
     use Concerns\HasAttributes,
         Concerns\HasEvents,

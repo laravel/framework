@@ -4,8 +4,9 @@ namespace Illuminate\Testing;
 
 use Illuminate\Testing\Assert as PHPUnit;
 use Illuminate\Testing\Constraints\SeeInOrder;
+use Stringable;
 
-class TestComponent
+class TestComponent implements Stringable
 {
     /**
      * The original component.

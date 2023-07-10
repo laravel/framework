@@ -14,9 +14,10 @@ use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\ViewErrorBag;
+use Stringable;
 use Throwable;
 
-class View implements ArrayAccess, Htmlable, ViewContract
+class View implements ArrayAccess, Htmlable, Stringable, ViewContract
 {
     use Macroable {
         __call as macroCall;
