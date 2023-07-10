@@ -704,11 +704,36 @@ class Worker
         $lastRestart = null;
 
         if ($this->cache) {
-            $lastRestart = $this->cache->get('illuminate:queue:restart');
+            $lockKey = 'illuminate:queue:restart:lock';
+            $maxAttempts = 5;
+            $retryDelaySeconds = 0.1;
 
-            if ($lastRestart === null) {
-                $lastRestart = now();
-                $this->cache->forever('illuminate:queue:restart', $lastRestart);
+            $attempts = 0;
+            $lockAcquired = false;
+
+            while ($attempts < $maxAttempts && !$lockAcquired) {
+                $lockAcquired = $this->cache->add($lockKey, true, 2);
+
+                if (!$lockAcquired) {
+                    sleep($retryDelaySeconds);
+                    $attempts++;
+                }
+            }
+
+            if ($lockAcquired) {
+                try {
+                    $lastRestart = $this->cache->get('illuminate:queue:restart');
+
+                    if ($lastRestart === null) {
+                        $lastRestart = now();
+                        $this->cache->forever('illuminate:queue:restart', $lastRestart);
+                    }
+                } finally {
+                    $this->cache->forget($lockKey);
+                }
+            } else {
+                // Lock couldn't be acquired after maximum attempts, so we'll just return null
+                return null;
             }
         }
 
