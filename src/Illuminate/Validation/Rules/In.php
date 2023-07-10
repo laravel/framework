@@ -2,7 +2,9 @@
 
 namespace Illuminate\Validation\Rules;
 
-class In
+use Stringable;
+
+class In implements Stringable
 {
     /**
      * The name of the rule.
