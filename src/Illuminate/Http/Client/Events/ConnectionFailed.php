@@ -2,8 +2,6 @@
 
 namespace Illuminate\Http\Client\Events;
 
-use Illuminate\Http\Client\Request;
-
 class ConnectionFailed
 {
     /**
@@ -19,7 +17,7 @@ class ConnectionFailed
      * @param  \Illuminate\Http\Client\Request  $request
      * @return void
      */
-    public function __construct(Request $request)
+    public function __construct($request)
     {
         $this->request = $request;
     }
