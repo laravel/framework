@@ -711,10 +711,10 @@ class Worker
             $attempts = 0;
             $lockAcquired = false;
 
-            while ($attempts < $maxAttempts && !$lockAcquired) {
+            while ($attempts < $maxAttempts && ! $lockAcquired) {
                 $lockAcquired = $this->cache->add($lockKey, true, 2);
 
-                if (!$lockAcquired) {
+                if (! $lockAcquired) {
                     sleep($retryDelaySeconds);
                     $attempts++;
                 }

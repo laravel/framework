@@ -119,8 +119,10 @@ class QueueWorkerTest extends TestCase
 
         $this->cacheManager->shouldReceive('store')->once()->with(null)->andReturn($this->cacheRepository);
         $this->cacheRepository->shouldReceive('flush')->once();
-        $this->cacheRepository->shouldReceive('get');
-        $this->cacheRepository->shouldReceive('forever');
+        $this->cacheRepository->shouldReceive('get')->once()->andReturn(null);
+        $this->cacheRepository->shouldReceive('forever')->once()->andReturn(true);
+        $this->cacheRepository->shouldReceive('add')->once()->andReturn(true);
+        $this->cacheRepository->shouldReceive('forget')->once()->andReturn(true);
 
         $app = new Application;
         $app['path.storage'] = __DIR__;
