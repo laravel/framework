@@ -389,6 +389,42 @@ if (! function_exists('dispatch')) {
     }
 }
 
+if (! function_exists('dispatch_if')) {
+    /**
+     * Dispatch a job to its appropriate handler if the given condition is true.
+     *
+     * @param  bool  $boolean
+     * @param  mixed  $job
+     * @return void|\Illuminate\Foundation\Bus\PendingDispatch
+     */
+    function dispatch_if($boolean, $job)
+    {
+        if ($boolean) {
+            return $job instanceof Closure
+                ? new PendingClosureDispatch(CallQueuedClosure::create($job))
+                : new PendingDispatch($job);
+        }
+    }
+}
+
+if (! function_exists('dispatch_unless')) {
+    /**
+     * Dispatch a job to its appropriate handler unless the given condition is true.
+     *
+     * @param  bool  $boolean
+     * @param  mixed  $job
+     * @return void|\Illuminate\Foundation\Bus\PendingDispatch
+     */
+    function dispatch_unless($boolean, $job)
+    {
+        if (! $boolean) {
+            return $job instanceof Closure
+                ? new PendingClosureDispatch(CallQueuedClosure::create($job))
+                : new PendingDispatch($job);
+        }
+    }
+}
+
 if (! function_exists('dispatch_sync')) {
     /**
      * Dispatch a command to its appropriate handler in the current process.
