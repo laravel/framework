@@ -576,11 +576,12 @@ class Builder implements BuilderContract
      *
      * @param  array  $attributes
      * @param  array  $values
+     * @param  array  $newValues
      * @return \Illuminate\Database\Eloquent\Model|static
      */
-    public function updateOrCreate(array $attributes, array $values = [])
+    public function updateOrCreate(array $attributes, array $values = [], array $newValues = [])
     {
-        return tap($this->firstOrNew($attributes), function ($instance) use ($values) {
+        return tap($this->firstOrNew($attributes, $newValues), function ($instance) use ($values) {
             $instance->fill($values)->save();
         });
     }
