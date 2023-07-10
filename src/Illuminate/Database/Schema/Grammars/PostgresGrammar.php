@@ -1137,7 +1137,7 @@ class PostgresGrammar extends Grammar
             if (!in_array($column->autoIncrement, $this->supportedAutoIncrementKeyTypes(), true)) {
                 throw new \RuntimeException(
                     "Invalid serial key type [{$column->autoIncrement}]."
-                )
+                );
             }
             return " {$column->autoIncrement} key";
         }
