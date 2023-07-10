@@ -1132,8 +1132,14 @@ class PostgresGrammar extends Grammar
     {
         if (! $column->change
             && (in_array($column->type, $this->serials) || ($column->generatedAs !== null))
-            && $column->autoIncrement) {
-            return ' primary key';
+            && $column->autoIncrement
+        ) {
+            if (!in_array($column->autoIncrement, $this->supportedAutoIncrementKeyTypes(), true)) {
+                throw new \RuntimeException(
+                    "Invalid serial key type [{$column->autoIncrement}]."
+                )
+            }
+            return " {$column->autoIncrement} key";
         }
     }
 
@@ -1215,5 +1221,15 @@ class PostgresGrammar extends Grammar
         }
 
         return $sql;
+    }
+
+    /**
+     * Get the supported serial key types.
+     *
+     * @return string[]
+     */
+    protected function supportedAutoIncrementKeyTypes(): array
+    {
+        return ['primary', 'unique'];
     }
 }

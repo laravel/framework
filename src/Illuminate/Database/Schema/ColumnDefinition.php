@@ -7,7 +7,7 @@ use Illuminate\Support\Fluent;
 /**
  * @method $this after(string $column) Place the column "after" another column (MySQL)
  * @method $this always(bool $value = true) Used as a modifier for generatedAs() (PostgreSQL)
- * @method $this autoIncrement() Set INTEGER columns as auto-increment (primary key)
+ * @method $this autoIncrement(string $indexType = 'PRIMARY') Set INTEGER columns as auto-increment (primary key)
  * @method $this change() Change the column
  * @method $this charset(string $charset) Specify a character set for the column (MySQL)
  * @method $this collation(string $collation) Specify a collation for the column (MySQL/PostgreSQL/SQL Server)

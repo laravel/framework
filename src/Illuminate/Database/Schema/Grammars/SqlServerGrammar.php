@@ -992,6 +992,11 @@ class SqlServerGrammar extends Grammar
     protected function modifyIncrement(Blueprint $blueprint, Fluent $column)
     {
         if (! $column->change && in_array($column->type, $this->serials) && $column->autoIncrement) {
+            if (!in_array($column->autoIncrement, $this->supportedSerialKeyTypes(), true)) {
+                throw new \InvalidArgumentException(
+                    "Unsupported indentity key type [{$column->autoIncrement}]."
+                );
+            }
             return ' identity primary key';
         }
     }
@@ -1046,5 +1051,15 @@ class SqlServerGrammar extends Grammar
         }
 
         return "N'$value'";
+    }
+
+    /**
+     * Get the supported serial key types.
+     *
+     * @return string[]
+     */
+    public function supportedSerialKeyTypes(): array
+    {
+        return ['primary', 'unique'];
     }
 }

@@ -987,10 +987,17 @@ class SQLiteGrammar extends Grammar
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $column
      * @return string|null
+     * 
+     * @throws \RuntimeException
      */
     protected function modifyIncrement(Blueprint $blueprint, Fluent $column)
     {
         if (in_array($column->type, $this->serials) && $column->autoIncrement) {
+            if (!in_array($column->autoIncrement, $this->supportedSerialKeyTypes(), true)) {
+                throw new \InvalidArgumentException(
+                    "Unsupported autoincrement key type [{$column->autoIncrement}]."
+                );
+            }
             return ' primary key autoincrement';
         }
     }
@@ -1006,5 +1013,10 @@ class SQLiteGrammar extends Grammar
         [$field, $path] = $this->wrapJsonFieldAndPath($value);
 
         return 'json_extract('.$field.$path.')';
+    }
+
+    public function supportedSerialKeyTypes(): array
+    {
+        return ['primary'];
     }
 }

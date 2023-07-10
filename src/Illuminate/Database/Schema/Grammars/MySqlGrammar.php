@@ -1186,11 +1186,18 @@ class MySqlGrammar extends Grammar
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $column
      * @return string|null
+     *
+     * @throws \RuntimeException
      */
     protected function modifyIncrement(Blueprint $blueprint, Fluent $column)
     {
         if (in_array($column->type, $this->serials) && $column->autoIncrement) {
-            return ' auto_increment primary key';
+            if (!in_array($column->autoIncrement, $this->supportedAutoIncrementKeyTypes(), true)) {
+                throw new \RuntimeException(
+                    "Unsupported auto_increment key type [{$column->autoIncrement}]."
+                );
+            }
+            return " auto_increment {$column->autoIncrement} key";
         }
     }
 
@@ -1276,5 +1283,15 @@ class MySqlGrammar extends Grammar
         [$field, $path] = $this->wrapJsonFieldAndPath($value);
 
         return 'json_unquote(json_extract('.$field.$path.'))';
+    }
+
+    /**
+     * Get the supported auto increment key types.
+     *
+     * @return string[]
+     */
+    protected function supportedAutoIncrementKeyTypes(): array
+    {
+        return ['primary', 'unique'];
     }
 }
