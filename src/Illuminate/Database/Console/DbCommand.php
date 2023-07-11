@@ -130,7 +130,7 @@ class DbCommand extends Command
     public function getCommand(array $connection)
     {
         return [
-            'mysql' => 'mysql',
+            'mysql' => $this->isMariaDBInstalled() ? 'mariadb' : 'mysql',
             'pgsql' => 'psql',
             'sqlite' => 'sqlite3',
             'sqlsrv' => 'sqlcmd',
@@ -223,5 +223,25 @@ class DbCommand extends Command
         return array_values(array_filter($args, function ($key) use ($connection) {
             return ! empty($connection[$key]);
         }, ARRAY_FILTER_USE_KEY));
+    }
+
+    /**
+     * Check if MariaDB is installed on the system.
+     *
+     * @return bool
+     */
+    protected function isMariaDBInstalled()
+    {
+        $finder = 'which';
+        $program = 'mariadb';
+
+        if (windows_os()) {
+            $finder = 'where';
+        }
+
+        $process = new Process([$finder, $program]);
+        $process->run();
+
+        return $process->isSuccessful();
     }
 }
