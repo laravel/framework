@@ -1,6 +1,35 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.14.1...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v10.15.0...10.x)
+
+## [v10.15.0](https://github.com/laravel/framework/compare/v10.14.1...v10.15.0) - 2023-07-11
+
+- [10.x] Change return type of `getPrivateToken` in AblyBroadcaster by [@milwad](https://github.com/milwad)-dev in https://github.com/laravel/framework/pull/47602
+- [10.x] Add toRawSql, dumpRawSql() and ddRawSql() to Query Builders by [@tpetry](https://github.com/tpetry) in https://github.com/laravel/framework/pull/47507
+- [10.x] Fix recorderHandler not recording changes made by middleware by [@j3j5](https://github.com/j3j5) in https://github.com/laravel/framework/pull/47614
+- Pass queue from Mailable to SendQueuedMailable job by [@Tarpsvo](https://github.com/Tarpsvo) in https://github.com/laravel/framework/pull/47612
+- [10.x] Sub-minute Scheduling by [@jessarcher](https://github.com/jessarcher) in https://github.com/laravel/framework/pull/47279
+- [10.x] Fixes failing tests running on DynamoDB Local 2.0.0 by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/47653
+- [10.x] Allow password reset callback to modify the result by [@GrahamCampbell](https://github.com/GrahamCampbell) in https://github.com/laravel/framework/pull/47641
+- Forget with collections by [@joelbutcher](https://github.com/joelbutcher) in https://github.com/laravel/framework/pull/47637
+- [10.x] Do not apply global scopes when incrementing/decrementing an existing model by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/47629
+- [10.x] Adds inline attachments support for "notifications" markdown mailables by [@nunomaduro](https://github.com/nunomaduro) in https://github.com/laravel/framework/pull/47643
+- Assertions for counting outgoing mailables by [@jasonmccreary](https://github.com/jasonmccreary) in https://github.com/laravel/framework/pull/47655
+- [10.x] Add getRawQueryLog() method by [@fuwasegu](https://github.com/fuwasegu) in https://github.com/laravel/framework/pull/47623
+- [10.x] Fix Storage::cloud() return type by [@tattali](https://github.com/tattali) in https://github.com/laravel/framework/pull/47664
+- [10.x] Add `isUrl` to the `Str` class and use it from the validator by [@GrahamCampbell](https://github.com/GrahamCampbell) in https://github.com/laravel/framework/pull/47688
+- [10.x] Remove unwanted call to include stack traces by [@HazzazBinFaiz](https://github.com/HazzazBinFaiz) in https://github.com/laravel/framework/pull/47687
+- [10.x] Make Vite throw a new `ManifestNotFoundException` by [@innocenzi](https://github.com/innocenzi) in https://github.com/laravel/framework/pull/47681
+- [10.x] Move class from file logic in Console Kernel to dedicated method by [@CalebDW](https://github.com/CalebDW) in https://github.com/laravel/framework/pull/47665
+- [10.x] Dispatch model pruning started and ended events by [@ziadoz](https://github.com/ziadoz) in https://github.com/laravel/framework/pull/47669
+- [10.x] Update DatabaseRule to handle Enums for simple where clause by [@CalebDW](https://github.com/CalebDW) in https://github.com/laravel/framework/pull/47679
+- [10.x] Add data_remove helper by [@PhiloNL](https://github.com/PhiloNL) in https://github.com/laravel/framework/pull/47618
+- [10.x] Added tests for `isUrl` to Str. by [@michaelnabil230](https://github.com/michaelnabil230) in https://github.com/laravel/framework/pull/47690
+- [10.x] Added `isUrl` to Stringable.  by [@michaelnabil230](https://github.com/michaelnabil230) in https://github.com/laravel/framework/pull/47689
+- [10.x] Tweak return type for missing config by [@sfreytag](https://github.com/sfreytag) in https://github.com/laravel/framework/pull/47702
+- [10.x] Fix parallel testing without any database connection by [@deleugpn](https://github.com/deleugpn) in https://github.com/laravel/framework/pull/47705
+- [10.x] Test Improvements by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/47709
+- [10.x] Allows HTTP exceptions to be thrown for views by [@nunomaduro](https://github.com/nunomaduro) in https://github.com/laravel/framework/pull/47714
 
 ## [v10.14.1](https://github.com/laravel/framework/compare/v10.14.0...v10.14.1) - 2023-06-28
 
