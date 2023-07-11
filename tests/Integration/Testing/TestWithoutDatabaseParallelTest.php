@@ -14,21 +14,12 @@ class TestWithoutDatabaseParallelTest extends TestCase
     }
 
     /**
-     * @define-env defineParallelEnvironmentWithoutDatabase
-     */
-    public function testRunningParallelTestWithoutDatabaseShouldNotCrashOnDefaultConnection()
-    {
-        // We should not create a database connection to check if it's SQLite or not.
-        ParallelTesting::callSetUpProcessCallbacks();
-    }
-
-    /**
      * Define the test environment.
      *
      * @param  \Illuminate\Foundation\Application  $app
      * @return void
      */
-    protected function defineParallelEnvironmentWithoutDatabase($app)
+    protected function defineEnvironment($app)
     {
         // Given an application that does not use database connections at all
         $app['config']->set('database.default', null);
@@ -45,5 +36,11 @@ class TestWithoutDatabaseParallelTest extends TestCase
                 $_SERVER['TEST_TOKEN'],
             );
         });
+    }
+
+    public function testRunningParallelTestWithoutDatabaseShouldNotCrashOnDefaultConnection()
+    {
+        // We should not create a database connection to check if it's SQLite or not.
+        ParallelTesting::callSetUpProcessCallbacks();
     }
 }
