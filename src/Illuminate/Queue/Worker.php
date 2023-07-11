@@ -701,9 +701,22 @@ class Worker
      */
     protected function getTimestampOfLastQueueRestart()
     {
-        if ($this->cache) {
-            return $this->cache->get('illuminate:queue:restart');
+        if (! $this->cache) {
+            return null;
         }
+        // If we have a restart timestamp, return it.
+        $restartTimestamp = $this->cache->get('illuminate:queue:restart');
+        if ($restartTimestamp !== null) {
+            return $restartTimestamp;
+        }
+        // If no timestamp is set, cache one and use that.
+        return $this->cache->lock('illuminate:queue:restart-lock', 5)->block(5, function () {
+                     return $this->cache
+                                 ->rememberForever(
+                                     'illuminate:queue:restart',
+                                         fn() => Carbon::now()->getTimestamp()
+                                 );
+                 });
     }
 
     /**
