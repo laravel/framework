@@ -405,6 +405,12 @@ class SupportStrTest extends TestCase
         $this->assertTrue(Str::is([null], null));
     }
 
+    public function testIsUrl()
+    {
+        $this->assertTrue(Str::isUrl('https://laravel.com'));
+        $this->assertFalse(Str::isUrl('invalid url'));
+    }
+
     /**
      * @dataProvider validUuidList
      */

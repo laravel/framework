@@ -154,7 +154,7 @@ trait DatabaseRule
      * Set a "where in" constraint on the query.
      *
      * @param  string  $column
-     * @param  \Illuminate\Contracts\Support\Arrayable|array  $values
+     * @param  \Illuminate\Contracts\Support\Arrayable|\BackedEnum|array  $values
      * @return $this
      */
     public function whereIn($column, $values)
@@ -168,7 +168,7 @@ trait DatabaseRule
      * Set a "where not in" constraint on the query.
      *
      * @param  string  $column
-     * @param  \Illuminate\Contracts\Support\Arrayable|array  $values
+     * @param  \Illuminate\Contracts\Support\Arrayable|\BackedEnum|array  $values
      * @return $this
      */
     public function whereNotIn($column, $values)
