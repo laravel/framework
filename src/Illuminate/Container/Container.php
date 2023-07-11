@@ -638,7 +638,7 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Call the given Closure / class@method and inject its dependencies.
      *
-     * @param  callable|string  $callback
+     * @param  callable|array|string  $callback
      * @param  array<string, mixed>  $parameters
      * @param  string|null  $defaultMethod
      * @return mixed
