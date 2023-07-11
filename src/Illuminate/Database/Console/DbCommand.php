@@ -16,7 +16,8 @@ class DbCommand extends Command
      */
     protected $signature = 'db {connection? : The database connection that should be used}
                {--read : Connect to the read connection}
-               {--write : Connect to the write connection}';
+               {--write : Connect to the write connection}
+               {--driver= :  The database driver to use}';
 
     /**
      * The console command description.
@@ -129,8 +130,14 @@ class DbCommand extends Command
      */
     public function getCommand(array $connection)
     {
+        if ($driver = $this->option('driver')) {
+            if ($driver === 'mariadb' && $connection['driver'] === 'mysql') {
+                return $driver;
+            }
+        }
+
         return [
-            'mysql' => $this->isMariaDBInstalled() ? 'mariadb' : 'mysql',
+            'mysql' => 'mysql',
             'pgsql' => 'psql',
             'sqlite' => 'sqlite3',
             'sqlsrv' => 'sqlcmd',
@@ -223,25 +230,5 @@ class DbCommand extends Command
         return array_values(array_filter($args, function ($key) use ($connection) {
             return ! empty($connection[$key]);
         }, ARRAY_FILTER_USE_KEY));
-    }
-
-    /**
-     * Check if MariaDB is installed on the system.
-     *
-     * @return bool
-     */
-    protected function isMariaDBInstalled()
-    {
-        $finder = 'which';
-        $program = 'mariadb';
-
-        if (windows_os()) {
-            $finder = 'where';
-        }
-
-        $process = new Process([$finder, $program]);
-        $process->run();
-
-        return $process->isSuccessful();
     }
 }
