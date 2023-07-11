@@ -11,6 +11,7 @@ use Illuminate\View\Engines\CompilerEngine;
 use Illuminate\View\ViewException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class ViewCompilerEngineTest extends TestCase
 {
@@ -41,6 +42,30 @@ class ViewCompilerEngineTest extends TestCase
 
         $this->assertSame('Hello World
 ', $results);
+    }
+
+    public function testRegularExceptionsAreReThrownAsViewExceptions()
+    {
+        $engine = $this->getEngine();
+        $engine->getCompiler()->shouldReceive('getCompiledPath')->with(__DIR__.'/fixtures/foo.php')->andReturn(__DIR__.'/fixtures/regular-exception.php');
+        $engine->getCompiler()->shouldReceive('isExpired')->once()->andReturn(false);
+
+        $this->expectException(ViewException::class);
+        $this->expectExceptionMessage('regular exception message');
+
+        $engine->get(__DIR__.'/fixtures/foo.php');
+    }
+
+    public function testHttpExceptionsAreNotReThrownAsViewExceptions()
+    {
+        $engine = $this->getEngine();
+        $engine->getCompiler()->shouldReceive('getCompiledPath')->with(__DIR__.'/fixtures/foo.php')->andReturn(__DIR__.'/fixtures/http-exception.php');
+        $engine->getCompiler()->shouldReceive('isExpired')->once()->andReturn(false);
+
+        $this->expectException(HttpException::class);
+        $this->expectExceptionMessage('http exception message');
+
+        $engine->get(__DIR__.'/fixtures/foo.php');
     }
 
     public function testThatViewsAreNotAskTwiceIfTheyAreExpired()
