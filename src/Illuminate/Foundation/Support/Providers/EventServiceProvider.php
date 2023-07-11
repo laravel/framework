@@ -11,21 +11,21 @@ class EventServiceProvider extends ServiceProvider
     /**
      * The event handler mappings for the application.
      *
-     * @var array<string, array<int, string>>
+     * @var array<class-string, array<int, class-string>>
      */
     protected $listen = [];
 
     /**
      * The subscribers to register.
      *
-     * @var array
+     * @var array<class-string|object>
      */
     protected $subscribe = [];
 
     /**
      * The model observers to register.
      *
-     * @var array<string, string|object|array<int, string|object>>
+     * @var array<class-string, string|object|array<int, string|object>>
      */
     protected $observers = [];
 
