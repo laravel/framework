@@ -7,6 +7,8 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Eloquent\MassPrunable;
 use Illuminate\Database\Eloquent\Prunable;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Events\ModelPruningFinished;
+use Illuminate\Database\Events\ModelPruningStarting;
 use Illuminate\Database\Events\ModelsPruned;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -70,9 +72,13 @@ class PruneCommand extends Command
             $this->components->twoColumnDetail($event->model, "{$event->count} records");
         });
 
+        $events->dispatch(new ModelPruningStarting($models->all()));
+
         $models->each(function ($model) {
             $this->pruneModel($model);
         });
+
+        $events->dispatch(new ModelPruningFinished($models->all()));
 
         $events->forget(ModelsPruned::class);
     }

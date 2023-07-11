@@ -103,7 +103,7 @@ class PasswordBrokerManager implements FactoryContract
      * Get the password broker configuration.
      *
      * @param  string  $name
-     * @return array
+     * @return array|null
      */
     protected function getConfig($name)
     {

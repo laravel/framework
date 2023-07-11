@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use Illuminate\Database\Capsule\Manager as DB;
@@ -10,8 +11,11 @@ use Illuminate\Database\Eloquent\MassPrunable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Prunable;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Events\ModelPruningFinished;
+use Illuminate\Database\Events\ModelPruningStarting;
 use Illuminate\Database\Events\ModelsPruned;
 use Illuminate\Events\Dispatcher;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -192,6 +196,27 @@ class PruneCommandTest extends TestCase
         $this->assertEquals(4, PrunableTestSoftDeletedModelWithPrunableRecords::withTrashed()->count());
     }
 
+    public function testTheCommandDispatchesEvents()
+    {
+        $dispatcher = m::mock(DispatcherContract::class);
+
+        $dispatcher->shouldReceive('dispatch')->once()->withArgs(function ($event) {
+            return get_class($event) === ModelPruningStarting::class &&
+                $event->models === [PrunableTestModelWithPrunableRecords::class];
+        });
+        $dispatcher->shouldReceive('listen')->once()->with(ModelsPruned::class, m::type(Closure::class));
+        $dispatcher->shouldReceive('dispatch')->twice()->with(m::type(ModelsPruned::class));
+        $dispatcher->shouldReceive('dispatch')->once()->withArgs(function ($event) {
+            return get_class($event) === ModelPruningFinished::class &&
+                $event->models === [PrunableTestModelWithPrunableRecords::class];
+        });
+        $dispatcher->shouldReceive('forget')->once()->with(ModelsPruned::class);
+
+        Container::getInstance()->singleton(DispatcherContract::class, fn () => $dispatcher);
+
+        $this->artisan(['--model' => PrunableTestModelWithPrunableRecords::class]);
+    }
+
     protected function artisan($arguments)
     {
         $input = new ArrayInput($arguments);
@@ -209,6 +234,8 @@ class PruneCommandTest extends TestCase
         parent::tearDown();
 
         Container::setInstance(null);
+
+        m::close();
     }
 }
 
