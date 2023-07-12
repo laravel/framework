@@ -164,11 +164,31 @@ class ScheduleListCommand extends Command
      */
     private function getNextDueDateForEvent($event, DateTimeZone $timezone)
     {
-        return Carbon::instance(
+        $nextDueDate = Carbon::instance(
             (new CronExpression($event->expression))
                 ->getNextRunDate(Carbon::now()->setTimezone($event->timezone))
                 ->setTimezone($timezone)
         );
+
+        if (! $event->isRepeatable()) {
+            return $nextDueDate;
+        }
+
+        $previousDueDate = Carbon::instance(
+            (new CronExpression($event->expression))
+                ->getPreviousRunDate(Carbon::now()->setTimezone($event->timezone), allowCurrentDate: true)
+                ->setTimezone($timezone)
+        );
+
+        $now = Carbon::now()->setTimezone($event->timezone);
+
+        if (! $now->copy()->startOfMinute()->eq($previousDueDate)) {
+            return $nextDueDate;
+        }
+
+        return $now
+            ->endOfSecond()
+            ->ceilSeconds($event->repeatSeconds);
     }
 
     /**
