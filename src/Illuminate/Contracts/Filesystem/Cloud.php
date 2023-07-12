@@ -11,4 +11,11 @@ interface Cloud extends Filesystem
      * @return string
      */
     public function url($path);
+
+    /**
+     * Determine if a file exists.
+     * @param  string  $path
+     * @return bool
+     */
+    public function fileExists(string $path);
 }
