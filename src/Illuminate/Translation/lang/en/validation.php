@@ -144,7 +144,7 @@ return [
     ],
     'starts_with' => 'The :attribute field must start with one of the following: :values.',
     'string' => 'The :attribute field must be a string.',
-    'timezone' => 'The :attribute field must be a valid timezone.',
+    'timezone' => 'The :attribute field must be of a valid timezone.',
     'unique' => 'The :attribute has already been taken.',
     'uploaded' => 'The :attribute failed to upload.',
     'uppercase' => 'The :attribute field must be uppercase.',
