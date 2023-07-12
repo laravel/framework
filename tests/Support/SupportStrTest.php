@@ -696,6 +696,22 @@ class SupportStrTest extends TestCase
         $this->assertSame('ÖffentlicheÜberraschungen', Str::studly('öffentliche-überraschungen'));
     }
 
+
+    public function testStartWithUpper()
+    {
+        $this->assertTrue(Str::startWithUpper('Upper'));
+        $this->assertFalse(Str::startWithUpper('lower'));
+        $this->assertFalse(Str::startWithUpper(''));
+    }
+
+
+    public function testStartWithLower()
+    {
+        $this->assertTrue(Str::startWithLower('lower'));
+        $this->assertFalse(Str::startWithLower('Upper'));
+        $this->assertFalse(Str::startWithLower(''));
+    }
+
     public function testMask()
     {
         $this->assertSame('tay*************', Str::mask('taylor@email.com', '*', 3));

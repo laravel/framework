@@ -1481,4 +1481,24 @@ class Str
         static::$camelCache = [];
         static::$studlyCache = [];
     }
+
+    /**
+     * Check a string start with upper case or not
+     * @param  string  $string
+     * @return bool
+     */
+    public static function startWithUpper(string $string) {
+        $chr = mb_substr ($string, 0, 1, "UTF-8");
+        return  mb_strtolower($chr, "UTF-8") != $chr;
+    }
+
+    /**
+     * Check a string start with lower case or not
+     * @param  string  $string
+     * @return bool
+     */
+    public static function startWithLower(string $string) {
+        $chr = mb_substr ($string, 0, 1, "UTF-8");
+        return mb_strtoupper($chr, "UTF-8") != $chr;
+    }
 }
