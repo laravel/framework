@@ -62,12 +62,16 @@ class ScheduleListCommand extends Command
 
         $expressionSpacing = $this->getCronExpressionSpacing($events);
 
+        $repeatExpressionSpacing = $this->getRepeatExpressionSpacing($events);
+
         $timezone = new DateTimeZone($this->option('timezone') ?? config('app.timezone'));
 
         $events = $this->sortEvents($events, $timezone);
 
-        $events = $events->map(function ($event) use ($terminalWidth, $expressionSpacing, $timezone) {
+        $events = $events->map(function ($event) use ($terminalWidth, $expressionSpacing, $repeatExpressionSpacing, $timezone) {
             $expression = $this->formatCronExpression($event->expression, $expressionSpacing);
+
+            $repeatExpression = str_pad($this->getRepeatExpression($event), $repeatExpressionSpacing);
 
             $command = $event->command ?? '';
 
@@ -101,15 +105,16 @@ class ScheduleListCommand extends Command
             $hasMutex = $event->mutex->exists($event) ? 'Has Mutex › ' : '';
 
             $dots = str_repeat('.', max(
-                $terminalWidth - mb_strlen($expression.$command.$nextDueDateLabel.$nextDueDate.$hasMutex) - 8, 0
+                $terminalWidth - mb_strlen($expression.$repeatExpression.$command.$nextDueDateLabel.$nextDueDate.$hasMutex) - 8, 0
             ));
 
             // Highlight the parameters...
             $command = preg_replace("#(php artisan [\w\-:]+) (.+)#", '$1 <fg=yellow;options=bold>$2</>', $command);
 
             return [sprintf(
-                '  <fg=yellow>%s</>  %s<fg=#6C7280>%s %s%s %s</>',
+                '  <fg=yellow>%s</> <fg=#6C7280>%s</> %s<fg=#6C7280>%s %s%s %s</>',
                 $expression,
+                $repeatExpression,
                 $command,
                 $dots,
                 $hasMutex,
@@ -139,6 +144,28 @@ class ScheduleListCommand extends Command
         $rows = $events->map(fn ($event) => array_map('mb_strlen', preg_split("/\s+/", $event->expression)));
 
         return collect($rows[0] ?? [])->keys()->map(fn ($key) => $rows->max($key))->all();
+    }
+
+    /**
+     * Gets the spacing to be used on each event row.
+     *
+     * @param  \Illuminate\Support\Collection  $events
+     * @return int
+     */
+    private function getRepeatExpressionSpacing($events)
+    {
+        return $events->map(fn ($event) => mb_strlen($this->getRepeatExpression($event)))->max();
+    }
+
+    /**
+     * Gets the repeat expression for an event.
+     *
+     * @param  \Illuminate\Console\Scheduling\Event  $event
+     * @return string
+     */
+    private function getRepeatExpression($event)
+    {
+        return $event->isRepeatable() ? "{$event->repeatSeconds}s " : '';
     }
 
     /**
