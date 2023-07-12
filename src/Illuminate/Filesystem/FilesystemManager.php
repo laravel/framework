@@ -86,7 +86,7 @@ class FilesystemManager implements FactoryContract
     /**
      * Get a default cloud filesystem instance.
      *
-     * @return \Illuminate\Contracts\Filesystem\Cloud
+     * @return \Illuminate\Filesystem\FilesystemAdapter
      */
     public function cloud()
     {
@@ -167,7 +167,7 @@ class FilesystemManager implements FactoryContract
      * Create an instance of the local driver.
      *
      * @param  array  $config
-     * @return \Illuminate\Contracts\Filesystem\Filesystem
+     * @return \Illuminate\Filesystem\FilesystemAdapter
      */
     public function createLocalDriver(array $config)
     {
@@ -191,7 +191,7 @@ class FilesystemManager implements FactoryContract
      * Create an instance of the ftp driver.
      *
      * @param  array  $config
-     * @return \Illuminate\Contracts\Filesystem\Filesystem
+     * @return \Illuminate\Filesystem\FilesystemAdapter
      */
     public function createFtpDriver(array $config)
     {
@@ -208,7 +208,7 @@ class FilesystemManager implements FactoryContract
      * Create an instance of the sftp driver.
      *
      * @param  array  $config
-     * @return \Illuminate\Contracts\Filesystem\Filesystem
+     * @return \Illuminate\Filesystem\FilesystemAdapter
      */
     public function createSftpDriver(array $config)
     {
@@ -229,7 +229,7 @@ class FilesystemManager implements FactoryContract
      * Create an instance of the Amazon S3 driver.
      *
      * @param  array  $config
-     * @return \Illuminate\Contracts\Filesystem\Cloud
+     * @return \Illuminate\Filesystem\AwsS3V3Adapter
      */
     public function createS3Driver(array $config)
     {
