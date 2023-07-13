@@ -560,15 +560,17 @@ trait ValidatesAttributes
                 $errors = DateTime::getLastErrors();
 
                 // Validates only that the specified format can be parsed
-                if (!$date || isset($errors['errors']) || isset($errors['warnings'])) {
+                if (! $date || isset($errors['errors']) || isset($errors['warnings'])) {
                     continue;
                 }
 
-                if (!$strict) {
+                if (! $strict) {
                     return true;
                 } else {
                     // Validates an exact match with the parsed and reformatted version in the specified format
-                    if ($date->format($format) === $value) return true;
+                    if ($date->format($format) === $value) {
+                        return true;
+                    }
                 }
             } catch (ValueError) {
                 return false;
