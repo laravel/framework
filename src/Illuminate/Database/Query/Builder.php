@@ -2291,6 +2291,20 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a "having count" clause to the query.
+     *
+     * @param  string  $column
+     * @param  string|null  $operator
+     * @param  int|null  $value
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function havingCount($column, $operator = null, $value = null, $boolean = 'and')
+    {
+        return $this->havingRaw("COUNT({$this->grammar->wrap($column)}) $operator ?", [$value], $boolean);
+    }
+
+    /**
      * Add an "order by" clause to the query.
      *
      * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Contracts\Database\Query\Expression|string  $column
