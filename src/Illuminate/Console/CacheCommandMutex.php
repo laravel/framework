@@ -3,6 +3,7 @@
 namespace Illuminate\Console;
 
 use Carbon\CarbonInterval;
+use Illuminate\Cache\DynamoDbStore;
 use Illuminate\Contracts\Cache\Factory as Cache;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Support\InteractsWithTime;
@@ -45,13 +46,15 @@ class CacheCommandMutex implements CommandMutex
     {
         $store = $this->cache->store($this->store);
 
-        /** @var \DateTimeInterface|\DateInterval $expiresAt */
         $expiresAt = method_exists($command, 'isolationLockExpiresAt')
             ? $command->isolationLockExpiresAt()
             : CarbonInterval::hour();
 
-        if ($store->getStore() instanceof LockProvider) {
-            return $store->getStore()->lock($this->commandMutexName($command), $this->secondsUntil($expiresAt))->get();
+        if ($this->shouldUseLocks($store->getStore())) {
+            return $store->getStore()->lock(
+                $this->commandMutexName($command),
+                $this->secondsUntil($expiresAt)
+            )->get();
         }
 
         return $store->add($this->commandMutexName($command), true, $expiresAt);
@@ -59,9 +62,6 @@ class CacheCommandMutex implements CommandMutex
 
     /**
      * Determine if a command mutex exists for the given command.
-     * warning: Relying on this method can cause race conditions.
-     *
-     * @deprecated Will be removed in a future version.
      *
      * @param  \Illuminate\Console\Command  $command
      * @return bool
@@ -70,12 +70,14 @@ class CacheCommandMutex implements CommandMutex
     {
         $store = $this->cache->store($this->store);
 
-        if ($store->getStore() instanceof LockProvider) {
+        if ($this->shouldUseLocks($store->getStore())) {
             $lock = $store->getStore()->lock($this->commandMutexName($command));
-            $acquired = $lock->get();
-            $lock->release();
 
-            return ! $acquired;
+            return tap(! $lock->get(), function ($exists) {
+                if ($exists) {
+                    $lock->release();
+                }
+            });
         }
 
         return $this->cache->store($this->store)->has($this->commandMutexName($command));
@@ -91,7 +93,7 @@ class CacheCommandMutex implements CommandMutex
     {
         $store = $this->cache->store($this->store);
 
-        if ($store->getStore() instanceof LockProvider) {
+        if ($this->shouldUseLocks($store->getStore())) {
             return $store->getStore()->lock($this->commandMutexName($command))->forceRelease();
         }
 
@@ -118,5 +120,16 @@ class CacheCommandMutex implements CommandMutex
         $this->store = $store;
 
         return $this;
+    }
+
+    /**
+     * Determine if the given store should use locks for command mutexes.
+     *
+     * @param  \Illuminate\Contracts\Cache\Store  $store
+     * @return bool
+     */
+    protected function shouldUseLocks($store)
+    {
+        return $store instanceof LockProvider && ! $store instanceof DynamoDbStore;
     }
 }
