@@ -73,7 +73,7 @@ class CacheCommandMutex implements CommandMutex
         if ($this->shouldUseLocks($store->getStore())) {
             $lock = $store->getStore()->lock($this->commandMutexName($command));
 
-            return tap(! $lock->get(), function ($exists) {
+            return tap(! $lock->get(), function ($exists) use ($lock) {
                 if ($exists) {
                     $lock->release();
                 }
