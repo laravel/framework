@@ -551,12 +551,24 @@ trait ValidatesAttributes
             return false;
         }
 
-        foreach ($parameters as $format) {
-            try {
-                $date = DateTime::createFromFormat('!'.$format, $value);
+        $formats = array_filter($parameters, fn (int|string $v) => $v !== 'strict');
+        $strict = $formats !== $parameters;
 
-                if ($date && $date->format($format) == $value) {
+        foreach ($formats as $format) {
+            try {
+                $date = DateTime::createFromFormat("!{$format}", $value);
+                $errors = DateTime::getLastErrors();
+
+                // Validates only that the specified format can be parsed
+                if (!$date || isset($errors['errors']) || isset($errors['warnings'])) {
+                    continue;
+                }
+
+                if (!$strict) {
                     return true;
+                } else {
+                    // Validates an exact match with the parsed and reformatted version in the specified format
+                    if ($date->format($format) === $value) return true;
                 }
             } catch (ValueError) {
                 return false;
