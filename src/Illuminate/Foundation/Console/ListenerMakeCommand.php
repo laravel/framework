@@ -82,17 +82,6 @@ class ListenerMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Determine if the class already exists.
-     *
-     * @param  string  $rawName
-     * @return bool
-     */
-    protected function alreadyExists($rawName)
-    {
-        return class_exists($rawName);
-    }
-
-    /**
      * Get the default namespace for the class.
      *
      * @param  string  $rootNamespace

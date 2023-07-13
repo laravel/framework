@@ -49,17 +49,6 @@ class ExceptionMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Determine if the class already exists.
-     *
-     * @param  string  $rawName
-     * @return bool
-     */
-    protected function alreadyExists($rawName)
-    {
-        return class_exists($this->rootNamespace().'Exceptions\\'.$rawName);
-    }
-
-    /**
      * Get the default namespace for the class.
      *
      * @param  string  $rootNamespace
