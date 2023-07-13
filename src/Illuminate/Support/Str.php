@@ -480,6 +480,30 @@ class Str
     }
 
     /**
+     * Determine if a given value is a valid DOMAIN.
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    public static function isDomain($value)
+    {
+        if (! is_string($value)) {
+            return false;
+        }
+
+        $pattern = '
+            ~^
+            (?:[\pL\pN\pS\-_]+\.)+
+            [\pL\pN\-_]{2,63}+
+            \.?
+            (?:[\pL\pN\-_]{2,63}+)?+
+            $~ixu
+        ';
+
+        return preg_match($pattern, $value) > 0;
+    }
+
+    /**
      * Determine if a given value is a valid UUID.
      *
      * @param  mixed  $value

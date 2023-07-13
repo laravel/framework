@@ -2310,6 +2310,18 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute is a valid DOMAIN.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validateDomain($attribute, $value)
+    {
+        return Str::isDomain($value);
+    }
+
+    /**
      * Validate that an attribute is a valid ULID.
      *
      * @param  string  $attribute
