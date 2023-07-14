@@ -1583,19 +1583,25 @@ class HttpClientTest extends TestCase
         ]);
 
         $response = $this->factory
+            ->baseUrl('http://foo.com')
             ->retry(2, 1000, function ($exception, $request) {
                 $this->assertInstanceOf(PendingRequest::class, $request);
 
+                $request->baseUrl('http://bar.com');
                 $request->withHeaders(['Foo' => 'Bar']);
 
                 return true;
             }, false)
-            ->get('http://foo.com/get');
+            ->get('/get');
 
         $this->assertTrue($response->successful());
 
         $this->factory->assertSent(function (Request $request) {
-            return $request->hasHeader('Foo') && $request->header('Foo') === ['Bar'];
+            return $request->url() === 'http://foo.com/get' && ! $request->hasHeader('Foo');
+        });
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://bar.com/get' && $request->hasHeader('Foo') && $request->header('Foo') === ['Bar'];
         });
     }
 

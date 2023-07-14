@@ -816,25 +816,19 @@ class PendingRequest
      */
     public function send(string $method, string $url, array $options = [])
     {
-        if (! Str::startsWith($url, ['http://', 'https://'])) {
-            $url = ltrim(rtrim($this->baseUrl, '/').'/'.ltrim($url, '/'), '/');
-        }
-
-        $url = $this->expandUrlParameters($url);
-
         $options = $this->parseHttpOptions($options);
 
         [$this->pendingBody, $this->pendingFiles] = [null, []];
 
         if ($this->async) {
-            return $this->makePromise($method, $url, $options);
+            return $this->makePromise($method, $this->getUrl($url), $options);
         }
 
         $shouldRetry = null;
 
         return retry($this->tries ?? 1, function ($attempt) use ($method, $url, $options, &$shouldRetry) {
             try {
-                return tap(new Response($this->sendRequest($method, $url, $options)), function ($response) use ($attempt, &$shouldRetry) {
+                return tap(new Response($this->sendRequest($method, $this->getUrl($url), $options)), function ($response) use ($attempt, &$shouldRetry) {
                     $this->populateResponse($response);
 
                     $this->dispatchResponseReceivedEvent($response);
@@ -875,6 +869,21 @@ class PendingRequest
 
             return $result;
         });
+    }
+
+    /**
+     * Get the url
+     *
+     * @param  string  $url
+     * @return string
+     */
+    protected function getUrl(string $url)
+    {
+        if (! Str::startsWith($url, ['http://', 'https://'])) {
+            $url = ltrim(rtrim($this->baseUrl, '/').'/'.ltrim($url, '/'), '/');
+        }
+
+        return $this->expandUrlParameters($url);
     }
 
     /**
