@@ -56,6 +56,23 @@ class RouteCollectionTest extends TestCase
         $this->assertEquals($routeIndex, $this->routeCollection->getByName('route_name'));
     }
 
+    public function testRouteCollectionAddRouteWithSameParamsButDifferentWheres()
+    {
+        $this->routeCollection->add((new Route('GET', 'foo/{bar}', [
+            'uses' => 'FooController@index',
+            'as' => 'foo_index',
+        ]))->where('bar', 'baz'));
+        $this->routeCollection->add((new Route('GET', 'foo/{bar}', [
+            'uses' => 'FooController@index',
+            'as' => 'foo_index',
+        ]))->where('bar', 'foo'));
+        $this->routeCollection->add((new Route('GET', 'foo/{bar}', [
+            'uses' => 'FooController@index',
+            'as' => 'foo_index',
+        ]))->where('bar', 'baz'));
+        $this->assertCount(2, $this->routeCollection);
+    }
+
     public function testRouteCollectionCanRetrieveByAction()
     {
         $this->routeCollection->add($routeIndex = new Route('GET', 'foo/index', $action = [

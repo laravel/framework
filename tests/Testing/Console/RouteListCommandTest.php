@@ -99,6 +99,40 @@ class RouteListCommandTest extends TestCase
             ->expectsOutput('');
     }
 
+    public function testDisplayRoutesForCliWithWhereParameters()
+    {
+        $this->router->get('closure', function () {
+            return new RedirectResponse($this->urlGenerator->signedRoute('signed-route'));
+        });
+
+        $this->router->get('controller-method/{user}', [FooController::class, 'show']);
+        $this->router->post('controller-invokable', FooController::class);
+        $this->router->domain('{account}.example.com')->where(['account' => 'abc|def'])->group(function () {
+            $this->router->get('user/{id}', function ($account, $id) {
+                //
+            })->name('user.show')->middleware('web')->where(['id' => '\d+']);
+        });
+        $this->router->domain('{account?}.example.com')->where(['account' => 'foo|bar'])->group(function () {
+            $this->router->get('user/{id}', function ($account, $id) {
+                //
+            })->name('user.show')->middleware('web')->where(['id' => '\d+']);
+        });
+
+        $this->artisan(RouteListCommand::class, ['-v' => true])
+            ->assertSuccessful()
+            ->expectsOutput('')
+            ->expectsOutput('  GET|HEAD   closure ............................................... ')
+            ->expectsOutput('  POST       controller-invokable Illuminate\\Tests\\Testing\\Console\\FooController')
+            ->expectsOutput('  GET|HEAD   controller-method/{user} Illuminate\\Tests\\Testing\\Console\\FooController@show')
+            ->expectsOutput('  GET|HEAD   {account:abc|def}.example.com/user/{id:\d+} . user.show')
+            ->expectsOutput('             ⇂ web')
+            ->expectsOutput('  GET|HEAD   {account?:foo|bar}.example.com/user/{id:\d+} user.show')
+            ->expectsOutput('             ⇂ web')
+            ->expectsOutput('')
+            ->expectsOutput('                                                  Showing [5] routes')
+            ->expectsOutput('');
+    }
+
     public function testRouteCanBeFilteredByName()
     {
         $this->withoutDeprecationHandling();

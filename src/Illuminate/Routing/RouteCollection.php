@@ -59,7 +59,7 @@ class RouteCollection extends AbstractRouteCollection
      */
     protected function addToCollections($route)
     {
-        $domainAndUri = $route->getDomain().$route->uri();
+        $domainAndUri = $route->getQualifiedUriWithWheres();
 
         foreach ($route->methods() as $method) {
             $this->routes[$method][$domainAndUri] = $route;

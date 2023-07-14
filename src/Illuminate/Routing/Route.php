@@ -856,6 +856,41 @@ class Route
         })->uri;
     }
 
+    public function getDomainWithWheres(): ?string
+    {
+        return $this->replaceWheres($this->domain());
+    }
+
+    public function getUriWithWheres(): ?string
+    {
+        return $this->replaceWheres($this->uri());
+    }
+
+    public function getQualifiedUriWithWheres(): ?string
+    {
+        return $this->replaceWheres($this->getDomain().$this->uri());
+    }
+
+    /**
+     * Inserts the where regex of each parameter in the url.
+     */
+    protected function replaceWheres(?string $uri): ?string
+    {
+        if (empty($uri)) {
+            return $uri;
+        }
+        $search = [];
+        $replace = [];
+        foreach ($this->wheres as $where => $regex) {
+            $search[] = '{'.$where.'}';
+            $replace[] = '{'.$where.':'.$regex.'}';
+            $search[] = '{'.$where.'?}';
+            $replace[] = '{'.$where.'?:'.$regex.'}';
+        }
+
+        return str_replace($search, $replace, $uri);
+    }
+
     /**
      * Get the name of the route instance.
      *
