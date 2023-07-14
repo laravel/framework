@@ -81,6 +81,13 @@ class Middleware
     protected $groupReplacements = [];
 
     /**
+     * The Folio / page middleware for the application.
+     *
+     * @var array
+     */
+    protected $pageMiddleware = [];
+
+    /**
      * Indicates if the "trust hosts" middleware is enabled.
      *
      * @var bool
@@ -354,6 +361,19 @@ class Middleware
     }
 
     /**
+     * Register the Folio / page middleware for the application.
+     *
+     * @param  array  $middleware
+     * @return $this
+     */
+    public function pages(array $middleware)
+    {
+        $this->pageMiddleware = $middleware;
+
+        return $this;
+    }
+
+    /**
      * Register additional middleware aliases.
      *
      * @param  array  $aliases
@@ -532,6 +552,16 @@ class Middleware
         $this->throttleWithRedis = true;
 
         return $this;
+    }
+
+    /**
+     * Get the Folio / page middleware for the application.
+     *
+     * @return array
+     */
+    public function getPageMiddleware()
+    {
+        return $this->pageMiddleware;
     }
 
     /**

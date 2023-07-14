@@ -11,9 +11,17 @@ use Illuminate\Foundation\Support\Providers\EventServiceProvider as AppEventServ
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as AppRouteServiceProvider;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
+use Laravel\Folio\Folio;
 
 class ApplicationBuilder
 {
+    /**
+     * The Folio / page middleware that have been defined by the user.
+     *
+     * @var array
+     */
+    protected array $pageMiddleware = [];
+
     /**
      * Create a new application builder instance.
      */
@@ -99,6 +107,9 @@ class ApplicationBuilder
      * @param  \Closure|null  $using
      * @param  string|null  $web
      * @param  string|null  $api
+     * @param  string|null  $commands
+     * @param  string|null  $channels
+     * @param  string|null  $pages
      * @param  string|null  $apiPrefix
      * @param  callable|null  $then
      * @return $this
@@ -108,11 +119,12 @@ class ApplicationBuilder
         ?string $api = null,
         ?string $commands = null,
         ?string $channels = null,
+        ?string $pages = null,
         string $apiPrefix = 'api',
         ?callable $then = null)
     {
         if (is_null($using) && (is_string($web) || is_string($api))) {
-            $using = $this->buildRoutingCallback($web, $api, $apiPrefix, $then);
+            $using = $this->buildRoutingCallback($web, $api, $pages, $apiPrefix, $then);
         }
 
         AppRouteServiceProvider::loadRoutesUsing($using);
@@ -137,19 +149,30 @@ class ApplicationBuilder
      *
      * @param  string|null  $web
      * @param  string|null  $api
+     * @param  string|null  $pages
      * @param  string  $apiPrefix
      * @param  callable|null  $then
      * @return \Closure
      */
-    protected function buildRoutingCallback(?string $web, ?string $api, string $apiPrefix, ?callable $then): Closure
+    protected function buildRoutingCallback(?string $web,
+        ?string $api,
+        ?string $pages,
+        string $apiPrefix,
+        ?callable $then)
     {
-        return function () use ($web, $api, $apiPrefix, $then) {
+        return function () use ($web, $api, $pages, $apiPrefix, $then) {
             if (is_string($api) && realpath($api) !== false) {
                 Route::middleware('api')->prefix($apiPrefix)->group($api);
             }
 
             if (is_string($web) && realpath($web) !== false) {
                 Route::middleware('web')->group($web);
+            }
+
+            if (is_string($pages) &&
+                realpath($pages) !== false &&
+                class_exists(Folio::class)) {
+                Folio::route($pages, middleware: $this->pageMiddleware);
             }
 
             if (is_callable($then)) {
@@ -173,6 +196,7 @@ class ApplicationBuilder
 
             $callback($middleware);
 
+            $this->pageMiddleware = $middleware->getPageMiddleware();
             $kernel->setGlobalMiddleware($middleware->getGlobalMiddleware());
             $kernel->setMiddlewareGroups($middleware->getMiddlewareGroups());
             $kernel->setMiddlewareAliases($middleware->getMiddlewareAliases());
