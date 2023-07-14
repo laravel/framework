@@ -847,6 +847,18 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Get a lazy collection for this query with relationships.
+     *
+     * @return \Illuminate\Support\LazyCollection
+     */
+    public function cursorWithRelations()
+    {
+        return $this->cursor()->map(function($model) {
+            return array_first($builder->eagerLoadRelations([$model]));
+        });
+    }
+
+    /**
      * Add a generic "order by" clause if the query doesn't already have one.
      *
      * @return void
