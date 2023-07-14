@@ -853,7 +853,7 @@ class Builder implements BuilderContract
      */
     public function cursorWithRelations()
     {
-        return $this->cursor()->map(function($model) {
+        return $this->cursor()->map(function ($model) {
             return array_first($builder->eagerLoadRelations([$model]));
         });
     }
