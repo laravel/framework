@@ -491,14 +491,7 @@ class Str
             return false;
         }
 
-        $pattern = '
-            ~^
-            (?:[\pL\pN\pS\-_]+\.)+
-            [\pL\pN\-_]{2,63}+
-            \.?
-            (?:[\pL\pN\-_]{2,63}+)?+
-            $~ixu
-        ';
+        $pattern = '^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+(?:[a-zA-Z]{2,}\.?|[a-zA-Z0-9\-]{2,}\.?)$';
 
         return preg_match($pattern, $value) > 0;
     }
