@@ -559,8 +559,20 @@ trait ValidatesAttributes
                 $date = DateTime::createFromFormat("!{$format}", $value);
                 $errors = DateTime::getLastErrors();
 
-                // Validates only that the specified format can be parsed
-                if (! $date || isset($errors['errors']) || isset($errors['warnings'])) {
+                // Validates only that the specified format can be parsed.
+                //
+                // DateTime::getLastErrors() returns false when there are no errors or warnings in PHP 8.2 and later,
+                // and an array containing information about warnings or errors in PHP 8.1 and earlier.
+                // Therefore, to check if there is an error or warning,
+                // we need to first confirm that $errors is not false,
+                // and then make a judgement by looking at the contents of the array.
+                if (
+                    ! $date
+                    || (
+                        $errors !== false
+                        && ($errors['warning_count'] !== 0 || $errors['error_count'] !== 0)
+                    )
+                ) {
                     continue;
                 }
 

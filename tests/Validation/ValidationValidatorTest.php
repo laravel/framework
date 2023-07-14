@@ -5366,9 +5366,9 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
 
         // UTC expressed as Z
-        $v = new Validator($trans, ['x' => '2023-01-01T00:00:00Z'], ['x' => 'date_format:' . $format]);
+        $v = new Validator($trans, ['x' => '2023-01-01T00:00:00Z'], ['x' => 'date_format:'.$format]);
         $this->assertTrue($v->passes());
-        $v = new Validator($trans, ['x' => '2023-01-01T00:00:00Z'], ['x' => 'date_format:loose,' . $format]);
+        $v = new Validator($trans, ['x' => '2023-01-01T00:00:00Z'], ['x' => 'date_format:loose,'.$format]);
         $this->assertTrue($v->passes());
 
         // JST expressed as +09:00
