@@ -112,19 +112,7 @@ class ApplicationBuilder
         ?callable $then = null)
     {
         if (is_null($using) && (is_string($web) || is_string($api))) {
-            $using = function () use ($web, $api, $apiPrefix, $then) {
-                if (is_string($api) && realpath($api) !== false) {
-                    Route::middleware('api')->prefix($apiPrefix)->group($api);
-                }
-
-                if (is_string($web) && realpath($web) !== false) {
-                    Route::middleware('web')->group($web);
-                }
-
-                if (is_callable($then)) {
-                    $then();
-                }
-            };
+            $using = $this->buildRoutingCallback($web, $api, $apiPrefix, $then);
         }
 
         AppRouteServiceProvider::loadRoutesUsing($using);
@@ -142,6 +130,32 @@ class ApplicationBuilder
         }
 
         return $this;
+    }
+
+    /**
+     * Create the routing callback for the application.
+     *
+     * @param  string|null  $web
+     * @param  string|null  $api
+     * @param  string  $apiPrefix
+     * @param  callable|null  $then
+     * @return \Closure
+     */
+    protected function buildRoutingCallback(?string $web, ?string $api, string $apiPrefix, ?callable $then): Closure
+    {
+        return function () use ($web, $api, $apiPrefix, $then) {
+            if (is_string($api) && realpath($api) !== false) {
+                Route::middleware('api')->prefix($apiPrefix)->group($api);
+            }
+
+            if (is_string($web) && realpath($web) !== false) {
+                Route::middleware('web')->group($web);
+            }
+
+            if (is_callable($then)) {
+                $then();
+            }
+        };
     }
 
     /**
