@@ -491,7 +491,11 @@ class Str
             return false;
         }
 
-        $pattern = '^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+(?:[a-zA-Z]{2,}\.?|[a-zA-Z0-9\-]{2,}\.?)$';
+        $pattern = '
+            ~^
+            (?:[a-zA-Z0-9](?:[a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+(?:[a-zA-Z]{2,}\.?|[a-zA-Z0-9\-]{2,}\.?)$
+            ~ixu
+        ';
 
         return preg_match($pattern, $value) > 0;
     }
