@@ -551,8 +551,8 @@ trait ValidatesAttributes
             return false;
         }
 
-        $formats = array_filter($parameters, fn (int|string $v) => $v !== 'strict');
-        $strict = $formats !== $parameters;
+        $formats = array_filter($parameters, fn (int|string $v) => $v !== 'loose');
+        $loose = $formats !== $parameters;
 
         foreach ($formats as $format) {
             try {
@@ -564,7 +564,7 @@ trait ValidatesAttributes
                     continue;
                 }
 
-                if (! $strict) {
+                if ($loose) {
                     return true;
                 } else {
                     // Validates an exact match with the parsed and reformatted version in the specified format
