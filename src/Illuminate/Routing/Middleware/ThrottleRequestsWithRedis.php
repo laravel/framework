@@ -121,7 +121,7 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
     }
 
     /**
-     * Get Redis Connection
+     * Get Redis Connection.
      *
      * @return \Illuminate\Redis\Connections\Connection
      */
