@@ -872,7 +872,7 @@ class PendingRequest
     }
 
     /**
-     * Get the url
+     * Get the url.
      *
      * @param  string  $url
      * @return string
