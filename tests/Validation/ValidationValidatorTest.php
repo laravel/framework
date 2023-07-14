@@ -5332,37 +5332,37 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
-    public function testDateAndFormatStrictOption()
+    public function testDateAndFormatLooseOption()
     {
         date_default_timezone_set('UTC');
         $trans = $this->getIlluminateArrayTranslator();
         $format = DateTimeInterface::RFC3339;
 
         // UTC expressed as +00:00
-        $v = new Validator($trans, ['x' => '2023-01-01T00:00:00+00:00'], ['x' => 'date_format:' . $format]);
+        $v = new Validator($trans, ['x' => '2023-01-01T00:00:00+00:00'], ['x' => 'date_format:'.$format]);
         $this->assertTrue($v->passes());
-        $v = new Validator($trans, ['x' => '2023-01-01T00:00:00+00:00'], ['x' => 'date_format:loose,' . $format]);
+        $v = new Validator($trans, ['x' => '2023-01-01T00:00:00+00:00'], ['x' => 'date_format:loose,'.$format]);
         $this->assertTrue($v->passes());
 
         // UTC expressed as Z
-        $v = new Validator($trans, ['x' => '2023-01-01T00:00:00Z'], ['x' => 'date_format:' . $format]);
+        $v = new Validator($trans, ['x' => '2023-01-01T00:00:00Z'], ['x' => 'date_format:'.$format]);
         $this->assertTrue($v->fails());
-        $v = new Validator($trans, ['x' => '2023-01-01T00:00:00Z'], ['x' => 'date_format:loose,' . $format]);
+        $v = new Validator($trans, ['x' => '2023-01-01T00:00:00Z'], ['x' => 'date_format:loose,'.$format]);
         $this->assertTrue($v->passes());
 
         // JST expressed as +09:00
-        $v = new Validator($trans, ['x' => '2023-01-01T00:00:00+09:00'], ['x' => 'date_format:' . $format]);
+        $v = new Validator($trans, ['x' => '2023-01-01T00:00:00+09:00'], ['x' => 'date_format:'.$format]);
         $this->assertTrue($v->passes());
-        $v = new Validator($trans, ['x' => '2023-01-01T00:00:00+09:00'], ['x' => 'date_format:loose,' . $format]);
+        $v = new Validator($trans, ['x' => '2023-01-01T00:00:00+09:00'], ['x' => 'date_format:loose,'.$format]);
         $this->assertTrue($v->passes());
 
         // Replace P with p
         $format = str_replace('P', 'p', $format);
 
         // UTC expressed as +00:00
-        $v = new Validator($trans, ['x' => '2023-01-01T00:00:00+00:00'], ['x' => 'date_format:' . $format]);
+        $v = new Validator($trans, ['x' => '2023-01-01T00:00:00+00:00'], ['x' => 'date_format:'.$format]);
         $this->assertTrue($v->fails());
-        $v = new Validator($trans, ['x' => '2023-01-01T00:00:00+00:00'], ['x' => 'date_format:loose,' . $format]);
+        $v = new Validator($trans, ['x' => '2023-01-01T00:00:00+00:00'], ['x' => 'date_format:loose,'.$format]);
         $this->assertTrue($v->passes());
 
         // UTC expressed as Z
@@ -5372,9 +5372,9 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
 
         // JST expressed as +09:00
-        $v = new Validator($trans, ['x' => '2023-01-01T00:00:00+09:00'], ['x' => 'date_format:' . $format]);
+        $v = new Validator($trans, ['x' => '2023-01-01T00:00:00+09:00'], ['x' => 'date_format:'.$format]);
         $this->assertTrue($v->passes());
-        $v = new Validator($trans, ['x' => '2023-01-01T00:00:00+09:00'], ['x' => 'date_format:loose,' . $format]);
+        $v = new Validator($trans, ['x' => '2023-01-01T00:00:00+09:00'], ['x' => 'date_format:loose,'.$format]);
         $this->assertTrue($v->passes());
     }
 
