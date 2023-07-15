@@ -52,9 +52,7 @@ class LoadEnvironmentVariables
             return;
         }
 
-        $this->setEnvironmentFilePath(
-            $app, $app->environmentFile().'.'.$environment
-        );
+        $this->setEnvironmentFilePath($app, $app->environmentFile().'.'.$environment);
     }
 
     /**
