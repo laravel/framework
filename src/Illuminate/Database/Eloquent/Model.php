@@ -1166,6 +1166,21 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Save the model or touch if there are no changes.
+     *
+     * @param  array  $options
+     * @return bool
+     */
+    public function saveOrTouch(array $options = [])
+    {
+        if (! $this->exists || $this->isDirty()) {
+            return $this->save($options);
+        }
+
+        return $this->touch();
+    }
+
+    /**
      * Perform any actions that are necessary after the model is saved.
      *
      * @param  array  $options

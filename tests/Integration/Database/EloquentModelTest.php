@@ -22,6 +22,12 @@ class EloquentModelTest extends DatabaseTestCase
             $table->string('name');
             $table->string('title');
         });
+
+        Schema::create('test_model3', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('name');
+            $table->timestamps();
+        });
     }
 
     public function testUserCanUpdateNullableDate()
@@ -94,6 +100,45 @@ class EloquentModelTest extends DatabaseTestCase
         $user->save();
         $this->assertFalse($user->wasChanged());
     }
+
+    public function testTouchOrSaveTouchesModelWhenNoChanges(){
+        $this->travelTo(now()->subMinute());
+        $user = TestModel3::create([
+            'name' => Str::random(),
+        ]);
+        $originalTimestamp = $user->updated_at;
+
+        $this->travelBack();
+
+        $this->assertFalse($user->isDirty());
+
+        $user->saveOrTouch();
+
+        $this->assertGreaterThanOrEqual($originalTimestamp, $user->refresh()->updated_at);
+    }
+
+    public function testTouchOrSaveSavesModelWhenDoesNotExist() {
+        $user = new TestModel3([
+            'name' => Str::random(),
+        ]);
+        $user->saveOrTouch();
+
+        $this->assertTrue($user->exists);
+        $this->assertDatabaseHas('test_model3', [
+            'name' => $user->name,
+        ]);
+    }
+
+    public function testTouchOrSaveSavesModelWhenIsDirty() {
+        $user = TestModel3::create([
+            'name' => 'Nuno Maduro',
+        ]);
+        $user->name = 'Dries Vint';
+
+        $user->saveOrTouch();
+
+        $this->assertEquals('Dries Vint', $user->refresh()->name);
+    }
 }
 
 class TestModel1 extends Model
@@ -108,5 +153,11 @@ class TestModel2 extends Model
 {
     public $table = 'test_model2';
     public $timestamps = false;
+    protected $guarded = [];
+}
+
+class TestModel3 extends Model
+{
+    public $table = 'test_model3';
     protected $guarded = [];
 }
