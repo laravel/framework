@@ -14,6 +14,7 @@ class RedirectController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @param  \Illuminate\Routing\UrlGenerator  $url
      * @return \Illuminate\Http\RedirectResponse
+     * @throws \Illuminate\Routing\Exceptions\UrlGenerationException
      */
     public function __invoke(Request $request, UrlGenerator $url)
     {
