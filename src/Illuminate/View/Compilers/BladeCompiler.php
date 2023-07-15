@@ -57,6 +57,13 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected $conditions = [];
 
     /**
+     * The registered string preparation callbacks.
+     *
+     * @var array
+     */
+    protected $prepareStringsForCompilationUsing = [];
+
+    /**
      * All of the registered precompilers.
      *
      * @var array
@@ -248,6 +255,10 @@ class BladeCompiler extends Compiler implements CompilerInterface
     public function compileString($value)
     {
         [$this->footer, $result] = [[], ''];
+
+        foreach ($this->prepareStringsForCompilationUsing as $callback) {
+            $value = $callback($value);
+        }
 
         // First we will compile the Blade component tags. This is a precompile style
         // step which compiles the component Blade tags into @component directives
@@ -945,6 +956,19 @@ class BladeCompiler extends Compiler implements CompilerInterface
     public function getCustomDirectives()
     {
         return $this->customDirectives;
+    }
+
+    /**
+     * Indicate that the following callable should be used to prepare strings for compilation.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function prepareStringsForCompilationUsing(callable $callback)
+    {
+        $this->prepareStringsForCompilationUsing[] = $callback;
+
+        return $this;
     }
 
     /**
