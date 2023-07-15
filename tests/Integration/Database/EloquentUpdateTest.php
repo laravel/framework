@@ -144,7 +144,7 @@ class EloquentUpdateTest extends DatabaseTestCase
     public function testSave($counter, $saveOptions, $queries, $updatedTimestamps)
     {
         $model = TestUpdateModel3::create([
-            'counter' => 0
+            'counter' => 0,
         ]);
 
         $updatedAt = $model->updated_at;
