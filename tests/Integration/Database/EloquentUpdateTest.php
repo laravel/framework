@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Database;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
@@ -135,6 +136,39 @@ class EloquentUpdateTest extends DatabaseTestCase
 
         $deletedModel->decrement('counter');
         $this->assertEquals(0, $deletedModel->fresh()->counter);
+    }
+
+    /**
+     * @dataProvider SaveProvider
+     */
+    public function testSave($counter, $saveOptions, $queries, $updatedTimestamps)
+    {
+        $model = TestUpdateModel3::create([
+            'counter' => 0
+        ]);
+
+        $updatedAt = $model->updated_at;
+        $model->counter = $counter;
+
+        sleep(1);
+
+        DB::enableQueryLog();
+
+        $this->assertTrue($model->save($saveOptions));
+        $this->assertEquals($queries, count(DB::getQueryLog()));
+        $this->assertEquals($updatedTimestamps, $updatedAt->notEqualTo($model->updated_at));
+    }
+
+    public static function saveProvider()
+    {
+        return [
+            'Save with change' => [100, [], 1, true],
+            'Save without change' => [0, [], 0, false],
+            'Force save with change' => [100, ['force' => true], 1, true],
+            'Force save without change' => [0, ['force' => true], 1, true],
+            'Save with change with force false' => [100, ['force' => false], 1, true],
+            'Save without change with force false' => [0, ['force' => false], 0, false],
+        ];
     }
 }
 

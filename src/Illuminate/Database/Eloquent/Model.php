@@ -1126,7 +1126,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         // that is already in this database using the current IDs in this "where"
         // clause to only update this model. Otherwise, we'll just insert them.
         if ($this->exists) {
-            $saved = $this->isDirty() ?
+            $saved = (($options['force'] ?? false) ?: $this->isDirty()) ?
                 $this->performUpdate($query) : true;
         }
 
@@ -1175,7 +1175,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     {
         $this->fireModelEvent('saved', false);
 
-        if ($this->isDirty() && ($options['touch'] ?? true)) {
+        if ((($options['force'] ?? false) ?: $this->isDirty()) && ($options['touch'] ?? true)) {
             $this->touchOwners();
         }
 
