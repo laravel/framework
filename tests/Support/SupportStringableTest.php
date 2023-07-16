@@ -33,6 +33,12 @@ class SupportStringableTest extends TestCase
         $this->assertFalse($this->stringable('ù')->isAscii());
     }
 
+    public function testIsUrl()
+    {
+        $this->assertTrue($this->stringable('https://laravel.com')->isUrl());
+        $this->assertFalse($this->stringable('invalid url')->isUrl());
+    }
+
     public function testIsUuid()
     {
         $this->assertTrue($this->stringable('2cdc7039-65a6-4ac7-8e5d-d554a98e7b15')->isUuid());

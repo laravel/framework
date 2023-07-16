@@ -7,6 +7,7 @@ use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
 use Orchestra\Testbench\TestCase;
 
@@ -70,6 +71,25 @@ class RequestDurationThresholdTest extends TestCase
         $kernel->terminate($request, $response);
 
         $this->assertSame('http://localhost/test-route', $url);
+    }
+
+    public function testUsesTheConfiguredDateTimezone()
+    {
+        Config::set('app.timezone', 'UTC');
+        Route::get('test-route', fn () => 'ok');
+        $kernel = $this->app[Kernel::class];
+        $startedAt = null;
+        $kernel->whenRequestLifecycleIsLongerThan(CarbonInterval::seconds(1), function ($started) use (&$startedAt) {
+            $startedAt = $started;
+        });
+
+        Config::set('app.timezone', 'Australia/Melbourne');
+        Carbon::setTestNow(now()->startOfDay());
+        $kernel->handle($request = Request::create('http://localhost/test-route'));
+        Carbon::setTestNow(now()->addMinute());
+        $kernel->terminate($request, new Response);
+
+        $this->assertSame('Australia/Melbourne', $startedAt->timezone->getName());
     }
 
     public function testItCanExceedThresholdWhenSpecifyingDurationAsMilliseconds()
@@ -165,5 +185,13 @@ class RequestDurationThresholdTest extends TestCase
 
         $kernel->terminate($request, $response);
         $this->assertNull($kernel->requestStartedAt());
+    }
+
+    public function testItHandlesCallingTerminateWithoutHandle()
+    {
+        $this->app[Kernel::class]->terminate(Request::create('http://localhost/test-route'), new Response);
+
+        // this is a placeholder just to show that the above did not throw an exception.
+        $this->assertTrue(true);
     }
 }

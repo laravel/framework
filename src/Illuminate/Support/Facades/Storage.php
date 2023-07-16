@@ -7,7 +7,7 @@ use Illuminate\Filesystem\Filesystem;
 /**
  * @method static \Illuminate\Contracts\Filesystem\Filesystem drive(string|null $name = null)
  * @method static \Illuminate\Contracts\Filesystem\Filesystem disk(string|null $name = null)
- * @method static \Illuminate\Contracts\Filesystem\Filesystem cloud()
+ * @method static \Illuminate\Contracts\Filesystem\Cloud cloud()
  * @method static \Illuminate\Contracts\Filesystem\Filesystem build(string|array $config)
  * @method static \Illuminate\Contracts\Filesystem\Filesystem createLocalDriver(array $config)
  * @method static \Illuminate\Contracts\Filesystem\Filesystem createFtpDriver(array $config)

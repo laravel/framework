@@ -67,7 +67,8 @@ class CommandSchedulingTest extends TestCase
      */
     public function testExecutionOrder($background, $expected)
     {
-        $event = $this->app->make(Schedule::class)
+        $schedule = $this->app->make(Schedule::class);
+        $event = $schedule
             ->command("test:{$this->id}")
             ->onOneServer()
             ->after(function () {
@@ -82,8 +83,11 @@ class CommandSchedulingTest extends TestCase
         }
 
         // We'll trigger the scheduler three times to simulate multiple servers
+        $this->app->instance(Schedule::class, clone $schedule);
         $this->artisan('schedule:run');
+        $this->app->instance(Schedule::class, clone $schedule);
         $this->artisan('schedule:run');
+        $this->app->instance(Schedule::class, clone $schedule);
         $this->artisan('schedule:run');
 
         if ($background) {

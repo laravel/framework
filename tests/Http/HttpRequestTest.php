@@ -723,7 +723,7 @@ class HttpRequestTest extends TestCase
         $this->assertNull($request->date('doesnt_exists'));
 
         $this->assertEquals($current, $request->date('as_datetime'));
-        $this->assertEquals($current, $request->date('as_format', 'U'));
+        $this->assertEquals($current->format('Y-m-d H:i:s P'), $request->date('as_format', 'U')->format('Y-m-d H:i:s P'));
         $this->assertEquals($current, $request->date('as_timezone', null, 'America/Santiago'));
 
         $this->assertTrue($request->date('as_date')->isSameDay($current));

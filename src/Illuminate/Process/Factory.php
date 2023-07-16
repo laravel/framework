@@ -212,6 +212,8 @@ class Factory
             $times, $count,
             "An expected process ran {$count} times instead of {$times} times."
         );
+
+        return $this;
     }
 
     /**
