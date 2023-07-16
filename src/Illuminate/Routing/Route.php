@@ -182,7 +182,7 @@ class Route
      * Parse the route action into a standard array.
      *
      * @param  callable|array|null  $action
-     * @return array{uses: callable|string, controller?: string, ...}
+     * @return array{uses: callable|string, controller?: string}
      *
      * @throws \UnexpectedValueException
      */
