@@ -2,8 +2,11 @@
 
 namespace Illuminate\Tests\Database;
 
+use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Illuminate\Database\Connection;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Builder;
+use Illuminate\Database\Schema\Grammars\Grammar;
 use LogicException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -40,6 +43,30 @@ class DatabaseSchemaBuilderTest extends TestCase
         $this->expectExceptionMessage('This database driver does not support dropping databases.');
 
         $builder->dropDatabaseIfExists('foo');
+    }
+
+    public function testDropIndexIfExists()
+    {
+        $connection = m::mock(Connection::class);
+        $grammar = new class extends Grammar {};
+        $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
+        $connection->shouldReceive('getConfig')->with('prefix_indexes')->andReturnTrue();
+        $connection->shouldReceive('getConfig')->with('prefix')->andReturnTrue();
+
+        $sm = m::mock(AbstractSchemaManager::class);
+        $connection->shouldReceive('getDoctrineSchemaManager')->once()->andReturn($sm);
+        $blueprint = m::mock(Blueprint::class);
+        $blueprint->shouldReceive('dropForeign')->once()->with('user_foreign')->andReturnSelf();
+        $blueprint->shouldReceive('dropIndex')->once()->with('user_foreign')->andReturnSelf();
+        $builder = m::mock(Builder::class, [$connection])->makePartial();
+        $builder->shouldReceive('table')->once()->andReturnUsing(function ($table, $callback) use ($blueprint) {
+            $callback($blueprint);
+        });
+
+        $sm->shouldReceive('listTableIndexes')->once()->with('users')->andReturn(['user_foreign' => []]);
+
+        $this->assertNull($builder->dropIndexIfExists('users','user_foreign'));
+
     }
 
     public function testHasTableCorrectlyCallsGrammar()
