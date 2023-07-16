@@ -15,7 +15,7 @@ class RouteAction
      *
      * @param  string  $uri
      * @param  mixed  $action
-     * @return array{uses: callable|string, controller?: string}
+     * @return array{uses: callable|string, controller?: string, ...}
      */
     public static function parse($uri, $action)
     {
