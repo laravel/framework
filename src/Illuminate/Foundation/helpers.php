@@ -368,9 +368,9 @@ if (! function_exists('decrypt')) {
      * @param  bool  $unserialize
      * @return mixed
      */
-    function decrypt($value, $unserialize = true)
+    function decrypt($value, $unserialize = true, $key = null)
     {
-        return app('encrypter')->decrypt($value, $unserialize);
+        return app('encrypter')->decrypt($value, $unserialize, $key);
     }
 }
 
@@ -413,9 +413,9 @@ if (! function_exists('encrypt')) {
      * @param  bool  $serialize
      * @return string
      */
-    function encrypt($value, $serialize = true)
+    function encrypt($value, $serialize = true, $key = null)
     {
-        return app('encrypter')->encrypt($value, $serialize);
+        return app('encrypter')->encrypt($value, $serialize, $key);
     }
 }
 
