@@ -126,7 +126,7 @@ class EncrypterTest extends TestCase
 
     }
 
-    public function testThrowExceptionWithDifferentDecryptionKey()
+    public function testThrowExceptionWithDifferentDecryptionKeys()
     {
         $this->expectException(DecryptException::class);
         $this->expectExceptionMessage('Could not decrypt the data.');
