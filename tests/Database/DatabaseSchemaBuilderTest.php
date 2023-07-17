@@ -45,27 +45,48 @@ class DatabaseSchemaBuilderTest extends TestCase
         $builder->dropDatabaseIfExists('foo');
     }
 
-    public function testDropIndexIfExists()
+    public function testDropIndexesIfExists()
     {
+        $indexes = ['index1', 'index2', 'index3'];
         $connection = m::mock(Connection::class);
         $grammar = new class extends Grammar {};
         $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
         $connection->shouldReceive('getConfig')->with('prefix_indexes')->andReturnTrue();
         $connection->shouldReceive('getConfig')->with('prefix')->andReturnTrue();
-
         $sm = m::mock(AbstractSchemaManager::class);
         $connection->shouldReceive('getDoctrineSchemaManager')->once()->andReturn($sm);
         $blueprint = m::mock(Blueprint::class);
-        $blueprint->shouldReceive('dropForeign')->once()->with('user_foreign')->andReturnSelf();
-        $blueprint->shouldReceive('dropIndex')->once()->with('user_foreign')->andReturnSelf();
+        $blueprint->shouldReceive('dropForeign')->times(count($indexes))->andReturnSelf();
+        $blueprint->shouldReceive('dropIndex')->times(count($indexes))->andReturnSelf();
+        $builder = m::mock(Builder::class, [$connection])->makePartial();
+        $builder->shouldReceive('table')->times(count($indexes))->andReturnUsing(function ($table, $callback) use ($blueprint) {
+            $callback($blueprint);
+        });
+        $sm->shouldReceive('listTableIndexes')->once()->with('users')->andReturn(array_flip($indexes));
+
+        $this->assertNull($builder->dropIndexIfExists('users', $indexes));
+    }
+
+    public function testDropIndexIfExists()
+    {
+        $index = 'index';
+        $connection = m::mock(Connection::class);
+        $grammar = new class extends Grammar {};
+        $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
+        $connection->shouldReceive('getConfig')->with('prefix_indexes')->andReturnTrue();
+        $connection->shouldReceive('getConfig')->with('prefix')->andReturnTrue();
+        $sm = m::mock(AbstractSchemaManager::class);
+        $connection->shouldReceive('getDoctrineSchemaManager')->once()->andReturn($sm);
+        $blueprint = m::mock(Blueprint::class);
+        $blueprint->shouldReceive('dropForeign')->once()->with($index)->andReturnSelf();
+        $blueprint->shouldReceive('dropIndex')->once()->with($index)->andReturnSelf();
         $builder = m::mock(Builder::class, [$connection])->makePartial();
         $builder->shouldReceive('table')->once()->andReturnUsing(function ($table, $callback) use ($blueprint) {
             $callback($blueprint);
         });
+        $sm->shouldReceive('listTableIndexes')->once()->with('users')->andReturn([$index => []]);
 
-        $sm->shouldReceive('listTableIndexes')->once()->with('users')->andReturn(['user_foreign' => []]);
-
-        $this->assertNull($builder->dropIndexIfExists('users', 'user_foreign'));
+        $this->assertNull($builder->dropIndexIfExists('users', $index));
     }
 
     public function testHasTableCorrectlyCallsGrammar()
