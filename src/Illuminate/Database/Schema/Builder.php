@@ -329,23 +329,27 @@ class Builder
      * Drop index from a table schema only if exists.
      *
      * @param  string  $table
-     * @param  string  $index
+     * @param  string|array  $index
      * @return void
      */
     public function dropIndexIfExists($table, $index)
     {
         $sm = $this->getConnection()->getDoctrineSchemaManager();
         $indexes = $sm->listTableIndexes($table);
-        
-        if (array_key_exists($index, $indexes)) { 
-            $this->table($table, function (Blueprint $blueprint) use($index) {
-                $blueprint->dropForeign($index);
-                $blueprint->dropIndex($index);
-            });
+        $index = is_array($index) ? $index : [$index];
+
+        foreach($index as $key)
+        {
+            if (array_key_exists($key, $indexes)) {
+                $this->table($table, function (Blueprint $blueprint) use($key) {
+                    $blueprint->dropForeign($key);
+                    $blueprint->dropIndex($key);
+                });
+            }
+
         }
     }
 
-    
     /**
      * Drop all tables from the database.
      *

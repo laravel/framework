@@ -66,7 +66,6 @@ class DatabaseSchemaBuilderTest extends TestCase
         $sm->shouldReceive('listTableIndexes')->once()->with('users')->andReturn(['user_foreign' => []]);
 
         $this->assertNull($builder->dropIndexIfExists('users','user_foreign'));
-
     }
 
     public function testHasTableCorrectlyCallsGrammar()
