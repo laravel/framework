@@ -338,15 +338,13 @@ class Builder
         $indexes = $sm->listTableIndexes($table);
         $index = is_array($index) ? $index : [$index];
 
-        foreach($index as $key)
-        {
+        foreach ($index as $key) {
             if (array_key_exists($key, $indexes)) {
-                $this->table($table, function (Blueprint $blueprint) use($key) {
+                $this->table($table, function (Blueprint $blueprint) use ($key) {
                     $blueprint->dropForeign($key);
                     $blueprint->dropIndex($key);
                 });
             }
-
         }
     }
 
