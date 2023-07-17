@@ -49,7 +49,7 @@ class SqlServerGrammar extends Grammar
     {
         // An order by clause is required for SQL Server offset to function...
         if (($query->offset || ($query->limit && $query->limit > 0)) && empty($query->orders)) {
-            if($query->distinct){
+            if ($query->distinct){
                 $select = $this->columnize($query->columns);
                 $query->orders[] = ['sql' => "(SELECT $select)"];
             } else {
