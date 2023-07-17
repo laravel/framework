@@ -21,7 +21,7 @@ namespace Illuminate\Support\Facades;
  * @method static void create(string $table, \Closure $callback)
  * @method static void drop(string $table)
  * @method static void dropIfExists(string $table)
- * @method static void dropIndexIfExists(string $table,string $index)
+ * @method static void dropIndexIfExists(string $table, string|array $index)
  * @method static void dropColumns(string $table, string|array $columns)
  * @method static void dropAllTables()
  * @method static void dropAllViews()
