@@ -7,6 +7,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
 class PendingDispatch
 {
@@ -162,9 +163,19 @@ class PendingDispatch
 
         $uniqueLock = new UniqueLock(Container::getInstance()->make(Cache::class));
 
-        return $this->afterResponse
-            ? $uniqueLock->acquire($this->job)
-            : $uniqueLock->unlocked($this->job);
+        return $this->shouldBeQueued() && ! $this->afterResponse
+            ? $uniqueLock->unlocked($this->job)
+            : $uniqueLock->acquire($this->job);
+    }
+
+    /**
+     * Determine if the job should be queued.
+     *
+     * @return bool
+     */
+    protected function shouldBeQueued()
+    {
+        return $this->job instanceof ShouldQueue;
     }
 
     /**
