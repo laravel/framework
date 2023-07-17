@@ -28,6 +28,7 @@ namespace Illuminate\Support\Facades;
  * @method static void aliasInclude(string $path, string|null $alias = null)
  * @method static void directive(string $name, callable $handler)
  * @method static array getCustomDirectives()
+ * @method static \Illuminate\View\Compilers\BladeCompiler prepareStringsForCompilationUsing(callable $callback)
  * @method static void precompiler(callable $precompiler)
  * @method static void setEchoFormat(string $format)
  * @method static void withDoubleEncoding()
