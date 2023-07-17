@@ -3891,6 +3891,17 @@ SQL;
         $this->assertSame('select * from [users]', $builder->toSql());
     }
 
+    public function testSqlServerLimitsAndOffsetsWithDistinct()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->take(10)->distinct();
+        $this->assertSame('select distinct top 10 * from [users] order by (SELECT *)', $builder->toSql());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->skip(5)->take(10)->distinct();
+        $this->assertSame('select distinct * from [users] order by (SELECT *) offset 5 rows fetch next 10 rows only', $builder->toSql());
+    }
+
     public function testMySqlSoundsLikeOperator()
     {
         $builder = $this->getMySqlBuilder();
