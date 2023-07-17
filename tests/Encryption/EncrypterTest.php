@@ -117,6 +117,24 @@ class EncrypterTest extends TestCase
         $this->assertNotEmpty($data->mac);
     }
 
+    public function testAllowCustomKey()
+    {
+        $e = new Encrypter(str_repeat('b', 32), 'AES-256-CBC');
+        $encrypted = $e->encrypt('foo',true,'bar');
+
+        $this->assertSame('foo', $e->decrypt($encrypted,true,'bar'));
+
+    }
+
+    public function testThrowExceptionWithDifferentDecryptionKey()
+    {
+        $this->expectException(DecryptException::class);
+        $this->expectExceptionMessage('Could not decrypt the data.');
+
+        $e = new Encrypter(str_repeat('b', 32), 'AES-256-CBC');
+        $encrypted = $e->encrypt('foo',true,'bar');
+        $e->decrypt($encrypted);
+    }
     public function testDoNoAllowLongerKey()
     {
         $this->expectException(RuntimeException::class);
