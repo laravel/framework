@@ -59,6 +59,21 @@ class UniqueLock
     }
 
     /**
+     * Check if the lock for the given job is not set.
+     *
+     * @param  mixed  $job
+     * @return bool
+     */
+    public function unlocked($job)
+    {
+        $cache = method_exists($job, 'uniqueVia')
+            ? $job->uniqueVia()
+            : $this->cache;
+
+        return $cache->lock($this->getKey($job))->get(fn() => true);
+    }
+
+    /**
      * Generate the lock key for the given job.
      *
      * @param  mixed  $job

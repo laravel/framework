@@ -4,9 +4,12 @@ namespace Illuminate\Queue;
 
 use Closure;
 use DateTimeInterface;
+use Illuminate\Bus\UniqueLock;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Queue\Events\JobQueued;
 use Illuminate\Support\Arr;
 use Illuminate\Support\InteractsWithTime;
@@ -290,7 +293,7 @@ abstract class Queue
     }
 
     /**
-     * Enqueue a job using the given callback.
+     * Enqueue a job using the given callback instantly or after database transaction commit.
      *
      * @param  \Closure|string|object  $job
      * @param  string  $payload
@@ -304,12 +307,29 @@ abstract class Queue
         if ($this->shouldDispatchAfterCommit($job) &&
             $this->container->bound('db.transactions')) {
             return $this->container->make('db.transactions')->addCallback(
-                function () use ($payload, $queue, $delay, $callback, $job) {
-                    return tap($callback($payload, $queue, $delay), function ($jobId) use ($job) {
-                        $this->raiseJobQueuedEvent($jobId, $job);
-                    });
+                function () use ($job, $payload, $queue, $delay, $callback) {
+                    return $this->enqueue($job, $payload, $queue, $delay, $callback);
                 }
             );
+        }
+
+        return $this->enqueue($job, $payload, $queue, $delay, $callback);
+    }
+
+    /**
+     * Enqueue a job using the given callback checking the unique lock.
+     *
+     * @param  \Closure|string|object  $job
+     * @param  string  $payload
+     * @param  string  $queue
+     * @param  \DateTimeInterface|\DateInterval|int|null  $delay
+     * @param  callable  $callback
+     * @return mixed
+     */
+    protected function enqueue($job, $payload, $queue, $delay, $callback)
+    {
+        if (! $this->shouldDispatch($job)) {
+            return;
         }
 
         return tap($callback($payload, $queue, $delay), function ($jobId) use ($job) {
@@ -334,6 +354,22 @@ abstract class Queue
         }
 
         return false;
+    }
+
+    /**
+     * Determine if the job should be dispatched and job uniqueness conditions met
+     *
+     * @param  \Closure|string|object  $job
+     * @return bool
+     */
+    protected function shouldDispatch($job)
+    {
+        if ($job instanceof Closure || ! is_object($job) || ! $job instanceof ShouldBeUnique) {
+            return true;
+        }
+
+        return (new UniqueLock(Container::getInstance()->make(Cache::class)))
+            ->acquire($job);
     }
 
     /**
