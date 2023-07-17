@@ -70,7 +70,7 @@ class UniqueLock
             ? $job->uniqueVia()
             : $this->cache;
 
-        return $cache->lock($this->getKey($job))->get(fn() => true);
+        return $cache->lock($this->getKey($job))->get(fn () => true);
     }
 
     /**

@@ -357,7 +357,7 @@ abstract class Queue
     }
 
     /**
-     * Determine if the job should be dispatched and job uniqueness conditions met
+     * Determine if the job should be dispatched and job uniqueness conditions met.
      *
      * @param  \Closure|string|object  $job
      * @return bool
