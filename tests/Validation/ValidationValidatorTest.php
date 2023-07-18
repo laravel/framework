@@ -728,6 +728,33 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testArrayValidationMessagesAreAccurate()
+    {
+        // Note that the *second* email is invalid in the user input sample
+        $userInput = ['test@example.com', 'invalid_email', 'john@test.com'];
+
+        // Since the issue occurs between module boundaries (validation &
+        //  locale), we'll need to load the actual locale file.
+        $trans = $this->getIlluminateArrayTranslator();
+        $locale = require_once('src/Illuminate/Translation/lang/en/validation.php');
+        $trans->addLines(['validation.email' => $locale['email']], 'en');
+
+        // Run validation on user input sample
+        $v = new Validator(
+            $trans,
+            [ 'emails' => $userInput ],
+            [ 'emails.*' => 'email' ]
+        );
+
+        // Error message must indicate that the *second* email is the point of
+        //  failure, so the user sees an accurate depiction of which email
+        //  has failed validation.
+        $this->assertSame(
+            'The emails.2 field must be a valid email address.',
+            $v->errors()->first()
+        );
+    }
+
     public function testCustomValidationLinesAreRespected()
     {
         $trans = $this->getIlluminateArrayTranslator();
