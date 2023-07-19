@@ -103,7 +103,6 @@ class FilesystemManagerTest extends TestCase
         try {
             $filesystem = new FilesystemManager(new Application);
 
-            $local = $filesystem->disk('local');
             $scoped = $filesystem->build([
                 'driver' => 'scoped',
                 'disk' => [
@@ -114,9 +113,12 @@ class FilesystemManagerTest extends TestCase
             ]);
 
             $scoped->put('dirname/filename.txt', 'file content');
-            $this->assertEquals('file content', $local->get('path-prefix/dirname/filename.txt'));
-            $local->deleteDirectory('path-prefix');
+            $this->assertTrue(is_dir(__DIR__ . '/../../to-be-scoped/path-prefix'));
+            $this->assertEquals(file_get_contents(__DIR__.'/../../to-be-scoped/path-prefix/dirname/filename.txt'), 'file content');
         } finally {
+            unlink(__DIR__.'/../../to-be-scoped/path-prefix/dirname/filename.txt');
+            rmdir(__DIR__.'/../../to-be-scoped/path-prefix/dirname');
+            rmdir(__DIR__.'/../../to-be-scoped/path-prefix');
             rmdir(__DIR__.'/../../to-be-scoped');
         }
     }
