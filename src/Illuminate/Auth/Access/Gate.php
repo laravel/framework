@@ -71,7 +71,7 @@ class Gate implements GateContract
     /**
      * The default denial response for gates and policies.
      *
-     * @var Illuminate\Auth\Access\Response|null
+     * @var \Illuminate\Auth\Access\Response|null
      */
     protected $defaultDenialResponse;
 
