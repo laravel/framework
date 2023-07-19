@@ -97,4 +97,27 @@ class FilesystemManagerTest extends TestCase
             rmdir(__DIR__.'/../../to-be-scoped');
         }
     }
+
+    public function testCanBuildInlineScopedDisks()
+    {
+        try {
+            $filesystem = new FilesystemManager(new Application);
+
+            $local = $filesystem->disk('local');
+            $scoped = $filesystem->build([
+                'driver' => 'scoped',
+                'disk' => [
+                    'driver' => 'local',
+                    'root' => 'to-be-scoped',
+                ],
+                'prefix' => 'path-prefix',
+            ]);
+
+            $scoped->put('dirname/filename.txt', 'file content');
+            $this->assertEquals('file content', $local->get('path-prefix/dirname/filename.txt'));
+            $local->deleteDirectory('path-prefix');
+        } finally {
+            rmdir(__DIR__.'/../../to-be-scoped');
+        }
+    }
 }
