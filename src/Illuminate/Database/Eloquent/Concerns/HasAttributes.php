@@ -140,6 +140,13 @@ trait HasAttributes
     public static $snakeAttributes = true;
 
     /**
+     * List of attributes to force mutations
+     *
+     * @var array
+     */
+    public static $forceMutateAttributes = [];
+
+    /**
      * The cache of the mutated attributes for each class.
      *
      * @var array
@@ -2196,13 +2203,13 @@ trait HasAttributes
             collect($attributeMutatorMethods = static::getAttributeMarkedMutatorMethods($classOrInstance))
                     ->mapWithKeys(function ($match) {
                         return [lcfirst(static::$snakeAttributes ? Str::snake($match) : $match) => true];
-                    })->all();
+                    })->merge(static::$forceMutateAttributes)->all();
 
         static::$mutatorCache[$class] = collect(static::getMutatorMethods($class))
                 ->merge($attributeMutatorMethods)
                 ->map(function ($match) {
                     return lcfirst(static::$snakeAttributes ? Str::snake($match) : $match);
-                })->all();
+                })->merge(static::$forceMutateAttributes)->all();
     }
 
     /**
