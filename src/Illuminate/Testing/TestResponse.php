@@ -492,7 +492,7 @@ class TestResponse implements ArrayAccess
      */
     public function assertContent($value)
     {
-        PHPUnit::assertSame($value, $this->content());
+        PHPUnit::assertSame($value, $this->getContent());
 
         return $this;
     }

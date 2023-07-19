@@ -28,6 +28,7 @@ use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Cookie;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class TestResponseTest extends TestCase
@@ -233,6 +234,10 @@ class TestResponseTest extends TestCase
         } catch (AssertionFailedError $e) {
             $this->assertSame('Failed asserting that two strings are identical.', $e->getMessage());
         }
+
+        $response = TestResponse::fromBaseResponse(new SymfonyResponse('expected response data'));
+
+        $response->assertContent('expected response data');
     }
 
     public function testAssertStreamedContent()
