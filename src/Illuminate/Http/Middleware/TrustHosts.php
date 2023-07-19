@@ -60,6 +60,18 @@ abstract class TrustHosts
     }
 
     /**
+     * Get a regular expression matching the application URL.
+     *
+     * @return string|null
+     */
+    protected function onlyApplicationUrl()
+    {
+        if ($host = parse_url($this->app['config']->get('app.url'), PHP_URL_HOST)) {
+            return '^'.preg_quote($host).'$';
+        }
+    }
+
+    /**
      * Get a regular expression matching the application URL and all of its subdomains.
      *
      * @return string|null
