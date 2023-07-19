@@ -5580,6 +5580,22 @@ class SupportCollectionTest extends TestCase
     }
 
     /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testEnforce($collection)
+    {
+        $data = $collection::make([1, 2, 3]);
+
+        $data->enforce('int');
+
+        $data = $collection::make([1, 2, 3, 'foo']);
+
+        $this->expectException(UnexpectedValueException::class);
+
+        $data->enforce('int');
+    }
+
+    /**
      * Provides each collection class, respectively.
      *
      * @return array

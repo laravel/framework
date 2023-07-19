@@ -313,6 +313,28 @@ trait EnumeratesValues
     }
 
     /**
+     * Ensure that every item in the collection is of the expected type.
+     *
+     * @template TEnforceIntoValue
+     *
+     * @param  string|class-string<TEnforceIntoValue>  $type
+     *
+     * @return static<mixed, TEnforceIntoValue>
+     *
+     * @throws \UnexpectedValueException
+     */
+    public function enforce($type)
+    {
+        return $this->each(function($item) use ($type) {
+            $itemType = get_debug_type($item);
+
+            if ($itemType !== $type) {
+                throw new UnexpectedValueException("Collection should only include '{$type}' items, but '{$itemType}' found.");
+            }
+        });
+    }
+
+    /**
      * Determine if the collection is not empty.
      *
      * @return bool
