@@ -317,8 +317,7 @@ trait EnumeratesValues
      *
      * @template TEnforceIntoValue
      *
-     * @param  string|class-string<TEnforceIntoValue>  $type
-     *
+     * @param  class-string<TEnforceIntoValue>  $type
      * @return static<mixed, TEnforceIntoValue>
      *
      * @throws \UnexpectedValueException
