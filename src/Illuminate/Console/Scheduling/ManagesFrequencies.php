@@ -261,6 +261,7 @@ trait ManagesFrequencies
     /**
      * Schedule the event to run every odd hour.
      *
+     * @param  array|string|int  $minutes
      * @return $this
      */
     public function everyOddHour($minutes)
@@ -271,6 +272,7 @@ trait ManagesFrequencies
     /**
      * Schedule the event to run every two hours.
      *
+     * @param  array|string|int  $minutes
      * @return $this
      */
     public function everyTwoHours($minutes)
@@ -281,6 +283,7 @@ trait ManagesFrequencies
     /**
      * Schedule the event to run every three hours.
      *
+     * @param  array|string|int  $minutes
      * @return $this
      */
     public function everyThreeHours($minutes)
@@ -291,6 +294,7 @@ trait ManagesFrequencies
     /**
      * Schedule the event to run every four hours.
      *
+     * @param  array|string|int  $minutes
      * @return $this
      */
     public function everyFourHours($minutes)
@@ -301,6 +305,7 @@ trait ManagesFrequencies
     /**
      * Schedule the event to run every six hours.
      *
+     * @param  array|string|int  $minutes
      * @return $this
      */
     public function everySixHours($minutes)
