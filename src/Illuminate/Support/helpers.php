@@ -269,7 +269,7 @@ if (! function_exists('str')) {
      * @param  string|null  $string
      * @return \Illuminate\Support\Stringable|mixed
      */
-    function str($string = null)
+    function str(string $string = null, string $default = null)
     {
         if (func_num_args() === 0) {
             return new class
@@ -286,7 +286,7 @@ if (! function_exists('str')) {
             };
         }
 
-        return Str::of($string);
+        return Str::of(!empty($string) ? $string : $default);
     }
 }
 
