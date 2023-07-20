@@ -324,7 +324,7 @@ trait EnumeratesValues
      */
     public function enforce($type)
     {
-        return $this->each(function($item) use ($type) {
+        return $this->each(function ($item) use ($type) {
             $itemType = get_debug_type($item);
 
             if ($itemType !== $type) {
