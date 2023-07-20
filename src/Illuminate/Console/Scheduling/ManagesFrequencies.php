@@ -244,20 +244,18 @@ trait ManagesFrequencies
      */
     public function hourly()
     {
-        return $this->spliceIntoPosition(1, 0);
+        return $this->repeatHour(0, '*');
     }
 
     /**
      * Schedule the event to run hourly at a given offset in the hour.
      *
-     * @param  array|int  $offset
+     * @param  array|string|int  $minutes
      * @return $this
      */
-    public function hourlyAt($offset)
+    public function hourlyAt($minutes)
     {
-        $offset = is_array($offset) ? implode(',', $offset) : $offset;
-
-        return $this->spliceIntoPosition(1, $offset);
+        return $this->repeatHour($minutes, '*');
     }
 
     /**
@@ -265,9 +263,9 @@ trait ManagesFrequencies
      *
      * @return $this
      */
-    public function everyOddHour()
+    public function everyOddHour($minutes)
     {
-        return $this->spliceIntoPosition(1, 0)->spliceIntoPosition(2, '1-23/2');
+        return $this->repeatHour($minutes, '1-23/2');
     }
 
     /**
@@ -275,10 +273,9 @@ trait ManagesFrequencies
      *
      * @return $this
      */
-    public function everyTwoHours()
+    public function everyTwoHours($minutes)
     {
-        return $this->spliceIntoPosition(1, 0)
-                    ->spliceIntoPosition(2, '*/2');
+        return $this->repeatHour($minutes, '*/2');
     }
 
     /**
@@ -286,10 +283,9 @@ trait ManagesFrequencies
      *
      * @return $this
      */
-    public function everyThreeHours()
+    public function everyThreeHours($minutes)
     {
-        return $this->spliceIntoPosition(1, 0)
-                    ->spliceIntoPosition(2, '*/3');
+        return $this->repeatHour($minutes, '*/3');
     }
 
     /**
@@ -297,10 +293,9 @@ trait ManagesFrequencies
      *
      * @return $this
      */
-    public function everyFourHours()
+    public function everyFourHours($minutes)
     {
-        return $this->spliceIntoPosition(1, 0)
-                    ->spliceIntoPosition(2, '*/4');
+        return $this->repeatHour($minutes, '*/4');
     }
 
     /**
@@ -308,10 +303,9 @@ trait ManagesFrequencies
      *
      * @return $this
      */
-    public function everySixHours()
+    public function everySixHours($minutes)
     {
-        return $this->spliceIntoPosition(1, 0)
-                    ->spliceIntoPosition(2, '*/6');
+        return $this->repeatHour($minutes, '*/6');
     }
 
     /**
@@ -321,8 +315,7 @@ trait ManagesFrequencies
      */
     public function daily()
     {
-        return $this->spliceIntoPosition(1, 0)
-                    ->spliceIntoPosition(2, 0);
+        return $this->repeatHour(0, 0);
     }
 
     /**
@@ -346,8 +339,7 @@ trait ManagesFrequencies
     {
         $segments = explode(':', $time);
 
-        return $this->spliceIntoPosition(2, (int) $segments[0])
-                    ->spliceIntoPosition(1, count($segments) === 2 ? (int) $segments[1] : '0');
+        return $this->repeatHour((int) data_get($segments, '1', '0'), (int) $segments[0]);
     }
 
     /**
@@ -374,7 +366,22 @@ trait ManagesFrequencies
     {
         $hours = $first.','.$second;
 
-        return $this->spliceIntoPosition(1, $offset)
+        return $this->repeatHour($offset, $hours);
+    }
+
+    /**
+     * Schedule the event to run multiple times per hour or multiples hours.
+     *
+     * @param  array|string|int  $minutes
+     * @param  array|string|int  $hours
+     * @return $this
+     */
+    protected function repeatHour($minutes, $hours)
+    {
+        $hours = is_array($hours) ? implode(',', $hours) : $hours;
+        $minutes = is_array($minutes) ? implode(',', $minutes) : $minutes;
+
+        return $this->spliceIntoPosition(1, $minutes)
                     ->spliceIntoPosition(2, $hours);
     }
 
