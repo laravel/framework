@@ -101,7 +101,7 @@ class ScheduleTestCommand extends Command
 
         $this->components->task($description, fn () => $task->run($this->laravel));
 
-        if (!$task instanceof CallbackEvent) {
+        if (! $task instanceof CallbackEvent) {
             $this->components->bulletList([$task->getSummaryForDisplay()]);
         }
 
