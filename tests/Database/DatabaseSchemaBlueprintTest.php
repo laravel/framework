@@ -35,7 +35,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
     public function testIndexDefaultNames()
     {
         $blueprint = new Blueprint('users');
-        $blueprint->unique(['foo', 'bar']);
+        $blueprint->unique(['foo', 'bar' => 'desc']);
         $commands = $blueprint->getCommands();
         $this->assertSame('users_foo_bar_unique', $commands[0]->index);
 

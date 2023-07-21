@@ -1679,7 +1679,13 @@ class Blueprint
      */
     protected function createIndexName($type, array $columns)
     {
-        $index = strtolower($this->prefix.$this->table.'_'.implode('_', $columns).'_'.$type);
+        $columnized = implode('_', array_map(
+            static fn ($key, $value) => is_string($key) ? $key : $value,
+            array_keys($columns),
+            $columns,
+        ));
+
+        $index = strtolower($this->prefix.$this->table.'_'.$columnized.'_'.$type);
 
         return str_replace(['-', '.'], '_', $index);
     }
