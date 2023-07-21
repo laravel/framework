@@ -220,7 +220,7 @@ class PostgresGrammar extends Grammar
         $sql = sprintf('alter table %s add constraint %s unique (%s)',
             $this->wrapTable($blueprint),
             $this->wrap($command->index),
-            $this->columnize($command->columns)
+            $this->columnizeIndexKeys($command->columns)
         );
 
         if (! is_null($command->deferrable)) {
