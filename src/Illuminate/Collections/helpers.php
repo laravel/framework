@@ -154,7 +154,7 @@ if (! function_exists('data_forget')) {
      * Remove / unset an item from an array or object using "dot" notation.
      *
      * @param  mixed  $target
-     * @param  string|array|int|null  $key
+     * @param  string|array  $key
      * @return mixed
      */
     function data_forget(&$target, $key)
