@@ -168,9 +168,11 @@ if (! function_exists('data_forget')) {
                 }
             }
         } elseif (Arr::accessible($target)) {
-            if ($segments && Arr::exists($target, $segment)) {
-                data_forget($target[$segment], $segments);
-            } else {
+            if ($segments) {
+                data_forget($target, $segments);
+            }
+
+            if (Arr::exists($target, $segment)) {
                 Arr::forget($target, $segment);
             }
         } elseif (is_object($target)) {
