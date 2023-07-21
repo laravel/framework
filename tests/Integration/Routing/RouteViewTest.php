@@ -64,7 +64,7 @@ class RouteViewTest extends TestCase
             return view('route-using-ipv6');
         })->name('ipv6');
 
-        View::addLocation(__DIR__ . '/Fixtures');
+        View::addLocation(__DIR__.'/Fixtures');
 
         $response = $this->get('https://[::1]/');
 
