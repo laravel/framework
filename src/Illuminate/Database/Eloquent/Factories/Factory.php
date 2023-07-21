@@ -816,9 +816,17 @@ abstract class Factory
      */
     public static function factoryForModel(string $modelName)
     {
+        // dd($modelName);
         $factory = static::resolveFactoryName($modelName);
 
-        return $factory::new();
+        try {
+            return $factory::new();
+        } catch (Throwable $e) {
+            // @TODO check error message
+            RealTimeFactory::guessModelNamesUsing(fn () => $modelName);
+
+            return RealTimeFactory::new();
+        }
     }
 
     /**
