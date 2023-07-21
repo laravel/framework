@@ -252,6 +252,29 @@ class RouteCollectionTest extends TestCase
         $this->assertEquals($routeB, $this->routeCollection->getByAction('OverwrittenView@view'));
     }
 
+    public function testRouteCollectionWontReturnRouteByObjectReference()
+    {
+        $route = new Route('GET', 'foo', [
+            'uses' => 'FooController@index',
+            'as' => 'foo_index',
+        ]);
+        $this->routeCollection->add($route);
+
+        $request = Request::create('foo');
+
+        $request->setRouteResolver(
+            fn () => $route->bind($request)
+        );
+
+        $currentRoute = $request->route();
+        $routeFromRequest = $this->routeCollection->match($request);
+
+        // If the route objects have the same properties, but are not the same object (reference) loose comparison
+        // will be true while strict comparison will be false.
+        $this->assertTrue($currentRoute == $routeFromRequest);
+        $this->assertFalse($currentRoute === $routeFromRequest);
+    }
+
     public function testCannotCacheDuplicateRouteNames()
     {
         $this->routeCollection->add(
