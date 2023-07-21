@@ -298,6 +298,21 @@ abstract class Grammar extends BaseGrammar
     }
 
     /**
+     * @param  array $columns
+     * @return string
+     */
+    protected function columnizeIndexKeys(array $columns): string
+    {
+        foreach ($columns as $column => $order) {
+            $expressions[] = is_string($column)
+                ? $this->wrap($column) . ' ' . $order
+                : $this->wrap($order);
+        }
+
+        return implode(', ', $expressions);
+    }
+
+    /**
      * Format a value so that it can be used in "default" clauses.
      *
      * @param  mixed  $value

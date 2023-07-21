@@ -258,6 +258,16 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertSame('alter table "users" add constraint "bar" unique ("foo")', $statements[0]);
     }
 
+    public function testAddingUniqueKeyWithDirection()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->unique(['foo' => 'desc'], 'bar');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "users" add constraint "bar" unique ("foo" desc)', $statements[0]);
+    }
+
     public function testAddingIndex()
     {
         $blueprint = new Blueprint('users');
@@ -276,6 +286,16 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('create index "baz" on "users" using hash ("foo", "bar")', $statements[0]);
+    }
+
+    public function testAddingIndexWithDirection()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->index(['foo', 'bar' => 'desc'], 'baz');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create index "baz" on "users" ("foo", "bar" desc)', $statements[0]);
     }
 
     public function testAddingFulltextIndex()

@@ -176,7 +176,7 @@ class SQLiteGrammar extends Grammar
         return sprintf('create unique index %s on %s (%s)',
             $this->wrap($command->index),
             $this->wrapTable($blueprint),
-            $this->columnize($command->columns)
+            $this->columnizeIndexKeys($command->columns)
         );
     }
 
@@ -192,7 +192,7 @@ class SQLiteGrammar extends Grammar
         return sprintf('create index %s on %s (%s)',
             $this->wrap($command->index),
             $this->wrapTable($blueprint),
-            $this->columnize($command->columns)
+            $this->columnizeIndexKeys($command->columns)
         );
     }
 
