@@ -82,9 +82,11 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
             return $route->isFallback;
         });
 
-        return $routes->merge($fallbacks)->first(
+        $route = $routes->merge($fallbacks)->first(
             fn (Route $route) => $route->matches($request, $includingMethod)
         );
+
+        return $route instanceof Route ? clone $route : null;
     }
 
     /**
