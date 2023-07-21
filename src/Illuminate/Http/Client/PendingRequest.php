@@ -845,7 +845,7 @@ class PendingRequest
      * Send a pool of asynchronous requests concurrently.
      *
      * @param  callable  $callback
-     * @return array
+     * @return \Illuminate\Support\Collection
      */
     public function pool(callable $callback)
     {
@@ -857,7 +857,7 @@ class PendingRequest
             $results[$key] = $item instanceof static ? $item->getPromise()->wait() : $item->wait();
         }
 
-        return $results;
+        return new Collection($results);
     }
 
     /**

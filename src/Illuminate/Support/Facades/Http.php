@@ -68,7 +68,7 @@ use Illuminate\Http\Client\Factory;
  * @method static \Illuminate\Http\Client\Response patch(string $url, array $data = [])
  * @method static \Illuminate\Http\Client\Response put(string $url, array $data = [])
  * @method static \Illuminate\Http\Client\Response delete(string $url, array $data = [])
- * @method static array pool(callable $callback)
+ * @method static \Illuminate\Support\Collection pool(callable $callback)
  * @method static \Illuminate\Http\Client\Response send(string $method, string $url, array $options = [])
  * @method static \GuzzleHttp\Client buildClient()
  * @method static \GuzzleHttp\Client createClient(\GuzzleHttp\HandlerStack $handlerStack)
