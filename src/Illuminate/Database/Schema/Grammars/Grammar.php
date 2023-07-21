@@ -301,16 +301,16 @@ abstract class Grammar extends BaseGrammar
      * Convert an array into a delimited string.
      * Given array can be one of the following.
      * - List of column names
-     * - Assoc array with column names as key and sort direction as value
+     * - Assoc array with column names as key and sort direction as value.
      *
-     * @param  array $columns
+     * @param  array  $columns
      * @return string
      */
     protected function columnizeIndexKeys(array $columns): string
     {
         foreach ($columns as $column => $order) {
             $expressions[] = is_string($column)
-                ? $this->wrap($column) . ' ' . $order
+                ? $this->wrap($column).' '.$order
                 : $this->wrap($order);
         }
 
