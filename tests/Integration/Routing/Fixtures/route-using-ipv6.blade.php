@@ -1,0 +1,1 @@
+Test {{ route('ipv6') }}

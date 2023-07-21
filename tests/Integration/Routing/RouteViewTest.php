@@ -57,4 +57,17 @@ class RouteViewTest extends TestCase
 
         $this->assertSame('Laravel', $this->get('/route')->headers->get('Framework'));
     }
+
+    public function testRouteHelperUsingLoopbackIpv6AsDomain()
+    {
+        Route::get('/', function () {
+            return view('route-using-ipv6');
+        })->name('ipv6');
+
+        View::addLocation(__DIR__ . '/Fixtures');
+
+        $response = $this->get('https://[::1]/');
+
+        $this->assertSame('Test https://[::1]', $response->content());
+    }
 }
