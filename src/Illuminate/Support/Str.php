@@ -956,7 +956,7 @@ class Str
      * @param  string|iterable<string>  $replace
      * @param  string|iterable<string>  $subject
      * @param  bool  $caseSensitive
-     * @return string
+     * @return string|string[]
      */
     public static function replace($search, $replace, $subject, $caseSensitive = true)
     {
