@@ -136,7 +136,7 @@ class PivotInteractionUser extends Model
     protected $fillable = ['name'];
     protected $table = 'users';
     public $timestamps = false;
-    
+
     public function roles()
     {
         return $this->belongsToMany(PivotInteractionRoles::class, 'role_user', 'user_id', 'role_id')->withPivot('office');
@@ -146,7 +146,6 @@ class PivotInteractionUser extends Model
 /**
  * Role model.
  */
-
 class PivotInteractionRoles extends Model
 {
     public $timestamps = false;
