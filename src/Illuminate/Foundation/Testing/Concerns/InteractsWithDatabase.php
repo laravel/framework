@@ -9,6 +9,7 @@ use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Testing\Constraints\CountInDatabase;
+use Illuminate\Testing\Constraints\HasCountInDatabase;
 use Illuminate\Testing\Constraints\HasInDatabase;
 use Illuminate\Testing\Constraints\NotSoftDeletedInDatabase;
 use Illuminate\Testing\Constraints\SoftDeletedInDatabase;
@@ -80,6 +81,24 @@ trait InteractsWithDatabase
     {
         $this->assertThat(
             $this->getTable($table), new CountInDatabase($this->getConnection($connection, $table), 0)
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert the count of a given where condition exists in the database.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model|string  $table
+     * @param  array  $data
+     * @param  int  $count
+     * @param  string|null  $connection
+     * @return $this
+     */
+    protected function assertDatabaseHasCount($table, array $data, int $count, $connection = null)
+    {
+        $this->assertThat(
+            $this->getTable($table), new HasCountInDatabase($this->getConnection($connection, $table), $data, $count)
         );
 
         return $this;

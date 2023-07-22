@@ -95,6 +95,30 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertDatabaseHas($this->table, $this->data);
     }
 
+    public function testSeeInDatabaseCountFindsResults()
+    {
+        $this->mockCountBuilder(1);
+
+        $this->assertDatabaseHasCount($this->table, $this->data, 1);
+    }
+
+    public function testAssertDatabaseHasCountSupportModels()
+    {
+        $this->mockCountBuilder(2);
+
+        $this->assertDatabaseHasCount(ProductStub::class, $this->data, 2);
+        $this->assertDatabaseHasCount(new ProductStub, $this->data, 2);
+    }
+
+    public function testAssertTableEntriesHasCountWrong()
+    {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Failed asserting that the data in table [products] matches expected entries count of 3. Entries found: 1.');
+        $this->mockCountBuilder(1);
+
+        $this->assertDatabaseHasCount($this->table, $this->data, 3);
+    }
+
     public function testDontSeeInDatabaseDoesNotFindResults()
     {
         $this->mockCountBuilder(0);
