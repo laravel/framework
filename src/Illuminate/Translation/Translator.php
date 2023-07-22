@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Contracts\Translation\Loader;
 use Illuminate\Contracts\Translation\Translator as TranslatorContract;
 use Illuminate\Support\Arr;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\NamespacedItemResolver;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
@@ -209,7 +210,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      * @param  string  $locale
      * @param  string  $item
      * @param  array  $replace
-     * @return string|array|null
+     * @return HtmlString|string|array|null
      */
     protected function getLine($namespace, $group, $locale, $item, array $replace)
     {
@@ -219,9 +220,15 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
 
         if (is_string($line)) {
             return $this->makeReplacements($line, $replace);
+        } elseif ($line instanceof HtmlString) {
+            return new HtmlString($this->makeReplacements($line->toHtml(), $replace));
         } elseif (is_array($line) && count($line) > 0) {
             array_walk_recursive($line, function (&$value, $key) use ($replace) {
-                $value = $this->makeReplacements($value, $replace);
+                if ($value instanceof HtmlString) {
+                    $value =  new HtmlString($this->makeReplacements($value->toHtml(), $replace));
+                } else {
+                    $value = $this->makeReplacements($value, $replace);
+                }
             });
 
             return $line;
