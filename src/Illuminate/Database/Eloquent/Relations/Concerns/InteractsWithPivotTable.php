@@ -151,7 +151,6 @@ trait InteractsWithPivotTable
      */
     public function syncWithManyPivotValues($ids, array $values, bool $detaching = true)
     {
-
         if ($ids instanceof \illuminate\Support\Collection) {
             $ids = $ids->toArray();
         }
