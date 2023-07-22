@@ -5,6 +5,7 @@ namespace Illuminate\Console\Concerns;
 use Closure;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Helper\Table;
@@ -152,6 +153,25 @@ trait InteractsWithIO
     public function ask($question, $default = null)
     {
         return $this->output->ask($question, $default);
+    }
+
+    /**
+     * Prompt the user for input until validation passes.
+     *
+     * @param  string  $question
+     * @param  string|null $default
+     * @param  array  $rules
+     * @return mixed
+     */
+    public function askAndValidate($question, $default = null, $rules = [])
+    {
+        $value = $this->ask($question, $default);
+
+        while ( ! $this->validateInput($value, $rules)) {
+            $value = $this->ask($question, $default);
+        }
+
+        return $value;
     }
 
     /**
@@ -449,5 +469,14 @@ trait InteractsWithIO
     public function getOutput()
     {
         return $this->output;
+    }
+
+    public function validateInput($value, array $rules): bool
+    {
+        return Validator::make([
+            'input' => $value
+        ], [
+            'input' => $rules
+        ])->passes();
     }
 }

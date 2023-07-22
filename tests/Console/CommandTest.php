@@ -6,6 +6,7 @@ use Illuminate\Console\Application;
 use Illuminate\Console\Command;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Console\View\Components\Factory;
+use Illuminate\Support\Facades\Validator;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -213,5 +214,39 @@ class CommandTest extends TestCase
         $command->setOutput($output);
 
         $command->choice('Select all that apply.', ['option-1', 'option-2', 'option-3'], null, null, true);
+    }
+
+    public function testAskWithValidate()
+    {
+        $output = m::mock(OutputStyle::class);
+
+        $output->shouldReceive('ask')
+            ->twice()
+            ->with('Name ?', null)
+            ->andReturns(null, 'Tom')
+        ;
+
+        $validator1 = m::mock(\Illuminate\Contracts\Validation\Validator::class);
+        $validator2 = m::mock(\Illuminate\Contracts\Validation\Validator::class);
+
+        $validator1->shouldReceive('passes')
+            ->once()
+            ->andReturn(false)
+        ;
+
+        $validator2->shouldReceive('passes')
+            ->once()
+            ->andReturn(true)
+        ;
+
+        Validator::shouldReceive('make')
+            ->twice()
+            ->andReturns($validator1, $validator2)
+        ;
+
+        $command = new Command;
+        $command->setOutput($output);
+
+        $command->askAndValidate('Name ?', null, ['required', 'string', 'max: 25']);
     }
 }
