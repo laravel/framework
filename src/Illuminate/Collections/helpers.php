@@ -168,12 +168,12 @@ if (! function_exists('data_forget')) {
                 }
             }
         } elseif (Arr::accessible($target)) {
-            if ($segments) {
-                data_forget($target, $segments);
-            }
-
             if (Arr::exists($target, $segment)) {
                 Arr::forget($target, $segment);
+            }
+
+            if ($segments) {
+                data_forget($target, $segments);
             }
         } elseif (is_object($target)) {
             if ($segments && isset($target->{$segment})) {
