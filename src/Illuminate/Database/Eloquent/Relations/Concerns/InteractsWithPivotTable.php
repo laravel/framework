@@ -141,6 +141,34 @@ trait InteractsWithPivotTable
         }), $detaching);
     }
 
+     /**
+     * Sync the intermediate tables with a list of IDs or collection of models with different pivot values.
+     *
+     * @param  \Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model|array  $ids
+     * @param  array  $values
+     * @param  bool  $detaching
+     * @return array
+     */
+    public function syncWithManyPivotValues($ids, array $values, bool $detaching = true)
+    {
+
+        if($ids instanceof \illuminate\Support\Collection){
+            $ids = $ids->toArray();
+        }
+        
+        //$ids are paired with $values in the same position in their array eg. $ids[0] => $values[0]
+        //If $ids length is less than that of the $values the remaining $ids with no value pair are
+        //ignored while syncing to pivot table, meaning all $ids must have a pair to be synced
+
+        array_splice($ids, count($values));
+
+        return $this->sync(collect($this->parseIds($ids))->mapWithKeys(function ($value, $key) use ($values) {
+            return [
+                $value => $values[$key]
+            ];
+        }), $detaching);
+    }
+
     /**
      * Format the sync / toggle record list so that it is keyed by ID.
      *
