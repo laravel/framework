@@ -57,7 +57,6 @@ class DatabaseConcernsInteractsWithPivotTableTest extends TestCase
         return $this->connection()->getSchemaBuilder();
     }
 
-
     protected function connection(): mixed
     {
         return Model::getConnectionResolver()->connection();
@@ -130,7 +129,7 @@ class DatabaseConcernsInteractsWithPivotTableTest extends TestCase
 }
 
 /**
- * User model
+ * User model.
  */
 class PivotInteractionUser extends Model
 {
@@ -144,7 +143,7 @@ class PivotInteractionUser extends Model
 }
 
 /**
- * Role model
+ * Role model.
  */
 
 class PivotInteractionRoles extends Model
