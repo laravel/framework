@@ -253,7 +253,7 @@ class CommandTest extends TestCase
         $validator2->shouldReceive('validate')
             ->once()
             ->andReturn([
-                'input' => 'Tom'
+                'input' => 'Tom',
             ]);
 
         Validator::shouldReceive('make')
