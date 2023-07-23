@@ -72,6 +72,11 @@ class RouteUrlGenerator
         // prepare it for returning to the developer. If the URI is supposed to
         // be absolute, we will return it as-is. Otherwise we will remove the URL's root.
 
+        $uri = strtr($uri, [
+            '{' => '%7B',
+            '}' => '%7D',
+        ]);
+
         if (! $absolute) {
             $uri = preg_replace('#^(//|[^/?])+#', '', $uri);
 

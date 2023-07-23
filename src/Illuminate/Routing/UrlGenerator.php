@@ -130,6 +130,8 @@ class UrlGenerator implements UrlGeneratorContract
         '%26' => '&',
         '%23' => '#',
         '%25' => '%',
+        '%7B' => '{',
+        '%7D' => '}',
     ];
 
     /**
@@ -616,11 +618,12 @@ class UrlGenerator implements UrlGeneratorContract
      *
      * @see https://github.com/laravel/framework/pull/47802
      * @link http://www.faqs.org/rfcs/rfc3986.html
+     * @return string
      */
-    private function encodePath(string &$path): void
+    private function encodePath(string $path): string
     {
         // TODO: add tests for reserved and unreserved characters encoding
-        strtr(rawurlencode($path), self::DONT_ENCODE_CHARACTERS);
+        return strtr(rawurlencode($path), self::DONT_ENCODE_CHARACTERS);
     }
 
     /**
@@ -643,7 +646,7 @@ class UrlGenerator implements UrlGeneratorContract
             $path = call_user_func($this->formatPathUsing, $path, $route);
         }
 
-        $this->encodePath($path);
+        $path = $this->encodePath($path);
 
         return trim($root.$path, '/');
     }
