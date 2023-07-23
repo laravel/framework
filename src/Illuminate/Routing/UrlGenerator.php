@@ -614,10 +614,11 @@ class UrlGenerator implements UrlGeneratorContract
     }
 
     /**
-     * Encoding path acording RFC3986
+     * Encoding path acording RFC3986.
      *
      * @see https://github.com/laravel/framework/pull/47802
      * @link http://www.faqs.org/rfcs/rfc3986.html
+     *
      * @return string
      */
     private function encodePath(string $path): string

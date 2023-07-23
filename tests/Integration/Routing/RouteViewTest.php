@@ -61,10 +61,10 @@ class RouteViewTest extends TestCase
     /**
      * @dataProvider provideUrlsToValidateEncoding
      *
-     * @param string $route
-     * @param string $name
-     * @param string $act
-     * @param string $assert
+     * @param  string  $route
+     * @param  string  $name
+     * @param  string  $act
+     * @param  string  $assert
      */
     public function testRouteHelperUsingLoopbackIpv6AsDomain(string $route, string $name, string $act, string $assert)
     {
@@ -80,12 +80,15 @@ class RouteViewTest extends TestCase
     }
 
     /**
-     * A sets of URLs to test if encoding is match acording with the RFC3986
+     * A sets of URLs to test if encoding is match acording with the RFC3986.
      *
      * @todo Add more route URLs
+     *
      * @see https://github.com/laravel/framework/pull/47802
      * @link http://www.faqs.org/rfcs/rfc3986.html
+     *
      * @return array
+     *
      * @static
      */
     public static function provideUrlsToValidateEncoding(): array
