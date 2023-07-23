@@ -111,6 +111,28 @@ class UrlGenerator implements UrlGeneratorContract
     protected $routeGenerator;
 
     /**
+     * Characters that should not be URL encoded.
+     *
+     * @var array
+     */
+    const DONT_ENCODE_CHARACTERS = [
+        '%2F' => '/',
+        '%40' => '@',
+        '%3A' => ':',
+        '%3B' => ';',
+        '%2C' => ',',
+        '%3D' => '=',
+        '%2B' => '+',
+        '%21' => '!',
+        '%2A' => '*',
+        '%7C' => '|',
+        '%3F' => '?',
+        '%26' => '&',
+        '%23' => '#',
+        '%25' => '%',
+    ];
+
+    /**
      * Create a new URL Generator instance.
      *
      * @param  \Illuminate\Routing\RouteCollectionInterface  $routes
@@ -590,6 +612,18 @@ class UrlGenerator implements UrlGeneratorContract
     }
 
     /**
+     * Encoding path acording RFC3986
+     *
+     * @see https://github.com/laravel/framework/pull/47802
+     * @link http://www.faqs.org/rfcs/rfc3986.html
+     */
+    private function encodePath(string &$path): void
+    {
+        // TODO: add tests for reserved and unreserved characters encoding
+        strtr(rawurlencode($path), self::DONT_ENCODE_CHARACTERS);
+    }
+
+    /**
      * Format the given URL segments into a single URL.
      *
      * @param  string  $root
@@ -608,6 +642,8 @@ class UrlGenerator implements UrlGeneratorContract
         if ($this->formatPathUsing) {
             $path = call_user_func($this->formatPathUsing, $path, $route);
         }
+
+        $this->encodePath($path);
 
         return trim($root.$path, '/');
     }

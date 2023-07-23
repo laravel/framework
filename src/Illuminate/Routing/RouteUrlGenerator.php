@@ -29,30 +29,6 @@ class RouteUrlGenerator
     public $defaultParameters = [];
 
     /**
-     * Characters that should not be URL encoded.
-     *
-     * @var array
-     */
-    public $dontEncode = [
-        '%2F' => '/',
-        '%40' => '@',
-        '%3A' => ':',
-        '%3B' => ';',
-        '%2C' => ',',
-        '%3D' => '=',
-        '%2B' => '+',
-        '%21' => '!',
-        '%2A' => '*',
-        '%7C' => '|',
-        '%3F' => '?',
-        '%26' => '&',
-        '%23' => '#',
-        '%25' => '%',
-        '%5B' => '[',
-        '%5D' => ']',
-    ];
-
-    /**
      * Create a new Route URL generator.
      *
      * @param  \Illuminate\Routing\UrlGenerator  $url
@@ -92,10 +68,9 @@ class RouteUrlGenerator
             throw UrlGenerationException::forMissingParameters($route, $matchedMissingParameters[1]);
         }
 
-        // Once we have ensured that there are no missing parameters in the URI we will encode
-        // the URI and prepare it for returning to the developer. If the URI is supposed to
+        // Once we have ensured that there are no missing parameters in the URI,
+        // prepare it for returning to the developer. If the URI is supposed to
         // be absolute, we will return it as-is. Otherwise we will remove the URL's root.
-        $uri = strtr(rawurlencode($uri), $this->dontEncode);
 
         if (! $absolute) {
             $uri = preg_replace('#^(//|[^/?])+#', '', $uri);
