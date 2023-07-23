@@ -172,7 +172,7 @@ class CacheCommandMutexTest extends TestCase
         $this->cacheRepository->shouldReceive('add')
             ->once()
             ->withArgs(function ($key) {
-                $this->assertEquals('framework/command-command-name', $key);
+                $this->assertEquals('framework'.DIRECTORY_SEPARATOR.'command-command-name', $key);
 
                 return true;
             })
@@ -202,7 +202,7 @@ class CacheCommandMutexTest extends TestCase
         $this->cacheRepository->shouldReceive('add')
             ->once()
             ->withArgs(function ($key) {
-                $this->assertEquals('framework/command-command-name-isolated', $key);
+                $this->assertEquals('framework'.DIRECTORY_SEPARATOR.'command-command-name-isolated', $key);
 
                 return true;
             })
