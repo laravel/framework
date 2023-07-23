@@ -106,7 +106,13 @@ class CacheCommandMutex implements CommandMutex
      */
     protected function commandMutexName($command)
     {
-        return 'framework'.DIRECTORY_SEPARATOR.'command-'.$command->getName();
+        $baseName = 'framework'.DIRECTORY_SEPARATOR.'command-'.$command->getName();
+
+        if (method_exists($command, 'getIsolatedMutexName')) {
+            return $baseName.'-'.$command->getIsolatedMutexName();
+        }
+
+        return $baseName;
     }
 
     /**
