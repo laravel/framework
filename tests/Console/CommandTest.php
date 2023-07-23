@@ -222,7 +222,7 @@ class CommandTest extends TestCase
     {
         $output = m::mock(OutputStyle::class);
 
-        $output->shouldReceive('ask')->twice()->with('Name ?', null)->andReturns(null, 'Tom');
+        $output->shouldReceive('ask')->twice()->with('Name ?', null)->andReturns(null, 'Foo');
 
         $output->shouldReceive('writeln')->once()->withArgs(function (...$args) {
             return $args[0] === '<error>Invalid input:</error>';
@@ -253,7 +253,7 @@ class CommandTest extends TestCase
         $validator2->shouldReceive('validate')
             ->once()
             ->andReturn([
-                'input' => 'Tom',
+                'input' => 'Foo',
             ]);
 
         Validator::shouldReceive('make')
