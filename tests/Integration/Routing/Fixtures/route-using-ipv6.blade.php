@@ -1,1 +1,1 @@
-Test {{ route('ipv6') }}
+Test {{ route($routeName) }}

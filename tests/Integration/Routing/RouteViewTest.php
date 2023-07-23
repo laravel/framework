@@ -58,16 +58,45 @@ class RouteViewTest extends TestCase
         $this->assertSame('Laravel', $this->get('/route')->headers->get('Framework'));
     }
 
-    public function testRouteHelperUsingLoopbackIpv6AsDomain()
+    /**
+     * @dataProvider provideUrlsToValidateEncoding
+     *
+     * @param string $route
+     * @param string $name
+     * @param string $act
+     * @param string $assert
+     */
+    public function testRouteHelperUsingLoopbackIpv6AsDomain(string $route, string $name, string $act, string $assert)
     {
-        Route::get('/', function () {
-            return view('route-using-ipv6');
-        })->name('ipv6');
+        Route::get($route, function () use ($name) {
+            return view('route-using-ipv6', ['routeName' => $name]);
+        })->name($name);
 
         View::addLocation(__DIR__.'/Fixtures');
 
-        $response = $this->get('https://[::1]/');
+        $response = $this->get($act);
 
-        $this->assertSame('Test https://[::1]', $response->content());
+        $this->assertSame("Test {$assert}", $response->content());
+    }
+
+    /**
+     * A sets of URLs to test if encoding is match acording with the RFC3986
+     *
+     * @todo Add more route URLs
+     * @see https://github.com/laravel/framework/pull/47802
+     * @link http://www.faqs.org/rfcs/rfc3986.html
+     * @return array
+     * @static
+     */
+    public static function provideUrlsToValidateEncoding(): array
+    {
+        return [
+            'Ipv6LiteralAddresses' => [
+                '/',
+                'root',
+                'https://[::1]/',
+                'https://[::1]',
+            ],
+        ];
     }
 }
