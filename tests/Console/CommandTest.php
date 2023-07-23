@@ -244,25 +244,21 @@ class CommandTest extends TestCase
         $validationException
             ->shouldReceive('errors')
             ->once()
-            ->andReturn(array_values($validationMessages))
-        ;
+            ->andReturn(array_values($validationMessages));
 
         $validator1->shouldReceive('validate')
             ->once()
-            ->andThrow($validationException)
-        ;
+            ->andThrow($validationException);
 
         $validator2->shouldReceive('validate')
             ->once()
             ->andReturn([
                 'input' => 'Tom'
-            ])
-        ;
+            ]);
 
         Validator::shouldReceive('make')
             ->twice()
-            ->andReturns($validator1, $validator2)
-        ;
+            ->andReturns($validator1, $validator2);
 
         $command = new Command;
         $command->setOutput($output);

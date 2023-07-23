@@ -169,7 +169,7 @@ trait InteractsWithIO
     {
         $value = $this->ask($question, $default);
 
-        while ( ! $this->validateInput($value, $rules, $messages)) {
+        while (! $this->validateInput($value, $rules, $messages)) {
             $value = $this->ask($question, $default);
         }
 
@@ -476,9 +476,9 @@ trait InteractsWithIO
     /**
      * Validate input based on given rules. Any errors will be output to the user.
      *
-     * @param $value
-     * @param array $rules
-     * @param array $messages
+     * @param  $value
+     * @param  array  $rules
+     * @param  array  $messages
      * @return bool
      */
     public function validateInput($value, array $rules, array $messages = []): bool
