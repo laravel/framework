@@ -6,7 +6,9 @@ use Illuminate\Console\Application;
 use Illuminate\Console\Command;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Console\View\Components\Factory;
+use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -220,23 +222,41 @@ class CommandTest extends TestCase
     {
         $output = m::mock(OutputStyle::class);
 
-        $output->shouldReceive('ask')
-            ->twice()
-            ->with('Name ?', null)
-            ->andReturns(null, 'Tom')
+        $output->shouldReceive('ask')->twice()->with('Name ?', null)->andReturns(null, 'Tom');
+
+        $output->shouldReceive('writeln')->once()->withArgs(function (...$args) {
+            return $args[0] === '<error>Invalid input:</error>';
+        });
+
+        $output->shouldReceive('writeln')->once()->withArgs(function (...$args) {
+            return $args[0] === '<error>input is required</error>';
+        });
+
+        $validationMessages = [
+            'input.required' => 'input is required',
+        ];
+
+        $validator1 = m::mock(ValidatorContract::class);
+        $validator2 = m::mock(ValidatorContract::class);
+
+        $validationException = m::mock(ValidationException::class);
+
+        $validationException
+            ->shouldReceive('errors')
+            ->once()
+            ->andReturn(array_values($validationMessages))
         ;
 
-        $validator1 = m::mock(\Illuminate\Contracts\Validation\Validator::class);
-        $validator2 = m::mock(\Illuminate\Contracts\Validation\Validator::class);
-
-        $validator1->shouldReceive('passes')
+        $validator1->shouldReceive('validate')
             ->once()
-            ->andReturn(false)
+            ->andThrow($validationException)
         ;
 
-        $validator2->shouldReceive('passes')
+        $validator2->shouldReceive('validate')
             ->once()
-            ->andReturn(true)
+            ->andReturn([
+                'input' => 'Tom'
+            ])
         ;
 
         Validator::shouldReceive('make')
@@ -247,6 +267,10 @@ class CommandTest extends TestCase
         $command = new Command;
         $command->setOutput($output);
 
-        $command->askAndValidate('Name ?', null, ['required', 'string', 'max: 25']);
+        $command->askAndValidate(
+            question: 'Name ?',
+            rules: ['required'],
+            messages: $validationMessages
+        );
     }
 }

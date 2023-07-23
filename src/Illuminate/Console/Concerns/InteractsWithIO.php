@@ -7,6 +7,7 @@ use Illuminate\Console\OutputStyle;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
@@ -159,15 +160,16 @@ trait InteractsWithIO
      * Prompt the user for input until validation passes.
      *
      * @param  string  $question
-     * @param  string|null $default
+     * @param  string|null  $default
      * @param  array  $rules
+     * @param  array  $messages
      * @return mixed
      */
-    public function askAndValidate($question, $default = null, $rules = [])
+    public function askAndValidate($question, $default = null, array $rules = [], array $messages = [])
     {
         $value = $this->ask($question, $default);
 
-        while ( ! $this->validateInput($value, $rules)) {
+        while ( ! $this->validateInput($value, $rules, $messages)) {
             $value = $this->ask($question, $default);
         }
 
@@ -471,12 +473,27 @@ trait InteractsWithIO
         return $this->output;
     }
 
-    public function validateInput($value, array $rules): bool
+    /**
+     * Validate input based on given rules. Any errors will be output to the user.
+     *
+     * @param $value
+     * @param array $rules
+     * @param array $messages
+     * @return bool
+     */
+    public function validateInput($value, array $rules, array $messages = []): bool
     {
-        return Validator::make([
-            'input' => $value
-        ], [
-            'input' => $rules
-        ])->passes();
+        try {
+            Validator::make(['input' => $value], ['input' => $rules], $messages)->validate();
+
+            return true;
+        } catch (ValidationException $e) {
+            $this->error('Invalid input:');
+            foreach ($e->errors() as $error) {
+                $this->error($error);
+            }
+        }
+
+        return false;
     }
 }
