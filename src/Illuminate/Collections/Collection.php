@@ -505,6 +505,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
                 $groupKey = match (true) {
                     is_bool($groupKey) => (int) $groupKey,
                     $groupKey instanceof \Stringable => (string) $groupKey,
+                    $groupKey instanceof \BackedEnum => $groupKey->value,
                     default => $groupKey,
                 };
 
