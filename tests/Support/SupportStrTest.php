@@ -1124,6 +1124,17 @@ class SupportStrTest extends TestCase
     {
         $this->assertTrue(strlen(Str::password()) === 32);
     }
+
+    public function testPasswordComplexity()
+    {
+        $password = Str::password(5, 1, 1, 1, 1, 1);
+
+        $this->assertEquals(1, preg_match('/[a-z]/', $password));
+        $this->assertEquals(1, preg_match('/[A-Z]/', $password));
+        $this->assertEquals(1, preg_match('/[0-9]/', $password));
+        $this->assertEquals(1, preg_match('/[^a-zA-Z0-9 ]/', $password));
+        $this->assertEquals(1, preg_match('/ /', $password));
+    }
 }
 
 class StringableObjectStub
