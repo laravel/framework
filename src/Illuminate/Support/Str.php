@@ -4,6 +4,7 @@ namespace Illuminate\Support;
 
 use Closure;
 use Illuminate\Support\Traits\Macroable;
+use InvalidArgumentException;
 use JsonException;
 use League\CommonMark\Environment\Environment;
 use League\CommonMark\Extension\GithubFlavoredMarkdownExtension;
@@ -803,33 +804,90 @@ class Str
      * Generate a random, secure password.
      *
      * @param  int  $length
-     * @param  bool  $letters
-     * @param  bool  $numbers
-     * @param  bool  $symbols
-     * @param  bool  $spaces
+     * @param  int|null  $lowerCase Include a minimal of N lower-case letters, or null to not use them.
+     * @param  int|null  $upperCase Include a minimal of N upper-case letters, or null to not use them.
+     * @param  int|null  $numbers Include a minimal of N numbers, or null to not use them.
+     * @param  int|null  $symbols Include a minimal of N symbols, or null to not use them.
+     * @param  int|null  $spaces Include a minimal of N spaces, or null to not use them.
+     *
      * @return string
      */
-    public static function password($length = 32, $letters = true, $numbers = true, $symbols = true, $spaces = false)
+    public static function password($length = 32, $lowerCase = 1, $upperCase = 1, $numbers = 1, $symbols = 1, $spaces = null)
     {
+        $totalMinimalCharacters = ($lowerCase ?? 0)
+            + ($upperCase ?? 0)
+            + ($numbers ?? 0)
+            + ($symbols ?? 0)
+            + ($spaces ?? 0);
+
+        if($length < $totalMinimalCharacters) {
+            throw new InvalidArgumentException(
+                "You requested {$length} password characters, but the minimal characters are requiring a length of at least {$totalMinimalCharacters}."
+            );
+        }
+
+        $requiredCharacters = collect();
+        $addToRequiredCharacters = function ($characters, $length) use (&$requiredCharacters) {
+            if ($length > 0) {
+                $requiredCharacters->push(...$characters->pipe(fn($c) => Collection::times(
+                    $length,
+                    fn() => $characters[random_int(0, $characters->count() - 1)]
+                )));
+            }
+        };
+
         return (new Collection)
-                ->when($letters, fn ($c) => $c->merge([
+            ->when(is_int($lowerCase), function ($c) use ($lowerCase, $addToRequiredCharacters) {
+                $characters = collect([
                     'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k',
                     'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
-                    'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G',
-                    'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
-                    'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-                ]))
-                ->when($numbers, fn ($c) => $c->merge([
+                    'w', 'x', 'y', 'z',
+                ]);
+                $addToRequiredCharacters($characters, $lowerCase);
+
+                return $c->merge($characters);
+            })
+            ->when(is_int($upperCase), function ($c) use ($upperCase, $addToRequiredCharacters) {
+                $characters = collect([
+                    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
+                    'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
+                    'W', 'X', 'Y', 'Z',
+                ]);
+                $addToRequiredCharacters($characters, $upperCase);
+
+                return $c->merge($characters);
+            })
+            ->when(is_int($numbers), function ($c) use ($numbers, $addToRequiredCharacters) {
+                $characters = collect([
                     '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-                ]))
-                ->when($symbols, fn ($c) => $c->merge([
+                ]);
+                $addToRequiredCharacters($characters, $numbers);
+
+                return $c->merge($characters);
+            })
+            ->when(is_int($symbols), function ($c) use ($symbols, $addToRequiredCharacters) {
+                $characters = collect([
                     '~', '!', '#', '$', '%', '^', '&', '*', '(', ')', '-',
                     '_', '.', ',', '<', '>', '?', '/', '\\', '{', '}', '[',
                     ']', '|', ':', ';',
-                ]))
-                ->when($spaces, fn ($c) => $c->merge([' ']))
-                ->pipe(fn ($c) => Collection::times($length, fn () => $c[random_int(0, $c->count() - 1)]))
-                ->implode('');
+                ]);
+                $addToRequiredCharacters($characters, $symbols);
+
+                return $c->merge($characters);
+            })
+            ->when(is_int($spaces), function ($c) use ($spaces, $addToRequiredCharacters) {
+                $characters = collect([' ']);
+                $addToRequiredCharacters($characters, $spaces);
+
+                return $c->merge($characters);
+            })
+            ->pipe(fn($c) => Collection::times(
+                $length - $requiredCharacters->count(),
+                fn() => $c[random_int(0, $c->count() - 1)]
+            ))
+            ->merge($requiredCharacters)
+            ->shuffle()
+            ->implode('');
     }
 
     /**
