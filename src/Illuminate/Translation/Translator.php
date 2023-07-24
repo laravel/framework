@@ -210,7 +210,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      * @param  string  $locale
      * @param  string  $item
      * @param  array  $replace
-     * @return HtmlString|string|array|null
+     * @return \Illuminate\Support\HtmlString|string|array|null
      */
     protected function getLine($namespace, $group, $locale, $item, array $replace)
     {
