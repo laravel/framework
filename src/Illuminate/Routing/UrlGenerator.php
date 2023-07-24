@@ -623,7 +623,6 @@ class UrlGenerator implements UrlGeneratorContract
      */
     private function encodePath(string $path): string
     {
-        // TODO: add tests for reserved and unreserved characters encoding
         return strtr(rawurlencode($path), self::DONT_ENCODE_CHARACTERS);
     }
 

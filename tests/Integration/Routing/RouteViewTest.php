@@ -65,11 +65,12 @@ class RouteViewTest extends TestCase
      * @param  string  $name
      * @param  string  $act
      * @param  string  $assert
+     * @param  array  $payload
      */
-    public function testRouteHelperUsingLoopbackIpv6AsDomain(string $route, string $name, string $act, string $assert)
+    public function testRouteHelperUsingLoopbackIpv6AsDomain(string $route, string $name, string $act, string $assert, array $payload = [])
     {
-        Route::get($route, function () use ($name) {
-            return view('route-using-ipv6', ['routeName' => $name]);
+        Route::get($route, function () use ($name, $payload) {
+            return view('route-using-ipv6', ['routeName' => $name, 'payload' => [...$payload]]);
         })->name($name);
 
         View::addLocation(__DIR__.'/Fixtures');
@@ -81,8 +82,6 @@ class RouteViewTest extends TestCase
 
     /**
      * A sets of URLs to test if encoding is match acording with the RFC3986.
-     *
-     * @todo Add more route URLs
      *
      * @see https://github.com/laravel/framework/pull/47802
      * @link http://www.faqs.org/rfcs/rfc3986.html
@@ -99,6 +98,20 @@ class RouteViewTest extends TestCase
                 'root',
                 'https://[::1]/',
                 'https://[::1]',
+            ],
+            'Ipv6LiteralAddressesWithSquareBracketsInUri' => [
+                '/secret[{passphrase}]',
+                'square-brackets-secret',
+                'https://[::1]/secret[12345678]',
+                'https://[::1]/secret%5B12345678%5D',
+                ['passphrase' => 12345678],
+            ],
+            'IPv4LiteralAddressesWithBracketsAndUri' => [
+                'foo/{bar}/{baz}',
+                'foo-bar-baz',
+                'http://127.0.0.1/foo/\'(parenthesis)/"[square_brackets]',
+                'http://127.0.0.1/foo/%27%28parenthesis%29/%22%5Bsquare_brackets%5D',
+                ['bar' => '\'(parenthesis)', 'baz' => '"[square_brackets]'],
             ],
         ];
     }

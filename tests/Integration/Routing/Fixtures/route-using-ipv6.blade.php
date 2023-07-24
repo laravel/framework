@@ -1,1 +1,1 @@
-Test {{ route($routeName) }}
+Test {{ route($routeName, [...$payload]) }}
