@@ -362,6 +362,10 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function except($keys)
     {
+        if (is_null($keys)) {
+            return new static($this->items);
+        }
+
         if ($keys instanceof Enumerable) {
             $keys = $keys->all();
         } elseif (! is_array($keys)) {
