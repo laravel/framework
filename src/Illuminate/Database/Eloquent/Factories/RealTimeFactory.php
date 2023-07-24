@@ -5,12 +5,25 @@ namespace Illuminate\Database\Eloquent\Factories;
 use BackedEnum;
 use DateTime;
 use Doctrine\DBAL\Schema\Column;
+use Doctrine\DBAL\Types\ArrayType;
+use Doctrine\DBAL\Types\BigIntType;
+use Doctrine\DBAL\Types\BooleanType;
 use Doctrine\DBAL\Types\DateTimeType;
+use Doctrine\DBAL\Types\DecimalType;
+use Doctrine\DBAL\Types\FloatType;
+use Doctrine\DBAL\Types\IntegerType;
+use Doctrine\DBAL\Types\JsonType;
 use Doctrine\DBAL\Types\PhpIntegerMappingType;
+use Doctrine\DBAL\Types\SmallIntType;
 use Doctrine\DBAL\Types\Type;
 use Illuminate\Database\Concerns\InteractsWithTables;
+use Illuminate\Database\Eloquent\Casts\AsArrayObject;
+use Illuminate\Database\Eloquent\Casts\AsCollection;
+use Illuminate\Database\Eloquent\Casts\AsEncryptedArrayObject;
+use Illuminate\Database\Eloquent\Casts\AsEncryptedCollection;
 use Illuminate\Database\Eloquent\Casts\AsEnumArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsEnumCollection;
+use Illuminate\Database\Eloquent\Casts\AsStringable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -90,20 +103,29 @@ class RealTimeFactory extends Factory
             return null;
         }
 
+        if ($value = $this->guessValue($column->getName())) {
+            return $value;
+        }
+
         return ($value = $this->valueFromCast($column->getName())) ?
             $value :
-            $this->valueFromType($column->getType());
+            $this->valueFromColumn($column);
     }
 
     /**
-     * Generate a value for the given column type.
+     * Generate a value for the given column.
      */
-    protected function valueFromType(Type $type): mixed
+    protected function valueFromColumn(Column $column): mixed
     {
+        dump($column);
+
         return match (true) {
-            $type instanceof PhpIntegerMappingType => fake()->randomDigit,
-            $type instanceof DateTimeType => fake()->dateTime,
-            default => fake()->word
+            $this->isIntegerType($column->getType()) => $this->integerValue(),
+            $this->isDateType($column->getType()) => $this->dateValue(),
+            $this->isDecimalType($column->getType()) => $this->decimalValue($column->getPrecision() ?: 10, $column->getScale() ?: 2),
+            $column->getType() instanceof BooleanType => $this->booleanValue(),
+            $column->getType() instanceof JsonType,$column->getType() instanceof ArrayType => $this->jsonValue(),
+            default => $this->stringValue(),
         };
     }
 
@@ -161,7 +183,7 @@ class RealTimeFactory extends Factory
 
     protected function isArrayCastable(string $key): bool
     {
-        return in_array($key, ['array', 'json', 'object', 'collection', 'encrypted:array', 'encrypted:collection', 'encrypted:json', 'encrypted:object']);
+        return in_array($key, ['array', 'json', 'object', 'collection', 'encrypted:array', 'encrypted:collection', 'encrypted:json', 'encrypted:object', AsArrayObject::class, AsCollection::class, AsEncryptedCollection::class, AsEncryptedArrayObject::class]);
     }
 
     /**
@@ -170,6 +192,17 @@ class RealTimeFactory extends Factory
     protected function isIntegerCastable(string $key): bool
     {
         return in_array($key, ['int', 'integer']);
+    }
+
+    /**
+     * Determine whether the given type is an integer type.
+     */
+    protected function isIntegerType(Type $type): bool
+    {
+        return $type instanceof PhpIntegerMappingType ||
+            $type instanceof BigIntType ||
+            $type instanceof IntegerType ||
+            $type instanceof SmallIntType;
     }
 
     /**
@@ -193,6 +226,15 @@ class RealTimeFactory extends Factory
     }
 
     /**
+     * Determine whether the given type is a decimal type.
+     */
+    protected function isDecimalType(Type $type): bool
+    {
+        return $type instanceof DecimalType ||
+            $type instanceof FloatType;
+    }
+
+    /**
      * Determine whether the given cast is a boolean cast.
      */
     protected function isBooleanCastable(string $key): bool
@@ -206,6 +248,11 @@ class RealTimeFactory extends Factory
     protected function isDateCastable(string $key): bool
     {
         return in_array($key, ['date', 'datetime', 'immutable_date', 'immutable_datetime']);
+    }
+
+    protected function isDateType(Type $type): bool
+    {
+        return $type instanceof DateTimeType;
     }
 
     /**
@@ -240,7 +287,8 @@ class RealTimeFactory extends Factory
     {
         return in_array($key, [
             'string',
-            'encrypted:string',
+            'encrypted',
+            AsStringable::class,
         ]);
     }
 
@@ -250,6 +298,14 @@ class RealTimeFactory extends Factory
     protected function arrayValue(): array
     {
         return fake()->words(5);
+    }
+
+    /**
+     * Generate a JSON value.
+     */
+    protected function jsonValue(): string
+    {
+        return json_encode($this->arrayValue());
     }
 
     /**
@@ -271,9 +327,9 @@ class RealTimeFactory extends Factory
     /**
      * Generate a decimal value.
      */
-    protected function decimalValue(int $precision): float
+    protected function decimalValue(int $max = 100, int $decimals = 2): float
     {
-        return fake()->randomFloat($precision, 0, 100);
+        return fake()->randomFloat($decimals, 0, $max);
     }
 
     /**
@@ -326,5 +382,32 @@ class RealTimeFactory extends Factory
     protected function stringValue(): string
     {
         return fake()->word;
+    }
+
+    /**
+     * Guess the value of a column based on its name.
+     */
+    protected function guessValue(string $column): mixed
+    {
+        $guessable = $this->guessableValues();
+
+        return isset($guessable[$column]) ? $guessable[$column]() : null;
+    }
+
+    /**
+     * Get a list of guessable values.
+     *
+     * @return array<string, callable>
+     */
+    protected function guessableValues(): array
+    {
+        return [
+            'email' => fn () => fake()->safeEmail,
+            'email_address' => fn () => fake()->safeEmail,
+            'name' => fn () => fake()->name,
+            'first_name' => fn () => fake()->firstName,
+            'last_name' => fn () => fake()->lastName,
+            'username' => fn () => fake()->userName,
+        ];
     }
 }
