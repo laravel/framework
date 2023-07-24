@@ -3349,6 +3349,20 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testGroupByAttributeWithBackedEnumKey($collection)
+    {
+        $data = new $collection([
+            ['rating' => TestBackedEnum::A, 'url' => '1'],
+            ['rating' => TestBackedEnum::B, 'url' => '1'],
+        ]);
+
+        $result = $data->groupBy('rating');
+        $this->assertEquals([TestBackedEnum::A->value => [['rating' => TestBackedEnum::A, 'url' => '1']], TestBackedEnum::B->value => [['rating' => TestBackedEnum::B, 'url' => '1']]], $result->toArray());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testGroupByAttributePreservingKeys($collection)
     {
         $data = new $collection([10 => ['rating' => 1, 'url' => '1'],  20 => ['rating' => 1, 'url' => '1'],  30 => ['rating' => 2, 'url' => '2']]);
