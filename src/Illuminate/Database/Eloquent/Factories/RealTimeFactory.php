@@ -103,6 +103,10 @@ class RealTimeFactory extends Factory
             return null;
         }
 
+        if ($this->isForeignKey($column)) {
+            return null;
+        }
+
         if ($value = $this->guessValue($column->getName())) {
             return $value;
         }
@@ -110,6 +114,16 @@ class RealTimeFactory extends Factory
         return ($value = $this->valueFromCast($column->getName())) ?
             $value :
             $this->valueFromColumn($column);
+    }
+
+    /**
+     * Determine whether the given column is a foreign key.
+     */
+    protected function isForeignKey(Column $column): bool
+    {
+        return collect($this->schema->listTableForeignKeys($this->table))
+            ->filter(fn ($foreignKey) => in_array($column->getName(), $foreignKey->getLocalColumns()))
+            ->isNotEmpty();
     }
 
     /**
@@ -181,7 +195,7 @@ class RealTimeFactory extends Factory
 
     protected function isArrayCastable(string $key): bool
     {
-        return in_array($key, ['array', 'json', 'object', 'collection', 'encrypted:array', 'encrypted:collection', 'encrypted:json', 'encrypted:object', AsArrayObject::class, AsCollection::class, AsEncryptedCollection::class, AsEncryptedArrayObject::class]);
+        return in_array($key, ['array', 'json', 'object', 'collection', 'encrypted:array', 'encrypted:collection', 'encrypted:json', 'encrypted:object', AsArrayObject::class, AsCollection::class, AsEncryptedArrayObject::class, AsEncryptedCollection::class]);
     }
 
     /**
@@ -311,7 +325,7 @@ class RealTimeFactory extends Factory
      */
     protected function integerValue(): int
     {
-        return fake()->randomDigit;
+        return fake()->randomDigit();
     }
 
     /**
@@ -335,7 +349,7 @@ class RealTimeFactory extends Factory
      */
     protected function booleanValue(): bool
     {
-        return fake()->boolean;
+        return fake()->boolean();
     }
 
     /**
@@ -351,7 +365,7 @@ class RealTimeFactory extends Factory
      */
     protected function timestampValue(): int
     {
-        return fake()->unixTime;
+        return fake()->unixTime();
     }
 
     /**
@@ -379,7 +393,7 @@ class RealTimeFactory extends Factory
      */
     protected function stringValue(): string
     {
-        return fake()->word;
+        return fake()->word();
     }
 
     /**
