@@ -804,12 +804,11 @@ class Str
      * Generate a random, secure password.
      *
      * @param  int  $length
-     * @param  int|null  $lowerCase Include a minimal of N lower-case letters, or null to not use them.
-     * @param  int|null  $upperCase Include a minimal of N upper-case letters, or null to not use them.
-     * @param  int|null  $numbers Include a minimal of N numbers, or null to not use them.
-     * @param  int|null  $symbols Include a minimal of N symbols, or null to not use them.
-     * @param  int|null  $spaces Include a minimal of N spaces, or null to not use them.
-     *
+     * @param  int|null  $lowerCase  Include a minimal of N lower-case letters, or null to not use them.
+     * @param  int|null  $upperCase  Include a minimal of N upper-case letters, or null to not use them.
+     * @param  int|null  $numbers  Include a minimal of N numbers, or null to not use them.
+     * @param  int|null  $symbols  Include a minimal of N symbols, or null to not use them.
+     * @param  int|null  $spaces  Include a minimal of N spaces, or null to not use them.
      * @return string
      */
     public static function password($length = 32, $lowerCase = 1, $upperCase = 1, $numbers = 1, $symbols = 1, $spaces = null)
@@ -820,7 +819,7 @@ class Str
             + ($symbols ?? 0)
             + ($spaces ?? 0);
 
-        if($length < $totalMinimalCharacters) {
+        if ($length < $totalMinimalCharacters) {
             throw new InvalidArgumentException(
                 "You requested {$length} password characters, but the minimal characters are requiring a length of at least {$totalMinimalCharacters}."
             );
@@ -829,9 +828,9 @@ class Str
         $requiredCharacters = collect();
         $addToRequiredCharacters = function ($characters, $length) use (&$requiredCharacters) {
             if ($length > 0) {
-                $requiredCharacters->push(...$characters->pipe(fn($c) => Collection::times(
+                $requiredCharacters->push(...$characters->pipe(fn ($c) => Collection::times(
                     $length,
-                    fn() => $characters[random_int(0, $characters->count() - 1)]
+                    fn () => $characters[random_int(0, $characters->count() - 1)]
                 )));
             }
         };
@@ -881,9 +880,9 @@ class Str
 
                 return $c->merge($characters);
             })
-            ->pipe(fn($c) => Collection::times(
+            ->pipe(fn ($c) => Collection::times(
                 $length - $requiredCharacters->count(),
-                fn() => $c[random_int(0, $c->count() - 1)]
+                fn () => $c[random_int(0, $c->count() - 1)]
             ))
             ->merge($requiredCharacters)
             ->shuffle()
