@@ -108,6 +108,27 @@ class ScheduleListCommandTest extends TestCase
             ->expectsOutput('             ⇁ This is the description of the command.');
     }
 
+    public function testDisplayScheduleSubMinute()
+    {
+        $this->schedule->command('inspire')->weekly()->everySecond();
+        $this->schedule->command('inspire')->everyTwoSeconds();
+        $this->schedule->command('inspire')->everyFiveSeconds();
+        $this->schedule->command('inspire')->everyTenSeconds();
+        $this->schedule->command('inspire')->everyFifteenSeconds();
+        $this->schedule->command('inspire')->everyTwentySeconds();
+        $this->schedule->command('inspire')->everyThirtySeconds();
+
+        $this->artisan(ScheduleListCommand::class)
+            ->assertSuccessful()
+            ->expectsOutput('  * 0 * * 0 1s   php artisan inspire ............. Next Due: 1 second from now')
+            ->expectsOutput('  * * * * * 2s   php artisan inspire ............ Next Due: 2 seconds from now')
+            ->expectsOutput('  * * * * * 5s   php artisan inspire ............ Next Due: 5 seconds from now')
+            ->expectsOutput('  * * * * * 10s  php artisan inspire ........... Next Due: 10 seconds from now')
+            ->expectsOutput('  * * * * * 15s  php artisan inspire ........... Next Due: 15 seconds from now')
+            ->expectsOutput('  * * * * * 20s  php artisan inspire ........... Next Due: 20 seconds from now')
+            ->expectsOutput('  * * * * * 30s  php artisan inspire ........... Next Due: 30 seconds from now');
+    }
+
     protected function tearDown(): void
     {
         parent::tearDown();

@@ -2690,7 +2690,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testSqlServerExists()
     {
         $builder = $this->getSqlServerBuilder();
-        $builder->getConnection()->shouldReceive('select')->once()->with('select top 1 1 [exists] from [users] order by (SELECT 0)', [], true)->andReturn([['exists' => 1]]);
+        $builder->getConnection()->shouldReceive('select')->once()->with('select top 1 1 [exists] from [users]', [], true)->andReturn([['exists' => 1]]);
         $results = $builder->from('users')->exists();
         $this->assertTrue($results);
     }
@@ -3856,7 +3856,7 @@ SQL;
     {
         $builder = $this->getSqlServerBuilder();
         $builder->select('*')->from('users')->take(10);
-        $this->assertSame('select top 10 * from [users] order by (SELECT 0)', $builder->toSql());
+        $this->assertSame('select top 10 * from [users]', $builder->toSql());
 
         $builder = $this->getSqlServerBuilder();
         $builder->select('*')->from('users')->skip(10)->orderBy('email', 'desc');
@@ -3875,7 +3875,7 @@ SQL;
             return $query->select('created_at')->from('logins')->where('users.name', 'nameBinding')->whereColumn('user_id', 'users.id')->limit(1);
         };
         $builder->select('*')->from('users')->where('email', 'emailBinding')->orderBy($subQuery)->skip(10)->take(10);
-        $this->assertSame('select * from [users] where [email] = ? order by (select top 1 [created_at] from [logins] where [users].[name] = ? and [user_id] = [users].[id] order by (SELECT 0)) asc offset 10 rows fetch next 10 rows only', $builder->toSql());
+        $this->assertSame('select * from [users] where [email] = ? order by (select top 1 [created_at] from [logins] where [users].[name] = ? and [user_id] = [users].[id]) asc offset 10 rows fetch next 10 rows only', $builder->toSql());
         $this->assertEquals(['emailBinding', 'nameBinding'], $builder->getBindings());
 
         $builder = $this->getSqlServerBuilder();
