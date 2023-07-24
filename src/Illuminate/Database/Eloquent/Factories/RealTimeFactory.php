@@ -117,8 +117,6 @@ class RealTimeFactory extends Factory
      */
     protected function valueFromColumn(Column $column): mixed
     {
-        dump($column);
-
         return match (true) {
             $this->isIntegerType($column->getType()) => $this->integerValue(),
             $this->isDateType($column->getType()) => $this->dateValue(),
@@ -345,7 +343,7 @@ class RealTimeFactory extends Factory
      */
     protected function dateValue(): DateTime
     {
-        return fake()->dateTime;
+        return fake()->dateTime();
     }
 
     /**
@@ -402,12 +400,12 @@ class RealTimeFactory extends Factory
     protected function guessableValues(): array
     {
         return [
-            'email' => fn () => fake()->safeEmail,
-            'email_address' => fn () => fake()->safeEmail,
-            'name' => fn () => fake()->name,
-            'first_name' => fn () => fake()->firstName,
-            'last_name' => fn () => fake()->lastName,
-            'username' => fn () => fake()->userName,
+            'email' => fn () => fake()->safeEmail(),
+            'email_address' => fn () => fake()->safeEmail(),
+            'name' => fn () => fake()->name(),
+            'first_name' => fn () => fake()->firstName(),
+            'last_name' => fn () => fake()->lastName(),
+            'username' => fn () => fake()->userName(),
         ];
     }
 }
