@@ -1102,7 +1102,6 @@ class MailMailableTest extends TestCase
         $this->assertEquals('X-Custom-Header', $sentMessage->getOriginalMessage()->getHeaders()->get('x-custom-header')->getName());
         $this->assertEquals('Custom Value', $sentMessage->getOriginalMessage()->getHeaders()->get('x-custom-header')->getValue());
     }
-
 }
 
 class MailableHeadersStub extends Mailable
