@@ -9,6 +9,8 @@ use Doctrine\DBAL\Types\DateTimeType;
 use Doctrine\DBAL\Types\PhpIntegerMappingType;
 use Doctrine\DBAL\Types\Type;
 use Illuminate\Database\Concerns\InteractsWithTables;
+use Illuminate\Database\Eloquent\Casts\AsEnumArrayObject;
+use Illuminate\Database\Eloquent\Casts\AsEnumCollection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -142,6 +144,10 @@ class RealTimeFactory extends Factory
             return $this->timestampValue();
         }
 
+        if ($this->isEnumCollectionCastable($key)) {
+            return $this->enumCollectionValue($key);
+        }
+
         if ($this->isEnumCastable($key)) {
             return $this->enumValue($key);
         }
@@ -208,6 +214,15 @@ class RealTimeFactory extends Factory
     protected function isTimestampCastable(string $key): bool
     {
         return $key === 'timestamp';
+    }
+
+    /**
+     * Determine whether the given cast is an enum collection cast.
+     */
+    protected function isEnumCollectionCastable(string $key): bool
+    {
+        return in_array(Str::before($key, ':'), [AsEnumCollection::class, AsEnumArrayObject::class]) &&
+            $this->isEnumCastable($key);
     }
 
     /**
@@ -283,6 +298,15 @@ class RealTimeFactory extends Factory
     protected function timestampValue(): int
     {
         return fake()->unixTime;
+    }
+
+    /**
+     * Generate an enum collection value.
+     */
+    protected function enumCollectionValue(string $enum): mixed
+    {
+        return collect(range(1, 5))->map(fn () => $this->enumValue($enum))
+            ->all();
     }
 
     /**
