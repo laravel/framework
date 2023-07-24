@@ -4,6 +4,7 @@ namespace Illuminate\Database\Console;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Illuminate\Console\Command;
+use Illuminate\Database\Concerns\InteractsWithTables;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\PostgresConnection;
@@ -18,26 +19,7 @@ use Symfony\Component\Process\Process;
 
 abstract class DatabaseInspectionCommand extends Command
 {
-    /**
-     * A map of database column types.
-     *
-     * @var array
-     */
-    protected $typeMappings = [
-        'bit' => 'string',
-        'citext' => 'string',
-        'enum' => 'string',
-        'geometry' => 'string',
-        'geomcollection' => 'string',
-        'linestring' => 'string',
-        'ltree' => 'string',
-        'multilinestring' => 'string',
-        'multipoint' => 'string',
-        'multipolygon' => 'string',
-        'point' => 'string',
-        'polygon' => 'string',
-        'sysname' => 'string',
-    ];
+    use InteractsWithTables;
 
     /**
      * The Composer instance.
@@ -57,19 +39,6 @@ abstract class DatabaseInspectionCommand extends Command
         parent::__construct();
 
         $this->composer = $composer ?? $this->laravel->make(Composer::class);
-    }
-
-    /**
-     * Register the custom Doctrine type mappings for inspection commands.
-     *
-     * @param  \Doctrine\DBAL\Platforms\AbstractPlatform  $platform
-     * @return void
-     */
-    protected function registerTypeMappings(AbstractPlatform $platform)
-    {
-        foreach ($this->typeMappings as $type => $value) {
-            $platform->registerDoctrineTypeMapping($type, $value);
-        }
     }
 
     /**
