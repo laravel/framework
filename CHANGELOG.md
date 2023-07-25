@@ -1,6 +1,11 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.15.0...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.52.11...10.x)
+
+## [v9.52.11](https://github.com/laravel/framework/compare/v10.15.0...v9.52.11) - 2023-07-25
+
+- [9.x] Fix CI for DynamoDB by [@GrahamCampbell](https://github.com/GrahamCampbell) in https://github.com/laravel/framework/pull/47656
+- [9.x] Pin `amazon/dynamodb-local` version in `docker-compose.yml` by [@GrahamCampbell](https://github.com/GrahamCampbell) in https://github.com/laravel/framework/pull/47657
 
 ## [v10.15.0](https://github.com/laravel/framework/compare/v10.14.1...v10.15.0) - 2023-07-11
 
