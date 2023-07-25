@@ -818,14 +818,7 @@ abstract class Factory
     {
         $factory = static::resolveFactoryName($modelName);
 
-        try {
-            return $factory::new();
-        } catch (Throwable $e) {
-            // @TODO check error message
-            RealTimeFactory::guessModelNamesUsing(fn () => $modelName);
-
-            return RealTimeFactory::new();
-        }
+        return $factory::new();
     }
 
     /**

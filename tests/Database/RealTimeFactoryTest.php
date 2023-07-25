@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Casts\AsEncryptedArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsEncryptedCollection;
 use Illuminate\Database\Eloquent\Casts\AsEnumCollection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Factories\HasRealTimeFactory;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\QueryException;
 use Illuminate\Encryption\Encrypter;
@@ -375,7 +376,7 @@ class RealTimeFactoryTest extends TestCase
 
 class Cast extends Eloquent
 {
-    use HasFactory;
+    use HasRealTimeFactory;
 
     protected $casts = [
         'array_column' => 'array',
@@ -411,22 +412,22 @@ class Cast extends Eloquent
 
 class Type extends Eloquent
 {
-    use HasFactory;
+    use HasRealTimeFactory;
 }
 
 class Nullable extends Eloquent
 {
-    use HasFactory;
+    use HasRealTimeFactory;
 }
 
 class Guess extends Eloquent
 {
-    use HasFactory;
+    use HasRealTimeFactory;
 }
 
 class Key extends Eloquent
 {
-    use HasFactory;
+    use HasRealTimeFactory;
 }
 
 enum FooBarEnum
