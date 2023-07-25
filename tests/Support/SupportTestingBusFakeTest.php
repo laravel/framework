@@ -468,6 +468,14 @@ class SupportTestingBusFakeTest extends TestCase
     {
         $this->fake->chain([
             new ChainedJobStub,
+        ])->dispatch();
+
+        $this->fake->assertChained([
+            ChainedJobStub::class,
+        ]);
+
+        $this->fake->chain([
+            new ChainedJobStub,
             new OtherBusJobStub,
         ])->dispatch();
 
