@@ -4,6 +4,7 @@ namespace Illuminate\Auth;
 
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\UserProvider;
+use Illuminate\Validation\UnauthorizedException;
 
 /**
  * These methods are typically the same across all guards.
@@ -105,6 +106,19 @@ trait GuardHelpers
         $this->user = null;
 
         return $this;
+    }
+
+    /**
+     * Get the currently authenticated user or throws an exception.
+     *
+     * @return \Illuminate\Contracts\Auth\Authenticatable
+     */
+    public function userOrFail()
+    {
+        $user = $this->user();
+        throw_if(! $user, new UnauthorizedException);
+
+        return $user;
     }
 
     /**
