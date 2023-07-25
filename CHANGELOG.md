@@ -1,7 +1,16 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.52.8...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.52.10...9.x)
 
+## [v9.52.10](https://github.com/laravel/framework/compare/v9.52.9...v9.52.10) - 2023-06-27
+
+* Fix SES V2 Transport "reply to" addresses by @jacobmllr95 in https://github.com/laravel/framework/pull/47522
+* Fixes unable to use `trans()->has()` on JSON language files by @crynobone in https://github.com/laravel/framework/pull/47582
+
+## [v9.52.9](https://github.com/laravel/framework/compare/v9.52.8...v9.52.9) - 2023-06-08
+
+* Fixes usage of `Redis::many()` with empty array by @nunomaduro in https://github.com/laravel/framework/pull/47307
+* Fix PHPStan description of Closure returning a union type by @ondrejmirtes in https://github.com/laravel/framework/pull/47352
 
 ## [v9.52.8](https://github.com/laravel/framework/compare/v9.52.7...v9.52.8) - 2023-05-30
 
