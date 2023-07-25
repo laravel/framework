@@ -4,8 +4,8 @@ body:
   - type: markdown
     attributes:
       value: |
-        "Please read [our full contribution guide](https://laravel.com/docs/contributions#bug-reports) before submitting bug reports."
-        "If you notice improper DocBlock, PHPStan, or IDE warnings while using Laravel, do not create a GitHub issue. Instead, please submit a pull request to fix the problem."
+        Please read [our full contribution guide](https://laravel.com/docs/contributions#bug-reports) before submitting bug reports.
+        If you notice improper DocBlock, PHPStan, or IDE warnings while using Laravel, do not create a GitHub issue. Instead, please submit a pull request to fix the problem.
   - type: input
     attributes:
       label: Laravel Version
