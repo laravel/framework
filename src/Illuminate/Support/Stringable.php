@@ -1126,6 +1126,19 @@ class Stringable implements JsonSerializable, ArrayAccess
     }
 
     /**
+     * Increments the given string by appending a number to it or increasing the number.
+     *
+     * @param  string  $separator
+     * @param  int  $first
+     * @param  int  $step
+     * @return static
+     */
+    public function increment($separator = '_', $first = 1, $step = 1)
+    {
+        return new static(Str::increment($this->value, $separator, $first, $step));
+    }
+
+    /**
      * Convert the string into a `HtmlString` instance.
      *
      * @return \Illuminate\Support\HtmlString
