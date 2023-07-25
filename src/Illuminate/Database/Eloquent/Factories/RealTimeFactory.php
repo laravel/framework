@@ -89,11 +89,26 @@ class RealTimeFactory extends Factory
         return $this;
     }
 
-    public function forModel(string $model)
+    /**
+     * Set the model for the factory.
+     */
+    public function forModel(string $model): self
     {
         $this->model = $model;
 
         return $this;
+    }
+
+    /**
+     * Create a new instance of the factory builder with the given mutated properties.
+     *
+     * @return static
+     */
+    protected function newInstance(array $arguments = [])
+    {
+        return parent::newInstance($arguments)
+            ->forModel($this->model)
+            ->configure();
     }
 
     /**
