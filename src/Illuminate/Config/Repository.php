@@ -57,14 +57,18 @@ class Repository implements ArrayAccess, ConfigContract
     }
 
     /**
-     * Get many configuration values.
+     * Get configuration values for multiple keys.
      *
-     * @param  array  $keys
-     * @return array
+     * @param  array  ...$keys  An array of keys or multiple arguments containing keys.
+     * @return array  An associative array with the configuration values for the specified keys.
      */
-    public function getMany($keys)
+    public function getMany(...$keys)
     {
         $config = [];
+
+        if (isset($keys[0]) && is_array($keys[0])) {
+            $keys = $keys[0];
+        }
 
         foreach ($keys as $key => $default) {
             if (is_numeric($key)) {
