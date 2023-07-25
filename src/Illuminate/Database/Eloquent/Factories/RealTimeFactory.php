@@ -19,6 +19,7 @@ use Doctrine\DBAL\Types\SmallIntType;
 use Doctrine\DBAL\Types\TextType;
 use Doctrine\DBAL\Types\TimeType;
 use Doctrine\DBAL\Types\Type;
+use Exception;
 use Illuminate\Database\Concerns\InteractsWithTables;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsCollection;
@@ -63,9 +64,8 @@ class RealTimeFactory extends Factory
      */
     public function definition(): array
     {
-        $this->configure();
-
-        return $this->getColumnsFromModel()
+        return $this->configure()
+            ->getColumnsFromModel()
             ->map(fn (Column $column) => $this->value($column))
             ->all();
     }
@@ -75,12 +75,23 @@ class RealTimeFactory extends Factory
      */
     public function configure(): self
     {
+        if (! interface_exists('Doctrine\DBAL\Driver')) {
+            throw new Exception('Real-time factories require the Doctrine DBAL (doctrine/dbal) package.');
+        }
+
         $modelName = $this->modelName();
         $this->modelInstance = new $modelName;
         $connection = $this->modelInstance->getConnection();
         $this->schema = $connection->getDoctrineSchemaManager();
         $this->table = $this->modelInstance->getConnection()->getTablePrefix().$this->modelInstance->getTable();
         $this->registerTypeMappings($connection->getDoctrineConnection()->getDatabasePlatform());
+
+        return $this;
+    }
+
+    public function forModel(string $model)
+    {
+        $this->model = $model;
 
         return $this;
     }
@@ -134,11 +145,11 @@ class RealTimeFactory extends Factory
      */
     protected function valueFromColumn(Column $column): mixed
     {
-        if(! $column->getNotnull() && $column->getDefault() === null) {
+        if (! $column->getNotnull() && $column->getDefault() === null) {
             return null;
         }
 
-        if($value = $column->getDefault()) {
+        if ($value = $column->getDefault()) {
             return $value;
         }
 

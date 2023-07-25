@@ -13,10 +13,10 @@ trait HasRealTimeFactory
      */
     public static function factory($count = null, $state = [])
     {
-        RealTimeFactory::guessModelNamesUsing(fn () => get_called_class());
-
-        return RealTimeFactory::new()
+        return (new RealTimeFactory)
             ->count(is_numeric($count) ? $count : null)
-            ->state(is_callable($count) || is_array($count) ? $count : $state);
+            ->state(is_callable($count) || is_array($count) ? $count : $state)
+            ->forModel(static::class)
+            ->configure();
     }
 }
