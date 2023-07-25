@@ -1,6 +1,32 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.52.11...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v10.16.0...10.x)
+
+## [v10.16.0](https://github.com/laravel/framework/compare/v9.52.11...v10.16.0) - 2023-07-25
+
+- [10.x] Improve display of sub-minute tasks in `schedule:list` command. by [@jessarcher](https://github.com/jessarcher) in https://github.com/laravel/framework/pull/47720
+- [10.x] Add new SQL error message "No connection could be made because the target machine actively refused it" by [@magnusvin](https://github.com/magnusvin) in https://github.com/laravel/framework/pull/47718
+- [10.x] Ignore second in HttpRequestTest date comparison by [@kylekatarnls](https://github.com/kylekatarnls) in https://github.com/laravel/framework/pull/47719
+- [10.x] Call `renderForAssertions` in `assertHasSubject` by [@ttrig](https://github.com/ttrig) in https://github.com/laravel/framework/pull/47728
+- [10.x] We dont want Symfony to catch pcntl signal by [@ChristopheBorcard](https://github.com/ChristopheBorcard) in https://github.com/laravel/framework/pull/47725
+- [10.x] Use atomic locks for command mutex by [@Gaitholabi](https://github.com/Gaitholabi) in https://github.com/laravel/framework/pull/47624
+- [10.x] Improve typehint for Model::getConnectionResolver() by [@LukeTowers](https://github.com/LukeTowers) in https://github.com/laravel/framework/pull/47749
+- [10.x] add getRedisConnection to ThrottleRequestsWithRedis by [@snmatsui](https://github.com/snmatsui) in https://github.com/laravel/framework/pull/47742
+- [10.x] Adjusts for Volt by [@nunomaduro](https://github.com/nunomaduro) in https://github.com/laravel/framework/pull/47757
+- [10.x] Fix sql server paging problems by [@joelharkes](https://github.com/joelharkes) in https://github.com/laravel/framework/pull/47763
+- [10.x] Typo type of data by [@hungthai1401](https://github.com/hungthai1401) in https://github.com/laravel/framework/pull/47775
+- [10.x] Add missing tests for the `schedule:list` command. by [@xiCO2k](https://github.com/xiCO2k) in https://github.com/laravel/framework/pull/47787
+- [10.x] Fix `Str::replace` return type by [@datlechin](https://github.com/datlechin) in https://github.com/laravel/framework/pull/47779
+- [10.x] Collection::except() with null returns all by [@pniaps](https://github.com/pniaps) in https://github.com/laravel/framework/pull/47821
+- [10.x] fix issue #47727 with wrong return type by [@renky](https://github.com/renky) in https://github.com/laravel/framework/pull/47820
+- [10.x] Remove unused variable in `VendorPublishCommand` by [@hungthai1401](https://github.com/hungthai1401) in https://github.com/laravel/framework/pull/47817
+- [10.x] Remove unused variable in `MigrateCommand` by [@sangnguyenplus](https://github.com/sangnguyenplus) in https://github.com/laravel/framework/pull/47816
+- [10.x] Revert 47763 fix sql server by [@dunhamjared](https://github.com/dunhamjared) in https://github.com/laravel/framework/pull/47792
+- [10.x] Add test for Message ID, References and Custom Headers for Mailables by [@alexbowers](https://github.com/alexbowers) in https://github.com/laravel/framework/pull/47791
+- [10.x] Add support for `BackedEnum` in Collection `groupBy` method by [@osbre](https://github.com/osbre) in https://github.com/laravel/framework/pull/47823
+- [10.x] Support inline disk for scoped driver by [@alexbowers](https://github.com/alexbowers) in https://github.com/laravel/framework/pull/47776
+- [10.x] Allowing bind of IPv6 addresses in development server by [@MuriloChianfa](https://github.com/MuriloChianfa) in https://github.com/laravel/framework/pull/47804
+- [10.x] Add more info to issue template by [@driesvints](https://github.com/driesvints) in https://github.com/laravel/framework/pull/47828
 
 ## [v9.52.11](https://github.com/laravel/framework/compare/v10.15.0...v9.52.11) - 2023-07-25
 
