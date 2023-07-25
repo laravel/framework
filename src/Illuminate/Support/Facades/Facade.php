@@ -347,7 +347,7 @@ abstract class Facade
         $instance = static::getFacadeRoot();
 
         if (! $instance) {
-            throw new RuntimeException('A facade root has not been set.');
+            throw new RuntimeException(sprintf('A facade root has not been set for %s', static::class));
         }
 
         return $instance->$method(...$args);
