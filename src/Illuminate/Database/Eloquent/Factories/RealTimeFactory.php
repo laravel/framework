@@ -7,6 +7,7 @@ use DateTime;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Types\ArrayType;
 use Doctrine\DBAL\Types\BigIntType;
+use Doctrine\DBAL\Types\BlobType;
 use Doctrine\DBAL\Types\BooleanType;
 use Doctrine\DBAL\Types\DateTimeType;
 use Doctrine\DBAL\Types\DecimalType;
@@ -15,6 +16,8 @@ use Doctrine\DBAL\Types\IntegerType;
 use Doctrine\DBAL\Types\JsonType;
 use Doctrine\DBAL\Types\PhpIntegerMappingType;
 use Doctrine\DBAL\Types\SmallIntType;
+use Doctrine\DBAL\Types\TextType;
+use Doctrine\DBAL\Types\TimeType;
 use Doctrine\DBAL\Types\Type;
 use Illuminate\Database\Concerns\InteractsWithTables;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
@@ -131,10 +134,20 @@ class RealTimeFactory extends Factory
      */
     protected function valueFromColumn(Column $column): mixed
     {
+        if(! $column->getNotnull() && $column->getDefault() === null) {
+            return null;
+        }
+
+        if($value = $column->getDefault()) {
+            return $value;
+        }
+
         return match (true) {
             $this->isIntegerType($column->getType()) => $this->integerValue(),
             $this->isDateType($column->getType()) => $this->dateValue(),
             $this->isDecimalType($column->getType()) => $this->decimalValue($column->getPrecision() ?: 10, $column->getScale() ?: 2),
+            $column->getType() instanceof TimeType => fake()->time(),
+            $column->getType() instanceof BlobType,$column->getType() instanceof TextType => fake()->text(),
             $column->getType() instanceof BooleanType => $this->booleanValue(),
             $column->getType() instanceof JsonType,$column->getType() instanceof ArrayType => $this->jsonValue(),
             default => $this->stringValue(),
