@@ -193,7 +193,7 @@ class Request implements ArrayAccess
     protected function json()
     {
         if (! $this->data) {
-            $this->data = json_decode($this->body(), true);
+            $this->data = json_decode($this->body(), true) ?? [];
         }
 
         return $this->data;

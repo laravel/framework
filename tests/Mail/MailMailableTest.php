@@ -8,6 +8,7 @@ use Illuminate\Contracts\View\Factory;
 use Illuminate\Mail\Attachment;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Mail\Mailables\Headers;
 use Illuminate\Mail\Mailer;
 use Illuminate\Mail\Transport\ArrayTransport;
 use Mockery as m;
@@ -1076,6 +1077,42 @@ class MailMailableTest extends TestCase
 
     public function testAssertHasSubject()
     {
+    }
+
+    public function testMailableHeadersGetSent()
+    {
+        $view = m::mock(Factory::class);
+
+        $mailer = new Mailer('array', $view, new ArrayTransport);
+
+        $mailable = new MailableHeadersStub;
+        $mailable->to('hello@laravel.com');
+        $mailable->from('taylor@laravel.com');
+        $mailable->html('test content');
+
+        $sentMessage = $mailer->send($mailable);
+
+        $this->assertSame('custom-message-id@example.com', $sentMessage->getMessageId());
+
+        $this->assertTrue($sentMessage->getOriginalMessage()->getHeaders()->has('references'));
+        $this->assertEquals('References', $sentMessage->getOriginalMessage()->getHeaders()->get('references')->getName());
+        $this->assertEquals('<previous-message@example.com>', $sentMessage->getOriginalMessage()->getHeaders()->get('references')->getValue());
+
+        $this->assertTrue($sentMessage->getOriginalMessage()->getHeaders()->has('x-custom-header'));
+        $this->assertEquals('X-Custom-Header', $sentMessage->getOriginalMessage()->getHeaders()->get('x-custom-header')->getName());
+        $this->assertEquals('Custom Value', $sentMessage->getOriginalMessage()->getHeaders()->get('x-custom-header')->getValue());
+    }
+}
+
+class MailableHeadersStub extends Mailable
+{
+    public function headers()
+    {
+        return new Headers('custom-message-id@example.com', [
+            'previous-message@example.com',
+        ], [
+            'X-Custom-Header' => 'Custom Value',
+        ]);
     }
 }
 
