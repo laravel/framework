@@ -9,6 +9,7 @@ use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Validation\UnauthorizedException;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -46,7 +47,12 @@ class AuthServiceProvider extends ServiceProvider
      */
     protected function registerUserResolver()
     {
-        $this->app->bind(AuthenticatableContract::class, fn ($app) => call_user_func($app['auth']->userResolver()));
+        $this->app->bind(AuthenticatableContract::class, function ($app) {
+            $user = call_user_func($app['auth']->userResolver());
+            throw_if(! $user, new UnauthorizedException);
+
+            return $user;
+        });
     }
 
     /**
