@@ -1481,4 +1481,19 @@ class Str
         static::$camelCache = [];
         static::$studlyCache = [];
     }
+
+    /**
+     * Increments the given string by appending a number to it or increasing the number.
+     *
+     * @param  string  $value
+     * @param  string  $separator
+     * @param  int  $first
+     * @param  int  $step
+     * @return string
+     */
+    public static function increment($value, $separator = '_', $first = 1, $step = 1)
+    {
+        preg_match('/(.+)'.preg_quote($separator, '/').'([0-9]+)$/', $value, $match);
+        return isset($match[2]) ? $match[1].$separator.((int) $match[2] + $step) : $value.$separator.$first;
+    }
 }
