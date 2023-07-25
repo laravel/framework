@@ -124,7 +124,7 @@ class PostgresGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
-     * @return string
+     * @return string|void
      */
     public function compileAutoIncrementStartingValues(Blueprint $blueprint, Fluent $command)
     {
@@ -550,7 +550,7 @@ class PostgresGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
-     * @return string
+     * @return string|void
      */
     public function compileComment(Blueprint $blueprint, Fluent $command)
     {

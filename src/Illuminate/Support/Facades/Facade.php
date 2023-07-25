@@ -57,7 +57,7 @@ abstract class Facade
     /**
      * Convert the facade into a Mockery spy.
      *
-     * @return \Mockery\MockInterface
+     * @return \Mockery\MockInterface|void
      */
     public static function spy()
     {

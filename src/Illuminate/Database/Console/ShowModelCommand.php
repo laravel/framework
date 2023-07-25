@@ -65,7 +65,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
     /**
      * Execute the console command.
      *
-     * @return int
+     * @return int|void
      */
     public function handle()
     {

@@ -271,7 +271,7 @@ class ScheduleRunCommand extends Command
     /**
      * Ensure the interrupt signal is cleared.
      *
-     * @return bool
+     * @return void
      */
     protected function clearInterruptSignal()
     {

@@ -701,7 +701,7 @@ class ResourceRegistrar
      * Get or set the action verbs used in the resource URIs.
      *
      * @param  array  $verbs
-     * @return array
+     * @return array|void
      */
     public static function verbs(array $verbs = [])
     {

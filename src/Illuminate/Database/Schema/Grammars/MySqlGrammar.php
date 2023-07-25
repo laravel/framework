@@ -198,7 +198,7 @@ class MySqlGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
-     * @return string
+     * @return string|void
      */
     public function compileAutoIncrementStartingValues(Blueprint $blueprint, Fluent $command)
     {
