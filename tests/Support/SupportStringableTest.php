@@ -1121,6 +1121,15 @@ class SupportStringableTest extends TestCase
         $this->assertEquals('"value"', $this->stringable('value')->wrap('"'));
     }
 
+    public function testIncrement()
+    {
+        $this->assertEquals('laravel_1', $this->stringable('laravel')->increment());
+        $this->assertEquals('laravel-1', $this->stringable('laravel')->increment('-'));
+        $this->assertEquals('laravel_4', $this->stringable('laravel')->increment(first: 4));
+        $this->assertEquals('laravel_2', $this->stringable('laravel_1')->increment());
+        $this->assertEquals('laravel_3', $this->stringable('laravel_1')->increment(step: 2));
+    }
+
     public function testToHtmlString()
     {
         $this->assertEquals(

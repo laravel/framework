@@ -1124,6 +1124,15 @@ class SupportStrTest extends TestCase
     {
         $this->assertTrue(strlen(Str::password()) === 32);
     }
+
+    public function testIncrement()
+    {
+        $this->assertSame('laravel_1', Str::increment('laravel'));
+        $this->assertSame('laravel-1', Str::increment('laravel', '-'));
+        $this->assertSame('laravel_4', Str::increment('laravel', first: 4));
+        $this->assertSame('laravel_2', Str::increment('laravel_1'));
+        $this->assertSame('laravel_3', Str::increment('laravel_1', step: 2));
+    }
 }
 
 class StringableObjectStub
