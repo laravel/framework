@@ -17,6 +17,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Cookie\CookieJar;
 use Illuminate\Support\Timebox;
+use Illuminate\Validation\UnauthorizedException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -282,6 +283,24 @@ class AuthGuardTest extends TestCase
         $guard->getSession()->shouldNotReceive('get');
 
         $this->assertFalse($guard->hasUser());
+    }
+
+    public function testUserOrFailThrowsWhenUserIsNull()
+    {
+        $this->expectException(UnauthorizedException::class);
+        $guard = $this->getGuard();
+        $guard->getSession()->shouldReceive('get')->once()->andReturn(null);
+
+        $guard->userOrFail();
+    }
+
+    public function testUserOrFailReturnsUser()
+    {
+        $user = m::mock(Authenticatable::class);
+        $guard = $this->getGuard();
+        $guard->setUser($user);
+
+        $this->assertSame($user, $guard->userOrFail());
     }
 
     public function testIsAuthedReturnsTrueWhenUserIsNotNull()
