@@ -46,7 +46,7 @@ interface Filesystem
      * Write the contents of a file.
      *
      * @param  string  $path
-     * @param  string|resource|File|UploadedFile  $contents
+     * @param  string|resource|\Illuminate\Http\UploadedFile  $contents
      * @param  mixed  $options
      * @return bool
      */
