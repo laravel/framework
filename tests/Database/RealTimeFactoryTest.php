@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Casts\AsCollection;
 use Illuminate\Database\Eloquent\Casts\AsEncryptedArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsEncryptedCollection;
 use Illuminate\Database\Eloquent\Casts\AsEnumCollection;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasRealTimeFactory;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\QueryException;
@@ -175,6 +175,57 @@ class RealTimeFactoryTest extends TestCase
             $table->foreignId('cast_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
+
+        $this->schema()->create('users', function ($table) {
+            $table->increments('id');
+            $table->string('name');
+            $table->string('email');
+            $table->timestamps();
+        });
+
+        $this->schema()->create('posts', function ($table) {
+            $table->increments('id');
+            $table->foreignIdFor(User::class)->constrained()->onDelete('cascade');
+            $table->string('title');
+            $table->text('body');
+            $table->boolean('published');
+            $table->timestamps();
+        });
+
+        $this->schema()->create('roles', function ($table) {
+            $table->increments('id');
+            $table->string('name');
+            $table->timestamps();
+        });
+
+        $this->schema()->create('role_user', function ($table) {
+            $table->increments('id');
+            $table->foreignIdFor(User::class)->constrained()->onDelete('cascade');
+            $table->foreignIdFor(Role::class)->constrained()->onDelete('cascade');
+            $table->boolean('active')->default(true);
+            $table->timestamps();
+        });
+
+        $this->schema()->create('comments', function ($table) {
+            $table->increments('id');
+            $table->morphs('commentable');
+            $table->string('body');
+            $table->timestamps();
+        });
+
+        $this->schema()->create('tags', function ($table) {
+            $table->increments('id');
+            $table->string('name');
+            $table->timestamps();
+        });
+
+        $this->schema()->create('taggables', function ($table) {
+            $table->increments('id');
+            $table->foreignIdFor(Tag::class)->constrained();
+            $table->morphs('taggable');
+            $table->boolean('public')->default(false);
+            $table->timestamps();
+        });
     }
 
     /**
@@ -184,7 +235,18 @@ class RealTimeFactoryTest extends TestCase
     {
         m::close();
 
+        $this->schema()->drop('casts');
+        $this->schema()->drop('types');
+        $this->schema()->drop('nullables');
+        $this->schema()->drop('guesses');
+        $this->schema()->drop('keys');
         $this->schema()->drop('users');
+        $this->schema()->drop('posts');
+        $this->schema()->drop('roles');
+        $this->schema()->drop('role_user');
+        $this->schema()->drop('comments');
+        $this->schema()->drop('tags');
+        $this->schema()->drop('taggables');
 
         Container::setInstance(null);
     }
@@ -247,7 +309,6 @@ class RealTimeFactoryTest extends TestCase
     public function testItGeneratesTheCorrectDataForDbalTypes()
     {
         $type = Type::factory()->create();
-        // dd($type->toArray());
 
         $this->assertTrue(collect([
             $type->big_increments_column,
@@ -372,6 +433,152 @@ class RealTimeFactoryTest extends TestCase
 
         Key::factory()->create();
     }
+
+    public function testItCanHandleHasManyRelationships()
+    {
+        $user = User::factory()->has(Post::factory()->count(3))->create();
+        $this->assertInstanceOf(User::class, $user);
+        $this->assertCount(3, $user->posts);
+
+        $user = User::factory()->hasPosts(2)->create();
+        $this->assertInstanceOf(User::class, $user);
+        $this->assertCount(2, $user->posts);
+
+        $user = User::factory()
+            ->has(
+                Post::factory()
+                    ->count(3)
+                    ->state(function (array $attributes, User $user) {
+                        return ['title' => $user->name];
+                    })
+            )
+            ->create(['name' => 'Joe Dixon']);
+        $user->posts->each(fn ($post) => $this->assertSame('Joe Dixon', $post->title));
+
+        $user = User::factory()
+            ->hasPosts(3, [
+                'published' => false,
+            ])
+            ->create();
+
+        $user->posts->each(fn ($post) => $this->assertFalse($post->published));
+    }
+
+    public function testItCanHandleBelongsToRelationships()
+    {
+        $posts = Post::factory()
+            ->count(3)
+            ->for(User::factory()->state([
+                'name' => 'Joe Dixon',
+            ]))
+            ->create();
+
+        $this->assertCount(3, $posts);
+        $this->assertCount(1, User::all());
+        $posts->each(fn ($post) => $this->assertSame('Joe Dixon', $post->user->name));
+
+        $user = User::factory()->create();
+
+        $posts = Post::factory()
+            ->count(2)
+            ->for($user)
+            ->create();
+        $this->assertCount(2, $posts);
+
+        $posts = Post::factory()
+            ->count(3)
+            ->forUser([
+                'name' => 'Joe Dixon',
+            ])
+            ->create();
+        $this->assertCount(3, $posts);
+        $this->assertCount(1, $posts->pluck('user')->pluck('id')->unique());
+    }
+
+    public function testItCanHandleManyToManyRelationships()
+    {
+        $user = User::factory()
+            ->has(Role::factory()->count(3))
+            ->create();
+        $this->assertCount(3, $user->roles);
+
+        $user = User::factory()
+            ->hasAttached(
+                Role::factory()->count(3),
+                ['active' => false]
+            )
+            ->create();
+        $this->assertTrue($user->roles->every(fn ($role) => $role->pivot->active === 0));
+
+        $user = User::factory()
+            ->hasAttached(
+                Role::factory()
+                    ->count(3)
+                    ->state(function (array $attributes, User $user) {
+                        return ['name' => $user->name.' Role'];
+                    }),
+                ['active' => true]
+            )
+            ->create();
+        $this->assertTrue($user->roles->every(fn ($role) => $role->name === $user->name.' Role'));
+
+        $roles = Role::factory()->count(3)->create();
+        $users = User::factory()
+            ->count(3)
+            ->hasAttached($roles, ['active' => false])
+            ->create();
+        $this->assertTrue($users->every(fn ($user) => $user->roles->every(fn ($role) => $role->pivot->active === 0)));
+
+        $user = User::factory()
+            ->hasRoles(1, [
+                'name' => 'Editor',
+            ])
+            ->create();
+        $this->assertCount(1, $user->roles);
+        $this->assertSame('Editor', $user->roles->first()->name);
+    }
+
+    public function testItCanHandleMorphManyRelationships()
+    {
+        $post = Post::factory()->hasComments(3)->forUser()->create();
+
+        $this->assertCount(3, $post->comments);
+    }
+
+    public function testItCanHandleMorphToRelationships()
+    {
+        $comments = Comment::factory()->count(3)->for(Post::factory()->forUser(), 'commentable')->create();
+
+        $this->assertCount(3, $comments);
+        $this->assertCount(1, $comments->pluck('commentable')->pluck('id')->unique());
+        $this->assertCount(1, $comments->pluck('commentable')->pluck('user')->pluck('id')->unique());
+    }
+
+    public function testItCanHandleManyToManyPolymorphicRelationships()
+    {
+        $post = Post::factory()
+            ->hasAttached(
+                Tag::factory()->count(3),
+                ['public' => true]
+            )
+            ->forUser()
+            ->create();
+        $this->assertTrue($post->tags->every(fn ($tag) => $tag->pivot->public === 1));
+
+        $post = Post::factory()
+            ->hasTags(3, ['name' => 'My Tag'])
+            ->forUser()
+            ->create();
+        $this->assertCount(3, $post->tags);
+        $this->assertTrue($post->tags->every(fn ($tag) => $tag->name === 'My Tag'));
+    }
+
+    public function testItCanBeUsedToDefineARelationWithinAFactory()
+    {
+        $post = PostFactory::new()->create();
+
+        $this->assertNotNull($post->user);
+    }
 }
 
 class Cast extends Eloquent
@@ -428,6 +635,96 @@ class Guess extends Eloquent
 class Key extends Eloquent
 {
     use HasRealTimeFactory;
+}
+
+class User extends Eloquent
+{
+    use HasRealTimeFactory;
+
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
+
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class)
+            ->withPivot('active')
+            ->withTimestamps();
+    }
+}
+
+class Post extends Eloquent
+{
+    use HasRealTimeFactory;
+
+    protected $casts = [
+        'published' => 'boolean',
+    ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function comments()
+    {
+        return $this->morphMany(Comment::class, 'commentable');
+    }
+
+    public function tags()
+    {
+        return $this->morphToMany(Tag::class, 'taggable')
+            ->withPivot('public')
+            ->withTimestamps();
+    }
+}
+
+class Role extends Eloquent
+{
+    use HasRealTimeFactory;
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class)
+            ->withPivot('active')
+            ->withTimestamps();
+    }
+}
+
+class Comment extends Eloquent
+{
+    use HasRealTimeFactory;
+
+    public function commentable()
+    {
+        return $this->morphTo();
+    }
+}
+
+class Tag extends Eloquent
+{
+    use HasRealTimeFactory;
+
+    public function posts()
+    {
+        return $this->morphedByMany(Post::class, 'taggable');
+    }
+}
+
+class PostFactory extends Factory
+{
+    protected $model = Post::class;
+
+    public function definition()
+    {
+        return [
+            'user_id' => User::factory(),
+            'title' => fake()->word(),
+            'body' => fake()->paragraph(),
+            'published' => fake()->boolean(),
+        ];
+    }
 }
 
 enum FooBarEnum
