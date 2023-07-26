@@ -329,7 +329,7 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
 
     /**
      * Convert a human-friendly file size to kilobytes.
-     * 
+     *
      * @param  string  $humanReadable
      * @return number The number of kilobytes
      */
