@@ -1124,6 +1124,13 @@ class SupportStrTest extends TestCase
     {
         $this->assertTrue(strlen(Str::password()) === 32);
     }
+
+    public function testNaturalLanguateList()
+    {
+        $this->assertSame('one, two and three', Str::naturalLanguateList(['one', 'two', 'three']));
+        $this->assertSame('one, two or three', Str::naturalLanguateList(['one', 'two', 'three'], 'or'));
+        $this->assertSame('one; two and three', Str::naturalLanguateList(['one', 'two', 'three'], separator: '; '));
+    }
 }
 
 class StringableObjectStub
