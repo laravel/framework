@@ -95,7 +95,7 @@ class HttpTestingFileFactoryTest extends TestCase
 
         $imagePath = $image->getRealPath();
 
-        $this->assertSame('image/x-ms-bmp', mime_content_type($imagePath));
+        $this->assertSame('image/bmp', mime_content_type($imagePath));
 
         $this->assertSame('image/bmp', getimagesize($imagePath)['mime']);
     }
