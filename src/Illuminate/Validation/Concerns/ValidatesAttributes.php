@@ -2302,11 +2302,12 @@ trait ValidatesAttributes
      *
      * @param  string  $attribute
      * @param  mixed  $value
+     * @param  array<int, string>  $parameters
      * @return bool
      */
-    public function validateUrl($attribute, $value)
+    public function validateUrl($attribute, $value, $parameters = [])
     {
-        return Str::isUrl($value);
+        return Str::isUrl($value, $parameters);
     }
 
     /**
