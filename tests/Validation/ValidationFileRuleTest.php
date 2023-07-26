@@ -223,6 +223,15 @@ class ValidationFileRuleTest extends TestCase
         );
     }
 
+    public function testHumanReadable()
+    {
+        $this->assertEquals(File::default()->stringToKb('1mb'), 1000);
+        $this->assertEquals(File::default()->stringToKb('1.5mb'), 1500);
+        $this->assertEquals(File::default()->stringToKb('1.5555mb'), 1556);
+        $this->assertEquals(File::default()->stringToKb('1MB'), 1000);
+        $this->assertEquals(File::default()->stringToKb('1000'), 1000);
+    }
+
     public function testMacro()
     {
         File::macro('toDocument', function () {

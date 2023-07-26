@@ -131,13 +131,13 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
     /**
      * Indicate that the uploaded file should be exactly a certain size in kilobytes.
      *
-     * @param  int  $kilobytes
+     * @param  string  $size
      * @return $this
      */
-    public function size($kilobytes)
+    public function size($size)
     {
-        $this->minimumFileSize = $kilobytes;
-        $this->maximumFileSize = $kilobytes;
+        $this->minimumFileSize = $this->stringToKb($size);
+        $this->maximumFileSize = $this->minimumFileSize;
 
         return $this;
     }
@@ -145,14 +145,14 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
     /**
      * Indicate that the uploaded file should be between a minimum and maximum size in kilobytes.
      *
-     * @param  int  $minKilobytes
-     * @param  int  $maxKilobytes
+     * @param  string  $minSize
+     * @param  string  $maxSize
      * @return $this
      */
-    public function between($minKilobytes, $maxKilobytes)
+    public function between($minSize, $maxSize)
     {
-        $this->minimumFileSize = $minKilobytes;
-        $this->maximumFileSize = $maxKilobytes;
+        $this->minimumFileSize = $this->stringToKb($minSize);
+        $this->maximumFileSize = $this->stringToKb($maxSize);
 
         return $this;
     }
@@ -160,12 +160,12 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
     /**
      * Indicate that the uploaded file should be no less than the given number of kilobytes.
      *
-     * @param  int  $kilobytes
+     * @param  string  $size
      * @return $this
      */
-    public function min($kilobytes)
+    public function min($size)
     {
-        $this->minimumFileSize = $kilobytes;
+        $this->minimumFileSize = $this->stringToKb($size);
 
         return $this;
     }
@@ -173,12 +173,12 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
     /**
      * Indicate that the uploaded file should be no more than the given number of kilobytes.
      *
-     * @param  int  $kilobytes
+     * @param  string  $size
      * @return $this
      */
-    public function max($kilobytes)
+    public function max($size)
     {
-        $this->maximumFileSize = $kilobytes;
+        $this->maximumFileSize = $this->stringToKb($size);
 
         return $this;
     }
@@ -325,5 +325,29 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
         $this->data = $data;
 
         return $this;
+    }
+
+    /**
+     * Convert a human-friendly file size to kilobytes.
+     * 
+     * @param  string  $humanReadable
+     * @return number The number of kilobytes
+     */
+    public function stringToKb(string $humanReadable)
+    {
+        if ($humanReadable === null) return null;
+        if (is_numeric($humanReadable)) return $humanReadable;
+
+        $suffixesToKb = [
+            'kb' => 1,
+            'mb' => 1000,
+            'gb' => 1000000,
+            'tb' => 1000000000
+        ];
+
+        $amount = floatval($humanReadable);
+        $suffix = strtolower(substr(trim($humanReadable), -2));
+
+        return round($suffixesToKb[$suffix] * $amount);
     }
 }
