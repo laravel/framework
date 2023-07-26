@@ -92,6 +92,10 @@ class TrustProxies
      */
     protected function getTrustedHeaderNames()
     {
+        if (is_int($this->headers)) {
+            return $this->headers;
+        }
+
         return match ($this->headers) {
             'HEADER_X_FORWARDED_AWS_ELB', Request::HEADER_X_FORWARDED_AWS_ELB => Request::HEADER_X_FORWARDED_AWS_ELB,
             'HEADER_FORWARDED', Request::HEADER_FORWARDED => Request::HEADER_FORWARDED,
