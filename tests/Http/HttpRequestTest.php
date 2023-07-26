@@ -1572,5 +1572,6 @@ class HttpRequestTest extends TestCase
         $request = Request::createFromBase($base);
 
         $this->assertInstanceOf(InputBag::class, $request->getPayload());
+        $this->assertSame('world', $request->getPayload()->get('hello'));
     }
 }
