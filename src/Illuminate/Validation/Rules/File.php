@@ -203,7 +203,7 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
             Str::endsWith($size, 'mb') => $value * 1000,
             Str::endsWith($size, 'gb') => $value * 1000000,
             Str::endsWith($size, 'tb') => $value * 1000000000,
-            default => throw new InvalidArgumentException("Invalid file size suffix."),
+            default => throw new InvalidArgumentException('Invalid file size suffix.'),
         });
     }
 
