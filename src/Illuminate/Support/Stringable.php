@@ -1133,9 +1133,9 @@ class Stringable implements JsonSerializable, ArrayAccess
      * @param  string  $separator
      * @return static
      */
-    public function naturalLanguateList(array $list, $and = 'and', $separator = ', ')
+    public function naturalLanguageList(array $list, $and = 'and', $separator = ', ')
     {
-        return new static(Str::naturalLanguateList($list, $and, $separator));
+        return new static(Str::naturalLanguageList($list, $and, $separator));
     }
 
     /**

@@ -1121,11 +1121,11 @@ class SupportStringableTest extends TestCase
         $this->assertEquals('"value"', $this->stringable('value')->wrap('"'));
     }
 
-    public function testNaturalLanguateList()
+    public function testNaturalLanguageList()
     {
-        $this->assertEquals('one, two and three', $this->stringable()->naturalLanguateList(['one', 'two', 'three']));
-        $this->assertEquals('one, two or three', $this->stringable()->naturalLanguateList(['one', 'two', 'three'], 'or'));
-        $this->assertEquals('one; two and three', $this->stringable()->naturalLanguateList(['one', 'two', 'three'], separator: '; '));
+        $this->assertEquals('one, two and three', $this->stringable()->naturalLanguageList(['one', 'two', 'three']));
+        $this->assertEquals('one, two or three', $this->stringable()->naturalLanguageList(['one', 'two', 'three'], 'or'));
+        $this->assertEquals('one; two and three', $this->stringable()->naturalLanguageList(['one', 'two', 'three'], separator: '; '));
     }
 
     public function testToHtmlString()

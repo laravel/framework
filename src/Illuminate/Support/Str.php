@@ -1490,7 +1490,7 @@ class Str
      * @param  string  $separator
      * @return string
      */
-    public static function naturalLanguateList(array $list, $and = 'and', $separator = ', ')
+    public static function naturalLanguageList(array $list, $and = 'and', $separator = ', ')
     {
         if (count($list) > 1) {
             return implode($separator, array_slice($list, 0, -1)).' '.$and.' '.array_pop($list);
