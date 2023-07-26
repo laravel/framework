@@ -7,6 +7,7 @@ use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
@@ -136,7 +137,7 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
      */
     public function size($size)
     {
-        $this->minimumFileSize = $this->stringToKb($size);
+        $this->minimumFileSize = $this->toKilobytes($size);
         $this->maximumFileSize = $this->minimumFileSize;
 
         return $this;
@@ -151,8 +152,8 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
      */
     public function between($minSize, $maxSize)
     {
-        $this->minimumFileSize = $this->stringToKb($minSize);
-        $this->maximumFileSize = $this->stringToKb($maxSize);
+        $this->minimumFileSize = $this->toKilobytes($minSize);
+        $this->maximumFileSize = $this->toKilobytes($maxSize);
 
         return $this;
     }
@@ -165,7 +166,7 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
      */
     public function min($size)
     {
-        $this->minimumFileSize = $this->stringToKb($size);
+        $this->minimumFileSize = $this->toKilobytes($size);
 
         return $this;
     }
@@ -178,9 +179,32 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
      */
     public function max($size)
     {
-        $this->maximumFileSize = $this->stringToKb($size);
+        $this->maximumFileSize = $this->toKilobytes($size);
 
         return $this;
+    }
+
+    /**
+     * Convert a potentially human-friendly file size to kilobytes.
+     *
+     * @param  string|int  $size
+     * @return mixed
+     */
+    protected function toKilobytes($size)
+    {
+        if (! is_string($size)) {
+            return $size;
+        }
+
+        $value = floatval($size);
+
+        return round(match (true) {
+            Str::endsWith($size, 'kb') => $value * 1,
+            Str::endsWith($size, 'mb') => $value * 1000,
+            Str::endsWith($size, 'gb') => $value * 1000000,
+            Str::endsWith($size, 'tb') => $value * 1000000000,
+            default => throw new InvalidArgumentException("Invalid file size suffix."),
+        });
     }
 
     /**
@@ -325,34 +349,5 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
         $this->data = $data;
 
         return $this;
-    }
-
-    /**
-     * Convert a human-friendly file size to kilobytes.
-     *
-     * @param  string  $humanReadable
-     * @return number The number of kilobytes
-     */
-    public function stringToKb(string $humanReadable)
-    {
-        if ($humanReadable === null) {
-            return null;
-        }
-
-        if (is_numeric($humanReadable)) {
-            return $humanReadable;
-        }
-
-        $suffixesToKb = [
-            'kb' => 1,
-            'mb' => 1000,
-            'gb' => 1000000,
-            'tb' => 1000000000,
-        ];
-
-        $amount = floatval($humanReadable);
-        $suffix = strtolower(substr(trim($humanReadable), -2));
-
-        return round($suffixesToKb[$suffix] * $amount);
     }
 }

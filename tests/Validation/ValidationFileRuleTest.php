@@ -223,13 +223,40 @@ class ValidationFileRuleTest extends TestCase
         );
     }
 
-    public function testHumanReadable()
+    public function testMaxWithHumanReadableSize()
     {
-        $this->assertEquals(File::default()->stringToKb('1mb'), 1000);
-        $this->assertEquals(File::default()->stringToKb('1.5mb'), 1500);
-        $this->assertEquals(File::default()->stringToKb('1.5555mb'), 1556);
-        $this->assertEquals(File::default()->stringToKb('1MB'), 1000);
-        $this->assertEquals(File::default()->stringToKb('1000'), 1000);
+        $this->fails(
+            File::default()->max('1024kb'),
+            UploadedFile::fake()->create('foo.txt', 1025),
+            ['validation.max.file']
+        );
+
+        $this->passes(
+            File::default()->max('1024kb'),
+            [
+                UploadedFile::fake()->create('foo.txt', 1024),
+                UploadedFile::fake()->create('foo.txt', 1023),
+                UploadedFile::fake()->create('foo.txt', 512),
+            ]
+        );
+    }
+
+    public function testMaxWithHumanReadableSizeAndMultipleValue()
+    {
+        $this->fails(
+            File::default()->max('1mb'),
+            UploadedFile::fake()->create('foo.txt', 1025),
+            ['validation.max.file']
+        );
+
+        $this->passes(
+            File::default()->max('1mb'),
+            [
+                UploadedFile::fake()->create('foo.txt', 1000),
+                UploadedFile::fake()->create('foo.txt', 999),
+                UploadedFile::fake()->create('foo.txt', 512),
+            ]
+        );
     }
 
     public function testMacro()
