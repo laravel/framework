@@ -140,7 +140,7 @@ trait HasAttributes
     public static $snakeAttributes = true;
 
     /**
-     * List of attributes to force mutations
+     * List of attributes to force mutations.
      *
      * @var array
      */
