@@ -4,7 +4,7 @@ namespace Illuminate\Database\Console;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Illuminate\Console\Command;
-use Illuminate\Database\Concerns\InteractsWithTables;
+use Illuminate\Database\Concerns\ManagesTypeMapping;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\PostgresConnection;
@@ -19,7 +19,7 @@ use Symfony\Component\Process\Process;
 
 abstract class DatabaseInspectionCommand extends Command
 {
-    use InteractsWithTables;
+    use ManagesTypeMapping;
 
     /**
      * The Composer instance.

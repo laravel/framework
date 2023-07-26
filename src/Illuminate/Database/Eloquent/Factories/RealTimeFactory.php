@@ -20,7 +20,7 @@ use Doctrine\DBAL\Types\TextType;
 use Doctrine\DBAL\Types\TimeType;
 use Doctrine\DBAL\Types\Type;
 use Exception;
-use Illuminate\Database\Concerns\InteractsWithTables;
+use Illuminate\Database\Concerns\ManagesTypeMapping;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsCollection;
 use Illuminate\Database\Eloquent\Casts\AsEncryptedArrayObject;
@@ -34,7 +34,7 @@ use Illuminate\Support\Str;
 
 class RealTimeFactory extends Factory
 {
-    use InteractsWithTables;
+    use ManagesTypeMapping;
 
     /**
      * An instance of the factory's corresponding model.

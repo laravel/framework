@@ -4,7 +4,7 @@ namespace Illuminate\Database\Concerns;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 
-trait InteractsWithTables
+trait ManagesTypeMapping
 {
     /**
      * A map of database column types.
