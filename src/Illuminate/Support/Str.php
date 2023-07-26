@@ -445,10 +445,10 @@ class Str
      * Determine if a given value is a valid URL.
      *
      * @param  mixed  $value
-     * @param  array|null  $protocols
+     * @param  array  $protocols
      * @return bool
      */
-    public static function isUrl($value, array $protocols = null)
+    public static function isUrl($value, array $protocols = [])
     {
         if (! is_string($value)) {
             return false;
@@ -464,7 +464,7 @@ class Str
          * (c) Fabien Potencier <fabien@symfony.com> http://symfony.com
          */
         $pattern = '~^
-            (%s)://                                 # protocol
+            (LARAVEL_PROTOCOLS)://                                 # protocol
             (((?:[\_\.\pL\pN-]|%[0-9A-Fa-f]{2})+:)?((?:[\_\.\pL\pN-]|%[0-9A-Fa-f]{2})+)@)?  # basic auth
             (
                 ([\pL\pN\pS\-\_\.])+(\.?([\pL\pN]|xn\-\-[\pL\pN-]+)+\.?) # a domain name
@@ -481,7 +481,7 @@ class Str
             (?:\# (?:[\pL\pN\-._\~!$&\'()*+,;=:@/?]|%[0-9A-Fa-f]{2})* )?       # a fragment (optional)
         $~ixu';
 
-        return preg_match(str_replace('%s', $protocolList, $pattern), $value) > 0;
+        return preg_match(str_replace('LARAVEL_PROTOCOLS', $protocolList, $pattern), $value) > 0;
     }
 
     /**
