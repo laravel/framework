@@ -100,7 +100,6 @@ class RealTimeFactoryTest extends TestCase
             $table->date('date_column');
             $table->decimal('decimal_column');
             $table->double('double_column');
-            // $table->enum('enum_column', ['active', 'inactive']);
             $table->float('float_column');
             $table->foreignId('foreign_id_column');
             $table->foreignIdFor(Cast::class);
