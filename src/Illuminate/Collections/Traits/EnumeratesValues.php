@@ -322,7 +322,7 @@ trait EnumeratesValues
      *
      * @throws \UnexpectedValueException
      */
-    public function enforce($type)
+    public function ensure($type)
     {
         return $this->each(function ($item) use ($type) {
             $itemType = get_debug_type($item);
