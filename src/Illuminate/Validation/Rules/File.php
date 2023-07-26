@@ -335,14 +335,19 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
      */
     public function stringToKb(string $humanReadable)
     {
-        if ($humanReadable === null) return null;
-        if (is_numeric($humanReadable)) return $humanReadable;
+        if ($humanReadable === null) {
+            return null;
+        }
+
+        if (is_numeric($humanReadable)) {
+            return $humanReadable;
+        }
 
         $suffixesToKb = [
             'kb' => 1,
             'mb' => 1000,
             'gb' => 1000000,
-            'tb' => 1000000000
+            'tb' => 1000000000,
         ];
 
         $amount = floatval($humanReadable);
