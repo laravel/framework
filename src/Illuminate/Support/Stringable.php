@@ -1126,6 +1126,19 @@ class Stringable implements JsonSerializable, ArrayAccess
     }
 
     /**
+     * Generate a comma separated list where the last two items are joined with 'and', forming natural language.
+     *
+     * @param  array  $list
+     * @param  string  $and
+     * @param  string  $separator
+     * @return static
+     */
+    public function naturalLanguateList(array $list, $and = 'and', $separator = ', ')
+    {
+        return new static(Str::naturalLanguateList($list, $and, $separator));
+    }
+
+    /**
      * Convert the string into a `HtmlString` instance.
      *
      * @return \Illuminate\Support\HtmlString

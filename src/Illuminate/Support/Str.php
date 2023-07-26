@@ -1481,4 +1481,21 @@ class Str
         static::$camelCache = [];
         static::$studlyCache = [];
     }
+
+    /**
+     * Generate a comma separated list where the last two items are joined with 'and', forming natural language.
+     *
+     * @param  array  $list
+     * @param  string  $and
+     * @param  string  $separator
+     * @return string
+     */
+    public static function naturalLanguateList(array $list, $and = 'and', $separator = ', ')
+    {
+        if (count($list) > 1) {
+            return implode($separator, array_slice($list, 0, -1)) . ' ' . $and . ' ' . array_pop($list);
+        }
+
+        return (string) array_pop($list);
+    }
 }
