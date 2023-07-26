@@ -132,7 +132,7 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
     /**
      * Indicate that the uploaded file should be exactly a certain size in kilobytes.
      *
-     * @param  string  $size
+     * @param  string|int  $size
      * @return $this
      */
     public function size($size)
@@ -146,8 +146,8 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
     /**
      * Indicate that the uploaded file should be between a minimum and maximum size in kilobytes.
      *
-     * @param  string  $minSize
-     * @param  string  $maxSize
+     * @param  string|int  $minSize
+     * @param  string|int  $maxSize
      * @return $this
      */
     public function between($minSize, $maxSize)
@@ -161,7 +161,7 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
     /**
      * Indicate that the uploaded file should be no less than the given number of kilobytes.
      *
-     * @param  string  $size
+     * @param  string|int  $size
      * @return $this
      */
     public function min($size)
@@ -174,7 +174,7 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
     /**
      * Indicate that the uploaded file should be no more than the given number of kilobytes.
      *
-     * @param  string  $size
+     * @param  string|int  $size
      * @return $this
      */
     public function max($size)
