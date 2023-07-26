@@ -205,6 +205,24 @@ class ValidationFileRuleTest extends TestCase
         );
     }
 
+    public function testMinWithHumanReadableSize()
+    {
+        $this->fails(
+            File::default()->min('1024kb'),
+            UploadedFile::fake()->create('foo.txt', 1023),
+            ['validation.min.file']
+        );
+
+        $this->passes(
+            File::default()->min('1024kb'),
+            [
+                UploadedFile::fake()->create('foo.txt', 1024),
+                UploadedFile::fake()->create('foo.txt', 1025),
+                UploadedFile::fake()->create('foo.txt', 2048),
+            ]
+        );
+    }
+
     public function testMax()
     {
         $this->fails(
