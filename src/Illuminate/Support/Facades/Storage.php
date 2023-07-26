@@ -24,7 +24,7 @@ use Illuminate\Filesystem\Filesystem;
  * @method static bool exists(string $path)
  * @method static string|null get(string $path)
  * @method static resource|null readStream(string $path)
- * @method static bool put(string $path, string|resource $contents, mixed $options = [])
+ * @method static bool put(string $path, \Psr\Http\Message\StreamInterface|\Illuminate\Http\File|\Illuminate\Http\UploadedFile|string|resource $contents, mixed $options = [])
  * @method static bool writeStream(string $path, resource $resource, array $options = [])
  * @method static string getVisibility(string $path)
  * @method static bool setVisibility(string $path, string $visibility)
