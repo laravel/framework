@@ -95,6 +95,7 @@ return [
         'string' => 'The :attribute field must not be greater than :max characters.',
     ],
     'max_digits' => 'The :attribute field must not have more than :max digits.',
+    'max_html' => 'The :attribute field must be least :max characters.',
     'mimes' => 'The :attribute field must be a file of type: :values.',
     'mimetypes' => 'The :attribute field must be a file of type: :values.',
     'min' => [
@@ -104,6 +105,7 @@ return [
         'string' => 'The :attribute field must be at least :min characters.',
     ],
     'min_digits' => 'The :attribute field must have at least :min digits.',
+    'min_html' => 'The :attribute field must be least :min characters.',
     'missing' => 'The :attribute field must be missing.',
     'missing_if' => 'The :attribute field must be missing when :other is :value.',
     'missing_unless' => 'The :attribute field must be missing unless :other is :value.',

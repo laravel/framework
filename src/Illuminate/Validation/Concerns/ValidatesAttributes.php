@@ -1540,6 +1540,36 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute has a minimum length after stripping out all HTML elements.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateMinHtml($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'min_html');
+
+        return mb_strlen(trim(strip_tags(html_entity_decode($value)))) >= $parameters[0];
+    }
+
+    /**
+     * Validate that an attribute has a maximum length after stripping out all HTML elements.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateMaxHtml($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'max_html');
+
+        return mb_strlen(trim(strip_tags(html_entity_decode($value)))) <= $parameters[0];
+    }
+
+    /**
      * Validate that an attribute is missing.
      *
      * @param  string  $attribute

@@ -3092,6 +3092,34 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testValidateHtmlMin()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, ['foo' => '<p>12345678910</p>'], ['foo' => 'MinHtml:10']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '<p>123456789</p>'], ['foo' => 'MinHtml:10']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '<p data-attribute style="color: red"><div>123</div></p>'], ['foo' => 'MinHtml:10']);
+        $this->assertFalse($v->passes());
+    }
+
+    public function testValidateHtmlMax()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, ['foo' => '<p>1234567890</p>'], ['foo' => 'MaxHtml:10']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '<p>12345678910</p>'], ['foo' => 'MaxHtml:10']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '<p data-attribute style="color: red"><div>123</div></p>'], ['foo' => 'MaxHtml:10']);
+        $this->assertTrue($v->passes());
+    }
+
     public function testValidateMax()
     {
         $trans = $this->getIlluminateArrayTranslator();
