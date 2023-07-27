@@ -600,6 +600,14 @@ class RealTimeFactoryTest extends TestCase
 
         Post::factory()->times(3);
     }
+
+    public function testIgnoresPrimaryAndForeignKeysFromDefinition()
+    {
+        $factory = Key::factory();
+
+        $this->assertArrayNotHasKey('id', $factory->definition());
+        $this->assertArrayNotHasKey('cast_id', $factory->definition());
+    }
 }
 
 class Cast extends Eloquent

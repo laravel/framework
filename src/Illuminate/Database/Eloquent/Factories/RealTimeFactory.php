@@ -5,6 +5,7 @@ namespace Illuminate\Database\Eloquent\Factories;
 use BackedEnum;
 use DateTime;
 use Doctrine\DBAL\Schema\Column;
+use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Types\ArrayType;
 use Doctrine\DBAL\Types\BigIntType;
 use Doctrine\DBAL\Types\BlobType;
@@ -67,6 +68,7 @@ class RealTimeFactory extends Factory
     {
         return $this->configure()
             ->getColumnsFromModel()
+            ->reject(fn (Column $column) => $column->getAutoincrement() || $this->isForeignKey($column) || $this->isPrimaryKey($column))
             ->map(fn (Column $column) => $this->value($column))
             ->all();
     }
@@ -140,14 +142,6 @@ class RealTimeFactory extends Factory
      */
     protected function value(Column $column): mixed
     {
-        if ($column->getAutoincrement()) {
-            return null;
-        }
-
-        if ($this->isForeignKey($column)) {
-            return null;
-        }
-
         if ($value = $this->guessValue($column->getName())) {
             return $value;
         }
@@ -165,6 +159,15 @@ class RealTimeFactory extends Factory
         return collect($this->schema->listTableForeignKeys($this->table))
             ->filter(fn ($foreignKey) => in_array($column->getName(), $foreignKey->getLocalColumns()))
             ->isNotEmpty();
+    }
+
+    /**
+     * Determine whether the given column is the primary key.
+     */
+    protected function isPrimaryKey(Column $column): bool
+    {
+        return collect($this->schema->listTableIndexes($this->table))
+            ->some(fn (Index $index) => $index->isPrimary() && in_array($column->getName(), $index->getColumns()));
     }
 
     /**
