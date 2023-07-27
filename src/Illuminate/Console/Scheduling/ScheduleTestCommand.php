@@ -60,7 +60,7 @@ class ScheduleTestCommand extends Command
 
             $index = key($matches);
         } else {
-            $index = array_search($this->components->choice('Which command would you like to run?', $commandNames), $commandNames);
+            $index = $this->getSelectedCommandByIndex($commandNames);
         }
 
         $event = $commands[$index];
@@ -84,5 +84,32 @@ class ScheduleTestCommand extends Command
         }
 
         $this->newLine();
+    }
+
+    /**
+     * Get the selected command name by index.
+     *
+     * @param  array  $commandNames
+     * @return int
+     */
+    protected function getSelectedCommandByIndex(array $commandNames)
+    {
+        if (count($commandNames) !== count(array_unique($commandNames))) {
+            // Some commands (likely closures) have the same name, append unique indexes to each one...
+            $uniqueCommandNames = array_map(function ($index, $value) {
+                return "$value [$index]";
+            }, array_keys($commandNames), $commandNames);
+
+            $selectedCommand = $this->components->choice('Which command would you like to run?', $uniqueCommandNames);
+
+            preg_match('/\[(\d+)\]/', $selectedCommand, $choice);
+
+            return (int) $choice[1];
+        } else {
+            return array_search(
+                $this->components->choice('Which command would you like to run?', $commandNames),
+                $commandNames
+            );
+        }
     }
 }
