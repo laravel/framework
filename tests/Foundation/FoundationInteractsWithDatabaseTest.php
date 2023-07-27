@@ -478,7 +478,6 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
         $builder->shouldReceive('where')->with($key, $value)->andReturnSelf();
 
-
         $builder->shouldReceive('select')->with(array_keys($this->data))->andReturnSelf();
 
         $builder->shouldReceive('limit')->andReturnSelf();
@@ -517,7 +516,6 @@ class CustomProductStub extends ProductStub
 {
     const DELETED_AT = 'trashed_at';
 }
-
 
 class CustomProductStubWithCasts extends ProductStub
 {

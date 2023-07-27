@@ -37,7 +37,6 @@ trait InteractsWithDatabase
 
     protected function parseData($table, array $data): array
     {
-
         if (class_exists($table) && new $table() instanceof Model) {
             /* @var $model Model */
             $table::unguard();
