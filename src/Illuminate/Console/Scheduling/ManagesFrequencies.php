@@ -264,7 +264,7 @@ trait ManagesFrequencies
      * @param  array|string|int  $offset
      * @return $this
      */
-    public function everyOddHour($offset)
+    public function everyOddHour($offset = 0)
     {
         return $this->hourBasedSchedule($offset, '1-23/2');
     }
@@ -275,7 +275,7 @@ trait ManagesFrequencies
      * @param  array|string|int  $offset
      * @return $this
      */
-    public function everyTwoHours($offset)
+    public function everyTwoHours($offset = 0)
     {
         return $this->hourBasedSchedule($offset, '*/2');
     }
@@ -286,7 +286,7 @@ trait ManagesFrequencies
      * @param  array|string|int  $offset
      * @return $this
      */
-    public function everyThreeHours($offset)
+    public function everyThreeHours($offset = 0)
     {
         return $this->hourBasedSchedule($offset, '*/3');
     }
@@ -297,7 +297,7 @@ trait ManagesFrequencies
      * @param  array|string|int  $offset
      * @return $this
      */
-    public function everyFourHours($offset)
+    public function everyFourHours($offset = 0)
     {
         return $this->hourBasedSchedule($offset, '*/4');
     }
@@ -308,7 +308,7 @@ trait ManagesFrequencies
      * @param  array|string|int  $offset
      * @return $this
      */
-    public function everySixHours($offset)
+    public function everySixHours($offset = 0)
     {
         return $this->hourBasedSchedule($offset, '*/6');
     }
