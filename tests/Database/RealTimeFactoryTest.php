@@ -592,6 +592,14 @@ class RealTimeFactoryTest extends TestCase
 
         $this->assertContains('key', array_keys($word->toArray()));
     }
+
+    public function testRealTimeFactoriesCannotBeInstantiatedWithNew()
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Real-time factories cannot be instantiated with new()');
+
+        Post::factory()->times(3);
+    }
 }
 
 class Cast extends Eloquent

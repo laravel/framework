@@ -31,6 +31,7 @@ use Illuminate\Database\Eloquent\Casts\AsStringable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use RuntimeException;
 
 class RealTimeFactory extends Factory
 {
@@ -109,6 +110,17 @@ class RealTimeFactory extends Factory
         return parent::newInstance($arguments)
             ->forModel($this->model)
             ->configure();
+    }
+
+    /**
+     * Get a new factory instance for the given attributes.
+     *
+     * @param  (callable(array<string, mixed>): array<string, mixed>)|array<string, mixed>  $attributes
+     * @return static
+     */
+    public static function new($attributes = [])
+    {
+        throw new RuntimeException('Real-time factories cannot be instantiated with new()');
     }
 
     /**
@@ -464,11 +476,14 @@ class RealTimeFactory extends Factory
     {
         return [
             'email' => fn () => fake()->safeEmail(),
+            'e_mail' => fn () => fake()->safeEmail(),
             'email_address' => fn () => fake()->safeEmail(),
             'name' => fn () => fake()->name(),
             'first_name' => fn () => fake()->firstName(),
             'last_name' => fn () => fake()->lastName(),
             'username' => fn () => fake()->userName(),
+            'dob' => fn () => fake()->date(),
+            'date_of_birth' => fn () => fake()->date(),
         ];
     }
 }
