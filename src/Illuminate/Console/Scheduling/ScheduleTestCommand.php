@@ -52,7 +52,7 @@ class ScheduleTestCommand extends Command
                 return trim(str_replace($commandBinary, '', $commandName)) === $name;
             });
 
-            if (count($matches) !== 1) {
+            if (count($matches) === 0) {
                 $this->components->info('No matching scheduled command found.');
 
                 return;
