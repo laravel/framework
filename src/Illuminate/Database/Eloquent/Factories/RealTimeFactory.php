@@ -185,7 +185,7 @@ class RealTimeFactory extends Factory
      */
     protected function valueFromCast(string $column): mixed
     {
-        if(in_array($column, $this->modelInstance->getDates())) {
+        if (in_array($column, $this->modelInstance->getDates())) {
             return $this->dateValue();
         }
 
