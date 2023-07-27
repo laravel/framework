@@ -47,14 +47,14 @@ class CacheTest extends TestCase
         $this->assertNull($response->getMaxAge());
     }
 
-    public function testDoNotSetHeaderWhenNoContent()
+    public function testDoSetHeaderWhenNoContent()
     {
         $response = (new Cache)->handle(new Request, function () {
             return new Response;
         }, 'max_age=120;s_maxage=60');
 
-        $this->assertNull($response->getMaxAge());
-        $this->assertNull($response->getEtag());
+        $this->assertNotNull($response->getMaxAge());
+        $this->assertNotNull($response->getEtag());
     }
 
     public function testSetHeaderToFileEvenWithNoContent()
