@@ -118,7 +118,7 @@ class RealTimeFactory extends Factory
     {
         $columns = $this->schema->listTableColumns($this->table);
 
-        return collect($columns);
+        return collect($columns)->keyBy(fn ($column) => $column->getName());
     }
 
     /**
