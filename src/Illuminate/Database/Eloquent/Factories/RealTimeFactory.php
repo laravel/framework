@@ -232,6 +232,9 @@ class RealTimeFactory extends Factory
         return null;
     }
 
+    /**
+     * Determine whether the given cast is an array cast.
+     */
     protected function isArrayCastable(string $key): bool
     {
         return in_array($key, ['array', 'json', 'object', 'collection', 'encrypted:array', 'encrypted:collection', 'encrypted:json', 'encrypted:object', AsArrayObject::class, AsCollection::class, AsEncryptedArrayObject::class, AsEncryptedCollection::class]);
