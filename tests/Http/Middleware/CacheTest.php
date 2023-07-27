@@ -54,7 +54,7 @@ class CacheTest extends TestCase
         }, 'max_age=120;s_maxage=60');
 
         $this->assertNotNull($response->getMaxAge());
-        $this->assertNotNull($response->getEtag());
+        $this->assertNull($response->getEtag());
     }
 
     public function testSetHeaderToFileEvenWithNoContent()
