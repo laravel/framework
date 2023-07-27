@@ -244,7 +244,7 @@ trait ManagesFrequencies
      */
     public function hourly()
     {
-        return $this->hourBasedSchedule(0, '*');
+        return $this->spliceIntoPosition(1, 0);
     }
 
     /**
