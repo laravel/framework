@@ -52,35 +52,15 @@ class ScheduleTestCommand extends Command
                 return trim(str_replace($commandBinary, '', $commandName)) === $name;
             });
 
-            if (count($matches) === 0) {
+            if (count($matches) !== 1) {
                 $this->components->info('No matching scheduled command found.');
 
                 return;
             }
 
             $index = key($matches);
-
-            // Handle multiple matches
-            if (count($matches) > 1) {
-                $options = array_map(function ($index, $value) {
-                    return "$value [$index]";
-                }, array_keys($matches), $matches);
-                $userInput = $this->components->choice('Multiple matching scheduled commands found. Select one:', $options);
-                preg_match('/\[(\d+)\]/', $userInput, $choice);
-                $index = (int) $choice[1];
-            }
         } else {
-            // if there are multiple scheduled commands with the same description
-            if (count($commandNames) !== count(array_unique($commandNames))) {
-                $options = array_map(function ($index, $value) {
-                    return "$value [$index]";
-                }, array_keys($commandNames), $commandNames);
-                $userInput = $this->components->choice('Which command would you like to run?', $options);
-                preg_match('/\[(\d+)\]/', $userInput, $choice);
-                $index = (int) $choice[1];
-            } else {
-                $index = array_search($this->components->choice('Which command would you like to run?', $commandNames), $commandNames);
-            }
+            $index = $this->getSelectedCommandByIndex($commandNames);
         }
 
         $event = $commands[$index];
@@ -104,5 +84,32 @@ class ScheduleTestCommand extends Command
         }
 
         $this->newLine();
+    }
+
+    /**
+     * Get the selected command name by index.
+     *
+     * @param  array  $commandNames
+     * @return int
+     */
+    protected function getSelectedCommandByIndex(array $commandNames)
+    {
+        if (count($commandNames) !== count(array_unique($commandNames))) {
+            // Some commands (likely closures) have the same name, append unique indexes to each one...
+            $uniqueCommandNames = array_map(function ($index, $value) {
+                return "$value [$index]";
+            }, array_keys($commandNames), $commandNames);
+
+            $selectedCommand = $this->components->choice('Which command would you like to run?', $uniqueCommandNames);
+
+            preg_match('/\[(\d+)\]/', $selectedCommand, $choice);
+
+            return (int) $choice[1];
+        } else {
+            return array_search(
+                $this->components->choice('Which command would you like to run?', $commandNames),
+                $commandNames
+            );
+        }
     }
 }
