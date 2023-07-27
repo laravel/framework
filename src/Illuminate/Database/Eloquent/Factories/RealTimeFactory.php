@@ -185,6 +185,10 @@ class RealTimeFactory extends Factory
      */
     protected function valueFromCast(string $column): mixed
     {
+        if(in_array($column, $this->modelInstance->getDates())) {
+            return $this->dateValue();
+        }
+
         if (! $key = $this->modelInstance->getCasts()[$column] ?? null) {
             return null;
         }

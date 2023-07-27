@@ -320,8 +320,6 @@ class RealTimeFactoryTest extends TestCase
             $type->remember_token,
             $type->soft_deletes_tz_column,
             $type->soft_deletes_column,
-            $type->created_at,
-            $type->updated_at,
         ])->every(fn ($value) => is_null($value)));
 
         $this->assertTrue(collect([
@@ -385,6 +383,8 @@ class RealTimeFactoryTest extends TestCase
             $type->date_time_column,
             $type->timestamp_tz_column,
             $type->timestamp_column,
+            $type->created_at,
+            $type->updated_at,
         ])->every(fn ($value) => $value instanceof DateTime));
 
         $this->assertTrue(collect([
