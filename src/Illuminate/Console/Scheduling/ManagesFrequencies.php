@@ -244,73 +244,73 @@ trait ManagesFrequencies
      */
     public function hourly()
     {
-        return $this->repeatHour(0, '*');
+        return $this->hourBasedSchedule(0, '*');
     }
 
     /**
      * Schedule the event to run hourly at a given offset in the hour.
      *
-     * @param  array|string|int  $minutes
+     * @param  array|string|int  $offset
      * @return $this
      */
-    public function hourlyAt($minutes)
+    public function hourlyAt($offset)
     {
-        return $this->repeatHour($minutes, '*');
+        return $this->hourBasedSchedule($offset, '*');
     }
 
     /**
      * Schedule the event to run every odd hour.
      *
-     * @param  array|string|int  $minutes
+     * @param  array|string|int  $offset
      * @return $this
      */
-    public function everyOddHour($minutes)
+    public function everyOddHour($offset)
     {
-        return $this->repeatHour($minutes, '1-23/2');
+        return $this->hourBasedSchedule($offset, '1-23/2');
     }
 
     /**
      * Schedule the event to run every two hours.
      *
-     * @param  array|string|int  $minutes
+     * @param  array|string|int  $offset
      * @return $this
      */
-    public function everyTwoHours($minutes)
+    public function everyTwoHours($offset)
     {
-        return $this->repeatHour($minutes, '*/2');
+        return $this->hourBasedSchedule($offset, '*/2');
     }
 
     /**
      * Schedule the event to run every three hours.
      *
-     * @param  array|string|int  $minutes
+     * @param  array|string|int  $offset
      * @return $this
      */
-    public function everyThreeHours($minutes)
+    public function everyThreeHours($offset)
     {
-        return $this->repeatHour($minutes, '*/3');
+        return $this->hourBasedSchedule($offset, '*/3');
     }
 
     /**
      * Schedule the event to run every four hours.
      *
-     * @param  array|string|int  $minutes
+     * @param  array|string|int  $offset
      * @return $this
      */
-    public function everyFourHours($minutes)
+    public function everyFourHours($offset)
     {
-        return $this->repeatHour($minutes, '*/4');
+        return $this->hourBasedSchedule($offset, '*/4');
     }
 
     /**
      * Schedule the event to run every six hours.
      *
-     * @param  array|string|int  $minutes
+     * @param  array|string|int  $offset
      * @return $this
      */
-    public function everySixHours($minutes)
+    public function everySixHours($offset)
     {
-        return $this->repeatHour($minutes, '*/6');
+        return $this->hourBasedSchedule($offset, '*/6');
     }
 
     /**
@@ -320,7 +320,7 @@ trait ManagesFrequencies
      */
     public function daily()
     {
-        return $this->repeatHour(0, 0);
+        return $this->hourBasedSchedule(0, 0);
     }
 
     /**
@@ -344,7 +344,10 @@ trait ManagesFrequencies
     {
         $segments = explode(':', $time);
 
-        return $this->repeatHour((int) data_get($segments, '1', '0'), (int) $segments[0]);
+        return $this->hourBasedSchedule(
+            count($segments) === 2 ? (int) $segments[1] : '0',
+            (int) $segments[0]
+        );
     }
 
     /**
@@ -371,20 +374,21 @@ trait ManagesFrequencies
     {
         $hours = $first.','.$second;
 
-        return $this->repeatHour($offset, $hours);
+        return $this->hourBasedSchedule($offset, $hours);
     }
 
     /**
-     * Schedule the event to run multiple times per hour or multiples hours.
+     * Schedule the event to run at the given minutes and hours.
      *
      * @param  array|string|int  $minutes
      * @param  array|string|int  $hours
      * @return $this
      */
-    protected function repeatHour($minutes, $hours)
+    protected function hourBasedSchedule($minutes, $hours)
     {
-        $hours = is_array($hours) ? implode(',', $hours) : $hours;
         $minutes = is_array($minutes) ? implode(',', $minutes) : $minutes;
+
+        $hours = is_array($hours) ? implode(',', $hours) : $hours;
 
         return $this->spliceIntoPosition(1, $minutes)
                     ->spliceIntoPosition(2, $hours);
