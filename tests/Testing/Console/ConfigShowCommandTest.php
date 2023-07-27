@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Config\Console;
+namespace Illuminate\Tests\Testing\Console;
 
 use Illuminate\Foundation\Console\ConfigShowCommand;
 use Orchestra\Testbench\TestCase;
