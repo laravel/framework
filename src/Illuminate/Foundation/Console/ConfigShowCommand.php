@@ -34,6 +34,7 @@ class ConfigShowCommand extends Command
 
         if (! $data) {
             $this->components->error("Config `{$config}` does not exist.");
+
             return Command::FAILURE;
         }
 
@@ -55,6 +56,7 @@ class ConfigShowCommand extends Command
     {
         if (! is_array($data)) {
             $this->title($config, $this->formatValue($data));
+
             return;
         }
 
