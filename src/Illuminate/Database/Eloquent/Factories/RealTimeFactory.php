@@ -304,6 +304,9 @@ class RealTimeFactory extends Factory
         return in_array($key, ['date', 'datetime', 'immutable_date', 'immutable_datetime']);
     }
 
+    /**
+     * Determine whether the given cast is a date cast.
+     */
     protected function isDateType(Type $type): bool
     {
         return $type instanceof DateTimeType;
