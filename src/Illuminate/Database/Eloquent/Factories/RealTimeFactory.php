@@ -140,7 +140,7 @@ class RealTimeFactory extends Factory
             return $value;
         }
 
-        return ($value = $this->valueFromCast($column->getName())) ?
+        return ($value = $this->valueFromCast($column)) ?
             $value :
             $this->valueFromColumn($column);
     }
@@ -176,20 +176,20 @@ class RealTimeFactory extends Factory
             $column->getType() instanceof BlobType,$column->getType() instanceof TextType => fake()->text(),
             $column->getType() instanceof BooleanType => $this->booleanValue(),
             $column->getType() instanceof JsonType,$column->getType() instanceof ArrayType => $this->jsonValue(),
-            default => $this->stringValue(),
+            default => $this->stringValue($column->getLength()),
         };
     }
 
     /**
      * Generate a value using the defined cast for the column.
      */
-    protected function valueFromCast(string $column): mixed
+    protected function valueFromCast(Column $column): mixed
     {
-        if (in_array($column, $this->modelInstance->getDates())) {
+        if (in_array($column->getName(), $this->modelInstance->getDates())) {
             return $this->dateValue();
         }
 
-        if (! $key = $this->modelInstance->getCasts()[$column] ?? null) {
+        if (! $key = $this->modelInstance->getCasts()[$column->getName()] ?? null) {
             return null;
         }
 
@@ -230,7 +230,7 @@ class RealTimeFactory extends Factory
         }
 
         if ($this->isStringCastable($key)) {
-            return $this->stringValue();
+            return $this->stringValue($column->getLength());
         }
 
         return null;
@@ -440,9 +440,9 @@ class RealTimeFactory extends Factory
     /**
      * Generate a string value.
      */
-    protected function stringValue(): string
+    protected function stringValue(?int $columnLength): string
     {
-        return fake()->word();
+        return fake()->text($columnLength ?? 10);
     }
 
     /**

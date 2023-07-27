@@ -343,7 +343,7 @@ class RealTimeFactoryTest extends TestCase
             $type->uuid_morphs_column_id,
             $type->ulid_column,
             $type->uuid_column,
-        ])->every(fn ($value) => is_string($value) && count(explode(' ', $value)) === 1));
+        ])->every(fn ($value) => is_string($value) && strlen($value) <= 10));
 
         $this->assertTrue(collect([
             $type->json_column,
