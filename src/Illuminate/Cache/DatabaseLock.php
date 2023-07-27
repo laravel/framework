@@ -29,9 +29,11 @@ class DatabaseLock extends Lock
     protected $lottery;
 
     /**
-     * @var int expire time used set when no lock time is provided.
+     * The default number of seconds that a lock should be held.
+     *
+     * @var int
      */
-    protected int $defaultTimeoutInSeconds;
+    protected $defaultTimeoutInSeconds;
 
     /**
      * Create a new lock instance.

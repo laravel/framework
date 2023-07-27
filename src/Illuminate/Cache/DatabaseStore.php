@@ -59,9 +59,11 @@ class DatabaseStore implements LockProvider, Store
     protected $lockLottery;
 
     /**
-     * @var int expire time used set when no lock time is provided.
+     * The default number of seconds that a lock should be held.
+     *
+     * @var int
      */
-    protected int $lockDefaultTimeoutInSeconds;
+    protected $defaultLockTimeoutInSeconds;
 
     /**
      * Create a new database store.
@@ -78,14 +80,14 @@ class DatabaseStore implements LockProvider, Store
                                                     $prefix = '',
                                                     $lockTable = 'cache_locks',
                                                     $lockLottery = [2, 100],
-                                                    $lockDefaultTimeoutInSeconds = 86400)
+                                                    $defaultLockTimeoutInSeconds = 86400)
     {
         $this->table = $table;
         $this->prefix = $prefix;
         $this->connection = $connection;
         $this->lockTable = $lockTable;
         $this->lockLottery = $lockLottery;
-        $this->lockDefaultTimeoutInSeconds = $lockDefaultTimeoutInSeconds;
+        $this->defaultLockTimeoutInSeconds = $defaultLockTimeoutInSeconds;
     }
 
     /**
@@ -285,7 +287,7 @@ class DatabaseStore implements LockProvider, Store
             $seconds,
             $owner,
             $this->lockLottery,
-            $this->lockDefaultTimeoutInSeconds
+            $this->defaultLockTimeoutInSeconds
         );
     }
 
