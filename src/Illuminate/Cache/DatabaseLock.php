@@ -4,7 +4,6 @@ namespace Illuminate\Cache;
 
 use Illuminate\Database\Connection;
 use Illuminate\Database\QueryException;
-use Illuminate\Support\Carbon;
 
 class DatabaseLock extends Lock
 {
