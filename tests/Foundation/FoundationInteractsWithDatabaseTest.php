@@ -229,14 +229,14 @@ class FoundationInteractsWithDatabaseTest extends TestCase
             'name' => [
                 'khaled',
                 'waleed',
-            ]
+            ],
         ];
 
         $this->data = [
             'name' => json_encode([
                 'khaled',
                 'waleed',
-            ])
+            ]),
         ];
 
         $this->mockCountBuilder(1);
@@ -478,6 +478,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
         $builder->shouldReceive('where')->with($key, $value)->andReturnSelf();
 
+
         $builder->shouldReceive('select')->with(array_keys($this->data))->andReturnSelf();
 
         $builder->shouldReceive('limit')->andReturnSelf();
@@ -521,6 +522,6 @@ class CustomProductStub extends ProductStub
 class CustomProductStubWithCasts extends ProductStub
 {
     protected $casts = [
-        'name' => 'array'
+        'name' => 'array',
     ];
 }
