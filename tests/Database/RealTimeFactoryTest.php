@@ -225,6 +225,12 @@ class RealTimeFactoryTest extends TestCase
             $table->boolean('public')->default(false);
             $table->timestamps();
         });
+
+        $this->schema()->create('reserved_words', function ($table) {
+            $table->increments('id');
+            $table->string('key');
+            $table->timestamps();
+        });
     }
 
     /**
@@ -246,6 +252,7 @@ class RealTimeFactoryTest extends TestCase
         $this->schema()->drop('comments');
         $this->schema()->drop('tags');
         $this->schema()->drop('taggables');
+        $this->schema()->drop('reserved_words');
 
         Container::setInstance(null);
     }
@@ -578,6 +585,13 @@ class RealTimeFactoryTest extends TestCase
 
         $this->assertNotNull($post->user);
     }
+
+    public function testItCanKeyReservedColumnNames()
+    {
+        $word = ReservedWord::factory()->create();
+
+        $this->assertContains('key', array_keys($word->toArray()));
+    }
 }
 
 class Cast extends Eloquent
@@ -709,6 +723,11 @@ class Tag extends Eloquent
     {
         return $this->morphedByMany(Post::class, 'taggable');
     }
+}
+
+class ReservedWord extends Eloquent
+{
+    use HasRealTimeFactory;
 }
 
 class PostFactory extends Factory
