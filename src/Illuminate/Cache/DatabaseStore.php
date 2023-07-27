@@ -59,6 +59,11 @@ class DatabaseStore implements LockProvider, Store
     protected $lockLottery;
 
     /**
+     * @var int expire time used set when no lock time is provided.
+     */
+    protected int $lockDefaultTimeoutInSeconds;
+
+    /**
      * Create a new database store.
      *
      * @param  \Illuminate\Database\ConnectionInterface  $connection
@@ -69,16 +74,18 @@ class DatabaseStore implements LockProvider, Store
      * @return void
      */
     public function __construct(ConnectionInterface $connection,
-                                $table,
-                                $prefix = '',
-                                $lockTable = 'cache_locks',
-                                $lockLottery = [2, 100])
+                                                    $table,
+                                                    $prefix = '',
+                                                    $lockTable = 'cache_locks',
+                                                    $lockLottery = [2, 100],
+                                                    $lockDefaultTimeoutInSeconds = 86400)
     {
         $this->table = $table;
         $this->prefix = $prefix;
         $this->connection = $connection;
         $this->lockTable = $lockTable;
         $this->lockLottery = $lockLottery;
+        $this->lockDefaultTimeoutInSeconds = $lockDefaultTimeoutInSeconds;
     }
 
     /**
@@ -277,7 +284,8 @@ class DatabaseStore implements LockProvider, Store
             $this->prefix.$name,
             $seconds,
             $owner,
-            $this->lockLottery
+            $this->lockLottery,
+            $this->lockDefaultTimeoutInSeconds
         );
     }
 
