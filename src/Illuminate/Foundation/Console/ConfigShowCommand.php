@@ -91,7 +91,7 @@ class ConfigShowCommand extends Command
      */
     protected function formatKey($key)
     {
-         return preg_replace_callback(
+        return preg_replace_callback(
             '/(.*)\.(.*)$/', fn ($matches) => sprintf(
                 '<fg=gray>%s ⇁</> %s',
                 str_replace('.', ' ⇁ ', $matches[1]),
@@ -101,7 +101,7 @@ class ConfigShowCommand extends Command
     }
 
     /**
-     * Formats the config value
+     * Formats the config value.
      *
      * @param  string  $value
      * @return string
