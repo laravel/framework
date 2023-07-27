@@ -101,12 +101,18 @@ class CacheCommandMutex implements CommandMutex
     }
 
     /**
+     * Get the isolatable command mutex name.
+     *
      * @param  \Illuminate\Console\Command  $command
      * @return string
      */
     protected function commandMutexName($command)
     {
-        return 'framework'.DIRECTORY_SEPARATOR.'command-'.$command->getName();
+        $baseName = 'framework'.DIRECTORY_SEPARATOR.'command-'.$command->getName();
+
+        return method_exists($command, 'isolatableId')
+            ? $baseName.'-'.$command->isolatableId()
+            : $baseName;
     }
 
     /**
