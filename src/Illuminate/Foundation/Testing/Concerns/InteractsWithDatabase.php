@@ -26,11 +26,26 @@ trait InteractsWithDatabase
      */
     protected function assertDatabaseHas($table, array $data, $connection = null)
     {
+        $data = $this->parseData($table, $data);
+
         $this->assertThat(
             $this->getTable($table), new HasInDatabase($this->getConnection($connection, $table), $data)
         );
 
         return $this;
+    }
+
+    protected function parseData($table, array $data): array
+    {
+
+        if (class_exists($table) && new $table() instanceof Model) {
+            /* @var $model Model */
+            $table::unguard();
+
+            return (new $table($data))->newInstance($data)->getAttributes();
+        }
+
+        return $data;
     }
 
     /**

@@ -223,6 +223,27 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertSoftDeleted(new ProductStub($this->data));
     }
 
+    public function testAssertDatabaseHasSupportsModelsCasts()
+    {
+        $data = [
+            'name' => [
+                'khaled',
+                'waleed',
+            ]
+        ];
+
+        $this->data = [
+            'name' => json_encode([
+                'khaled',
+                'waleed',
+            ])
+        ];
+
+        $this->mockCountBuilder(1);
+
+        $this->assertDatabaseHas(CustomProductStubWithCasts::class, $data);
+    }
+
     public function testAssertSoftDeletedInDatabaseDoesNotFindModelWithCustomColumnResults()
     {
         $this->expectException(ExpectationFailedException::class);
@@ -458,4 +479,12 @@ class ProductStub extends Model
 class CustomProductStub extends ProductStub
 {
     const DELETED_AT = 'trashed_at';
+}
+
+
+class CustomProductStubWithCasts extends ProductStub
+{
+    protected $casts = [
+        'name' => 'array'
+    ];
 }
