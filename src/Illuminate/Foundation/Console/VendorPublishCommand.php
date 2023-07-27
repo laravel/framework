@@ -163,8 +163,6 @@ class VendorPublishCommand extends Command
      */
     protected function publishTag($tag)
     {
-        $published = false;
-
         $pathsToPublish = $this->pathsToPublish($tag);
 
         if ($publishing = count($pathsToPublish) > 0) {

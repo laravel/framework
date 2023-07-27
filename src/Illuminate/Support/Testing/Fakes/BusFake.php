@@ -341,11 +341,6 @@ class BusFake implements Fake, QueueingDispatcher
             "The expected [{$command}] job was not dispatched."
         );
 
-        PHPUnit::assertTrue(
-            collect($expectedChain)->isNotEmpty(),
-            'The expected chain can not be empty.'
-        );
-
         $this->isChainOfObjects($expectedChain)
             ? $this->assertDispatchedWithChainOfObjects($command, $expectedChain, $callback)
             : $this->assertDispatchedWithChainOfClasses($command, $expectedChain, $callback);

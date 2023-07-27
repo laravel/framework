@@ -301,8 +301,7 @@ class TrustProxiesTest extends TestCase
     {
         $trustedProxy = $this->createTrustedProxy(
             Request::HEADER_X_FORWARDED_FOR | Request::HEADER_X_FORWARDED_HOST |
-            Request::HEADER_X_FORWARDED_PORT | Request::HEADER_X_FORWARDED_PREFIX |
-            Request::HEADER_X_FORWARDED_PROTO,
+            Request::HEADER_X_FORWARDED_PORT | Request::HEADER_X_FORWARDED_PROTO,
             '*'
         );
 
@@ -316,7 +315,7 @@ class TrustProxiesTest extends TestCase
             $this->assertSame('serversforhackers.com', $request->getHost(),
                 'Assert trusted proxy used forwarded header for host');
             $this->assertEquals(443, $request->getPort(), 'Assert trusted proxy used forwarded header for port');
-            $this->assertSame('/prefix', $request->getBaseUrl(), 'Assert trusted proxy used forwarded header for prefix');
+            $this->assertSame('', $request->getBaseUrl(), 'Assert trusted proxy did not use forwarded header for prefix');
         });
     }
 
@@ -362,7 +361,7 @@ class TrustProxiesTest extends TestCase
      * Fake an HTTP request by generating a Symfony Request object.
      *
      * @param  array  $serverOverrides
-     * @return \Symfony\Component\HttpFoundation\Request
+     * @return \Illuminate\Http\Request
      */
     protected function createProxiedRequest($serverOverrides = [])
     {

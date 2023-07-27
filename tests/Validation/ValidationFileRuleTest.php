@@ -205,6 +205,24 @@ class ValidationFileRuleTest extends TestCase
         );
     }
 
+    public function testMinWithHumanReadableSize()
+    {
+        $this->fails(
+            File::default()->min('1024kb'),
+            UploadedFile::fake()->create('foo.txt', 1023),
+            ['validation.min.file']
+        );
+
+        $this->passes(
+            File::default()->min('1024kb'),
+            [
+                UploadedFile::fake()->create('foo.txt', 1024),
+                UploadedFile::fake()->create('foo.txt', 1025),
+                UploadedFile::fake()->create('foo.txt', 2048),
+            ]
+        );
+    }
+
     public function testMax()
     {
         $this->fails(
@@ -218,6 +236,42 @@ class ValidationFileRuleTest extends TestCase
             [
                 UploadedFile::fake()->create('foo.txt', 1024),
                 UploadedFile::fake()->create('foo.txt', 1023),
+                UploadedFile::fake()->create('foo.txt', 512),
+            ]
+        );
+    }
+
+    public function testMaxWithHumanReadableSize()
+    {
+        $this->fails(
+            File::default()->max('1024kb'),
+            UploadedFile::fake()->create('foo.txt', 1025),
+            ['validation.max.file']
+        );
+
+        $this->passes(
+            File::default()->max('1024kb'),
+            [
+                UploadedFile::fake()->create('foo.txt', 1024),
+                UploadedFile::fake()->create('foo.txt', 1023),
+                UploadedFile::fake()->create('foo.txt', 512),
+            ]
+        );
+    }
+
+    public function testMaxWithHumanReadableSizeAndMultipleValue()
+    {
+        $this->fails(
+            File::default()->max('1mb'),
+            UploadedFile::fake()->create('foo.txt', 1025),
+            ['validation.max.file']
+        );
+
+        $this->passes(
+            File::default()->max('1mb'),
+            [
+                UploadedFile::fake()->create('foo.txt', 1000),
+                UploadedFile::fake()->create('foo.txt', 999),
                 UploadedFile::fake()->create('foo.txt', 512),
             ]
         );
