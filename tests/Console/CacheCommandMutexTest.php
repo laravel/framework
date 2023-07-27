@@ -187,7 +187,7 @@ class CacheCommandMutexTest extends TestCase
         {
             protected $name = 'command-name';
 
-            public function getIsolatedMutexName()
+            public function isolatableId()
             {
                 return 'isolated';
             }
