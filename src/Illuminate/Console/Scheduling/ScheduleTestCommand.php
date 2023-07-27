@@ -52,32 +52,33 @@ class ScheduleTestCommand extends Command
                 return trim(str_replace($commandBinary, '', $commandName)) === $name;
             });
 
-            if (count($matches) === 0) {
+            if (count($matches) !== 1) {
                 $this->components->info('No matching scheduled command found.');
+
                 return;
             }
 
             $index = key($matches);
 
             // Handle multiple matches
-            if (count($matches) >= 1) {
+            if (count($matches) > 1) {
                 $options = array_map(function ($index, $value) {
                     return "$value [$index]";
                 }, array_keys($matches), $matches);
                 $userInput = $this->components->choice('Multiple matching scheduled commands found. Select one:', $options);
                 preg_match('/\[(\d+)\]/', $userInput, $choice);
-                $index = (int)$choice[1];
+                $index = (int) $choice[1];
             }
         } else {
             // if there are multiple scheduled commands with the same description
-            if(count($commandNames) !== count(array_unique($commandNames))){
+            if (count($commandNames) !== count(array_unique($commandNames))) {
                 $options = array_map(function ($index, $value) {
                     return "$value [$index]";
                 }, array_keys($commandNames), $commandNames);
                 $userInput = $this->components->choice('Which command would you like to run?', $options);
                 preg_match('/\[(\d+)\]/', $userInput, $choice);
-                $index = (int)$choice[1];
-            }else{
+                $index = (int) $choice[1];
+            } else {
                 $index = array_search($this->components->choice('Which command would you like to run?', $commandNames), $commandNames);
             }
         }
