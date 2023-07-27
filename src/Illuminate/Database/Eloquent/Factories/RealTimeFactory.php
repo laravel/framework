@@ -487,6 +487,8 @@ class RealTimeFactory extends Factory
             'username' => fn () => fake()->userName(),
             'dob' => fn () => fake()->date(),
             'date_of_birth' => fn () => fake()->date(),
+            'uuid' => fn () => fake()->uuid(),
+            'url' => fn () => fake()->url(),
         ];
     }
 }
