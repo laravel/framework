@@ -330,6 +330,18 @@ trait InteractsWithInput
     }
 
     /**
+     * Retrieve input from the request as a string.
+     *
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return string
+     */
+    public function rawString($key, $default = null)
+    {
+        return (string) $this->input($key, $default);
+    }
+
+    /**
      * Retrieve input as a boolean value.
      *
      * Returns true when value is "1", "true", "on", and "yes". Otherwise, returns false.

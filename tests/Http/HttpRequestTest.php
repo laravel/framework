@@ -613,6 +613,32 @@ class HttpRequestTest extends TestCase
         $this->assertSame('', $request->string('unknown_key')->value());
     }
 
+    public function testRawStringMethod()
+    {
+        $request = Request::create('/', 'GET', [
+            'int' => 123,
+            'int_str' => '456',
+            'float' => 123.456,
+            'float_str' => '123.456',
+            'float_zero' => 0.000,
+            'float_str_zero' => '0.000',
+            'str' => 'abc',
+            'empty_str' => '',
+            'null' => null,
+        ]);
+        $this->assertIsString($request->rawString('int'));
+        $this->assertIsSTring($request->rawString('unknown_key'));
+        $this->assertSame('123', $request->rawString('int'));
+        $this->assertSame('456', $request->rawString('int_str'));
+        $this->assertSame('123.456', $request->rawString('float'));
+        $this->assertSame('123.456', $request->rawString('float_str'));
+        $this->assertSame('0', $request->rawString('float_zero'));
+        $this->assertSame('0.000', $request->rawString('float_str_zero'));
+        $this->assertSame('', $request->rawString('empty_str'));
+        $this->assertSame('', $request->rawString('null'));
+        $this->assertSame('', $request->rawString('unknown_key'));
+    }
+
     public function testBooleanMethod()
     {
         $request = Request::create('/', 'GET', ['with_trashed' => 'false', 'download' => true, 'checked' => 1, 'unchecked' => '0', 'with_on' => 'on', 'with_yes' => 'yes']);
