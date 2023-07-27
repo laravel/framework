@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
+use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'config:show')]
 class ConfigShowCommand extends Command
@@ -20,7 +21,7 @@ class ConfigShowCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Lists all the config values';
 
     /**
      * Execute the console command.
