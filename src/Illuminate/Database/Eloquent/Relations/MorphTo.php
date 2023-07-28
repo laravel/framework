@@ -146,6 +146,10 @@ class MorphTo extends BelongsTo
                                 (array) ($this->morphableEagerLoadCounts[get_class($instance)] ?? [])
                             );
 
+        if ($callback = ($this->morphableConstraints['*'] ?? null)) {
+            $callback($query);
+        }
+
         if ($callback = ($this->morphableConstraints[get_class($instance)] ?? null)) {
             $callback($query);
         }
@@ -363,6 +367,48 @@ class MorphTo extends BelongsTo
         }
 
         return $query;
+    }
+
+    /**
+     * Add the with-trashed to the query when available.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $builder
+     * @return void
+     */
+    public function withTrashed()
+    {
+        $callback = fn ($query) => $query->hasMacro('withTrashed') ? $query->withTrashed() : $query;
+
+        return $this->when(true, $callback)
+            ->constrain(['*' => $callback]);
+    }
+
+    /**
+     * Add the without-trashed to the query when available.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $builder
+     * @return void
+     */
+    public function withoutTrashed()
+    {
+        $callback = fn ($query) => $query->hasMacro('withoutTrashed') ? $query->withoutTrashed() : $query;
+
+        return $this->when(true, $callback)
+            ->constrain(['*' => $callback]);
+    }
+
+    /**
+     * Add the only-trashed to the query when available.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $builder
+     * @return void
+     */
+    public function onlyTrashed()
+    {
+        $callback = fn ($query) => $query->hasMacro('onlyTrashed') ? $query->onlyTrashed() : $query;
+
+        return $this->when(true, $callback)
+            ->constrain(['*' => $callback]);
     }
 
     /**
