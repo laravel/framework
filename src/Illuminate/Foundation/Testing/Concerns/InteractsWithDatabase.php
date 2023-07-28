@@ -106,7 +106,12 @@ trait InteractsWithDatabase
         }
 
         $this->assertThat(
-            $this->getTable($table), new SoftDeletedInDatabase($this->getConnection($connection, $table), $data, $deletedAtColumn)
+            $this->getTable($table),
+            new SoftDeletedInDatabase(
+                $this->getConnection($connection, $table),
+                $data,
+                $this->getDeletedAtColumn($table, $deletedAtColumn)
+            )
         );
 
         return $this;
@@ -115,7 +120,7 @@ trait InteractsWithDatabase
     /**
      * Assert the given record has not been "soft deleted".
      *
-     * @param  \Illuminate\Database\Eloquent\Model|string  $table
+     * @param  \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\SoftDeletes|string  $table
      * @param  array  $data
      * @param  string|null  $connection
      * @param  string|null  $deletedAtColumn
@@ -133,7 +138,12 @@ trait InteractsWithDatabase
         }
 
         $this->assertThat(
-            $this->getTable($table), new NotSoftDeletedInDatabase($this->getConnection($connection, $table), $data, $deletedAtColumn)
+            $this->getTable($table),
+            new NotSoftDeletedInDatabase(
+                $this->getConnection($connection, $table),
+                $data,
+                $this->getDeletedAtColumn($table, $deletedAtColumn)
+            )
         );
 
         return $this;
@@ -268,6 +278,19 @@ trait InteractsWithDatabase
     protected function getTableConnection($table)
     {
         return $this->newModelFor($table)?->getConnectionName();
+    }
+
+    /**
+     * Get the table column name used for soft deletes.
+     *
+     * @param  string  $table
+     * @param  string  $defaultColumnName
+     *
+     * @return string
+     */
+    protected function getDeletedAtColumn($table, $defaultColumnName = 'deleted_at')
+    {
+        return $this->newModelFor($table)?->getDeletedAtColumn() ?: $defaultColumnName;
     }
 
     /**
