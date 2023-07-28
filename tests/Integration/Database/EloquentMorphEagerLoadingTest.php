@@ -27,10 +27,18 @@ class EloquentMorphEagerLoadingTest extends DatabaseTestCase
             $table->increments('video_id');
         });
 
+        Schema::create('actions', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('target_type');
+            $table->integer('target_id');
+        });
+
         Schema::create('comments', function (Blueprint $table) {
             $table->increments('id');
             $table->string('commentable_type');
             $table->integer('commentable_id');
+            $table->string('target_type')->nullable();
+            $table->integer('target_id')->nullable();
         });
 
         $user = User::create();
@@ -42,7 +50,9 @@ class EloquentMorphEagerLoadingTest extends DatabaseTestCase
 
         (new Comment)->commentable()->associate($post)->save();
         (new Comment)->commentable()->associate($video)->save();
-        (new Comment)->commentable()->associate($user2)->save();
+
+        (new Action)->target()->associate($video)->save();
+        (new Action)->target()->associate($user2)->save();
     }
 
     public function testWithMorphLoading()
@@ -53,13 +63,13 @@ class EloquentMorphEagerLoadingTest extends DatabaseTestCase
             }])
             ->get();
 
-        $this->assertCount(3, $comments);
+        $this->assertCount(2, $comments);
 
         $this->assertTrue($comments[0]->relationLoaded('commentable'));
+        $this->assertInstanceOf(Post::class, $comments[0]->getRelation('commentable'));
         $this->assertTrue($comments[0]->commentable->relationLoaded('user'));
         $this->assertTrue($comments[1]->relationLoaded('commentable'));
-        $this->assertTrue($comments[2]->relationLoaded('commentable'));
-        $this->assertNull($comments[2]->commentable);
+        $this->assertInstanceOf(Video::class, $comments[1]->getRelation('commentable'));
     }
 
     public function testWithMorphLoadingWithSingleRelation()
@@ -76,17 +86,27 @@ class EloquentMorphEagerLoadingTest extends DatabaseTestCase
 
     public function testMorphLoadingMixedWithTrashedRelations()
     {
-        $comments = Comment::query()
-            ->with('commentable_with_trashed')
+        $action = Action::query()
+            ->with('target')
             ->get();
 
-        $this->assertCount(3, $comments);
+        $this->assertCount(2, $action);
 
-        $this->assertTrue($comments[0]->relationLoaded('commentable_with_trashed'));
-        $this->assertNull($comments[0]->getRelation('commentable_with_trashed'));
-        $this->assertTrue($comments[1]->relationLoaded('commentable_with_trashed'));
-        $this->assertTrue($comments[2]->relationLoaded('commentable_with_trashed'));
-        $this->assertNull($comments[2]->getRelation('commentable_with_trashed'));
+        $this->assertTrue($action[0]->relationLoaded('target'));
+        $this->assertInstanceOf(Video::class, $action[0]->getRelation('target'));
+        $this->assertTrue($action[1]->relationLoaded('target'));
+        $this->assertInstanceOf(User::class, $action[1]->getRelation('target'));
+    }
+}
+
+
+class Action extends Model
+{
+    public $timestamps = false;
+
+    public function target()
+    {
+        return $this->morphTo()->withTrashed();
     }
 }
 
@@ -97,11 +117,6 @@ class Comment extends Model
     public function commentable()
     {
         return $this->morphTo();
-    }
-
-    public function commentable_with_trashed()
-    {
-        return $this->morphTo('commentable')->withTrashed();
     }
 }
 
