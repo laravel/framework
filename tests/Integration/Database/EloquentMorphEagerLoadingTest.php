@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Database\EloquentMorphEagerLoadingTest;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
@@ -14,6 +15,7 @@ class EloquentMorphEagerLoadingTest extends DatabaseTestCase
     {
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
+            $table->softDeletes();
         });
 
         Schema::create('posts', function (Blueprint $table) {
@@ -32,6 +34,7 @@ class EloquentMorphEagerLoadingTest extends DatabaseTestCase
         });
 
         $user = User::create();
+        $user2 = User::forceCreate(['deleted_at' => now()]);
 
         $post = tap((new Post)->user()->associate($user))->save();
 
@@ -39,6 +42,7 @@ class EloquentMorphEagerLoadingTest extends DatabaseTestCase
 
         (new Comment)->commentable()->associate($post)->save();
         (new Comment)->commentable()->associate($video)->save();
+        (new Comment)->commentable()->associate($user2)->save();
     }
 
     public function testWithMorphLoading()
@@ -49,9 +53,13 @@ class EloquentMorphEagerLoadingTest extends DatabaseTestCase
             }])
             ->get();
 
+        $this->assertCount(3, $comments);
+
         $this->assertTrue($comments[0]->relationLoaded('commentable'));
         $this->assertTrue($comments[0]->commentable->relationLoaded('user'));
         $this->assertTrue($comments[1]->relationLoaded('commentable'));
+        $this->assertTrue($comments[2]->relationLoaded('commentable'));
+        $this->assertNull($comments[2]->commentable);
     }
 
     public function testWithMorphLoadingWithSingleRelation()
@@ -72,9 +80,13 @@ class EloquentMorphEagerLoadingTest extends DatabaseTestCase
             ->with('commentable_with_trashed')
             ->get();
 
+        $this->assertCount(3, $comments);
+
         $this->assertTrue($comments[0]->relationLoaded('commentable_with_trashed'));
         $this->assertNull($comments[0]->getRelation('commentable_with_trashed'));
         $this->assertTrue($comments[1]->relationLoaded('commentable_with_trashed'));
+        $this->assertTrue($comments[2]->relationLoaded('commentable_with_trashed'));
+        $this->assertNull($comments[2]->getRelation('commentable_with_trashed'));
     }
 }
 
@@ -89,7 +101,7 @@ class Comment extends Model
 
     public function commentable_with_trashed()
     {
-        return $this->commentable()->withTrashed();
+        return $this->morphTo('commentable')->withTrashed();
     }
 }
 
@@ -106,6 +118,8 @@ class Post extends Model
 
 class User extends Model
 {
+    use SoftDeletes;
+
     public $timestamps = false;
 }
 
