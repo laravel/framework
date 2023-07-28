@@ -18,6 +18,7 @@ use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Exceptions\BackedEnumCaseNotFoundException;
 use Illuminate\Routing\Router;
@@ -384,7 +385,7 @@ class Handler implements ExceptionHandlerContract
      *
      * @throws \Throwable
      */
-    public function render($request, Throwable $e)
+    public function render(Request $request, Throwable $e)
     {
         $e = $this->mapException($e);
 

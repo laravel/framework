@@ -2,6 +2,7 @@
 
 namespace Illuminate\Contracts\Debug;
 
+use Illuminate\Http\Request;
 use Throwable;
 
 interface ExceptionHandler
@@ -33,7 +34,7 @@ interface ExceptionHandler
      *
      * @throws \Throwable
      */
-    public function render($request, Throwable $e);
+    public function render(Request $request, Throwable $e);
 
     /**
      * Render an exception to the console.
