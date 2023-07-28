@@ -486,6 +486,19 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->assertSame($newFoo->id, $user->last_updated_foo_state->id);
     }
 
+    public function testCanProvideOnlyAggregateFunction()
+    {
+        $user = HasOneOfManyTestUser::create();
+        $user->prices()->create([
+            'published_at' => today(),
+        ]);
+        $lastMonthPrice = $user->prices()->create([
+            'published_at' => today()->subMonth(),
+        ]);
+
+        $this->assertSame($lastMonthPrice->id, $user->price_last_month->id);
+    }
+
     /**
      * Get a database connection instance.
      *
@@ -610,6 +623,13 @@ class HasOneOfManyTestUser extends Eloquent
     public function price_with_shortcut()
     {
         return $this->hasOne(HasOneOfManyTestPrice::class, 'user_id')->latestOfMany(['published_at', 'id']);
+    }
+
+    public function price_last_month()
+    {
+        return $this->hasOne(HasOneOfManyTestPrice::class, 'user_id')->ofMany(null, function ($q) {
+            $q->where('published_at', '<', today()->startOfMonth());
+        });
     }
 
     public function price_without_global_scope()
