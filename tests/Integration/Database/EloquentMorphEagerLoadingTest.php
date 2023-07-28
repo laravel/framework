@@ -39,6 +39,7 @@ class EloquentMorphEagerLoadingTest extends DatabaseTestCase
 
         (new Comment)->commentable()->associate($post)->save();
         (new Comment)->commentable()->associate($video)->save();
+        (new Comment)->commentable()->associate($user)->save();
     }
 
     public function testWithMorphLoading()
@@ -52,6 +53,7 @@ class EloquentMorphEagerLoadingTest extends DatabaseTestCase
         $this->assertTrue($comments[0]->relationLoaded('commentable'));
         $this->assertTrue($comments[0]->commentable->relationLoaded('user'));
         $this->assertTrue($comments[1]->relationLoaded('commentable'));
+        $this->assertTrue($comments[2]->relationLoaded('commentable'));
     }
 
     public function testWithMorphLoadingWithSingleRelation()
@@ -65,6 +67,18 @@ class EloquentMorphEagerLoadingTest extends DatabaseTestCase
         $this->assertTrue($comments[0]->relationLoaded('commentable'));
         $this->assertTrue($comments[0]->commentable->relationLoaded('user'));
     }
+
+    public function testMorphLoadingMixedWithTrashedRelations()
+    {
+        $comments = Comment::query()
+            ->with('commentable_with_trashed')
+            ->get();
+
+        $this->assertTrue($comments[0]->relationLoaded('commentable_with_trashed'));
+        $this->assertNull($comments[0]->getRelation('commentable_with_trashed'));
+        $this->assertTrue($comments[1]->relationLoaded('commentable_with_trashed'));
+        $this->assertTrue($comments[2]->relationLoaded('commentable_with_trashed'));
+    }
 }
 
 class Comment extends Model
@@ -74,6 +88,11 @@ class Comment extends Model
     public function commentable()
     {
         return $this->morphTo();
+    }
+
+    public function commentable_with_trashed()
+    {
+        return $this->commentable()->withTrashed();
     }
 }
 
