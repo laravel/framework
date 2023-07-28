@@ -66,7 +66,7 @@ trait CanBeOneOfMany
      *
      * @throws \InvalidArgumentException
      */
-    public function ofMany($column = null, $aggregate = null, $relation = null)
+    public function ofMany($column = 'id', $aggregate = 'MAX', $relation = null)
     {
         $this->isOneOfMany = true;
 
@@ -77,6 +77,12 @@ trait CanBeOneOfMany
         $keyName = $this->query->getModel()->getKeyName();
 
         $column = is_null($column) ? [] : $column;
+        $aggregate ??= 'MAX';
+
+        if ($aggregate instanceof Closure) {
+            $closure = $aggregate;
+            $aggregate = 'MAX';
+        }
 
         $columns = is_string($columns = $column) ? [
             $column => $aggregate,
@@ -85,10 +91,6 @@ trait CanBeOneOfMany
 
         if (! array_key_exists($keyName, $columns)) {
             $columns[$keyName] = 'MAX';
-        }
-
-        if ($aggregate instanceof Closure) {
-            $closure = $aggregate;
         }
 
         foreach ($columns as $column => $aggregate) {
