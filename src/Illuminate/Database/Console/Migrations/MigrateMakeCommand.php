@@ -136,6 +136,7 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
 
         if (empty($ide)) {
             $this->components->warn('Please set the LARAVEL_IDE environment variable');
+            
             return;
         }
 
