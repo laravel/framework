@@ -813,10 +813,16 @@ abstract class Factory
      *
      * @param  class-string<\Illuminate\Database\Eloquent\Model>  $modelName
      * @return \Illuminate\Database\Eloquent\Factories\Factory
+     *
+     * @throws \Illuminate\Database\Eloquent\Factories\FactoryNotFoundException
      */
     public static function factoryForModel(string $modelName)
     {
         $factory = static::resolveFactoryName($modelName);
+
+        if (! class_exists($factory)) {
+            throw new FactoryNotFoundException($factory);
+        }
 
         return $factory::new();
     }
@@ -906,10 +912,14 @@ abstract class Factory
 
         $relatedModel = get_class($this->newModel()->{$relationship}()->getRelated());
 
-        if (method_exists($relatedModel, 'newFactory')) {
-            $factory = $relatedModel::newFactory() ?? static::factoryForModel($relatedModel);
-        } else {
-            $factory = static::factoryForModel($relatedModel);
+        try {
+            if (method_exists($relatedModel, 'newFactory')) {
+                $factory = $relatedModel::newFactory() ?? static::factoryForModel($relatedModel);
+            } else {
+                $factory = static::factoryForModel($relatedModel);
+            }
+        } catch (FactoryNotFoundException $e) {
+            $factory = $relatedModel::newRealTimeFactory();
         }
 
         if (str_starts_with($method, 'for')) {

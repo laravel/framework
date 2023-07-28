@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Casts\AsEncryptedArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsEncryptedCollection;
 use Illuminate\Database\Eloquent\Casts\AsEnumCollection;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Database\Eloquent\Factories\HasRealTimeFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\QueryException;
 use Illuminate\Encryption\Encrypter;
@@ -581,7 +581,7 @@ class RealTimeFactoryTest extends TestCase
 
     public function testItCanBeUsedToDefineARelationWithinAFactory()
     {
-        $post = PostFactory::new()->create();
+        $post = PostDummyFactory::new()->create();
 
         $this->assertNotNull($post->user);
     }
@@ -598,7 +598,7 @@ class RealTimeFactoryTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Real-time factories cannot be instantiated with new()');
 
-        Post::factory()->times(3);
+        User::factory()->times(3);
     }
 
     public function testIgnoresPrimaryAndForeignKeysFromDefinition()
@@ -612,7 +612,7 @@ class RealTimeFactoryTest extends TestCase
 
 class Cast extends Eloquent
 {
-    use HasRealTimeFactory;
+    use HasFactory;
 
     protected $casts = [
         'array_column' => 'array',
@@ -648,27 +648,27 @@ class Cast extends Eloquent
 
 class Type extends Eloquent
 {
-    use HasRealTimeFactory;
+    use HasFactory;
 }
 
 class Nullable extends Eloquent
 {
-    use HasRealTimeFactory;
+    use HasFactory;
 }
 
 class Guess extends Eloquent
 {
-    use HasRealTimeFactory;
+    use HasFactory;
 }
 
 class Key extends Eloquent
 {
-    use HasRealTimeFactory;
+    use HasFactory;
 }
 
 class User extends Eloquent
 {
-    use HasRealTimeFactory;
+    use HasFactory;
 
     public function posts()
     {
@@ -685,7 +685,7 @@ class User extends Eloquent
 
 class Post extends Eloquent
 {
-    use HasRealTimeFactory;
+    use HasFactory;
 
     protected $casts = [
         'published' => 'boolean',
@@ -711,7 +711,7 @@ class Post extends Eloquent
 
 class Role extends Eloquent
 {
-    use HasRealTimeFactory;
+    use HasFactory;
 
     public function users()
     {
@@ -723,7 +723,7 @@ class Role extends Eloquent
 
 class Comment extends Eloquent
 {
-    use HasRealTimeFactory;
+    use HasFactory;
 
     public function commentable()
     {
@@ -733,7 +733,7 @@ class Comment extends Eloquent
 
 class Tag extends Eloquent
 {
-    use HasRealTimeFactory;
+    use HasFactory;
 
     public function posts()
     {
@@ -743,10 +743,10 @@ class Tag extends Eloquent
 
 class ReservedWord extends Eloquent
 {
-    use HasRealTimeFactory;
+    use HasFactory;
 }
 
-class PostFactory extends Factory
+class PostDummyFactory extends Factory
 {
     protected $model = Post::class;
 
