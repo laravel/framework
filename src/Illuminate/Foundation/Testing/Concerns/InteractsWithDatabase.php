@@ -285,7 +285,6 @@ trait InteractsWithDatabase
      *
      * @param  string  $table
      * @param  string  $defaultColumnName
-     *
      * @return string
      */
     protected function getDeletedAtColumn($table, $defaultColumnName = 'deleted_at')
