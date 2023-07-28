@@ -5,6 +5,7 @@ namespace Illuminate\Database\Console\Migrations;
 use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Illuminate\Database\Migrations\MigrationCreator;
 use Illuminate\Support\Composer;
+use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Str;
 
 class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
@@ -19,7 +20,8 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
         {--table= : The table to migrate}
         {--path= : The location where the migration file should be created}
         {--realpath : Indicate any provided migration file paths are pre-resolved absolute paths}
-        {--fullpath : Output the full path of the migration (Deprecated)}';
+        {--fullpath : Output the full path of the migration (Deprecated)}
+        {--open : Open the newly created migration file in the default editor set in LARAVEL_IDE environment variable}';
 
     /**
      * The console command description.
@@ -43,6 +45,12 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
      * @deprecated Will be removed in a future Laravel version.
      */
     protected $composer;
+
+    /**
+     * The created migration file path.
+     * @var string
+     */
+    protected $file;
 
     /**
      * Create a new migration install command instance.
@@ -95,6 +103,10 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
         // the migration out, we will dump-autoload for the entire framework to
         // make sure that the migrations are registered by the class loaders.
         $this->writeMigration($name, $table, $create);
+
+        if ($this->input->getOption('open')) {
+            $this->openMigrationFile();
+        }
     }
 
     /**
@@ -107,11 +119,30 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
      */
     protected function writeMigration($name, $table, $create)
     {
-        $file = $this->creator->create(
+        $this->file = $this->creator->create(
             $name, $this->getMigrationPath(), $table, $create
         );
 
-        $this->components->info(sprintf('Migration [%s] created successfully.', $file));
+        $this->components->info(sprintf('Migration [%s] created successfully.', $this->file));
+    }
+
+    /**
+     * Open the created migration file in the editor.
+     */
+    protected function openMigrationFile()
+    {
+        $ide = env('LARAVEL_IDE');
+
+        if (empty($ide)) {
+            $this->components->warn('Please set the LARAVEL_IDE environment variable');
+            return;
+        }
+
+        if (file_exists($this->file)) {
+            Process::run([$ide, $this->file]);
+        } else {
+            $this->components->error("Migration file not found: {$this->file}");
+        }
     }
 
     /**
@@ -123,8 +154,8 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
     {
         if (! is_null($targetPath = $this->input->getOption('path'))) {
             return ! $this->usingRealPath()
-                            ? $this->laravel->basePath().'/'.$targetPath
-                            : $targetPath;
+                ? $this->laravel->basePath().'/'.$targetPath
+                : $targetPath;
         }
 
         return parent::getMigrationPath();
