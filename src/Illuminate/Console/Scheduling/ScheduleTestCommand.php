@@ -63,7 +63,6 @@ class ScheduleTestCommand extends Command
             if (count($matches) > 1) {
                 $index = $this->getSelectedCommandByIndex($matches);
             }
-
         } else {
             $index = $this->getSelectedCommandByIndex($commandNames);
         }
