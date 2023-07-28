@@ -120,7 +120,7 @@ trait InteractsWithDatabase
     /**
      * Assert the given record has not been "soft deleted".
      *
-     * @param  \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\SoftDeletes|string  $table
+     * @param  \Illuminate\Database\Eloquent\Model|string  $table
      * @param  array  $data
      * @param  string|null  $connection
      * @param  string|null  $deletedAtColumn
