@@ -99,7 +99,6 @@ class EloquentMorphEagerLoadingTest extends DatabaseTestCase
     }
 }
 
-
 class Action extends Model
 {
     public $timestamps = false;
