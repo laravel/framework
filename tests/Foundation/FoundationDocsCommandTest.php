@@ -48,10 +48,10 @@ class FoundationDocsCommandTest extends TestCase
     {
         $this->artisan('docs')
             ->expectsQuestion('Which page would you like to open?', '')
-            ->expectsOutputToContain('Opening the docs to: https://laravel.com/docs/8.x')
+            ->expectsOutputToContain('Opening the docs to: https://laravel.com/docs/8.x/installation')
             ->assertSuccessful();
 
-        $this->assertSame($this->openedUrl, 'https://laravel.com/docs/8.x');
+        $this->assertSame($this->openedUrl, 'https://laravel.com/docs/8.x/installation');
     }
 
     public function testItCanSpecifyAutocompleteInOriginalCasing(): void

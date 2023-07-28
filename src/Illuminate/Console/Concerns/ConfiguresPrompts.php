@@ -24,7 +24,7 @@ trait ConfiguresPrompts
     {
         Prompt::setOutput($this->output);
 
-        Prompt::fallbackWhen(! $input->isInteractive() || windows_os() || app()->runningUnitTests());
+        Prompt::fallbackWhen(! $input->isInteractive() || windows_os() || $this->laravel->runningUnitTests());
 
         TextPrompt::fallbackUsing(fn (TextPrompt $prompt) => $this->promptUntilValid(
             fn () => $this->components->ask($prompt->label, $prompt->default ?: null) ?? '',
