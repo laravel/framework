@@ -372,43 +372,52 @@ class MorphTo extends BelongsTo
     /**
      * Add the with-trashed to the query when available.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $builder
-     * @return void
+     * @return $this
      */
     public function withTrashed()
     {
         $callback = fn ($query) => $query->hasMacro('withTrashed') ? $query->withTrashed() : $query;
 
-        return $this->when(true, $callback)
-            ->constrain(['*' => $callback]);
+        $this->macroBuffer[] = [
+            'method' => 'when',
+            'parameters' => [true, $callback],
+        ];
+
+        return $this->when(true, $callback);
     }
 
     /**
      * Add the without-trashed to the query when available.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $builder
-     * @return void
+     * @return $this
      */
     public function withoutTrashed()
     {
         $callback = fn ($query) => $query->hasMacro('withoutTrashed') ? $query->withoutTrashed() : $query;
 
-        return $this->when(true, $callback)
-            ->constrain(['*' => $callback]);
+        $this->macroBuffer[] = [
+            'method' => 'when',
+            'parameters' => [true, $callback],
+        ];
+
+        return $this->when(true, $callback);
     }
 
     /**
      * Add the only-trashed to the query when available.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $builder
-     * @return void
+     * @return $this
      */
     public function onlyTrashed()
     {
         $callback = fn ($query) => $query->hasMacro('onlyTrashed') ? $query->onlyTrashed() : $query;
 
-        return $this->when(true, $callback)
-            ->constrain(['*' => $callback]);
+        $this->macroBuffer[] = [
+            'method' => 'when',
+            'parameters' => [true, $callback],
+        ];
+
+        return $this->when(true, $callback);
     }
 
     /**
