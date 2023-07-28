@@ -14,14 +14,14 @@ class ConfigShowCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'config:show {config : The config to show}';
+    protected $signature = 'config:show {config : The configuration file to show}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Lists all the config values';
+    protected $description = 'Display all of the values for a given configuration file';
 
     /**
      * Execute the console command.
@@ -31,37 +31,38 @@ class ConfigShowCommand extends Command
     public function handle()
     {
         $config = $this->argument('config');
+
         $data = config($config);
 
         if (! $data) {
-            $this->components->error("Config `{$config}` does not exist.");
+            $this->components->error("Configuration file `{$config}` does not exist.");
 
             return Command::FAILURE;
         }
 
         $this->newLine();
-        $this->display($config, $data);
+        $this->render($config, $data);
         $this->newLine();
 
         return Command::SUCCESS;
     }
 
     /**
-     * Render the config information.
+     * Render the configuration values.
      *
-     * @param  string  $config
+     * @param  string  $name
      * @param  mixed  $data
      * @return void
      */
-    public function display($config, $data)
+    public function render($name, $data)
     {
         if (! is_array($data)) {
-            $this->title($config, $this->formatValue($data));
+            $this->title($name, $this->formatValue($data));
 
             return;
         }
 
-        $this->title($config);
+        $this->title($name);
 
         foreach (Arr::dot($data) as $key => $value) {
             $this->components->twoColumnDetail(
@@ -72,7 +73,7 @@ class ConfigShowCommand extends Command
     }
 
     /**
-     * Renders the title.
+     * Render the title.
      *
      * @param  string  $title
      * @param  string|null  $subtitle
@@ -87,7 +88,7 @@ class ConfigShowCommand extends Command
     }
 
     /**
-     * Formats the config key.
+     * Format the given configuration key.
      *
      * @param  string  $key
      * @return string
@@ -104,9 +105,9 @@ class ConfigShowCommand extends Command
     }
 
     /**
-     * Formats the config value.
+     * Format the given configuration value.
      *
-     * @param  string  $value
+     * @param  mixed  $value
      * @return string
      */
     protected function formatValue($value)
