@@ -48,6 +48,7 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
 
     /**
      * The created migration file path.
+     * 
      * @var string
      */
     protected $file;
