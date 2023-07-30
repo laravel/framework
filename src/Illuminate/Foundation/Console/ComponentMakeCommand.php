@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Str;
@@ -11,6 +12,8 @@ use Symfony\Component\Console\Input\InputOption;
 #[AsCommand(name: 'make:component')]
 class ComponentMakeCommand extends GeneratorCommand
 {
+    use CreatesMatchingTest;
+
     /**
      * The console command name.
      *
