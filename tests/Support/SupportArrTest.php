@@ -1004,6 +1004,45 @@ class SupportArrTest extends TestCase
         $this->assertSame('font-weight: bold; margin-top: 4px; margin-left: 2px;', $styles);
     }
 
+    public function testToHtmlAttributes()
+    {
+        $attributes = Arr::toHtmlAttributes([])->toHtml();
+
+        $this->assertSame('', $attributes);
+
+        $attributes = Arr::toHtmlAttributes([
+            'class' => 'font-bold',
+            'id' => 'foo',
+            'style' => 'margin-top: 4px;',
+        ])->toHtml();
+
+        $this->assertSame('class="font-bold" id="foo" style="margin-top: 4px;"', $attributes);
+
+        $attributes = Arr::toHtmlAttributes([
+            'class' => 'font-bold',
+            'id' => 'foo',
+            'style' => 'margin-top: 4px;',
+            'disabled' => true,
+            'required' => false,
+        ])->toHtml();
+
+        $this->assertSame('class="font-bold" id="foo" style="margin-top: 4px;" disabled', $attributes);
+
+        $attributes = Arr::toHtmlAttributes([
+            'class' => 'font-bold',
+            'id' => 'foo',
+            'style' => 'margin-top: 4px;',
+            'disabled' => true,
+            'required' => false,
+            'data' => [
+                'foo' => 'bar',
+                'baz' => 'qux',
+            ],
+        ])->toHtml();
+
+        $this->assertSame('class="font-bold" id="foo" style="margin-top: 4px;" disabled data-foo="bar" data-baz="qux"', $attributes);
+    }
+
     public function testWhere()
     {
         $array = [100, '200', 300, '400', 500];

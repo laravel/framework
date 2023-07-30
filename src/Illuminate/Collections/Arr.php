@@ -858,6 +858,33 @@ class Arr
     }
 
     /**
+     * Convert an array of attributes to a string.
+     *
+     * @param  array  $array
+     * @return HtmlString
+     */
+    public static function toHtmlAttributes($array)
+    {
+        $htmlAttributes = static::wrap($array);
+
+        $attributes = [];
+
+        foreach ($htmlAttributes as $attribute => $constraint) {
+            if ($constraint === true) {
+                $attributes[] = $attribute;
+            } elseif (is_array($constraint)) {
+                foreach ($constraint as $key => $value) {
+                    $attributes[] = sprintf('%s-%s="%s"', $attribute, $key, htmlentities($value));
+                }
+            } elseif ($constraint) {
+                $attributes[] = sprintf('%s="%s"', $attribute, htmlentities($constraint));
+            }
+        }
+
+        return new HtmlString(implode(' ', $attributes));
+    }
+
+    /**
      * Filter the array using the given callback.
      *
      * @param  array  $array
