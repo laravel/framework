@@ -3495,7 +3495,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $connection->expects($this->once())
                     ->method('update')
                     ->with(
-                        'update `users` set `name` = json_set(`name`, \'$."first_name"\', ?), `name` = json_set(`name`, \'$."last_name"\', ?) where `active` = ?',
+                        'update `users` set `name` = json_set(coalesce(`name`, \'{}\'), \'$."first_name"\', ?), `name` = json_set(coalesce(`name`, \'{}\'), \'$."last_name"\', ?) where `active` = ?',
                         ['John', 'Doe', 1]
                     );
 
@@ -3513,7 +3513,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $connection->expects($this->once())
                     ->method('update')
                     ->with(
-                        'update `users` set `meta` = json_set(`meta`, \'$."name"."first_name"\', ?), `meta` = json_set(`meta`, \'$."name"."last_name"\', ?) where `active` = ?',
+                        'update `users` set `meta` = json_set(coalesce(`meta`, \'{}\'), \'$."name"."first_name"\', ?), `meta` = json_set(coalesce(`meta`, \'{}\'), \'$."name"."last_name"\', ?) where `active` = ?',
                         ['John', 'Doe', 1]
                     );
 
@@ -3531,7 +3531,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $connection->expects($this->once())
                     ->method('update')
                     ->with(
-                        'update `users` set `options` = ?, `meta` = json_set(`meta`, \'$."tags"\', cast(? as json)), `group_id` = 45, `created_at` = ? where `active` = ?',
+                        'update `users` set `options` = ?, `meta` = json_set(coalesce(`meta`, \'{}\'), \'$."tags"\', cast(? as json)), `group_id` = 45, `created_at` = ? where `active` = ?',
                         [
                             json_encode(['2fa' => false, 'presets' => ['laravel', 'vue']]),
                             json_encode(['white', 'large']),
@@ -3558,7 +3558,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $connection->expects($this->once())
                     ->method('update')
                     ->with(
-                        'update `users` set `options` = json_set(`options`, \'$[1]."2fa"\', false), `meta` = json_set(`meta`, \'$."tags"[0][2]\', ?) where `active` = ?',
+                        'update `users` set `options` = json_set(coalesce(`options`, \'{}\'), \'$[1]."2fa"\', false), `meta` = json_set(coalesce(`meta`, \'{}\'), \'$."tags"[0][2]\', ?) where `active` = ?',
                         [
                             'large',
                             1,
@@ -3581,7 +3581,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $connection->shouldReceive('update')
                     ->once()
                     ->with(
-                        'update `users` set `options` = json_set(`options`, \'$."enable"\', false), `updated_at` = ? where `id` = ?',
+                        'update `users` set `options` = json_set(coalesce(`options`, \'{}\'), \'$."enable"\', false), `updated_at` = ? where `id` = ?',
                         ['2015-05-26 22:02:06', 0]
                     );
         $builder = new Builder($connection, $grammar, $processor);
@@ -3590,18 +3590,18 @@ class DatabaseQueryBuilderTest extends TestCase
         $connection->shouldReceive('update')
             ->once()
             ->with(
-                'update `users` set `options` = json_set(`options`, \'$."size"\', ?), `updated_at` = ? where `id` = ?',
+                'update `users` set `options` = json_set(coalesce(`options`, \'{}\'), \'$."size"\', ?), `updated_at` = ? where `id` = ?',
                 [45, '2015-05-26 22:02:06', 0]
             );
         $builder = new Builder($connection, $grammar, $processor);
         $builder->from('users')->where('id', '=', 0)->update(['options->size' => 45, 'updated_at' => '2015-05-26 22:02:06']);
 
         $builder = $this->getMySqlBuilder();
-        $builder->getConnection()->shouldReceive('update')->once()->with('update `users` set `options` = json_set(`options`, \'$."size"\', ?)', [null]);
+        $builder->getConnection()->shouldReceive('update')->once()->with('update `users` set `options` = json_set(coalesce(`options`, \'{}\'), \'$."size"\', ?)', [null]);
         $builder->from('users')->update(['options->size' => null]);
 
         $builder = $this->getMySqlBuilder();
-        $builder->getConnection()->shouldReceive('update')->once()->with('update `users` set `options` = json_set(`options`, \'$."size"\', 45)', []);
+        $builder->getConnection()->shouldReceive('update')->once()->with('update `users` set `options` = json_set(coalesce(`options`, \'{}\'), \'$."size"\', 45)', []);
         $builder->from('users')->update(['options->size' => new Raw('45')]);
     }
 

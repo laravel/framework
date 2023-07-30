@@ -273,7 +273,7 @@ class MySqlGrammar extends Grammar
 
         [$field, $path] = $this->wrapJsonFieldAndPath($key);
 
-        return "{$field} = json_set({$field}{$path}, {$value})";
+        return "{$field} = json_set(coalesce({$field}, '{}'){$path}, {$value})";
     }
 
     /**
