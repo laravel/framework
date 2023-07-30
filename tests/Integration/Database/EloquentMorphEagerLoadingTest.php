@@ -37,8 +37,6 @@ class EloquentMorphEagerLoadingTest extends DatabaseTestCase
             $table->increments('id');
             $table->string('commentable_type');
             $table->integer('commentable_id');
-            $table->string('target_type')->nullable();
-            $table->integer('target_id')->nullable();
         });
 
         $user = User::create();
