@@ -676,7 +676,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function getClassForCallable($callback)
     {
-        if (! is_callable($callback) 
+        if (! is_callable($callback)
             || ($reflector = new ReflectionFunction($callback(...)))->isAnonymous()) {
             return false;
         }
