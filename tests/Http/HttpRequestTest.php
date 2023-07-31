@@ -1571,4 +1571,20 @@ class HttpRequestTest extends TestCase
         $this->assertInstanceOf(InputBag::class, $request->getPayload());
         $this->assertSame('world', $request->getPayload()->get('hello'));
     }
+
+    public function testJsonRequestsCanMergeDataIntoJsonRequest()
+    {
+        if (! method_exists(SymfonyRequest::class, 'getPayload')) {
+            return;
+        }
+
+        $base = SymfonyRequest::create('/', 'POST', server: ['CONTENT_TYPE' => 'application/json'], content: '{"first":"Taylor","last":"Otwell"}');
+        $request = Request::createFromBase($base);
+
+        $request->merge([
+            'name' => $request->get('first').' '.$request->get('last'),
+        ]);
+
+        $this->assertSame('Taylor Otwell', $request->get('name'));
+    }
 }
