@@ -26,7 +26,7 @@ class PredisConnectionTest extends TestCase
         $event = Event::fake();
 
         $command = 'ftSearch';
-        $parameters = ['test', "*", (new SearchArguments())->dialect('3')->withScores()];
+        $parameters = ['test', '*', (new SearchArguments())->dialect('3')->withScores()];
 
         $predis = new PredisConnection($client = m::mock(Client::class));
         $predis->setEventDispatcher($event);
@@ -35,7 +35,7 @@ class PredisConnectionTest extends TestCase
 
         $this->assertTrue($predis->command($command, $parameters));
 
-        $event->assertDispatched(function (CommandExecuted $event) use ($command, $parameters) {
+        $event->assertDispatched(function (CommandExecuted $event) use ($command) {
             return $event->connection instanceof PredisConnection
                 && $event->command === $command
                 && $event->parameters === ['test', '*', ['DIALECT', '3', 'WITHSCORES']];
