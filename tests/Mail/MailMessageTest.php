@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Mail;
 
 use Illuminate\Contracts\Mail\Attachable;
 use Illuminate\Mail\Attachment;
+use Illuminate\Mail\Mailables\Address as MailableAddress;
 use Illuminate\Mail\Message;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
@@ -53,7 +54,9 @@ class MailMessageTest extends TestCase
 
     public function testToMethodWithOverride()
     {
+        $this->message->to('bar@foo.baz', 'Bar');
         $this->assertInstanceOf(Message::class, $message = $this->message->to('foo@bar.baz', 'Foo', true));
+        $this->assertCount(1, $message->getSymfonyMessage()->getTo());
         $this->assertEquals(new Address('foo@bar.baz', 'Foo'), $message->getSymfonyMessage()->getTo()[0]);
     }
 
@@ -235,5 +238,53 @@ class MailMessageTest extends TestCase
         $this->assertSame("Content-Disposition: inline; name={$name};\r\n filename={$name}", $headers[2]);
 
         unlink($path);
+    }
+
+    public function testItAcceptsToMailableAddressArrayAndConvertsToSwiftAddress()
+    {
+        $message = $this->message->to([new MailableAddress('foo@bar.baz', 'Foo')]);
+        $this->assertEquals(new Address('foo@bar.baz', 'Foo'), $message->getSymfonyMessage()->getTo()[0]);
+    }
+
+    public function testItAcceptsToMailableAddressArrayAndConvertsToSwiftAddressWithOverride()
+    {
+        $this->message->to('bar@foo.baz', 'Bar');
+        $message = $this->message->to([new MailableAddress('foo@bar.baz', 'Foo')], null, true);
+        $this->assertCount(1, $message->getSymfonyMessage()->getTo());
+        $this->assertEquals(new Address('foo@bar.baz', 'Foo'), $message->getSymfonyMessage()->getTo()[0]);
+    }
+
+    public function testItAcceptsBccMailableAddressArrayAndConvertsToSwiftAddress()
+    {
+        $message = $this->message->bcc([new MailableAddress('foo@bar.baz', 'Foo')]);
+        $this->assertEquals(new Address('foo@bar.baz', 'Foo'), $message->getSymfonyMessage()->getBcc()[0]);
+    }
+
+    public function testItAcceptsBccMailableAddressArrayAndConvertsToSwiftAddressWithOverride()
+    {
+        $this->message->bcc('bar@foo.baz', 'Bar');
+        $message = $this->message->bcc([new MailableAddress('foo@bar.baz', 'Foo')], null, true);
+        $this->assertCount(1, $message->getSymfonyMessage()->getBcc());
+        $this->assertEquals(new Address('foo@bar.baz', 'Foo'), $message->getSymfonyMessage()->getBcc()[0]);
+    }
+
+    public function testItAcceptsCcMailableAddressArrayAndConvertsToSwiftAddress()
+    {
+        $message = $this->message->cc([new MailableAddress('foo@bar.baz', 'Foo')]);
+        $this->assertEquals(new Address('foo@bar.baz', 'Foo'), $message->getSymfonyMessage()->getCc()[0]);
+    }
+
+    public function testItAcceptsCcMailableAddressArrayAndConvertsToSwiftAddressWithOverride()
+    {
+        $this->message->cc('bar@foo.baz', 'Bar');
+        $message = $this->message->cc([new MailableAddress('foo@bar.baz', 'Foo')], null, true);
+        $this->assertCount(1, $message->getSymfonyMessage()->getCc());
+        $this->assertEquals(new Address('foo@bar.baz', 'Foo'), $message->getSymfonyMessage()->getCc()[0]);
+    }
+
+    public function testItAcceptsReplyToMailableAddressArrayAndConvertsToSwiftAddress()
+    {
+        $message = $this->message->replyTo([new MailableAddress('foo@bar.baz', 'Foo')]);
+        $this->assertEquals(new Address('foo@bar.baz', 'Foo'), $message->getSymfonyMessage()->getReplyTo()[0]);
     }
 }

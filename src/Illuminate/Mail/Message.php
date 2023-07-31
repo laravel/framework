@@ -3,6 +3,7 @@
 namespace Illuminate\Mail;
 
 use Illuminate\Contracts\Mail\Attachable;
+use Illuminate\Mail\Mailables\Address as MailableAddress;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Symfony\Component\Mime\Address;
@@ -101,7 +102,7 @@ class Message
     {
         if ($override) {
             is_array($address)
-                ? $this->message->to(...$address)
+                ? $this->message->to(...$this->collectAddresses($address))
                 : $this->message->to(new Address($address, (string) $name));
 
             return $this;
@@ -138,7 +139,7 @@ class Message
     {
         if ($override) {
             is_array($address)
-                ? $this->message->cc(...$address)
+                ? $this->message->cc(...$this->collectAddresses($address))
                 : $this->message->cc(new Address($address, (string) $name));
 
             return $this;
@@ -175,7 +176,7 @@ class Message
     {
         if ($override) {
             is_array($address)
-                ? $this->message->bcc(...$address)
+                ? $this->message->bcc(...$this->collectAddresses($address))
                 : $this->message->bcc(new Address($address, (string) $name));
 
             return $this;
@@ -225,21 +226,7 @@ class Message
         if (is_array($address)) {
             $type = lcfirst($type);
 
-            $addresses = collect($address)->map(function ($address, $key) {
-                if (is_string($key) && is_string($address)) {
-                    return new Address($key, $address);
-                }
-
-                if (is_array($address)) {
-                    return new Address($address['email'] ?? $address['address'], $address['name'] ?? null);
-                }
-
-                if (is_null($address)) {
-                    return new Address($key);
-                }
-
-                return $address;
-            })->all();
+            $addresses = $this->collectAddresses($address);
 
             $this->message->{"{$type}"}(...$addresses);
         } else {
@@ -247,6 +234,35 @@ class Message
         }
 
         return $this;
+    }
+
+    /**
+     * Convert possible message variants to Symfony addresses.
+     *
+     * @param  array  $address
+     * @return array
+     */
+    protected function collectAddresses(array $address)
+    {
+        return collect($address)->map(function ($address, $key) {
+            if (is_string($key) && is_string($address)) {
+                return new Address($key, $address);
+            }
+
+            if (is_array($address)) {
+                return new Address($address['email'] ?? $address['address'], $address['name'] ?? null);
+            }
+
+            if ($address instanceof MailableAddress) {
+                return new Address($address->address, $address->name);
+            }
+
+            if (is_null($address)) {
+                return new Address($key);
+            }
+
+            return $address;
+        })->all();
     }
 
     /**
