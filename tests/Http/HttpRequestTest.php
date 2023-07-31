@@ -1587,4 +1587,18 @@ class HttpRequestTest extends TestCase
 
         $this->assertSame('Taylor Otwell', $request->get('name'));
     }
+
+    public function testItCanHaveObjectsInJsonPayload()
+    {
+        if (! method_exists(SymfonyRequest::class, 'getPayload')) {
+            return;
+        }
+
+        $base = SymfonyRequest::create('/', 'POST', server: ['CONTENT_TYPE' => 'application/json'], content: '{"framework":{"name":"Laravel"}}');
+        $request = Request::createFromBase($base);
+
+        $value = $request->get('framework');
+
+        $this->assertSame(['name' => 'Laravel'], $request->get('framework'));
+    }
 }
