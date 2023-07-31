@@ -40,45 +40,45 @@ jobs:
       - name: Update facade docblocks
         run: |
           php -f vendor/bin/facade.php -- \
-            Illuminate\\Support\\Facades\\Lang \
-            Illuminate\\Support\\Facades\\Vite \
-            Illuminate\\Support\\Facades\\Hash \
-            Illuminate\\Support\\Facades\\Validator \
-            Illuminate\\Support\\Facades\\Event \
-            Illuminate\\Support\\Facades\\Auth \
             Illuminate\\Support\\Facades\\App \
-            Illuminate\\Support\\Facades\\Mail \
-            Illuminate\\Support\\Facades\\Gate \
-            Illuminate\\Support\\Facades\\RateLimiter \
-            Illuminate\\Support\\Facades\\Response \
-            Illuminate\\Support\\Facades\\Cache \
-            Illuminate\\Support\\Facades\\Session \
-            Illuminate\\Support\\Facades\\File \
-            Illuminate\\Support\\Facades\\Cookie \
-            Illuminate\\Support\\Facades\\Http \
-            Illuminate\\Support\\Facades\\Config \
-            Illuminate\\Support\\Facades\\Queue \
-            Illuminate\\Support\\Facades\\URL \
-            Illuminate\\Support\\Facades\\Request \
-            Illuminate\\Support\\Facades\\Password \
-            Illuminate\\Support\\Facades\\DB \
             Illuminate\\Support\\Facades\\Artisan \
-            Illuminate\\Support\\Facades\\Date \
-            Illuminate\\Support\\Facades\\Route \
-            Illuminate\\Support\\Facades\\Redis \
-            Illuminate\\Support\\Facades\\View \
-            Illuminate\\Support\\Facades\\Storage \
-            Illuminate\\Support\\Facades\\Pipeline \
-            Illuminate\\Support\\Facades\\Log \
-            Illuminate\\Support\\Facades\\Schema \
-            Illuminate\\Support\\Facades\\Redirect \
-            Illuminate\\Support\\Facades\\Crypt \
-            Illuminate\\Support\\Facades\\Bus \
-            Illuminate\\Support\\Facades\\Notification \
+            Illuminate\\Support\\Facades\\Auth \
             Illuminate\\Support\\Facades\\Blade \
             Illuminate\\Support\\Facades\\Broadcast \
+            Illuminate\\Support\\Facades\\Bus \
+            Illuminate\\Support\\Facades\\Cache \
+            Illuminate\\Support\\Facades\\Config \
+            Illuminate\\Support\\Facades\\Cookie \
+            Illuminate\\Support\\Facades\\Crypt \
+            Illuminate\\Support\\Facades\\DB \
+            Illuminate\\Support\\Facades\\Date \
+            Illuminate\\Support\\Facades\\Event \
+            Illuminate\\Support\\Facades\\File \
+            Illuminate\\Support\\Facades\\Gate \
+            Illuminate\\Support\\Facades\\Hash \
+            Illuminate\\Support\\Facades\\Http \
+            Illuminate\\Support\\Facades\\Lang \
+            Illuminate\\Support\\Facades\\Log \
+            Illuminate\\Support\\Facades\\Mail \
+            Illuminate\\Support\\Facades\\Notification \
             Illuminate\\Support\\Facades\\ParallelTesting \
-            Illuminate\\Support\\Facades\\Process
+            Illuminate\\Support\\Facades\\Password \
+            Illuminate\\Support\\Facades\\Pipeline \
+            Illuminate\\Support\\Facades\\Process \
+            Illuminate\\Support\\Facades\\Queue \
+            Illuminate\\Support\\Facades\\RateLimiter \
+            Illuminate\\Support\\Facades\\Redirect \
+            Illuminate\\Support\\Facades\\Redis \
+            Illuminate\\Support\\Facades\\Request \
+            Illuminate\\Support\\Facades\\Response \
+            Illuminate\\Support\\Facades\\Route \
+            Illuminate\\Support\\Facades\\Schema \
+            Illuminate\\Support\\Facades\\Session \
+            Illuminate\\Support\\Facades\\Storage \
+            Illuminate\\Support\\Facades\\URL \
+            Illuminate\\Support\\Facades\\Validator \
+            Illuminate\\Support\\Facades\\View \
+            Illuminate\\Support\\Facades\\Vite
 
       - name: Commit facade docblocks
         uses: stefanzweifel/git-auto-commit-action@v4
