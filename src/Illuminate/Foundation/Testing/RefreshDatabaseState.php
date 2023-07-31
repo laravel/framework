@@ -17,4 +17,11 @@ class RefreshDatabaseState
      * @var bool
      */
     public static $lazilyRefreshed = false;
+
+    /**
+     * The list of in-memory database connections.
+     *
+     * @var array<string, \PDO>
+     */
+    public static $inMemoryConnections = [];
 }
