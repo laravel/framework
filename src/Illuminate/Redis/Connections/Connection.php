@@ -125,6 +125,17 @@ abstract class Connection
     }
 
     /**
+     * Parse command parameters for event dispatching.
+     *
+     * @param  array  $parameters
+     * @return array
+     */
+    protected function parseParametersForEvent(array $parameters)
+    {
+        return $parameters;
+    }
+
+    /**
      * Fire the given event if possible.
      *
      * @param  mixed  $event
