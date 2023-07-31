@@ -159,13 +159,43 @@ class RealTimeFactoryTest extends TestCase
         });
 
         $this->schema()->create('guesses', function ($table) {
-            $table->increments('id');
             $table->string('email');
+            $table->string('e_mail');
             $table->string('email_address');
             $table->string('name');
             $table->string('first_name');
             $table->string('last_name');
+            $table->string('login');
             $table->string('username');
+            $table->string('dob');
+            $table->string('date_of_birth');
+            $table->string('uuid');
+            $table->string('url');
+            $table->string('website');
+            $table->string('phone');
+            $table->string('phone_number');
+            $table->string('telephone');
+            $table->string('tel');
+            $table->string('town');
+            $table->string('city');
+            $table->string('zip');
+            $table->string('zip_code');
+            $table->string('zipcode');
+            $table->string('postal_code');
+            $table->string('postalcode');
+            $table->string('post_code');
+            $table->string('postcode');
+            $table->string('state');
+            $table->string('province');
+            $table->string('county');
+            $table->string('country');
+            $table->string('currency_code');
+            $table->string('currency');
+            $table->string('company');
+            $table->string('company_name');
+            $table->string('companyname');
+            $table->string('employer');
+            $table->string('title');
             $table->timestamps();
         });
 
@@ -415,21 +445,64 @@ class RealTimeFactoryTest extends TestCase
         $fake = m::mock(Generator::class);
         app()->singleton(Generator::class.':en_US', fn () => $fake);
 
-        $fake->shouldReceive('safeEmail')->twice()->andReturn('joe@laravel.com');
+        $fake->shouldReceive('safeEmail')->andReturn('joe@laravel.com');
         $fake->shouldReceive('name')->andReturn('Joe Dixon');
         $fake->shouldReceive('firstName')->andReturn('Joe');
         $fake->shouldReceive('lastName')->andReturn('Dixon');
+        $fake->shouldReceive('login')->andReturn('_joedixon');
         $fake->shouldReceive('username')->andReturn('_joedixon');
+        $fake->shouldReceive('date')->andReturn('2023-07-31 11:32:00');
         $fake->shouldReceive('dateTime')->andReturn(now());
+        $fake->shouldReceive('uuid')->andReturn('123e4567-e89b-12d3-a456-426614174000');
+        $fake->shouldReceive('url')->andReturn('https://laravel.com');
+        $fake->shouldReceive('phoneNumber')->andReturn('012345678910');
+        $fake->shouldReceive('city')->andReturn('Little Rock');
+        $fake->shouldReceive('postcode')->andReturn('90210');
+        $fake->shouldReceive('state')->andReturn('Arkansas');
+        $fake->shouldReceive('country')->andReturn('United States');
+        $fake->shouldReceive('currencyCode')->andReturn('USD');
+        $fake->shouldReceive('company')->andReturn('Laravel LLC');
+        $fake->shouldReceive('title')->andReturn('Mrs');
 
         $guess = Guess::factory()->create();
 
         $this->assertSame('joe@laravel.com', $guess->email);
+        $this->assertSame('joe@laravel.com', $guess->e_mail);
         $this->assertSame('joe@laravel.com', $guess->email_address);
         $this->assertSame('Joe Dixon', $guess->name);
         $this->assertSame('Joe', $guess->first_name);
         $this->assertSame('Dixon', $guess->last_name);
+        $this->assertSame('_joedixon', $guess->login);
         $this->assertSame('_joedixon', $guess->username);
+        $this->assertSame('2023-07-31 11:32:00', $guess->dob);
+        $this->assertSame('2023-07-31 11:32:00', $guess->date_of_birth);
+        $this->assertSame('123e4567-e89b-12d3-a456-426614174000', $guess->uuid);
+        $this->assertSame('https://laravel.com', $guess->url);
+        $this->assertSame('https://laravel.com', $guess->website);
+        $this->assertSame('012345678910', $guess->phone);
+        $this->assertSame('012345678910', $guess->phone_number);
+        $this->assertSame('012345678910', $guess->telephone);
+        $this->assertSame('012345678910', $guess->tel);
+        $this->assertSame('Little Rock', $guess->city);
+        $this->assertSame('Little Rock', $guess->town);
+        $this->assertSame('90210', $guess->zip);
+        $this->assertSame('90210', $guess->zip_code);
+        $this->assertSame('90210', $guess->zipcode);
+        $this->assertSame('90210', $guess->postal_code);
+        $this->assertSame('90210', $guess->postalcode);
+        $this->assertSame('90210', $guess->post_code);
+        $this->assertSame('90210', $guess->postcode);
+        $this->assertSame('Arkansas', $guess->state);
+        $this->assertSame('Arkansas', $guess->province);
+        $this->assertSame('Arkansas', $guess->county);
+        $this->assertSame('United States', $guess->country);
+        $this->assertSame('USD', $guess->currency_code);
+        $this->assertSame('USD', $guess->currency);
+        $this->assertSame('Laravel LLC', $guess->company);
+        $this->assertSame('Laravel LLC', $guess->company_name);
+        $this->assertSame('Laravel LLC', $guess->companyname);
+        $this->assertSame('Laravel LLC', $guess->employer);
+        $this->assertSame('Mrs', $guess->title);
     }
 
     public function testItDoesNotGenerateForeignKeyValues()
