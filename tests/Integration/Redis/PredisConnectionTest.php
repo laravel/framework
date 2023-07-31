@@ -20,7 +20,7 @@ class PredisConnectionTest extends TestCase
     public function testPredisCanEmitEventWithArrayableArgumentObject()
     {
         if (! class_exists(SearchArguments::class)) {
-            $this->markTestSkipped('Skipped tests on predis/predis dependency without '.SearchArguments::class);
+            return $this->markTestSkipped('Skipped tests on predis/predis dependency without '.SearchArguments::class);
         }
 
         $event = Event::fake();
