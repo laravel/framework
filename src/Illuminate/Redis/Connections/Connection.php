@@ -127,7 +127,7 @@ abstract class Connection
     }
 
     /**
-     * Parse command parameters for event dispatching.
+     * Parse the command's parameters for event dispatching.
      *
      * @param  array  $parameters
      * @return array

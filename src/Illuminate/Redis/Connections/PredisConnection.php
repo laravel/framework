@@ -30,22 +30,6 @@ class PredisConnection extends Connection implements ConnectionContract
     }
 
     /**
-     * Parse command parameters for event dispatching.
-     *
-     * @param  array  $parameters
-     * @return array
-     */
-    protected function parseParametersForEvent(array $parameters)
-    {
-        return collect($parameters)
-            ->transform(function ($parameter) {
-                return $parameter instanceof ArrayableArgument
-                    ? $parameter->toArray()
-                    : $parameter;
-            })->all();
-    }
-
-    /**
      * Subscribe to a set of given channels for messages.
      *
      * @param  array|string  $channels
@@ -66,5 +50,21 @@ class PredisConnection extends Connection implements ConnectionContract
         }
 
         unset($loop);
+    }
+
+    /**
+     * Parse the command's parameters for event dispatching.
+     *
+     * @param  array  $parameters
+     * @return array
+     */
+    protected function parseParametersForEvent(array $parameters)
+    {
+        return collect($parameters)
+            ->transform(function ($parameter) {
+                return $parameter instanceof ArrayableArgument
+                    ? $parameter->toArray()
+                    : $parameter;
+            })->all();
     }
 }
