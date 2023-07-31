@@ -21,6 +21,7 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
             $table->json('array_object_json');
             $table->text('collection');
             $table->string('stringable');
+            $table->string('password');
             $table->timestamps();
         });
 
@@ -42,7 +43,7 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
         $model->array_object_json = ['name' => 'Taylor'];
         $model->collection = collect(['name' => 'Taylor']);
         $model->stringable = Str::of('Taylor');
-        $model->password = $password = Hash::make('secret');
+        $model->password = Hash::make('secret');
 
         $model->save();
 
@@ -90,7 +91,7 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
             'array_object_json' => ['name' => 'Taylor'],
             'collection' => collect(['name' => 'Taylor']),
             'stringable' => Str::of('Taylor'),
-            'password' => $password = Hash::make('secret'),
+            'password' => Hash::make('secret'),
         ]);
 
         $model->save();
