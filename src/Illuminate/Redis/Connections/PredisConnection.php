@@ -4,6 +4,8 @@ namespace Illuminate\Redis\Connections;
 
 use Closure;
 use Illuminate\Contracts\Redis\Connection as ConnectionContract;
+use Illuminate\Redis\Events\CommandExecuted;
+use Predis\Command\Argument\ArrayableArgument;
 
 /**
  * @mixin \Predis\Client
@@ -26,6 +28,35 @@ class PredisConnection extends Connection implements ConnectionContract
     public function __construct($client)
     {
         $this->client = $client;
+    }
+
+    /**
+     * Run a command against the Redis database.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return mixed
+     */
+    public function command($method, array $parameters = [])
+    {
+        $start = microtime(true);
+
+        $result = $this->client->{$method}(...$parameters);
+
+        $time = round((microtime(true) - $start) * 1000, 2);
+
+        if (isset($this->events)) {
+            $parameters = collect($parameters)
+                ->transform(function ($parameter) {
+                    return $parameter instanceof ArrayableArgument
+                        ? $parameter->toArray()
+                        : $parameter;
+                })->all();
+
+            $this->event(new CommandExecuted($method, $parameters, $time, $this));
+        }
+
+        return $result;
     }
 
     /**
