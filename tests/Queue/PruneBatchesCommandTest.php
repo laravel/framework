@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Queue;
 
 use Illuminate\Bus\BatchRepository;
 use Illuminate\Bus\DatabaseBatchRepository;
-use Illuminate\Container\Container;
+use Illuminate\Foundation\Application;
 use Illuminate\Queue\Console\PruneBatchesCommand;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -20,7 +20,7 @@ class PruneBatchesCommandTest extends TestCase
 
     public function testAllowPruningAllUnfinishedBatches()
     {
-        $container = new Container;
+        $container = new Application;
         $container->instance(BatchRepository::class, $repo = m::spy(DatabaseBatchRepository::class));
 
         $command = new PruneBatchesCommand;
@@ -33,7 +33,7 @@ class PruneBatchesCommandTest extends TestCase
 
     public function testAllowPruningAllCancelledBatches()
     {
-        $container = new Container;
+        $container = new Application;
         $container->instance(BatchRepository::class, $repo = m::spy(DatabaseBatchRepository::class));
 
         $command = new PruneBatchesCommand;
