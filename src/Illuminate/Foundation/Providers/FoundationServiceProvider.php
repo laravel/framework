@@ -42,8 +42,8 @@ class FoundationServiceProvider extends AggregateServiceProvider
      * @var array
      */
     public $singletons = [
-        Vite::class => Vite::class,
         HttpFactory::class => HttpFactory::class,
+        Vite::class => Vite::class,
     ];
 
     /**
