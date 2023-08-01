@@ -418,8 +418,12 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function getVisibility($path)
     {
-        if ($this->driver->visibility($path) == Visibility::PUBLIC) {
-            return FilesystemContract::VISIBILITY_PUBLIC;
+        try  {
+            if ($this->driver->visibility($path) == Visibility::PUBLIC) {
+                return FilesystemContract::VISIBILITY_PUBLIC;
+            }
+        }catch(UnableToRetrieveMetadata $e){
+            throw_if($this->throwsExceptions(), $e);
         }
 
         return FilesystemContract::VISIBILITY_PRIVATE;
