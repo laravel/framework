@@ -33,7 +33,7 @@ trait Dispatchable
      *
      * @param  bool  $boolean
      * @param  mixed  ...$arguments
-     * @return void|mixed
+     * @return mixed
      */
     public static function dispatchUnless($boolean, ...$arguments)
     {
