@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Integration\Http;
 
-use Illuminate\Http\Client\Factory;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\Http;
 use Orchestra\Testbench\TestCase;
