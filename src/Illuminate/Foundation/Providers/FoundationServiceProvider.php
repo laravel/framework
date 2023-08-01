@@ -13,6 +13,7 @@ use Illuminate\Foundation\Http\HtmlDumper;
 use Illuminate\Foundation\MaintenanceModeManager;
 use Illuminate\Foundation\Precognition;
 use Illuminate\Foundation\Vite;
+use Illuminate\Http\Client\Factory as ClientFactory;
 use Illuminate\Http\Request;
 use Illuminate\Log\Events\MessageLogged;
 use Illuminate\Support\AggregateServiceProvider;
@@ -42,6 +43,7 @@ class FoundationServiceProvider extends AggregateServiceProvider
      */
     public $singletons = [
         Vite::class => Vite::class,
+        ClientFactory::class => ClientFactory::class,
     ];
 
     /**
