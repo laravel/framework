@@ -1,0 +1,13 @@
+diff --git a/src/Illuminate/Database/Console/ShowModelCommand.php b/src/Illuminate/Database/Console/ShowModelCommand.php
+index ad1be5d20338e530aa5bfd042af99b7ae7c37d39..ff58ca86c2cafc37635ffa6076aab0d4e0b174ab 100644
+--- a/src/Illuminate/Database/Console/ShowModelCommand.php
++++ b/src/Illuminate/Database/Console/ShowModelCommand.php
+@@ -414,7 +414,7 @@ protected function displayCli($class, $database, $table, $policy, $attributes, $
+      */
+     protected function getMigrations($model)
+     {
+-        $tableName = $model->getConnection()->getTablePrefix() . $model->getTable();
++        $tableName = $model->getConnection()->getTablePrefix().$model->getTable();
+ 
+         // Get the list of all migrations
+         $allMigrations = $this->laravel['migration.repository']->getMigrations(-1);

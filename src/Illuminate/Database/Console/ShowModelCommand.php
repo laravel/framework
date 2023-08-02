@@ -414,7 +414,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
      */
     protected function getMigrations($model)
     {
-        $tableName = $model->getConnection()->getTablePrefix() . $model->getTable();
+        $tableName = $model->getConnection()->getTablePrefix().$model->getTable();
 
         // Get the list of all migrations
         $allMigrations = $this->laravel['migration.repository']->getMigrations(-1);
