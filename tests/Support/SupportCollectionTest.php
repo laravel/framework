@@ -5613,7 +5613,7 @@ class SupportCollectionTest extends TestCase
      */
     public function testEnsureForObjects($collection)
     {
-        $data = $collection::make([new stdClass, new stdClass, new stdClass, ]);
+        $data = $collection::make([new stdClass, new stdClass, new stdClass]);
         $data->ensure(stdClass::class);
 
         $data = $collection::make([new stdClass, new stdClass, new stdClass, $collection]);

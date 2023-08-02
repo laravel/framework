@@ -317,7 +317,7 @@ trait EnumeratesValues
      *
      * @template TEnsureOfType
      *
-     * @param  class-string<TEnsureOfType> $type
+     * @param  class-string<TEnsureOfType>  $type
      * @return static<mixed, TEnsureOfType>
      *
      * @throws \UnexpectedValueException
@@ -327,7 +327,7 @@ trait EnumeratesValues
         return $this->each(function ($item) use ($type) {
             $itemType = get_debug_type($item);
 
-            if ($itemType !== $type && !$item instanceof $type) {
+            if ($itemType !== $type && ! $item instanceof $type) {
                 throw new UnexpectedValueException(
                     sprintf("Collection should only include '%s' items, but '%s' found.", $type, $itemType)
                 );
