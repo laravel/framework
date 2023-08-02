@@ -37,7 +37,8 @@ trait InteractsWithDatabase
 
     /**
      * Parse the data according to if the table is a
-     * Model class with casts
+     * Model class with casts.
+     *
      * @param  \Illuminate\Database\Eloquent\Model|string  $table
      * @param  array  $data
      * @return array
@@ -53,7 +54,7 @@ trait InteractsWithDatabase
             $casted = false;
 
             foreach ($data as $key => $value) {
-                if ($model->hasCast($key) && $model->isAttributeValueCastedProperly($key,$value)) {
+                if ($model->hasCast($key) && $model->isAttributeValueCastedProperly($key, $value)) {
                     $casted = true;
                     break;
                 }
