@@ -6,6 +6,7 @@ use ErrorException;
 use FilesystemIterator;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\LazyCollection;
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
@@ -72,6 +73,21 @@ class Filesystem
     public function json($path, $flags = 0, $lock = false)
     {
         return json_decode($this->get($path, $lock), true, 512, $flags);
+    }
+
+    /**
+     * Get converted contents of a GitHub flavored Markdown file in HTML.
+     *
+     * @param  string  $path
+     * @param  array  $options
+     * @param  bool  $lock
+     * @return string
+     *
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     */
+    public function markdown($path, $options = [], $lock = false)
+    {
+        return Str::markdown($this->get($path, $lock), $options);
     }
 
     /**

@@ -360,6 +360,13 @@ class FilesystemTest extends TestCase
         $this->assertNull($files->json(self::$tempDir.'/file.json'));
     }
 
+    public function testMarkdownReturnsParsedMarkdown()
+    {
+        file_put_contents(self::$tempDir.'/file.md', '*Hello World*');
+        $files = new Filesystem;
+        $this->assertSame("<p><em>Hello World</em></p>\n", $files->markdown(self::$tempDir.'/file.md'));
+    }
+
     public function testAppendAddsDataToFile()
     {
         file_put_contents(self::$tempDir.'/file.txt', 'foo');
