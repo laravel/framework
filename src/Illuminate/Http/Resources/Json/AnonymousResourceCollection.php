@@ -18,36 +18,36 @@ class AnonymousResourceCollection extends ResourceCollection
     /**
      * @var array
      */
-    public $pagination;
+    public array $pagination;
     /**
      * @var string
      */
-    public $base_name;
+    public string $base_name;
 
     /**
      * @var array
      */
-    public $queries;
+    public array $queries;
 
     /**
      * Indicates if the collection keys should be preserved.
      *
      * @var bool
      */
-    public $preserveKeys = false;
+    public bool $preserveKeys = false;
 
     /**
      * Create a new anonymous resource collection.
      *
      * @param  mixed  $resource
-     * @param  string  $collects
+     * @param string $collects
      * @return void
      */
-    public function __construct($resource, $collects)
+    public function __construct($resource, string $collects)
     {
         $this->getResourceName($collects);
 
-        $this->getQueries();
+        $this->queries = \request()->except('page');
 
         $this->resolvePagination($resource);
 
@@ -64,20 +64,8 @@ class AnonymousResourceCollection extends ResourceCollection
         $this->base_name =  Str::of(class_basename($collects))
             ->replace('Resource','',false)
             ->plural()
-            ->ucfirst()
+            ->lcfirst()
             ->value();
-    }
-
-    /**
-     * @return void
-     */
-    private function getQueries():void{
-        $this->queries = array();
-        if(isset($_SERVER['QUERY_STRING'])){
-            parse_str($_SERVER['QUERY_STRING'], $this->queries);
-            if(isset($this->queries['page']))
-                unset($this->queries['page']);
-        }
     }
 
     /**
@@ -92,16 +80,19 @@ class AnonymousResourceCollection extends ResourceCollection
                 'perPage' => $resource->perPage(),
                 'options' => $resource->getOptions(),
                 'queries'=> $this->queries,
-                'nextPageUrl' => $this->handelQueryInPagination($resource->nextPageUrl()),
-                'prevPageUrl' => $this->handelQueryInPagination($resource->previousPageUrl()),
+                'nextPageUrl' => $this->handelQueryInPagination($resource->nextPageUrl()??''),
+                'prevPageUrl' => $this->handelQueryInPagination($resource->previousPageUrl()??''),
                 'currentPage' => $resource->currentPage(),
                 'lastPage' => $resource->lastPage(),
             ];
         }
         elseif ($resource instanceof Paginator){
             $this->pagination = [
-                'nextPageUrl' => $this->handelQueryInPagination($resource->nextPageUrl()),
-                'prevPageUrl' => $this->handelQueryInPagination($resource->previousPageUrl()),
+                'total' => $resource->total(),
+                'nextPageUrl' => $this->handelQueryInPagination($resource->nextPageUrl()??''),
+                'prevPageUrl' => $this->handelQueryInPagination($resource->previousPageUrl()??''),
+                'currentPage' => $resource->currentPage(),
+                'perPage' => $resource->perPage(),
             ];
         }
         else{
@@ -110,16 +101,12 @@ class AnonymousResourceCollection extends ResourceCollection
     }
 
     /**
-     * @param $url
+     * @param string $url
      * @return string
      */
-    private function handelQueryInPagination($url):string{
-        if ($this->queries && $url)
-            return $url . '&' . http_build_query($this->queries , '', '&amp;');
-        elseif ($url)
-            return $url;
-        else
-            return '';
+    private function handelQueryInPagination(string $url=''):string{
+        return ($this->queries && $url)?
+            $url . '&' . http_build_query($this->queries , '', '&amp;') : $url;
     }
 
 
@@ -130,9 +117,7 @@ class AnonymousResourceCollection extends ResourceCollection
     public function toArray($request):array
     {
         $data[$this->base_name] = $this->collection;
-        if(!empty($this->pagination)){
-            $data['pagination'] = $this->pagination;
-        }
+        (empty($this->pagination))?:$data['pagination'] = $this->pagination;
         return $data;
     }
 }
