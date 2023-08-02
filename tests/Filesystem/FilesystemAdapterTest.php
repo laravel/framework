@@ -198,6 +198,13 @@ class FilesystemAdapterTest extends TestCase
         $this->assertNull($filesystemAdapter->json('file.json'));
     }
 
+    public function testMarkdownReturnsParsedMarkdown()
+    {
+        $this->filesystem->write('file.md', '*Hello World*');
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+        $this->assertSame("<p><em>Hello World</em></p>\n", $filesystemAdapter->markdown('file.md'));
+    }
+
     public function testMimeTypeNotDetected()
     {
         $this->filesystem->write('unknown.mime-type', '');

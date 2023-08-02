@@ -277,6 +277,20 @@ class FilesystemAdapter implements CloudFilesystemContract
     }
 
     /**
+     * Get converted contents of a GitHub flavored Markdown file in HTML.
+     *
+     * @param  string  $path
+     * @param  array  $options
+     * @return string|null
+     */
+    public function markdown($path, $options = [])
+    {
+        $content = $this->get($path);
+
+        return is_null($content) ? null : Str::markdown($content, $options);
+    }
+
+    /**
      * Create a streamed response for a given file.
      *
      * @param  string  $path
