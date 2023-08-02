@@ -2267,7 +2267,7 @@ trait HasAttributes
             case 'decimal':
                 // Assuming decimal casting is in the format 'decimal:2'
                 $decimalPlaces = explode(':', $this->getCasts()[$attribute], 2)[1];
-                
+
                 return is_numeric($value) && preg_match('/^\d+(\.\d{1,'.$decimalPlaces.'})?$/', $value);
             case 'string':
                 return is_string($value);
