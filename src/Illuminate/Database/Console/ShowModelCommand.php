@@ -95,6 +95,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
             $this->getAttributes($model),
             $this->getRelations($model),
             $this->getObservers($model),
+            $this->getMigrations($model),
         );
     }
 
@@ -275,11 +276,11 @@ class ShowModelCommand extends DatabaseInspectionCommand
      * @param  \Illuminate\Support\Collection  $observers
      * @return void
      */
-    protected function display($class, $database, $table, $policy, $attributes, $relations, $observers)
+    protected function display($class, $database, $table, $policy, $attributes, $relations, $observers, $migrations)
     {
         $this->option('json')
-            ? $this->displayJson($class, $database, $table, $policy, $attributes, $relations, $observers)
-            : $this->displayCli($class, $database, $table, $policy, $attributes, $relations, $observers);
+            ? $this->displayJson($class, $database, $table, $policy, $attributes, $relations, $observers, $migrations)
+            : $this->displayCli($class, $database, $table, $policy, $attributes, $relations, $observers, $migrations);
     }
 
     /**
@@ -294,7 +295,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
      * @param  \Illuminate\Support\Collection  $observers
      * @return void
      */
-    protected function displayJson($class, $database, $table, $policy, $attributes, $relations, $observers)
+    protected function displayJson($class, $database, $table, $policy, $attributes, $relations, $observers, $migrations)
     {
         $this->output->writeln(
             collect([
@@ -321,7 +322,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
      * @param  \Illuminate\Support\Collection  $observers
      * @return void
      */
-    protected function displayCli($class, $database, $table, $policy, $attributes, $relations, $observers)
+    protected function displayCli($class, $database, $table, $policy, $attributes, $relations, $observers, $migrations)
     {
         $this->newLine();
 
@@ -390,6 +391,46 @@ class ShowModelCommand extends DatabaseInspectionCommand
         }
 
         $this->newLine();
+
+        $this->components->twoColumnDetail(
+            '<fg=green;options=bold>Migrations</>',
+            'batch',
+        );
+
+        foreach ($migrations as $migration) {
+            $this->components->twoColumnDetail(
+                $migration['file'],
+                $migration['batch']
+            );
+        }
+        $this->newLine();
+    }
+
+    /**
+     * Get all migration that affected this model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return array
+     */
+    protected function getMigrations($model)
+    {
+        $tableName = $model->getConnection()->getTablePrefix() . $model->getTable();
+
+        // Get the list of all migrations
+        $allMigrations = $this->laravel['migration.repository']->getMigrations(-1);
+
+        // Filter the migrations to find the ones related to the given table
+        return collect($allMigrations)
+            ->map(function ($migration) {
+                return [
+                    'file' => $migration->migration,
+                    'batch' => $migration->batch,
+                ];
+            })
+            ->filter(function ($migrationName) use ($tableName) {
+                return str_contains($migrationName['file'], $tableName);
+            })
+            ->all();
     }
 
     /**
