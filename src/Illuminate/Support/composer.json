@@ -23,7 +23,6 @@
         "illuminate/conditionable": "^11.0",
         "illuminate/contracts": "^11.0",
         "illuminate/macroable": "^11.0",
-        "nesbot/carbon": "^2.62.1",
         "voku/portable-ascii": "^2.0"
     },
     "conflict": {

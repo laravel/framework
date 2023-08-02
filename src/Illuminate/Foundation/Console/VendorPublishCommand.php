@@ -15,6 +15,8 @@ use League\Flysystem\UnixVisibility\PortableVisibilityConverter;
 use League\Flysystem\Visibility;
 use Symfony\Component\Console\Attribute\AsCommand;
 
+use function Laravel\Prompts\select;
+
 #[AsCommand(name: 'vendor:publish')]
 class VendorPublishCommand extends Command
 {
@@ -112,9 +114,10 @@ class VendorPublishCommand extends Command
      */
     protected function promptForProviderOrTag()
     {
-        $choice = $this->components->choice(
+        $choice = select(
             "Which provider or tag's files would you like to publish?",
-            $choices = $this->publishableChoices()
+            $choices = $this->publishableChoices(),
+            scroll: 15,
         );
 
         if ($choice == $choices[0] || is_null($choice)) {
@@ -132,7 +135,7 @@ class VendorPublishCommand extends Command
     protected function publishableChoices()
     {
         return array_merge(
-            ['<comment>Publish files from all providers and tags listed below</comment>'],
+            ['All providers and tags'],
             preg_filter('/^/', '<fg=gray>Provider:</> ', Arr::sort(ServiceProvider::publishableProviders())),
             preg_filter('/^/', '<fg=gray>Tag:</> ', Arr::sort(ServiceProvider::publishableGroups()))
         );
@@ -163,8 +166,6 @@ class VendorPublishCommand extends Command
      */
     protected function publishTag($tag)
     {
-        $published = false;
-
         $pathsToPublish = $this->pathsToPublish($tag);
 
         if ($publishing = count($pathsToPublish) > 0) {
