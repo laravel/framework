@@ -119,4 +119,14 @@ trait ConfiguresPrompts
             return $result;
         }
     }
+
+    /**
+     * Restore the prompts output.
+     *
+     * @return void
+     */
+    protected function restorePrompts()
+    {
+        Prompt::setOutput($this->output);
+    }
 }
