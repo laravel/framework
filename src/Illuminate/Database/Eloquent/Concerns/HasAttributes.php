@@ -2243,14 +2243,14 @@ trait HasAttributes
     }
 
     /**
-     * Check if a given value is cast probably according to the attribute cast type
+     * Check if a given value is cast probably according to the attribute cast type.
      *
      * @param  string  $attribute
      * @return bool
      */
     public function isAttributeValueCastedProperly($attribute, $value)
     {
-        if (!$this->hasCast($attribute)) {
+        if (! $this->hasCast($attribute)) {
             return true; // Attribute is not cast, so it's always considered correct
         }
 
@@ -2267,7 +2267,7 @@ trait HasAttributes
             case 'decimal':
                 // Assuming decimal casting is in the format 'decimal:2'
                 $decimalPlaces = explode(':', $this->getCasts()[$attribute], 2)[1];
-                return is_numeric($value) && preg_match('/^\d+(\.\d{1,' . $decimalPlaces . '})?$/', $value);
+                return is_numeric($value) && preg_match('/^\d+(\.\d{1,'.$decimalPlaces .'})?$/', $value);
             case 'string':
                 return is_string($value);
             case 'bool':
@@ -2290,7 +2290,7 @@ trait HasAttributes
             case 'immutable_custom_datetime':
             case 'timestamp':
                 return $value instanceof Carbon || is_numeric($value);
-            // Add more cases for other data types as needed
+                // Add more cases for other data types as needed
             default:
                 // Unknown cast type, always considered correct
                 if ($this->isEnumCastable($attribute) || $this->isClassCastable($attribute)) {
