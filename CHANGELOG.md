@@ -1,6 +1,14 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.16.0...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.52.14...10.x)
+
+## [v9.52.14](https://github.com/laravel/framework/compare/v10.16.0...v9.52.14) - 2023-08-02
+
+### What's Changed
+
+- [9.x] Circumvent PHP 8.2.9 date format bug that makes artisan serve crash by [@levu42](https://github.com/levu42) in https://github.com/laravel/framework/pull/47931
+
+**Full Changelog**: https://github.com/laravel/framework/compare/v9.52.13...v9.52.14
 
 ## [v10.16.0](https://github.com/laravel/framework/compare/v9.52.11...v10.16.0) - 2023-07-25
 
