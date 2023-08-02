@@ -35,13 +35,33 @@ trait InteractsWithDatabase
         return $this;
     }
 
-    protected function parseData($table, array $data): array
+    /**
+     * Parse the data according to if the table is a
+     * Model class with casts
+     * @param  \Illuminate\Database\Eloquent\Model|string  $table
+     * @param  array  $data
+     * @return array
+     */
+    protected function parseData($table, array $data)
     {
         if (class_exists($table) && new $table() instanceof Model) {
             /* @var $model Model */
             $table::unguard();
 
-            return (new $table($data))->newInstance($data)->getAttributes();
+            $model = (new $table($data));
+
+            $casted = false;
+
+            foreach ($data as $key => $value) {
+                if ($model->hasCast($key) && $model->isAttributeValueCastedProperly($key,$value)) {
+                    $casted = true;
+                    break;
+                }
+            }
+
+            return $casted
+                ? (new $table($data))->newInstance($data)->getAttributes()
+                : $data;
         }
 
         return $data;
