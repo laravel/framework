@@ -168,7 +168,7 @@ class Command extends SymfonyCommand
      */
     public function run(InputInterface $input, OutputInterface $output): int
     {
-        $this->output = $this->laravel->make(
+        $this->output = $output instanceof OutputStyle ? $output : $this->laravel->make(
             OutputStyle::class, ['input' => $input, 'output' => $output]
         );
 
