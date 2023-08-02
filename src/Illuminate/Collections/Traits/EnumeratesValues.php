@@ -298,10 +298,10 @@ trait EnumeratesValues
     /**
      * Ensure that every item in the collection is of the expected type.
      *
-     * @template TEnforceIntoValue
+     * @template TEnsureOfType
      *
-     * @param  class-string<TEnforceIntoValue>  $type
-     * @return static<mixed, TEnforceIntoValue>
+     * @param  class-string<TEnsureOfType>  $type
+     * @return static<mixed, TEnsureOfType>
      *
      * @throws \UnexpectedValueException
      */
@@ -310,8 +310,10 @@ trait EnumeratesValues
         return $this->each(function ($item) use ($type) {
             $itemType = get_debug_type($item);
 
-            if ($itemType !== $type) {
-                throw new UnexpectedValueException("Collection should only include '{$type}' items, but '{$itemType}' found.");
+            if ($itemType !== $type && ! $item instanceof $type) {
+                throw new UnexpectedValueException(
+                    sprintf("Collection should only include '%s' items, but '%s' found.", $type, $itemType)
+                );
             }
         });
     }
