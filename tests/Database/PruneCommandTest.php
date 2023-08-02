@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Database;
 
 use Closure;
-use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Console\PruneCommand;
@@ -15,6 +14,7 @@ use Illuminate\Database\Events\ModelPruningFinished;
 use Illuminate\Database\Events\ModelPruningStarting;
 use Illuminate\Database\Events\ModelsPruned;
 use Illuminate\Events\Dispatcher;
+use Illuminate\Foundation\Application;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -26,7 +26,7 @@ class PruneCommandTest extends TestCase
     {
         parent::setUp();
 
-        Container::setInstance($container = new Container);
+        Application::setInstance($container = new Application);
 
         $container->singleton(DispatcherContract::class, function () {
             return new Dispatcher();
@@ -212,7 +212,7 @@ class PruneCommandTest extends TestCase
         });
         $dispatcher->shouldReceive('forget')->once()->with(ModelsPruned::class);
 
-        Container::getInstance()->singleton(DispatcherContract::class, fn () => $dispatcher);
+        Application::getInstance()->singleton(DispatcherContract::class, fn () => $dispatcher);
 
         $this->artisan(['--model' => PrunableTestModelWithPrunableRecords::class]);
     }
@@ -223,7 +223,7 @@ class PruneCommandTest extends TestCase
         $output = new BufferedOutput;
 
         tap(new PruneCommand())
-            ->setLaravel(Container::getInstance())
+            ->setLaravel(Application::getInstance())
             ->run($input, $output);
 
         return $output;
@@ -233,7 +233,7 @@ class PruneCommandTest extends TestCase
     {
         parent::tearDown();
 
-        Container::setInstance(null);
+        Application::setInstance(null);
 
         m::close();
     }

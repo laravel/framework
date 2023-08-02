@@ -13,6 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class Command extends SymfonyCommand
 {
     use Concerns\CallsCommands,
+        Concerns\ConfiguresPrompts,
         Concerns\HasParameters,
         Concerns\InteractsWithIO,
         Concerns\InteractsWithSignals,
@@ -172,6 +173,8 @@ class Command extends SymfonyCommand
         );
 
         $this->components = $this->laravel->make(Factory::class, ['output' => $this->output]);
+
+        $this->configurePrompts($input);
 
         try {
             return parent::run(
