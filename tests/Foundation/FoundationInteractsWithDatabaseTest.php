@@ -226,6 +226,8 @@ class FoundationInteractsWithDatabaseTest extends TestCase
     public function testAssertDatabaseHasSupportsModelsCasts()
     {
         $data = [
+            'role' => RoleType::ADMIN,
+            'is_active' => true,
             'name' => [
                 'khaled',
                 'waleed',
@@ -233,6 +235,8 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         ];
 
         $this->data = [
+            'role' => 1,
+            'is_active' => 1,
             'name' => json_encode([
                 'khaled',
                 'waleed',
@@ -242,6 +246,8 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->mockCountBuilder(1);
 
         $this->assertDatabaseHas(CustomProductStubWithCasts::class, $data);
+
+        $this->assertDatabaseHas(CustomProductStubWithCasts::class, $this->data);
     }
 
     public function testAssertSoftDeletedInDatabaseDoesNotFindModelWithCustomColumnResults()
@@ -485,5 +491,11 @@ class CustomProductStubWithCasts extends ProductStub
 {
     protected $casts = [
         'name' => 'array',
+        'role' => RoleType::class,
     ];
+}
+
+enum RoleType: int
+{
+    case ADMIN = 1;
 }
