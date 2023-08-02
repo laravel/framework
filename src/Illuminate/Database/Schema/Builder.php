@@ -152,11 +152,12 @@ class Builder
     /**
      * Determine if the given table exists.
      *
-     * @param  string  $table
+     * @param  class-string|string  $table
      * @return bool
      */
     public function hasTable($table)
     {
+        $table = $this->nomalizeTableName($table);
         $table = $this->connection->getTablePrefix().$table;
 
         return count($this->connection->selectFromWriteConnection(
@@ -167,7 +168,7 @@ class Builder
     /**
      * Determine if the given table has a given column.
      *
-     * @param  string  $table
+     * @param  class-string|string  $table
      * @param  string  $column
      * @return bool
      */
@@ -181,7 +182,7 @@ class Builder
     /**
      * Determine if the given table has given columns.
      *
-     * @param  string  $table
+     * @param  class-string|string  $table
      * @param  array  $columns
      * @return bool
      */
@@ -201,7 +202,7 @@ class Builder
     /**
      * Execute a table builder callback if the given table has a given column.
      *
-     * @param  string  $table
+     * @param  class-string|string  $table
      * @param  string  $column
      * @param  \Closure  $callback
      * @return void
@@ -216,7 +217,7 @@ class Builder
     /**
      * Execute a table builder callback if the given table doesn't have a given column.
      *
-     * @param  string  $table
+     * @param  class-string|string  $table
      * @param  string  $column
      * @param  \Closure  $callback
      * @return void
@@ -245,11 +246,13 @@ class Builder
     /**
      * Get the column listing for a given table.
      *
-     * @param  string  $table
+     * @param  class-string|string  $table
      * @return array
      */
     public function getColumnListing($table)
     {
+        $table = $this->nomalizeTableName($table);
+
         $results = $this->connection->selectFromWriteConnection($this->grammar->compileColumnListing(
             $this->connection->getTablePrefix().$table
         ));
@@ -260,7 +263,7 @@ class Builder
     /**
      * Modify a table on the schema.
      *
-     * @param  string  $table
+     * @param  class-string|string  $table
      * @param  \Closure  $callback
      * @return void
      */
@@ -272,7 +275,7 @@ class Builder
     /**
      * Create a new table on the schema.
      *
-     * @param  string  $table
+     * @param  class-string|string  $table
      * @param  \Closure  $callback
      * @return void
      */
@@ -288,7 +291,7 @@ class Builder
     /**
      * Drop a table from the schema.
      *
-     * @param  string  $table
+     * @param  class-string|string  $table
      * @return void
      */
     public function drop($table)
@@ -301,7 +304,7 @@ class Builder
     /**
      * Drop a table from the schema if it exists.
      *
-     * @param  string  $table
+     * @param  class-string|string  $table
      * @return void
      */
     public function dropIfExists($table)
@@ -314,7 +317,7 @@ class Builder
     /**
      * Drop columns from a table schema.
      *
-     * @param  string  $table
+     * @param  class-string|string  $table
      * @param  string|array  $columns
      * @return void
      */
@@ -442,7 +445,7 @@ class Builder
     /**
      * Create a new command set with a Closure.
      *
-     * @param  string  $table
+     * @param  class-string|string  $table
      * @param  \Closure|null  $callback
      * @return \Illuminate\Database\Schema\Blueprint
      */
@@ -452,11 +455,26 @@ class Builder
                     ? $this->connection->getConfig('prefix')
                     : '';
 
+        $table = $this->nomalizeTableName($table);
+
         if (isset($this->resolver)) {
             return call_user_func($this->resolver, $table, $callback, $prefix);
         }
 
         return Container::getInstance()->make(Blueprint::class, compact('table', 'callback', 'prefix'));
+    }
+
+    /**
+     * @param  class-string|string  $table
+     * @return string
+     */
+    protected function nomalizeTableName($table)
+    {
+        if (str_contains($table, '\\') && method_exists($table, 'getTable')) {
+            $table = (new $table)->getTable();
+        }
+
+        return $table;
     }
 
     /**
