@@ -1,5 +1,6 @@
 <?php
 
+
 namespace Illuminate\Auth;
 
 use Closure;
