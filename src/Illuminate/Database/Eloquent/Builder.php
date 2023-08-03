@@ -1079,9 +1079,9 @@ class Builder implements BuilderContract
      */
     public function touch($column = null)
     {
-        $time = $this->model->freshTimestamp();
-
         if ($column) {
+            $time = $this->model->freshTimestampForAttribute($column);
+
             return $this->toBase()->update([$column => $time]);
         }
 
@@ -1090,6 +1090,8 @@ class Builder implements BuilderContract
         if (! $this->model->usesTimestamps() || is_null($column)) {
             return false;
         }
+
+        $time = $this->model->freshTimestampForAttribute($column);
 
         return $this->toBase()->update([$column => $time]);
     }
@@ -1140,7 +1142,7 @@ class Builder implements BuilderContract
         $column = $this->model->getUpdatedAtColumn();
 
         $values = array_merge(
-            [$column => $this->model->freshTimestampString()],
+            [$column => $this->model->freshTimestampForAttribute($column)],
             $values
         );
 
@@ -1190,16 +1192,19 @@ class Builder implements BuilderContract
             return $values;
         }
 
-        $timestamp = $this->model->freshTimestampString();
-
+        $timestamps = [];
         $columns = array_filter([
             $this->model->getCreatedAtColumn(),
             $this->model->getUpdatedAtColumn(),
         ]);
 
         foreach ($columns as $column) {
+            $timestamps[$column] = $this->model->freshTimestampForAttribute($column);
+        }
+
+        if (! empty($timestamps)) {
             foreach ($values as &$row) {
-                $row = array_merge([$column => $timestamp], $row);
+                $row = array_merge($timestamps, $row);
             }
         }
 

@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Database;
 
 use BadMethodCallException;
 use Closure;
+use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Eloquent\Builder;
@@ -2068,6 +2069,42 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(1, $result);
     }
 
+    public function testUpdateWithCustomTimestampCasts()
+    {
+        $now = Carbon::parse('2017-10-10 10:10:10');
+        Carbon::setTestNow($now);
+        $now = $now->timestamp;
+
+        $query = new BaseBuilder(m::mock(ConnectionInterface::class), new Grammar, m::mock(Processor::class));
+        $builder = new Builder($query);
+        $model = new EloquentBuilderTestStubWithTimestampCasts;
+        $this->mockConnectionForModel($model, '');
+        $builder->setModel($model);
+        $builder->getConnection()->shouldReceive('update')->once()
+            ->with('update "table" set "foo" = ?, "table"."updated_at" = ?', ['bar', $now])->andReturn(1);
+
+        $result = $builder->update(['foo' => 'bar']);
+        $this->assertEquals(1, $result);
+    }
+
+    public function testUpdateWithCustomTimestampMutators()
+    {
+        $now = Carbon::parse('2017-10-10 10:10:10');
+        Carbon::setTestNow($now);
+        $now = $now->timestamp;
+
+        $query = new BaseBuilder(m::mock(ConnectionInterface::class), new Grammar, m::mock(Processor::class));
+        $builder = new Builder($query);
+        $model = new EloquentBuilderTestStubWithTimestampMutators();
+        $this->mockConnectionForModel($model, '');
+        $builder->setModel($model);
+        $builder->getConnection()->shouldReceive('update')->once()
+            ->with('update "table" set "foo" = ?, "table"."updated_at" = ?', ['bar', $now])->andReturn(1);
+
+        $result = $builder->update(['foo' => 'bar']);
+        $this->assertEquals(1, $result);
+    }
+
     public function testUpdateWithoutTimestamp()
     {
         $query = new BaseBuilder(m::mock(ConnectionInterface::class), new Grammar, m::mock(Processor::class));
@@ -2139,6 +2176,58 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(2, $result);
     }
 
+    public function testUpsertWithCustomTimestampCasts()
+    {
+        $now = Carbon::parse('2017-10-10 10:10:10');
+        Carbon::setTestNow($now);
+        $now = $now->timestamp;
+
+        $query = m::mock(BaseBuilder::class);
+        $query->shouldReceive('from')->with('table')->andReturn('table');
+        $query->from = 'table';
+
+        $builder = new Builder($query);
+        $model = new EloquentBuilderTestStubWithTimestampCasts;
+        $model->setDateFormat('Y-m-d H:i:s');
+        $builder->setModel($model);
+
+        $query->shouldReceive('upsert')->once()
+            ->with([
+                ['email' => 'foo', 'name' => 'bar', 'updated_at' => $now, 'created_at' => $now],
+                ['name' => 'bar2', 'email' => 'foo2', 'updated_at' => $now, 'created_at' => $now],
+            ], ['email'], ['email', 'name', 'updated_at'])->andReturn(2);
+
+        $result = $builder->upsert([['email' => 'foo', 'name' => 'bar'], ['name' => 'bar2', 'email' => 'foo2']], ['email']);
+
+        $this->assertEquals(2, $result);
+    }
+
+    public function testUpsertWithCustomTimestampMutators()
+    {
+        $now = Carbon::parse('2017-10-10 10:10:10');
+        Carbon::setTestNow($now);
+        $now = $now->timestamp;
+
+        $query = m::mock(BaseBuilder::class);
+        $query->shouldReceive('from')->with('table')->andReturn('table');
+        $query->from = 'table';
+
+        $builder = new Builder($query);
+        $model = new EloquentBuilderTestStubWithTimestampMutators;
+        $model->setDateFormat('Y-m-d H:i:s');
+        $builder->setModel($model);
+
+        $query->shouldReceive('upsert')->once()
+            ->with([
+                ['email' => 'foo', 'name' => 'bar', 'updated_at' => $now, 'created_at' => $now],
+                ['name' => 'bar2', 'email' => 'foo2', 'updated_at' => $now, 'created_at' => $now],
+            ], ['email'], ['email', 'name', 'updated_at'])->andReturn(2);
+
+        $result = $builder->upsert([['email' => 'foo', 'name' => 'bar'], ['name' => 'bar2', 'email' => 'foo2']], ['email']);
+
+        $this->assertEquals(2, $result);
+    }
+
     public function testTouch()
     {
         Carbon::setTestNow($now = '2017-10-10 10:10:10');
@@ -2192,6 +2281,62 @@ class DatabaseEloquentBuilderTest extends TestCase
         $result = $builder->touch();
 
         $this->assertFalse($result);
+    }
+
+    public function testTouchWithCustomTimestampCasts()
+    {
+        $now = Carbon::parse('2017-10-10 10:10:10');
+        Carbon::setTestNow($now);
+        $now = $now->timestamp;
+
+        $query = m::mock(BaseBuilder::class);
+        $query->shouldReceive('from')->with('table')->andReturn('table');
+        $query->from = 'table';
+
+        $builder = new Builder($query);
+        $model = new EloquentBuilderTestStubWithTimestampCasts;
+        $model->setDateFormat('Y-m-d H:i:s');
+        $builder->setModel($model);
+
+        $query->shouldReceive('update')->once()->with(['updated_at' => $now])->andReturn(2);
+
+        $result = $builder->touch();
+
+        $this->assertEquals(2, $result);
+
+        $query->shouldReceive('update')->once()->with(['created_at' => $now])->andReturn(3);
+
+        $result = $builder->touch('created_at');
+
+        $this->assertEquals(3, $result);
+    }
+
+    public function testTouchWithCustomTimestampMutators()
+    {
+        $now = Carbon::parse('2017-10-10 10:10:10');
+        Carbon::setTestNow($now);
+        $now = $now->timestamp;
+
+        $query = m::mock(BaseBuilder::class);
+        $query->shouldReceive('from')->with('table')->andReturn('table');
+        $query->from = 'table';
+
+        $builder = new Builder($query);
+        $model = new EloquentBuilderTestStubWithTimestampMutators;
+        $model->setDateFormat('Y-m-d H:i:s');
+        $builder->setModel($model);
+
+        $query->shouldReceive('update')->once()->with(['updated_at' => $now])->andReturn(2);
+
+        $result = $builder->touch();
+
+        $this->assertEquals(2, $result);
+
+        $query->shouldReceive('update')->once()->with(['created_at' => $now])->andReturn(3);
+
+        $result = $builder->touch('created_at');
+
+        $this->assertEquals(3, $result);
     }
 
     public function testWithCastsMethod()
@@ -2466,5 +2611,54 @@ class EloquentBuilderTestWhereBelongsToStub extends Model
     public function parent()
     {
         return $this->belongsTo(self::class, 'parent_id', 'id', 'parent');
+    }
+}
+
+class UnixTimeStampCast implements CastsAttributes
+{
+    public function get($model, string $key, $value, array $attributes)
+    {
+        return $value ? Carbon::createFromTimestampUTC($value) : null;
+    }
+
+    public function set($model, string $key, $value, array $attributes)
+    {
+        $value = Carbon::parse($value);
+        return $value ? $value->timestamp : null;
+    }
+}
+
+class EloquentBuilderTestStubWithTimestampCasts extends Model
+{
+    protected $table = 'table';
+
+    protected $casts = [
+        'created_at' => UnixTimeStampCast::class,
+        'updated_at' => UnixTimeStampCast::class,
+    ];
+}
+
+class EloquentBuilderTestStubWithTimestampMutators extends Model
+{
+    protected $table = 'table';
+
+    public function getCreatedAtAttribute($value)
+    {
+        return $value ? Carbon::createFromTimestampUTC($value) : null;
+    }
+
+    public function setCreatedAtAttribute($value)
+    {
+        return $this->attributes['created_at'] = Carbon::parse($value)->timestamp ?? null;
+    }
+
+    public function getUpdatedAtAttribute($value)
+    {
+        return $value ? Carbon::createFromTimestampUTC($value) : null;
+    }
+
+    public function setUpdatedAtAttribute($value)
+    {
+        return $this->attributes['updated_at'] = Carbon::parse($value)->timestamp ?? null;
     }
 }

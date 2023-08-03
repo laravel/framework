@@ -125,6 +125,25 @@ trait HasTimestamps
     }
 
     /**
+     * Get a fresh timestamp for the model attribute considering casting or mutation.
+     *
+     * @param string $key
+     * @return mixed
+     */
+    public function freshTimestampForAttribute(string $key): mixed
+    {
+        $value = $this->freshTimestamp();
+
+        if ($this->hasGetMutator($key) || $this->hasCast($key)) {
+            $value =
+                (clone $this)->forceFill([$key => $value])->getAttributes()[$key] ??
+                $value;
+        }
+
+        return $value;
+    }
+
+    /**
      * Determine if the model uses timestamps.
      *
      * @return bool
