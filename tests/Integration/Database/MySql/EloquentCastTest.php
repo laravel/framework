@@ -4,10 +4,8 @@ namespace Illuminate\Tests\Integration\Database\MySql;
 
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
-use stdClass;
 
 class EloquentCastTest extends MySqlTestCase
 {
