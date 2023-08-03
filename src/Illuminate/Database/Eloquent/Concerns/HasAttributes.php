@@ -1467,12 +1467,18 @@ trait HasAttributes
      *
      * @return array
      */
-    public function getDates()
+    public function getDates(): array
     {
-        return $this->usesTimestamps() ? [
+        $dateAttributes = array_filter(
+            array_keys($this->getCasts()), fn(string $key): bool => $this->isDateCastable($key)
+        );
+
+        $timestamps = $this->usesTimestamps() ? [
             $this->getCreatedAtColumn(),
             $this->getUpdatedAtColumn(),
         ] : [];
+
+        return array_unique([...$dateAttributes, ...$timestamps]);
     }
 
     /**
