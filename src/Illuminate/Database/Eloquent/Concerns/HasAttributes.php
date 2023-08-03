@@ -1470,7 +1470,7 @@ trait HasAttributes
     public function getDates(): array
     {
         $dateAttributes = array_filter(
-            array_keys($this->getCasts()), fn(string $key): bool => $this->isDateCastable($key)
+            array_keys($this->getCasts()), fn (string $key): bool => $this->isDateCastable($key)
         );
 
         $timestamps = $this->usesTimestamps() ? [
