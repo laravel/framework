@@ -261,7 +261,7 @@ class AboutCommand extends Command
     }
 
     /**
-     * Convert to search keyword.
+     * Format the given string for searching.
      *
      * @param  string  $value
      * @return string
