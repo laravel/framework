@@ -227,4 +227,9 @@ class FrequencyTest extends TestCase
 
         $this->assertSame('*/6 * * * *', $this->event->everyXMinutes(6)->getExpression());
     }
+
+    public function testBetween()
+    {
+        $this->assertSame('*/2 06-23 * * *', $this->event->everyTwoMinutes()->between('06:00', '23:00')->getExpression());
+    }
 }
