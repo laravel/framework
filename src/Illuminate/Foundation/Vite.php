@@ -670,6 +670,10 @@ class Vite implements Htmlable
 
         $path = public_path($buildDirectory.'/'.$chunk['file']);
 
+        if (! is_file($path) || ! file_exists($path)) {
+            return '';
+        }
+
         return file_get_contents($path);
     }
 
