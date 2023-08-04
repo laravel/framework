@@ -143,8 +143,8 @@ class AboutCommand extends Command
         $output = $data->flatMap(function ($data, $section) {
             return [
                 (string) Str::of($section)->snake() => $data->mapWithKeys(fn ($item, $key) => [
-                    $this->toSearchKeyword($item[0]) => value($item[1])
-                ])
+                    $this->toSearchKeyword($item[0]) => value($item[1]),
+                ]),
             ];
         });
 
