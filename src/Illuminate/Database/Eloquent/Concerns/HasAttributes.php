@@ -1474,7 +1474,21 @@ trait HasAttributes
             $this->getUpdatedAtColumn(),
         ] : [];
     }
+    
+    /**
+     * Get all attributes that should be converted to dates including timestamps and user-defined.
+     *
+     * @return array
+     */
+    public function getDateCastableAttributes(): array
+    {
+        $dateAttributes = array_filter(
+            array_keys($this->getCasts()), fn(string $key): bool => $this->isDateCastable($key)
+        );
 
+        return array_unique([...$dateAttributes, ...$this->getDates()]);
+    }
+    
     /**
      * Get the format for database stored dates.
      *
