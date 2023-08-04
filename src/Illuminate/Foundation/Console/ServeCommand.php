@@ -305,6 +305,8 @@ class ServeCommand extends Command
             ? '/^\[\d+]\s\[([a-zA-Z0-9: ]+)\]/'
             : '/^\[([^\]]+)\]/';
 
+        $line = str_replace('  ', ' ', $line);
+
         preg_match($regex, $line, $matches);
 
         return Carbon::createFromFormat('D M d H:i:s Y', $matches[1]);

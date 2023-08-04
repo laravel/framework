@@ -38,6 +38,7 @@ class SeedCommandTest extends TestCase
         $container = m::mock(Container::class);
         $container->shouldReceive('call');
         $container->shouldReceive('environment')->once()->andReturn('testing');
+        $container->shouldReceive('runningUnitTests')->andReturn('true');
         $container->shouldReceive('make')->with('DatabaseSeeder')->andReturn($seeder);
         $container->shouldReceive('make')->with(OutputStyle::class, m::any())->andReturn(
             $outputStyle
@@ -79,6 +80,7 @@ class SeedCommandTest extends TestCase
         $container = m::mock(Container::class);
         $container->shouldReceive('call');
         $container->shouldReceive('environment')->once()->andReturn('testing');
+        $container->shouldReceive('runningUnitTests')->andReturn('true');
         $container->shouldReceive('make')->with(UserWithoutModelEventsSeeder::class)->andReturn($seeder);
         $container->shouldReceive('make')->with(OutputStyle::class, m::any())->andReturn(
             $outputStyle

@@ -91,7 +91,7 @@ class AboutCommand extends Command
                 return $index === false ? 99 : $index;
             })
             ->filter(function ($data, $key) {
-                return $this->option('only') ? in_array(Str::of($key)->lower()->snake(), $this->sections()) : true;
+                return $this->option('only') ? in_array($this->toSearchKeyword($key), $this->sections()) : true;
             })
             ->pipe(fn ($data) => $this->display($data));
 
@@ -141,7 +141,11 @@ class AboutCommand extends Command
     protected function displayJson($data)
     {
         $output = $data->flatMap(function ($data, $section) {
-            return [(string) Str::of($section)->snake() => $data->mapWithKeys(fn ($item, $key) => [(string) Str::of($item[0])->lower()->snake() => value($item[1])])];
+            return [
+                (string) Str::of($section)->snake() => $data->mapWithKeys(fn ($item, $key) => [
+                    $this->toSearchKeyword($item[0]) => value($item[1]),
+                ]),
+            ];
         });
 
         $this->output->writeln(strip_tags(json_encode($output)));
@@ -250,6 +254,20 @@ class AboutCommand extends Command
      */
     protected function sections()
     {
-        return array_filter(explode(',', $this->option('only') ?? ''));
+        return collect(explode(',', $this->option('only') ?? ''))
+            ->filter()
+            ->map(fn ($only) => $this->toSearchKeyword($only))
+            ->all();
+    }
+
+    /**
+     * Format the given string for searching.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function toSearchKeyword(string $value)
+    {
+        return (string) Str::of($value)->lower()->snake();
     }
 }

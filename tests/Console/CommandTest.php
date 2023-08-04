@@ -51,6 +51,7 @@ class CommandTest extends TestCase
 
             $command->call(Command::class);
         });
+        $application->shouldReceive('runningUnitTests')->andReturn(true);
 
         $command->run($input, $output);
     }

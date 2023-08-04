@@ -5598,17 +5598,40 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
-    public function testEnsure($collection)
+    public function testEnsureForScalar($collection)
     {
         $data = $collection::make([1, 2, 3]);
-
         $data->ensure('int');
 
         $data = $collection::make([1, 2, 3, 'foo']);
-
         $this->expectException(UnexpectedValueException::class);
-
         $data->ensure('int');
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testEnsureForObjects($collection)
+    {
+        $data = $collection::make([new stdClass, new stdClass, new stdClass]);
+        $data->ensure(stdClass::class);
+
+        $data = $collection::make([new stdClass, new stdClass, new stdClass, $collection]);
+        $this->expectException(UnexpectedValueException::class);
+        $data->ensure(stdClass::class);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testEnsureForInheritance($collection)
+    {
+        $data = $collection::make([new \Error, new \Error]);
+        $data->ensure(\Throwable::class);
+
+        $data = $collection::make([new \Error, new \Error, new $collection]);
+        $this->expectException(UnexpectedValueException::class);
+        $data->ensure(\Throwable::class);
     }
 
     /**

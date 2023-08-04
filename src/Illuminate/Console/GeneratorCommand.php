@@ -485,7 +485,35 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
     protected function promptForMissingArgumentsUsing()
     {
         return [
-            'name' => 'What should the '.strtolower($this->type).' be named?',
+            'name' => [
+                'What should the '.strtolower($this->type).' be named?',
+                match ($this->type) {
+                    'Cast' => 'E.g. Json',
+                    'Channel' => 'E.g. OrderChannel',
+                    'Console command' => 'E.g. SendEmails',
+                    'Component' => 'E.g. Alert',
+                    'Controller' => 'E.g. UserController',
+                    'Event' => 'E.g. PodcastProcessed',
+                    'Exception' => 'E.g. InvalidOrderException',
+                    'Factory' => 'E.g. PostFactory',
+                    'Job' => 'E.g. ProcessPodcast',
+                    'Listener' => 'E.g. SendPodcastNotification',
+                    'Mail' => 'E.g. OrderShipped',
+                    'Middleware' => 'E.g. EnsureTokenIsValid',
+                    'Model' => 'E.g. Flight',
+                    'Notification' => 'E.g. InvoicePaid',
+                    'Observer' => 'E.g. UserObserver',
+                    'Policy' => 'E.g. PostPolicy',
+                    'Provider' => 'E.g. ElasticServiceProvider',
+                    'Request' => 'E.g. StorePodcastRequest',
+                    'Resource' => 'E.g. UserResource',
+                    'Rule' => 'E.g. Uppercase',
+                    'Scope' => 'E.g. TrendingScope',
+                    'Seeder' => 'E.g. UserSeeder',
+                    'Test' => 'E.g. UserTest',
+                    default => '',
+                },
+            ],
         ];
     }
 }
