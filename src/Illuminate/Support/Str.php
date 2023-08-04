@@ -1034,7 +1034,7 @@ class Str
      * Remove any occurrence of the given string in the subject.
      *
      * @param  string|iterable<string>  $search
-     * @param  string  $subject
+     * @param  string|iterable<string>  $subject
      * @param  bool  $caseSensitive
      * @return string
      */
