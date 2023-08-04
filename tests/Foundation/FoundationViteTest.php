@@ -1275,7 +1275,7 @@ class FoundationViteTest extends TestCase
     {
         $path = public_path('build/assets');
 
-        unlink($path . $asset);
+        unlink($path.$asset);
 
         rmdir($path);
     }
