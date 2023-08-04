@@ -656,6 +656,24 @@ class Vite implements Htmlable
     }
 
     /**
+     * Get the content for an asset.
+     *
+     * @param  string  $asset
+     * @param  string|null  $buildDirectory
+     * @return string
+     */
+    public function content($asset, $buildDirectory = null)
+    {
+        $buildDirectory ??= $this->buildDirectory;
+
+        $chunk = $this->chunk($this->manifest($buildDirectory), $asset);
+
+        $path = public_path($buildDirectory.'/'.$chunk['file']);
+
+        return file_get_contents($path);
+    }
+
+    /**
      * Generate an asset path for the application.
      *
      * @param  string  $path
