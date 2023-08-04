@@ -266,7 +266,7 @@ class AboutCommand extends Command
      * @param  string  $value
      * @return string
      */
-    protected function toSearchKeyword(string $value): string
+    protected function toSearchKeyword(string $value)
     {
         return (string) Str::of($value)->lower()->snake();
     }
