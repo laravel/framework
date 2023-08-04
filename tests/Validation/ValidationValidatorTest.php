@@ -2860,6 +2860,50 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['foo' => '1.88888888888888888888'], ['foo' => 'Decimal:20|Max:1.88888888888888888888']);
         $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, [
+            // these are the same number
+            'decimal' => '0.555',
+            'scientific' => '5.55e-1',
+        ], [
+            'decimal' => 'Decimal:0,2',
+            'scientific' => 'Decimal:0,2',
+        ]);
+        $this->assertSame(['decimal', 'scientific'], $v->errors()->keys());
+
+        $v = new Validator($trans, [
+            // these are the same number
+            'decimal' => '0.555',
+            'scientific' => '5.55e-1',
+        ], [
+            'decimal' => 'Decimal:0,3',
+            'scientific' => 'Decimal:0,3',
+        ]);
+        $this->assertSame(['scientific'], $v->errors()->keys());
+
+        $v = new Validator($trans, ['foo' => '+'], ['foo' => 'Decimal:0,2']);
+        $this->assertTrue($v->fails());
+        $v = new Validator($trans, ['foo' => '-'], ['foo' => 'Decimal:0,2']);
+        $this->assertTrue($v->fails());
+        $v = new Validator($trans, ['foo' => '10@12'], ['foo' => 'Decimal:0,2']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => '+123'], ['foo' => 'Decimal:0,2']);
+        $this->assertTrue($v->passes());
+        $v = new Validator($trans, ['foo' => '-123'], ['foo' => 'Decimal:0,2']);
+        $this->assertTrue($v->passes());
+        $v = new Validator($trans, ['foo' => '+123.'], ['foo' => 'Decimal:0,2']);
+        $this->assertTrue($v->passes());
+        $v = new Validator($trans, ['foo' => '-123.'], ['foo' => 'Decimal:0,2']);
+        $this->assertTrue($v->passes());
+        $v = new Validator($trans, ['foo' => '123.'], ['foo' => 'Decimal:0,2']);
+        $this->assertTrue($v->passes());
+        $v = new Validator($trans, ['foo' => '123.'], ['foo' => 'Decimal:0,2']);
+        $this->assertTrue($v->passes());
+        $v = new Validator($trans, ['foo' => '123.34'], ['foo' => 'Decimal:0,2']);
+        $this->assertTrue($v->passes());
+        $v = new Validator($trans, ['foo' => '123.34'], ['foo' => 'Decimal:0,2']);
+        $this->assertTrue($v->passes());
     }
 
     public function testValidateInt()
