@@ -2906,6 +2906,126 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testDecimalDigits()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, ['num' => '55.55'], ['num' => 'digits:4|decimal:2']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['num' => '-55.55'], ['num' => 'digits:4|decimal:2']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['num' => '+55.55'], ['num' => 'digits:4|decimal:2']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['num' => '.55'], ['num' => 'digits:2|decimal:2']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['num' => '+.55'], ['num' => 'digits:2|decimal:2']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['num' => '-.55'], ['num' => 'digits:2|decimal:2']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['num' => '.55'], ['num' => 'digits:2|decimal:2']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['num' => '5.55'], ['num' => 'digits:4|decimal:2']);
+        $this->assertSame(['validation.digits'], $v->errors()->all());
+
+        $v = new Validator($trans, ['num' => '+5.55'], ['num' => 'digits:4|decimal:2']);
+        $this->assertSame(['validation.digits'], $v->errors()->all());
+
+        $v = new Validator($trans, ['num' => '-5.55'], ['num' => 'digits:4|decimal:2']);
+        $this->assertSame(['validation.digits'], $v->errors()->all());
+
+        $v = new Validator($trans, ['num' => '555.55'], ['num' => 'digits:4|decimal:2']);
+        $this->assertSame(['validation.digits'], $v->errors()->all());
+
+        $v = new Validator($trans, ['num' => '+555.55'], ['num' => 'digits:4|decimal:2']);
+        $this->assertSame(['validation.digits'], $v->errors()->all());
+
+        $v = new Validator($trans, ['num' => '-555.55'], ['num' => 'digits:4|decimal:2']);
+        $this->assertSame(['validation.digits'], $v->errors()->all());
+    }
+
+    public function testDecimalMaxDigits()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, ['num' => '55.55'], ['num' => 'max_digits:4|decimal:2']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['num' => '5.55'], ['num' => 'max_digits:4|decimal:2']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['num' => '.55'], ['num' => 'max_digits:4|decimal:2']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['num' => '-55.55'], ['num' => 'max_digits:4|decimal:2']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['num' => '+55.55'], ['num' => 'max_digits:4|decimal:2']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['num' => '.55'], ['num' => 'max_digits:2|decimal:2']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['num' => '+.55'], ['num' => 'max_digits:2|decimal:2']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['num' => '-.55'], ['num' => 'max_digits:2|decimal:2']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['num' => '555.55'], ['num' => 'max_digits:4|decimal:2']);
+        $this->assertSame(['validation.max_digits'], $v->errors()->all());
+
+        $v = new Validator($trans, ['num' => '+555.55'], ['num' => 'max_digits:4|decimal:2']);
+        $this->assertSame(['validation.max_digits'], $v->errors()->all());
+
+        $v = new Validator($trans, ['num' => '-555.55'], ['num' => 'max_digits:4|decimal:2']);
+        $this->assertSame(['validation.max_digits'], $v->errors()->all());
+    }
+
+    public function testDecimalMinDigits()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, ['num' => '55.55'], ['num' => 'min_digits:2|decimal:2']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['num' => '5.55'], ['num' => 'min_digits:2|decimal:2']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['num' => '.55'], ['num' => 'min_digits:2|decimal:2']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['num' => '-55.55'], ['num' => 'min_digits:2|decimal:2']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['num' => '+55.55'], ['num' => 'min_digits:2|decimal:2']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['num' => '.55'], ['num' => 'min_digits:2|decimal:2']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['num' => '+.55'], ['num' => 'min_digits:2|decimal:2']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['num' => '-.55'], ['num' => 'min_digits:2|decimal:2']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['num' => '5.55'], ['num' => 'min_digits:4|decimal:2']);
+        $this->assertSame(['validation.min_digits'], $v->errors()->all());
+
+        $v = new Validator($trans, ['num' => '+5.55'], ['num' => 'min_digits:4|decimal:2']);
+        $this->assertSame(['validation.min_digits'], $v->errors()->all());
+
+        $v = new Validator($trans, ['num' => '-5.55'], ['num' => 'min_digits:4|decimal:2']);
+        $this->assertSame(['validation.min_digits'], $v->errors()->all());
+    }
+
     public function testValidateInt()
     {
         $trans = $this->getIlluminateArrayTranslator();

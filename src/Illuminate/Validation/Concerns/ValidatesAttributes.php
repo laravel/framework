@@ -597,13 +597,13 @@ trait ValidatesAttributes
             return false;
         }
 
-        $matches = [];
-
-        if (preg_match('/^[+-]?\d*\.?(\d*)$/', $value, $matches) !== 1) {
+        if (! $this->isDecimal($value)) {
             return false;
         }
 
-        $decimals = strlen(end($matches));
+        $decimals = Str::contains($value, '.')
+            ? strlen(Str::after($value, '.'))
+            : 0;
 
         if (! isset($parameters[1])) {
             return $decimals == $parameters[0];
@@ -649,6 +649,10 @@ trait ValidatesAttributes
     public function validateDigits($attribute, $value, $parameters)
     {
         $this->requireParameterCount(1, $parameters, 'digits');
+
+        if ($this->hasRule($attribute, 'Decimal')) {
+            return $this->isDecimal($value) && preg_match_all('/\d/', $value) == $parameters[0];
+        }
 
         return ! preg_match('/[^0-9]/', $value)
                     && strlen((string) $value) == $parameters[0];
@@ -1434,6 +1438,10 @@ trait ValidatesAttributes
     {
         $this->requireParameterCount(1, $parameters, 'max_digits');
 
+        if ($this->hasRule($attribute, 'Decimal')) {
+            return $this->isDecimal($value) && preg_match_all('/\d/', $value) <= $parameters[0];
+        }
+
         $length = strlen((string) $value);
 
         return ! preg_match('/[^0-9]/', $value) && $length <= $parameters[0];
@@ -1535,6 +1543,10 @@ trait ValidatesAttributes
     public function validateMinDigits($attribute, $value, $parameters)
     {
         $this->requireParameterCount(1, $parameters, 'min_digits');
+
+        if ($this->hasRule($attribute, 'Decimal')) {
+            return $this->isDecimal($value) && preg_match_all('/\d/', $value) >= $parameters[0];
+        }
 
         $length = strlen((string) $value);
 
@@ -2468,5 +2480,16 @@ trait ValidatesAttributes
     protected function trim($value)
     {
         return is_string($value) ? trim($value) : $value;
+    }
+
+    /**
+     * Determine if the value is in the shape of a decimal.
+     *
+     * @param  string  $value
+     * @return bool
+     */
+    protected function isDecimal($value)
+    {
+        return preg_match('/^[+-]?\d*\.?(\d*)$/', $value) === 1;
     }
 }
