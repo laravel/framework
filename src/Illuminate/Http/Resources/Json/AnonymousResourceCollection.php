@@ -2,9 +2,9 @@
 
 namespace Illuminate\Http\Resources\Json;
 
+use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
-use Illuminate\Support\Str;
 
 class AnonymousResourceCollection extends ResourceCollection
 {
@@ -19,10 +19,6 @@ class AnonymousResourceCollection extends ResourceCollection
      * @var array
      */
     public array $pagination;
-    /**
-     * @var string
-     */
-    public string $base_name;
 
     /**
      * @var array
@@ -45,8 +41,6 @@ class AnonymousResourceCollection extends ResourceCollection
      */
     public function __construct($resource, string $collects)
     {
-        $this->getResourceName($collects);
-
         $this->queries = \request()->except('page');
 
         $this->resolvePagination($resource);
@@ -54,18 +48,6 @@ class AnonymousResourceCollection extends ResourceCollection
         $this->collects = $collects;
 
         parent::__construct($resource);
-    }
-
-    /**
-     * @param $collects
-     * @return void
-     */
-    public function getResourceName($collects):void{
-        $this->base_name =  Str::of(class_basename($collects))
-            ->replace('Resource','',false)
-            ->plural()
-            ->lcfirst()
-            ->value();
     }
 
     /**
@@ -111,13 +93,17 @@ class AnonymousResourceCollection extends ResourceCollection
 
 
     /**
-     * @param $request
+     * @param Request $request
      * @return array
      */
-    public function toArray($request):array
+    public function toArray(Request $request):array
     {
-        $data[$this->base_name] = $this->collection;
-        (empty($this->pagination))?:$data['pagination'] = $this->pagination;
+        if(empty($this->pagination)){
+            $data = $this->collection->map->toArray($request)->all();
+        }else{
+            $data['data'] = $this->collection;
+            $data['paginate'] = $this->pagination;
+        }
         return $data;
     }
 }
