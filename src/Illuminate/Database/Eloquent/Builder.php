@@ -1142,7 +1142,11 @@ class Builder implements BuilderContract
         if (! array_key_exists($column, $values)) {
             $timestamp = $this->model->freshTimestampString();
 
-            if ($this->model->hasCast($column)) {
+            if (
+                $this->model->hasSetMutator($column)
+                || $this->model->hasAttributeSetMutator($column)
+                || $this->model->hasCast($column)
+            ) {
                 $timestamp = $this->model->newInstance([$column => $timestamp])->getAttributes()[$column];
             }
 
