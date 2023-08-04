@@ -3,6 +3,7 @@
 namespace Illuminate\Console\Scheduling;
 
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 
 trait ManagesFrequencies
@@ -29,7 +30,8 @@ trait ManagesFrequencies
      */
     public function between($startTime, $endTime)
     {
-        return $this->when($this->inTimeInterval($startTime, $endTime));
+        return $this->when($this->inTimeInterval($startTime, $endTime))
+            ->spliceIntoPosition(2, Str::before($startTime, ':').'-'.Str::before($endTime, ':'));
     }
 
     /**
