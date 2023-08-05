@@ -6,17 +6,19 @@ use Closure;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Concerns\InteractsWithQueryException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 
 class BelongsToMany extends Relation
 {
-    use InteractsWithDictionary, InteractsWithPivotTable;
+    use InteractsWithDictionary, InteractsWithPivotTable, InteractsWithQueryException;
 
     /**
      * The intermediate table for the relation.
@@ -628,6 +630,46 @@ class BelongsToMany extends Relation
         }
 
         return $instance;
+    }
+
+    /**
+     * Attempts to create the related record and return the first match if a unique constraint happens.
+     *
+     * @param  array  $attributes
+     * @param  array  $values
+     * @param  array  $joining
+     * @param  bool  $touch
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function createOrFirst(array $attributes = [], array $values = [], array $joining = [], $touch = true)
+    {
+        // First, we're goint to attempt to create the related record
+        // which also attempts to attach it to the current record.
+
+        try {
+            return $this->create(array_merge($attributes, $values), $joining, $touch);
+        } catch (QueryException $exception) {
+            if (! $this->matchesUniqueConstraintException($exception)) {
+                throw $exception;
+            }
+        }
+
+        // Then, we'll assume the related record already exists, so we
+        // we only attempt to attach it to the current record.
+
+        try {
+            $instance = $this->related->where($attributes)->firstOrFail();
+
+            $this->attach($instance, $joining, $touch);
+
+            return $instance;
+        } catch (QueryException $exception) {
+            if (! $this->matchesUniqueConstraintException($exception)) {
+                throw $exception;
+            }
+
+            return (clone $this)->where($attributes)->first();
+        }
     }
 
     /**
