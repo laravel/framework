@@ -643,8 +643,9 @@ class BelongsToMany extends Relation
      */
     public function createOrFirst(array $attributes = [], array $values = [], array $joining = [], $touch = true)
     {
-        // First, we're goint to attempt to create the related record
-        // which also attempts to attach it to the current record.
+        // First, we'll attempt to create the related record. If it works,
+        // this means the related record didn't exist before, so it was
+        // successfully created and it's also automatically attached.
 
         try {
             return $this->create(array_merge($attributes, $values), $joining, $touch);
@@ -654,8 +655,9 @@ class BelongsToMany extends Relation
             }
         }
 
-        // Then, we'll assume the related record already exists, so we
-        // we only attempt to attach it to the current record.
+        // If we run into a UNIQUE constraint violation, we'll assume it came from the related model's
+        // table. Then, we'll find it (or fail) and attempt to attach it to the current model. When
+        // that works, we return the attached instance. If attaching also fails, we'll do a find.
 
         try {
             $instance = $this->related->where($attributes)->firstOrFail();
