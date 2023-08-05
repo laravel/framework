@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Concerns\QueriesRelationships;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Database\QueryException;
 use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Arr;
@@ -569,6 +570,21 @@ class Builder implements BuilderContract
         return tap($this->newModelInstance(array_merge($attributes, $values)), function ($instance) {
             $instance->save();
         });
+    }
+
+    public function createOrFirst(array $attributes = [], array $values = [])
+    {
+        try {
+            return tap($this->newModelInstance(array_merge($attributes, $values)), function (Model $instance) {
+                $instance->save();
+            });
+        } catch (QueryException $exception) {
+            if (! $this->matchesUniqueConstraintException($exception)) {
+                throw $exception;
+            }
+
+            return $this->where($attributes)->first();
+        }
     }
 
     /**
@@ -1982,6 +1998,36 @@ class Builder implements BuilderContract
                 static::macro($method->name, $method->invoke($mixin));
             }
         }
+    }
+
+    /**
+     * Checks if the QueryException was caused by a UNIQUE constraint violation.
+     *
+     * @return bool
+     */
+    protected function matchesUniqueConstraintException(QueryException $exception)
+    {
+        // SQLite3
+        if (preg_match('#(column(s)? .* (is|are) not unique|UNIQUE constraint failed: .*)#i', $exception->getMessage())) {
+            return true;
+        }
+
+        // MySQL
+        if (preg_match('#SQLSTATE\[23000\]: Integrity constraint violation: 1062#i', $exception->getMessage())) {
+            return true;
+        }
+
+        // PostgreSQL
+        if (preg_match('#SQLSTATE\[23505\]#i', $exception->getMessage())) {
+            return true;
+        }
+
+        // SQLServer
+        if (preg_match('#SQLSTATE\[23000\]:.*Cannot insert duplicate key row in object.*#i', $exception->getMessage())) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
