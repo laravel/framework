@@ -4,12 +4,14 @@ namespace Illuminate\Database\Eloquent\Relations;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Concerns\InteractsWithQueryException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
+use Illuminate\Database\QueryException;
 
 abstract class HasOneOrMany extends Relation
 {
-    use InteractsWithDictionary;
+    use InteractsWithDictionary, InteractsWithQueryException;
 
     /**
      * The foreign key of the parent model.
@@ -239,6 +241,26 @@ abstract class HasOneOrMany extends Relation
         }
 
         return $instance;
+    }
+
+    /**
+     * Attempt to create the record or find the first one matching the attributes if a unique constraint violation happens.
+     *
+     * @param  array  $attributes
+     * @param  array  $values
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function createOrFirst(array $attributes = [], array $values = [])
+    {
+        try {
+            return $this->create(array_merge($attributes, $values));
+        } catch (QueryException $exception) {
+            if (! $this->matchesUniqueConstraintException($exception)) {
+                throw $exception;
+            }
+
+            return $this->where($attributes)->first();
+        }
     }
 
     /**
