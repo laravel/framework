@@ -1,18 +1,18 @@
 <?php
 
-namespace Illuminate\Tests\Database;
+namespace Illuminate\Tests\Integration\Database\Postgres;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Tests\Integration\Database\MySql\MySqlTestCase;
+use Illuminate\Tests\Integration\Database\Postgres\PostgresTestCase;
 
-class DatabaseEloquentMySqlIntegrationTest extends MySqlTestCase
+class DatabaseEloquentPostgresIntegrationTest extends PostgresTestCase
 {
     protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
-        if (! Schema::hasTable('database_eloquent_mysql_integration_users')) {
-            Schema::create('database_eloquent_mysql_integration_users', function (Blueprint $table) {
+        if (! Schema::hasTable('database_eloquent_postgres_integration_users')) {
+            Schema::create('database_eloquent_postgres_integration_users', function (Blueprint $table) {
                 $table->id();
                 $table->string('name')->nullable();
                 $table->string('email')->unique();
@@ -23,17 +23,17 @@ class DatabaseEloquentMySqlIntegrationTest extends MySqlTestCase
 
     protected function destroyDatabaseMigrations()
     {
-        Schema::drop('database_eloquent_mysql_integration_users');
+        Schema::drop('database_eloquent_postgres_integration_users');
     }
 
     public function testCreateOrFirst()
     {
-        $user1 = DatabaseEloquentMySqlIntegrationUser::createOrFirst(['email' => 'taylorotwell@gmail.com']);
+        $user1 = DatabaseEloquentPostgresIntegrationUser::createOrFirst(['email' => 'taylorotwell@gmail.com']);
 
         $this->assertSame('taylorotwell@gmail.com', $user1->email);
         $this->assertNull($user1->name);
 
-        $user2 = DatabaseEloquentMySqlIntegrationUser::createOrFirst(
+        $user2 = DatabaseEloquentPostgresIntegrationUser::createOrFirst(
             ['email' => 'taylorotwell@gmail.com'],
             ['name' => 'Taylor Otwell']
         );
@@ -42,7 +42,7 @@ class DatabaseEloquentMySqlIntegrationTest extends MySqlTestCase
         $this->assertSame('taylorotwell@gmail.com', $user2->email);
         $this->assertNull($user2->name);
 
-        $user3 = DatabaseEloquentMySqlIntegrationUser::createOrFirst(
+        $user3 = DatabaseEloquentPostgresIntegrationUser::createOrFirst(
             ['email' => 'abigailotwell@gmail.com'],
             ['name' => 'Abigail Otwell']
         );
@@ -51,7 +51,7 @@ class DatabaseEloquentMySqlIntegrationTest extends MySqlTestCase
         $this->assertSame('abigailotwell@gmail.com', $user3->email);
         $this->assertSame('Abigail Otwell', $user3->name);
 
-        $user4 = DatabaseEloquentMySqlIntegrationUser::createOrFirst(
+        $user4 = DatabaseEloquentPostgresIntegrationUser::createOrFirst(
             ['name' => 'Dries Vints'],
             ['name' => 'Nuno Maduro', 'email' => 'nuno@laravel.com']
         );
@@ -60,9 +60,9 @@ class DatabaseEloquentMySqlIntegrationTest extends MySqlTestCase
     }
 }
 
-class DatabaseEloquentMySqlIntegrationUser extends Model
+class DatabaseEloquentPostgresIntegrationUser extends Model
 {
-    protected $table = 'database_eloquent_mysql_integration_users';
+    protected $table = 'database_eloquent_postgres_integration_users';
 
     protected $guarded = [];
 }
