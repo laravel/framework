@@ -13,7 +13,7 @@ trait InteractsWithQueryException
      *
      * @var string
      */
-    private const UNIQUE_CONSTRAINT_MYSQL_PATTERN = '#Integrity constraint violation: 1062#i';
+    protected static $UNIQUE_CONSTRAINT_MYSQL_PATTERN = '#Integrity constraint violation: 1062#i';
 
     /**
      * SQLite 3.8.2 and above will return the newly formatted error message:
@@ -22,21 +22,21 @@ trait InteractsWithQueryException
      *
      * @var string
      */
-    private const UNIQUE_CONSTRAINT_SQLITE_PATTERN = '#(column(s)? .* (is|are) not unique|UNIQUE constraint failed: .*)#i';
+    protected static $UNIQUE_CONSTRAINT_SQLITE_PATTERN = '#(column(s)? .* (is|are) not unique|UNIQUE constraint failed: .*)#i';
 
     /**
      * The error code PostgreSQL returns when we run into a UNIQUE constraint violation.
      *
      * @var string
      */
-    private const UNIQUE_CONSTRAINT_POSTGRES_CODE = '23505';
+    protected static $UNIQUE_CONSTRAINT_POSTGRES_CODE = '23505';
 
     /**
      * The error message regex pattern for when SQL Server runs into a UNIQUE constraint violation.
      *
      * @var string
      */
-    private const UNIQUE_CONSTRAINT_SQLSERVER_PATTERN = '#Cannot insert duplicate key row in object#i';
+    protected static $UNIQUE_CONSTRAINT_SQLSERVER_PATTERN = '#Cannot insert duplicate key row in object#i';
 
     /**
      * Checks if the QueryException was caused by a UNIQUE constraint violation.
@@ -45,19 +45,19 @@ trait InteractsWithQueryException
      */
     protected function matchesUniqueConstraintException(QueryException $exception)
     {
-        if (preg_match(self::UNIQUE_CONSTRAINT_SQLITE_PATTERN, $exception->getMessage())) {
+        if (preg_match(self::$UNIQUE_CONSTRAINT_SQLITE_PATTERN, $exception->getMessage())) {
             return true;
         }
 
-        if (preg_match(self::UNIQUE_CONSTRAINT_MYSQL_PATTERN, $exception->getMessage())) {
+        if (preg_match(self::$UNIQUE_CONSTRAINT_MYSQL_PATTERN, $exception->getMessage())) {
             return true;
         }
 
-        if (preg_match(self::UNIQUE_CONSTRAINT_SQLSERVER_PATTERN, $exception->getMessage())) {
+        if (preg_match(self::$UNIQUE_CONSTRAINT_SQLSERVER_PATTERN, $exception->getMessage())) {
             return true;
         }
 
-        if (self::UNIQUE_CONSTRAINT_POSTGRES_CODE === $exception->getCode()) {
+        if (self::$UNIQUE_CONSTRAINT_POSTGRES_CODE === $exception->getCode()) {
             return true;
         }
 
