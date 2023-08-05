@@ -72,6 +72,28 @@ class DatabaseSoftDeletingScopeTest extends TestCase
         $this->assertEquals($model, $result);
     }
 
+    public function testCreateOrRestoreExtension()
+    {
+        $builder = new EloquentBuilder(new BaseBuilder(
+            m::mock(ConnectionInterface::class),
+            m::mock(Grammar::class),
+            m::mock(Processor::class)
+        ));
+
+        $scope = new SoftDeletingScope;
+        $scope->extend($builder);
+        $callback = $builder->getMacro('createOrRestore');
+        $givenBuilder = m::mock(EloquentBuilder::class);
+        $givenBuilder->shouldReceive('withTrashed')->once();
+        $attributes = ['name' => 'foo'];
+        $values = ['email' => 'bar'];
+        $givenBuilder->shouldReceive('createOrFirst')->once()->with($attributes, $values)->andReturn($model = m::mock(Model::class));
+        $model->shouldReceive('restore')->once()->andReturn(true);
+        $result = $callback($givenBuilder, $attributes, $values);
+
+        $this->assertEquals($model, $result);
+    }
+
     public function testWithTrashedExtension()
     {
         $builder = new EloquentBuilder(new BaseBuilder(
