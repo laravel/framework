@@ -573,6 +573,13 @@ class Builder implements BuilderContract
         });
     }
 
+    /**
+     * Attempts to create the record and switches to finding it if we run into a UNIQUE constraint violation.
+     *
+     * @param  array  $attributes
+     * @param  array  $values
+     * @return \Illuminate\Database\Eloquent\Model|static
+     */
     public function createOrFirst(array $attributes = [], array $values = [])
     {
         try {
