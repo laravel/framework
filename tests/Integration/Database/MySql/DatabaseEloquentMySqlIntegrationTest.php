@@ -5,7 +5,6 @@ namespace Illuminate\Tests\Integration\Database\MySql;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Tests\Integration\Database\MySql\MySqlTestCase;
 
 class DatabaseEloquentMySqlIntegrationTest extends MySqlTestCase
 {

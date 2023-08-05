@@ -5,7 +5,6 @@ namespace Illuminate\Tests\Integration\Database\Postgres;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Tests\Integration\Database\Postgres\PostgresTestCase;
 
 class DatabaseEloquentPostgresIntegrationTest extends PostgresTestCase
 {
