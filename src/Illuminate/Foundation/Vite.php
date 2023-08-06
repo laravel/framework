@@ -673,7 +673,7 @@ class Vite implements Htmlable
         $path = public_path($buildDirectory.'/'.$chunk['file']);
 
         if (! is_file($path) || ! file_exists($path)) {
-            throw new Exception("Unable to locate file at path: {$path}.");
+            throw new Exception("Unable to locate file from Vite manifest: {$path}.");
         }
 
         return file_get_contents($path);
