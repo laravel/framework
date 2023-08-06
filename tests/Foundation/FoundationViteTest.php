@@ -1199,6 +1199,20 @@ class FoundationViteTest extends TestCase
         $this->cleanViteManifest();
     }
 
+    public function testItThrowsWhenUnableToFindFileToRetrieveContent()
+    {
+        $this->makeViteManifest();
+
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Unable to locate file at path: '.public_path('build/assets/app.versioned.js'));
+
+        $content = ViteFacade::content('resources/js/app.js');
+
+        $this->assertSame('some content', $content);
+
+        $this->cleanViteManifest();
+    }
+
     protected function makeViteManifest($contents = null, $path = 'build')
     {
         app()->usePublicPath(__DIR__);

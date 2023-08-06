@@ -661,6 +661,8 @@ class Vite implements Htmlable
      * @param  string  $asset
      * @param  string|null  $buildDirectory
      * @return string
+     *
+     * @throws \Exception
      */
     public function content($asset, $buildDirectory = null)
     {
@@ -671,7 +673,7 @@ class Vite implements Htmlable
         $path = public_path($buildDirectory.'/'.$chunk['file']);
 
         if (! is_file($path) || ! file_exists($path)) {
-            return '';
+            throw new Exception("Unable to locate file at path: {$path}.");
         }
 
         return file_get_contents($path);
