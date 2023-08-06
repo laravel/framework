@@ -45,6 +45,23 @@ class PaginatorTest extends TestCase
         $this->assertSame('http://website.com/test?page=1', $p->previousPageUrl());
     }
 
+    public function testLengthPaginatorCorrectlyGenerateUrlsWithQueryAndPageNamesWithBrackets()
+    {
+        $p = new Paginator(['item1', 'item2', 'item3'], 2, 2, [
+            'path' => 'http://website.com/test',
+            'pageName' => 'items[page]',
+            'query' => [
+                'status' => 'open',
+                'items' => ['page' => 1, 'per_page' => 15],
+            ],
+        ]);
+
+        $this->assertSame(
+            'http://website.com/test?status=open&items%5Bpage%5D=2&items%5Bper_page%5D=15',
+            $p->url($p->currentPage())
+        );
+    }
+
     public function testItRetrievesThePaginatorOptions()
     {
         $p = new Paginator(['item1', 'item2', 'item3'], 2, 2, ['path' => 'http://website.com/test']);
