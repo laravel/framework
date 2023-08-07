@@ -637,14 +637,16 @@ trait QueriesRelationships
                 $expression = $column;
             }
 
+            // Apply constraints to the relation so the user can rely on the
+            // scopes/helpers of the relation rather than the Builder.
+            $constraints($relation);
+
             // Here, we will grab the relationship sub-query and prepare to add it to the main query
             // as a sub-select. First, we'll get the "has" query and use that to get the relation
             // sub-query. We'll format this relationship name and append this column if needed.
             $query = $relation->getRelationExistenceQuery(
                 $relation->getRelated()->newQuery(), $this, new Expression($expression)
             )->setBindings([], 'select');
-
-            $query->callScope($constraints);
 
             $query = $query->mergeConstraintsFrom($relation->getQuery())->toBase();
 

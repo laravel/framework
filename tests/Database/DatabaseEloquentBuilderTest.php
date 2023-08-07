@@ -1243,8 +1243,8 @@ class DatabaseEloquentBuilderTest extends TestCase
             $q->where('bam', '>', 'qux');
         }]);
 
-        $this->assertSame('select "id", (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and "bam" > ? and "active" = ?) as "active_foo_count" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
-        $this->assertEquals(['qux', true], $builder->getBindings());
+        $this->assertSame('select "id", (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and "active" = ? and "bam" > ?) as "active_foo_count" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+        $this->assertEquals([true, 'qux'], $builder->getBindings());
     }
 
     public function testWithCountAndGlobalScope()
@@ -1369,8 +1369,8 @@ class DatabaseEloquentBuilderTest extends TestCase
             $q->where('bam', '>', 'qux');
         }]);
 
-        $this->assertSame('select "id", exists(select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and "bam" > ? and "active" = ?) as "active_foo_exists" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
-        $this->assertEquals(['qux', true], $builder->getBindings());
+        $this->assertSame('select "id", exists(select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and "active" = ? and "bam" > ?) as "active_foo_exists" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+        $this->assertEquals([true, 'qux'], $builder->getBindings());
     }
 
     public function testWithExistsAndGlobalScope()
