@@ -65,7 +65,7 @@ class EnvironmentEncryptCommand extends Command
 
         $environmentFile = $this->laravel->environmentFilePath();
         
-        if($this->option('env')) {
+        if ($this->option('env')) {
             $environmentFile .= '.'.$this->option('env');
         }
 
