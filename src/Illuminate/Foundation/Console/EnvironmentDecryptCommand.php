@@ -80,10 +80,6 @@ class EnvironmentDecryptCommand extends Command
 
         $encryptedFile .= '.encrypted';
 
-        $encryptedFile = ($this->option('env')
-                    ? base_path('.env').'.'.$this->option('env')
-                    : $this->laravel->environmentFilePath()).'.encrypted';
-
         $outputFile = $this->outputFilePath();
 
         if (Str::endsWith($outputFile, '.encrypted')) {
