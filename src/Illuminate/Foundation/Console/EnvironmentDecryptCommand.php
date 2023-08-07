@@ -72,6 +72,14 @@ class EnvironmentDecryptCommand extends Command
 
         $key = $this->parseKey($key);
 
+        $encryptedFile = $this->laravel->environmentFilePath();
+
+        if($this->option('env')) {
+            $encryptedFile .= '.'.$this->option('env');
+        }
+
+        $encryptedFile .= '.encrypted';
+
         $encryptedFile = ($this->option('env')
                     ? base_path('.env').'.'.$this->option('env')
                     : $this->laravel->environmentFilePath()).'.encrypted';
