@@ -442,6 +442,16 @@ trait InteractsWithIO
     }
 
     /**
+     * Get the components implementation.
+     *
+     * @return \Illuminate\Console\View\Components\Factory
+     */
+    public function getComponents()
+    {
+        return $this->components;
+    }
+
+    /**
      * Get the output implementation.
      *
      * @return \Illuminate\Console\OutputStyle
