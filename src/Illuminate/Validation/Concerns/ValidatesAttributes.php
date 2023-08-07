@@ -593,7 +593,9 @@ trait ValidatesAttributes
 
         $matches = [];
 
-        preg_match('/^[+-]?\d*.(\d*)$/', $value, $matches);
+        if (preg_match('/^[+-]?\d*\.?(\d*)$/', $value, $matches) !== 1) {
+            return false;
+        }
 
         $decimals = strlen(end($matches));
 
