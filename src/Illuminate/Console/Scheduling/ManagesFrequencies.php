@@ -3,6 +3,7 @@
 namespace Illuminate\Console\Scheduling;
 
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 
 trait ManagesFrequencies
