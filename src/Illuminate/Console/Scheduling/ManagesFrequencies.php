@@ -687,7 +687,7 @@ trait ManagesFrequencies
     /**
      * Prefixes the given value into the given position of the expression.
      *
-     * @param  int $position
+     * @param  int  $position
      * @param  string  $value
      * @return $this
      */
@@ -695,7 +695,7 @@ trait ManagesFrequencies
     {
         $segments = preg_split("/\s+/", $this->expression);
 
-        $segments[$position - 1] = Str::replace('*','', $value.$segments[$position - 1]);
+        $segments[$position - 1] = Str::replace('*', '', $value.$segments[$position - 1]);
 
         return $this->cron(implode(' ', $segments));
     }
