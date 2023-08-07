@@ -2485,7 +2485,7 @@ trait ValidatesAttributes
     /**
      * Determine if the value is in the shape of a decimal.
      *
-     * @param  string  $value
+     * @param  mixed  $value
      * @return bool
      */
     protected function isDecimal($value)
