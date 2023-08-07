@@ -699,6 +699,4 @@ trait ManagesFrequencies
 
         return $this->cron(implode(' ', $segments));
     }
-
-
 }
