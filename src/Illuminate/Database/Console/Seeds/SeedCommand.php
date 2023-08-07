@@ -4,6 +4,7 @@ namespace Illuminate\Database\Console\Seeds;
 
 use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Eloquent\Model;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -66,8 +67,16 @@ class SeedCommand extends Command
 
         $this->resolver->setDefaultConnection($this->getDatabase());
 
-        Model::unguarded(function () {
-            $this->getSeeder()->__invoke();
+        try {
+            $seeder = $this->getSeeder();
+        } catch (BindingResolutionException $e) {
+            $this->components->error("Seeder {$this->getClassArgument()} not found");
+
+            return 1;
+        }
+
+        Model::unguarded(function () use($seeder) {
+            $seeder->__invoke();
         });
 
         if ($previousConnection) {
@@ -84,7 +93,7 @@ class SeedCommand extends Command
      */
     protected function getSeeder()
     {
-        $class = $this->input->getArgument('class') ?? $this->input->getOption('class');
+        $class = $this->getClassArgument();
 
         if (! str_contains($class, '\\')) {
             $class = 'Database\\Seeders\\'.$class;
@@ -110,6 +119,14 @@ class SeedCommand extends Command
         $database = $this->input->getOption('database');
 
         return $database ?: $this->laravel['config']['database.default'];
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getClassArgument(): mixed
+    {
+        return $this->input->getArgument('class') ?? $this->input->getOption('class');
     }
 
     /**
