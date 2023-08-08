@@ -32,16 +32,14 @@ class ConfigShowCommand extends Command
     {
         $config = $this->argument('config');
 
-        $data = config($config);
-
-        if (! $data) {
+        if (! config()->has($config)) {
             $this->components->error("Configuration file `{$config}` does not exist.");
 
             return Command::FAILURE;
         }
 
         $this->newLine();
-        $this->render($config, $data);
+        $this->render($config);
         $this->newLine();
 
         return Command::SUCCESS;
@@ -51,11 +49,12 @@ class ConfigShowCommand extends Command
      * Render the configuration values.
      *
      * @param  string  $name
-     * @param  mixed  $data
      * @return void
      */
-    public function render($name, $data)
+    public function render($name)
     {
+        $data = config($name);
+
         if (! is_array($data)) {
             $this->title($name, $this->formatValue($data));
 
