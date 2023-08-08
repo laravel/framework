@@ -550,8 +550,8 @@ if (! function_exists('carbon')) {
     /**
      * Create a new Carbon instance.
      *
-     * @param DateTimeInterface|string|null $time
-     * @param DateTimeZone|string|null      $tz
+     * @param  DateTimeInterface|string|null  $time
+     * @param  DateTimeZone|string|null  $tz
      * @return \Illuminate\Support\Carbon
      * 
      * @throws InvalidFormatException
