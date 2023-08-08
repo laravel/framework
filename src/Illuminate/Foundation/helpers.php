@@ -553,7 +553,7 @@ if (! function_exists('carbon')) {
      * @param  DateTimeInterface|string|null  $time
      * @param  DateTimeZone|string|null  $tz
      * @return \Illuminate\Support\Carbon
-     * 
+     *
      * @throws InvalidFormatException
      */
     function carbon($time = null, $tz = null)
