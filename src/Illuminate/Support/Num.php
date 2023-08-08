@@ -20,7 +20,7 @@ class Num
     public static function float(string $value, ?string $decimalSeparator = null): float
     {
         $decimalSeparator = $decimalSeparator ?? self::guessDecimalSeparator($value);
-        $cleanedValue = preg_replace('/[^0-9' . preg_quote($decimalSeparator) . ']/', '', $value);
+        $cleanedValue = preg_replace('/[^0-9'.preg_quote($decimalSeparator).']/', '', $value);
 
         if ($decimalSeparator === self::COMMA) {
             $floatValue = (float) str_replace($decimalSeparator, self::POINT, $cleanedValue);
