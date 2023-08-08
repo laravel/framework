@@ -566,7 +566,7 @@ trait EnumeratesValues
             $filteredCollection = $this;
             
             foreach ($key as $searchKey => $searchValue) {
-                $filteredCollection = $filteredCollection->filter($filteredCollection->operatorForWhere($searchKey, null , $searchValue));
+                $filteredCollection = $filteredCollection->filter($filteredCollection->operatorForWhere($searchKey, null, $searchValue));
             }
             
             return $filteredCollection;     
