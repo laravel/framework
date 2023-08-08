@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Queue\Attributes\WithoutRelations;
 use Illuminate\Queue\SerializesModels;
 use LogicException;
 use Orchestra\Testbench\TestCase;
@@ -318,6 +319,19 @@ class ModelSerializationTest extends TestCase
         );
     }
 
+    public function test_it_respects_without_relations_attribute()
+    {
+        $user = User::create([
+            'email' => 'taylor@laravel.com',
+        ])->load(['roles']);
+
+        $serialized = serialize(new ModelSerializationWithoutRelations($user));
+
+        $this->assertSame(
+            'O:69:"Illuminate\Tests\Integration\Queue\ModelSerializationWithoutRelations":1:{s:4:"user";O:45:"Illuminate\Contracts\Database\ModelIdentifier":5:{s:5:"class";s:39:"Illuminate\Tests\Integration\Queue\User";s:2:"id";i:1;s:9:"relations";a:0:{}s:10:"connection";s:7:"testing";s:15:"collectionClass";N;}}', $serialized
+        );
+    }
+
     public function test_serialization_types_empty_custom_eloquent_collection()
     {
         $class = new ModelSerializationTypedCustomCollectionTestClass(
@@ -497,6 +511,19 @@ class ModelSerializationAccessibleTestClass
 class ModelSerializationParentAccessibleTestClass extends ModelSerializationAccessibleTestClass
 {
     //
+}
+
+class ModelSerializationWithoutRelations
+{
+    use SerializesModels;
+
+    #[WithoutRelations]
+    public User $user;
+
+    public function __construct(User $user)
+    {
+        $this->user = $user;
+    }
 }
 
 class ModelRelationSerializationTestClass

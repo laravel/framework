@@ -2,6 +2,7 @@
 
 namespace Illuminate\Queue;
 
+use Illuminate\Queue\Attributes\WithoutRelations;
 use ReflectionClass;
 use ReflectionProperty;
 
@@ -45,7 +46,9 @@ trait SerializesModels
                 $name = "\0*\0{$name}";
             }
 
-            $values[$name] = $this->getSerializedPropertyValue($value);
+            $withoutRelations = $property->getAttributes(WithoutRelations::class) !== [];
+
+            $values[$name] = $this->getSerializedPropertyValue($value, $withoutRelations);
         }
 
         return $values;
