@@ -564,11 +564,9 @@ trait EnumeratesValues
     {
         if (is_iterable($key)) {
             $filteredCollection = $this;
-            
             foreach ($key as $searchKey => $searchValue) {
                 $filteredCollection = $filteredCollection->filter($filteredCollection->operatorForWhere($searchKey, null, $searchValue));
             }
-            
             return $filteredCollection;     
         } else {
             return $this->filter($this->operatorForWhere(...func_get_args()));
