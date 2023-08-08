@@ -567,6 +567,7 @@ trait EnumeratesValues
             foreach ($key as $searchKey => $searchValue) {
                 $filteredCollection = $filteredCollection->filter($filteredCollection->operatorForWhere($searchKey, null, $searchValue));
             }
+
             return new static($filteredCollection);
         } else {
             return $this->filter($this->operatorForWhere(...func_get_args()));
