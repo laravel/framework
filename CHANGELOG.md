@@ -1,6 +1,11 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.17.1...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v10.16.1...10.x)
+
+## [v10.16.1](https://github.com/laravel/framework/compare/v10.17.1...v10.16.1) - 2023-07-26
+
+- [10.x] Fix BusFake::assertChained() for a single job by [@gehrisandro](https://github.com/gehrisandro) in https://github.com/laravel/framework/pull/47832
+- [10.x] Retain `$request->request` `InputBag` type by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/47838
 
 ## [v10.17.1](https://github.com/laravel/framework/compare/v9.52.14...v10.17.1) - 2023-08-02
 
