@@ -555,14 +555,23 @@ trait EnumeratesValues
     /**
      * Filter items by the given key value pair.
      *
-     * @param  callable|string  $key
+     * @param  callable|string|array  $key
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return static
      */
     public function where($key, $operator = null, $value = null)
     {
-        return $this->filter($this->operatorForWhere(...func_get_args()));
+        if(is_iterable($key)) {
+            $filteredCollection = $this;
+            foreach($key as $searchKey => $searchValue) {
+
+                $filteredCollection = $filteredCollection->filter($filteredCollection->operatorForWhere($searchKey, null , $searchValue));
+            }
+            return $filteredCollection;     
+        } else {
+            return $this->filter($this->operatorForWhere(...func_get_args()));
+        }
     }
 
     /**
