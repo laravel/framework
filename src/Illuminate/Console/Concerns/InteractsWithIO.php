@@ -442,16 +442,6 @@ trait InteractsWithIO
     }
 
     /**
-     * Get the components implementation.
-     *
-     * @return \Illuminate\Console\View\Components\Factory
-     */
-    public function getComponents()
-    {
-        return $this->components;
-    }
-
-    /**
      * Get the output implementation.
      *
      * @return \Illuminate\Console\OutputStyle
@@ -459,5 +449,15 @@ trait InteractsWithIO
     public function getOutput()
     {
         return $this->output;
+    }
+
+    /**
+     * Get the output component factory implementation.
+     *
+     * @return \Illuminate\Console\View\Components\Factory
+     */
+    public function outputComponents()
+    {
+        return $this->components;
     }
 }
