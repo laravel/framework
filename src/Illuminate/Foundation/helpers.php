@@ -546,6 +546,22 @@ if (! function_exists('mix')) {
     }
 }
 
+if (! function_exists('carbon')) {
+    /**
+     * Create a new Carbon instance.
+     *
+     * @param DateTimeInterface|string|null $time
+     * @param DateTimeZone|string|null      $tz
+     * @return \Illuminate\Support\Carbon
+     * 
+     * @throws InvalidFormatException
+     */
+    function carbon($time = null, $tz = null)
+    {
+        return Date::parse($time, $tz);
+    }
+}
+
 if (! function_exists('now')) {
     /**
      * Create a new Carbon instance for the current time.
