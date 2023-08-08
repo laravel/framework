@@ -1,6 +1,6 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.17.0...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.52.15...10.x)
 
 ## [v10.17.1](https://github.com/laravel/framework/compare/v9.52.14...v10.17.1) - 2023-08-02
 
@@ -12,6 +12,10 @@
 - [10.x] Fix prompt and console component spacing when calling another command by [@jessarcher](https://github.com/jessarcher) in https://github.com/laravel/framework/pull/47928
 - [10.x] Fix prompt rendering after `callSilent` by [@jessarcher](https://github.com/jessarcher) in https://github.com/laravel/framework/pull/47929
 - [10.x] Update ensure() collection method to correctly work with Interfaces and object inheritance by [@karpilin](https://github.com/karpilin) in https://github.com/laravel/framework/pull/47934
+
+## [v9.52.15](https://github.com/laravel/framework/compare/v10.17.0...v9.52.15) - 2023-08-08
+
+- [9.x] Improve decimal shape validation by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/47957
 
 ## [v10.17.0](https://github.com/laravel/framework/compare/v10.16.1...v10.17.0) - 2023-08-01
 
