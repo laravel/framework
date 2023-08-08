@@ -122,7 +122,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
         if (is_null($keys)) {
             $values = $this->attributes;
         } else {
-            $keys = Arr::wrap($keys);
+            $keys = is_array($keys) ? $keys : func_get_args();
 
             $values = Arr::only($this->attributes, $keys);
         }
@@ -141,7 +141,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
         if (is_null($keys)) {
             $values = $this->attributes;
         } else {
-            $keys = Arr::wrap($keys);
+            $keys = is_array($keys) ? $keys : func_get_args();
 
             $values = Arr::except($this->attributes, $keys);
         }
@@ -168,6 +168,8 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
      */
     public function whereStartsWith($needles)
     {
+		$needles = is_array($needles) ? $needles : func_get_args();
+
         return $this->filter(function ($value, $key) use ($needles) {
             return Str::startsWith($key, $needles);
         });
@@ -194,7 +196,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
      */
     public function thatStartWith($needles)
     {
-        return $this->whereStartsWith($needles);
+        return $this->whereStartsWith(is_array($needles) ? $needles : func_get_args());
     }
 
     /**

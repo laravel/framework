@@ -12,7 +12,12 @@ class ViewComponentAttributeBagTest extends TestCase
         $bag = new ComponentAttributeBag(['class' => 'font-bold', 'name' => 'test']);
 
         $this->assertSame('class="font-bold"', (string) $bag->whereStartsWith('class'));
+        $this->assertSame('class="font-bold" name="test"', (string) $bag->whereStartsWith('class', 'name'));
+        $this->assertSame('class="font-bold"', (string) $bag->thatStartWith('class'));
+        $this->assertSame('class="font-bold" name="test"', (string) $bag->thatStartWith('class', 'name'));
         $this->assertSame('font-bold', (string) $bag->whereStartsWith('class')->first());
+		$this->assertSame('class="font-bold" name="test"', (string) $bag->only('class', 'name'));
+		$this->assertSame('style="margin: 0;"', (string) $bag->except('name', 'class')->merge(['style' => 'margin: 0;']));
         $this->assertSame('name="test"', (string) $bag->whereDoesntStartWith('class'));
         $this->assertSame('test', (string) $bag->whereDoesntStartWith('class')->first());
         $this->assertSame('class="mt-4 font-bold" name="test"', (string) $bag->merge(['class' => 'mt-4']));
