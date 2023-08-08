@@ -656,7 +656,7 @@ class Vite implements Htmlable
     }
 
     /**
-     * Get the content for an asset.
+     * Get the content of a given asset.
      *
      * @param  string  $asset
      * @param  string|null  $buildDirectory
