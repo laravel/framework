@@ -39,11 +39,6 @@
 - [10.x] Allowing bind of IPv6 addresses in development server by [@MuriloChianfa](https://github.com/MuriloChianfa) in https://github.com/laravel/framework/pull/47804
 - [10.x] Add more info to issue template by [@driesvints](https://github.com/driesvints) in https://github.com/laravel/framework/pull/47828
 
-## [v9.52.11](https://github.com/laravel/framework/compare/v10.15.0...v9.52.11) - 2023-07-25
-
-- [9.x] Fix CI for DynamoDB by [@GrahamCampbell](https://github.com/GrahamCampbell) in https://github.com/laravel/framework/pull/47656
-- [9.x] Pin `amazon/dynamodb-local` version in `docker-compose.yml` by [@GrahamCampbell](https://github.com/GrahamCampbell) in https://github.com/laravel/framework/pull/47657
-
 ## [v10.15.0](https://github.com/laravel/framework/compare/v10.14.1...v10.15.0) - 2023-07-11
 
 - [10.x] Change return type of `getPrivateToken` in AblyBroadcaster by [@milwad](https://github.com/milwad)-dev in https://github.com/laravel/framework/pull/47602
