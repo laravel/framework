@@ -24,6 +24,7 @@ use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
 use Illuminate\Validation\ValidationData;
 use InvalidArgumentException;
+use RuntimeException;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use ValueError;
@@ -2352,7 +2353,7 @@ trait ValidatesAttributes
         // is the size. If it is a file, we take kilobytes, and for a string the
         // entire length of the string will be considered the attribute size.
         if (is_numeric($value) && $hasNumeric) {
-            return $this->trim($value);
+            return $this->ensureExponentWithinRange($attribute, $this->trim($value));
         } elseif (is_array($value)) {
             return count($value);
         } elseif ($value instanceof File) {
@@ -2468,5 +2469,35 @@ trait ValidatesAttributes
     protected function trim($value)
     {
         return is_string($value) ? trim($value) : $value;
+    }
+
+    /**
+     * Ensure the exponent is within the allowed range.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return mixed
+     */
+    protected function ensureExponentWithinRange($attribute, $value)
+    {
+        $stringValue = (string) $value;
+
+        if (! is_numeric($value) || ! Str::contains($stringValue, 'e', ignoreCase: true)) {
+            return $value;
+        }
+
+        $scale = (int) (Str::contains($stringValue, 'e')
+            ? Str::after($stringValue, 'e')
+            : Str::after($stringValue, 'E'));
+
+        $withinRange = (
+            $this->ensureExponentWithinRangeUsing ?? fn ($scale) => $scale <= 1000 && $scale >= -1000
+        )($scale, $attribute, $value);
+
+        if ($withinRange) {
+            return $value;
+        }
+
+        throw new MathException('Scientific notation exponent outside of allowed range.');
     }
 }
