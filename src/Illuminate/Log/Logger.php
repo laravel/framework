@@ -52,7 +52,7 @@ class Logger implements LoggerInterface
     /**
      * Log an emergency message to the logs.
      *
-     * @param  \Illuminate\Contracts\Support\Arrayable|\Illuminate\Contracts\Support\Jsonable|\Illuminate\Support\Stringable|array|string  $message
+     * @param  \Illuminate\Contracts\Support\Arrayable|\Illuminate\Contracts\Support\Jsonable|\Illuminate\Support\Stringable|array|callable|string  $message
      * @param  array  $context
      * @return void
      */
@@ -64,7 +64,7 @@ class Logger implements LoggerInterface
     /**
      * Log an alert message to the logs.
      *
-     * @param  \Illuminate\Contracts\Support\Arrayable|\Illuminate\Contracts\Support\Jsonable|\Illuminate\Support\Stringable|array|string  $message
+     * @param  \Illuminate\Contracts\Support\Arrayable|\Illuminate\Contracts\Support\Jsonable|\Illuminate\Support\Stringable|array|callable|string  $message
      * @param  array  $context
      * @return void
      */
@@ -76,7 +76,7 @@ class Logger implements LoggerInterface
     /**
      * Log a critical message to the logs.
      *
-     * @param  \Illuminate\Contracts\Support\Arrayable|\Illuminate\Contracts\Support\Jsonable|\Illuminate\Support\Stringable|array|string  $message
+     * @param  \Illuminate\Contracts\Support\Arrayable|\Illuminate\Contracts\Support\Jsonable|\Illuminate\Support\Stringable|array|callable|string  $message
      * @param  array  $context
      * @return void
      */
@@ -88,7 +88,7 @@ class Logger implements LoggerInterface
     /**
      * Log an error message to the logs.
      *
-     * @param  \Illuminate\Contracts\Support\Arrayable|\Illuminate\Contracts\Support\Jsonable|\Illuminate\Support\Stringable|array|string  $message
+     * @param  \Illuminate\Contracts\Support\Arrayable|\Illuminate\Contracts\Support\Jsonable|\Illuminate\Support\Stringable|array|callable|string  $message
      * @param  array  $context
      * @return void
      */
@@ -100,7 +100,7 @@ class Logger implements LoggerInterface
     /**
      * Log a warning message to the logs.
      *
-     * @param  \Illuminate\Contracts\Support\Arrayable|\Illuminate\Contracts\Support\Jsonable|\Illuminate\Support\Stringable|array|string  $message
+     * @param  \Illuminate\Contracts\Support\Arrayable|\Illuminate\Contracts\Support\Jsonable|\Illuminate\Support\Stringable|array|callable|string  $message
      * @param  array  $context
      * @return void
      */
@@ -112,7 +112,7 @@ class Logger implements LoggerInterface
     /**
      * Log a notice to the logs.
      *
-     * @param  \Illuminate\Contracts\Support\Arrayable|\Illuminate\Contracts\Support\Jsonable|\Illuminate\Support\Stringable|array|string  $message
+     * @param  \Illuminate\Contracts\Support\Arrayable|\Illuminate\Contracts\Support\Jsonable|\Illuminate\Support\Stringable|array|callable|string  $message
      * @param  array  $context
      * @return void
      */
@@ -124,7 +124,7 @@ class Logger implements LoggerInterface
     /**
      * Log an informational message to the logs.
      *
-     * @param  \Illuminate\Contracts\Support\Arrayable|\Illuminate\Contracts\Support\Jsonable|\Illuminate\Support\Stringable|array|string  $message
+     * @param  \Illuminate\Contracts\Support\Arrayable|\Illuminate\Contracts\Support\Jsonable|\Illuminate\Support\Stringable|array|callable|string  $message
      * @param  array  $context
      * @return void
      */
@@ -136,7 +136,7 @@ class Logger implements LoggerInterface
     /**
      * Log a debug message to the logs.
      *
-     * @param  \Illuminate\Contracts\Support\Arrayable|\Illuminate\Contracts\Support\Jsonable|\Illuminate\Support\Stringable|array|string  $message
+     * @param  \Illuminate\Contracts\Support\Arrayable|\Illuminate\Contracts\Support\Jsonable|\Illuminate\Support\Stringable|array|callable|string  $message
      * @param  array  $context
      * @return void
      */
@@ -149,7 +149,7 @@ class Logger implements LoggerInterface
      * Log a message to the logs.
      *
      * @param  string  $level
-     * @param  \Illuminate\Contracts\Support\Arrayable|\Illuminate\Contracts\Support\Jsonable|\Illuminate\Support\Stringable|array|string  $message
+     * @param  \Illuminate\Contracts\Support\Arrayable|\Illuminate\Contracts\Support\Jsonable|\Illuminate\Support\Stringable|array|callable|string  $message
      * @param  array  $context
      * @return void
      */
@@ -162,7 +162,7 @@ class Logger implements LoggerInterface
      * Dynamically pass log calls into the writer.
      *
      * @param  string  $level
-     * @param  \Illuminate\Contracts\Support\Arrayable|\Illuminate\Contracts\Support\Jsonable|\Illuminate\Support\Stringable|array|string  $message
+     * @param  \Illuminate\Contracts\Support\Arrayable|\Illuminate\Contracts\Support\Jsonable|\Illuminate\Support\Stringable|array|callable|string  $message
      * @param  array  $context
      * @return void
      */
@@ -175,7 +175,7 @@ class Logger implements LoggerInterface
      * Write a message to the log.
      *
      * @param  string  $level
-     * @param  \Illuminate\Contracts\Support\Arrayable|\Illuminate\Contracts\Support\Jsonable|\Illuminate\Support\Stringable|array|string  $message
+     * @param  \Illuminate\Contracts\Support\Arrayable|\Illuminate\Contracts\Support\Jsonable|\Illuminate\Support\Stringable|array|callable|string  $message
      * @param  array  $context
      * @return void
      */
@@ -252,11 +252,13 @@ class Logger implements LoggerInterface
     /**
      * Format the parameters for the logger.
      *
-     * @param  \Illuminate\Contracts\Support\Arrayable|\Illuminate\Contracts\Support\Jsonable|\Illuminate\Support\Stringable|array|string  $message
+     * @param  \Illuminate\Contracts\Support\Arrayable|\Illuminate\Contracts\Support\Jsonable|\Illuminate\Support\Stringable|array|callable|string  $message
      * @return string
      */
     protected function formatMessage($message)
     {
+        if (is_callable($message)) $message = $message();
+
         if (is_array($message)) {
             return var_export($message, true);
         } elseif ($message instanceof Jsonable) {
