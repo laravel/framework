@@ -18,7 +18,7 @@ use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Validations\FieldsValidationException;
-use Illuminate\Database\Eloquent\Validations\onCreateRules;
+use Illuminate\Database\Eloquent\Validations\OnCreateRules;
 use Illuminate\Database\Eloquent\Validations\OnUpdateRules;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
