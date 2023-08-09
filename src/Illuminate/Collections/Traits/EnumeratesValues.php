@@ -569,9 +569,9 @@ trait EnumeratesValues
             }
 
             return new static($filteredCollection);
-        } else {
-            return $this->filter($this->operatorForWhere(...func_get_args()));
         }
+        
+        return $this->filter($this->operatorForWhere(...func_get_args()));
     }
 
     /**
