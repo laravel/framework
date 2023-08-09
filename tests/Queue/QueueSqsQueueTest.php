@@ -79,7 +79,7 @@ class QueueSqsQueueTest extends TestCase
         ]);
 
         $this->mockedQueueAttributesResponseModel = new Result([
-            'Validations' => [
+            'Attributes' => [
                 'ApproximateNumberOfMessages' => 1,
             ],
         ]);
