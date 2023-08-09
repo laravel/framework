@@ -3,6 +3,7 @@
 namespace Illuminate\Database;
 
 use Closure;
+use Exception;
 use Illuminate\Database\PDO\SqlServerDriver;
 use Illuminate\Database\Query\Grammars\SqlServerGrammar as QueryGrammar;
 use Illuminate\Database\Query\Processors\SqlServerProcessor;
@@ -136,5 +137,15 @@ class SqlServerConnection extends Connection
     protected function getDoctrineDriver()
     {
         return new SqlServerDriver;
+    }
+
+    /**
+     * Detects if the database exception was caused by a unique constraint violation.
+     *
+     * @return bool
+     */
+    protected function matchesUniqueConstraintException(Exception $exception)
+    {
+        return boolval(preg_match('#Cannot insert duplicate key row in object#i', $exception->getMessage()));
     }
 }

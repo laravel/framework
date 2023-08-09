@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database;
 
+use Exception;
 use Illuminate\Database\PDO\SQLiteDriver;
 use Illuminate\Database\Query\Grammars\SQLiteGrammar as QueryGrammar;
 use Illuminate\Database\Query\Processors\SQLiteProcessor;
@@ -128,5 +129,19 @@ class SQLiteConnection extends Connection
     protected function getForeignKeyConstraintsConfigurationValue()
     {
         return $this->getConfig('foreign_key_constraints');
+    }
+
+    /**
+     * Detects if the database exception was caused by a unique constraint violation.
+     *
+     * @return bool
+     */
+    protected function matchesUniqueConstraintException(Exception $exception)
+    {
+        // SQLite 3.8.2 and above will return the newly formatted error message:
+        // "UNIQUE constraint failed: *table_name*.*column_name*", however in
+        // older versions, it returns "column *column_name* is not unique".
+
+        return boolval(preg_match('#(column(s)? .* (is|are) not unique|UNIQUE constraint failed: .*)#i', $exception->getMessage()));
     }
 }

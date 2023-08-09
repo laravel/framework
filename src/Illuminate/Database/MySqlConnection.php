@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database;
 
+use Exception;
 use Illuminate\Database\PDO\MySqlDriver;
 use Illuminate\Database\Query\Grammars\MySqlGrammar as QueryGrammar;
 use Illuminate\Database\Query\Processors\MySqlProcessor;
@@ -104,5 +105,19 @@ class MySqlConnection extends Connection
     protected function getDoctrineDriver()
     {
         return new MySqlDriver;
+    }
+
+    /**
+     * Detects if the database exception was caused by a unique constraint violation.
+     *
+     * @return bool
+     */
+    protected function matchesUniqueConstraintException(Exception $exception)
+    {
+        // We'll match against the message instead of the exception code because
+        // the exception code returns "23000" instead of "1062", which is the
+        // error code MySQL should return in UNIQUE constraints violations.
+
+        return boolval(preg_match('#Integrity constraint violation: 1062#i', $exception->getMessage()));
     }
 }

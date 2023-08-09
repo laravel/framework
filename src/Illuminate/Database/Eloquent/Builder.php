@@ -9,13 +9,12 @@ use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Concerns\BuildsQueries;
-use Illuminate\Database\Eloquent\Concerns\InteractsWithQueryException;
 use Illuminate\Database\Eloquent\Concerns\QueriesRelationships;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
-use Illuminate\Database\QueryException;
 use Illuminate\Database\RecordsNotFoundException;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -32,7 +31,7 @@ use ReflectionMethod;
  */
 class Builder implements BuilderContract
 {
-    use BuildsQueries, ForwardsCalls, InteractsWithQueryException, QueriesRelationships {
+    use BuildsQueries, ForwardsCalls, QueriesRelationships {
         BuildsQueries::sole as baseSole;
     }
 
@@ -586,11 +585,7 @@ class Builder implements BuilderContract
             return tap($this->newModelInstance(array_merge($attributes, $values)), function (Model $instance) {
                 $instance->save();
             });
-        } catch (QueryException $exception) {
-            if (! $this->matchesUniqueConstraintException($exception)) {
-                throw $exception;
-            }
-
+        } catch (UniqueConstraintViolationException $exception) {
             return $this->where($attributes)->first();
         }
     }

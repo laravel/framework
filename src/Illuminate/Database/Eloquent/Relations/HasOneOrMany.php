@@ -4,14 +4,13 @@ namespace Illuminate\Database\Eloquent\Relations;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Concerns\InteractsWithQueryException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
-use Illuminate\Database\QueryException;
+use Illuminate\Database\UniqueConstraintViolationException;
 
 abstract class HasOneOrMany extends Relation
 {
-    use InteractsWithDictionary, InteractsWithQueryException;
+    use InteractsWithDictionary;
 
     /**
      * The foreign key of the parent model.
@@ -254,11 +253,7 @@ abstract class HasOneOrMany extends Relation
     {
         try {
             return $this->create(array_merge($attributes, $values));
-        } catch (QueryException $exception) {
-            if (! $this->matchesUniqueConstraintException($exception)) {
-                throw $exception;
-            }
-
+        } catch (UniqueConstraintViolationException $exception) {
             return $this->where($attributes)->first();
         }
     }

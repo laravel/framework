@@ -6,19 +6,18 @@ use Closure;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Concerns\InteractsWithQueryException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable;
-use Illuminate\Database\QueryException;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 
 class BelongsToMany extends Relation
 {
-    use InteractsWithDictionary, InteractsWithPivotTable, InteractsWithQueryException;
+    use InteractsWithDictionary, InteractsWithPivotTable;
 
     /**
      * The intermediate table for the relation.
@@ -649,10 +648,8 @@ class BelongsToMany extends Relation
 
         try {
             return $this->create(array_merge($attributes, $values), $joining, $touch);
-        } catch (QueryException $exception) {
-            if (! $this->matchesUniqueConstraintException($exception)) {
-                throw $exception;
-            }
+        } catch (UniqueConstraintViolationException $exception) {
+            // Do nothing...
         }
 
         // If we run into a UNIQUE constraint violation, we'll assume it came from the related model's
@@ -660,16 +657,12 @@ class BelongsToMany extends Relation
         // that works, we return the attached instance. If attaching also fails, we'll do a find.
 
         try {
-            $instance = $this->related->where($attributes)->firstOrFail();
+            $instance = $this->related->where($attributes)->first();
 
             $this->attach($instance, $joining, $touch);
 
             return $instance;
-        } catch (QueryException $exception) {
-            if (! $this->matchesUniqueConstraintException($exception)) {
-                throw $exception;
-            }
-
+        } catch (UniqueConstraintViolationException $exception) {
             return (clone $this)->where($attributes)->first();
         }
     }

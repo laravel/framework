@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database;
 
+use Exception;
 use Illuminate\Database\PDO\PostgresDriver;
 use Illuminate\Database\Query\Grammars\PostgresGrammar as QueryGrammar;
 use Illuminate\Database\Query\Processors\PostgresProcessor;
@@ -104,5 +105,17 @@ class PostgresConnection extends Connection
     protected function getDoctrineDriver()
     {
         return new PostgresDriver;
+    }
+
+    /**
+     * Detects if the database exception was caused by a unique constraint violation.
+     *
+     * @return bool
+     */
+    protected function matchesUniqueConstraintException(Exception $exception)
+    {
+        // The error code PostgreSQL returns when we run into a UNIQUE constraint violation.
+
+        return '23505' === $exception->getCode();
     }
 }
