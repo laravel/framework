@@ -2494,10 +2494,10 @@ trait ValidatesAttributes
             $this->ensureExponentWithinAllowedRangeUsing ?? fn ($scale) => $scale <= 1000 && $scale >= -1000
         )($scale, $attribute, $value);
 
-        if ($withinRange) {
-            return $value;
+        if (! $withinRange) {
+            throw new MathException('Scientific notation exponent outside of allowed range.');
         }
 
-        throw new MathException('Scientific notation exponent outside of allowed range.');
+        return $value;
     }
 }
