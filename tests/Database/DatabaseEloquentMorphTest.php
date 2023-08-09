@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Database\QueryException;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -224,7 +224,7 @@ class DatabaseEloquentMorphTest extends TestCase
         $model->shouldReceive('setAttribute')->once()->with('morph_id', 1);
         $model->shouldReceive('setAttribute')->once()->with('morph_type', get_class($relation->getParent()));
         $model->shouldReceive('save')->once()->andThrow(
-            new QueryException('mysql', 'example mysql', [], new Exception('SQLSTATE[23000]: Integrity constraint violation: 1062')),
+            new UniqueConstraintViolationException('mysql', 'example mysql', [], new Exception('SQLSTATE[23000]: Integrity constraint violation: 1062')),
         );
 
         $relation->getQuery()->shouldReceive('where')->once()->with(['foo'])->andReturn($relation->getQuery());
@@ -241,7 +241,7 @@ class DatabaseEloquentMorphTest extends TestCase
         $model->shouldReceive('setAttribute')->once()->with('morph_id', 1);
         $model->shouldReceive('setAttribute')->once()->with('morph_type', get_class($relation->getParent()));
         $model->shouldReceive('save')->once()->andThrow(
-            new QueryException('mysql', 'example mysql', [], new Exception('SQLSTATE[23000]: Integrity constraint violation: 1062')),
+            new UniqueConstraintViolationException('mysql', 'example mysql', [], new Exception('SQLSTATE[23000]: Integrity constraint violation: 1062')),
         );
 
         $relation->getQuery()->shouldReceive('where')->once()->with(['foo' => 'bar'])->andReturn($relation->getQuery());

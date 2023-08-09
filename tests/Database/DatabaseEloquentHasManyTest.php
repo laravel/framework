@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\QueryException;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -177,7 +177,7 @@ class DatabaseEloquentHasManyTest extends TestCase
         $relation->getRelated()->shouldReceive('newInstance')->once()->with(['foo' => 'bar', 'baz' => 'qux'])->andReturn(m::mock(Model::class, function ($model) {
             $model->shouldReceive('setAttribute')->once()->with('foreign_key', 1);
             $model->shouldReceive('save')->once()->andThrow(
-                new QueryException('mysql', 'example mysql', [], new Exception('SQLSTATE[23000]: Integrity constraint violation: 1062')),
+                new UniqueConstraintViolationException('mysql', 'example mysql', [], new Exception('SQLSTATE[23000]: Integrity constraint violation: 1062')),
             );
         }));
 
