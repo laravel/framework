@@ -567,7 +567,7 @@ class Builder implements BuilderContract
             return $instance;
         }
 
-        return $this->create(array_merge($attributes, $values));
+        return $this->createOrFirst($attributes, $values);
     }
 
     /**
