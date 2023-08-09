@@ -225,6 +225,21 @@ class SupportArrTest extends TestCase
         $this->assertSame('', Arr::join([], ', ', ' and '));
     }
 
+    public function testTruncateJoin()
+    {
+        $array = ['Antartica', 'Africa', 'Asia', 'Europe', 'North America', 'South America', 'Australia'];
+
+        $this->assertSame('Antartica, Africa, + 5 more', Arr::truncateJoin($array, 2, ', '));
+
+        $this->assertSame('Antartica, Africa, and 5 more', Arr::truncateJoin($array, 2, ', ', 'and'));
+
+        $this->assertSame('Antartica, Africa, and 5 more continents', Arr::truncateJoin($array, 2, ', ', 'and', 'more continents'));
+
+        $this->assertSame('Antartica', Arr::truncateJoin(['Antartica'], 2, ', '));
+
+        $this->assertSame('', Arr::truncateJoin([], 2, ', '));
+    }
+
     public function testLast()
     {
         $array = [100, 200, 300];

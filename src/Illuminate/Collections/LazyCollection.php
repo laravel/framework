@@ -710,6 +710,20 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
+     * Display limited items from the array then replace the remaining items with message
+     *
+     * @param int $limit
+     * @param string $glue
+     * @param string $connector
+     * @param string $message
+     * @return string
+     */
+    public function truncateJoin($limit, $glue, $connector = '+', $message = 'more')
+    {
+        return $this->collect()->truncateJoin(...func_get_args());
+    }
+
+    /**
      * Get the keys of the collection items.
      *
      * @return static<int, TKey>

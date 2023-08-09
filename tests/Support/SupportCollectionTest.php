@@ -1913,6 +1913,24 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testTruncateJoin($collection)
+    {
+        $array = ['Antartica', 'Africa', 'Asia', 'Europe', 'North America', 'South America', 'Australia'];
+        
+        $this->assertSame('Antartica, Africa, + 5 more', (new $collection($array))->truncateJoin(2, ', '));
+
+        $this->assertSame('Antartica, Africa, and 5 more', (new $collection($array))->truncateJoin(2, ', ', 'and'));
+
+        $this->assertSame('Antartica, Africa, and 5 more continents', (new $collection($array))->truncateJoin(2, ', ', 'and', 'more continents'));
+
+        $this->assertSame('Antartica', (new $collection(['Antartica']))->truncateJoin(2, ', '));
+
+        $this->assertSame('', (new $collection([]))->truncateJoin(2, ', ', 'and'));
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testCrossJoin($collection)
     {
         // Cross join with an array

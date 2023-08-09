@@ -454,6 +454,31 @@ class Arr
     }
 
     /**
+     * Display limited items from the array then replace the remaining items with message
+     *
+     * @param array $array
+     * @param int $limit
+     * @param string $glue
+     * @param string $connector
+     * @param string $message
+     * @return string
+     */
+    public static function truncateJoin($array, $limit, $glue, $connector = '+', $message = 'more')
+    {
+        $count = count($array);
+
+        if ($count <= $limit) {
+            return static::join($array, $glue);
+        }
+
+        $firstFewItems = static::join(array_slice($array, 0, $limit, true), $glue);
+        $remainingCount = $count - $limit;
+
+        // trim so that when the message parameter is empty string, it doesn't have a trailing space
+        return trim("$firstFewItems, $connector $remainingCount $message");
+    }
+
+    /**
      * Key an associative array by a field or using a callback.
      *
      * @param  array  $array
