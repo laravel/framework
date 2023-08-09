@@ -317,7 +317,7 @@ if (! function_exists('throw_if')) {
      * @template TException of \Throwable
      *
      * @param  mixed  $condition
-     * @param  TException|class-string<TException>  $exception
+     * @param  TException|string|class-string<TException>  $exception
      * @param  mixed  ...$parameters
      * @return mixed
      *
@@ -344,7 +344,7 @@ if (! function_exists('throw_unless')) {
      * @template TException of \Throwable
      *
      * @param  mixed  $condition
-     * @param  TException|class-string<TException>  $exception
+     * @param  TException|string|class-string<TException>  $exception
      * @param  mixed  ...$parameters
      * @return mixed
      *
