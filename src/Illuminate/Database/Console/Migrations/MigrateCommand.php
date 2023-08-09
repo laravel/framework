@@ -9,7 +9,6 @@ use Illuminate\Database\Events\SchemaLoaded;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Database\SQLiteDatabaseDoesNotExistException;
 use Illuminate\Database\SqlServerConnection;
-use Illuminate\Support\Facades\Artisan;
 use PDOException;
 use Throwable;
 
