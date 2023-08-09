@@ -16,14 +16,19 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\Eloquent\Validations\Rules;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Validation\Validator;
 use JsonSerializable;
 use LogicException;
+use ReflectionClass;
+use Stringable;
 
-abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToString, HasBroadcastChannel, Jsonable, JsonSerializable, QueueableEntity, UrlRoutable
+abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToString, HasBroadcastChannel, Jsonable, JsonSerializable, QueueableEntity, Stringable, UrlRoutable
 {
     use Concerns\HasAttributes,
         Concerns\HasEvents,
@@ -333,6 +338,99 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected static function booted()
     {
         //
+
+    }
+
+    protected array $rules = [];
+
+    /**
+     * Validate the model's data before saving or updating.
+     *
+     * @param callable|null $callback
+     *
+     * @return Model
+     * @throws ValidationException
+     */
+    public function validate(callable $callback = null): static
+    {
+        if(!is_null($callback)){
+            $rules = $this->rules;
+            $this->rules = $callback($rules);
+
+            return $this;
+        }
+        $rules = array_merge(
+            $this->rules,
+            $this->getModelRules(),
+            $this->getPropertyRules()
+        );
+
+        $this->fillableFromRules();
+
+        $validator = Validator::make($this->attributesToArray(), $rules);
+
+        if ($validator->fails()) {
+            throw new ValidationException($validator);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get the validation rules for the model fields decorator.
+     *
+     * @return array
+     */
+    public function getModelRules(): array
+    {
+        $decorator = new ReflectionClass($this);
+        $attributes = $decorator->getAttributes(Rules::class);
+
+        if (!empty($attributes)) {
+            $modelRules = $attributes[0]->newInstance();
+            return $modelRules->rules;
+        }
+
+        return [];
+    }
+
+    /**
+     * Get the validation rules for the model properties decorated with Rules attribute.
+     *
+     * @return array
+     */
+    public function getPropertyRules(): array
+    {
+        $class = new ReflectionClass($this);
+        $properties = $class->getProperties();
+
+        $propertyRules = [];
+
+        foreach ($properties as $property) {
+            $attributes = $property->getAttributes(Rules::class);
+            if (!empty($attributes)) {
+                $propertyName = $property->getName();
+                $propertyRules[$propertyName] = $attributes[0]->newInstance()->rules;
+            }
+        }
+
+        return $propertyRules;
+    }
+
+    /**
+     * Automatically populate the fillable fields from the merged rules.
+     *
+     * @return void
+     */
+    protected function fillableFromRules(): void
+    {
+        $rules = array_merge(
+            $this->rules,
+            $this->getModelRules(),
+            $this->getPropertyRules()
+        );
+
+        $this->fillable = array_merge($this->fillable, array_keys($rules));
     }
 
     /**
@@ -965,6 +1063,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             return false;
         }
 
+        if ($this->isClassDeviable($column)) {
+            $amount = (clone $this)->setAttribute($column, $amount)->getAttributeFromArray($column);
+        }
+
         return tap($this->setKeysForSaveQuery($this->newQueryWithoutScopes())->{$method}($column, $amount, $extra), function () use ($column) {
             $this->syncChanges();
 
@@ -977,9 +1079,11 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Update the model in the database.
      *
-     * @param  array  $attributes
-     * @param  array  $options
+     * @param array $attributes
+     * @param array $options
+     *
      * @return bool
+     * @throws ValidationException
      */
     public function update(array $attributes = [], array $options = [])
     {
@@ -1011,9 +1115,11 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Update the model in the database without raising any events.
      *
-     * @param  array  $attributes
-     * @param  array  $options
+     * @param array $attributes
+     * @param array $options
+     *
      * @return bool
+     * @throws ValidationException
      */
     public function updateQuietly(array $attributes = [], array $options = [])
     {
@@ -1106,14 +1212,18 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Save the model to the database.
      *
-     * @param  array  $options
+     * @param array $options
+     *
      * @return bool
+     * @throws ValidationException
      */
     public function save(array $options = [])
     {
         $this->mergeAttributesFromCachedCasts();
 
         $query = $this->newModelQuery();
+
+        $this->validate();
 
         // If the "saving" event returns false we'll bail out of the save and return
         // false, indicating that the save failed. This provides a chance for any
