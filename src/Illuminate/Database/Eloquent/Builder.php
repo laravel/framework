@@ -1147,7 +1147,9 @@ class Builder implements BuilderContract
                 || $this->model->hasAttributeSetMutator($column)
                 || $this->model->hasCast($column)
             ) {
-                $timestamp = $this->model->newInstance([$column => $timestamp])->getAttributes()[$column];
+                $timestamp = $this->model->newInstance()
+                    ->forceFill([$column => $timestamp])
+                    ->getAttributes()[$column];
             }
 
             $values = array_merge([$column => $timestamp], $values);

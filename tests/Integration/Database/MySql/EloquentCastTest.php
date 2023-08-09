@@ -121,7 +121,7 @@ class UserWithIntTimestampsViaCasts extends Model
 {
     protected $table = 'users';
 
-    protected $guarded = [];
+    protected $fillable = ['email'];
 
     protected $casts = [
         'created_at' => UnixTimeStampToCarbon::class,
@@ -146,7 +146,7 @@ class UserWithIntTimestampsViaAttribute extends Model
 {
     protected $table = 'users';
 
-    protected $guarded = [];
+    protected $fillable = ['email'];
 
     protected function updatedAt(): Attribute
     {
@@ -169,7 +169,7 @@ class UserWithIntTimestampsViaMutator extends Model
 {
     protected $table = 'users';
 
-    protected $guarded = [];
+    protected $fillable = ['email'];
 
     protected function getUpdatedAtAttribute($value)
     {
