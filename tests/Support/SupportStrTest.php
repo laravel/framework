@@ -901,6 +901,14 @@ class SupportStrTest extends TestCase
         $this->assertEquals(3, Str::wordCount('МАМА МЫЛА РАМУ', 'абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'));
     }
 
+    public function testWordWrap()
+    {
+        $this->assertEquals('Hello<br />World', Str::wordWrap('Hello World', 3, '<br />'));
+        $this->assertEquals('Hel<br />lo<br />Wor<br />ld', Str::wordWrap('Hello World', 3, '<br />', true));
+
+        $this->assertEquals('❤Multi<br />Byte☆❤☆❤☆❤', Str::wordWrap('❤Multi Byte☆❤☆❤☆❤', 3, '<br />'));
+    }
+
     public static function validUuidList()
     {
         return [
