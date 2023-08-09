@@ -7,12 +7,12 @@ use Illuminate\Support\Arr;
 use InvalidArgumentException;
 
 #[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_PROPERTY)]
-class Rules
+class OnUpdateRules
 {
     public array|string $rules;
 
     /**
-     * Create a new Rules instance.
+     * Create a new OnUpdateRules instance.
      *
      * @param array|string $rules The rules to apply.
      */
@@ -23,8 +23,7 @@ class Rules
                 $this->validateFieldAndRules($field, $rule);
                 $this->rules = $rules;
             }
-        } elseif (is_string($rules) || is_array($rules)) {
-
+        } elseif (is_string($rules)) {
             $this->rules = $rules;
         } else {
             throw new InvalidArgumentException('Validation rules must be a string or an array.');
