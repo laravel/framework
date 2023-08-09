@@ -1080,7 +1080,7 @@ class Connection implements ConnectionInterface
      */
     protected function escapeString($value)
     {
-        return $this->getPdo()->quote($value);
+        return $this->getReadPdo()->quote($value);
     }
 
     /**
