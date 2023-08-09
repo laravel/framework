@@ -570,7 +570,6 @@ trait EnumeratesValues
 
             return new static($filteredCollection);
         }
-        
         return $this->filter($this->operatorForWhere(...func_get_args()));
     }
 
