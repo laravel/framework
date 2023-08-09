@@ -198,12 +198,12 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
      */
     protected function qualifyClass($name)
     {
-        $explodedName = collect(explode(".", $name));
-        $explodedName->transform(function($value) {
+        $explodedName = collect(explode('.', $name));
+        $explodedName->transform(function ($value) {
             return Str::ucfirst(Str::camel($value));
         });
 
-        $name = implode("/", $explodedName->toArray());
+        $name = implode('/', $explodedName->toArray());
 
         $name = ltrim($name, '\\/');
 
