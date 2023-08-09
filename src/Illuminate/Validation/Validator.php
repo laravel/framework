@@ -296,6 +296,13 @@ class Validator implements ValidatorContract
     protected $exception = ValidationException::class;
 
     /**
+     * The custom callback to determine if an exponent is within allowed range.
+     *
+     * @var callable|null
+     */
+    protected $ensureExponentWithinAllowedRangeUsing;
+
+    /**
      * Create a new Validator instance.
      *
      * @param  \Illuminate\Contracts\Translation\Translator  $translator
@@ -1487,6 +1494,19 @@ class Validator implements ValidatorContract
         }
 
         $this->exception = $exception;
+
+        return $this;
+    }
+
+    /**
+     * Ensure exponents are within range using the given callback.
+     *
+     * @param  callable(int $scale, string $attribute, mixed $value)  $callback
+     * @return $this
+     */
+    public function ensureExponentWithinAllowedRangeUsing($callback)
+    {
+        $this->ensureExponentWithinAllowedRangeUsing = $callback;
 
         return $this;
     }

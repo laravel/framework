@@ -18,6 +18,7 @@ use Illuminate\Contracts\Validation\ValidatorAwareRule;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Exceptions\MathException;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
 use Illuminate\Validation\DatabasePresenceVerifierInterface;
@@ -8765,6 +8766,76 @@ class ValidationValidatorTest extends TestCase
             'size',
             'size_str',
         ], $validator->messages()->keys());
+    }
+
+    /** @dataProvider outsideRangeExponents */
+    public function testItLimitsLengthOfScientificNotationExponent($value)
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $validator = new Validator($trans, ['foo' => $value], ['foo' => 'numeric|min:3']);
+
+        $this->expectException(MathException::class);
+        $this->expectExceptionMessage('Scientific notation exponent outside of allowed range.');
+
+        $validator->passes();
+    }
+
+    public static function outsideRangeExponents()
+    {
+        return [
+            ['1.0e+1001'],
+            ['1.0E+1001'],
+            ['1.0e1001'],
+            ['1.0E1001'],
+            ['1.0e-1001'],
+            ['1.0E-1001'],
+        ];
+    }
+
+    /** @dataProvider withinRangeExponents */
+    public function testItAllowsScientificNotationWithinRange($value, $rule)
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $validator = new Validator($trans, ['foo' => $value], ['foo' => ['numeric', $rule]]);
+
+        $this->assertTrue($validator->passes());
+    }
+
+    public static function withinRangeExponents()
+    {
+        return [
+            ['1.0e+1000', 'min:3'],
+            ['1.0E+1000', 'min:3'],
+            ['1.0e1000', 'min:3'],
+            ['1.0E1000', 'min:3'],
+            ['1.0e-1000', 'max:3'],
+            ['1.0E-1000', 'max:3'],
+        ];
+    }
+
+    public function testItCanConfigureAllowedExponentRange()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $validator = new Validator($trans, ['foo' => '1.0e-1000'], ['foo' => ['numeric', 'max:3']]);
+        $scale = $attribute = $value = null;
+        $withinRange = true;
+
+        $validator->ensureExponentWithinAllowedRangeUsing(function () use (&$scale, &$attribute, &$value, &$withinRange) {
+            [$scale, $attribute, $value] = func_get_args();
+
+            return $withinRange;
+        });
+
+        $this->assertTrue($validator->passes());
+        $this->assertSame(-1000, $scale);
+        $this->assertSame('foo', $attribute);
+        $this->assertSame('1.0e-1000', $value);
+
+        $withinRange = false;
+        $this->expectException(MathException::class);
+        $this->expectExceptionMessage('Scientific notation exponent outside of allowed range.');
+
+        $validator->passes();
     }
 
     protected function getTranslator()
