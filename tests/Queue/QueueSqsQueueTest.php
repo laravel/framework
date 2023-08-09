@@ -60,7 +60,7 @@ class QueueSqsQueueTest extends TestCase
             'MD5OfBody' => md5($this->mockedPayload),
             'ReceiptHandle' => $this->mockedReceiptHandle,
             'MessageId' => $this->mockedMessageId,
-            'Validations' => ['ApproximateReceiveCount' => 1],
+            'Attributes' => ['ApproximateReceiveCount' => 1],
         ]);
 
         $this->mockedReceiveMessageResponseModel = new Result([
