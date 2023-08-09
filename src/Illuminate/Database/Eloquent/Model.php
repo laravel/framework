@@ -376,7 +376,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         if (!is_null($callback)) {
             $rules = $callback($this->rules);
             $this->rules = tap($rules, fn($value) => throw_unless(is_array($value), new Exception('The validate callback should return an array')));
-        } else {
+        } else if(!empty($this->rules)){
             $validator = Validator::make($this->attributesToArray(), $this->rules);
             if ($validator->fails()) {
                 $rules = $validator->errors()->all();
