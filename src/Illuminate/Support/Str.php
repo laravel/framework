@@ -1346,17 +1346,17 @@ class Str
     }
 
     /**
-     * Wraps a string to a given number of characters.
+     * Wrap a string to a given number of characters.
      *
      * @param  string  $string
      * @param  int  $characters
      * @param  string  $break
-     * @param  bool  $cut_long_words
+     * @param  bool  $cutLongWords
      * @return string
      */
-    public static function wordWrap($string, $characters = 75, $break = "\n", $cut_long_words = false)
+    public static function wordWrap($string, $characters = 75, $break = "\n", $cutLongWords = false)
     {
-        return wordwrap($string, $characters, $break, $cut_long_words);
+        return wordwrap($string, $characters, $break, $cutLongWords);
     }
 
     /**
