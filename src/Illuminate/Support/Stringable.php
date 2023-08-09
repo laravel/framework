@@ -1114,7 +1114,7 @@ class Stringable implements JsonSerializable, ArrayAccess
     }
 
     /**
-     * Wraps a string to a given number of characters
+     * Wraps a string to a given number of characters.
      *
      * @param  int  $characters
      * @param  string  $break

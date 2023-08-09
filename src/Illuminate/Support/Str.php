@@ -1346,7 +1346,7 @@ class Str
     }
 
     /**
-     * Wraps a string to a given number of characters
+     * Wraps a string to a given number of characters.
      *
      * @param  string  $string
      * @param  int  $characters
