@@ -16,13 +16,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\Eloquent\Validations\FieldsValidationException;
 use Illuminate\Database\Eloquent\Validations\Rules;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Validation\ValidationException;
-use Illuminate\Validation\Validator;
 use JsonSerializable;
 use LogicException;
 use ReflectionClass;
@@ -350,87 +351,89 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      *
      * @return Model
      * @throws ValidationException
+     * @throws FieldsValidationException
      */
     public function validate(callable $callback = null): static
     {
-        if(!is_null($callback)){
-            $rules = $this->rules;
-            $this->rules = $callback($rules);
+        $this->getModelRules();
+        $this->getPropertyRules();
+        $this->appendFillables();
 
-            return $this;
-        }
-        $rules = array_merge(
-            $this->rules,
-            $this->getModelRules(),
-            $this->getPropertyRules()
-        );
+        $rules = $this->rules;
 
-        $this->fillableFromRules();
+        if (!is_null($callback)) {
+            $modifiedRules = $callback($rules);
 
-        $validator = Validator::make($this->attributesToArray(), $rules);
+            if (is_array($modifiedRules)) {
+                $this->rules = array_merge($rules, $modifiedRules);
+            }
+        } else {
+            $validator = Validator::make($this->attributesToArray(), $rules);
+            if ($validator->fails()) {
+                $errors = $validator->errors()->all();
 
-        if ($validator->fails()) {
-            throw new ValidationException($validator);
+                throw new FieldsValidationException($errors);
+            }
         }
 
         return $this;
     }
 
+
+
     /**
      * Get the validation rules for the model fields decorator.
      *
-     * @return array
+     * @return Model
      */
-    public function getModelRules(): array
+    public function getModelRules(): Model
     {
         $decorator = new ReflectionClass($this);
         $attributes = $decorator->getAttributes(Rules::class);
 
         if (!empty($attributes)) {
             $modelRules = $attributes[0]->newInstance();
-            return $modelRules->rules;
+
+            $rules = $modelRules->rules;
+            foreach ($rules as $field => $rule){
+
+                $this->rules[$field] = $rule;
+            }
         }
 
-        return [];
+        return $this;
     }
 
     /**
      * Get the validation rules for the model properties decorated with Rules attribute.
      *
-     * @return array
+     * @return Model
      */
-    public function getPropertyRules(): array
+    public function getPropertyRules(): Model
     {
         $class = new ReflectionClass($this);
         $properties = $class->getProperties();
-
-        $propertyRules = [];
-
         foreach ($properties as $property) {
             $attributes = $property->getAttributes(Rules::class);
             if (!empty($attributes)) {
                 $propertyName = $property->getName();
-                $propertyRules[$propertyName] = $attributes[0]->newInstance()->rules;
+                $rules = $attributes[0]->newInstance()->rules;
+                if(is_array($rules) && Arr::isAssoc($rules)){
+                    if(!Arr::has($rules, $propertyName)){
+                       throw new \InvalidArgumentException("Invalid rules used on property $propertyName");
+                    }else{
+                        $rules = $rules[$propertyName];
+                    }
+                }elseif(is_string($rules)){
+                    $this->rules[$propertyName] =  [$rules];
+                }else{
+                    $this->rules[$propertyName] =  $rules;
+                }
+
             }
         }
 
-        return $propertyRules;
-    }
-
-    /**
-     * Automatically populate the fillable fields from the merged rules.
-     *
-     * @return void
-     */
-    protected function fillableFromRules(): void
-    {
-        $rules = array_merge(
-            $this->rules,
-            $this->getModelRules(),
-            $this->getPropertyRules()
-        );
-
-        $this->fillable = array_merge($this->fillable, array_keys($rules));
+        return $this;
     }
 
     /**
@@ -1216,14 +1219,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      *
      * @return bool
      * @throws ValidationException
+     * @throws FieldsValidationException
      */
     public function save(array $options = [])
     {
-        $this->mergeAttributesFromCachedCasts();
-
-        $query = $this->newModelQuery();
-
         $this->validate();
+        $this->mergeAttributesFromCachedCasts();
+        $query = $this->newModelQuery();
 
         // If the "saving" event returns false we'll bail out of the save and return
         // false, indicating that the save failed. This provides a chance for any
@@ -2505,5 +2507,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         $this->bootIfNotBooted();
 
         $this->initializeTraits();
+    }
+
+    private function appendFillables(): void
+    {
+        $this->fillable = array_merge($this->fillable, array_keys($this->rules));
     }
 }

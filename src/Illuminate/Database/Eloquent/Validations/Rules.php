@@ -21,8 +21,10 @@ class Rules
         if (is_array($rules) && Arr::isAssoc($rules)) {
             foreach ($rules as $field => $rule) {
                 $this->validateFieldAndRules($field, $rule);
+                $this->rules = $rules;
             }
         } elseif (is_string($rules) || is_array($rules)) {
+
             $this->rules = $rules;
         } else {
             throw new InvalidArgumentException('Validation rules must be a string or an array.');
