@@ -830,7 +830,8 @@ class Connection implements ConnectionInterface
      */
     protected function matchesUniqueConstraintException(Exception $exception)
     {
-        throw new Exception('Missing implementation of matchesUniqueConstraintException in the Connection class.');
+        // It's up to each child class of Connection to detect a unique constraint violation.
+        return false;
     }
 
     /**
