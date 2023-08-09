@@ -9,6 +9,7 @@ use Illuminate\Database\Events\SchemaLoaded;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Database\SQLiteDatabaseDoesNotExistException;
 use Illuminate\Database\SqlServerConnection;
+use Illuminate\Support\Facades\Artisan;
 use PDOException;
 use Throwable;
 
@@ -31,7 +32,8 @@ class MigrateCommand extends BaseCommand implements Isolatable
                 {--pretend : Dump the SQL queries that would be run}
                 {--seed : Indicates if the seed task should be re-run}
                 {--seeder= : The class name of the root seeder}
-                {--step : Force the migrations to be run so they can be rolled back individually}';
+                {--step : Force the migrations to be run so they can be rolled back individually}
+                {--safe : Show all pending migrations and confirm before migrating}';
 
     /**
      * The console command description.
@@ -78,6 +80,18 @@ class MigrateCommand extends BaseCommand implements Isolatable
     {
         if (! $this->confirmToProceed()) {
             return 1;
+        }
+
+        if ($this->option('safe') && count($this->getAllMigrationFiles()) > 0) {
+            $this->call('migrate:status', ['--pending' => true]);
+
+            $confirmed = confirm('Are you sure you want to run those migrations?', default: false);
+
+            if (! $confirmed) {
+                $this->components->warn('Command cancelled.');
+
+                return 0;
+            }
         }
 
         $this->migrator->usingConnection($this->option('database'), function () {
@@ -279,5 +293,13 @@ class MigrateCommand extends BaseCommand implements Isolatable
         }
 
         return database_path('schema/'.$connection->getName().'-schema.sql');
+    }
+
+    /**
+     * Get an array of all of the migration files.
+     */
+    protected function getAllMigrationFiles(): array
+    {
+        return $this->migrator->getMigrationFiles($this->getMigrationPaths());
     }
 }
