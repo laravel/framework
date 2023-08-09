@@ -649,7 +649,7 @@ class BelongsToMany extends Relation
         try {
             return $this->create(array_merge($attributes, $values), $joining, $touch);
         } catch (UniqueConstraintViolationException $exception) {
-            // Do nothing...
+            // ...
         }
 
         // If we run into a UNIQUE constraint violation, we'll assume it came from the related model's
