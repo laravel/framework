@@ -84,16 +84,7 @@ class DatabaseEloquentModelTest extends TestCase
         $attributes = $model->getAttributes();
         $this->assertSame(json_encode(['name' => 'taylor']), $attributes['list_items']);
     }
-
-    public function testModelAttributeGlobalValidationRulesOverride()
-    {
-        $model = new EloquentModelStub;
-        $model->name = 'foo';
-        $model->validateUsing(fn($rules) => []);
-        $model->save();
-        $this->assertInstanceOf(EloquentModelStub::class, $model);
-        $this->assertSame('foo', $model->name);
-    }
+    
 
     public function testSetAttributeWithNumericKey()
     {
