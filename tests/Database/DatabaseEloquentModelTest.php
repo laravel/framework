@@ -29,6 +29,9 @@ use Illuminate\Database\Eloquent\MissingAttributeException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Eloquent\Validations\FieldsValidationException;
+use Illuminate\Database\Eloquent\Validations\OnCreateRules;
+use Illuminate\Database\Eloquent\Validations\OnUpdateRules;
 use Illuminate\Database\Query\Builder as BaseBuilder;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
@@ -80,6 +83,71 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(['name' => 'taylor'], $model->list_items);
         $attributes = $model->getAttributes();
         $this->assertSame(json_encode(['name' => 'taylor']), $attributes['list_items']);
+    }
+
+    public function testModelAttributeGlobalValidationRulesOverride()
+    {
+        $model = new EloquentModelStubWithModelAttributes;
+        $model->name = 'foo';
+        $model->validateUsing(fn($rules) => []);
+        $model->save();
+        $this->assertInstanceOf(EloquentModelStubWithModelAttributes::class, $model);
+        $this->assertSame('foo', $model->name);
+
+        $model = new EloquentModelStubWithModelAttributes;
+        $model->name = 'fooBarBaz fooBarBaz';
+        $model->validateUsing(function($rules){
+            unset($rules['name']);
+
+            return $rules;
+        });
+
+        $model->save();
+        $this->assertInstanceOf(EloquentModelStubWithModelAttributes::class, $model);
+        $this->assertSame('foo', $model->name);
+
+        $model = EloquentModelStubWithModelAttributes::validateUsing(function($rules){
+            unset($rules['name']);
+
+            return $rules;
+        })->create([
+            'name' => 'foo'
+        ]);
+        $this->assertSame('foo', $model->name);
+
+        $model->name = 'bar';
+        $model->save();
+        $this->expectException(FieldsValidationException::class);
+
+        $model->name = 'barBarBazFoo';
+        $model->save();
+        $this->assertSame('barBarBazFoo', $model->name);
+    }
+
+    public function testModelAttributeGlobalValidation()
+    {
+        $model = new EloquentModelStubWithModelAttributes;
+        $model->name = null;
+        $model->save();
+        $this->expectException(FieldsValidationException::class);
+
+        $model = new EloquentModelStubWithModelAttributes;
+        $model->name = 'fooBarBaz fooBarBaz';
+        $model->save();
+        $this->expectException(FieldsValidationException::class);
+
+        $model = EloquentModelStubWithModelAttributes::create([
+            'name' => 'foo'
+        ]);
+        $this->assertSame('foo', $model->name);
+
+        $model->name = 'bar';
+        $model->save();
+        $this->expectException(FieldsValidationException::class);
+
+        $model->name = 'barBarBazFoo';
+        $model->save();
+        $this->assertSame('barBarBazFoo', $model->name);
     }
 
     public function testSetAttributeWithNumericKey()
@@ -2857,6 +2925,12 @@ class EloquentModelStubWithTrait extends EloquentModelStub
     use FooBarTrait;
 }
 
+#[OnCreateRules(['foo' => 'required|max:12'])]
+#[OnUpdateRules(['foo' => 'required|min:10'])]
+class EloquentModelStubWithModelAttributes extends EloquentModelStub
+{
+
+}
 class EloquentModelCamelStub extends EloquentModelStub
 {
     public static $snakeAttributes = false;

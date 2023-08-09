@@ -348,11 +348,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected static function booted()
     {
        static::updating(function (self $model){
-           $model->useUpdateRules();
+           $model->getModelRules();
+           $model->getPropertyRules();
            $model->validate();
        });
         static::creating(function (self $model){
-            $model->useUpdateRules();
+            $model->getModelRules(useOnCreateRules: false);
+            $model->getPropertyRules(useOnCreateRules: false);
             $model->validate();
         });
 
