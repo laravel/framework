@@ -1346,6 +1346,19 @@ class Str
     }
 
     /**
+     * Wraps a string to a given number of characters
+     *
+     * @param  string  $string
+     * @param  int  $characters
+     * @param  string  $break
+     * @param  bool  $cut_long_words
+     * @return string
+     */
+    public static function wordWrap($string, $characters = 75, $break = PHP_EOL, $cut_long_words = false){
+        return wordwrap($string, $characters, $break, $cut_long_words);
+    }
+
+    /**
      * Generate a UUID (version 4).
      *
      * @return \Ramsey\Uuid\UuidInterface
