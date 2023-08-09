@@ -300,7 +300,7 @@ class Validator implements ValidatorContract
      *
      * @var callable|null
      */
-    protected $ensureExponentWithinRangeUsing;
+    protected $ensureExponentWithinAllowedRangeUsing;
 
     /**
      * Create a new Validator instance.
@@ -1504,9 +1504,9 @@ class Validator implements ValidatorContract
      * @param  callable(int $scale, string $attribute, mixed $value)  $callback
      * @return $this
      */
-    public function ensureExponentWithinRangeUsing($callback)
+    public function ensureExponentWithinAllowedRangeUsing($callback)
     {
-        $this->ensureExponentWithinRangeUsing = $callback;
+        $this->ensureExponentWithinAllowedRangeUsing = $callback;
 
         return $this;
     }

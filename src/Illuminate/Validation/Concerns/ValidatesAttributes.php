@@ -2353,7 +2353,7 @@ trait ValidatesAttributes
         // is the size. If it is a file, we take kilobytes, and for a string the
         // entire length of the string will be considered the attribute size.
         if (is_numeric($value) && $hasNumeric) {
-            return $this->ensureExponentWithinRange($attribute, $this->trim($value));
+            return $this->ensureExponentWithinAllowedRange($attribute, $this->trim($value));
         } elseif (is_array($value)) {
             return count($value);
         } elseif ($value instanceof File) {
@@ -2478,7 +2478,7 @@ trait ValidatesAttributes
      * @param  mixed  $value
      * @return mixed
      */
-    protected function ensureExponentWithinRange($attribute, $value)
+    protected function ensureExponentWithinAllowedRange($attribute, $value)
     {
         $stringValue = (string) $value;
 
@@ -2491,7 +2491,7 @@ trait ValidatesAttributes
             : Str::after($stringValue, 'E'));
 
         $withinRange = (
-            $this->ensureExponentWithinRangeUsing ?? fn ($scale) => $scale <= 1000 && $scale >= -1000
+            $this->ensureExponentWithinAllowedRangeUsing ?? fn ($scale) => $scale <= 1000 && $scale >= -1000
         )($scale, $attribute, $value);
 
         if ($withinRange) {

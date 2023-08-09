@@ -8820,7 +8820,7 @@ class ValidationValidatorTest extends TestCase
         $scale = $attribute = $value = null;
         $withinRange = true;
 
-        $validator->ensureExponentWithinRangeUsing(function () use (&$scale, &$attribute, &$value, &$withinRange) {
+        $validator->ensureExponentWithinAllowedRangeUsing(function () use (&$scale, &$attribute, &$value, &$withinRange) {
             [$scale, $attribute, $value] = func_get_args();
 
             return $withinRange;
