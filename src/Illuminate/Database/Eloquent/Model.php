@@ -29,9 +29,8 @@ use Illuminate\Validation\ValidationException;
 use JsonSerializable;
 use LogicException;
 use ReflectionClass;
-use Stringable;
 
-abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToString, HasBroadcastChannel, Jsonable, JsonSerializable, QueueableEntity, Stringable, UrlRoutable
+abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToString, HasBroadcastChannel, Jsonable, JsonSerializable, QueueableEntity, UrlRoutable
 {
     use Concerns\HasAttributes,
         Concerns\HasEvents,
@@ -391,7 +390,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Get the validation rules for the model fields decorator.
      *
-     * @param bool $useCreateRules
+     * @param bool $useOnCreateRules
      *
      * @return Model
      */
@@ -417,7 +416,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Get the validation rules for the model properties decorated with OnUpdateRules attribute.
      *
-     * @param bool $useCreateRules
+     * @param bool $useOnCreateRules
      *
      * @return Model
      */
@@ -1078,11 +1077,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         if ($this->fireModelEvent('updating') === false) {
             return false;
         }
-
-        if ($this->isClassDeviable($column)) {
-            $amount = (clone $this)->setAttribute($column, $amount)->getAttributeFromArray($column);
-        }
-
         return tap($this->setKeysForSaveQuery($this->newQueryWithoutScopes())->{$method}($column, $amount, $extra), function () use ($column) {
             $this->syncChanges();
 
@@ -1099,7 +1093,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * @param array $options
      *
      * @return bool
-     * @throws ValidationException
+     * @throws ValidationException|FieldsValidationException
      */
     public function update(array $attributes = [], array $options = [])
     {
@@ -1133,9 +1127,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      *
      * @param array $attributes
      * @param array $options
-     *
      * @return bool
-     * @throws ValidationException
      */
     public function updateQuietly(array $attributes = [], array $options = [])
     {
@@ -1229,10 +1221,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * Save the model to the database.
      *
      * @param array $options
-     *
      * @return bool
-     * @throws ValidationException
-     * @throws FieldsValidationException
      */
     public function save(array $options = [])
     {
