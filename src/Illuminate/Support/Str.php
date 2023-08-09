@@ -1354,7 +1354,8 @@ class Str
      * @param  bool  $cut_long_words
      * @return string
      */
-    public static function wordWrap($string, $characters = 75, $break = "\n", $cut_long_words = false){
+    public static function wordWrap($string, $characters = 75, $break = "\n", $cut_long_words = false)
+    {
         return wordwrap($string, $characters, $break, $cut_long_words);
     }
 

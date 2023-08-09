@@ -1121,7 +1121,8 @@ class Stringable implements JsonSerializable, ArrayAccess
      * @param  bool  $cut_long_words
      * @return Stringable
      */
-    public function wordWrap($characters = 75, $break = "\n", $cut_long_words = false){
+    public function wordWrap($characters = 75, $break = "\n", $cut_long_words = false)
+    {
         return new static(Str::wordWrap($this->value, $characters, $break, $cut_long_words));
     }
 
