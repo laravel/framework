@@ -36,7 +36,7 @@ class AssertRedirectToRouteTest extends TestCase
 
         $this->router
             ->get('')
-            ->name('route-with-empty-url');
+            ->name('route-with-empty-uri');
 
         $this->urlGenerator = $this->app->make(UrlGenerator::class);
     }
@@ -74,14 +74,14 @@ class AssertRedirectToRouteTest extends TestCase
             ]);
     }
 
-    public function testAssertRedirectToRouteWithRouteNameAndParamsWhenRouteUrlIsEmpty()
+    public function testAssertRedirectToRouteWithRouteNameAndParamsWhenRouteUriIsEmpty()
     {
         $this->router->get('test-route', function () {
-            return new RedirectResponse($this->urlGenerator->route('route-with-empty-url', ['foo' => 'bar']));
+            return new RedirectResponse($this->urlGenerator->route('route-with-empty-uri', ['foo' => 'bar']));
         });
 
         $this->get('test-route')
-            ->assertRedirectToRoute('route-with-empty-url', ['foo' => 'bar']);
+            ->assertRedirectToRoute('route-with-empty-uri', ['foo' => 'bar']);
     }
 
     protected function tearDown(): void
