@@ -193,11 +193,7 @@ class TestResponse implements ArrayAccess
             $this->statusMessageWithDetails('201, 301, 302, 303, 307, 308', $this->getStatusCode()),
         );
 
-        $request = Request::create($this->headers->get('Location'));
-
-        PHPUnit::assertEquals(
-            app('url')->to($uri), $request->fullUrl()
-        );
+        $this->assertLocation($uri);
 
         return $this;
     }
