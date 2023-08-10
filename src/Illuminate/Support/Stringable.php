@@ -292,6 +292,17 @@ class Stringable implements JsonSerializable, ArrayAccess
     }
 
     /**
+     * Prune the last occurrence of the given suffix if it exists at the end of the string.
+     *
+     * @param  string  $suffix
+     * @return static
+     */
+    public function pruneEnd($suffix)
+    {
+        return new static(Str::pruneEnd($this->value, $suffix));
+    }
+
+    /**
      * Determine if a given string matches a given pattern.
      *
      * @param  string|iterable<string>  $pattern
@@ -657,6 +668,18 @@ class Stringable implements JsonSerializable, ArrayAccess
     }
 
     /**
+     * Replace the first occurrence of the given value if it appears at the start of the string.
+     *
+     * @param  string  $search
+     * @param  string  $replace
+     * @return static
+     */
+    public function replaceStart($search, $replace)
+    {
+        return new static(Str::replaceStart($search, $replace, $this->value));
+    }
+
+    /**
      * Replace the last occurrence of a given value in the string.
      *
      * @param  string  $search
@@ -666,6 +689,18 @@ class Stringable implements JsonSerializable, ArrayAccess
     public function replaceLast($search, $replace)
     {
         return new static(Str::replaceLast($search, $replace, $this->value));
+    }
+
+    /**
+     * Replace the last occurrence of a given value if it appears at the end of the string.
+     *
+     * @param  string  $search
+     * @param  string  $replace
+     * @return static
+     */
+    public function replaceEnd($search, $replace)
+    {
+        return new static(Str::replaceEnd($search, $replace, $this->value));
     }
 
     /**
@@ -715,6 +750,17 @@ class Stringable implements JsonSerializable, ArrayAccess
     public function start($prefix)
     {
         return new static(Str::start($this->value, $prefix));
+    }
+
+    /**
+     * Prune the first occurrence of the given prefix if it exists at the start of the string.
+     *
+     * @param  string  $prefix
+     * @return static
+     */
+    public function pruneStart($prefix)
+    {
+        return new static(Str::pruneStart($this->value, $prefix));
     }
 
     /**
