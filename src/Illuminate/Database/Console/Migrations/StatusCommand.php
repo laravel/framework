@@ -76,9 +76,9 @@ class StatusCommand extends BaseCommand
                     );
 
                 $this->newLine();
-            } else if($this->option('pending')) {
+            } elseif ($this->option('pending')) {
                 $this->components->info('No pending migrations found');
-            } else{
+            } else {
                 $this->components->info('No migrations found');
             }
         });
