@@ -65,11 +65,13 @@ class SqsJob extends Job implements JobContract
      */
     public function delete()
     {
-        parent::delete();
+        if(!$this->isDeleted()) {
+            $this->sqs->deleteMessage([
+                'QueueUrl' => $this->queue, 'ReceiptHandle' => $this->job['ReceiptHandle'],
+            ]);
+        }
 
-        $this->sqs->deleteMessage([
-            'QueueUrl' => $this->queue, 'ReceiptHandle' => $this->job['ReceiptHandle'],
-        ]);
+        parent::delete();
     }
 
     /**
