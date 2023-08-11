@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+
 use function Laravel\Prompts\multiselect;
 
 #[AsCommand(name: 'db:seed')]
