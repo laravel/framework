@@ -115,7 +115,7 @@ trait ManagesComponents
      */
     protected function componentData()
     {
-        $defaultSlot = new HtmlString(trim(ob_get_clean()));
+        $defaultSlot = new ComponentSlot(trim(ob_get_clean()));
 
         $slots = array_merge([
             '__default' => $defaultSlot,
