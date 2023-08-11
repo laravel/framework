@@ -482,6 +482,25 @@ trait EnumeratesValues
     }
 
     /**
+     * Calculate the percentage of items that pass a given truth test.
+     *
+     * @param  (callable(TValue, TKey): bool)  $callback
+     * @param  int  $precision
+     * @return float|null
+     */
+    public function percentage(callable $callback, int $precision = 2)
+    {
+        if ($this->isEmpty()) {
+            return null;
+        }
+
+        return round(
+            $this->filter($callback)->count() / $this->count() * 100,
+            $precision
+        );
+    }
+
+    /**
      * Get the sum of the given values.
      *
      * @param  (callable(TValue): mixed)|string|null  $callback
