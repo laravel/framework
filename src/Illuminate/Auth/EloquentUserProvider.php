@@ -166,7 +166,9 @@ class EloquentUserProvider implements UserProvider
         $query = is_null($model)
                 ? $this->createModel()->newQuery()
                 : $model->newQuery();
-
+        if(method_exists($model, 'authQueryCallback')){
+            $this->withQuery([$model, 'authQueryCallback']);
+        }
         with($query, $this->queryCallback);
 
         return $query;
