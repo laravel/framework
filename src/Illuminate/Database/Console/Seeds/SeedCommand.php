@@ -88,7 +88,6 @@ class SeedCommand extends Command
      * Prepare the given seeder.
      *
      * @param  string  $class
-     *
      * @return \Illuminate\Database\Seeder
      */
     protected function prepareSeeder(string $class)
@@ -131,7 +130,7 @@ class SeedCommand extends Command
         $seeders = [];
 
         foreach ($files as $file) {
-            if (!str_contains($file, '.php')) {
+            if (! str_contains($file, '.php')) {
                 continue;
             }
 
