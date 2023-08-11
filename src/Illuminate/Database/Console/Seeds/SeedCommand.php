@@ -145,6 +145,10 @@ class SeedCommand extends Command
             $seeders[] = str_replace('.php', '', $file);
         }
 
+        if (empty($seeders)) {
+            throw new Exception('No seeders found.');
+        }
+
         return multiselect(
             label: 'Select seeders to run',
             options: $seeders,
