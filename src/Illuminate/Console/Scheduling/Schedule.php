@@ -15,8 +15,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Support\ProcessUtils;
 use Illuminate\Support\Traits\Macroable;
-use RuntimeException;
 use InvalidArgumentException;
+use RuntimeException;
 
 class Schedule
 {
@@ -77,7 +77,6 @@ class Schedule
      * @var array<string, bool>
      */
     protected $mutexCache = [];
-
 
     /**
      * Default configuration for events.
@@ -147,12 +146,12 @@ class Schedule
     /**
      * Add event defaults to the event.
      *
-     * @param \Illuminate\Console\Scheduling\Event $event
+     * @param  \Illuminate\Console\Scheduling\Event  $event
      * @return \Illuminate\Console\Scheduling\Event
      */
     protected function addEventDefaults($event)
     {
-        foreach($this->eventDefaults as $key => $value) {
+        foreach ($this->eventDefaults as $key => $value) {
             $event->{$key} = $value;
         }
 
@@ -413,13 +412,13 @@ class Schedule
      * Set defaults to apply to all scheduled commands.
      *
      * @param  array<string, mixed>  $defaults
-     * @param callable(Schedule): void|null $callback
+     * @param  callable(Schedule): void|null  $callback
      * @return void
      */
     public function withEventDefaults(array $defaults, $callback = null)
     {
-        foreach($defaults as $key => $value) {
-            if (!in_array($key, $this->allowedAttributes)) {
+        foreach ($defaults as $key => $value) {
+            if (! in_array($key, $this->allowedAttributes)) {
                 throw new InvalidArgumentException("Invalid attribute: {$key}");
             }
         }
@@ -430,9 +429,9 @@ class Schedule
             return;
         }
 
-        $schedule = tap(new static($this->timezone), function(Schedule $schedule) use ($defaults, $callback) {
-           $schedule->withEventDefaults($defaults);
-           call_user_func($callback, $schedule);
+        $schedule = tap(new static($this->timezone), function (Schedule $schedule) use ($defaults, $callback) {
+            $schedule->withEventDefaults($defaults);
+            call_user_func($callback, $schedule);
         });
 
         $this->events = [...$this->events, ...$schedule->events()];
