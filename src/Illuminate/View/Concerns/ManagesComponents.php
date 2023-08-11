@@ -6,6 +6,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Arr;
 use Illuminate\Support\HtmlString;
+use Illuminate\View\ComponentAttributeBag;
 use Illuminate\View\ComponentSlot;
 
 trait ManagesComponents
@@ -138,6 +139,7 @@ trait ManagesComponents
      */
     public function getConsumableComponentData($key, $default = null)
     {
+
         if (array_key_exists($key, $this->currentComponentData)) {
             return $this->currentComponentData[$key];
         }
@@ -150,6 +152,13 @@ trait ManagesComponents
 
         for ($i = $currentComponent - 1; $i >= 0; $i--) {
             $data = $this->componentData[$i] ?? [];
+            if (array_key_exists($key, $data)) {
+                return $data[$key];
+            }
+
+            if (isset($data['attributes']) && $data['attributes'] instanceof ComponentAttributeBag) {
+                $data = $data['attributes']->getAttributes();
+            }
 
             if (array_key_exists($key, $data)) {
                 return $data[$key];
