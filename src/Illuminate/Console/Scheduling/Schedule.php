@@ -86,9 +86,11 @@ class Schedule
     protected $eventDefaults = [];
 
     /**
+     * The properties which can be set on an event via defaults.
+     *
      * @var array<int, string>
      */
-    protected $allowedAttributes = [
+    protected $allowedEventProperties = [
         'onOneServer',
         'timezone',
         'user',
@@ -418,7 +420,7 @@ class Schedule
     public function withEventDefaults(array $defaults, $callback = null)
     {
         foreach ($defaults as $key => $value) {
-            if (! in_array($key, $this->allowedAttributes)) {
+            if (! in_array($key, $this->allowedEventProperties)) {
                 throw new InvalidArgumentException("Invalid attribute: {$key}");
             }
         }
