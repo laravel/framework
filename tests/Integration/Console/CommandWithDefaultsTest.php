@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Integration\Console;
 
-use Illuminate\Console\Scheduling\Event;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Orchestra\Testbench\TestCase;
@@ -57,5 +56,4 @@ class CommandWithDefaultsTest extends TestCase
 
 class SomeJob implements ShouldQueue
 {
-
 }
