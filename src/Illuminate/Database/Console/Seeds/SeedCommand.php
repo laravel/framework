@@ -61,11 +61,9 @@ class SeedCommand extends Command
             return 1;
         }
 
-        if ($this->input->getOption('pick')) {
-            $seeders = $this->pickSeeder();
-        } else {
-            $seeders = [$this->getSeeder()];
-        }
+        $seeders = $this->input->getOption('pick')
+            ? $this->pickSeeder()
+            : $this->getSeeder();
 
         $this->components->info('Seeding database.');
 
@@ -87,9 +85,9 @@ class SeedCommand extends Command
     }
 
     /**
-     * Get a seeder instance from the container.
+     * Prepare the given seeder.
      *
-     * @param  string|null  $seeder
+     * @param  string  $class
      *
      * @return \Illuminate\Database\Seeder
      */
@@ -105,9 +103,9 @@ class SeedCommand extends Command
     }
 
     /**
-     * Get a seeder instance from the container.
+     * Get the seeder to be run.
      *
-     * @return \Illuminate\Database\Seeder
+     * @return array
      */
     protected function getSeeder()
     {
@@ -118,11 +116,11 @@ class SeedCommand extends Command
             $class = 'DatabaseSeeder';
         }
 
-        return $class;
+        return [$class];
     }
 
     /**
-     * Pick the seeder to run by interacting with prompts.
+     * Choose the seeder to run by interacting with the prompt.
      *
      * @return array
      */
