@@ -16,6 +16,7 @@ use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Support\ProcessUtils;
 use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
+use InvalidArgumentException;
 
 class Schedule
 {
@@ -77,6 +78,27 @@ class Schedule
      */
     protected $mutexCache = [];
 
+
+    /**
+     * Default configuration for events.
+     *
+     * @var array<string, mixed>
+     */
+    protected $eventDefaults = [];
+
+    /**
+     * @var array<int, string>
+     */
+    protected $allowedAttributes = [
+        'onOneServer',
+        'timezone',
+        'user',
+        'environments',
+        'evenInMaintenanceMode',
+        'withoutOverlapping',
+        'runInBackground',
+    ];
+
     /**
      * Create a new schedule instance.
      *
@@ -118,6 +140,21 @@ class Schedule
         $this->events[] = $event = new CallbackEvent(
             $this->eventMutex, $callback, $parameters, $this->timezone
         );
+
+        return $event;
+    }
+
+    /**
+     * Add event defaults to the event.
+     *
+     * @param \Illuminate\Console\Scheduling\Event $event
+     * @return \Illuminate\Console\Scheduling\Event
+     */
+    protected function addEventDefaults($event)
+    {
+        foreach($this->eventDefaults as $key => $value) {
+            $event->{$key} = $value;
+        }
 
         return $event;
     }
@@ -327,7 +364,7 @@ class Schedule
      */
     public function events()
     {
-        return $this->events;
+        return array_map($this->addEventDefaults(...), $this->events);
     }
 
     /**
@@ -370,5 +407,34 @@ class Schedule
         }
 
         return $this->dispatcher;
+    }
+
+    /**
+     * Set defaults to apply to all scheduled commands.
+     *
+     * @param  array<string, mixed>  $defaults
+     * @param callable(Schedule): void|null $callback
+     * @return void
+     */
+    public function withEventDefaults(array $defaults, $callback = null)
+    {
+        foreach($defaults as $key => $value) {
+            if (!in_array($key, $this->allowedAttributes)) {
+                throw new InvalidArgumentException("Invalid attribute: {$key}");
+            }
+        }
+
+        if (is_null($callback)) {
+            $this->eventDefaults = $defaults;
+
+            return;
+        }
+
+        $schedule = tap(new static($this->timezone), function(Schedule $schedule) use ($defaults, $callback) {
+           $schedule->withEventDefaults($defaults);
+           call_user_func($callback, $schedule);
+        });
+
+        $this->events = [...$this->events, ...$schedule->events()];
     }
 }
