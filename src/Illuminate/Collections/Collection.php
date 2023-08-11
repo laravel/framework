@@ -1758,23 +1758,4 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     {
         unset($this->items[$key]);
     }
-
-    /**
-     * Calculates the percentage of items that pass a given truth test.
-     *
-     * @param  (callable(TValue, TKey): bool)  $callback
-     * @param  int  $precision
-     * @return float|null
-     */
-    public function percentage(callable $callback, int $precision = 2): float|null
-    {
-        if ($this->isEmpty()) {
-            return null;
-        }
-
-        return round(
-            num: $this->filter($callback)->count() / $this->count() * 100,
-            precision: $precision
-        );
-    }
 }
