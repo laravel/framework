@@ -139,7 +139,6 @@ trait ManagesComponents
      */
     public function getConsumableComponentData($key, $default = null)
     {
-
         if (array_key_exists($key, $this->currentComponentData)) {
             return $this->currentComponentData[$key];
         }
