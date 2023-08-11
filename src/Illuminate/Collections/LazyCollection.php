@@ -1660,6 +1660,25 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
+     * Calculates the percentage of items that pass a given truth test.
+     *
+     * @param  (callable(TValue, TKey): bool)  $callback
+     * @param  int  $precision
+     * @return float
+     */
+    public function percentage(callable $callback, int $precision = 2): float
+    {
+        if ($this->isEmpty()) {
+            return 0;
+        }
+
+        return round(
+            num: $this->filter($callback)->count() / $this->count() * 100,
+            precision: $precision
+        );
+    }
+
+    /**
      * Make an iterator from the given source.
      *
      * @template TIteratorKey of array-key
