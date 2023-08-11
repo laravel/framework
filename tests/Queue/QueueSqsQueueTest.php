@@ -174,6 +174,7 @@ class QueueSqsQueueTest extends TestCase
     public function testGetQueueProperlyResolvesUrlWithPrefixAndQueuePrefix()
     {
         $this->prefix .= 'example-prefix-';
+        $this->queueUrl = $this->prefix.$this->queueName;
         $queue = new SqsQueue($this->sqs, $this->queueName, $this->prefix);
         $this->assertEquals($this->queueUrl, $queue->getQueue(null));
         $queueUrl = $this->baseUrl.'/'.$this->account.'/example-prefix-test';
