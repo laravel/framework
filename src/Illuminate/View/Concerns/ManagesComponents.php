@@ -5,7 +5,6 @@ namespace Illuminate\View\Concerns;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Arr;
-use Illuminate\Support\HtmlString;
 use Illuminate\View\ComponentSlot;
 
 trait ManagesComponents
