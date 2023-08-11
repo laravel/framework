@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Console\Seeds;
 
+use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
@@ -123,10 +124,16 @@ class SeedCommand extends Command
      * Choose the seeder to run by interacting with the prompt.
      *
      * @return array
+     *
+     * @throws \Exception
      */
     protected function pickSeeder()
     {
-        $files = scandir(database_path('seeders'));
+        try {
+            $files = scandir(database_path('seeders'));
+        } catch (Exception) {
+            throw new Exception('Unable to scan seeders directory.');
+        }
 
         $seeders = [];
 
