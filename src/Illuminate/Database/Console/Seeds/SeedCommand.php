@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+use function Laravel\Prompts\multiselect;
 
 #[AsCommand(name: 'db:seed')]
 class SeedCommand extends Command
@@ -60,14 +61,22 @@ class SeedCommand extends Command
             return 1;
         }
 
+        if ($this->input->getOption('pick')) {
+            $seeders = $this->pickSeeder();
+        } else {
+            $seeders = [$this->getSeeder()];
+        }
+
         $this->components->info('Seeding database.');
 
         $previousConnection = $this->resolver->getDefaultConnection();
 
         $this->resolver->setDefaultConnection($this->getDatabase());
 
-        Model::unguarded(function () {
-            $this->getSeeder()->__invoke();
+        Model::unguarded(function () use ($seeders) {
+            foreach ($seeders as $seeder) {
+                $this->prepareSeeder($seeder)->__invoke();
+            }
         });
 
         if ($previousConnection) {
@@ -80,24 +89,63 @@ class SeedCommand extends Command
     /**
      * Get a seeder instance from the container.
      *
+     * @param  string|null  $seeder
+     *
+     * @return \Illuminate\Database\Seeder
+     */
+    protected function prepareSeeder(string $class)
+    {
+        if (! str_contains($class, '\\')) {
+            $class = 'Database\\Seeders\\'.$class;
+        }
+
+        return $this->laravel->make($class)
+            ->setContainer($this->laravel)
+            ->setCommand($this);
+    }
+
+    /**
+     * Get a seeder instance from the container.
+     *
      * @return \Illuminate\Database\Seeder
      */
     protected function getSeeder()
     {
         $class = $this->input->getArgument('class') ?? $this->input->getOption('class');
 
-        if (! str_contains($class, '\\')) {
-            $class = 'Database\\Seeders\\'.$class;
-        }
-
         if ($class === 'Database\\Seeders\\DatabaseSeeder' &&
             ! class_exists($class)) {
             $class = 'DatabaseSeeder';
         }
 
-        return $this->laravel->make($class)
-                        ->setContainer($this->laravel)
-                        ->setCommand($this);
+        return $class;
+    }
+
+    /**
+     * Pick the seeder to run by interacting with prompts.
+     *
+     * @return array
+     */
+    protected function pickSeeder()
+    {
+        $files = scandir(database_path('seeders'));
+
+        $seeders = [];
+
+        foreach ($files as $file) {
+            if (!str_contains($file, '.php')) {
+                continue;
+            }
+
+            $seeders[] = str_replace('.php', '', $file);
+        }
+
+        return multiselect(
+            label: 'Select seeders to run',
+            options: $seeders,
+            default: ['DatabaseSeeder'],
+            required: true
+        );
     }
 
     /**
@@ -135,6 +183,7 @@ class SeedCommand extends Command
             ['class', null, InputOption::VALUE_OPTIONAL, 'The class name of the root seeder', 'Database\\Seeders\\DatabaseSeeder'],
             ['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to seed'],
             ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production'],
+            ['pick', null, InputOption::VALUE_NONE, 'Pick the seeder to run'],
         ];
     }
 }
