@@ -5644,6 +5644,7 @@ class SupportCollectionTest extends TestCase
         $this->assertSame(33.33, $collection->percentage(fn ($value) => $value === 1));
         $this->assertSame(50.00, $collection->percentage(fn ($value) => $value === 2));
         $this->assertSame(16.67, $collection->percentage(fn ($value) => $value === 3));
+        $this->assertSame(0.0, $collection->percentage(fn ($value) => $value === 5));
     }
 
     /**
@@ -5661,6 +5662,17 @@ class SupportCollectionTest extends TestCase
         $this->assertSame(25.00, $collection->percentage(fn ($value) => $value['foo'] === 'foo'));
         $this->assertSame(50.00, $collection->percentage(fn ($value) => $value['foo'] === 'bar'));
         $this->assertSame(25.00, $collection->percentage(fn ($value) => $value['foo'] === 'baz'));
+        $this->assertSame(0.0, $collection->percentage(fn ($value) => $value['foo'] === 'test'));
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testPercentageReturnsNullForEmptyCollections($collection)
+    {
+        $collection = new $collection([]);
+
+        $this->assertNull($collection->percentage(fn ($value) => $value === 1));
     }
 
     /**

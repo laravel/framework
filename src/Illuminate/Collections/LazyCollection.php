@@ -1664,12 +1664,12 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      *
      * @param  (callable(TValue, TKey): bool)  $callback
      * @param  int  $precision
-     * @return float
+     * @return float|null
      */
-    public function percentage(callable $callback, int $precision = 2): float
+    public function percentage(callable $callback, int $precision = 2): float|null
     {
         if ($this->isEmpty()) {
-            return 0;
+            return null;
         }
 
         return round(
