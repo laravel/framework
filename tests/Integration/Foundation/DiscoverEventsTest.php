@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Foundation;
 
 use Illuminate\Foundation\Events\DiscoverEvents;
+use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Events\EventOne;
 use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Events\EventTwo;
 use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Listeners\AbstractListener;
@@ -10,9 +11,17 @@ use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Listeners\Li
 use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Listeners\ListenerInterface;
 use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\UnionListeners\UnionListener;
 use Orchestra\Testbench\TestCase;
+use SplFileInfo;
 
 class DiscoverEventsTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        DiscoverEvents::$guessClassNamesUsingCallback = null;
+
+        parent::tearDown();
+    }
+
     public function testEventsCanBeDiscovered()
     {
         class_alias(Listener::class, 'Tests\Integration\Foundation\Fixtures\EventDiscovery\Listeners\Listener');
@@ -44,6 +53,31 @@ class DiscoverEventsTest extends TestCase
             ],
             EventTwo::class => [
                 UnionListener::class.'@handle',
+            ],
+        ], $events);
+    }
+
+    public function testEventsCanBeDiscoveredUsingCustomClassNameGuessing()
+    {
+        DiscoverEvents::guessClassNamesUsing(function (SplFileInfo $file, $basePath) {
+            return Str::of($file->getRealPath())
+                ->after($basePath.DIRECTORY_SEPARATOR)
+                ->before('.php')
+                ->replace(DIRECTORY_SEPARATOR, '\\')
+                ->ucfirst()
+                ->prepend('Illuminate\\')
+                ->toString();
+        });
+
+        $events = DiscoverEvents::within(__DIR__.'/Fixtures/EventDiscovery/Listeners', getcwd());
+
+        $this->assertEquals([
+            EventOne::class => [
+                Listener::class.'@handle',
+                Listener::class.'@handleEventOne',
+            ],
+            EventTwo::class => [
+                Listener::class.'@handleEventTwo',
             ],
         ], $events);
     }
