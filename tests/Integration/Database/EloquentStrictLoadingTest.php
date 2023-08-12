@@ -19,6 +19,13 @@ class EloquentStrictLoadingTest extends DatabaseTestCase
         Model::preventLazyLoading();
     }
 
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        Model::handleLazyLoadingViolationUsing(null);
+    }
+
     protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
         Schema::create('test_model1', function (Blueprint $table) {
@@ -50,7 +57,7 @@ class EloquentStrictLoadingTest extends DatabaseTestCase
         $models[0]->modelTwos;
     }
 
-    public function testStrictModeDoesntThrowAnExceptionOnLazyLoadingWithSingleModel()
+    public function testStrictModeDoesntThrowAnExceptionOnLazyLoadingWhenModelIsLoadedInCollectionWithLessThanMinimum()
     {
         EloquentStrictLoadingTestModel1::create();
 
@@ -159,6 +166,19 @@ class EloquentStrictLoadingTest extends DatabaseTestCase
     {
         $model1 = EloquentStrictLoadingTestModel1WithLocalPreventsLazyLoading::create();
         $this->assertInstanceOf(Collection::class, $model1->modelTwos);
+    }
+
+    public function testStrictModeRespectsConfigurationMinimum()
+    {
+        Model::preventLazyLoading(count: 1);
+
+        $this->expectException(LazyLoadingViolationException::class);
+        $this->expectExceptionMessage('Attempted to lazy load');
+        EloquentStrictLoadingTestModel1::create();
+
+        $models = EloquentStrictLoadingTestModel1::get();
+
+        $models[0]->modelTwos;
     }
 }
 
