@@ -283,16 +283,20 @@ trait InteractsWithIO
     /**
      * Execute a given callback while advancing a progress indicator.
      *
-     * @param iterable|null $totalSteps
-     * @param \Closure $callback
+     * @param  iterable|null  $totalSteps
+     * @param  \Closure  $callback
+     * @param  int  $indicatorChangeInterval
+     * @param  array  $indicatorValues
+     * @param  string  $startMsg
+     * @param  string  $finishMsg
      *
-     * @return mixed
+     * @return mixed|void
      */
-    public function withProgressIndicator($totalSteps, $callback, int $indicatorChangeInterval = 250, array $indicatorValues = ['◜ ', ' ◝', ' ◞', '◟ '])
+    public function withProgressIndicator($totalSteps, $callback, int $indicatorChangeInterval = 250, array $indicatorValues = ['◜ ', ' ◝', ' ◞', '◟ '], string $startMsg = '', string $finishMsg = '')
     {
         $indicator = new ProgressIndicator($this->output, indicatorChangeInterval: $indicatorChangeInterval, indicatorValues: $indicatorValues);
 
-        $indicator->start('');
+        $indicator->start($startMsg);
 
         if (is_iterable($totalSteps)) {
             $result = [];
@@ -305,7 +309,7 @@ trait InteractsWithIO
             $result = $callback($indicator);
         }
 
-        $indicator->finish('');
+        $indicator->finish($finishMsg);
 
         return $result;
     }
