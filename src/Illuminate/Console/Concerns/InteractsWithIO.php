@@ -7,6 +7,7 @@ use Illuminate\Console\OutputStyle;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
+use Symfony\Component\Console\Helper\ProgressIndicator;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -277,6 +278,36 @@ trait InteractsWithIO
         if (is_iterable($totalSteps)) {
             return $totalSteps;
         }
+    }
+
+    /**
+     * Execute a given callback while advancing a progress indicator.
+     *
+     * @param iterable|null $totalSteps
+     * @param \Closure $callback
+     *
+     * @return mixed
+     */
+    public function withProgressIndicator($totalSteps, $callback, int $indicatorChangeInterval = 250, array $indicatorValues = ['◜ ', ' ◝', ' ◞', '◟ '])
+    {
+        $indicator = new ProgressIndicator($this->output, indicatorChangeInterval: $indicatorChangeInterval, indicatorValues: $indicatorValues);
+
+        $indicator->start('');
+
+        if (is_iterable($totalSteps)) {
+            $result = [];
+            foreach ($totalSteps as $value) {
+                $result[] = $callback($value, $indicator);
+
+                $indicator->advance();
+            }
+        } else {
+            $result = $callback($indicator);
+        }
+
+        $indicator->finish('');
+
+        return $result;
     }
 
     /**
