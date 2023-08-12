@@ -2191,8 +2191,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public static function setModelPreventsLazyLoading($items, $model)
     {
-        if (count($items) >= self::$minimumCountOfItemsToBeConsideredLazyLoading) {
-            $model->preventsLazyLoading = Model::preventsLazyLoading();
+        if (count($items) >= static::$minimumCountOfItemsToBeConsideredLazyLoading) {
+            $model->preventsLazyLoading = static::preventsLazyLoading();
         }
 
         return $model;
