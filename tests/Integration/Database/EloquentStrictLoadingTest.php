@@ -42,6 +42,11 @@ class EloquentStrictLoadingTest extends DatabaseTestCase
             $table->increments('id');
             $table->foreignId('model_2_id');
         });
+
+        Schema::create('test_model4', function (Blueprint $table) {
+            $table->increments('id');
+            $table->foreignId('model_2_id');
+        });
     }
 
     public function testStrictModeThrowsAnExceptionOnLazyLoading()
@@ -180,6 +185,28 @@ class EloquentStrictLoadingTest extends DatabaseTestCase
 
         $models[0]->modelTwos;
     }
+
+    public function testCustomSetModelPreventsLazyLoading()
+    {
+        Model::preventLazyLoading(false);
+
+        EloquentStrictLoadingTestModelWithCustomLazyLoadingMethod::create();
+        EloquentStrictLoadingTestModelWithCustomLazyLoadingMethod::create();
+
+        $this->assertInstanceOf(
+            Collection::class,
+            EloquentStrictLoadingTestModelWithCustomLazyLoadingMethod::get()[0]->modelTwos
+        );
+
+        EloquentStrictLoadingTestModelWithCustomLazyLoadingMethod::create();
+        $this->assertInstanceOf(
+            Collection::class,
+            EloquentStrictLoadingTestModel1::get()[0]->modelTwos
+        );
+
+        $this->expectException(LazyLoadingViolationException::class);
+        EloquentStrictLoadingTestModelWithCustomLazyLoadingMethod::get()[0]->modelTwos;
+    }
 }
 
 class EloquentStrictLoadingTestModel1 extends Model
@@ -241,6 +268,16 @@ class EloquentStrictLoadingTestModel3 extends Model
     public $table = 'test_model3';
     public $timestamps = false;
     protected $guarded = [];
+}
+
+class EloquentStrictLoadingTestModelWithCustomLazyLoadingMethod extends EloquentStrictLoadingTestModel1
+{
+    public static function setModelPreventsLazyLoading($items, $model)
+    {
+        $model->preventsLazyLoading = count($items) === 3;
+
+        return $model;
+    }
 }
 
 class ViolatedLazyLoadingEvent
