@@ -283,12 +283,12 @@ trait InteractsWithIO
     /**
      * Execute a given callback while advancing a progress indicator.
      *
-     * @param  iterable|mixed  $totalSteps The callback is called per step or for the given value.
-     * @param  \Closure  $callback The callback receives the current step or the given value and the indicator instance.
-     * @param  int  $indicatorChangeInterval The number of milliseconds after which the indicator should change.
-     * @param  array  $indicatorValues The values the indicator should cycle through.
-     * @param  string  $startMsg The message to display when starting the indicator.
-     * @param  string  $finishMsg The message to display when finishing the indicator.
+     * @param  iterable|mixed  $totalSteps  The callback is called per step or for the given value.
+     * @param  \Closure  $callback  The callback receives the current step or the given value and the indicator instance.
+     * @param  int  $indicatorChangeInterval  The number of milliseconds after which the indicator should change.
+     * @param  array  $indicatorValues  The values the indicator should cycle through.
+     * @param  string  $startMsg  The message to display when starting the indicator.
+     * @param  string  $finishMsg  The message to display when finishing the indicator.
      * @return mixed|void
      */
     public function withProgressIndicator($totalSteps, $callback, int $indicatorChangeInterval = 250, array $indicatorValues = ['◜ ', ' ◝', ' ◞', '◟ '], string $startMsg = '', string $finishMsg = '')
