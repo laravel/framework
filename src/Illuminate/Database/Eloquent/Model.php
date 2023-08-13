@@ -2220,7 +2220,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         return $model;
     }
 
-
     /**
      * Determine if discarding guarded attribute fills is disabled.
      *

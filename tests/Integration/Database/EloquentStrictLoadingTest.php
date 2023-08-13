@@ -177,7 +177,7 @@ class EloquentStrictLoadingTest extends DatabaseTestCase
     public function testStrictModeRespectsLazyLoadingCallback()
     {
         Model::preventLazyLoading(false);
-        Model::setModelPreventsLazyLoadingCallback(function($items, $model, $default) {
+        Model::setModelPreventsLazyLoadingCallback(function ($items, $model, $default) {
             if (count($items)) {
                 $model->preventsLazyLoading = $default;
             }
