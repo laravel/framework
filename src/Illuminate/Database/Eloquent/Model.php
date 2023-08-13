@@ -176,11 +176,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected static $lazyLoadingViolationCallback;
 
     /**
-     * @var int
-     */
-    protected static $minimumCountOfItemsToBeConsideredLazyLoading = 2;
-
-    /**
      * Indicates if an exception should be thrown instead of silently discarding non-fillable attributes.
      *
      * @var bool
@@ -207,6 +202,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * @var callable|null
      */
     protected static $missingAttributeViolationCallback;
+
+    /**
+     * The callback that determines if a hydrated model should have its preventLazyLoading bool set.
+     *
+     * @var callable|null
+     */
+    protected static $modelPreventsLazyLoadingCallback;
 
     /**
      * Indicates if broadcasting is currently enabled.
@@ -421,13 +423,11 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * Prevent model relationships from being lazy loaded.
      *
      * @param  bool  $value
-     * @param  int  $count
      * @return void
      */
-    public static function preventLazyLoading($value = true, $count = 2)
+    public static function preventLazyLoading($value = true)
     {
         static::$modelsShouldPreventLazyLoading = $value;
-        static::$minimumCountOfItemsToBeConsideredLazyLoading = $count;
     }
 
     /**
@@ -2181,9 +2181,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         return static::$modelsShouldPreventLazyLoading;
     }
 
+    public static function setModelPreventsLazyLoadingCallback(?callable $callback)
+    {
+        static::$modelPreventsLazyLoadingCallback = $callback;
+    }
+
     /**
-     * Indicate the model should prevent lazy-loading if items exceeds
-     * the minimum count of items to be considered lazy loading.
+     * Determine if model should have its prevent lazy-loading flag set.
      *
      * @param  \Countable|array  $items
      * @param  static  $model
@@ -2191,12 +2195,31 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public static function setModelPreventsLazyLoading($items, $model)
     {
-        if (count($items) >= static::$minimumCountOfItemsToBeConsideredLazyLoading) {
+        $userFunction = static::$modelPreventsLazyLoadingCallback ?? function ($items, $model, $default) {
+            if (count($items) > 1) {
+                $model->preventsLazyLoading = $default;
+            }
+
+            return $model;
+        };
+
+        return call_user_func($userFunction, $items, $model, static::preventsLazyLoading());
+        if (isset(static::$modelPreventsLazyLoadingCallback)) {
+            return call_user_func(
+                static::$modelPreventsLazyLoadingCallback,
+                $items,
+                $model,
+                static::preventsLazyLoading()
+            );
+        }
+
+        if (count($items) > 1) {
             $model->preventsLazyLoading = static::preventsLazyLoading();
         }
 
         return $model;
     }
+
 
     /**
      * Determine if discarding guarded attribute fills is disabled.
