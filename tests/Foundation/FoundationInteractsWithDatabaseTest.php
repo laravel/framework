@@ -223,29 +223,35 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertSoftDeleted(new ProductStub($this->data));
     }
 
-    public function testAssertDatabaseHasSupportsModelsCasts()
+    public function testAssertDatabaseHasSupportCastedData()
     {
-        $data = [
-            'role' => RoleType::ADMIN,
-            'is_active' => true,
+        $this->data = [
+            'role' => RoleEnum::ADMIN,
+            'is_active' => 1,
             'name' => [
                 'khaled',
                 'waleed',
             ],
         ];
 
+        $this->mockCountBuilder( 1 );
+
+        $this->assertDatabaseHas(CustomProductStubWithCasts::class, $this->data);
+    }
+    public function testAssertDatabaseHasSupportNotCastedData()
+    {
         $this->data = [
-            'role' => 1,
+            'role' => RoleEnum::ADMIN,
             'is_active' => 1,
-            'name' => json_encode([
-                'khaled',
-                'waleed',
-            ]),
+            'name' => [
+                'hans',
+                'thomas',
+            ],
         ];
 
-        $this->mockCountBuilder(1);
+        $this->mockCountBuilder( 1 );
 
-        $this->assertDatabaseHas(CustomProductStubWithCasts::class, $data);
+        $this->data[ 'name' ] = json_encode( $this->data[ 'name' ] );
 
         $this->assertDatabaseHas(CustomProductStubWithCasts::class, $this->data);
     }
@@ -527,11 +533,11 @@ class CustomProductStubWithCasts extends ProductStub
 {
     protected $casts = [
         'name' => 'array',
-        'role' => RoleType::class,
+        'role' => RoleEnum::class,
     ];
 }
 
-enum RoleType: int
+enum RoleEnum: int
 {
     case ADMIN = 1;
 }
