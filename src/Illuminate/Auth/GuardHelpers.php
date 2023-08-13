@@ -127,4 +127,24 @@ trait GuardHelpers
     {
         $this->provider = $provider;
     }
+
+    /**
+     * This is checked in AuthenticateSession middleware, default to false.
+     *
+     * @return false
+     */
+    public function viaRemember()
+    {
+        return false;
+    }
+
+    /**
+     * Forget the current user.
+     *
+     * @return void
+     */
+    public function logoutCurrentDevice()
+    {
+        $this->forgetUser();
+    }
 }

@@ -49,11 +49,11 @@ class AuthenticateSession implements AuthenticatesSessions
             }
         }
 
-        if (! $request->session()->has('password_hash_'.$this->auth->getDefaultDriver())) {
+        if (! $request->session()->has('password_hash')) {
             $this->storePasswordHashInSession($request);
         }
 
-        if ($request->session()->get('password_hash_'.$this->auth->getDefaultDriver()) !== $request->user()->getAuthPassword()) {
+        if ($request->session()->get('password_hash') !== $request->user()->getAuthPassword()) {
             $this->logout($request);
         }
 
@@ -77,7 +77,7 @@ class AuthenticateSession implements AuthenticatesSessions
         }
 
         $request->session()->put([
-            'password_hash_'.$this->auth->getDefaultDriver() => $request->user()->getAuthPassword(),
+            'password_hash' => $request->user()->getAuthPassword(),
         ]);
     }
 
