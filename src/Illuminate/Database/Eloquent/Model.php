@@ -2187,7 +2187,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
-     * Determine if model should have its prevent lazy-loading flag set.
+     * Determine if model should have its prevent lazy loading flag set.
      *
      * @param  \Countable|array  $items
      * @param  static  $model
@@ -2196,14 +2196,14 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public static function setModelPreventsLazyLoading($items, $model)
     {
         /**
-         * If no callback is specified, we default to only preventing lazy-loading when the model was fetched
+         * If no callback is specified, we default to only preventing lazy loading when the model was fetched
          * in a collection of more than one model. This means we will prevent egregious n+1 queries while
-         * still allowing the user to lazy-load relations for single models.
+         * still allowing the user to lazy load relations for single models.
          */
-        $userFunction = static::$modelPreventsLazyLoadingCallback
+        $preventsLazyLoadingQualifierFunction = static::$modelPreventsLazyLoadingCallback
             ?? fn ($items, $model) => count($items) > 1 ? $model::preventsLazyLoading() : false;
 
-        $model->preventsLazyLoading = (bool) call_user_func($userFunction, $items, $model);
+        $model->preventsLazyLoading = (bool) call_user_func($preventsLazyLoadingQualifierFunction, $items, $model);
 
         return $model;
     }
