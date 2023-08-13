@@ -12,6 +12,7 @@ use Illuminate\Testing\Constraints\CountInDatabase;
 use Illuminate\Testing\Constraints\HasInDatabase;
 use Illuminate\Testing\Constraints\NotSoftDeletedInDatabase;
 use Illuminate\Testing\Constraints\SoftDeletedInDatabase;
+use Illuminate\Tests\Foundation\RoleEnum;
 use PHPUnit\Framework\Constraint\LogicalNot as ReverseConstraint;
 
 trait InteractsWithDatabase
@@ -45,27 +46,23 @@ trait InteractsWithDatabase
      */
     protected function parseData($table, array $data)
     {
-        if (class_exists($table) && new $table() instanceof Model) {
-            /* @var $model Model */
-            $table::unguard();
-
-            $model = (new $table($data));
-
-            $casted = false;
-
-            foreach ($data as $key => $value) {
-                if ($model->hasCast($key) && $model->isAttributeValueCastedProperly($key, $value)) {
-                    $casted = true;
-                    break;
-                }
-            }
-
-            return $casted
-                ? (new $table($data))->newInstance($data)->getAttributes()
-                : $data;
+        if (!class_exists($table) and ! is_a($table,Model::class,true))
+        {
+            return $data;
         }
 
-        return $data;
+        $model = (new $table);
+        foreach ( $data as $key => $value ) {
+            if ( $model->hasCast( $key ) ) {
+                $data[ $key ] = match ($model->getCasts()[$key]){
+                        'array' => is_string( $value ) ? json_decode( $value ) : $value,
+                        default => $value
+                };
+            }
+        }
+        $model->setRawAttributes( $data );
+
+        return $model->getAttributes();
     }
 
     /**
