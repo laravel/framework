@@ -169,6 +169,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected static $modelsShouldPreventLazyLoading = false;
 
     /**
+     * The callback that determines if a hydrated model should have its preventLazyLoading bool set.
+     *
+     * @var ?callable(\Countable|array, static): bool
+     */
+    protected static $modelPreventsLazyLoadingCallback;
+
+    /**
      * The callback that is responsible for handling lazy loading violations.
      *
      * @var callable|null
@@ -202,13 +209,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * @var callable|null
      */
     protected static $missingAttributeViolationCallback;
-
-    /**
-     * The callback that determines if a hydrated model should have its preventLazyLoading bool set.
-     *
-     * @var callable|null
-     */
-    protected static $modelPreventsLazyLoadingCallback;
 
     /**
      * Indicates if broadcasting is currently enabled.
@@ -2195,27 +2195,15 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public static function setModelPreventsLazyLoading($items, $model)
     {
-        $userFunction = static::$modelPreventsLazyLoadingCallback ?? function ($items, $model, $default) {
-            if (count($items) > 1) {
-                $model->preventsLazyLoading = $default;
-            }
+        /**
+         * If no callback is specified, we default to only preventing lazy-loading when the model was fetched
+         * in a collection of more than one model. This means we will prevent egregious n+1 queries while
+         * still allowing the user to lazy-load relations for single models.
+         */
+        $userFunction = static::$modelPreventsLazyLoadingCallback
+            ?? fn ($items, $model) => count($items) > 1 ? $model::preventsLazyLoading() : false;
 
-            return $model;
-        };
-
-        return call_user_func($userFunction, $items, $model, static::preventsLazyLoading());
-        if (isset(static::$modelPreventsLazyLoadingCallback)) {
-            return call_user_func(
-                static::$modelPreventsLazyLoadingCallback,
-                $items,
-                $model,
-                static::preventsLazyLoading()
-            );
-        }
-
-        if (count($items) > 1) {
-            $model->preventsLazyLoading = static::preventsLazyLoading();
-        }
+        $model->preventsLazyLoading = (bool) call_user_func($userFunction, $items, $model);
 
         return $model;
     }
