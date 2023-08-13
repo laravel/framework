@@ -408,7 +408,7 @@ class Builder implements BuilderContract
         return $instance->newCollection(array_map(function ($item) use ($items, $instance) {
             $model = $instance->newFromBuilder($item);
 
-            return $model->setModelPreventsLazyLoading($items, $model);
+            return $model::setModelPreventsLazyLoading($items, $model);
         }, $items));
     }
 
