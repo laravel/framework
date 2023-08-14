@@ -43,11 +43,6 @@ class EloquentStrictLoadingTest extends DatabaseTestCase
             $table->increments('id');
             $table->foreignId('model_2_id');
         });
-
-        Schema::create('test_model4', function (Blueprint $table) {
-            $table->increments('id');
-            $table->foreignId('model_2_id');
-        });
     }
 
     public function testStrictModeThrowsAnExceptionOnLazyLoading()
