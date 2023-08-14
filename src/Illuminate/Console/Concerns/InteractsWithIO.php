@@ -289,7 +289,7 @@ trait InteractsWithIO
      * @param  array  $indicatorValues  The values the indicator should cycle through.
      * @param  string  $startMsg  The message to display when starting the indicator.
      * @param  string  $finishMsg  The message to display when finishing the indicator.
-     * @return mixed|void
+     * @return mixed
      */
     public function withProgressIndicator($totalSteps, $callback, int $indicatorChangeInterval = 250, array $indicatorValues = ['◜ ', ' ◝', ' ◞', '◟ '], string $startMsg = '', string $finishMsg = '')
     {
