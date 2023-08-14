@@ -48,13 +48,14 @@ trait PromptsForMissingInput
                 }
 
                 if (is_array($label)) {
-                    [$label, $placeholder] = $label;
+                    [$label, $placeholder, $validation] = $label;
                 }
 
                 $input->setArgument($argument->getName(), text(
                     label: $label,
                     placeholder: $placeholder ?? '',
-                    validate: fn ($value) => empty($value) ? "The {$argument->getName()} is required." : null,
+                    required: "The {$argument->getName()} is required.",
+                    validate: fn (string $value) => $validation($value)
                 ));
             })
             ->isNotEmpty();

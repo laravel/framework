@@ -513,6 +513,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
                     'Test' => 'E.g. UserTest',
                     default => '',
                 },
+                fn (string $value) => null,
             ],
         ];
     }
