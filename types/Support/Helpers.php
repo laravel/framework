@@ -53,3 +53,7 @@ assertType('int', transform(new User(), fn () => 1));
 assertType('null', transform(null, fn () => 1));
 assertType('null', transform('', fn () => 1));
 assertType('null', transform([], fn () => 1));
+
+assertType('int|null', rescue(fn () => 123));
+assertType('int', rescue(fn () => 123, 345));
+assertType('int', rescue(fn () => 123, fn () => 345));
