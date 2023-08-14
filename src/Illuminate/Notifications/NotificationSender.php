@@ -111,6 +111,20 @@ class NotificationSender
     }
 
     /**
+     * Send the given notification immediately.
+     *
+     * @param            $notifiables
+     * @param            $notification
+     * @param array|null $channels
+     *
+     * @return void
+     */
+    public function sendSync($notifiables, $notification, array $channels = null)
+    {
+        $this->sendNow($notifiables, $notification, $channels);
+    }
+
+    /**
      * Get the notifiable's preferred locale for the notification.
      *
      * @param  mixed  $notifiable

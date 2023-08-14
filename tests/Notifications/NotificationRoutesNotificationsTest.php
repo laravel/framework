@@ -46,6 +46,19 @@ class NotificationRoutesNotificationsTest extends TestCase
         $notifiable->notifyNow($instance);
     }
 
+    public function testNotificationCanBeSentSync()
+    {
+        $container = new Container;
+        $factory = m::mock(Dispatcher::class);
+        $container->instance(Dispatcher::class, $factory);
+        $notifiable = new RoutesNotificationsTestInstance;
+        $instance = new stdClass;
+        $factory->shouldReceive('sendSync')->with($notifiable, $instance, null);
+        Container::setInstance($container);
+
+        $notifiable->notifyNow($instance);
+    }
+
     public function testNotificationOptionRouting()
     {
         $instance = new RoutesNotificationsTestInstance;
