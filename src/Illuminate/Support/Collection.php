@@ -1106,6 +1106,10 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         return new static(Arr::pluck($this->items, $value, $key));
     }
+    public function lists($value, $key = null)
+    {
+        return new static(Arr::pluck($this->items, $value, $key));
+    }
 
     /**
      * Run a map over each of the items.

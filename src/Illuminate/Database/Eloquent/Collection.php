@@ -428,6 +428,10 @@ class Collection extends BaseCollection implements QueueableCollection
     {
         return $this->toBase()->pluck($value, $key);
     }
+    public function lists($value, $key = null)
+    {
+        return $this->toBase()->pluck($value, $key);
+    }
 
     /**
      * Get the keys of the collection items.
