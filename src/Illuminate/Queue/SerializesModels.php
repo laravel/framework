@@ -19,7 +19,9 @@ trait SerializesModels
     {
         $values = [];
 
-        $properties = (new ReflectionClass($this))->getProperties();
+        $reflectionClass = new ReflectionClass($this);
+        $properties = $reflectionClass->getProperties();
+        $classExplicitlyBarsRelations = ! empty($reflectionClass->getAttributes(WithoutRelations::class));
 
         $class = get_class($this);
 
@@ -46,10 +48,9 @@ trait SerializesModels
                 $name = "\0*\0{$name}";
             }
 
-            $values[$name] = $this->getSerializedPropertyValue(
-                $value,
-                empty($property->getAttributes(WithoutRelations::class))
-            );
+            $withoutRelations = $classExplicitlyBarsRelations || ! empty($property->getAttributes(WithoutRelations::class));
+
+            $values[$name] = $this->getSerializedPropertyValue($value, ! $withoutRelations);
         }
 
         return $values;

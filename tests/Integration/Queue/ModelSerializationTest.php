@@ -332,6 +332,24 @@ class ModelSerializationTest extends TestCase
         );
     }
 
+    public function test_it_respects_without_relations_attribute_applied_to_class()
+    {
+        $user = User::create([
+            'email' => 'taylor@laravel.com',
+        ])->load(['roles']);
+
+        $serialized = serialize(new ModelSerializationAttributeTargetsClassTestClass($user));
+
+        $this->assertSame(
+            'O:83:"Illuminate\Tests\Integration\Queue\ModelSerializationAttributeTargetsClassTestClass":1:{s:4:"user";O:45:"Illuminate\Contracts\Database\ModelIdentifier":5:{s:5:"class";s:39:"Illuminate\Tests\Integration\Queue\User";s:2:"id";i:1;s:9:"relations";a:0:{}s:10:"connection";s:7:"testing";s:15:"collectionClass";N;}}', $serialized
+        );
+
+        /** @var ModelSerializationAttributeTargetsClassTestClass $unserialized */
+        $unserialized = unserialize($serialized);
+
+        $this->assertFalse($unserialized->user->relationLoaded('roles'));
+    }
+
     public function test_serialization_types_empty_custom_eloquent_collection()
     {
         $class = new ModelSerializationTypedCustomCollectionTestClass(
@@ -522,6 +540,18 @@ class ModelSerializationWithoutRelations
 
     public function __construct(User $user)
     {
+        $this->user = $user;
+    }
+}
+
+#[WithoutRelations]
+class ModelSerializationAttributeTargetsClassTestClass
+{
+    use SerializesModels;
+
+    public User $user;
+
+    public function __construct(User $user) {
         $this->user = $user;
     }
 }
