@@ -908,6 +908,18 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertTrue($url2->hasValidSignature($request));
         $this->assertFalse($url->hasValidSignature($request));
     }
+
+    public function testMissingNamedRouteResolution()
+    {
+        $url = new UrlGenerator(
+            new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+
+        $url->resolveMissingNamedRoutesUsing(fn ($name, $parameters, $absolute) => 'test-url');
+
+        $this->assertSame('test-url', $url->route('foo'));
+    }
 }
 
 class RoutableInterfaceStub implements UrlRoutable

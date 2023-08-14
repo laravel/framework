@@ -450,4 +450,14 @@ trait InteractsWithIO
     {
         return $this->output;
     }
+
+    /**
+     * Get the output component factory implementation.
+     *
+     * @return \Illuminate\Console\View\Components\Factory
+     */
+    public function outputComponents()
+    {
+        return $this->components;
+    }
 }

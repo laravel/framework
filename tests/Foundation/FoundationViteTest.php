@@ -1184,6 +1184,31 @@ class FoundationViteTest extends TestCase
         $this->cleanViteManifest($buildDir);
     }
 
+    public function testItRetrievesAssetContent()
+    {
+        $this->makeViteManifest();
+
+        $this->makeAsset('/app.versioned.js', 'some content');
+
+        $content = ViteFacade::content('resources/js/app.js');
+
+        $this->assertSame('some content', $content);
+
+        $this->cleanAsset('/app.versioned.js');
+
+        $this->cleanViteManifest();
+    }
+
+    public function testItThrowsWhenUnableToFindFileToRetrieveContent()
+    {
+        $this->makeViteManifest();
+
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Unable to locate file from Vite manifest: '.public_path('build/assets/app.versioned.js'));
+
+        ViteFacade::content('resources/js/app.js');
+    }
+
     protected function makeViteManifest($contents = null, $path = 'build')
     {
         app()->usePublicPath(__DIR__);
@@ -1243,6 +1268,26 @@ class FoundationViteTest extends TestCase
         if (file_exists(public_path($path))) {
             rmdir(public_path($path));
         }
+    }
+
+    protected function makeAsset($asset, $content)
+    {
+        $path = public_path('build/assets');
+
+        if (! file_exists($path)) {
+            mkdir($path, recursive: true);
+        }
+
+        file_put_contents($path.'/'.$asset, $content);
+    }
+
+    protected function cleanAsset($asset)
+    {
+        $path = public_path('build/assets');
+
+        unlink($path.$asset);
+
+        rmdir($path);
     }
 
     protected function makeViteHotFile($path = null)
