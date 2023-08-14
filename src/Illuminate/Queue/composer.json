@@ -14,7 +14,7 @@
         }
     ],
     "require": {
-        "php": ">=8.1",
+        "php": ">=8.0",
         "ext-json": "*",
         "illuminate/console": "5.8.*",
         "illuminate/container": "5.8.*",

@@ -14,7 +14,7 @@
         }
     ],
     "require": {
-        "php": ">=8.1",
+        "php": ">=8.0",
         "ext-json": "*",
         "erusev/parsedown": "^1.7",
         "illuminate/container": "5.8.*",
