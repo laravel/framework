@@ -4,7 +4,7 @@ namespace Illuminate\Queue\Attributes;
 
 use Attribute;
 
-#[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_CLASS)]
+#[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_PROPERTY)]
 class WithoutRelations
 {
     //
