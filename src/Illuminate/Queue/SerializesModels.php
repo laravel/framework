@@ -46,9 +46,10 @@ trait SerializesModels
                 $name = "\0*\0{$name}";
             }
 
-            $withoutRelations = $property->getAttributes(WithoutRelations::class) !== [];
-
-            $values[$name] = $this->getSerializedPropertyValue($value, $withoutRelations);
+            $values[$name] = $this->getSerializedPropertyValue(
+                $value,
+                empty($property->getAttributes(WithoutRelations::class))
+            );
         }
 
         return $values;
