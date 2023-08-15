@@ -610,7 +610,7 @@ class BelongsToMany extends Relation
     }
 
     /**
-     * Get the first related record matching the attributes or create it.
+     * Get the first record matching the attributes. If the record is not found, create it.
      *
      * @param  array  $attributes
      * @param  array  $values
@@ -632,7 +632,7 @@ class BelongsToMany extends Relation
     }
 
     /**
-     * Attempts to create the related record and return the first match if a unique constraint happens.
+     * Attempt to create the record. If a unique constraint violation occurs, attempt to find the matching record.
      *
      * @param  array  $attributes
      * @param  array  $values
@@ -642,26 +642,16 @@ class BelongsToMany extends Relation
      */
     public function createOrFirst(array $attributes = [], array $values = [], array $joining = [], $touch = true)
     {
-        // First, we'll attempt to create the related record. If it works,
-        // this means the related record didn't exist before, so it was
-        // successfully created and it's also automatically attached.
-
         try {
             return $this->create(array_merge($attributes, $values), $joining, $touch);
         } catch (UniqueConstraintViolationException $exception) {
             // ...
         }
 
-        // If we run into a UNIQUE constraint violation, we'll assume it came from the related model's
-        // table. Then, we'll find it (or fail) and attempt to attach it to the current model. When
-        // that works, we return the attached instance. If attaching also fails, we'll do a find.
-
         try {
-            $instance = $this->related->where($attributes)->first();
-
-            $this->attach($instance, $joining, $touch);
-
-            return $instance;
+            return tap($this->related->where($attributes)->first(), function ($instance) use ($joining, $touch) {
+                $this->attach($instance, $joining, $touch);
+            });
         } catch (UniqueConstraintViolationException $exception) {
             return (clone $this)->where($attributes)->first();
         }

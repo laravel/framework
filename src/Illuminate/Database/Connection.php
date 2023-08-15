@@ -792,7 +792,7 @@ class Connection implements ConnectionInterface
         // message to include the bindings with SQL, which will make this exception a
         // lot more helpful to the developer instead of just the database's errors.
         catch (Exception $e) {
-            if ($this->matchesUniqueConstraintException($e)) {
+            if ($this->isUniqueConstraintError($e)) {
                 throw new UniqueConstraintViolationException(
                     $this->getName(), $query, $this->prepareBindings($bindings), $e
                 );
@@ -802,6 +802,17 @@ class Connection implements ConnectionInterface
                 $this->getName(), $query, $this->prepareBindings($bindings), $e
             );
         }
+    }
+
+    /**
+     * Determine if the given database exception was caused by a unique constraint violation.
+     *
+     * @param  \Exception  $exception
+     * @return bool
+     */
+    protected function isUniqueConstraintError(Exception $exception)
+    {
+        return false;
     }
 
     /**
@@ -821,17 +832,6 @@ class Connection implements ConnectionInterface
         if ($this->loggingQueries) {
             $this->queryLog[] = compact('query', 'bindings', 'time');
         }
-    }
-
-    /**
-     * Detects if the database exception was caused by a unique constraint violation.
-     *
-     * @return bool
-     */
-    protected function matchesUniqueConstraintException(Exception $exception)
-    {
-        // It's up to each child class of Connection to detect a unique constraint violation.
-        return false;
     }
 
     /**

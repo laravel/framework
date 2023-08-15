@@ -38,6 +38,17 @@ class PostgresConnection extends Connection
     }
 
     /**
+     * Determine if the given database exception was caused by a unique constraint violation.
+     *
+     * @param  \Exception  $exception
+     * @return bool
+     */
+    protected function isUniqueConstraintError(Exception $exception)
+    {
+        return '23505' === $exception->getCode();
+    }
+
+    /**
      * Get the default query grammar instance.
      *
      * @return \Illuminate\Database\Query\Grammars\PostgresGrammar
@@ -105,17 +116,5 @@ class PostgresConnection extends Connection
     protected function getDoctrineDriver()
     {
         return new PostgresDriver;
-    }
-
-    /**
-     * Detects if the database exception was caused by a unique constraint violation.
-     *
-     * @return bool
-     */
-    protected function matchesUniqueConstraintException(Exception $exception)
-    {
-        // The error code PostgreSQL returns when we run into a UNIQUE constraint violation.
-
-        return '23505' === $exception->getCode();
     }
 }

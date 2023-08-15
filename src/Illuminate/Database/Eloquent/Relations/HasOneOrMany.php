@@ -227,7 +227,7 @@ abstract class HasOneOrMany extends Relation
     }
 
     /**
-     * Get the first related record matching the attributes or create it.
+     * Get the first record matching the attributes. If the record is not found, create it.
      *
      * @param  array  $attributes
      * @param  array  $values
@@ -243,7 +243,7 @@ abstract class HasOneOrMany extends Relation
     }
 
     /**
-     * Attempt to create the record or find the first one matching the attributes if a unique constraint violation happens.
+     * Attempt to create the record. If a unique constraint violation occurs, attempt to find the matching record.
      *
      * @param  array  $attributes
      * @param  array  $values

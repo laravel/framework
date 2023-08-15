@@ -28,6 +28,17 @@ class MySqlConnection extends Connection
     }
 
     /**
+     * Determine if the given database exception was caused by a unique constraint violation.
+     *
+     * @param  \Exception  $exception
+     * @return bool
+     */
+    protected function isUniqueConstraintError(Exception $exception)
+    {
+        return boolval(preg_match('#Integrity constraint violation: 1062#i', $exception->getMessage()));
+    }
+
+    /**
      * Determine if the connected database is a MariaDB database.
      *
      * @return bool
@@ -105,19 +116,5 @@ class MySqlConnection extends Connection
     protected function getDoctrineDriver()
     {
         return new MySqlDriver;
-    }
-
-    /**
-     * Detects if the database exception was caused by a unique constraint violation.
-     *
-     * @return bool
-     */
-    protected function matchesUniqueConstraintException(Exception $exception)
-    {
-        // We'll match against the message instead of the exception code because
-        // the exception code returns "23000" instead of "1062", which is the
-        // error code MySQL should return in UNIQUE constraints violations.
-
-        return boolval(preg_match('#Integrity constraint violation: 1062#i', $exception->getMessage()));
     }
 }

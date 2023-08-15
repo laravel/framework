@@ -69,6 +69,17 @@ class SqlServerConnection extends Connection
     }
 
     /**
+     * Determine if the given database exception was caused by a unique constraint violation.
+     *
+     * @param  \Exception  $exception
+     * @return bool
+     */
+    protected function isUniqueConstraintError(Exception $exception)
+    {
+        return boolval(preg_match('#Cannot insert duplicate key row in object#i', $exception->getMessage()));
+    }
+
+    /**
      * Get the default query grammar instance.
      *
      * @return \Illuminate\Database\Query\Grammars\SqlServerGrammar
@@ -137,15 +148,5 @@ class SqlServerConnection extends Connection
     protected function getDoctrineDriver()
     {
         return new SqlServerDriver;
-    }
-
-    /**
-     * Detects if the database exception was caused by a unique constraint violation.
-     *
-     * @return bool
-     */
-    protected function matchesUniqueConstraintException(Exception $exception)
-    {
-        return boolval(preg_match('#Cannot insert duplicate key row in object#i', $exception->getMessage()));
     }
 }
