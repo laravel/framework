@@ -732,6 +732,30 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
+     * Guarantee a resolved object is a given class.
+     *
+     * @template TAbstract of object
+     * @template TClass of object
+     *
+     * @param  $abstract
+     * @param  array  $parameters
+     * @param  class-string<TClass>|null  $class
+     * @return ($abstract is class-string<TAbstract> ? ($class is null ? TAbstract : TClass) : TClass)
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     */
+    public function makeAs($abstract, array $parameters = [], string $class = null)
+    {
+        $expected = class_exists($abstract) ? ($class ?? $abstract) : $class;
+
+        if (is_a($concrete = $this->make($abstract, $parameters), $expected)) {
+            return $concrete;
+        }
+
+        throw new BindingResolutionException("Target [$expected] is not instantiable.");
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @return mixed
