@@ -1061,6 +1061,10 @@ class Container implements ArrayAccess, ContainerContract
     protected function resolveClass(ReflectionParameter $parameter)
     {
         try {
+            if ($parameter->isDefaultValueAvailable()) {
+                return $parameter->getDefaultValue();
+            }
+
             return $parameter->isVariadic()
                         ? $this->resolveVariadicClass($parameter)
                         : $this->make(Util::getParameterClassName($parameter));
@@ -1070,12 +1074,6 @@ class Container implements ArrayAccess, ContainerContract
         // is optional, and if it is we will return the optional parameter value as
         // the value of the dependency, similarly to how we do this with scalars.
         catch (BindingResolutionException $e) {
-            if ($parameter->isDefaultValueAvailable()) {
-                array_pop($this->with);
-
-                return $parameter->getDefaultValue();
-            }
-
             if ($parameter->isVariadic()) {
                 array_pop($this->with);
 
