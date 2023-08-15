@@ -238,7 +238,7 @@ abstract class Factory
      * @param  int|null|iterable<int, array<string, mixed>>  $records
      * @return \Illuminate\Database\Eloquent\Collection<int, \Illuminate\Database\Eloquent\Model|TModel>
      */
-    public function createMany(int|null|iterable $records = null)
+    public function createMany(int|iterable|null $records = null)
     {
         if (is_null($records)) {
             $records = $this->count ?? 1;
@@ -261,7 +261,7 @@ abstract class Factory
      * @param  int|null|iterable<int, array<string, mixed>>  $records
      * @return \Illuminate\Database\Eloquent\Collection<int, \Illuminate\Database\Eloquent\Model|TModel>
      */
-    public function createManyQuietly(int|null|iterable $records = null)
+    public function createManyQuietly(int|iterable|null $records = null)
     {
         return Model::withoutEvents(function () use ($records) {
             return $this->createMany($records);
