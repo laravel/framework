@@ -225,6 +225,7 @@ class ContextualBindingTest extends TestCase
             $resolvedInstance->implOne
         );
         $this->assertNull($resolvedInstance->implOne->inner);
+        $this->assertNull($resolvedInstance->implOne->optional);
 
         $this->assertInstanceOf(
             ContainerTestContextInjectTwo::class,
@@ -580,10 +581,12 @@ class ContainerTestContextInjectTwoInstances
 class ContainerTestContextWithOptionalInnerDependency
 {
     public $inner;
+    public $optional;
 
-    public function __construct(ContainerTestContextInjectOne $inner = null)
+    public function __construct(ContainerTestContextInjectOne $inner = null, ContainerTestContextInjectVariadicExtended $optional = null)
     {
         $this->inner = $inner;
+        $this->optional = $optional;
     }
 }
 
@@ -605,6 +608,10 @@ class ContainerTestContextInjectVariadic
     {
         $this->stubs = $stubs;
     }
+}
+
+class ContainerTestContextInjectVariadicExtended extends ContainerTestContextInjectVariadic
+{
 }
 
 class ContainerTestContextInjectVariadicAfterNonVariadic
