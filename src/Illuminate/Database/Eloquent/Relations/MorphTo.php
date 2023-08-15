@@ -351,22 +351,7 @@ class MorphTo extends BelongsTo
     }
 
     /**
-     * Replay stored macro calls on the actual related instance.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    protected function replayMacros(Builder $query)
-    {
-        foreach ($this->macroBuffer as $macro) {
-            $query->{$macro['method']}(...$macro['parameters']);
-        }
-
-        return $query;
-    }
-
-    /**
-     * Add the with-trashed to the query when available.
+     * Indicate that soft deleted models should be included in the results.
      *
      * @return $this
      */
@@ -383,7 +368,7 @@ class MorphTo extends BelongsTo
     }
 
     /**
-     * Add the without-trashed to the query when available.
+     * Indicate that soft deleted models should not be included in the results.
      *
      * @return $this
      */
@@ -400,7 +385,7 @@ class MorphTo extends BelongsTo
     }
 
     /**
-     * Add the only-trashed to the query when available.
+     * Indicate that only soft deleted models should be included in the results.
      *
      * @return $this
      */
@@ -414,6 +399,21 @@ class MorphTo extends BelongsTo
         ];
 
         return $this->when(true, $callback);
+    }
+
+    /**
+     * Replay stored macro calls on the actual related instance.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    protected function replayMacros(Builder $query)
+    {
+        foreach ($this->macroBuffer as $macro) {
+            $query->{$macro['method']}(...$macro['parameters']);
+        }
+
+        return $query;
     }
 
     /**
