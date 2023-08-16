@@ -697,7 +697,7 @@ class ContainerTest extends TestCase
             return new ContainerConcreteStub;
         });
 
-        $this->assertInstanceOf(ContainerConcreteStub::class, $container->makeAs('makeAs', [],ContainerConcreteStub::class ));
+        $this->assertInstanceOf(ContainerConcreteStub::class, $container->makeAs('makeAs', [], ContainerConcreteStub::class));
     }
 
     public function testMakeAsThrowsContainerExceptionWhenMisused()
