@@ -680,10 +680,6 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(ContainerImplementationStub::class, $result);
     }
 
-    /**
-     * @test
-     * @group current
-     */
     public function testContainerCanMakeAsFromAbstract()
     {
         $container = new Container;
@@ -693,11 +689,6 @@ class ContainerTest extends TestCase
 
         $this->assertInstanceOf(ContainerConcreteStub::class, $container->makeAs(ContainerConcreteStub::class));
     }
-
-    /**
-     * @test
-     * @group current
-     */
     public function testContainerCanMakeAsFromMagicString()
     {
         $container = new Container;
@@ -706,6 +697,28 @@ class ContainerTest extends TestCase
         });
 
         $this->assertInstanceOf(ContainerConcreteStub::class, $container->makeAs('makeAs', [],ContainerConcreteStub::class ));
+    }
+
+    public function testMakeAsThrowsContainerExceptionWhenMisused()
+    {
+        $container = new Container;
+        $container->bind(ContainerConcreteStub::class, function () {
+            return 'Taylor';
+        });
+
+        $this->expectException(BindingResolutionException::class);
+        $container->makeAs(ContainerConcreteStub::class);
+    }
+
+    public function testMakeAsThrowsContainerExceptionWhenExpectationIsNotMet()
+    {
+        $container = new Container;
+        $container->bind(ContainerConcreteStub::class, function () {
+            return new ContainerConcreteStub;
+        });
+
+        $this->expectException(BindingResolutionException::class);
+        $container->makeAs(ContainerConcreteStub::class, [],ContainerImplementationStubTwo::class);
     }
 
     // public function testContainerCanCatchCircularDependency()
