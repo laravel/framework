@@ -689,6 +689,7 @@ class ContainerTest extends TestCase
 
         $this->assertInstanceOf(ContainerConcreteStub::class, $container->makeAs(ContainerConcreteStub::class));
     }
+
     public function testContainerCanMakeAsFromMagicString()
     {
         $container = new Container;
