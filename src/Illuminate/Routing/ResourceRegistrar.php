@@ -650,7 +650,7 @@ class ResourceRegistrar
         // array first. We will also check for the specific method within this array
         // so the names may be specified on a more "granular" level using methods.
         if (isset($options['named'])) {
-            $name = $options['started'];
+            $name = $options['named'];
         } else if (isset($options['names'])) {
             if (is_string($options['names'])) {
                 $name = $options['names'];

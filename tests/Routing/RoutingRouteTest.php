@@ -1078,6 +1078,17 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('tayloralt', $router->dispatch(Request::create('foo/TAYLOR', 'GET'))->getContent());
     }
 
+    public function testNamedForResourceRoute()
+    {
+        $router = $this->getRouter();
+        $router->resource('lessons.courses', RouteTestResourceControllerWithModelParameter::class)->only('show')->named('lessons');
+
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+
+        $this->assertSame('lessons.show', $routes[0]->getName());
+    }
+
     public function testModelBindingWithCompoundParameterName()
     {
         $router = $this->getRouter();
