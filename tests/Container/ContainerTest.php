@@ -719,7 +719,7 @@ class ContainerTest extends TestCase
         });
 
         $this->expectException(BindingResolutionException::class);
-        $container->makeAs(ContainerConcreteStub::class, [],ContainerImplementationStubTwo::class);
+        $container->makeAs(ContainerConcreteStub::class, [], ContainerImplementationStubTwo::class);
     }
 
     // public function testContainerCanCatchCircularDependency()
