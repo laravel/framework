@@ -93,8 +93,44 @@ class RedisTaggedCache extends TaggedCache
      */
     public function flush()
     {
-        $this->flushValues();
-        $this->tags->flush();
+        /** @var \Illuminate\Cache\RedisStore $redis_store */
+        $redis_store = $this->store;
+
+        $redis_connection = $redis_store->connection();
+        $redis_prefix = match ($redis_connection::class) {
+            \Illuminate\Redis\Connections\PhpRedisConnection::class => $redis_connection->client()->getOption(\Redis::OPT_PREFIX),
+            \Illuminate\Redis\Connections\PredisConnection::class => $redis_connection->client()->getOptions()->prefix,
+        };
+
+        /** @var \Illuminate\Cache\RedisTagSet $redis_tag_set */
+        $redis_tag_set = $this->tags;
+        $entries = $redis_tag_set->entries();
+
+        $cache_tags = [];
+        $need_deleted_keys = [];
+
+        $cache_prefix = $redis_prefix.$redis_store->getPrefix();
+
+        foreach ($this->tags->getNames() as $name) {
+            $cache_tags[] = $cache_prefix.$this->tags->tagId($name);
+        }
+
+        foreach ($entries as $entry) {
+            $need_deleted_keys[] = $redis_store->getPrefix().$entry;
+        }
+
+        $lua_script = <<<'LUA'
+            local prefix = table.remove(ARGV, 1)
+            for i, key in ipairs(KEYS) do
+                redis.call('DEL', key)
+                for j, arg in ipairs(ARGV) do
+                    local zkey = string.gsub(key, prefix, "")
+                    redis.call('ZREM', arg, zkey)
+                end
+            end
+            LUA;
+
+        $redis_connection->eval($lua_script, count($need_deleted_keys), ...$need_deleted_keys, ...[$cache_prefix, ...$cache_tags]);
 
         return true;
     }
