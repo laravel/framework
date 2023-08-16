@@ -680,6 +680,34 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(ContainerImplementationStub::class, $result);
     }
 
+    /**
+     * @test
+     * @group current
+     */
+    public function testContainerCanMakeAsFromAbstract()
+    {
+        $container = new Container;
+        $container->bind(ContainerConcreteStub::class, function () {
+            return new ContainerConcreteStub;
+        });
+
+        $this->assertInstanceOf(ContainerConcreteStub::class, $container->makeAs(ContainerConcreteStub::class));
+    }
+
+    /**
+     * @test
+     * @group current
+     */
+    public function testContainerCanMakeAsFromMagicString()
+    {
+        $container = new Container;
+        $container->bind('makeAs', function () {
+            return new ContainerConcreteStub;
+        });
+
+        $this->assertInstanceOf(ContainerConcreteStub::class, $container->makeAs('makeAs', [],ContainerConcreteStub::class ));
+    }
+
     // public function testContainerCanCatchCircularDependency()
     // {
     //     $this->expectException(\Illuminate\Contracts\Container\CircularDependencyException::class);
