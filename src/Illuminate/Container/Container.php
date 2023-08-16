@@ -737,7 +737,7 @@ class Container implements ArrayAccess, ContainerContract
      * @template TAbstract of object
      * @template TExpected of object
      *
-     * @param  $abstract
+     * @param  string|callable  $abstract
      * @param  array  $parameters
      * @param  class-string<TExpected>|null  $expected
      * @return ($abstract is class-string<TAbstract> ? ($expected is null ? TAbstract : TExpected) : TExpected)
