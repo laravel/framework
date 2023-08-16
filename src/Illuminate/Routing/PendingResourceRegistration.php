@@ -115,6 +115,19 @@ class PendingResourceRegistration
     }
 
     /**
+     * Set the route name for all resource routes.
+     *
+     * @param  string  $name
+     * @return \Illuminate\Routing\PendingResourceRegistration
+     */
+    public function named($name)
+    {
+        $this->options['named'] = $name;
+
+        return $this;
+    }
+
+    /**
      * Override the route parameter names.
      *
      * @param  array|string  $parameters
