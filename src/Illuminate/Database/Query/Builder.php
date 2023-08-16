@@ -2456,11 +2456,12 @@ class Builder implements BuilderContract
      *
      * @param  int  $perPage
      * @param  int|null  $lastId
-     * @param  string  $column
+     * @param  string|null  $column
      * @return $this
      */
-    public function forPageBeforeId($perPage = 15, $lastId = 0, $column = 'id')
+    public function forPageBeforeId($perPage = 15, $lastId = 0, $column = null)
     {
+        $column ??= $this->defaultKeyName();
         $this->orders = $this->removeExistingOrdersFor($column);
 
         if (! is_null($lastId)) {
@@ -2476,11 +2477,12 @@ class Builder implements BuilderContract
      *
      * @param  int  $perPage
      * @param  int|null  $lastId
-     * @param  string  $column
+     * @param  string|null  $column
      * @return $this
      */
-    public function forPageAfterId($perPage = 15, $lastId = 0, $column = 'id')
+    public function forPageAfterId($perPage = 15, $lastId = 0, $column = null)
     {
+        $column ??= $this->defaultKeyName();
         $this->orders = $this->removeExistingOrdersFor($column);
 
         if (! is_null($lastId)) {
@@ -2655,7 +2657,7 @@ class Builder implements BuilderContract
      */
     public function find($id, $columns = ['*'])
     {
-        return $this->where('id', '=', $id)->first($columns);
+        return $this->where($this->defaultKeyName(), '=', $id)->first($columns);
     }
 
     /**
