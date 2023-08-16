@@ -99,6 +99,7 @@ trait HasEvents
                 'retrieved', 'creating', 'created', 'updating', 'updated',
                 'saving', 'saved', 'restoring', 'restored', 'replicating',
                 'deleting', 'deleted', 'forceDeleting', 'forceDeleted',
+                'touching', 'touched',
             ],
             $this->observables
         );
@@ -335,6 +336,28 @@ trait HasEvents
     public static function deleted($callback)
     {
         static::registerModelEvent('deleted', $callback);
+    }
+
+    /**
+     * Register a touching model event with the dispatcher.
+     *
+     * @param  \Illuminate\Events\QueuedClosure|\Closure|string|array  $callback
+     * @return void
+     */
+    public static function touching($callback)
+    {
+        static::registerModelEvent('touching', $callback);
+    }
+
+    /**
+     * Register a touched model event with the dispatcher.
+     *
+     * @param  \Illuminate\Events\QueuedClosure|\Closure|string|array  $callback
+     * @return void
+     */
+    public static function touched($callback)
+    {
+        static::registerModelEvent('touched', $callback);
     }
 
     /**

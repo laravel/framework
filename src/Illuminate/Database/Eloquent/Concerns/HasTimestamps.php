@@ -30,17 +30,20 @@ trait HasTimestamps
     {
         if ($attribute) {
             $this->$attribute = $this->freshTimestamp();
-
-            return $this->save();
+        } elseif (! $this->usesTimestamps()) {
+            return false;
+        } else {
+            $this->updateTimestamps();
         }
 
-        if (! $this->usesTimestamps()) {
+        // If the touching event returns false, we will cancel the touch operation so
+        // developers can hook Validation systems into their models and cancel this
+        // operation if the model does not pass validation. Otherwise, we touch.
+        if ($this->fireModelEvent('touching') === false) {
             return false;
         }
 
-        $this->updateTimestamps();
-
-        return $this->save();
+        return tap($this->save(), fn () => $this->fireModelEvent('touched', false));
     }
 
     /**

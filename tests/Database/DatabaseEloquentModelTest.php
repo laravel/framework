@@ -2123,6 +2123,40 @@ class DatabaseEloquentModelTest extends TestCase
         $model->touchOwners();
     }
 
+    public function testTouchingAndTouchedEventsAreFired()
+    {
+        $model = $this->getMockBuilder(EloquentModelStub::class)->onlyMethods(['newModelQuery', 'updateTimestamps'])->getMock();
+        $model->exists = true;
+        $model->id = 1;
+        $model->syncOriginalAttribute('id');
+
+        $model->setEventDispatcher($events = m::mock(Dispatcher::class));
+
+        $events->shouldReceive('until')->once()->with('eloquent.touching: '.get_class($model), $model)->andReturn(true);
+        $events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
+        $events->shouldReceive('dispatch')->once()->with('eloquent.saved: '.get_class($model), $model)->andReturn(true);
+        $events->shouldReceive('dispatch')->once()->with('eloquent.touched: '.get_class($model), $model)->andReturn(true);
+
+        $this->assertTrue($model->touch());
+    }
+
+    public function testTouchIsCanceledIfTouchingEventReturnsFalse()
+    {
+        $model = $this->getMockBuilder(EloquentModelStub::class)->onlyMethods(['newModelQuery'])->getMock();
+        $model->exists = true;
+        $model->id = 1;
+        $model->syncOriginalAttribute('id');
+
+        $model->setEventDispatcher($events = m::mock(Dispatcher::class));
+
+        $events->shouldReceive('until')->once()->with('eloquent.touching: '.get_class($model), $model)->andReturn(false);
+        $events->shouldReceive('until')->never()->with('eloquent.saving: '.get_class($model), $model);
+        $events->shouldReceive('dispatch')->never()->with('eloquent.saved: '.get_class($model), $model);
+        $events->shouldReceive('dispatch')->never()->with('eloquent.touched: '.get_class($model), $model);
+
+        $this->assertFalse($model->touch());
+    }
+
     public function testModelAttributesAreCastedWhenPresentInCastsArray()
     {
         $model = new EloquentModelCastingStub;
