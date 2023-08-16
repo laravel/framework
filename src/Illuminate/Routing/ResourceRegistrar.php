@@ -651,7 +651,7 @@ class ResourceRegistrar
         // so the names may be specified on a more "granular" level using methods.
         if (isset($options['named'])) {
             $name = $options['named'];
-        } else if (isset($options['names'])) {
+        } elseif (isset($options['names'])) {
             if (is_string($options['names'])) {
                 $name = $options['names'];
             } elseif (isset($options['names'][$method])) {
