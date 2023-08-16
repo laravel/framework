@@ -33,6 +33,25 @@ class Benchmark
     }
 
     /**
+     * Measure a callable once and return the duration and result.
+     *
+     * @template TReturn of mixed
+     *
+     * @param  (callable(): TReturn)  $callback
+     * @return array{0: float, 1: TReturn}
+     */
+    public static function once(callable $callback): array
+    {
+        gc_collect_cycles();
+
+        $start = hrtime(true);
+
+        $result = $callback();
+
+        return [(hrtime(true) - $start) / 1000000, $result];
+    }
+
+    /**
      * Measure a callable or array of callables over the given number of iterations, then dump and die.
      *
      * @param  \Closure|array  $benchmarkables
