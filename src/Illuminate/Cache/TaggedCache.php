@@ -2,6 +2,8 @@
 
 namespace Illuminate\Cache;
 
+use Illuminate\Cache\Events\KeyForgotten;
+use Illuminate\Cache\Events\KeyWritten;
 use Illuminate\Contracts\Cache\Store;
 
 class TaggedCache extends Repository
@@ -16,6 +18,12 @@ class TaggedCache extends Repository
      * @var \Illuminate\Cache\TagSet
      */
     protected $tags;
+
+    /**
+     * List of keys within this namespace
+     * @var array
+     */
+    protected $itemKeys = [];
 
     /**
      * Create a new tagged cache instance.
@@ -78,6 +86,8 @@ class TaggedCache extends Repository
      */
     public function flush()
     {
+        array_walk($this->itemKeys, [$this->store, 'forget']);
+        $this->itemKeys = [];
         $this->tags->reset();
 
         return true;
@@ -110,6 +120,14 @@ class TaggedCache extends Repository
      */
     protected function event($event)
     {
+        $itemKey = $this->itemKey($event->key);
+        if ($event instanceof KeyWritten && !in_array($itemKey, $this->itemKeys)) {
+            $this->itemKeys[] = $itemKey;
+        } elseif ($event instanceof KeyForgotten && in_array($itemKey, $this->itemKeys)) {
+            $this->itemKeys = array_values(array_filter($this->itemKeys, function ($k) use ($itemKey) {
+                return $k !== $itemKey;
+            }));
+        }
         parent::event($event->setTags($this->tags->getNames()));
     }
 
