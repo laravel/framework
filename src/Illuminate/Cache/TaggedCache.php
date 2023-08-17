@@ -21,6 +21,7 @@ class TaggedCache extends Repository
 
     /**
      * List of keys within this namespace
+     *
      * @var array
      */
     protected $itemKeys = [];
@@ -121,7 +122,7 @@ class TaggedCache extends Repository
     protected function event($event)
     {
         $itemKey = $this->itemKey($event->key);
-        if ($event instanceof KeyWritten && !in_array($itemKey, $this->itemKeys)) {
+        if ($event instanceof KeyWritten && ! in_array($itemKey, $this->itemKeys)) {
             $this->itemKeys[] = $itemKey;
         } elseif ($event instanceof KeyForgotten && in_array($itemKey, $this->itemKeys)) {
             $this->itemKeys = array_values(array_filter($this->itemKeys, function ($k) use ($itemKey) {
