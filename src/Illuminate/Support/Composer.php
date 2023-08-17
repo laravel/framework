@@ -2,7 +2,10 @@
 
 namespace Illuminate\Support;
 
+use Closure;
 use Illuminate\Filesystem\Filesystem;
+use RuntimeException;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 
@@ -128,5 +131,91 @@ class Composer
         }
 
         return explode(' ', $output)[2] ?? null;
+    }
+
+    /**
+     * Installs the given Composer Packages into the application.
+     *
+     * @param  array<int, string>  $packages
+     * @param  bool  $asDev
+     * @param  \Closure|\Symfony\Component\Console\Output\OutputInterface|null  $output
+     * @return bool
+     */
+    protected function requirePackages(array $packages, bool $asDev = false, Closure|OutputInterface $output = null)
+    {
+        $composer = $this->findComposer();
+        $command = explode(' ', $composer);
+        array_push($command, 'require');
+
+        $command = array_merge(
+            $command,
+            $packages,
+            $asDev ? ['--dev'] : [],
+        );
+
+        return 0 === (new Process($command, cwd: $this->workingPath, env: ['COMPOSER_MEMORY_LIMIT' => '-1']))
+            ->setTimeout(null)
+            ->run(
+                $output instanceof OutputInterface
+                    ? function ($type, $line) use ($output) {
+                        $output->write('    '.$line);
+                    } : $output
+            );
+    }
+
+    /**
+     * Removes the given Composer Packages from the application.
+     *
+     * @param  array<int, string>  $packages
+     * @param  bool  $asDev
+     * @param  \Closure|\Symfony\Component\Console\Output\OutputInterface|null  $output
+     * @return bool
+     */
+    protected function removePackages(array $packages, bool $asDev = false, Closure|OutputInterface $output = null)
+    {
+        $composer = $this->findComposer();
+        $command = explode(' ', $composer);
+        array_push($command, 'remove');
+
+        $command = array_merge(
+            $command,
+            $packages,
+            $asDev ? ['--dev'] : [],
+        );
+
+        return 0 === (new Process($command, cwd: $this->workingPath, env: ['COMPOSER_MEMORY_LIMIT' => '-1']))
+            ->setTimeout(null)
+            ->run(
+                $output instanceof OutputInterface
+                    ? function ($type, $line) use ($output) {
+                        $output->write('    '.$line);
+                    } : $output
+            );
+    }
+
+    /**
+     * Modify composer content.
+     *
+     * @param  callable(array):array  $callback
+     * @return void
+     *
+     * @throw \RuntimeException
+     */
+    public function modify(callable $callback)
+    {
+        $composerFile = "{$this->workingPath}/composer.json";
+
+        if (! file_exists($composerFile)) {
+            throw new RuntimeException("Unable to locate `composer.json` from [{$this->workingPath}]");
+        }
+
+        $composer = json_decode(file_get_contents($composerFile), true, 512, JSON_THROW_ON_ERROR);
+
+        $composer = call_user_func($callback, $composer);
+
+        file_put_contents(
+            $composerFile,
+            json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+        );
     }
 }
