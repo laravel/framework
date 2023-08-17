@@ -38,9 +38,9 @@ class Benchmark
      * @template TReturn of mixed
      *
      * @param  (callable(): TReturn)  $callback
-     * @return array{0: float, 1: TReturn}
+     * @return array{0: TReturn, 1: float}
      */
-    public static function once(callable $callback): array
+    public static function value(callable $callback): array
     {
         gc_collect_cycles();
 
@@ -48,7 +48,7 @@ class Benchmark
 
         $result = $callback();
 
-        return [(hrtime(true) - $start) / 1000000, $result];
+        return [$result, (hrtime(true) - $start) / 1000000];
     }
 
     /**
