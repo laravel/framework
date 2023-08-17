@@ -20,7 +20,7 @@ class TaggedCache extends Repository
     protected $tags;
 
     /**
-     * List of keys within this namespace
+     * List of keys within this namespace.
      *
      * @var array
      */
