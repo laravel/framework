@@ -19,6 +19,7 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
         {--table= : The table to migrate}
         {--path= : The location where the migration file should be created}
         {--realpath : Indicate any provided migration file paths are pre-resolved absolute paths}
+        {--stubpath : The location where the stub file should be loaded}
         {--fullpath : Output the full path of the migration (Deprecated)}';
 
     /**
@@ -103,13 +104,19 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
      * @param  string  $name
      * @param  string  $table
      * @param  bool  $create
+     *
      * @return void
      */
     protected function writeMigration($name, $table, $create)
     {
-        $file = $this->creator->create(
-            $name, $this->getMigrationPath(), $table, $create
-        );
+        $file = $this->creator
+            ->withStubPath($this->input->getOption('stubpath') ?? null)
+            ->create(
+                $name,
+                $this->getMigrationPath(),
+                $table,
+                $create
+            );
 
         $this->components->info(sprintf('Migration [%s] created successfully.', $file));
     }

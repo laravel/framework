@@ -228,4 +228,18 @@ class MigrationCreator
     {
         return $this->files;
     }
+
+    /**
+     * Allow overriding the custom stub path at execution time
+     *
+     * @return self
+     */
+    public function withStubPath(?string $path)
+    {
+        if ($path !== null) {
+            $this->customStubPath = $path;
+        }
+
+        return $this;
+    }
 }
