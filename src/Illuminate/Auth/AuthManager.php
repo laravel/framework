@@ -169,7 +169,8 @@ class AuthManager implements FactoryContract
             $this->app['request'],
             $config['input_key'] ?? 'api_token',
             $config['storage_key'] ?? 'api_token',
-            $config['hash'] ?? false
+            $config['hash'] ?? false,
+            $config['hash_algo'] ?? 'sha256'
         );
 
         $this->app->refresh('request', $guard, 'setRequest');

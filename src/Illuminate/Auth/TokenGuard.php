@@ -39,6 +39,13 @@ class TokenGuard implements Guard
     protected $hash = false;
 
     /**
+     * The algorithm to be used for API token hashing if enabled.
+     *
+     * @var string
+     */
+    protected $hashAlgorithm;
+
+    /**
      * Create a new authentication guard.
      *
      * @param  \Illuminate\Contracts\Auth\UserProvider  $provider
@@ -46,6 +53,7 @@ class TokenGuard implements Guard
      * @param  string  $inputKey
      * @param  string  $storageKey
      * @param  bool  $hash
+     * @param  string  $hashAlgorithm
      * @return void
      */
     public function __construct(
@@ -53,9 +61,11 @@ class TokenGuard implements Guard
         Request $request,
         $inputKey = 'api_token',
         $storageKey = 'api_token',
-        $hash = false)
+        $hash = false,
+        $hashAlgorithm = 'sha256')
     {
         $this->hash = $hash;
+        $this->hashAlgorithm = $hashAlgorithm;
         $this->request = $request;
         $this->provider = $provider;
         $this->inputKey = $inputKey;
@@ -82,7 +92,7 @@ class TokenGuard implements Guard
 
         if (! empty($token)) {
             $user = $this->provider->retrieveByCredentials([
-                $this->storageKey => $this->hash ? hash('sha256', $token) : $token,
+                $this->storageKey => $this->hash ? hash($this->hashAlgorithm, $token) : $token,
             ]);
         }
 
