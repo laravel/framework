@@ -465,6 +465,72 @@ class RouteRegistrarTest extends TestCase
         );
     }
 
+    public function testCanInferActionFromUri()
+    {
+        $this->router->controller(UserController::class)->group(function ($router) {
+            $router->get('me');
+        });
+
+        $this->assertSame(
+            UserController::class.'@me',
+            $this->getRoute()->getAction()['uses']
+        );
+    }
+
+    public function testCanInferActionFromNestedPath()
+    {
+        $this->router->controller(UserController::class)->group(function ($router) {
+            $router->post('users/invite');
+        });
+
+        $this->assertSame(
+            UserController::class.'@invite',
+            $this->getRoute()->getAction()['uses']
+        );
+    }
+
+    public function testCanTurnInferredActionsIntoCamelCase()
+    {
+        $this->router->controller(UserController::class)->group(function ($router) {
+            $router->post('reset-password');
+        });
+
+        $this->assertSame(
+            UserController::class.'@resetPassword',
+            $this->getRoute()->getAction()['uses']
+        );
+    }
+
+    public function testCanInferActionFromTheLatestGroupController()
+    {
+        $this->router->controller(RouteRegistrarControllerStub::class)->group(function ($router) {
+            $router->controller(UserController::class)->group(function ($router) {
+                $router->get('me');
+            });
+        });
+
+        $this->assertSame(
+            UserController::class.'@me',
+            $this->getRoute()->getAction()['uses']
+        );
+    }
+
+    public function testCanInferActionFromTheLastGroupWithController()
+    {
+        $this->router->controller(UserController::class)->group(function ($router) {
+            $router->middleware('auth')->group(function ($router) {
+                $router->prefix('users')->group(function ($router) {
+                    $router->get('me');
+                });
+            });
+        });
+
+        $this->assertSame(
+            UserController::class.'@me',
+            $this->getRoute()->getAction()['uses']
+        );
+    }
+
     public function testRouteGroupingWithoutPrefix()
     {
         $this->router->group([], function ($router) {

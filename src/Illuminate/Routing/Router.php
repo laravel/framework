@@ -548,6 +548,7 @@ class Router implements BindingRegistrar, RegistrarContract
         // an acceptable array format before registering it and creating this route
         // instance itself. We need to build the Closure that will call this out.
         if ($this->actionReferencesController($action)) {
+            $action ??= Str::of($uri)->afterLast('/')->camel()->value();
             $action = $this->convertToControllerAction($action);
         }
 
@@ -575,6 +576,10 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     protected function actionReferencesController($action)
     {
+        if ($action === null && (end($this->groupStack)['controller'] ?? false)) {
+            return true;
+        }
+
         if (! $action instanceof Closure) {
             return is_string($action) || (isset($action['uses']) && is_string($action['uses']));
         }
