@@ -395,10 +395,10 @@ trait QueriesRelationships
      *
      * @param  string  $relation
      * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
-     * @param  array  $value
+     * @param  array|null  $value
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
-    public function whereRelationIn($relation, $column, $value)
+    public function whereRelationIn($relation, $column, $value = null)
     {
         return $this->whereHas($relation, function ($query) use ($column, $value) {
             if ($column instanceof Closure) {
@@ -434,10 +434,10 @@ trait QueriesRelationships
      *
      * @param  string  $relation
      * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
-     * @param  array  $value
+     * @param  array|null  $value
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
-    public function orWhereRelationIn($relation, $column, $value)
+    public function orWhereRelationIn($relation, $column, $value = null)
     {
         return $this->orWhereHas($relation, function ($query) use ($column, $value) {
             if ($column instanceof Closure) {
