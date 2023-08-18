@@ -242,6 +242,23 @@ trait EnumeratesValues
     }
 
     /**
+     * Execute a callback over each item, but not stopping at an exception.
+     *
+     * @param  callable(TValue, TKey): mixed  $callback
+     * @return $this
+     */
+    public function tryEach(callable $callback)
+    {
+        foreach ($this as $key => $item) {
+            if (rescue(static fn () => $callback($item, $key)) === false) {
+                break;
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Execute a callback over each nested chunk of items.
      *
      * @param  callable(...mixed): mixed  $callback
