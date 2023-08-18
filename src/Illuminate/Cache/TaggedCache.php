@@ -126,7 +126,7 @@ class TaggedCache extends Repository
         $itemKey = $this->itemKey($event->key);
         if ($itemKey !== $this->getMetadataKey() && ($event instanceof KeyWritten || $event instanceof KeyForgotten)) {
             $itemKeys = $this->getItemKeys();
-            if ($event instanceof KeyWritten && !in_array($itemKey, $itemKeys)) {
+            if ($event instanceof KeyWritten && ! in_array($itemKey, $itemKeys)) {
                 $itemKeys[] = $itemKey;
             } elseif ($event instanceof KeyForgotten && in_array($itemKey, $this->itemKeys)) {
                 $itemKeys = array_values(
