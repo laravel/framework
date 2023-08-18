@@ -391,6 +391,25 @@ trait QueriesRelationships
     }
 
     /**
+     * Add a basic where in clause to a relationship query.
+     *
+     * @param  string  $relation
+     * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  array  $value
+     * @return \Illuminate\Database\Eloquent\Builder|static
+     */
+    public function whereRelationIn($relation, $column, $value)
+    {
+        return $this->whereHas($relation, function ($query) use ($column, $value) {
+            if ($column instanceof Closure) {
+                $column($query);
+            } else {
+                $query->whereIn($column, $value);
+            }
+        });
+    }
+
+    /**
      * Add an "or where" clause to a relationship query.
      *
      * @param  string  $relation
@@ -406,6 +425,25 @@ trait QueriesRelationships
                 $column($query);
             } else {
                 $query->where($column, $operator, $value);
+            }
+        });
+    }
+
+    /**
+     * Add an "or where in" clause to a relationship query.
+     *
+     * @param  string  $relation
+     * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  array  $value
+     * @return \Illuminate\Database\Eloquent\Builder|static
+     */
+    public function orWhereRelationIn($relation, $column, $value)
+    {
+        return $this->orWhereHas($relation, function ($query) use ($column, $value) {
+            if ($column instanceof Closure) {
+                $column($query);
+            } else {
+                $query->whereIn($column, $value);
             }
         });
     }
