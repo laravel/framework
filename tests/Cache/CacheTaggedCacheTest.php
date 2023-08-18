@@ -203,6 +203,19 @@ class CacheTaggedCacheTest extends TestCase
         $this->assertSame('bar', $store->tags($tags)->get('foo'));
     }
 
+    public function testFlushFunctionDoesntLeakMemory()
+    {
+        $store = new ArrayStore;
+        $tags = ['bop'];
+        $before = memory_get_usage(true);
+        for ($i = 0; $i < 100; $i++) {
+            $store->tags($tags)->forever('foo', 'bar');
+            $store->tags($tags)->flush();
+        }
+        $after = memory_get_usage(true);
+        $this->assertSame($before, $after);
+    }
+
     private function getTestCacheStoreWithTagValues(): ArrayStore
     {
         $store = new ArrayStore;

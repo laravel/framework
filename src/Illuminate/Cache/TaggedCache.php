@@ -87,8 +87,10 @@ class TaggedCache extends Repository
      */
     public function flush()
     {
-        array_walk($this->itemKeys, [$this->store, 'forget']);
-        $this->itemKeys = [];
+        foreach ($this->getItemKeys() as $key) {
+            $this->store->forget($key);
+        }
+        $this->store->forget($this->getMetadataKey());
         $this->tags->reset();
 
         return true;
@@ -122,14 +124,41 @@ class TaggedCache extends Repository
     protected function event($event)
     {
         $itemKey = $this->itemKey($event->key);
-        if ($event instanceof KeyWritten && ! in_array($itemKey, $this->itemKeys)) {
-            $this->itemKeys[] = $itemKey;
-        } elseif ($event instanceof KeyForgotten && in_array($itemKey, $this->itemKeys)) {
-            $this->itemKeys = array_values(array_filter($this->itemKeys, function ($k) use ($itemKey) {
-                return $k !== $itemKey;
-            }));
+        if ($itemKey !== $this->getMetadataKey() && ($event instanceof KeyWritten || $event instanceof KeyForgotten)) {
+            $itemKeys = $this->getItemKeys();
+            if ($event instanceof KeyWritten && !in_array($itemKey, $itemKeys)) {
+                $itemKeys[] = $itemKey;
+            } elseif ($event instanceof KeyForgotten && in_array($itemKey, $this->itemKeys)) {
+                $itemKeys = array_values(
+                    array_filter($itemKeys, function ($k) use ($itemKey) {
+                        return $k !== $itemKey;
+                    })
+                );
+            }
+            $this->putItemKeys($itemKeys);
         }
         parent::event($event->setTags($this->tags->getNames()));
+    }
+
+    private function getMetadataKey(): string
+    {
+        return $this->taggedItemKey('meta:keys');
+    }
+
+    private function getItemKeys(): array
+    {
+        $metadataKey = $this->getMetadataKey();
+        $keys = $this->store->get($metadataKey);
+        if (! is_array($keys)) {
+            $keys = [];
+        }
+        return $keys;
+    }
+
+    private function putItemKeys(array $keys): void
+    {
+        $metadataKey = $this->getMetadataKey();
+        $this->store->forever($metadataKey, $keys);
     }
 
     /**
